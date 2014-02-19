@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<security:http pattern="/assets/**" security="none" />
+	<security:http access-denied-page="/error/handle/403"
+		entry-point-ref="entryPoint" access-decision-manager-ref="accessDecisionManager">
+		<security:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userManager"/>
+		<security:intercept-url pattern="/common/**"
+			access="ROLE_ADMINISTRATOR" />
+		<security:intercept-url pattern="/remoting/**"
+			access="ROLE_BUILTIN_ANONYMOUS" />
+		<security:intercept-url pattern="/setup"
+			access="ROLE_BUILTIN_ANONYMOUS" />
+		<security:intercept-url pattern="/signup*/**"
+			access="ROLE_BUILTIN_ANONYMOUS" />
+		<security:intercept-url pattern="/login"
+			access="ROLE_BUILTIN_USER,ROLE_BUILTIN_ANONYMOUS" />
+		<security:intercept-url pattern="/oauth*/**"
+			access="ROLE_BUILTIN_USER,ROLE_BUILTIN_ANONYMOUS" />
+		<security:intercept-url pattern="/locale"
+			access="ROLE_BUILTIN_USER,ROLE_BUILTIN_ANONYMOUS" />
+		<security:intercept-url pattern="/**"
+			access="ROLE_BUILTIN_USER" />
+		<security:session-management
+			session-fixation-protection="migrateSession" />
+		<security:remember-me services-ref="rememberMeServices" />
+		<security:anonymous granted-authority="ROLE_BUILTIN_ANONYMOUS"
+			username="anonymousUser" key="anonymous" />
+		<security:logout logout-url="/logout"
+			invalidate-session="true" success-handler-ref="logoutSuccessHandler" />
+		<security:custom-filter ref="authenticationFilter"
+			position="FORM_LOGIN_FILTER" />
+		<!-- <security:intercept-url pattern="/switch" access="ROLE_ADMINISTRATOR"/> 
+			<security:intercept-url pattern="/exit" access="ROLE_PREVIOUS_ADMINISTRATOR"/> 
+			<security:custom-filter ref="switchUserProcessingFilter" position="SWITCH_USER_FILTER"/> -->
+	</security:http>
+
+</beans>

@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS ironrhino;
+CREATE DATABASE "ironrhino" WITH TEMPLATE template0 OWNER "postgres" ENCODING 'UTF-8' LC_COLLATE = 'zh_CN.UTF-8' LC_CTYPE = 'zh_CN.UTF-8';

@@ -1,0 +1,71 @@
+#_window_ form{
+	padding-top : 20px;
+}
+#_window_ form textarea.input-xxlarge,#_window_ form input.input-xxlarge {
+	width: 515px;
+}
+table.richtable thead {
+	background: #DEDEDE;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EFEFEF), to(#EFEFEF), color-stop(.5,#DEDEDE));
+	background: -moz-linear-gradient(center top , #EFEFEF, #DEDEDE, #EFEFEF);
+	background: -o-linear-gradient(top,  #EFEFEF, #DEDEDE, #EFEFEF);
+	background: -ms-linear-gradient(top, #EFEFEF, #DEDEDE, #EFEFEF);
+	background: linear-gradient(to bottom, #EFEFEF, #DEDEDE, #EFEFEF);
+}
+table.richtable td,table.richtable th {
+	padding: 0.5em;
+	height: 30px;
+	vertical-align: middle;
+	word-break: break-all;
+}
+table.richtable th {
+	min-width: 50px;
+	padding: 0.5em 0;
+	line-height: 200%;
+}
+table.richtable th.checkbox,table.richtable th.radio {
+	max-width: 50px;
+	width: 50px;
+}
+table.richtable td {
+	word-wrap: break-all;
+	white-space: pre-wrap;
+}
+.richtable th {
+	text-align: center;
+}
+.richtable table td.action{
+	white-space:nowrap;
+	overflow:hidden;
+}
+.richtable tbody input.text,.richtable tbody textarea.text {
+	width: 90%;
+	width: calc(100% - 13px);
+	margin: 0;
+}
+.richtable tbody input.radio {
+	width: auto;
+	margin: 0;
+}
+.richtable tbody select {
+	width: 95%;
+	width: calc(100% - 13px);
+	margin: 0;
+	padding-left: 0;
+}
+.richtable tr.selected td {
+	background-color: #FFC !important;
+}
+.richtable td.edited{
+	background-color: #fff3f0 !important;
+}
+table.richtable a .glyphicon {
+	color: #404040;
+}
+table.richtable a:hover .glyphicon ,table.richtable a:focus .glyphicon  {
+	color: #005580;
+}
+.toolbar .btn[data-shown],.toolbar .btn[data-action="save"]{
+	display: none;
+}
+/*override bootstrap end*/

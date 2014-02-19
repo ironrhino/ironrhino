@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="ironrhino" default="jar" basedir=".">
+
+	<property name="version" value="1.0" />
+	<property name="src.dir" location="${basedir}/src" />
+	<property name="webapp.dir" location="${basedir}/webapp" />
+	<property name="lib.dir" location="${basedir}/lib" />
+	<property name="classes.dir" location="${webapp.dir}/WEB-INF/classes" />
+	<property name="target.dir" location="${basedir}/target" />
+	<property name="test.dir" location="${basedir}/test" />
+	<property name="test.src.dir" location="${basedir}/test/src" />
+	<property name="test.classes.dir" location="${basedir}/test/classes" />
+	<property name="test.results.dir" location="${basedir}/test/results" />
+	<property name="war.name" value="ironrhino.war" />
+
+	<path id="lib.classpath">
+		<fileset dir="${webapp.dir}/WEB-INF/lib">
+					<include name="*.jar" />
+				</fileset>
+		<fileset dir="${lib.dir}">
+			<exclude name="closure*.jar" />
+			<exclude name="yuicompressor*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+		<mkdir dir="${target.dir}" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${test.classes.dir}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${classes.dir}" />
+		<delete dir="${test.classes.dir}" />
+	</target>
+
+	<target name="compile">
+		<antcall target="clean" />
+		<antcall target="init" />
+		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${src.dir}" destdir="${classes.dir}" encoding="utf-8">
+			<classpath refid="lib.classpath" />
+			<compilerarg line="-Xlint:unchecked" />
+		</javac>
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="test" depends="compile">
+		<mkdir dir="${test.classes.dir}" />
+		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${test.src.dir}" destdir="${test.classes.dir}" encoding="UTF-8">
+			<classpath>
+				<path refid="lib.classpath" />
+				<pathelement location="${classes.dir}" />
+			</classpath>
+		</javac>
+		<copy todir="${test.classes.dir}">
+			<fileset dir="${test.src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<mkdir dir="${test.results.dir}" />
+		<junit haltonfailure="no" printsummary="on">
+			<classpath>
+				<path refid="lib.classpath" />
+				<pathelement location="${classes.dir}" />
+				<pathelement location="${test.classes.dir}" />
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<formatter type="plain" />
+			<formatter type="xml" />
+			<batchtest todir="${test.results.dir}">
+				<fileset dir="${test.classes.dir}" includes="**/*Test.class" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<import file="build.jar.xml" />
+
+	<import file="build.compress.xml" />
+
+	<target name="dist">
+		<antcall target="compile" />
+		<antcall target="jar" />
+	</target>
+
+	<target name="create" depends="dist">
+		<script language="javascript">
+			<![CDATA[
+			importPackage(java.io);
+			var version = project.getProperty('version');
+			if(!version)
+				version = '1.0';
+			var projectName = project.getProperty('project.name');
+			if(!projectName)
+				projectName = 'sample';
+			var projectPackage = project.getProperty('project.basePackage');
+			if(!projectPackage)
+				projectPackage = 'com.' + projectName;
+			var features = project.getProperty('project.features')||'';
+			var basedir = project.getProperty('basedir');
+			var projectDir = basedir + '/../' + projectName;
+			var projectSrc = projectDir + '/src';
+			var testSrc = projectDir + '/test/src';
+			var projectLib = projectDir + '/lib';
+			var webappLib = projectDir + '/webapp/WEB-INF/lib';
+			var mkdir = project.createTask('mkdir');
+			mkdir.setDir(new File(projectDir));
+			mkdir.perform();
+			mkdir.setDir(new File(projectSrc+'/'+new java.lang.String(projectPackage).replaceAll('\\.','/')));
+			mkdir.perform();
+			mkdir.setDir(new File(projectSrc+'/'+new java.lang.String(projectPackage).replaceAll('\\.','/')+'/model'));
+			mkdir.perform();
+			mkdir.setDir(new File(projectSrc+'/'+new java.lang.String(projectPackage).replaceAll('\\.','/')+'/service'));
+			mkdir.perform();
+			mkdir.setDir(new File(projectSrc+'/'+new java.lang.String(projectPackage).replaceAll('\\.','/')+'/action'));
+			mkdir.perform();
+			mkdir.setDir(new File(testSrc+'/'+new java.lang.String(projectPackage).replaceAll('\\.','/')+'/test'));
+			mkdir.perform();
+			mkdir.setDir(new File(projectLib));
+			mkdir.perform();
+			mkdir.setDir(new File(webappLib));
+			mkdir.perform();
+			var file = new File(projectSrc+'/'+new java.lang.String(projectPackage).replaceAll('\\.','/')+'/package-info.java');
+			if(!file.exists()){
+				var echo = project.createTask("echo");
+				echo.setFile(file);
+				echo.setMessage('@AutoConfig(namespace = "/")\npackage '+projectPackage+';\nimport org.ironrhino.core.metadata.AutoConfig;');
+				echo.perform();
+			}
+			var file = new File(projectSrc+'/resources/i18n/'+projectName+'/messages_zh_CN.properties');
+			if(!file.exists()){
+				echo = project.createTask("echo");
+				echo.setFile(file);
+				echo.setMessage('#'+projectName+'='+projectName);
+				echo.perform();
+			}
+			var copy = project.createTask('copy');
+			var fs = project.createDataType('fileset');
+			fs.setDir(new File(basedir+'/.settings'));
+			fs.setIncludes('*');
+			copy.addFileset(fs);
+			copy.setTodir(new File(projectDir+'/.settings'));
+			copy.perform();
+			copy = project.createTask('copy');
+			fs = project.createDataType('fileset');
+			fs.setDir(new File(basedir+'/lib'));
+			fs.setIncludes('*.jar');
+			copy.addFileset(fs);
+			copy.setTodir(new File(projectLib));
+			copy.perform();
+			copy = project.createTask('copy');
+			fs = project.createDataType('fileset');
+			fs.setDir(new File(basedir+'/webapp/WEB-INF/lib'));
+			fs.setIncludes('*.jar');
+			var excludes = '';
+			if(features.indexOf('search')<0)
+				excludes+='elasticsearch-*.jar,lucene-*.jar,mmseg4j-*.jar,';
+			if(features.indexOf('redis')<0)
+				excludes+='jedis-*.jar,commons-pool-*.jar,spring-data-redis-*.jar,';
+			if(features.indexOf('rabbitmq')<0)
+				excludes+='rabbitmq-client-*.jar,spring-rabbit-*.jar,spring-amqp-*.jar,';
+			if(features.indexOf('mongodb')<0)
+				excludes+='mongo-java-driver-*.jar,spring-data-mongodb-*.jar,spring-data-commons-*.jar,';
+			if(features.indexOf('zookeeper')<0)
+				excludes+='zookeeper-*.jar,curator-*.jar,';
+			if(features.indexOf('jasperreports')<0)
+				excludes+='jasperreports-*.jar,commons-digester-*.jar,commons-collections-*.jar,dynamicreports-core-*.jar,poi-*.jar,iText*.jar,struts2-jasperreports-plugin-*.jar,';
+			if(features.indexOf('zxing')<0)
+				excludes+='zxing-*.jar,';
+			if(excludes)
+			fs.setExcludes(excludes);
+			copy.addFileset(fs);
+			copy.setTodir(new File(webappLib));
+			copy.perform();
+			copy = project.createTask('copy');
+			fs = project.createDataType('fileset');
+			fs.setDir(new File(basedir+'/target'));
+			var includes = 'ironrhino-assets-'+version+'.jar,ironrhino-core-'+version+'.jar,ironrhino-hibernate-config-'+version+'.jar,ironrhino-security-'+version+'.jar,ironrhino-security-config-'+version+'.jar,ironrhino-sitemesh-config-'+version+'.jar,';
+			if(features.indexOf('search')>=0)
+				includes += 'ironrhino-search-config-'+version+'.jar,';
+			if(features.indexOf('redis')>=0)
+				includes += 'ironrhino-redis-config-'+version+'.jar,';
+			if(features.indexOf('rabbitmq')>=0)
+				includes += 'ironrhino-rabbitmq-config-'+version+'.jar,';
+			if(features.indexOf('mongodb')>=0)
+				includes += 'ironrhino-mongodb-config-'+version+'.jar,';
+			if(features.indexOf('zookeeper')>=0)
+				includes += 'ironrhino-zookeeper-'+version+'.jar,';
+			if(features.indexOf('remoting')>=0)
+				includes += 'ironrhino-remoting-*-'+version+'.jar';
+			fs.setIncludes(includes);
+			copy.addFileset(fs);
+			copy.setTodir(new File(webappLib));
+			copy.perform();
+			file = new File(projectSrc+'/ironrhino.properties');
+			if(!file.exists()){
+				var echo = project.createTask("echo");
+				echo.setFile(new File(projectSrc+'/ironrhino.properties'));
+				echo.setMessage('app.name='+projectName+'\napp.basePackage='+projectPackage);
+				echo.perform();
+			}
+			file = new File(projectSrc+'/resources/view/decorator/include/nav.ftl');
+			if(!file.exists()){
+				echo = project.createTask("echo");
+				echo.setFile(file);
+				echo.setMessage('<ul class="nav">\n  <li><a href="<@url value="/"/>">${action.getText("index")}</a></li>\n  <@authorize ifAnyGranted="ROLE_ADMINISTRATOR">\n  <li><a href="<@url value="/user"/>">${action.getText("user")}</a></li>\n</@authorize>\n</ul>');
+				echo.perform();
+			}
+			copy = project.createTask("copy");
+			copy.setTofile(new File(projectDir+'/build.xml'));
+			copy.setFile(new File(basedir+'/build.project.xml'));
+			copy.perform();
+			copy.setTofile(new File(projectDir+'/.project'));
+			copy.setFile(new File(basedir+'/.project'));
+			copy.perform();
+			var replace = project.createTask("replace");
+			replace.setFile(new File(projectDir+'/.project'));
+			replace.setToken('ironrhino');
+			replace.setValue(projectName);
+			replace.perform();
+			var classpath = [];
+			classpath.push('<?xml version="1.0" encoding="UTF-8"?>');
+			classpath.push('<classpath>');
+			classpath.push('	<classpathentry kind="src" path="src"/>');
+			classpath.push('	<classpathentry kind="src" output="test/classes" path="test/src"/>');
+			classpath.push('	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>');
+			classpath.push('	<classpathentry kind="output" path="webapp/WEB-INF/classes"/>');
+			var files = new File(projectLib).listFiles();
+			for(var i=0;i<files.length;i++)
+				classpath.push('	<classpathentry kind="lib" path="lib/'+files[i].getName()+'"/>');
+			files = new File(webappLib).listFiles();
+			for(var i=0;i<files.length;i++)
+				classpath.push('	<classpathentry kind="lib" path="webapp/WEB-INF/lib/'+files[i].getName()+'"/>');
+			classpath.push('</classpath>');
+			file = new File(projectDir+'/.classpath');
+			if(!file.exists()){
+				echo = project.createTask("echo");
+				echo.setFile(file);
+				echo.setMessage(classpath.join('\n'));
+				echo.perform();
+			}
+			println('*********************************');
+			println('created project ['+projectName+'] at '+new File(projectDir).getCanonicalPath()+' ,you can import this project into eclipse .');
+			println('*********************************');
+			]]>
+		</script>
+	</target>
+
+</project>

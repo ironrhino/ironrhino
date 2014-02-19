@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans profile="dual,cloud,cluster" default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+	<rabbit:listener-container
+		connection-factory="rabbitConnectionFactory">
+		<rabbit:listener queue-names="org.ironrhino.core.mail.SimpleMailMessageWrapper"
+			ref="rabbitSimpleMailMessageWrapperQueue" method="consume" />
+	</rabbit:listener-container>
+	<bean id="rabbitSimpleMailMessageWrapperQueue"
+		class="org.ironrhino.core.mail.RabbitSimpleMailMessageWrapperQueue"
+		primary="true" />
+	<bean id="redisSimpleMailMessageWrapperQueue"
+		class="org.ironrhino.core.mail.RedisSimpleMailMessageWrapperQueue" />
+</beans>

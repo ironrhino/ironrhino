@@ -1,0 +1,2 @@
+<#macro printSetting key default="">${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('settingControl').getStringValue(key,default)!}</#macro>
+<#function getSetting key default=""><#return statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('settingControl').getStringValue(key,default)></#function>

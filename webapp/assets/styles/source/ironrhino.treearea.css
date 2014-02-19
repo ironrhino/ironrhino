@@ -1,0 +1,16 @@
+.treearea div.area{
+	border:solid 1px #ffc000;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	margin: 5px;
+}
+.treearea span {
+	display : block;
+	float: left;
+	margin: 5px;
+	cursor: pointer;
+}
+.treearea span.selected{
+	color: #ffc000;
+}

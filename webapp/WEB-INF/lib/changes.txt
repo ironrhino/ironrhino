@@ -1,0 +1,3 @@
+1.remove lines contains jsp or velocity in struts-default.xml of struts2-core-*.jar
+2.remove web-fragment.xml and services in META_INF of spring-web-*.jar
+3.update freemarker.core.Include.class in freemarker-*.jar

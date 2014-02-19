@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+	"http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<bean type="com.opensymphony.xwork2.config.PackageProvider" name="ironrhino-autoconfig"
+		class="org.ironrhino.core.struts.AutoConfigPackageProvider" />
+	<bean type="org.apache.struts2.views.freemarker.FreemarkerManager"
+		class="org.ironrhino.core.struts.MyFreemarkerManager" />
+	<constant name="struts.devMode" value="false" />
+	<constant name="struts.ognl.allowStaticMethodAccess" value="false" />
+	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<constant name="struts.mapper.class" value="org.ironrhino.core.struts.mapper.DefaultActionMapper" />
+	<constant name="struts.url.includeParams" value="none" />
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	<constant name="struts.multipart.maxSize" value="5242880" />
+	<constant name="struts.freemarker.templatesCache.updateDelay"
+		value="2147483647" />
+	<constant name="struts.freemarker.mru.max.strong.size" value="0" />
+	<package name="ironrhino-default" extends="struts-default">
+		<result-types>
+			<result-type name="autoconfig"
+				class="org.ironrhino.core.struts.result.AutoConfigResult" />
+			<result-type name="accessDenied"
+				class="org.ironrhino.core.struts.result.AccessDeniedResult" />
+			<result-type name="directTemplate"
+				class="org.ironrhino.core.struts.result.DirectTemplateResult" />
+			<result-type name="json" class="org.ironrhino.core.struts.result.JsonResult" />
+			<result-type name="referer"
+				class="org.ironrhino.core.struts.result.RefererResult" />
+			<result-type name="jasperreports"
+				class="org.apache.struts2.views.jasperreports.JasperReportsResult" />
+			<result-type name="dynamicreports"
+				class="org.ironrhino.core.struts.result.DynamicReportsResult" />
+			<result-type name="qrcode"
+				class="org.ironrhino.core.struts.result.QRCodeResult" />
+		</result-types>
+		<interceptors>
+			<interceptor name="exception"
+				class="org.ironrhino.core.struts.ExceptionInterceptor" />
+			<interceptor name="annotationWorkflow"
+				class="com.opensymphony.xwork2.interceptor.annotations.AnnotationWorkflowInterceptor" />
+			<interceptor-stack name="annotationDefaultStack">
+				<interceptor-ref name="exception" />
+				<interceptor-ref name="checkbox" />
+				<interceptor-ref name="actionMappingParams" />
+				<interceptor-ref name="params">
+					<param name="acceptParamNames">\w+((\.\w+)|(\[\d+\])|(\(\d+\))|(\['(\w|[^x00-xff])+'\])|(\('(\w|[^x00-xff])+'\)))*</param>
+					<param name="excludeParams">_.*_</param>
+				</interceptor-ref>
+				<interceptor-ref name="conversionError" />
+				<interceptor-ref name="annotationWorkflow" />
+				<interceptor-ref name="validation">
+					<param name="validateAnnotatedMethodOnly">true</param>
+				</interceptor-ref>
+				<interceptor-ref name="workflow" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="annotationDefaultStack" />
+		<global-results>
+			<result name="json" type="json" />
+			<result name="referer" type="referer" />
+			<result name="redirect" type="redirect">${targetUrl}</result>
+			<result name="accessDenied" type="accessDenied" />
+			<result name="directTemplate" type="directTemplate" />
+			<result name="dynamicreports" type="dynamicreports" />
+			<result name="qrcode" type="qrcode" />
+			<result name="error" type="autoconfig" />
+		</global-results>
+	</package>
+</struts>

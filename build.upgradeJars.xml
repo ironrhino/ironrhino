@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="ironrhino-upgradeJars" default="upgradeJars" basedir=".">
+	<target name="upgradeJars">
+		<script language="javascript">
+			<![CDATA[
+			importPackage(java.io);
+			var classpathfile = new File(project.getProperty('basedir')+'/.classpath');
+			var is = new FileInputStream(classpathfile);
+			var br = new BufferedReader(new InputStreamReader(is,'utf-8'));
+			var lines = [];
+			var line;
+			while(line=br.readLine()){
+				if(line.indexOf('kind="lib"') < 0)
+					continue;
+				lines.push(line);	
+			}
+			br.close();
+			is.close();
+			var replacement = [];
+			for(var n=0;n<lines.length;n++){
+				var arr = lines[n].split('"');
+				var path = arr[arr.length-2];
+				var arr2 = path.split('/');
+				var filename = arr2[arr2.length-1];
+				var jarname = filename.substring(0,filename.lastIndexOf(filename.lastIndexOf('-')>0?'-':'.'));
+				var version = filename.substring(jarname.length()+1);
+				var file = new File(basedir+'/' + path);
+        		var parent = file.getParentFile();
+        		var files = parent.listFiles();
+				if(!files)
+					continue;
+        		for(var i=0;i<files.length;i++){
+        			var f = files[i];
+        			var filename2 = f.getName();
+        			var jarname2 = filename2.substring(0,filename2.lastIndexOf(filename2.lastIndexOf('-')>0?'-':'.'));
+        			var version2 = filename2.substring(jarname2.length()+1);
+        			if(f.isFile() && filename != filename2 && jarname == jarname2 && version2.length()>0){
+						if(version.length()>4)
+							version = version.substring(0,version.length()-4);
+						if(version2.length()>4)
+							version2 = version2.substring(0,version2.length()-4);
+						var verarr1 = version.split("\\.");
+						var verarr2 = version2.split("\\.");
+        				var upgrade = false;
+						for(var j=0;j<verarr2.length;j++){
+							if(j==verarr1.length || verarr2[j]>verarr1[j] || verarr2[j].length() > verarr1[j].length()){
+								upgrade = true;
+								break;
+							}
+						}
+						if(!upgrade)
+								continue;
+        				println('upgrade jar from '+filename+' to '+filename2);
+        				if(file.exists()){
+	        					var del = project.createTask("delete");
+	        					del.setFile(file);
+	        					del.perform();
+        				}
+        				replacement.push(filename);
+        				replacement.push(f.getName());
+        				break;
+        			}
+        		}
+
+			}
+			for(var i=0;i<replacement.length;i+=2){
+				var replace = project.createTask("replace");
+				replace.setFile(classpathfile);
+				replace.setToken(replacement[i]);
+				replace.setValue(replacement[i+1]);
+				replace.perform();
+			}
+			]]>
+					</script>
+				</target>
+			</project>

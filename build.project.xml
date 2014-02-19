@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="sync" basedir=".">
+
+	<property name="src.dir" location="${basedir}/src" />
+	<property name="webapp.dir" location="${basedir}/webapp" />
+	<property name="lib.dir" location="${basedir}/lib" />
+	<property name="classes.dir" location="${webapp.dir}/WEB-INF/classes" />
+	<property name="target.dir" location="${basedir}/target" />
+	<property name="test.dir" location="${basedir}/test" />
+	<property name="test.src.dir" location="${basedir}/test/src" />
+	<property name="test.classes.dir" location="${basedir}/test/classes" />
+	<property name="test.results.dir" location="${basedir}/test/results" />
+	<property name="war.name" value="ROOT.war" />
+	<property name="server.home" value="/tomcat" />
+	<property name="server.startup.port" value="8080" />
+	<property name="server.shutdown.port" value="8005" />
+	<property name="webapp.deploy.dir" value="${server.home}/webapps/ROOT" />
+	<property file="build.properties" />
+	<property name="version" value="1.0" />
+	<property name="jar.name" value="app-${version}.jar" />
+	
+	<import file="build.include.xml" optional="true"/>
+
+	<condition property="cmd.suffix" value="bat">
+		<os family="windows" />
+	</condition>
+	<condition property="cmd.suffix" value="sh">
+		<os family="unix" />
+	</condition>
+	<property name="server.startup.cmd" value="${server.home}/bin/startup.${cmd.suffix}" />
+	<property name="server.shutdown.cmd" value="${server.home}/bin/shutdown.${cmd.suffix}" />
+
+	<path id="lib.classpath">
+		<fileset dir="${webapp.dir}/WEB-INF/lib">
+					<include name="*.jar" />
+				</fileset>
+		<fileset dir="${lib.dir}">
+			<exclude name="closure*.jar" />
+			<exclude name="yuicompressor*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+		<mkdir dir="${target.dir}" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${test.classes.dir}" />
+	</target>
+
+	<target name="sync">
+		<copy tofile="build.xml" file="${basedir}/../ironrhino/build.project.xml"
+			failonerror="false" />
+		<script language="javascript">
+			<![CDATA[
+			importPackage(java.io);
+			if(!new File(basedir+'/../ironrhino').isDirectory()){
+				println("directory ../ironrhino doesn't exists");
+			}else{
+				var classpathfile = new File(basedir+'/.classpath');
+				var is = new FileInputStream(classpathfile);
+				var br = new BufferedReader(new InputStreamReader(is,'utf-8'));
+				var lines = [];
+				var line;
+				while(line=br.readLine()){
+					if(line.indexOf('kind="lib"') < 0)
+						continue;
+					lines.push(line);	
+				}
+				br.close();
+				is.close();
+				var replacement = [];
+				for(var n=0;n<lines.length;n++){
+					var line = lines[n];
+					var index = line.indexOf('path="')+6;
+					var path = line.substring(index,line.indexOf('"',index));
+					var arr2 = path.split('/');
+					var filename = arr2[arr2.length-1];
+					var jarname = filename.substring(0,filename.lastIndexOf(filename.lastIndexOf('-')>0?'-':'.'));
+					var version = filename.substring(jarname.length()+1);
+					copy = project.createTask("copy");
+	        		var file = new File(basedir+'/../ironrhino/' + (filename.startsWith('ironrhino')?'target/'+filename:path));
+					var tofile = new File(basedir,path);
+	        		if(!file.exists()){
+	        			var parent = file.getParentFile();
+						if(!parent.exists())
+							continue;
+	        			var files = parent.listFiles();
+	        			for(var i=0;i<files.length;i++){
+	        				var f = files[i];
+	        				var filename2 = f.getName();
+	        				var jarname2 = filename2.substring(0,filename2.lastIndexOf(filename2.lastIndexOf('-')>0?'-':'.'));
+	        				var version2 = filename2.substring(jarname2.length()+1);
+	        				if(f.isFile() && filename != filename2 && jarname == jarname2 && version2.length()>0){
+								if(version.length()>4)
+									version = version.substring(0,version.length()-4);
+								if(version2.length()>4)
+									version2 = version2.substring(0,version2.length()-4);
+								var verarr1 = version.split("\\.");
+								var verarr2 = version2.split("\\.");
+		        				var upgrade = false;
+								for(var j=0;j<verarr2.length;j++){
+									if(j==verarr1.length || verarr2[j]>verarr1[j] || verarr2[j].length() > verarr1[j].length()){
+										upgrade = true;
+										break;
+									}
+								}
+								if(!upgrade)
+										continue;
+	        					println('upgrade jar from '+filename+' to '+f.getName());
+	        					file = f;
+	        					if(tofile.exists()){
+		        					var del = project.createTask("delete");
+		        					del.setFile(tofile);
+		        					del.perform();
+	        					}
+	        					tofile = new File(basedir,path.replaceAll(filename,f.getName()));
+	        					replacement.push(filename);
+	        					replacement.push(f.getName());
+	        					break;
+	        				}
+	        			}
+	        		}
+	        		if(!file.exists())
+	        			file = new File(basedir+'/extralib',filename);
+	        		copy.setFile(file);
+	        		copy.setTofile(tofile);
+					copy.setPreserveLastModified(true);
+	        		if(file.exists())
+	        			copy.perform();
+				}
+				for(var i=0;i<replacement.length;i+=2){
+					var replace = project.createTask("replace");
+					replace.setFile(classpathfile);
+					replace.setToken(replacement[i]);
+					replace.setValue(replacement[i+1]);
+					replace.perform();
+				}
+				// clean unused jar
+				is = new FileInputStream(new File(project.getProperty('basedir')+'/.classpath'));
+				br = new BufferedReader(new InputStreamReader(is,'utf-8'));
+				var jarnames = [];
+				while(line=br.readLine()){
+					if(line.indexOf('kind="lib"') < 0)
+						continue;
+					var index = line.indexOf('path="')+6;
+					var path = line.substring(index,line.indexOf('"',index));
+					var arr2 = path.split('/');
+					if(arr2[0]=='webapp')
+						jarnames.push(arr2[arr2.length-1]);	
+				}
+				br.close();
+				is.close();
+				var lib = new File(basedir,'webapp/WEB-INF/lib');
+				var files = lib.listFiles();
+				for(var i=0;i<files.length;i++){
+					var f = files[i];
+					var jarname = f.getName();
+					var contains = false;
+					for(var j=0;j<jarnames.length;j++){
+						if(jarnames[j].equals(jarname)){
+							contains = true;
+							break;
+						}
+					}
+					if(jarname.endsWith('.jar')&& !contains){
+						var del = project.createTask("delete");
+						del.setFile(f);
+						del.perform();
+				}
+				}
+			}
+			]]>
+		</script>
+	</target>
+
+	<target name="compile" depends="sync">
+		<antcall target="clean" />
+		<antcall target="init" />
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('pre-compile'))
+				project.executeTarget('pre-compile');
+			]]>
+		</script>
+		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source"
+			srcdir="${src.dir}" destdir="${classes.dir}" encoding="UTF-8">
+			<classpath refid="lib.classpath" />
+		</javac>
+		<copy todir="${classes.dir}" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('post-compile'))
+				project.executeTarget('post-compile');
+			]]>
+		</script>
+	</target>
+
+	<target name="test" depends="compile">
+		<mkdir dir="${test.classes.dir}" />
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('pre-test'))
+				project.executeTarget('pre-test');
+			]]>
+		</script>
+		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source"
+			srcdir="${test.src.dir}" destdir="${test.classes.dir}" encoding="utf-8">
+			<classpath>
+				<path refid="lib.classpath" />
+				<pathelement location="${classes.dir}" />
+			</classpath>
+		</javac>
+		<copy todir="${test.classes.dir}" preservelastmodified="true">
+			<fileset dir="${test.src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('post-test'))
+				project.executeTarget('post-test');
+			]]>
+		</script>		
+		<mkdir dir="${test.results.dir}" />
+		<junit haltonfailure="no" printsummary="on">
+			<classpath>
+				<path refid="lib.classpath" />
+				<pathelement location="${classes.dir}" />
+				<pathelement location="${test.classes.dir}" />
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<formatter type="plain" />
+			<formatter type="xml" />
+			<batchtest todir="${test.results.dir}">
+				<fileset dir="${test.classes.dir}" includes="**/*Test.class" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="compress">
+		<java jar="${lib.dir}/closure-compiler.jar" fork="true">
+			<arg
+				line=" --js=./webapp/assets/scripts/app.js --js_output_file=./webapp/assets/scripts/app-min.js" />
+		</java>
+		<java jar="${lib.dir}/yuicompressor.jar" fork="true">
+			<arg
+				line=" --charset utf-8 --type css -o ./webapp/assets/styles/app-min.css ./webapp/assets/styles/app.css" />
+		</java>
+	</target>
+
+	<target name="append-revision-for-assets">
+		<script language="javascript">
+						<![CDATA[
+			importPackage(java.io);
+			var assetsDir = new File(project.getProperty('webapp.dir')+'/assets');
+			var dirs = assetsDir.listFiles();
+			for(var n=0;n<dirs.length;n++){
+				var dir = dirs[n];
+				if(dir.getName()=='components'||dir.getName()=='images'||!dir.isDirectory())
+					continue;
+				var files = dir.listFiles();
+				for(var i=0;i<files.length;i++){
+					var file = files[i];
+					if(file.isDirectory())
+						continue;
+					var name = file.getName();
+					if(name.indexOf('-min.') > 0)
+						continue;
+					var revision = null;
+					var exec = project.createTask('exec');
+					exec.setExecutable('svn');
+					exec.setOutputproperty(name+'.svninfo');
+					exec.setFailIfExecutionFails(false);
+					exec.setResultProperty('resultCode');
+					var arg = exec.createArg();
+					arg.setValue('info');
+					arg = exec.createArg();
+					arg.setValue(file.getPath());
+					exec.execute();
+					var svninfo = project.getProperty(name+'.svninfo');
+						if(svninfo){
+							var arr = svninfo.split('\n');
+							for(var j=0;j<arr.length;j++){
+								var arr2 = arr[j].split(':',2);
+								if(arr2.length>1){
+									var s = arr2[1].trim();
+									try{
+										if(s.match(/^\d+$/)){
+											revision = s;
+										}
+									}catch(e){
+									}
+								}
+							}
+						}
+					revision = revision || (''+file.lastModified());
+					if(revision.length==13)
+						revision = revision.substring(0,10);
+					var dir = new File(project.getProperty('webapp.dir')+'/WEB-INF/classes/resources/view/decorator');
+					if(dir.exists()){
+						var replaceregexp = project.createTask('replaceregexp');
+						replaceregexp.setEncoding('utf-8');
+						replaceregexp.setPreserveLastModified(true);
+						var fs = project.createDataType("fileset");
+		      			fs.setDir(dir);
+		      			fs.setIncludes('**/*.ftl');
+		      			replaceregexp.addFileset(fs);
+		      			var namearr = name.split('\\.');
+		      			var match = '/'+dir.getName()+'/'+namearr[0]+'(.*)\\.'+namearr[1];
+		      			var replace = '/'+dir.getName()+'/'+namearr[0]+'\\1\\.'+namearr[1]+'?'+revision;
+		        		replaceregexp.setMatch(match);
+		        		replaceregexp.setReplace(replace);
+		        		replaceregexp.perform();
+					}
+				}
+			}
+			]]>
+		</script>
+	</target>
+	<target name="reset-append-revision-for-assets">
+		<copy todir="${webapp.dir}/WEB-INF/classes/resources/view/decorator"
+			preservelastmodified="true" overwrite="true" failonerror="false">
+			<fileset dir="${src.dir}/resources/view/decorator">
+				<include name="**/*.ftl" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="unzip-assets">
+		<move file="${webapp.dir}/assets" tofile="${webapp.dir}/assetsbak"
+			preservelastmodified="true" failonerror="false" />
+		<unzip dest="${webapp.dir}">
+			<fileset dir="${webapp.dir}/WEB-INF/lib" includes="ironrhino-assets-*.jar" />
+		</unzip>
+		<sync todir="${webapp.dir}/assets">
+			<fileset dir="${webapp.dir}/META-INF/resources/assets" />
+			<preserveintarget>
+				<include name="**/**" />
+			</preserveintarget>
+		</sync>
+		<sync todir="${webapp.dir}/assets" failonerror="false">
+			<fileset dir="${webapp.dir}/assetsbak" />
+			<preserveintarget>
+				<include name="**/**" />
+			</preserveintarget>
+		</sync>
+		<delete dir="${webapp.dir}/META-INF" />
+	</target>
+
+	<target name="reset-assets">
+		<delete dir="${webapp.dir}/assets" />
+		<move file="${webapp.dir}/assetsbak" tofile="${webapp.dir}/assets"
+			preservelastmodified="true" failonerror="false" />
+	</target>
+
+	<target name="jar" depends="compile">
+		<mkdir dir="${target.dir}" />
+		<delete file="${target.dir}/${jar.name}" />
+		<antcall target="unzip-assets" />
+		<antcall target="append-revision-for-assets" />
+		<antcall target="reset-assets" />
+		<copy todir="${classes.dir}/META-INF/resources"
+			preservelastmodified="true" failonerror="false">
+			<fileset dir="${webapp.dir}" includes="assets/**" />
+		</copy>
+		<jar jarfile="${target.dir}/${jar.name}" basedir="${classes.dir}" />
+		<delete dir="${classes.dir}/META-INF/resources" />
+		<antcall target="reset-append-revision-for-assets" />
+	</target>
+
+	<target name="war" depends="jar">
+		<antcall target="unzip-assets" />
+		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
+			preservelastmodified="true" />
+		<mkdir dir="${target.dir}/classes" />
+		<move todir="${target.dir}/classes" preservelastmodified="true">
+			<fileset dir="${webapp.dir}/WEB-INF/classes" />
+		</move>
+		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
+			needxmlfile="false" excludes="**/upload/**,assetsbak/**,**/ironrhino-assets-*.jar" />
+		<move file="${webapp.dir}/WEB-INF/lib/${jar.name}" todir="${target.dir}"
+			preservelastmodified="true" />
+		<move todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${target.dir}/classes" />
+		</move>
+		<delete dir="${target.dir}/classes" />
+		<antcall target="reset-assets" />
+	</target>
+
+	<target name="war2" depends="jar">
+		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
+			preservelastmodified="true" />
+		<mkdir dir="${target.dir}/classes" />
+		<move todir="${target.dir}/classes" preservelastmodified="true">
+			<fileset dir="${webapp.dir}/WEB-INF/classes" />
+		</move>
+		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
+			needxmlfile="false" excludes="assets/**" />
+		<move file="${webapp.dir}/WEB-INF/lib/${jar.name}" todir="${target.dir}"
+			preservelastmodified="true" />
+		<move todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${target.dir}/classes" />
+		</move>
+		<delete dir="${target.dir}/classes" />
+	</target>
+	
+	<target name="war-standalone" depends="jar">
+		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
+			preservelastmodified="true" />
+		<mkdir dir="${target.dir}/classes" />
+		<move todir="${target.dir}/classes" preservelastmodified="true">
+			<fileset dir="${webapp.dir}/WEB-INF/classes" />
+		</move>
+		<mkdir dir="${webapp.dir}/WEB-INF/libext" />
+		<copy tofile="${webapp.dir}/WEB-INF/libext/servlet-api.jar" failonerror="false">
+			<fileset file="${lib.dir}/servlet-api*.jar" />	
+		</copy>
+		<copy tofile="${webapp.dir}/WEB-INF/libext/websocket-api.jar" failonerror="false">
+			<fileset file="${lib.dir}/websocket-api*.jar" />	
+		</copy>
+		<copy tofile="${webapp.dir}/WEB-INF/libext/jetty.jar" failonerror="false">
+			<fileset file="${lib.dir}/jetty*.jar" />	
+		</copy>
+		<copy tofile="${webapp.dir}/WEB-INF/libext/bootstrap.jar" failonerror="false">
+			<fileset file="${lib.dir}/bootstrap*.jar" />	
+		</copy>
+		<script language="javascript">
+			<![CDATA[
+					importPackage(java.io);
+					var libext = new File(project.getProperty('webapp.dir')+'/WEB-INF/libext');
+					var ironrhinolib = new File(project.getProperty('basedir')+'/../ironrhino/lib');
+					var file = new File(libext,'servlet-api.jar');
+					if(!file.exists()){
+						var copy = project.createTask('copy');
+						copy.setTofile(file);
+						var fs = project.createDataType("fileset");
+				      	fs.setDir(ironrhinolib);
+				      	fs.setIncludes('servlet-api*.jar');
+						copy.addFileset(fs);
+						copy.perform();
+					}
+					file = new File(libext,'websocket-api.jar');
+					if(!file.exists()){
+						var copy = project.createTask('copy');
+						copy.setTofile(file);
+						var fs = project.createDataType("fileset");
+				      	fs.setDir(ironrhinolib);
+				      	fs.setIncludes('websocket-api*.jar');
+						copy.addFileset(fs);
+						copy.perform();
+					}
+					file = new File(libext,'jetty.jar');
+					if(!file.exists()){
+						var copy = project.createTask('copy');
+						copy.setTofile(file);
+						var fs = project.createDataType("fileset");
+				      	fs.setDir(ironrhinolib);
+				      	fs.setIncludes('jetty*.jar');
+						copy.addFileset(fs);
+						copy.perform();
+					}
+					file = new File(libext,'bootstrap.jar');
+					if(!file.exists()){
+						var copy = project.createTask('copy');
+						copy.setTofile(file);
+						var fs = project.createDataType("fileset");
+				      	fs.setDir(new File(project.getProperty('basedir')+'/../ironrhino/target'));
+				      	fs.setIncludes('bootstrap*.jar');
+						copy.addFileset(fs);
+						copy.perform();
+					}								
+			]]>
+		</script>
+		<copy todir="${webapp.dir}">
+		    <restrict>
+		        <name name="bootstrap/Main.class"/> 
+		            <archives>
+		                <zips>
+		                    <fileset dir="${webapp.dir}/WEB-INF/libext" includes="bootstrap.jar" />
+		                </zips>
+		        </archives>
+		    </restrict>
+		</copy>
+		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
+			needxmlfile="false" excludes="assets/**">
+			<manifest>
+				<attribute name="Main-Class" value="bootstrap.Main" />
+			</manifest>
+		</war>	
+		<move file="${webapp.dir}/WEB-INF/lib/${jar.name}" todir="${target.dir}"
+			preservelastmodified="true" />
+		<move todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${target.dir}/classes" />
+		</move>
+		<delete dir="${webapp.dir}/bootstrap" />
+		<delete dir="${webapp.dir}/WEB-INF/libext" />
+		<delete dir="${target.dir}/classes" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${classes.dir}" />
+		<delete dir="${test.classes.dir}" />
+	</target>
+
+
+	<target name="checkwebappdeployed">
+		<available property="webapp.deployed" file="${webapp.deploy.dir}/WEB-INF/web.xml" />
+	</target>
+
+	<target name="checkserverstarted">
+		<condition property="server.started">
+			<socket server="localhost" port="${server.shutdown.port}" />
+		</condition>
+	</target>
+
+	<target name="backup" if="webapp.deployed" depends="checkwebappdeployed">
+		<war warfile="${target.dir}/${war.name}.bak" basedir="${webapp.deploy.dir}"
+			needxmlfile="false" />
+	</target>
+
+	<target name="update">
+		<antcall target="compile" />
+		<sync todir="${webapp.deploy.dir}">
+			<fileset dir="${webapp.dir}" />
+			<preserveintarget>
+				<include name="**/.*/**" />
+				<include name="**/.class" />
+				<include name="**/.jar" />
+			</preserveintarget>
+		</sync>
+	</target>
+
+	<target name="shutdown" if="server.started" depends="checkserverstarted">
+		<waitfor checkevery="1" checkeveryunit="second" maxwait="2"
+			maxwaitunit="second">
+			<http
+				url="http://localhost:${server.startup.port}/?firewallHandler.allowedAddrPattern=127.0.0.1" />
+		</waitfor>
+		<sleep seconds="3" />
+		<exec executable="${server.shutdown.cmd}" dir="${server.home}">
+			<arg value="-force" />
+		</exec>
+		<waitfor checkevery="2" checkeveryunit="second" maxwait="60"
+			maxwaitunit="second">
+			<not>
+				<socket server="localhost" port="${server.shutdown.port}" />
+			</not>
+		</waitfor>
+		<sleep seconds="3" />
+	</target>
+
+	<target name="startup" depends="shutdown">
+		<exec executable="${server.startup.cmd}" dir="${server.home}" />
+		<waitfor checkevery="2" checkeveryunit="second" maxwait="180"
+			maxwaitunit="second">
+			<http url="http://localhost:${server.startup.port}/" />
+		</waitfor>
+	</target>
+
+	<target name="deploy">
+		<antcall target="war" />
+		<antcall target="backup" />
+		<antcall target="shutdown" />
+		<delete dir="${webapp.deploy.dir}" />
+		<unzip dest="${webapp.deploy.dir}" src="${target.dir}/${war.name}" />
+		<antcall target="startup" />
+	</target>
+
+	<target name="rollback">
+		<antcall target="shutdown" />
+		<delete dir="${webapp.deploy.dir}" />
+		<unzip dest="${webapp.deploy.dir}" src="${target.dir}/${war.name}.bak" />
+		<antcall target="startup" />
+	</target>
+
+
+</project>

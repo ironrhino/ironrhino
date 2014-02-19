@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+	<context:property-placeholder location="classpath:resources/spring/applicationContext.properties,file:${app.home}/conf/applicationContext.properties" ignore-resource-not-found="true"/>
+	<context:component-scan base-package="org.ironrhino,${app.basePackage:}" name-generator="org.ironrhino.core.spring.NameGenerator"/>
+	<aop:aspectj-autoproxy />
+	<bean id="conversionService"
+		class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<bean class="org.ironrhino.core.spring.converter.DateConverter"/>
+			</list>
+		</property>
+	</bean>
+</beans>
