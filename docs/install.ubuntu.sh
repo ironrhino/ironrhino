@@ -297,7 +297,7 @@ elif [ -d .git ];then
 git reset --hard
 git clean -df
 gitpulloutput=\`git pull\`
-echo "\$svnupoutput"
+echo "\$gitpulloutput"
 if ! \$(echo "\$gitpulloutput"|grep up-to-date >/dev/null 2>&1) ; then
 ant dist
 fi
