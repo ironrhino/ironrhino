@@ -6,7 +6,10 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.BoundValueOperations;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
@@ -33,7 +36,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 		Assert.isTrue(getPaddingLength() > 0);
 		boundValueOperations = stringRedisTemplate.boundValueOps(KEY_SEQUENCE
 				+ getSequenceName());
-		boundValueOperations.setIfAbsent(getStringValue(new Date(),
+		boundValueOperations.setIfAbsent(getStringValue(now(),
 				getPaddingLength(), 0));
 	}
 
@@ -58,10 +61,11 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 		if (cycleType.ordinal() <= CycleType.YEAR.ordinal())
 			cal.set(Calendar.YEAR, Integer.valueOf(stringValue.substring(0, 4)));
 		Date d = cal.getTime();
-		if (getCycleType().isSameCycle(d, new Date()))
+		Date now = now();
+		if (getCycleType().isSameCycle(d, now))
 			return stringValue;
 
-		final String restart = getStringValue(new Date(), getPaddingLength(), 1);
+		final String restart = getStringValue(now, getPaddingLength(), 1);
 		boolean success = stringRedisTemplate
 				.execute(new SessionCallback<Boolean>() {
 					@Override
@@ -79,6 +83,19 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 					}
 				});
 		return success ? restart : nextStringValue();
+	}
+
+	protected Date now() {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(stringRedisTemplate
+				.execute(new RedisCallback<Long>() {
+					@Override
+					public Long doInRedis(RedisConnection connection)
+							throws DataAccessException {
+						return connection.time();
+					}
+				}));
+		return cal.getTime();
 	}
 
 }
