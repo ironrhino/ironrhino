@@ -318,15 +318,13 @@
 						arg.setValue('webapp/assets/'+dir.getName()+'/'+name);
 						exec.execute();
 						var gitlog = project.getProperty(name+'.gitlog');
-						if(gitlog){
+						if(gitlog&&gitlog.trim().length()>0){
 							revision = gitlog.split('\n')[0].split('\\s+')[1];
-							if(revision.length > 8)
+							if(revision.length() > 8)
 								revision = revision.substring(0,8);
 						}
 					}
 					revision = revision || (''+file.lastModified());
-					if(revision.length==13)
-						revision = revision.substring(0,10);
 					var decdir = new File(project.getProperty('webapp.dir')+'/WEB-INF/classes/resources/view/decorator');
 					if(decdir.exists()){
 						var replaceregexp = project.createTask('replaceregexp');

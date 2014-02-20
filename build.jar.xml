@@ -118,9 +118,9 @@
 				arg.setValue('-1');
 				exec.execute();
 				var gitlog = project.getProperty('gitlog');
-				if(gitlog){
+				if(gitlog&&gitlog.trim().length()>0){
 					var revision = gitlog.split('\n')[0].split('\\s+')[1];
-					if(revision.length > 8)
+					if(revision.length() > 8)
 						revision = revision.substring(0,8);
 					project.setProperty('revision',revision);
 				}
@@ -195,15 +195,13 @@
 						arg.setValue('webapp/assets/'+dir.getName()+'/'+name);
 						exec.execute();
 						var gitlog = project.getProperty(name+'.gitlog');
-						if(gitlog){
+						if(gitlog&&gitlog.trim().length()>0){
 							revision = gitlog.split('\n')[0].split('\\s+')[1];
-							if(revision.length > 8)
+							if(revision.length() > 8)
 								revision = revision.substring(0,8);
 						}
 					}
 					revision = revision || (''+file.lastModified());
-					if(revision.length==13)
-						revision = revision.substring(0,10);
 					var replaceregexp = project.createTask('replaceregexp');
 					replaceregexp.setEncoding('utf-8');
 					replaceregexp.setPreserveLastModified(true);
