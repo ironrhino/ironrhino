@@ -299,13 +299,13 @@
 					revision = revision || (''+file.lastModified());
 					if(revision.length==13)
 						revision = revision.substring(0,10);
-					var dir = new File(project.getProperty('webapp.dir')+'/WEB-INF/classes/resources/view/decorator');
-					if(dir.exists()){
+					var decdir = new File(project.getProperty('webapp.dir')+'/WEB-INF/classes/resources/view/decorator');
+					if(decdir.exists()){
 						var replaceregexp = project.createTask('replaceregexp');
 						replaceregexp.setEncoding('utf-8');
 						replaceregexp.setPreserveLastModified(true);
 						var fs = project.createDataType("fileset");
-		      			fs.setDir(dir);
+		      			fs.setDir(decdir);
 		      			fs.setIncludes('**/*.ftl');
 		      			replaceregexp.addFileset(fs);
 		      			var namearr = name.split('\\.');
