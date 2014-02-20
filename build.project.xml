@@ -255,6 +255,11 @@
 		<script language="javascript">
 						<![CDATA[
 			importPackage(java.io);
+			var vcs;
+			if(new File(basedir+'/.svn').isDirectory())
+				vcs = 'svn';
+			else if(new File(basedir+'/.git').isDirectory())
+				vcs = 'git';
 			var assetsDir = new File(project.getProperty('webapp.dir')+'/assets');
 			var dirs = assetsDir.listFiles();
 			for(var n=0;n<dirs.length;n++){
@@ -270,32 +275,55 @@
 					if(name.indexOf('-min.') > 0)
 						continue;
 					var revision = null;
-					var exec = project.createTask('exec');
-					exec.setExecutable('svn');
-					exec.setOutputproperty(name+'.svninfo');
-					exec.setFailIfExecutionFails(false);
-					exec.setResultProperty('resultCode');
-					var arg = exec.createArg();
-					arg.setValue('info');
-					arg = exec.createArg();
-					arg.setValue(file.getPath());
-					exec.execute();
-					var svninfo = project.getProperty(name+'.svninfo');
-						if(svninfo){
-							var arr = svninfo.split('\n');
-							for(var j=0;j<arr.length;j++){
-								var arr2 = arr[j].split(':',2);
-								if(arr2.length>1){
-									var s = arr2[1].trim();
-									try{
-										if(s.match(/^\d+$/)){
-											revision = s;
+					if(vcs == 'svn'){
+						var exec = project.createTask('exec');
+						exec.setExecutable('svn');
+						exec.setOutputproperty(name+'.svninfo');
+						exec.setFailIfExecutionFails(false);
+						exec.setResultProperty('resultCode');
+						var arg = exec.createArg();
+						arg.setValue('info');
+						arg = exec.createArg();
+						arg.setValue(file.getPath());
+						exec.execute();
+						var svninfo = project.getProperty(name+'.svninfo');
+							if(svninfo){
+								var arr = svninfo.split('\n');
+								for(var j=0;j<arr.length;j++){
+									var arr2 = arr[j].split(':',2);
+									if(arr2.length>1){
+										var s = arr2[1].trim();
+										try{
+											if(s.match(/^\d+$/)){
+												revision = s;
+											}
+										}catch(e){
 										}
-									}catch(e){
 									}
 								}
 							}
+					}else if(vcs == 'git'){
+						var exec = project.createTask('exec');
+						exec.setExecutable('git');
+						exec.setOutputproperty(name+'.gitlog');
+						exec.setFailIfExecutionFails(false);
+						exec.setResultProperty('resultCode');
+						var arg = exec.createArg();
+						arg.setValue('log');
+						arg = exec.createArg();
+						arg.setValue('-1');
+						arg = exec.createArg();
+						arg.setValue('--');
+						arg = exec.createArg();
+						arg.setValue('webapp/assets/'+dir.getName()+'/'+name);
+						exec.execute();
+						var gitlog = project.getProperty(name+'.gitlog');
+						if(gitlog){
+							revision = gitlog.split('\n')[0].split(/\s+/)[1];
+							if(revision.length > 8)
+								revision = revision.substring(0,8);
 						}
+					}
 					revision = revision || (''+file.lastModified());
 					if(revision.length==13)
 						revision = revision.substring(0,10);
