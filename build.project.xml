@@ -319,7 +319,7 @@
 						exec.execute();
 						var gitlog = project.getProperty(name+'.gitlog');
 						if(gitlog){
-							revision = gitlog.split('\n')[0].split(/\s+/)[1];
+							revision = gitlog.split('\n')[0].split('\\s+')[1];
 							if(revision.length > 8)
 								revision = revision.substring(0,8);
 						}
