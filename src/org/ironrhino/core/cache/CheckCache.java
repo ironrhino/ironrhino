@@ -29,6 +29,8 @@ public @interface CheckCache {
 
 	boolean eternal() default false;
 
+	boolean cacheNull() default true;
+
 	// mvel expression
 	String onHit() default "";
 

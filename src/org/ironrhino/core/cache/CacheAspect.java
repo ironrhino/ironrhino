@@ -84,17 +84,20 @@ public class CacheAspect extends BaseAspect {
 		Object result = jp.proceed();
 		putReturnValueIntoContext(context, result);
 		if (ExpressionUtils.evalBoolean(checkCache.when(), context, true)) {
-			Object cacheResult = (result == null ? NullObject.get() : result);
-			if (checkCache.eternal()) {
-				cacheManager.put(key, cacheResult, 0, checkCache.timeUnit(),
-						namespace);
-			} else {
-				int timeToLive = ExpressionUtils.evalInt(
-						checkCache.timeToLive(), context, 0);
-				int timeToIdle = ExpressionUtils.evalInt(
-						checkCache.timeToIdle(), context, 0);
-				cacheManager.put(key, cacheResult, timeToIdle, timeToLive,
-						checkCache.timeUnit(), namespace);
+			Object cacheResult = (result == null && checkCache.cacheNull()) ? NullObject
+					.get() : result;
+			if (cacheResult != null) {
+				if (checkCache.eternal()) {
+					cacheManager.put(key, cacheResult, 0,
+							checkCache.timeUnit(), namespace);
+				} else {
+					int timeToLive = ExpressionUtils.evalInt(
+							checkCache.timeToLive(), context, 0);
+					int timeToIdle = ExpressionUtils.evalInt(
+							checkCache.timeToIdle(), context, 0);
+					cacheManager.put(key, cacheResult, timeToIdle, timeToLive,
+							checkCache.timeUnit(), namespace);
+				}
 			}
 			if (result != null)
 				ExpressionUtils.eval(checkCache.onPut(), context);
