@@ -64,8 +64,10 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 	@CheckCache(key = "${path}", namespace = "page", eternal = true)
 	public Page getByPath(String path) {
 		Page page = findByNaturalId(path);
-		if (page != null)
+		if (page != null) {
+			page.setContent(encodeURL(page.getContent()));
 			page.setDraft(null);
+		}
 		return page;
 	}
 
@@ -99,6 +101,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 		if (page == null || StringUtils.isBlank(page.getDraft()))
 			return null;
 		pullDraft(page);
+		page.setContent(encodeURL(page.getContent()));
 		return page;
 	}
 
@@ -309,6 +312,11 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 			return sortedMap;
 		}
 
+	}
+
+	protected static String encodeURL(String content) {
+		return content != null ? content.replaceAll("\"(/assets/[^\"]*)\"",
+				"\"<@url value=\"$1\"/>\"") : null;
 	}
 
 }

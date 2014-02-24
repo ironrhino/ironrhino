@@ -10,6 +10,7 @@
 $(function() {
 		var cmsPath= $('meta[name="cms_path"]').attr('content') || '';
 		var options = {
+			relative_urls: false,
 		    selector: "#page_content",
 		    content_css : '<#if Parameters.content_css?has_content>${Parameters.content_css}<#else><@url value="/assets/styles/ironrhino-min.css"/></#if>',
 		    plugins: [
