@@ -30355,7 +30355,8 @@ MessageBundle = {
 		'action.denied' : 'requested action denied',
 		'maximum.exceeded' : '{0} , exceed maximum {1}',
 		'pattern.coords.invalid' : 'coords should be between {0} and {1}',
-		'data.invalid' : 'data invalid,please check it.'
+		'data.invalid' : 'data invalid,please check it.',
+		'repeat.not.matched' : 'repeat match failed'
 	},
 	'zh_CN' : {
 		'ajax.loading' : '正在加载...',
@@ -30394,7 +30395,8 @@ MessageBundle = {
 		'action.denied' : '你拒绝了请求',
 		'maximum.exceeded' : '{0} ,超过最大限制数{1}',
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
-		'data.invalid' : '数据错误,请检查'
+		'data.invalid' : '数据错误,请检查',
+		'repeat.not.matched' : '两次输入不一致'
 	},
 	get : function() {
 		var key = arguments[0];
@@ -30758,6 +30760,14 @@ Form = {
 							$(target).val(value);
 						}
 					}
+				} else if ($(target).hasClass('repeat')) {
+					if (value != $(
+							'[name="' + $(target).data('repeatwith') + '"]',
+							$(target).closest('form')).val()) {
+						Message.showFieldError(target, null,
+								'repeat.not.matched');
+						return false;
+					}
 				}
 				return true;
 			} else {
@@ -31043,14 +31053,14 @@ Initialization.common = function() {
 				$(this).remove()
 			}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
 				if (!$(this).hasClass('email') && !$(this).hasClass('regex')
-						&& ev.keyCode != 13)
+						&& !$(this).hasClass('repeat') && ev.keyCode != 13)
 					if ($(this).val())
 						Form.validate(this);
 				return true;
 			})).on('focusout', 'input,textarea', function(ev) {
 		// if (this.value != this.defaultValue)
 		if ($(this).hasClass('email') || $(this).hasClass('regex')
-				|| !$(this).hasClass('required'))
+				|| $(this).hasClass('repeat') || !$(this).hasClass('required'))
 			Form.validate(this);
 		return true;
 	}).on('change', 'select', function() {

@@ -326,6 +326,14 @@ Form = {
 							$(target).val(value);
 						}
 					}
+				} else if ($(target).hasClass('repeat')) {
+					if (value != $(
+							'[name="' + $(target).data('repeatwith') + '"]',
+							$(target).closest('form')).val()) {
+						Message.showFieldError(target, null,
+								'repeat.not.matched');
+						return false;
+					}
 				}
 				return true;
 			} else {
@@ -611,14 +619,14 @@ Initialization.common = function() {
 				$(this).remove()
 			}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
 				if (!$(this).hasClass('email') && !$(this).hasClass('regex')
-						&& ev.keyCode != 13)
+						&& !$(this).hasClass('repeat') && ev.keyCode != 13)
 					if ($(this).val())
 						Form.validate(this);
 				return true;
 			})).on('focusout', 'input,textarea', function(ev) {
 		// if (this.value != this.defaultValue)
 		if ($(this).hasClass('email') || $(this).hasClass('regex')
-				|| !$(this).hasClass('required'))
+				|| $(this).hasClass('repeat') || !$(this).hasClass('required'))
 			Form.validate(this);
 		return true;
 	}).on('change', 'select', function() {
