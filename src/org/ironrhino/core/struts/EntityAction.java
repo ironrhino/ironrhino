@@ -656,7 +656,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return makeEntityValid() ? NONE : INPUT;
 	}
 
-	private boolean makeEntityValid() {
+	protected boolean makeEntityValid() {
 		boolean idAssigned = isIdAssigned();
 		boolean fromList = "cell".equalsIgnoreCase(ServletActionContext
 				.getRequest().getHeader("X-Edit"));

@@ -149,7 +149,7 @@ public class UserAction extends EntityAction<User> {
 		return makeEntityValid() ? NONE : INPUT;
 	}
 
-	private boolean makeEntityValid() {
+	protected boolean makeEntityValid() {
 		if (user == null) {
 			addActionError(getText("access.denied"));
 			return false;
