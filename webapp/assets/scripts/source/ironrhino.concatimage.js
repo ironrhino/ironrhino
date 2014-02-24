@@ -91,11 +91,24 @@
 			$(canvas).css('width', '100%');
 		if (field) {
 			var maxwidth = parseInt($(field).data('maxwidth'));
-			if (maxwidth && canvas.width > maxwidth)
+			if (maxwidth && canvas.width > maxwidth){
 				scale(canvas, maxwidth / canvas.width);
+				$(canvas).css('max-width', maxwidth);
+			}
+			var maxheight = parseInt($(field).data('maxheight'));
+			if (maxheight && canvas.height > maxheight){
+				scale(canvas, maxheight / canvas.height);
+				$(canvas).css('max-height', maxheight);
+			}
 			var data = canvas.toDataURL();
 			var maxlength = parseInt($(field).data('maximum'))
 					|| parseInt($(field).attr('maxlength'));
+			var times = 4;
+			while (data.length > maxlength && times > 0) {
+				scale(canvas, 0.9);
+				data = image.toDataURL();
+				times--;
+			}
 			if (data.length > maxlength) {
 				Message.showActionError(MessageBundle.get($(field)
 								.data('error')
@@ -103,7 +116,7 @@
 				canvas.parentNode.removeChild(canvas);
 				$(target).data('count', '0');
 			} else {
-				$(field).val(data);
+				$(field).val(data).trigger('validate');
 				$(target).data('count', imgs.length);
 				var form = $(field).closest('form');
 				if (!form.hasClass('nodirty'))

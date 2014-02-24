@@ -49,12 +49,26 @@
 							if (field) {
 								var maxwidth = parseInt($(field)
 										.data('maxwidth'));
-								if (maxwidth && canvas.width > maxwidth)
+								if (maxwidth && canvas.width > maxwidth) {
 									scale(canvas, maxwidth / canvas.width);
+									$(image).css('max-width', maxwidth);
+								}
+								var maxheight = parseInt($(field)
+										.data('maxheight'));
+								if (maxheight && canvas.height > maxheight) {
+									scale(canvas, maxheight / canvas.height);
+									$(image).css('max-height', maxheight);
+								}
 								var data = image.toDataURL();
 								var maxlength = parseInt($(field)
 										.data('maximum'))
 										|| parseInt($(field).attr('maxlength'));
+								var times = 4;
+								while (data.length > maxlength && times > 0) {
+									scale(canvas, 0.9);
+									data = image.toDataURL();
+									times--;
+								}
 								if (data.length > maxlength) {
 									Message.showActionError(MessageBundle.get(
 											$(field).data('error')
@@ -63,7 +77,7 @@
 									$(target).data('count', '0');
 									image.parentNode.removeChild(image);
 								} else {
-									$(field).val(data);
+									$(field).val(data).trigger('validate');
 									var form = $(field).closest('form');
 									if (!form.hasClass('nodirty'))
 										form.addClass('dirty');

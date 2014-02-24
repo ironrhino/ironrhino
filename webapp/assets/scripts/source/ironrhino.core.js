@@ -617,6 +617,8 @@ Initialization.common = function() {
 						});
 			}).on('click', '.removeonclick', function() {
 				$(this).remove()
+			}).on('validate', ':input', function(ev) {
+				Form.validate(this);
 			}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
 				if (!$(this).hasClass('email') && !$(this).hasClass('regex')
 						&& !$(this).hasClass('repeat') && ev.keyCode != 13)

@@ -22,8 +22,7 @@
 					if (coords.length >= options.minCoords
 							&& coords.length <= options.maxCoords) {
 						modal.remove();
-						t.val(JSON.stringify(coords));
-						Form.validate(t);
+						t.val(JSON.stringify(coords)).trigger('validate');
 						if (t.hasClass('submit')) {
 							var f = t.closest('form');
 							var inputed = true;

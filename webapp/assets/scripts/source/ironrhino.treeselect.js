@@ -16,8 +16,7 @@
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr);
 				if (ele.is(':input')) {
-					ele.val(val);
-					Form.validate(ele);
+					ele.val(val).trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);

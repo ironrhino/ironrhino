@@ -31051,6 +31051,8 @@ Initialization.common = function() {
 						});
 			}).on('click', '.removeonclick', function() {
 				$(this).remove()
+			}).on('validate', ':input', function(ev) {
+				Form.validate(this);
 			}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
 				if (!$(this).hasClass('email') && !$(this).hasClass('regex')
 						&& !$(this).hasClass('repeat') && ev.keyCode != 13)
@@ -32396,12 +32398,26 @@ Observation.checkavailable = function(container) {
 							if (field) {
 								var maxwidth = parseInt($(field)
 										.data('maxwidth'));
-								if (maxwidth && canvas.width > maxwidth)
+								if (maxwidth && canvas.width > maxwidth) {
 									scale(canvas, maxwidth / canvas.width);
+									$(image).css('max-width', maxwidth);
+								}
+								var maxheight = parseInt($(field)
+										.data('maxheight'));
+								if (maxheight && canvas.height > maxheight) {
+									scale(canvas, maxheight / canvas.height);
+									$(image).css('max-height', maxheight);
+								}
 								var data = image.toDataURL();
 								var maxlength = parseInt($(field)
 										.data('maximum'))
 										|| parseInt($(field).attr('maxlength'));
+								var times = 4;
+								while (data.length > maxlength && times > 0) {
+									scale(canvas, 0.9);
+									data = image.toDataURL();
+									times--;
+								}
 								if (data.length > maxlength) {
 									Message.showActionError(MessageBundle.get(
 											$(field).data('error')
@@ -32410,7 +32426,7 @@ Observation.checkavailable = function(container) {
 									$(target).data('count', '0');
 									image.parentNode.removeChild(image);
 								} else {
-									$(field).val(data);
+									$(field).val(data).trigger('validate');
 									var form = $(field).closest('form');
 									if (!form.hasClass('nodirty'))
 										form.addClass('dirty');
@@ -32536,11 +32552,24 @@ Observation.concatsnapshot = function(container) {
 			$(canvas).css('width', '100%');
 		if (field) {
 			var maxwidth = parseInt($(field).data('maxwidth'));
-			if (maxwidth && canvas.width > maxwidth)
+			if (maxwidth && canvas.width > maxwidth){
 				scale(canvas, maxwidth / canvas.width);
+				$(canvas).css('max-width', maxwidth);
+			}
+			var maxheight = parseInt($(field).data('maxheight'));
+			if (maxheight && canvas.height > maxheight){
+				scale(canvas, maxheight / canvas.height);
+				$(canvas).css('max-height', maxheight);
+			}
 			var data = canvas.toDataURL();
 			var maxlength = parseInt($(field).data('maximum'))
 					|| parseInt($(field).attr('maxlength'));
+			var times = 4;
+			while (data.length > maxlength && times > 0) {
+				scale(canvas, 0.9);
+				data = image.toDataURL();
+				times--;
+			}
 			if (data.length > maxlength) {
 				Message.showActionError(MessageBundle.get($(field)
 								.data('error')
@@ -32548,7 +32577,7 @@ Observation.concatsnapshot = function(container) {
 				canvas.parentNode.removeChild(canvas);
 				$(target).data('count', '0');
 			} else {
-				$(field).val(data);
+				$(field).val(data).trigger('validate');
 				$(target).data('count', imgs.length);
 				var form = $(field).closest('form');
 				if (!form.hasClass('nodirty'))
@@ -36649,8 +36678,7 @@ if (window.FileReader)
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr);
 				if (ele.is(':input')) {
-					ele.val(val);
-					Form.validate(ele);
+					ele.val(val).trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -36847,8 +36875,7 @@ Observation.treeselect = function(container) {
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr);
 				if (ele.is(':input')) {
-					ele.val(val);
-					Form.validate(ele);
+					ele.val(val).trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -37489,8 +37516,7 @@ Observation.filtercolumn = function(container) {
 					if (coords.length >= options.minCoords
 							&& coords.length <= options.maxCoords) {
 						modal.remove();
-						t.val(JSON.stringify(coords));
-						Form.validate(t);
+						t.val(JSON.stringify(coords)).trigger('validate');
 						if (t.hasClass('submit')) {
 							var f = t.closest('form');
 							var inputed = true;
