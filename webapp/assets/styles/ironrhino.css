@@ -8319,6 +8319,11 @@ div.form-horizontal .controls,.controls.text {
 .form-actions {
 	padding: 10px 20px 10px;
 }
+.hero-unit .form-horizontal {
+	font-size: 13px;
+	font-weight: normal;
+	line-height: 20px;
+}
 @media (max-width: 960px) {
   .form-horizontal .control-label{
 	width: 60px;
