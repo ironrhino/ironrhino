@@ -19,19 +19,19 @@
 													$(this).remove();
 												}).click();
 							});
-					$(target).bind('dragover', function(e) {
+					$(target).on('dragover', function(e) {
 								$(this).addClass('drophover');
 								return false;
-							}).bind('dragleave', function(e) {
+							}).on('dragleave', function(e) {
 								$(this).removeClass('drophover');
 								return false;
-							}).get(0).ondrop = function(e) {
+							}).on('drop', function(e) {
 						e.preventDefault();
 						$(this).removeClass('drophover');
-						concatenateImages(e.dataTransfer.files, target, field,
-								maximum, t.data('error'));
+						concatenateImages(e.originalEvent.dataTransfer.files,
+								target, field, maximum, t.data('error'));
 						return true;
-					};
+					});
 				});
 		return this;
 	}
@@ -91,12 +91,12 @@
 			$(canvas).css('width', '100%');
 		if (field) {
 			var maxwidth = parseInt($(field).data('maxwidth'));
-			if (maxwidth && canvas.width > maxwidth){
+			if (maxwidth && canvas.width > maxwidth) {
 				scale(canvas, maxwidth / canvas.width);
 				$(canvas).css('max-width', maxwidth);
 			}
 			var maxheight = parseInt($(field).data('maxheight'));
-			if (maxheight && canvas.height > maxheight){
+			if (maxheight && canvas.height > maxheight) {
 				scale(canvas, maxheight / canvas.height);
 				$(canvas).css('max-height', maxheight);
 			}

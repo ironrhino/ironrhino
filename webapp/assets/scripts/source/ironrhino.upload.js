@@ -86,22 +86,22 @@ Observation.upload = function(container) {
 						return false;
 					}
 				});
-		upload_form.bind('dragover', function(e) {
+		upload_form.on('dragover', function(e) {
 					$(this).addClass('drophover');
 					return false;
-				}).bind('dragleave', function(e) {
+				}).on('dragleave', function(e) {
 					$(this).removeClass('drophover');
 					return false;
-				}).get(0).ondrop = function(e) {
-			e.preventDefault();
-			$(this).removeClass('drophover');
-			uploadFiles(e.dataTransfer.files);
-			return true;
-		};
-		$(document.body).bind('dragover', function(e) {
+				}).on('drop', function(e) {
+					e.preventDefault();
+					$(this).removeClass('drophover');
+					uploadFiles(e.originalEvent.dataTransfer.files);
+					return true;
+				});
+		$(document.body).on('dragover', function(e) {
 					return false;
-				})[0].ondrop = function(e) {
-			var id = e.dataTransfer.getData('Text');
+				}).on('drop', function(e) {
+			var id = e.originalEvent.dataTransfer.getData('Text');
 			var target = $(e.target);
 			if (!id || target.is('#upload_form')
 					|| target.parents('#upload_form').length)
@@ -114,16 +114,17 @@ Observation.upload = function(container) {
 			if (e.stopPropagation)
 				e.stopPropagation();
 			deleteFiles(id);
-		}
+		});
 	}
 
 	$('.uploaditem', container).prop('draggable', true).each(function() {
 		var t = $(this);
-		this.ondragstart = function(e) {
-			e.dataTransfer.effectAllowed = 'copy';
-			e.dataTransfer.setData('Text', $(':input:eq(0)', t.closest('tr'))
-							.attr('value'));
-		};
+		t.on('dragstart', function(e) {
+					e.originalEvent.dataTransfer.effectAllowed = 'copy';
+					e.originalEvent.dataTransfer.setData('Text', $(
+									':input:eq(0)', t.closest('tr'))
+									.attr('value'));
+				});
 	});
 
 	$('#more', container).click(function() {
