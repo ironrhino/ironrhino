@@ -59,7 +59,8 @@ public class CacheAspect extends BaseAspect {
 					timeToIdle, checkCache.timeUnit()) : cacheManager.get(key,
 					namespace);
 			if (value != null) {
-				putReturnValueIntoContext(context, value);
+				putReturnValueIntoContext(context,
+						value instanceof NullObject ? null : value);
 				ExpressionUtils.eval(checkCache.onHit(), context);
 				return value instanceof NullObject ? null : value;
 			} else {
@@ -72,7 +73,8 @@ public class CacheAspect extends BaseAspect {
 						Thread.sleep(mutexWait);
 						value = cacheManager.get(key, namespace);
 						if (value != null) {
-							putReturnValueIntoContext(context, value);
+							putReturnValueIntoContext(context,
+									value instanceof NullObject ? null : value);
 							ExpressionUtils.eval(checkCache.onHit(), context);
 							return value instanceof NullObject ? null : value;
 						}

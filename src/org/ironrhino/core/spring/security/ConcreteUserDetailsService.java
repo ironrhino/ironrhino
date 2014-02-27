@@ -1,13 +1,9 @@
 package org.ironrhino.core.spring.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-public interface ConcreteUserDetailsService extends UserDetailsService {
+public interface ConcreteUserDetailsService {
 
-	@Override
-	public UserDetails loadUserByUsername(String username)
-			throws UsernameNotFoundException;
+	public UserDetails loadUserByUsername(String username);
 
 }

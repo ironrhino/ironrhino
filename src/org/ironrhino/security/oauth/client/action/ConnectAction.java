@@ -105,14 +105,14 @@ public class ConnectAction extends BaseAction {
 			if (user == null) {
 				String id = p.getUid();
 				LoginEvent loginEvent;
-				try {
-					user = (User) userManager.loadUserByUsername(id);
+				user = (User) userManager.loadUserByUsername(id);
+				if (user != null) {
 					OAuthTokenUtils.putTokenIntoUserAttribute(provider, user,
 							token);
 					userManager.save(user);
 					loginEvent = new LoginEvent(user, "oauth",
 							provider.getName());
-				} catch (UsernameNotFoundException e) {
+				} else {
 					user = new User();
 					user.setUsername(userManager.suggestUsername(id));
 					user.setLegiblePassword(CodecUtils.randomString(10));

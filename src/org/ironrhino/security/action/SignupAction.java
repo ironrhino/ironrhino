@@ -176,10 +176,12 @@ public class SignupAction extends BaseAction {
 				try {
 					User ud = (User) userManager.loadUserByUsername(user
 							.getUsername());
-					AuthzUtils.autoLogin(ud);
-					LoginEvent loginEvent = new LoginEvent(ud);
-					loginEvent.setFirst(true);
-					eventPublisher.publish(loginEvent, Scope.LOCAL);
+					if (ud != null) {
+						AuthzUtils.autoLogin(ud);
+						LoginEvent loginEvent = new LoginEvent(ud);
+						loginEvent.setFirst(true);
+						eventPublisher.publish(loginEvent, Scope.LOCAL);
+					}
 				} catch (RuntimeException e) {
 					log.warn(e.getMessage(), e);
 				}

@@ -2,6 +2,7 @@ package org.ironrhino.core.spring.security;
 
 import java.util.List;
 
+import org.ironrhino.core.remoting.Remoting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
+@Remoting(UserDetailsService.class)
 public class DelegateUserDetailsService implements UserDetailsService {
 
 	@Autowired

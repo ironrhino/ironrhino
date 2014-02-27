@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -26,10 +24,11 @@ import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.security.acl.model.Acl;
 import org.ironrhino.security.acl.service.AclManager;
-import org.ironrhino.security.service.UserManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -59,7 +58,7 @@ public class PermitAction extends BaseAction {
 	private transient AclManager aclManager;
 
 	@Autowired
-	private transient UserManager userManager;
+	private transient UserDetailsService userDetailsService;
 
 	@Autowired
 	private transient UserRoleManager userRoleManager;
@@ -220,7 +219,8 @@ public class PermitAction extends BaseAction {
 	public String input() {
 		if (StringUtils.isBlank(role) && StringUtils.isNotBlank(username)) {
 			try {
-				UserDetails user = userManager.loadUserByUsername(username);
+				UserDetails user = userDetailsService
+						.loadUserByUsername(username);
 				role = UsernameRoleMapper.map(user.getUsername());
 			} catch (UsernameNotFoundException e) {
 				addActionError(getText("validation.not.exists"));

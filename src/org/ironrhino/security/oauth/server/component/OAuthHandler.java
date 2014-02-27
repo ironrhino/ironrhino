@@ -14,7 +14,6 @@ import org.ironrhino.core.util.UserAgent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
-import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
@@ -23,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ public class OAuthHandler implements AccessHandler {
 	private OAuthManager oauthManager;
 
 	@Autowired
-	private UserManager userManager;
+	private UserDetailsService userDetailsService;
 
 	@Override
 	public String getPattern() {
@@ -91,7 +91,7 @@ public class OAuthHandler implements AccessHandler {
 					}
 				}
 				if (authorized) {
-					UserDetails ud = userManager
+					UserDetails ud = userDetailsService
 							.loadUserByUsername(authorization.getGrantor()
 									.getUsername());
 					SecurityContext sc = SecurityContextHolder.getContext();

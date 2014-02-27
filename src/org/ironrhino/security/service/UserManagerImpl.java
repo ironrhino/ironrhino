@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
-import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleMapper;
 import org.ironrhino.core.service.BaseManagerImpl;
@@ -21,14 +20,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@Remoting(UserDetailsService.class)
 public class UserManagerImpl extends BaseManagerImpl<User> implements
 		UserManager {
 
@@ -68,9 +65,11 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 			user = findOne("email", username);
 		else
 			user = findByNaturalId(username);
-		if (user == null)
-			throw new UsernameNotFoundException("No such Username : "
-					+ username);
+		if (user == null) {
+			// throw new UsernameNotFoundException("No such Username : "+
+			// username);
+			return null; // for @CheckCache
+		}
 		populateAuthorities(user);
 		return user;
 	}
