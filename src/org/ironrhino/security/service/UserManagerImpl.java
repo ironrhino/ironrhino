@@ -13,11 +13,11 @@ import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleMapper;
 import org.ironrhino.core.service.BaseManagerImpl;
-import org.ironrhino.core.spring.security.FallbackUserDetailsService;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,16 +27,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Primary
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Remoting(UserDetailsService.class)
 public class UserManagerImpl extends BaseManagerImpl<User> implements
 		UserManager {
 
 	@Autowired(required = false)
 	private List<UserRoleMapper> userRoleMappers;
-
-	@Autowired(required = false)
-	private FallbackUserDetailsService fallbackUserDetailsService;
 
 	@Override
 	@Transactional
@@ -71,8 +68,6 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 			user = findOne("email", username);
 		else
 			user = findByNaturalId(username);
-		if (user == null && fallbackUserDetailsService != null)
-			return fallbackUserDetailsService.loadUserByUsername(username);
 		if (user == null)
 			throw new UsernameNotFoundException("No such Username : "
 					+ username);
