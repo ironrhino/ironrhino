@@ -7,7 +7,7 @@
 	<security:authentication-manager alias="authenticationManager"
 		erase-credentials="true">
 		<security:authentication-provider
-			user-service-ref="delegateUserDetailsService">
+			user-service-ref="userDetailsService">
 			<security:password-encoder ref="passwordEncoder" />
 		</security:authentication-provider>
 		<security:authentication-provider
@@ -50,7 +50,7 @@
 		class="org.ironrhino.core.spring.security.DefaultTokenBasedRememberMeServices"
 		p:parameter="rememberme" p:cookieName="rm">
 		<constructor-arg value="${rememberMe.key:youcannotguessme}" />
-		<constructor-arg ref="delegateUserDetailsService" />
+		<constructor-arg ref="userDetailsService" />
 	</bean>
 
 	<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.MixedPasswordEncoder" />
@@ -60,7 +60,7 @@
 		</list> </property> </bean> -->
 
 	<!-- <bean id="switchUserProcessingFilter" class="org.springframework.security.web.authentication.switchuser.SwitchUserFilter" 
-		p:userDetailsService-ref="delegateUserDetailsService" p:switchUserUrl="/switch" p:exitUserUrl="/exit" 
+		p:userDetailsService-ref="userDetailsService" p:switchUserUrl="/switch" p:exitUserUrl="/exit" 
 		p:targetUrl="/" /> -->
 
 </beans>

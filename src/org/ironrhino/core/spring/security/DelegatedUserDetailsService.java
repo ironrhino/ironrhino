@@ -3,6 +3,7 @@ package org.ironrhino.core.spring.security;
 import java.util.List;
 
 import org.ironrhino.core.remoting.Remoting;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,10 +11,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("userDetailsService")
 @Primary
 @Remoting(UserDetailsService.class)
-public class DelegateUserDetailsService implements UserDetailsService {
+@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+public class DelegatedUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	private List<ConcreteUserDetailsService> userDetailsServices;

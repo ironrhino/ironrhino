@@ -7,7 +7,7 @@
 	<security:http pattern="/assets/**" security="none" />
 	<security:http access-denied-page="/error/handle/403"
 		entry-point-ref="entryPoint" access-decision-manager-ref="accessDecisionManager">
-		<security:x509 subject-principal-regex="CN=(.*?)," user-service-ref="delegateUserDetailsService"/>
+		<security:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService"/>
 		<security:intercept-url pattern="/common/**"
 			access="ROLE_ADMINISTRATOR" />
 		<security:intercept-url pattern="/remoting/**"
