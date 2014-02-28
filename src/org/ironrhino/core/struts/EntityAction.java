@@ -972,6 +972,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			for (Object o : siblings) {
 				BaseTreeableEntity sibling = (BaseTreeableEntity) o;
+				entityManager.evict(sibling);
 				if (!treeEntity.isNew()
 						&& sibling.getId().equals(treeEntity.getId()))
 					continue;
