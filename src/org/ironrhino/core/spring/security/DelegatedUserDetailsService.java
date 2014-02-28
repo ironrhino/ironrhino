@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DelegatedUserDetailsService implements UserDetailsService {
 
-	@Autowired
+	@Autowired(required = false)
 	private List<ConcreteUserDetailsService> userDetailsServices;
 
 	@Override
