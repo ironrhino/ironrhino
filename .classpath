@@ -26,7 +26,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/guava-16.0.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hessian-4.0.37.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-commons-annotations-4.0.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-4.3.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-4.3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpclient-4.3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/iText-2.1.7.jar"/>
