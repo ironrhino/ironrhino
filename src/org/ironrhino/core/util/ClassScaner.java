@@ -2,6 +2,7 @@ package org.ironrhino.core.util;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.configuration.CustomAnnotationTypeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -205,7 +207,15 @@ public class ClassScaner {
 				appBasePackage = "org.ironrhino";
 			}
 			String[] arr = appBasePackage.split(",+");
-			return arr;
+			Set<String> packages = new TreeSet<String>();
+			Set<Class<?>> componentScans = scanAnnotated(arr,
+					ComponentScan.class);
+			for (Class<?> c : componentScans) {
+				ComponentScan cs = c.getAnnotation(ComponentScan.class);
+				packages.addAll(Arrays.asList(cs.value()));
+			}
+			packages.addAll(Arrays.asList(arr));
+			return packages.toArray(new String[0]);
 		} else {
 			Set<String> packages = new TreeSet<String>();
 			for (Package p : Package.getPackages()) {
