@@ -24,6 +24,7 @@ import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.aop.PublishAspect;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.util.XmlUtils;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -75,16 +76,18 @@ public class RegionSetup {
 									.substring(0, 2))) {
 						String[] arr2 = coordinate.split(",");
 						Coordinate c = new Coordinate();
-						c.setLatitude(Double.valueOf(arr2[1]));
-						c.setLongitude(Double.valueOf(arr2[0]));
+						c.setLatitude(NumberUtils.round(
+								Double.valueOf(arr2[1]), 6));
+						c.setLongitude(NumberUtils.round(
+								Double.valueOf(arr2[0]), 6));
 						region.setCoordinate(c);
 						break;
 					}
 				} else {
 					String[] arr2 = coordinate.split(",");
 					Coordinate c = new Coordinate();
-					c.setLatitude(Double.valueOf(arr2[1]));
-					c.setLongitude(Double.valueOf(arr2[0]));
+					c.setLatitude(NumberUtils.round(Double.valueOf(arr2[1]), 6));
+					c.setLongitude(NumberUtils.round(Double.valueOf(arr2[0]), 6));
 					region.setCoordinate(c);
 				}
 			}

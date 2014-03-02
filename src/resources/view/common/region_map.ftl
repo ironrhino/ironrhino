@@ -55,7 +55,7 @@ function getMarkers(){
 	var bounds = map.getBounds();
 	var southWest = bounds.getSouthWest();
 	var northEast = bounds.getNorthEast();
-	var url = '${actionBaseUrl}/markers?southWest='+southWest.lat()+','+southWest.lng()+'&northEast='+northEast.lat()+','+northEast.lng()+'&zoom='+map.getZoom();
+	var url = '${actionBaseUrl}/markers?southWest='+southWest.lat().toFixed(6)+','+southWest.lng().toFixed(6)+'&northEast='+northEast.lat().toFixed(6)+','+northEast.lng().toFixed(6)+'&zoom='+map.getZoom();
 	$.ajax({
 		url:url, 
 		global:false,
@@ -111,8 +111,8 @@ function moveMarker(marker){
 				return;
 			}
 			region.coordinate = {
-				latitude:marker.getPosition().lat(),
-				longitude:marker.getPosition().lng()
+				latitude:marker.getPosition().lat().toFixed(6),
+				longitude:marker.getPosition().lng().toFixed(6)
 			};
 			regions[region.id+''] = region;
 			var data = {
@@ -163,8 +163,8 @@ function moveTo(region){
 	        map.setCenter(pos);
 	        map.setZoom(9);
 	        region.coordinate = {
-				latitude:pos.lat(),
-				longitude:pos.lng()
+				latitude:pos.lat().toFixed(6),
+				longitude:pos.lng().toFixed(6)
 			};
 			var data = {
 			'region.id':region.id,
@@ -185,8 +185,8 @@ function mark(region){
 		if(!confirm('确认空白标注所在地是'+region.name+'?'))
 			return;
 		region.coordinate = {
-			latitude:newMarker.getPosition().lat(),
-			longitude:newMarker.getPosition().lng()
+			latitude:newMarker.getPosition().lat().toFixed(6),
+			longitude:newMarker.getPosition().lng().toFixed(6)
 		};
 		var data = {
 			'region.id':region.id,
@@ -219,8 +219,8 @@ function nextRequestInQueue(){
                   		var pos = results[0].geometry.location;
                         var data = {
 						'region.id':item.value,
-						'region.coordinate.latitude':pos.lat(),
-						'region.coordinate.longitude':pos.lng()
+						'region.coordinate.latitude':pos.lat().toFixed(6),
+						'region.coordinate.longitude':pos.lng().toFixed(6)
 						}
 						$.ajax({url:'${actionBaseUrl}/mark',data:data,global:false,success:function(resp){}});
 
