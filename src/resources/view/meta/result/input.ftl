@@ -85,7 +85,7 @@
 				<#else>
 					<div class="control-group">
 						<label class="control-label">${action.getText(label)}</label>
-						<div class="controls">
+						<div class="controls text">
 						<span>${entity[key]!}</span>
 						</div>
 					</div>
@@ -93,7 +93,7 @@
 			<#elseif config.type=='dictionary' && selectDictionary??>
 				<div class="control-group">
 				<label class="control-label" for="${id}">${action.getText(label)}</label>
-				<div class="controls">
+				<div class="controls<#if readonly> text</#if>">
 				<#if !readonly>
 					<@selectDictionary id=id dictionaryName=templateName name=entityName+"."+key value="${entity[key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
 				<#else>
