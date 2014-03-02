@@ -23542,6 +23542,7 @@ function log() {
 					function createNode(parent) {
 						var parentTreenode = $(parent).parent('li')
 								.data('treenode');
+						this.parent = parentTreenode;
 						if (parentTreenode)
 							this.fullname = (parentTreenode.fullname || parentTreenode.name)
 									+ (settings.separator || '') + this.name;
@@ -37847,16 +37848,20 @@ if (window.FileReader)
 			url += (url.indexOf('?') > -1 ? '&' : '?') + 'r=' + Math.random();
 		$.getJSON(url, function(data) {
 			$.each(data, function() {
+				var parent = null;
 				var fullname = '';
 				$('.area', treearea).each(function() {
 					$('span', this).each(function() {
-						if ($(this).hasClass('selected'))
+						if ($(this).hasClass('selected')) {
 							fullname += (fullname
 									? (treeoptions.separator || '')
 									: '')
 									+ $(this).text();
+							parent = $(this).data('treenode');
+						}
 					});
 				});
+				this.parent = parent;
 				this.fullname = fullname
 						+ (fullname ? (treeoptions.separator || '') : '')
 						+ this.name;

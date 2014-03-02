@@ -31,6 +31,7 @@
 					function createNode(parent) {
 						var parentTreenode = $(parent).parent('li')
 								.data('treenode');
+						this.parent = parentTreenode;
 						if (parentTreenode)
 							this.fullname = (parentTreenode.fullname || parentTreenode.name)
 									+ (settings.separator || '') + this.name;
