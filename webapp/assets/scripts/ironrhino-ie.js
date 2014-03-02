@@ -37949,6 +37949,10 @@ if (window.FileReader)
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
 		val(options.id, '');
+		if (options.id) {
+			var idtarget = find(options.id);
+			idtarget.removeData('treenode');
+		}
 		$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -38070,6 +38074,7 @@ if (window.FileReader)
 				var form = idtarget.closest('form');
 				if (!form.hasClass('nodirty'))
 					form.addClass('dirty');
+				idtarget.data('treenode', treenode);
 			}
 		}
 		$('#_tree_window').dialog('close');
@@ -38456,8 +38461,9 @@ function latlng_createOrMoveMarker(latLng) {
 	} else {
 		latlng_marker.setPosition(latLng);
 	}
-	if (latlng_map.getZoom() < 8)
-		latlng_map.setZoom(8);
+	var zoom = latlng_input.data('zoom') || 8;
+	if (latlng_map.getZoom() < zoom)
+		latlng_map.setZoom(zoom);
 	latlng_map.setCenter(latLng);
 }
 function latlng_setLatLng(latLng) {
@@ -38480,7 +38486,27 @@ function latlng_getLatLng() {
 							latlng_resetMaps();
 
 					});
-		else
+		else if (latlng_input.data('regionselector')) {
+			var coordinate;
+			var region = $(latlng_input.data('regionselector'))
+					.data('treenode');
+			if (region) {
+				var coordinate = region.coordinate;
+				while (!coordinate && region.parent) {
+					region = region.parent;
+					coordinate = region.coordinate;
+				}
+
+			}
+			if (coordinate) {
+				latlng_map
+						.setCenter(new google.maps.LatLng(
+								region.coordinate.latitude,
+								region.coordinate.longitude));
+				latlng_map.setZoom(latlng_input.data('zoom') || 8);
+			} else
+				latlng_resetMaps();
+		} else
 			latlng_resetMaps();
 }
 Observation.latlng = function(container) {

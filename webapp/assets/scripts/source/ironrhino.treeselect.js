@@ -62,6 +62,10 @@
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
 		val(options.id, '');
+		if (options.id) {
+			var idtarget = find(options.id);
+			idtarget.removeData('treenode');
+		}
 		$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -183,6 +187,7 @@
 				var form = idtarget.closest('form');
 				if (!form.hasClass('nodirty'))
 					form.addClass('dirty');
+				idtarget.data('treenode', treenode);
 			}
 		}
 		$('#_tree_window').dialog('close');
