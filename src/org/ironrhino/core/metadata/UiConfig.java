@@ -79,7 +79,7 @@ public @interface UiConfig {
 
 	String optionsExpression() default ""; // for select,multiselect
 
-	String pickUrl() default "";// for listpick
+	String pickUrl() default "";// for listpick treeselect
 
 	String templateName() default ""; // for dictionary,schema
 

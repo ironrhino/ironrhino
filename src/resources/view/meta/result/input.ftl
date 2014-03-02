@@ -90,6 +90,23 @@
 						</div>
 					</div>
 				</#if>
+			<#elseif config.type=='treeselect'>
+				<#if !readonly>
+					<div class="control-group treeselect" data-options="{'url':'<@url value=config.pickUrl/>','name':'#${id}-control','id':'#${id}'}">
+						<@s.hidden id=id name=entityName+"."+key+".id" cssClass=config.cssClass/>
+						<label class="control-label" for="${id}-control">${action.getText(label)}</label>
+						<div class="controls">
+						<span id="${id}-control"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
+						</div>
+					</div>
+				<#else>
+					<div class="control-group">
+						<label class="control-label">${action.getText(label)}</label>
+						<div class="controls text">
+						<span>${entity[key]!}</span>
+						</div>
+					</div>
+				</#if>
 			<#elseif config.type=='dictionary' && selectDictionary??>
 				<div class="control-group">
 				<label class="control-label" for="${id}">${action.getText(label)}</label>

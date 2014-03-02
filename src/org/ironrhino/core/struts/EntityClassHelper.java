@@ -221,7 +221,8 @@ public class EntityClassHelper {
 						}
 					if (manyToOne != null && !manyToOne.optional())
 						uci.setRequired(true);
-					uci.setType("listpick");
+					if (uci.getType() == UiConfig.DEFAULT_INPUT_TYPE)
+						uci.setType("listpick");
 					uci.setExcludeIfNotEdited(true);
 					if (StringUtils.isBlank(uci.getPickUrl())) {
 						String url = AutoConfigPackageProvider
