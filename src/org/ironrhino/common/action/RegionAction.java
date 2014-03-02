@@ -177,7 +177,7 @@ public class RegionAction extends BaseAction {
 			Region temp = region;
 			region = entityManager.get(temp.getId());
 			if (ServletActionContext.getRequest().getParameter(
-					"region.coordinate.latLngAsString") != null) {
+					"region.coordinate") != null) {
 				region.setCoordinate(temp.getCoordinate());
 			}
 			if (!region.getName().equals(temp.getName())) {
