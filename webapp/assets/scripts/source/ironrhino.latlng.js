@@ -18,7 +18,7 @@
 				win.closest('.ui-dialog').css('z-index', '2003');
 				if (typeof google == 'undefined') {
 					var script = document.createElement('script');
-					script.src = 'https://www.google.com/jsapi?callback=latlng_loadMaps';
+					script.src = 'http://www.google.com/jsapi?callback=latlng_loadMaps';
 					script.type = 'text/javascript';
 					document.getElementsByTagName("head")[0]
 							.appendChild(script);
@@ -99,7 +99,8 @@ function latlng_createOrMoveMarker(latLng) {
 	latlng_map.setCenter(latLng);
 }
 function latlng_setLatLng(latLng) {
-	$(latlng_input).val(latLng.lat() + ',' + latLng.lng());
+	$(latlng_input)
+			.val(latLng.lat().toFixed(6) + ',' + latLng.lng().toFixed(6));
 }
 function latlng_getLatLng() {
 	if (latlng_input)
