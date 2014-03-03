@@ -37147,12 +37147,24 @@ Observation._imagepick = function(container) {
 (function($) {
 	$.fn.latlng = function() {
 		var t = $(this);
-		if (!t.parent('.input-append').length)
-			t
-					.wrap('<div class="input-append"></div>')
-					.after('<span class="add-on"><i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i></span>');
-		$('.glyphicon-map-marker', t.next()).click(function() {
-			window.latlng_input = $(this).parent().prev();
+		var anchor;
+		if (t.is('[type="hidden"]')) {
+			anchor = $('<i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i>')
+					.insertAfter(t);
+		} else {
+			if (!t.parent('.input-append').length)
+				t
+						.wrap('<div class="input-append"></div>')
+						.after('<span class="add-on"><i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i></span>');
+			anchor = $(
+					'<i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i>',
+					t.next());
+		}
+		if (t.closest('.control-group').length)
+			anchor = $('.control-label,.glyphicon-map-marker', t
+							.closest('.control-group'));
+		anchor.click(function() {
+			window.latlng_input = t;
 			if (!$('#_maps_window').length) {
 				var win = $('<div id="_maps_window" title="'
 						+ MessageBundle.get('select')
@@ -37175,6 +37187,24 @@ Observation._imagepick = function(container) {
 				latlng_getLatLng();
 			}
 		});
+		if (t.data('staticmapselector')) {
+			t.change(function(e) {
+				var holder = $(t.data('staticmapselector'));
+				var value = $(t).val();
+				if (value) {
+					holder
+							.html('<img src="http://maps.googleapis.com/maps/api/staticmap?center='
+									+ value
+									+ '&zoom='
+									+ (t.data('zoom') || 13)
+									+ '&size='
+									+ (t.data('size') || '200x200')
+									+ '&sensor=false"/>');
+				} else {
+					holder.html('');
+				}
+			});
+		}
 	};
 
 })(jQuery);
@@ -37247,7 +37277,8 @@ function latlng_createOrMoveMarker(latLng) {
 }
 function latlng_setLatLng(latLng) {
 	$(latlng_input)
-			.val(latLng.lat().toFixed(6) + ',' + latLng.lng().toFixed(6));
+			.val(latLng.lat().toFixed(6) + ',' + latLng.lng().toFixed(6))
+			.trigger('change').trigger('validate');
 }
 function latlng_getLatLng() {
 	if (latlng_input)
