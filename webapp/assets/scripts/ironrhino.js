@@ -37269,11 +37269,14 @@ function latlng_getLatLng() {
 			var coordinate;
 			var region = $(latlng_input.data('regionselector'))
 					.data('treenode');
+			var zoom = latlng_input.data('zoom') || 8;
 			if (region) {
 				var coordinate = region.coordinate;
 				while (!coordinate && region.parent) {
 					region = region.parent;
 					coordinate = region.coordinate;
+					if (zoom > 5)
+						zoom -= 2;
 				}
 
 			}
@@ -37282,7 +37285,7 @@ function latlng_getLatLng() {
 						.setCenter(new google.maps.LatLng(
 								region.coordinate.latitude,
 								region.coordinate.longitude));
-				latlng_map.setZoom(latlng_input.data('zoom') || 8);
+				latlng_map.setZoom(zoom);
 			} else
 				latlng_resetMaps();
 		} else
