@@ -182,7 +182,7 @@
 			]]>
 		</script>
 		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source"
-			srcdir="${src.dir}" destdir="${classes.dir}" encoding="UTF-8">
+			srcdir="${src.dir}" destdir="${classes.dir}" encoding="UTF-8" includejavaruntime="true">
 			<classpath refid="lib.classpath" />
 		</javac>
 		<copy todir="${classes.dir}" preservelastmodified="true">
@@ -223,7 +223,7 @@
 			if(project.getTargets().containsKey('post-test'))
 				project.executeTarget('post-test');
 			]]>
-		</script>		
+		</script>	
 		<mkdir dir="${test.results.dir}" />
 		<junit haltonfailure="no" printsummary="on">
 			<classpath>
@@ -383,6 +383,12 @@
 	</target>
 
 	<target name="jar" depends="compile">
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('pre-jar'))
+				project.executeTarget('pre-jar');
+			]]>
+		</script>
 		<mkdir dir="${target.dir}" />
 		<delete file="${target.dir}/${jar.name}" />
 		<antcall target="unzip-assets" />
@@ -395,9 +401,21 @@
 		<jar jarfile="${target.dir}/${jar.name}" basedir="${classes.dir}" />
 		<delete dir="${classes.dir}/META-INF/resources" />
 		<antcall target="reset-append-revision-for-assets" />
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('post-jar'))
+				project.executeTarget('post-jar');
+			]]>
+		</script>
 	</target>
 
 	<target name="war" depends="jar">
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('pre-war'))
+				project.executeTarget('pre-war');
+			]]>
+		</script>	
 		<antcall target="unzip-assets" />
 		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
 			preservelastmodified="true" />
@@ -414,9 +432,21 @@
 		</move>
 		<delete dir="${target.dir}/classes" />
 		<antcall target="reset-assets" />
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('post-war'))
+				project.executeTarget('post-war');
+			]]>
+		</script>	
 	</target>
 
 	<target name="war2" depends="jar">
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('pre-war2'))
+				project.executeTarget('pre-war2');
+			]]>
+		</script>			
 		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
 			preservelastmodified="true" />
 		<mkdir dir="${target.dir}/classes" />
@@ -431,9 +461,21 @@
 			<fileset dir="${target.dir}/classes" />
 		</move>
 		<delete dir="${target.dir}/classes" />
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('post-war2'))
+				project.executeTarget('post-war2');
+			]]>
+		</script>
 	</target>
 	
 	<target name="war-standalone" depends="jar">
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('pre-war-standalone'))
+				project.executeTarget('pre-war-standalone');
+			]]>
+		</script>
 		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
 			preservelastmodified="true" />
 		<mkdir dir="${target.dir}/classes" />
@@ -524,6 +566,12 @@
 		<delete dir="${webapp.dir}/bootstrap" />
 		<delete dir="${webapp.dir}/WEB-INF/libext" />
 		<delete dir="${target.dir}/classes" />
+		<script language="javascript">
+			<![CDATA[
+			if(project.getTargets().containsKey('post-war-standalone'))
+				project.executeTarget('post-war-standalone');
+			]]>
+		</script>	
 	</target>
 
 	<target name="clean">
