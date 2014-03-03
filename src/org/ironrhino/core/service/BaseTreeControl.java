@@ -94,6 +94,8 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> implements
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private synchronized void update(T treeNode) {
 		T t = tree.getDescendantOrSelfById(treeNode.getId());
+		if (t == null)
+			return;
 		boolean needsort = t.compareTo(treeNode) != 0
 				|| !t.getFullId().equals(treeNode.getFullId());
 		if (!t.getFullId().equals(treeNode.getFullId())) {
@@ -125,18 +127,19 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> implements
 
 	private void resetChildren(T treeNode) {
 		if (treeNode.isHasChildren())
-			for (T r : treeNode.getChildren()) {
-				String fullId = (r.getParent()).getFullId()
-						+ String.valueOf(r.getId()) + ".";
-				r.setFullId(fullId);
-				r.setLevel(fullId.split("\\.").length);
-				resetChildren(r);
+			for (T t : treeNode.getChildren()) {
+				String fullId = (t.getParent()).getFullId()
+						+ String.valueOf(t.getId()) + ".";
+				t.setFullId(fullId);
+				t.setLevel(fullId.split("\\.").length);
+				resetChildren(t);
 			}
 	}
 
 	private synchronized void delete(T treeNode) {
-		T r = tree.getDescendantOrSelfById(treeNode.getId());
-		r.getParent().getChildren().remove(r);
+		T t = tree.getDescendantOrSelfById(treeNode.getId());
+		if (t != null)
+			t.getParent().getChildren().remove(t);
 	}
 
 	@Override
