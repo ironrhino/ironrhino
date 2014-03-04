@@ -7,10 +7,11 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
@@ -25,8 +26,10 @@ import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -160,7 +163,21 @@ public class SetupAction extends BaseAction {
 
 	public void doSetup() throws Exception {
 		String[] beanNames = ctx.getBeanDefinitionNames();
-		for (String beanName : beanNames) {
+		Map<Method, Object> methods = new TreeMap<Method, Object>(
+				new Comparator<Method>() {
+					@Override
+					public int compare(Method m1, Method m2) {
+						int order1 = org.springframework.core.Ordered.LOWEST_PRECEDENCE, order2 = org.springframework.core.Ordered.LOWEST_PRECEDENCE;
+						Order o = m1.getAnnotation(Order.class);
+						if (o != null)
+							order1 = o.value();
+						o = m2.getAnnotation(Order.class);
+						if (o != null)
+							order2 = o.value();
+						return order1 == order2 ? 0 : order1 < order2 ? -1 : 1;
+					}
+				});
+		for (String beanName : beanNames)
 			if (StringUtils.isAlphanumeric(beanName)
 					&& ctx.isSingleton(beanName)) {
 				String beanClassName = ctx.getBeanFactory()
@@ -168,52 +185,53 @@ public class SetupAction extends BaseAction {
 				Class<?> clz = beanClassName != null ? Class
 						.forName(beanClassName) : ReflectionUtils
 						.getTargetObject(ctx.getBean(beanName)).getClass();
-				Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz,
-						Setup.class);
-				for (Method m : methods) {
-					int modifiers = m.getModifiers();
-					if (Modifier.isPublic(modifiers)) {
-						if (m.getParameterTypes().length == 0) {
-							m.invoke(ctx.getBean(beanName), new Object[0]);
-						} else {
-							String[] parameterNames = ReflectionUtils.parameterNameDiscoverer
-									.getParameterNames(m);
-							Class<?>[] parameterTypes = m.getParameterTypes();
-							Object[] value = new Object[parameterNames.length];
-							for (int i = 0; i < parameterNames.length; i++) {
-								String pvalue = ServletActionContext
-										.getRequest().getParameter(
-												parameterNames[i]);
-								Object v = pvalue;
-								Class<?> type = parameterTypes[i];
-								if (!type.equals(String.class)) {
-									if (type.equals(Integer.class)
-											|| type.equals(Integer.TYPE)) {
-										v = Integer.valueOf(pvalue);
-									} else if (type.equals(Long.class)
-											|| type.equals(Long.TYPE)) {
-										v = Long.valueOf(pvalue);
-									} else if (type.equals(Float.class)
-											|| type.equals(Float.TYPE)) {
-										v = Float.valueOf(pvalue);
-									} else if (type.equals(Double.class)
-											|| type.equals(Double.TYPE)) {
-										v = Double.valueOf(pvalue);
-									} else if (type.equals(BigDecimal.class)) {
-										v = new BigDecimal(pvalue);
-									} else if (type.equals(Boolean.class)
-											|| type.equals(Boolean.TYPE)) {
-										v = "true".equals(pvalue);
-									}
-								}
-								value[i] = v;
-							}
-							Object o = m.invoke(ctx.getBean(beanName), value);
-							if (o instanceof UserDetails)
-								AuthzUtils.autoLogin((UserDetails) o);
+				Object bean = ctx.getBean(beanName);
+				for (Method m : AnnotationUtils.getAnnotatedMethods(clz,
+						Setup.class))
+					methods.put(m, bean);
+			}
+		for (Map.Entry<Method, Object> entry : methods.entrySet()) {
+			Method m = entry.getKey();
+			int modifiers = m.getModifiers();
+			if (!Modifier.isPublic(modifiers))
+				continue;
+			if (m.getParameterTypes().length == 0) {
+				m.invoke(entry.getValue(), new Object[0]);
+			} else {
+				String[] parameterNames = ReflectionUtils.parameterNameDiscoverer
+						.getParameterNames(m);
+				Class<?>[] parameterTypes = m.getParameterTypes();
+				Object[] value = new Object[parameterNames.length];
+				for (int i = 0; i < parameterNames.length; i++) {
+					String pvalue = ServletActionContext.getRequest()
+							.getParameter(parameterNames[i]);
+					Object v = pvalue;
+					Class<?> type = parameterTypes[i];
+					if (!type.equals(String.class)) {
+						if (type.equals(Integer.class)
+								|| type.equals(Integer.TYPE)) {
+							v = Integer.valueOf(pvalue);
+						} else if (type.equals(Long.class)
+								|| type.equals(Long.TYPE)) {
+							v = Long.valueOf(pvalue);
+						} else if (type.equals(Float.class)
+								|| type.equals(Float.TYPE)) {
+							v = Float.valueOf(pvalue);
+						} else if (type.equals(Double.class)
+								|| type.equals(Double.TYPE)) {
+							v = Double.valueOf(pvalue);
+						} else if (type.equals(BigDecimal.class)) {
+							v = new BigDecimal(pvalue);
+						} else if (type.equals(Boolean.class)
+								|| type.equals(Boolean.TYPE)) {
+							v = "true".equals(pvalue);
 						}
 					}
+					value[i] = v;
 				}
+				Object o = m.invoke(entry.getValue(), value);
+				if (o instanceof UserDetails)
+					AuthzUtils.autoLogin((UserDetails) o);
 			}
 		}
 	}

@@ -8,6 +8,7 @@ import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,6 +18,7 @@ public class AdminUserSetup {
 	private UserManager userManager;
 
 	@Setup
+	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public User setup(
 			@SetupParameter(defaultValue = "admin", displayOrder = Ordered.HIGHEST_PRECEDENCE, label = "admin.username") String username,
 			@SetupParameter(defaultValue = "password", displayOrder = Ordered.HIGHEST_PRECEDENCE + 1, label = "admin.password") String password)
