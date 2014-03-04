@@ -221,7 +221,7 @@ public class EntityClassHelper {
 						}
 					if (manyToOne != null && !manyToOne.optional())
 						uci.setRequired(true);
-					if (uci.getType() == UiConfig.DEFAULT_INPUT_TYPE)
+					if (uci.getType().equals(UiConfig.DEFAULT_TYPE))
 						uci.setType("listpick");
 					uci.setExcludeIfNotEdited(true);
 					if (StringUtils.isBlank(uci.getPickUrl())) {
