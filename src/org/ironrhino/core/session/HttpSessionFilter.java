@@ -31,6 +31,9 @@ public class HttpSessionFilter implements Filter {
 	@Autowired
 	private HttpSessionManager httpSessionManager;
 
+	@Autowired(required = false)
+	private HttpSessionFilterHook httpSessionFilterHook;
+
 	private String[] excludePatterns;
 
 	@Override
@@ -68,7 +71,11 @@ public class HttpSessionFilter implements Filter {
 				req, session);
 		WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(
 				(HttpServletResponse) response, session);
+		if (httpSessionFilterHook != null)
+			httpSessionFilterHook.beforeDoFilter();
 		chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
+		if (httpSessionFilterHook != null)
+			httpSessionFilterHook.afterDoFilter();
 		try {
 			session.save();
 		} catch (Exception e) {

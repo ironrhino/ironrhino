@@ -32719,29 +32719,39 @@ Observation.common = function(container) {
 		t.click(function(e) {
 			if (!$('#' + id).length) {
 				$.get(t.attr('href'), function(data) {
-					var html = data.replace(/<script(.|\s)*?\/script>/g, '');
-					var div = $('<div/>').html(html);
-					var title = $('title', div).html();
-					var body = $('#content', div).html();
-					var modalwidth = t.data('modalwidth');
-					$('<div id="'
-							+ id
-							+ '" class="modal hide fade in"'
-							+ (modalwidth ? ' style="width:' + modalwidth
-									+ ';"' : '')
-							+ '><div class="modal-header"><a class="close" data-dismiss="modal">&times;</a><h3 style="text-align:center;">'
-							+ title
-							+ '</h3></div><div class="modal-body" style="padding-top:40px;">'
-							+ body + '</div></div>').appendTo(document.body);
-					_observe($('#' + id));
-					$('form', $('#' + id)).each(function() {
-								this.onsuccess = function() {
-									$('#' + id).modal('hide');
-								};
-							});
-					t.data('originalhref', t.attr('href')).attr('href',
-							'#' + id).attr('data-toggle', 'modal');
-					$('#' + id).modal('show');
+					if (typeof data == 'object') {
+						if (data.actionErrors) {
+							Message.showActionError(data.actionErrors);
+						} else {
+							console.log(JSON.stringify(data));
+						}
+					} else {
+						var html = data
+								.replace(/<script(.|\s)*?\/script>/g, '');
+						var div = $('<div/>').html(html);
+						var title = $('title', div).html();
+						var body = $('#content', div).html();
+						var modalwidth = t.data('modalwidth');
+						$('<div id="'
+								+ id
+								+ '" class="modal hide fade in"'
+								+ (modalwidth ? ' style="width:' + modalwidth
+										+ ';"' : '')
+								+ '><div class="modal-header"><a class="close" data-dismiss="modal">&times;</a><h3 style="text-align:center;">'
+								+ title
+								+ '</h3></div><div class="modal-body" style="padding-top:40px;">'
+								+ body + '</div></div>')
+								.appendTo(document.body);
+						_observe($('#' + id));
+						$('form', $('#' + id)).each(function() {
+									this.onsuccess = function() {
+										$('#' + id).modal('hide');
+									};
+								});
+						t.data('originalhref', t.attr('href')).attr('href',
+								'#' + id).attr('data-toggle', 'modal');
+						$('#' + id).modal('show');
+					}
 				});
 			} else {
 				if (t.hasClass('nocache')) {
