@@ -211,21 +211,27 @@ upstream  backend  {
     server   localhost:8081;
 }
 server {
-     listen   80 default_server;
-     location ~ ^/assets/ {
-             root   /home/$USER/tomcat8080/webapps/ROOT;
-             expires      max;
-             add_header Cache-Control public;
-             charset utf-8;
-     }
-     location  / {
-             proxy_pass  http://backend;
-             proxy_redirect    off;
-             proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
-             proxy_set_header  X-Real-IP  \$remote_addr;
-             proxy_set_header  Host \$http_host;
-             limit_conn addr   8;
-     }
+	listen   80 default_server;
+	location ~ ^/assets/ {
+			root   /home/$USER/tomcat8080/webapps/ROOT;
+			expires      max;
+			add_header Cache-Control public;
+			charset utf-8;
+	}
+	location ~ ^/websocket/ {
+			proxy_pass http://backend;
+			proxy_http_version 1.1;
+			proxy_set_header Upgrade \$http_upgrade;
+			proxy_set_header Connection "upgrade";
+	}
+	location  / {
+			proxy_pass  http://backend;
+			proxy_redirect    off;
+			proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
+			proxy_set_header  X-Real-IP  \$remote_addr;
+			proxy_set_header  Host \$http_host;
+			limit_conn addr   8;
+	}
 }
 EOF
 service nginx restart
