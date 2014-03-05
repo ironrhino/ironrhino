@@ -198,11 +198,16 @@ fi
 
 
 #config nginx
-if [ -f /etc/nginx/sites-enabled/default ] && ! $(more /etc/nginx/sites-enabled/default|grep backend >/dev/null 2>&1) ; then
-rm -rf /etc/nginx/sites-enabled/default
+if [ -d /etc/nginx/sites-enabled ]  ; then
+ngigxfile="/etc/nginx/sites-enabled/default"
+else
+ngigxfile="/etc/nginx/conf.d/default.conf"
 fi
-if [ ! -f /etc/nginx/sites-enabled/default ]; then
-cat>/etc/nginx/sites-enabled/default<<EOF
+if [ -f $ngigxfile ] && ! $(more $ngigxfile|grep backend >/dev/null 2>&1) ; then
+rm -rf $ngigxfile
+fi
+if [ ! -f $ngigxfile ]; then
+cat>$ngigxfile<<EOF
 gzip_min_length  1024;
 gzip_types       text/xml text/css text/javascript application/x-javascript;
 limit_conn_zone  \$binary_remote_addr zone=addr:10m;
@@ -211,27 +216,27 @@ upstream  backend  {
     server   localhost:8081;
 }
 server {
-	listen   80 default_server;
-	location ~ ^/assets/ {
-			root   /home/$USER/tomcat8080/webapps/ROOT;
-			expires      max;
-			add_header Cache-Control public;
-			charset utf-8;
-	}
-	location ~ ^/websocket/ {
-			proxy_pass http://backend;
-			proxy_http_version 1.1;
-			proxy_set_header Upgrade \$http_upgrade;
-			proxy_set_header Connection "upgrade";
-	}
-	location  / {
-			proxy_pass  http://backend;
-			proxy_redirect    off;
-			proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
-			proxy_set_header  X-Real-IP  \$remote_addr;
-			proxy_set_header  Host \$http_host;
-			limit_conn addr   8;
-	}
+        listen   80 default_server;
+        location ~ ^/assets/ {
+                 root   /home/$USER/tomcat8080/webapps/ROOT;
+                 expires      max;
+                 add_header Cache-Control public;
+                 charset utf-8;
+        }
+        location ~ ^/websocket/ {
+                 proxy_pass http://backend;
+                 proxy_http_version 1.1;
+                 proxy_set_header Upgrade \$http_upgrade;
+                 proxy_set_header Connection "upgrade";
+        }
+        location  / {
+                 proxy_pass  http://backend;
+                 proxy_redirect    off;
+                 proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
+                 proxy_set_header  X-Real-IP  \$remote_addr;
+                 proxy_set_header  Host \$http_host;
+                 limit_conn addr   8;
+        }
 }
 EOF
 service nginx restart
