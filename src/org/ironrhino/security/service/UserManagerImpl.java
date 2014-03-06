@@ -15,7 +15,6 @@ import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(0)
 public class UserManagerImpl extends BaseManagerImpl<User> implements
 		UserManager {
 
