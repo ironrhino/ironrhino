@@ -54,6 +54,11 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 	}
 
 	@Override
+	public boolean accepts(String username) {
+		return true;
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	@CheckCache(namespace = "user", key = "${username}")
 	public UserDetails loadUserByUsername(String username) {

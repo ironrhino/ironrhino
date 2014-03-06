@@ -26,13 +26,14 @@ public class DelegatedUserDetailsService implements UserDetailsService {
 		UserDetails ud = null;
 		if (userDetailsServices != null)
 			for (ConcreteUserDetailsService uds : userDetailsServices)
-				try {
-					ud = uds.loadUserByUsername(username);
-					if (ud != null)
-						return ud;
-				} catch (UsernameNotFoundException unfe) {
-					continue;
-				}
+				if (uds.accepts(username))
+					try {
+						ud = uds.loadUserByUsername(username);
+						if (ud != null)
+							return ud;
+					} catch (UsernameNotFoundException unfe) {
+						continue;
+					}
 		throw new UsernameNotFoundException("No such Username : " + username);
 	}
 }
