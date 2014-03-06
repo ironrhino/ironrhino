@@ -296,8 +296,7 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 	@Override
 	@NotInJson
 	public boolean isAccountNonExpired() {
-		return accountExpireDate == null
-				|| accountExpireDate.before(new Date());
+		return accountExpireDate == null || accountExpireDate.after(new Date());
 	}
 
 	@Override
@@ -310,7 +309,7 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 	@NotInJson
 	public boolean isCredentialsNonExpired() {
 		return passwordExpireDate == null
-				|| passwordExpireDate.before(new Date());
+				|| passwordExpireDate.after(new Date());
 	}
 
 	public boolean isPasswordValid(String legiblePassword) {
