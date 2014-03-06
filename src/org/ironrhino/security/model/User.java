@@ -125,34 +125,12 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 	private String modifyUser;
 
 	@Override
-	public Collection<GrantedAuthority> getAuthorities() {
-		return authorities;
+	public String getUsername() {
+		return username;
 	}
 
-	@Override
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public String getCreateUser() {
-		return createUser;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	@Override
-	public Date getModifyDate() {
-		return modifyDate;
-	}
-
-	public String getModifyUser() {
-		return modifyUser;
-	}
-
-	public String getName() {
-		return name;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	@Override
@@ -160,8 +138,39 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 		return password;
 	}
 
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		if (email != null && email.endsWith("@gmail.com")) {
+			String name = email.substring(0, email.indexOf('@'));
+			if (name.indexOf('+') > 0)
+				name = name.substring(0, name.indexOf('+'));
+			name = name.replaceAll("\\.", "");
+			email = name + "@gmail.com";
+		}
+		this.email = email;
+	}
+
 	public String getPhone() {
 		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public Set<String> getRoles() {
@@ -178,9 +187,82 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 		return null;
 	}
 
+	public void setRoles(Set<String> roles) {
+		this.roles = roles;
+	}
+
+	public void setRolesAsString(String rolesAsString) {
+		roles.clear();
+		if (StringUtils.isNotBlank(rolesAsString))
+			roles.addAll(Arrays.asList(org.ironrhino.core.util.StringUtils
+					.trimTail(rolesAsString, ",").split("\\s*,\\s*")));
+	}
+
 	@Override
-	public String getUsername() {
-		return username;
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	@Override
+	public Collection<GrantedAuthority> getAuthorities() {
+		return authorities;
+	}
+
+	public void setAuthorities(Collection<GrantedAuthority> authorities) {
+		this.authorities = authorities;
+	}
+
+	@Override
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	@Override
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getCreateUser() {
+		return createUser;
+	}
+
+	public void setCreateUser(String createUser) {
+		this.createUser = createUser;
+	}
+
+	@Override
+	public void setCreateUserDetails(User createUser) {
+		if (createUser != null)
+			this.createUser = createUser.getUsername();
+	}
+
+	@Override
+	public Date getModifyDate() {
+		return modifyDate;
+	}
+
+	@Override
+	public void setModifyDate(Date modifyDate) {
+		this.modifyDate = modifyDate;
+	}
+
+	public String getModifyUser() {
+		return modifyUser;
+	}
+
+	public void setModifyUser(String modifyUser) {
+		this.modifyUser = modifyUser;
+	}
+
+	@Override
+	public void setModifyUserDetails(User modifyUser) {
+		if (modifyUser != null)
+			this.modifyUser = modifyUser.getUsername();
 	}
 
 	@Override
@@ -201,94 +283,12 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 		return true;
 	}
 
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
-
 	public boolean isPasswordValid(String legiblePassword) {
 		return AuthzUtils.isPasswordValid(this, legiblePassword);
 	}
 
-	public void setAuthorities(Collection<GrantedAuthority> authorities) {
-		this.authorities = authorities;
-	}
-
-	@Override
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	public void setCreateUser(String createUser) {
-		this.createUser = createUser;
-	}
-
-	@Override
-	public void setCreateUserDetails(User createUser) {
-		if (createUser != null)
-			this.createUser = createUser.getUsername();
-	}
-
-	public void setEmail(String email) {
-		if (email != null && email.endsWith("@gmail.com")) {
-			String name = email.substring(0, email.indexOf('@'));
-			if (name.indexOf('+') > 0)
-				name = name.substring(0, name.indexOf('+'));
-			name = name.replaceAll("\\.", "");
-			email = name + "@gmail.com";
-		}
-		this.email = email;
-	}
-
-	@Override
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
 	public void setLegiblePassword(String legiblePassword) {
 		this.password = AuthzUtils.encodePassword(this, legiblePassword);
-	}
-
-	@Override
-	public void setModifyDate(Date modifyDate) {
-		this.modifyDate = modifyDate;
-	}
-
-	public void setModifyUser(String modifyUser) {
-		this.modifyUser = modifyUser;
-	}
-
-	@Override
-	public void setModifyUserDetails(User modifyUser) {
-		if (modifyUser != null)
-			this.modifyUser = modifyUser.getUsername();
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public void setRoles(Set<String> roles) {
-		this.roles = roles;
-	}
-
-	public void setRolesAsString(String rolesAsString) {
-		roles.clear();
-		if (StringUtils.isNotBlank(rolesAsString))
-			roles.addAll(Arrays.asList(org.ironrhino.core.util.StringUtils
-					.trimTail(rolesAsString, ",").split("\\s*,\\s*")));
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
 	}
 
 	public String getAttribute(String key) {
