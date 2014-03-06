@@ -243,6 +243,7 @@ public class HttpClientUtils {
 			this.charset = charset;
 		}
 
+		@Override
 		public String handleResponse(final HttpResponse response)
 				throws HttpResponseException, IOException {
 			final StatusLine statusLine = response.getStatusLine();

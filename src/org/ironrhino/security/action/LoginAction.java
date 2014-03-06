@@ -1,6 +1,5 @@
 package org.ironrhino.security.action;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,13 +18,17 @@ import org.ironrhino.security.event.LoginEvent;
 import org.ironrhino.security.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
@@ -41,6 +44,9 @@ public class LoginAction extends BaseAction {
 	private String password;
 
 	private String username;
+
+	@Autowired
+	private transient UserDetailsService userDetailsService;
 
 	@Autowired
 	private transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
@@ -77,15 +83,25 @@ public class LoginAction extends BaseAction {
 					.attemptAuthentication(request, response);
 		} catch (AuthenticationException failed) {
 			if (failed instanceof DisabledException)
-				addFieldError("username", getText("user.disabled"));
+				addFieldError("username",
+						getText(DisabledException.class.getName()));
 			else if (failed instanceof LockedException)
-				addFieldError("username", getText("user.locked"));
+				addFieldError("username",
+						getText(LockedException.class.getName()));
 			else if (failed instanceof AccountExpiredException)
-				addFieldError("username", getText("user.expired"));
+				addFieldError("username",
+						getText(AccountExpiredException.class.getName()));
 			else if (failed instanceof BadCredentialsException)
-				addFieldError("password", getText("user.bad.credentials"));
-			else if (failed instanceof CredentialsExpiredException)
-				addFieldError("password", getText("user.credentials.expired"));
+				addFieldError("password",
+						getText(BadCredentialsException.class.getName()));
+			else if (failed instanceof CredentialsExpiredException) {
+				addActionMessage(getText(CredentialsExpiredException.class
+						.getName()));
+				UserDetails ud = userDetailsService
+						.loadUserByUsername(username);
+				authResult = new UsernamePasswordAuthenticationToken(ud,
+						ud.getPassword(), ud.getAuthorities());
+			}
 			captchaManager.addCaptachaThreshold(request);
 			try {
 				usernamePasswordAuthenticationFilter.unsuccess(request,

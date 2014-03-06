@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.Authorize;
@@ -22,6 +20,7 @@ import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -149,6 +148,7 @@ public class UserAction extends EntityAction<User> {
 		return makeEntityValid() ? NONE : INPUT;
 	}
 
+	@Override
 	protected boolean makeEntityValid() {
 		if (user == null) {
 			addActionError(getText("access.denied"));

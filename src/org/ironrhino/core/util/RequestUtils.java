@@ -8,6 +8,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -122,7 +123,7 @@ public class RequestUtils {
 	public static String getRequestUri(HttpServletRequest request) {
 		// handle http dispatcher includes.
 		String uri = (String) request
-				.getAttribute("javax.servlet.include.servlet_path");
+				.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
 		if (uri == null) {
 			uri = request.getRequestURI();
 			uri = uri.substring(request.getContextPath().length());

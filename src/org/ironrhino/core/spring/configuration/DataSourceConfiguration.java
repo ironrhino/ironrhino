@@ -92,6 +92,7 @@ public class DataSourceConfiguration {
 
 		private Logger logger = LoggerFactory.getLogger("access-warn");
 
+		@Override
 		public void onQueryExecuteTimeLimitExceeded(ConnectionHandle handle,
 				Statement statement, String sql, Map<Object, Object> logParams,
 				long timeElapsedInNs) {

@@ -7,9 +7,18 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.impl.DefaultSessionCompressor;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AccountStatusException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -79,8 +88,38 @@ public class SessionCompressorManager {
 						compressor = defaultSessionCompressor;
 					try {
 						Object value = compressor.uncompress(entry.getValue());
-						if (value != null)
-							map.put(key, value);
+						if (value == null)
+							continue;
+						if (value instanceof SecurityContext) {
+							Authentication auth = ((SecurityContext) value)
+									.getAuthentication();
+							Object principal = auth != null ? auth
+									.getPrincipal() : null;
+							if (principal instanceof UserDetails) {
+								UserDetails ud = (UserDetails) principal;
+								String username = ud.getUsername();
+								String uri = RequestUtils.getRequestUri(session
+										.getRequest());
+								if (!uri.endsWith("/logout")) {
+									if (!ud.isEnabled()) {
+										throw new DisabledException(username);
+									} else if (!ud.isAccountNonExpired()) {
+										throw new AccountExpiredException(
+												username);
+									} else if (!ud.isAccountNonLocked()) {
+										throw new LockedException(username);
+									} else if (!ud.isCredentialsNonExpired()) {
+										if (!uri.endsWith("/password"))
+											throw new CredentialsExpiredException(
+													username);
+									}
+								}
+							}
+						}
+						map.put(key, value);
+
+					} catch (AccountStatusException e) {
+						throw e;
 					} catch (Exception e) {
 						log.error("uncompress error for " + key
 								+ ",it won't be restored", e);

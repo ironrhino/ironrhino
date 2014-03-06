@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.concurrent.BlockingDeque;
 
 import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.support.collections.DefaultRedisList;
 

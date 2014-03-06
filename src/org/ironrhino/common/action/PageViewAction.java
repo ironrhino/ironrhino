@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.common.service.PageViewService;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @AutoConfig
 public class PageViewAction extends BaseAction {

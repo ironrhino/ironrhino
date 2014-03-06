@@ -59,13 +59,14 @@ public class SecurityContextSessionCompressor implements
 		if (StringUtils.isNotBlank(string))
 			try {
 				String[] arr = string.split(",", 2);
-				UserDetails ud = userDetailsService.loadUserByUsername(arr[1]);
-				if (CodecUtils.md5Hex(ud.getPassword()).equals(arr[0])
-						&& ud.isEnabled() && ud.isAccountNonExpired()
-						&& ud.isAccountNonLocked()
-						&& ud.isCredentialsNonExpired())
+				String username = arr[1];
+				String password = arr[0];
+				UserDetails ud = userDetailsService
+						.loadUserByUsername(username);
+				if (CodecUtils.md5Hex(ud.getPassword()).equals(password)) {
 					sc.setAuthentication(new UsernamePasswordAuthenticationToken(
 							ud, ud.getPassword(), ud.getAuthorities()));
+				}
 			} catch (UsernameNotFoundException e) {
 				logger.warn(e.getMessage());
 			}

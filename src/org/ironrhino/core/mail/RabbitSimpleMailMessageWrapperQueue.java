@@ -1,8 +1,7 @@
 package org.ironrhino.core.mail;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.ironrhino.core.rabbitmq.RabbitQueue;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class RabbitSimpleMailMessageWrapperQueue extends
 		RabbitQueue<SimpleMailMessageWrapper> implements

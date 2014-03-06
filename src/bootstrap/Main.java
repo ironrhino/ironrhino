@@ -42,7 +42,7 @@ public class Main {
 		System.out.println(warUrl.getPath());
 		List<URL> jarUrls = extractJettyJarsFromWar(warUrl.getPath());
 		ClassLoader urlClassLoader = new URLClassLoader(
-				(URL[]) jarUrls.toArray(new URL[jarUrls.size()]));
+				jarUrls.toArray(new URL[jarUrls.size()]));
 		Thread.currentThread().setContextClassLoader(urlClassLoader);
 		Class<?> jettyUtil = urlClassLoader
 				.loadClass("bootstrap.JettyLauncher");

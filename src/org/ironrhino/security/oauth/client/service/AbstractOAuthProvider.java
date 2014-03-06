@@ -1,11 +1,10 @@
 package org.ironrhino.security.oauth.client.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.ironrhino.common.support.SettingControl;
 import org.ironrhino.security.oauth.client.model.Profile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractOAuthProvider implements OAuthProvider {
 

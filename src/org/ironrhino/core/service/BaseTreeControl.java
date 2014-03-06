@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.BaseTreeableEntity;
-import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.context.ApplicationListener;

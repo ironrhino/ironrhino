@@ -2,8 +2,6 @@ package org.ironrhino.common.action;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.common.model.Page;
@@ -13,6 +11,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @AutoConfig(namespace = DisplayPageAction.NAMESPACE, actionName = DisplayPageAction.ACTION_NAME)
 public class DisplayPageAction extends BaseAction {

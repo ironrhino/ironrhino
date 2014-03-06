@@ -3,12 +3,11 @@ package org.ironrhino.common.action;
 import java.io.File;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.ironrhino.common.support.InstallationManager;
 import org.ironrhino.common.support.InstallationManager.Component;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.struts.BaseAction;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @AutoConfig(fileupload = "application/java-archive,application/octet-stream")
 public class InstallAction extends BaseAction {

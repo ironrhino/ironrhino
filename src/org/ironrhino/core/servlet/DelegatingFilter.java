@@ -11,6 +11,7 @@ public class DelegatingFilter extends DelegatingFilterProxy {
 
 	private static Filter dummy = new DummyFilter();
 
+	@Override
 	protected Filter initDelegate(WebApplicationContext wac)
 			throws ServletException {
 		try {

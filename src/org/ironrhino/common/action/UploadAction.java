@@ -12,8 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
@@ -25,6 +23,7 @@ import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.struts.TemplateProvider;
 import org.ironrhino.core.util.ErrorMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.io.Files;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;

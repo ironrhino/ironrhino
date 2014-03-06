@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.support.StatControl;
 import org.ironrhino.core.chart.openflashchart.Chart;
@@ -16,6 +14,7 @@ import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.stat.Key;
 import org.ironrhino.core.stat.analysis.TreeNode;
 import org.ironrhino.core.struts.BaseAction;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @AutoConfig
 public class MonitorAction extends BaseAction {

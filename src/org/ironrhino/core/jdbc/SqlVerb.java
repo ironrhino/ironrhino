@@ -1,6 +1,5 @@
 package org.ironrhino.core.jdbc;
 
-import org.ironrhino.core.jdbc.SqlUtils;
 import org.ironrhino.core.model.Displayable;
 
 import com.opensymphony.xwork2.ActionContext;

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,6 +16,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.RequestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @AutoConfig(namespace = "/")
 public class LocaleAction extends BaseAction {

@@ -1,7 +1,5 @@
 package org.ironrhino.common.action;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.Constants;
 import org.ironrhino.common.model.Page;
@@ -11,6 +9,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.struts.RequestDecoratorMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.interceptor.annotations.Before;

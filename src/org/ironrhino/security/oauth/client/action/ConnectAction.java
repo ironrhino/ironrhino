@@ -3,7 +3,6 @@ package org.ironrhino.security.oauth.client.action;
 import java.net.URLEncoder;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +25,7 @@ import org.ironrhino.security.oauth.client.service.OAuthProvider;
 import org.ironrhino.security.oauth.client.service.OAuthProviderManager;
 import org.ironrhino.security.oauth.client.util.OAuthTokenUtils;
 import org.ironrhino.security.service.UserManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @AutoConfig
