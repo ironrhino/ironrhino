@@ -2,9 +2,9 @@ package org.ironrhino.core.hibernate;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.persistence.Entity;
 
@@ -40,12 +40,12 @@ public class SessionFactoryBean extends
 				.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
 			properties.put(AvailableSettings.DIALECT_RESOLVERS,
 					MyDialectResolver.class.getName());
-		Set<Class<?>> classes = ClassScaner.scanAnnotated(
+		Collection<Class<?>> classes = ClassScaner.scanAnnotated(
 				ClassScaner.getAppPackages(), Entity.class);
 		if (annotatedClasses != null)
 			classes.addAll(Arrays.asList(annotatedClasses));
 		if (StringUtils.isNotBlank(excludeFilter)) {
-			Set<Class<?>> temp = classes;
+			Collection<Class<?>> temp = classes;
 			classes = new HashSet<Class<?>>();
 			String[] arr = excludeFilter.split("\\s*,\\s*");
 			for (Class<?> clz : temp) {

@@ -3,7 +3,7 @@ package org.ironrhino.core.util;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Set;
+import java.util.Collection;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -93,7 +93,7 @@ public class XmlUtils {
 	}
 
 	private static JAXBContext initContext() {
-		Set<Class<?>> classes = ClassScaner.scanAnnotated(
+		Collection<Class<?>> classes = ClassScaner.scanAnnotated(
 				ClassScaner.getAppPackages(), XmlRootElement.class);
 		try {
 			return JAXBContext.newInstance(classes.toArray(new Class[0]));

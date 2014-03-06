@@ -69,7 +69,7 @@ public class UserRoleManager {
 	public Set<String> getStaticRoles() {
 		if (staticRoles == null) {
 			Set<String> temp = new LinkedHashSet<String>();
-			Set<Class<?>> set = ClassScaner.scanAssignable(
+			Collection<Class<?>> set = ClassScaner.scanAssignable(
 					ClassScaner.getAppPackages(), UserRole.class);
 			for (Class<?> c : set) {
 				if (Enum.class.isAssignableFrom(c)) {

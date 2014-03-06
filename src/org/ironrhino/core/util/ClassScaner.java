@@ -2,8 +2,10 @@ package org.ironrhino.core.util;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +69,7 @@ public class ClassScaner {
 	}
 
 	@SafeVarargs
-	public static Set<Class<?>> scanAnnotated(String basePackage,
+	public static Collection<Class<?>> scanAnnotated(String basePackage,
 			Class<? extends Annotation>... annotations) {
 		ClassScaner cs = new ClassScaner();
 		for (Class<? extends Annotation> anno : annotations)
@@ -75,50 +77,54 @@ public class ClassScaner {
 		return cs.doScan(basePackage);
 	}
 
-	public static Set<Class<?>> scanAnnotated(String[] basePackages,
+	public static Collection<Class<?>> scanAnnotated(String[] basePackages,
 			Class<? extends Annotation> annotation) {
 		ClassScaner cs = new ClassScaner();
 		cs.addIncludeFilter(new CustomAnnotationTypeFilter(annotation));
-		Set<Class<?>> classes = new HashSet<Class<?>>();
+		List<Class<?>> classes = new ArrayList<Class<?>>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));
+		Collections.sort(classes, ClassComparator.getDefaultInstance());
 		return classes;
 	}
 
 	@SafeVarargs
-	public static Set<Class<?>> scanAnnotated(String[] basePackages,
+	public static Collection<Class<?>> scanAnnotated(String[] basePackages,
 			Class<? extends Annotation>... annotations) {
 		ClassScaner cs = new ClassScaner();
 		for (Class<? extends Annotation> anno : annotations)
 			cs.addIncludeFilter(new CustomAnnotationTypeFilter(anno));
-		Set<Class<?>> classes = new HashSet<Class<?>>();
+		List<Class<?>> classes = new ArrayList<Class<?>>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));
+		Collections.sort(classes, ClassComparator.getDefaultInstance());
 		return classes;
 	}
 
-	public static Set<Class<?>> scanAssignable(String basePackage,
+	public static Collection<Class<?>> scanAssignable(String basePackage,
 			Class<?>... classes) {
 		ClassScaner cs = new ClassScaner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
-		Set<Class<?>> set = new HashSet<Class<?>>();
-		set.addAll(cs.doScan(basePackage));
-		return set;
+		List<Class<?>> list = new ArrayList<Class<?>>();
+		list.addAll(cs.doScan(basePackage));
+		Collections.sort(list, ClassComparator.getDefaultInstance());
+		return list;
 	}
 
-	public static Set<Class<?>> scanAssignable(String[] basePackages,
+	public static Collection<Class<?>> scanAssignable(String[] basePackages,
 			Class<?>... classes) {
 		ClassScaner cs = new ClassScaner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
-		Set<Class<?>> set = new HashSet<Class<?>>();
+		List<Class<?>> list = new ArrayList<Class<?>>();
 		for (String s : basePackages)
-			set.addAll(cs.doScan(s));
-		return set;
+			list.addAll(cs.doScan(s));
+		Collections.sort(list, ClassComparator.getDefaultInstance());
+		return list;
 	}
 
-	public static Set<Class<?>> scanAnnotatedPackage(String basePackage,
+	public static Collection<Class<?>> scanAnnotatedPackage(String basePackage,
 			Class<? extends Annotation> annotation) {
 		ClassScaner cs = new ClassScaner();
 		cs.addIncludeFilter(new AnnotationTypeFilter(annotation));
@@ -126,7 +132,7 @@ public class ClassScaner {
 	}
 
 	@SafeVarargs
-	public static Set<Class<?>> scanAnnotatedPackage(String basePackage,
+	public static Collection<Class<?>> scanAnnotatedPackage(String basePackage,
 			Class<? extends Annotation>... annotations) {
 		ClassScaner cs = new ClassScaner();
 		for (Class<? extends Annotation> anno : annotations)
@@ -134,14 +140,14 @@ public class ClassScaner {
 		return cs.doScan(basePackage, "/**/*/package-info.class");
 	}
 
-	public Set<Class<?>> doScan(String basePackage) {
+	public Collection<Class<?>> doScan(String basePackage) {
 		return doScan(basePackage, null);
 	}
 
-	public Set<Class<?>> doScan(String basePackage, String pattern) {
+	public Collection<Class<?>> doScan(String basePackage, String pattern) {
 		if (org.apache.commons.lang3.StringUtils.isBlank(pattern))
 			pattern = "/**/*.class";
-		Set<Class<?>> classes = new HashSet<Class<?>>();
+		List<Class<?>> classes = new ArrayList<Class<?>>();
 		Resource resource = null;
 		try {
 			String searchPath = new StringBuilder(
@@ -172,6 +178,7 @@ public class ClassScaner {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+		Collections.sort(classes, ClassComparator.getDefaultInstance());
 		return classes;
 	}
 
@@ -208,7 +215,7 @@ public class ClassScaner {
 			}
 			String[] arr = appBasePackage.split(",+");
 			Set<String> packages = new TreeSet<String>();
-			Set<Class<?>> componentScans = scanAnnotated(arr,
+			Collection<Class<?>> componentScans = scanAnnotated(arr,
 					ComponentScan.class);
 			for (Class<?> c : componentScans) {
 				ComponentScan cs = c.getAnnotation(ComponentScan.class);

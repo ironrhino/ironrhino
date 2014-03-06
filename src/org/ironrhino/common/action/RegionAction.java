@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
@@ -338,7 +337,7 @@ public class RegionAction extends BaseAction {
 				addActionError(getText("validation.invalid"));
 				return SUCCESS;
 			}
-			Set<Class<?>> set = ClassScaner.scanAssignable(
+			Collection<Class<?>> set = ClassScaner.scanAssignable(
 					ClassScaner.getAppPackages(), Persistable.class);
 			for (Class<?> clz : set) {
 				if (clz.equals(Region.class))

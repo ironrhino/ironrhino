@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.PostConstruct;
@@ -110,7 +109,7 @@ public class IndexManagerImpl implements IndexManager {
 					}
 
 				});
-		Set<Class<?>> set = ClassScaner.scanAnnotated(
+		Collection<Class<?>> set = ClassScaner.scanAnnotated(
 				ClassScaner.getAppPackages(), Searchable.class);
 		typeClassMapping = new HashMap<String, Class>(set.size());
 		schemaMapping = new HashMap<Class, Map<String, Object>>(set.size());
