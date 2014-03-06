@@ -89,6 +89,18 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 	@NotInCopy
 	@NotInJson
 	@UiConfig(hidden = true)
+	@Transient
+	private Date accountExpireDate;
+
+	@NotInCopy
+	@NotInJson
+	@UiConfig(hidden = true)
+	@Transient
+	private Date passwordExpireDate;
+
+	@NotInCopy
+	@NotInJson
+	@UiConfig(hidden = true)
 	@Column(updatable = false)
 	private Date createDate = new Date();
 
@@ -208,13 +220,20 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 		this.enabled = enabled;
 	}
 
-	@Override
-	public Collection<GrantedAuthority> getAuthorities() {
-		return authorities;
+	public Date getAccountExpireDate() {
+		return accountExpireDate;
 	}
 
-	public void setAuthorities(Collection<GrantedAuthority> authorities) {
-		this.authorities = authorities;
+	public void setAccountExpireDate(Date accountExpireDate) {
+		this.accountExpireDate = accountExpireDate;
+	}
+
+	public Date getPasswordExpireDate() {
+		return passwordExpireDate;
+	}
+
+	public void setPasswordExpireDate(Date passwordExpireDate) {
+		this.passwordExpireDate = passwordExpireDate;
 	}
 
 	@Override
@@ -266,9 +285,19 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 	}
 
 	@Override
+	public Collection<GrantedAuthority> getAuthorities() {
+		return authorities;
+	}
+
+	public void setAuthorities(Collection<GrantedAuthority> authorities) {
+		this.authorities = authorities;
+	}
+
+	@Override
 	@NotInJson
 	public boolean isAccountNonExpired() {
-		return true;
+		return accountExpireDate == null
+				|| accountExpireDate.before(new Date());
 	}
 
 	@Override
@@ -280,7 +309,8 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 	@Override
 	@NotInJson
 	public boolean isCredentialsNonExpired() {
-		return true;
+		return passwordExpireDate == null
+				|| passwordExpireDate.before(new Date());
 	}
 
 	public boolean isPasswordValid(String legiblePassword) {
