@@ -72,10 +72,14 @@ public class HttpSessionFilter implements Filter {
 		WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(
 				(HttpServletResponse) response, session);
 		if (httpSessionFilterHook != null)
-			httpSessionFilterHook.beforeDoFilter();
-		chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
-		if (httpSessionFilterHook != null)
-			httpSessionFilterHook.afterDoFilter();
+			try {
+				httpSessionFilterHook.beforeDoFilter();
+				chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
+			} finally {
+				httpSessionFilterHook.afterDoFilter();
+			}
+		else
+			chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
 		try {
 			session.save();
 		} catch (Exception e) {
