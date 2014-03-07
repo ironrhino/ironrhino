@@ -56,9 +56,8 @@ public class ImageCaptcha {
 			// g.setColor(new
 			// Color((int)(Math.random()*256),0,(int)(Math.random()*256)));
 			g.setPaint(getPaint(p, size));
-			if (fonts.size() > 0)
-				g.setFont(new Font(fonts.get((int) (Math.random() * fonts
-						.size())), getFace(), size));
+			g.setFont(new Font(fonts.size() > 0 ? fonts.get((int) (Math
+					.random() * fonts.size())) : "Arial", getFace(), size));
 			g.drawString("" + use[i], p.x, p.y);
 		}
 		g.setStroke(new BasicStroke(1.0f));
@@ -105,11 +104,7 @@ public class ImageCaptcha {
 	}
 
 	private static int getSize() {
-		int[] sizes = new int[20];
-		for (int i = 0; i < 20; i++) {
-			sizes[i] = 30 + i;
-		}
-		return sizes[(int) (Math.random() * sizes.length)];
+		return 30 + random.nextInt(20);
 	}
 
 	public BufferedImage getImage() {
