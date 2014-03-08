@@ -353,24 +353,28 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 				return resultPage;
 			}
 		}
-		int start, end;
-		if (!resultPage.isReverse()) {
-			start = (resultPage.getPageNo() - 1) * resultPage.getPageSize();
-			end = resultPage.getPageNo() * resultPage.getPageSize();
-		} else {
-			start = (int) (resultPage.getTotalResults() - resultPage
-					.getPageNo() * resultPage.getPageSize());
-			end = (int) (resultPage.getTotalResults() - (resultPage.getPageNo() - 1)
-					* resultPage.getPageSize());
-		}
 		long time = System.currentTimeMillis();
-		if (!(resultPage.isCounting() && totalResults == 0))
-			resultPage.setResult(findBetweenListByCriteria(detachedCriteria,
-					start, end));
-		else
-			resultPage.setResult(Collections.EMPTY_LIST);
+		if (resultPage.isPaginating()) {
+			int start, end;
+			if (!resultPage.isReverse()) {
+				start = (resultPage.getPageNo() - 1) * resultPage.getPageSize();
+				end = resultPage.getPageNo() * resultPage.getPageSize();
+			} else {
+				start = (int) (resultPage.getTotalResults() - resultPage
+						.getPageNo() * resultPage.getPageSize());
+				end = (int) (resultPage.getTotalResults() - (resultPage
+						.getPageNo() - 1) * resultPage.getPageSize());
+			}
+			if (!(resultPage.isCounting() && totalResults == 0))
+				resultPage.setResult(findBetweenListByCriteria(
+						detachedCriteria, start, end));
+			else
+				resultPage.setResult(Collections.EMPTY_LIST);
+			resultPage.setStart(start);
+		} else {
+			resultPage.setResult(findListByCriteria(detachedCriteria));
+		}
 		resultPage.setTookInMillis(System.currentTimeMillis() - time);
-		resultPage.setStart(start);
 		return resultPage;
 	}
 

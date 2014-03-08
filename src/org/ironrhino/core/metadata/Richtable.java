@@ -15,6 +15,8 @@ public @interface Richtable {
 	String formid() default "";
 
 	String order() default "";
+	
+	boolean paginating() default true;
 
 	int defaultPageSize() default ResultPage.DEFAULT_PAGE_SIZE;
 	

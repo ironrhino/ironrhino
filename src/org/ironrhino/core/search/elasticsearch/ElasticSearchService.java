@@ -57,8 +57,13 @@ public class ElasticSearchService<T> implements SearchService<T> {
 		if (criteria == null)
 			return resultPage;
 		SearchRequestBuilder srb = criteria2builder(criteria);
-		srb.setFrom(resultPage.getStart());
-		srb.setSize(resultPage.getPageSize());
+		if (resultPage.isPaginating()) {
+			srb.setFrom(resultPage.getStart());
+			srb.setSize(resultPage.getPageSize());
+		} else {
+			srb.setFrom(0);
+			srb.setSize(ResultPage.DEFAULT_MAX_PAGESIZE);
+		}
 		try {
 			SearchResponse response = srb.execute().get();
 			SearchHits shs = response.getHits();

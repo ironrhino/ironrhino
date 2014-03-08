@@ -400,6 +400,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					&& resultPage.getPageSize() != richtableConfig
 							.defaultPageSize())
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
+			if (richtableConfig != null)
+				resultPage.setPaginating(richtableConfig.paginating());
 			resultPage.setCriteria(dc);
 			if (criteriaState.getOrderings().isEmpty()) {
 				if (richtableConfig != null
@@ -466,8 +468,20 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			} else if (Ordered.class.isAssignableFrom(getEntityClass())
 					&& searchableProperties.contains("displayOrder"))
 				criteria.addSort("displayOrder", false);
-			if (resultPage == null)
+			boolean resetPageSize;
+			if (resultPage == null) {
 				resultPage = new ResultPage();
+				resetPageSize = richtableConfig != null;
+			} else {
+				resetPageSize = richtableConfig != null
+						&& richtableConfig.fixPageSize();
+			}
+			if (resetPageSize
+					&& resultPage.getPageSize() != richtableConfig
+							.defaultPageSize())
+				resultPage.setPageSize(richtableConfig.defaultPageSize());
+			if (richtableConfig != null)
+				resultPage.setPaginating(richtableConfig.paginating());
 			resultPage.setCriteria(criteria);
 			resultPage = elasticSearchService.search(resultPage,
 					new Mapper<Persistable<?>>() {
