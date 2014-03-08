@@ -388,8 +388,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					dc.add(CriterionUtils.like(keyword, MatchMode.ANYWHERE,
 							propertyNamesInLike.toArray(new String[0])));
 			}
-			if (resultPage == null)
+			if (resultPage == null) {
 				resultPage = new ResultPage();
+				int defaultPageSize = getRichtableConfig().getDefaultPageSize();
+				if (resultPage.getPageSize() != defaultPageSize)
+					resultPage.setPageSize(defaultPageSize);
+			}
 			resultPage.setCriteria(dc);
 			if (criteriaState.getOrderings().isEmpty()) {
 				if (richtableConfig != null

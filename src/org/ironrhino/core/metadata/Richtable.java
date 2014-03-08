@@ -6,6 +6,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.ironrhino.core.model.ResultPage;
+
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Richtable {
@@ -14,12 +16,14 @@ public @interface Richtable {
 
 	String order() default "";
 
+	int defaultPageSize() default ResultPage.DEFAULT_PAGE_SIZE;
+
 	boolean showPageSize() default true;
-	
+
 	boolean showCheckColumn() default true;
-	
+
 	boolean showActionColumn() default true;
-	
+
 	boolean showBottomButtons() default true;
 
 	boolean searchable() default false;
