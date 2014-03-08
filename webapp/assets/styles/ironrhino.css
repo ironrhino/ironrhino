@@ -8372,6 +8372,12 @@ textarea{
 	height: 150px;
 	resize: vertical;
 }
+select.empty{
+	color: #ccc;
+}
+select.empty option{
+	color: #000;
+}
 input::-ms-reveal,input::-ms-clear {
 	display: none;
 }

@@ -32316,7 +32316,13 @@ Initialization.common = function() {
 			button.click();
 		}
 
-	});
+	}).on('change', 'select', function(e) {
+				var t = $(this);
+				if (!t.val())
+					t.addClass('empty');
+				else
+					t.removeClass('empty');
+			});
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
 	Nav.init();
@@ -32425,6 +32431,11 @@ if (HISTORY_ENABLED) {
 }
 
 Observation.common = function(container) {
+	$('select', container).each(function(e) {
+				var t = $(this);
+				if (!t.val())
+					t.addClass('empty');
+			});
 	$('.controls .field-error', container).each(function() {
 				var text = $(this).text();
 				var field = $(':input', $(this).parent());
