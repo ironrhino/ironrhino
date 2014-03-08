@@ -17,6 +17,8 @@ public @interface Richtable {
 	String order() default "";
 
 	int defaultPageSize() default ResultPage.DEFAULT_PAGE_SIZE;
+	
+	boolean fixPageSize() default false;
 
 	boolean showPageSize() default true;
 

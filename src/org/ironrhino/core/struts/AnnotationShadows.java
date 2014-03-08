@@ -12,7 +12,6 @@ import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.util.JsonUtils;
 
 public class AnnotationShadows {
@@ -497,7 +496,6 @@ public class AnnotationShadows {
 		private String formid = "";
 		private boolean filterable = true;
 		private boolean celleditable = true;
-		private int defaultPageSize = ResultPage.DEFAULT_PAGE_SIZE;
 		private boolean showPageSize = true;
 		private boolean showCheckColumn = true;
 		private boolean showActionColumn = true;
@@ -522,8 +520,7 @@ public class AnnotationShadows {
 			this.formid = config.formid();
 			this.filterable = config.filterable();
 			this.celleditable = config.celleditable();
-			this.defaultPageSize = config.defaultPageSize();
-			this.showPageSize = config.showPageSize();
+			this.showPageSize = !config.fixPageSize() && config.showPageSize();
 			this.showCheckColumn = config.showCheckColumn();
 			this.showActionColumn = config.showActionColumn();
 			this.showBottomButtons = config.showBottomButtons();
@@ -561,14 +558,6 @@ public class AnnotationShadows {
 
 		public void setCelleditable(boolean celleditable) {
 			this.celleditable = celleditable;
-		}
-
-		public int getDefaultPageSize() {
-			return defaultPageSize;
-		}
-
-		public void setDefaultPageSize(int defaultPageSize) {
-			this.defaultPageSize = defaultPageSize;
 		}
 
 		public boolean isShowPageSize() {
