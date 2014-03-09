@@ -33267,14 +33267,20 @@ Observation.checkavailable = function(container) {
 		}
 		var xhr = new XMLHttpRequest();
 		xhr.open('POST', options.url);
+		var headers = options.headers || {};
+		if (!headers["X-Requested-With"])
+			headers['X-Requested-With'] = 'XMLHttpRequest';
+		for (var k in headers)
+			xhr.setRequestHeader(k, headers[k]);
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
-				if ((xhr.status >= 200 && xhr.status <= 200)
-						|| xhr.status == 304) {
-					if (xhr.responseText != '') {
-						if (typeof options['success'] != 'undefined')
-							options['success'](xhr);
-					}
+				if (xhr.status == 200 || xhr.status == 304) {
+					if (typeof options['success'] != 'undefined')
+						options['success'](xhr);
+					var data = xhr.responseText;
+					if (data.indexOf('[') == 0 || data.indexOf('{') == 0)
+						data = $.parseJSON(data);
+					Ajax.handleResponse(data, options);
 				}
 			}
 		}
@@ -35436,23 +35442,8 @@ function uploadFiles(files, filenames) {
 					beforeSend : Indicator.show,
 					success : function(xhr) {
 						Indicator.hide();
-						var data = xhr.responseText;
-						var html = data
-								.replace(/<script(.|\s)*?\/script>/g, '');
-						var div = $('<div/>').html(html);
-						var message = $('#message', div);
-						if (message.html()) {
-							if ($('.action-error', message).length
-									|| !$('#upload_form input[name="pick"]').length)
-								if ($('#message').length)
-									$('#message').html(message.html());
-								else
-									$('<div id="message">' + message.html()
-											+ '</div>')
-											.prependTo($('#content'));
-							if ($('.action-error', message).length)
-								return;
-						}
+					},
+					onsuccess : function(xhr) {
 						$('#files button.reload').trigger('click');
 					}
 				});

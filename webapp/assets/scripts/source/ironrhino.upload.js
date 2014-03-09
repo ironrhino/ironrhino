@@ -231,23 +231,8 @@ function uploadFiles(files, filenames) {
 					beforeSend : Indicator.show,
 					success : function(xhr) {
 						Indicator.hide();
-						var data = xhr.responseText;
-						var html = data
-								.replace(/<script(.|\s)*?\/script>/g, '');
-						var div = $('<div/>').html(html);
-						var message = $('#message', div);
-						if (message.html()) {
-							if ($('.action-error', message).length
-									|| !$('#upload_form input[name="pick"]').length)
-								if ($('#message').length)
-									$('#message').html(message.html());
-								else
-									$('<div id="message">' + message.html()
-											+ '</div>')
-											.prependTo($('#content'));
-							if ($('.action-error', message).length)
-								return;
-						}
+					},
+					onsuccess : function(xhr) {
 						$('#files button.reload').trigger('click');
 					}
 				});

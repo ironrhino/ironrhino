@@ -20,14 +20,20 @@
 		}
 		var xhr = new XMLHttpRequest();
 		xhr.open('POST', options.url);
+		var headers = options.headers || {};
+		if (!headers["X-Requested-With"])
+			headers['X-Requested-With'] = 'XMLHttpRequest';
+		for (var k in headers)
+			xhr.setRequestHeader(k, headers[k]);
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
-				if ((xhr.status >= 200 && xhr.status <= 200)
-						|| xhr.status == 304) {
-					if (xhr.responseText != '') {
-						if (typeof options['success'] != 'undefined')
-							options['success'](xhr);
-					}
+				if (xhr.status == 200 || xhr.status == 304) {
+					if (typeof options['success'] != 'undefined')
+						options['success'](xhr);
+					var data = xhr.responseText;
+					if (data.indexOf('[') == 0 || data.indexOf('{') == 0)
+						data = $.parseJSON(data);
+					Ajax.handleResponse(data, options);
 				}
 			}
 		}
