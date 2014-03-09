@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.XmlUtils;
@@ -250,21 +249,6 @@ public class LocationUtils {
 			}
 		}
 		return name;
-	}
-
-	private static double earth_radius = 6371000;
-
-	public static long distance(Coordinate c1, Coordinate c2) {
-		Double latitude = (c1.getLatitude() - c2.getLatitude()) * Math.PI / 180;
-		Double longitude = (c1.getLongitude() - c2.getLongitude()) * Math.PI
-				/ 180;
-		Double aDouble = Math.sin(latitude / 2) * Math.sin(latitude / 2)
-				+ Math.cos(c1.getLatitude() * Math.PI / 180)
-				* Math.cos(c2.getLatitude() * Math.PI / 180)
-				* Math.sin(longitude / 2) * Math.sin(longitude / 2);
-		Double distance = 2 * Math.atan2(Math.sqrt(aDouble),
-				Math.sqrt(1 - aDouble));
-		return Math.round((earth_radius * distance) * 1000) / 1000;
 	}
 
 }

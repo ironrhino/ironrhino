@@ -13,6 +13,8 @@ public class Coordinate implements Serializable {
 
 	private static final long serialVersionUID = 5828814302557010566L;
 
+	private static double EARTH_RADIUS = 6371000;
+
 	private Double latitude;
 
 	private Double longitude;
@@ -106,6 +108,20 @@ public class Coordinate implements Serializable {
 			}
 			return d;
 		}
+	}
+
+	public int distanceFrom(Coordinate c2) {
+		Coordinate c1 = this;
+		Double latitude = (c1.getLatitude() - c2.getLatitude()) * Math.PI / 180;
+		Double longitude = (c1.getLongitude() - c2.getLongitude()) * Math.PI
+				/ 180;
+		Double aDouble = Math.sin(latitude / 2) * Math.sin(latitude / 2)
+				+ Math.cos(c1.getLatitude() * Math.PI / 180)
+				* Math.cos(c2.getLatitude() * Math.PI / 180)
+				* Math.sin(longitude / 2) * Math.sin(longitude / 2);
+		Double distance = 2 * Math.atan2(Math.sqrt(aDouble),
+				Math.sqrt(1 - aDouble));
+		return (int) Math.round((EARTH_RADIUS * distance) * 1000) / 1000;
 	}
 
 }
