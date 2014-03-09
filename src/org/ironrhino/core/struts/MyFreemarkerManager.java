@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.apache.struts2.views.freemarker.ScopesHashModel;
 import org.ironrhino.core.util.AppInfo;
@@ -33,11 +34,12 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateHashModelEx;
-import freemarker.template.TemplateModelException;
 
 public class MyFreemarkerManager extends FreemarkerManager {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
+
+	private String base;
 
 	@Override
 	protected freemarker.template.Configuration createConfiguration(
@@ -75,6 +77,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		TemplateProvider templateProvider = WebApplicationContextUtils
 				.getWebApplicationContext(servletContext).getBean(
 						"templateProvider", TemplateProvider.class);
+		base = templateProvider.getAllSharedVariables().get("base");
 		Map<String, Object> globalVariables = new HashMap<String, Object>(8);
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
 		globalVariables.put("statics", BeansWrapper.getDefaultInstance()
@@ -164,17 +167,13 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	}
 
 	@Override
-	protected ScopesHashModel buildScopesHashModel(
+	public ScopesHashModel buildTemplateModel(ValueStack stack, Object action,
 			ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response, ObjectWrapper wrapper,
-			ValueStack stack) {
-		ScopesHashModel model = super.buildScopesHashModel(servletContext,
-				request, response, wrapper, stack);
-		try {
-			model.put("Parameters", model.get(".freemarker.RequestParameters"));
-		} catch (TemplateModelException e) {
-			e.printStackTrace();
-		}
+			HttpServletResponse response, ObjectWrapper wrapper) {
+		ScopesHashModel model = super.buildTemplateModel(stack, action,
+				servletContext, request, response, wrapper);
+		if (StringUtils.isNotBlank(base))
+			model.put("base", base);
 		return model;
 	}
 
