@@ -32540,7 +32540,7 @@ Observation.common = function(container) {
 				ajax({
 							global : false,
 							quiet : true,
-							type : f.attr('method'),
+							type : t.data('method') || f.attr('method'),
 							url : url,
 							data : data,
 							target : f[0],
