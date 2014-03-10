@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.security.role.UserRole;
@@ -15,6 +17,7 @@ import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +33,9 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 
 	@Autowired(required = false)
 	private List<UserRoleMapper> userRoleMappers;
+
+	@Value("${userManager.passwordExpiresInDays:0}")
+	private int passwordExpiresInDays;
 
 	@Override
 	@Transactional
@@ -73,6 +79,13 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 			// throw new UsernameNotFoundException("No such Username : "+
 			// username);
 			return null; // for @CheckCache
+		}
+		if (passwordExpiresInDays > 0) {
+			Date passwordModifyDate = user.getPasswordModifyDate();
+			if (passwordModifyDate != null
+					&& DateUtils.addDays(passwordModifyDate,
+							passwordExpiresInDays).before(new Date()))
+				user.setPasswordExpired(true);
 		}
 		populateAuthorities(user);
 		return user;

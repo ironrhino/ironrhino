@@ -95,8 +95,13 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 	@NotInCopy
 	@NotInJson
 	@UiConfig(hidden = true)
+	private Date passwordModifyDate;
+
+	@NotInCopy
+	@NotInJson
+	@UiConfig(hidden = true)
 	@Transient
-	private Date passwordExpireDate;
+	private boolean passwordExpired;
 
 	@NotInCopy
 	@NotInJson
@@ -228,12 +233,20 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 		this.accountExpireDate = accountExpireDate;
 	}
 
-	public Date getPasswordExpireDate() {
-		return passwordExpireDate;
+	public Date getPasswordModifyDate() {
+		return passwordModifyDate;
 	}
 
-	public void setPasswordExpireDate(Date passwordExpireDate) {
-		this.passwordExpireDate = passwordExpireDate;
+	public void setPasswordModifyDate(Date passwordModifyDate) {
+		this.passwordModifyDate = passwordModifyDate;
+	}
+
+	public boolean isPasswordExpired() {
+		return passwordExpired;
+	}
+
+	public void setPasswordExpired(boolean passwordExpired) {
+		this.passwordExpired = passwordExpired;
 	}
 
 	@Override
@@ -308,8 +321,7 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 	@Override
 	@NotInJson
 	public boolean isCredentialsNonExpired() {
-		return passwordExpireDate == null
-				|| passwordExpireDate.after(new Date());
+		return !isPasswordExpired();
 	}
 
 	public boolean isPasswordValid(String legiblePassword) {
@@ -318,6 +330,7 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 
 	public void setLegiblePassword(String legiblePassword) {
 		this.password = AuthzUtils.encodePassword(this, legiblePassword);
+		passwordModifyDate = new Date();
 	}
 
 	public String getAttribute(String key) {

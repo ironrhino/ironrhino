@@ -5,7 +5,8 @@
 </head>
 <body>
 <#if !(authentication("principal").credentialsNonExpired!true)>
-<div class="alert alert-warn">
+<div class="action-error alert alert-error">
+<a class="close" data-dismiss="alert">&times;</a>
 ${action.getText('org.springframework.security.authentication.CredentialsExpiredException')}
 </div>
 </#if>
