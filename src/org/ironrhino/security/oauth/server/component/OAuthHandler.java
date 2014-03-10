@@ -104,7 +104,7 @@ public class OAuthHandler implements AccessHandler {
 							.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
 									sc);
 					request.setAttribute(
-							HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP,
+							HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API,
 							sessionMap);
 					request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST,
 							true);

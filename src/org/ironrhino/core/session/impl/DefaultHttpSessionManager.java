@@ -128,7 +128,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 		// simulated session
 		Map<String, Object> sessionMap = (Map<String, Object>) session
-				.getRequest().getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP);
+				.getRequest().getAttribute(
+						REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 		if (sessionMap != null) {
 			session.setAttrMap(sessionMap);
 			return;
@@ -177,16 +178,23 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		session.setMinActiveInterval(minActiveInterval);
 		if (session.getSessionTracker() == null)
 			session.setSessionTracker(getSessionTracker(session));
-		doInitialize(session);
+		sessionMap = (Map<String, Object>) session.getRequest().getAttribute(
+				REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO);
+		if (sessionMap != null) {
+			session.setAttrMap(sessionMap);
+			session.setDirty(true);
+		} else {
+			doInitialize(session);
+		}
 	}
 
 	@Override
 	public void save(WrappedHttpSession session) {
 		// simulated session
-		if (session.getRequest()
-				.getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP) != null) {
+		if (session.getRequest().getAttribute(
+				REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API) != null) {
 			session.getRequest().removeAttribute(
-					REQUEST_ATTRIBUTE_KEY_SESSION_MAP);
+					REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 			return;
 		}
 		boolean sessionTrackerChanged = false;

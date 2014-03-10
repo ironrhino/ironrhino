@@ -44,9 +44,12 @@ public class SecurityContextSessionCompressor implements
 					return null;
 				if (auth.isAuthenticated()) {
 					UserDetails ud = (UserDetails) auth.getPrincipal();
-					return new StringBuilder(
-							CodecUtils.md5Hex(ud.getPassword())).append(",")
-							.append(ud.getUsername()).toString();
+					String password = ud.getPassword();
+					StringBuilder sb = new StringBuilder();
+					if (password != null)
+						sb.append(CodecUtils.md5Hex(ud.getPassword()));
+					sb.append(",").append(ud.getUsername());
+					return sb.toString();
 				}
 			}
 		}
@@ -63,7 +66,9 @@ public class SecurityContextSessionCompressor implements
 				String password = arr[0];
 				UserDetails ud = userDetailsService
 						.loadUserByUsername(username);
-				if (CodecUtils.md5Hex(ud.getPassword()).equals(password)) {
+				if (ud.getPassword() == null && StringUtils.isBlank(password)
+						|| ud.getPassword() != null
+						&& CodecUtils.md5Hex(ud.getPassword()).equals(password)) {
 					sc.setAuthentication(new UsernamePasswordAuthenticationToken(
 							ud, ud.getPassword(), ud.getAuthorities()));
 				}
