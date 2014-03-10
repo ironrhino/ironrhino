@@ -76,7 +76,7 @@ public class EhCacheManager implements CacheManager {
 		Element element = cache.get(key);
 		if (element != null) {
 			if (element.getTimeToIdle() != timeToLive) {
-				element.setTimeToIdle(timeToLive);
+				element.setTimeToIdle((int) timeUnit.toSeconds(timeToLive));
 				cache.put(element);
 			}
 			return element.getObjectValue();
