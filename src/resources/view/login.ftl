@@ -3,13 +3,17 @@
 <head>
 <title>${action.getText('login')}</title>
 <meta name="body_class" content="welcome" />
-<@authorize ifAnyGranted="ROLE_BUILTIN_USER">
+<#assign notlogin = false>
+<@authorize ifAllGranted="ROLE_BUILTIN_ANONYMOUS">
+<#assign notlogin = true>
+</@authorize>
+<#if !notlogin>
 <meta name="decorator" content="simple" />
 <meta http-equiv="refresh" content="0; url=<@url value="/"/>" />
-</@authorize>
+</#if>
 </head>
 <body>
-<@authorize ifNotGranted="ROLE_BUILTIN_USER">
+<#if notlogin>
 <div class="row">
 	<div class="span6 offset3">
 	<div class="hero-unit">
@@ -33,8 +37,7 @@
 <div class="ajaxpanel" data-url="<@url value="/oauth/connect"/>">
 </div>
 </#if>
-</@authorize>
-<@authorize ifAnyGranted="ROLE_BUILTIN_USER">
+<#else>
 <div class="modal">
 	<div class="modal-body">
 		<div class="progress progress-striped active">
@@ -42,6 +45,6 @@
 		</div>
 	</div>
 </div>
-</@authorize>
+</#if>
 </body>
 </html></#escape>
