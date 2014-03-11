@@ -21,6 +21,7 @@
 				<bean class="org.springframework.security.access.vote.RoleVoter">
 					<property name="rolePrefix" value="" />
 				</bean>
+				<bean class="org.springframework.security.web.access.expression.WebExpressionVoter"/>
 			</list>
 		</property>
 	</bean>

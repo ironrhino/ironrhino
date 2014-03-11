@@ -5,25 +5,25 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
 	<security:http pattern="/assets/**" security="none" />
-	<security:http access-denied-page="/error/handle/403"
+	<security:http use-expressions="true" access-denied-page="/error/handle/403"
 		entry-point-ref="entryPoint" access-decision-manager-ref="accessDecisionManager">
 		<security:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService"/>
 		<security:intercept-url pattern="/common/**"
-			access="ROLE_ADMINISTRATOR" />
+			access="hasRole('ROLE_ADMINISTRATOR')" />
 		<security:intercept-url pattern="/remoting/**"
-			access="ROLE_BUILTIN_ANONYMOUS" />
+			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/setup"
-			access="ROLE_BUILTIN_ANONYMOUS" />
+			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/signup*/**"
-			access="ROLE_BUILTIN_ANONYMOUS" />
+			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/login"
-			access="ROLE_BUILTIN_USER,ROLE_BUILTIN_ANONYMOUS" />
+			access="hasAnyRole('ROLE_BUILTIN_USER','ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/oauth*/**"
-			access="ROLE_BUILTIN_USER,ROLE_BUILTIN_ANONYMOUS" />
+			access="hasAnyRole('ROLE_BUILTIN_USER','ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/locale"
-			access="ROLE_BUILTIN_USER,ROLE_BUILTIN_ANONYMOUS" />
+			access="hasAnyRole('ROLE_BUILTIN_USER','ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/**"
-			access="ROLE_BUILTIN_USER" />
+			access="hasRole('ROLE_BUILTIN_USER')" />
 		<security:session-management
 			session-fixation-protection="migrateSession" />
 		<security:remember-me services-ref="rememberMeServices" />
