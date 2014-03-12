@@ -324,7 +324,11 @@ svn up --force
 elif [ -d .git ];then
 git reset --hard
 #git clean -f
-git pull
+gitpulloutput=\`git pull\`
+echo "\$gitpulloutput"
+if \$(echo "\$gitpulloutput"|grep fatal >/dev/null 2>&1) ; then
+exit 1
+fi
 else
 echo 'no svn or git'
 fi
