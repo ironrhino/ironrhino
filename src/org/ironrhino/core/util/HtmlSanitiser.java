@@ -22,13 +22,17 @@ public class HtmlSanitiser {
 
 	private static final Set<String> VALID_ELEMENT_NAMES = new HashSet<String>(
 			Arrays.asList(new String[] { HTMLElementName.DIV,
-					HTMLElementName.BR, HTMLElementName.P, HTMLElementName.B,
-					HTMLElementName.I, HTMLElementName.OL, HTMLElementName.UL,
-					HTMLElementName.LI, HTMLElementName.A }));
+					HTMLElementName.SPAN, HTMLElementName.STRONG,
+					HTMLElementName.EM, HTMLElementName.BR, HTMLElementName.P,
+					HTMLElementName.B, HTMLElementName.I, HTMLElementName.OL,
+					HTMLElementName.UL, HTMLElementName.LI, HTMLElementName.A,
+					HTMLElementName.TABLE, HTMLElementName.THEAD,
+					HTMLElementName.TBODY, HTMLElementName.TR,
+					HTMLElementName.TH, HTMLElementName.TD }));
 
 	private static final Set<String> VALID_ATTRIBUTE_NAMES = new HashSet<String>(
 			Arrays.asList(new String[] { "id", "class", "href", "target",
-					"title", "style" }));
+					"title", "style", "align" }));
 
 	private static final Object VALID_MARKER = new Object();
 
