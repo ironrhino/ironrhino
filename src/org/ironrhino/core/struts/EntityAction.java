@@ -56,7 +56,6 @@ import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -370,8 +369,15 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				} else {
 					parentEntity = (BaseTreeableEntity) entityManager
 							.get(parent);
-					dc.createAlias("parent", "_p_").add(
-							Restrictions.eq("_p_.id", parent));
+					String alias = criteriaState.getAliases().get("parent");
+					if (alias == null) {
+						alias = "parent_";
+						while (criteriaState.getAliases().containsValue(alias))
+							alias += "_";
+						dc.createAlias("parent", alias);
+						criteriaState.getAliases().put("parent", alias);
+					}
+					dc.add(Restrictions.eq(alias + ".id", parent));
 				}
 			}
 			if (searchable && StringUtils.isNotBlank(keyword)) {
@@ -379,10 +385,35 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs()
 						.entrySet()) {
 					if (entry.getValue().isSearchable()
-							&& String.class.equals(entry.getValue()
-									.getPropertyType())
-							&& !entry.getValue().isExcludedFromLike())
-						propertyNamesInLike.add(entry.getKey());
+							&& !entry.getValue().isExcludedFromLike()) {
+						if (String.class.equals(entry.getValue()
+								.getPropertyType())) {
+							propertyNamesInLike.add(entry.getKey());
+						} else if (Persistable.class.isAssignableFrom(entry
+								.getValue().getPropertyType())) {
+							Set<String> nestSearchableProperties = entry
+									.getValue().getNestSearchableProperties();
+							if (nestSearchableProperties != null
+									&& nestSearchableProperties.size() > 0) {
+								String alias = criteriaState.getAliases().get(
+										entry.getKey());
+								if (alias == null) {
+									alias = entry.getKey() + "_";
+									while (criteriaState.getAliases()
+											.containsValue(alias))
+										alias += "_";
+									dc.createAlias(entry.getKey(), alias);
+									criteriaState.getAliases().put(
+											entry.getKey(), alias);
+								}
+								for (String s : nestSearchableProperties)
+									propertyNamesInLike.add(new StringBuilder(
+											alias).append(".").append(s)
+											.toString());
+							}
+						}
+
+					}
 				}
 				if (propertyNamesInLike.size() > 0)
 					dc.add(CriterionUtils.like(keyword, MatchMode.ANYWHERE,
@@ -419,7 +450,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							if (Persistable.class.isAssignableFrom(type)) {
 								String alias = aliases.get(p1);
 								if (alias == null) {
-									alias = CodecUtils.randomString(4);
+									alias = p1+"_";
+									while (aliases.containsValue(alias))
+										alias += "_";
 									dc.createAlias(p1, alias);
 									aliases.put(p1, alias);
 								}

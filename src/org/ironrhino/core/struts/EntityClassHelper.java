@@ -4,6 +4,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.ironrhino.core.hibernate.CriterionOperator;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Attributable;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
@@ -85,25 +87,6 @@ public class EntityClassHelper {
 						Field f = declaredClass.getDeclaredField(propertyName);
 						if (f != null)
 							trans = f.getAnnotation(Transient.class);
-					} catch (Exception e) {
-					}
-				SearchableProperty searchableProperty = pd.getReadMethod()
-						.getAnnotation(SearchableProperty.class);
-				if (searchableProperty == null)
-					try {
-						Field f = declaredClass.getDeclaredField(propertyName);
-						if (f != null)
-							searchableProperty = f
-									.getAnnotation(SearchableProperty.class);
-					} catch (Exception e) {
-					}
-				SearchableId searchableId = pd.getReadMethod().getAnnotation(
-						SearchableId.class);
-				if (searchableId == null)
-					try {
-						Field f = declaredClass.getDeclaredField(propertyName);
-						if (f != null)
-							searchableId = f.getAnnotation(SearchableId.class);
 					} catch (Exception e) {
 					}
 				UiConfig uiConfig = pd.getReadMethod().getAnnotation(
@@ -192,8 +175,6 @@ public class EntityClassHelper {
 					} catch (NoSuchMethodException e) {
 						uci.setListValue(uci.getListKey());
 					}
-					map.put(propertyName, uci);
-					continue;
 				} else if (Persistable.class.isAssignableFrom(returnType)) {
 					JoinColumn joincolumnannotation = pd.getReadMethod()
 							.getAnnotation(JoinColumn.class);
@@ -253,10 +234,7 @@ public class EntityClassHelper {
 						}
 						uci.setPickUrl(sb.toString());
 					}
-					map.put(propertyName, uci);
-					continue;
-				}
-				if (returnType == Integer.TYPE || returnType == Short.TYPE
+				}else if (returnType == Integer.TYPE || returnType == Short.TYPE
 						|| returnType == Long.TYPE || returnType == Double.TYPE
 						|| returnType == Float.TYPE
 						|| Number.class.isAssignableFrom(returnType)) {
@@ -323,9 +301,49 @@ public class EntityClassHelper {
 				}
 				if (columnannotation != null && columnannotation.unique())
 					uci.setUnique(true);
-				if (searchableProperty != null || searchableId != null)
+				SearchableProperty searchableProperty = pd.getReadMethod()
+						.getAnnotation(SearchableProperty.class);
+				if (searchableProperty == null)
+					try {
+						Field f = declaredClass.getDeclaredField(propertyName);
+						if (f != null)
+							searchableProperty = f
+									.getAnnotation(SearchableProperty.class);
+					} catch (Exception e) {
+					}
+				SearchableId searchableId = pd.getReadMethod().getAnnotation(
+						SearchableId.class);
+				if (searchableId == null)
+					try {
+						Field f = declaredClass.getDeclaredField(propertyName);
+						if (f != null)
+							searchableId = f.getAnnotation(SearchableId.class);
+					} catch (Exception e) {
+					}
+				SearchableComponent searchableComponent = pd.getReadMethod()
+						.getAnnotation(SearchableComponent.class);
+				if (searchableComponent == null)
+					try {
+						Field f = declaredClass.getDeclaredField(propertyName);
+						if (f != null)
+							searchableComponent = f
+									.getAnnotation(SearchableComponent.class);
+					} catch (Exception e) {
+					}
+				if (searchableProperty != null || searchableId != null
+						|| searchableComponent != null) {
 					uci.setSearchable(true);
-
+					if (searchableComponent != null) {
+						String s = searchableComponent
+								.nestSearchableProperties();
+						if (StringUtils.isNotBlank(s)) {
+							Set<String> nestSearchableProperties = new LinkedHashSet<String>();
+							nestSearchableProperties.addAll(Arrays.asList(s
+									.split("\\s*,\\s*")));
+							uci.setNestSearchableProperties(nestSearchableProperties);
+						}
+					}
+				}
 				if (naturalIds.containsKey(pd.getName())) {
 					uci.setRequired(true);
 					if (naturalIds.size() == 1)

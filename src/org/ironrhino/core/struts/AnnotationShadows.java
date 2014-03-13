@@ -48,13 +48,14 @@ public class AnnotationShadows {
 		private String listKey = UiConfig.DEFAULT_LIST_KEY;
 		private String listValue = UiConfig.DEFAULT_LIST_VALUE;
 		private String cellEdit = "";
-		private boolean searchable;
 		private String optionsExpression = "";
 		private String pickUrl = "";
 		private String templateName = "";
 		private boolean excludedFromLike = false;
 		private boolean excludedFromCriteria = false;
 		private boolean excludedFromOrdering = false;
+		private boolean searchable;
+		private Set<String> nestSearchableProperties;
 
 		public UiConfigImpl() {
 		}
@@ -101,7 +102,6 @@ public class AnnotationShadows {
 				this.cssClasses.addAll(Arrays.asList(config.cssClass().split(
 						"\\s")));
 			this.thCssClass = config.thCssClass();
-			this.searchable = config.searchable();
 			this.optionsExpression = config.optionsExpression();
 			this.pickUrl = config.pickUrl();
 			this.templateName = config.templateName();
@@ -112,6 +112,7 @@ public class AnnotationShadows {
 			this.excludedFromLike = config.excludedFromLike();
 			this.excludedFromCriteria = config.excludedFromCriteria();
 			this.excludedFromOrdering = config.excludedFromOrdering();
+			this.searchable = config.searchable();
 		}
 
 		public boolean isExcludedFromLike() {
@@ -402,6 +403,15 @@ public class AnnotationShadows {
 
 		public void setSearchable(boolean searchable) {
 			this.searchable = searchable;
+		}
+
+		public Set<String> getNestSearchableProperties() {
+			return nestSearchableProperties;
+		}
+
+		public void setNestSearchableProperties(
+				Set<String> nestSearchableProperties) {
+			this.nestSearchableProperties = nestSearchableProperties;
 		}
 
 	}

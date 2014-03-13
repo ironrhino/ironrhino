@@ -18,7 +18,6 @@ import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.struts.EntityClassHelper;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
-import org.ironrhino.core.util.CodecUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 
@@ -120,7 +119,10 @@ public class CriterionUtils {
 									String alias = state.getAliases().get(
 											propertyName);
 									if (alias == null) {
-										alias = CodecUtils.randomString(4);
+										alias = propertyName + "_";
+										while (state.getAliases()
+												.containsValue(alias))
+											alias += "_";
 										dc.createAlias(propertyName, alias);
 										state.getAliases().put(propertyName,
 												alias);
@@ -207,7 +209,9 @@ public class CriterionUtils {
 							}
 							String alias = state.getAliases().get(propertyName);
 							if (alias == null) {
-								alias = CodecUtils.randomString(4);
+								alias = propertyName + "_";
+								while (state.getAliases().containsValue(alias))
+									alias += "_";
 								dc.createAlias(propertyName, alias);
 								state.getAliases().put(propertyName, alias);
 							}

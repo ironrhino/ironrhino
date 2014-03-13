@@ -20,4 +20,6 @@ public @interface SearchableComponent {
 	String converter() default "";
 
 	String accessor() default "";
+
+	String nestSearchableProperties() default "";
 }
