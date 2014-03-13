@@ -326,7 +326,7 @@ git reset --hard
 #git clean -f
 gitpulloutput=\`git pull\`
 echo "\$gitpulloutput"
-if \$(echo "\$gitpulloutput"|grep fatal >/dev/null 2>&1) ; then
+if ! \$(echo "\$gitpulloutput"|grep fatal >/dev/null 2>&1) ; then
 exit 1
 fi
 else
