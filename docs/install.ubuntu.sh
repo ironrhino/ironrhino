@@ -307,9 +307,9 @@ fi
 elif [ -d .git ];then
 git reset --hard
 git clean -df
-gitpulloutput=\`git pull\`
-echo "\$gitpulloutput"
-if ! \$(echo "\$gitpulloutput"|grep up-to-date >/dev/null 2>&1) ; then
+gitpulloutput=\`git pull 2>&1\`
+echo \$gitpulloutput
+if [[ \$gitpulloutput =~ up-to-date ]] ; then
 ant dist
 fi
 fi
@@ -324,9 +324,9 @@ svn up --force
 elif [ -d .git ];then
 git reset --hard
 #git clean -f
-gitpulloutput=\`git pull\`
-echo "\$gitpulloutput"
-if ! \$(echo "\$gitpulloutput"|grep fatal >/dev/null 2>&1) ; then
+gitpulloutput=\`git pull 2>&1\`
+echo \$gitpulloutput
+if [[ \$gitpulloutput =~ fatal: ]] ; then
 exit 1
 fi
 else
