@@ -309,7 +309,7 @@ git reset --hard
 git clean -df
 gitpulloutput=\`git pull 2>&1\`
 echo \$gitpulloutput
-if [[ \$gitpulloutput =~ up-to-date ]] ; then
+if ! [[ \$gitpulloutput =~ up-to-date ]] ; then
 ant dist
 fi
 fi
