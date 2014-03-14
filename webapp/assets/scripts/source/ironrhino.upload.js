@@ -141,35 +141,39 @@ Observation.upload = function(container) {
 	}).blur(function() {
 		var oldvalue = $(this).data('oldvalue');
 		var newvalue = $(this).text();
-		$.ajax({
-			url : CONTEXT_PATH + '/common/upload/rename/' + encodeURI(oldvalue),
-			data : {
-				folder : $('#upload_form [name="folder"]').val(),
-				filename : newvalue
-			},
-			beforeSend : Indicator.show,
-			success : function(data) {
-				Indicator.hide();
-				if (typeof data == 'string') {
-					var html = data.replace(/<script(.|\s)*?\/script>/g, '');
-					var div = $('<div/>').html(html);
-					var message = $('#message', div);
-					if (message.html()) {
-						if ($('.action-error', message).length
-								|| !$('#upload_form input[name="pick"]').length)
-							if ($('#message').length)
-								$('#message').html(message.html());
-							else
-								$('<div id="message">' + message.html()
-										+ '</div>').prependTo($('#content'));
+		if (oldvalue != newvalue)
+			$.ajax({
+				url : CONTEXT_PATH + '/common/upload/rename/'
+						+ encodeURI(oldvalue),
+				data : {
+					folder : $('#upload_form [name="folder"]').val(),
+					filename : newvalue
+				},
+				beforeSend : Indicator.show,
+				success : function(data) {
+					Indicator.hide();
+					if (typeof data == 'string') {
+						var html = data
+								.replace(/<script(.|\s)*?\/script>/g, '');
+						var div = $('<div/>').html(html);
+						var message = $('#message', div);
+						if (message.html()) {
+							if ($('.action-error', message).length
+									|| !$('#upload_form input[name="pick"]').length)
+								if ($('#message').length)
+									$('#message').html(message.html());
+								else
+									$('<div id="message">' + message.html()
+											+ '</div>')
+											.prependTo($('#content'));
+						}
+					} else {
+						Message.showActionError(data.actionErrors);
+						Message.showActionMessage(data.actionMessages);
 					}
-				} else {
-					Message.showActionError(data.actionErrors);
-					Message.showActionMessage(data.actionMessages);
+					$('#files button.reload').trigger('click');
 				}
-				$('#files button.reload').trigger('click');
-			}
-		});
+			});
 	});
 
 };

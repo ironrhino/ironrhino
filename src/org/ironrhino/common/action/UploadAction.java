@@ -88,6 +88,10 @@ public class UploadAction extends BaseAction {
 		return folder;
 	}
 
+	public String getUploadRootDir() {
+		return UPLOAD_DIR;
+	}
+
 	public String getFolderEncoded() {
 		if (folderEncoded == null) {
 			if (folder != null) {
@@ -200,7 +204,7 @@ public class UploadAction extends BaseAction {
 		if (StringUtils.isNotBlank(folder))
 			files.put("..", Boolean.FALSE);
 		files.putAll(fileStorage.listFilesAndDirectory(Files
-				.simplifyPath(UPLOAD_DIR + folder)));
+				.simplifyPath(getUploadRootDir() + folder)));
 		return ServletActionContext.getRequest().getParameter("pick") != null ? "pick"
 				: LIST;
 	}
@@ -216,8 +220,8 @@ public class UploadAction extends BaseAction {
 		String[] paths = getId();
 		if (paths != null) {
 			for (String path : paths) {
-				if (!fileStorage.delete(Files.simplifyPath(UPLOAD_DIR + "/"
-						+ folder + "/" + path)))
+				if (!fileStorage.delete(Files.simplifyPath(getUploadRootDir()
+						+ "/" + folder + "/" + path)))
 					addActionError(getText("delete.forbidden",
 							new String[] { path }));
 			}
@@ -231,7 +235,7 @@ public class UploadAction extends BaseAction {
 			if (!path.startsWith("/"))
 				path = "/" + path;
 			folder = path;
-			fileStorage.mkdir(Files.simplifyPath(UPLOAD_DIR
+			fileStorage.mkdir(Files.simplifyPath(getUploadRootDir()
 					+ (folder.startsWith("/") ? "" : "/") + folder));
 		}
 		return list();
@@ -244,26 +248,29 @@ public class UploadAction extends BaseAction {
 			return list();
 		}
 		String newName = filename[0];
-		if (!fileStorage.exists(Files.simplifyPath(UPLOAD_DIR + "/" + folder
-				+ "/" + oldName))) {
+		if (oldName.equals(newName))
+			return list();
+		if (!fileStorage.exists(Files.simplifyPath(getUploadRootDir() + "/"
+				+ folder + "/" + oldName))) {
 			addActionError(getText("validation.not.exists"));
 			return list();
 		}
-		if (fileStorage.exists(Files.simplifyPath(UPLOAD_DIR + "/" + folder
-				+ "/" + newName))) {
+		if (fileStorage.exists(Files.simplifyPath(getUploadRootDir() + "/"
+				+ folder + "/" + newName))) {
 			addActionError(getText("validation.already.exists"));
 			return list();
 		}
 		fileStorage.rename(
-				Files.simplifyPath(UPLOAD_DIR + "/" + folder + "/" + oldName),
-				Files.simplifyPath(UPLOAD_DIR + "/" + folder + "/" + newName));
-		addActionMessage(getText("operate.success"));
+				Files.simplifyPath(getUploadRootDir() + "/" + folder + "/"
+						+ oldName),
+				Files.simplifyPath(getUploadRootDir() + "/" + folder + "/"
+						+ newName));
 		return list();
 	}
 
 	@JsonConfig(root = "files")
 	public String files() {
-		String path = Files.simplifyPath(UPLOAD_DIR + "/" + folder);
+		String path = Files.simplifyPath(getUploadRootDir() + "/" + folder);
 		Map<String, Boolean> map = fileStorage.listFilesAndDirectory(path);
 		files = new LinkedHashMap<String, Boolean>();
 		String[] suffixes = null;
@@ -295,7 +302,7 @@ public class UploadAction extends BaseAction {
 	}
 
 	private String createPath(String filename, boolean autorename) {
-		String dir = UPLOAD_DIR + "/";
+		String dir = getUploadRootDir() + "/";
 		if (StringUtils.isNotBlank(folder))
 			dir = dir + folder + "/";
 		String path = dir + filename;
@@ -310,4 +317,5 @@ public class UploadAction extends BaseAction {
 		path = Files.simplifyPath(path);
 		return path;
 	}
+
 }
