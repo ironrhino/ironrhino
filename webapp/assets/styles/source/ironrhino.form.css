@@ -79,10 +79,13 @@ textarea{
 	height: 150px;
 	resize: vertical;
 }
-textarea.container{
+textarea.container,input.container,select.container{
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+}
+input.container,select.container{
+	height: 30px;
 }
 select.empty{
 	color: #ccc;
