@@ -308,7 +308,7 @@ elif [ -d .git ];then
 git reset --hard
 git clean -df
 gitpulloutput=\`git pull 2>&1\`
-echo \$gitpulloutput
+echo "\$gitpulloutput"
 if ! [[ \$gitpulloutput =~ up-to-date ]] ; then
 ant dist
 fi
@@ -325,7 +325,7 @@ elif [ -d .git ];then
 git reset --hard
 #git clean -f
 gitpulloutput=\`git pull 2>&1\`
-echo \$gitpulloutput
+echo "\$gitpulloutput"
 if [[ \$gitpulloutput =~ fatal: ]] ; then
 exit 1
 fi
