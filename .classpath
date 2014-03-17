@@ -55,7 +55,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-jasperreports-plugin-2.3.16.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-sitemesh-plugin-2.3.16.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-spring-plugin-2.3.16.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xmemcached-1.4.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xmemcached-1.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xwork-core-2.3.16.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dynamicreports-core-3.2.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/antlr-runtime-3.4.jar"/>
