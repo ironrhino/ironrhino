@@ -17,6 +17,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
+import org.ironrhino.core.aop.PublishAware;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
@@ -39,6 +40,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.ClassUtils;
 
+@PublishAware
 @AutoConfig
 @Searchable
 @Entity
