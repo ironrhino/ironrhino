@@ -219,7 +219,7 @@ ${formHeader!}
 <button type="button" class="btn confirm" data-action="disable" data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])">${action.getText("disable")}</button>
 </#if>
 </#if>
-<#if !readonly||deletable><button type="button" class="btn" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${action.getText("delete")}</button></#if>
+<#if !readonly||deletable><button type="button" class="btn confirm" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${action.getText("delete")}</button></#if>
 <#if treeable??&&treeable&&parentEntity??>
 <#if parentEntity.parent??>
 <a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}">${action.getText("upward")}</a>
