@@ -11,8 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.support.JdbcUtils;
 
 public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
@@ -34,9 +32,10 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
 	@Override
 	public void afterPropertiesSet() {
-		Connection con = DataSourceUtils.getConnection(getDataSource());
+		Connection con = null;
 		Statement stmt = null;
 		try {
+			con = getDataSource().getConnection();
 			DatabaseMetaData dbmd = con.getMetaData();
 			ResultSet rs = dbmd.getTables(null, null, "%", null);
 			boolean tableExists = false;
@@ -47,7 +46,6 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 				}
 			}
 			stmt = con.createStatement();
-			DataSourceUtils.applyTransactionTimeout(stmt, getDataSource());
 			String columnName = getSequenceName();
 			if (tableExists) {
 				rs = stmt.executeQuery("SELECT * FROM " + getTableName());
@@ -60,7 +58,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 						break;
 					}
 				}
-				JdbcUtils.closeResultSet(rs);
+				rs.close();
 				if (!columnExists) {
 					stmt.execute("ALTER TABLE `" + getTableName() + "` ADD "
 							+ columnName + " INT NOT NULL DEFAULT 0,ADD "
@@ -77,8 +75,18 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
 		} finally {
-			JdbcUtils.closeStatement(stmt);
-			DataSourceUtils.releaseConnection(con, getDataSource());
+			if (stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			if (con != null)
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 		}
 	}
 
@@ -88,10 +96,11 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 		if (this.maxId.get() <= this.nextId.get()) {
 			if (getLockService().tryLock(getLockName())) {
 				try {
-					Connection con = DataSourceUtils
-							.getConnection(getDataSource());
+					Connection con = null;
 					Statement stmt = null;
 					try {
+						con = getDataSource().getConnection();
+						con.setAutoCommit(false);
 						stmt = con.createStatement();
 						String columnName = getSequenceName();
 						if (isSameCycle(con, stmt)) {
@@ -119,15 +128,25 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 							this.nextId.set(next);
 							this.maxId.set(rs.getInt(1));
 						} finally {
-							JdbcUtils.closeResultSet(rs);
+							rs.close();
 						}
 
 					} catch (SQLException ex) {
 						throw new DataAccessResourceFailureException(
 								"Could not obtain last_insert_id()", ex);
 					} finally {
-						JdbcUtils.closeStatement(stmt);
-						DataSourceUtils.releaseConnection(con, getDataSource());
+						if (stmt != null)
+							try {
+								stmt.close();
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
+						if (con != null)
+							try {
+								con.close();
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
 					}
 				} finally {
 					getLockService().unlock(getLockName());
@@ -158,7 +177,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			lastTimestamp = new Date(last);
 			thisTimestamp = new Date(rs.getLong(2) * 1000);
 		} finally {
-			JdbcUtils.closeResultSet(rs);
+			rs.close();
 		}
 		return getCycleType().isSameCycle(lastTimestamp, thisTimestamp);
 	}

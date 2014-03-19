@@ -9,8 +9,6 @@ import java.sql.Statement;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.support.JdbcUtils;
 
 public abstract class AbstractSequenceCyclicSequence extends
 		AbstractDatabaseCyclicSequence {
@@ -63,9 +61,10 @@ public abstract class AbstractSequenceCyclicSequence extends
 
 	@Override
 	public void afterPropertiesSet() {
-		Connection con = DataSourceUtils.getConnection(getDataSource());
+		Connection con = null;
 		Statement stmt = null;
 		try {
+			con = getDataSource().getConnection();
 			DatabaseMetaData dbmd = con.getMetaData();
 			ResultSet rs = dbmd.getTables(null, null, "%", null);
 			boolean tableExists = false;
@@ -76,7 +75,6 @@ public abstract class AbstractSequenceCyclicSequence extends
 				}
 			}
 			stmt = con.createStatement();
-			DataSourceUtils.applyTransactionTimeout(stmt, getDataSource());
 			String columnName = getSequenceName();
 			if (tableExists) {
 				rs = stmt.executeQuery("SELECT * FROM " + getTableName());
@@ -89,7 +87,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 						break;
 					}
 				}
-				JdbcUtils.closeResultSet(rs);
+				rs.close();
 				if (!columnExists) {
 					stmt.execute(getAddColumnStatement());
 					stmt.execute(getCreateSequenceStatement());
@@ -104,8 +102,18 @@ public abstract class AbstractSequenceCyclicSequence extends
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
 		} finally {
-			JdbcUtils.closeStatement(stmt);
-			DataSourceUtils.releaseConnection(con, getDataSource());
+			if (stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			if (con != null)
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 		}
 	}
 
@@ -113,10 +121,12 @@ public abstract class AbstractSequenceCyclicSequence extends
 	public String nextStringValue() throws DataAccessException {
 		String lockName = getLockName();
 		long nextId = 0;
-		Connection con = DataSourceUtils.getConnection(getDataSource());
+		Connection con = null;
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
+			con = getDataSource().getConnection();
+			con.setAutoCommit(false);
 			stmt = con.createStatement();
 			if (!isSameCycle(con, stmt)) {
 				if (getLockService().tryLock(lockName)) {
@@ -142,22 +152,31 @@ public abstract class AbstractSequenceCyclicSequence extends
 				rs.next();
 				nextId = rs.getLong(1);
 			} finally {
-				JdbcUtils.closeResultSet(rs);
+				rs.close();
 			}
 			con.commit();
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(
 					"Could not obtain next value of sequence", ex);
 		} finally {
-			JdbcUtils.closeStatement(stmt);
-			DataSourceUtils.releaseConnection(con, getDataSource());
+			if (stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			if (con != null)
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 		}
 		return getStringValue(thisTimestamp, getPaddingLength(), (int) nextId);
 	}
 
 	protected boolean isSameCycle(Connection con, Statement stmt)
 			throws SQLException {
-		DataSourceUtils.applyTransactionTimeout(stmt, getDataSource());
 		ResultSet rs = stmt.executeQuery("SELECT  " + getSequenceName()
 				+ "_TIMESTAMP," + getCurrentTimestamp() + " FROM "
 				+ getTableName());
@@ -166,7 +185,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 			lastTimestamp = rs.getTimestamp(1);
 			thisTimestamp = rs.getTimestamp(2);
 		} finally {
-			JdbcUtils.closeResultSet(rs);
+			rs.close();
 		}
 		return getCycleType().isSameCycle(lastTimestamp, thisTimestamp);
 	}
