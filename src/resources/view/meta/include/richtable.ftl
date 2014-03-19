@@ -72,7 +72,7 @@ ${formHeader!}
 
 <#macro rttheadtd name,alias='',title='',cellName='',cellEdit='',class='',width='',readonly=false,resizable=true,excludeIfNotEdited=false>
 <th<#if title?has_content> title="${action.getText(title)}"</#if><#if excludeIfNotEdited||class?has_content> class="<#if excludeIfNotEdited> excludeIfNotEdited</#if><#if class?has_content> ${class}</#if>"</#if><#if width?has_content> style="width:${width};"</#if><#if !readonly> data-cellName="${cellName}"</#if><#if cellEdit?has_content> data-cellEdit="${cellEdit}"</#if>>
-<#if resizable><span class="resizeTitle"></#if><#if alias?has_content>${action.getText(alias)}<#else>${action.getText(name)}</#if><#if resizable></span><span class="resizeBar visible-desktop"></span></#if>
+<#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?substring(alias?last_index_of('.')+1)/></#if></#if>${action.getText(alias)}<#if resizable></span><span class="resizeBar visible-desktop"></span></#if>
 </th>
 </#macro>
 <#macro rtmiddle width='50px' showActionColumn=true>
@@ -264,9 +264,12 @@ ${formFooter!}
 				<select class="decrease property">
 					<option value=""></option>
 					<#list propertyNamesInCriteria.entrySet() as entry>
-					<#local label=entry.key/>
-					<#if entry.value.alias?has_content>
-						<#local label=entry.value.alias/>
+					<#local label=entry.value.alias!/>
+					<#if !label?has_content>
+						<#local label=entry.key/>
+						<#if label?index_of('.') gt 0>
+							<#local label=label?substring(label?last_index_of('.')+1)/>
+						</#if>
 					</#if>
 					<#if entry.value.propertyType.enum>
 					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="${statics['org.ironrhino.core.struts.I18N'].getTextForEnum(entry.value.propertyType)}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
@@ -303,9 +306,12 @@ ${formFooter!}
 					<option value=""></option>
 					<#list propertyNamesInCriteria.entrySet() as entry>
 					<#if !entry.value.excludedFromOrdering>
-					<#local label=entry.key/>
-					<#if entry.value.alias?has_content>
-						<#local label=entry.value.alias/>
+					<#local label=entry.value.alias!/>
+					<#if !label?has_content>
+						<#local label=entry.key/>
+						<#if label?index_of('.') gt 0>
+							<#local label=label?substring(label?last_index_of('.')+1)/>
+						</#if>
 					</#if>
 					<option value="${entry.key}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					</#if>
