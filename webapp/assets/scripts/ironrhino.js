@@ -30695,6 +30695,21 @@ Form = {
 		if ($(target).prop('tagName') != 'FORM') {
 			$(target).closest('.control-group').removeClass('error');
 			$('.field-error', $(target).parent()).fadeIn().remove();
+			if ($(target).is('input[type="radio"]')) {
+				if ($(target).hasClass('required')) {
+					var options = $('input[type="radio"][name="' + target.name
+									+ '"]', target.form);
+					var checked = false;
+					$.each(options, function(i, v) {
+								if (v.checked)
+									checked = true;
+							});
+					if (!checked) {
+						Message.showFieldError(target, null, 'required');
+						return false;
+					}
+				}
+			}
 			if ($(target).is(':visible,[type="hidden"],.sqleditor,.chzn-done')
 					&& !$(target).prop('disabled')) {
 				var value = $(target).val();
