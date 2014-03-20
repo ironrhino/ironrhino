@@ -122,7 +122,8 @@ ${formHeader!}
 		<#elseif value?is_hash&&value.displayName??>
 		${value.displayName}<#t>
 		<#elseif value?is_date>
-		${value?datetime}<#t>
+		<#local classname=value.class.name/>
+		<#if classname=='java.sql.Date'>${value?date}<#elseif classname=='java.sql.Time'>${value?time}<#else>${value?datetime}</#if><#t>
 		<#else>
 		${value?xhtml}<#t>
 		</#if>
