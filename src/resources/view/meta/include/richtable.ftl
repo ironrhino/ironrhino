@@ -121,6 +121,8 @@ ${formHeader!}
 		${action.getText(value?string)}<#t>
 		<#elseif value?is_hash&&value.displayName??>
 		${value.displayName}<#t>
+		<#elseif value?is_date>
+		${value?datetime}<#t>
 		<#else>
 		${value?xhtml}<#t>
 		</#if>
