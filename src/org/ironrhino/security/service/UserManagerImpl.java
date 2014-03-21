@@ -9,8 +9,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.criterion.DetachedCriteria;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
+import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleMapper;
 import org.ironrhino.core.service.BaseManagerImpl;
@@ -152,6 +154,11 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 			user = findByNaturalId(candidate + i);
 		}
 		return candidate + i;
+	}
+
+	public DetachedCriteria detachedCriteria(String role) {
+		DetachedCriteria dc = detachedCriteria();
+		return dc.add(CriterionUtils.matchTag("rolesAsString", role));
 	}
 
 }
