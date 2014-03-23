@@ -1,6 +1,7 @@
 package org.ironrhino.common.support;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -115,12 +116,9 @@ public class RegionSetup {
 
 	private static Map<String, String> regionAreacodeMap() {
 		List<String> lines = new ArrayList<String>();
-		try {
-			lines = IOUtils.readLines(
-					Thread.currentThread()
-							.getContextClassLoader()
-							.getResourceAsStream(
-									"resources/data/region_code.txt"), "utf-8");
+		try (InputStream is = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("resources/data/region_code.txt")) {
+			lines = IOUtils.readLines(is, "utf-8");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

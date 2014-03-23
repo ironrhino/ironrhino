@@ -1,6 +1,7 @@
 package org.ironrhino.core.jdbc;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -283,9 +284,8 @@ public enum DatabaseProduct {
 	public abstract int getDefaultPort();
 
 	public List<String> getKeywords() {
-		try {
-			List<String> lines = IOUtils.readLines(getClass()
-					.getResourceAsStream("keywords.txt"));
+		try (InputStream is = getClass().getResourceAsStream("keywords.txt")) {
+			List<String> lines = IOUtils.readLines(is, "UTF-8");
 			for (String line : lines) {
 				if (line.startsWith(name() + "=")) {
 					String s = line.substring(line.indexOf("=") + 1);
