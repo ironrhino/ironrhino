@@ -31,13 +31,13 @@ import org.ironrhino.core.model.Recordable;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
+import org.ironrhino.core.security.role.RoledUserDetails;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.ClassUtils;
 
 @PublishAware
@@ -47,8 +47,8 @@ import org.springframework.util.ClassUtils;
 @Table(name = "`user`")
 @Richtable(order = "username asc")
 @ClassPresentConditional("org.ironrhino.security.service.UserManagerImpl")
-public class User extends BaseEntity implements UserDetails, Recordable<User>,
-		Enableable {
+public class User extends BaseEntity implements RoledUserDetails,
+		Recordable<User>, Enableable {
 
 	private static final long serialVersionUID = -6135434863820342822L;
 
@@ -192,6 +192,7 @@ public class User extends BaseEntity implements UserDetails, Recordable<User>,
 		this.phone = phone;
 	}
 
+	@Override
 	public Set<String> getRoles() {
 		return roles;
 	}
