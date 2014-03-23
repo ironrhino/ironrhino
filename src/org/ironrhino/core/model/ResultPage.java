@@ -37,7 +37,7 @@ public class ResultPage<T> implements Serializable {
 
 	private long totalResults = -1;
 
-	private Collection<T> result = new ArrayList<T>();
+	private Collection<T> result = new ArrayList<T>(0);
 
 	private Object criteria;
 
