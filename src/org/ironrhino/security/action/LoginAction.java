@@ -15,7 +15,6 @@ import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationF
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.event.LoginEvent;
-import org.ironrhino.security.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,9 +114,9 @@ public class LoginAction extends BaseAction {
 				usernamePasswordAuthenticationFilter.success(request, response,
 						authResult);
 				Object principal = authResult.getPrincipal();
-				if (principal instanceof User)
-					eventPublisher.publish(new LoginEvent((User) principal),
-							Scope.LOCAL);
+				if (principal instanceof UserDetails)
+					eventPublisher.publish(new LoginEvent(
+							(UserDetails) principal), Scope.LOCAL);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}

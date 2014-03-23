@@ -10,9 +10,9 @@ import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.spring.security.DefaultLogoutSuccessHandler;
 import org.ironrhino.security.event.LogoutEvent;
-import org.ironrhino.security.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public class LogoutSuccessHandler extends DefaultLogoutSuccessHandler {
 
@@ -26,9 +26,9 @@ public class LogoutSuccessHandler extends DefaultLogoutSuccessHandler {
 		super.onLogoutSuccess(request, response, authentication);
 		if (authentication != null) {
 			Object principal = authentication.getPrincipal();
-			if (principal instanceof User)
-				eventPublisher.publish(new LogoutEvent((User) principal),
-						Scope.LOCAL);
+			if (principal instanceof UserDetails)
+				eventPublisher.publish(
+						new LogoutEvent((UserDetails) principal), Scope.LOCAL);
 		}
 	}
 
