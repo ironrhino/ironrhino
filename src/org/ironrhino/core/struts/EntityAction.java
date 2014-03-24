@@ -450,7 +450,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							if (Persistable.class.isAssignableFrom(type)) {
 								String alias = aliases.get(p1);
 								if (alias == null) {
-									alias = p1+"_";
+									alias = p1 + "_";
 									while (aliases.containsValue(alias))
 										alias += "_";
 									dc.createAlias(p1, alias);
@@ -729,7 +729,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				if (str != null && entry.getValue().isTrim()
 						&& "input".equals(entry.getValue().getType())) {
 					str = str.trim();
-					bw.setPropertyValue(entry.getKey(), str);
+					if (bw.getPropertyDescriptor(entry.getKey())
+							.getWriteMethod() != null)
+						bw.setPropertyValue(entry.getKey(), str);
 				}
 				if (StringUtils.isNotBlank(str)) {
 					int maxlength = entry.getValue().getMaxlength();
