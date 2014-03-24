@@ -1,9 +1,13 @@
 package org.ironrhino.core.hibernate;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.persistence.Entity;
@@ -40,13 +44,26 @@ public class SessionFactoryBean extends
 				.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
 			properties.put(AvailableSettings.DIALECT_RESOLVERS,
 					MyDialectResolver.class.getName());
-		Collection<Class<?>> classes = ClassScaner.scanAnnotated(
+		Map<String, Class<?>> added = new HashMap<String, Class<?>>();
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		Collection<Class<?>> scaned = ClassScaner.scanAnnotated(
 				ClassScaner.getAppPackages(), Entity.class);
 		if (annotatedClasses != null)
-			classes.addAll(Arrays.asList(annotatedClasses));
+			for (Class<?> c : annotatedClasses)
+				if (!added.containsKey(c.getSimpleName())
+						|| !c.isAssignableFrom(added.get(c.getSimpleName()))) {
+					classes.add(c);
+					added.put(c.getSimpleName(), c);
+				}
+		for (Class<?> c : scaned)
+			if (!added.containsKey(c.getSimpleName())
+					|| !c.isAssignableFrom(added.get(c.getSimpleName()))) {
+				classes.add(c);
+				added.put(c.getSimpleName(), c);
+			}
 		if (StringUtils.isNotBlank(excludeFilter)) {
 			Collection<Class<?>> temp = classes;
-			classes = new HashSet<Class<?>>();
+			classes = new ArrayList<Class<?>>();
 			String[] arr = excludeFilter.split("\\s*,\\s*");
 			for (Class<?> clz : temp) {
 				boolean exclude = false;
@@ -61,6 +78,12 @@ public class SessionFactoryBean extends
 					classes.add(clz);
 			}
 		}
+		Collections.sort(classes, new Comparator<Class<?>>() {
+			@Override
+			public int compare(Class<?> a, Class<?> b) {
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		annotatedClasses = classes.toArray(new Class<?>[0]);
 		logger.info("annotatedClasses: ");
 		for (Class<?> clz : annotatedClasses)

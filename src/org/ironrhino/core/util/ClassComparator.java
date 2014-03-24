@@ -7,11 +7,7 @@ import org.springframework.core.annotation.Order;
 
 public class ClassComparator implements Comparator<Class<?>> {
 
-	private final static ClassComparator DEFAULT_INSTANCE = new ClassComparator();
-
-	public static ClassComparator getDefaultInstance() {
-		return DEFAULT_INSTANCE;
-	}
+	public final static ClassComparator INSTANCE = new ClassComparator();
 
 	@Override
 	public int compare(Class<?> a, Class<?> b) {
