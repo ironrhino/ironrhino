@@ -35,7 +35,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.ClassUtils;
 
 @MappedSuperclass
-class BaseUser extends BaseEntity implements RoledUserDetails,
+public class BaseUser extends BaseEntity implements RoledUserDetails,
 		Recordable<BaseUser>, Enableable {
 
 	private static final long serialVersionUID = -6135434863820342822L;
