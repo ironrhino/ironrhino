@@ -38197,6 +38197,7 @@ Observation.treeselect = function(container) {
 			current = $(this);
 			var options = {
 				separator : ',',
+				idindex : 0,
 				nameindex : 1,
 				multiple : false
 			}
@@ -38246,7 +38247,10 @@ Observation.treeselect = function(container) {
 					if (!options.multiple) {
 						$(target).on('click', 'tbody input[type=radio]',
 								function() {
-									var id = $(this).val();
+									var id = options.idindex == 0
+											? $(this).val()
+											: $($(this).closest('tr')[0].cells[options.idindex])
+													.text();
 									var name = $($(this).closest('tr')[0].cells[options.nameindex])
 											.text();
 									if (options.name) {
@@ -38283,7 +38287,11 @@ Observation.treeselect = function(container) {
 							var checkbox = $('tbody :checked', target);
 							var ids = [], names = [];
 							checkbox.each(function() {
-								ids.push($(this).val());
+								ids
+										.push(options.idindex == 0
+												? $(this).val()
+												: $($(this).closest('tr')[0].cells[options.idindex])
+														.text());
 								names
 										.push($($(this).closest('tr')[0].cells[options.nameindex])
 												.text());

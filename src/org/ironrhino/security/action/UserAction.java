@@ -279,4 +279,9 @@ public class UserAction extends EntityAction<User> {
 		return JSON;
 	}
 
+	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
+	public String pick() throws Exception {
+		return super.pick();
+	}
+
 }
