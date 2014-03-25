@@ -1289,31 +1289,29 @@ Observation.common = function(container) {
 							'X-Data-Type' : 'json'
 						});
 			$(this).bind('submit', function(e) {
-				var form = $(this);
-				var btn = $('.clicked', form).removeClass('clicked');
-				if (btn.hasClass('noajax'))
-					return true;
-				if (btn.hasClass('reload') || btn.data('action'))
-					options.pushState = false;
-				var files = [];
-				if ($(this).hasClass('ajaxupload')
-						|| 'multipart/form-data' == $(this).attr('enctype')) {
-					$(this).removeAttr('enctype').addClass('ajaxupload');
-					$('input[type="file"]', form).each(function() {
-								var fs = this.files;
-								if (fs && fs.length > 0)
-									for (var i = 0; i < fs.length; i++)
-										files.push(fs[i]);
-							});
-				}
-				if (files.length) {
-					options.target = target;
-					$.ajaxupload(files, options);
-				} else {
-					$(this).ajaxSubmit(options);
-				}
-				return false;
-			});
+						var form = $(this);
+						var btn = $('.clicked', form).removeClass('clicked');
+						if (btn.hasClass('noajax'))
+							return true;
+						if (btn.hasClass('reload') || btn.data('action'))
+							options.pushState = false;
+						var files = [];
+						if ('multipart/form-data' == $(this).attr('enctype')) {
+							$('input[type="file"]', form).each(function() {
+										var fs = this.files;
+										if (fs && fs.length > 0)
+											for (var i = 0; i < fs.length; i++)
+												files.push(fs[i]);
+									});
+						}
+						if (files.length) {
+							options.target = target;
+							$.ajaxupload(files, options);
+						} else {
+							$(this).ajaxSubmit(options);
+						}
+						return false;
+					});
 			return;
 		} else {
 			$(this).click(function() {

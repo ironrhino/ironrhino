@@ -3,7 +3,6 @@
 		if (!files)
 			return false;
 		var _options = {
-			url : document.location.href,
 			name : 'file'
 		};
 		options = options || {};
@@ -24,11 +23,11 @@
 		}
 		var xhr = new XMLHttpRequest();
 		var url = options.url;
-		if (options.target && options.target.tagName == 'FORM') {
-			url = options.target.action;
-			if (!options.data)
-				options.data = $(options.target).serialize();
-		}
+		if (!url)
+			if (options.target && options.target.tagName == 'FORM')
+				url = options.target.action;
+			else
+				url = document.location.href;
 		xhr.open('POST', url);
 		var headers = options.headers || {};
 		if (!headers["X-Requested-With"])
@@ -74,7 +73,12 @@
 			var formData = new FormData();
 			for (var i = 0; i < files.length; i++)
 				formData.append(options.name, files[i]);
-			if (options.data)
+			if (options.target && options.target.tagName == 'FORM') {
+				$(':input', options.target).each(function(i, v) {
+							if ('file' != this.type && !this.disabled)
+								formData.append(this.name, this.value);
+						});
+			} else if (options.data)
 				$.each(options.data, function(k, v) {
 							formData.append(k, v);
 						});
@@ -95,7 +99,23 @@
 					var completed = 0;
 					var boundary = 'xxxxxxxxx';
 					var body = new BlobBuilder();
-					if (options.data) {
+					if (options.target && options.target.tagName == 'FORM') {
+						$(':input', options.target).each(function(i, v) {
+							if ('file' != this.type && !this.disabled) {
+								var bb = new BlobBuilder();
+								bb.append('--');
+								bb.append(boundary);
+								bb.append('\r\n');
+								bb
+										.append('Content-Disposition: form-data; name="');
+								bb.append(this.name);
+								bb.append('" ');
+								bb.append(this.value);
+								bb.append('\r\n');
+								body.append(bb.getBlob());
+							}
+						});
+					} else if (options.data) {
 						$.each(options.data, function(k, v) {
 							var bb = new BlobBuilder();
 							bb.append('--');
