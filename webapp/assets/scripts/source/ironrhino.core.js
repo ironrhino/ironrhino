@@ -1206,6 +1206,8 @@ Observation.common = function(container) {
 					}
 				});
 		if (this.tagName == 'FORM') {
+			if ($(this).attr('enctype'))
+				return;
 			var options = {
 				beforeSubmit : function() {
 					if (!Ajax.fire(target, 'onprepare'))
