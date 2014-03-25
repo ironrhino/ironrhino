@@ -13,13 +13,15 @@
 				return false;
 		}
 		var progress;
-		if (!options.progress) {
-			progress = $('#_uploadprogress');
-			if (!progress.length)
-				progress = $('<progress id="_uploadprogress" style="position: fixed;z-index: 10001;left: 45%;top: 0px;width: 100px;" min="0" max="100" value="0">0</progress>')
-						.appendTo(document.body);
-		} else {
-			progress = $(options.progress);
+		if (files.length) {
+			if (!options.progress) {
+				progress = $('#_uploadprogress');
+				if (!progress.length)
+					progress = $('<progress id="_uploadprogress" style="position: fixed;z-index: 10001;left: 45%;top: 0px;width: 100px;" min="0" max="100" value="0">0</progress>')
+							.appendTo(document.body);
+			} else {
+				progress = $(options.progress);
+			}
 		}
 		var xhr = new XMLHttpRequest();
 		var url = options.url;
@@ -29,6 +31,8 @@
 			else
 				url = document.location.href;
 		xhr.open('POST', url);
+		if (!files.length)
+			Indicator.show();
 		var headers = options.headers || {};
 		if (!headers["X-Requested-With"])
 			headers['X-Requested-With'] = 'XMLHttpRequest';
@@ -37,12 +41,17 @@
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 				if (xhr.status == 200 || xhr.status == 304) {
+					if (!files.length)
+						Indicator.hide();
 					if (typeof options['success'] != 'undefined')
 						options['success'](xhr);
 					var data = xhr.responseText;
 					if (data.indexOf('[') == 0 || data.indexOf('{') == 0)
 						data = $.parseJSON(data);
 					Ajax.handleResponse(data, options);
+				} else {
+					if (!files.length)
+						Indicator.showError();
 				}
 			}
 		}

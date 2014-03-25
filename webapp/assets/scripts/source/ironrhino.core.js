@@ -1295,16 +1295,14 @@ Observation.common = function(container) {
 							return true;
 						if (btn.hasClass('reload') || btn.data('action'))
 							options.pushState = false;
-						var files = [];
 						if ('multipart/form-data' == $(this).attr('enctype')) {
+							var files = [];
 							$('input[type="file"]', form).each(function() {
 										var fs = this.files;
 										if (fs && fs.length > 0)
 											for (var i = 0; i < fs.length; i++)
 												files.push(fs[i]);
 									});
-						}
-						if (files.length) {
 							options.target = target;
 							$.ajaxupload(files, options);
 						} else {
