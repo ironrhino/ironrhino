@@ -84,9 +84,10 @@
 				formData.append(options.name, files[i]);
 			if (options.target && options.target.tagName == 'FORM') {
 				$(':input', options.target).each(function(i, v) {
-							if ('file' != this.type && !this.disabled)
-								formData.append(this.name, this.value);
-						});
+					if (!(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
+							&& !this.checked))
+						formData.append(this.name, $(this).val());
+				});
 			} else if (options.data)
 				$.each(options.data, function(k, v) {
 							formData.append(k, v);
@@ -110,7 +111,8 @@
 					var body = new BlobBuilder();
 					if (options.target && options.target.tagName == 'FORM') {
 						$(':input', options.target).each(function(i, v) {
-							if ('file' != this.type && !this.disabled) {
+							if (!(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
+									&& !this.checked)) {
 								var bb = new BlobBuilder();
 								bb.append('--');
 								bb.append(boundary);
@@ -119,7 +121,7 @@
 										.append('Content-Disposition: form-data; name="');
 								bb.append(this.name);
 								bb.append('" ');
-								bb.append(this.value);
+								bb.append($(this).val());
 								bb.append('\r\n');
 								body.append(bb.getBlob());
 							}
