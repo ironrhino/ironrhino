@@ -25,7 +25,7 @@
 		var xhr = new XMLHttpRequest();
 		var url = options.url;
 		if (options.target && options.target.tagName == 'FORM') {
-				url = options.target.action;
+			url = options.target.action;
 			if (!options.data)
 				options.data = $(options.target).serialize();
 		}
@@ -65,7 +65,9 @@
 			options.data = {};
 			for (var i = 0; i < arr.length; i++) {
 				var arr2 = arr[i].split('=', 2);
-				options.data[arr2[0]] = arr2.length == 2 ? arr2[1] : '';
+				options.data[arr2[0]] = arr2.length == 2
+						? decodeURIComponent(arr2[1])
+						: '';
 			}
 		}
 		if (!!window.FormData) {

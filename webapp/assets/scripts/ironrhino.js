@@ -31357,7 +31357,9 @@ Observation.common = function(container) {
 						option.format = t.data('format') || 'yyyy-MM-dd';
 						option.pickTime = false;
 					}
-					t.datetimepicker(option);
+					t.datetimepicker(option).on('changeDate', function(e) {
+								t.trigger('validate');
+							});
 				});
 	$('input.captcha', container).focus(function() {
 				if ($(this).data('_captcha_'))
@@ -31642,7 +31644,6 @@ Observation.common = function(container) {
 				});
 		if (this.tagName == 'FORM') {
 			var options = {
-				'target' : target,
 				beforeSubmit : function() {
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
@@ -31741,6 +31742,7 @@ Observation.common = function(container) {
 							});
 				}
 				if (files.length) {
+					options.target = target;
 					$.ajaxupload(files, options);
 				} else {
 					$(this).ajaxSubmit(options);
@@ -32077,7 +32079,7 @@ Observation.checkavailable = function(container) {
 		var xhr = new XMLHttpRequest();
 		var url = options.url;
 		if (options.target && options.target.tagName == 'FORM') {
-				url = options.target.action;
+			url = options.target.action;
 			if (!options.data)
 				options.data = $(options.target).serialize();
 		}
@@ -32117,7 +32119,9 @@ Observation.checkavailable = function(container) {
 			options.data = {};
 			for (var i = 0; i < arr.length; i++) {
 				var arr2 = arr[i].split('=', 2);
-				options.data[arr2[0]] = arr2.length == 2 ? arr2[1] : '';
+				options.data[arr2[0]] = arr2.length == 2
+						? decodeURIComponent(arr2[1])
+						: '';
 			}
 		}
 		if (!!window.FormData) {

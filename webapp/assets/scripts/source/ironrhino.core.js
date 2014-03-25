@@ -922,7 +922,9 @@ Observation.common = function(container) {
 						option.format = t.data('format') || 'yyyy-MM-dd';
 						option.pickTime = false;
 					}
-					t.datetimepicker(option);
+					t.datetimepicker(option).on('changeDate', function(e) {
+								t.trigger('validate');
+							});
 				});
 	$('input.captcha', container).focus(function() {
 				if ($(this).data('_captcha_'))
@@ -1207,7 +1209,6 @@ Observation.common = function(container) {
 				});
 		if (this.tagName == 'FORM') {
 			var options = {
-				'target' : target,
 				beforeSubmit : function() {
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
@@ -1306,6 +1307,7 @@ Observation.common = function(container) {
 							});
 				}
 				if (files.length) {
+					options.target = target;
 					$.ajaxupload(files, options);
 				} else {
 					$(this).ajaxSubmit(options);
