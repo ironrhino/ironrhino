@@ -233,7 +233,7 @@ function uploadFiles(files, filenames) {
 					name : $('#upload_form input[type="file"]').attr('name'),
 					data : data,
 					beforeSend : Indicator.show,
-					success : function(xhr) {
+					complete : function(xhr) {
 						Indicator.hide();
 					},
 					onsuccess : function(xhr) {

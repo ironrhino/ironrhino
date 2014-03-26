@@ -149,6 +149,6 @@ function upload(files) {
 						+ ($('#' + tinymce.EditorManager.activeEditor.id)
 								.data('uploadurl') || '/common/upload')
 						+ '?folder=' + folder,
-				success : browse
+				onsuccess : browse
 			});
 }
