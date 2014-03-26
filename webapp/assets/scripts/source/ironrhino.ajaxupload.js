@@ -43,8 +43,6 @@
 				if (xhr.status == 200 || xhr.status == 304) {
 					if (!files.length)
 						Indicator.hide();
-					if (typeof options['success'] != 'undefined')
-						options['success'](xhr);
 					var data = xhr.responseText;
 					if (data.indexOf('[') == 0 || data.indexOf('{') == 0)
 						data = $.parseJSON(data);
@@ -53,6 +51,8 @@
 					if (!files.length)
 						Indicator.showError();
 				}
+				if (typeof options['complete'] != 'undefined')
+					options['complete'](xhr);
 			}
 		}
 		if (progress && progress.length) {
