@@ -1,6 +1,7 @@
 package org.ironrhino.core.session;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -32,7 +33,7 @@ public class HttpSessionFilter implements Filter {
 	private HttpSessionManager httpSessionManager;
 
 	@Autowired(required = false)
-	private HttpSessionFilterHook httpSessionFilterHook;
+	private List<HttpSessionFilterHook> httpSessionFilterHooks;
 
 	private String[] excludePatterns;
 
@@ -71,12 +72,17 @@ public class HttpSessionFilter implements Filter {
 				req, session);
 		WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(
 				(HttpServletResponse) response, session);
-		if (httpSessionFilterHook != null)
+		if (httpSessionFilterHooks != null)
 			try {
-				httpSessionFilterHook.beforeDoFilter();
+				for (HttpSessionFilterHook httpSessionFilterHook : httpSessionFilterHooks)
+					httpSessionFilterHook.beforeDoFilter();
 				chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
 			} finally {
-				httpSessionFilterHook.afterDoFilter();
+				for (int i = httpSessionFilterHooks.size() - 1; i > -1; i--) {
+					HttpSessionFilterHook httpSessionFilterHook = httpSessionFilterHooks
+							.get(i);
+					httpSessionFilterHook.afterDoFilter();
+				}
 			}
 		else
 			chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
