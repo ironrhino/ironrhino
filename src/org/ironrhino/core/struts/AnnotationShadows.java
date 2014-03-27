@@ -60,7 +60,8 @@ public class AnnotationShadows {
 		public UiConfigImpl() {
 		}
 
-		public UiConfigImpl(Class<?> propertyType, UiConfig config) {
+		public UiConfigImpl(String propertyName, Class<?> propertyType,
+				UiConfig config) {
 			this.propertyType = propertyType;
 			if (config == null)
 				return;
@@ -105,6 +106,8 @@ public class AnnotationShadows {
 			this.optionsExpression = config.optionsExpression();
 			this.pickUrl = config.pickUrl();
 			this.templateName = config.templateName();
+			if (StringUtils.isBlank(templateName))
+				this.templateName = propertyName;
 			if (StringUtils.isNotBlank(this.regex)) {
 				cssClasses.add("regex");
 				dynamicAttributes.put("data-regex", this.regex);

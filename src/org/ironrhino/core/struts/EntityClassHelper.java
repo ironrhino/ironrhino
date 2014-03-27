@@ -134,8 +134,8 @@ public class EntityClassHelper {
 							lob = f.getAnnotation(Lob.class);
 					} catch (Exception e) {
 					}
-				UiConfigImpl uci = new UiConfigImpl(pd.getPropertyType(),
-						uiConfig);
+				UiConfigImpl uci = new UiConfigImpl(pd.getName(),
+						pd.getPropertyType(), uiConfig);
 				if (idAssigned && propertyName.equals("id"))
 					uci.addCssClass("required checkavailable");
 				if (Attributable.class.isAssignableFrom(entityClass)
