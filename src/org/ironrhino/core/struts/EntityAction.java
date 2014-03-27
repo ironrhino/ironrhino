@@ -789,6 +789,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					log.error(e.getMessage(), e);
 				}
 				persisted = entityManager.findOne(caseInsensitive, args);
+				entityManager.evict(persisted);
 				if (persisted != null) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
@@ -936,9 +937,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 			}
 			try {
-				if (persisted == null)
+				if (persisted == null) {
 					persisted = entityManager.get((Serializable) bw
 							.getPropertyValue("id"));
+					entityManager.evict(persisted);
+				}
 				BeanWrapperImpl bwp = new BeanWrapperImpl(persisted);
 				bwp.setConversionService(conversionService);
 				String versionPropertyName = getVersionPropertyName();
@@ -1084,13 +1087,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					temp.setConversionService(conversionService);
 					temp.setPropertyValue(listKey, parameterValue);
 					BaseManager em = getEntityManager(type);
-					Object obj;
+					Persistable obj;
 					if (listKey.equals(UiConfig.DEFAULT_LIST_KEY))
 						obj = em.get((Serializable) temp
 								.getPropertyValue(listKey));
 					else
 						obj = em.findOne(listKey,
 								(Serializable) temp.getPropertyValue(listKey));
+					em.evict(obj);
 					bw.setPropertyValue(propertyName, obj);
 					em = getEntityManager(getEntityClass());
 				}
