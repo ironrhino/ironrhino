@@ -41,6 +41,7 @@ import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ValueThenKeyComparator;
+import org.springframework.beans.BeanWrapperImpl;
 
 public class EntityClassHelper {
 
@@ -217,25 +218,43 @@ public class EntityClassHelper {
 						columns.addAll(AnnotationUtils
 								.getAnnotatedPropertyNameAndAnnotations(
 										returnType, NaturalId.class).keySet());
-						Map<String, UiConfigImpl> configs = getUiConfigs(returnType);
-						for (String column : "fullname,name,code".split(","))
-							if (configs.containsKey(column)
-									&& (!columns.contains("fullname")
+						BeanWrapperImpl bw = new BeanWrapperImpl(returnType);
+						for (String column : "fullname,name,code".split(",")) {
+							if (bw.isReadableProperty(column)
+									&& (!bw.isReadableProperty("fullname")
 											&& column.equals("name") || !column
 												.equals("name")))
 								columns.add(column);
-						for (Map.Entry<String, UiConfigImpl> entry : configs
-								.entrySet())
-							if (entry.getValue().isShownInPick())
-								columns.add(entry.getKey());
+						}
+						for (PropertyDescriptor pd2 : bw
+								.getPropertyDescriptors()) {
+							if (pd2.getReadMethod() == null)
+								continue;
+							UiConfig uic = pd2.getReadMethod().getAnnotation(
+									UiConfig.class);
+							if (uic == null) {
+								try {
+									Field f = pd2.getReadMethod()
+											.getDeclaringClass()
+											.getDeclaredField(pd.getName());
+									if (f != null)
+										uic = f.getAnnotation(UiConfig.class);
+								} catch (Exception e) {
+
+								}
+							}
+							if (uic != null && uic.shownInPick())
+								columns.add(pd.getName());
+						}
 						if (!columns.isEmpty()) {
 							sb.append("?columns="
 									+ StringUtils.join(columns, ','));
 						}
 						uci.setPickUrl(sb.toString());
 					}
-				}else if (returnType == Integer.TYPE || returnType == Short.TYPE
-						|| returnType == Long.TYPE || returnType == Double.TYPE
+				} else if (returnType == Integer.TYPE
+						|| returnType == Short.TYPE || returnType == Long.TYPE
+						|| returnType == Double.TYPE
 						|| returnType == Float.TYPE
 						|| Number.class.isAssignableFrom(returnType)) {
 					if (returnType == Integer.TYPE
