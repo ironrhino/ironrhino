@@ -12,7 +12,7 @@
 	<span id="client"><#if authorization.client??>${authorization.client.name}</#if></span>
 	</div>
 	</div>
-	<div class="control-group listpick" data-options="{'url':'<@url value="/user/pick?columns=username,name"/>','name':'#grantor','id':'#grantorId'}">
+	<div class="control-group listpick" data-options="{'url':'<@url value="/user/pick?columns=username,name&enabled=true"/>','name':'#grantor','id':'#grantorId'}">
 	<@s.hidden id="grantorId" name="authorization.grantor.id" cssClass="required"/>
 	<label class="control-label" for="grantor">${action.getText('grantor')}</label>
 	<div class="controls">

@@ -215,17 +215,14 @@ public class EntityClassHelper {
 												.getSimpleName()));
 						sb.append("/pick");
 						Set<String> columns = new LinkedHashSet<String>();
+						BeanWrapperImpl bw = new BeanWrapperImpl(returnType);
+						if (bw.isReadableProperty("name"))
+							columns.add("name");
+						if (bw.isReadableProperty("fullname"))
+							columns.add("fullname");
 						columns.addAll(AnnotationUtils
 								.getAnnotatedPropertyNameAndAnnotations(
 										returnType, NaturalId.class).keySet());
-						BeanWrapperImpl bw = new BeanWrapperImpl(returnType);
-						for (String column : "fullname,name,code".split(",")) {
-							if (bw.isReadableProperty(column)
-									&& (!bw.isReadableProperty("fullname")
-											&& column.equals("name") || !column
-												.equals("name")))
-								columns.add(column);
-						}
 						for (PropertyDescriptor pd2 : bw
 								.getPropertyDescriptors()) {
 							if (pd2.getReadMethod() == null)
