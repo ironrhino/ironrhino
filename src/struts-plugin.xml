@@ -45,7 +45,7 @@
 				<interceptor-ref name="checkbox" />
 				<interceptor-ref name="actionMappingParams" />
 				<interceptor-ref name="params">
-					<param name="acceptParamNames">\w+((\.\w+)|(\[\d+\])|(\(\d+\))|(\['(\w|[^x00-xff])+'\])|(\('(\w|[^x00-xff])+'\)))*</param>
+					<param name="acceptParamNames">\w+((\.\w+)|(\[\d+\])|(\(\d+\))|(\['(\w|[\u4e00-\u9fa5])+'\])|(\('(\w|[\u4e00-\u9fa5])+'\)))*</param>
 					<param name="excludeParams">_.*_</param>
 				</interceptor-ref>
 				<interceptor-ref name="conversionError" />
