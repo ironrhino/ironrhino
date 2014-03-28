@@ -61,6 +61,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -300,6 +301,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					_entity = entityManager.findByNaturalId(paramters);
 			}
 
+		} catch (ConversionNotSupportedException e) {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
