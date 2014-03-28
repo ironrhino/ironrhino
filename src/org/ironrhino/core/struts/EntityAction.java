@@ -621,13 +621,16 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				Object value = null;
 				if (Persistable.class.isAssignableFrom(type)) {
 					BaseManager em = getEntityManager(type);
-					value = em.get(parameterValue);
-					if (value == null) {
-						try {
+					try {
+						BeanWrapperImpl bwt = new BeanWrapperImpl(
+								type.newInstance());
+						bwt.setPropertyValue("id", parameterValue);
+						value = em.get((Serializable) bwt
+								.getPropertyValue("id"));
+						if (value == null)
 							value = em.findOne(parameterValue);
-						} catch (Exception e) {
+					} catch (Exception e) {
 
-						}
 					}
 					bw.setPropertyValue(propertyName, value);
 				} else {
