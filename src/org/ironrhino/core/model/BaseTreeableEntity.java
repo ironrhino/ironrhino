@@ -116,7 +116,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 				.getAnnotation(FullnameSeperator.class);
 		if (fs != null)
 			return fs.seperator();
-		return "";
+		return "/";
 	}
 
 	public String getFullname() {
