@@ -30,8 +30,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.hibernate.CriterionOperator;
+import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Attributable;
+import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
@@ -216,10 +218,21 @@ public class EntityClassHelper {
 						sb.append("/pick");
 						Set<String> columns = new LinkedHashSet<String>();
 						BeanWrapperImpl bw = new BeanWrapperImpl(returnType);
-						if (bw.isReadableProperty("name"))
-							columns.add("name");
-						if (bw.isReadableProperty("fullname"))
-							columns.add("fullname");
+						if (BaseTreeableEntity.class
+								.isAssignableFrom(returnType)) {
+							FullnameSeperator fs = returnType
+									.getAnnotation(FullnameSeperator.class);
+							if (fs != null && !fs.independent()
+									&& bw.isReadableProperty("fullname"))
+								columns.add("fullname");
+							else
+								columns.add("name");
+						} else {
+							if (bw.isReadableProperty("name"))
+								columns.add("name");
+							if (bw.isReadableProperty("fullname"))
+								columns.add("fullname");
+						}
 						columns.addAll(AnnotationUtils
 								.getAnnotatedPropertyNameAndAnnotations(
 										returnType, NaturalId.class).keySet());

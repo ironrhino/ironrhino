@@ -22,6 +22,7 @@ import javax.persistence.SequenceGenerator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.CaseInsensitive;
+import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.UiConfig;
@@ -111,6 +112,10 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 	}
 
 	public String getFullnameSeperator() {
+		FullnameSeperator fs = getClass()
+				.getAnnotation(FullnameSeperator.class);
+		if (fs != null)
+			return fs.seperator();
 		return "";
 	}
 

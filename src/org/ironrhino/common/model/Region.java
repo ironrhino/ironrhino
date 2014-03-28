@@ -8,6 +8,7 @@ import javax.persistence.Table;
 import org.ironrhino.common.util.LocationUtils;
 import org.ironrhino.core.aop.PublishAware;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.model.BaseTreeableEntity;
@@ -21,6 +22,7 @@ import org.ironrhino.core.util.StringUtils;
 @Searchable
 @Entity
 @Table(name = "common_region")
+@FullnameSeperator(independent = false, seperator = "")
 public class Region extends BaseTreeableEntity<Region> {
 
 	private static final long serialVersionUID = 8878381261391688086L;
