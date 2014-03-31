@@ -40,6 +40,7 @@ public class AnnotationShadows {
 		private String template = "";
 		private String listTemplate = "";
 		private String viewTemplate = "";
+		private String inputTemplate = "";
 		private String width;
 		private Map<String, String> dynamicAttributes = new HashMap<String, String>(
 				0);
@@ -87,6 +88,7 @@ public class AnnotationShadows {
 			this.template = config.template();
 			this.listTemplate = config.listTemplate();
 			this.viewTemplate = config.viewTemplate();
+			this.inputTemplate = config.inputTemplate();
 			this.width = config.width();
 			if (StringUtils.isNotBlank(config.dynamicAttributes()))
 				try {
@@ -366,6 +368,14 @@ public class AnnotationShadows {
 
 		public void setViewTemplate(String viewTemplate) {
 			this.viewTemplate = viewTemplate;
+		}
+
+		public String getInputTemplate() {
+			return inputTemplate;
+		}
+
+		public void setInputTemplate(String inputTemplate) {
+			this.inputTemplate = inputTemplate;
 		}
 
 		public String getWidth() {

@@ -39,7 +39,14 @@
 		</#if>
 		<#if !(entity.new && readonly)>
 			<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key)/>
-			<#if config.type=='textarea'>
+			<#if config.inputTemplate?has_content>
+				<div class="control-group">
+					<label class="control-label">${action.getText(label)}</label>
+					<div class="controls">
+					<@config.inputTemplate?interpret/>
+					</div>
+				</div>
+			<#elseif config.type=='textarea'>
 				<#assign dynamicAttributes=config.dynamicAttributes/>
 				<#if config.maxlength gt 0>
 				<#assign dynamicAttributes=dynamicAttributes+{"maxlength":config.maxlength}>

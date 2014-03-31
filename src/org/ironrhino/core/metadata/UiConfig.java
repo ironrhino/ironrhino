@@ -62,6 +62,8 @@ public @interface UiConfig {
 	String listTemplate() default "";
 
 	String viewTemplate() default "";
+	
+	String inputTemplate() default "";
 
 	String width() default "";
 
