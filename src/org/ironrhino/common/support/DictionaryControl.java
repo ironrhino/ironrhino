@@ -111,21 +111,23 @@ public class DictionaryControl implements
 	@org.springframework.core.annotation.Order(Ordered.HIGHEST_PRECEDENCE)
 	public void setup() {
 		entityManager.setEntityClass(Dictionary.class);
-		if (entityManager.countAll() > 0)
-			return;
 		try (InputStream is = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("resources/data/dictionary.txt")) {
+			if (is == null)
+				return;
 			String name = null;
 			String description = null;
 			List<LabelValue> items = null;
 			for (String s : IOUtils.readLines(is, "UTF-8")) {
 				if (StringUtils.isBlank(s) || s.trim().startsWith("#")) {
 					if (name != null && items != null) {
-						Dictionary dictionary = new Dictionary();
-						dictionary.setName(name);
-						dictionary.setItems(items);
-						dictionary.setDescription(description);
-						entityManager.save(dictionary);
+						if (entityManager.findOne(name) == null) {
+							Dictionary dictionary = new Dictionary();
+							dictionary.setName(name);
+							dictionary.setItems(items);
+							dictionary.setDescription(description);
+							entityManager.save(dictionary);
+						}
 						name = null;
 						description = null;
 						items = null;
@@ -147,11 +149,13 @@ public class DictionaryControl implements
 				}
 			}
 			if (name != null && items != null) {
-				Dictionary dictionary = new Dictionary();
-				dictionary.setName(name);
-				dictionary.setItems(items);
-				dictionary.setDescription(description);
-				entityManager.save(dictionary);
+				if (entityManager.findOne(name) == null) {
+					Dictionary dictionary = new Dictionary();
+					dictionary.setName(name);
+					dictionary.setItems(items);
+					dictionary.setDescription(description);
+					entityManager.save(dictionary);
+				}
 				name = null;
 				description = null;
 				items = null;

@@ -150,19 +150,19 @@ public class SettingControl implements
 	@org.springframework.core.annotation.Order(Ordered.HIGHEST_PRECEDENCE)
 	public void setup() {
 		entityManager.setEntityClass(Setting.class);
-		if (entityManager.countAll() > 0)
-			return;
 		try (InputStream is = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("resources/data/setting.txt")) {
+			if (is == null)
+				return;
 			for (String s : IOUtils.readLines(is, "UTF-8")) {
 				if (StringUtils.isBlank(s) || s.trim().startsWith("#"))
 					continue;
-				String arr[] = s.split("\\s+", 2);
+				String arr[] = s.trim().split("\\s+", 2);
 				String description = null;
 				if (arr.length == 2)
 					description = arr[1];
 				arr = arr[0].split("\\s*=\\s*", 2);
-				if (arr.length < 2)
+				if (arr.length < 2 || entityManager.findOne(arr[0]) != null)
 					continue;
 				Setting setting = new Setting(arr[0], arr[1]);
 				setting.setDescription(description);
