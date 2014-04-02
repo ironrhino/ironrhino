@@ -246,7 +246,7 @@ public class EntityClassHelper {
 								try {
 									Field f = pd2.getReadMethod()
 											.getDeclaringClass()
-											.getDeclaredField(pd.getName());
+											.getDeclaredField(pd2.getName());
 									if (f != null)
 										uic = f.getAnnotation(UiConfig.class);
 								} catch (Exception e) {
@@ -254,7 +254,7 @@ public class EntityClassHelper {
 								}
 							}
 							if (uic != null && uic.shownInPick())
-								columns.add(pd.getName());
+								columns.add(pd2.getName());
 						}
 						if (!columns.isEmpty()) {
 							sb.append("?columns="
