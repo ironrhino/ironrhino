@@ -209,58 +209,7 @@ public class EntityClassHelper {
 						uci.setType("listpick");
 					uci.setExcludeIfNotEdited(true);
 					if (StringUtils.isBlank(uci.getPickUrl())) {
-						String url = AutoConfigPackageProvider
-								.getEntityUrl(returnType);
-						StringBuilder sb = url != null ? new StringBuilder(url)
-								: new StringBuilder("/").append(StringUtils
-										.uncapitalize(returnType
-												.getSimpleName()));
-						sb.append("/pick");
-						Set<String> columns = new LinkedHashSet<String>();
-						BeanWrapperImpl bw = new BeanWrapperImpl(returnType);
-						if (BaseTreeableEntity.class
-								.isAssignableFrom(returnType)) {
-							FullnameSeperator fs = returnType
-									.getAnnotation(FullnameSeperator.class);
-							if (fs != null && !fs.independent()
-									&& bw.isReadableProperty("fullname"))
-								columns.add("fullname");
-							else
-								columns.add("name");
-						} else {
-							if (bw.isReadableProperty("name"))
-								columns.add("name");
-							if (bw.isReadableProperty("fullname"))
-								columns.add("fullname");
-						}
-						columns.addAll(AnnotationUtils
-								.getAnnotatedPropertyNameAndAnnotations(
-										returnType, NaturalId.class).keySet());
-						for (PropertyDescriptor pd2 : bw
-								.getPropertyDescriptors()) {
-							if (pd2.getReadMethod() == null)
-								continue;
-							UiConfig uic = pd2.getReadMethod().getAnnotation(
-									UiConfig.class);
-							if (uic == null) {
-								try {
-									Field f = pd2.getReadMethod()
-											.getDeclaringClass()
-											.getDeclaredField(pd2.getName());
-									if (f != null)
-										uic = f.getAnnotation(UiConfig.class);
-								} catch (Exception e) {
-
-								}
-							}
-							if (uic != null && uic.shownInPick())
-								columns.add(pd2.getName());
-						}
-						if (!columns.isEmpty()) {
-							sb.append("?columns="
-									+ StringUtils.join(columns, ','));
-						}
-						uci.setPickUrl(sb.toString());
+						uci.setPickUrl(getPickUrl(returnType));
 					}
 				} else if (returnType == Integer.TYPE
 						|| returnType == Short.TYPE || returnType == Long.TYPE
@@ -423,6 +372,53 @@ public class EntityClassHelper {
 	public static Map<String, UiConfigImpl> getPropertyNamesInCriteria(
 			Class<? extends Persistable<?>> entityClass) {
 		return filterPropertyNamesInCriteria(getUiConfigs(entityClass));
+	}
+
+	public static String getPickUrl(Class<?> entityClass) {
+		String url = AutoConfigPackageProvider.getEntityUrl(entityClass);
+		StringBuilder sb = url != null ? new StringBuilder(url)
+				: new StringBuilder("/").append(StringUtils
+						.uncapitalize(entityClass.getSimpleName()));
+		sb.append("/pick");
+		Set<String> columns = new LinkedHashSet<String>();
+		BeanWrapperImpl bw = new BeanWrapperImpl(entityClass);
+		if (BaseTreeableEntity.class.isAssignableFrom(entityClass)) {
+			FullnameSeperator fs = entityClass
+					.getAnnotation(FullnameSeperator.class);
+			if (fs != null && !fs.independent()
+					&& bw.isReadableProperty("fullname"))
+				columns.add("fullname");
+			else
+				columns.add("name");
+		} else {
+			if (bw.isReadableProperty("name"))
+				columns.add("name");
+			if (bw.isReadableProperty("fullname"))
+				columns.add("fullname");
+		}
+		columns.addAll(AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(
+				entityClass, NaturalId.class).keySet());
+		for (PropertyDescriptor pd : bw.getPropertyDescriptors()) {
+			if (pd.getReadMethod() == null)
+				continue;
+			UiConfig uic = pd.getReadMethod().getAnnotation(UiConfig.class);
+			if (uic == null) {
+				try {
+					Field f = pd.getReadMethod().getDeclaringClass()
+							.getDeclaredField(pd.getName());
+					if (f != null)
+						uic = f.getAnnotation(UiConfig.class);
+				} catch (Exception e) {
+
+				}
+			}
+			if (uic != null && uic.shownInPick())
+				columns.add(pd.getName());
+		}
+		if (!columns.isEmpty()) {
+			sb.append("?columns=" + StringUtils.join(columns, ','));
+		}
+		return sb.toString();
 	}
 
 	private static ValueThenKeyComparator<String, UiConfigImpl> comparator = new ValueThenKeyComparator<String, UiConfigImpl>() {

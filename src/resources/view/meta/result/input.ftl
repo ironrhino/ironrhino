@@ -91,9 +91,10 @@
 					</div>
 				<#else>
 					<div class="control-group">
+						<@s.hidden id=id name=entityName+"."+key+".id" cssClass=config.cssClass/>
 						<label class="control-label">${action.getText(label)}</label>
 						<div class="controls text">
-						<span>${entity[key]!}</span>
+						<span><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
 						</div>
 					</div>
 				</#if>
