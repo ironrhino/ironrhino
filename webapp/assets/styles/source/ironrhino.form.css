@@ -54,15 +54,21 @@ th.radio input[type="radio"],th.checkbox input[type="checkbox"],td.radio input[t
 	float: none !important;
 	margin: 0;
 }
+
 input.integer,input.long,input.double,input.date,input.datetime,input.time {
-	width: 75px;
 	font-family: Arial;
 }
+input.integer,input.long,input.double{
+	width: 100px;
+}
 input.double.large {
-	width: 120px;
+	width: 150px;
 }
 input.long {
 	width: 150px;
+}
+input.date {
+	width: 75px;
 }
 input.datetime {
 	width: 125px;
