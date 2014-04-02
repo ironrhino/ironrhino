@@ -1,5 +1,8 @@
 package org.ironrhino.common.support;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -8,23 +11,27 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Order;
 import org.ironrhino.common.model.Dictionary;
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
+import org.ironrhino.core.metadata.Setup;
+import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DictionaryControl implements
 		ApplicationListener<EntityOperationEvent> {
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Map<String, Dictionary> map;
 
@@ -97,6 +104,60 @@ public class DictionaryControl implements
 						map.remove(dictInMemory.getName());
 					}
 			}
+		}
+	}
+
+	@Setup
+	@org.springframework.core.annotation.Order(Ordered.HIGHEST_PRECEDENCE)
+	public void setup() {
+		entityManager.setEntityClass(Dictionary.class);
+		if (entityManager.countAll() > 0)
+			return;
+		try (InputStream is = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("resources/data/dictionary.txt")) {
+			String name = null;
+			String description = null;
+			List<LabelValue> items = null;
+			for (String s : IOUtils.readLines(is, "UTF-8")) {
+				if (StringUtils.isBlank(s) || s.trim().startsWith("#")) {
+					if (name != null && items != null) {
+						Dictionary dictionary = new Dictionary();
+						dictionary.setName(name);
+						dictionary.setItems(items);
+						dictionary.setDescription(description);
+						entityManager.save(dictionary);
+						name = null;
+						description = null;
+						items = null;
+					}
+					continue;
+				}
+				if (s.indexOf('=') < 0) {
+					String[] arr = s.split("\\s+", 2);
+					name = arr[0];
+					if (arr.length > 1)
+						description = arr[1];
+				} else {
+					String[] arr = s.split("\\s*=\\s*", 2);
+					if (items == null)
+						items = new ArrayList<>();
+					items.add(new LabelValue(
+							StringUtils.isNotBlank(arr[1]) ? arr[1] : arr[0],
+							arr[0]));
+				}
+			}
+			if (name != null && items != null) {
+				Dictionary dictionary = new Dictionary();
+				dictionary.setName(name);
+				dictionary.setItems(items);
+				dictionary.setDescription(description);
+				entityManager.save(dictionary);
+				name = null;
+				description = null;
+				items = null;
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 }
