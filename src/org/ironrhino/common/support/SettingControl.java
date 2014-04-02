@@ -1,5 +1,7 @@
 package org.ironrhino.common.support;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,23 +12,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Order;
 import org.ironrhino.common.model.Setting;
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
+import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SettingControl implements
 		ApplicationListener<EntityOperationEvent> {
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Map<String, Setting> settings;
 
@@ -138,6 +143,33 @@ public class SettingControl implements
 						settings.remove(settingInMemory.getKey());
 					}
 			}
+		}
+	}
+
+	@Setup
+	@org.springframework.core.annotation.Order(Ordered.HIGHEST_PRECEDENCE)
+	public void setup() {
+		entityManager.setEntityClass(Setting.class);
+		if (entityManager.countAll() > 0)
+			return;
+		try (InputStream is = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("resources/data/setting.txt")) {
+			for (String s : IOUtils.readLines(is, "UTF-8")) {
+				if (StringUtils.isBlank(s) || s.trim().startsWith("#"))
+					continue;
+				String arr[] = s.split("\\s+", 2);
+				String description = null;
+				if (arr.length == 2)
+					description = arr[1];
+				arr = arr[0].split("\\s*=\\s*", 2);
+				if (arr.length < 2)
+					continue;
+				Setting setting = new Setting(arr[0], arr[1]);
+				setting.setDescription(description);
+				entityManager.save(setting);
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
