@@ -105,11 +105,13 @@ public class Region extends BaseTreeableEntity<Region> {
 		this.coordinate = coordinate;
 	}
 
+	@NotInJson
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
 	public String getNameAsPinyin() {
 		return StringUtils.pinyin(name);
 	}
 
+	@NotInJson
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
 	public String getNameAsPinyinAbbr() {
 		return StringUtils.pinyinAbbr(name);
