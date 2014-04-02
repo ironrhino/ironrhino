@@ -164,9 +164,7 @@
 	function doclick(treenode, options) {
 		if (options.name) {
 			var nametarget = find(options.name);
-			var name = options.full || false
-					? treenode.fullname
-					: treenode.name;
+			var name = options.full ? treenode.fullname : treenode.name;
 			val(options.name, name);
 			if (nametarget.is(':input')) {
 				nametarget.trigger('change');

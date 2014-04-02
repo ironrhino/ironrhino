@@ -22317,11 +22317,12 @@ function log() {
 						var parentTreenode = $(parent).parent('li')
 								.data('treenode');
 						this.parent = parentTreenode;
-						if (parentTreenode)
-							this.fullname = (parentTreenode.fullname || parentTreenode.name)
-									+ (settings.separator || '') + this.name;
-						else
-							this.fullname = this.name;
+						if(!this.fullname)
+							if (parentTreenode)
+								this.fullname = (parentTreenode.fullname || parentTreenode.name)
+										+ (settings.separator || '') + this.name;
+							else
+								this.fullname = this.name;
 						var current = $("<li/>")
 								.data('treenode', this)
 								.html("<a><span>" + (this.name) + "</span></a>")
@@ -36723,9 +36724,10 @@ if (window.FileReader)
 					});
 				});
 				this.parent = parent;
-				this.fullname = fullname
-						+ (fullname ? (treeoptions.separator || '') : '')
-						+ this.name;
+				if (!this.fullname)
+					this.fullname = fullname
+							+ (fullname ? (treeoptions.separator || '') : '')
+							+ this.name;
 				var span = $('<span/>').text(this.name).data('treenode', this)
 						.appendTo(area).click(function(ev) {
 							var target = $(ev.target);
@@ -36917,9 +36919,7 @@ if (window.FileReader)
 	function doclick(treenode, options) {
 		if (options.name) {
 			var nametarget = find(options.name);
-			var name = options.full || false
-					? treenode.fullname
-					: treenode.name;
+			var name = options.full ? treenode.fullname : treenode.name;
 			val(options.name, name);
 			if (nametarget.is(':input')) {
 				nametarget.trigger('change');

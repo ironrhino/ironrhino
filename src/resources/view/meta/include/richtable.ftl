@@ -147,6 +147,7 @@ ${formHeader!}
 <button type="button" class="btn" data-view="input">${action.getText("edit")}</button>
 </#if>
 <#if treeable??&&treeable>
+<button type="button" class="btn" data-view="move">${action.getText("move")}</button>
 <a class="btn ajax view" href="${actionBaseUrl}?parent=${entity.id}">${action.getText("enter")}</a>
 </#if>
 </#if>

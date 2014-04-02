@@ -88,9 +88,10 @@
 					});
 				});
 				this.parent = parent;
-				this.fullname = fullname
-						+ (fullname ? (treeoptions.separator || '') : '')
-						+ this.name;
+				if (!this.fullname)
+					this.fullname = fullname
+							+ (fullname ? (treeoptions.separator || '') : '')
+							+ this.name;
 				var span = $('<span/>').text(this.name).data('treenode', this)
 						.appendTo(area).click(function(ev) {
 							var target = $(ev.target);

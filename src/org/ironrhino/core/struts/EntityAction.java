@@ -69,6 +69,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionProxy;
 import com.opensymphony.xwork2.inject.Inject;
+import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 import com.opensymphony.xwork2.util.ValueStack;
 import com.opensymphony.xwork2.util.ValueStackFactory;
 import com.opensymphony.xwork2.util.reflection.ReflectionContextState;
@@ -1393,6 +1394,36 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			addActionMessage(getText("operate.success"));
 		}
+		return SUCCESS;
+	}
+
+	@InputConfig(resultName = "move")
+	public String move() {
+		if (!isTreeable())
+			return NOTFOUND;
+		String id = getUid();
+		BaseTreeableEntity entity = null;
+		BaseTreeableEntity parentEntity = null;
+		BaseManager em = getEntityManager(getEntityClass());
+		if (StringUtils.isNumeric(id))
+			entity = (BaseTreeableEntity) em.get(Long.valueOf(id));
+		if (entity == null) {
+			addActionError(getText("validation.required"));
+			return SUCCESS;
+		}
+		if (parent != null && parent > 0)
+			parentEntity = (BaseTreeableEntity) em.get(Long.valueOf(parent));
+		if (parentEntity != null
+				&& parentEntity.getFullId().startsWith(entity.getFullId())
+				|| entity.getParent() == null && parentEntity == null
+				|| entity.getParent() != null && parentEntity != null
+				&& entity.getParent().getId().equals(parentEntity.getId())) {
+			addActionError(getText("validation.invalid"));
+			return SUCCESS;
+		}
+		entity.setParent(parentEntity);
+		em.save(entity);
+		addActionMessage(getText("operate.success"));
 		return SUCCESS;
 	}
 
