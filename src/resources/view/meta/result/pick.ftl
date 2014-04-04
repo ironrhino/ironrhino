@@ -22,14 +22,18 @@
 	<#if uiConfigs??>
 	<#list propertyNames as column>
 		<#if uiConfigs[column]??>
-		<#assign config=uiConfigs[column]>
-		<#assign shown=!config.hiddenInList.value>
-		<#if shown && config.hiddenInList.expression?has_content>
-		<#assign shown=!config.hiddenInList.expression?eval/>
-		</#if>
-		<#if shown>
-			<#assign columnNames=columnNames+[column]>
-		</#if>
+			<#assign config=uiConfigs[column]>
+			<#if config.shownInPick>
+				<#assign columnNames=columnNames+[column]>
+			<#else>
+				<#assign shown=!config.hiddenInList.value>
+				<#if shown && config.hiddenInList.expression?has_content>
+				<#assign shown=!config.hiddenInList.expression?eval/>
+				</#if>
+				<#if shown>
+					<#assign columnNames=columnNames+[column]>
+				</#if>
+			</#if>
 		</#if>
 	</#list>
 	<#else>
