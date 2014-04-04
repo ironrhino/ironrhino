@@ -234,6 +234,29 @@ public class EntityClassHelper {
 							|| returnType == BigDecimal.class) {
 						uci.setInputType("number");
 						uci.addCssClass("double");
+						if (columnannotation != null) {
+							int scale = columnannotation.scale();
+							if (scale == 0)
+								scale = 2;
+							StringBuilder step = new StringBuilder(scale + 2);
+							step.append("0.");
+							for (int i = 0; i < scale - 1; i++)
+								step.append("0");
+							step.append("1");
+							uci.getDynamicAttributes().put("step",
+									step.toString());
+							uci.getDynamicAttributes().put("data-scale",
+									String.valueOf(scale));
+							if (StringUtils.isBlank(uci.getTemplate())) {
+								StringBuilder template = new StringBuilder(
+										scale + 35);
+								template.append("<#if value?is_number>${value?string('0.");
+								for (int i = 0; i < scale; i++)
+									template.append("0");
+								template.append("')}<#else>${value!}</#if>");
+								uci.setTemplate(template.toString());
+							}
+						}
 					}
 					Set<String> cssClasses = uci.getCssClasses();
 					if (cssClasses.contains("double")
