@@ -247,10 +247,11 @@ public class EntityClassHelper {
 									step.toString());
 							uci.getDynamicAttributes().put("data-scale",
 									String.valueOf(scale));
-							if (StringUtils.isBlank(uci.getTemplate())) {
+							if (StringUtils.isBlank(uci.getTemplate())
+									&& returnType == BigDecimal.class) {
 								StringBuilder template = new StringBuilder(
-										scale + 35);
-								template.append("<#if value?is_number>${value?string('0.");
+										scale + 40);
+								template.append("<#if value?is_number>${value?string('#,##0.");
 								for (int i = 0; i < scale; i++)
 									template.append("0");
 								template.append("')}<#else>${value!}</#if>");
