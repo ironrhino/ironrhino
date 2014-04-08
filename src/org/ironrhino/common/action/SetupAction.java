@@ -174,7 +174,8 @@ public class SetupAction extends BaseAction {
 						o = m2.getAnnotation(Order.class);
 						if (o != null)
 							order2 = o.value();
-						return order1 == order2 ? 0 : order1 < order2 ? -1 : 1;
+						return order1 == order2 ? m1.toString().compareTo(
+								m2.toString()) : order1 < order2 ? -1 : 1;
 					}
 				});
 		for (String beanName : beanNames)
