@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.ironrhino.core.metadata.NotInCopy;
@@ -22,6 +23,15 @@ public class BeanUtils {
 				name) != null)
 			return true;
 		return false;
+	}
+
+	public static void copyProperties(Map<String, Object> source,
+			Object target, String... ignoreProperties) {
+		BeanWrapperImpl bw = new BeanWrapperImpl(target);
+		for (Map.Entry<String, Object> entry : source.entrySet()) {
+			if (bw.isWritableProperty(entry.getKey()))
+				bw.setPropertyValue(entry.getKey(), entry.getValue());
+		}
 	}
 
 	public static void copyProperties(Object source, Object target,
