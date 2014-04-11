@@ -32,7 +32,8 @@ Initialization.upload = function() {
 		$.snapshot({
 			onsnapshot : function(canvas, timestamp) {
 				var filename = 'snapshot_'
-						+ new Date(timestamp).format('%Y%m%d%H%M%S') + '.png';
+						+ $.format.date(new Date(timestamp),
+								'yyyyMMddHHmmssSSS') + '.png';
 				var file;
 				if (canvas && canvas.mozGetAsFile)
 					uploadFiles([canvas.mozGetAsFile(filename)]);

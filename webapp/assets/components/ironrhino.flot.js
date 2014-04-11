@@ -46,9 +46,8 @@
 													+ '%' : y) + '</strong>';
 									if (istime)
 										content += '<span>'
-												+ new Date(x).format($(this)
-														.data('timeformat')
-														|| '%m-%d') + '</span>';
+												+ $.format.date(new Date(x),
+														'MM-dd') + '</span>';
 									showTooltip(item.pageX, item.pageY, content);
 								}
 							} else {
