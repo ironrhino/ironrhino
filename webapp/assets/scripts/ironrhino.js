@@ -31689,8 +31689,6 @@ Initialization.common = function() {
 						.closest('.ui-dialog')));
 	}).on('mouseenter', '.popover,.tooltip', function() {
 				$(this).remove()
-			}).on('click', ':submit', function(e) {
-				$(this).addClass('clicked');
 			}).on('click', '.action-error strong.force-override', function(e) {
 		var msgcontainer = $(e.target).closest('.message-container');
 		if (msgcontainer.length) {
@@ -32326,6 +32324,8 @@ Observation.common = function(container) {
 			$(this).bind('submit', function(e) {
 						var form = $(this);
 						var btn = $('.clicked', form).removeClass('clicked');
+						if (!btn.length)
+							btn = $(':input:focus[type=submit]', form);
 						if (btn.hasClass('noajax'))
 							return true;
 						if (btn.hasClass('reload') || btn.data('action'))
