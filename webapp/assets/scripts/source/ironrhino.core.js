@@ -1335,6 +1335,7 @@ Observation.common = function(container) {
 							$.history.load('!' + hash);
 						}
 					}
+					Ajax.fire(target, 'onbeforesubmit');
 				},
 				error : function() {
 					Form.focus(target);
