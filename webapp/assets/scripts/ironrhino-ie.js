@@ -32090,6 +32090,8 @@ MessageBundle = {
 		'ajax.loading' : 'loading...',
 		'ajax.error' : 'network error,please try later',
 		'required' : 'please input value',
+		'required.only.one' : '{0} are required only one',
+		'required.at.least.one' : '{0} are required at least one',
 		'selection.required' : 'please select',
 		'phone' : 'please input valid phone number',
 		'email' : 'please input valid email',
@@ -32117,6 +32119,8 @@ MessageBundle = {
 		'ajax.loading' : '正在加载...',
 		'ajax.error' : '错误,请稍后再试',
 		'required' : '请填写',
+		'required.only.one' : '{0}必须要有且只有一个不为空',
+		'required.at.least.one' : '{0}至少要一个不为空',
 		'selection.required' : '请选择',
 		'email' : 'email不合法',
 		'regex' : '请输入正确的格式',
@@ -32551,6 +32555,74 @@ Form = {
 					});
 			if (!valid)
 				Form.focus(target);
+			var groups = {};
+			$('[data-only-one-required-group]', target).each(function() {
+				var t = $(this);
+				if (t.is(':visible,[type="hidden"],.sqleditor,.chzn-done')
+						&& !t.prop('disabled')) {
+					var group = t.data('only-one-required-group');
+					var inputs = groups[group];
+					if (!inputs) {
+						inputs = [];
+						groups[group] = inputs;
+					}
+					inputs.push(t);
+				}
+			});
+			for (var group in groups) {
+				var inputs = groups[group];
+				var matched = 0;
+				var labels = [];
+				$.each(inputs, function(i, v) {
+							labels.push($('.control-label',
+									v.closest('.control-group')).text());
+							if (v.val())
+								matched++;
+						});
+				if (matched != 1) {
+					valid = false;
+					$.each(inputs, function(i, v) {
+								v.closest('.control-group').addClass('error');
+							});
+					Message.showActionError(MessageBundle.get(
+									'required.only.one', '[' + labels + ']'),
+							target);
+				}
+			}
+			groups = {};
+			$('[data-at-least-one-required-group]', target).each(function() {
+				var t = $(this);
+				if (t.is(':visible,[type="hidden"],.sqleditor,.chzn-done')
+						&& !t.prop('disabled')) {
+					var group = t.data('at-least-one-required-group');
+					var inputs = groups[group];
+					if (!inputs) {
+						inputs = [];
+						groups[group] = inputs;
+					}
+					inputs.push(t);
+				}
+			});
+			for (var group in groups) {
+				var inputs = groups[group];
+				var matched = 0;
+				var labels = [];
+				$.each(inputs, function(i, v) {
+							labels.push($('.control-label',
+									v.closest('.control-group')).text());
+							if (v.val())
+								matched++;
+						});
+				if (matched < 1) {
+					valid = false;
+					$.each(inputs, function(i, v) {
+								v.closest('.control-group').addClass('error');
+							});
+					Message.showActionError(MessageBundle
+									.get('required.at.least.one', '[' + labels
+													+ ']'), target);
+				}
+			}
 			return valid;
 		}
 	}
