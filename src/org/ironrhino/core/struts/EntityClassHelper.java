@@ -240,8 +240,9 @@ public class EntityClassHelper {
 							|| returnType == BigDecimal.class) {
 						uci.setInputType("number");
 						uci.addCssClass("double");
-						if (columnannotation != null) {
-							int scale = columnannotation.scale();
+						if (returnType == BigDecimal.class) {
+							int scale = columnannotation != null ? columnannotation
+									.scale() : 2;
 							if (scale == 0)
 								scale = 2;
 							StringBuilder step = new StringBuilder(scale + 2);
