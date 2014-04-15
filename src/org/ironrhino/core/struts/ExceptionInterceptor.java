@@ -34,6 +34,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 				if (action instanceof ValidationAware) {
 					ValidationAware validationAwareAction = (ValidationAware) action;
 					Throwable cause = e.getCause();
+
 					if (e instanceof OptimisticLockingFailureException
 							|| cause instanceof OptimisticLockingFailureException) {
 						validationAwareAction.addActionError(findText(
@@ -43,33 +44,39 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 						validationAwareAction.addActionError(findText(
 								"validation.already.exists", null));
 						log.error(e.getMessage(), e);
-					} else if (e instanceof ValidationException
-							|| cause instanceof ValidationException) {
-						ValidationException ve = (ValidationException) ((e instanceof ValidationException) ? e
-								: cause);
-						for (String s : ve.getActionMessages())
-							validationAwareAction.addActionMessage(findText(s,
-									null));
-						for (String s : ve.getActionErrors())
-							validationAwareAction.addActionError(findText(s,
-									null));
-						for (Map.Entry<String, List<String>> entry : ve
-								.getFieldErrors().entrySet()) {
-							for (String s : entry.getValue())
-								validationAwareAction.addFieldError(
-										entry.getKey(), findText(s, null));
-						}
-					} else if (e instanceof ErrorMessage) {
-						ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e
-								: cause);
-						validationAwareAction.addActionError(em
-								.getLocalizedMessage());
 					} else {
-						String msg = findText(e.getMessage(), null);
-						if (msg == null)
-							msg = e.toString();
-						validationAwareAction.addActionError(msg);
-						log.error(e.getMessage(), e);
+						if (cause != null)
+							while (cause.getCause() != null)
+								cause = cause.getCause();
+						if (e instanceof ValidationException
+								|| cause instanceof ValidationException) {
+							ValidationException ve = (ValidationException) ((e instanceof ValidationException) ? e
+									: cause);
+							for (String s : ve.getActionMessages())
+								validationAwareAction
+										.addActionMessage(findText(s, null));
+							for (String s : ve.getActionErrors())
+								validationAwareAction.addActionError(findText(
+										s, null));
+							for (Map.Entry<String, List<String>> entry : ve
+									.getFieldErrors().entrySet()) {
+								for (String s : entry.getValue())
+									validationAwareAction.addFieldError(
+											entry.getKey(), findText(s, null));
+							}
+						} else if (e instanceof ErrorMessage
+								|| cause instanceof ErrorMessage) {
+							ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e
+									: cause);
+							validationAwareAction.addActionError(em
+									.getLocalizedMessage());
+						} else {
+							String msg = findText(e.getMessage(), null);
+							if (msg == null)
+								msg = e.toString();
+							validationAwareAction.addActionError(msg);
+							log.error(e.getMessage(), e);
+						}
 					}
 				}
 				result = BaseAction.ERROR;

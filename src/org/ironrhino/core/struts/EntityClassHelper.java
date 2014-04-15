@@ -38,6 +38,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
+import org.ironrhino.core.struts.AnnotationShadows.HiddenImpl;
 import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
@@ -138,6 +139,11 @@ public class EntityClassHelper {
 					}
 				UiConfigImpl uci = new UiConfigImpl(pd.getName(),
 						pd.getPropertyType(), uiConfig);
+				if (pd.getWriteMethod() == null) {
+					HiddenImpl hi = new HiddenImpl();
+					hi.setValue(true);
+					uci.setHiddenInInput(hi);
+				}
 				if (idAssigned && propertyName.equals("id"))
 					uci.addCssClass("required checkavailable");
 				if (Attributable.class.isAssignableFrom(entityClass)
