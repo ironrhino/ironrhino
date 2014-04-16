@@ -4,9 +4,20 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 
 public class NumberUtils {
+
+	public static String formatAmount(BigDecimal value) {
+		return new DecimalFormat("#,##0.00").format(value);
+	}
+
+	public static BigDecimal parseAmount(String value) throws ParseException {
+		return new BigDecimal(new DecimalFormat("#,##0.00").parse(value)
+				.doubleValue());
+	}
 
 	public static String format(int value, int digit) {
 		NumberFormat nf = NumberFormat.getIntegerInstance();
