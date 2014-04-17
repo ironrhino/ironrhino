@@ -63,15 +63,10 @@ public class ConsoleAction extends BaseAction {
 	@Override
 	@InputConfig(resultName = "success")
 	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "expression", trim = true, key = "validation.required") })
-	public String execute() {
-		try {
-			result = applicationContextConsole.execute(expression, scope);
-			addActionMessage(getText("operate.success")
-					+ (result != null ? (":" + JsonUtils.toJson(result)) : ""));
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			addActionError(getText("error") + ":" + e.getMessage());
-		}
+	public String execute() throws Exception {
+		result = applicationContextConsole.execute(expression, scope);
+		addActionMessage(getText("operate.success")
+				+ (result != null ? (":" + JsonUtils.toJson(result)) : ""));
 		return SUCCESS;
 	}
 
