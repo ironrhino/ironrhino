@@ -55,6 +55,7 @@ public class AnnotationShadows {
 		private boolean excludedFromLike = false;
 		private boolean excludedFromCriteria = false;
 		private boolean excludedFromOrdering = false;
+		private String group;
 		private boolean searchable;
 		private Set<String> nestSearchableProperties;
 		private Map<String, UiConfigImpl> collectionElementUiConfigs;
@@ -118,7 +119,16 @@ public class AnnotationShadows {
 			this.excludedFromLike = config.excludedFromLike();
 			this.excludedFromCriteria = config.excludedFromCriteria();
 			this.excludedFromOrdering = config.excludedFromOrdering();
+			this.group = config.group();
 			this.searchable = config.searchable();
+		}
+
+		public String getGroup() {
+			return group;
+		}
+
+		public void setGroup(String group) {
+			this.group = group;
 		}
 
 		public boolean isExcludedFromLike() {

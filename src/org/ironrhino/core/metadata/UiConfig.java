@@ -30,7 +30,7 @@ public @interface UiConfig {
 	int maxlength() default 0;
 
 	String regex() default "";
-	
+
 	boolean trim() default true;
 
 	String cssClass() default "";
@@ -62,7 +62,7 @@ public @interface UiConfig {
 	String listTemplate() default "";
 
 	String viewTemplate() default "";
-	
+
 	String inputTemplate() default "";
 
 	String width() default "";
@@ -90,5 +90,7 @@ public @interface UiConfig {
 	boolean excludedFromCriteria() default false;
 
 	boolean excludedFromOrdering() default false;
+
+	String group() default "";
 
 }

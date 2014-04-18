@@ -18,7 +18,7 @@
 		<#if config.alias??>
 			<#assign label=config.alias>
 		</#if>
-		<div class="control-group">
+		<div class="control-group"<#if config.group?has_content> data-group="${config.group}"</#if>>
 			<label class="control-label">${action.getText(label)}</label>
 			<div class="controls">
 			<#assign template=config.template/>
