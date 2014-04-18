@@ -28,7 +28,10 @@ public class ReflectionUtils {
 	}
 
 	public static Class<?> getGenericClass(Class<?> clazz, int index) {
-		Type genType = clazz.getGenericSuperclass();
+		return getGenericClass(clazz.getGenericSuperclass(), index);
+	}
+
+	public static Class<?> getGenericClass(Type genType, int index) {
 		if (genType instanceof ParameterizedType) {
 			ParameterizedType pramType = (ParameterizedType) genType;
 			Type[] params = pramType.getActualTypeArguments();

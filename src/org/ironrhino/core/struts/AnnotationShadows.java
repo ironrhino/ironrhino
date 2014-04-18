@@ -57,6 +57,7 @@ public class AnnotationShadows {
 		private boolean excludedFromOrdering = false;
 		private boolean searchable;
 		private Set<String> nestSearchableProperties;
+		private Map<String, UiConfigImpl> collectionElementUiConfigs;
 
 		public UiConfigImpl() {
 		}
@@ -425,6 +426,15 @@ public class AnnotationShadows {
 		public void setNestSearchableProperties(
 				Set<String> nestSearchableProperties) {
 			this.nestSearchableProperties = nestSearchableProperties;
+		}
+
+		public Map<String, UiConfigImpl> getCollectionElementUiConfigs() {
+			return collectionElementUiConfigs;
+		}
+
+		public void setCollectionElementUiConfigs(
+				Map<String, UiConfigImpl> collectionElementUiConfigs) {
+			this.collectionElementUiConfigs = collectionElementUiConfigs;
 		}
 
 	}

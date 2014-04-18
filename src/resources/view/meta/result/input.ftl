@@ -195,6 +195,71 @@
 						</div>
 					</div>
 				</#if>
+			<#elseif config.type=='collection'&&config.collectionElementUiConfigs??>
+				<#assign collectionElementUiConfigs=config.collectionElementUiConfigs/>
+				<div class="control-group">
+					<label class="control-label">${action.getText(label)}</label>
+					<div class="controls">
+						<table class="table table-bordered middle datagrid" style="table-layout:fixed;">
+						<thead>
+							<tr>
+								<#list collectionElementUiConfigs.entrySet() as entry>
+								<#assign label2=entry.key>
+								<#if entry.value.alias??>
+									<#assign label2=entry.value.alias>
+								</#if>
+								<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${action.getText(label2)}</th>
+								</#list>
+								<th class="manipulate"></th>
+							</tr>
+						</thead>
+						<tbody>
+						<#assign size=0>
+						<#assign collections=entity[key]!>
+						<#if collections?is_collection && collections?size gt 0>
+							<#assign size = collections?size-1>
+						</#if>
+						<#list 0..size as index>
+							<tr>
+								<#list collectionElementUiConfigs.entrySet() as entry>
+								<#assign config = entry.value>
+								<td>
+								<#if config.inputTemplate?has_content>
+									<@config.inputTemplate?interpret/>
+								<#elseif config.type=='textarea'>
+									<#assign dynamicAttributes=config.dynamicAttributes/>
+									<#if config.maxlength gt 0>
+									<#assign dynamicAttributes=dynamicAttributes+{"maxlength":config.maxlength}>
+									</#if>
+									<@s.textarea id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
+								<#elseif config.type=='checkbox'>
+										<@s.checkbox id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
+								<#elseif config.type=='enum'>
+										<@s.select id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
+								<#elseif config.type=='select'>
+										<@s.select id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
+								<#elseif config.type=='multiselect'>
+										<@s.select id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
+								<#elseif config.type=='dictionary' && selectDictionary??>
+										<@selectDictionary id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key value="${entity[key][index][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
+								<#else>
+									<#if config.cssClass?contains('datetime')>
+										<@s.textfield value=(entity[key]?string('yyyy-MM-dd HH:mm:ss'))! id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
+									<#elseif config.cssClass?contains('time')>
+										<@s.textfield value=(entity[key]?string('HH:mm:ss'))! id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
+									<#else>
+										<@s.textfield  id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
+									</#if>
+								</#if>
+								</td>
+								</#list>
+								<td class="manipulate"></td>
+							</tr>
+						</#list>
+						</tbody>
+						</table>
+					</div>
+				</div>
 			<#else>
 				<#if config.cssClass?contains('datetime')>
 					<@s.textfield value=(entity[key]?string('yyyy-MM-dd HH:mm:ss'))! id=id label="%{getText('${label}')}" name=entityName+"."+key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
