@@ -243,6 +243,16 @@
 										<@s.select id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
 								<#elseif config.type=='dictionary' && selectDictionary??>
 										<@selectDictionary id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key value="${entity[key][index][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
+								<#elseif config.type=='listpick'>
+										<div class="listpick" data-options="{'url':'<@url value=config.pickUrl/>'}">
+										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="listpick-id ${config.cssClass}"/>
+										<span class="listpick-name"><#if entity[key][index][entry.key]??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if></#if></span>
+										</div>
+								<#elseif config.type=='treeselect'>
+										<div class="treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}">
+										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="treeselect-id ${config.cssClass}"/>
+										<span class="treeselect-name"><#if entity[key][index][entry.key]??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if></#if></span>
+										</div>
 								<#else>
 									<#if config.cssClass?contains('datetime')>
 										<@s.textfield value=(entity[key]?string('yyyy-MM-dd HH:mm:ss'))! id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
