@@ -32389,6 +32389,9 @@ Message = {
 		var msg = msg || MessageBundle.get(msgKey);
 		if (field && $(field).length) {
 			field = $(field);
+			var tabpane = field.closest('.control-group').parent('.tab-pane');
+			if (tabpane.length && !tabpane.hasClass('active'))
+				$('a[href$="#' + tabpane.attr('id') + '"]').tab('show');
 			var cgroup = field.closest('.control-group');
 			cgroup.addClass('error');
 			$('.field-error', field.parent()).remove();
@@ -32469,8 +32472,15 @@ Form = {
 				}
 			}
 			var valid = true;
-			var inhiddenpanel = $(target).css('display') != 'none'
-					&& !$(target).closest('.tab-pane').hasClass('active');
+			var tabpane = $(target).closest('.control-group')
+					.parent('.tab-pane');
+			var inhiddenpanel = tabpane.length
+					&& $(target).css('display') != 'none'
+					&& !tabpane.hasClass('active');
+			if (inhiddenpanel
+					&& $('.control-group.error', tabpane
+									.siblings('.tab-pane.active')).length)
+				return;
 			if ((inhiddenpanel || $(target)
 					.is(':visible,[type="hidden"],.sqleditor,.chzn-done'))
 					&& !$(target).prop('disabled')) {
@@ -32551,9 +32561,6 @@ Form = {
 					}
 				}
 			}
-			if (!valid && inhiddenpanel)
-				$('a[href="#' + $(target).closest('.tab-pane').attr('id')
-						+ '"]').tab('show');
 			return valid;
 		} else {
 			var valid = true;
