@@ -198,9 +198,10 @@
 			<#elseif config.type=='collection'&&config.collectionElementUiConfigs??>
 				<#assign collectionElementUiConfigs=config.collectionElementUiConfigs/>
 				<div class="control-group">
+					<input type="hidden" name="__datagrid_${entityName}.${key}"/>
 					<label class="control-label">${action.getText(label)}</label>
 					<div class="controls">
-						<table class="table table-bordered middle datagrid" style="table-layout:fixed;">
+						<table class="table table-bordered middle datagrid ${config.cssClass}" style="table-layout:fixed;">
 						<thead>
 							<tr>
 								<#list collectionElementUiConfigs.entrySet() as entry>
