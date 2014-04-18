@@ -4,7 +4,7 @@
 <title>${action.getText('view')}${action.getText(entityName)}</title>
 </head>
 <body>
-	<div class="form-horizontal">
+	<div class="form-horizontal groupable">
 	<#list uiConfigs.entrySet() as entry>
 		<#assign key=entry.key>
 		<#assign config=entry.value>
@@ -18,7 +18,7 @@
 		<#if config.alias??>
 			<#assign label=config.alias>
 		</#if>
-		<div class="control-group"<#if config.group?has_content> data-group="${config.group}"</#if>>
+		<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
 			<label class="control-label">${action.getText(label)}</label>
 			<div class="controls">
 			<#assign template=config.template/>
