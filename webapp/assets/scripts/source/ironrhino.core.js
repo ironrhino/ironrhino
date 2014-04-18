@@ -275,7 +275,11 @@ Form = {
 					}
 				}
 			}
-			if ($(target).is(':visible,[type="hidden"],.sqleditor,.chzn-done')
+			var valid = true;
+			var inhiddenpanel = $(target).css('display') != 'none'
+					&& !$(target).closest('.tab-pane').hasClass('active');
+			if ((inhiddenpanel || $(target)
+					.is(':visible,[type="hidden"],.sqleditor,.chzn-done'))
 					&& !$(target).prop('disabled')) {
 				var value = $(target).val();
 				if ($(target).hasClass('required') && !value) {
@@ -285,21 +289,25 @@ Form = {
 								'selection.required');
 					else
 						Message.showFieldError(target, null, 'required');
-					return false;
+					if (inhiddenpanel)
+						$('a[href="#'
+								+ $(target).closest('.tab-pane').attr('id')
+								+ '"]').tab('show');
+					valid = false;
 				} else if ($(target).hasClass('email')
 						&& value
 						&& !value
 								.match(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)) {
 					Message.showFieldError(target, null, 'email');
-					return false;
+					valid = false;
 				} else if ($(target).hasClass('regex') && value
 						&& !value.match(new RegExp($(target).data('regex')))) {
 					Message.showFieldError(target, null, 'regex');
-					return false;
+					valid = false;
 				} else if ($(target).hasClass('phone') && value
 						&& !value.match(/^[\d-]+$/)) {
 					Message.showFieldError(target, null, 'phone');
-					return false;
+					valid = false;
 				} else if (($(target).hasClass('integer') || $(target)
 						.hasClass('long'))
 						&& value) {
@@ -310,26 +318,25 @@ Form = {
 						Message
 								.showFieldError(target, null,
 										'integer.positive');
-						return false;
+						valid = false;
 					}
 					if (!$(target).hasClass('positive')
 							&& !value.match(/^[-+]?\d*$/)) {
 						Message.showFieldError(target, null, 'integer');
-						return false;
+						valid = false;
 					}
-					return true;
 				} else if ($(target).hasClass('double') && value) {
 					if ($(target).hasClass('positive')
 							&& (!value.match(/^[+]?\d+\.?(\d+)?$/) || !$(target)
 									.hasClass('zero')
 									&& parseFloat(value) == 0)) {
 						Message.showFieldError(target, null, 'double.positive');
-						return false;
+						valid = false;
 					}
 					if (!$(target).hasClass('positive')
 							&& !value.match(/^[-+]?\d+\.?(\d+)?$/)) {
 						Message.showFieldError(target, null, 'double');
-						return false;
+						valid = false;
 					}
 					var i = value.indexOf('.');
 					if (i > -1) {
@@ -347,13 +354,14 @@ Form = {
 							$(target).closest('form')).val()) {
 						Message.showFieldError(target, null,
 								'repeat.not.matched');
-						return false;
+						valid = false;
 					}
 				}
-				return true;
-			} else {
-				return true;
 			}
+			if (!valid && inhiddenpanel)
+				$('a[href="#' + $(target).closest('.tab-pane').attr('id')
+						+ '"]').tab('show');
+			return valid;
 		} else {
 			var valid = true;
 			$(':input', target).each(function() {
