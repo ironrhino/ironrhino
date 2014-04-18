@@ -20,9 +20,8 @@ public class DelegatedUserDetailsService implements UserDetailsService {
 	@Autowired(required = false)
 	private List<ConcreteUserDetailsService> userDetailsServices;
 
-	@Override
-	public UserDetails loadUserByUsername(String username)
-			throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username,
+			boolean nullInsteadException) throws UsernameNotFoundException {
 		UserDetails ud = null;
 		if (userDetailsServices != null)
 			for (ConcreteUserDetailsService uds : userDetailsServices)
@@ -34,6 +33,14 @@ public class DelegatedUserDetailsService implements UserDetailsService {
 					} catch (UsernameNotFoundException unfe) {
 						continue;
 					}
+		if (nullInsteadException)
+			return null;
 		throw new UsernameNotFoundException("No such Username : " + username);
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username)
+			throws UsernameNotFoundException {
+		return loadUserByUsername(username, false);
 	}
 }
