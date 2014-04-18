@@ -82,11 +82,11 @@
 				</#if>	
 			<#elseif config.type=='listpick'>
 				<#if !readonly>
-					<div class="control-group listpick" data-options="{'url':'<@url value=config.pickUrl/>','name':'#${id}-control','id':'#${id}'}">
-						<@s.hidden id=id name=entityName+"."+key+".id" cssClass=config.cssClass/>
+					<div class="control-group listpick" data-options="{'url':'<@url value=config.pickUrl/>'}">
+						<@s.hidden id=id name=entityName+"."+key+".id" cssClass="listpick-id ${config.cssClass}"/>
 						<label class="control-label" for="${id}-control">${action.getText(label)}</label>
 						<div class="controls">
-						<span id="${id}-control"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
+						<span class="listpick-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
 						</div>
 					</div>
 				<#else>
@@ -100,11 +100,11 @@
 				</#if>
 			<#elseif config.type=='treeselect'>
 				<#if !readonly>
-					<div class="control-group treeselect" data-options="{'url':'<@url value=config.pickUrl/>','name':'#${id}-control','id':'#${id}'}">
-						<@s.hidden id=id name=entityName+"."+key+".id" cssClass=config.cssClass/>
+					<div class="control-group treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}">
+						<@s.hidden id=id name=entityName+"."+key+".id" cssClass="treeselect-id ${config.cssClass}"/>
 						<label class="control-label" for="${id}-control">${action.getText(label)}</label>
 						<div class="controls">
-						<span id="${id}-control"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
+						<span class="treeselect-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
 						</div>
 					</div>
 				<#else>

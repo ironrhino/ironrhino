@@ -38490,21 +38490,26 @@ if (window.FileReader)
 })(jQuery);
 (function($) {
 	var current;
-	function find(expr) {
+	function find(expr, container) {
+		if (!container)
+			container = document;
 		var i = expr.indexOf('@');
 		if (i == 0)
 			return current;
 		else if (i > 0)
 			expr = expr.substring(0, i);
-		return (expr == 'this') ? current : $(expr);
+		return (expr == 'this') ? current : $(expr, container);
 	}
-	function val(expr, val, html) {// expr #id #id@attr .class@attr @attr
+	function val(expr, container, val, html) {// expr #id #id@attr .class@attr
+												// @attr
+		if (!container)
+			container = document;
 		if (!expr)
 			return;
-		if (arguments.length > 1) {
+		if (arguments.length > 2) {
 			var i = expr.indexOf('@');
 			if (i < 0) {
-				var ele = expr == 'this' ? current : $(expr);
+				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
 					ele.val(val).trigger('validate');
 				} else {
@@ -38517,7 +38522,7 @@ if (window.FileReader)
 				current.attr(expr.substring(i + 1), val);
 			} else {
 				var selector = expr.substring(0, i);
-				var ele = selector == 'this' ? current : $(selector);
+				var ele = selector == 'this' ? current : $(selector, container);
 				if (ele.parents('.richtable').length
 						&& ele.prop('tagName') == 'TD'
 						&& expr.indexOf('data-cellvalue') > -1)
@@ -38528,7 +38533,7 @@ if (window.FileReader)
 		} else {
 			var i = expr.indexOf('@');
 			if (i < 0) {
-				var ele = expr == 'this' ? current : $(expr);
+				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input'))
 					return ele.val();
 				else
@@ -38539,7 +38544,7 @@ if (window.FileReader)
 				return current.attr(expr.substring(i + 1));
 			} else {
 				var selector = expr.substring(0, i);
-				var ele = selector == 'this' ? current : $(selector);
+				var ele = selector == 'this' ? current : $(selector, container);
 				return ele.attr(expr.substring(i + 1));
 			}
 		}
@@ -38548,10 +38553,10 @@ if (window.FileReader)
 		current = $(event.target).closest('.treeselect');
 		var options = current.data('_options');
 		var nametarget = find(options.name);
-		val(options.name, nametarget.is(':input,td')
+		val(options.name,current, nametarget.is(':input,td')
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
-		val(options.id, '');
+		val(options.id,current, '');
 		if (options.id) {
 			var idtarget = find(options.id);
 			idtarget.removeData('treenode');
@@ -38567,6 +38572,8 @@ if (window.FileReader)
 			var options = {
 				idproperty : 'id',
 				separator : '',
+				id : '.treeselect-id',
+				name : '.treeselect-name',
 				full : true,
 				cache : true
 			}
@@ -38575,18 +38582,18 @@ if (window.FileReader)
 			current.data('_options', options);
 			var nametarget = null;
 			if (options.name) {
-				nametarget = find(options.name);
+				nametarget = find(options.name,current);
 				var remove = nametarget.children('a.remove');
 				if (remove.length) {
 					remove.click(removeAction);
 				} else {
-					var text = val(options.name);
+					var text = val(options.name,current);
 					if (text) {
 						if (text.indexOf('...') < 0)
 							$('<a class="remove" href="#">&times;</a>')
 									.appendTo(nametarget).click(removeAction);
 					} else if (!nametarget.is(':input,td')) {
-						val(options.name,
+						val(options.name,current,
 								'<i class="glyphicon glyphicon-list"></i>',
 								true);
 					}
@@ -38609,7 +38616,7 @@ if (window.FileReader)
 					$('#_tree_window').closest('.ui-dialog').css('z-index',
 							'2002');
 					if (nametarget && nametarget.length)
-						options.value = val(options.name) || '';
+						options.value = val(options.name,current) || '';
 					if (options.type != 'treeview') {
 						options.click = function(treenode) {
 							doclick(treenode, options);
@@ -38653,9 +38660,9 @@ if (window.FileReader)
 
 	function doclick(treenode, options) {
 		if (options.name) {
-			var nametarget = find(options.name);
+			var nametarget = find(options.name,current);
 			var name = options.full ? treenode.fullname : treenode.name;
-			val(options.name, name);
+			val(options.name,current, name);
 			if (nametarget.is(':input')) {
 				nametarget.trigger('change');
 				var form = nametarget.closest('form');
@@ -38667,9 +38674,9 @@ if (window.FileReader)
 			}
 		}
 		if (options.id) {
-			var idtarget = find(options.id);
+			var idtarget = find(options.id,current);
 			var id = treenode[options.idproperty];
-			val(options.id, id);
+			val(options.id,current, id);
 			if (idtarget.is(':input')) {
 				idtarget.trigger('change');
 				var form = idtarget.closest('form');
@@ -38690,21 +38697,26 @@ Observation.treeselect = function(container) {
 };
 (function($) {
 	var current;
-	function find(expr) {
+	function find(expr, container) {
+		if (!container)
+			container = document;
 		var i = expr.indexOf('@');
 		if (i == 0)
 			return current;
 		else if (i > 0)
 			expr = expr.substring(0, i);
-		return (expr == 'this') ? current : $(expr);
+		return (expr == 'this') ? current : $(expr, container);
 	}
-	function val(expr, val, html) {// expr #id #id@attr .class@attr @attr
+	function val(expr, container, val, html) {// expr #id #id@attr .class@attr
+		// @attr
+		if (!container)
+			container = document;
 		if (!expr)
 			return;
-		if (arguments.length > 1) {
+		if (arguments.length > 2) {
 			var i = expr.indexOf('@');
 			if (i < 0) {
-				var ele = expr == 'this' ? current : $(expr);
+				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
 					ele.val(val).trigger('validate');
 				} else {
@@ -38717,7 +38729,7 @@ Observation.treeselect = function(container) {
 				current.attr(expr.substring(i + 1), val);
 			} else {
 				var selector = expr.substring(0, i);
-				var ele = selector == 'this' ? current : $(selector);
+				var ele = selector == 'this' ? current : $(selector, container);
 				if (ele.parents('.richtable').length
 						&& ele.prop('tagName') == 'TD'
 						&& expr.indexOf('data-cellvalue') > -1)
@@ -38728,7 +38740,7 @@ Observation.treeselect = function(container) {
 		} else {
 			var i = expr.indexOf('@');
 			if (i < 0) {
-				var ele = expr == 'this' ? current : $(expr);
+				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input'))
 					return ele.val();
 				else
@@ -38739,7 +38751,7 @@ Observation.treeselect = function(container) {
 				return current.attr(expr.substring(i + 1));
 			} else {
 				var selector = expr.substring(0, i);
-				var ele = selector == 'this' ? current : $(selector);
+				var ele = selector == 'this' ? current : $(selector, container);
 				return ele.attr(expr.substring(i + 1));
 			}
 		}
@@ -38747,11 +38759,12 @@ Observation.treeselect = function(container) {
 	function removeAction(event) {
 		current = $(event.target).closest('.listpick');
 		var options = current.data('_options');
-		var nametarget = find(options.name);
-		val(options.name, nametarget.is(':input,td')
+		if (options.name)
+			var nametarget = find(options.name, current);
+		val(options.name, current, nametarget.is(':input,td')
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
-		val(options.id, '');
+		val(options.id, current, '', false);
 		$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -38762,6 +38775,8 @@ Observation.treeselect = function(container) {
 			current = $(this);
 			var options = {
 				separator : ',',
+				id: '.listpick-id',
+				name: '.listpick-name',
 				idindex : 0,
 				nameindex : 1,
 				multiple : false
@@ -38771,18 +38786,18 @@ Observation.treeselect = function(container) {
 			current.data('_options', options);
 			var nametarget = null;
 			if (options.name) {
-				nametarget = find(options.name);
+				nametarget = find(options.name, current);
 				var remove = nametarget.children('a.remove');
 				if (remove.length) {
 					remove.click(removeAction);
 				} else {
-					var text = val(options.name);
+					var text = val(options.name, current);
 					if (text) {
 						if (text.indexOf('...') < 0)
 							$('<a class="remove" href="#">&times;</a>')
 									.appendTo(nametarget).click(removeAction);
 					} else if (!nametarget.is(':input,td')) {
-						val(options.name,
+						val(options.name, current,
 								'<i class="glyphicon glyphicon-list"></i>',
 								true);
 					}
@@ -38819,8 +38834,9 @@ Observation.treeselect = function(container) {
 									var name = $($(this).closest('tr')[0].cells[options.nameindex])
 											.text();
 									if (options.name) {
-										val(options.name, name);
-										var nametarget = find(options.name);
+										val(options.name, current, name);
+										var nametarget = find(options.name,
+												current);
 										if (nametarget.is(':input')) {
 											nametarget.trigger('change');
 											var form = nametarget
@@ -38834,8 +38850,8 @@ Observation.treeselect = function(container) {
 										}
 									}
 									if (options.id) {
-										val(options.id, id);
-										var idtarget = find(options.id);
+										val(options.id, current, id);
+										var idtarget = find(options.id, current);
 										if (idtarget.is(':input')) {
 											idtarget.trigger('change');
 											var form = idtarget.closest('form');
@@ -38863,13 +38879,15 @@ Observation.treeselect = function(container) {
 							});
 							var separator = options.separator;
 							if (options.name) {
-								var nametarget = find(options.name);
+								var nametarget = find(options.name, current);
 								var name = names.join(separator);
 								if (nametarget.is(':input')) {
 									nametarget.trigger('change');
-									var _names = val(options.name) || '';
+									var _names = val(options.name, current)
+											|| '';
 									val(
 											options.name,
+											current,
 											ArrayUtils
 													.unique((_names
 															+ (_names
@@ -38888,17 +38906,18 @@ Observation.treeselect = function(container) {
 											: '') + name).split(separator))
 											.join(separator);
 									nametarget.data('picked', picked);
-									val(options.name, picked);
+									val(options.name, current, picked);
 									$('<a class="remove" href="#">&times;</a>')
 											.appendTo(nametarget)
 											.click(removeAction);
 								}
 							}
 							if (options.id) {
-								var idtarget = find(options.id);
+								var idtarget = find(options.id, current);
 								var id = ids.join(separator);
-								var _ids = val(options.id) || '';
-								val(options.id, ArrayUtils.unique((_ids
+								var _ids = val(options.id, current) || '';
+								val(options.id, current,
+										ArrayUtils.unique((_ids
 												+ (_ids ? separator : '') + id)
 												.split(separator))
 												.join(separator));

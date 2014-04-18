@@ -1,20 +1,25 @@
 (function($) {
 	var current;
-	function find(expr) {
+	function find(expr, container) {
+		if (!container)
+			container = document;
 		var i = expr.indexOf('@');
 		if (i == 0)
 			return current;
 		else if (i > 0)
 			expr = expr.substring(0, i);
-		return (expr == 'this') ? current : $(expr);
+		return (expr == 'this') ? current : $(expr, container);
 	}
-	function val(expr, val, html) {// expr #id #id@attr .class@attr @attr
+	function val(expr, container, val, html) {// expr #id #id@attr .class@attr
+												// @attr
+		if (!container)
+			container = document;
 		if (!expr)
 			return;
-		if (arguments.length > 1) {
+		if (arguments.length > 2) {
 			var i = expr.indexOf('@');
 			if (i < 0) {
-				var ele = expr == 'this' ? current : $(expr);
+				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
 					ele.val(val).trigger('validate');
 				} else {
@@ -27,7 +32,7 @@
 				current.attr(expr.substring(i + 1), val);
 			} else {
 				var selector = expr.substring(0, i);
-				var ele = selector == 'this' ? current : $(selector);
+				var ele = selector == 'this' ? current : $(selector, container);
 				if (ele.parents('.richtable').length
 						&& ele.prop('tagName') == 'TD'
 						&& expr.indexOf('data-cellvalue') > -1)
@@ -38,7 +43,7 @@
 		} else {
 			var i = expr.indexOf('@');
 			if (i < 0) {
-				var ele = expr == 'this' ? current : $(expr);
+				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input'))
 					return ele.val();
 				else
@@ -49,7 +54,7 @@
 				return current.attr(expr.substring(i + 1));
 			} else {
 				var selector = expr.substring(0, i);
-				var ele = selector == 'this' ? current : $(selector);
+				var ele = selector == 'this' ? current : $(selector, container);
 				return ele.attr(expr.substring(i + 1));
 			}
 		}
@@ -58,10 +63,10 @@
 		current = $(event.target).closest('.treeselect');
 		var options = current.data('_options');
 		var nametarget = find(options.name);
-		val(options.name, nametarget.is(':input,td')
+		val(options.name,current, nametarget.is(':input,td')
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
-		val(options.id, '');
+		val(options.id,current, '');
 		if (options.id) {
 			var idtarget = find(options.id);
 			idtarget.removeData('treenode');
@@ -77,6 +82,8 @@
 			var options = {
 				idproperty : 'id',
 				separator : '',
+				id : '.treeselect-id',
+				name : '.treeselect-name',
 				full : true,
 				cache : true
 			}
@@ -85,18 +92,18 @@
 			current.data('_options', options);
 			var nametarget = null;
 			if (options.name) {
-				nametarget = find(options.name);
+				nametarget = find(options.name,current);
 				var remove = nametarget.children('a.remove');
 				if (remove.length) {
 					remove.click(removeAction);
 				} else {
-					var text = val(options.name);
+					var text = val(options.name,current);
 					if (text) {
 						if (text.indexOf('...') < 0)
 							$('<a class="remove" href="#">&times;</a>')
 									.appendTo(nametarget).click(removeAction);
 					} else if (!nametarget.is(':input,td')) {
-						val(options.name,
+						val(options.name,current,
 								'<i class="glyphicon glyphicon-list"></i>',
 								true);
 					}
@@ -119,7 +126,7 @@
 					$('#_tree_window').closest('.ui-dialog').css('z-index',
 							'2002');
 					if (nametarget && nametarget.length)
-						options.value = val(options.name) || '';
+						options.value = val(options.name,current) || '';
 					if (options.type != 'treeview') {
 						options.click = function(treenode) {
 							doclick(treenode, options);
@@ -163,9 +170,9 @@
 
 	function doclick(treenode, options) {
 		if (options.name) {
-			var nametarget = find(options.name);
+			var nametarget = find(options.name,current);
 			var name = options.full ? treenode.fullname : treenode.name;
-			val(options.name, name);
+			val(options.name,current, name);
 			if (nametarget.is(':input')) {
 				nametarget.trigger('change');
 				var form = nametarget.closest('form');
@@ -177,9 +184,9 @@
 			}
 		}
 		if (options.id) {
-			var idtarget = find(options.id);
+			var idtarget = find(options.id,current);
 			var id = treenode[options.idproperty];
-			val(options.id, id);
+			val(options.id,current, id);
 			if (idtarget.is(':input')) {
 				idtarget.trigger('change');
 				var form = idtarget.closest('form');
