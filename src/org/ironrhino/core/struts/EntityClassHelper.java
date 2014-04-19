@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -139,6 +140,20 @@ public class EntityClassHelper {
 							lob = f.getAnnotation(Lob.class);
 					} catch (Exception e) {
 					}
+				Embedded embedded = pd.getReadMethod().getAnnotation(
+						Embedded.class);
+				Class<?> embeddedClass = null;
+				if (embedded == null) {
+					try {
+						Field f = declaredClass.getDeclaredField(propertyName);
+						if (f != null)
+							embedded = f.getAnnotation(Embedded.class);
+						embeddedClass = f.getType();
+					} catch (Exception e) {
+					}
+				} else {
+					embeddedClass = pd.getReadMethod().getReturnType();
+				}
 				ElementCollection elementCollection = pd.getReadMethod()
 						.getAnnotation(ElementCollection.class);
 				Class<?> elementClass = null;
@@ -163,6 +178,19 @@ public class EntityClassHelper {
 					hi.setValue(true);
 					uci.setHiddenInInput(hi);
 				}
+				if (embedded != null) {
+					HiddenImpl hi = new HiddenImpl();
+					hi.setValue(true);
+					uci.setHiddenInList(hi);
+					uci.setType("embedded");
+					Map<String, UiConfigImpl> map2 = getUiConfigs(embeddedClass);
+					for (UiConfigImpl ui : map2.values()) {
+						if (StringUtils.isBlank(ui.getGroup())
+								&& StringUtils.isNoneBlank(uci.getGroup()))
+							ui.setGroup(uci.getGroup());
+					}
+					uci.setEmbeddedUiConfigs(map2);
+				}
 				if (elementCollection != null) {
 					HiddenImpl hi = new HiddenImpl();
 					hi.setValue(true);
@@ -172,7 +200,7 @@ public class EntityClassHelper {
 						uci.setHiddenInView(hi);
 					} else {
 						uci.setType("collection");
-						uci.setCollectionElementUiConfigs(getUiConfigs(elementClass));
+						uci.setEmbeddedUiConfigs(getUiConfigs(elementClass));
 					}
 				}
 				if (idAssigned && propertyName.equals("id"))

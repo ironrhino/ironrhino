@@ -195,8 +195,65 @@
 						</div>
 					</div>
 				</#if>
-			<#elseif config.type=='collection'&&config.collectionElementUiConfigs??>
-				<#assign collectionElementUiConfigs=config.collectionElementUiConfigs/>
+			<#elseif config.type=='embedded'&&config.embeddedUiConfigs??>
+				<#list config.embeddedUiConfigs.entrySet() as entry>
+					<#assign config = entry.value>
+					<#assign label=entry.key>
+					<#if config.alias??>
+						<#assign label=config.alias>
+					</#if>
+					<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
+					<#if config.inputTemplate?has_content>
+						<@config.inputTemplate?interpret/>
+					<#elseif config.type=='textarea'>
+						<#assign dynamicAttributes=config.dynamicAttributes/>
+						<#if config.maxlength gt 0>
+						<#assign dynamicAttributes=dynamicAttributes+{"maxlength":config.maxlength}>
+						</#if>
+						<@s.textarea group=config.group! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
+					<#elseif config.type=='checkbox'>
+							<@s.checkbox group=config.group! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
+					<#elseif config.type=='enum'>
+							<@s.select group=config.group! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
+					<#elseif config.type=='select'>
+							<@s.select group=config.group! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
+					<#elseif config.type=='multiselect'>
+							<@s.select group=config.group! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
+					<#elseif config.type=='dictionary' && selectDictionary??>
+						<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
+						<label class="control-label">${action.getText(label)}</label>
+						<div class="controls">
+							<@selectDictionary id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key value="${entity[key][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
+						</div>
+						</div>
+					<#elseif config.type=='listpick'>
+						<div class="control-group listpick" data-options="{'url':'<@url value=config.pickUrl/>'}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
+						<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="listpick-id ${config.cssClass}"/>
+						<label class="control-label">${action.getText(label)}</label>
+							<div class="controls">
+							<span class=" listpick-name"><#if entity[key][entry.key]??><#if entity[key][entry.key].fullname??>${entity[key][entry.key].fullname!}<#else>${entity[key][entry.key]!}</#if></#if></span>
+							</div>
+						</div>
+					<#elseif config.type=='treeselect'>
+						<div class="control-group treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
+							<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="treeselect-id ${config.cssClass}"/>
+							<label class="control-label">${action.getText(label)}</label>
+							<div class="controls">
+							<span class="treeselect-name"><#if entity[key][entry.key]??><#if entity[key][entry.key].fullname??>${entity[key][entry.key].fullname!}<#else>${entity[key][entry.key]!}</#if></#if></span>
+							</div>
+						</div>
+					<#else>
+						<#if config.cssClass?contains('datetime')>
+							<@s.textfield group=config.group! value=(entity[key][entry.key]?string('yyyy-MM-dd HH:mm:ss'))! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
+						<#elseif config.cssClass?contains('time')>
+							<@s.textfield group=config.group! value=(entity[key][entry.key]?string('HH:mm:ss'))! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
+						<#else>
+							<@s.textfield group=config.group! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
+						</#if>
+					</#if>
+				</#list>
+			<#elseif config.type=='collection'&&config.embeddedUiConfigs??>
+				<#assign embeddedUiConfigs=config.embeddedUiConfigs/>
 				<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
 					<input type="hidden" name="__datagrid_${entityName}.${key}"/>
 					<label class="control-label">${action.getText(label)}</label>
@@ -204,7 +261,7 @@
 						<table class="table table-bordered middle datagrid ${config.cssClass}" style="table-layout:fixed;">
 						<thead>
 							<tr>
-								<#list collectionElementUiConfigs.entrySet() as entry>
+								<#list embeddedUiConfigs.entrySet() as entry>
 								<#assign label2=entry.key>
 								<#if entry.value.alias??>
 									<#assign label2=entry.value.alias>
@@ -222,7 +279,7 @@
 						</#if>
 						<#list 0..size as index>
 							<tr>
-								<#list collectionElementUiConfigs.entrySet() as entry>
+								<#list embeddedUiConfigs.entrySet() as entry>
 								<#assign config = entry.value>
 								<td>
 								<#if config.inputTemplate?has_content>

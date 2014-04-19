@@ -58,7 +58,7 @@ public class AnnotationShadows {
 		private String group;
 		private boolean searchable;
 		private Set<String> nestSearchableProperties;
-		private Map<String, UiConfigImpl> collectionElementUiConfigs;
+		private Map<String, UiConfigImpl> embeddedUiConfigs;
 
 		public UiConfigImpl() {
 		}
@@ -438,13 +438,13 @@ public class AnnotationShadows {
 			this.nestSearchableProperties = nestSearchableProperties;
 		}
 
-		public Map<String, UiConfigImpl> getCollectionElementUiConfigs() {
-			return collectionElementUiConfigs;
+		public Map<String, UiConfigImpl> getEmbeddedUiConfigs() {
+			return embeddedUiConfigs;
 		}
 
-		public void setCollectionElementUiConfigs(
-				Map<String, UiConfigImpl> collectionElementUiConfigs) {
-			this.collectionElementUiConfigs = collectionElementUiConfigs;
+		public void setEmbeddedUiConfigs(
+				Map<String, UiConfigImpl> embeddedUiConfigs) {
+			this.embeddedUiConfigs = embeddedUiConfigs;
 		}
 
 	}
