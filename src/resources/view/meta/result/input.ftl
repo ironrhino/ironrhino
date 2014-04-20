@@ -53,10 +53,7 @@
 				</#if>
 				<@s.textarea group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='checkbox'>
-				<#if readonly>
-					<@s.hidden name=entityName+"."+key />
-				</#if>
-				<@s.checkbox disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
+				<@s.checkbox readonly=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
 			<#elseif config.type=='enum'>
 				<#if readonly>
 					<@s.hidden name=entityName+"."+key value="${(entity[key].name())!}"/>
@@ -190,10 +187,7 @@
 						</#if>
 						<@s.textarea group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 					<#elseif config.type=='checkbox'>
-						<#if readonly>
-						<@s.hidden name=entityName+"."+key />
-						</#if>
-						<@s.checkbox disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
+						<@s.checkbox readonly=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
 					<#elseif config.type=='enum'>
 						<#if readonly>
 						<@s.hidden name=entityName+"."+key value="${(entity[key].name())!}"/>
@@ -299,10 +293,7 @@
 									</#if>
 									<@s.textarea readonly=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 								<#elseif config.type=='checkbox'>
-									<#if readonly>
-										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
-									</#if>
-									<@s.checkbox disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
+									<@s.checkbox readonly=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
 								<#elseif config.type=='enum'>
 									<#if readonly>
 										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key value="${(entity[key][index][entry.key].name())!}"/>
