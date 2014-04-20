@@ -53,78 +53,49 @@
 				</#if>
 				<@s.textarea group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='checkbox'>
-				<#if !readonly>
-					<@s.checkbox group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
-				<#else>
+				<#if readonly>
 					<@s.hidden name=entityName+"."+key />
-					<@s.checkbox group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass disabled="true" dynamicAttributes=config.dynamicAttributes />
 				</#if>
+				<@s.checkbox disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
 			<#elseif config.type=='enum'>
-				<#if !readonly>
-					<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
-				<#else>
-					<@s.hidden name=entityName+"."+key value="%{${entityName+'.'+key+'.id'}}"/>
-					<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass disabled=true list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes />
+				<#if readonly>
+					<@s.hidden name=entityName+"."+key value="${(entity[key].name())!}"/>
 				</#if>
+				<@s.select disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
 			<#elseif config.type=='select'>
-				<#if !readonly>
-					<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
-				<#else>
-					<@s.hidden name=entityName+"."+key value="%{${entityName+'.'+key+'.id'}}"/>
-					<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass disabled=true list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes />
+				<#if readonly>
+					<@s.hidden name=entityName+"."+key />
 				</#if>
+				<@s.select disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
 			<#elseif config.type=='multiselect'>
-				<#if !readonly>
-					<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
-				<#else>
-					<@s.hidden name=entityName+"."+key value="%{${entityName+'.'+key+'.id'}}"/>
-					<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass disabled=true list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" multiple=true headerValue="" dynamicAttributes=config.dynamicAttributes />
-				</#if>	
+				<#if readonly>
+					<@s.hidden name=entityName+"."+key />
+				</#if>
+				<@s.select disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
 			<#elseif config.type=='listpick'>
-				<#if !readonly>
-					<div class="control-group listpick" data-options="{'url':'<@url value=config.pickUrl/>'}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
-						<@s.hidden id=id name=entityName+"."+key+".id" cssClass="listpick-id ${config.cssClass}"/>
-						<label class="control-label" for="${id}-control">${action.getText(label)}</label>
-						<div class="controls">
-						<span class="listpick-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
-						</div>
+				<div class="control-group<#if !readonly> listpick</#if>" data-options="{'url':'<@url value=config.pickUrl/>'}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
+					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="listpick-id ${config.cssClass}"/>
+					<label class="control-label" for="${id}-control">${action.getText(label)}</label>
+					<div class="controls">
+					<span class="listpick-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
 					</div>
-				<#else>
-					<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
-						<@s.hidden id=id name=entityName+"."+key+".id" cssClass=config.cssClass/>
-						<label class="control-label">${action.getText(label)}</label>
-						<div class="controls text">
-						<span><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
-						</div>
-					</div>
-				</#if>
+				</div>
 			<#elseif config.type=='treeselect'>
-				<#if !readonly>
-					<div class="control-group treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
-						<@s.hidden id=id name=entityName+"."+key+".id" cssClass="treeselect-id ${config.cssClass}"/>
-						<label class="control-label" for="${id}-control">${action.getText(label)}</label>
-						<div class="controls">
-						<span class="treeselect-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
-						</div>
+				<div class="control-group<#if !readonly> treeselect</#if>" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
+					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="treeselect-id ${config.cssClass}"/>
+					<label class="control-label" for="${id}-control">${action.getText(label)}</label>
+					<div class="controls">
+					<span class="treeselect-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
 					</div>
-				<#else>
-					<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
-						<label class="control-label">${action.getText(label)}</label>
-						<div class="controls text">
-						<span>${entity[key]!}</span>
-						</div>
-					</div>
-				</#if>
+				</div>
 			<#elseif config.type=='dictionary' && selectDictionary??>
 				<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
 				<label class="control-label" for="${id}">${action.getText(label)}</label>
-				<div class="controls<#if readonly> text</#if>">
-				<#if !readonly>
-					<@selectDictionary id=id dictionaryName=templateName name=entityName+"."+key value="${entity[key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
-				<#else>
-					<@s.hidden id=id name=entityName+"."+key/>
-					<span id="${id}"><@displayDictionaryLabel dictionaryName=templateName value=entity[key]!/></span>
-				</#if>
+				<div class="controls">
+					<#if readonly>
+						<@s.hidden name=entityName+"."+key />
+					</#if>
+					<@selectDictionary disabled=readonly id=id dictionaryName=templateName name=entityName+"."+key value="${entity[key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
 				</div>
 				</div>
 			<#elseif config.type=='attributes'>
@@ -198,10 +169,17 @@
 			<#elseif config.type=='embedded'&&config.embeddedUiConfigs??>
 				<#list config.embeddedUiConfigs.entrySet() as entry>
 					<#assign config = entry.value>
+					<#assign value=entity[key][entry.key]!>
+					<#assign hidden=config.hiddenInInput.value>
+					<#if !hidden && config.hiddenInInput.expression?has_content>
+						<#assign hidden=config.hiddenInInput.expression?eval>
+					</#if>
+					<#if !hidden>
 					<#assign label=entry.key>
 					<#if config.alias??>
 						<#assign label=config.alias>
 					</#if>
+					<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 					<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
 					<#if config.inputTemplate?has_content>
 						<@config.inputTemplate?interpret/>
@@ -212,22 +190,37 @@
 						</#if>
 						<@s.textarea group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 					<#elseif config.type=='checkbox'>
-							<@s.checkbox group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
+						<#if readonly>
+						<@s.hidden name=entityName+"."+key />
+						</#if>
+						<@s.checkbox disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
 					<#elseif config.type=='enum'>
-							<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
+						<#if readonly>
+						<@s.hidden name=entityName+"."+key value="${(entity[key].name())!}"/>
+						</#if>
+						<@s.select disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
 					<#elseif config.type=='select'>
-							<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
+						<#if readonly>
+						<@s.hidden name=entityName+"."+key/>
+						</#if>
+						<@s.select disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
 					<#elseif config.type=='multiselect'>
-							<@s.select group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
+						<#if readonly>
+						<@s.hidden name=entityName+"."+key/>
+						</#if>
+						<@s.select disabled=readonly group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
 					<#elseif config.type=='dictionary' && selectDictionary??>
 						<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
 						<label class="control-label">${action.getText(label)}</label>
 						<div class="controls">
-							<@selectDictionary id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key value="${entity[key][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
+						<#if readonly>
+							<@s.hidden name=entityName+"."+key />
+						</#if>
+						<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key value="${entity[key][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
 						</div>
 						</div>
 					<#elseif config.type=='listpick'>
-						<div class="control-group listpick" data-options="{'url':'<@url value=config.pickUrl/>'}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
+						<div class="control-group<#if !readonly> listpick</#if>" data-options="{'url':'<@url value=config.pickUrl/>'}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
 						<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="listpick-id ${config.cssClass}"/>
 						<label class="control-label">${action.getText(label)}</label>
 							<div class="controls">
@@ -235,7 +228,7 @@
 							</div>
 						</div>
 					<#elseif config.type=='treeselect'>
-						<div class="control-group treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
+						<div class="control-group<#if !readonly> treeselect</#if>" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
 							<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="treeselect-id ${config.cssClass}"/>
 							<label class="control-label">${action.getText(label)}</label>
 							<div class="controls">
@@ -251,6 +244,7 @@
 							<@s.textfield group=action.getText(config.group)! id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=config.dynamicAttributes />
 						</#if>
 					</#if>
+					</#if>
 				</#list>
 			<#elseif config.type=='collection'&&config.embeddedUiConfigs??>
 				<#assign embeddedUiConfigs=config.embeddedUiConfigs/>
@@ -262,11 +256,18 @@
 						<thead>
 							<tr>
 								<#list embeddedUiConfigs.entrySet() as entry>
+								<#assign config=entry.value>
+								<#assign hidden=config.hiddenInInput.value>
+								<#if !hidden && config.hiddenInInput.expression?has_content>
+									<#assign hidden=config.hiddenInInput.expression?eval>
+								</#if>
+								<#if !hidden>
 								<#assign label2=entry.key>
-								<#if entry.value.alias??>
-									<#assign label2=entry.value.alias>
+								<#if config.alias??>
+									<#assign label2=config.alias>
 								</#if>
 								<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${action.getText(label2)}</th>
+								</#if>
 								</#list>
 								<th class="manipulate"></th>
 							</tr>
@@ -281,7 +282,14 @@
 							<tr>
 								<#list embeddedUiConfigs.entrySet() as entry>
 								<#assign config = entry.value>
+								<#assign hidden=config.hiddenInInput.value>
+								<#if !hidden && config.hiddenInInput.expression?has_content>
+									<#assign hidden=config.hiddenInInput.expression?eval>
+								</#if>
+								<#if !hidden>
 								<td>
+								<#assign value=(entity[key][index][entry.key])!>
+								<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 								<#if config.inputTemplate?has_content>
 									<@config.inputTemplate?interpret/>
 								<#elseif config.type=='textarea'>
@@ -289,24 +297,39 @@
 									<#if config.maxlength gt 0>
 									<#assign dynamicAttributes=dynamicAttributes+{"maxlength":config.maxlength}>
 									</#if>
-									<@s.textarea id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
+									<@s.textarea readonly=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 								<#elseif config.type=='checkbox'>
-										<@s.checkbox id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
+									<#if readonly>
+										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
+									</#if>
+									<@s.checkbox disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=config.dynamicAttributes />
 								<#elseif config.type=='enum'>
-										<@s.select id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
+									<#if readonly>
+										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key value="${(entity[key][index][entry.key].name())!}"/>
+									</#if>
+									<@s.select disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
 								<#elseif config.type=='select'>
-										<@s.select id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
+									<#if readonly>
+										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
+									</#if>
+									<@s.select disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=config.dynamicAttributes/>
 								<#elseif config.type=='multiselect'>
-										<@s.select id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
+									<#if readonly>
+										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
+									</#if>
+									<@s.select disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=config.dynamicAttributes/>
 								<#elseif config.type=='dictionary' && selectDictionary??>
-										<@selectDictionary id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key value="${entity[key][index][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
+									<#if readonly>
+										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
+									</#if>
+									<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key value="${entity[key][index][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
 								<#elseif config.type=='listpick'>
-										<div class="listpick" data-options="{'url':'<@url value=config.pickUrl/>'}">
+										<div<#if !readonly> class="listpick" data-options="{'url':'<@url value=config.pickUrl/>'}"</#if>>
 										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="listpick-id ${config.cssClass}"/>
 										<span class="listpick-name"><#if entity[key][index][entry.key]??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if></#if></span>
 										</div>
 								<#elseif config.type=='treeselect'>
-										<div class="treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}">
+										<div<#if !readonly> class="treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}"</#if>>
 										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="treeselect-id ${config.cssClass}"/>
 										<span class="treeselect-name"><#if entity[key][index][entry.key]??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if></#if></span>
 										</div>
@@ -320,6 +343,7 @@
 									</#if>
 								</#if>
 								</td>
+								</#if>
 								</#list>
 								<td class="manipulate"></td>
 							</tr>
