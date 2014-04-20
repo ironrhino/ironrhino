@@ -22,6 +22,11 @@
 				<#list config.embeddedUiConfigs.entrySet() as entry>
 				<#assign config=entry.value>
 				<#assign value=(entity[key][entry.key])!>
+				<#assign hidden=config.hiddenInView.value>
+				<#if !hidden && config.hiddenInView.expression?has_content>
+					<#assign hidden=config.hiddenInView.expression?eval>
+				</#if>
+				<#if !hidden>
 				<#assign label=entry.key>
 				<#if config.alias??>
 					<#assign label=config.alias>
@@ -89,6 +94,7 @@
 					</#if>
 					</div>
 				</div>
+				</#if>
 				</#list>
 		<#else>		
 		<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
@@ -122,11 +128,18 @@
 					<thead>
 						<tr>
 							<#list embeddedUiConfigs.entrySet() as entry>
+							<#assign config=entry.value>
+							<#assign hidden=config.hiddenInView.value>
+							<#if !hidden && config.hiddenInView.expression?has_content>
+								<#assign hidden=config.hiddenInView.expression?eval>
+							</#if>
+							<#if !hidden>
 							<#assign label2=entry.key>
-							<#if entry.value.alias??>
-								<#assign label2=entry.value.alias>
+							<#if config.alias??>
+								<#assign label2=config.alias>
 							</#if>
 							<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${action.getText(label2)}</th>
+							</#if>
 							</#list>
 						</tr>
 					</thead>
@@ -139,6 +152,11 @@
 							<#list embeddedUiConfigs.entrySet() as entry>
 							<#assign config = entry.value>
 							<#assign value=element[entry.key]!>
+							<#assign hidden=config.hiddenInView.value>
+							<#if !hidden && config.hiddenInView.expression?has_content>
+								<#assign hidden=config.hiddenInView.expression?eval>
+							</#if>
+							<#if !hidden>
 							<td>
 							<#assign template=config.template/>
 							<#if config.viewTemplate!=''>
@@ -196,6 +214,7 @@
 								<@template?interpret/>
 							</#if>
 							</td>
+							</#if>
 							</#list>
 						</tr>
 					</#list>
