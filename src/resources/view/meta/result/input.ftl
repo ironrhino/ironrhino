@@ -166,7 +166,7 @@
 			<#elseif config.type=='embedded'&&config.embeddedUiConfigs??>
 				<#list config.embeddedUiConfigs.entrySet() as entry>
 					<#assign config = entry.value>
-					<#assign value=entity[key][entry.key]!>
+					<#assign value=(entity[key][entry.key])!>
 					<#assign hidden=config.hiddenInInput.value>
 					<#if !hidden && config.hiddenInInput.expression?has_content>
 						<#assign hidden=config.hiddenInInput.expression?eval>
