@@ -26,7 +26,7 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.driverClassName:}")
 	private String driverClass;
 
-	@Value("${jdbc.url:jdbc:mysql:///${app.name}?createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&tinyInt1isBit=false&rewriteBatchedStatements=true}")
+	@Value("${jdbc.url:jdbc:mysql:///${app.name}?createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&tinyInt1isBit=false}")
 	private String jdbcUrl;
 
 	@Value("${jdbc.username:root}")
