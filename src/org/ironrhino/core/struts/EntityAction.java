@@ -242,7 +242,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return ApplicationContextUtils.getEntityManager(entityClass);
 	}
 
-	private void tryFindEntity() {
+	protected void setEntity(Persistable<?> entity) {
+		this._entity = entity;
+	}
+
+	protected void tryFindEntity() {
 		BaseManager entityManager = getEntityManager(getEntityClass());
 		try {
 			BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass()
