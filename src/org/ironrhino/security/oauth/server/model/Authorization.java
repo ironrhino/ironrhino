@@ -70,7 +70,7 @@ public class Authorization extends BaseEntity {
 
 	@NotInCopy
 	@UiConfig(hidden = true)
-	@Column(nullable = false, insertable = false)
+	@Column(nullable = false)
 	private Date modifyDate = new Date();
 
 	@NotInCopy
