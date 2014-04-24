@@ -46,7 +46,7 @@
 				<interceptor-ref name="actionMappingParams" />
 				<interceptor-ref name="params">
 					<param name="acceptParamNames">\w+((\.\w+)|(\[\d+\])|(\(\d+\))|(\['(\w|[\u4e00-\u9fa5])+'\])|(\('(\w|[\u4e00-\u9fa5])+'\)))*</param>
-					<param name="excludeParams">_.*_</param>
+					<param name="excludeParams">(.*\.|^)class\..*,^dojo\..*,^struts\..*,^session\..*,^request\..*,^application\..*,^servlet(Request|Response)\..*,^parameters\..*,^action:.*,^method:.*</param>
 				</interceptor-ref>
 				<interceptor-ref name="conversionError" />
 				<interceptor-ref name="annotationWorkflow" />
