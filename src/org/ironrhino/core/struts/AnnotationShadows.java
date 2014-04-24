@@ -55,7 +55,7 @@ public class AnnotationShadows {
 		private boolean excludedFromLike = false;
 		private boolean excludedFromCriteria = false;
 		private boolean excludedFromOrdering = false;
-		private String group;
+		private String group = "";
 		private boolean searchable;
 		private Set<String> nestSearchableProperties;
 		private Map<String, UiConfigImpl> embeddedUiConfigs;

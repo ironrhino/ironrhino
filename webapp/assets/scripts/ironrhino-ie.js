@@ -36600,7 +36600,7 @@ Observation.sortableTable = function(container) {
 			if ($(this).hasClass('datagrided'))
 				return;
 			$(this).addClass('datagrided');
-			$('td.manipulate', this).css({
+			$('td.manipulate,th.manipulate', this).css({
 						'width' : '80px',
 						'padding-left' : '10px',
 						'text-align' : 'left'

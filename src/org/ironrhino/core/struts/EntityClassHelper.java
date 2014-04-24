@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
@@ -154,23 +154,12 @@ public class EntityClassHelper {
 				} else {
 					embeddedClass = pd.getReadMethod().getReturnType();
 				}
-				ElementCollection elementCollection = pd.getReadMethod()
-						.getAnnotation(ElementCollection.class);
+
 				Class<?> elementClass = null;
-				if (elementCollection == null) {
-					try {
-						Field f = declaredClass.getDeclaredField(propertyName);
-						if (f != null)
-							elementCollection = f
-									.getAnnotation(ElementCollection.class);
-						elementClass = ReflectionUtils.getGenericClass(
-								f.getGenericType(), 0);
-					} catch (Exception e) {
-					}
-				} else {
+				if (Collection.class.isAssignableFrom(pd.getReadMethod()
+						.getReturnType()))
 					elementClass = ReflectionUtils.getGenericClass(pd
 							.getReadMethod().getGenericReturnType(), 0);
-				}
 				UiConfigImpl uci = new UiConfigImpl(pd.getName(),
 						pd.getPropertyType(), uiConfig);
 				if (pd.getWriteMethod() == null) {
@@ -191,17 +180,12 @@ public class EntityClassHelper {
 					}
 					uci.setEmbeddedUiConfigs(map2);
 				}
-				if (elementCollection != null) {
+				if (elementClass != null) {
 					HiddenImpl hi = new HiddenImpl();
 					hi.setValue(true);
 					uci.setHiddenInList(hi);
-					if (elementClass == null) {
-						uci.setHiddenInInput(hi);
-						uci.setHiddenInView(hi);
-					} else {
-						uci.setType("collection");
-						uci.setEmbeddedUiConfigs(getUiConfigs(elementClass));
-					}
+					uci.setType("collection");
+					uci.setEmbeddedUiConfigs(getUiConfigs(elementClass));
 				}
 				if (idAssigned && propertyName.equals("id"))
 					uci.addCssClass("required checkavailable");
