@@ -62,8 +62,9 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 				if (!columnExists) {
 					stmt.execute("ALTER TABLE `" + getTableName() + "` ADD "
 							+ columnName + " INT NOT NULL DEFAULT 0,ADD "
-							+ columnName
-							+ "_TIMESTAMP BIGINT DEFAULT UNIX_TIMESTAMP()");
+							+ columnName + "_TIMESTAMP BIGINT DEFAULT 0");
+					stmt.execute("update `" + getTableName() + "` set "
+							+ columnName + "_TIMESTAMP=UNIX_TIMESTAMP()");
 				}
 			} else {
 				stmt.execute("CREATE TABLE `" + getTableName() + "` ("
