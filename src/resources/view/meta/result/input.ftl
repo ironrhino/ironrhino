@@ -246,7 +246,7 @@
 					<input type="hidden" name="__datagrid_${entityName}.${key}"/>
 					<label class="control-label">${action.getText(label)}</label>
 					<div class="controls">
-						<table class="table table-bordered middle datagrid ${config.cssClass}" style="table-layout:fixed;">
+						<table class="table table-bordered table-fixed middle datagrid ${config.cssClass}">
 						<thead>
 							<tr>
 								<#list embeddedUiConfigs.entrySet() as entry>

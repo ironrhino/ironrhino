@@ -124,7 +124,7 @@
 					</#if>
 				<#elseif config.type=='collection'&&config.embeddedUiConfigs??>
 					<#assign embeddedUiConfigs=config.embeddedUiConfigs/>
-					<table class="table table-bordered middle ${config.cssClass}" style="table-layout:fixed;">
+					<table class="table table-bordered table-fixed middle ${config.cssClass}">
 					<thead>
 						<tr>
 							<#list embeddedUiConfigs.entrySet() as entry>

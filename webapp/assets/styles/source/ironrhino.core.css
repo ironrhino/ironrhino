@@ -22,6 +22,13 @@ td.center {
 td.middle {
 	vertical-align:middle;
 }
+.table-fixed{
+	table-layout:fixed;
+}
+.table-fixed > thead > tr > th,.table-fixed > thead > tr > td,.table-fixed > tbody > tr > td{
+	word-wrap:break-word;
+	word-break:break-all;
+}
 .navbar-fixed-top, .navbar-fixed-bottom{
 	z-index: 1000;
 	font-size:1.1em;
