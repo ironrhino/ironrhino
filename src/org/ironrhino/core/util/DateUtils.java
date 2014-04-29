@@ -84,6 +84,31 @@ public class DateUtils {
 				endDate.getTime() - startDate.getTime(), TimeUnit.MILLISECONDS) + 1;
 	}
 
+	public static boolean isSpanLeapDay(Date startDate, Date endDate) {
+		return !endDate.before(nextLeapDay(startDate));
+	}
+
+	public static Date nextLeapDay(Date since) {
+		since = beginOfDay(since);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(since);
+		int year = cal.get(Calendar.YEAR);
+		if (isLeapYear(year)) {
+			Date leapDay = parseDate8(year + "0229");
+			if (!since.after(leapDay))
+				return leapDay;
+		}
+		while (!isLeapYear(++year))
+			;
+		return parseDate8(year + "0229");
+	}
+
+	public static boolean isLeapYear(int year) {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, year);
+		return cal.getActualMaximum(Calendar.DAY_OF_YEAR) > 365;
+	}
+
 	public static Date parseDate10(String string) {
 		try {
 			return DATE10_DF.parse(string);
