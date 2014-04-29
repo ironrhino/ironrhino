@@ -30678,7 +30678,7 @@ $(function () {
 // 5.exchange Hour pattern HH and hh
 // 6.comment this.set(); in hide()
 // 7.comment this.set(); in hide()
-// 8.add if(position='absolute' && $(document).height()-offset.top < 300)
+// 8.add if ($(document).height() - offset.top < 300)
 // 9.rename icon- to glyphicon-
 (function($) {
 
@@ -30942,8 +30942,14 @@ $(function () {
 					: this.$element.offset();
 			this.width = this.component ? this.component.outerWidth()
 					: this.$element.outerWidth();
-			offset.top = offset.top + this.height;
-
+			if ($(document).height() - offset.top < 300){
+				offset.top = offset.top - this.widget.height() - 18;
+				this.widget.addClass('upon');
+			}else{
+				offset.top = offset.top + this.height;
+				this.widget.removeClass('upon');
+			}
+			
 			var $window = $(window);
 
 			if (this.options.width != undefined) {
@@ -30976,11 +30982,6 @@ $(function () {
 				left : offset.left,
 				right : offset.right
 			});
-			if (position = 'absolute'
-					&& $(document).height() - offset.top < 300)
-				$("html, body").animate({
-					scrollTop : $(document).height()
-				}, 200);
 		},
 
 		notifyChange : function() {
