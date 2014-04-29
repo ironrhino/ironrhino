@@ -33493,6 +33493,9 @@ Observation.common = function(container) {
 				});
 		if (this.tagName == 'FORM') {
 			var options = {
+				beforeSerialize : function() {
+					Ajax.fire(target, 'onbeforeserialize');
+				},
 				beforeSubmit : function() {
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
@@ -33553,7 +33556,8 @@ Observation.common = function(container) {
 							$.history.load('!' + hash);
 						}
 					}
-					Ajax.fire(target, 'onbeforesubmit');
+					if (Ajax.fire(target, 'onbeforesubmit') === false)
+						return false;
 				},
 				error : function() {
 					Form.focus(target);
@@ -33818,10 +33822,11 @@ Observation.checkavailable = function(container) {
 		options = options || {};
 		$.extend(_options, options);
 		options = _options;
-		if (typeof options.beforeSubmit == 'function') {
-			if (options.beforeSubmit() === false)
+		if (typeof options.beforeSerialize == 'function') {
+			if (options.beforeSerialize() === false)
 				return false;
 		}
+
 		var progress;
 		if (files.length) {
 			if (!options.progress) {
@@ -33902,6 +33907,14 @@ Observation.checkavailable = function(container) {
 				$.each(options.data, function(k, v) {
 							formData.append(k, v);
 						});
+			if (typeof options.beforeSubmit == 'function') {
+				if (options.beforeSubmit() === false)
+					return;
+			}
+			if (typeof options.beforeSend == 'function') {
+				if (options.beforeSend() === false)
+					return;
+			}
 			xhr.send(formData);
 			return true;
 		} else {
@@ -33972,8 +33985,14 @@ Observation.checkavailable = function(container) {
 							body.append('--');
 							body.append(boundary);
 							body.append('--');
-							if (typeof options['beforeSend'] != 'undefined')
-								options['beforeSend']();
+							if (typeof options.beforeSubmit == 'function') {
+								if (options.beforeSubmit() === false)
+									return;
+							}
+							if (typeof options.beforeSend == 'function') {
+								if (options.beforeSend() === false)
+									return;
+							}
 							xhr.send(body.getBlob());
 						}
 					};
@@ -33983,8 +34002,14 @@ Observation.checkavailable = function(container) {
 			}
 			body = compose(files, options, boundary);
 			if (body) {
-				if (typeof options['beforeSend'] != 'undefined')
-					options['beforeSend']();
+				if (typeof options.beforeSubmit == 'function') {
+					if (options.beforeSubmit() === false)
+						return;
+				}
+				if (typeof options.beforeSend == 'function') {
+					if (options.beforeSend() === false)
+						return;
+				}
 				if (xhr.sendAsBinary)
 					xhr.sendAsBinary(body);
 				else

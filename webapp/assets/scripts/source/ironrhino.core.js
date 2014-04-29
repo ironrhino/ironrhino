@@ -1299,6 +1299,9 @@ Observation.common = function(container) {
 				});
 		if (this.tagName == 'FORM') {
 			var options = {
+				beforeSerialize : function() {
+					Ajax.fire(target, 'onbeforeserialize');
+				},
 				beforeSubmit : function() {
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
@@ -1359,7 +1362,8 @@ Observation.common = function(container) {
 							$.history.load('!' + hash);
 						}
 					}
-					Ajax.fire(target, 'onbeforesubmit');
+					if (Ajax.fire(target, 'onbeforesubmit') === false)
+						return false;
 				},
 				error : function() {
 					Form.focus(target);
