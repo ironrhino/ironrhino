@@ -1,7 +1,7 @@
 (function($) {
 	var current;
 	function find(expr, container) {
-		if (!container)
+		if (!container || expr.indexOf('#') > -1)
 			container = document;
 		var i = expr.indexOf('@');
 		if (i == 0)
@@ -12,7 +12,7 @@
 	}
 	function val(expr, container, val, html) {// expr #id #id@attr .class@attr
 		// @attr
-		if (!container)
+		if (!container || expr.indexOf('#') > -1)
 			container = document;
 		if (!expr)
 			return;
@@ -78,8 +78,8 @@
 			current = $(this);
 			var options = {
 				separator : ',',
-				id: '.listpick-id',
-				name: '.listpick-name',
+				id : '.listpick-id',
+				name : '.listpick-name',
 				idindex : 0,
 				nameindex : 1,
 				multiple : false
