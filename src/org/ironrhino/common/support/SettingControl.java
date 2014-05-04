@@ -20,6 +20,8 @@ import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -154,16 +156,22 @@ public class SettingControl implements
 				.getResourceAsStream("resources/data/setting.txt")) {
 			if (is == null)
 				return;
+			Setting temp;
 			for (String s : IOUtils.readLines(is, "UTF-8")) {
 				if (StringUtils.isBlank(s) || s.trim().startsWith("#"))
 					continue;
-				String arr[] = s.trim().split("\\s+", 2);
+				String arr[] = s.trim().split("#", 2);
 				String description = null;
 				if (arr.length == 2)
-					description = arr[1];
-				arr = arr[0].split("\\s*=\\s*", 2);
-				if (arr.length < 2 || entityManager.findOne(arr[0]) != null)
+					description = arr[1].trim();
+				arr = arr[0].trim().split("\\s*=\\s*", 2);
+				if (arr.length < 2)
 					continue;
+				if ((temp = entityManager.findOne(arr[0])) != null)
+					if (AppInfo.getStage() == Stage.DEVELOPMENT)
+						entityManager.delete(temp);
+					else
+						continue;
 				Setting setting = new Setting(arr[0], arr[1]);
 				setting.setDescription(description);
 				entityManager.save(setting);
