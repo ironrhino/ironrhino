@@ -31009,7 +31009,8 @@ MessageBundle = {
 		'maximum.exceeded' : '{0} ,超过最大限制数{1}',
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
 		'data.invalid' : '数据错误,请检查',
-		'repeat.not.matched' : '两次输入不一致'
+		'repeat.not.matched' : '两次输入不一致',
+		'other': '其他'
 	},
 	get : function() {
 		var key = arguments[0];
@@ -37283,7 +37284,8 @@ if (window.FileReader)
 			var groups = {};
 			$('[data-group],.control-group', t).each(function() {
 						var ct = $(this);
-						var group = ct.data('group') || '';
+						var group = ct.data('group')
+								|| MessageBundle.get('other');
 						var cts = groups[group];
 						if (!cts) {
 							cts = [];

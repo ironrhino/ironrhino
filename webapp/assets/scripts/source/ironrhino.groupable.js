@@ -9,7 +9,8 @@
 			var groups = {};
 			$('[data-group],.control-group', t).each(function() {
 						var ct = $(this);
-						var group = ct.data('group') || '';
+						var group = ct.data('group')
+								|| MessageBundle.get('other');
 						var cts = groups[group];
 						if (!cts) {
 							cts = [];
