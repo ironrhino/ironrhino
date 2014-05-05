@@ -10,33 +10,49 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+/**
+ * ZooKeeper应用客户端连接服务端的配置器
+ */
 @Configuration
 @Profile(CLUSTER)
 public class ZooKeeperConfiguration {
 
-	@Value("${zooKeeper.connectString:localhost:2181}")
-	private String connectString;
+  /**
+   * ZooKeeper服务端地址
+   */
+  @Value("${zooKeeper.connectString:localhost:2181}")
+  private String connectString;
 
-	@Value("${zooKeeper.connectionTimeout:10000}")
-	private int connectionTimeout;
+  /**
+   * 设置连接超时
+   */
+  @Value("${zooKeeper.connectionTimeout:10000}")
+  private int connectionTimeout;
 
-	@Value("${zooKeeper.sessionTimeout:60000}")
-	private int sessionTimeout;
+  /**
+   * 设置session过期
+   */
+  @Value("${zooKeeper.sessionTimeout:60000}")
+  private int sessionTimeout;
 
-	public @Bean(initMethod = "start", destroyMethod = "close")
-	CuratorFramework curatorFramework() {
-		CuratorFramework curatorFramework = CuratorFrameworkFactory.builder()
-				.connectString(connectString)
-				.retryPolicy(new ExponentialBackoffRetry(1000, 3))
-				.connectionTimeoutMs(connectionTimeout)
-				.sessionTimeoutMs(sessionTimeout).build();
-		curatorFramework.getCuratorListenable().addListener(defaultWatcher());
-		return curatorFramework;
-	}
+  /**
+   * 实例化curatorFramework连接器, 并加载CuratorListener默认的监听器.
+   * 
+   * @return curatorFramework
+   */
+  public @Bean(initMethod = "start", destroyMethod = "close")
+  CuratorFramework curatorFramework() {
+    CuratorFramework curatorFramework =
+        CuratorFrameworkFactory.builder().connectString(connectString)
+            .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+            .connectionTimeoutMs(connectionTimeout).sessionTimeoutMs(sessionTimeout).build();
+    curatorFramework.getCuratorListenable().addListener(defaultWatcher());
+    return curatorFramework;
+  }
 
-	public @Bean
-	DefaultWatcher defaultWatcher() {
-		return new DefaultWatcher();
-	}
+  public @Bean
+  DefaultWatcher defaultWatcher() {
+    return new DefaultWatcher();
+  }
 
 }

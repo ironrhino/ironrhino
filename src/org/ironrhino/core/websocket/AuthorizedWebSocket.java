@@ -20,6 +20,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+/**
+ * WebSocket验证器，允许登录用户连接WebSocket.
+ */
 public class AuthorizedWebSocket {
 
 	public static final String USER_PROPERTIES_NAME_USERNAME = "username";

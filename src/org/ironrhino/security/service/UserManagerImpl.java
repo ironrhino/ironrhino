@@ -27,6 +27,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 用户接口实现，通过范型重载基类实现
+ */
 @Component
 @Order(0)
 public class UserManagerImpl extends BaseManagerImpl<User> implements
@@ -35,9 +38,13 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 	@Autowired(required = false)
 	private List<UserRoleMapper> userRoleMappers;
 
+	// 密码过期天数
 	@Value("${userManager.passwordExpiresInDays:0}")
 	private int passwordExpiresInDays;
 
+	/**
+	 * 删除用户成功后AOP实现清空缓存中的用户对象
+	 */
 	@Override
 	@Transactional
 	@EvictCache(namespace = "user", key = "${[user.username,user.email]}")
@@ -45,6 +52,9 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 		super.delete(user);
 	}
 
+	/**
+     * 新增用户成功后AOP实现清空缓存中的用户对象
+     */
 	@Override
 	@Transactional
 	@EvictCache(namespace = "user", key = "${[user.username,user.email]}")

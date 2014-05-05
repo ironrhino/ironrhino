@@ -7,6 +7,9 @@ import org.ironrhino.common.model.Page;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.service.BaseManager;
 
+/**
+ * CMS内容页面管理接口
+ */
 public interface PageManager extends BaseManager<Page> {
 
 	public Page getByPath(String path);

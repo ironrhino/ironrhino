@@ -4,8 +4,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 缓存管理接口
+ */
 public interface CacheManager {
-
+    // 缓存对象存活时间，时间单位：秒
 	String DEFAULT_TIME_TO_LIVE = "3600";
 
 	String DEFAULT_TIME_TO_IDLE = "-1";

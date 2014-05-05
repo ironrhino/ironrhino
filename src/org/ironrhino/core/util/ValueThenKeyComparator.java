@@ -3,6 +3,9 @@ package org.ironrhino.core.util;
 import java.util.Comparator;
 import java.util.Map;
 
+/**
+ * 对K,V型的数据结构提供精准的匹配对比工具, 两个对象的键和值完全一致性比较.
+ */
 public class ValueThenKeyComparator<K, V> implements
 		Comparator<Map.Entry<K, V>> {
 

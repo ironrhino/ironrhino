@@ -6,8 +6,11 @@ import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 
+/**
+ * OAuth管理接口
+ */
 public interface OAuthManager {
-
+    // 默认过期时间，时间单位：秒
 	long DEFAULT_EXPIRE_TIME = 14 * 24 * 3600;
 
 	public Authorization generate(Client client, String redirectUri,

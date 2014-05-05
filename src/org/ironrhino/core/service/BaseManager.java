@@ -11,6 +11,9 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.ResultPage;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
+/**
+ * 通用父类接口定义，默认实现了范型对象的增删改查通用功能
+ */
 public interface BaseManager<T extends Persistable<?>> {
 
 	public Class<? extends Persistable<?>> getEntityClass();

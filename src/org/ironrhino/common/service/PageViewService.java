@@ -6,6 +6,9 @@ import java.util.Set;
 
 import org.ironrhino.common.model.tuples.Pair;
 
+/**
+ * 页面访问量统计服务接口
+ */
 public interface PageViewService {
 
 	public void put(Date date, String ip, String url, String sessionId,

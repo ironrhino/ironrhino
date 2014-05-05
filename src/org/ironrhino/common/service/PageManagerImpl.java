@@ -29,10 +29,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * CMS内容页面管理实现类
+ */
 @Component
 public class PageManagerImpl extends BaseManagerImpl<Page> implements
 		PageManager {
-
+  
+    /**
+     * 全文搜索
+     */
 	@Autowired(required = false)
 	private transient ElasticSearchService<Page> elasticSearchService;
 

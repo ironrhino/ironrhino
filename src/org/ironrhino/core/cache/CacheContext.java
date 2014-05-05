@@ -18,6 +18,9 @@ import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionContext;
 
+/**
+ * 缓存内容片断
+ */
 public class CacheContext {
 
 	private static Logger log = LoggerFactory.getLogger(CacheContext.class);

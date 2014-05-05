@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * 缓存AOP实现类
+ */
 @Aspect
 @Component
 public class CacheAspect extends BaseAspect {

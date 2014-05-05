@@ -29,6 +29,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+/**
+ * 缓存的xmemcached实现
+ */
 @Component("cacheManager")
 @Profile(CLUSTER)
 public class MemcachedCacheManager implements CacheManager {

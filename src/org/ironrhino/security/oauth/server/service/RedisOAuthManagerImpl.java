@@ -21,6 +21,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * OAuth管理集群环境实现类
+ */
 @Component("oauthManager")
 @Profile(CLUSTER)
 public class RedisOAuthManagerImpl implements OAuthManager {
