@@ -315,14 +315,14 @@
 									</#if>
 									<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key value="${entity[key][index][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
 								<#elseif config.type=='listpick'>
-										<div class="<#if !readonly>_</#if>listpick" data-options="{'url':'<@url value=config.pickUrl/>'}">
+										<div class="<#if readonly>_</#if>listpick" data-options="{'url':'<@url value=config.pickUrl/>'}">
 										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="listpick-id ${config.cssClass}"/>
-										<span class="listpick-name"><#if entity[key][index][entry.key]??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if></#if></span>
+										<span class="listpick-name"><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></span>
 										</div>
 								<#elseif config.type=='treeselect'>
-										<div class="<#if !readonly>_</#if>treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}">
+										<div class="<#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=config.pickUrl/>','cache':false}">
 										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="treeselect-id ${config.cssClass}"/>
-										<span class="treeselect-name"><#if entity[key][index][entry.key]??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if></#if></span>
+										<span class="treeselect-name"><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></span>
 										</div>
 								<#else>
 									<#if config.cssClass?contains('datetime')>

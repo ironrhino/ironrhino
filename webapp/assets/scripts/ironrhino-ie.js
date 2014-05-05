@@ -32394,7 +32394,12 @@ Message = {
 							"opacity" : 0.8
 						});
 			} else if (field.is('[type="hidden"]')) {
-				if (cgroup.length) {
+				var fp = field.parent('.listpick,.treeselect');
+				if (fp.length) {
+					cgroup.removeClass('error');
+					$('<span class="field-error">' + msg + '</span>')
+							.appendTo(fp);
+				} else if (cgroup.length) {
 					// $('.controls span', cgroup).text('');
 					$('<span class="field-error">' + msg + '</span>')
 							.appendTo($('.controls', cgroup));
@@ -36725,6 +36730,8 @@ Observation.sortableTable = function(container) {
 				$(this).remove();
 			}
 		});
+		$('.listpick-name,.treeselect-name', r)
+				.html('<i class="glyphicon glyphicon-list"></i>');
 		$('.removeonadd', r).remove();
 		$('.hideonadd', r).hide();
 		$('.showonadd', r).show();

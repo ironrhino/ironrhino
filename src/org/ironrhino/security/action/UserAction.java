@@ -9,6 +9,9 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
+import org.hibernate.criterion.DetachedCriteria;
+import org.ironrhino.core.hibernate.CriteriaState;
+import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.CurrentPassword;
 import org.ironrhino.core.metadata.JsonConfig;
@@ -97,6 +100,12 @@ public class UserAction extends EntityAction<User> {
 
 	public boolean isUserPasswordReadonly() {
 		return userPasswordReadonly;
+	}
+
+	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {
+		String role = ServletActionContext.getRequest().getParameter("role");
+		if (StringUtils.isNotBlank(role))
+			dc.add(CriterionUtils.matchTag("rolesAsString", role));
 	}
 
 	@Override

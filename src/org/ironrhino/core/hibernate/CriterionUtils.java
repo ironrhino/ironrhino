@@ -99,6 +99,14 @@ public class CriterionUtils {
 									- CRITERION_ORDER_SUFFIX.length());
 					String s = parameterMap.get(parameterName)[0];
 					Boolean desc = s.equalsIgnoreCase("desc");
+					if (propertyName.equals("id")
+							|| propertyName.endsWith("Date")) {
+						if (desc)
+							dc.addOrder(Order.desc(propertyName));
+						else
+							dc.addOrder(Order.asc(propertyName));
+						continue;
+					}
 					if (propertyName.startsWith(entityName + "."))
 						propertyName = propertyName.substring(propertyName
 								.indexOf('.') + 1);
