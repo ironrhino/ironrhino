@@ -24,12 +24,15 @@ import org.springframework.stereotype.Component;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.util.LocalizedTextUtil;
 
+/**
+ * 用户角色管理实现类
+ */
 @Component
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class UserRoleManager {
 
 	private Set<String> staticRoles;
-
+	// 设置互斥使用的权限
 	@Value("${userRoleManager.rolesMutex:}")
 	private String rolesMutex;
 

@@ -23,25 +23,28 @@ import com.opensymphony.xwork2.inject.Container;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
+/**
+ * 模板定义类
+ */
 @Component
 public class TemplateProvider {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
-
+	// 项目ftl页面路径
 	@Value("${ironrhino.view.ftl.location:"
 			+ AutoConfigResult.DEFAULT_FTL_LOCATION + "}")
 	private String ftlLocation;
-
+	// ftl页面存放在类的路径
 	@Value("${ironrhino.view.ftl.classpath:"
 			+ AutoConfigResult.DEFAULT_FTL_CLASSPATH + "}")
 	private String ftlClasspath;
-
+	// 根路径
 	@Value("${base:}")
 	private String base;
-
+	// 静态文件路径
 	@Value("${assetsBase:}")
 	private String assetsBase;
-
+	//  SSO服务器路径
 	@Value("${ssoServerBase:}")
 	private String ssoServerBase;
 

@@ -31,6 +31,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.io.Files;
 
+/**
+ * 文件存储Mongo简单实现
+ */
 @Component("fileStorage")
 @Profile({ CLOUD, CLUSTER })
 public class MongoFileStorage implements FileStorage {

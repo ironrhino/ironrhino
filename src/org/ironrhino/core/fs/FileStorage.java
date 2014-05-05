@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 文件存储接口定义
+ */
 public interface FileStorage {
 
 	public void write(InputStream is, String path) throws IOException;

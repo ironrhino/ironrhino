@@ -30,12 +30,15 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+/**
+ * 文件本地化存储实现
+ */
 @Component("fileStorage")
 @Profile({ DEFAULT, DUAL })
 public class LocalFileStorage implements FileStorage {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
+	// 本地存储路径
 	@Value("${fileStorage.uri:file:///${app.context}/assets/}")
 	protected String uri;
 

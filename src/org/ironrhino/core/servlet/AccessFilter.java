@@ -28,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * 请求过滤器, 记录日志
+ */
 @Component
 public class AccessFilter implements Filter {
 
@@ -38,14 +41,14 @@ public class AccessFilter implements Filter {
 	public static final long DEFAULT_RESPONSETIMETHRESHOLD = 5000;
 
 	public static final boolean DEFAULT_PRINT = true;
-
+	// 设置请求响应时间阀门值，时间单位毫秒
 	@Value("${accessFilter.responseTimeThreshold:"
 			+ DEFAULT_RESPONSETIMETHRESHOLD + "}")
 	public long responseTimeThreshold = DEFAULT_RESPONSETIMETHRESHOLD;
-
+	// 日志打印开关
 	@Value("${accessFilter.print:" + DEFAULT_PRINT + "}")
 	private boolean print = DEFAULT_PRINT;
-
+	// 日志记录的例外规则
 	@Value("${accessFilter.excludePatterns:}")
 	private String excludePatterns;
 

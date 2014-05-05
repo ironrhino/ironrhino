@@ -40,6 +40,9 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * JDBC查询服务实现类
+ */
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class JdbcQueryService {

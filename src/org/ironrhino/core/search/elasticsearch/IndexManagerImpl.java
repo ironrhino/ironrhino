@@ -56,11 +56,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 
+/**
+ * ElasticSearch索引管理实现类
+ */
 @SuppressWarnings(value = { "unchecked", "rawtypes" })
 public class IndexManagerImpl implements IndexManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
+	// 设置索引名称
 	@Value("${indexManager.indexName:ironrhino}")
 	private String indexName;
 

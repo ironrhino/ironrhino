@@ -10,17 +10,20 @@ import org.ironrhino.core.struts.BaseAction;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+/**
+ * 留言反馈内容控制器
+ */
 @AutoConfig(namespace = "/")
 public class SubmitFeedbackAction extends BaseAction {
 
 	private static final long serialVersionUID = -8376029703532190694L;
-
+	// 应用标识
 	private String domain;
-
+	// 标题
 	private String name;
-
+	// 联系方式
 	private String contact;
-
+	// 反馈内容
 	private String content;
 
 	@Resource

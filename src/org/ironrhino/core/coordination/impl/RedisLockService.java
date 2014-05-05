@@ -15,6 +15,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * Redis锁服务
+ */
 @Component("lockService")
 @Profile({ DUAL, CLOUD })
 public class RedisLockService implements LockService {
@@ -26,7 +29,7 @@ public class RedisLockService implements LockService {
 	@Autowired
 	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
-
+	// 设置锁超时间, 时间单位毫秒
 	@Value("${lockService.timeout:300}")
 	private int timeout = 300;
 

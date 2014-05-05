@@ -22,6 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+/**
+ * zookeeper服务注册器, 使用CuratorFramework管理连接
+ */
 @Component("serviceRegistry")
 @Profile(CLUSTER)
 public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements

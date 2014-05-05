@@ -28,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.io.Files;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+/**
+ * 文件上传控制器
+ */
 @AutoConfig(fileupload = "image/*,text/*,application/x-shockwave-flash,application/pdf,application/msword,application/vnd.ms-powerpoint,application/octet-stream")
 public class UploadAction extends BaseAction {
 

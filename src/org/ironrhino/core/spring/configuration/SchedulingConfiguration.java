@@ -17,15 +17,18 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
+/**
+ * 基于spring调度器的默认配置实现
+ */
 @EnableScheduling
 @EnableAsync(proxyTargetClass = true, order = -1)
 @Configuration
 public class SchedulingConfiguration implements SchedulingConfigurer,
 		AsyncConfigurer {
-
+    // 调度器线程池容量设置
 	@Value("${taskScheduler.poolSize:5}")
 	private int taskSchedulerPoolSize = 5;
-
+	// 任务执行器线程池容量设置
 	@Value("${taskExecutor.poolSize:5}")
 	private int taskExecutorPoolSize = 5;
 

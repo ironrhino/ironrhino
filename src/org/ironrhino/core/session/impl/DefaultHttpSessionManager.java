@@ -18,6 +18,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * HttpSession管理默认实现类
+ */
 @Component("httpSessionManager")
 public class DefaultHttpSessionManager implements HttpSessionManager {
 
@@ -30,7 +33,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	public static final int DEFAULT_MAXINACTIVEINTERVAL = 43200; // in seconds
 
 	public static final int DEFAULT_MINACTIVEINTERVAL = 60;// in seconds
-
+	// session跟踪标识名称
 	@Value("${httpSessionManager.sessionTrackerName:"
 			+ DEFAULT_SESSION_TRACKER_NAME + "}")
 	private String sessionTrackerName = DEFAULT_SESSION_TRACKER_NAME;

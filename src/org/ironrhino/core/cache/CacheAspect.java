@@ -30,10 +30,10 @@ public class CacheAspect extends BaseAspect {
 
 	@Autowired
 	private CacheManager cacheManager;
-
+  // 防雪崩
 	@Value("${cacheAspect.mutex:true}")
 	private boolean mutex;
-
+  // 互斥等待时长，时间单位毫秒
 	@Value("${cacheAspect.mutexWait:" + DEFAULT_MUTEX_WAIT + "}")
 	private int mutexWait = DEFAULT_MUTEX_WAIT;
 

@@ -26,6 +26,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * JDBC更新服务实现类
+ */
 public class JdbcUpdateService {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());

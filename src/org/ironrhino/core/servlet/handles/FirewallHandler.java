@@ -12,12 +12,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+/**
+ * 防火墙规则设置
+ */
 @Component
 @Order(Integer.MIN_VALUE)
 public class FirewallHandler implements AccessHandler {
 
 	public static final String KEY_ALLOWEDADDRPATTERN = "firewallHandler.allowedAddrPattern";
-
+	 // 防火墙允许规则设置
 	@Value("${" + KEY_ALLOWEDADDRPATTERN + ":}")
 	private String allowedAddrPattern;
 

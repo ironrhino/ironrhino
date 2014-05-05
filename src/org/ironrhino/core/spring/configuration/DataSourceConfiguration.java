@@ -19,6 +19,9 @@ import com.jolbox.bonecp.BoneCPDataSource;
 import com.jolbox.bonecp.ConnectionHandle;
 import com.jolbox.bonecp.hooks.AbstractConnectionHook;
 
+/**
+ * 数据源连接参数配置
+ */
 @Configuration
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class DataSourceConfiguration {

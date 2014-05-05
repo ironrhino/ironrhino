@@ -34,13 +34,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+/**
+ * 系统参数设置控制器
+ */
 @AutoConfig(namespace = "/")
 public class SetupAction extends BaseAction {
 
 	private static final long serialVersionUID = -9168529475332327922L;
 
 	private static final String SETUP_ENABLED_KEY = "setup.enabled";
-
+	// 系统设置开关
 	@Value("${" + SETUP_ENABLED_KEY + ":true}")
 	private boolean enabled;
 

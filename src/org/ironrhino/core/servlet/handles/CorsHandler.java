@@ -10,13 +10,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+/**
+ * 使用CORS，发送一些带凭据的跨域请求. 一般默认情况下都是不启用带有凭据的跨域，
+ * 因此如果想要启用的话，只需将XMLHttpRequest的withCredentials属性设置为True.
+ */
 @Component
 @Order(Integer.MIN_VALUE + 1)
 public class CorsHandler implements AccessHandler {
-
+    // 设置相同的请求源开关
 	@Value("${cors.openForSameOrigin:true}")
 	private boolean openForSameOrigin;
-
+	// 设置相同的请求源标识
 	@Value("${cors.xFrameOptions:SAMEORIGIN}")
 	private String xFrameOptions = "SAMEORIGIN";
 
