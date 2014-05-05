@@ -36725,6 +36725,8 @@ Observation.sortableTable = function(container) {
 				$(this).remove();
 			}
 		});
+		$('.listpick-name,.treeselect-name', r)
+				.html('<i class="glyphicon glyphicon-list"></i>');
 		$('.removeonadd', r).remove();
 		$('.hideonadd', r).hide();
 		$('.showonadd', r).show();
