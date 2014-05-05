@@ -36267,9 +36267,12 @@ Richtable = {
 		form = form || $('form.richtable');
 		reloadonclose = reloadonclose || false;
 		useiframe = useiframe || false;
-		var win = $('#_window_');
+		var winid = '_window_';
+		if (form.closest('#_pick_window').length)
+			winid = '_window2_';
+		var win = $('#' + winid);
 		if (!win.length)
-			win = $('<div id="_window_"></div>').appendTo(document.body)
+			win = $('<div id="' + winid + '"></div>').appendTo(document.body)
 					.dialog();
 		if (!useiframe) {
 			// ajax replace
@@ -36284,7 +36287,7 @@ Richtable = {
 				var hash = document.location.hash;
 				if (hash.indexOf('!') == 1)
 					pathname = CONTEXT_PATH + hash.substring(2);
-				$('#_window_ form.ajax').each(function() {
+				$('#' + winid + ' form.ajax').each(function() {
 					var inputform = $(this);
 					$(':input:visible', inputform).filter(function(i) {
 						return $(this).attr('name')
@@ -36333,7 +36336,7 @@ Richtable = {
 					}
 					if (inputform.hasClass('view')
 							&& !(inputform.data('replacement')))
-						inputform.data('replacement', '_window_:content');
+						inputform.data('replacement', winid + ':content');
 					if (!inputform.hasClass('view')
 							&& !inputform.hasClass('keepopen')) {
 						$('button[type=submit]', inputform).click(function(e) {
@@ -36344,14 +36347,14 @@ Richtable = {
 										.hasClass('save_and_create'))
 									// setTimeout(function()
 									// {
-									$('#_window_').dialog('close');
+									$('#' + winid).dialog('close');
 								// }, 1000);
 
 							};
 						});
 					}
 				});
-				$('#_window_ a').each(function() {
+				$('#' + winid + ' a').each(function() {
 					var href = $(this).attr('href');
 					if (href && href.indexOf('http') != 0
 							&& href.indexOf('/') != 0
@@ -36368,7 +36371,7 @@ Richtable = {
 						url : url,
 						cache : false,
 						target : target,
-						replacement : '_window_:content',
+						replacement : winid + ':content',
 						quiet : true
 					});
 		} else {
@@ -36376,7 +36379,7 @@ Richtable = {
 			win.html('<iframe style="width:100%;height:550px;border:0;"/>');
 			url += (url.indexOf('?') > 0 ? '&' : '?') + 'decorator=simple&'
 					+ Math.random();
-			var iframe = $('#_window_ > iframe')[0];
+			var iframe = $('#' + winid + ' > iframe')[0];
 			iframe.src = url;
 			iframe.onload = function() {
 				Dialog.adapt(win, iframe);
@@ -36395,8 +36398,9 @@ Richtable = {
 			closeOnEscape : false,
 			close : function() {
 				if (reloadonclose
-						&& ($('#_window_ form.ajax').hasClass('forcereload') || !$('#_window_ form.ajax')
-								.hasClass('dontreload'))) {
+						&& ($('#' + winid + ' form.ajax')
+								.hasClass('forcereload') || !$('#' + winid
+								+ ' form.ajax').hasClass('dontreload'))) {
 					$('.action .reload', form).addClass('clicked');
 					$(form).submit();
 				}
@@ -36428,7 +36432,8 @@ Richtable = {
 			opt.height = 600;
 		win.dialog(opt);
 		win.dialog('open');
-		win.closest('.ui-dialog').css('z-index', '2000');
+		win.closest('.ui-dialog').css('z-index',
+				winid == '_window_' ? '2000' : '10000');
 		$('.ui-dialog-titlebar-close', win.closest('.ui-dialog')).blur();
 	},
 	click : function(event) {
@@ -36441,7 +36446,8 @@ Richtable = {
 		var idparams;
 		var tr = $(btn).closest('tr');
 		var id = tr.data('rowid')
-				|| $('input[type="checkbox"]:eq(0)', tr).val();
+				|| $('input[type="checkbox"],input[type="radio"]',
+						$('td:eq(0)', tr)).val();
 		if (id) {
 			idparams = 'id=' + id;
 		} else {
@@ -36538,9 +36544,12 @@ Richtable = {
 			Richtable.open(url, reloadonclose, options.iframe, form);
 			delete options.iframe;
 			delete options.reloadonclose;
+			var winid = '_window_';
+			if (form.closest('#_pick_window').length)
+				winid = '_window2_';
 			for (var key in options)
-				$('#_window_').dialog('option', key, options[key]);
-			Dialog.adapt($('#_window_'));
+				$('#' + winid).dialog('option', key, options[key]);
+			Dialog.adapt($('#' + winid));
 			return false;
 		}
 	},
