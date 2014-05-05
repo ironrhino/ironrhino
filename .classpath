@@ -6,12 +6,12 @@
 	<classpathentry kind="lib" path="lib/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="lib/hamcrest-core-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/spring-test-4.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/spring-test-4.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/closure-compiler.jar"/>
 	<classpathentry kind="lib" path="lib/yuicompressor.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aopalliance-1.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjrt-1.7.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjweaver-1.7.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjrt-1.8.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjweaver-1.8.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/bonecp-0.8.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-codec-1.8.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-collections-3.2.1.jar"/>
@@ -43,7 +43,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.0.8.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.10.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.2.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.3.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.6.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-log4j12-1.7.6.jar"/>
@@ -61,48 +61,48 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/antlr-runtime-3.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jasperreports-5.5.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aspects-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-core-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-expression-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jdbc-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-tx-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-web-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webmvc-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/elasticsearch-1.1.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-analyzers-common-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-core-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-highlighter-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-memory-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-queries-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-queryparser-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-join-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-sandbox-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-codecs-4.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-suggest-4.7.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jasperreports-5.5.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aspects-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-core-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-expression-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jdbc-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-tx-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-web-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webmvc-4.0.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/elasticsearch-1.1.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-analyzers-common-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-core-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-highlighter-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-memory-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-queries-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-queryparser-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-join-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-sandbox-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-codecs-4.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-suggest-4.7.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-analysis-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zxing-core-3.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zxing-javase-3.0.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.11.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-commons-1.7.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-mongodb-1.4.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.3.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.3.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.12.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-commons-1.7.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-mongodb-1.4.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.3.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-annotations-2.3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-core-2.3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-databind-2.3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jpa-api-2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-core-1.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/websocket-api-1.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.4.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.4.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.4.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.4.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.4.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.4.2.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-all-9.1.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpmime-4.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/eaxy-0.1.jar"/>

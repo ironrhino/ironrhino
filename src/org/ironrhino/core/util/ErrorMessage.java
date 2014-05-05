@@ -42,8 +42,15 @@ public class ErrorMessage extends RuntimeException {
 	@Override
 	public String getLocalizedMessage() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(LocalizedTextUtil.findText(ExceptionInterceptor.class,
-				message, ActionContext.getContext().getLocale(), message, args));
+		ActionContext context = ActionContext.getContext();
+		if (context == null) {
+			sb.append(message);
+			if (StringUtils.isNotBlank(submessage))
+				sb.append(" : ").append(submessage);
+			return sb.toString();
+		}
+		sb.append(LocalizedTextUtil.findText(ErrorMessage.class, message,
+				ActionContext.getContext().getLocale(), message, args));
 		if (StringUtils.isNotBlank(submessage)) {
 			sb.append(" : ");
 			sb.append(LocalizedTextUtil.findText(ExceptionInterceptor.class,

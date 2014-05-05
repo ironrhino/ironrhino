@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
@@ -157,9 +158,13 @@ public class EntityClassHelper {
 
 				Class<?> elementClass = null;
 				if (Collection.class.isAssignableFrom(pd.getReadMethod()
-						.getReturnType()))
+						.getReturnType())) {
 					elementClass = ReflectionUtils.getGenericClass(pd
 							.getReadMethod().getGenericReturnType(), 0);
+					if (elementClass != null
+							&& elementClass.getAnnotation(Embeddable.class) == null)
+						elementClass = null;
+				}
 				UiConfigImpl uci = new UiConfigImpl(pd.getName(),
 						pd.getPropertyType(), uiConfig);
 				if (pd.getWriteMethod() == null) {

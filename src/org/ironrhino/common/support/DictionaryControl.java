@@ -20,6 +20,8 @@ import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,13 +117,20 @@ public class DictionaryControl implements
 				.getResourceAsStream("resources/data/dictionary.txt")) {
 			if (is == null)
 				return;
+			Dictionary temp = null;
 			String name = null;
 			String description = null;
 			List<LabelValue> items = null;
 			for (String s : IOUtils.readLines(is, "UTF-8")) {
 				if (StringUtils.isBlank(s) || s.trim().startsWith("#")) {
 					if (name != null && items != null) {
-						if (entityManager.findOne(name) == null) {
+						temp = entityManager.findOne(name);
+						if (AppInfo.getStage() == Stage.DEVELOPMENT
+								&& temp != null) {
+							entityManager.delete(temp);
+							temp = null;
+						}
+						if (temp == null) {
 							Dictionary dictionary = new Dictionary();
 							dictionary.setName(name);
 							dictionary.setItems(items);
@@ -134,22 +143,26 @@ public class DictionaryControl implements
 					}
 					continue;
 				}
-				if (s.indexOf('=') < 0) {
-					String[] arr = s.split("\\s+", 2);
-					name = arr[0];
+				if (name == null) {
+					String[] arr = s.split("#", 2);
+					name = arr[0].trim();
 					if (arr.length > 1)
-						description = arr[1];
+						description = arr[1].trim();
 				} else {
 					String[] arr = s.split("\\s*=\\s*", 2);
 					if (items == null)
 						items = new ArrayList<>();
-					items.add(new LabelValue(
-							StringUtils.isNotBlank(arr[1]) ? arr[1] : arr[0],
+					items.add(new LabelValue(arr.length > 1 ? arr[1] : null,
 							arr[0]));
 				}
 			}
 			if (name != null && items != null) {
-				if (entityManager.findOne(name) == null) {
+				temp = entityManager.findOne(name);
+				if (AppInfo.getStage() == Stage.DEVELOPMENT && temp != null) {
+					entityManager.delete(temp);
+					temp = null;
+				}
+				if (temp == null) {
 					Dictionary dictionary = new Dictionary();
 					dictionary.setName(name);
 					dictionary.setItems(items);

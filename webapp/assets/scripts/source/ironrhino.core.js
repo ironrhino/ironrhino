@@ -1005,7 +1005,16 @@ Observation.common = function(container) {
 					}
 					t.datetimepicker(option).on('changeDate', function(e) {
 								t.trigger('validate');
-							});
+							}).on('show', function(e) {
+						$('input.date,input.datetime,input.time',
+								t.closest('form')).not('[readonly]')
+								.not('[disabled]').not(t).each(function(i, v) {
+											var dp = $(v)
+													.data('datetimepicker');
+											if (dp && dp.widget.is(':visible'))
+												dp.hide();
+										});
+					});
 				});
 	$('input.captcha', container).focus(function() {
 				if ($(this).data('_captcha_'))
@@ -1290,6 +1299,9 @@ Observation.common = function(container) {
 				});
 		if (this.tagName == 'FORM') {
 			var options = {
+				beforeSerialize : function() {
+					Ajax.fire(target, 'onbeforeserialize');
+				},
 				beforeSubmit : function() {
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
@@ -1350,7 +1362,8 @@ Observation.common = function(container) {
 							$.history.load('!' + hash);
 						}
 					}
-					Ajax.fire(target, 'onbeforesubmit');
+					if (Ajax.fire(target, 'onbeforesubmit') === false)
+						return false;
 				},
 				error : function() {
 					Form.focus(target);

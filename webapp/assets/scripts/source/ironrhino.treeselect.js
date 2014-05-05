@@ -1,7 +1,7 @@
 (function($) {
 	var current;
 	function find(expr, container) {
-		if (!container)
+		if (!container || expr.indexOf('#') > -1)
 			container = document;
 		var i = expr.indexOf('@');
 		if (i == 0)
@@ -11,8 +11,8 @@
 		return (expr == 'this') ? current : $(expr, container);
 	}
 	function val(expr, container, val, html) {// expr #id #id@attr .class@attr
-												// @attr
-		if (!container)
+		// @attr
+		if (!container || expr.indexOf('#') > -1)
 			container = document;
 		if (!expr)
 			return;
@@ -63,10 +63,10 @@
 		current = $(event.target).closest('.treeselect');
 		var options = current.data('_options');
 		var nametarget = find(options.name);
-		val(options.name,current, nametarget.is(':input,td')
+		val(options.name, current, nametarget.is(':input,td')
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
-		val(options.id,current, '');
+		val(options.id, current, '');
 		if (options.id) {
 			var idtarget = find(options.id);
 			idtarget.removeData('treenode');
@@ -92,18 +92,18 @@
 			current.data('_options', options);
 			var nametarget = null;
 			if (options.name) {
-				nametarget = find(options.name,current);
+				nametarget = find(options.name, current);
 				var remove = nametarget.children('a.remove');
 				if (remove.length) {
 					remove.click(removeAction);
 				} else {
-					var text = val(options.name,current);
+					var text = val(options.name, current);
 					if (text) {
 						if (text.indexOf('...') < 0)
 							$('<a class="remove" href="#">&times;</a>')
 									.appendTo(nametarget).click(removeAction);
 					} else if (!nametarget.is(':input,td')) {
-						val(options.name,current,
+						val(options.name, current,
 								'<i class="glyphicon glyphicon-list"></i>',
 								true);
 					}
@@ -126,7 +126,7 @@
 					$('#_tree_window').closest('.ui-dialog').css('z-index',
 							'2002');
 					if (nametarget && nametarget.length)
-						options.value = val(options.name,current) || '';
+						options.value = val(options.name, current) || '';
 					if (options.type != 'treeview') {
 						options.click = function(treenode) {
 							doclick(treenode, options);
@@ -170,9 +170,9 @@
 
 	function doclick(treenode, options) {
 		if (options.name) {
-			var nametarget = find(options.name,current);
+			var nametarget = find(options.name, current);
 			var name = options.full ? treenode.fullname : treenode.name;
-			val(options.name,current, name);
+			val(options.name, current, name);
 			if (nametarget.is(':input')) {
 				nametarget.trigger('change');
 				var form = nametarget.closest('form');
@@ -184,9 +184,9 @@
 			}
 		}
 		if (options.id) {
-			var idtarget = find(options.id,current);
+			var idtarget = find(options.id, current);
 			var id = treenode[options.idproperty];
-			val(options.id,current, id);
+			val(options.id, current, id);
 			if (idtarget.is(':input')) {
 				idtarget.trigger('change');
 				var form = idtarget.closest('form');

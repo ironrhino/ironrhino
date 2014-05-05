@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.ironrhino.core.util.ErrorMessage;
+import org.ironrhino.core.util.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 import com.opensymphony.xwork2.ActionContext;
@@ -39,12 +39,14 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 							|| cause instanceof OptimisticLockingFailureException) {
 						validationAwareAction.addActionError(findText(
 								"try.again.later", null));
-					} else if (e instanceof DataIntegrityViolationException
-							|| cause instanceof DataIntegrityViolationException) {
-						validationAwareAction.addActionError(findText(
-								"validation.already.exists", null));
-						log.error(e.getMessage(), e);
-					} else {
+					} 
+					// else if (e instanceof DataIntegrityViolationException
+					// || cause instanceof DataIntegrityViolationException) {
+					// validationAwareAction.addActionError(findText(
+					// "validation.already.exists", null));
+					// log.error(e.getMessage(), e);
+					// }
+					else {
 						if (cause != null)
 							while (cause.getCause() != null)
 								cause = cause.getCause();
@@ -71,9 +73,9 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 							validationAwareAction.addActionError(em
 									.getLocalizedMessage());
 						} else {
-							String msg = findText(e.getMessage(), null);
+							String msg = e.getMessage();
 							if (msg == null)
-								msg = e.toString();
+								msg = ExceptionUtils.getDetailMessage(e);
 							validationAwareAction.addActionError(msg);
 							log.error(e.getMessage(), e);
 						}

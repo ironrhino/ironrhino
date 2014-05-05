@@ -8,10 +8,11 @@
 		options = options || {};
 		$.extend(_options, options);
 		options = _options;
-		if (typeof options.beforeSubmit == 'function') {
-			if (options.beforeSubmit() === false)
+		if (typeof options.beforeSerialize == 'function') {
+			if (options.beforeSerialize() === false)
 				return false;
 		}
+
 		var progress;
 		if (files.length) {
 			if (!options.progress) {
@@ -92,6 +93,14 @@
 				$.each(options.data, function(k, v) {
 							formData.append(k, v);
 						});
+			if (typeof options.beforeSubmit == 'function') {
+				if (options.beforeSubmit() === false)
+					return;
+			}
+			if (typeof options.beforeSend == 'function') {
+				if (options.beforeSend() === false)
+					return;
+			}
 			xhr.send(formData);
 			return true;
 		} else {
@@ -162,8 +171,14 @@
 							body.append('--');
 							body.append(boundary);
 							body.append('--');
-							if (typeof options['beforeSend'] != 'undefined')
-								options['beforeSend']();
+							if (typeof options.beforeSubmit == 'function') {
+								if (options.beforeSubmit() === false)
+									return;
+							}
+							if (typeof options.beforeSend == 'function') {
+								if (options.beforeSend() === false)
+									return;
+							}
 							xhr.send(body.getBlob());
 						}
 					};
@@ -173,8 +188,14 @@
 			}
 			body = compose(files, options, boundary);
 			if (body) {
-				if (typeof options['beforeSend'] != 'undefined')
-					options['beforeSend']();
+				if (typeof options.beforeSubmit == 'function') {
+					if (options.beforeSubmit() === false)
+						return;
+				}
+				if (typeof options.beforeSend == 'function') {
+					if (options.beforeSend() === false)
+						return;
+				}
 				if (xhr.sendAsBinary)
 					xhr.sendAsBinary(body);
 				else
