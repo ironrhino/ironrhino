@@ -36433,7 +36433,7 @@ Richtable = {
 		win.dialog(opt);
 		win.dialog('open');
 		win.closest('.ui-dialog').css('z-index',
-				winid == '_window_' ? '2000' : '10000');
+				winid == '_window_' ? '2000' : '2002');
 		$('.ui-dialog-titlebar-close', win.closest('.ui-dialog')).blur();
 	},
 	click : function(event) {
