@@ -32395,7 +32395,7 @@ Message = {
 						});
 			} else if (field.is('[type="hidden"]')) {
 				var fp = field.parent('.listpick,.treeselect');
-				if (fp.length) {
+				if (fp.length && !fp.is('.control-group')) {
 					cgroup.removeClass('error');
 					$('<span class="field-error">' + msg + '</span>')
 							.appendTo(fp);
