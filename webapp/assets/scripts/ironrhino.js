@@ -32353,11 +32353,11 @@ Observation.common = function(container) {
 		if (this.tagName == 'FORM') {
 			var options = {
 				beforeSerialize : function() {
+					if (!Ajax.fire(target, 'onprepare'))
+						return false;
 					Ajax.fire(target, 'onbeforeserialize');
 				},
 				beforeSubmit : function() {
-					if (!Ajax.fire(target, 'onprepare'))
-						return false;
 					$('.action-error').remove();
 					if (!Form.validate(target))
 						return false;
