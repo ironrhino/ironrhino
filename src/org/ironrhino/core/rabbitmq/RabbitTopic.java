@@ -19,6 +19,9 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+/**
+ * 基于Rabbit消息服务器的主题订阅模型
+ */
 public abstract class RabbitTopic<T extends Serializable> implements Topic<T> {
 
 	@Autowired
@@ -26,7 +29,7 @@ public abstract class RabbitTopic<T extends Serializable> implements Topic<T> {
 
 	@Autowired
 	protected RabbitAdmin rabbitAdmin;
-
+	// 标识名称设置
 	@Value("${rabbitmq.exchangeName:ironrhino}")
 	protected String exchangeName;
 

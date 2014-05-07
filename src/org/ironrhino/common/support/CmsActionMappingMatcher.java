@@ -29,21 +29,24 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * CMS路径映射匹配器
+ */
 @Component
 public class CmsActionMappingMatcher implements ActionMappingMatcher,
 		ApplicationListener<EntityOperationEvent> {
 
 	public static final String DEFAULT_PAGE_PATH_PREFIX = "/p/";
-
+	// 访问的一级路径
 	@Value("${cms.pagePathPrefix:" + DEFAULT_PAGE_PATH_PREFIX + "}")
 	private String pagePathPrefix = DEFAULT_PAGE_PATH_PREFIX;
-
+	// CMS路径映射
 	@Value("${" + Constants.SETTING_KEY_CMS_SERIESES + ":}")
 	private String serieses = "";
-
+	// CMS栏目
 	@Value("${" + Constants.SETTING_KEY_CMS_COLUMNS + ":}")
 	private String columns = "";
-
+    // CMS内容
 	@Value("${" + Constants.SETTING_KEY_CMS_ISSUES + ":}")
 	private String issues = "";
 

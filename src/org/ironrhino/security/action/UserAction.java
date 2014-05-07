@@ -35,6 +35,9 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
+/**
+ * 用户控制器
+ */
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class UserAction extends EntityAction<User> {
 
@@ -49,10 +52,10 @@ public class UserAction extends EntityAction<User> {
 	private String password;
 
 	private String confirmPassword;
-
+	// 用户资料只读开关
 	@Value("${user.profile.readonly:false}")
 	private boolean userProfileReadonly;
-
+	// 用户密码只读开关
 	@Value("${user.password.readonly:false}")
 	private boolean userPasswordReadonly;
 
