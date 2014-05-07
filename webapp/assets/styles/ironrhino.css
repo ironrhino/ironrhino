@@ -8324,6 +8324,12 @@ div.text-core{
 .form-horizontal [class*="span"] .controls {
 	margin-left: 80px;
 }
+.form-horizontal .span6 .control-label,.form-horizontal .span4 .control-label{
+	width: 100px;
+}
+.form-horizontal .span6 .controls,.form-horizontal .span4 .controls {
+	margin-left: 120px;
+}
 div.form-horizontal  .control-label{
 	font-weight: bold;
 }
