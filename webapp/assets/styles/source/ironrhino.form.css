@@ -4,17 +4,11 @@
 .form-horizontal .controls {
 	margin-left: 120px;
 }
-.form-horizontal [class*="span"] .control-label{
+.form-horizontal .span3 .control-label,.form-horizontal .span2 .control-label,.form-horizontal .span1 .control-label{
 	width: 60px;
 }
-.form-horizontal [class*="span"] .controls {
+.form-horizontal .span3 .controls,.form-horizontal .span2 .controls,.form-horizontal .span1 .controls {
 	margin-left: 80px;
-}
-.form-horizontal .span6 .control-label,.form-horizontal .span4 .control-label{
-	width: 100px;
-}
-.form-horizontal .span6 .controls,.form-horizontal .span4 .controls {
-	margin-left: 120px;
 }
 div.form-horizontal  .control-label{
 	font-weight: bold;
