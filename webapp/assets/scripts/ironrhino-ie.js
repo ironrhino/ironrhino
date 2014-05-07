@@ -32395,7 +32395,7 @@ Message = {
 						});
 			} else if (field.is('[type="hidden"]')) {
 				var fp = field.parent('.listpick,.treeselect');
-				if (fp.length) {
+				if (fp.length && !fp.is('.control-group')) {
 					cgroup.removeClass('error');
 					$('<span class="field-error">' + msg + '</span>')
 							.appendTo(fp);
@@ -33471,11 +33471,11 @@ Observation.common = function(container) {
 		if (this.tagName == 'FORM') {
 			var options = {
 				beforeSerialize : function() {
+					if (!Ajax.fire(target, 'onprepare'))
+						return false;
 					Ajax.fire(target, 'onbeforeserialize');
 				},
 				beforeSubmit : function() {
-					if (!Ajax.fire(target, 'onprepare'))
-						return false;
 					$('.action-error').remove();
 					if (!Form.validate(target))
 						return false;

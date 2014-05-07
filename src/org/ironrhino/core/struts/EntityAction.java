@@ -706,6 +706,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			UiConfigImpl uiconfig = entry.getValue();
 			Object value = bwp.getPropertyValue(name);
 			if (uiconfig.isRequired()
+					&& !uiconfig.getHiddenInInput().isValue()
 					&& (value == null || value instanceof String
 							&& StringUtils.isBlank(value.toString()))) {
 				addFieldError(getEntityName() + "." + name,
