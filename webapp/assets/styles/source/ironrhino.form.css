@@ -322,7 +322,10 @@ input[type="radio"].custom + label.custom:active, input[type="radio"].custom:che
 .radio.inline+.radio.inline, .checkbox.inline+.checkbox.inline{
 	margin-left: 20px;
 }
-
+[class*="span"] .radio.inline,
+[class*="span"] .checkbox.inline {
+  padding-top: 0;
+}
 select{
 	line-height: 18px;
 	-webkit-appearance: none;
