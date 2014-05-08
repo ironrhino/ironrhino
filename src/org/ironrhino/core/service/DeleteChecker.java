@@ -1,11 +1,15 @@
 package org.ironrhino.core.service;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -13,7 +17,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.metadata.CollectionMetadata;
+import org.hibernate.type.CollectionType;
+import org.hibernate.type.ComponentType;
 import org.hibernate.type.ManyToOneType;
+import org.hibernate.type.OneToOneType;
 import org.hibernate.type.Type;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Enableable;
@@ -31,11 +39,14 @@ public class DeleteChecker {
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	private Map<Class<?>, List<Tuple<Class<?>, String>>> mapping;
+	private Map<Class<?>, List<Tuple<Class<?>, String>>> mapping = new HashMap<Class<?>, List<Tuple<Class<?>, String>>>();
+
+	private Map<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>> componentMapping = new HashMap<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>>();
+
+	private Map<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>> collectionMapping = new HashMap<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>>();
 
 	@PostConstruct
 	public void init() {
-		mapping = new HashMap<Class<?>, List<Tuple<Class<?>, String>>>();
 		Map<String, ClassMetadata> map = sessionFactory.getAllClassMetadata();
 		for (Map.Entry<String, ClassMetadata> entry : map.entrySet()) {
 			ClassMetadata cm = entry.getValue();
@@ -46,8 +57,8 @@ public class DeleteChecker {
 					if (BaseTreeableEntity.class.isAssignableFrom(cm
 							.getMappedClass()) && name.equals("parent"))
 						continue;
-					ManyToOneType mtp = (ManyToOneType) type;
-					Class<?> referrer = mtp.getReturnedClass();
+					ManyToOneType mtoType = (ManyToOneType) type;
+					Class<?> referrer = mtoType.getReturnedClass();
 					List<Tuple<Class<?>, String>> list = mapping.get(referrer);
 					if (list == null) {
 						list = new ArrayList<Tuple<Class<?>, String>>();
@@ -55,10 +66,91 @@ public class DeleteChecker {
 					}
 					list.add(new Tuple<Class<?>, String>(cm.getMappedClass(),
 							name));
+				} else if (type instanceof OneToOneType) {
+					OneToOneType otoType = (OneToOneType) type;
+					Class<?> referrer = otoType.getReturnedClass();
+					List<Tuple<Class<?>, String>> list = mapping.get(referrer);
+					if (list == null) {
+						list = new ArrayList<Tuple<Class<?>, String>>();
+						mapping.put(referrer, list);
+					}
+					list.add(new Tuple<Class<?>, String>(cm.getMappedClass(),
+							name));
+				} else if (type instanceof CollectionType) {
+					if (BaseTreeableEntity.class.isAssignableFrom(cm
+							.getMappedClass()) && name.equals("children"))
+						continue;
+					CollectionType collectionType = (CollectionType) type;
+					CollectionMetadata collectionMetadata = sessionFactory
+							.getCollectionMetadata(collectionType.getRole());
+					Class<?> componentClass = collectionMetadata
+							.getElementType().getReturnedClass();
+					try {
+						Class<?> superClass = componentClass;
+						while (true) {
+							for (Field f : superClass.getDeclaredFields()) {
+								if (f.getAnnotation(ManyToOne.class) != null
+										|| f.getAnnotation(OneToOne.class) != null) {
+									Class<?> referrer = f.getType();
+									List<Tuple<Class<?>, Tuple<String, String>>> list = collectionMapping
+											.get(referrer);
+									if (list == null) {
+										list = new ArrayList<Tuple<Class<?>, Tuple<String, String>>>();
+										collectionMapping.put(referrer, list);
+									}
+									list.add(new Tuple<Class<?>, Tuple<String, String>>(
+											cm.getMappedClass(),
+											new Tuple<String, String>(name, f
+													.getName())));
+								}
+							}
+							superClass = componentClass.getSuperclass();
+							if (superClass.equals(Object.class)
+									|| superClass
+											.getAnnotation(MappedSuperclass.class) == null)
+								break;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+				} else if (type instanceof ComponentType) {
+					ComponentType componentType = (ComponentType) type;
+					Class<?> componentClass = componentType.getReturnedClass();
+					try {
+						Class<?> superClass = componentClass;
+						while (true) {
+							for (Field f : superClass.getDeclaredFields()) {
+								if (f.getAnnotation(ManyToOne.class) != null
+										|| f.getAnnotation(OneToOne.class) != null) {
+									Class<?> referrer = f.getType();
+									List<Tuple<Class<?>, Tuple<String, String>>> list = componentMapping
+											.get(referrer);
+									if (list == null) {
+										list = new ArrayList<Tuple<Class<?>, Tuple<String, String>>>();
+										componentMapping.put(referrer, list);
+									}
+									list.add(new Tuple<Class<?>, Tuple<String, String>>(
+											cm.getMappedClass(),
+											new Tuple<String, String>(name, f
+													.getName())));
+								}
+							}
+							superClass = componentClass.getSuperclass();
+							if (superClass.equals(Object.class)
+									|| superClass
+											.getAnnotation(MappedSuperclass.class) == null)
+								break;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
 				}
 			}
 
 		}
+
 	}
 
 	public void check(Persistable<?> entity) {
@@ -75,6 +167,43 @@ public class DeleteChecker {
 			for (Tuple<Class<?>, String> tuple : references) {
 				Criteria c = session.createCriteria(tuple.getKey());
 				c.add(Restrictions.eq(tuple.getValue(), entity));
+				c.setProjection(Projections.projectionList().add(
+						Projections.rowCount()));
+				long count = (Long) c.uniqueResult();
+				if (count > 0)
+					throw new ErrorMessage("delete.forbidden",
+							new Object[] { entity },
+							"delete.forbidden.referrer");
+			}
+		}
+		List<Tuple<Class<?>, Tuple<String, String>>> componentReferences = componentMapping
+				.get(entity.getClass());
+		if (componentReferences != null && componentReferences.size() > 0) {
+			Session session = sessionFactory.getCurrentSession();
+			for (Tuple<Class<?>, Tuple<String, String>> tuple : componentReferences) {
+				Criteria c = session.createCriteria(tuple.getKey());
+				Tuple<String, String> value = tuple.getValue();
+				c.add(Restrictions.eq(value.getKey() + "." + value.getValue(),
+						entity));
+				c.setProjection(Projections.projectionList().add(
+						Projections.rowCount()));
+				long count = (Long) c.uniqueResult();
+				if (count > 0)
+					throw new ErrorMessage("delete.forbidden",
+							new Object[] { entity },
+							"delete.forbidden.referrer");
+			}
+		}
+		List<Tuple<Class<?>, Tuple<String, String>>> collectionReferences = collectionMapping
+				.get(entity.getClass());
+		if (collectionReferences != null && collectionReferences.size() > 0) {
+			Session session = sessionFactory.getCurrentSession();
+			for (Tuple<Class<?>, Tuple<String, String>> tuple : collectionReferences) {
+				Criteria c = session.createCriteria(tuple.getKey());
+				Tuple<String, String> value = tuple.getValue();
+				c.createAlias(value.getKey(), value.getKey())
+						.add(Restrictions.eq(
+								value.getKey() + "." + value.getValue(), entity));
 				c.setProjection(Projections.projectionList().add(
 						Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
