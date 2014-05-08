@@ -108,9 +108,15 @@
 			}
 			var func = function(event) {
 				current = $(event.target).closest('.listpick');
-				var winid = '_pick_window';
-				if ($('#' + winid).length)
-					winid = '_pick_window2';
+				var winid = current.data('winid');
+				if (winid) {
+					$('#' + winid).remove();
+				} else {
+					var winid = '_pick_window';
+					if ($('#' + winid).length)
+						winid = '_pick_window2';
+					current.data('winid', winid);
+				}
 				var win = $('<div id="' + winid + '" title="'
 						+ MessageBundle.get('select') + '"></div>')
 						.appendTo(document.body).dialog({
