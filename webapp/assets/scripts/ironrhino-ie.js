@@ -38970,6 +38970,24 @@ Observation.treeselect = function(container) {
 												form.addClass('dirty');
 										}
 									}
+									if (options.mapping) {
+										for (var k in options.mapping) {
+											val(
+													k,
+													$(target).data('listpick'),
+													$($(this).closest('tr')[0].cells[options.mapping[k]])
+															.text());
+											var ktarget = find(k, $(target)
+															.data('listpick'));
+											if (ktarget.is(':input')) {
+												ktarget.trigger('change');
+												var form = ktarget
+														.closest('form');
+												if (!form.hasClass('nodirty'))
+													form.addClass('dirty');
+											}
+										}
+									}
 									win.dialog('destroy').remove();
 									return false;
 								});
