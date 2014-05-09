@@ -21,7 +21,7 @@
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
-					ele.val(val).trigger('validate');
+					ele.val(val).trigger('change').trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -173,27 +173,16 @@
 			var nametarget = find(options.name, current);
 			var name = options.full ? treenode.fullname : treenode.name;
 			val(options.name, current, name);
-			if (nametarget.is(':input')) {
-				nametarget.trigger('change');
-				var form = nametarget.closest('form');
-				if (!form.hasClass('nodirty'))
-					form.addClass('dirty');
-			} else {
+			if (!nametarget.is(':input'))
 				$('<a class="remove" href="#">&times;</a>')
 						.appendTo(nametarget).click(removeAction);
-			}
 		}
 		if (options.id) {
 			var idtarget = find(options.id, current);
 			var id = treenode[options.idproperty];
 			val(options.id, current, id);
-			if (idtarget.is(':input')) {
-				idtarget.trigger('change');
-				var form = idtarget.closest('form');
-				if (!form.hasClass('nodirty'))
-					form.addClass('dirty');
+			if (idtarget.is(':input'))
 				idtarget.data('treenode', treenode);
-			}
 		}
 		$('#_tree_window').dialog('close');
 		if (options.select)

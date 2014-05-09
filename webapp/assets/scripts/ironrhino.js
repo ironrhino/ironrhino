@@ -37491,7 +37491,7 @@ Observation.groupable = function(container) {
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
-					ele.val(val).trigger('validate');
+					ele.val(val).trigger('change').trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -37643,27 +37643,16 @@ Observation.groupable = function(container) {
 			var nametarget = find(options.name, current);
 			var name = options.full ? treenode.fullname : treenode.name;
 			val(options.name, current, name);
-			if (nametarget.is(':input')) {
-				nametarget.trigger('change');
-				var form = nametarget.closest('form');
-				if (!form.hasClass('nodirty'))
-					form.addClass('dirty');
-			} else {
+			if (!nametarget.is(':input'))
 				$('<a class="remove" href="#">&times;</a>')
 						.appendTo(nametarget).click(removeAction);
-			}
 		}
 		if (options.id) {
 			var idtarget = find(options.id, current);
 			var id = treenode[options.idproperty];
 			val(options.id, current, id);
-			if (idtarget.is(':input')) {
-				idtarget.trigger('change');
-				var form = idtarget.closest('form');
-				if (!form.hasClass('nodirty'))
-					form.addClass('dirty');
+			if (idtarget.is(':input'))
 				idtarget.data('treenode', treenode);
-			}
 		}
 		$('#_tree_window').dialog('close');
 		if (options.select)
@@ -37698,7 +37687,7 @@ Observation.treeselect = function(container) {
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
-					ele.val(val).trigger('validate');
+					ele.val(val).trigger('change').trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -37745,6 +37734,10 @@ Observation.treeselect = function(container) {
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
 		val(options.id, current, '', false);
+		if (options.mapping) {
+			for (var k in options.mapping)
+				val(k, current, '', false);
+		}
 		$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -37828,29 +37821,16 @@ Observation.treeselect = function(container) {
 														.data('listpick'), name);
 										var nametarget = find(options.name,
 												$(target).data('listpick'));
-										if (nametarget.is(':input')) {
-											nametarget.trigger('change');
-											var form = nametarget
-													.closest('form');
-											if (!form.hasClass('nodirty'))
-												form.addClass('dirty');
-										} else {
+										if (!nametarget.is(':input'))
 											$('<a class="remove" href="#">&times;</a>')
 													.appendTo(nametarget)
 													.click(removeAction);
-										}
 									}
 									if (options.id) {
 										val(options.id, $(target)
 														.data('listpick'), id);
 										var idtarget = find(options.id,
 												$(target).data('listpick'));
-										if (idtarget.is(':input')) {
-											idtarget.trigger('change');
-											var form = idtarget.closest('form');
-											if (!form.hasClass('nodirty'))
-												form.addClass('dirty');
-										}
 									}
 									if (options.mapping) {
 										for (var k in options.mapping) {
@@ -37859,15 +37839,6 @@ Observation.treeselect = function(container) {
 													$(target).data('listpick'),
 													$($(this).closest('tr')[0].cells[options.mapping[k]])
 															.text());
-											var ktarget = find(k, $(target)
-															.data('listpick'));
-											if (ktarget.is(':input')) {
-												ktarget.trigger('change');
-												var form = ktarget
-														.closest('form');
-												if (!form.hasClass('nodirty'))
-													form.addClass('dirty');
-											}
 										}
 									}
 									win.dialog('destroy').remove();
@@ -37894,7 +37865,6 @@ Observation.treeselect = function(container) {
 												.data('listpick'));
 								var name = names.join(separator);
 								if (nametarget.is(':input')) {
-									nametarget.trigger('change');
 									var _names = val(options.name, $(target)
 													.data('listpick'))
 											|| '';
@@ -37908,9 +37878,6 @@ Observation.treeselect = function(container) {
 																	: '') + name)
 															.split(separator))
 													.join(separator));
-									var form = nametarget.closest('form');
-									if (!form.hasClass('nodirty'))
-										form.addClass('dirty');
 								} else {
 									var picked = nametarget.data('picked')
 											|| '';
@@ -37938,12 +37905,6 @@ Observation.treeselect = function(container) {
 												+ (_ids ? separator : '') + id)
 												.split(separator))
 												.join(separator));
-								if (idtarget.is(':input')) {
-									idtarget.trigger('change');
-									var form = idtarget.closest('form');
-									if (!form.hasClass('nodirty'))
-										form.addClass('dirty');
-								}
 							}
 							win.dialog('destroy').remove();
 							return false;

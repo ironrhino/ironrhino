@@ -21,7 +21,7 @@
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
-					ele.val(val).trigger('validate');
+					ele.val(val).trigger('change').trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -68,6 +68,10 @@
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
 		val(options.id, current, '', false);
+		if (options.mapping) {
+			for (var k in options.mapping)
+				val(k, current, '', false);
+		}
 		$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -151,29 +155,16 @@
 														.data('listpick'), name);
 										var nametarget = find(options.name,
 												$(target).data('listpick'));
-										if (nametarget.is(':input')) {
-											nametarget.trigger('change');
-											var form = nametarget
-													.closest('form');
-											if (!form.hasClass('nodirty'))
-												form.addClass('dirty');
-										} else {
+										if (!nametarget.is(':input'))
 											$('<a class="remove" href="#">&times;</a>')
 													.appendTo(nametarget)
 													.click(removeAction);
-										}
 									}
 									if (options.id) {
 										val(options.id, $(target)
 														.data('listpick'), id);
 										var idtarget = find(options.id,
 												$(target).data('listpick'));
-										if (idtarget.is(':input')) {
-											idtarget.trigger('change');
-											var form = idtarget.closest('form');
-											if (!form.hasClass('nodirty'))
-												form.addClass('dirty');
-										}
 									}
 									if (options.mapping) {
 										for (var k in options.mapping) {
@@ -182,15 +173,6 @@
 													$(target).data('listpick'),
 													$($(this).closest('tr')[0].cells[options.mapping[k]])
 															.text());
-											var ktarget = find(k, $(target)
-															.data('listpick'));
-											if (ktarget.is(':input')) {
-												ktarget.trigger('change');
-												var form = ktarget
-														.closest('form');
-												if (!form.hasClass('nodirty'))
-													form.addClass('dirty');
-											}
 										}
 									}
 									win.dialog('destroy').remove();
@@ -217,7 +199,6 @@
 												.data('listpick'));
 								var name = names.join(separator);
 								if (nametarget.is(':input')) {
-									nametarget.trigger('change');
 									var _names = val(options.name, $(target)
 													.data('listpick'))
 											|| '';
@@ -231,9 +212,6 @@
 																	: '') + name)
 															.split(separator))
 													.join(separator));
-									var form = nametarget.closest('form');
-									if (!form.hasClass('nodirty'))
-										form.addClass('dirty');
 								} else {
 									var picked = nametarget.data('picked')
 											|| '';
@@ -261,12 +239,6 @@
 												+ (_ids ? separator : '') + id)
 												.split(separator))
 												.join(separator));
-								if (idtarget.is(':input')) {
-									idtarget.trigger('change');
-									var form = idtarget.closest('form');
-									if (!form.hasClass('nodirty'))
-										form.addClass('dirty');
-								}
 							}
 							win.dialog('destroy').remove();
 							return false;
