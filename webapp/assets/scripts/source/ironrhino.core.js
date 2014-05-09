@@ -758,10 +758,13 @@ Initialization.common = function() {
 
 	}).on('change', 'select', function(e) {
 				var t = $(this);
-				if (!t.val())
-					t.addClass('empty');
-				else
-					t.removeClass('empty');
+				var option = t.find('option:eq(0)');
+				if (!option.attr('value') && option.text()) {
+					if (!t.val())
+						t.addClass('empty');
+					else
+						t.removeClass('empty');
+				}
 			});
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
@@ -873,7 +876,8 @@ if (HISTORY_ENABLED) {
 Observation.common = function(container) {
 	$('select', container).each(function(e) {
 				var t = $(this);
-				if (!t.val())
+				var option = t.find('option:eq(0)');
+				if (!option.attr('value') && option.text() && !t.val())
 					t.addClass('empty');
 			});
 	$('.controls .field-error', container).each(function() {
