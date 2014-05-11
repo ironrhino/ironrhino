@@ -1014,16 +1014,21 @@ Observation.common = function(container) {
 					}
 					t.datetimepicker(option).on('changeDate', function(e) {
 								t.trigger('validate');
-							}).on('show', function(e) {
-						$('input.date,input.datetime,input.time',
-								t.closest('form')).not('[readonly]')
-								.not('[disabled]').not(t).each(function(i, v) {
-											var dp = $(v)
-													.data('datetimepicker');
-											if (dp && dp.widget.is(':visible'))
-												dp.hide();
-										});
-					});
+								var dp = t.data('datetimepicker');
+								if (dp && dp.widget.is(':visible'))
+									dp.hide();
+							})
+					// .on('show', function(e) {
+					// $('input.date,input.datetime,input.time',
+					// t.closest('form')).not('[readonly]')
+					// .not('[disabled]').not(t).each(function(i, v) {
+					// var dp = $(v)
+					// .data('datetimepicker');
+					// if (dp && dp.widget.is(':visible'))
+					// dp.hide();
+					//										});
+					//					})
+					;
 				});
 	$('input.captcha', container).focus(function() {
 				if ($(this).data('_captcha_'))
