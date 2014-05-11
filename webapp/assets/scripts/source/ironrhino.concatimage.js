@@ -39,7 +39,8 @@
 	function concatenateImages(files, target, field, maximum, error) {
 		if (files.length > maximum) {
 			Message.showActionError(MessageBundle.get(error
-							|| 'maximum.exceeded', files.length, maximum));
+							|| 'maximum.exceeded', files.length,
+							maximum), $(target).closest('form'));
 			return;
 		}
 		window.URL = window.URL || window.webkitURL || window.mozURL;

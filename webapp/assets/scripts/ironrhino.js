@@ -30965,6 +30965,7 @@ MessageBundle = {
 		'unsupported.browser' : 'unsupported browser',
 		'action.denied' : 'requested action denied',
 		'maximum.exceeded' : '{0} , exceed maximum {1}',
+		'max.rows.reached' : 'reached max rows : {0}',
 		'pattern.coords.invalid' : 'coords should be between {0} and {1}',
 		'data.invalid' : 'data invalid,please check it.',
 		'repeat.not.matched' : 'repeat match failed'
@@ -31007,6 +31008,7 @@ MessageBundle = {
 		'unsupported.browser' : '你使用的浏览器不支持该功能',
 		'action.denied' : '你拒绝了请求',
 		'maximum.exceeded' : '{0} ,超过最大限制数{1}',
+		'max.rows.reached' : '已经达到了最大行数: {0}',
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
 		'data.invalid' : '数据错误,请检查',
 		'repeat.not.matched' : '两次输入不一致',
@@ -33260,7 +33262,8 @@ Observation.concatsnapshot = function(container) {
 	function concatenateImages(files, target, field, maximum, error) {
 		if (files.length > maximum) {
 			Message.showActionError(MessageBundle.get(error
-							|| 'maximum.exceeded', files.length, maximum));
+							|| 'maximum.exceeded', files.length,
+							maximum), $(target).closest('form'));
 			return;
 		}
 		window.URL = window.URL || window.webkitURL || window.mozURL;
@@ -35552,12 +35555,21 @@ Observation.sortableTable = function(container) {
 
 	var addRow = function(event, options, row, first, skipRename) {
 		var current = $(event.target).closest('tr');
-		var table = current.closest('table');
+		var table = current.closest('table.datagrided');
 		var row = row
 				|| $(event.target).closest('tbody')
 						.children(':not(.nontemplate):eq(0)');
 		if (!row.length)
 			return;
+		var maxrows = parseInt(table.data('maxrows'));
+		if (maxrows) {
+			var currentrows = $('tbody tr', table).length;
+			if (currentrows == maxrows) {
+				Message.showActionError(MessageBundle.get('max.rows.reached',
+								currentrows), table.closest('form'));
+				return;
+			}
+		}
 		var r = row.clone(true);
 		$('*', r).removeAttr('id');
 		$('span.info', r).html('');
