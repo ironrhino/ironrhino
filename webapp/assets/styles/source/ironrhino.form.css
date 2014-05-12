@@ -10,6 +10,12 @@
 .form-horizontal .span3 .controls,.form-horizontal .span2 .controls,.form-horizontal .span1 .controls {
 	margin-left: 80px;
 }
+.form-horizontal .span6 .control-label{
+	width: 180px;
+}
+.form-horizontal .span6 .controls {
+	margin-left: 200px;
+}
 div.form-horizontal  .control-label{
 	font-weight: bold;
 }

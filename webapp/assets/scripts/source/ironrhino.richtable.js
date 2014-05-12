@@ -108,14 +108,15 @@ Richtable = {
 									inputform).val())
 								create = false;
 						}
-						if (create) {
+						if (create && inputform.hasClass('sequential_create')) {
 							$('button[type="submit"]', inputform)
 									.addClass('btn-primary')
-									.after(' <button type="submit" class="btn save_and_create">'
+									.after(' <button type="submit" class="btn sequential_create">'
 											+ MessageBundle
 													.get('save.and.create')
 											+ '</button>');
-							$('.save_and_create', inputform).click(function() {
+							$('.sequential_create', inputform).click(
+									function() {
 										$('form.ajax').addClass('reset');
 									});
 						}
