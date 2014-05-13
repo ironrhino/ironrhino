@@ -32076,8 +32076,8 @@ Observation.common = function(container) {
 					// .data('datetimepicker');
 					// if (dp && dp.widget.is(':visible'))
 					// dp.hide();
-					//										});
-					//					})
+					// });
+					// })
 					;
 				});
 	$('input.captcha', container).focus(function() {
@@ -32364,14 +32364,14 @@ Observation.common = function(container) {
 		if (this.tagName == 'FORM') {
 			var options = {
 				beforeSerialize : function() {
+					$('.action-error').remove();
+					if (!Form.validate(target))
+						return false;
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
 					Ajax.fire(target, 'onbeforeserialize');
 				},
 				beforeSubmit : function() {
-					$('.action-error').remove();
-					if (!Form.validate(target))
-						return false;
 					Indicator.text = $(target).data('indicator');
 					$('button[type="submit"]', target).prop('disabled', true);
 					Ajax.fire(target, 'onloading');
