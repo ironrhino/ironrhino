@@ -32776,7 +32776,7 @@ Observation.checkavailable = function(container) {
 				$(':input', options.target).each(function(i, v) {
 					if (!(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
 							&& !this.checked))
-						formData.append(this.name, $(this).val());
+						formData.append(this.name, fieldValue(this));
 				});
 			} else if (options.data)
 				$.each(options.data, function(k, v) {
@@ -32819,7 +32819,7 @@ Observation.checkavailable = function(container) {
 										.append('Content-Disposition: form-data; name="');
 								bb.append(this.name);
 								bb.append('" ');
-								bb.append($(this).val());
+								bb.append(fieldValue(this));
 								bb.append('\r\n');
 								body.append(bb.getBlob());
 							}
@@ -32895,6 +32895,11 @@ Observation.checkavailable = function(container) {
 			}
 			return true;
 		}
+	}
+
+	function fieldValue(el) {
+		return typeof $.fieldValue != 'undefined' ? $.fieldValue(el) : $(el)
+				.val();
 	}
 
 	function compose(files, options, boundary) {
