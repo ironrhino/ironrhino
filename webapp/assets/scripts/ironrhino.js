@@ -32595,7 +32595,7 @@ var Dialog = {
 			hasRow = $('div.row', doc).length > 0;
 		}
 		if (hasRow)
-			win.dialog('option', 'width', '90%');
+			d.dialog('option', 'width', '90%');
 		d.dialog('option', 'position', 'center');
 		// var height = d.height();
 		// if (height >= $(window).height())
