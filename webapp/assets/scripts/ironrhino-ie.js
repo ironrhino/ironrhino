@@ -33695,8 +33695,10 @@ var Nav = {
 var Dialog = {
 	adapt : function(d, iframe) {
 		var useiframe = iframe != null;
+		var hasRow = false;
 		if (!iframe) {
 			$(d).dialog('option', 'title', Ajax.title);
+			hasRow = $('div.row', d).length > 0;
 		} else {
 			var doc = iframe.document;
 			if (iframe.contentDocument) {
@@ -33708,7 +33710,10 @@ var Dialog = {
 			$(d).dialog('option', 'minHeight', height);
 			var height = $(doc).height() + 20;
 			$(iframe).height(height);
+			hasRow = $('div.row', doc).length > 0;
 		}
+		if (hasRow)
+			win.dialog('option', 'width', '90%');
 		d.dialog('option', 'position', 'center');
 		// var height = d.height();
 		// if (height >= $(window).height())
