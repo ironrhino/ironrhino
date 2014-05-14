@@ -66,8 +66,8 @@ Richtable = {
 			winid = '_window2_';
 		var win = $('#' + winid);
 		if (!win.length)
-			win = $('<div id="' + winid + '"></div>').appendTo(document.body)
-					.dialog();
+			win = $('<div id="' + winid + '" class="window-richtable"></div>')
+					.appendTo(document.body).dialog();
 		if (!useiframe) {
 			// ajax replace
 			var target = win.get(0);

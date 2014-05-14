@@ -122,7 +122,8 @@
 					current.data('winid', winid);
 				}
 				var win = $('<div id="' + winid + '" title="'
-						+ MessageBundle.get('select') + '"></div>')
+						+ MessageBundle.get('select')
+						+ '" class="window-listpick"></div>')
 						.appendTo(document.body).dialog({
 							width : current.data('_options').width || 800,
 							minHeight : current.data('_options').minHeight

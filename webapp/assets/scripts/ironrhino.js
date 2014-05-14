@@ -36300,8 +36300,8 @@ Richtable = {
 			winid = '_window2_';
 		var win = $('#' + winid);
 		if (!win.length)
-			win = $('<div id="' + winid + '"></div>').appendTo(document.body)
-					.dialog();
+			win = $('<div id="' + winid + '" class="window-richtable"></div>')
+					.appendTo(document.body).dialog();
 		if (!useiframe) {
 			// ajax replace
 			var target = win.get(0);
@@ -37806,7 +37806,8 @@ Observation.treeselect = function(container) {
 					current.data('winid', winid);
 				}
 				var win = $('<div id="' + winid + '" title="'
-						+ MessageBundle.get('select') + '"></div>')
+						+ MessageBundle.get('select')
+						+ '" class="window-listpick"></div>')
 						.appendTo(document.body).dialog({
 							width : current.data('_options').width || 800,
 							minHeight : current.data('_options').minHeight
