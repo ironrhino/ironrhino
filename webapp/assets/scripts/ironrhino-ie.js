@@ -32083,6 +32083,7 @@ MessageBundle = {
 		'unsupported.browser' : 'unsupported browser',
 		'action.denied' : 'requested action denied',
 		'maximum.exceeded' : '{0} , exceed maximum {1}',
+		'max.rows.reached' : 'reached max rows : {0}',
 		'pattern.coords.invalid' : 'coords should be between {0} and {1}',
 		'data.invalid' : 'data invalid,please check it.',
 		'repeat.not.matched' : 'repeat match failed'
@@ -32125,6 +32126,7 @@ MessageBundle = {
 		'unsupported.browser' : '你使用的浏览器不支持该功能',
 		'action.denied' : '你拒绝了请求',
 		'maximum.exceeded' : '{0} ,超过最大限制数{1}',
+		'max.rows.reached' : '已经达到了最大行数: {0}',
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
 		'data.invalid' : '数据错误,请检查',
 		'repeat.not.matched' : '两次输入不一致',
@@ -32924,10 +32926,13 @@ Initialization.common = function() {
 
 	}).on('change', 'select', function(e) {
 				var t = $(this);
-				if (!t.val())
-					t.addClass('empty');
-				else
-					t.removeClass('empty');
+				var option = t.find('option:eq(0)');
+				if (!option.attr('value') && option.text()) {
+					if (!t.val())
+						t.addClass('empty');
+					else
+						t.removeClass('empty');
+				}
 			});
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
@@ -33039,7 +33044,8 @@ if (HISTORY_ENABLED) {
 Observation.common = function(container) {
 	$('select', container).each(function(e) {
 				var t = $(this);
-				if (!t.val())
+				var option = t.find('option:eq(0)');
+				if (!option.attr('value') && option.text() && !t.val())
 					t.addClass('empty');
 			});
 	$('.controls .field-error', container).each(function() {
@@ -33176,16 +33182,21 @@ Observation.common = function(container) {
 					}
 					t.datetimepicker(option).on('changeDate', function(e) {
 								t.trigger('validate');
-							}).on('show', function(e) {
-						$('input.date,input.datetime,input.time',
-								t.closest('form')).not('[readonly]')
-								.not('[disabled]').not(t).each(function(i, v) {
-											var dp = $(v)
-													.data('datetimepicker');
-											if (dp && dp.widget.is(':visible'))
-												dp.hide();
-										});
-					});
+								var dp = t.data('datetimepicker');
+								if (dp && dp.widget.is(':visible'))
+									dp.hide();
+							})
+					// .on('show', function(e) {
+					// $('input.date,input.datetime,input.time',
+					// t.closest('form')).not('[readonly]')
+					// .not('[disabled]').not(t).each(function(i, v) {
+					// var dp = $(v)
+					// .data('datetimepicker');
+					// if (dp && dp.widget.is(':visible'))
+					// dp.hide();
+					// });
+					// })
+					;
 				});
 	$('input.captcha', container).focus(function() {
 				if ($(this).data('_captcha_'))
@@ -33471,14 +33482,14 @@ Observation.common = function(container) {
 		if (this.tagName == 'FORM') {
 			var options = {
 				beforeSerialize : function() {
+					$('.action-error').remove();
+					if (!Form.validate(target))
+						return false;
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
 					Ajax.fire(target, 'onbeforeserialize');
 				},
 				beforeSubmit : function() {
-					$('.action-error').remove();
-					if (!Form.validate(target))
-						return false;
 					Indicator.text = $(target).data('indicator');
 					$('button[type="submit"]', target).prop('disabled', true);
 					Ajax.fire(target, 'onloading');
@@ -33684,8 +33695,10 @@ var Nav = {
 var Dialog = {
 	adapt : function(d, iframe) {
 		var useiframe = iframe != null;
+		var hasRow = false;
 		if (!iframe) {
 			$(d).dialog('option', 'title', Ajax.title);
+			hasRow = $('div.row', d).length > 0;
 		} else {
 			var doc = iframe.document;
 			if (iframe.contentDocument) {
@@ -33697,7 +33710,10 @@ var Dialog = {
 			$(d).dialog('option', 'minHeight', height);
 			var height = $(doc).height() + 20;
 			$(iframe).height(height);
+			hasRow = $('div.row', doc).length > 0;
 		}
+		if (hasRow)
+			d.dialog('option', 'width', '90%');
 		d.dialog('option', 'position', 'center');
 		// var height = d.height();
 		// if (height >= $(window).height())
@@ -33878,7 +33894,7 @@ Observation.checkavailable = function(container) {
 				$(':input', options.target).each(function(i, v) {
 					if (!(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
 							&& !this.checked))
-						formData.append(this.name, $(this).val());
+						formData.append(this.name, fieldValue(this));
 				});
 			} else if (options.data)
 				$.each(options.data, function(k, v) {
@@ -33921,7 +33937,7 @@ Observation.checkavailable = function(container) {
 										.append('Content-Disposition: form-data; name="');
 								bb.append(this.name);
 								bb.append('" ');
-								bb.append($(this).val());
+								bb.append(fieldValue(this));
 								bb.append('\r\n');
 								body.append(bb.getBlob());
 							}
@@ -33997,6 +34013,11 @@ Observation.checkavailable = function(container) {
 			}
 			return true;
 		}
+	}
+
+	function fieldValue(el) {
+		return typeof $.fieldValue != 'undefined' ? $.fieldValue(el) : $(el)
+				.val();
 	}
 
 	function compose(files, options, boundary) {
@@ -34374,7 +34395,8 @@ Observation.concatsnapshot = function(container) {
 	function concatenateImages(files, target, field, maximum, error) {
 		if (files.length > maximum) {
 			Message.showActionError(MessageBundle.get(error
-							|| 'maximum.exceeded', files.length, maximum));
+							|| 'maximum.exceeded', files.length,
+							maximum), $(target).closest('form'));
 			return;
 		}
 		window.URL = window.URL || window.webkitURL || window.mozURL;
@@ -36666,12 +36688,21 @@ Observation.sortableTable = function(container) {
 
 	var addRow = function(event, options, row, first, skipRename) {
 		var current = $(event.target).closest('tr');
-		var table = current.closest('table');
+		var table = current.closest('table.datagrided');
 		var row = row
 				|| $(event.target).closest('tbody')
 						.children(':not(.nontemplate):eq(0)');
 		if (!row.length)
 			return;
+		var maxrows = parseInt(table.data('maxrows'));
+		if (maxrows) {
+			var currentrows = $('tbody tr', table).length;
+			if (currentrows == maxrows) {
+				Message.showActionError(MessageBundle.get('max.rows.reached',
+								currentrows), table.closest('form'));
+				return;
+			}
+		}
 		var r = row.clone(true);
 		$('*', r).removeAttr('id');
 		$('span.info', r).html('');
@@ -37397,8 +37428,8 @@ Richtable = {
 			winid = '_window2_';
 		var win = $('#' + winid);
 		if (!win.length)
-			win = $('<div id="' + winid + '"></div>').appendTo(document.body)
-					.dialog();
+			win = $('<div id="' + winid + '" class="window-richtable"></div>')
+					.appendTo(document.body).dialog();
 		if (!useiframe) {
 			// ajax replace
 			var target = win.get(0);
@@ -37439,14 +37470,15 @@ Richtable = {
 									inputform).val())
 								create = false;
 						}
-						if (create) {
+						if (create && inputform.hasClass('sequential_create')) {
 							$('button[type="submit"]', inputform)
 									.addClass('btn-primary')
-									.after(' <button type="submit" class="btn save_and_create">'
+									.after(' <button type="submit" class="btn sequential_create">'
 											+ MessageBundle
 													.get('save.and.create')
 											+ '</button>');
-							$('.save_and_create', inputform).click(function() {
+							$('.sequential_create', inputform).click(
+									function() {
 										$('form.ajax').addClass('reset');
 									});
 						}
@@ -38605,7 +38637,7 @@ Observation.groupable = function(container) {
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
-					ele.val(val).trigger('validate');
+					ele.val(val).trigger('change').trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -38708,7 +38740,7 @@ Observation.groupable = function(container) {
 										|| 500
 							});
 					$('#_tree_window').closest('.ui-dialog').css('z-index',
-							'2002');
+							'2010');
 					if (nametarget && nametarget.length)
 						options.value = val(options.name, current) || '';
 					if (options.type != 'treeview') {
@@ -38757,27 +38789,16 @@ Observation.groupable = function(container) {
 			var nametarget = find(options.name, current);
 			var name = options.full ? treenode.fullname : treenode.name;
 			val(options.name, current, name);
-			if (nametarget.is(':input')) {
-				nametarget.trigger('change');
-				var form = nametarget.closest('form');
-				if (!form.hasClass('nodirty'))
-					form.addClass('dirty');
-			} else {
+			if (!nametarget.is(':input'))
 				$('<a class="remove" href="#">&times;</a>')
 						.appendTo(nametarget).click(removeAction);
-			}
 		}
 		if (options.id) {
 			var idtarget = find(options.id, current);
 			var id = treenode[options.idproperty];
 			val(options.id, current, id);
-			if (idtarget.is(':input')) {
-				idtarget.trigger('change');
-				var form = idtarget.closest('form');
-				if (!form.hasClass('nodirty'))
-					form.addClass('dirty');
+			if (idtarget.is(':input'))
 				idtarget.data('treenode', treenode);
-			}
 		}
 		$('#_tree_window').dialog('close');
 		if (options.select)
@@ -38812,7 +38833,7 @@ Observation.treeselect = function(container) {
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
-					ele.val(val).trigger('validate');
+					ele.val(val).trigger('change').trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -38859,6 +38880,10 @@ Observation.treeselect = function(container) {
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
 		val(options.id, current, '', false);
+		if (options.mapping) {
+			for (var k in options.mapping)
+				val(k, current, '', false);
+		}
 		$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -38899,15 +38924,25 @@ Observation.treeselect = function(container) {
 			}
 			var func = function(event) {
 				current = $(event.target).closest('.listpick');
-				$('#_pick_window').remove();
-				var win = $('<div id="_pick_window" title="'
-						+ MessageBundle.get('select') + '"></div>')
+				var winid = current.data('winid');
+				if (winid) {
+					$('#' + winid).remove();
+				} else {
+					var winid = '_pick_window';
+					if ($('#' + winid).length)
+						winid = '_pick_window2';
+					current.data('winid', winid);
+				}
+				var win = $('<div id="' + winid + '" title="'
+						+ MessageBundle.get('select')
+						+ '" class="window-listpick"></div>')
 						.appendTo(document.body).dialog({
 							width : current.data('_options').width || 800,
 							minHeight : current.data('_options').minHeight
 									|| 500
 						});
-				win.closest('.ui-dialog').css('z-index', '2001');
+				win.closest('.ui-dialog').css('z-index',
+						winid == '_pick_window' ? '2001' : '2003');
 				if (win.html() && typeof $.fn.mask != 'undefined')
 					win.mask(MessageBundle.get('ajax.loading'));
 				else
@@ -38915,6 +38950,7 @@ Observation.treeselect = function(container) {
 							+ MessageBundle.get('ajax.loading') + '</div>');
 				var target = win.get(0);
 				target.onsuccess = function() {
+					$(target).data('listpick', current);
 					if (typeof $.fn.mask != 'undefined')
 						win.unmask();
 					Dialog.adapt(win);
@@ -38928,29 +38964,28 @@ Observation.treeselect = function(container) {
 									var name = $($(this).closest('tr')[0].cells[options.nameindex])
 											.text();
 									if (options.name) {
-										val(options.name, current, name);
+										val(options.name, $(target)
+														.data('listpick'), name);
 										var nametarget = find(options.name,
-												current);
-										if (nametarget.is(':input')) {
-											nametarget.trigger('change');
-											var form = nametarget
-													.closest('form');
-											if (!form.hasClass('nodirty'))
-												form.addClass('dirty');
-										} else {
+												$(target).data('listpick'));
+										if (!nametarget.is(':input'))
 											$('<a class="remove" href="#">&times;</a>')
 													.appendTo(nametarget)
 													.click(removeAction);
-										}
 									}
 									if (options.id) {
-										val(options.id, current, id);
-										var idtarget = find(options.id, current);
-										if (idtarget.is(':input')) {
-											idtarget.trigger('change');
-											var form = idtarget.closest('form');
-											if (!form.hasClass('nodirty'))
-												form.addClass('dirty');
+										val(options.id, $(target)
+														.data('listpick'), id);
+										var idtarget = find(options.id,
+												$(target).data('listpick'));
+									}
+									if (options.mapping) {
+										for (var k in options.mapping) {
+											val(
+													k,
+													$(target).data('listpick'),
+													$($(this).closest('tr')[0].cells[options.mapping[k]])
+															.text());
 										}
 									}
 									win.dialog('destroy').remove();
@@ -38973,15 +39008,16 @@ Observation.treeselect = function(container) {
 							});
 							var separator = options.separator;
 							if (options.name) {
-								var nametarget = find(options.name, current);
+								var nametarget = find(options.name, $(target)
+												.data('listpick'));
 								var name = names.join(separator);
 								if (nametarget.is(':input')) {
-									nametarget.trigger('change');
-									var _names = val(options.name, current)
+									var _names = val(options.name, $(target)
+													.data('listpick'))
 											|| '';
 									val(
 											options.name,
-											current,
+											$(target).data('listpick'),
 											ArrayUtils
 													.unique((_names
 															+ (_names
@@ -38989,9 +39025,6 @@ Observation.treeselect = function(container) {
 																	: '') + name)
 															.split(separator))
 													.join(separator));
-									var form = nametarget.closest('form');
-									if (!form.hasClass('nodirty'))
-										form.addClass('dirty');
 								} else {
 									var picked = nametarget.data('picked')
 											|| '';
@@ -39000,27 +39033,25 @@ Observation.treeselect = function(container) {
 											: '') + name).split(separator))
 											.join(separator);
 									nametarget.data('picked', picked);
-									val(options.name, current, picked);
+									val(options.name, $(target)
+													.data('listpick'), picked);
 									$('<a class="remove" href="#">&times;</a>')
 											.appendTo(nametarget)
 											.click(removeAction);
 								}
 							}
 							if (options.id) {
-								var idtarget = find(options.id, current);
+								var idtarget = find(options.id, $(target)
+												.data('listpick'));
 								var id = ids.join(separator);
-								var _ids = val(options.id, current) || '';
-								val(options.id, current,
+								var _ids = val(options.id, $(target)
+												.data('listpick'))
+										|| '';
+								val(options.id, $(target).data('listpick'),
 										ArrayUtils.unique((_ids
 												+ (_ids ? separator : '') + id)
 												.split(separator))
 												.join(separator));
-								if (idtarget.is(':input')) {
-									idtarget.trigger('change');
-									var form = idtarget.closest('form');
-									if (!form.hasClass('nodirty'))
-										form.addClass('dirty');
-								}
 							}
 							win.dialog('destroy').remove();
 							return false;
@@ -39034,7 +39065,7 @@ Observation.treeselect = function(container) {
 							url : url,
 							cache : false,
 							target : target,
-							replacement : '_pick_window:content',
+							replacement : winid + ':content',
 							quiet : true
 						});
 

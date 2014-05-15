@@ -24,6 +24,7 @@ MessageBundle = {
 		'unsupported.browser' : 'unsupported browser',
 		'action.denied' : 'requested action denied',
 		'maximum.exceeded' : '{0} , exceed maximum {1}',
+		'max.rows.reached' : 'reached max rows : {0}',
 		'pattern.coords.invalid' : 'coords should be between {0} and {1}',
 		'data.invalid' : 'data invalid,please check it.',
 		'repeat.not.matched' : 'repeat match failed'
@@ -66,6 +67,7 @@ MessageBundle = {
 		'unsupported.browser' : '你使用的浏览器不支持该功能',
 		'action.denied' : '你拒绝了请求',
 		'maximum.exceeded' : '{0} ,超过最大限制数{1}',
+		'max.rows.reached' : '已经达到了最大行数: {0}',
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
 		'data.invalid' : '数据错误,请检查',
 		'repeat.not.matched' : '两次输入不一致',

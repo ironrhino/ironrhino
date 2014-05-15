@@ -21,7 +21,7 @@
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
 				if (ele.is(':input')) {
-					ele.val(val).trigger('validate');
+					ele.val(val).trigger('change').trigger('validate');
 				} else {
 					if (html)
 						ele.html(val);
@@ -68,6 +68,10 @@
 						? ''
 						: '<i class="glyphicon glyphicon-list"></i>', true);
 		val(options.id, current, '', false);
+		if (options.mapping) {
+			for (var k in options.mapping)
+				val(k, current, '', false);
+		}
 		$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -108,15 +112,25 @@
 			}
 			var func = function(event) {
 				current = $(event.target).closest('.listpick');
-				$('#_pick_window').remove();
-				var win = $('<div id="_pick_window" title="'
-						+ MessageBundle.get('select') + '"></div>')
+				var winid = current.data('winid');
+				if (winid) {
+					$('#' + winid).remove();
+				} else {
+					var winid = '_pick_window';
+					if ($('#' + winid).length)
+						winid = '_pick_window2';
+					current.data('winid', winid);
+				}
+				var win = $('<div id="' + winid + '" title="'
+						+ MessageBundle.get('select')
+						+ '" class="window-listpick"></div>')
 						.appendTo(document.body).dialog({
 							width : current.data('_options').width || 800,
 							minHeight : current.data('_options').minHeight
 									|| 500
 						});
-				win.closest('.ui-dialog').css('z-index', '2001');
+				win.closest('.ui-dialog').css('z-index',
+						winid == '_pick_window' ? '2001' : '2003');
 				if (win.html() && typeof $.fn.mask != 'undefined')
 					win.mask(MessageBundle.get('ajax.loading'));
 				else
@@ -124,6 +138,7 @@
 							+ MessageBundle.get('ajax.loading') + '</div>');
 				var target = win.get(0);
 				target.onsuccess = function() {
+					$(target).data('listpick', current);
 					if (typeof $.fn.mask != 'undefined')
 						win.unmask();
 					Dialog.adapt(win);
@@ -137,29 +152,28 @@
 									var name = $($(this).closest('tr')[0].cells[options.nameindex])
 											.text();
 									if (options.name) {
-										val(options.name, current, name);
+										val(options.name, $(target)
+														.data('listpick'), name);
 										var nametarget = find(options.name,
-												current);
-										if (nametarget.is(':input')) {
-											nametarget.trigger('change');
-											var form = nametarget
-													.closest('form');
-											if (!form.hasClass('nodirty'))
-												form.addClass('dirty');
-										} else {
+												$(target).data('listpick'));
+										if (!nametarget.is(':input'))
 											$('<a class="remove" href="#">&times;</a>')
 													.appendTo(nametarget)
 													.click(removeAction);
-										}
 									}
 									if (options.id) {
-										val(options.id, current, id);
-										var idtarget = find(options.id, current);
-										if (idtarget.is(':input')) {
-											idtarget.trigger('change');
-											var form = idtarget.closest('form');
-											if (!form.hasClass('nodirty'))
-												form.addClass('dirty');
+										val(options.id, $(target)
+														.data('listpick'), id);
+										var idtarget = find(options.id,
+												$(target).data('listpick'));
+									}
+									if (options.mapping) {
+										for (var k in options.mapping) {
+											val(
+													k,
+													$(target).data('listpick'),
+													$($(this).closest('tr')[0].cells[options.mapping[k]])
+															.text());
 										}
 									}
 									win.dialog('destroy').remove();
@@ -182,15 +196,16 @@
 							});
 							var separator = options.separator;
 							if (options.name) {
-								var nametarget = find(options.name, current);
+								var nametarget = find(options.name, $(target)
+												.data('listpick'));
 								var name = names.join(separator);
 								if (nametarget.is(':input')) {
-									nametarget.trigger('change');
-									var _names = val(options.name, current)
+									var _names = val(options.name, $(target)
+													.data('listpick'))
 											|| '';
 									val(
 											options.name,
-											current,
+											$(target).data('listpick'),
 											ArrayUtils
 													.unique((_names
 															+ (_names
@@ -198,9 +213,6 @@
 																	: '') + name)
 															.split(separator))
 													.join(separator));
-									var form = nametarget.closest('form');
-									if (!form.hasClass('nodirty'))
-										form.addClass('dirty');
 								} else {
 									var picked = nametarget.data('picked')
 											|| '';
@@ -209,27 +221,25 @@
 											: '') + name).split(separator))
 											.join(separator);
 									nametarget.data('picked', picked);
-									val(options.name, current, picked);
+									val(options.name, $(target)
+													.data('listpick'), picked);
 									$('<a class="remove" href="#">&times;</a>')
 											.appendTo(nametarget)
 											.click(removeAction);
 								}
 							}
 							if (options.id) {
-								var idtarget = find(options.id, current);
+								var idtarget = find(options.id, $(target)
+												.data('listpick'));
 								var id = ids.join(separator);
-								var _ids = val(options.id, current) || '';
-								val(options.id, current,
+								var _ids = val(options.id, $(target)
+												.data('listpick'))
+										|| '';
+								val(options.id, $(target).data('listpick'),
 										ArrayUtils.unique((_ids
 												+ (_ids ? separator : '') + id)
 												.split(separator))
 												.join(separator));
-								if (idtarget.is(':input')) {
-									idtarget.trigger('change');
-									var form = idtarget.closest('form');
-									if (!form.hasClass('nodirty'))
-										form.addClass('dirty');
-								}
 							}
 							win.dialog('destroy').remove();
 							return false;
@@ -243,7 +253,7 @@
 							url : url,
 							cache : false,
 							target : target,
-							replacement : '_pick_window:content',
+							replacement : winid + ':content',
 							quiet : true
 						});
 

@@ -66,8 +66,8 @@ Richtable = {
 			winid = '_window2_';
 		var win = $('#' + winid);
 		if (!win.length)
-			win = $('<div id="' + winid + '"></div>').appendTo(document.body)
-					.dialog();
+			win = $('<div id="' + winid + '" class="window-richtable"></div>')
+					.appendTo(document.body).dialog();
 		if (!useiframe) {
 			// ajax replace
 			var target = win.get(0);
@@ -108,14 +108,15 @@ Richtable = {
 									inputform).val())
 								create = false;
 						}
-						if (create) {
+						if (create && inputform.hasClass('sequential_create')) {
 							$('button[type="submit"]', inputform)
 									.addClass('btn-primary')
-									.after(' <button type="submit" class="btn save_and_create">'
+									.after(' <button type="submit" class="btn sequential_create">'
 											+ MessageBundle
 													.get('save.and.create')
 											+ '</button>');
-							$('.save_and_create', inputform).click(function() {
+							$('.sequential_create', inputform).click(
+									function() {
 										$('form.ajax').addClass('reset');
 									});
 						}

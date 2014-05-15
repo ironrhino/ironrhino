@@ -76,12 +76,21 @@
 
 	var addRow = function(event, options, row, first, skipRename) {
 		var current = $(event.target).closest('tr');
-		var table = current.closest('table');
+		var table = current.closest('table.datagrided');
 		var row = row
 				|| $(event.target).closest('tbody')
 						.children(':not(.nontemplate):eq(0)');
 		if (!row.length)
 			return;
+		var maxrows = parseInt(table.data('maxrows'));
+		if (maxrows) {
+			var currentrows = $('tbody tr', table).length;
+			if (currentrows == maxrows) {
+				Message.showActionError(MessageBundle.get('max.rows.reached',
+								currentrows), table.closest('form'));
+				return;
+			}
+		}
 		var r = row.clone(true);
 		$('*', r).removeAttr('id');
 		$('span.info', r).html('');

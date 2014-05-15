@@ -758,10 +758,13 @@ Initialization.common = function() {
 
 	}).on('change', 'select', function(e) {
 				var t = $(this);
-				if (!t.val())
-					t.addClass('empty');
-				else
-					t.removeClass('empty');
+				var option = t.find('option:eq(0)');
+				if (!option.attr('value') && option.text()) {
+					if (!t.val())
+						t.addClass('empty');
+					else
+						t.removeClass('empty');
+				}
 			});
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
@@ -873,7 +876,8 @@ if (HISTORY_ENABLED) {
 Observation.common = function(container) {
 	$('select', container).each(function(e) {
 				var t = $(this);
-				if (!t.val())
+				var option = t.find('option:eq(0)');
+				if (!option.attr('value') && option.text() && !t.val())
 					t.addClass('empty');
 			});
 	$('.controls .field-error', container).each(function() {
@@ -1010,16 +1014,21 @@ Observation.common = function(container) {
 					}
 					t.datetimepicker(option).on('changeDate', function(e) {
 								t.trigger('validate');
-							}).on('show', function(e) {
-						$('input.date,input.datetime,input.time',
-								t.closest('form')).not('[readonly]')
-								.not('[disabled]').not(t).each(function(i, v) {
-											var dp = $(v)
-													.data('datetimepicker');
-											if (dp && dp.widget.is(':visible'))
-												dp.hide();
-										});
-					});
+								var dp = t.data('datetimepicker');
+								if (dp && dp.widget.is(':visible'))
+									dp.hide();
+							})
+					// .on('show', function(e) {
+					// $('input.date,input.datetime,input.time',
+					// t.closest('form')).not('[readonly]')
+					// .not('[disabled]').not(t).each(function(i, v) {
+					// var dp = $(v)
+					// .data('datetimepicker');
+					// if (dp && dp.widget.is(':visible'))
+					// dp.hide();
+					// });
+					// })
+					;
 				});
 	$('input.captcha', container).focus(function() {
 				if ($(this).data('_captcha_'))
@@ -1305,14 +1314,14 @@ Observation.common = function(container) {
 		if (this.tagName == 'FORM') {
 			var options = {
 				beforeSerialize : function() {
+					$('.action-error').remove();
+					if (!Form.validate(target))
+						return false;
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
 					Ajax.fire(target, 'onbeforeserialize');
 				},
 				beforeSubmit : function() {
-					$('.action-error').remove();
-					if (!Form.validate(target))
-						return false;
 					Indicator.text = $(target).data('indicator');
 					$('button[type="submit"]', target).prop('disabled', true);
 					Ajax.fire(target, 'onloading');
@@ -1518,8 +1527,10 @@ var Nav = {
 var Dialog = {
 	adapt : function(d, iframe) {
 		var useiframe = iframe != null;
+		var hasRow = false;
 		if (!iframe) {
 			$(d).dialog('option', 'title', Ajax.title);
+			hasRow = $('div.row', d).length > 0;
 		} else {
 			var doc = iframe.document;
 			if (iframe.contentDocument) {
@@ -1531,7 +1542,10 @@ var Dialog = {
 			$(d).dialog('option', 'minHeight', height);
 			var height = $(doc).height() + 20;
 			$(iframe).height(height);
+			hasRow = $('div.row', doc).length > 0;
 		}
+		if (hasRow)
+			d.dialog('option', 'width', '90%');
 		d.dialog('option', 'position', 'center');
 		// var height = d.height();
 		// if (height >= $(window).height())
