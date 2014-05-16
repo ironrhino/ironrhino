@@ -70,8 +70,8 @@ public class ApplicationContextConsole implements
 	public Map<String, Scope> getTriggers() {
 		if (triggers == null) {
 			triggers = new TreeMap<String, Scope>();
-			triggers.put("freemarkerConfiguration.clearTemplateCache()",
-					Scope.APPLICATION);
+			// triggers.put("freemarkerConfiguration.clearTemplateCache()",
+			// Scope.APPLICATION);
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
 				if (StringUtils.isAlphanumeric(beanName)
