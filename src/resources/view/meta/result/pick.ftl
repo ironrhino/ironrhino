@@ -74,16 +74,16 @@
 		<#else>
 			<#if uiConfigs?? && uiConfigs[column]??>
 				<#assign uiConfig = uiConfigs[column]/>
+				<#assign width = uiConfig.width!/>
 				<#assign template = uiConfig.template!/>
 				<#if uiConfig.listTemplate?has_content>
 				<#assign template = uiConfig.listTemplate/>
 				</#if>
-			</#if>
-			<#if template?has_content>
-				<#assign columns=columns+{column:{'template':template}}/>
 			<#else>
-				<#assign columns=columns+{column:{}}/>
+				<#assign width = ''/>
+				<#assign template = ''/>	
 			</#if>
+			<#assign columns=columns+{column:{'width':width,'template':template}}/>
 		</#if>
 	</#list>
 </#if>
