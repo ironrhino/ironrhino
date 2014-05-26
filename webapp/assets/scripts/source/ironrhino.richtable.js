@@ -139,7 +139,7 @@ Richtable = {
 								$(this).removeClass('dirty');
 								$(this).removeClass('dontreload');
 								if (!$(e.target).closest('button')
-										.hasClass('save_and_create'))
+										.hasClass('sequential_create'))
 									// setTimeout(function()
 									// {
 									$('#' + winid).dialog('close');
