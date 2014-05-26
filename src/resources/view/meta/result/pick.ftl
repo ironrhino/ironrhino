@@ -72,7 +72,18 @@
 		<#if treeable && column == 'name'||column == 'fullname'>
 			<#assign columns=columns+{column:{'template':r'<#if entity.leaf??&&!entity.leaf><a href="${href}${href?contains("?")?string("&","?")+"parent="+entity.id}" class="ajax view" data-replacement="${entityName}_pick">${value}</a><#else>${value}</#if>'}}/>
 		<#else>
-			<#assign columns=columns+{column:{}}/>
+			<#if uiConfigs?? && uiConfigs[column]??>
+				<#assign uiConfig = uiConfigs[column]/>
+				<#assign width = uiConfig.width!/>
+				<#assign template = uiConfig.template!/>
+				<#if uiConfig.listTemplate?has_content>
+				<#assign template = uiConfig.listTemplate/>
+				</#if>
+			<#else>
+				<#assign width = ''/>
+				<#assign template = ''/>	
+			</#if>
+			<#assign columns=columns+{column:{'width':width,'template':template}}/>
 		</#if>
 	</#list>
 </#if>

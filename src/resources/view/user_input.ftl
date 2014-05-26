@@ -4,7 +4,7 @@
 <title><#if user.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('user')}</title>
 </head>
 <body>
-<@s.form action="${actionBaseUrl}/save" method="post" cssClass="ajax form-horizontal">
+<@s.form action="${actionBaseUrl}/save" method="post" cssClass="ajax form-horizontal sequential_create">
 	<#if !user.new>
 		<@s.hidden name="user.id" />
 		<@s.textfield label="%{getText('username')}" name="user.username" readonly="true"/>

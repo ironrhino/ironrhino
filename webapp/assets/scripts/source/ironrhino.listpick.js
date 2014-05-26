@@ -145,12 +145,13 @@
 					if (!options.multiple) {
 						$(target).on('click', 'tbody input[type=radio]',
 								function() {
-									var id = options.idindex == 0
-											? $(this).val()
-											: $($(this).closest('tr')[0].cells[options.idindex])
-													.text();
-									var name = $($(this).closest('tr')[0].cells[options.nameindex])
-											.text();
+									var cell = $($(this).closest('tr')[0].cells[options.idindex]);
+									var id = options.idindex == 0 ? $(this)
+											.val() : cell.data('cellvalue')
+											|| cell.text();
+									cell = $($(this).closest('tr')[0].cells[options.nameindex]);
+									var name = cell.data('cellvalue')
+											|| cell.text();
 									if (options.name) {
 										val(options.name, $(target)
 														.data('listpick'), name);
@@ -169,11 +170,10 @@
 									}
 									if (options.mapping) {
 										for (var k in options.mapping) {
-											val(
-													k,
-													$(target).data('listpick'),
-													$($(this).closest('tr')[0].cells[options.mapping[k]])
-															.text());
+											cell = $($(this).closest('tr')[0].cells[options.mapping[k]]);
+											val(k, $(target).data('listpick'),
+													cell.data('cellvalue')
+															|| cell.text());
 										}
 									}
 									win.dialog('destroy').remove();
@@ -185,14 +185,15 @@
 							var checkbox = $('tbody :checked', target);
 							var ids = [], names = [];
 							checkbox.each(function() {
-								ids
-										.push(options.idindex == 0
-												? $(this).val()
-												: $($(this).closest('tr')[0].cells[options.idindex])
-														.text());
-								names
-										.push($($(this).closest('tr')[0].cells[options.nameindex])
-												.text());
+								var cell = $($(this).closest('tr')[0].cells[options.idindex]);
+								var id = options.idindex == 0
+										? $(this).val()
+										: cell.data('cellvalue') || cell.text();
+								cell = $($(this).closest('tr')[0].cells[options.nameindex]);
+								var name = cell.data('cellvalue')
+										|| cell.text();
+								ids.push(id);
+								names.push(name);
 							});
 							var separator = options.separator;
 							if (options.name) {
