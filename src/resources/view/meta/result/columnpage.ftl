@@ -6,13 +6,13 @@
 <body>
 <ul class="breadcrumb">
 	<li>
-    	<a href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
+    	<a class="ajax view" href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
 	</li>
 <#if !column??>
 	<li class="active">${action.getText(name)}</li>
 <#else>
 	<li>
-    	<a href="<@url value="/${name}"/>">${action.getText(name)}</a> <span class="divider">/</span>
+    	<a class="ajax view" href="<@url value="/${name}"/>">${action.getText(name)}</a> <span class="divider">/</span>
 	</li>
 	<li class="active">${column!}</li>
 </#if>
@@ -24,7 +24,7 @@
 			<li class="nav-header">${name}</li>
 			<#list columns as var>
 			<#assign active=column?? && column==var/>
-			<li<#if active> class="active"</#if>><a href="<@url value="/${name}/list/${var?url}"/>" class="ajax view history">${var}</a></li>
+			<li<#if active> class="active"</#if>><a href="<@url value="/${name}/list/${var?url}"/>" class="ajax view">${var}</a></li>
 			</#list>
 		</ul>
     </div>
