@@ -63,11 +63,13 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public <K> K executeFind(HibernateCallback<K> callback);
 
+	public void iterate(int fetchSize, IterateCallback callback);
+
 	public void iterate(int fetchSize, IterateCallback callback,
-			DetachedCriteria... dc);
+			DetachedCriteria dc);
 
 	public static interface IterateCallback {
-		public void process(Object[] entityArray,Session session);
+		public void process(Object[] entityArray, Session session);
 	}
 
 }

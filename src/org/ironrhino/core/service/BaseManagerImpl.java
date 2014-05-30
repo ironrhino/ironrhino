@@ -618,12 +618,17 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	}
 
 	@Override
+	public void iterate(int fetchSize, IterateCallback callback) {
+		iterate(fetchSize, callback, null);
+	}
+
+	@Override
 	public void iterate(int fetchSize, IterateCallback callback,
-			DetachedCriteria... dc) {
+			DetachedCriteria dc) {
 		Session hibernateSession = sessionFactory.openSession();
 		Criteria c;
-		if (dc.length == 1) {
-			c = dc[0].getExecutableCriteria(hibernateSession);
+		if (dc != null) {
+			c = dc.getExecutableCriteria(hibernateSession);
 		} else {
 			c = hibernateSession.createCriteria(getEntityClass());
 			c.addOrder(Order.asc("id"));
