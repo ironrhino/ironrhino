@@ -32432,10 +32432,18 @@ Form = {
 			}
 		}
 	},
-	validate : function(target) {
-		if ($(target).prop('tagName') != 'FORM') {
+	clearError : function(target) {
+		if ($(target).prop('tagName') == 'FORM') {
+			$('.control-group.error', target).removeClass('error');
+			$('.field-error', target).fadeIn().remove();
+		} else {
 			$(target).closest('.control-group').removeClass('error');
 			$('.field-error', $(target).parent()).fadeIn().remove();
+		}
+	},
+	validate : function(target) {
+		if ($(target).prop('tagName') != 'FORM') {
+			Form.clearError(target);
 			if ($(target).is('input[type="radio"]')) {
 				if ($(target).hasClass('required')) {
 					var options = $('input[type="radio"][name="' + target.name
