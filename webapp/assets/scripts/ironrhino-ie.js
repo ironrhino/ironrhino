@@ -32386,16 +32386,18 @@ Message = {
 				var promptHeight = prompt.height();
 				promptTopPosition = field.position().top;
 				promptleftPosition = field.position().left + fieldWidth - 30;
-				// marginTopSize = -promptHeight;
-				marginTopSize = -38;
+				marginTopSize = -promptHeight;
 				prompt.css({
 							"top" : promptTopPosition + "px",
 							"left" : promptleftPosition + "px",
-							"marginTop" : marginTopSize + "px",
+							"marginTop" : "-38px",
 							"opacity" : 0
 						});
 				prompt.animate({
 							"opacity" : 0.8
+						});
+				prompt.css({
+							"marginTop" : -prompt.height() + "px"
 						});
 			} else if (field.is('[type="hidden"]')) {
 				var fp = field.parent('.listpick,.treeselect');
