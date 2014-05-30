@@ -31257,6 +31257,7 @@ Message = {
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
 			if (field.is(':visible')) {
+				$(field).parent().css('position', 'relative');
 				var prompt = $('<div class="field-error removeonclick"><div class="field-error-content">'
 						+ msg + '</div><div>').insertAfter(field);
 				$('<div class="field-error-arrow"/>')
@@ -31267,7 +31268,8 @@ Message = {
 				var promptHeight = prompt.height();
 				promptTopPosition = field.position().top;
 				promptleftPosition = field.position().left + fieldWidth - 30;
-				marginTopSize = -promptHeight;
+				// marginTopSize = -promptHeight;
+				marginTopSize = -38;
 				prompt.css({
 							"top" : promptTopPosition + "px",
 							"left" : promptleftPosition + "px",
