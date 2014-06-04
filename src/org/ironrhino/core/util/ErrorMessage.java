@@ -49,15 +49,19 @@ public class ErrorMessage extends RuntimeException {
 				sb.append(" : ").append(submessage);
 			return sb.toString();
 		}
-		sb.append(LocalizedTextUtil.findText(ErrorMessage.class, message,
-				ActionContext.getContext().getLocale(), message, args));
-		if (StringUtils.isNotBlank(submessage)) {
-			sb.append(" : ");
-			sb.append(LocalizedTextUtil.findText(ExceptionInterceptor.class,
-					submessage, ActionContext.getContext().getLocale(),
-					submessage, args));
+		try {
+			sb.append(LocalizedTextUtil.findText(ErrorMessage.class, message,
+					ActionContext.getContext().getLocale(), message, args));
+			if (StringUtils.isNotBlank(submessage)) {
+				sb.append(" : ");
+				sb.append(LocalizedTextUtil.findText(
+						ExceptionInterceptor.class, submessage, ActionContext
+								.getContext().getLocale(), submessage, args));
+			}
+			return sb.toString();
+		} catch (IllegalArgumentException e) {
+			return message;
 		}
-		return sb.toString();
 	}
 
 	public void setMessage(String message) {
