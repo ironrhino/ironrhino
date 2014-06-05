@@ -66,6 +66,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 							+ columnName + "_TIMESTAMP BIGINT DEFAULT 0");
 					stmt.execute("update `" + getTableName() + "` set "
 							+ columnName + "_TIMESTAMP=UNIX_TIMESTAMP()");
+					con.commit();
 				}
 			} else {
 				stmt.execute("CREATE TABLE `" + getTableName() + "` ("
@@ -73,6 +74,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 						+ "_TIMESTAMP BIGINT) ");
 				stmt.execute("INSERT INTO `" + getTableName()
 						+ "` VALUES(0,UNIX_TIMESTAMP())");
+				con.commit();
 			}
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
