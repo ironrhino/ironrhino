@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
-	private Buffer buffer;
+	private volatile Buffer buffer;
 
 	private String location;
 
@@ -24,16 +24,25 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
 	public LazyCommitResponseWrapper(final HttpServletResponse response) {
 		super(response);
-		buffer = new Buffer(getCharacterEncoding());
 	}
 
 	@Override
 	public ServletOutputStream getOutputStream() {
+		if (buffer == null)
+			synchronized (this) {
+				if (buffer == null)
+					buffer = new Buffer(getCharacterEncoding());
+			}
 		return buffer.getOutputStream();
 	}
 
 	@Override
 	public PrintWriter getWriter() {
+		if (buffer == null)
+			synchronized (this) {
+				if (buffer == null)
+					buffer = new Buffer(getCharacterEncoding());
+			}
 		return buffer.getWriter();
 	}
 
@@ -153,7 +162,7 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
 					@Override
 					public void setWriteListener(WriteListener listener) {
-						
+
 					}
 				};
 			}
