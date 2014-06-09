@@ -35602,7 +35602,8 @@ Observation.sortableTable = function(container) {
 		$('span.info', r).html('');
 		$(':input[type!=checkbox][type!=radio]', r).val('');
 		$('input[type=checkbox],input[type=radio]', r).prop('checked', false);
-		$(':input', r).prop('readonly', false).removeAttr('keyupValidate');
+		$(':input', r).not('.readonly').prop('readonly', false)
+				.removeAttr('keyupValidate');
 		$('select.decrease', r).each(function() {
 			var selectedValues = $.map($('select.decrease', table), function(e,
 							i) {
