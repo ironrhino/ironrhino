@@ -92,7 +92,7 @@
 					<#if readonly>
 						<@s.hidden name=entityName+"."+key />
 					</#if>
-					<@selectDictionary disabled=readonly id=id dictionaryName=templateName name=entityName+"."+key value="${entity[key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
+					<@selectDictionary disabled=readonly id=id dictionaryName=templateName name=entityName+"."+key required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
 				</div>
 				</div>
 			<#elseif config.type=='attributes'>
@@ -210,7 +210,7 @@
 						<#if readonly>
 							<@s.hidden name=entityName+"."+key />
 						</#if>
-						<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key value="${entity[key][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
+						<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
 						</div>
 						</div>
 					<#elseif config.type=='listpick'>
@@ -313,7 +313,7 @@
 									<#if readonly>
 										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
 									</#if>
-									<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key value="${entity[key][index][entry.key]!}" required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
+									<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key required=config.required class=config.cssClass dynamicAttributes=config.dynamicAttributes/>
 								<#elseif config.type=='listpick'>
 										<div class="<#if readonly>_</#if>listpick" data-options="{'url':'<@url value=config.pickUrl/>'}">
 										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="listpick-id ${config.cssClass}"/>
