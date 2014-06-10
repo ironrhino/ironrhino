@@ -129,7 +129,7 @@
 	<li class="active">${parentEntity.name}</li>
 </ul>
 </#if>
-<@richtable entityName=entityName formid=entityName+'_pick_form' action=requestURI columns=columns bottomButtons=bottomButtons searchable=true readonly=true showCheckColumn=true multipleCheck=multiple columnfilterable=false resizable=false sortable=false showPageSize=false/>
+<@richtable entityName=entityName formid=entityName+'_pick_form' action=requestURI columns=columns bottomButtons=bottomButtons searchable=searchable!true readonly=true showCheckColumn=true multipleCheck=multiple columnfilterable=false resizable=false sortable=false showPageSize=false/>
 </div>
 </body>
 </html></#escape>
