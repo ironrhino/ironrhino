@@ -38937,6 +38937,7 @@ Observation.treeselect = function(container) {
 			}
 			var func = function(event) {
 				current = $(event.target).closest('.listpick');
+				var options = current.data('_options');
 				var winid = current.data('winid');
 				if (winid) {
 					$('#' + winid).remove();
