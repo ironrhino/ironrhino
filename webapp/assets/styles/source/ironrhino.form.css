@@ -1,3 +1,6 @@
+.modal-body > form {
+	padding-top: 30px;
+}
 .form-horizontal .control-label{
 	width: 100px;
 }

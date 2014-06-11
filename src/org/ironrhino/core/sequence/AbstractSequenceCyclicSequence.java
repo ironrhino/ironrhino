@@ -65,6 +65,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 		Statement stmt = null;
 		try {
 			con = getDataSource().getConnection();
+			con.setAutoCommit(false);
 			DatabaseMetaData dbmd = con.getMetaData();
 			ResultSet rs = dbmd.getTables(null, null, "%", null);
 			boolean tableExists = false;

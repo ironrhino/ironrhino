@@ -86,7 +86,7 @@ ${formHeader!}
 
 <#macro rttbodytrstart entity showCheckColumn=true multipleCheck=true rowid='' dynamicAttributes...>
 <#if !rowid?has_content>
-	<#local id=entity.id?string/>
+	<#local id=(entity.id?string)!/>
 <#else>
 	<#local id><@rowid?interpret/></#local>
 </#if>

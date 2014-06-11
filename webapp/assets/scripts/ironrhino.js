@@ -31257,6 +31257,7 @@ Message = {
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
 			if (field.is(':visible')) {
+				$(field).parent().css('position', 'relative');
 				var prompt = $('<div class="field-error removeonclick"><div class="field-error-content">'
 						+ msg + '</div><div>').insertAfter(field);
 				$('<div class="field-error-arrow"/>')
@@ -31271,11 +31272,14 @@ Message = {
 				prompt.css({
 							"top" : promptTopPosition + "px",
 							"left" : promptleftPosition + "px",
-							"marginTop" : marginTopSize + "px",
+							"marginTop" : "-38px",
 							"opacity" : 0
 						});
 				prompt.animate({
 							"opacity" : 0.8
+						});
+				prompt.css({
+							"marginTop" : -prompt.height() + "px"
 						});
 			} else if (field.is('[type="hidden"]')) {
 				var fp = field.parent('.listpick,.treeselect');
@@ -31314,10 +31318,18 @@ Form = {
 			}
 		}
 	},
-	validate : function(target) {
-		if ($(target).prop('tagName') != 'FORM') {
+	clearError : function(target) {
+		if ($(target).prop('tagName') == 'FORM') {
+			$('.control-group.error', target).removeClass('error');
+			$('.field-error', target).fadeIn().remove();
+		} else {
 			$(target).closest('.control-group').removeClass('error');
 			$('.field-error', $(target).parent()).fadeIn().remove();
+		}
+	},
+	validate : function(target) {
+		if ($(target).prop('tagName') != 'FORM') {
+			Form.clearError(target);
 			if ($(target).is('input[type="radio"]')) {
 				if ($(target).hasClass('required')) {
 					var options = $('input[type="radio"][name="' + target.name
@@ -35590,7 +35602,8 @@ Observation.sortableTable = function(container) {
 		$('span.info', r).html('');
 		$(':input[type!=checkbox][type!=radio]', r).val('');
 		$('input[type=checkbox],input[type=radio]', r).prop('checked', false);
-		$(':input', r).prop('readonly', false).removeAttr('keyupValidate');
+		$(':input', r).not('.readonly').prop('readonly', false)
+				.removeAttr('keyupValidate');
 		$('select.decrease', r).each(function() {
 			var selectedValues = $.map($('select.decrease', table), function(e,
 							i) {
@@ -37806,6 +37819,7 @@ Observation.treeselect = function(container) {
 			}
 			var func = function(event) {
 				current = $(event.target).closest('.listpick');
+				var options = current.data('_options');
 				var winid = current.data('winid');
 				if (winid) {
 					$('#' + winid).remove();

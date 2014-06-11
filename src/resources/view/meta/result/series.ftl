@@ -6,13 +6,13 @@
 <body>
 <ul class="breadcrumb">
 	<li>
-    	<a href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
+    	<a class="ajax view" href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
 	</li>
 <#if !page??>
 	<li class="active">${action.getText(name)}</li>
 <#else>
 	<li>
-    	<a href="<@url value="/${name}"/>">${action.getText(name)}</a> <span class="divider">/</span>
+    	<a class="ajax view" href="<@url value="/${name}"/>">${action.getText(name)}</a> <span class="divider">/</span>
 	</li>
 	<li class="active">${page.title!}</li>
 </#if>
@@ -24,7 +24,7 @@
 			<li class="nav-header">${name}</li>
 			<#list pages as var>
 			<#assign active=page?? && page.path==var.path/>
-			<li<#if active> class="active"</#if>><a href="<@url value="/${name}/p${var.path}"/>" class="ajax view history">${var.title}</a></li>
+			<li<#if active> class="active"</#if>><a href="<@url value="/${name}/p${var.path}"/>" class="ajax view">${var.title}</a></li>
 			</#list>
 		</ul>
     </div>
@@ -35,8 +35,8 @@
 			</div>
 			<#if showPager>
 			<div class="pager">
-				<#if previousPage??><li><a href="<@url value="/${name}/p${previousPage.path}"/>" class="ajax view history">${action.getText('previouspage')}:${previousPage.title}</a></li></#if>
-				<#if nextPage??><li><a href="<@url value="/${name}/p${nextPage.path}"/>" class="ajax view history">${action.getText('nextpage')}:${nextPage.title}</a></li></#if>
+				<#if previousPage??><li><a href="<@url value="/${name}/p${previousPage.path}"/>" class="ajax view">${action.getText('previouspage')}:${previousPage.title}</a></li></#if>
+				<#if nextPage??><li><a href="<@url value="/${name}/p${nextPage.path}"/>" class="ajax view">${action.getText('nextpage')}:${nextPage.title}</a></li></#if>
 			</div>
 			</#if>
 		</#if>

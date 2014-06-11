@@ -6,7 +6,7 @@
 <body>
 <ul class="breadcrumb">
 	<li>
-    	<a href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
+    	<a class="ajax view" href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
 	</li>
 	<li class="active">${action.getText(name)}</li>
 </ul>

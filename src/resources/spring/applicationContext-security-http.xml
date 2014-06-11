@@ -16,6 +16,8 @@
 			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/signup*/**"
 			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
+		<security:intercept-url pattern="/signin*/**"
+			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/login"
 			access="hasAnyRole('ROLE_BUILTIN_USER','ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/oauth*/**"
