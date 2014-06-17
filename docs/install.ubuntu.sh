@@ -394,6 +394,28 @@ chown $USER:$USER backup.sh
 chmod +x backup.sh
 fi
 
+#generate exportdb.sh and importdb.sh
+if [ ! -f exportdb.sh ]; then
+cat>exportdb.sh<<EOF
+DB_NAME=test
+DB_USERNAME=root
+DB_PASSWORD=secret
+mysqldump --no-data --routines -u \$DB_USERNAME -p\$DB_PASSWORD \$DB_NAME > db-schema.sql
+mysqldump --single-transaction --quick --no-autocommit --no-create-info --extended-insert=false -u \$DB_USERNAME -p\$DB_PASSWORD \$DB_NAME > db-data.sql
+EOF
+cat>importdb.sh<<EOF
+DB_NAME=test
+DB_USERNAME=root
+DB_PASSWORD=secret
+mysql -f -u \$DB_USERNAME -p\$DB_PASSWORD \$DB_NAME < db-schema.sql
+mysql -f -u \$DB_USERNAME -p\$DB_PASSWORD \$DB_NAME < db-data.sql
+EOF
+chown $USER:$USER exportdb.sh
+chown $USER:$USER importdb.sh
+chmod +x exportdb.sh
+chmod +x importdb.sh
+fi
+
 
 #iptables
 if [ ! -f /etc/init.d/iptables ]; then
@@ -431,7 +453,7 @@ fi
 
 #install redis
 if ! which redis-server > /dev/null && ! $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
-wget http://download.redis.io/releases/redis-2.8.9.tar.gz
+wget http://download.redis.io/releases/redis-2.8.11.tar.gz
 fi
 if $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
 tar xvf redis-*.tar.gz >/dev/null && rm -rf redis-*.tar.gz
