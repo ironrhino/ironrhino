@@ -61,6 +61,7 @@ public class AppInfoListener implements ServletContextListener {
 		String home = appProperties.getProperty(AppInfo.KEY_APP_HOME);
 		if (StringUtils.isNotBlank(home))
 			AppInfo.setAppHome(home);
+		System.setProperty(AppInfo.KEY_STAGE, AppInfo.getStage().name());
 		System.setProperty(AppInfo.KEY_APP_HOME, AppInfo.getAppHome());
 		System.setProperty(AppInfo.KEY_APP_NAME, AppInfo.getAppName());
 		System.setProperty("hibernate.logger.level",
