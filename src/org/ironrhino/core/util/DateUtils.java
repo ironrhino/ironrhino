@@ -256,8 +256,8 @@ public class DateUtils {
 			long m = (long) ((d - h) * 3600);
 			m /= 60;
 			if (m == 0)
-				m = 1;
-			if (m == 30)
+				s = h + "个小时";
+			else if (m == 30)
 				s = h + "个半小时";
 			else
 				s = h + "个小时" + m + "分钟";

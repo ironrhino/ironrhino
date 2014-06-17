@@ -31879,6 +31879,14 @@ Initialization.common = function() {
 					window.close();
 				}, 1000);
 	}
+	if ($('.time[title]').length) {
+		setInterval(function() {
+					$('.time[title]').each(function() {
+								var t = $(this);
+								t.text(DateUtils.humanRead(t.attr('title')));
+							});
+				}, 60 * 1000);
+	}
 };
 
 var HISTORY_ENABLED = MODERN_BROWSER
@@ -32660,6 +32668,92 @@ ArrayUtils = {
 			}
 			return arr2;
 		}
+	}
+};
+DateUtils = {
+	humanRead : function(date) {
+		if (typeof date == 'string') {
+			string = true;
+			date = new Date(date);
+		}
+		var now = new Date();
+		var delta = now.getTime() - date.getTime();
+		var before = (delta >= 0);
+		delta = delta < 0 ? -delta : delta;
+		delta /= 1000;
+		var s;
+		if (delta <= 60) {
+			return "1分钟内";
+		} else if (delta < 3600) {
+			delta = Math.floor(delta / 60);
+			if (delta == 30)
+				s = "半个小时";
+			else
+				s = delta + "分钟";
+		} else if (delta < 86400) {
+			var d = delta / 3600;
+			var h = Math.floor(d);
+			var m = (d - h) * 3600;
+			m = Math.floor(m / 60);
+			if (m == 0)
+				s = h + "个小时";
+			else if (m == 30)
+				s = h + "个半小时";
+			else
+				s = h + "个小时" + m + "分钟";
+		} else if (delta < 2592000) {
+			s = Math.floor(delta / 86400) + "天";
+		} else if (delta < 31104000) {
+			s = Math.floor(delta / 2592000) + "个月";
+		} else {
+			s = Math.floor(delta / 31104000) + "年";
+		}
+		return s + (before ? "前" : "后");
+
+	},
+	addDays : function(date, days) {
+		var string = false;
+		if (typeof date == 'string') {
+			string = true;
+			date = new Date(date);
+		}
+		var time = date.getTime();
+		time += (24 * 3600 * 1000) * days;
+		date = new Date();
+		date.setTime(time);
+		return string ? $.format.date(date, 'yyyy-MM-dd') : date;
+	},
+	getIntervalDays : function(startDate, endDate) {
+		if (typeof startDate == 'string')
+			startDate = new Date(startDate);
+		if (typeof endDate == 'string')
+			endDate = new Date(endDate);
+		var diff = endDate.getTime() - startDate.getTime();
+		return diff / (24 * 3600 * 1000) + 1;
+	},
+
+	isLeapYear : function(year) {
+		return new Date(year, 1, 29).getMonth() == 1;
+	},
+	nextLeapDay : function(since) {
+		if (typeof since == 'string')
+			since = new Date(since);
+		var year = since.getFullYear();
+		if (DateUtils.isLeapYear(year)) {
+			var leapDay = new Date(year, 1, 29);
+			if (since.getTime() <= leapDay.getTime())
+				return leapDay;
+		}
+		while (!DateUtils.isLeapYear(++year));
+		return new Date(year, 1, 29);
+	},
+
+	isSpanLeapDay : function(startDate, endDate) {
+		if (typeof startDate == 'string')
+			startDate = new Date(startDate);
+		if (typeof endDate == 'string')
+			endDate = new Date(endDate);
+		return endDate.getTime() >= DateUtils.nextLeapDay(startDate).getTime();
 	}
 };
 (function($) {
