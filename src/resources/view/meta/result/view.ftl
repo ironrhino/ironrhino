@@ -238,7 +238,7 @@
 										<ul class="unstyled" style="padding-bottom:10px;">
 										<#list item?keys as k>
 											<#if k!='class' && item[k]?? && !item[k]?is_method>
-											<li>${k}: ${item[k]?string}</li>
+											<li><em>${action.getText(k)}:</em> ${item[k]?string}</li>
 											</#if>
 										</#list>
 										</ul>
