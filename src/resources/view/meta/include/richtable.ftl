@@ -249,9 +249,9 @@ ${formHeader!}
 </div>
 <div class="status span<#if showBottomButtons>2<#else>3</#if>">
 <span>
-<#if resultPage??>
+<#if resultPage?? && resultPage.totalResults gt 0>
 ${resultPage.totalResults}<span class="recordLabel"> ${action.getText('record')}</span>
-<#else>
+<#elseif list?? && list?size gt 0>
 ${list?size}<span class="recordLabel"> ${action.getText('record')}</span>
 </#if>
 </span>
