@@ -104,7 +104,7 @@ public class ConfigLoader {
             DocumentBuilder builder = factory.newDocumentBuilder();
 
             Document document;
-            InputStream is = config.getServletContext().getResourceAsStream(configFileName);
+            InputStream is = config.getServletContext().getResourceAsStream(configFileName.indexOf('/') == 0 ? configFileName : '/'+configFileName);
             if (is == null){
                 is = getClass().getClassLoader().getResourceAsStream(configFileName);
                 }

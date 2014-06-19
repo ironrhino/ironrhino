@@ -124,7 +124,7 @@ public class DefaultFactory extends BaseFactory {
 
         InputStream is = null;
 
-        is = config.getServletContext().getResourceAsStream(configFileName);
+        is = config.getServletContext().getResourceAsStream(configFileName.indexOf('/') == 0 ? configFileName : '/'+configFileName);
 
         if (is == null){
             is = getClass().getClassLoader().getResourceAsStream(configFileName);
@@ -163,7 +163,7 @@ public class DefaultFactory extends BaseFactory {
 
         InputStream is = null;
 
-        is = config.getServletContext().getResourceAsStream(excludesFileName);
+        is = config.getServletContext().getResourceAsStream(excludesFileName.indexOf('/') == 0 ? excludesFileName : '/'+excludesFileName);
         if (is == null)
              is = getClass().getClassLoader().getResourceAsStream(excludesFileName);
         if (is == null)
