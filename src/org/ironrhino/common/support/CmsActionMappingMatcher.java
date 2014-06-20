@@ -243,14 +243,35 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher,
 	@Override
 	public void onApplicationEvent(EntityOperationEvent event) {
 		if (event.getEntity() instanceof Setting) {
-			Setting settingInEvent = (Setting) event.getEntity();
-			String key = settingInEvent.getKey();
+			Setting setting = (Setting) event.getEntity();
+			String key = setting.getKey();
 			if (key.equals(Constants.SETTING_KEY_CMS_SERIESES)) {
-				buildSerieses();
+				List<String> list = new ArrayList<String>();
+				if (StringUtils.isNotBlank(serieses))
+					for (String s : serieses.split("\\s*,\\s*"))
+						list.add(s);
+				if (StringUtils.isNotBlank(setting.getValue()))
+					for (String s : setting.getValue().split("\\s*,\\s*"))
+						list.add(s);
+				seriesesList = list;
 			} else if (key.equals(Constants.SETTING_KEY_CMS_COLUMNS)) {
-				buildColumns();
+				List<String> list = new ArrayList<String>();
+				if (StringUtils.isNotBlank(columns))
+					for (String s : columns.split("\\s*,\\s*"))
+						list.add(s);
+				if (StringUtils.isNotBlank(setting.getValue()))
+					for (String s : setting.getValue().split("\\s*,\\s*"))
+						list.add(s);
+				columnsList = list;
 			} else if (key.equals(Constants.SETTING_KEY_CMS_ISSUES)) {
-				buildIssues();
+				List<String> list = new ArrayList<String>();
+				if (StringUtils.isNotBlank(issues))
+					for (String s : issues.split("\\s*,\\s*"))
+						list.add(s);
+				if (StringUtils.isNotBlank(setting.getValue()))
+					for (String s : setting.getValue().split("\\s*,\\s*"))
+						list.add(s);
+				issuesList = list;
 			}
 		}
 	}

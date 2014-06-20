@@ -30,7 +30,6 @@ import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 @Component
-@org.springframework.core.annotation.Order(Ordered.HIGHEST_PRECEDENCE)
 public class SettingControl implements
 		ApplicationListener<EntityOperationEvent> {
 
