@@ -24,7 +24,7 @@
 			<li class="nav-header">${name}</li>
 			<#list pages as var>
 			<#assign active=page?? && page.path==var.path/>
-			<li<#if active> class="active"</#if>><a href="<@url value="/${name}/p${var.path}"/>" class="ajax view">${var.title}</a></li>
+			<li<#if active> class="active"</#if> style="padding-left:10px;"><a href="<@url value="/${name}/p${var.path}"/>" class="ajax view">${var.title}</a></li>
 			</#list>
 		</ul>
     </div>

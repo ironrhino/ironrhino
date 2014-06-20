@@ -32558,15 +32558,15 @@ Observation.common = function(container) {
 
 var Nav = {
 	init : function() {
-		$(document).on('click', '.nav:not(.nav-tabs) li a', function() {
+		$(document).on('click', '.nav:not(.nav-tabs):not(.nav-list) li a', function() {
 					$('li', $(this).closest('.nav')).removeClass('active');
 					Nav.indicate($(this));
 				});
 	},
 	activate : function(url) {
 		url = UrlUtils.absolutize(url);
-		$('.nav:not(.nav-tabs) li').removeClass('active open');
-		$('.nav:not(.nav-tabs) li a').each(function() {
+		$('.nav:not(.nav-tabs):not(.nav-list) li').removeClass('active open');
+		$('.nav:not(.nav-tabs):not(.nav-list) li a').each(function() {
 					if (this.href == url || url.indexOf(this.href + '?') == 0) {
 						Nav.indicate($(this));
 					}

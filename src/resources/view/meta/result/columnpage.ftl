@@ -8,7 +8,7 @@
 	<li>
     	<a class="ajax view" href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
 	</li>
-<#if !column??>
+<#if !column?has_content>
 	<li class="active">${action.getText(name)}</li>
 <#else>
 	<li>
@@ -21,10 +21,10 @@
   <div class="row-fluid">
     <div class="span2">
 		<ul class="nav nav-list">
-			<li class="nav-header">${name}</li>
+			<li class="nav-header"><a href="<@url value="/${name}"/>" class="ajax view">${name}</a></li>
 			<#list columns as var>
-			<#assign active=column?? && column==var/>
-			<li<#if active> class="active"</#if>><a href="<@url value="/${name}/list/${var?url}"/>" class="ajax view">${var}</a></li>
+			<#assign active=column?has_content && column==var/>
+			<li<#if active> class="active"</#if> style="padding-left:10px;"><a href="<@url value="/${name}/list/${var?url}"/>" class="ajax view">${var}</a></li>
 			</#list>
 		</ul>
     </div>
