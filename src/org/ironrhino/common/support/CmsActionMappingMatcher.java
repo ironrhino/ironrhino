@@ -2,6 +2,7 @@ package org.ironrhino.common.support;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,124 +69,137 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher,
 			DefaultActionMapper actionMapper) {
 		String uri = RequestUtils.getRequestUri(request);
 		String encoding = actionMapper.getEncoding();
-		if (uri.startsWith(pagePathPrefix)) {
-			String pagePath = uri.substring(pagePathPrefix.length() - 1);
-			ActionMapping mapping = new ActionMapping();
-			mapping.setNamespace(DisplayPageAction.NAMESPACE);
-			mapping.setName(DisplayPageAction.ACTION_NAME);
-			Map<String, Object> params = new HashMap<String, Object>(8);
-			try {
+		try {
+			if (uri.startsWith(pagePathPrefix)) {
+				String pagePath = uri.substring(pagePathPrefix.length() - 1);
+				ActionMapping mapping = new ActionMapping();
+				mapping.setNamespace(DisplayPageAction.NAMESPACE);
+				mapping.setName(DisplayPageAction.ACTION_NAME);
+				Map<String, Object> params = new HashMap<String, Object>(8);
 				params.put(AbstractActionMapper.ID,
 						URLDecoder.decode(pagePath, encoding));
 				mapping.setParams(params);
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-			return mapping;
-		}
-		for (String name : seriesesList) {
-			String pageurl = new StringBuilder("/").append(name)
-					.append(DEFAULT_PAGE_PATH_PREFIX).toString();
-			if (uri.equals("/" + name) || uri.startsWith(pageurl)) {
-				ActionMapping mapping = new ActionMapping();
-				mapping.setNamespace(SeriesPageAction.NAMESPACE);
-				mapping.setName(SeriesPageAction.ACTION_NAME);
-				Map<String, Object> params = new HashMap<String, Object>(8);
-				params.put("name", name);
-				String pn = request.getParameter(ResultPage.PAGENO_PARAM_NAME);
-				if (StringUtils.isNumeric(pn))
-					params.put("resultPage.pageNo", pn);
-				String ps = request
-						.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
-				if (StringUtils.isNumeric(ps))
-					params.put("resultPage.pageSize", ps);
-				if (uri.startsWith(pageurl)) {
-					params.put(AbstractActionMapper.ID,
-							uri.substring(pageurl.length()));
-				}
-				mapping.setParams(params);
 				return mapping;
 			}
-		}
-		for (String name : columnsList) {
-			String listurl = new StringBuilder("/").append(name)
-					.append("/list/").toString();
-			String pageurl = new StringBuilder("/").append(name)
-					.append(DEFAULT_PAGE_PATH_PREFIX).toString();
-			if (uri.equals("/" + name) || uri.startsWith(listurl)
-					|| uri.startsWith(pageurl)) {
-				ActionMapping mapping = new ActionMapping();
-				mapping.setNamespace(ColumnPageAction.NAMESPACE);
-				mapping.setName(ColumnPageAction.ACTION_NAME);
-				Map<String, Object> params = new HashMap<String, Object>(8);
-				params.put("name", name);
-				String pn = request.getParameter(ResultPage.PAGENO_PARAM_NAME);
-				if (StringUtils.isNumeric(pn))
-					params.put("resultPage.pageNo", pn);
-				String ps = request
-						.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
-				if (StringUtils.isNumeric(ps))
-					params.put("resultPage.pageSize", ps);
-				if (uri.startsWith(listurl)) {
-					mapping.setMethod("list");
-					try {
-						params.put(AbstractActionMapper.ID, URLDecoder.decode(
-								uri.substring(listurl.length()), encoding));
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+			for (String name : seriesesList) {
+				String pageurl = new StringBuilder("/")
+						.append(URLEncoder.encode(name, encoding))
+						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
+				if (uri.equals("/" + URLEncoder.encode(name, encoding))
+						|| uri.startsWith(pageurl)) {
+					ActionMapping mapping = new ActionMapping();
+					mapping.setNamespace(SeriesPageAction.NAMESPACE);
+					mapping.setName(SeriesPageAction.ACTION_NAME);
+					Map<String, Object> params = new HashMap<String, Object>(8);
+					params.put("name", name);
+					String pn = request
+							.getParameter(ResultPage.PAGENO_PARAM_NAME);
+					if (StringUtils.isNumeric(pn))
+						params.put("resultPage.pageNo", pn);
+					String ps = request
+							.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
+					if (StringUtils.isNumeric(ps))
+						params.put("resultPage.pageSize", ps);
+					if (uri.startsWith(pageurl)) {
+						params.put(AbstractActionMapper.ID,
+								uri.substring(pageurl.length()));
 					}
-				} else if (uri.startsWith(pageurl)) {
-					mapping.setMethod("p");
-					try {
-						params.put(AbstractActionMapper.ID, URLDecoder.decode(
-								uri.substring(pageurl.length()), encoding));
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
+					mapping.setParams(params);
+					return mapping;
 				}
-				mapping.setParams(params);
-				return mapping;
 			}
-		}
-		for (String name : issuesList) {
-			String listurl = new StringBuilder("/").append(name)
-					.append("/list/").toString();
-			String pageurl = new StringBuilder("/").append(name)
-					.append(DEFAULT_PAGE_PATH_PREFIX).toString();
-			if (uri.equals("/" + name) || uri.startsWith(listurl)
-					|| uri.startsWith(pageurl)) {
-				ActionMapping mapping = new ActionMapping();
-				mapping.setNamespace(IssuePageAction.NAMESPACE);
-				mapping.setName(IssuePageAction.ACTION_NAME);
-				Map<String, Object> params = new HashMap<String, Object>(8);
-				params.put("name", name);
-				String pn = request.getParameter(ResultPage.PAGENO_PARAM_NAME);
-				if (StringUtils.isNumeric(pn))
-					params.put("resultPage.pageNo", pn);
-				String ps = request
-						.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
-				if (StringUtils.isNumeric(ps))
-					params.put("resultPage.pageSize", ps);
-				if (uri.startsWith(listurl)) {
-					mapping.setMethod("list");
-					try {
-						params.put(AbstractActionMapper.ID, URLDecoder.decode(
-								uri.substring(listurl.length()), encoding));
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+			for (String name : columnsList) {
+				String listurl = new StringBuilder("/")
+						.append(URLEncoder.encode(name, encoding))
+						.append("/list/").toString();
+				String pageurl = new StringBuilder("/")
+						.append(URLEncoder.encode(name, encoding))
+						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
+				if (uri.equals("/" + URLEncoder.encode(name, encoding))
+						|| uri.startsWith(listurl) || uri.startsWith(pageurl)) {
+					ActionMapping mapping = new ActionMapping();
+					mapping.setNamespace(ColumnPageAction.NAMESPACE);
+					mapping.setName(ColumnPageAction.ACTION_NAME);
+					Map<String, Object> params = new HashMap<String, Object>(8);
+					params.put("name", name);
+					String pn = request
+							.getParameter(ResultPage.PAGENO_PARAM_NAME);
+					if (StringUtils.isNumeric(pn))
+						params.put("resultPage.pageNo", pn);
+					String ps = request
+							.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
+					if (StringUtils.isNumeric(ps))
+						params.put("resultPage.pageSize", ps);
+					if (uri.startsWith(listurl)) {
+						mapping.setMethod("list");
+						try {
+							params.put(AbstractActionMapper.ID, URLDecoder
+									.decode(uri.substring(listurl.length()),
+											encoding));
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+					} else if (uri.startsWith(pageurl)) {
+						mapping.setMethod("p");
+						try {
+							params.put(AbstractActionMapper.ID, URLDecoder
+									.decode(uri.substring(pageurl.length()),
+											encoding));
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
 					}
-				} else if (uri.startsWith(pageurl)) {
-					mapping.setMethod("p");
-					try {
-						params.put(AbstractActionMapper.ID, URLDecoder.decode(
-								uri.substring(pageurl.length()), encoding));
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
+					mapping.setParams(params);
+					return mapping;
 				}
-				mapping.setParams(params);
-				return mapping;
 			}
+			for (String name : issuesList) {
+				String listurl = new StringBuilder("/")
+						.append(URLEncoder.encode(name, encoding))
+						.append("/list/").toString();
+				String pageurl = new StringBuilder("/")
+						.append(URLEncoder.encode(name, encoding))
+						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
+				if (uri.equals("/" + URLEncoder.encode(name, encoding))
+						|| uri.startsWith(listurl) || uri.startsWith(pageurl)) {
+					ActionMapping mapping = new ActionMapping();
+					mapping.setNamespace(IssuePageAction.NAMESPACE);
+					mapping.setName(IssuePageAction.ACTION_NAME);
+					Map<String, Object> params = new HashMap<String, Object>(8);
+					params.put("name", name);
+					String pn = request
+							.getParameter(ResultPage.PAGENO_PARAM_NAME);
+					if (StringUtils.isNumeric(pn))
+						params.put("resultPage.pageNo", pn);
+					String ps = request
+							.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
+					if (StringUtils.isNumeric(ps))
+						params.put("resultPage.pageSize", ps);
+					if (uri.startsWith(listurl)) {
+						mapping.setMethod("list");
+						try {
+							params.put(AbstractActionMapper.ID, URLDecoder
+									.decode(uri.substring(listurl.length()),
+											encoding));
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+					} else if (uri.startsWith(pageurl)) {
+						mapping.setMethod("p");
+						try {
+							params.put(AbstractActionMapper.ID, URLDecoder
+									.decode(uri.substring(pageurl.length()),
+											encoding));
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+					}
+					mapping.setParams(params);
+					return mapping;
+				}
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
