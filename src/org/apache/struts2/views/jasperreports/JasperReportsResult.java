@@ -257,7 +257,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
         initializeProperties(invocation);
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Creating JasperReport for dataSource = " + dataSource + ", format = " + format);
+            LOG.debug("Creating JasperReport for dataSource = " + dataSource + ", format = " + format, new Object[0]);
         }
 
         HttpServletRequest request = (HttpServletRequest) invocation.getInvocationContext().get(ServletActionContext.HTTP_REQUEST);
@@ -310,7 +310,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
         Map reportParams = (Map) stack.findValue(reportParameters);
         if (reportParams != null) {
             if (LOG.isDebugEnabled()) {
-        	LOG.debug("Found report parameters; adding to parameters...");
+        	LOG.debug("Found report parameters; adding to parameters...", new Object[0]);
             }
             parameters.putAll(reportParams);
         }
@@ -385,7 +385,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
             Map exportParams = (Map) stack.findValue(exportParameters);
             if (exportParams != null) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Found export parameters; adding to exporter parameters...");
+                    LOG.debug("Found export parameters; adding to exporter parameters...", new Object[0]);
                 }
                 exporter.getParameters().putAll(exportParams);
             }

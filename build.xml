@@ -89,6 +89,10 @@
 	<target name="create" depends="dist">
 		<script language="javascript">
 			<![CDATA[
+			try{
+				load('nashorn:mozilla_compat.js');
+			}catch(e){
+			}
 			importPackage(java.io);
 			var version = project.getProperty('version');
 			if(!version)

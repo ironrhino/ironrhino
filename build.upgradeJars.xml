@@ -3,6 +3,10 @@
 	<target name="upgradeJars">
 		<script language="javascript">
 			<![CDATA[
+			try{
+				load('nashorn:mozilla_compat.js');
+			}catch(e){
+			}
 			importPackage(java.io);
 			var classpathfile = new File(project.getProperty('basedir')+'/.classpath');
 			var is = new FileInputStream(classpathfile);

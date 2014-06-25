@@ -176,7 +176,7 @@ public class ServletUrlRenderer implements UrlRenderer {
                 includeExtraParameters(urlComponent);
             } else if (includeParams != null) {
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn("Unknown value for includeParams parameter to URL tag: " + includeParams);
+                    LOG.warn("Unknown value for includeParams parameter to URL tag: " + includeParams, new Object[0]);
                 }
             }
         } catch (Exception e) {

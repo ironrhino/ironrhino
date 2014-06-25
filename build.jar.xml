@@ -79,6 +79,10 @@
 	<target name="set-revision">
 		<script language="javascript">
 			<![CDATA[
+			try{
+				load('nashorn:mozilla_compat.js');
+			}catch(e){
+			}
 			importPackage(java.io);
 			if(new File(basedir+'/.svn').isDirectory()){
 				var exec = project.createTask('exec');
@@ -131,6 +135,10 @@
 	<target name="append-revision-for-assets">
 		<script language="javascript">
 			<![CDATA[
+			try{
+				load('nashorn:mozilla_compat.js');
+			}catch(e){
+			}
 			importPackage(java.io);
 			var vcs;
 			if(new File(basedir+'/.svn').isDirectory())

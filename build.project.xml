@@ -51,6 +51,10 @@
 			failonerror="false" />
 		<script language="javascript">
 			<![CDATA[
+			try{
+				load('nashorn:mozilla_compat.js');
+			}catch(e){
+			}
 			importPackage(java.io);
 			if(!new File(basedir+'/../ironrhino').isDirectory()){
 				println("directory ../ironrhino doesn't exists");
@@ -254,6 +258,10 @@
 	<target name="append-revision-for-assets">
 		<script language="javascript">
 						<![CDATA[
+			try{
+				load('nashorn:mozilla_compat.js');
+			}catch(e){
+			}
 			importPackage(java.io);
 			var vcs;
 			if(new File(basedir+'/.svn').isDirectory())
@@ -497,6 +505,10 @@
 		</copy>
 		<script language="javascript">
 			<![CDATA[
+					try{
+						load('nashorn:mozilla_compat.js');
+					}catch(e){
+					}
 					importPackage(java.io);
 					var libext = new File(project.getProperty('webapp.dir')+'/WEB-INF/libext');
 					var ironrhinolib = new File(project.getProperty('basedir')+'/../ironrhino/lib');
