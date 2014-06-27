@@ -18,7 +18,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/jquery-2.1.1.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.browser-1.0.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.cookie-1.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.ui-1.10.4.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.ui-1.11.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.history-2.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.rc4-1.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.form-2.95.js" />
@@ -78,7 +78,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/jquery-1.11.1.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.browser-1.0.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.cookie-1.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.ui-1.10.4.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.ui-1.11.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.history-2.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.rc4-1.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.form-2.95.js" />
