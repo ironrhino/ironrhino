@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1241,6 +1242,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		}
 		String json = JsonUtils.toJson(map);
 		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setHeader("Content-type", "application/json");
+		String filename = String.valueOf(_entity.getId());
+		if (bwi.getPropertyValue("name") != null)
+			filename = String.valueOf(bwi.getPropertyValue("name"));
+		filename = URLEncoder.encode(filename, "UTF-8");
+		response.setHeader("Content-disposition", "attachment;filename="
+				+ filename + ".json");
 		PrintWriter out = response.getWriter();
 		out.print(json);
 		out.flush();

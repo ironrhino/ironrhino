@@ -264,7 +264,7 @@
 	</#list>
 	<#if richtableConfig.exportable>
 	<div class="form-actions">
-		<a href="${actionBaseUrl}/export/${entity.id}" class="btn" download="${entity.id}.json">${action.getText('export')}</a>
+		<a href="${actionBaseUrl}/export/${entity.id}" class="btn">${action.getText('export')}</a>
 	</div>
 	</#if>
 	</div>
