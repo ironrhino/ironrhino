@@ -10,8 +10,8 @@
 	<classpathentry kind="lib" path="lib/closure-compiler.jar"/>
 	<classpathentry kind="lib" path="lib/yuicompressor.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aopalliance-1.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjrt-1.8.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjweaver-1.8.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjrt-1.8.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjweaver-1.8.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/bonecp-0.8.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-codec-1.9.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-collections-3.2.1.jar"/>
