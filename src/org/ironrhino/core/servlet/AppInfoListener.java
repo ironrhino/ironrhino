@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 
 public class AppInfoListener implements ServletContextListener {
 
-	public static volatile ServletContext SERVLET_CONTEXT;
+	public static ServletContext SERVLET_CONTEXT;
 
 	private Logger logger;
 
