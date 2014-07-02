@@ -33170,16 +33170,18 @@ Initialization.common = function() {
 			}).on('validate', ':input', function(ev) {
 				Form.validate(this);
 			}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
-				if (!$(this).hasClass('email') && !$(this).hasClass('regex')
+				if ($(this).hasClass('required') || !$(this).hasClass('email')
+						&& !$(this).hasClass('regex')
 						&& !$(this).hasClass('repeat') && ev.keyCode != 13)
 					if ($(this).val())
 						Form.validate(this);
 				return true;
 			})).on('focusout', 'input,textarea', function(ev) {
-		// if (this.value != this.defaultValue)
-		if ($(this).hasClass('email') || $(this).hasClass('regex')
-				|| $(this).hasClass('repeat') || !$(this).hasClass('required'))
-			Form.validate(this);
+		if (this.value != this.defaultValue)
+			if ($(this).hasClass('email') || $(this).hasClass('regex')
+					|| $(this).hasClass('repeat')
+					|| !$(this).hasClass('required'))
+				Form.validate(this);
 		return true;
 	}).on('change', 'select', function() {
 				Form.validate(this);
@@ -33943,7 +33945,8 @@ Observation.common = function(container) {
 
 var Nav = {
 	init : function() {
-		$(document).on('click', '.nav:not(.nav-tabs):not(.nav-list) li a', function() {
+		$(document).on('click', '.nav:not(.nav-tabs):not(.nav-list) li a',
+				function() {
 					$('li', $(this).closest('.nav')).removeClass('active');
 					Nav.indicate($(this));
 				});
