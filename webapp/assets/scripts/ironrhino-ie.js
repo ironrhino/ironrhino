@@ -32643,8 +32643,10 @@ Message = {
 				field = field.next('.chzn-container');
 			if (field.is(':visible')) {
 				$(field).parent().css('position', 'relative');
-				var prompt = $('<div class="field-error removeonclick"><div class="field-error-content">'
-						+ msg + '</div><div>').insertAfter(field);
+				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
+						+ msg
+						+ '<a class="remove pull-right" href="#">&times;</a></div><div>')
+						.insertAfter(field);
 				$('<div class="field-error-arrow"/>')
 						.html('<div class="line10"><!-- --></div><div class="line9"><!-- --></div><div class="line8"><!-- --></div><div class="line7"><!-- --></div><div class="line6"><!-- --></div><div class="line5"><!-- --></div><div class="line4"><!-- --></div><div class="line3"><!-- --></div><div class="line2"><!-- --></div><div class="line1"><!-- --></div>')
 						.appendTo(prompt);
@@ -32706,6 +32708,9 @@ Form = {
 	clearError : function(target) {
 		if ($(target).prop('tagName') == 'FORM') {
 			$('.control-group.error', target).removeClass('error');
+			$('.field-error', target).fadeIn().remove();
+		} else if ($(target).prop('tagName') == 'DIV') {
+			$(target).removeClass('error');
 			$('.field-error', target).fadeIn().remove();
 		} else {
 			$(target).closest('.control-group').removeClass('error');
@@ -33167,6 +33172,9 @@ Initialization.common = function() {
 						});
 			}).on('click', '.removeonclick', function() {
 				$(this).remove()
+			}).on('click', '.control-group .field-error .remove', function(e) {
+				Form.clearError($(e.target).closest('.control-group'));
+				return false;
 			}).on('validate', ':input', function(ev) {
 				Form.validate(this);
 			}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
