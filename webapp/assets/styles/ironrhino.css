@@ -8321,6 +8321,9 @@ div.text-core{
 .modal-body > form {
 	padding-top: 30px;
 }
+.form-horizontal .tab-pane div.control-group:first-child{
+	margin-top: 40px;
+}
 .form-horizontal .control-label{
 	width: 100px;
 }
@@ -8462,26 +8465,21 @@ span.checkboxgroup{
 .action-error strong.force-override{
 	cursor: pointer;
 }
-.field-error.field-error-popover {
+.field-error-popover {
 	position: absolute;
-	top: 300px;
-	left: 300px;
-	display: block;
-	z-index: 5000;
 }
 
-.field-error .field-error-content {
+.field-error-popover .field-error-content {
 	width: 100%;
 	background: #fcf8e3;
 	position:relative;
-	z-index:5001;
 	color: #b94a48;
 	max-width: 300px;
 	border: 1px solid #b94a48;
 	padding: 4px 10px 4px 10px;
-	border-radius: 6px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
+	border-radius: 6px;
 }
 .field-error-content:before{
     content:'';
