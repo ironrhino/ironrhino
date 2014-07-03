@@ -163,61 +163,27 @@ span.checkboxgroup{
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 }
-.field-error .field-error-arrow {
-	width: 15px;
-	margin: -2px 0 0 13px;
-	position:relative;
-	z-index: 5006;
+.field-error-content:before{
+    content:'';
+    display:inline-block;
+    border-left:7px solid transparent;
+    border-right:7px solid transparent;
+    border-top:7px solid #b94a48;
+    position:absolute;
+    top: auto;
+	bottom:-7px;
+	left:10px;
 }
-.field-error .field-error-arrow div {
-	border-left: 1px solid #b94a48;
-	border-right: 1px solid #b94a48;
-	font-size: 0px;
-	height: 1px;
-	background: #fcf8e3;
-	margin: 0 auto;
-	line-height: 0;
-	font-size: 0;
-	display: block;
-}
-.field-error .field-error-arrow .line10 {
-	width: 15px;
-	border: none;
-}
-.field-error .field-error-arrow .line9 {
-	width: 13px;
-	border: none;
-}
-.field-error .field-error-arrow .line8 {
-	width: 11px;
-}
-.field-error .field-error-arrow .line7 {
-	width: 9px;
-}
-.field-error .field-error-arrow .line6 {
-	width: 7px;
-}
-.field-error .field-error-arrow .line5 {
-	width: 5px;
-}
-.field-error .field-error-arrow .line4 {
-	width: 3px;
-}
-.field-error .field-error-arrow .line3 {
-	width: 1px;
-	border-left: 1px solid #b94a48;
-	border-right: 1px solid #b94a48;
-	border-bottom: 0 solid #b94a48;
-}
-.field-error .field-error-arrow .line2 {
-	width: 3px;
-	border: none;
-	background: #b94a48;
-}
-.field-error .field-error-arrow .line1 {
-	width: 1px;
-	border: none;
-	background: #b94a48;
+.field-error-content:after{
+    content: '';
+	display: inline-block;
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid #fcf8e3;
+	position: absolute;
+	top: auto;
+	bottom: -6px;
+	left: 11px;
 }
 .input-append .field-error-content {
 	font-size: 13px;

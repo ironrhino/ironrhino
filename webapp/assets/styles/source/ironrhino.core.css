@@ -48,10 +48,10 @@ td.middle {
 	opacity: 1;
 	filter: alpha(opacity=100);
 }
-.ui-dialog-titlebar-close,a.close{
+.ui-dialog-titlebar-close,a.close,a.remove{
 	transition:all 0.5s ease;
 }
-.ui-dialog-titlebar-close:hover,a.close:hover{
+.ui-dialog-titlebar-close:hover,a.close:hover,a.remove:hover{
 	transform:rotate(90deg);
 }
 /*override bootstrap end*/

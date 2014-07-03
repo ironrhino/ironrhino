@@ -31529,13 +31529,10 @@ Message = {
 						+ msg
 						+ '<a class="remove pull-right" href="#">&times;</a></div><div>')
 						.insertAfter(field);
-				$('<div class="field-error-arrow"/>')
-						.html('<div class="line10"><!-- --></div><div class="line9"><!-- --></div><div class="line8"><!-- --></div><div class="line7"><!-- --></div><div class="line6"><!-- --></div><div class="line5"><!-- --></div><div class="line4"><!-- --></div><div class="line3"><!-- --></div><div class="line2"><!-- --></div><div class="line1"><!-- --></div>')
-						.appendTo(prompt);
 				var promptTopPosition, promptleftPosition, marginTopSize;
 				var fieldWidth = field.width();
 				var promptHeight = prompt.height();
-				promptTopPosition = field.position().top;
+				promptTopPosition = field.position().top - 6;
 				promptleftPosition = field.position().left + fieldWidth - 30;
 				marginTopSize = -promptHeight;
 				prompt.css({
