@@ -32642,7 +32642,7 @@ Message = {
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
 			if (field.is(':visible')) {
-				$(field).parent().css('position', 'relative');
+				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
 						+ msg
 						+ '<a class="remove pull-right" href="#">&times;</a></div><div>')
@@ -32651,7 +32651,14 @@ Message = {
 				var fieldWidth = field.width();
 				var promptHeight = prompt.height();
 				promptTopPosition = field.position().top - 6;
-				promptleftPosition = field.position().left + fieldWidth - 30;
+				var parentWidth = field.closest('.controls').width();
+				if (parentWidth && (parentWidth - fieldWidth) < prompt.width()) {
+					promptleftPosition = field.position().left + fieldWidth
+							- (prompt.width() + 10);
+				} else {
+					promptleftPosition = field.position().left + fieldWidth
+							- 30;
+				}
 				marginTopSize = -promptHeight;
 				prompt.css({
 							"top" : promptTopPosition + "px",
