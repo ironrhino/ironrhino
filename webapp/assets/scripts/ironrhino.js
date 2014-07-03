@@ -31525,6 +31525,14 @@ Message = {
 				field = field.next('.chzn-container');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
+				var grandpa = field.parent().parent();
+				if (grandpa.hasClass('control-group')
+						&& grandpa.parent().hasClass('tab-pane')
+						&& grandpa.is(':first-child')) {
+					grandpa.css({
+								'margin-top' : '40px'
+							});
+				}
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
 						+ msg
 						+ '<a class="remove pull-right" href="#">&times;</a></div><div>')

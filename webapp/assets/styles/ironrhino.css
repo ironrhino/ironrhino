@@ -8321,9 +8321,6 @@ div.text-core{
 .modal-body > form {
 	padding-top: 30px;
 }
-.form-horizontal .tab-pane div.control-group:first-child{
-	margin-top: 40px;
-}
 .form-horizontal .control-label{
 	width: 100px;
 }
