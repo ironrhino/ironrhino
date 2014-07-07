@@ -70,7 +70,8 @@ body.welcome .hero-unit .caption {
 	text-align: center;
 	text-shadow: 1px 1px 1px gray;
 	border-radius:20px;
-	background-color: #e3e3e3;
+	background-color: #e6e6e6;
+	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
 	margin-top: -40px;
 }
 body.welcome .hero-unit form {
