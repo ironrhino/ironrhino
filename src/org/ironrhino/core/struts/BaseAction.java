@@ -285,8 +285,9 @@ public class BaseAction extends ActionSupport {
 		if (captchaManager != null
 				&& captchaRequired
 				&& !firstReachCaptchaThreshold
-				&& !captchaManager.validate(ServletActionContext.getRequest(),
-						ServletActionContext.getRequest().getSession().getId()))
+				&& !captchaManager.verify(ServletActionContext.getRequest(),
+						ServletActionContext.getRequest().getSession().getId(),
+						true))
 			addFieldError(CaptchaManager.KEY_CAPTCHA, getText("captcha.error"));
 		if (csrfRequired) {
 			String value = RequestUtils.getCookieValue(

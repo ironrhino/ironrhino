@@ -8500,7 +8500,9 @@ span.checkboxgroup{
 	font-size: 13px;
 	line-height: 20px;
 }
-
+.input-error{
+	border-color: red !important;
+}
 img.captcha {
 	height: 25px;
 	width: 100px;

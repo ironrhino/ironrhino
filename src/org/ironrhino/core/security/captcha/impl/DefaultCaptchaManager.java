@@ -74,7 +74,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
 		return challenge;
 	}
 
-	protected boolean validate(String input, String answer) {
+	protected boolean verify(String input, String answer) {
 		if (input == null || answer == null)
 			return false;
 		return clarifyChallenge(input).equals(answer);
@@ -133,21 +133,23 @@ public class DefaultCaptchaManager implements CaptchaManager {
 	}
 
 	@Override
-	public boolean validate(HttpServletRequest request, String token) {
-		Boolean validated = (Boolean) request
+	public boolean verify(HttpServletRequest request, String token,
+			boolean cleanup) {
+		Boolean pass = (Boolean) request
 				.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_VALIDATED);
-		if (validated == null) {
+		if (pass == null) {
 			String answer = (String) cacheManager.get(CACHE_PREFIX_ANSWER
 					+ token, KEY_CAPTCHA);
-			validated = validate(request.getParameter(KEY_CAPTCHA), answer);
-			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_VALIDATED,
-					validated);
+			pass = verify(request.getParameter(KEY_CAPTCHA), answer);
+			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_VALIDATED, pass);
 		}
-		if (validated)
+		if (!cleanup)
+			return pass;
+		if (pass)
 			cacheManager.delete(getThresholdKey(request), KEY_CAPTCHA);
 		else
 			addCaptachaThreshold(request);
-		return validated;
+		return pass;
 	}
 
 	protected String getThresholdKey(HttpServletRequest request) {

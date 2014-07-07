@@ -20,13 +20,21 @@ public class CaptchaFilter implements Filter {
 
 	public static final String DEFAULT_IMAGE_CAPTCHA_URL = "/captcha.jpg";
 
+	public static final String DEFAULT_IMAGE_CAPTCHA_VERIFY_URL = "/verifyCaptcha";
+
 	@Autowired
 	private transient CaptchaManager captchaManager;
 
 	private String imageCaptchaUrl = DEFAULT_IMAGE_CAPTCHA_URL;
 
+	private String imageCaptchaVerifyUrl = DEFAULT_IMAGE_CAPTCHA_VERIFY_URL;
+
 	public void setImageCaptchaUrl(String imageCaptchaUrl) {
 		this.imageCaptchaUrl = imageCaptchaUrl;
+	}
+
+	public void setImageCaptchaVerifyUrl(String imageCaptchaVerifyUrl) {
+		this.imageCaptchaVerifyUrl = imageCaptchaVerifyUrl;
 	}
 
 	@Override
@@ -51,6 +59,14 @@ public class CaptchaFilter implements Filter {
 							.fuzzifyChallenge(challenge)).getImage(), "JPEG",
 					response.getOutputStream());
 			response.getOutputStream().close();
+			return;
+		} else if (path.equals(imageCaptchaVerifyUrl)) {
+			response.setContentType("text/plain");
+			response.setHeader("Pragma", "No-cache");
+			response.setHeader("Cache-Control", "no-cache");
+			response.setDateHeader("Expires", 0);
+			boolean pass = captchaManager.verify(request, token, false);
+			response.getWriter().print(pass);
 			return;
 		}
 		chain.doFilter(req, resp);

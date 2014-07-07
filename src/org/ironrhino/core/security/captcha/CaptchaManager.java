@@ -14,7 +14,8 @@ public interface CaptchaManager {
 
 	public String clarifyChallenge(String challenge);
 
-	public boolean validate(HttpServletRequest request, String token);
+	public boolean verify(HttpServletRequest request, String token,
+			boolean cleanup);
 
 	/**
 	 * array[0] = isCaptchaRequired,array[1] = isFirstReachCaptchaThreshold

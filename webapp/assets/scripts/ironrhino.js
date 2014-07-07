@@ -32116,7 +32116,50 @@ Initialization.common = function() {
 					else
 						t.removeClass('empty');
 				}
-			});
+			}).on('click', 'img.captcha', Captcha.refresh).on('focus',
+			'input.captcha', function() {
+				var t = $(this);
+
+				if (t.next('img.captcha').length)
+					return;
+				t.after('<img class="captcha" src="' + t.data('captcha')
+						+ '"/>');
+			}).on('keyup', 'input.captcha', function() {
+				var t = $(this);
+				t.removeClass('input-error');
+				if (t.val().length >= 4)
+					t.trigger('verify');
+			})
+			/*
+			 * .on('focusout', 'input.captcha', function() {
+			 * $(this).trigger('verify'); })
+			 */.on('verify', 'input.captcha', function() {
+		var t = $(this);
+		var img = t.next('img.captcha');
+		if (t.val() && img.length) {
+			var token = img.attr('src');
+			var index = token.indexOf('token=');
+			if (index > -1)
+				token = token.substring(index + 6);
+			index = token.indexOf('&');
+			if (index > -1)
+				token = token.substring(0, index);
+			$.ajax({
+						global : false,
+						type : "POST",
+						url : CONTEXT_PATH + '/verifyCaptcha',
+						data : {
+							captcha : t.val(),
+							token : token
+						},
+						success : function(result) {
+							result == 'false' ? t.addClass('input-error')
+									.focus() : t.removeClass('input-error')
+									.blur();
+						}
+					});
+		}
+	});
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
 	Nav.init();
@@ -32389,13 +32432,6 @@ Observation.common = function(container) {
 					// })
 					;
 				});
-	$('input.captcha', container).focus(function() {
-				if ($(this).data('_captcha_'))
-					return;
-				$(this).after('<img class="captcha" src="' + this.id + '"/>');
-				$('img.captcha', container).click(Captcha.refresh);
-				$(this).data('_captcha_', true);
-			});
 	if (typeof $.fn.treeTable != 'undefined')
 		$('.treeTable', container).each(function() {
 			$(this).treeTable({
