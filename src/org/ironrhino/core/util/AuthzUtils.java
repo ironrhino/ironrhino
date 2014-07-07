@@ -79,6 +79,8 @@ public class AuthzUtils {
 				for (GrantedAuthority var : authz)
 					roleNames.add(var.getAuthority());
 		}
+		if (roleNames.isEmpty())
+			roleNames.add("ROLE_BUILTIN_ANONYMOUS");
 		return roleNames;
 	}
 
