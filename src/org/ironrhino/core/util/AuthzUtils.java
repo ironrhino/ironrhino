@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Secured;
+import org.ironrhino.core.security.role.UserRole;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -80,7 +81,7 @@ public class AuthzUtils {
 					roleNames.add(var.getAuthority());
 		}
 		if (roleNames.isEmpty())
-			roleNames.add("ROLE_BUILTIN_ANONYMOUS");
+			roleNames.add(UserRole.ROLE_BUILTIN_ANONYMOUS);
 		return roleNames;
 	}
 

@@ -32729,7 +32729,7 @@ Form = {
 			$('.field-error', $(target).parent()).fadeIn().remove();
 		}
 	},
-	validate : function(target) {
+	validate : function(target, evt) {
 		if ($(target).prop('tagName') != 'FORM') {
 			Form.clearError(target);
 			if ($(target).is('input[type="radio"]')) {
@@ -32773,18 +32773,20 @@ Form = {
 								+ $(target).closest('.tab-pane').attr('id')
 								+ '"]').tab('show');
 					valid = false;
-				} else if ($(target).hasClass('email')
+				} else if (evt != 'keyup'
+						&& $(target).hasClass('email')
 						&& value
 						&& !value
 								.match(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)) {
 					Message.showFieldError(target, null, 'email');
 					valid = false;
-				} else if ($(target).hasClass('regex') && value
+				} else if (evt != 'keyup' && $(target).hasClass('regex')
+						&& value
 						&& !value.match(new RegExp($(target).data('regex')))) {
 					Message.showFieldError(target, null, 'regex');
 					valid = false;
-				} else if ($(target).hasClass('phone') && value
-						&& !value.match(/^[\d-]+$/)) {
+				} else if (evt != 'keyup' && $(target).hasClass('phone')
+						&& value && !value.match(/^[\d-]+$/)) {
 					Message.showFieldError(target, null, 'phone');
 					valid = false;
 				} else if (($(target).hasClass('integer') || $(target)
@@ -32827,7 +32829,7 @@ Form = {
 							$(target).val(value);
 						}
 					}
-				} else if ($(target).hasClass('repeat')) {
+				} else if (evt != 'keyup' && $(target).hasClass('repeat')) {
 					if (value != $(
 							'[name="' + $(target).data('repeatwith') + '"]',
 							$(target).closest('form')).val()) {
@@ -33188,23 +33190,21 @@ Initialization.common = function() {
 				Form.clearError($(e.target).closest('.control-group'));
 				return false;
 			}).on('validate', ':input', function(ev) {
-				Form.validate(this);
+				Form.validate(this, 'validate');
 			}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
-				if ($(this).hasClass('required') || !$(this).hasClass('email')
-						&& !$(this).hasClass('regex')
-						&& !$(this).hasClass('repeat') && ev.keyCode != 13)
-					if ($(this).val())
-						Form.validate(this);
+						if ($(this).val()) {
+							if (ev.keyCode != 13)
+								Form.validate(this, 'keyup');
+						} else {
+							Form.clearError($(this));
+						}
+						return true;
+					})).on('focusout', 'input,textarea', function(ev) {
+				if (this.value != this.defaultValue)
+					Form.validate(this, 'focusout');
 				return true;
-			})).on('focusout', 'input,textarea', function(ev) {
-		if (this.value != this.defaultValue)
-			if ($(this).hasClass('email') || $(this).hasClass('regex')
-					|| $(this).hasClass('repeat')
-					|| !$(this).hasClass('required'))
-				Form.validate(this);
-		return true;
-	}).on('change', 'select', function() {
-				Form.validate(this);
+			}).on('change', 'select', function() {
+				Form.validate(this, 'change');
 				return true;
 			}).on('dblclick', '.ui-dialog-titlebar', function() {
 		Dialog.toggleMaximization($('.ui-dialog-content', $(this)
