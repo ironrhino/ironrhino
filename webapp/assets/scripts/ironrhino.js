@@ -32219,6 +32219,10 @@ Initialization.common = function() {
 							});
 				}, 60 * 1000);
 	}
+	if ($('body').hasClass('welcome')) {
+		$('<section id="powered-by">Powered by Ironrhino</section>')
+				.appendTo(document.body);
+	}
 };
 
 var HISTORY_ENABLED = MODERN_BROWSER

@@ -28,6 +28,7 @@ public class CorsHandler implements AccessHandler {
 	@Override
 	public boolean handle(HttpServletRequest request,
 			HttpServletResponse response) {
+		response.setHeader("X-Powered-By", "Ironrhino");
 		response.setHeader("X-Frame-Options", xFrameOptions);
 		String origin = request.getHeader("Origin");
 		if (StringUtils.isNotBlank(origin)) {

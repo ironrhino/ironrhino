@@ -8146,6 +8146,17 @@ body.welcome .hero-unit form {
 #nav-breadcrumb {
 	font-size: 1.1em;
 }
+#powered-by {
+	color: transparent;
+	font-size: 1.5em;
+	text-align: center;
+	cursor: none;
+	margin: auto 30%;
+	transition:all 0.5s ease;
+}
+#powered-by:hover {
+	color: grey;
+}
 .btn:focus,a:focus {
     outline: none;
 }
