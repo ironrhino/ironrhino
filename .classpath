@@ -100,9 +100,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jpa-api-2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-core-1.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/websocket-api-1.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.5.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.5.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.5.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.6.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.6.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-all-9.2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpmime-4.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/eaxy-0.1.jar"/>
