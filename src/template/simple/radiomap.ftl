@@ -21,43 +21,43 @@
  */
 -->
 <@s.iterator value="parameters.list">
-    <#if parameters.listKey??>
+    <#if parameters.listKey?has_content>
         <#assign itemKey = stack.findValue(parameters.listKey)/>
     <#else>
         <#assign itemKey = stack.findValue('top')/>
     </#if>
     <#assign itemKeyStr = itemKey.toString() />
-    <#if parameters.listValue??>
+    <#if parameters.listValue?has_content>
         <#assign itemValue = stack.findString(parameters.listValue)/>
     <#else>
         <#assign itemValue = stack.findString('top')/>
     </#if>
 <label for="${parameters.id?html}${itemKeyStr?html}" class="radio inline"><#rt/>    
 <input type="radio"<#rt/>
-<#if parameters.name??>
+<#if parameters.name?has_content>
  name="${parameters.name?html}"<#rt/>
 </#if>
  id="${parameters.id?html}${itemKeyStr?html}"<#rt/>
-<#if tag.contains(parameters.nameValue?default(''), itemKeyStr) || tag.contains(parameters.nameValue?default(''), itemValue)>
+<#if tag.contains(parameters.nameValue!'', itemKeyStr) || tag.contains(parameters.nameValue!'', itemValue)>
  checked="checked"<#rt/>
 </#if>
-<#if itemKey??>
+<#if itemKey?has_content>
  value="${itemKeyStr?html}"<#rt/>
 </#if>
-<#if parameters.disabled?default(false)>
+<#if parameters.disabled!false>
  disabled="disabled"<#rt/>
 </#if>
-<#if parameters.tabindex??>
+<#if parameters.tabindex?has_content>
  tabindex="${parameters.tabindex?html}"<#rt/>
 </#if>
-<#if parameters.cssClass??>
+<#if parameters.cssClass?has_content>
  class="${parameters.cssClass?html}"<#rt/>
 </#if>
-<#if parameters.cssStyle??>
+<#if parameters.cssStyle?has_content>
  style="${parameters.cssStyle?html}"<#rt/>
 </#if>
 <#include "/${parameters.templateDir}/simple/css.ftl" />
-<#if parameters.title??>
+<#if parameters.title?has_content>
  title="${parameters.title?html}"<#rt/>
 </#if>
 <#include "/${parameters.templateDir}/simple/scripting-events.ftl" />

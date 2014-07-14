@@ -22,24 +22,23 @@
 -->
 <#setting number_format="#.#####">
 <select<#rt/>
- name="${parameters.name?default("")?html}"<#rt/>
-<#if parameters.get("size")??>
- size="${parameters.get("size")?html}"<#rt/>
+<#if parameters.name?has_content>
+ name="${parameters.name?html}"<#rt/>
 </#if>
-<#if parameters.disabled?default(false)>
+<#if parameters.disabled!false>
  disabled="disabled"<#rt/>
 </#if>
-<#if parameters.tabindex??>
+<#if parameters.tabindex?has_content>
  tabindex="${parameters.tabindex?html}"<#rt/>
 </#if>
-<#if parameters.id??>
+<#if parameters.id?has_content>
  id="${parameters.id?html}"<#rt/>
 </#if>
 <#include "/${parameters.templateDir}/simple/css.ftl" />
-<#if parameters.title??>
+<#if parameters.title?has_content>
  title="${parameters.title?html}"<#rt/>
 </#if>
-<#if parameters.multiple?default(false)>
+<#if parameters.multiple!false>
  multiple="multiple"<#rt/>
 </#if>
 <#include "/${parameters.templateDir}/simple/scripting-events.ftl" />
@@ -53,12 +52,12 @@
     </#if>
     >${parameters.headerValue?html}</option>
 </#if>
-<#if parameters.emptyOption?default(false)>
+<#if parameters.emptyOption!false>
     <option value=""></option>
 </#if>
 <@s.iterator value="parameters.list">
-        <#if parameters.listKey??>
-            <#if stack.findValue(parameters.listKey)??>
+        <#if parameters.listKey?has_content>
+            <#if stack.findValue(parameters.listKey)?has_content>
               <#assign itemKey = stack.findValue(parameters.listKey)/>
               <#assign itemKeyStr = stack.findString(parameters.listKey)/>
             <#else>
@@ -69,8 +68,8 @@
             <#assign itemKey = stack.findValue('top')/>
             <#assign itemKeyStr = stack.findString('top')>
         </#if>
-        <#if parameters.listValue??>
-            <#if stack.findString(parameters.listValue)??>
+        <#if parameters.listValue?has_content>
+            <#if stack.findString(parameters.listValue)?has_content>
               <#assign itemValue = stack.findString(parameters.listValue)/>
             <#else>
               <#assign itemValue = ''/>
@@ -88,9 +87,9 @@
 <#include "/${parameters.templateDir}/simple/optgroup.ftl" />
 
 </select>
-<#if parameters.multiple?default(false)>
+<#if parameters.multiple!false>
 <input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.name?html}" value=""<#rt/>
-<#if parameters.disabled?default(false)>
+<#if parameters.disabled!false>
  disabled="disabled"<#rt/>
 </#if>
  />

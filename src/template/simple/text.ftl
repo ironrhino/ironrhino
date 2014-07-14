@@ -21,8 +21,10 @@
  */
 -->
 <input<#rt/>
- type="${parameters.type?default("text")?html}"<#rt/>
- name="${parameters.name?default("")?html}"<#rt/>
+ type="${(parameters.type!'text')?html}"<#rt/>
+<#if parameters.name?has_content> 
+ name="${parameters.name?html}"<#rt/>
+</#if>
 <#if parameters.get("size")?has_content>
  size="${parameters.get("size")?html}"<#rt/>
 </#if>
@@ -32,10 +34,10 @@
 <#if parameters.nameValue?has_content>
  value="${parameters.nameValue?html}"<#rt/>
 </#if>
-<#if parameters.disabled?default(false)>
+<#if parameters.disabled!false>
  disabled="disabled"<#rt/>
 </#if>
-<#if parameters.readonly?default(false)>
+<#if parameters.readonly!false>
  readonly="readonly"<#rt/>
 </#if>
 <#if parameters.tabindex?has_content>
@@ -45,7 +47,7 @@
  id="${parameters.id?html}"<#rt/>
 </#if>
 <#include "/${parameters.templateDir}/simple/css.ftl" />
-<#if parameters.title??>
+<#if parameters.title?has_content>
  title="${parameters.title?html}"<#rt/>
 </#if>
 <#include "/${parameters.templateDir}/simple/scripting-events.ftl" />

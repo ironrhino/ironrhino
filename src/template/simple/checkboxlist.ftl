@@ -24,13 +24,13 @@
 <#if parameters.list??>
 <@s.iterator value="parameters.list">
     <#assign itemCount = itemCount + 1/>
-    <#if parameters.listKey??>
+    <#if parameters.listKey?has_content>
         <#assign itemKey = stack.findValue(parameters.listKey)/>
         <#else>
             <#assign itemKey = stack.findValue('top')/>
     </#if>
-    <#if parameters.listValue??>
-        <#assign itemValue = stack.findString(parameters.listValue)?default("")/>
+    <#if parameters.listValue?has_content>
+        <#assign itemValue = stack.findString(parameters.listValue)!""/>
         <#else>
             <#assign itemValue = stack.findString('top')/>
     </#if>
@@ -41,10 +41,10 @@
     <#if tag.contains(parameters.nameValue, itemKey) || tag.contains(parameters.nameValue, itemValue)>
        checked="checked"<#rt/>
     </#if>
-    <#if parameters.disabled?default(false)>
+    <#if parameters.disabled!false>
        disabled="disabled"<#rt/>
     </#if>
-    <#if parameters.title??>
+    <#if parameters.title?has_content>
        title="${parameters.title?html}"<#rt/>
     </#if>
     <#include "/${parameters.templateDir}/simple/css.ftl" />
@@ -58,7 +58,7 @@ ${itemValue?html}</label>
 </#if>
 <input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.name?html}"
        value=""<#rt/>
-<#if parameters.disabled?default(false)>
+<#if parameters.disabled!false>
        disabled="disabled"<#rt/>
 </#if>
         />

@@ -22,8 +22,8 @@
 -->
 <#if (actionErrors?? && actionErrors?size > 0)>
 	<#list actionErrors as error>
-		<#if error?if_exists != "">
-            <div<#if parameters.cssClass??> class="${parameters.cssClass?html}"<#else> class="action-error alert alert-error"</#if><#if parameters.cssStyle??> style="${parameters.cssStyle?html}"</#if>><a class="close" data-dismiss="alert">&times;</a><#if parameters.escape>${error!?html}<#else>${error!}</#if></div>
+		<#if error?has_content>
+            <div<#if parameters.cssClass?has_content> class="${parameters.cssClass?html}"<#else> class="action-error alert alert-error"</#if><#if parameters.cssStyle?has_content> style="${parameters.cssStyle?html}"</#if>><a class="close" data-dismiss="alert">&times;</a><#if parameters.escape>${error!?html}<#else>${error!}</#if></div>
         </#if>
 	</#list>
 </#if>
