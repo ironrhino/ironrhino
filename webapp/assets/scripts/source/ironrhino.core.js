@@ -1686,8 +1686,17 @@ ArrayUtils = {
 DateUtils = {
 	humanRead : function(date) {
 		if (typeof date == 'string') {
-			string = true;
+			var string = date;
 			date = new Date(date);
+			if (isNaN(date.getTime())) {
+				var arr = string.split(' ');
+				date = new Date(arr[0]);
+				string = arr[1];
+				arr = string.split(':');
+				date.setHours(parseInt(arr[0]));
+				date.setMinutes(parseInt(arr[1]));
+				date.setSeconds(parseInt(arr[2]));
+			}
 		}
 		var now = new Date();
 		var delta = now.getTime() - date.getTime();
@@ -1719,7 +1728,7 @@ DateUtils = {
 		} else if (delta < 31104000) {
 			s = Math.floor(delta / 2592000) + "个月";
 		} else {
-			s = Math.floor(delta / 31104000) + "年";
+			s = Math.floor(delta / 3110400) / 10 + "年";
 		}
 		return s + (before ? "前" : "后");
 
