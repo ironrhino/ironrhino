@@ -117,17 +117,18 @@
 	<#assign hidden=config.hiddenInList.expression?eval>
 	</#if>
 	<#if !hidden>
-		<#assign value = entity[key]!>
-		<#if config.type=='dictionary' && selectDictionary??>
-			<#assign templateName><@config.templateName?interpret /></#assign>
-			<#assign value=getDictionaryLabel(templateName,value)/>	
-		</#if>
 		<#assign dynamicAttributes={}>
 		<#if config.type=='listpick'&&richtableConfig.celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
 			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":(value.id?string)!,"data-options":"{'url':'"+config.pickUrl+"','name':'this','id':'this@data-cellvalue'}"}>
 		</#if>
 		<#if config.readonly.expression?has_content && config.readonly.expression?eval>
 		<#assign dynamicAttributes=dynamicAttributes+{'data-readonly':'true'}/>
+		</#if>
+		<#assign value = entity[key]!>
+		<#if config.type=='dictionary' && selectDictionary??>
+			<#assign dynamicAttributes=dynamicAttributes+{'data-cellvalue':value}/>
+			<#assign templateName><@config.templateName?interpret /></#assign>
+			<#assign value=getDictionaryLabel(templateName,value)/>	
 		</#if>
 		<#assign template=config.template/>
 		<#if config.listTemplate?has_content>
