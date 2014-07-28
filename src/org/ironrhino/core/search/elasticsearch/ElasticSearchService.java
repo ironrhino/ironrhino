@@ -19,9 +19,10 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder.Operator;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.facet.FacetBuilders;
-import org.elasticsearch.search.facet.terms.TermsFacet;
-import org.elasticsearch.search.facet.terms.TermsFacetBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.search.SearchCriteria;
@@ -133,16 +134,16 @@ public class ElasticSearchService<T> implements SearchService<T> {
 		SearchRequestBuilder srb = criteria2builder(criteria);
 		srb.setFrom(0);
 		srb.setSize(0);
-		TermsFacetBuilder tfb = FacetBuilders.termsFacet(field);
-		tfb.field(field);
-		srb.addFacet(tfb);
+		TermsBuilder tb = AggregationBuilders.terms(field);
+		tb.field(field);
+		srb.addAggregation(tb);
 		try {
 			SearchResponse response = srb.execute().get();
-			TermsFacet facet = response.getFacets().facet(TermsFacet.class,
-					field);
+			StringTerms aggr = response.getAggregations().get(field);
 			Map<String, Integer> result = new LinkedHashMap<String, Integer>();
-			for (TermsFacet.Entry entry : facet.getEntries())
-				result.put(entry.getTerm().string(), entry.getCount());
+			for (Terms.Bucket bucket : aggr.getBuckets()) {
+				result.put(bucket.getKey(), (int) bucket.getDocCount());
+			}
 			return result;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
