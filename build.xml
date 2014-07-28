@@ -246,6 +246,13 @@
 				echo.setMessage(classpath.join('\n'));
 				echo.perform();
 			}
+			file = new File(projectDir+'/.gitignore');
+			if(!file.exists()){
+				var echo = project.createTask("echo");
+				echo.setFile(file);
+				echo.setMessage('lib/**\ntarget/**\ntest/classes/**\nwebapp/WEB-INF/classes/**\nwebapp/WEB-INF/lib/**');
+				echo.perform();
+			}
 			println('*********************************');
 			println('created project ['+projectName+'] at '+new File(projectDir).getCanonicalPath()+' ,you can import this project into eclipse .');
 			println('*********************************');
