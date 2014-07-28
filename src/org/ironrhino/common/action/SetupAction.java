@@ -26,6 +26,8 @@ import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -38,6 +40,8 @@ import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 public class SetupAction extends BaseAction {
 
 	private static final long serialVersionUID = -9168529475332327922L;
+
+	private static Logger logger = LoggerFactory.getLogger(SetupAction.class);
 
 	private static final String SETUP_ENABLED_KEY = "setup.enabled";
 
@@ -162,6 +166,7 @@ public class SetupAction extends BaseAction {
 	}
 
 	public void doSetup() throws Exception {
+		logger.info("setup started");
 		String[] beanNames = ctx.getBeanDefinitionNames();
 		Map<Method, Object> methods = new TreeMap<Method, Object>(
 				new Comparator<Method>() {
@@ -196,6 +201,7 @@ public class SetupAction extends BaseAction {
 			int modifiers = m.getModifiers();
 			if (!Modifier.isPublic(modifiers))
 				continue;
+			logger.info("executing {}", m);
 			if (m.getParameterTypes().length == 0) {
 				m.invoke(entry.getValue(), new Object[0]);
 			} else {
@@ -235,6 +241,7 @@ public class SetupAction extends BaseAction {
 					AuthzUtils.autoLogin((UserDetails) o);
 			}
 		}
+		logger.info("setup finished");
 	}
 
 	public static class SetupParameterImpl implements Serializable,
