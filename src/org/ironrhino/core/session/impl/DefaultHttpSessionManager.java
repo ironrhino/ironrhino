@@ -23,6 +23,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	private static final String SALT = "awpeqaidasdfaioiaoduifayzuxyaaokadoaifaodiaoi";
 
+	private static final String SESSION_KEY_REMOTE_ADDR = "_REMOTE_ADDR";
+
 	private static final String SESSION_TRACKER_SEPERATOR = "-";
 
 	public static final int DEFAULT_LIFETIME = -1; // in seconds
@@ -63,6 +65,9 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Value("${httpSessionManager.minActiveInterval:"
 			+ DEFAULT_MINACTIVEINTERVAL + "}")
 	private int minActiveInterval;
+
+	@Value("${httpSessionManager.checkRemoteAddr:true}")
+	private boolean checkRemoteAddr;
 
 	public String getDefaultLocaleName() {
 		return defaultLocaleName;
@@ -185,6 +190,10 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			session.setDirty(true);
 		} else {
 			doInitialize(session);
+			if (checkRemoteAddr && !session.isNew())
+				if (!RequestUtils.getRemoteAddr(session.getRequest()).equals(
+						(String) session.getAttribute(SESSION_KEY_REMOTE_ADDR)))
+					invalidate(session);
 		}
 	}
 
@@ -215,6 +224,10 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 					session.getResponse(), getSessionTrackerName(),
 					session.getSessionTracker(), true);
 		}
+		if (checkRemoteAddr
+				&& session.getAttribute(SESSION_KEY_REMOTE_ADDR) == null)
+			session.setAttribute(SESSION_KEY_REMOTE_ADDR,
+					RequestUtils.getRemoteAddr(session.getRequest()));
 		doSave(session);
 	}
 
