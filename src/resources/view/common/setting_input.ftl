@@ -20,7 +20,7 @@
 		<@s.textfield label="%{getText('key')}" name="setting.key" class="required checkavailable input-xxlarge"/>
 	</#if>
 	<#if view=='embedded'>
-	<@s.textarea label="%{getText('value')}" theme="simple" name="setting.value" style="width:95%;" class="${Parameters.class!}" maxlength="4000"/>
+	<@s.textarea label="%{getText('value')}" theme="simple" name="setting.value" style="width:95%;" class="${Parameters.class!Parameters.cssClass!}" maxlength="4000"/>
 	<#else>
 	<@s.textarea label="%{getText('value')}" name="setting.value" class="input-xxlarge" maxlength="4000"/>
 	</#if>
