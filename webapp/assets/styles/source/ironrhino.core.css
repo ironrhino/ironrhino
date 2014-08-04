@@ -48,11 +48,11 @@ td.middle {
 	opacity: 1;
 	filter: alpha(opacity=100);
 }
-.ui-dialog-titlebar-close,a.close,a.remove{
+.ui-dialog-titlebar-close,a.close,a.remove,.modal-close button.close{
 	transition:all 0.5s ease;
 }
-.ui-dialog-titlebar-close:hover,a.close:hover,a.remove:hover{
-	transform:rotate(90deg);
+.ui-dialog-titlebar-close:hover,a.close:hover,a.remove:hover,.modal-close button.close:hover{
+	transform:rotate(360deg);
 }
 /*override bootstrap end*/
 body.main > #content > form:first-child {
