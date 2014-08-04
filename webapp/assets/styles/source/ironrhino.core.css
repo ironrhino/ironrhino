@@ -56,10 +56,10 @@ td.middle {
 }
 /*override bootstrap end*/
 body.main > #content > form:first-child {
-	margin-top: 10px;
+	margin-top: 20px;
 }
 body.main > #content > form:first-child > .negative-margin:first-child {
-	margin-top: -10px;
+	margin-top: -20px;
 }
 body.welcome {
 	padding-top: 10%;

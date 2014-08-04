@@ -751,8 +751,9 @@ Initialization.common = function() {
 						});
 			}).on('click', '.removeonclick', function() {
 				$(this).remove()
-			}).on('click', '.control-group .field-error .remove', function(e) {
+			}).on('click', '.field-error .remove', function(e) {
 				Form.clearError($(e.target).closest('.control-group'));
+				$(e.target).closest('.field-error').remove();
 				return false;
 			}).on('validate', ':input', function(ev) {
 				Form.validate(this, 'validate');

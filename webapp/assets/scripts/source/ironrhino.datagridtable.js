@@ -152,7 +152,8 @@
 		});
 		$('.listpick-name,.treeselect-name', r)
 				.html('<i class="glyphicon glyphicon-list"></i>');
-		$('.removeonadd', r).remove();
+		$('.removeonadd,.field-error', r).remove();
+		$('.error', r).removeClass('error');
 		$('.hideonadd', r).hide();
 		$('.showonadd', r).show();
 		$(':input', r).eq(0).focus();
