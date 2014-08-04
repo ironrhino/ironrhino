@@ -8085,10 +8085,10 @@ td.middle {
 }
 /*override bootstrap end*/
 body.main > #content > form:first-child {
-	margin-top: 10px;
+	margin-top: 20px;
 }
 body.main > #content > form:first-child > .negative-margin:first-child {
-	margin-top: -10px;
+	margin-top: -20px;
 }
 body.welcome {
 	padding-top: 10%;
@@ -8472,10 +8472,12 @@ span.checkboxgroup{
 }
 
 .field-error-popover .field-error-content {
+	text-align: left;
 	width: 100%;
 	background: #fcf8e3;
 	position:relative;
 	color: #b94a48;
+	min-width: 100px;
 	max-width: 300px;
 	border: 1px solid #b94a48;
 	padding: 4px 10px 4px 10px;

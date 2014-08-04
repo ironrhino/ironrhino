@@ -32068,8 +32068,9 @@ Initialization.common = function() {
 						});
 			}).on('click', '.removeonclick', function() {
 				$(this).remove()
-			}).on('click', '.control-group .field-error .remove', function(e) {
+			}).on('click', '.field-error .remove', function(e) {
 				Form.clearError($(e.target).closest('.control-group'));
+				$(e.target).closest('.field-error').remove();
 				return false;
 			}).on('validate', ':input', function(ev) {
 				Form.validate(this, 'validate');
@@ -36091,7 +36092,8 @@ Observation.sortableTable = function(container) {
 		});
 		$('.listpick-name,.treeselect-name', r)
 				.html('<i class="glyphicon glyphicon-list"></i>');
-		$('.removeonadd', r).remove();
+		$('.removeonadd,.field-error', r).remove();
+		$('.error', r).removeClass('error');
 		$('.hideonadd', r).hide();
 		$('.showonadd', r).show();
 		$(':input', r).eq(0).focus();
