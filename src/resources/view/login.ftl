@@ -18,13 +18,13 @@
 	<div class="span6 offset3">
 	<div class="hero-unit">
 	<h2 class="caption">${action.getText('login')}</h2>
-	<@s.form id="login" action="login" method="post" cssClass="ajax focus form-horizontal well">
+	<@s.form id="login" action="login" method="post" class="ajax focus form-horizontal well">
 		<@s.hidden id="targetUrl" name="targetUrl" />
-		<@s.textfield label="%{getText('username')}" name="username" cssClass="required span2"/>
-		<@s.password label="%{getText('password')}" name="password" cssClass="required span2 input-pattern submit"/>
-		<@s.checkbox label="%{getText('rememberme')}" name="rememberme" cssClass="custom"/>
+		<@s.textfield label="%{getText('username')}" name="username" class="required span2"/>
+		<@s.password label="%{getText('password')}" name="password" class="required span2 input-pattern submit"/>
+		<@s.checkbox label="%{getText('rememberme')}" name="rememberme" class="custom"/>
 		<@captcha/>
-		<@s.submit value="%{getText('login')}" cssClass="btn-primary">
+		<@s.submit value="%{getText('login')}" class="btn-primary">
 		<#if getSetting??&&'true'==getSetting('signup.enabled')>
 		<@s.param name="after"> <a class="btn" href="${getUrl('/signup')}">${action.getText('signup')}</a></@s.param>
 		</#if>

@@ -4,7 +4,7 @@
 <title>${action.getText('upload')}</title>
 </head>
 <body>
-<@s.form id="upload_form" action="${actionBaseUrl}" method="post" cssClass="ajax view form-inline" dynamicAttributes={"data-replacement":"files"}>
+<@s.form id="upload_form" action="${actionBaseUrl}" method="post" class="ajax view form-inline" dynamicAttributes={"data-replacement":"files"}>
 	<input type="hidden" name="pick" value="true"/>
 	<table id="files" class="checkboxgroup table table-striped middle" style="margin-top:50px;">
 		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${action.getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>

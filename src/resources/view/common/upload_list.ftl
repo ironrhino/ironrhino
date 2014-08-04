@@ -4,7 +4,7 @@
 <title>${action.getText('upload')}</title>
 </head>
 <body>
-<@s.form id="upload_form" action="upload" method="post" enctype="multipart/form-data" cssClass="form-inline">
+<@s.form id="upload_form" action="upload" method="post" enctype="multipart/form-data" class="form-inline">
 	<div class="row">
 	<#list 1..Parameters.size?default('4')?number as index>
 		<div class="span3"><@s.file theme="simple" name="file" multiple="true"/></div>
@@ -12,7 +12,7 @@
 	</div>
 	<div style="text-align:center;padding-top:30px;">
 	<@s.submit theme="simple" value="${action.getText('upload')}"/>
-	<label for="autorename">${action.getText('autorename')}:</label><@s.checkbox theme="simple" id="autorename" name="autorename" cssClass="custom"/>
+	<label for="autorename">${action.getText('autorename')}:</label><@s.checkbox theme="simple" id="autorename" name="autorename" class="custom"/>
 	</div>
 	<table id="files" class="checkboxgroup table table-striped middle" style="margin-top:50px;">
 		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${action.getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>

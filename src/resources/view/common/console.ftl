@@ -53,9 +53,9 @@ $(function(){
 </script>
 </head>
 <body>
-<@s.form id="form" action="console" method="post" cssClass="ajax focus form-inline well">
-	<span>${action.getText('expression')}:<@s.textfield theme="simple" id="expression" name="expression" cssClass="input-xxlarge"/></span>
-	<span>${action.getText('scope')}:<@s.select theme="simple" id="scope" name="scope" cssClass="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/></span>
+<@s.form id="form" action="console" method="post" class="ajax focus form-inline well">
+	<span>${action.getText('expression')}:<@s.textfield theme="simple" id="expression" name="expression" class="input-xxlarge"/></span>
+	<span>${action.getText('scope')}:<@s.select theme="simple" id="scope" name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/></span>
 	<@s.submit id="submit" theme="simple" value="%{getText('confirm')}" />
 </@s.form>
 <hr/>

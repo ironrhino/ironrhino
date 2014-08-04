@@ -10,7 +10,7 @@
 <@s.hidden name="vtype"/>
 <@s.hidden name="ctype"/>
 <span>${action.getText('date')}</span>
-<@s.textfield label="%{getText('date')}" theme="simple" name="date" cssClass="date"/>
+<@s.textfield label="%{getText('date')}" theme="simple" name="date" class="date"/>
 <@s.submit value="%{getText('query')}" theme="simple"/>
 </form>
 </div>
@@ -19,9 +19,9 @@
 <@s.hidden name="vtype"/>
 <@s.hidden name="ctype"/>
 <span>${action.getText('date.range')}</span>
-<@s.textfield label="%{getText('from')}" theme="simple" name="from" cssClass="date"/>
+<@s.textfield label="%{getText('from')}" theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
-<@s.textfield label="%{getText('to')}" theme="simple" name="to" cssClass="date"/>
+<@s.textfield label="%{getText('to')}" theme="simple" name="to" class="date"/>
 <@s.submit value="%{getText('query')}" theme="simple"/>
 </form>
 </div>

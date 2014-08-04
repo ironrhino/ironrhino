@@ -18,10 +18,10 @@
 	<div class="span6 offset3">
 	<div class="hero-unit">
 	<h2 class="caption">${action.getText('signup.forgot')}</h2>
-	<@s.form method="post" action="forgot" cssClass="ajax reset form-horizontal well">
-		<@s.textfield label="%{getText('email')}" name="email" type="email" cssClass="required email"/>
+	<@s.form method="post" action="forgot" class="ajax reset form-horizontal well">
+		<@s.textfield label="%{getText('email')}" name="email" type="email" class="required email"/>
 		<@captcha/>
-		<@s.submit value="%{getText('confirm')}"  cssClass="btn-primary">
+		<@s.submit value="%{getText('confirm')}"  class="btn-primary">
 		<@s.param name="after"> <a class="btn" href="${getUrl('/signup')}">${action.getText('signup')}</a> <a class="btn" href="${getUrl('/login')}">${action.getText('login')}</a></@s.param>
 		</@s.submit>
 	</@s.form>

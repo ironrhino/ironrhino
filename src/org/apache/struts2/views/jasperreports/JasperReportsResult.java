@@ -156,6 +156,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
     protected String delimiter;
     protected String imageServletUrl = "/images/";
     protected String timeZone;
+    protected boolean wrapField = true;
 
     /**
      * Connection which can be passed to the report
@@ -227,6 +228,10 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
     public void setTimeZone(final String timeZone) {
         this.timeZone = timeZone;
     }
+    
+    public void setWrapField(boolean wrapField) {
+        this.wrapField = wrapField;
+    }
 
     public String getReportParameters() {
         return reportParameters;
@@ -284,7 +289,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
 
         Connection conn = (Connection) stack.findValue(connection);
         if (conn == null)
-            stackDataSource = new ValueStackDataSource(stack, dataSource);
+            stackDataSource = new ValueStackDataSource(stack, dataSource, wrapField);
 
         // Determine the directory that the report file is in and set the reportDirectory parameter
         // For WW 2.1.7:

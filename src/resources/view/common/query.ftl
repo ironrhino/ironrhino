@@ -82,12 +82,12 @@ $(function(){
 </script>
 </head>
 <body>
-<@s.form id="query-form" action="${actionBaseUrl}" method="post" cssClass="form-horizontal ajax view history">
-	<@s.textarea label="sql" name="sql" cssClass="required span8 sqleditor codeblock" placeholder="select username,name,email from user where username=:username">
+<@s.form id="query-form" action="${actionBaseUrl}" method="post" class="form-horizontal ajax view history">
+	<@s.textarea label="sql" name="sql" class="required span8 sqleditor codeblock" placeholder="select username,name,email from user where username=:username">
 	<#if tables?? && tables?size gt 0>
 	<@s.param name="after">
 	<div style="display:inline-block;vertical-align:top;margin-left:20px;">
-	<@s.select id="tables" theme="simple" cssClass="chosen input-medium" list="tables" listKey="top" listValue="top" headerKey="" headerValue=""/>
+	<@s.select id="tables" theme="simple" class="chosen input-medium" list="tables" listKey="top" listValue="top" headerKey="" headerValue=""/>
 	</div>
 	</@s.param>
 	</#if>
