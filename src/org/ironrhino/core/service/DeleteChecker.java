@@ -104,7 +104,7 @@ public class DeleteChecker {
 													.getName())));
 								}
 							}
-							superClass = componentClass.getSuperclass();
+							superClass = superClass.getSuperclass();
 							if (superClass.equals(Object.class)
 									|| superClass
 											.getAnnotation(MappedSuperclass.class) == null)
@@ -136,7 +136,7 @@ public class DeleteChecker {
 													.getName())));
 								}
 							}
-							superClass = componentClass.getSuperclass();
+							superClass = superClass.getSuperclass();
 							if (superClass.equals(Object.class)
 									|| superClass
 											.getAnnotation(MappedSuperclass.class) == null)
