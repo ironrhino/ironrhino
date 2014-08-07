@@ -45,7 +45,7 @@ public class ResultPage<T> implements Serializable {
 
 	private boolean counting = true;
 
-	private boolean paginating = true;
+	private Boolean paginating;
 
 	private boolean executed;
 
@@ -77,12 +77,16 @@ public class ResultPage<T> implements Serializable {
 		this.counting = counting;
 	}
 
-	public boolean isPaginating() {
+	public Boolean getPaginating() {
 		return paginating;
 	}
 
-	public void setPaginating(boolean paginating) {
+	public void setPaginating(Boolean paginating) {
 		this.paginating = paginating;
+	}
+
+	public boolean isPaginating() {
+		return paginating == null || paginating;
 	}
 
 	public boolean isExecuted() {

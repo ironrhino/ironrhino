@@ -439,7 +439,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					&& resultPage.getPageSize() != richtableConfig
 							.defaultPageSize())
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
-			if (richtableConfig != null)
+			if (richtableConfig != null && resultPage.getPaginating() == null)
 				resultPage.setPaginating(richtableConfig.paginating());
 			resultPage.setCriteria(dc);
 			if (criteriaState.getOrderings().isEmpty()) {
