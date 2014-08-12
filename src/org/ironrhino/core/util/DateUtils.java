@@ -194,6 +194,31 @@ public class DateUtils {
 		return cal.getTime();
 	}
 
+	public static Date beginOfMonth(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		return cal.getTime();
+	}
+
+	public static Date endOfMonth(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DAY_OF_YEAR, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.add(Calendar.MILLISECOND, -1);
+		cal.set(Calendar.DAY_OF_MONTH,
+				cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		return cal.getTime();
+	}
+
 	public static boolean isSameDay(Date date1, Date date2) {
 		if (date1 == null || date2 == null)
 			return false;
