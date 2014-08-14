@@ -13,6 +13,7 @@ import org.ironrhino.core.aop.PublishAware;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
+import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
@@ -27,7 +28,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Searchable
 @Entity
 @Table(name = "common_setting")
-@Richtable(searchable = true, order = "key asc", exportable = true, importable = true)
+@Richtable(searchable = true, readonly = @Readonly(expression = "entity.readonly"), order = "key asc", exportable = true, importable = true)
 public class Setting extends BaseEntity implements Recordable<UserDetails> {
 
 	private static final long serialVersionUID = -8352037603261222984L;
@@ -48,6 +49,12 @@ public class Setting extends BaseEntity implements Recordable<UserDetails> {
 	@SearchableProperty
 	@Column(length = 4000)
 	private String description = "";
+
+	@UiConfig(hidden = true)
+	private boolean readonly;
+
+	@UiConfig(hidden = true)
+	private boolean hidden;
 
 	@NotInCopy
 	@UiConfig(hidden = true)
@@ -103,6 +110,22 @@ public class Setting extends BaseEntity implements Recordable<UserDetails> {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public boolean isReadonly() {
+		return readonly;
+	}
+
+	public void setReadonly(boolean readonly) {
+		this.readonly = readonly;
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
 	}
 
 	@Override
