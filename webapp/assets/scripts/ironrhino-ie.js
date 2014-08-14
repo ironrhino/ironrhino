@@ -33354,7 +33354,7 @@ Initialization.common = function() {
 		});
 	}
 	if ($(document.body).hasClass('render-location-qrcode')) {
-		$('<div id="render-location-qrcode" style="width:15px;position:fixed;bottom:0;right:0;cursor:pointer;"><i class="glyphicon glyphicon-qrcode"></i></div>')
+		$('<div id="render-location-qrcode" class="hidden-phone hidden-tablet" style="width:15px;position:fixed;bottom:0;right:0;cursor:pointer;"><i class="glyphicon glyphicon-qrcode"></i></div>')
 				.appendTo(document.body);
 		$('#render-location-qrcode').click(function() {
 			var _this = $(this);
