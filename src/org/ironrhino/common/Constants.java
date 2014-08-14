@@ -9,5 +9,7 @@ public interface Constants {
 	String SETTING_KEY_AVAILABLE_LOCALES = "availableLocales";
 	String SETTING_KEY_MANIFEST_VERSION = "manifest.version";
 	String SETTING_KEY_FILE_STORAGE_PATH = "fileStorage.path";
+	String SETTING_KEY_SETUP_DATETIME = "setup.datetime";
+	String SETTING_KEY_SETUP_TIMESTAMP = "setup.timestamp";
 
 }

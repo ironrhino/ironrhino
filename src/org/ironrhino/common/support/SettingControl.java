@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +16,7 @@ import javax.annotation.Resource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Order;
+import org.ironrhino.common.Constants;
 import org.ironrhino.common.model.Setting;
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
@@ -22,6 +24,7 @@ import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -152,6 +155,23 @@ public class SettingControl implements
 	@org.springframework.core.annotation.Order(Ordered.HIGHEST_PRECEDENCE)
 	public void setup() {
 		entityManager.setEntityClass(Setting.class);
+		Date now = new Date();
+		Setting sd = entityManager
+				.findOne(Constants.SETTING_KEY_SETUP_DATETIME);
+		if (sd == null) {
+			sd = new Setting(Constants.SETTING_KEY_SETUP_DATETIME,
+					DateUtils.formatDatetime(now));
+			sd.setReadonly(true);
+			entityManager.save(sd);
+		}
+		sd = entityManager.findOne(Constants.SETTING_KEY_SETUP_TIMESTAMP);
+		if (sd == null) {
+			sd = new Setting(Constants.SETTING_KEY_SETUP_TIMESTAMP,
+					String.valueOf(now.getTime()));
+			sd.setReadonly(true);
+			sd.setHidden(true);
+			entityManager.save(sd);
+		}
 		try (InputStream is = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("resources/data/setting.txt")) {
 			if (is == null)
