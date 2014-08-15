@@ -1628,13 +1628,15 @@ var Dialog = {
 			$(iframe).height(height);
 			hasRow = $('div.row', doc).length > 0;
 		}
+		d.dialog('moveToTop');
 		if (hasRow)
 			d.dialog('option', 'width', '90%');
-		d.dialog('option', 'position', 'center');
 		// var height = d.height();
 		// if (height >= $(window).height())
 		// d.dialog('option', 'position', 'top');
-		d.dialog('moveToTop');
+		setTimeout(function() {
+					d.dialog('option', 'position', 'center');
+				}, 200);
 	},
 	toggleMaximization : function(d) {
 		var dialog = $(d).closest('.ui-dialog');
