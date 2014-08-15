@@ -59,18 +59,22 @@
 	<logger name="org.springframework.core.io.support.PathMatchingResourcePatternResolver" additivity="true">
 		<level value="ERROR"/>
 	</logger>
-	<logger name="com.opensymphony.xwork2.ognl.OgnlValueStack" additivity="true">
+	<logger name="org.springframework.core.type.classreading.AnnotationAttributesReadingVisitor" additivity="true">
 		<level value="ERROR"/>
+	</logger>
+	<logger name="org.springframework.security.config.http.FilterInvocationSecurityMetadataSourceParser" additivity="true">
+		<level value="WARN"/>
 	</logger>
 	<logger name="org.apache.struts2.components.ServletUrlRenderer" additivity="true">
 		<level value="ERROR"/>
 	</logger>
-	<logger name="org.springframework.core.type.classreading.AnnotationAttributesReadingVisitor" additivity="true">
+	<logger name="com.opensymphony.xwork2.ognl.OgnlValueStack" additivity="true">
 		<level value="ERROR"/>
 	</logger>
 	<logger name="com.opensymphony.xwork2.config.providers.XmlConfigurationProvider" additivity="true">
 		<level value="ERROR"/>
 	</logger>
+	
 	<logger name="org.hibernate.SQL" additivity="true">
 		<level value="${hibernate.logger.level}"/>
 		<appender-ref ref="HIBERNATE"/>
