@@ -56,36 +56,36 @@
 		</layout>
 	</appender>
    
-	<logger name="org.springframework.core.io.support.PathMatchingResourcePatternResolver" additivity="true">
+	<logger name="org.springframework.core.io.support.PathMatchingResourcePatternResolver">
 		<level value="ERROR"/>
 	</logger>
-	<logger name="org.springframework.core.type.classreading.AnnotationAttributesReadingVisitor" additivity="true">
+	<logger name="org.springframework.core.type.classreading.AnnotationAttributesReadingVisitor">
 		<level value="ERROR"/>
 	</logger>
-	<logger name="org.springframework.security.config.http.FilterInvocationSecurityMetadataSourceParser" additivity="true">
+	<logger name="org.springframework.security">
 		<level value="WARN"/>
 	</logger>
-	<logger name="org.hibernate.tool.hbm2ddl.TableMetadata" additivity="true">
+	<logger name="org.hibernate.tool.hbm2ddl.TableMetadata">
 		<level value="WARN"/>
 	</logger>
-	<logger name="org.apache.struts2.config.AbstractBeanSelectionProvider" additivity="true">
+	<logger name="org.apache.struts2.config.AbstractBeanSelectionProvider">
 		<level value="WARN"/>
 	</logger>
-	<logger name="org.apache.struts2.components.ServletUrlRenderer" additivity="true">
+	<logger name="org.apache.struts2.components.ServletUrlRenderer">
 		<level value="ERROR"/>
 	</logger>
-	<logger name="com.opensymphony.xwork2.ognl.OgnlValueStack" additivity="true">
+	<logger name="com.opensymphony.xwork2.ognl.OgnlValueStack">
 		<level value="ERROR"/>
 	</logger>
-	<logger name="com.opensymphony.xwork2.config.providers.XmlConfigurationProvider" additivity="true">
+	<logger name="com.opensymphony.xwork2.config.providers.XmlConfigurationProvider">
 		<level value="ERROR"/>
 	</logger>
 	
-	<logger name="org.hibernate.SQL" additivity="true">
+	<logger name="org.hibernate.SQL" additivity="false">
 		<level value="${hibernate.logger.level}"/>
 		<appender-ref ref="HIBERNATE"/>
 	</logger>
-	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" additivity="true">
+	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" additivity="false">
 		<level value="${hibernate.logger.level}"/>
 		<appender-ref ref="HIBERNATE"/>
 	</logger>
