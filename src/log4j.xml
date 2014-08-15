@@ -65,6 +65,12 @@
 	<logger name="org.springframework.security.config.http.FilterInvocationSecurityMetadataSourceParser" additivity="true">
 		<level value="WARN"/>
 	</logger>
+	<logger name="org.hibernate.tool.hbm2ddl.TableMetadata" additivity="true">
+		<level value="WARN"/>
+	</logger>
+	<logger name="org.apache.struts2.config.AbstractBeanSelectionProvider" additivity="true">
+		<level value="WARN"/>
+	</logger>
 	<logger name="org.apache.struts2.components.ServletUrlRenderer" additivity="true">
 		<level value="ERROR"/>
 	</logger>
