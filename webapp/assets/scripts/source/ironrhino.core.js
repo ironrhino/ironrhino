@@ -765,9 +765,9 @@ Initialization.common = function() {
 							Form.clearError($(this));
 						}
 						return true;
-					})).on('focusout', 'input,textarea', function(ev) {
+					})).on('change', 'input,textarea', function(ev) {
 				if (this.value != this.defaultValue)
-					Form.validate(this, 'focusout');
+					Form.validate(this, 'change');
 				return true;
 			}).on('change', 'select', function() {
 				Form.validate(this, 'change');
@@ -803,8 +803,7 @@ Initialization.common = function() {
 			}).on('click', 'img.captcha', Captcha.refresh).on('focus',
 			'input.captcha', function() {
 				var t = $(this);
-
-				if (t.next('img.captcha').length)
+				if (t.siblings('img.captcha').length)
 					return;
 				t.after('<img class="captcha" src="' + t.data('captcha')
 						+ '"/>');
@@ -1661,12 +1660,13 @@ var Dialog = {
 
 Captcha = {
 	refresh : function() {
+		var r = Math.random();
 		$('img.captcha').each(function() {
 					var src = this.src;
 					var i = src.lastIndexOf('&');
 					if (i > 0)
 						src = src.substring(0, i);
-					this.src = src + '&' + Math.random();
+					this.src = src + '&' + r;
 				});
 		$('input.captcha').val('').focus();
 	}
