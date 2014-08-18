@@ -142,6 +142,8 @@ public class UploadAction extends BaseAction {
 	@Override
 	@InputConfig(methodName = "list")
 	public String execute() {
+		if (folder == null)
+			folder = ServletActionContext.getRequest().getParameter("folder"); // workaround
 		if (file != null) {
 			int i = 0;
 			String[] arr = settingControl
