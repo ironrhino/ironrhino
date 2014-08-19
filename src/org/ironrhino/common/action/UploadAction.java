@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.io.Files;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
-@AutoConfig(fileupload = "image/*,text/*,application/x-shockwave-flash,application/pdf,application/msword,application/vnd.ms-powerpoint,application/octet-stream")
+@AutoConfig(fileupload = "image/*,video/*,text/*,application/x-shockwave-flash,application/pdf,application/msword,application/vnd.ms-powerpoint,application/octet-stream,application/zip,application/x-rar-compressed")
 public class UploadAction extends BaseAction {
 
 	private static final long serialVersionUID = 625509291613761721L;

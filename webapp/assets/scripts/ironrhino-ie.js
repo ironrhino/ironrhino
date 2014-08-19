@@ -33019,8 +33019,20 @@ Ajax = {
 			}
 			var html = data.replace(/<script(.|\s)*?\/script>/g, '');
 			var div = $('<div/>').html(html);
-			// others
 			var replacement = options.replacement;
+			if (typeof replacement == 'string') {
+				var map = {};
+				var entries = replacement.split(',');
+				var arr = [];
+				for (var i = 0; i < entries.length; i++) {
+					var entry = entries[i];
+					var ss = entry.split(':', 2);
+					var sss = ss.length == 2 ? ss[1] : ss[0];
+					map[ss[0]] = sss;
+					arr.push(sss != Ajax.defaultRepacement ? sss : '_');
+				}
+				replacement = map;
+			}
 			for (var key in replacement) {
 				var r = $('#' + key);
 				if (key == Ajax.defaultRepacement && !r.length)
