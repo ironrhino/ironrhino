@@ -4,7 +4,7 @@
 <title>${action.getText('upload')}</title>
 </head>
 <body>
-<@s.form id="upload_form" action="upload" method="post" enctype="multipart/form-data" class="form-inline">
+<@s.form id="upload_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="form-inline">
 	<div class="row">
 	<#list 1..Parameters.size?default('4')?number as index>
 		<div class="span3"><@s.file theme="simple" name="file" multiple="true"/></div>

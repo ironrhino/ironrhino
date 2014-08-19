@@ -142,8 +142,10 @@ public class UploadAction extends BaseAction {
 	@Override
 	@InputConfig(methodName = "list")
 	public String execute() {
-		if (folder == null)
-			folder = ServletActionContext.getRequest().getParameter("folder"); // workaround
+		// workaround for struts2 bug
+		folder = ServletActionContext.getRequest().getParameter("folder");
+		autorename = "true".equals(ServletActionContext.getRequest()
+				.getParameter("autorename"));
 		if (file != null) {
 			int i = 0;
 			String[] arr = settingControl
