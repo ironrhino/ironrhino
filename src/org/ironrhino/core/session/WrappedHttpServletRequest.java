@@ -84,6 +84,8 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 	@Override
 	public String[] getParameterValues(String name) {
 		String[] value = super.getParameterValues(name);
+		if (value == null)
+			return value;
 		for (int i = 0; i < value.length; i++)
 			value[i] = decryptIfNecessary(name, value[i]);
 		return value;
