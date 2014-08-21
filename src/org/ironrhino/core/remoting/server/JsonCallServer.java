@@ -131,7 +131,8 @@ public class JsonCallServer implements HttpRequestHandler {
 						"No Such Method");
 				return;
 			}
-			response.setContentType("application/json;charset=utf-8");
+			response.setContentType("application/json;charset="
+					+ response.getCharacterEncoding());
 			Object result = method.invoke(bean, parameters);
 			if (!method.getReturnType().equals(Void.class)) {
 				response.getWriter().write(JsonUtils.toJson(result));

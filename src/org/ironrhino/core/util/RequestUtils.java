@@ -5,7 +5,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
@@ -47,6 +49,21 @@ public class RequestUtils {
 			String[] value = entry.getValue();
 			if (value != null && value.length > 0)
 				map.put(name, value[0]);
+		}
+		return map;
+	}
+
+	public static Map<String, String> parseParametersFromQueryString(
+			String queryString) {
+		if (StringUtils.isBlank(queryString))
+			return Collections.emptyMap();
+		Map<String, String> map = new LinkedHashMap<String, String>();
+		for (String s : queryString.split("&")) {
+			if (StringUtils.isBlank(s))
+				continue;
+			String arr[] = s.split("=", 2);
+			if (!map.containsKey(arr[0]))
+				map.put(arr[0], arr.length == 2 ? arr[1] : "");
 		}
 		return map;
 	}

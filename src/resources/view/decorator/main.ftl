@@ -1,3 +1,4 @@
+<#assign charset=response.characterEncoding!'utf-8'/>
 <#assign requestURI=request.requestURI?substring(request.contextPath?length)/>
 <#assign modernBrowser = true/>
 <#assign ua = request.getAttribute('userAgent')!/>
@@ -15,9 +16,9 @@
 <head>
 <title><#noescape>${title}</#noescape></title>
 <#if modernBrowser>
-<meta charset="utf-8">
+<meta charset="${charset}">
 <#else>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=${charset}"/>
 </#if>
 <#if request.contextPath!=''>
 <meta name="context_path" content="${request.contextPath}" />
