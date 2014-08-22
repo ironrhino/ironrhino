@@ -42,7 +42,7 @@ public class Client extends BaseEntity implements Enableable {
 	@Column(nullable = false)
 	private String name;
 
-	@UiConfig(displayOrder = 3, alias = "clientSecret", cssClass = "span4", width = "200px", excludedFromCriteria = true)
+	@UiConfig(displayOrder = 3, alias = "client_secret", cssClass = "span4", width = "200px", excludedFromCriteria = true)
 	@Column(nullable = false)
 	private String secret = CodecUtils.nextId();
 
@@ -72,7 +72,7 @@ public class Client extends BaseEntity implements Enableable {
 	@Column(insertable = false)
 	private Date modifyDate;
 
-	@UiConfig(displayOrder = 2, width = "200px")
+	@UiConfig(displayOrder = 2, width = "200px", alias = "client_id")
 	public String getClientId() {
 		return getId();
 	}
