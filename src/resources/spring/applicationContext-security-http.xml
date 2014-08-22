@@ -12,6 +12,8 @@
 			access="hasRole('ROLE_ADMINISTRATOR')" />
 		<security:intercept-url pattern="/remoting/**"
 			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
+		<security:intercept-url pattern="/api/**"
+			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/setup"
 			access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/signup*/**"

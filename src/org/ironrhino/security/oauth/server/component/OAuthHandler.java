@@ -80,7 +80,7 @@ public class OAuthHandler implements AccessHandler {
 		}
 		if (StringUtils.isNotBlank(token)) {
 			Authorization authorization = oauthManager.retrieve(token);
-			if (authorization != null && authorization.getGrantor() != null) {
+			if (authorization != null) {
 				String[] scopes = null;
 				if (StringUtils.isNotBlank(authorization.getScope()))
 					scopes = authorization.getScope().split("\\s");
@@ -95,46 +95,59 @@ public class OAuthHandler implements AccessHandler {
 					}
 				}
 				if (authorized) {
-					UserDetails ud = null;
-					if (authorization.getGrantor() != null) {
-						try {
-							ud = userDetailsService
-									.loadUserByUsername(authorization
-											.getGrantor().getUsername());
-						} catch (UsernameNotFoundException unf) {
-							unf.printStackTrace();
-						}
+					if (!(authorization.getClient() != null && !authorization
+							.getClient().isEnabled())) {
+						UserDetails ud = null;
+						if (authorization.getGrantor() != null) {
+							try {
+								ud = userDetailsService
+										.loadUserByUsername(authorization
+												.getGrantor().getUsername());
+							} catch (UsernameNotFoundException unf) {
+								unf.printStackTrace();
+							}
 
-					} else if (authorization.getClient() != null) {
-						ud = authorization.getClient().getOwner();
+						} else if (authorization.getClient() != null) {
+							try {
+								ud = userDetailsService
+										.loadUserByUsername(authorization
+												.getClient().getOwner()
+												.getUsername());
+							} catch (UsernameNotFoundException unf) {
+								unf.printStackTrace();
+							}
+						}
+						if (ud != null && ud.isEnabled()
+								&& ud.isAccountNonExpired()
+								&& ud.isAccountNonLocked()) {
+							SecurityContext sc = SecurityContextHolder
+									.getContext();
+							Authentication auth = new UsernamePasswordAuthenticationToken(
+									ud, ud.getPassword(), ud.getAuthorities());
+							sc.setAuthentication(auth);
+							Map<String, Object> sessionMap = new HashMap<String, Object>(
+									2, 1);
+							sessionMap
+									.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+											sc);
+							request.setAttribute(
+									HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API,
+									sessionMap);
+							request.setAttribute(
+									REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
+						}
+						Client client = authorization.getClient();
+						if (client != null) {
+							UserAgent ua = new UserAgent(
+									request.getHeader("User-Agent"));
+							ua.setAppId(client.getId());
+							ua.setAppName(client.getName());
+							request.setAttribute("userAgent", ua);
+						}
+						return false;
+					} else {
+						errorMessage = "client_disabled";
 					}
-					if (ud != null && ud.isEnabled()
-							&& ud.isAccountNonExpired()
-							&& ud.isAccountNonLocked()) {
-						SecurityContext sc = SecurityContextHolder.getContext();
-						Authentication auth = new UsernamePasswordAuthenticationToken(
-								ud, ud.getPassword(), ud.getAuthorities());
-						sc.setAuthentication(auth);
-						Map<String, Object> sessionMap = new HashMap<String, Object>(
-								2, 1);
-						sessionMap
-								.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-										sc);
-						request.setAttribute(
-								HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API,
-								sessionMap);
-						request.setAttribute(
-								REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
-					}
-					Client client = authorization.getClient();
-					if (client != null) {
-						UserAgent ua = new UserAgent(
-								request.getHeader("User-Agent"));
-						ua.setAppId(client.getId());
-						ua.setAppName(client.getName());
-						request.setAttribute("userAgent", ua);
-					}
-					return false;
 				} else {
 					errorMessage = "unauthorized_scope";
 				}

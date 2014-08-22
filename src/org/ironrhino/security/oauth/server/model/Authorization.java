@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -42,12 +41,12 @@ public class Authorization extends BaseEntity {
 	private String accessToken = CodecUtils.nextId();
 
 	@UiConfig(displayOrder = 2)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	@JoinColumn(name = "client", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Client client;
 
 	@UiConfig(displayOrder = 3)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	@JoinColumn(name = "grantor", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private User grantor;
 

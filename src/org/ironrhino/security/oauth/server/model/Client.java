@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -56,7 +55,7 @@ public class Client extends BaseEntity implements Enableable {
 
 	@NotInCopy
 	@UiConfig(displayOrder = 6, width = "150px")
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "owner", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private User owner;
 
