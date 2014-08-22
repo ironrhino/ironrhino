@@ -41,6 +41,9 @@ public class OAuthHandler implements AccessHandler {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	@Autowired(required = false)
+	private OAuthAccessUnauthorizedHandler oauthAccessUnauthorizedHandler;
+
 	@Override
 	public String getPattern() {
 		return apiPattern;
@@ -126,13 +129,18 @@ public class OAuthHandler implements AccessHandler {
 		} else {
 			errorMessage = "missing_token";
 		}
-		try {
-			if (errorMessage != null)
-				response.getWriter().write(errorMessage);
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+		if (oauthAccessUnauthorizedHandler != null) {
+			oauthAccessUnauthorizedHandler.handle(request, response,
 					errorMessage);
-		} catch (IOException e) {
-			e.printStackTrace();
+		} else {
+			try {
+				if (errorMessage != null)
+					response.getWriter().write(errorMessage);
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+						errorMessage);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return true;
 	}
