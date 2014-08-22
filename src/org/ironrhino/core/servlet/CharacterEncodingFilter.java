@@ -6,7 +6,6 @@ import java.util.Map;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -14,9 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-public class MethodAndEncodingFilter extends OncePerRequestFilter {
-
-	public static final String PARAMETER_NAME_METHOD = "_method";
+public class CharacterEncodingFilter extends OncePerRequestFilter {
 
 	public static final String PARAMETER_NAME_INPUT_ENCODING = "_input_encoding";
 
@@ -52,31 +49,9 @@ public class MethodAndEncodingFilter extends OncePerRequestFilter {
 		else if (this.encoding != null && this.forceEncoding)
 			response.setCharacterEncoding(this.encoding);
 
-		String method = map.get(PARAMETER_NAME_METHOD);
-		if (StringUtils.isNotBlank(method))
-			request = new WrappedHttpServletRequest(request, method.trim()
-					.toUpperCase());
 		if (StringUtils.isNotBlank(outputEncoding))
 			response = new WrappedHttpServletResponse(response, outputEncoding);
 		filterChain.doFilter(request, response);
-	}
-
-	private static class WrappedHttpServletRequest extends
-			HttpServletRequestWrapper {
-
-		private String method;
-
-		public WrappedHttpServletRequest(HttpServletRequest request,
-				String method) {
-			super(request);
-			this.method = method;
-		}
-
-		@Override
-		public String getMethod() {
-			return method;
-		}
-
 	}
 
 	private static class WrappedHttpServletResponse extends

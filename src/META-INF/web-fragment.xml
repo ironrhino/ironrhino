@@ -13,8 +13,8 @@
 		</param-value>
 	</context-param>
 	<filter>
-		<filter-name>methodAndEncodingFilter</filter-name>
-		<filter-class>org.ironrhino.core.servlet.MethodAndEncodingFilter</filter-class>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.ironrhino.core.servlet.CharacterEncodingFilter</filter-class>
 		<init-param>
 			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
@@ -77,7 +77,7 @@
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>methodAndEncodingFilter</filter-name>
+		<filter-name>characterEncodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	<filter-mapping>
