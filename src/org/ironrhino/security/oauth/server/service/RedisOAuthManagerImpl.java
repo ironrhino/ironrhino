@@ -57,6 +57,22 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
+	public Authorization grant(Client client) {
+		Client orig = findClientById(client.getClientId());
+		if (orig == null)
+			throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
+		if (!orig.getSecret().equals(client.getSecret()))
+			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+		Authorization auth = new Authorization();
+		auth.setClient(client);
+		auth.setResponseType("token");
+		authorizationRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getId(), auth, expireTime,
+				TimeUnit.SECONDS);
+		return auth;
+	}
+
+	@Override
 	public Authorization generate(Client client, String redirectUri,
 			String scope, String responseType) {
 		if (!client.supportsRedirectUri(redirectUri))

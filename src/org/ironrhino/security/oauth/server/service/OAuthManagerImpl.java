@@ -44,6 +44,25 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
+	public Authorization grant(Client client) {
+		Client orig = findClientById(client.getClientId());
+		if (orig == null)
+			throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
+		if (!orig.getSecret().equals(client.getSecret()))
+			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+		entityManager.setEntityClass(Authorization.class);
+		Authorization auth = (Authorization) entityManager.findOne("client",
+				client, "responseType", "token");
+		if (auth != null)
+			return reuse(auth);
+		auth = new Authorization();
+		auth.setClient(client);
+		auth.setResponseType("token");
+		entityManager.save(auth);
+		return auth;
+	}
+
+	@Override
 	public Authorization generate(Client client, String redirectUri,
 			String scope, String responseType) {
 		if (!client.supportsRedirectUri(redirectUri))

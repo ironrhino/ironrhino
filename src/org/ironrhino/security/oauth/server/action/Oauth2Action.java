@@ -18,6 +18,7 @@ import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationF
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.security.model.User;
+import org.ironrhino.security.oauth.server.component.OAuthAccessUnauthorizedHandler;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
@@ -39,6 +40,9 @@ public class Oauth2Action extends BaseAction {
 
 	@Autowired
 	private transient OAuthManager oauthManager;
+
+	@Autowired(required = false)
+	private OAuthAccessUnauthorizedHandler oauthAccessUnauthorizedHandler;
 
 	@Autowired
 	private transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
@@ -226,11 +230,17 @@ public class Oauth2Action extends BaseAction {
 			displayForNative = client.isNative();
 			setUid(authorization.getId());
 		} catch (Exception e) {
-			try {
-				ServletActionContext.getResponse().sendError(
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			if (oauthAccessUnauthorizedHandler != null) {
+				oauthAccessUnauthorizedHandler.handle(
+						ServletActionContext.getRequest(),
+						ServletActionContext.getResponse(), e.getMessage());
+			} else {
+				try {
+					ServletActionContext.getResponse().sendError(
+							HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 			return NONE;
 		}
@@ -311,14 +321,19 @@ public class Oauth2Action extends BaseAction {
 				targetUrl = sb.toString();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				ServletActionContext.getResponse().sendError(
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-				return NONE;
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			if (oauthAccessUnauthorizedHandler != null) {
+				oauthAccessUnauthorizedHandler.handle(
+						ServletActionContext.getRequest(),
+						ServletActionContext.getResponse(), e.getMessage());
+			} else {
+				try {
+					ServletActionContext.getResponse().sendError(
+							HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
+			return NONE;
 		}
 		return REDIRECT;
 	}
@@ -345,6 +360,34 @@ public class Oauth2Action extends BaseAction {
 
 	@JsonConfig(root = "tojson")
 	public String token() {
+		if ("client_credential".equals(grant_type)) {
+			client = new Client();
+			client.setId(client_id);
+			client.setSecret(client_secret);
+			try {
+				authorization = oauthManager.grant(client);
+			} catch (Exception e) {
+				if (oauthAccessUnauthorizedHandler != null) {
+					oauthAccessUnauthorizedHandler.handle(
+							ServletActionContext.getRequest(),
+							ServletActionContext.getResponse(), e.getMessage());
+				} else {
+					try {
+						ServletActionContext.getResponse().sendError(
+								HttpServletResponse.SC_BAD_REQUEST,
+								e.getMessage());
+						return NONE;
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+				return NONE;
+			}
+			tojson = new HashMap<String, Object>();
+			tojson.put("access_token", authorization.getAccessToken());
+			tojson.put("expires_in", authorization.getExpiresIn());
+			return JSON;
+		}
 		if (!"authorization_code".equals(grant_type))
 			if ("refresh_token".equals(grant_type)) {
 				authorization = oauthManager.refresh(refresh_token);
@@ -357,14 +400,20 @@ public class Oauth2Action extends BaseAction {
 					tojson.put("refresh_token", authorization.getRefreshToken());
 				}
 			} else {
-				try {
-					ServletActionContext.getResponse().sendError(
-							HttpServletResponse.SC_BAD_REQUEST,
-							"grant_type must be authorization_code");
-					return NONE;
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				String message = "grant_type must be authorization_code";
+				if (oauthAccessUnauthorizedHandler != null) {
+					oauthAccessUnauthorizedHandler.handle(
+							ServletActionContext.getRequest(),
+							ServletActionContext.getResponse(), message);
+				} else {
+					try {
+						ServletActionContext.getResponse().sendError(
+								HttpServletResponse.SC_BAD_REQUEST, message);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				}
+				return NONE;
 			}
 		client = new Client();
 		client.setId(client_id);
@@ -377,12 +426,17 @@ public class Oauth2Action extends BaseAction {
 			tojson.put("expires_in", authorization.getExpiresIn());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				ServletActionContext.getResponse().sendError(
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			if (oauthAccessUnauthorizedHandler != null) {
+				oauthAccessUnauthorizedHandler.handle(
+						ServletActionContext.getRequest(),
+						ServletActionContext.getResponse(), e.getMessage());
+			} else {
+				try {
+					ServletActionContext.getResponse().sendError(
+							HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 			return NONE;
 		}

@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
@@ -94,23 +95,37 @@ public class OAuthHandler implements AccessHandler {
 					}
 				}
 				if (authorized) {
-					UserDetails ud = userDetailsService
-							.loadUserByUsername(authorization.getGrantor()
-									.getUsername());
-					SecurityContext sc = SecurityContextHolder.getContext();
-					Authentication auth = new UsernamePasswordAuthenticationToken(
-							ud, ud.getPassword(), ud.getAuthorities());
-					sc.setAuthentication(auth);
-					Map<String, Object> sessionMap = new HashMap<String, Object>(
-							2, 1);
-					sessionMap
-							.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-									sc);
-					request.setAttribute(
-							HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API,
-							sessionMap);
-					request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST,
-							true);
+					UserDetails ud = null;
+					if (authorization.getGrantor() != null) {
+						try {
+							ud = userDetailsService
+									.loadUserByUsername(authorization
+											.getGrantor().getUsername());
+						} catch (UsernameNotFoundException unf) {
+							unf.printStackTrace();
+						}
+
+					} else if (authorization.getClient() != null) {
+						ud = authorization.getClient().getOwner();
+					}
+					if (ud != null && ud.isEnabled()
+							&& ud.isAccountNonExpired()
+							&& ud.isAccountNonLocked()) {
+						SecurityContext sc = SecurityContextHolder.getContext();
+						Authentication auth = new UsernamePasswordAuthenticationToken(
+								ud, ud.getPassword(), ud.getAuthorities());
+						sc.setAuthentication(auth);
+						Map<String, Object> sessionMap = new HashMap<String, Object>(
+								2, 1);
+						sessionMap
+								.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+										sc);
+						request.setAttribute(
+								HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API,
+								sessionMap);
+						request.setAttribute(
+								REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
+					}
 					Client client = authorization.getClient();
 					if (client != null) {
 						UserAgent ua = new UserAgent(
