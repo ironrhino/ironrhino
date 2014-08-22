@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(Integer.MIN_VALUE)
-public class FirewallHandler implements AccessHandler {
+public class FirewallHandler extends AccessHandler {
 
 	public static final String KEY_ALLOWEDADDRPATTERN = "firewallHandler.allowedAddrPattern";
 
@@ -27,11 +27,6 @@ public class FirewallHandler implements AccessHandler {
 
 	public void setAllowedAddrPattern(String allowedAddrPattern) {
 		this.allowedAddrPattern = allowedAddrPattern;
-	}
-
-	@Override
-	public String getPattern() {
-		return null;
 	}
 
 	@Override

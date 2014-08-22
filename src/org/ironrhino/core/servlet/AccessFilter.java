@@ -131,7 +131,16 @@ public class AccessFilter implements Filter {
 			accessLog.info("");
 
 		if (handlers != null)
-			for (AccessHandler handler : handlers) {
+			loop: for (AccessHandler handler : handlers) {
+				String excludePattern = handler.getExcludePattern();
+				if (StringUtils.isNotBlank(excludePattern)) {
+					String[] arr = excludePattern.split("\\s*,\\s*");
+					for (String pa : arr)
+						if (org.ironrhino.core.util.StringUtils
+								.matchesWildcard(uri, pa)) {
+							continue loop;
+						}
+				}
 				String pattern = handler.getPattern();
 				boolean matched = StringUtils.isBlank(pattern);
 				if (!matched) {

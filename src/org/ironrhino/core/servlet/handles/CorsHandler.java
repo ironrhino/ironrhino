@@ -12,18 +12,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(Integer.MIN_VALUE + 1)
-public class CorsHandler implements AccessHandler {
+public class CorsHandler extends AccessHandler {
 
 	@Value("${cors.openForSameOrigin:true}")
 	private boolean openForSameOrigin;
 
 	@Value("${cors.xFrameOptions:SAMEORIGIN}")
 	private String xFrameOptions = "SAMEORIGIN";
-
-	@Override
-	public String getPattern() {
-		return null;
-	}
 
 	@Override
 	public boolean handle(HttpServletRequest request,

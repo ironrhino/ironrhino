@@ -3,11 +3,19 @@ package org.ironrhino.core.servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public interface AccessHandler {
+public class AccessHandler {
 
-	public String getPattern();
+	public String getPattern() {
+		return null;
+	}
+
+	public String getExcludePattern() {
+		return null;
+	}
 
 	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response);
+			HttpServletResponse response) {
+		return false;
+	}
 
 }

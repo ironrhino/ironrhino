@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(Integer.MIN_VALUE)
-public class PageViewHandler implements AccessHandler {
+public class PageViewHandler extends AccessHandler {
 
 	@Autowired(required = false)
 	private PageViewService pageViewService;
@@ -26,11 +26,6 @@ public class PageViewHandler implements AccessHandler {
 
 	@Autowired
 	private HttpSessionManager httpSessionManager;
-
-	@Override
-	public String getPattern() {
-		return null;
-	}
 
 	@Override
 	public boolean handle(final HttpServletRequest request,

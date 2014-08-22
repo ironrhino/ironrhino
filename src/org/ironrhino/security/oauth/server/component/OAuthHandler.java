@@ -29,12 +29,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(Integer.MIN_VALUE + 1)
-public class OAuthHandler implements AccessHandler {
+public class OAuthHandler extends AccessHandler {
 
 	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST = "_OAUTH_REQUEST";
 
-	@Value("${api.pattern:/user/self,/oauth2/tokeninfo,/oauth2/revoketoken}")
+	@Value("${oauth.api.pattern:/user/self,/oauth2/tokeninfo,/oauth2/revoketoken,/api/*}")
 	private String apiPattern;
+
+	@Value("${oauth.api.excludePattern:}")
+	private String apiExcludePattern;
 
 	@Autowired
 	private OAuthManager oauthManager;
@@ -48,6 +51,10 @@ public class OAuthHandler implements AccessHandler {
 	@Override
 	public String getPattern() {
 		return apiPattern;
+	}
+
+	public String getExcludePattern() {
+		return apiExcludePattern;
 	}
 
 	@Override

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(Integer.MIN_VALUE)
-public class UploadFilesHandler implements AccessHandler {
+public class UploadFilesHandler extends AccessHandler {
 
 	@Autowired
 	private FileStorage fileStorage;
