@@ -15,6 +15,7 @@ import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
+import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
@@ -28,14 +29,14 @@ import org.ironrhino.security.model.User;
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(name = "oauth_authorization")
-@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true))
+@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), bottomButtons = "<button type=\"button\" class=\"btn\" data-view=\"create\">${action.getText('create')}</button> <button type=\"button\" class=\"btn confirm\" data-action=\"delete\" data-shown=\"selected\" data-filterselector=\":not([data-deletable='false'])\">${action.getText('delete')}</button> <button type=\"button\" class=\"btn reload\">${action.getText('reload')}</button> <button type=\"button\" class=\"btn filter\">${action.getText('filter')}</button>")
 public class Authorization extends BaseEntity {
 
 	public static final int DEFAULT_LIFETIME = 3600;
 
 	private static final long serialVersionUID = -559379341059695550L;
 
-	@UiConfig(displayOrder = 1)
+	@UiConfig(displayOrder = 1, width = "200px")
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	private String accessToken = CodecUtils.nextId();
@@ -50,33 +51,33 @@ public class Authorization extends BaseEntity {
 	@JoinColumn(name = "grantor", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private User grantor;
 
-	@UiConfig(displayOrder = 4)
+	@UiConfig(displayOrder = 4, hiddenInList = @Hidden(true))
 	private String scope;
 
-	@UiConfig(displayOrder = 5)
+	@UiConfig(displayOrder = 5, hiddenInList = @Hidden(true))
 	@Column(unique = true)
 	private String code;
 
-	@UiConfig(displayOrder = 6)
+	@UiConfig(displayOrder = 6, width = "100px")
 	private int lifetime = DEFAULT_LIFETIME;
 
-	@UiConfig(displayOrder = 7)
+	@UiConfig(displayOrder = 7, hiddenInList = @Hidden(true))
 	@Column(unique = true)
 	private String refreshToken;
 
-	@UiConfig(displayOrder = 8)
+	@UiConfig(displayOrder = 8, width = "100px")
 	@Column(nullable = false)
 	private String responseType = "code";
 
 	@NotInCopy
-	@UiConfig(hidden = true)
-	@Column(nullable = false)
-	private Date modifyDate = new Date();
-
-	@NotInCopy
-	@UiConfig(hidden = true)
+	@UiConfig(displayOrder = 9, width = "130px")
 	@Column(nullable = false, updatable = false)
 	private Date createDate = new Date();
+
+	@NotInCopy
+	@UiConfig(displayOrder = 10, width = "130px")
+	@Column(nullable = false)
+	private Date modifyDate = new Date();
 
 	public String getAccessToken() {
 		return accessToken;

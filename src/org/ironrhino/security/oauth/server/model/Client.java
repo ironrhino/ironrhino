@@ -16,6 +16,7 @@ import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
+import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
@@ -42,35 +43,40 @@ public class Client extends BaseEntity implements Enableable {
 	@Column(nullable = false)
 	private String name;
 
-	@UiConfig(displayOrder = 2, cssClass = "span4", excludedFromCriteria = true)
+	@UiConfig(displayOrder = 3, alias = "clientSecret", cssClass = "span4", width = "200px", excludedFromCriteria = true)
 	@Column(nullable = false)
 	private String secret = CodecUtils.nextId();
 
-	@UiConfig(displayOrder = 3, cssClass = "span4")
+	@UiConfig(displayOrder = 4, cssClass = "span4", hiddenInList = @Hidden(true))
 	private String redirectUri;
 
-	@UiConfig(displayOrder = 4, cssClass = "span4", type = "textarea")
+	@UiConfig(displayOrder = 5, cssClass = "span4", type = "textarea", hiddenInList = @Hidden(true))
 	@Column(length = 4000)
 	private String description;
 
 	@NotInCopy
-	@UiConfig(displayOrder = 5, width = "200px")
+	@UiConfig(displayOrder = 6, width = "150px")
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "owner", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private User owner;
 
-	@UiConfig(displayOrder = 6, width = "80px")
+	@UiConfig(displayOrder = 7, width = "80px")
 	private boolean enabled = true;
 
 	@NotInCopy
-	@UiConfig(hidden = true)
+	@UiConfig(displayOrder = 8, hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
+	@Column(updatable = false)
+	private Date createDate = new Date();
+
+	@NotInCopy
+	@UiConfig(displayOrder = 9, hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
 	@Column(insertable = false)
 	private Date modifyDate;
 
-	@NotInCopy
-	@UiConfig(hidden = true)
-	@Column(updatable = false)
-	private Date createDate = new Date();
+	@UiConfig(displayOrder = 2, width = "200px")
+	public String getClientId() {
+		return getId();
+	}
 
 	public String getName() {
 		return name;
