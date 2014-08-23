@@ -7,7 +7,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.RequestUtils;
@@ -49,32 +48,7 @@ public class CharacterEncodingFilter extends OncePerRequestFilter {
 		else if (this.encoding != null && this.forceEncoding)
 			response.setCharacterEncoding(this.encoding);
 
-		if (StringUtils.isNotBlank(outputEncoding))
-			response = new WrappedHttpServletResponse(response, outputEncoding);
 		filterChain.doFilter(request, response);
-	}
-
-	private static class WrappedHttpServletResponse extends
-			HttpServletResponseWrapper {
-
-		private String encoding;
-
-		public WrappedHttpServletResponse(HttpServletResponse response,
-				String encoding) {
-			super(response);
-			this.encoding = encoding;
-		}
-
-		@Override
-		public void setCharacterEncoding(String encoding) {
-			this.encoding = encoding;
-		}
-
-		@Override
-		public String getCharacterEncoding() {
-			return this.encoding;
-		}
-
 	}
 
 }
