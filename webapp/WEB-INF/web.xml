@@ -157,4 +157,8 @@
 		<error-code>403</error-code>
 		<location>/error/handle/403</location>
 	</error-page>
+	<error-page>
+		<error-code>401</error-code>
+		<location>/error/handle/401</location>
+	</error-page>
 </web-app>

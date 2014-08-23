@@ -35,8 +35,11 @@ public class ErrorAction extends BaseAction {
 		}
 		String result;
 		switch (errorcode) {
-		case 403:
+		case 401:
 			result = ACCESSDENIED;
+			break;
+		case 403:
+			result = ERROR;
 			break;
 		case 404:
 			result = NOTFOUND;
@@ -50,8 +53,7 @@ public class ErrorAction extends BaseAction {
 					if (ud != null) {
 						targetUrl = "/"
 								+ StringUtils.uncapitalize(ud.getClass()
-										.getSimpleName())
-								+ "/password";
+										.getSimpleName()) + "/password";
 						return REDIRECT;
 					}
 				}
