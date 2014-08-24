@@ -34,6 +34,9 @@ import org.ironrhino.core.util.JsonUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.ClassUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @MappedSuperclass
 public class BaseUser extends BaseEntity implements RoledUserDetails,
 		Recordable<BaseUser>, Enableable {
@@ -53,7 +56,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	private String username;
 
 	@NotInCopy
-	@NotInJson
 	@Column(nullable = false)
 	@UiConfig(displayOrder = 2, excludedFromLike = true, excludedFromCriteria = true)
 	private String password;
@@ -68,7 +70,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	private String email;
 
 	@SearchableProperty
-	@NotInJson
 	@UiConfig(displayOrder = 5)
 	private String phone;
 
@@ -141,10 +142,12 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	}
 
 	@Override
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
+	@JsonProperty
 	public void setPassword(String password) {
 		this.password = password;
 	}
