@@ -6,7 +6,8 @@ import javax.persistence.Embeddable;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.ironrhino.core.metadata.NotInJson;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Embeddable
 public class Coordinate implements Serializable {
@@ -53,7 +54,7 @@ public class Coordinate implements Serializable {
 		this.longitude = longitude;
 	}
 
-	@NotInJson
+	@JsonIgnore
 	public void setLatLngAsString(String latLng) {
 		if (latLng == null || latLng.trim().length() == 0) {
 			this.latitude = null;

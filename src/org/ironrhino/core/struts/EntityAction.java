@@ -32,7 +32,6 @@ import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.JsonConfig;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.Owner;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
@@ -67,6 +66,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionProxy;
 import com.opensymphony.xwork2.inject.Inject;
@@ -1223,10 +1223,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
-		Set<String> notInJsons = AnnotationUtils.getAnnotatedPropertyNames(
-				getEntityClass(), NotInJson.class);
+		Set<String> jsonIgnores = AnnotationUtils.getAnnotatedPropertyNames(
+				getEntityClass(), JsonIgnore.class);
 		for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
-			if (notInJsons.contains(entry.getKey()))
+			if (jsonIgnores.contains(entry.getKey()))
 				continue;
 			Object value = bwi.getPropertyValue(entry.getKey());
 			if (value == null)

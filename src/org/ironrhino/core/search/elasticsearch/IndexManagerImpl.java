@@ -31,7 +31,6 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.search.SearchHit;
 import org.hibernate.Session;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
@@ -97,15 +96,11 @@ public class IndexManagerImpl implements IndexManager {
 
 					@Override
 					protected boolean _isIgnorable(Annotated a) {
-						if (a instanceof SearchableId
-								|| a instanceof SearchableProperty
-								|| a instanceof SearchableComponent)
+						if (a.getAnnotation(SearchableId.class) != null
+								|| a.getAnnotation(SearchableProperty.class) != null
+								|| a.getAnnotation(SearchableComponent.class) != null)
 							return false;
-						boolean b = super._isIgnorable(a);
-						if (b)
-							return b;
-						NotInJson ann = a.getAnnotation(NotInJson.class);
-						return ann != null;
+						return super._isIgnorable(a);
 					}
 
 				});

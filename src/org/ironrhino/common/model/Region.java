@@ -10,12 +10,13 @@ import org.ironrhino.core.aop.PublishAware;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.NotInCopy;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.util.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @PublishAware
 @AutoConfig
@@ -105,19 +106,19 @@ public class Region extends BaseTreeableEntity<Region> {
 		this.coordinate = coordinate;
 	}
 
-	@NotInJson
+	@JsonIgnore
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
 	public String getNameAsPinyin() {
 		return StringUtils.pinyin(name);
 	}
 
-	@NotInJson
+	@JsonIgnore
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
 	public String getNameAsPinyinAbbr() {
 		return StringUtils.pinyinAbbr(name);
 	}
 
-	@NotInJson
+	@JsonIgnore
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
 	public String getShortFullname() {
 		return LocationUtils.shortenAddress(getFullname());

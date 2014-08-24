@@ -1,6 +1,6 @@
 package org.ironrhino.security.oauth.client.model;
 
-import org.ironrhino.core.metadata.NotInJson;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class OAuthToken implements java.io.Serializable {
 
@@ -15,7 +15,7 @@ public class OAuthToken implements java.io.Serializable {
 		setSource(source);
 	}
 
-	@NotInJson
+	@JsonIgnore
 	public String getSource() {
 		return source;
 	}

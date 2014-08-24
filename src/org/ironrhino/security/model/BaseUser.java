@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.model.Enableable;
@@ -73,35 +72,35 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	@UiConfig(displayOrder = 5)
 	private String phone;
 
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(displayOrder = 6)
 	private boolean enabled = true;
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Transient
 	private Date accountExpireDate;
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	private Date passwordModifyDate;
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Transient
 	private boolean passwordExpired;
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
 	private Date createDate = new Date();
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@Transient
 	private Collection<GrantedAuthority> authorities;
 
@@ -110,24 +109,24 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	private Set<String> roles = new HashSet<String>(0);
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@Transient
 	private Map<String, String> attributes;
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
 	private Date modifyDate;
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
 	private String createUser;
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
 	private String modifyUser;
@@ -189,7 +188,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	}
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@Column(name = "roles", length = 4000)
 	@Access(AccessType.PROPERTY)
 	public String getRolesAsString() {
@@ -301,19 +300,19 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	}
 
 	@Override
-	@NotInJson
+	@JsonIgnore
 	public boolean isAccountNonExpired() {
 		return accountExpireDate == null || accountExpireDate.after(new Date());
 	}
 
 	@Override
-	@NotInJson
+	@JsonIgnore
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
 	@Override
-	@NotInJson
+	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
 		return !isPasswordExpired();
 	}

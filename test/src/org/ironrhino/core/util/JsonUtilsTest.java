@@ -10,9 +10,10 @@ import java.util.List;
 
 import javax.persistence.Lob;
 
-import org.ironrhino.core.metadata.NotInJson;
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 public class JsonUtilsTest {
@@ -27,7 +28,6 @@ public class JsonUtilsTest {
 
 	static class User {
 		private String username;
-		@NotInJson
 		private String password;
 		private int age;
 		private Status status;
@@ -52,10 +52,12 @@ public class JsonUtilsTest {
 			this.username = username;
 		}
 
+		@JsonIgnore
 		public String getPassword() {
 			return password;
 		}
 
+		@JsonProperty
 		public void setPassword(String password) {
 			this.password = password;
 		}

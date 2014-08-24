@@ -1,9 +1,9 @@
 package org.ironrhino.security.oauth.client.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.util.JsonUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class OAuth2Token extends OAuthToken {
@@ -134,7 +134,7 @@ public class OAuth2Token extends OAuthToken {
 		}
 	}
 
-	@NotInJson
+	@JsonIgnore
 	public boolean isExpired() {
 		if (expires_in <= 0 || create_time <= 0)
 			return false;
@@ -142,7 +142,7 @@ public class OAuth2Token extends OAuthToken {
 		return (System.currentTimeMillis() - create_time) / 1000 > (expires_in - offset);
 	}
 
-	@NotInJson
+	@JsonIgnore
 	public boolean isGoingToExpired() {
 		if (expires_in <= 0 || create_time <= 0)
 			return false;

@@ -23,7 +23,6 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
@@ -36,6 +35,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Searchable
 @AutoConfig
@@ -58,12 +59,12 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	@UiConfig(displayOrder = 2)
 	private String title;
 
-	@NotInJson
+	@JsonIgnore
 	@Lob
 	@UiConfig(displayOrder = 3, excludedFromCriteria = true)
 	private String head;
 
-	@NotInJson
+	@JsonIgnore
 	@SearchableProperty
 	@Lob
 	@Column(nullable = false)
@@ -74,7 +75,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	@UiConfig(displayOrder = 5, width = "100px")
 	private int displayOrder;
 
-	@NotInJson
+	@JsonIgnore
 	@Lob
 	@UiConfig(hidden = true)
 	private String draft;
@@ -201,7 +202,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	}
 
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@Column(name = "tags", length = 1024)
 	@Access(AccessType.PROPERTY)
 	public String getTagsAsString() {

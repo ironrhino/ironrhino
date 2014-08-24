@@ -24,11 +24,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.NotInCopy;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @MappedSuperclass
@@ -67,7 +68,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 	@OrderBy("displayOrder,name")
 	protected Collection<T> children = new HashSet<T>(0);
 
-	@NotInJson
+	@JsonIgnore
 	public String getFullId() {
 		return fullId;
 	}
@@ -87,7 +88,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 	}
 
 	@Override
-	@NotInJson
+	@JsonIgnore
 	public boolean isNew() {
 		return id == null || id == 0;
 	}
@@ -136,7 +137,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 	}
 
 	@Override
-	@NotInJson
+	@JsonIgnore
 	public int getDisplayOrder() {
 		return displayOrder;
 	}
@@ -157,7 +158,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 
 	@Override
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	public Collection<T> getChildren() {
 		return children;
@@ -181,7 +182,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 
 	@Override
 	@NotInCopy
-	@NotInJson
+	@JsonIgnore
 	@UiConfig(hidden = true)
 	public T getParent() {
 		return parent;
@@ -225,7 +226,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 		return null;
 	}
 
-	@NotInJson
+	@JsonIgnore
 	public List<T> getDescendants() {
 		List<T> ids = new ArrayList<T>();
 		if (!this.isLeaf())
@@ -235,7 +236,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 		return ids;
 	}
 
-	@NotInJson
+	@JsonIgnore
 	public List<T> getDescendantsAndSelf() {
 		List<T> ids = new ArrayList<T>();
 		collect((T) this, ids);

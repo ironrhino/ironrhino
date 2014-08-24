@@ -7,9 +7,10 @@ import javax.persistence.MappedSuperclass;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
-import org.ironrhino.core.metadata.NotInJson;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @MappedSuperclass
 public class BaseEntity extends Entity<String> {
@@ -34,7 +35,7 @@ public class BaseEntity extends Entity<String> {
 	}
 
 	@Override
-	@NotInJson
+	@JsonIgnore
 	public boolean isNew() {
 		return id == null || StringUtils.isBlank(id);
 	}
