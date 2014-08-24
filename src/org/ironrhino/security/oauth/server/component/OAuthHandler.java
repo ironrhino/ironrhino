@@ -171,7 +171,7 @@ public class OAuthHandler extends AccessHandler {
 			try {
 				if (errorMessage != null)
 					response.getWriter().write(errorMessage);
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+				response.sendError(HttpServletResponse.SC_FORBIDDEN,
 						errorMessage);
 			} catch (IOException e) {
 				e.printStackTrace();
