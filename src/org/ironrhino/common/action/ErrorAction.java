@@ -1,14 +1,18 @@
 package org.ironrhino.common.action;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,30 +26,38 @@ public class ErrorAction extends BaseAction {
 
 	private Exception exception;
 
+	@Autowired(required = false)
+	private HttpErrorHandler httpErrorHandler;
+
 	public Exception getException() {
 		return exception;
 	}
 
 	public String handle() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
 		int errorcode = 404;
 		try {
 			errorcode = Integer.valueOf(getUid());
 		} catch (Exception e) {
 
 		}
+		if (httpErrorHandler != null
+				&& httpErrorHandler.handle(request, response, errorcode, null))
+			return NONE;
 		String result;
 		switch (errorcode) {
-		case 401:
+		case HttpServletResponse.SC_UNAUTHORIZED:
 			result = ACCESSDENIED;
 			break;
-		case 403:
+		case HttpServletResponse.SC_FORBIDDEN:
 			result = ERROR;
 			break;
-		case 404:
+		case HttpServletResponse.SC_NOT_FOUND:
 			result = NOTFOUND;
 			break;
 		case 500:
-			exception = (Exception) ServletActionContext.getRequest()
+			exception = (Exception) request
 					.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 			if (exception instanceof AccountStatusException) {
 				if (exception instanceof CredentialsExpiredException) {
@@ -67,7 +79,7 @@ public class ErrorAction extends BaseAction {
 		default:
 			result = NOTFOUND;
 		}
-		ServletActionContext.getResponse().setStatus(errorcode);
+		response.setStatus(errorcode);
 		return result;
 	}
 }

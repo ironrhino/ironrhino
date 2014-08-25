@@ -1,5 +1,6 @@
 package api.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.AuthzUtils;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import api.Asserts;
 import api.RestStatus;
 
 @RestController
@@ -38,10 +40,17 @@ public class UserController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public RestStatus post(@RequestBody User user) {
+		Asserts.notBlank(user, "username", "password", "name");
 		User u = (User) userManager.loadUserByUsername(user.getUsername());
 		if (u != null)
-			throw RestStatus
-					.valueOf(RestStatus.CODE_ALREADY_EXISTS, "username");
+			throw RestStatus.valueOf(RestStatus.CODE_ALREADY_EXISTS,
+					"username already exists");
+		if (StringUtils.isNotBlank(user.getEmail())) {
+			u = (User) userManager.loadUserByUsername(user.getEmail());
+			if (u != null)
+				throw RestStatus.valueOf(RestStatus.CODE_ALREADY_EXISTS,
+						"email already exists");
+		}
 		u = new User();
 		u.setUsername(user.getUsername());
 		u.setLegiblePassword(user.getPassword());
@@ -57,10 +66,14 @@ public class UserController {
 		User u = (User) userManager.loadUserByUsername(username);
 		if (u == null)
 			throw RestStatus.NOT_FOUND;
-		u.setLegiblePassword(user.getPassword());
-		u.setName(user.getName());
-		u.setEmail(user.getEmail());
-		u.setPhone(user.getPhone());
+		if (user.getPassword() != null)
+			u.setLegiblePassword(user.getPassword());
+		if (user.getName() != null)
+			u.setName(user.getName());
+		if (user.getEmail() != null)
+			u.setEmail(user.getEmail());
+		if (user.getPhone() != null)
+			u.setPhone(user.getPhone());
 		userManager.save(u);
 		return RestStatus.OK;
 	}
@@ -70,12 +83,10 @@ public class UserController {
 		User u = (User) userManager.loadUserByUsername(username);
 		if (u == null)
 			throw RestStatus.NOT_FOUND;
-		if (!u.isEnabled()) {
-			userManager.delete(u);
-			return RestStatus.OK;
-		} else {
-			return RestStatus.ACCESS_UNAUTHORIZED;
-		}
+		if (u.isEnabled())
+			throw RestStatus.FORBIDDEN;
+		userManager.delete(u);
+		return RestStatus.OK;
 	}
 
 }

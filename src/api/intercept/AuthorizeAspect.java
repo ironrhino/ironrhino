@@ -31,7 +31,7 @@ public class AuthorizeAspect extends BaseAspect {
 		if (authorize != null
 				&& !AuthzUtils.authorize(authorize.ifAllGranted(),
 						authorize.ifAnyGranted(), authorize.ifNotGranted()))
-			throw RestStatus.ACCESS_UNAUTHORIZED;
+			throw RestStatus.UNAUTHORIZED;
 	}
 
 }

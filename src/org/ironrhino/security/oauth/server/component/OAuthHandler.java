@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
+import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.util.UserAgent;
 import org.ironrhino.security.oauth.server.model.Authorization;
@@ -46,7 +47,7 @@ public class OAuthHandler extends AccessHandler {
 	private UserDetailsService userDetailsService;
 
 	@Autowired(required = false)
-	private OAuthAccessUnauthorizedHandler oauthAccessUnauthorizedHandler;
+	private HttpErrorHandler httpErrorHandler;
 
 	@Override
 	public String getPattern() {
@@ -164,18 +165,16 @@ public class OAuthHandler extends AccessHandler {
 		} else {
 			errorMessage = "missing_token";
 		}
-		if (oauthAccessUnauthorizedHandler != null) {
-			oauthAccessUnauthorizedHandler.handle(request, response,
-					errorMessage);
-		} else {
-			try {
-				if (errorMessage != null)
-					response.getWriter().write(errorMessage);
-				response.sendError(HttpServletResponse.SC_FORBIDDEN,
-						errorMessage);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if (httpErrorHandler != null
+				&& httpErrorHandler.handle(request, response,
+						HttpServletResponse.SC_UNAUTHORIZED, errorMessage))
+			return true;
+		try {
+			if (errorMessage != null)
+				response.getWriter().write(errorMessage);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, errorMessage);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return true;
 	}
