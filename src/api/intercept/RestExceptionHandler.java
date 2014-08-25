@@ -21,6 +21,7 @@ public class RestExceptionHandler {
 			HttpServletResponse response, Throwable ex) {
 		if (ex instanceof HttpMediaTypeNotAcceptableException) {
 			response.setContentType("text/plain");
+			response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 			try {
 				response.getWriter().write("unsupported media type");
 			} catch (IOException e) {
