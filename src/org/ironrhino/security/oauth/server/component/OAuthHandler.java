@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.session.HttpSessionManager;
+import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.core.util.UserAgent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
@@ -62,7 +63,11 @@ public class OAuthHandler extends AccessHandler {
 	public boolean handle(HttpServletRequest request,
 			HttpServletResponse response) {
 		String errorMessage = null;
-		String token = request.getParameter("oauth_token");
+		Map<String, String> map = RequestUtils
+				.parseParametersFromQueryString(request.getQueryString());
+		String token = map.get("oauth_token");
+		if (token == null)
+			token = map.get("access_token");
 		if (token == null) {
 			String header = request.getHeader("Authorization");
 			if (header != null) {
