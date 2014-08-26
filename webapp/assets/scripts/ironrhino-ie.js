@@ -33545,7 +33545,7 @@ Observation.common = function(container) {
 					c.attr('class', c.data('originalclass') + ' ' + sw.val());
 				});
 	});
-	$(':input.conjunct', container).change(function() {
+	$(':input.conjunct', container).bind('conjunct', function() {
 				var t = $(this);
 				var f = $(this).closest('form');
 				var data = {};
@@ -33572,6 +33572,9 @@ Observation.common = function(container) {
 							replacement : t.data('replacement')
 						});
 			});
+	$(':input.conjunct', container).change(function() {
+				var t = $(this).trigger('conjunct');
+			});
 	// if (typeof $.fn.datepicker != 'undefined')
 	// $('input.date:not([readonly]):not([disabled])', container).datepicker({
 	// dateFormat : 'yy-mm-dd'
@@ -33594,7 +33597,7 @@ Observation.common = function(container) {
 						option.pickTime = false;
 					}
 					t.datetimepicker(option).on('changeDate', function(e) {
-								t.trigger('validate');
+								t.trigger('validate').trigger('conjunct');
 								var dp = t.data('datetimepicker');
 								if (dp && dp.widget.is(':visible'))
 									dp.hide();
@@ -34120,14 +34123,15 @@ var Dialog = {
 			hasRow = $('div.row', doc).length > 0;
 		}
 		d.dialog('moveToTop');
-		if (hasRow)
+		if (hasRow) {
 			d.dialog('option', 'width', '90%');
-		// var height = d.height();
-		// if (height >= $(window).height())
-		// d.dialog('option', 'position', 'top');
-		setTimeout(function() {
-					d.dialog('option', 'position', 'center');
-				}, 200);
+			// var height = d.height();
+			// if (height >= $(window).height())
+			// d.dialog('option', 'position', 'top');
+			setTimeout(function() {
+						d.dialog('option', 'position', 'center');
+					}, 500);
+		}
 	},
 	toggleMaximization : function(d) {
 		var dialog = $(d).closest('.ui-dialog');
