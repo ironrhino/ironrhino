@@ -2,6 +2,7 @@ package org.ironrhino.security.oauth.server.action;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.struts.EntityAction;
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
@@ -40,6 +41,8 @@ public class AuthorizationAction extends EntityAction<Authorization> {
 		if (authorization.getClient() != null
 				&& StringUtils.isBlank(authorization.getClient().getId()))
 			authorization.setClient(null);
+		authorization.setRefreshToken(CodecUtils.nextId());
+		authorization.setResponseType("token");
 		oauthManager.create(authorization);
 		addActionMessage(getText("operate.success") + ",token:  "
 				+ authorization.getAccessToken());

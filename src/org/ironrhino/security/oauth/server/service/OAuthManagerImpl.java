@@ -53,10 +53,27 @@ public class OAuthManagerImpl implements OAuthManager {
 		entityManager.setEntityClass(Authorization.class);
 		Authorization auth = (Authorization) entityManager.findOne("client",
 				client, "responseType", "token");
-		if (auth != null)
-			return reuse(auth);
+		if (auth != null) {
+			auth.setAccessToken(CodecUtils.nextId());
+			auth.setRefreshToken(CodecUtils.nextId());
+			auth.setModifyDate(new Date());
+			auth.setLifetime(Authorization.DEFAULT_LIFETIME);
+			entityManager.save(auth);
+			return auth;
+		}
 		auth = new Authorization();
 		auth.setClient(client);
+		auth.setResponseType("token");
+		auth.setRefreshToken(CodecUtils.nextId());
+		entityManager.save(auth);
+		return auth;
+	}
+
+	@Override
+	public Authorization grant(Client client, User grantor) {
+		Authorization auth = new Authorization();
+		auth.setClient(client);
+		auth.setGrantor(grantor);
 		auth.setResponseType("token");
 		auth.setRefreshToken(CodecUtils.nextId());
 		entityManager.save(auth);

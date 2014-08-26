@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 public class OAuthHandler extends AccessHandler {
 
 	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST = "_OAUTH_REQUEST";
+	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT = "_OAUTH_CLIENT";
 
 	@Value("${oauth.api.pattern:/user/self,/oauth2/tokeninfo,/oauth2/revoketoken,/api/*}")
 	private String apiPattern;
@@ -151,6 +152,8 @@ public class OAuthHandler extends AccessHandler {
 						}
 						Client client = authorization.getClient();
 						if (client != null) {
+							request.setAttribute(
+									REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, client);
 							UserAgent ua = new UserAgent(
 									request.getHeader("User-Agent"));
 							ua.setAppId(client.getId());

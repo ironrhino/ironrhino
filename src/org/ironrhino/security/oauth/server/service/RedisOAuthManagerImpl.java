@@ -33,11 +33,17 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
-	private static final String NAMESPACE_AUTHORIZATION = "oauth:authorization";
-	private static final String NAMESPACE_AUTHORIZATION_GRANTOR = "oauth:authorization:grantor";
+	private static final String NAMESPACE_AUTHORIZATION = "oauth:authorization:";
+	private static final String NAMESPACE_AUTHORIZATION_GRANTOR = "oauth:authorization:grantor:";
 
-	private static final String NAMESPACE_CLIENT = "oauth:client";
-	private static final String NAMESPACE_CLIENT_OWNER = "oauth:client:owner";
+	private static final String NAMESPACE_CLIENT = "oauth:client:";
+	private static final String NAMESPACE_CLIENT_OWNER = "oauth:client:owner:";
+
+	// oauth:authorization:{id} -> authorization
+	// oauth:authorization:{code} -> id
+	// oauth:authorization:{accessToken} -> id
+	// oauth:authorization:{refreshToken} -> id
+	// oauth:authorization:grantor:{username} -> [id]
 
 	private long expireTime = DEFAULT_EXPIRE_TIME;
 
@@ -64,12 +70,42 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		if (!orig.getSecret().equals(client.getSecret()))
 			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
 		Authorization auth = new Authorization();
+		auth.setId(CodecUtils.nextId());
 		auth.setClient(client);
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType("token");
 		authorizationRedisTemplate.opsForValue().set(
 				NAMESPACE_AUTHORIZATION + auth.getId(), auth, expireTime,
 				TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+				auth.getExpiresIn(), TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+				auth.getExpiresIn(), TimeUnit.SECONDS);
+		return auth;
+	}
+
+	@Override
+	public Authorization grant(Client client, User grantor) {
+		Authorization auth = new Authorization();
+		auth.setId(CodecUtils.nextId());
+		auth.setClient(client);
+		auth.setGrantor(grantor);
+		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setResponseType("token");
+		authorizationRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getId(), auth, expireTime,
+				TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+				auth.getExpiresIn(), TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+				auth.getExpiresIn(), TimeUnit.SECONDS);
+		stringRedisTemplate.opsForList().leftPush(
+				NAMESPACE_AUTHORIZATION_GRANTOR
+						+ auth.getGrantor().getUsername(), auth.getId());
 		return auth;
 	}
 
@@ -99,9 +135,9 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		authorizationRedisTemplate.opsForValue().set(
 				NAMESPACE_AUTHORIZATION + auth.getId(), auth, expireTime,
 				TimeUnit.SECONDS);
-		authorizationRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getCode(), auth, expireTime,
-				TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(),
+				expireTime, TimeUnit.SECONDS);
 		return auth;
 	}
 
@@ -115,24 +151,22 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		auth.setModifyDate(new Date());
 		if (auth.isClientSide()) {
 			authorizationRedisTemplate.delete(key);
-			authorizationRedisTemplate.opsForValue().set(
-					NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth,
-					auth.getExpiresIn(), TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(
+					NAMESPACE_AUTHORIZATION + auth.getAccessToken(),
+					auth.getId(), auth.getExpiresIn(), TimeUnit.SECONDS);
 			stringRedisTemplate.opsForValue().set(
 					NAMESPACE_AUTHORIZATION + auth.getRefreshToken(),
-					NAMESPACE_AUTHORIZATION + auth.getAccessToken(),
-					auth.getExpiresIn(), TimeUnit.SECONDS);
+					auth.getId(), auth.getExpiresIn(), TimeUnit.SECONDS);
 		} else {
 			auth.setCode(CodecUtils.nextId());
 			authorizationRedisTemplate.delete(key);
-			authorizationRedisTemplate.opsForValue().set(
-					NAMESPACE_AUTHORIZATION + auth.getCode(), auth, expireTime,
-					TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(
+					NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(),
+					expireTime, TimeUnit.SECONDS);
 		}
 		stringRedisTemplate.opsForList().leftPush(
 				NAMESPACE_AUTHORIZATION_GRANTOR
-						+ auth.getGrantor().getUsername(),
-				auth.getAccessToken());
+						+ auth.getGrantor().getUsername(), auth.getId());
 		return auth;
 	}
 
@@ -145,7 +179,11 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	@Override
 	public Authorization authenticate(String code, Client client) {
 		String key = NAMESPACE_AUTHORIZATION + code;
-		Authorization auth = authorizationRedisTemplate.opsForValue().get(key);
+		String id = stringRedisTemplate.opsForValue().get(key);
+		if (id == null)
+			throw new IllegalArgumentException("CODE_INVALID");
+		Authorization auth = authorizationRedisTemplate.opsForValue().get(
+				NAMESPACE_AUTHORIZATION + id);
 		if (auth == null)
 			throw new IllegalArgumentException("CODE_INVALID");
 		if (auth.isClientSide())
@@ -164,23 +202,25 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		auth.setModifyDate(new Date());
 		authorizationRedisTemplate.delete(key);
 		authorizationRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth,
+				NAMESPACE_AUTHORIZATION + auth.getId(), auth,
 				auth.getExpiresIn(), TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(
 				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(),
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
+				NAMESPACE_AUTHORIZATION + auth.getId(), auth.getExpiresIn(),
+				TimeUnit.SECONDS);
 		return auth;
 	}
 
 	@Override
 	public Authorization retrieve(String accessToken) {
 		String key = NAMESPACE_AUTHORIZATION + accessToken;
-		Authorization auth = authorizationRedisTemplate.opsForValue().get(key);
-		// authorizationRedisTemplate.expire(key, expireTime, TimeUnit.SECONDS);
-		if (auth != null)
-			if (auth.getExpiresIn() < 0)
-				return null;
+		String id = stringRedisTemplate.opsForValue().get(key);
+		if (id == null)
+			return null;
+		Authorization auth = authorizationRedisTemplate.opsForValue().get(
+				NAMESPACE_AUTHORIZATION + id);
+		if (auth != null && auth.getExpiresIn() < 0)
+			return null;
 		return auth;
 	}
 
@@ -192,47 +232,61 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		if (!orig.getSecret().equals(client.getSecret()))
 			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
 		String keyRefreshToken = NAMESPACE_AUTHORIZATION + refreshToken;
+		String id = stringRedisTemplate.opsForValue().get(keyRefreshToken);
+		if (id == null)
+			throw new IllegalArgumentException("INVALID_TOKEN");
 		Authorization auth = authorizationRedisTemplate.opsForValue().get(
-				stringRedisTemplate.opsForValue().get(keyRefreshToken));
+				stringRedisTemplate.opsForValue().get(
+						NAMESPACE_AUTHORIZATION + id));
 		if (auth == null)
 			throw new IllegalArgumentException("INVALID_TOKEN");
-		String keyAccessToken = NAMESPACE_AUTHORIZATION + auth.getAccessToken();
 		authorizationRedisTemplate.delete(keyRefreshToken);
-		authorizationRedisTemplate.delete(keyAccessToken);
+		authorizationRedisTemplate.delete(NAMESPACE_AUTHORIZATION
+				+ auth.getAccessToken());
 		auth.setAccessToken(CodecUtils.nextId());
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setModifyDate(new Date());
-		authorizationRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth,
+		stringRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(
 				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(),
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
+				NAMESPACE_AUTHORIZATION + auth.getId(), auth.getExpiresIn(),
+				TimeUnit.SECONDS);
 		return auth;
 	}
 
 	@Override
 	public void revoke(String accessToken) {
 		String key = NAMESPACE_AUTHORIZATION + accessToken;
-		Authorization auth = authorizationRedisTemplate.opsForValue().get(key);
-		authorizationRedisTemplate.delete(key);
-		authorizationRedisTemplate.delete(NAMESPACE_AUTHORIZATION
-				+ auth.getRefreshToken());
-		stringRedisTemplate.opsForList().remove(
-				NAMESPACE_AUTHORIZATION_GRANTOR
-						+ auth.getGrantor().getUsername(), 0, accessToken);
+		String id = stringRedisTemplate.opsForValue().get(key);
+		if (id == null)
+			return;
+		Authorization auth = authorizationRedisTemplate.opsForValue().get(
+				NAMESPACE_AUTHORIZATION + id);
+		if (auth != null) {
+			authorizationRedisTemplate.delete(NAMESPACE_AUTHORIZATION
+					+ auth.getId());
+			authorizationRedisTemplate.delete(key);
+			authorizationRedisTemplate.delete(NAMESPACE_AUTHORIZATION
+					+ auth.getRefreshToken());
+			stringRedisTemplate.opsForList().remove(
+					NAMESPACE_AUTHORIZATION_GRANTOR
+							+ auth.getGrantor().getUsername(), 0, auth.getId());
+		}
 	}
 
 	@Override
 	public void create(Authorization auth) {
-		authorizationRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth,
+		stringRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+				auth.getExpiresIn(), TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(
+				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
 		stringRedisTemplate.opsForList().leftPush(
 				NAMESPACE_AUTHORIZATION_GRANTOR
-						+ auth.getGrantor().getUsername(),
-				auth.getAccessToken());
+						+ auth.getGrantor().getUsername(), auth.getId());
 	}
 
 	@Override
@@ -257,8 +311,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	public void saveClient(Client client) {
 		if (client.isNew())
 			client.setId(CodecUtils.nextId());
-		String key = NAMESPACE_CLIENT + client.getId();
-		clientRedisTemplate.opsForValue().set(key, client);
+		clientRedisTemplate.opsForValue().set(
+				NAMESPACE_CLIENT + client.getId(), client);
 		if (client.getOwner() != null)
 			stringRedisTemplate.opsForSet().add(
 					NAMESPACE_CLIENT_OWNER + client.getOwner().getUsername(),
@@ -269,8 +323,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	public void deleteClient(Client client) {
 		if (client.isNew())
 			return;
-		String key = NAMESPACE_CLIENT + client.getId();
-		clientRedisTemplate.delete(key);
+		clientRedisTemplate.delete(NAMESPACE_CLIENT + client.getId());
 		if (client.getOwner() != null)
 			stringRedisTemplate.opsForSet().remove(
 					NAMESPACE_CLIENT_OWNER + client.getOwner().getUsername(),
@@ -279,15 +332,15 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 
 	@Override
 	public Client findClientById(String clientId) {
-		String key = NAMESPACE_CLIENT + clientId;
-		Client c = clientRedisTemplate.opsForValue().get(key);
+		Client c = clientRedisTemplate.opsForValue().get(
+				NAMESPACE_CLIENT + clientId);
 		return c != null && c.isEnabled() ? c : null;
 	}
 
 	@Override
 	public List<Client> findClientByOwner(User owner) {
-		String keyForSet = NAMESPACE_CLIENT_OWNER + owner.getUsername();
-		Set<String> ids = stringRedisTemplate.opsForSet().members(keyForSet);
+		Set<String> ids = stringRedisTemplate.opsForSet().members(
+				NAMESPACE_CLIENT_OWNER + owner.getUsername());
 		if (ids == null || ids.isEmpty())
 			return Collections.emptyList();
 		List<String> keys = new ArrayList<String>(ids.size());

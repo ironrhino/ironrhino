@@ -11,6 +11,8 @@ public interface OAuthManager {
 	long DEFAULT_EXPIRE_TIME = 14 * 24 * 3600;
 
 	public Authorization grant(Client client) throws Exception;
+	
+	public Authorization grant(Client client, User grantor) throws Exception;
 
 	public Authorization generate(Client client, String redirectUri,
 			String scope, String responseType) throws Exception;
