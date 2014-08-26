@@ -351,6 +351,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 
 	@Column(name = "attributes", length = 4000)
 	@Access(AccessType.PROPERTY)
+	@JsonIgnore
 	public String getAttributesAsString() {
 		if (attributes == null || attributes.isEmpty())
 			return null;

@@ -65,6 +65,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
 		Authorization auth = new Authorization();
 		auth.setClient(client);
+		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType("token");
 		authorizationRedisTemplate.opsForValue().set(
 				NAMESPACE_AUTHORIZATION + auth.getId(), auth, expireTime,
@@ -184,13 +185,22 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization refresh(String refreshToken) {
+	public Authorization refresh(Client client, String refreshToken) {
+		Client orig = findClientById(client.getClientId());
+		if (orig == null)
+			throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
+		if (!orig.getSecret().equals(client.getSecret()))
+			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
 		String keyRefreshToken = NAMESPACE_AUTHORIZATION + refreshToken;
 		Authorization auth = authorizationRedisTemplate.opsForValue().get(
 				stringRedisTemplate.opsForValue().get(keyRefreshToken));
+		if (auth == null)
+			throw new IllegalArgumentException("INVALID_TOKEN");
 		String keyAccessToken = NAMESPACE_AUTHORIZATION + auth.getAccessToken();
+		authorizationRedisTemplate.delete(keyRefreshToken);
 		authorizationRedisTemplate.delete(keyAccessToken);
 		auth.setAccessToken(CodecUtils.nextId());
+		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setModifyDate(new Date());
 		authorizationRedisTemplate.opsForValue().set(
 				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth,

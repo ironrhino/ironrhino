@@ -27,7 +27,7 @@ public interface OAuthManager {
 
 	public Authorization retrieve(String accessToken);
 
-	public Authorization refresh(String refreshToken);
+	public Authorization refresh(Client client,String refreshToken);
 
 	public void revoke(String accessToken);
 
