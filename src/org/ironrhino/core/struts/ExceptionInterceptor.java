@@ -29,11 +29,11 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 		try {
 			result = invocation.invoke();
 		} catch (Throwable e) {
+			if (e instanceof MethodFailedException)
+				e = e.getCause();
 			if (e instanceof NoSuchMethodException) {
 				result = BaseAction.NOTFOUND;
 			} else {
-				if (e instanceof MethodFailedException)
-					e = e.getCause();
 				Object action = invocation.getAction();
 				if (action instanceof ValidationAware) {
 					ValidationAware validationAwareAction = (ValidationAware) action;
