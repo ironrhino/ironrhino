@@ -1,4 +1,4 @@
-package api;
+package org.ironrhino.api;
 
 import java.io.IOException;
 

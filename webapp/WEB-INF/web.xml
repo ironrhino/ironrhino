@@ -145,7 +145,7 @@
 		</init-param>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>api.AppConfig</param-value>
+			<param-value>org.ironrhino.api.AppConfig</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>

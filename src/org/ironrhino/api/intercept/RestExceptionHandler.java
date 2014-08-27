@@ -1,16 +1,15 @@
-package api.intercept;
+package org.ironrhino.api.intercept;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.api.RestStatus;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import api.RestStatus;
 
 @ControllerAdvice
 public class RestExceptionHandler {

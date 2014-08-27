@@ -1,4 +1,4 @@
-package api;
+package org.ironrhino.api;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -15,13 +15,16 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+//only for exclude-filter of root ctx
+@ControllerAdvice
 @Configuration
-@ComponentScan(basePackages = "api", excludeFilters = @Filter(value = HttpErrorHandler.class, type = FilterType.ASSIGNABLE_TYPE))
+@ComponentScan(basePackages = "org.ironrhino.api", excludeFilters = @Filter(value = HttpErrorHandler.class, type = FilterType.ASSIGNABLE_TYPE))
 @EnableAspectJAutoProxy
 public class AppConfig extends WebMvcConfigurationSupport {
 

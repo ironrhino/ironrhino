@@ -1,4 +1,4 @@
-package api.controller;
+package org.ironrhino.api.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,6 +6,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.api.Asserts;
+import org.ironrhino.api.RestStatus;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.AuthzUtils;
@@ -21,9 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import api.Asserts;
-import api.RestStatus;
 
 @RestController
 @RequestMapping("/user")
