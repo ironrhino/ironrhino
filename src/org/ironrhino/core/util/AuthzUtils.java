@@ -22,6 +22,8 @@ public class AuthzUtils {
 	public static Object authentication(String property) {
 		Authentication auth = SecurityContextHolder.getContext()
 				.getAuthentication();
+		if (auth == null)
+			return null;
 		if (auth.getPrincipal() == null)
 			return null;
 		try {
