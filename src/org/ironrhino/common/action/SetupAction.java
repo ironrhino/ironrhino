@@ -102,7 +102,7 @@ public class SetupAction extends BaseAction {
 				ApplicationContextConsole console = ctx
 						.getBean(ApplicationContextConsole.class);
 				String expression = "settingControl.setValue(\""
-						+ SETUP_ENABLED_KEY + "\",\"false\")";
+						+ SETUP_ENABLED_KEY + "\",\"false\",true,true)";
 				console.execute(expression, Scope.LOCAL);
 			}
 		} catch (Exception e) {

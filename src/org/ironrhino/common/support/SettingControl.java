@@ -66,6 +66,28 @@ public class SettingControl implements
 		entityManager.save(s);
 	}
 
+	public void setValue(String key, String value, boolean readonly) {
+		Setting s = settings.get(key);
+		if (s != null)
+			s.setValue(value);
+		else
+			s = new Setting(key, value);
+		s.setReadonly(readonly);
+		entityManager.save(s);
+	}
+
+	public void setValue(String key, String value, boolean readonly,
+			boolean hidden) {
+		Setting s = settings.get(key);
+		if (s != null)
+			s.setValue(value);
+		else
+			s = new Setting(key, value);
+		s.setReadonly(readonly);
+		s.setHidden(hidden);
+		entityManager.save(s);
+	}
+
 	public int getIntValue(String key) {
 		return getIntValue(key, 0);
 	}
