@@ -3,6 +3,8 @@ package org.ironrhino.core.struts;
 import java.util.List;
 import java.util.Map;
 
+import ognl.MethodFailedException;
+
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 			if (e instanceof NoSuchMethodException) {
 				result = BaseAction.NOTFOUND;
 			} else {
+				if (e instanceof MethodFailedException)
+					e = e.getCause();
 				Object action = invocation.getAction();
 				if (action instanceof ValidationAware) {
 					ValidationAware validationAwareAction = (ValidationAware) action;
@@ -39,7 +43,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 							|| cause instanceof OptimisticLockingFailureException) {
 						validationAwareAction.addActionError(findText(
 								"try.again.later", null));
-					} 
+					}
 					// else if (e instanceof DataIntegrityViolationException
 					// || cause instanceof DataIntegrityViolationException) {
 					// validationAwareAction.addActionError(findText(
