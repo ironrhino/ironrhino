@@ -502,7 +502,7 @@ chmod +x upgrade_redis.sh
 fi
 
 
-#svn checkout ironrhino
+#git clone ironrhino
 if [ ! -d ironrhino ];then
 git clone https://github.com/ironrhino/ironrhino.git
 chown -R $USER:$USER ironrhino
