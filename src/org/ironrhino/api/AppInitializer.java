@@ -17,16 +17,17 @@ public class AppInitializer implements WebApplicationInitializer {
 	@Override
 	public void onStartup(ServletContext servletContext)
 			throws ServletException {
-		AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-		ctx.register(AppConfig.class);
 		FilterRegistration.Dynamic dyn = servletContext.addFilter("rest",
-				new RestFilter());
+				RestFilter.class);
 		dyn.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false,
-				"/api/*");
-		DispatcherServlet dispatcherServlet = new DispatcherServlet(ctx);
+				"/xiaobao/api/*");
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet("api",
-				dispatcherServlet);
-		dynamic.addMapping("/api/*");
+				DispatcherServlet.class);
+		dynamic.setInitParameter("contextClass",
+				AnnotationConfigWebApplicationContext.class.getName());
+		dynamic.setInitParameter("contextConfigLocation",
+				AppConfig.class.getName());
+		dynamic.addMapping("/xiaobao/api/*");
 		dynamic.setLoadOnStartup(1);
 	}
 
