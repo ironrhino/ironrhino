@@ -37,7 +37,7 @@ fi
 #install tomcat
 if [ ! -d tomcat8080 ];then
 if ! $(ls -l apache-tomcat-*.tar.gz >/dev/null 2>&1) ; then
-wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.54/bin/apache-tomcat-7.0.55.tar.gz
+wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.tar.gz
 fi
 tar xvf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
 rename s/^apache-tomcat.*$/tomcat/g apache-tomcat-*
