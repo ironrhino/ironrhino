@@ -217,6 +217,7 @@ upstream  backend  {
 }
 server {
         listen   80 default_server;
+        proxy_pass_header Server;
         location ~ ^/assets/ {
                  root   /home/$USER/tomcat8080/webapps/ROOT;
                  expires      max;
