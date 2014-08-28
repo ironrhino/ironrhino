@@ -12,7 +12,9 @@ public class SimpleMessage implements Serializable {
 
 	private String to;
 
-	private String message;
+	private String subject;
+
+	private String content;
 
 	public String getFrom() {
 		return from;
@@ -30,12 +32,20 @@ public class SimpleMessage implements Serializable {
 		this.to = to;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getSubject() {
+		return subject;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public String toString() {
