@@ -10,7 +10,7 @@ fi
 
 #install packages
 apt-get update
-apt-get --force-yes --yes install openjdk-7-jdk ant mysql-server subversion git nginx chkconfig sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
+apt-get --force-yes --yes install openjdk-7-jdk ant mysql-server subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
 apt-get --force-yes --yes remove openjdk-6-jre-headless
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
@@ -37,7 +37,7 @@ fi
 #install tomcat
 if [ ! -d tomcat8080 ];then
 if ! $(ls -l apache-tomcat-*.tar.gz >/dev/null 2>&1) ; then
-wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.54/bin/apache-tomcat-7.0.54.tar.gz
+wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.54/bin/apache-tomcat-7.0.55.tar.gz
 fi
 tar xvf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
 rename s/^apache-tomcat.*$/tomcat/g apache-tomcat-*
@@ -453,7 +453,7 @@ fi
 
 #install redis
 if ! which redis-server > /dev/null && ! $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
-wget http://download.redis.io/releases/redis-2.8.11.tar.gz
+wget http://download.redis.io/releases/redis-2.8.13.tar.gz
 fi
 if $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
 tar xvf redis-*.tar.gz >/dev/null && rm -rf redis-*.tar.gz
