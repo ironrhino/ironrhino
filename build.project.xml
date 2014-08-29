@@ -57,7 +57,7 @@
 			}
 			importPackage(java.io);
 			if(!new File(basedir+'/../ironrhino').isDirectory()){
-				println("directory ../ironrhino doesn't exists");
+				print("directory ../ironrhino doesn't exists\n");
 			}else{
 				var classpathfile = new File(basedir+'/.classpath');
 				var is = new FileInputStream(classpathfile);
@@ -109,7 +109,7 @@
 								}
 								if(!upgrade)
 										continue;
-	        					println('upgrade jar from '+filename+' to '+f.getName());
+	        					print('upgrade jar from '+filename+' to '+f.getName()+'\n');
 	        					file = f;
 	        					if(tofile.exists()){
 		        					var del = project.createTask("delete");

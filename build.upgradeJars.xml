@@ -54,7 +54,7 @@
 						}
 						if(!upgrade)
 								continue;
-        				println('upgrade jar from '+filename+' to '+filename2);
+        				print('upgrade jar from '+filename+' to '+filename2+'\n');
         				if(file.exists()){
 	        					var del = project.createTask("delete");
 	        					del.setFile(file);

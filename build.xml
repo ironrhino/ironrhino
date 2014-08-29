@@ -254,9 +254,9 @@
 				echo.setMessage('lib\ntarget\ntest/classes\nwebapp/WEB-INF/classes\nwebapp/WEB-INF/lib');
 				echo.perform();
 			}
-			println('*********************************');
-			println('created project ['+projectName+'] at '+new File(projectDir).getCanonicalPath()+' ,you can import this project into eclipse .');
-			println('*********************************');
+			print('*********************************\n');
+			print('created project ['+projectName+'] at '+new File(projectDir).getCanonicalPath()+' ,you can import this project into eclipse .\n');
+			print('*********************************\n');
 			]]>
 		</script>
 	</target>
