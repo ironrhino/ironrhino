@@ -20,14 +20,14 @@ public class AppInitializer implements WebApplicationInitializer {
 		FilterRegistration.Dynamic dyn = servletContext.addFilter("rest",
 				RestFilter.class);
 		dyn.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false,
-				"/xiaobao/api/*");
+				"/api/*");
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet("api",
 				DispatcherServlet.class);
 		dynamic.setInitParameter("contextClass",
 				AnnotationConfigWebApplicationContext.class.getName());
 		dynamic.setInitParameter("contextConfigLocation",
 				AppConfig.class.getName());
-		dynamic.addMapping("/xiaobao/api/*");
+		dynamic.addMapping("/api/*");
 		dynamic.setLoadOnStartup(1);
 	}
 
