@@ -45,9 +45,23 @@ cd tomcat && rm -rf bin/*.bat && rm -rf webapps/*
 cd conf
 sed -i  's/\s[3-4][a-x-]*manager.org.apache.juli.FileHandler,//g' logging.properties
 sed -i '/manager/d' logging.properties
-cd ..
-cd ..
-cat>tomcat/conf/server.xml<<EOF
+sed -i 's/tomcat7-websocket/*/g' catalina.properties
+sed -i '/ContextConfig.jarsToSkip/d' catalina.properties
+cat>>catalina.properties<<EOF
+org.apache.catalina.startup.ContextConfig.jarsToSkip=\\
+activiti-*.jar,antlr-*.jar,aopalliance-*.jar,aspectj*.jar,bonecp-*.jar,commons-*.jar,\\
+curator-*.jar,dom4j-*.jar,dynamicreports-*.jar,eaxy-*.jar,ehcache-*.jar,\\
+elasticsearch-*.jar,freemarker-*.jar,guava-*.jar,hessian-*.jar,hibernate-*.jar,\\
+http*.jar,iText*.jar, jackson-*.jar,jasperreports-*.jar,javamail-*.jar,\\
+javassist-*.jar,jboss-logging-*.jar,jedis-*.jar, jericho-*.jar,joda-*.jar,jpa-*.jar,\\
+jsoup-*.jar,jta-*.jar,log4j-*.jar,lucene-*.jar,mmseg4j-*.jar,\\
+mongo-java-driver-*.jar,mvel2-*.jar,mybatis-*.jar,mysql-*.jar,ognl-*.jar,pinyin4j-*.jar,\\
+poi-*.jar,rabbitmq-*.jar,sitemesh-*.jar,slf4j-*.jar,spring-*.jar,struts2-*.jar,\\
+xmemcached-*.jar,xwork-*.jar,zookeeper-*.jar,zxing-*.jar,\\
+ojdbc*.jar,sqljdbc*.jar,postgresql-*.jar,db2*.jar,jconn*.jar,h2-*.jar,hsqldb-*.jar,\\
+ifxjdbc*.jar,derbyclient*.jar,rhino*.jar
+EOF
+cat>server.xml<<EOF
 <?xml version="1.0" encoding="utf-8"?>
 <Server port="\${port.shutdown}" shutdown="SHUTDOWN">
   <Service name="Catalina">
@@ -59,12 +73,13 @@ cat>tomcat/conf/server.xml<<EOF
   </Service>
 </Server>
 EOF
+cd ..
+cd ..
 sed -i '99i export SPRING_PROFILES_DEFAULT' tomcat/bin/catalina.sh
 sed -i '99i SPRING_PROFILES_DEFAULT="dual"' tomcat/bin/catalina.sh
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:+UseParNewGC -XX:CMSMaxAbortablePrecleanTime=5 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
-cp -R tomcat tomcat8080
-cp -R tomcat tomcat8081
-rm -rf tomcat
+mv tomcat tomcat8080
+cp -R tomcat8080 tomcat8081
 sed -i '99i CATALINA_PID="/tmp/tomcat8080_pid"' tomcat8080/bin/catalina.sh
 sed -i '99i JAVA_OPTS="-Dport.http=8080 -Dport.shutdown=8005"' tomcat8080/bin/catalina.sh
 sed -i '99i CATALINA_PID="/tmp/tomcat8081_pid"' tomcat8081/bin/catalina.sh
@@ -169,10 +184,12 @@ if [ \$running = 1 ];then
 tomcat8080/bin/catalina.sh stop 10 -force
 fi
 cp tomcat8080/conf/server.xml .
+cp tomcat8080/conf/catalina.properties .
 cp tomcat8080/bin/catalina.sh .
 rm -rf tomcat8080
 cp -R apache-tomcat-\$version tomcat8080
 mv server.xml tomcat8080/conf/
+mv catalina.properties tomcat8080/conf/
 mv catalina.sh tomcat8080/bin/
 cp -R tomcat8081/webapps* tomcat8080
 if [ \$running = 1 ];then
@@ -181,10 +198,12 @@ sleep 120
 tomcat8081/bin/catalina.sh stop 10 -force
 fi
 cp tomcat8081/conf/server.xml .
+cp tomcat8081/conf/catalina.properties .
 cp tomcat8081/bin/catalina.sh .
 rm -rf tomcat8081
 cp -R apache-tomcat-\$version tomcat8081
 mv server.xml tomcat8081/conf/
+mv catalina.properties tomcat8081/conf/
 mv catalina.sh tomcat8081/bin/
 cp -R tomcat8080/webapps* tomcat8081
 if [ \$running = 1 ];then
