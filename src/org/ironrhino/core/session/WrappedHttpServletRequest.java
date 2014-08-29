@@ -103,6 +103,7 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 						.decode(RC4.decrypt(value, key), "UTF-8");
 				if (str.endsWith(key))
 					value = str.substring(0, str.length() - key.length());
+			} catch (IllegalArgumentException e) {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
