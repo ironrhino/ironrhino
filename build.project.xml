@@ -418,6 +418,7 @@
 	</target>
 
 	<target name="war" depends="jar">
+		<delete dir="${target.dir}/${war.name}" />
 		<script language="javascript">
 			<![CDATA[
 			if(project.getTargets().containsKey('pre-war'))
@@ -449,6 +450,7 @@
 	</target>
 
 	<target name="war2" depends="jar">
+		<delete dir="${target.dir}/${war.name}" />
 		<script language="javascript">
 			<![CDATA[
 			if(project.getTargets().containsKey('pre-war2'))
@@ -478,6 +480,7 @@
 	</target>
 	
 	<target name="war-standalone" depends="jar">
+		<delete dir="${target.dir}/${war.name}" />
 		<script language="javascript">
 			<![CDATA[
 			if(project.getTargets().containsKey('pre-war-standalone'))
@@ -491,15 +494,6 @@
 			<fileset dir="${webapp.dir}/WEB-INF/classes" />
 		</move>
 		<mkdir dir="${webapp.dir}/WEB-INF/libext" />
-		<copy tofile="${webapp.dir}/WEB-INF/libext/servlet-api.jar" failonerror="false">
-			<fileset file="${lib.dir}/servlet-api*.jar" />	
-		</copy>
-		<copy tofile="${webapp.dir}/WEB-INF/libext/websocket-api.jar" failonerror="false">
-			<fileset file="${lib.dir}/websocket-api*.jar" />	
-		</copy>
-		<copy tofile="${webapp.dir}/WEB-INF/libext/jetty.jar" failonerror="false">
-			<fileset file="${lib.dir}/jetty*.jar" />	
-		</copy>
 		<copy tofile="${webapp.dir}/WEB-INF/libext/bootstrap.jar" failonerror="false">
 			<fileset file="${lib.dir}/bootstrap*.jar" />	
 		</copy>
@@ -512,37 +506,7 @@
 					importPackage(java.io);
 					var libext = new File(project.getProperty('webapp.dir')+'/WEB-INF/libext');
 					var ironrhinolib = new File(project.getProperty('basedir')+'/../ironrhino/lib');
-					var file = new File(libext,'servlet-api.jar');
-					if(!file.exists()){
-						var copy = project.createTask('copy');
-						copy.setTofile(file);
-						var fs = project.createDataType("fileset");
-				      	fs.setDir(ironrhinolib);
-				      	fs.setIncludes('servlet-api*.jar');
-						copy.addFileset(fs);
-						copy.perform();
-					}
-					file = new File(libext,'websocket-api.jar');
-					if(!file.exists()){
-						var copy = project.createTask('copy');
-						copy.setTofile(file);
-						var fs = project.createDataType("fileset");
-				      	fs.setDir(ironrhinolib);
-				      	fs.setIncludes('websocket-api*.jar');
-						copy.addFileset(fs);
-						copy.perform();
-					}
-					file = new File(libext,'jetty.jar');
-					if(!file.exists()){
-						var copy = project.createTask('copy');
-						copy.setTofile(file);
-						var fs = project.createDataType("fileset");
-				      	fs.setDir(ironrhinolib);
-				      	fs.setIncludes('jetty*.jar');
-						copy.addFileset(fs);
-						copy.perform();
-					}
-					file = new File(libext,'bootstrap.jar');
+					var file = new File(libext,'bootstrap.jar');
 					if(!file.exists()){
 						var copy = project.createTask('copy');
 						copy.setTofile(file);

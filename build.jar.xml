@@ -5,6 +5,7 @@
 	<property name="src.dir" location="${basedir}/src" />
 	<property name="webapp.dir" location="${basedir}/webapp" />
 	<property name="classes.dir" location="${webapp.dir}/WEB-INF/classes" />
+	<property name="lib.dir" location="${basedir}/lib" />
 	<property name="target.dir" location="${basedir}/target" />
 	<property name="assets-jar.name" value="ironrhino-assets-${version}.jar" />
 	<property name="core-jar.name" value="ironrhino-core-${version}.jar" />
@@ -729,7 +730,16 @@
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
 				</manifest>
 			</jar>
-			<jar jarfile="${target.dir}/bootstrap.jar" basedir="${classes.dir}" includes="bootstrap/**" />
+			<jar jarfile="${target.dir}/temp.jar" basedir="${classes.dir}" includes="bootstrap/**" />
+			<zip destfile="${target.dir}/bootstrap.jar">
+			    <zipgroupfileset file="${target.dir}/temp.jar"/>
+			    <zipgroupfileset file="${lib.dir}/jetty-*.jar"/>
+			    <zipgroupfileset file="${lib.dir}/servlet-api-*.jar"/>
+			    <zipgroupfileset file="${lib.dir}/websocket-api-*.jar"/>
+			    <zipgroupfileset file="${lib.dir}/annotation-api-*.jar"/>
+			    <zipgroupfileset file="${lib.dir}/asm-*.jar"/>
+			</zip>
+			<delete file="${target.dir}/temp.jar" />
 		</target>
 
 	</project>
