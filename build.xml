@@ -152,6 +152,7 @@
 			fs = project.createDataType('fileset');
 			fs.setDir(new File(basedir+'/lib'));
 			fs.setIncludes('*.jar');
+			fs.setExcludes('jetty-*.jar,asm-*.jar,annotation-api-*.jar');
 			copy.addFileset(fs);
 			copy.setTodir(new File(projectLib));
 			copy.perform();

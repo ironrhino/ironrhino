@@ -68,9 +68,8 @@ public class RestFilter extends OncePerRequestFilter {
 			return super.getHeader(name);
 		}
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
-		public Enumeration getHeaders(String name) {
+		public Enumeration<String> getHeaders(String name) {
 			if (StringUtils.equalsIgnoreCase(HEADER_NAME_CONTENT_TYPE, name)) {
 				return Collections.enumeration(Arrays
 						.asList(MediaType.APPLICATION_JSON_VALUE));
