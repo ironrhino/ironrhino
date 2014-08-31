@@ -4,46 +4,20 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	<!-- 
-		<bean id="javaMailSender"
-		class="org.springframework.mail.javamail.JavaMailSenderImpl"
-		p:host="${mail.smtp.host:smtp.gmail.com}" p:port="${mail.smtp.port:465}"
-		p:username="${mail.smtp.username:ironrhinotest@gmail.com}"
-		p:password="${mail.smtp.password:testironrhino}">
+	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.smtp.host:smtp.gmail.com}" />
+		<property name="port" value="${mail.smtp.port:465}" />
+		<property name="username" value="${mail.smtp.username:ironrhinotest@gmail.com}" />
+		<property name="password" value="${mail.smtp.password:testironrhino}" />
 		<property name="javaMailProperties">
-		<props>
-		<prop key="mail.smtp.auth">true</prop>
-		</props>
-		</property>
-		</bean>
-	-->
-	<bean id="smtpAuthenticator"
-		class="org.ironrhino.core.mail.SmtpAuthenticator"
-		p:username="${mail.smtp.username:ironrhinotest@gmail.com}" p:password="${mail.smtp.password:testironrhino}" />
-
-	<bean id="mailSession" class="javax.mail.Session"
-		factory-method="getInstance">
-		<constructor-arg>
 			<props>
-				<prop key="mail.smtp.auth">true</prop>
-				<prop key="mail.smtp.socketFactory.port">
-					${mail.smtp.port:465}
-				</prop>
-				<prop key="mail.smtp.socketFactory.class">
-					javax.net.ssl.SSLSocketFactory
-				</prop>
-				<prop key="mail.smtp.socketFactory.fallback">
-					false
-				</prop>
+				<prop key="mail.smtp.auth">${mail.smtp.auth:true}</prop>
+				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+				<prop key="mail.smtp.ssl.trust">${mail.smtp.ssl.trust:*}</prop>
+				<prop key="mail.debug">${mail.debug:false}</prop>
 			</props>
-		</constructor-arg>
-		<constructor-arg ref="smtpAuthenticator" />
+		</property>
 	</bean>
-
-	<bean id="javaMailSender"
-		class="org.springframework.mail.javamail.JavaMailSenderImpl"
-		p:host="${mail.smtp.host:smtp.gmail.com}" p:port="${mail.smtp.port:465}"
-		p:defaultEncoding="UTF-8" p:session-ref="mailSession" />
 	<bean id="mailSender" class="org.ironrhino.core.mail.MailSender"
 		p:defaultFrom="${mail.default.from:ironrhinotest@gmail.com}" p:defaultTo="${mail.default.to:ironrhinotest@gmail.com}" />
 	<bean id="mailService" class="org.ironrhino.core.mail.MailService" />
