@@ -9,7 +9,7 @@
 	<div class="span6 offset3">
 	<div class="hero-unit">
 	<h2 class="caption">${action.getText('setup')}</h2>
-	<@s.form method="post" action="setup" class="ajax focus form-horizontal well">
+	<@s.form method="post" action="${actionBaseUrl}" class="ajax focus form-horizontal well">
 		<#list setupParameters as p>
 		<#if p.type=='boolean'>
 		<@s.checkbox label="%{getText('${p.label?has_content?string(p.label,p.name)}')}" name=p.name class="${p.required?string('required ','')}custom"/>
