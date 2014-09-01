@@ -491,6 +491,10 @@ public class AnnotationShadows {
 			this.deletable = deletable;
 		}
 
+		public boolean isDefaultOptions() {
+			return !value && "".equals(expression) && !deletable;
+		}
+
 	}
 
 	public static class HiddenImpl implements Serializable {
@@ -529,6 +533,10 @@ public class AnnotationShadows {
 
 		public void setExpression(String expression) {
 			this.expression = expression;
+		}
+
+		public boolean isDefaultOptions() {
+			return !value && "".equals(expression);
 		}
 
 	}

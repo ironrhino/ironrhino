@@ -178,11 +178,16 @@ public class EntityClassHelper {
 				}
 				UiConfigImpl uci = new UiConfigImpl(pd.getName(),
 						pd.getPropertyType(), uiConfig);
-				if (pd.getWriteMethod() == null || oneToOne != null
-						&& StringUtils.isNotBlank(oneToOne.mappedBy())) {
+				if (pd.getWriteMethod() == null) {
 					HiddenImpl hi = new HiddenImpl();
 					hi.setValue(true);
 					uci.setHiddenInInput(hi);
+					ReadonlyImpl ri = new ReadonlyImpl();
+					ri.setValue(true);
+					uci.setReadonly(ri);
+				}
+				if (oneToOne != null
+						&& StringUtils.isNotBlank(oneToOne.mappedBy())) {
 					ReadonlyImpl ri = new ReadonlyImpl();
 					ri.setValue(true);
 					uci.setReadonly(ri);
@@ -230,6 +235,39 @@ public class EntityClassHelper {
 						&& columnannotation.length() != 255
 						&& uci.getMaxlength() == 0)
 					uci.setMaxlength(columnannotation.length());
+				if (columnannotation != null) {
+					if (!columnannotation.updatable()
+							&& !columnannotation.insertable()) {
+						HiddenImpl hi = uci.getHiddenInInput();
+						if (hi == null || hi.isDefaultOptions()) {
+							hi = new HiddenImpl();
+							hi.setValue(true);
+							uci.setHiddenInInput(hi);
+						}
+						ReadonlyImpl ri = uci.getReadonly();
+						if (ri == null || ri.isDefaultOptions()) {
+							ri = new ReadonlyImpl();
+							ri.setValue(true);
+							uci.setReadonly(ri);
+						}
+					} else if (columnannotation.updatable()
+							&& !columnannotation.insertable()) {
+						ReadonlyImpl ri = uci.getReadonly();
+						if (ri == null || ri.isDefaultOptions()) {
+							ri = new ReadonlyImpl();
+							ri.setExpression("entity.new");
+							uci.setReadonly(ri);
+						}
+					} else if (!columnannotation.updatable()
+							&& columnannotation.insertable()) {
+						ReadonlyImpl ri = uci.getReadonly();
+						if (ri == null || ri.isDefaultOptions()) {
+							ri = new ReadonlyImpl();
+							ri.setExpression("!entity.new");
+							uci.setReadonly(ri);
+						}
+					}
+				}
 				if (lob != null || uci.getMaxlength() > 255)
 					uci.setExcludedFromOrdering(true);
 				Class<?> returnType = pd.getPropertyType();
@@ -262,6 +300,39 @@ public class EntityClassHelper {
 					if (joincolumnannotation != null
 							&& !joincolumnannotation.nullable())
 						uci.setRequired(true);
+					if (joincolumnannotation != null) {
+						if (!joincolumnannotation.updatable()
+								&& !joincolumnannotation.insertable()) {
+							HiddenImpl hi = uci.getHiddenInInput();
+							if (hi == null || hi.isDefaultOptions()) {
+								hi = new HiddenImpl();
+								hi.setValue(true);
+								uci.setHiddenInInput(hi);
+							}
+							ReadonlyImpl ri = uci.getReadonly();
+							if (ri == null || ri.isDefaultOptions()) {
+								ri = new ReadonlyImpl();
+								ri.setValue(true);
+								uci.setReadonly(ri);
+							}
+						} else if (joincolumnannotation.updatable()
+								&& !joincolumnannotation.insertable()) {
+							ReadonlyImpl ri = uci.getReadonly();
+							if (ri == null || ri.isDefaultOptions()) {
+								ri = new ReadonlyImpl();
+								ri.setExpression("entity.new");
+								uci.setReadonly(ri);
+							}
+						} else if (!joincolumnannotation.updatable()
+								&& joincolumnannotation.insertable()) {
+							ReadonlyImpl ri = uci.getReadonly();
+							if (ri == null || ri.isDefaultOptions()) {
+								ri = new ReadonlyImpl();
+								ri.setExpression("!entity.new");
+								uci.setReadonly(ri);
+							}
+						}
+					}
 					ManyToOne manyToOne = pd.getReadMethod().getAnnotation(
 							ManyToOne.class);
 					if (manyToOne == null)
