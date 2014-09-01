@@ -25,6 +25,19 @@ public class BeanUtils {
 		return false;
 	}
 
+	public static void copyPropertiesIfNotNull(Object source, Object target,
+			String... properties) {
+		if (properties.length == 0)
+			return;
+		BeanWrapperImpl bws = new BeanWrapperImpl(source);
+		BeanWrapperImpl bwt = new BeanWrapperImpl(target);
+		for (String propertyName : properties) {
+			Object value = bws.getPropertyValue(propertyName);
+			if (value != null)
+				bwt.setPropertyValue(propertyName, value);
+		}
+	}
+
 	public static void copyProperties(Map<String, Object> source,
 			Object target, String... ignoreProperties) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(target);

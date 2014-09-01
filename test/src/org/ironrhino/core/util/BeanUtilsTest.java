@@ -3,6 +3,7 @@ package org.ironrhino.core.util;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.junit.Test;
@@ -78,6 +79,21 @@ public class BeanUtilsTest {
 		assertNull(user2.getUsername());
 		assertNull(user2.getPassword());
 
+	}
+
+	@Test
+	public void copyPropertiesIfNotNull() {
+		User user1 = new User();
+		user1.setId("test");
+		user1.setUsername("username");
+
+		User user2 = new User();
+		user2.setPassword("password");
+		BeanUtils.copyPropertiesIfNotNull(user1, user2, "id", "username",
+				"password");
+		assertEquals(user2.getId(), "test");
+		assertEquals(user2.getUsername(), "username");
+		assertEquals(user2.getPassword(), "password");
 	}
 
 }
