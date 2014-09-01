@@ -43,14 +43,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 							|| cause instanceof OptimisticLockingFailureException) {
 						validationAwareAction.addActionError(findText(
 								"try.again.later", null));
-					}
-					// else if (e instanceof DataIntegrityViolationException
-					// || cause instanceof DataIntegrityViolationException) {
-					// validationAwareAction.addActionError(findText(
-					// "validation.already.exists", null));
-					// log.error(e.getMessage(), e);
-					// }
-					else {
+					} else {
 						if (cause != null)
 							while (cause.getCause() != null)
 								cause = cause.getCause();
@@ -77,7 +70,10 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 							validationAwareAction.addActionError(em
 									.getLocalizedMessage());
 						} else {
+
 							String msg = e.getMessage();
+							if (cause != null)
+								msg = cause.getMessage();
 							if (msg == null)
 								msg = ExceptionUtils.getDetailMessage(e);
 							validationAwareAction.addActionError(msg);
