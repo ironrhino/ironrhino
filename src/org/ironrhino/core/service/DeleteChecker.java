@@ -1,5 +1,6 @@
 package org.ironrhino.core.service;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -29,6 +31,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.ErrorMessage;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -69,13 +72,34 @@ public class DeleteChecker {
 				} else if (type instanceof OneToOneType) {
 					OneToOneType otoType = (OneToOneType) type;
 					Class<?> referrer = otoType.getReturnedClass();
-					List<Tuple<Class<?>, String>> list = mapping.get(referrer);
-					if (list == null) {
-						list = new ArrayList<Tuple<Class<?>, String>>();
-						mapping.put(referrer, list);
+					PrimaryKeyJoinColumn pkjc = null;
+					PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(
+							cm.getMappedClass(), name);
+					if (pd != null) {
+						Class<?> declaredClass = pd.getReadMethod() != null ? pd
+								.getReadMethod().getDeclaringClass() : cm
+								.getMappedClass();
+						if (pd.getReadMethod() != null)
+							pkjc = pd.getReadMethod().getAnnotation(
+									PrimaryKeyJoinColumn.class);
+						if (pkjc == null)
+							try {
+								Field f = declaredClass.getDeclaredField(name);
+								if (f != null)
+									pkjc = f.getAnnotation(PrimaryKeyJoinColumn.class);
+							} catch (Exception e) {
+							}
 					}
-					list.add(new Tuple<Class<?>, String>(cm.getMappedClass(),
-							name));
+					if (pkjc == null) {
+						List<Tuple<Class<?>, String>> list = mapping
+								.get(referrer);
+						if (list == null) {
+							list = new ArrayList<Tuple<Class<?>, String>>();
+							mapping.put(referrer, list);
+						}
+						list.add(new Tuple<Class<?>, String>(cm
+								.getMappedClass(), name));
+					}
 				} else if (type instanceof CollectionType) {
 					if (BaseTreeableEntity.class.isAssignableFrom(cm
 							.getMappedClass()) && name.equals("children"))
