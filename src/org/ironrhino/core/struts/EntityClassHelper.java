@@ -24,6 +24,7 @@ import javax.persistence.Embedded;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -42,6 +43,7 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.struts.AnnotationShadows.HiddenImpl;
+import org.ironrhino.core.struts.AnnotationShadows.ReadonlyImpl;
 import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
@@ -141,6 +143,15 @@ public class EntityClassHelper {
 							lob = f.getAnnotation(Lob.class);
 					} catch (Exception e) {
 					}
+				OneToOne oneToOne = pd.getReadMethod().getAnnotation(
+						OneToOne.class);
+				if (oneToOne == null)
+					try {
+						Field f = declaredClass.getDeclaredField(propertyName);
+						if (f != null)
+							oneToOne = f.getAnnotation(OneToOne.class);
+					} catch (Exception e) {
+					}
 				Embedded embedded = pd.getReadMethod().getAnnotation(
 						Embedded.class);
 				Class<?> embeddedClass = null;
@@ -167,10 +178,14 @@ public class EntityClassHelper {
 				}
 				UiConfigImpl uci = new UiConfigImpl(pd.getName(),
 						pd.getPropertyType(), uiConfig);
-				if (pd.getWriteMethod() == null) {
+				if (pd.getWriteMethod() == null || oneToOne != null
+						&& StringUtils.isNotBlank(oneToOne.mappedBy())) {
 					HiddenImpl hi = new HiddenImpl();
 					hi.setValue(true);
 					uci.setHiddenInInput(hi);
+					ReadonlyImpl ri = new ReadonlyImpl();
+					ri.setValue(true);
+					uci.setReadonly(ri);
 				}
 				if (embedded != null) {
 					HiddenImpl hi = new HiddenImpl();
