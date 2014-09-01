@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.api.RestStatus;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,8 +29,22 @@ public class RestExceptionHandler {
 			}
 			return null;
 		}
-		if (ex instanceof RestStatus)
-			return (RestStatus) ex;
+		if (ex instanceof HttpRequestMethodNotSupportedException) {
+			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+			return RestStatus.valueOf(RestStatus.CODE_FORBIDDEN,
+					ex.getMessage());
+		}
+		if (ex instanceof RestStatus) {
+			RestStatus rs = (RestStatus) ex;
+			if (rs.getCode().equals(RestStatus.CODE_FORBIDDEN))
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			else if (rs.getCode().equals(RestStatus.CODE_UNAUTHORIZED))
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			else if (rs.getCode().equals(RestStatus.CODE_NOT_FOUND))
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return rs;
+		}
+		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		return RestStatus.valueOf(RestStatus.CODE_INTERNAL_SERVER_ERROR,
 				ex.getMessage());
 	}
