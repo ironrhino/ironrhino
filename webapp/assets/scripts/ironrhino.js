@@ -31570,22 +31570,15 @@ Message = {
 				field = field.next('.chzn-container');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
-				var grandpa = field.parent().parent();
-				if (grandpa.hasClass('control-group')
-						&& grandpa.parent().hasClass('tab-pane')
-						&& grandpa.is(':first-child')) {
-					grandpa.css({
-								'margin-top' : '40px'
-							});
-				}
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
 						+ msg
 						+ '<a class="remove pull-right" href="#">&times;</a></div><div>')
 						.insertAfter(field);
-				var promptTopPosition, promptleftPosition, marginTopSize;
+				var promptTopPosition, promptleftPosition;
 				var fieldWidth = field.width();
 				var promptHeight = prompt.height();
-				promptTopPosition = field.position().top - 6;
+				promptTopPosition = field.position().top + field.outerHeight()
+						+ 6;
 				var parentWidth = field.closest('.controls').width();
 				if (parentWidth && (parentWidth - fieldWidth) < prompt.width()) {
 					promptleftPosition = field.position().left + fieldWidth
@@ -31594,18 +31587,13 @@ Message = {
 					promptleftPosition = field.position().left + fieldWidth
 							- 30;
 				}
-				marginTopSize = -promptHeight;
 				prompt.css({
 							"top" : promptTopPosition + "px",
 							"left" : promptleftPosition + "px",
-							"marginTop" : "-38px",
 							"opacity" : 0
 						});
 				prompt.animate({
 							"opacity" : 0.8
-						});
-				prompt.css({
-							"marginTop" : -prompt.height() + "px"
 						});
 			} else if (field.is('[type="hidden"]')) {
 				var fp = field.parent('.listpick,.treeselect');
@@ -32668,8 +32656,7 @@ Observation.common = function(container) {
 								+ (modalwidth ? ' style="width:' + modalwidth
 										+ ';"' : '')
 								+ '><div class="modal-header"><a class="close" data-dismiss="modal">&times;</a><h3 style="text-align:center;">'
-								+ title
-								+ '</h3></div><div class="modal-body" style="padding-top:40px;">'
+								+ title + '</h3></div><div class="modal-body">'
 								+ body + '</div></div>')
 								.appendTo(document.body);
 						_observe($('#' + id));
