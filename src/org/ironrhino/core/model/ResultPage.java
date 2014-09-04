@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class ResultPage<T> implements Serializable {
 
 	private static final long serialVersionUID = -3653886488085413894L;
@@ -35,23 +37,31 @@ public class ResultPage<T> implements Serializable {
 
 	private int pageSize = DEFAULT_PAGE_SIZE;
 
+	private int totalPage = 0;
+
 	private long totalResults = -1;
 
-	private Collection<T> result = new ArrayList<T>(0);
-
+	@JsonIgnore
 	private Object criteria;
 
+	@JsonIgnore
 	private boolean reverse;
 
+	@JsonIgnore
 	private boolean counting = true;
 
+	@JsonIgnore
 	private Boolean paginating;
 
+	@JsonIgnore
 	private boolean executed;
 
 	private long tookInMillis;
 
+	@JsonIgnore
 	private int start = -1;
+
+	private Collection<T> result = new ArrayList<T>(0);
 
 	public int getStart() {
 		return (this.pageNo - 1) * this.pageSize;
@@ -133,8 +143,9 @@ public class ResultPage<T> implements Serializable {
 	}
 
 	public int getTotalPage() {
-		return (int) (totalResults % pageSize == 0 ? totalResults / pageSize
-				: totalResults / pageSize + 1);
+		totalPage = (int) (totalResults % pageSize == 0 ? totalResults
+				/ pageSize : totalResults / pageSize + 1);
+		return totalPage;
 	}
 
 	public long getTotalResults() {
@@ -154,26 +165,32 @@ public class ResultPage<T> implements Serializable {
 		this.criteria = criteria;
 	}
 
+	@JsonIgnore
 	public boolean isFirst() {
 		return this.pageNo <= 1;
 	}
 
+	@JsonIgnore
 	public boolean isLast() {
 		return this.pageNo >= getTotalPage();
 	}
 
+	@JsonIgnore
 	public int getPreviousPage() {
 		return this.pageNo > 1 ? this.pageNo - 1 : 1;
 	}
 
+	@JsonIgnore
 	public int getNextPage() {
 		return this.pageNo < getTotalPage() ? this.pageNo + 1 : getTotalPage();
 	}
 
+	@JsonIgnore
 	public boolean isDefaultPageSize() {
 		return this.pageSize == DEFAULT_PAGE_SIZE;
 	}
 
+	@JsonIgnore
 	public boolean isCanListAll() {
 		return this.totalResults <= DEFAULT_MAX_PAGESIZE;
 	}

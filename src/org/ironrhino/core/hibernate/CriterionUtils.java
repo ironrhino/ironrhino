@@ -73,6 +73,20 @@ public class CriterionUtils {
 				EntityClassHelper.getUiConfigs(entityClass));
 	}
 
+	public static void filter(DetachedCriteria dc, Object entity,
+			String... propertyNames) {
+		BeanWrapperImpl bw = new BeanWrapperImpl(entity);
+		for (String propertyName : propertyNames) {
+			Object value = bw.getPropertyValue(propertyName);
+			if (value instanceof String) {
+				if (StringUtils.isNotBlank((String) value))
+					dc.add(Restrictions.eq(propertyName, value));
+			} else if (value != null) {
+				dc.add(Restrictions.eq(propertyName, value));
+			}
+		}
+	}
+
 	public static CriteriaState filter(DetachedCriteria dc,
 			Class<? extends Persistable<?>> entityClass,
 			Map<String, UiConfigImpl> uiConfigs) {
