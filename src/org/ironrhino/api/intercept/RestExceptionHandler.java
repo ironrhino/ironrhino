@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.api.RestStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
 public class RestExceptionHandler {
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@ExceptionHandler(Throwable.class)
 	@ResponseBody
@@ -44,6 +48,7 @@ public class RestExceptionHandler {
 				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return rs;
 		}
+		logger.error(ex.getMessage(), ex);
 		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		return RestStatus.valueOf(RestStatus.CODE_INTERNAL_SERVER_ERROR,
 				ex.getMessage());
