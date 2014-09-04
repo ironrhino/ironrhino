@@ -1,5 +1,7 @@
 package org.ironrhino.common.model;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -65,6 +67,7 @@ public class Region extends BaseTreeableEntity<Region> {
 	@Override
 	@NotInCopy
 	@SearchableProperty(boost = 2)
+	@Access(AccessType.PROPERTY)
 	public String getFullname() {
 		if (fullname == null)
 			fullname = super.getFullname();
