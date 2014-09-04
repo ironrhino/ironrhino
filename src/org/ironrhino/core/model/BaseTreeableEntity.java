@@ -112,6 +112,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 		this.name = name;
 	}
 
+	@JsonIgnore
 	public String getFullnameSeperator() {
 		FullnameSeperator fs = getClass()
 				.getAnnotation(FullnameSeperator.class);
@@ -168,6 +169,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 		this.children = children;
 	}
 
+	@JsonIgnore
 	public boolean isLeaf() {
 		return this.children == null || this.children.size() == 0;
 	}
@@ -176,6 +178,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 		return !isLeaf();
 	}
 
+	@JsonIgnore
 	public boolean isRoot() {
 		return this.parent == null;
 	}
