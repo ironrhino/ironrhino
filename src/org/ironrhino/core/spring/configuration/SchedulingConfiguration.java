@@ -1,11 +1,15 @@
 package org.ironrhino.core.spring.configuration;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.ironrhino.core.util.NameableThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,6 +58,22 @@ public class SchedulingConfiguration implements SchedulingConfigurer,
 	public ExecutorService taskExecutorThreadPool() {
 		return Executors.newFixedThreadPool(taskExecutorPoolSize,
 				new NameableThreadFactory("taskExecutor"));
+	}
+
+	@Override
+	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+		return new AsyncUncaughtExceptionHandler() {
+
+			private Logger logger = LoggerFactory
+					.getLogger(AsyncUncaughtExceptionHandler.class);
+
+			@Override
+			public void handleUncaughtException(Throwable ex, Method method,
+					Object... args) {
+				logger.error("method ( " + method.toString() + " ) error", ex);
+			}
+
+		};
 	}
 
 }
