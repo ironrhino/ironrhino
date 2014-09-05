@@ -11,6 +11,7 @@ import org.ironrhino.core.util.JsonUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class HttpErrorHandlerImpl implements HttpErrorHandler {
 
@@ -21,8 +22,10 @@ public class HttpErrorHandlerImpl implements HttpErrorHandler {
 				.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 		if (requestURI == null)
 			requestURI = request.getRequestURI();
-		if (!requestURI.startsWith("/api/"))
+		if (!requestURI.startsWith("/xiaobao/api/"))
 			return false;
+		if (statusCode > 0)
+			response.setStatus(statusCode);
 		RestStatus rs = null;
 		switch (statusCode) {
 		case HttpServletResponse.SC_UNAUTHORIZED:
