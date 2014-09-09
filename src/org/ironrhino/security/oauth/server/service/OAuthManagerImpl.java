@@ -51,17 +51,7 @@ public class OAuthManagerImpl implements OAuthManager {
 		if (!orig.getSecret().equals(client.getSecret()))
 			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
 		entityManager.setEntityClass(Authorization.class);
-		Authorization auth = (Authorization) entityManager.findOne("client",
-				client, "responseType", "token");
-		if (auth != null) {
-			auth.setAccessToken(CodecUtils.nextId());
-			auth.setRefreshToken(CodecUtils.nextId());
-			auth.setModifyDate(new Date());
-			auth.setLifetime(Authorization.DEFAULT_LIFETIME);
-			entityManager.save(auth);
-			return auth;
-		}
-		auth = new Authorization();
+		Authorization auth = new Authorization();
 		auth.setClient(client);
 		auth.setResponseType("token");
 		auth.setRefreshToken(CodecUtils.nextId());
