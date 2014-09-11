@@ -106,6 +106,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 
 	@SearchableProperty
 	@Transient
+	@JsonIgnore
 	private Set<String> roles = new HashSet<String>(0);
 
 	@NotInCopy
