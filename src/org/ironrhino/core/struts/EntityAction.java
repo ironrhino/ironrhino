@@ -1178,7 +1178,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	public String view() {
 		tryFindEntity();
 		if (_entity == null)
-			return NOTFOUND;
+			return isAjax() ? NONE : NOTFOUND;
 		Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
 		if (ownerProperty != null) {
 			Owner owner = ownerProperty.getKey();
