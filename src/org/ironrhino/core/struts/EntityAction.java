@@ -326,7 +326,6 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (richtableConfig == null)
 			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
 		final BaseManager entityManager = getEntityManager(getEntityClass());
-		Map<String, String> aliases = new HashMap<String, String>();
 		boolean searchable = isSearchable();
 		if (searchable
 				&& StringUtils.isNumeric(keyword)
@@ -456,13 +455,15 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 									.indexOf(".") + 1);
 							Class type = bw.getPropertyType(p1);
 							if (Persistable.class.isAssignableFrom(type)) {
-								String alias = aliases.get(p1);
+								String alias = criteriaState.getAliases().get(
+										p1);
 								if (alias == null) {
 									alias = p1 + "_";
-									while (aliases.containsValue(alias))
+									while (criteriaState.getAliases()
+											.containsValue(alias))
 										alias += "_";
 									dc.createAlias(p1, alias);
-									aliases.put(p1, alias);
+									criteriaState.getAliases().put(p1, alias);
 								}
 								propertyName = alias + "." + p2;
 							}
