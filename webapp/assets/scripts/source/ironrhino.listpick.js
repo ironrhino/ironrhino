@@ -64,9 +64,13 @@
 		var options = current.data('_options');
 		if (options.name)
 			var nametarget = find(options.name, current);
-		val(options.name, current, nametarget.is(':input,td')
-						? ''
-						: '<i class="glyphicon glyphicon-list"></i>', true);
+		var viewlink = current.find('a.view[rel="richtable"]');
+		if (current.is('td') && viewlink.length)
+			viewlink.text('');
+		else
+			val(options.name, current, nametarget.is(':input,td')
+							? ''
+							: '<i class="glyphicon glyphicon-list"></i>', true);
 		val(options.id, current, '', false);
 		if (options.mapping) {
 			for (var k in options.mapping)
@@ -99,6 +103,9 @@
 					remove.click(removeAction);
 				} else {
 					var text = val(options.name, current);
+					var viewlink = current.find('a.view[rel="richtable"]');
+					if (current.is('td') && viewlink.length)
+						text = viewlink.text();
 					if (text) {
 						if (text.indexOf('...') < 0)
 							$('<a class="remove" href="#">&times;</a>')
@@ -111,6 +118,8 @@
 				}
 			}
 			var func = function(event) {
+				if ($(event.target).is('a.view[rel="richtable"]'))
+					return true;
 				current = $(event.target).closest('.listpick');
 				var options = current.data('_options');
 				var winid = current.data('winid');
@@ -154,11 +163,30 @@
 									var name = cell.data('cellvalue')
 											|| cell.text();
 									if (options.name) {
-										val(options.name, $(target)
-														.data('listpick'), name);
 										var nametarget = find(options.name,
 												$(target).data('listpick'));
-										if (!nametarget.is(':input'))
+										var viewlink = nametarget
+												.find('a.view[rel="richtable"]');
+										if (nametarget.is('td')
+												&& viewlink.length) {
+											var href = viewlink.attr('href');
+											viewlink
+													.attr(
+															'href',
+															href
+																	.substring(
+																			0,
+																			href
+																					.lastIndexOf('/')
+																					+ 1)
+																	+ id);
+											viewlink.text(name);
+										} else
+											val(options.name, $(target)
+															.data('listpick'),
+													name);
+										if (!nametarget.is(':input')
+												&& !nametarget.find('a.remove').length)
 											$('<a class="remove" href="#">&times;</a>')
 													.appendTo(nametarget)
 													.click(removeAction);

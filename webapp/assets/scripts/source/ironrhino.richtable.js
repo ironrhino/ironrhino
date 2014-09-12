@@ -334,7 +334,7 @@ Richtable = {
 				}
 			}
 			var reloadonclose = typeof(options.reloadonclose) == 'undefined'
-					? (view != 'view')
+					? (view != 'view' && !$(btn).hasClass('view'))
 					: options.reloadonclose;
 			Richtable.open(url, reloadonclose, options.iframe, form);
 			delete options.iframe;

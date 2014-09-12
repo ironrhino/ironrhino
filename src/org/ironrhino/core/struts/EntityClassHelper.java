@@ -351,6 +351,17 @@ public class EntityClassHelper {
 					if (StringUtils.isBlank(uci.getPickUrl())) {
 						uci.setPickUrl(getPickUrl(returnType));
 					}
+					if (StringUtils.isBlank(uci.getListTemplate())) {
+						String url = AutoConfigPackageProvider
+								.getEntityUrl(returnType);
+						if (url == null)
+							url = new StringBuilder("/").append(
+									StringUtils.uncapitalize(returnType
+											.getSimpleName())).toString();
+						uci.setListTemplate("<#if value??><a href=\""
+								+ url
+								+ "/view/${value.id}\" class=\"view\" rel=\"richtable\" title=\"${action.getText('view')}\">${value?html}</a></#if>");
+					}
 				} else if (returnType == Integer.TYPE
 						|| returnType == Short.TYPE || returnType == Long.TYPE
 						|| returnType == Double.TYPE
