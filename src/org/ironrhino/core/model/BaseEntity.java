@@ -34,6 +34,10 @@ public class BaseEntity extends Entity<String> {
 			this.id = id;
 	}
 
+	public void clearId() {
+		this.id = null;
+	}
+
 	@Override
 	@JsonIgnore
 	public boolean isNew() {
