@@ -56,7 +56,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 
 	@NotInCopy
 	@Column(nullable = false)
-	@UiConfig(displayOrder = 2, excludedFromLike = true, excludedFromCriteria = true)
+	@UiConfig(hidden = true, excludedFromLike = true, excludedFromCriteria = true)
 	private String password;
 
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
@@ -73,7 +73,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	private String phone;
 
 	@JsonIgnore
-	@UiConfig(displayOrder = 6)
+	@UiConfig(displayOrder = 99)
 	private boolean enabled = true;
 
 	@NotInCopy
@@ -102,16 +102,19 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	@NotInCopy
 	@JsonIgnore
 	@Transient
+	@UiConfig(hidden = true)
 	private Collection<GrantedAuthority> authorities;
 
 	@SearchableProperty
 	@Transient
 	@JsonIgnore
+	@UiConfig(displayOrder = 100, alias = "role")
 	private Set<String> roles = new HashSet<String>(0);
 
 	@NotInCopy
 	@JsonIgnore
 	@Transient
+	@UiConfig(hidden = true)
 	private Map<String, String> attributes;
 
 	@NotInCopy
@@ -192,6 +195,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	@JsonIgnore
 	@Column(name = "roles", length = 4000)
 	@Access(AccessType.PROPERTY)
+	@UiConfig(hidden = true)
 	public String getRolesAsString() {
 		if (roles.size() > 0)
 			return StringUtils.join(roles.iterator(), ',');
@@ -353,6 +357,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	@Column(name = "attributes", length = 4000)
 	@Access(AccessType.PROPERTY)
 	@JsonIgnore
+	@UiConfig(hidden = true)
 	public String getAttributesAsString() {
 		if (attributes == null || attributes.isEmpty())
 			return null;
