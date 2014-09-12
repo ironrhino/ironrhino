@@ -1,6 +1,5 @@
 package org.ironrhino.core.struts;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -314,7 +313,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@Override
-	public String execute() {
+	public String execute() throws Exception {
 		BeanWrapperImpl bw;
 		try {
 			bw = new BeanWrapperImpl(getEntityClass().newInstance());
@@ -541,7 +540,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@Override
-	public String input() {
+	public String input() throws Exception {
 		if (getReadonly().isValue()) {
 			addActionError(getText("access.denied"));
 			return ACCESSDENIED;
@@ -653,7 +652,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@Override
-	public String save() {
+	public String save() throws Exception {
 		if (getReadonly().isValue()) {
 			addActionError(getText("access.denied"));
 			return ACCESSDENIED;
@@ -1175,7 +1174,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@Override
-	public String view() {
+	public String view() throws Exception {
 		tryFindEntity();
 		if (_entity == null)
 			return isAjax() ? NONE : NOTFOUND;
@@ -1200,7 +1199,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return VIEW;
 	}
 
-	public String export() throws IOException {
+	public String export() throws Exception {
 		if (!getRichtableConfig().isExportable())
 			return NOTFOUND;
 		tryFindEntity();
@@ -1258,7 +1257,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@Override
-	public String delete() {
+	public String delete() throws Exception {
 		if (getReadonly().isValue() && !getReadonly().isDeletable()) {
 			addActionError(getText("access.denied"));
 			return ACCESSDENIED;
@@ -1340,13 +1339,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return SUCCESS;
 	}
 
-	public String enable() {
+	public String enable() throws Exception {
 		if (!isEnableable() || getReadonly().isValue())
 			return ACCESSDENIED;
 		return updateEnabled(true);
 	}
 
-	public String disable() {
+	public String disable() throws Exception {
 		if (!isEnableable() || getReadonly().isValue())
 			return ACCESSDENIED;
 		return updateEnabled(false);
@@ -1412,7 +1411,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@InputConfig(resultName = "move")
-	public String move() {
+	public String move() throws Exception {
 		if (!isTreeable())
 			return NOTFOUND;
 		String id = getUid();
