@@ -358,7 +358,7 @@ public class EntityClassHelper {
 							url = new StringBuilder("/").append(
 									StringUtils.uncapitalize(returnType
 											.getSimpleName())).toString();
-						uci.setListTemplate("<#if value??><a href=\""
+						uci.setListTemplate("<#if value?has_content&&value.id?has_content><a href=\""
 								+ url
 								+ "/view/${value.id}\" class=\"view\" rel=\"richtable\" title=\"${action.getText('view')}\">${value?html}</a></#if>");
 					}
