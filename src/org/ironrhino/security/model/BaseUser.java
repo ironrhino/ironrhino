@@ -108,7 +108,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	@SearchableProperty
 	@Transient
 	@JsonIgnore
-	@UiConfig(displayOrder = 100, alias = "role")
+	@UiConfig(displayOrder = 100, alias = "role", template = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next> </#if></#list>")
 	private Set<String> roles = new HashSet<String>(0);
 
 	@NotInCopy
