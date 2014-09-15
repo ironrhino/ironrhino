@@ -34112,12 +34112,20 @@ var Dialog = {
 		d.dialog('moveToTop');
 		if (hasRow) {
 			d.dialog('option', 'width', '90%');
-			// var height = d.height();
-			// if (height >= $(window).height())
-			// d.dialog('option', 'position', 'top');
-			setTimeout(function() {
-						d.dialog('option', 'position', 'center');
-					}, 500);
+		}
+		var height = d.height();
+		if (height >= $(window).height()) {
+			d.dialog('option', 'position', {
+						my : 'top',
+						at : 'top',
+						of : window
+					});
+		} else {
+			d.dialog('option', 'position', {
+						my : 'center',
+						at : 'center',
+						of : window
+					});
 		}
 	},
 	toggleMaximization : function(d) {
@@ -34136,7 +34144,11 @@ var Dialog = {
 			dialog.outerWidth(viewportWidth);
 			if (dialog.outerHeight() < viewportHeight)
 				dialog.outerHeight(viewportHeight);
-			d.dialog('option', 'position', 'top');
+			d.dialog('option', 'position', {
+						my : 'top',
+						at : 'top',
+						of : window
+					});
 		}
 	}
 }
