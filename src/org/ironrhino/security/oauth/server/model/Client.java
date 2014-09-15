@@ -36,20 +36,20 @@ public class Client extends BaseEntity implements Enableable {
 
 	public static final String OAUTH_OOB = "urn:ietf:wg:oauth:2.0:oob";
 
-	@UiConfig(displayOrder = 1, cssClass = "span4")
+	@UiConfig(displayOrder = 1, cssClass = "input-xxlarge")
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	@Column(nullable = false)
 	private String name;
 
-	@UiConfig(displayOrder = 3, alias = "client_secret", cssClass = "span4", width = "200px", excludedFromCriteria = true)
+	@UiConfig(displayOrder = 3, alias = "client_secret", cssClass = "input-xxlarge", width = "200px", excludedFromCriteria = true)
 	@Column(nullable = false)
 	private String secret = CodecUtils.nextId();
 
-	@UiConfig(displayOrder = 4, cssClass = "span4", hiddenInList = @Hidden(true))
+	@UiConfig(displayOrder = 4, cssClass = "input-xxlarge", hiddenInList = @Hidden(true))
 	private String redirectUri;
 
-	@UiConfig(displayOrder = 5, cssClass = "span4", type = "textarea", hiddenInList = @Hidden(true))
+	@UiConfig(displayOrder = 5, cssClass = "input-xxlarge", type = "textarea", hiddenInList = @Hidden(true))
 	@Column(length = 4000)
 	private String description;
 
