@@ -351,7 +351,8 @@ public class EntityClassHelper {
 					if (StringUtils.isBlank(uci.getPickUrl())) {
 						uci.setPickUrl(getPickUrl(returnType));
 					}
-					if (StringUtils.isBlank(uci.getListTemplate())) {
+					if (StringUtils.isBlank(uci.getListTemplate())
+							&& !uci.isSuppressViewLink()) {
 						String url = AutoConfigPackageProvider
 								.getEntityUrl(returnType);
 						if (url == null)
