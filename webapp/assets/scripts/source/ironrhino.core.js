@@ -29,18 +29,18 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		$.param = function(a, traditional) {
 			if (jQuery.isArray(a) || a.jquery) {
 				jQuery.each(a, function() {
-							if (/password$/.test(this.name.toLowerCase())) {
-								try {
-									var key = $.cookie('T');
-									key = key.substring(15, 25);
-									this.value = $
-											.rc4EncryptStr(
-													encodeURIComponent(this.value
-															+ key), key);
-								} catch (e) {
-								}
-							}
-						});
+					if (/password$/.test(this.name.toLowerCase())) {
+						try {
+							var key = $.cookie('T');
+							if (key && key.length > 10)
+								key = key
+										.substring(key.length - 10, key.length);
+							this.value = $.rc4EncryptStr(
+									encodeURIComponent(this.value + key), key);
+						} catch (e) {
+						}
+					}
+				});
 
 			}
 			return temp(a, traditional);

@@ -95,10 +95,11 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 		if (value != null && name.toLowerCase().endsWith("password")
 				&& value.length() >= 20) {
 			String key = session.getSessionTracker();
-			if (key.length() < 25)
+			if (!isRequestedSessionIdFromCookie())
 				return value;
 			try {
-				key = key.substring(15, 25);
+				if (key.length() > 10)
+					key = key.substring(key.length() - 10, key.length());
 				String str = URLDecoder
 						.decode(RC4.decrypt(value, key), "UTF-8");
 				if (str.endsWith(key))
