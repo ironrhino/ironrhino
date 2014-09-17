@@ -144,12 +144,6 @@ public class UserAction extends EntityAction<User> {
 	public String save() {
 		if (!makeEntityValid())
 			return INPUT;
-		if (StringUtils.isBlank(user.getName()))
-			user.setName(null);
-		if (StringUtils.isBlank(user.getEmail()))
-			user.setEmail(null);
-		if (StringUtils.isBlank(user.getPhone()))
-			user.setPhone(null);
 		userManager.save(user);
 		addActionMessage(getText("save.success"));
 		return SUCCESS;
@@ -167,8 +161,6 @@ public class UserAction extends EntityAction<User> {
 			addActionError(getText("access.denied"));
 			return false;
 		}
-		if (StringUtils.isBlank(user.getEmail()))
-			user.setEmail(null);
 		if (user.isNew()) {
 			if (StringUtils.isNotBlank(user.getUsername())) {
 				user.setUsername(user.getUsername().toLowerCase());

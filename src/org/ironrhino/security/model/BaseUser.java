@@ -12,6 +12,8 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
@@ -399,6 +401,17 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	@Override
 	public String toString() {
 		return StringUtils.isNotBlank(this.name) ? this.name : this.username;
+	}
+
+	@PrePersist
+	@PreUpdate
+	public void replaceBlankWithNull() {
+		if (StringUtils.isBlank(name))
+			name = null;
+		if (StringUtils.isBlank(email))
+			email = null;
+		if (StringUtils.isBlank(phone))
+			phone = null;
 	}
 
 }
