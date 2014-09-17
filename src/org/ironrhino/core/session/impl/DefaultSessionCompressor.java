@@ -17,6 +17,8 @@ public class DefaultSessionCompressor implements SessionCompressor<Object> {
 	public String compress(Object value) throws Exception {
 		if (value == null)
 			return null;
+		if (value instanceof String)
+			return (String) value;
 		return value.getClass().getName() + SEPERATOR + JsonUtils.toJson(value);
 
 	}
@@ -27,10 +29,14 @@ public class DefaultSessionCompressor implements SessionCompressor<Object> {
 			return null;
 		int index = string.indexOf(SEPERATOR);
 		if (index < 0)
-			return null;
-		String className = string.substring(0, index);
-		String json = string.substring(index + SEPERATOR.length());
-		return JsonUtils.fromJson(json, Class.forName(className));
+			return string;
+		try {
+			String className = string.substring(0, index);
+			String json = string.substring(index + SEPERATOR.length());
+			return JsonUtils.fromJson(json, Class.forName(className));
+		} catch (ClassNotFoundException e) {
+			return string;
+		}
 
 	}
 
