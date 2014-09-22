@@ -27,7 +27,7 @@ public class AppInitializer implements WebApplicationInitializer {
 				AnnotationConfigWebApplicationContext.class.getName());
 		dynamic.setInitParameter("contextConfigLocation",
 				AppConfig.class.getName());
-		dynamic.addMapping("/api/*");
+		dynamic.addMapping("/api/*", "/api/v1/*");
 		dynamic.setLoadOnStartup(1);
 	}
 
