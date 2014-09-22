@@ -11,6 +11,7 @@ import org.ironrhino.api.RestStatus;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.component.OAuthHandler;
 import org.ironrhino.security.oauth.server.model.Authorization;
@@ -79,9 +80,7 @@ public class UserController {
 		u = new User();
 		u.setUsername(user.getUsername());
 		u.setLegiblePassword(user.getPassword());
-		u.setName(user.getName());
-		u.setEmail(user.getEmail());
-		u.setPhone(user.getPhone());
+		BeanUtils.copyPropertiesIfNotNull(user, u, "name", "email", "phone");
 		userManager.save(u);
 		return RestStatus.OK;
 	}
@@ -89,16 +88,14 @@ public class UserController {
 	@RequestMapping(value = "/{username}", method = RequestMethod.PUT)
 	public RestStatus put(@PathVariable String username, @RequestBody User user) {
 		User u = (User) userManager.loadUserByUsername(username);
-		if (u == null)
-			throw RestStatus.NOT_FOUND;
+		if (u == null) {
+			// throw RestStatus.NOT_FOUND;
+			u = new User();
+			u.setUsername(username);
+		}
 		if (user.getPassword() != null)
 			u.setLegiblePassword(user.getPassword());
-		if (user.getName() != null)
-			u.setName(user.getName());
-		if (user.getEmail() != null)
-			u.setEmail(user.getEmail());
-		if (user.getPhone() != null)
-			u.setPhone(user.getPhone());
+		BeanUtils.copyPropertiesIfNotNull(user, u, "name", "email", "phone");
 		userManager.save(u);
 		return RestStatus.OK;
 	}

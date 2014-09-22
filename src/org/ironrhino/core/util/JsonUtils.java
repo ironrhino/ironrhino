@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.persistence.Lob;
 
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,8 @@ public class JsonUtils {
 				});
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		if (AppInfo.getStage() == Stage.DEVELOPMENT)
+			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
 	}
 

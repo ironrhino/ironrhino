@@ -20,6 +20,7 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 //only for exclude-filter of root ctx
 @ControllerAdvice
@@ -43,6 +44,7 @@ public class AppConfig extends WebMvcConfigurationSupport {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
 		objectMapper
 				.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		jackson2.setObjectMapper(objectMapper);
 		converters.add(jackson2);
 	}
