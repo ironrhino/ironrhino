@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
+import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
@@ -30,6 +31,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.google.common.base.Objects;
 
@@ -43,6 +46,9 @@ public class Oauth2Action extends BaseAction {
 
 	@Autowired(required = false)
 	private HttpErrorHandler httpErrorHandler;
+
+	@Autowired
+	private transient UserDetailsService userDetailsService;
 
 	@Autowired
 	private transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
@@ -369,7 +375,49 @@ public class Oauth2Action extends BaseAction {
 
 	@JsonConfig(root = "tojson")
 	public String token() {
-		if ("client_credential".equals(grant_type)) {
+		if ("password".equals(grant_type)) {
+			client = oauthManager.findClientById(client_id);
+			try {
+				if (client == null)
+					throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
+				if (!client.getSecret().equals(client_secret))
+					throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+				if (client.getOwner() == null
+						|| !client.getOwner().getRoles()
+								.contains(UserRole.ROLE_ADMINISTRATOR))
+					throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
+				try {
+					User u = (User) userDetailsService
+							.loadUserByUsername(username);
+					if (!AuthzUtils.isPasswordValid(u, password))
+						throw new IllegalArgumentException("PASSWORD_MISMATCH");
+					authorization = oauthManager.grant(client, u);
+				} catch (UsernameNotFoundException e) {
+					throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
+				}
+			} catch (Exception e) {
+				if (httpErrorHandler != null
+						&& httpErrorHandler.handle(
+								ServletActionContext.getRequest(),
+								ServletActionContext.getResponse(),
+								HttpServletResponse.SC_BAD_REQUEST,
+								e.getMessage()))
+					return NONE;
+				try {
+					ServletActionContext.getResponse().sendError(
+							HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					return NONE;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				return NONE;
+			}
+			tojson = new HashMap<String, Object>();
+			tojson.put("access_token", authorization.getAccessToken());
+			tojson.put("refresh_token", authorization.getRefreshToken());
+			tojson.put("expires_in", authorization.getExpiresIn());
+			return JSON;
+		} else if ("client_credential".equals(grant_type)) {
 			client = new Client();
 			client.setId(client_id);
 			client.setSecret(client_secret);

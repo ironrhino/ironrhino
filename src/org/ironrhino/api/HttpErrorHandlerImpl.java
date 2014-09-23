@@ -11,7 +11,6 @@ import org.ironrhino.core.util.JsonUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class HttpErrorHandlerImpl implements HttpErrorHandler {
 
@@ -22,7 +21,7 @@ public class HttpErrorHandlerImpl implements HttpErrorHandler {
 				.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 		if (requestURI == null)
 			requestURI = request.getRequestURI();
-		if (!requestURI.startsWith("/xiaobao/api/"))
+		if (!requestURI.startsWith("/api/"))
 			return false;
 		if (statusCode > 0)
 			response.setStatus(statusCode);
