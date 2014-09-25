@@ -109,6 +109,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public String suggestUsername(String candidate) {
 		if (candidate.indexOf("://") > 0) {
 			try {
