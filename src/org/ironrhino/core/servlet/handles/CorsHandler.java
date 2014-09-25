@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 @Order(Integer.MIN_VALUE + 1)
 public class CorsHandler extends AccessHandler {
 
+	@Value("${cors.openForAllOrigin:false}")
+	private boolean openForAllOrigin;
+
 	@Value("${cors.openForSameOrigin:true}")
 	private boolean openForSameOrigin;
 
@@ -30,8 +33,9 @@ public class CorsHandler extends AccessHandler {
 			if (!("Upgrade".equalsIgnoreCase(request.getHeader("Connection")) && "WebSocket"
 					.equalsIgnoreCase(request.getHeader("Upgrade")))) {
 				String url = request.getRequestURL().toString();
-				if ((openForSameOrigin || RequestUtils
-						.isSameOrigin(url, origin)) && !url.startsWith(origin)) {
+				if (openForAllOrigin
+						|| (openForSameOrigin || RequestUtils.isSameOrigin(url,
+								origin)) && !url.startsWith(origin)) {
 					response.setHeader("Access-Control-Allow-Origin", origin);
 					response.setHeader("Access-Control-Allow-Credentials",
 							"true");
