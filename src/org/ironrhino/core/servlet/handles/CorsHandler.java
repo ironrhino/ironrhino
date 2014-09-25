@@ -33,9 +33,9 @@ public class CorsHandler extends AccessHandler {
 			if (!("Upgrade".equalsIgnoreCase(request.getHeader("Connection")) && "WebSocket"
 					.equalsIgnoreCase(request.getHeader("Upgrade")))) {
 				String url = request.getRequestURL().toString();
-				if (openForAllOrigin
-						|| (openForSameOrigin || RequestUtils.isSameOrigin(url,
-								origin)) && !url.startsWith(origin)) {
+				if (openForAllOrigin || openForSameOrigin
+						&& RequestUtils.isSameOrigin(url, origin)
+						&& !url.startsWith(origin)) {
 					response.setHeader("Access-Control-Allow-Origin", origin);
 					response.setHeader("Access-Control-Allow-Credentials",
 							"true");
