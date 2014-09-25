@@ -1,12 +1,12 @@
-package org.ironrhino.api.controller;
+package org.ironrhino.sample.api.controller;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.api.Asserts;
-import org.ironrhino.api.RestStatus;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
+import org.ironrhino.sample.api.Asserts;
+import org.ironrhino.sample.api.RestStatus;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.ironrhino.security.service.UserManager;

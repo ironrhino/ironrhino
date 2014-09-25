@@ -1,4 +1,4 @@
-package org.ironrhino.api;
+package org.ironrhino.sample.api;
 
 import java.util.EnumSet;
 
@@ -26,7 +26,7 @@ public class AppInitializer implements WebApplicationInitializer {
 		dynamic.setInitParameter("contextClass",
 				AnnotationConfigWebApplicationContext.class.getName());
 		dynamic.setInitParameter("contextConfigLocation",
-				AppConfig.class.getName());
+				ApiConfig.class.getName());
 		dynamic.addMapping("/api/*");
 		dynamic.setLoadOnStartup(1);
 	}

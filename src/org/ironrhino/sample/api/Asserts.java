@@ -1,4 +1,4 @@
-package org.ironrhino.api;
+package org.ironrhino.sample.api;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanWrapperImpl;

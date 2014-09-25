@@ -1,4 +1,4 @@
-package org.ironrhino.api;
+package org.ironrhino.sample.api;
 
 import java.io.IOException;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package org.ironrhino.api;
+package org.ironrhino.sample.api;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -25,9 +25,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 //only for exclude-filter of root ctx
 @ControllerAdvice
 @Configuration
-@ComponentScan(basePackages = "org.ironrhino.api", excludeFilters = @Filter(value = HttpErrorHandler.class, type = FilterType.ASSIGNABLE_TYPE))
+@ComponentScan(basePackages = "org.ironrhino.sample.api", excludeFilters = @Filter(value = HttpErrorHandler.class, type = FilterType.ASSIGNABLE_TYPE))
 @EnableAspectJAutoProxy
-public class AppConfig extends WebMvcConfigurationSupport {
+public class ApiConfig extends WebMvcConfigurationSupport {
 
 	@Override
 	protected void configureContentNegotiation(
