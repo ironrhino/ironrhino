@@ -42,7 +42,7 @@ import org.ironrhino.core.search.elasticsearch.annotations.Store;
 import org.ironrhino.core.service.BaseManager.IterateCallback;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.AnnotationUtils;
-import org.ironrhino.core.util.ClassScaner;
+import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
@@ -104,8 +104,8 @@ public class IndexManagerImpl implements IndexManager {
 					}
 
 				});
-		Collection<Class<?>> set = ClassScaner.scanAnnotated(
-				ClassScaner.getAppPackages(), Searchable.class);
+		Collection<Class<?>> set = ClassScanner.scanAnnotated(
+				ClassScanner.getAppPackages(), Searchable.class);
 		typeClassMapping = new HashMap<String, Class>(set.size());
 		schemaMapping = new HashMap<Class, Map<String, Object>>(set.size());
 		for (Class c : set) {

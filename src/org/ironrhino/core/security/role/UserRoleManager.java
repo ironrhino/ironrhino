@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
-import org.ironrhino.core.util.ClassScaner;
+import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,8 +69,8 @@ public class UserRoleManager {
 	public Set<String> getStaticRoles() {
 		if (staticRoles == null) {
 			Set<String> temp = new LinkedHashSet<String>();
-			Collection<Class<?>> set = ClassScaner.scanAssignable(
-					ClassScaner.getAppPackages(), UserRole.class);
+			Collection<Class<?>> set = ClassScanner.scanAssignable(
+					ClassScanner.getAppPackages(), UserRole.class);
 			for (Class<?> c : set) {
 				if (Enum.class.isAssignableFrom(c)) {
 					for (Object en : c.getEnumConstants()) {

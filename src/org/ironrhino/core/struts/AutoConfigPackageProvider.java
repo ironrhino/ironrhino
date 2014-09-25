@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.struts.result.AutoConfigResult;
-import org.ironrhino.core.util.ClassScaner;
+import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,13 +65,13 @@ public class AutoConfigPackageProvider implements PackageProvider {
 	protected Map<String, Set<String>> configPackages() {
 		Map<String, Set<String>> packages = new HashMap<String, Set<String>>();
 		Set<String> packagePrefixes = new HashSet<String>();
-		for (String pck : ClassScaner.getAppPackages()) {
+		for (String pck : ClassScanner.getAppPackages()) {
 			int i = pck.indexOf('.');
 			packagePrefixes.add(i > 0 ? pck.substring(0, i) : pck);
 		}
 		Set<Class<?>> packageInfos = new HashSet<Class<?>>();
 		for (String packagePrefix : packagePrefixes)
-			packageInfos.addAll(ClassScaner.scanAnnotatedPackage(packagePrefix,
+			packageInfos.addAll(ClassScanner.scanAnnotatedPackage(packagePrefix,
 					AutoConfig.class));
 		for (Class<?> packageInfo : packageInfos) {
 			String name = packageInfo.getName();
@@ -173,7 +173,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		for (Map.Entry<String, Set<String>> entry : packages.entrySet()) {
 			String defaultNamespace = entry.getKey();
 			Set<String> currentPackages = entry.getValue();
-			Collection<Class<?>> classes = ClassScaner.scanAnnotated(
+			Collection<Class<?>> classes = ClassScanner.scanAnnotated(
 					currentPackages.toArray(new String[0]), AutoConfig.class);
 			if (classes.size() == 0)
 				continue;

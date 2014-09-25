@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.configuration.CustomAnnotationTypeFilter;
@@ -25,10 +26,10 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.AssignableTypeFilter;
+import org.springframework.core.type.filter.RegexPatternTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
-import org.springframework.util.SystemPropertyUtils;
 
-public class ClassScaner {
+public class ClassScanner {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
@@ -39,8 +40,10 @@ public class ClassScaner {
 	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
 			this.resourcePatternResolver);
 
-	public ClassScaner() {
-
+	public ClassScanner() {
+		if (AppInfo.getExcludeFilterRegex() != null)
+			addExcludeFilter(new RegexPatternTypeFilter(Pattern.compile(AppInfo
+					.getExcludeFilterRegex())));
 	}
 
 	@Autowired(required = false)
@@ -71,7 +74,7 @@ public class ClassScaner {
 	@SafeVarargs
 	public static Collection<Class<?>> scanAnnotated(String basePackage,
 			Class<? extends Annotation>... annotations) {
-		ClassScaner cs = new ClassScaner();
+		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
 			cs.addIncludeFilter(new CustomAnnotationTypeFilter(anno));
 		return cs.doScan(basePackage);
@@ -79,7 +82,7 @@ public class ClassScaner {
 
 	public static Collection<Class<?>> scanAnnotated(String[] basePackages,
 			Class<? extends Annotation> annotation) {
-		ClassScaner cs = new ClassScaner();
+		ClassScanner cs = new ClassScanner();
 		cs.addIncludeFilter(new CustomAnnotationTypeFilter(annotation));
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		for (String s : basePackages)
@@ -91,7 +94,7 @@ public class ClassScaner {
 	@SafeVarargs
 	public static Collection<Class<?>> scanAnnotated(String[] basePackages,
 			Class<? extends Annotation>... annotations) {
-		ClassScaner cs = new ClassScaner();
+		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
 			cs.addIncludeFilter(new CustomAnnotationTypeFilter(anno));
 		List<Class<?>> classes = new ArrayList<Class<?>>();
@@ -103,7 +106,7 @@ public class ClassScaner {
 
 	public static Collection<Class<?>> scanAssignable(String basePackage,
 			Class<?>... classes) {
-		ClassScaner cs = new ClassScaner();
+		ClassScanner cs = new ClassScanner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
 		List<Class<?>> list = new ArrayList<Class<?>>();
@@ -114,7 +117,7 @@ public class ClassScaner {
 
 	public static Collection<Class<?>> scanAssignable(String[] basePackages,
 			Class<?>... classes) {
-		ClassScaner cs = new ClassScaner();
+		ClassScanner cs = new ClassScanner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
 		List<Class<?>> list = new ArrayList<Class<?>>();
@@ -126,7 +129,7 @@ public class ClassScaner {
 
 	public static Collection<Class<?>> scanAnnotatedPackage(String basePackage,
 			Class<? extends Annotation> annotation) {
-		ClassScaner cs = new ClassScaner();
+		ClassScanner cs = new ClassScanner();
 		cs.addIncludeFilter(new AnnotationTypeFilter(annotation));
 		return cs.doScan(basePackage, "/**/*/package-info.class");
 	}
@@ -134,7 +137,7 @@ public class ClassScaner {
 	@SafeVarargs
 	public static Collection<Class<?>> scanAnnotatedPackage(String basePackage,
 			Class<? extends Annotation>... annotations) {
-		ClassScaner cs = new ClassScaner();
+		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
 			cs.addIncludeFilter(new AnnotationTypeFilter(anno));
 		return cs.doScan(basePackage, "/**/*/package-info.class");
@@ -153,8 +156,7 @@ public class ClassScaner {
 			String searchPath = new StringBuilder(
 					ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX)
 					.append(org.springframework.util.ClassUtils
-							.convertClassNameToResourcePath(SystemPropertyUtils
-									.resolvePlaceholders(basePackage)))
+							.convertClassNameToResourcePath(basePackage))
 					.append(pattern).toString();
 			Resource[] resources = this.resourcePatternResolver
 					.getResources(searchPath);
@@ -183,20 +185,19 @@ public class ClassScaner {
 	}
 
 	protected boolean matches(MetadataReader metadataReader) throws IOException {
-		for (TypeFilter tf : this.excludeFilters) {
+		for (TypeFilter tf : this.includeFilters)
+			try {
+				if (!tf.match(metadataReader, this.metadataReaderFactory))
+					return false;
+			} catch (Exception e) {
+				return false;
+			}
+		for (TypeFilter tf : this.excludeFilters)
 			try {
 				return !tf.match(metadataReader, this.metadataReaderFactory);
 			} catch (Exception e) {
 				return false;
 			}
-		}
-		for (TypeFilter tf : this.includeFilters) {
-			try {
-				return tf.match(metadataReader, this.metadataReaderFactory);
-			} catch (Exception e) {
-				return false;
-			}
-		}
 		return true;
 	}
 

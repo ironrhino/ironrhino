@@ -83,6 +83,13 @@ public class AppInfoListener implements ServletContextListener {
 			appBasePackage = "com." + AppInfo.getAppName();
 		AppInfo.setAppBasePackage(appBasePackage);
 		System.setProperty(AppInfo.KEY_APP_BASEPACKAGE, appBasePackage);
+		String excludeFilterRegex = appProperties
+				.getProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX);
+		if (StringUtils.isNotBlank(excludeFilterRegex)) {
+			AppInfo.setExcludeFilterRegex(excludeFilterRegex);
+			System.setProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX,
+					excludeFilterRegex);
+		}
 		String userTimezone = System.getProperty("user.timezone");
 		if (StringUtils.isBlank(userTimezone)
 				|| !TimeZone.getTimeZone(userTimezone).getID()

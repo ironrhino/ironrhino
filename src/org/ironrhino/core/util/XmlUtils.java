@@ -93,8 +93,8 @@ public class XmlUtils {
 	}
 
 	private static JAXBContext initContext() {
-		Collection<Class<?>> classes = ClassScaner.scanAnnotated(
-				ClassScaner.getAppPackages(), XmlRootElement.class);
+		Collection<Class<?>> classes = ClassScanner.scanAnnotated(
+				ClassScanner.getAppPackages(), XmlRootElement.class);
 		try {
 			return JAXBContext.newInstance(classes.toArray(new Class[0]));
 		} catch (JAXBException e) {

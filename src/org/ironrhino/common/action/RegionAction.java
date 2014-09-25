@@ -22,7 +22,7 @@ import org.ironrhino.core.search.elasticsearch.ElasticSearchCriteria;
 import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.struts.BaseAction;
-import org.ironrhino.core.util.ClassScaner;
+import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.HtmlUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,8 +337,8 @@ public class RegionAction extends BaseAction {
 				addActionError(getText("validation.invalid"));
 				return SUCCESS;
 			}
-			Collection<Class<?>> set = ClassScaner.scanAssignable(
-					ClassScaner.getAppPackages(), Persistable.class);
+			Collection<Class<?>> set = ClassScanner.scanAssignable(
+					ClassScanner.getAppPackages(), Persistable.class);
 			for (Class<?> clz : set) {
 				if (clz.equals(Region.class))
 					continue;

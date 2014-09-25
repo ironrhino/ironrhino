@@ -15,7 +15,7 @@ import javax.persistence.Entity;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.cfg.AvailableSettings;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
-import org.ironrhino.core.util.ClassScaner;
+import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +46,8 @@ public class SessionFactoryBean extends
 					MyDialectResolver.class.getName());
 		Map<String, Class<?>> added = new HashMap<String, Class<?>>();
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		Collection<Class<?>> scaned = ClassScaner.scanAnnotated(
-				ClassScaner.getAppPackages(), Entity.class);
+		Collection<Class<?>> scaned = ClassScanner.scanAnnotated(
+				ClassScanner.getAppPackages(), Entity.class);
 		if (annotatedClasses != null)
 			for (Class<?> c : annotatedClasses)
 				if (!added.containsKey(c.getSimpleName())
