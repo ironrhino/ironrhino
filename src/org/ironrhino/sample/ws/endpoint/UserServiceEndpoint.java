@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 @Component
-@WebService(serviceName = "UserService")
+@WebService(serviceName = "UserService", targetNamespace = "http://sample.ironrhino.org")
 public class UserServiceEndpoint extends SpringBeanAutowiringSupport implements
 		UserService {
 
