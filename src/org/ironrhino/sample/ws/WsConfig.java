@@ -24,7 +24,7 @@ public class WsConfig {
 		SimpleJaxWsServiceExporter exporter = new SimpleJaxWsServiceExporter();
 		if (StringUtils.isBlank(baseAddress))
 			baseAddress = new StringBuilder("http://")
-					.append(AppInfo.getHostAddress()).append(":8080/")
+					.append(AppInfo.getHostAddress()).append(":8081/")
 					.toString();
 		logger.info("set ws.baseAddress: {}", baseAddress);
 		exporter.setBaseAddress(baseAddress);
