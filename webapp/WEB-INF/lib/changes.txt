@@ -1,2 +1,0 @@
-1.remove lines contains jsp or vm or velocity in struts-default.xml of struts2-core-*.jar
-2.update freemarker.core.Include.class in freemarker-*.jar
