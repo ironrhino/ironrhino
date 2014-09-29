@@ -59,7 +59,7 @@ public class ApplicationContextConsole implements
 								.getAttribute(FreemarkerManager.CONFIG_SERVLET_CONTEXT_KEY));
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
-				if (StringUtils.isAlphanumeric(beanName)
+				if (StringUtils.isAlphanumeric(beanName.replaceAll("_", ""))
 						&& ctx.isSingleton(beanName))
 					beans.put(beanName, ctx.getBean(beanName));
 			}
