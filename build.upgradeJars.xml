@@ -36,6 +36,13 @@
         		for(var i=0;i<files.length;i++){
         			var f = files[i];
         			var filename2 = f.getName();
+					if(filename2.toLowerCase().endsWith('.release.jar')||filename2.toLowerCase().endsWith('.final.jar')){
+						filename2 = filename2.substring(0,filename2.lastIndexOf('.'));
+						filename2 = filename2.substring(0,filename2.lastIndexOf('.'));
+						var f2 = new File(f.getParentFile(),filename2+'.jar');
+						f.renameTo(f2);
+						filename2 = f2.getName();
+					}
         			var jarname2 = filename2.substring(0,filename2.lastIndexOf(filename2.lastIndexOf('-')>0?'-':'.'));
         			var version2 = filename2.substring(jarname2.length()+1);
         			if(f.isFile() && filename != filename2 && jarname == jarname2 && version2.length()>0){
