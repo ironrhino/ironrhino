@@ -11,11 +11,12 @@ import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(Integer.MIN_VALUE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class PageViewHandler extends AccessHandler {
 
 	@Autowired(required = false)

@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface HttpSessionManager extends HttpSessionStore {
 
+	String REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API = "_session_id_in_request_for_api";
+	
 	String REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API = "_session_map_in_request_for_api";
 	
 	String REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO = "_session_map_in_request_for_sso";

@@ -102,6 +102,35 @@ public class AccessFilter implements Filter {
 			}
 		}
 
+		if (handlers != null)
+			loop: for (AccessHandler handler : handlers) {
+				String excludePattern = handler.getExcludePattern();
+				if (StringUtils.isNotBlank(excludePattern)) {
+					String[] arr = excludePattern.split("\\s*,\\s*");
+					for (String pa : arr)
+						if (org.ironrhino.core.util.StringUtils
+								.matchesWildcard(uri, pa)) {
+							continue loop;
+						}
+				}
+				String pattern = handler.getPattern();
+				boolean matched = StringUtils.isBlank(pattern);
+				if (!matched) {
+					String[] arr = pattern.split("\\s*,\\s*");
+					for (String pa : arr)
+						if (org.ironrhino.core.util.StringUtils
+								.matchesWildcard(uri, pa)) {
+							matched = true;
+							break;
+						}
+				}
+				if (matched) {
+					if (handler.handle(request, response)) {
+						return;
+					}
+				}
+			}
+
 		if (request.getAttribute("userAgent") == null)
 			request.setAttribute("userAgent",
 					new UserAgent(request.getHeader("User-Agent")));
@@ -129,36 +158,6 @@ public class AccessFilter implements Filter {
 				&& !uri.startsWith("/remoting/")
 				&& request.getHeader("Last-Event-Id") == null)
 			accessLog.info("");
-
-		if (handlers != null)
-			loop: for (AccessHandler handler : handlers) {
-				String excludePattern = handler.getExcludePattern();
-				if (StringUtils.isNotBlank(excludePattern)) {
-					String[] arr = excludePattern.split("\\s*,\\s*");
-					for (String pa : arr)
-						if (org.ironrhino.core.util.StringUtils
-								.matchesWildcard(uri, pa)) {
-							continue loop;
-						}
-				}
-				String pattern = handler.getPattern();
-				boolean matched = StringUtils.isBlank(pattern);
-				if (!matched) {
-					String[] arr = pattern.split("\\s*,\\s*");
-					for (String pa : arr)
-						if (org.ironrhino.core.util.StringUtils
-								.matchesWildcard(uri, pa)) {
-							matched = true;
-							break;
-						}
-				}
-				if (matched) {
-					if (handler.handle(request, response)) {
-						MDC.clear();
-						return;
-					}
-				}
-			}
 
 		long start = System.currentTimeMillis();
 		chain.doFilter(req, resp);

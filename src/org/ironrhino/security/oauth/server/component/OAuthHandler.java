@@ -18,6 +18,7 @@ import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,11 +31,12 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(Integer.MIN_VALUE + 1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class OAuthHandler extends AccessHandler {
 
 	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST = "_OAUTH_REQUEST";
 	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT = "_OAUTH_CLIENT";
+	public static final String SESSION_ID_PREFIX = "tk_";
 
 	@Value("${oauth.api.pattern:/user/self,/oauth2/tokeninfo,/oauth2/revoketoken,/api/*}")
 	private String apiPattern;
@@ -149,6 +151,9 @@ public class OAuthHandler extends AccessHandler {
 									sessionMap);
 							request.setAttribute(
 									REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
+							request.setAttribute(
+									HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API,
+									SESSION_ID_PREFIX + token);
 						}
 						Client client = authorization.getClient();
 						if (client != null) {

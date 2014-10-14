@@ -113,6 +113,10 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Override
 	public String getSessionId(HttpServletRequest request) {
+		String token = (String) request
+				.getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API);
+		if (token != null)
+			return token;
 		String sessionTracker = RequestUtils.getCookieValue(request,
 				getSessionTrackerName());
 		if (sessionTracker != null) {
@@ -257,6 +261,10 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Override
 	public String getSessionTracker(WrappedHttpSession session) {
+		String token = (String) session.getRequest().getAttribute(
+				REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API);
+		if (token != null)
+			return token;
 		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased)
 			return session.getId();
 		StringBuilder sb = new StringBuilder();
