@@ -38,8 +38,8 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jsoup-1.8.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jta-1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.32.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.33.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.0.8.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.10.1.jar"/>
@@ -61,7 +61,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/antlr-runtime-3.5.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jasperreports-5.6.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jasperreports-5.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aspects-4.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.1.1.jar"/>
