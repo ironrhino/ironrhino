@@ -587,7 +587,7 @@
 		<waitfor checkevery="1" checkeveryunit="second" maxwait="2"
 			maxwaitunit="second">
 			<http
-				url="http://localhost:${server.startup.port}/?firewallHandler.allowedAddrPattern=127.0.0.1" />
+				url="http://localhost:${server.startup.port}/?firewallHandler.allowedAddrPattern=127.0.0.1&amp;_internal_testing_" />
 		</waitfor>
 		<sleep seconds="3" />
 		<exec executable="${server.shutdown.cmd}" dir="${server.home}">
@@ -606,7 +606,7 @@
 		<exec executable="${server.startup.cmd}" dir="${server.home}" />
 		<waitfor checkevery="2" checkeveryunit="second" maxwait="180"
 			maxwaitunit="second">
-			<http url="http://localhost:${server.startup.port}/" />
+			<http url="http://localhost:${server.startup.port}/?_internal_testing_" />
 		</waitfor>
 	</target>
 
