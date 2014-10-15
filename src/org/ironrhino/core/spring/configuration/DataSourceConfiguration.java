@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.jolbox.bonecp.BoneCPDataSource;
@@ -59,8 +60,7 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.QueryExecuteTimeLimitInMs:5000}")
 	private long queryExecuteTimeLimitInMs;
 
-	public @Bean(destroyMethod = "close")
-	DataSource dataSource() {
+	public @Bean(destroyMethod = "close") @Primary DataSource dataSource() {
 		BoneCPDataSource ds = new BoneCPDataSource();
 		if (StringUtils.isNotBlank(driverClass))
 			ds.setDriverClass(driverClass);
@@ -83,8 +83,7 @@ public class DataSourceConfiguration {
 		return ds;
 	}
 
-	public @Bean
-	JdbcTemplate jdbcTemplate() {
+	public @Bean @Primary JdbcTemplate jdbcTemplate() {
 		return new JdbcTemplate(dataSource());
 	}
 
