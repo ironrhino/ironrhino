@@ -54,6 +54,7 @@ public class TestServlet extends HttpServlet {
 	private boolean test(String testurl) {
 		logger.info("testing: " + testurl);
 		HttpRequestBase httpRequest = new HttpGet(testurl);
+		httpRequest.addHeader("X-Test", "1");
 		try {
 			return HttpClientUtils.getDefaultInstance().execute(httpRequest)
 					.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK;

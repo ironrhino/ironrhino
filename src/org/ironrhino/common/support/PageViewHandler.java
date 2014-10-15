@@ -33,6 +33,7 @@ public class PageViewHandler extends AccessHandler {
 			HttpServletResponse response) {
 		if (pageViewService != null
 				&& request.getMethod().equalsIgnoreCase("GET")
+				&& request.getHeader("X-Test") == null
 				&& !request.getRequestURI().startsWith("/assets/")
 				&& !request.getRequestURI().endsWith("/favicon.ico")) {
 			final String remoteAddr = RequestUtils.getRemoteAddr(request);

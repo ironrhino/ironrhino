@@ -19,14 +19,21 @@ import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import redis.clients.jedis.Jedis;
+
 @Component
 public class PageViewServiceImpl implements PageViewService {
 
-	public static final String KEY_PAGE_VIEW = "{pv}:";
+	public static final String KEY_PAGE_VIEW = "pv:";
+
+	public static final String KEY_HYPERLOGLOG_SUFFIX = "_hll";
 
 	@Autowired(required = false)
 	@Qualifier("stringRedisTemplate")
@@ -268,11 +275,14 @@ public class PageViewServiceImpl implements PageViewService {
 		Date yesterday = cal.getTime();
 		String day = DateUtils.formatDate8(yesterday);
 		stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-				.append("uip:").append(day).append("_set").toString());
+				.append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX)
+				.toString());
 		stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-				.append("usid:").append(day).append("_set").toString());
+				.append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX)
+				.toString());
 		stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-				.append("uu:").append(day).append("_set").toString());
+				.append("uu:").append(day).append(KEY_HYPERLOGLOG_SUFFIX)
+				.toString());
 		updateMax(day, "pv", null);
 		updateMax(day, "uip", null);
 		updateMax(day, "usid", null);
@@ -280,13 +290,13 @@ public class PageViewServiceImpl implements PageViewService {
 		for (String domain : getDomains()) {
 			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
 					.append(domain).append(":").append("uip:").append(day)
-					.append("_set").toString());
+					.append(KEY_HYPERLOGLOG_SUFFIX).toString());
 			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
 					.append(domain).append(":").append("usid:").append(day)
-					.append("_set").toString());
+					.append(KEY_HYPERLOGLOG_SUFFIX).toString());
 			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
 					.append(domain).append(":").append("uu:").append(day)
-					.append("_set").toString());
+					.append(KEY_HYPERLOGLOG_SUFFIX).toString());
 			updateMax(day, "pv", domain);
 			updateMax(day, "uip", domain);
 			updateMax(day, "usid", domain);
@@ -294,7 +304,7 @@ public class PageViewServiceImpl implements PageViewService {
 		}
 	}
 
-	private boolean addUnique(String day, String type, String value,
+	private boolean addUnique(String day, String type, final String value,
 			String domain) {
 		if (StringUtils.isBlank(value))
 			return false;
@@ -303,8 +313,17 @@ public class PageViewServiceImpl implements PageViewService {
 			sb.append(domain).append(":");
 		sb.append(type).append(":").append(day);
 		String key = sb.toString();
-		sb.append("_set");
-		if (stringRedisTemplate.opsForSet().add(sb.toString(), value) == 1) {
+		sb.append(KEY_HYPERLOGLOG_SUFFIX);
+		final String key_hll = sb.toString();
+		Long result = stringRedisTemplate.execute(new RedisCallback<Long>() {
+			@Override
+			public Long doInRedis(RedisConnection rc)
+					throws DataAccessException {
+				Jedis jedis = (Jedis) rc.getNativeConnection();
+				return jedis.pfadd(key_hll, value);
+			}
+		});
+		if (result > 0) {
 			stringRedisTemplate.opsForValue().increment(key, 1);
 			return true;
 		}
