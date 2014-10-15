@@ -17,7 +17,7 @@ import org.springframework.util.Assert;
 
 public class RedisCyclicSequence extends AbstractCyclicSequence {
 
-	public static final String KEY_SEQUENCE = "{seq}:";
+	public static final String KEY_SEQUENCE = "seq:";
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
