@@ -7,11 +7,15 @@ import java.util.Map;
 
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.util.JsonUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -25,9 +29,19 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 //only for exclude-filter of root ctx
 @ControllerAdvice
 @Configuration
+@PropertySources({
+		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.properties"),
+		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.${STAGE}.properties"),
+		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.properties"),
+		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.${STAGE}.properties") })
 @ComponentScan(basePackages = "org.ironrhino.sample.api", excludeFilters = @Filter(value = HttpErrorHandler.class, type = FilterType.ASSIGNABLE_TYPE))
 @EnableAspectJAutoProxy
 public class ApiConfig extends WebMvcConfigurationSupport {
+
+	@Bean
+	public PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+		return new PropertySourcesPlaceholderConfigurer();
+	}
 
 	@Override
 	protected void configureContentNegotiation(
