@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.ironrhino.core.coordination.LockService;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Component("lockService")
 @Profile(CLUSTER)
+@ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
 public class ZooKeeperLockService implements LockService {
 
 	public static final String DEFAULT_ZOOKEEPER_PATH = "/lock";

@@ -15,6 +15,7 @@ import org.apache.zookeeper.CreateMode;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
 import org.ironrhino.core.event.InstanceShutdownEvent;
 import org.ironrhino.core.remoting.ExportServicesEvent;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.zookeeper.WatchedEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 @Component("serviceRegistry")
 @Profile(CLUSTER)
+@ResourcePresentConditional(value = "resources/spring/applicationContext-remoting.xml", negated = true)
 public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		WatchedEventListener {
 

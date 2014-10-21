@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.ExportServicesEvent;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 @Component("serviceRegistry")
 @Profile({ DUAL, CLOUD })
+@ResourcePresentConditional(value = "resources/spring/applicationContext-remoting.xml", negated = true)
 public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	private static final String NAMESPACE = "remoting:";

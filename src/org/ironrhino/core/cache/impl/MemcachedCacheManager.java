@@ -22,6 +22,7 @@ import net.rubyeye.xmemcached.utils.AddrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.metadata.PostPropertiesReset;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ import org.springframework.util.Assert;
 
 @Component("cacheManager")
 @Profile(CLUSTER)
+@ResourcePresentConditional(value = "resources/spring/applicationContext-cache.xml", negated = true)
 public class MemcachedCacheManager implements CacheManager {
 
 	private Logger log = LoggerFactory.getLogger(getClass());

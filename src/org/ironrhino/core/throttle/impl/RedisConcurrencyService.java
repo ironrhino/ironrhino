@@ -6,6 +6,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.throttle.ConcurrencyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Component("concurrencyService")
 @Profile({ DUAL, CLOUD, CLUSTER })
+@ResourcePresentConditional(value = "resources/spring/applicationContext-throttle.xml", negated = true)
 public class RedisConcurrencyService implements ConcurrencyService {
 
 	private static final String NAMESPACE = "concurrency:";

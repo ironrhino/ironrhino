@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @Component("cacheManager")
 @Profile({ DUAL, CLOUD })
+@ResourcePresentConditional(value = "resources/spring/applicationContext-cache.xml", negated = true)
 public class RedisCacheManager implements CacheManager {
 
 	private Logger log = LoggerFactory.getLogger(getClass());

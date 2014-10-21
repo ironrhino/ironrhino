@@ -6,6 +6,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.coordination.LockService;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Component("lockService")
 @Profile({ DUAL, CLOUD })
+@ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
 public class RedisLockService implements LockService {
 
 	private static final String NAMESPACE = "lock:";

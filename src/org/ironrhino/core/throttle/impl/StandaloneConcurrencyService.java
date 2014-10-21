@@ -6,12 +6,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.throttle.ConcurrencyService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component("concurrencyService")
 @Profile(DEFAULT)
+@ResourcePresentConditional(value = "resources/spring/applicationContext-throttle.xml", negated = true)
 public class StandaloneConcurrencyService implements ConcurrencyService {
 
 	private ConcurrentHashMap<String, Semaphore> semaphores = new ConcurrentHashMap<String, Semaphore>();

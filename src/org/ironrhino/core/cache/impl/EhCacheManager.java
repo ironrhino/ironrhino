@@ -15,11 +15,13 @@ import net.sf.ehcache.ObjectExistsException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component("cacheManager")
 @Profile(DEFAULT)
+@ResourcePresentConditional(value = "resources/spring/applicationContext-cache.xml", negated = true)
 public class EhCacheManager implements CacheManager {
 
 	private net.sf.ehcache.CacheManager ehCacheManager;

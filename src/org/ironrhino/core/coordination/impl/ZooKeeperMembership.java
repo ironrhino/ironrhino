@@ -11,6 +11,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.recipes.leader.Participant;
 import org.ironrhino.core.coordination.Membership;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Component("membership")
 @Profile(CLUSTER)
+@ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
 public class ZooKeeperMembership implements Membership {
 
 	public static final String DEFAULT_ZOOKEEPER_PATH = "/membership";
