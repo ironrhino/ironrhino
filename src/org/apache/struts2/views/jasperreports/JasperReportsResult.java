@@ -445,7 +445,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
     private void initializeProperties(ActionInvocation invocation) throws Exception {
         if (dataSource == null && connection == null) {
             String message = "No dataSource specified...";
-            LOG.error(message);
+            LOG.error(message,new Object[0]);
             throw new RuntimeException(message);
         }
         if (dataSource != null)
