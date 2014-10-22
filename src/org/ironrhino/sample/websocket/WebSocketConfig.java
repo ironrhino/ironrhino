@@ -11,7 +11,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 //only for exclude-filter of root ctx
 @ControllerAdvice
 @Configuration
-@ComponentScan(basePackages = "org.ironrhino.sample.websocket")
+@ComponentScan
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 

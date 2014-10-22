@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.remoting.jaxws.SimpleJaxWsServiceExporter;
 
 @Configuration
-@ComponentScan(basePackages = "org.ironrhino.sample.ws")
+@ComponentScan
 public class WsConfig {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
