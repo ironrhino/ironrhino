@@ -50,7 +50,12 @@ public class ElasticSearchClientFactoryBean implements FactoryBean<Client>,
 			Node node = nodeBuilder().settings(settings).node();
 			client = node.client();
 		} else {
-			TransportClient tclient = new TransportClient();
+			Map<String, String> map = new HashMap<String, String>();
+			if (settings != null)
+				map.putAll(settings);
+			Settings settings = ImmutableSettings.settingsBuilder().put(map)
+					.build();
+			TransportClient tclient = new TransportClient(settings);
 			for (String s : connectString.split("\\s*,\\s*")) {
 				String arr[] = s.trim().split(":", 2);
 				tclient.addTransportAddress(new InetSocketTransportAddress(
