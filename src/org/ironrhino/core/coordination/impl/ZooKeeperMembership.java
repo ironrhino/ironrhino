@@ -9,7 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.recipes.leader.Participant;
+import org.ironrhino.core.coordination.LeaderChangeListener;
 import org.ironrhino.core.coordination.Membership;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.AppInfo;
@@ -27,6 +29,9 @@ public class ZooKeeperMembership implements Membership {
 	@Autowired
 	private CuratorFramework curatorFramework;
 
+	@Autowired(required = false)
+	private List<LeaderChangeListener> leaderChangeListeners;
+
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
 	private ConcurrentHashMap<String, LeaderLatch> latchs = new ConcurrentHashMap<String, LeaderLatch>();
@@ -42,8 +47,27 @@ public class ZooKeeperMembership implements Membership {
 			latch = new LeaderLatch(curatorFramework, zooKeeperPath + "/"
 					+ group, AppInfo.getInstanceId());
 			LeaderLatch old = latchs.putIfAbsent(group, latch);
-			if (old == null)
+			if (old == null) {
 				latch.start();
+				if (leaderChangeListeners != null)
+					latch.addListener(new LeaderLatchListener() {
+
+						@Override
+						public void notLeader() {
+							for (LeaderChangeListener leaderChangeListener : leaderChangeListeners)
+								if (leaderChangeListener.supports(group))
+									leaderChangeListener.notLeader();
+						}
+
+						@Override
+						public void isLeader() {
+							for (LeaderChangeListener leaderChangeListener : leaderChangeListeners)
+								if (leaderChangeListener.supports(group))
+									leaderChangeListener.isLeader();
+						}
+
+					});
+			}
 		}
 	}
 
