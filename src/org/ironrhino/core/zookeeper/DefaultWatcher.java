@@ -9,12 +9,8 @@ import org.apache.curator.framework.api.CuratorListener;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
 public class DefaultWatcher implements CuratorListener {
-
-	@Autowired
-	private ApplicationContext applicationContext;
 
 	@Autowired(required = false)
 	private Collection<WatchedEventListener> eventListeners;
