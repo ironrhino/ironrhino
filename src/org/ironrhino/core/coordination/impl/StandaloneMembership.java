@@ -1,8 +1,6 @@
 package org.ironrhino.core.coordination.impl;
 
-import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
-import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component("membership")
-@Profile({ DEFAULT, DUAL, CLOUD })
+@Profile( DEFAULT)
 @ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
 public class StandaloneMembership implements Membership {
 
