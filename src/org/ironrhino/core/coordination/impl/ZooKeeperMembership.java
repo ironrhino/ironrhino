@@ -39,16 +39,17 @@ public class ZooKeeperMembership implements Membership {
 	public void join(final String group) throws Exception {
 		LeaderLatch latch = latchs.get(group);
 		if (latch == null) {
-			latchs.putIfAbsent(group, new LeaderLatch(curatorFramework,
-					zooKeeperPath + "/" + group, AppInfo.getInstanceId()));
-			latch = latchs.get(group);
+			latch = new LeaderLatch(curatorFramework, zooKeeperPath + "/"
+					+ group, AppInfo.getInstanceId());
+			LeaderLatch old = latchs.putIfAbsent(group, latch);
+			if (old == null)
+				latch.start();
 		}
-		latch.start();
 	}
 
 	@Override
 	public void leave(final String group) throws Exception {
-		LeaderLatch latch = latchs.get(group);
+		LeaderLatch latch = latchs.remove(group);
 		if (latch == null)
 			throw new Exception("Please join group " + group + " first");
 		latch.close();
@@ -77,9 +78,8 @@ public class ZooKeeperMembership implements Membership {
 			throw new Exception("Please join group " + group + " first");
 		Collection<Participant> participants = latch.getParticipants();
 		List<String> list = new ArrayList<String>(participants.size());
-		for (Participant p : participants) {
+		for (Participant p : participants)
 			list.add(p.getId());
-		}
 		return list;
 	}
 
