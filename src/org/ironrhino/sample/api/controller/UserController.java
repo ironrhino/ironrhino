@@ -8,7 +8,6 @@ import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.sample.api.Asserts;
 import org.ironrhino.sample.api.RestStatus;
 import org.ironrhino.security.model.User;
-import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,9 +23,6 @@ public class UserController {
 
 	@Autowired
 	private UserManager userManager;
-
-	@Autowired
-	private OAuthManager oauthManager;
 
 	@RequestMapping(value = "/@self", method = RequestMethod.GET)
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
