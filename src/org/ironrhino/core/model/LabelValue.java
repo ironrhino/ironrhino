@@ -2,6 +2,7 @@ package org.ironrhino.core.model;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
@@ -50,6 +51,16 @@ public class LabelValue implements Serializable {
 
 	public void setSelected(Boolean selected) {
 		this.selected = selected;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if (StringUtils.isNotBlank(label) || StringUtils.isNotBlank(value)) {
+			sb.append(StringUtils.isNotBlank(label) ? label : value)
+					.append(" = ").append(value);
+		}
+		return sb.toString();
 	}
 
 }
