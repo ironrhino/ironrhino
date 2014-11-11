@@ -634,7 +634,7 @@
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 				</manifest>
 			</jar>
-			<jar jarfile="${target.dir}/${userdetailsservice-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/security/model/User.class,org/ironrhino/security/service/UserManager.class">
+			<jar jarfile="${target.dir}/${userdetailsservice-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/security/model/User.class,org/ironrhino/security/model/BaseUser.class,org/ironrhino/security/service/UserManager.class">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-userdetailsservice" />
 					<attribute name="Implementation-Vendor" value="ironrhino" />
