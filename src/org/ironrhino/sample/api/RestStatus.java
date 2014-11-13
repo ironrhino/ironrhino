@@ -15,19 +15,22 @@ public class RestStatus extends RuntimeException {
 
 	public static final String CODE_OK = "0";
 
-	public static final String CODE_FORBIDDEN = "1";
+	public static final String CODE_REQUEST_TIMEOUT = "1";
 
-	public static final String CODE_UNAUTHORIZED = "2";
+	public static final String CODE_FORBIDDEN = "2";
 
-	public static final String CODE_NOT_FOUND = "3";
+	public static final String CODE_UNAUTHORIZED = "3";
 
-	public static final String CODE_ALREADY_EXISTS = "4";
+	public static final String CODE_NOT_FOUND = "4";
 
-	public static final String CODE_FIELD_INVALID = "5";
+	public static final String CODE_ALREADY_EXISTS = "5";
+
+	public static final String CODE_FIELD_INVALID = "6";
 
 	public static final String CODE_INTERNAL_SERVER_ERROR = "-1";
 
 	public static final RestStatus OK = valueOf(CODE_OK);
+	public static final RestStatus REQUEST_TIMEOUT = valueOf(CODE_REQUEST_TIMEOUT);
 	public static final RestStatus FORBIDDEN = valueOf(CODE_FORBIDDEN);
 	public static final RestStatus UNAUTHORIZED = valueOf(CODE_UNAUTHORIZED);
 	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND);

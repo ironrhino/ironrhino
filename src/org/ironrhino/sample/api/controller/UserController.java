@@ -26,7 +26,7 @@ public class UserController {
 
 	@Autowired
 	private UserManager userManager;
-	
+
 	@Autowired
 	private ExecutorService executorService;
 
@@ -49,20 +49,19 @@ public class UserController {
 		return valid ? RestStatus.OK : RestStatus.valueOf(
 				RestStatus.CODE_FIELD_INVALID, "password invalid");
 	}
-	
-	/*
-	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
-	public User get(@PathVariable String username) {
-		User u = (User) userManager.loadUserByUsername(username);
-		if (u == null)
-			throw RestStatus.NOT_FOUND;
-		return u;
-	}
-	*/
-	
+
+	// @RequestMapping(value = "/{username}", method = RequestMethod.GET)
+	// public User get(@PathVariable String username) {
+	// User u = (User) userManager.loadUserByUsername(username);
+	// if (u == null)
+	// throw RestStatus.NOT_FOUND;
+	// return u;
+	// }
+
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
 	public DeferredResult<User> get(final @PathVariable String username) {
-		final DeferredResult<User> dr = new DeferredResult<User>();
+		final DeferredResult<User> dr = new DeferredResult<User>(5000L,
+				RestStatus.REQUEST_TIMEOUT);
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {

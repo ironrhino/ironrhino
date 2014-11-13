@@ -40,7 +40,9 @@ public class RestExceptionHandler {
 		}
 		if (ex instanceof RestStatus) {
 			RestStatus rs = (RestStatus) ex;
-			if (rs.getCode().equals(RestStatus.CODE_FORBIDDEN))
+			if (rs.getCode().equals(RestStatus.CODE_REQUEST_TIMEOUT))
+				response.setStatus(HttpServletResponse.SC_REQUEST_TIMEOUT);
+			else if (rs.getCode().equals(RestStatus.CODE_FORBIDDEN))
 				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			else if (rs.getCode().equals(RestStatus.CODE_UNAUTHORIZED))
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
