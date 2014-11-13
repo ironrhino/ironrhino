@@ -3,6 +3,8 @@ package org.ironrhino.core.session;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -70,7 +72,7 @@ public class HttpSessionFilter implements Filter {
 				servletContext, httpSessionManager);
 		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(
 				req, session);
-		WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(
+		final WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(
 				(HttpServletResponse) response, session);
 		if (httpSessionFilterHooks != null)
 			try {
@@ -91,7 +93,34 @@ public class HttpSessionFilter implements Filter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			wrappedHttpResponse.commit();
+			if (!wrappedHttpRequest.isAsyncStarted()) {
+				wrappedHttpResponse.commit();
+			} else {
+				wrappedHttpRequest.getAsyncContext().addListener(
+						new AsyncListener() {
+
+							@Override
+							public void onTimeout(AsyncEvent event)
+									throws IOException {
+							}
+
+							@Override
+							public void onStartAsync(AsyncEvent event)
+									throws IOException {
+							}
+
+							@Override
+							public void onError(AsyncEvent event)
+									throws IOException {
+							}
+
+							@Override
+							public void onComplete(AsyncEvent event)
+									throws IOException {
+								wrappedHttpResponse.commit();
+							}
+						});
+			}
 		}
 	}
 

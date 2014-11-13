@@ -205,11 +205,7 @@ public class RequestUtils {
 		} catch (UnsupportedEncodingException e) {
 		}
 		Cookie cookie = new Cookie(cookieName, cookieValue);
-		try {
-			cookie.setHttpOnly(httpOnly);
-		} catch (NoSuchMethodError e) {
-			// for below servlet 3.0
-		}
+		cookie.setHttpOnly(httpOnly);
 		if (StringUtils.isNotBlank(domain))
 			cookie.setDomain(domain);
 		cookie.setMaxAge(maxAge);

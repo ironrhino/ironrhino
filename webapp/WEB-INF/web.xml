@@ -9,6 +9,7 @@
 		</param-value>
 	</context-param>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>characterEncodingFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.CharacterEncodingFilter</filter-class>
 		<init-param>
@@ -21,14 +22,17 @@
 		</init-param>
 	</filter>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>captchaFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
 	</filter>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>accessFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
 	</filter>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>httpSessionFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
 		<init-param>
@@ -37,10 +41,12 @@
 		</init-param>
 	</filter>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
 	</filter>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>openSessionInViewFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
 		<init-param>
@@ -53,14 +59,17 @@
 		</init-param>
 	</filter>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>strutsPrepareFilter</filter-name>
 		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareFilter</filter-class>
 	</filter>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>strutsExecuteFilter</filter-name>
 		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsExecuteFilter</filter-class>
 	</filter>
 	<filter>
+		<async-supported>true</async-supported>
 		<filter-name>sitemesh</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
 		<init-param>  

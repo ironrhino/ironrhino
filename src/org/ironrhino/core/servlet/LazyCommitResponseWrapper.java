@@ -22,12 +22,16 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
 	private String message;
 
+	private boolean committed;
+
 	public LazyCommitResponseWrapper(final HttpServletResponse response) {
 		super(response);
 	}
 
 	@Override
 	public ServletOutputStream getOutputStream() {
+		if (committed)
+			throw new IllegalStateException("Response Already Committed");
 		if (buffer == null)
 			synchronized (this) {
 				if (buffer == null)
@@ -38,6 +42,8 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
 	@Override
 	public PrintWriter getWriter() {
+		if (committed)
+			throw new IllegalStateException("Response Already Committed");
 		if (buffer == null)
 			synchronized (this) {
 				if (buffer == null)
@@ -82,6 +88,9 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 	}
 
 	public void commit() throws IOException {
+		if (committed)
+			throw new IllegalStateException("Response Already Committed");
+		committed = true;
 		if (status > 0)
 			super.setStatus(status);
 		if (message != null) {

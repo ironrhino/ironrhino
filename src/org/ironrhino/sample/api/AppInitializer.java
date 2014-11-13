@@ -21,6 +21,7 @@ public class AppInitializer implements WebApplicationInitializer {
 				RestFilter.class);
 		dyn.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false,
 				"/api/*");
+		dyn.setAsyncSupported(true);
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet("api",
 				DispatcherServlet.class);
 		dynamic.setInitParameter("contextClass",
@@ -28,6 +29,7 @@ public class AppInitializer implements WebApplicationInitializer {
 		dynamic.setInitParameter("contextConfigLocation",
 				ApiConfig.class.getName());
 		dynamic.addMapping("/api/*");
+		dynamic.setAsyncSupported(true);
 		dynamic.setLoadOnStartup(1);
 	}
 
