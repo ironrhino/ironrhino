@@ -7,9 +7,11 @@ import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.sample.api.RestStatus;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Aspect
+@ControllerAdvice
 public class AuthorizeAspect extends BaseAspect {
 
 	@Before("execution(public * *(..)) and @annotation(requestMapping) and not @annotation(org.ironrhino.core.metadata.Authorize)")
