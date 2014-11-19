@@ -17,6 +17,7 @@ import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,9 @@ import org.springframework.stereotype.Component;
 @Component("oauthManager")
 @Profile(CLUSTER)
 public class RedisOAuthManagerImpl implements OAuthManager {
+	
+	@Value("${oauth.authorization.lifetime:0}")
+	private int authorizationLifetime;
 
 	private RedisTemplate<String, Authorization> authorizationRedisTemplate;
 
@@ -70,6 +74,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		if (!orig.getSecret().equals(client.getSecret()))
 			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
 		Authorization auth = new Authorization();
+		if (authorizationLifetime > 0)
+			auth.setLifetime(authorizationLifetime);
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client);
 		auth.setRefreshToken(CodecUtils.nextId());
@@ -89,6 +95,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	@Override
 	public Authorization grant(Client client, User grantor) {
 		Authorization auth = new Authorization();
+		if (authorizationLifetime > 0)
+			auth.setLifetime(authorizationLifetime);
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client);
 		auth.setGrantor(grantor);
@@ -115,6 +123,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new IllegalArgumentException("REDIRECT_URI_MISMATCH");
 		Authorization auth = new Authorization();
+		if (authorizationLifetime > 0)
+			auth.setLifetime(authorizationLifetime);
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client);
 		if (StringUtils.isNotBlank(scope))

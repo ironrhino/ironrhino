@@ -20,6 +20,7 @@ import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,9 @@ public class OAuthManagerImpl implements OAuthManager {
 
 	@Resource
 	private EntityManager entityManager;
+
+	@Value("${oauth.authorization.lifetime:0}")
+	private int authorizationLifetime;
 
 	private long expireTime = DEFAULT_EXPIRE_TIME;
 
@@ -52,6 +56,8 @@ public class OAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
 		entityManager.setEntityClass(Authorization.class);
 		Authorization auth = new Authorization();
+		if (authorizationLifetime > 0)
+			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client);
 		auth.setResponseType("token");
 		auth.setRefreshToken(CodecUtils.nextId());
@@ -62,6 +68,8 @@ public class OAuthManagerImpl implements OAuthManager {
 	@Override
 	public Authorization grant(Client client, User grantor) {
 		Authorization auth = new Authorization();
+		if (authorizationLifetime > 0)
+			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client);
 		auth.setGrantor(grantor);
 		auth.setResponseType("token");
@@ -76,6 +84,8 @@ public class OAuthManagerImpl implements OAuthManager {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new IllegalArgumentException("REDIRECT_URI_MISMATCH");
 		Authorization auth = new Authorization();
+		if (authorizationLifetime > 0)
+			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client);
 		if (StringUtils.isNotBlank(scope))
 			auth.setScope(scope);
