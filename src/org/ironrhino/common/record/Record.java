@@ -21,19 +21,19 @@ public class Record extends BaseEntity {
 
 	private static final long serialVersionUID = -8287907984213799302L;
 
-	@UiConfig(width = "200px", displayOrder = 1)
+	@UiConfig(width = "200px")
 	private String entityClass;
 
-	@UiConfig(width = "200px", displayOrder = 2)
+	@UiConfig(width = "200px")
 	private String entityId;
 
-	@UiConfig(width = "100px", displayOrder = 3)
+	@UiConfig(width = "100px")
 	private String action;
 
-	@UiConfig(width = "200px", displayOrder = 4)
+	@UiConfig(width = "200px")
 	private String operatorId;
 
-	@UiConfig(width = "140px", displayOrder = 5)
+	@UiConfig(width = "140px")
 	private Date recordDate;
 
 	@UiConfig(hidden = true)

@@ -52,27 +52,26 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	@Column(nullable = false)
 	@CaseInsensitive
 	@NaturalId(mutable = true)
-	@UiConfig(displayOrder = 1, alias = "path")
+	@UiConfig(alias = "path")
 	private String path;
 
 	@SearchableProperty
-	@UiConfig(displayOrder = 2)
 	private String title;
 
 	@JsonIgnore
 	@Lob
-	@UiConfig(displayOrder = 3, excludedFromCriteria = true)
+	@UiConfig(excludedFromCriteria = true)
 	private String head;
 
 	@JsonIgnore
 	@SearchableProperty
 	@Lob
 	@Column(nullable = false)
-	@UiConfig(displayOrder = 4, hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true))
 	private String content;
 
 	@SearchableProperty
-	@UiConfig(displayOrder = 5, width = "100px")
+	@UiConfig(width = "100px")
 	private int displayOrder;
 
 	@JsonIgnore
@@ -86,18 +85,15 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	@NotInCopy
 	@SearchableProperty(index = Index.NOT_ANALYZED)
 	@Transient
-	@UiConfig(displayOrder = 6)
 	private Set<String> tags = new LinkedHashSet<String>(0);
 
 	@NotInCopy
 	@SearchableProperty
-	@UiConfig(displayOrder = 7)
 	@Column(updatable = false)
 	private Date createDate;
 
 	@NotInCopy
 	@SearchableProperty
-	@UiConfig(displayOrder = 8)
 	@Column(insertable = false)
 	private Date modifyDate;
 

@@ -53,7 +53,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	@CaseInsensitive
 	@NaturalId
 	@Column(nullable = false)
-	@UiConfig(displayOrder = 1)
 	private String username;
 
 	@NotInCopy
@@ -62,16 +61,13 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	private String password;
 
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
-	@UiConfig(displayOrder = 3)
 	private String name;
 
 	@SearchableProperty(boost = 3)
 	@Column(unique = true)
-	@UiConfig(displayOrder = 4)
 	private String email;
 
 	@SearchableProperty
-	@UiConfig(displayOrder = 5)
 	private String phone;
 
 	@JsonIgnore

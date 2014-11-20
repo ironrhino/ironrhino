@@ -27,24 +27,24 @@ public class Feedback extends BaseEntity implements Recordable<UserDetails> {
 	private static final long serialVersionUID = 7857273372050062349L;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(displayOrder = 1, hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true))
 	private String name;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(displayOrder = 2, hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true))
 	private String contact;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(displayOrder = 3, type = "textarea")
+	@UiConfig(type = "textarea")
 	@Column(length = 4000)
 	private String content;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(displayOrder = 4, hiddenInList = @Hidden(true), type = "textarea")
+	@UiConfig(hiddenInList = @Hidden(true), type = "textarea")
 	@Column(name = "`comment`", length = 4000)
 	private String comment;
 
-	@UiConfig(displayOrder = 5, width = "100px")
+	@UiConfig(width = "100px")
 	private String domain;
 
 	@UiConfig(readonly = @Readonly(true), width = "150px")

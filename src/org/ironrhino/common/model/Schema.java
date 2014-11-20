@@ -50,21 +50,20 @@ public class Schema extends BaseEntity {
 	};
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(displayOrder = 1, width = "300px")
+	@UiConfig(width = "300px")
 	@Column(nullable = false)
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	private String name;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(displayOrder = 2)
 	private String description;
 
-	@UiConfig(displayOrder = 3, width = "100px")
+	@UiConfig(width = "100px")
 	private boolean strict;
 
 	@SearchableComponent
-	@UiConfig(displayOrder = 4, hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true))
 	@Transient
 	private List<SchemaField> fields = new ArrayList<SchemaField>();
 

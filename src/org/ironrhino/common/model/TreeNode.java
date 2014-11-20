@@ -35,12 +35,11 @@ public class TreeNode extends BaseTreeableEntity<TreeNode> implements
 
 	private static final long serialVersionUID = 8878337541387688086L;
 
-	@UiConfig(displayOrder = 3)
 	private String description;
 
 	@NotInCopy
 	@Transient
-	@UiConfig(displayOrder = 4, hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true))
 	private List<Attribute> attributes = new ArrayList<Attribute>();
 
 	public TreeNode() {

@@ -22,19 +22,18 @@ public class Acl extends BaseEntity {
 
 	private static final long serialVersionUID = 7186455276739721437L;
 
-	@UiConfig(displayOrder = 1, width = "150px", type = "select", optionsExpression = "statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').getAllRoles(false)", listKey = "key", listValue = "value", template = "${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(value)}", cellDynamicAttributes = "{\"data-cellvalue\":\"${value}\"}")
+	@UiConfig(width = "150px", type = "select", optionsExpression = "statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').getAllRoles(false)", listKey = "key", listValue = "value", template = "${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(value)}", cellDynamicAttributes = "{\"data-cellvalue\":\"${value}\"}")
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	@Column(length = 50, nullable = false)
 	private String role;
 
-	@UiConfig(displayOrder = 2)
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	@Column(name = "`resource`", length = 150, nullable = false)
 	private String resource;
 
-	@UiConfig(displayOrder = 3, width = "100px")
+	@UiConfig(width = "100px")
 	private boolean permitted;
 
 	public Acl() {

@@ -26,23 +26,22 @@ public class LoginRecord extends BaseEntity {
 
 	private static final long serialVersionUID = -7691080078972338500L;
 
-	@UiConfig(displayOrder = 1, width = "100px")
+	@UiConfig(width = "100px")
 	@Column(nullable = false)
 	@SearchableProperty
 	private String username;
 
-	@UiConfig(displayOrder = 2, width = "100px")
+	@UiConfig(width = "100px")
 	@SearchableProperty
 	private String address;
 
-	@UiConfig(displayOrder = 3, width = "80px")
+	@UiConfig(width = "80px")
 	private boolean failed;
 
-	@UiConfig(displayOrder = 4)
 	@SearchableProperty
 	private String cause;
 
-	@UiConfig(displayOrder = 5, width = "150px")
+	@UiConfig(width = "150px")
 	@Column(name = "`date`")
 	private Date date = new Date();
 

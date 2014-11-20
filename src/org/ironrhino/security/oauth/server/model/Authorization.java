@@ -35,46 +35,44 @@ public class Authorization extends BaseEntity {
 
 	private static final long serialVersionUID = -559379341059695550L;
 
-	@UiConfig(displayOrder = 1, width = "200px", alias = "access_token")
+	@UiConfig(width = "200px", alias = "access_token")
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	private String accessToken = CodecUtils.nextId();
 
-	@UiConfig(displayOrder = 2)
 	@ManyToOne
 	@JoinColumn(name = "client", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Client client;
 
-	@UiConfig(displayOrder = 3)
 	@ManyToOne
 	@JoinColumn(name = "grantor", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private User grantor;
 
-	@UiConfig(displayOrder = 4, hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true))
 	private String scope;
 
-	@UiConfig(displayOrder = 5, hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true))
 	@Column(unique = true)
 	private String code;
 
-	@UiConfig(displayOrder = 6, width = "100px")
+	@UiConfig(width = "100px")
 	private int lifetime = DEFAULT_LIFETIME;
 
-	@UiConfig(displayOrder = 7, hiddenInList = @Hidden(true), alias = "refresh_token")
+	@UiConfig(hiddenInList = @Hidden(true), alias = "refresh_token")
 	@Column(unique = true)
 	private String refreshToken;
 
-	@UiConfig(displayOrder = 8, width = "100px", alias = "response_type")
+	@UiConfig(width = "100px", alias = "response_type")
 	@Column(nullable = false)
 	private String responseType = "code";
 
 	@NotInCopy
-	@UiConfig(displayOrder = 9, width = "130px")
+	@UiConfig(width = "130px")
 	@Column(nullable = false, updatable = false)
 	private Date createDate = new Date();
 
 	@NotInCopy
-	@UiConfig(displayOrder = 10, width = "130px")
+	@UiConfig(width = "130px")
 	@Column(nullable = false)
 	private Date modifyDate = new Date();
 

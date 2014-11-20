@@ -48,7 +48,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 	protected String fullId;
 
 	@Column(nullable = false)
-	@UiConfig(displayOrder = 1, cssClass = "checkavailable")
+	@UiConfig(cssClass = "checkavailable")
 	@SearchableProperty
 	protected String name;
 

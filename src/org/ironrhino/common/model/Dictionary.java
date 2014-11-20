@@ -54,18 +54,17 @@ public class Dictionary extends BaseEntity {
 	};
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(displayOrder = 1, width = "300px")
+	@UiConfig(width = "300px")
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	@Column(nullable = false)
 	private String name;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(displayOrder = 2)
 	private String description;
 
 	@SearchableComponent
-	@UiConfig(displayOrder = 3, hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true))
 	@Transient
 	private List<LabelValue> items = new ArrayList<LabelValue>();
 
