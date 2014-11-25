@@ -687,26 +687,24 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 
 	private static class RowBuffer {
 		private Object[] buffer;
-		private int fetchCount;
-		private int index = 0;
+		private int currentIndex;
 		private Session hibernateSession;
 		private IterateCallback callback;
 
-		RowBuffer(Session hibernateSession, int fetchCount,
+		RowBuffer(Session hibernateSession, int fetchSize,
 				IterateCallback callback) {
 			this.hibernateSession = hibernateSession;
-			this.fetchCount = fetchCount;
+			this.buffer = new Object[fetchSize];
 			this.callback = callback;
-			this.buffer = new Object[fetchCount + 1];
 		}
 
 		public void put(Object row) {
-			buffer[index] = row;
-			index++;
+			buffer[currentIndex] = row;
+			currentIndex++;
 		}
 
 		public boolean shouldFlush() {
-			return index >= fetchCount;
+			return currentIndex >= buffer.length - 1;
 		}
 
 		public int close() {
@@ -716,16 +714,15 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 		}
 
 		private int flush() {
-			Object[] arr = new Object[index];
-			for (int i = 0; i < index; i++) {
-				arr[i] = buffer[i];
-			}
-			callback.process(arr, hibernateSession);
+			if (currentIndex == 0)
+				return -1;
+			callback.process(Arrays.copyOfRange(buffer, 0, currentIndex),
+					hibernateSession);
 			Arrays.fill(buffer, null);
 			hibernateSession.flush();
 			hibernateSession.clear();
-			int result = index;
-			index = 0;
+			int result = currentIndex;
+			currentIndex = 0;
 			return result;
 		}
 	}
