@@ -68,6 +68,9 @@ public interface BaseManager<T extends Persistable<?>> {
 	public void iterate(int fetchSize, IterateCallback callback,
 			DetachedCriteria dc);
 
+	public void iterate(int fetchSize, IterateCallback callback,
+			DetachedCriteria dc, boolean commitPerFetch);
+
 	public static interface IterateCallback {
 		public void process(Object[] entityArray, Session session);
 	}

@@ -625,6 +625,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	@Override
 	public void iterate(int fetchSize, IterateCallback callback,
 			DetachedCriteria dc) {
+		iterate(fetchSize, callback, null, false);
+	}
+
+	@Override
+	public void iterate(int fetchSize, IterateCallback callback,
+			DetachedCriteria dc, boolean commitPerFetch) {
 		Session hibernateSession = sessionFactory.openSession();
 		Criteria c;
 		if (dc != null) {
@@ -663,6 +669,11 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 					buffer.put(prev);
 					buffer.flush();
 					prev = null;
+					if (commitPerFetch) {
+						hibernateTransaction.commit();
+						hibernateTransaction = hibernateSession
+								.beginTransaction();
+					}
 				}
 			}
 			if (prev != null) {
