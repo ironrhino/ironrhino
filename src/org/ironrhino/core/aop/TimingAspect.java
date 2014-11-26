@@ -25,16 +25,25 @@ public class TimingAspect extends BaseAspect {
 	public Object timing(ProceedingJoinPoint jp, Timing timing)
 			throws Throwable {
 		long time = System.currentTimeMillis();
-		Object result = jp.proceed();
+		Object result = null;
+		Throwable throwable = null;
+		try {
+			result = jp.proceed();
+		} catch (Throwable e) {
+			throwable = e;
+		}
 		time = System.currentTimeMillis() - time;
 		String method = jp.getStaticPart().getSignature().toLongString();
-		logger.info("{} takes {} ms", method, time);
+		logger.info("method[ {} ] tooks {} ms and {}", method, time,
+				throwable == null ? "success" : "fail");
 		if (StringUtils.isNotBlank(timing.value())) {
 			Map<String, Object> context = buildContext(jp);
 			context.put("method", method);
 			context.put("time", time);
 			ExpressionUtils.eval(timing.value(), context);
 		}
+		if (throwable != null)
+			throw throwable;
 		return result;
 	}
 
