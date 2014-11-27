@@ -535,6 +535,15 @@ public class Oauth2Action extends BaseAction {
 							"invalid_token"))
 				return NONE;
 			tojson.put("error", "invalid_token");
+		} else if (authorization.getExpiresIn() < 0) {
+			if (httpErrorHandler != null
+					&& httpErrorHandler.handle(
+							ServletActionContext.getRequest(),
+							ServletActionContext.getResponse(),
+							HttpServletResponse.SC_UNAUTHORIZED,
+							"expired_token"))
+				return NONE;
+			tojson.put("error", "expired_token");
 		} else {
 			if (authorization.getClient() != null)
 				tojson.put("client_id", authorization.getClient().getId());

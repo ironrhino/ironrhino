@@ -33,10 +33,11 @@ public class OAuthManagerImpl implements OAuthManager {
 	@Resource
 	private EntityManager entityManager;
 
-	@Value("${oauth.authorization.lifetime:0}")
+	@Value("${oauth.authorization.lifetime:3600}")
 	private int authorizationLifetime;
 
-	private long expireTime = DEFAULT_EXPIRE_TIME;
+	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
+	private long expireTime;
 
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
@@ -161,8 +162,6 @@ public class OAuthManagerImpl implements OAuthManager {
 				entityManager.delete(auth);
 				return null;
 			}
-			if (auth.getExpiresIn() < 0)
-				return null;
 		}
 		return auth;
 	}

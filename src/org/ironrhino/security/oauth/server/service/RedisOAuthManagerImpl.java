@@ -25,9 +25,12 @@ import org.springframework.stereotype.Component;
 @Component("oauthManager")
 @Profile(CLUSTER)
 public class RedisOAuthManagerImpl implements OAuthManager {
-	
+
 	@Value("${oauth.authorization.lifetime:0}")
 	private int authorizationLifetime;
+
+	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
+	private long expireTime;
 
 	private RedisTemplate<String, Authorization> authorizationRedisTemplate;
 
@@ -48,8 +51,6 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	// oauth:authorization:{accessToken} -> id
 	// oauth:authorization:{refreshToken} -> id
 	// oauth:authorization:grantor:{username} -> [id]
-
-	private long expireTime = DEFAULT_EXPIRE_TIME;
 
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
