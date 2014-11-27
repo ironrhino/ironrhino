@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ironrhino.core.servlet.HttpErrorHandler;
+import org.ironrhino.core.spring.converter.DateConverter;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -68,6 +70,11 @@ public class ApiConfig extends WebMvcConfigurationSupport {
 		Map<String, MediaType> map = new HashMap<String, MediaType>();
 		map.put("json", MediaType.APPLICATION_JSON);
 		return map;
+	}
+
+	@Override
+	public void addFormatters(FormatterRegistry formatterRegistry) {
+		formatterRegistry.addConverter(new DateConverter());
 	}
 
 }
