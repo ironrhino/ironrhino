@@ -32496,7 +32496,7 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 	var $ajax = $.ajax;
 	if (MODERN_BROWSER)
 		$.ajax = function(options) {
-			options.url = UrlUtils.makeSameOrigin(options.url);
+			// options.url = UrlUtils.makeSameOrigin(options.url);
 			options.xhrFields = {
 				withCredentials : true
 			};
