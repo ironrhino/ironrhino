@@ -1,14 +1,21 @@
 package org.ironrhino.security.oauth.server.service;
 
+import static org.ironrhino.core.metadata.Profiles.CLUSTER;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.model.Authorization;
@@ -16,9 +23,15 @@ import org.ironrhino.security.oauth.server.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
-public class RedisOAuthManagerImpl implements OAuthManager {
+@Component("oauthManager")
+@Profile(CLUSTER)
+@SuppressWarnings({ "unchecked", "rawtypes" })
+@ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
+public class HybirdOAuthManagerImpl implements OAuthManager {
 
 	@Value("${oauth.authorization.lifetime:0}")
 	private int authorizationLifetime;
@@ -28,7 +41,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 
 	private RedisTemplate<String, Authorization> authorizationRedisTemplate;
 
-	private RedisTemplate<String, Client> clientRedisTemplate;
+	@Resource
+	private EntityManager entityManager;
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
@@ -36,9 +50,6 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 
 	private static final String NAMESPACE_AUTHORIZATION = "oauth:authorization:";
 	private static final String NAMESPACE_AUTHORIZATION_GRANTOR = "oauth:authorization:grantor:";
-
-	private static final String NAMESPACE_CLIENT = "oauth:client:";
-	private static final String NAMESPACE_CLIENT_OWNER = "oauth:client:owner:";
 
 	// oauth:authorization:{id} -> authorization
 	// oauth:authorization:{code} -> id
@@ -55,10 +66,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		return expireTime;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setRedisTemplate(RedisTemplate redisTemplate) {
 		this.authorizationRedisTemplate = redisTemplate;
-		this.clientRedisTemplate = redisTemplate;
 	}
 
 	@Override
@@ -314,51 +323,28 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 
 	@Override
 	public void saveClient(Client client) {
-		if (client.isNew())
-			client.setId(CodecUtils.nextId());
-		clientRedisTemplate.opsForValue().set(
-				NAMESPACE_CLIENT + client.getId(), client);
-		if (client.getOwner() != null)
-			stringRedisTemplate.opsForSet().add(
-					NAMESPACE_CLIENT_OWNER + client.getOwner().getUsername(),
-					client.getId());
+		entityManager.save(client);
 	}
 
 	@Override
 	public void deleteClient(Client client) {
-		if (client.isNew())
-			return;
-		clientRedisTemplate.delete(NAMESPACE_CLIENT + client.getId());
-		if (client.getOwner() != null)
-			stringRedisTemplate.opsForSet().remove(
-					NAMESPACE_CLIENT_OWNER + client.getOwner().getUsername(),
-					client.getId());
+		entityManager.delete(client);
 	}
 
 	@Override
 	public Client findClientById(String clientId) {
-		Client c = clientRedisTemplate.opsForValue().get(
-				NAMESPACE_CLIENT + clientId);
+		entityManager.setEntityClass(Client.class);
+		Client c = (Client) entityManager.get(clientId);
 		return c != null && c.isEnabled() ? c : null;
 	}
 
 	@Override
 	public List<Client> findClientByOwner(User owner) {
-		Set<String> ids = stringRedisTemplate.opsForSet().members(
-				NAMESPACE_CLIENT_OWNER + owner.getUsername());
-		if (ids == null || ids.isEmpty())
-			return Collections.emptyList();
-		List<String> keys = new ArrayList<String>(ids.size());
-		for (String id : ids)
-			keys.add(NAMESPACE_CLIENT + id);
-		List<Client> list = clientRedisTemplate.opsForValue().multiGet(keys);
-		Collections.sort(list, new Comparator<Client>() {
-			@Override
-			public int compare(Client o1, Client o2) {
-				return o1.getCreateDate().compareTo(o2.getCreateDate());
-			}
-		});
-		return list;
+		entityManager.setEntityClass(Client.class);
+		DetachedCriteria dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("owner", owner));
+		dc.addOrder(Order.asc("createDate"));
+		return entityManager.findListByCriteria(dc);
 	}
 
 }

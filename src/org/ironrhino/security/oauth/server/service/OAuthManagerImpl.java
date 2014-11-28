@@ -16,6 +16,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.model.Authorization;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 @Component("oauthManager")
 @Profile({ DEFAULT, DUAL, CLOUD })
 @SuppressWarnings({ "unchecked", "rawtypes" })
+@ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
 public class OAuthManagerImpl implements OAuthManager {
 
 	@Resource
