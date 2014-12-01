@@ -241,8 +241,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		if (id == null)
 			throw new IllegalArgumentException("INVALID_TOKEN");
 		Authorization auth = authorizationRedisTemplate.opsForValue().get(
-				stringRedisTemplate.opsForValue().get(
-						NAMESPACE_AUTHORIZATION + id));
+				NAMESPACE_AUTHORIZATION + id);
 		if (auth == null)
 			throw new IllegalArgumentException("INVALID_TOKEN");
 		authorizationRedisTemplate.delete(keyRefreshToken);
@@ -255,9 +254,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(),
-				NAMESPACE_AUTHORIZATION + auth.getId(), auth.getExpiresIn(),
-				TimeUnit.SECONDS);
+				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+				auth.getExpiresIn(), TimeUnit.SECONDS);
 		return auth;
 	}
 
