@@ -131,6 +131,8 @@ public class WebProxyFilter implements Filter {
 		} catch (Exception e) {
 			httpRequest.abort();
 			e.printStackTrace();
+		} finally {
+			httpRequest.releaseConnection();
 		}
 	}
 

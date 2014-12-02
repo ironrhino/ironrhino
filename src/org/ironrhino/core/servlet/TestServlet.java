@@ -60,6 +60,8 @@ public class TestServlet extends HttpServlet {
 		} catch (Exception e) {
 			httpRequest.abort();
 			return false;
+		}finally{
+			httpRequest.releaseConnection();
 		}
 	}
 }

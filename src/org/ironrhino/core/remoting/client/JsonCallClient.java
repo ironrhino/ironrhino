@@ -170,6 +170,7 @@ public class JsonCallClient extends RemoteInvocationBasedAccessor implements
 				sb.append(line).append("\n");
 			reader.close();
 			is.close();
+			postMethod.releaseConnection();
 			String responseBody = null;
 			if (sb.length() > 0) {
 				sb.deleteCharAt(sb.length() - 1);
