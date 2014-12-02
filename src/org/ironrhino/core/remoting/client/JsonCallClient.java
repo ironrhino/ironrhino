@@ -18,11 +18,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.StringEntity;
 import org.ironrhino.core.remoting.ServiceRegistry;
+import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.remoting.support.RemoteInvocationBasedAccessor;
@@ -148,6 +150,10 @@ public class JsonCallClient extends RemoteInvocationBasedAccessor implements
 			String url = getServiceUrl() + "/"
 					+ invocation.getMethod().getName();
 			HttpPost postMethod = new HttpPost(url);
+			String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
+			if (requestId != null)
+				postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID,
+						requestId);
 			if (invocation.getMethod().getParameterTypes().length > 0)
 				postMethod.setEntity(new StringEntity(JsonUtils
 						.toJson(invocation.getArguments())));
