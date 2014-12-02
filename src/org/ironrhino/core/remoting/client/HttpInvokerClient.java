@@ -12,12 +12,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
+import org.springframework.remoting.httpinvoker.HttpInvokerRequestExecutor;
 import org.springframework.util.Assert;
 
 public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	private static Logger log = LoggerFactory
 			.getLogger(HttpInvokerClient.class);
+
+	private HttpInvokerRequestExecutor httpInvokerRequestExecutor;
 
 	private ServiceRegistry serviceRegistry;
 
@@ -73,6 +76,22 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	public void setExecutorService(ExecutorService executorService) {
 		this.executorService = executorService;
+	}
+
+	@Override
+	public HttpInvokerRequestExecutor getHttpInvokerRequestExecutor() {
+		if (this.httpInvokerRequestExecutor == null) {
+			SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor();
+			executor.setBeanClassLoader(getBeanClassLoader());
+			this.httpInvokerRequestExecutor = executor;
+		}
+		return this.httpInvokerRequestExecutor;
+	}
+
+	@Override
+	public void setHttpInvokerRequestExecutor(
+			HttpInvokerRequestExecutor httpInvokerRequestExecutor) {
+		this.httpInvokerRequestExecutor = httpInvokerRequestExecutor;
 	}
 
 	@Override
