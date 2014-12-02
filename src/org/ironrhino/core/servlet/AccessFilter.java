@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.core.util.UserAgent;
@@ -30,6 +31,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AccessFilter implements Filter {
+
+	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-ID";
+	public static final String MDC_KEY_SESSION_ID = "sessionId";
+	public static final String MDC_KEY_REQUEST_ID = "requestId";
 
 	private Logger accessLog = LoggerFactory.getLogger("access");
 
@@ -149,27 +154,43 @@ public class AccessFilter implements Filter {
 		s = RequestUtils.getCookieValue(request,
 				DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 		MDC.put("username", s != null ? " " + s : " ");
+		String sessionId = null;
 		if (httpSessionManager != null) {
-			String sessionId = httpSessionManager.getSessionId(request);
-			if (sessionId != null)
+			sessionId = httpSessionManager.getSessionId(request);
+			if (sessionId != null) {
 				MDC.put("session", " session:" + sessionId);
+				MDC.put(MDC_KEY_SESSION_ID, sessionId);
+			}
 		}
-		if (print && !uri.startsWith("/assets/")
-				&& !uri.startsWith("/remoting/")
-				&& request.getHeader("Last-Event-Id") == null)
-			accessLog.info("");
+		String requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
+		if (StringUtils.isBlank(requestId)) {
+			requestId = CodecUtils.nextId();
+			if (sessionId != null) {
+				requestId = new StringBuilder(sessionId).append("_")
+						.append(requestId).toString();
+			}
+		}
+		MDC.put("request", " request:" + requestId);
+		MDC.put(MDC_KEY_REQUEST_ID, requestId);
+		try {
+			if (print && !uri.startsWith("/assets/")
+					&& !uri.startsWith("/remoting/")
+					&& request.getHeader("Last-Event-Id") == null)
+				accessLog.info("");
 
-		long start = System.currentTimeMillis();
-		chain.doFilter(req, resp);
-		long responseTime = System.currentTimeMillis() - start;
-		if (responseTime > responseTimeThreshold) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(RequestUtils.serializeData(request))
-					.append(" response time:").append(responseTime)
-					.append("ms");
-			accesWarnLog.warn(sb.toString());
+			long start = System.currentTimeMillis();
+			chain.doFilter(req, resp);
+			long responseTime = System.currentTimeMillis() - start;
+			if (responseTime > responseTimeThreshold) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(RequestUtils.serializeData(request))
+						.append(" response time:").append(responseTime)
+						.append("ms");
+				accesWarnLog.warn(sb.toString());
+			}
+		} finally {
+			MDC.clear();
 		}
-		MDC.clear();
 	}
 
 	@Override
