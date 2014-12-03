@@ -31,7 +31,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 
 	@PostConstruct
 	public void init() {
-		httpClient = HttpClients.createSystem();
+		httpClient = HttpClients.createMinimal();
 	}
 
 	@Override

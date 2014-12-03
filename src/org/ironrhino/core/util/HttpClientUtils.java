@@ -86,8 +86,10 @@ public class HttpClientUtils {
 		CloseableHttpClient httpclient = HttpClientBuilder.create()
 				.setConnectionManager(connManager)
 				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-				.setDefaultRequestConfig(requestConfig)
-				.setDefaultHeaders(DEFAULT_HEADERS).build();
+				.setDefaultRequestConfig(requestConfig).disableAuthCaching()
+				.disableAutomaticRetries().disableConnectionState()
+				.disableCookieManagement().setDefaultHeaders(DEFAULT_HEADERS)
+				.build();
 		return httpclient;
 	}
 
