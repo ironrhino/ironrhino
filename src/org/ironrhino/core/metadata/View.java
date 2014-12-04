@@ -2,10 +2,13 @@ package org.ironrhino.core.metadata;
 
 public interface View {
 
-	public interface Summary {
+	public static interface Summary {
 	}
 
-	public interface Detail extends Summary {
+	public static interface Detail extends Summary {
+	}
+
+	public static interface Private extends Detail {
 	}
 
 }
