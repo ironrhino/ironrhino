@@ -130,6 +130,14 @@ public class JsonUtilsTest {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
+		json = "{\"date\":\"" + DateUtils.formatDatetime(d) + "\"}";
+		try {
+			User u = JsonUtils.fromJson(json, User.class);
+			assertEquals(d.getTime() / 1000, u.getDate().getTime() / 1000);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
 	}
 
 	@Test

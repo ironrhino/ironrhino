@@ -2,6 +2,8 @@ package org.ironrhino.core.util;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -51,7 +53,7 @@ public class JsonUtils {
 	}
 
 	public static ObjectMapper createNewObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
+		final ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setDateFormat(new SimpleDateFormat(DEFAULT_DATE_FORMAT));
 		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		objectMapper
@@ -80,6 +82,15 @@ public class JsonUtils {
 							DeserializationContext deserializationcontext)
 							throws IOException, JsonProcessingException {
 						String date = jsonparser.getText();
+						DateFormat df = objectMapper.getDeserializationConfig()
+								.getDateFormat();
+						if (df != null) {
+							DateFormat clone = (DateFormat) df.clone();
+							try {
+								return clone.parse(date);
+							} catch (ParseException e) {
+							}
+						}
 						Date d = DateUtils.parse(date);
 						if (d == null)
 							throw new RuntimeException(date
