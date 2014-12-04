@@ -14,8 +14,6 @@ public class StatLogSettings {
 
 	public static final String DATE_STYLE = "'.'yyyy-MM-dd";
 
-	public static final String LAYOUT = "%m%n";
-
 	public static final String TOKEN = "|";
 
 	public static final String SEPARATOR = "_";

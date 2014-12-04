@@ -1,6 +1,10 @@
 package org.ironrhino.core.stat;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,19 +13,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.DailyRollingFileAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.slf4j.LoggerFactory;
+import org.ironrhino.core.util.DateUtils;
 
 public class StatLog {
-
-	private static final Logger statLogger = Logger.getLogger("Stat");
-
-	private static final org.slf4j.Logger log = LoggerFactory
-			.getLogger(StatLog.class);
 
 	private static final Lock timerLock = new ReentrantLock();
 
@@ -32,34 +26,27 @@ public class StatLog {
 
 	private static Thread writeThread;
 
-	private static FileAppender statLogAppender;
+	private static Date lastDate;
+
+	private static FileOutputStream fileOutputStream;
+
+	private static BufferedWriter bufferedWriter;
 
 	static {
-		PatternLayout layout = new PatternLayout(StatLogSettings.LAYOUT);
-		try {
-			DailyRollingFileAppender statAppender = new DailyRollingFileAppender(
-					layout,
-					StatLogSettings
-							.getLogFile(StatLogSettings.STAT_LOG_FILE_NAME),
-					StatLogSettings.DATE_STYLE);
-			statAppender.setAppend(true);
-			statAppender.setEncoding(StatLogSettings.ENCODING);
-			statAppender.activateOptions();
-			statLogger.addAppender(statAppender);
-			statLogger.setLevel(Level.INFO);
-			statLogger.setAdditivity(false);
-
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		}
 		startNewThread();
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 
 			@Override
 			public void run() {
 				write(false);
-				if (statLogAppender != null)
-					statLogAppender.close();
+				try {
+					if (bufferedWriter != null)
+						bufferedWriter.close();
+					if (fileOutputStream != null)
+						fileOutputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 	}
@@ -70,7 +57,7 @@ public class StatLog {
 		try {
 			writeThread.interrupt();
 		} catch (Exception e) {
-			log.error("interrupt write thread error", e);
+			e.printStackTrace();
 		}
 		startNewThread();
 	}
@@ -82,11 +69,10 @@ public class StatLog {
 				while (true) {
 					timerLock.lock();
 					try {
-						if (condition.await(StatLogSettings.getIntervalUnit(),
-								TimeUnit.SECONDS))
-							log.debug("await returns true");
+						condition.await(StatLogSettings.getIntervalUnit(),
+								TimeUnit.SECONDS);
 					} catch (Exception e) {
-						log.error("wait error", e);
+						e.printStackTrace();
 					} finally {
 						timerLock.unlock();
 					}
@@ -113,7 +99,7 @@ public class StatLog {
 						.getIntervalMultiple()))
 					&& (value.getLongValue() > 0 || value.getDoubleValue() > 0)) {
 				key.setLastWriteTime(current);
-				output(statLogger, key, value);
+				output(key, value);
 				temp.put(key,
 						new Value(value.getLongValue(), value.getDoubleValue()));
 			}
@@ -126,14 +112,34 @@ public class StatLog {
 		}
 	}
 
-	private static void output(Logger logger, Key key, Value value) {
+	private synchronized static void output(Key key, Value value) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(key);
 		sb.append(StatLogSettings.TOKEN);
 		sb.append(value);
 		sb.append(StatLogSettings.TOKEN);
 		sb.append(sysdate());
-		logger.info(sb.toString());
+		try {
+			if (lastDate == null || !DateUtils.isSameDay(new Date(), lastDate)) {
+				lastDate = new Date();
+				if (bufferedWriter != null)
+					bufferedWriter.close();
+				if (fileOutputStream != null)
+					fileOutputStream.close();
+				fileOutputStream = new FileOutputStream(
+						StatLogSettings.getLogFile(StatLogSettings.STAT_LOG_FILE_NAME
+								+ DateUtils.format(lastDate,
+										StatLogSettings.DATE_STYLE)), true);
+				bufferedWriter = new BufferedWriter(new OutputStreamWriter(
+						fileOutputStream, StatLogSettings.ENCODING));
+			}
+			bufferedWriter.write(sb.toString());
+			bufferedWriter.write('\n');
+			bufferedWriter.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private static String sysdate() {

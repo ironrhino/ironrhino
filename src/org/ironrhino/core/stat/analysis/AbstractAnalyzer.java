@@ -18,7 +18,6 @@ import org.ironrhino.core.stat.KeyValuePair;
 import org.ironrhino.core.stat.StatLogSettings;
 import org.ironrhino.core.stat.Value;
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.TextFileIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,15 +131,12 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 	public static Map<String, File> getLogFile(Date date,
 			final boolean localhost) {
 		final Map<String, File> map = new TreeMap<String, File>();
-		boolean today = DateUtils.isToday(date);
 		StringBuilder sb = new StringBuilder();
 		if (localhost)
 			sb.append(AppInfo.getHostName());
 		sb.append(StatLogSettings.SEPARATOR);
 		sb.append(StatLogSettings.STAT_LOG_FILE_NAME);
-		if (!today)
-			sb.append(new SimpleDateFormat(StatLogSettings.DATE_STYLE)
-					.format(date));
+		sb.append(new SimpleDateFormat(StatLogSettings.DATE_STYLE).format(date));
 		final String suffix = sb.toString();
 		File dir = StatLogSettings.getLogFileDirectory();
 		dir.listFiles(new FileFilter() {
