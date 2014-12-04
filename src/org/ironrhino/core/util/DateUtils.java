@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 public class DateUtils {
@@ -158,6 +159,12 @@ public class DateUtils {
 	}
 
 	public static Date parse(String string) {
+		if (StringUtils.isNumeric(string) || string.length() >= 13)
+			try {
+				Long timestamp = Long.valueOf(string);
+				return new Date(timestamp);
+			} catch (NumberFormatException nfe) {
+			}
 		for (String format : ACCEPT_DATE_FORMATS) {
 			try {
 				return FastDateFormat.getInstance(format).parse(string);

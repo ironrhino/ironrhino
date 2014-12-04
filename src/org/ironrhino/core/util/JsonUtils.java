@@ -2,9 +2,7 @@ package org.ironrhino.core.util;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +16,13 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,12 +30,11 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class JsonUtils {
 
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	public static String[] ACCEPT_DATE_FORMATS = { DEFAULT_DATE_FORMAT,
-			"yyyy-MM-dd'T'HH:mm:ss", "yyyy/MM/dd", "yyyy-MM-dd" };
 
 	public static final TypeReference<List<String>> STRING_LIST_TYPE = new TypeReference<List<String>>() {
 	};
@@ -72,6 +73,20 @@ public class JsonUtils {
 				});
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		objectMapper.registerModule(new SimpleModule().addDeserializer(
+				Date.class, new JsonDeserializer<Date>() {
+					@Override
+					public Date deserialize(JsonParser jsonparser,
+							DeserializationContext deserializationcontext)
+							throws IOException, JsonProcessingException {
+						String date = jsonparser.getText();
+						Date d = DateUtils.parse(date);
+						if (d == null)
+							throw new RuntimeException(date
+									+ " is not valid date");
+						return d;
+					}
+				}));
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
@@ -101,29 +116,9 @@ public class JsonUtils {
 		return (T) objectMapper.readValue(json, type);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T fromJson(String json, Class<T> cls)
 			throws JsonParseException, JsonMappingException, IOException {
-		if (Date.class.isAssignableFrom(cls)) {
-			if (org.apache.commons.lang3.StringUtils.isNumeric(json)) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTimeInMillis(Long.valueOf(json));
-				return (T) cal.getTime();
-			} else if (json.startsWith("\"") && json.endsWith("\"")) {
-				String value = json.substring(1, json.length() - 2);
-				for (String pattern : ACCEPT_DATE_FORMATS) {
-					DateFormat format = new SimpleDateFormat(pattern);
-					try {
-						return (T) format.parse(value);
-					} catch (Exception e) {
-						continue;
-					}
-				}
-			}
-			return null;
-		} else {
-			return objectMapper.readValue(json, cls);
-		}
+		return objectMapper.readValue(json, cls);
 	}
 
 	public static <T> T fromJson(String json, Type type)

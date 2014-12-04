@@ -122,6 +122,14 @@ public class JsonUtilsTest {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
+		json = "{\"date\":\"" + DateUtils.formatDate10(d) + "\"}";
+		try {
+			User u = JsonUtils.fromJson(json, User.class);
+			assertEquals(DateUtils.beginOfDay(d), u.getDate());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
