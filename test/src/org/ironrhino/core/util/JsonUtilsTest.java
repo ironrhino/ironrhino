@@ -4,17 +4,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Lob;
 
+import org.ironrhino.core.model.ResultPage;
 import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class JsonUtilsTest {
 
@@ -164,6 +168,29 @@ public class JsonUtilsTest {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
+	}
+
+	@Test
+	public void testResultPage() throws JsonParseException,
+			JsonMappingException, IOException {
+		ResultPage<User> rp = new ResultPage<User>();
+		List<User> users = new ArrayList<User>();
+		for (int i = 0; i < 5; i++) {
+			User u = new User();
+			u.setUsername("username");
+			u.setPassword("password");
+			u.setStatus(Status.ACTIVE);
+			u.setAge(12);
+			users.add(u);
+		}
+		rp.setResult(users);
+		String json = JsonUtils.toJson(rp);
+		System.out.println(json);
+		ResultPage<User> rp2 = JsonUtils.fromJson(json,
+				new TypeReference<ResultPage<User>>() {
+				});
+		String json2 = JsonUtils.toJson(rp2);
+		assertEquals(json, json2);
 	}
 
 }
