@@ -166,7 +166,7 @@ public class AccessFilter implements Filter {
 		if (StringUtils.isBlank(requestId)) {
 			requestId = CodecUtils.nextId();
 			if (sessionId != null) {
-				requestId = new StringBuilder(sessionId).append("_")
+				requestId = new StringBuilder(sessionId).append('.')
 						.append(requestId).toString();
 			}
 			response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
