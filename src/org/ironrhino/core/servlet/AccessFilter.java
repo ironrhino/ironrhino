@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccessFilter implements Filter {
 
-	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-ID";
+	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-Id";
 	public static final String MDC_KEY_SESSION_ID = "sessionId";
 	public static final String MDC_KEY_REQUEST_ID = "requestId";
 
@@ -169,6 +169,7 @@ public class AccessFilter implements Filter {
 				requestId = new StringBuilder(sessionId).append("_")
 						.append(requestId).toString();
 			}
+			response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 		}
 		MDC.put("request", " request:" + requestId);
 		MDC.put(MDC_KEY_REQUEST_ID, requestId);
