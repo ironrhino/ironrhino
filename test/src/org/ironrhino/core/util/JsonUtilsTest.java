@@ -185,10 +185,11 @@ public class JsonUtilsTest {
 		}
 		rp.setResult(users);
 		String json = JsonUtils.toJson(rp);
-		System.out.println(json);
 		ResultPage<User> rp2 = JsonUtils.fromJson(json,
 				new TypeReference<ResultPage<User>>() {
 				});
+		assertEquals(rp.getResult().size(), rp2.getResult().size());
+		assertEquals(User.class, rp2.getResult().iterator().next().getClass());
 		String json2 = JsonUtils.toJson(rp2);
 		assertEquals(json, json2);
 	}
