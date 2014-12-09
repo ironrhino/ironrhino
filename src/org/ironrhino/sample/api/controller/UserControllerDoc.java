@@ -18,7 +18,8 @@ public class UserControllerDoc extends UserController {
 	@Override
 	@Api("获取当前用户信息")
 	@Fields({ @Field(name = "username", required = true),
-			@Field(name = "email", label = "电子邮箱") })
+			@Field(name = "name", required = true), @Field(name = "email"),
+			@Field(name = "phone") })
 	public User self() {
 		User u = new User();
 		u.setUsername("test");
@@ -26,7 +27,7 @@ public class UserControllerDoc extends UserController {
 	}
 
 	@Override
-	@Api(value="修改当前用户信息",description = "<strong>只传入需要修改的字段</strong>")
+	@Api(value = "修改当前用户信息", description = "<strong>只传入需要修改的字段</strong>")
 	public RestStatus put(@Fields({
 			@Field(name = "password", description = "传入明文密码"),
 			@Field(name = "email", label = "电子邮箱") }) User user) {

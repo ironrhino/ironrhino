@@ -13,7 +13,9 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.bytecode.Descriptor;
 
+import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ClassScanner;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.rest.ApiConfigBase;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
@@ -80,7 +82,7 @@ public class ApiDocHelper {
 	private static List<ApiModuleObject> cache = null;
 
 	public static List<ApiModuleObject> getApiModules() {
-		if (cache == null) {
+		if (cache == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			ObjectMapper objectMapper = ApiConfigBase.createObjectMapper();
 			Collection<Class<?>> classes = ClassScanner.scanAnnotated(
 					ClassScanner.getAppPackages(), ApiModule.class);
