@@ -161,18 +161,22 @@ public class FieldObject implements Serializable {
 					clazz = pd.getPropertyType();
 					i++;
 				}
-				if (pd != null)
+				if (pd != null) {
 					list.add(create(name, pd.getPropertyType(), f.required(),
 							f.defaultValue(), f));
-			} else {
-				FieldObject field = new FieldObject(name, type, f.required());
-				if (StringUtils.isNotBlank(f.defaultValue()))
-					field.setDefaultValue(f.defaultValue());
-				if (StringUtils.isNotBlank(f.label()))
-					field.setLabel(f.label());
-				if (StringUtils.isNotBlank(f.description()))
-					field.setDescription(f.description());
+					continue;
+				} else {
+					type = "string";
+				}
 			}
+			FieldObject field = new FieldObject(name, type, f.required());
+			if (StringUtils.isNotBlank(f.defaultValue()))
+				field.setDefaultValue(f.defaultValue());
+			if (StringUtils.isNotBlank(f.label()))
+				field.setLabel(f.label());
+			if (StringUtils.isNotBlank(f.description()))
+				field.setDescription(f.description());
+			list.add(field);
 		}
 		return list;
 	}
