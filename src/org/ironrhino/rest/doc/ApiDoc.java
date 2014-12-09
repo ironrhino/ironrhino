@@ -176,7 +176,7 @@ public class ApiDoc implements Serializable {
 						Type gtype = method.getGenericParameterTypes()[i];
 						if (gtype instanceof ParameterizedType) {
 							ParameterizedType pt = (ParameterizedType) gtype;
-							responseBodyClass = (Class<?>) pt
+							requestBodyClass = (Class<?>) pt
 									.getActualTypeArguments()[0];
 						}
 						if (fds != null) {
