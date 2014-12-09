@@ -1,5 +1,6 @@
 package org.ironrhino.rest.model;
 
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -146,22 +147,23 @@ public class FieldObject implements Serializable {
 	public static List<FieldObject> from(Class<?> domainClass, Fields fields) {
 		List<FieldObject> list = new ArrayList<>(fields.value().length);
 		for (Field f : fields.value()) {
-			Method m = BeanUtils.getPropertyDescriptor(domainClass, f.name())
-					.getReadMethod();
-			if (m == null)
-				continue;
-			list.add(create(f.name(), m.getReturnType(), f.required(),
-					f.defaultValue(), f));
+			String name = f.name();
+			String[] arr = name.split("\\.");
+			PropertyDescriptor pd = null;
+			int i = 0;
+			Class<?> clazz = domainClass;
+			while (i < arr.length) {
+				pd = BeanUtils.getPropertyDescriptor(clazz, arr[i]);
+				if (pd == null)
+					break;
+				clazz = pd.getPropertyType();
+				i++;
+			}
+			if (pd != null)
+				list.add(create(name, pd.getPropertyType(), f.required(),
+						f.defaultValue(), f));
 		}
 		return list;
-	}
-
-	@Override
-	public String toString() {
-		return "Field [name=" + name + ", type=" + type + ", required="
-				+ required + ", label=" + label + ", description="
-				+ description + ", defaultValue=" + defaultValue + ", values="
-				+ values + "]";
 	}
 
 }
