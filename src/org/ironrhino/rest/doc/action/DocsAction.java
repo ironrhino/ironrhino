@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.struts.BaseAction;
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.rest.doc.ApiDoc;
 import org.ironrhino.rest.doc.ApiDocHelper;
@@ -17,7 +19,7 @@ public class DocsAction extends BaseAction {
 
 	private static final long serialVersionUID = -2983503425168586385L;
 
-	private List<ApiModuleObject> apiModules = ApiDocHelper.getApiModules();
+	protected static List<ApiModuleObject> cache;
 
 	@Value("${apiBaseUrl:}")
 	private String apiBaseUrl;
@@ -37,7 +39,10 @@ public class DocsAction extends BaseAction {
 	}
 
 	public List<ApiModuleObject> getApiModules() {
-		return apiModules;
+		if (cache == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
+			cache = ApiDocHelper.getApiModules();
+		}
+		return cache;
 	}
 
 	public String getModule() {
@@ -62,7 +67,7 @@ public class DocsAction extends BaseAction {
 
 	public String execute() {
 		if (StringUtils.isNotBlank(module) && StringUtils.isNotBlank(api)) {
-			loop: for (ApiModuleObject apiModule : apiModules) {
+			loop: for (ApiModuleObject apiModule : getApiModules()) {
 				if (module.equals(apiModule.getName())) {
 					for (ApiDoc doc : apiModule.getApiDocs()) {
 						if (api.equals(doc.getName())) {
@@ -74,14 +79,6 @@ public class DocsAction extends BaseAction {
 			}
 		}
 		return SUCCESS;
-	}
-
-	public String overview() {
-		if (StringUtils.isBlank(apiBaseUrl)) {
-			apiBaseUrl = RequestUtils.getBaseUrl(ServletActionContext
-					.getRequest()) + "/api";
-		}
-		return "overview";
 	}
 
 }

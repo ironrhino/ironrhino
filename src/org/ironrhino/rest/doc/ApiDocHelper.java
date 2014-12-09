@@ -13,9 +13,7 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.bytecode.Descriptor;
 
-import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ClassScanner;
-import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.rest.ApiConfigBase;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
@@ -79,43 +77,42 @@ public class ApiDocHelper {
 		return methods;
 	}
 
-	private static List<ApiModuleObject> cache = null;
-
 	public static List<ApiModuleObject> getApiModules() {
-		if (cache == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
-			ObjectMapper objectMapper = ApiConfigBase.createObjectMapper();
-			Collection<Class<?>> classes = ClassScanner.scanAnnotated(
-					ClassScanner.getAppPackages(), ApiModule.class);
-			List<ApiModuleObject> list = new ArrayList<>();
-			for (Class<?> clazz : classes) {
-				ApiModule apiModule = clazz.getAnnotation(ApiModule.class);
-				String name = apiModule.value();
-				String description = apiModule.description();
-				ApiModuleObject apiModuleObject = null;
-				for (ApiModuleObject amo : list) {
-					if (amo.getName().equals(name)) {
-						apiModuleObject = amo;
-						break;
-					}
-				}
-				if (apiModuleObject == null) {
-					apiModuleObject = new ApiModuleObject();
-					apiModuleObject.setName(name);
-					apiModuleObject.setDescription(description);
-					list.add(apiModuleObject);
-				}
-				try {
-					List<Method> methods = findApiMethods(clazz);
-					for (Method m : methods)
-						apiModuleObject.getApiDocs().add(
-								new ApiDoc(clazz, m, objectMapper));
-				} catch (Exception e) {
-					e.printStackTrace();
+		return getApiModules(ClassScanner.getAppPackages());
+	}
+
+	public static List<ApiModuleObject> getApiModules(String[] basePackages) {
+		ObjectMapper objectMapper = ApiConfigBase.createObjectMapper();
+		Collection<Class<?>> classes = ClassScanner.scanAnnotated(basePackages,
+				ApiModule.class);
+		List<ApiModuleObject> list = new ArrayList<>();
+		for (Class<?> clazz : classes) {
+			ApiModule apiModule = clazz.getAnnotation(ApiModule.class);
+			String name = apiModule.value();
+			String description = apiModule.description();
+			ApiModuleObject apiModuleObject = null;
+			for (ApiModuleObject amo : list) {
+				if (amo.getName().equals(name)) {
+					apiModuleObject = amo;
+					break;
 				}
 			}
-			cache = list;
+			if (apiModuleObject == null) {
+				apiModuleObject = new ApiModuleObject();
+				apiModuleObject.setName(name);
+				apiModuleObject.setDescription(description);
+				list.add(apiModuleObject);
+			}
+			try {
+				List<Method> methods = findApiMethods(clazz);
+				for (Method m : methods)
+					apiModuleObject.getApiDocs().add(
+							new ApiDoc(clazz, m, objectMapper));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		return cache;
+		return list;
 	}
 
 }
