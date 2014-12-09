@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
 @RestController
-@RequestMapping({ "/user", "/v1/user" })
+@RequestMapping("/user")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class UserController {
 
