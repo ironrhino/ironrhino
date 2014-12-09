@@ -104,7 +104,7 @@ public class FieldObject implements Serializable {
 
 	public static FieldObject create(String name, Class<?> cls,
 			boolean required, String defaultValue, Field fd) {
-		String type;
+		String type = null;
 		Map<String, String> values = null;
 		if (cls.isEnum()) {
 			type = "string";
@@ -147,21 +147,32 @@ public class FieldObject implements Serializable {
 	public static List<FieldObject> from(Class<?> domainClass, Fields fields) {
 		List<FieldObject> list = new ArrayList<>(fields.value().length);
 		for (Field f : fields.value()) {
+			String type = f.type();
 			String name = f.name();
-			String[] arr = name.split("\\.");
-			PropertyDescriptor pd = null;
-			int i = 0;
-			Class<?> clazz = domainClass;
-			while (i < arr.length) {
-				pd = BeanUtils.getPropertyDescriptor(clazz, arr[i]);
-				if (pd == null)
-					break;
-				clazz = pd.getPropertyType();
-				i++;
+			if (StringUtils.isBlank(type)) {
+				String[] arr = name.split("\\.");
+				PropertyDescriptor pd = null;
+				int i = 0;
+				Class<?> clazz = domainClass;
+				while (i < arr.length) {
+					pd = BeanUtils.getPropertyDescriptor(clazz, arr[i]);
+					if (pd == null)
+						break;
+					clazz = pd.getPropertyType();
+					i++;
+				}
+				if (pd != null)
+					list.add(create(name, pd.getPropertyType(), f.required(),
+							f.defaultValue(), f));
+			} else {
+				FieldObject field = new FieldObject(name, type, f.required());
+				if (StringUtils.isNotBlank(f.defaultValue()))
+					field.setDefaultValue(f.defaultValue());
+				if (StringUtils.isNotBlank(f.label()))
+					field.setLabel(f.label());
+				if (StringUtils.isNotBlank(f.description()))
+					field.setDescription(f.description());
 			}
-			if (pd != null)
-				list.add(create(name, pd.getPropertyType(), f.required(),
-						f.defaultValue(), f));
 		}
 		return list;
 	}

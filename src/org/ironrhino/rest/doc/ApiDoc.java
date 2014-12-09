@@ -185,6 +185,7 @@ public class ApiDoc implements Serializable {
 									Method m = apiDocClazz.getDeclaredMethod(
 											fds.sampleMethodName(),
 											new Class[0]);
+									m.setAccessible(true);
 									Object requestObject = m.invoke(instance,
 											new Object[0]);
 									if (requestObject instanceof String)

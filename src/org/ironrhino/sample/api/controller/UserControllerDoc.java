@@ -1,5 +1,6 @@
 package org.ironrhino.sample.api.controller;
 
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Api;
@@ -22,7 +23,11 @@ public class UserControllerDoc extends UserController {
 			@Field(name = "phone") })
 	public User self() {
 		User u = new User();
+		u.setId(CodecUtils.nextId());
 		u.setUsername("test");
+		u.setName("测试");
+		u.setEmail("test@test.com");
+		u.setPhone("13111111111");
 		return u;
 	}
 
@@ -41,7 +46,7 @@ public class UserControllerDoc extends UserController {
 		return RestStatus.OK;
 	}
 
-	public JsonNode createUserForPassword() {
+	protected JsonNode createUserForPassword() {
 		ObjectNode jsonNode = JsonUtils.createNewObjectMapper()
 				.createObjectNode();
 		jsonNode.put("password", "iampassword");
