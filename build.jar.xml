@@ -77,6 +77,7 @@
 	<property name="security-oauth-client-jar.includes" value="org/ironrhino/security/oauth/package-info.class,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-jar.name" value="ironrhino-security-oauth-server-${version}.jar" />
 	<property name="security-oauth-server-jar.includes" value="org/ironrhino/security/oauth/package-info.class,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/oauth2**,resources/view/oauth/client**,resources/view/oauth/authorization**" />
+	<property name="rest-jar.name" value="ironrhino-rest-${version}.jar" />
 	<target name="set-revision">
 		<script language="javascript">
 			<![CDATA[
@@ -273,6 +274,7 @@
 			<delete file="${target.dir}/${security-acl-jar.name}" />
 			<delete file="${target.dir}/${security-oauth-client-jar.name}" />
 			<delete file="${target.dir}/${security-oauth-server-jar.name}" />
+			<delete file="${target.dir}/${rest-jar.name}" />
 			<delete file="${target.dir}/bootstrap.jar" />
 			<unzip dest="${webapp.dir}/assets/components">
 				<fileset dir="${webapp.dir}/assets/components" includes="*.zip" />
@@ -730,14 +732,26 @@
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
 				</manifest>
 			</jar>
+			<jar jarfile="${target.dir}/${rest-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/rest/**,resources/i18n/rest/**,resources/view/rest/*.ftl">
+				<manifest>
+					<attribute name="Implementation-Title" value="ironrhino-rest" />
+					<attribute name="Implementation-Vendor" value="ironrhino" />
+					<attribute name="Implementation-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Id" value="ironrhino-rest" />
+					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+					<attribute name="Ironrhino-Component-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+				</manifest>
+			</jar>
 			<jar jarfile="${target.dir}/temp.jar" basedir="${classes.dir}" includes="bootstrap/**" />
 			<zip destfile="${target.dir}/bootstrap.jar">
-			    <zipgroupfileset file="${target.dir}/temp.jar"/>
-			    <zipgroupfileset file="${lib.dir}/jetty-*.jar"/>
-			    <zipgroupfileset file="${lib.dir}/servlet-api-*.jar"/>
-			    <zipgroupfileset file="${lib.dir}/websocket-api-*.jar"/>
-			    <zipgroupfileset file="${lib.dir}/annotations-api-*.jar"/>
-			    <zipgroupfileset file="${lib.dir}/asm-*.jar"/>
+				<zipgroupfileset file="${target.dir}/temp.jar" />
+				<zipgroupfileset file="${lib.dir}/jetty-*.jar" />
+				<zipgroupfileset file="${lib.dir}/servlet-api-*.jar" />
+				<zipgroupfileset file="${lib.dir}/websocket-api-*.jar" />
+				<zipgroupfileset file="${lib.dir}/annotations-api-*.jar" />
+				<zipgroupfileset file="${lib.dir}/asm-*.jar" />
 			</zip>
 			<delete file="${target.dir}/temp.jar" />
 		</target>

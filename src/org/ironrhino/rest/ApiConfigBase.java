@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ironrhino.core.aop.TimingAspect;
 import org.ironrhino.core.spring.converter.DateConverter;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
@@ -79,11 +78,6 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Bean
 	protected AuthorizeAspect authorizeAspect() {
 		return new AuthorizeAspect();
-	}
-
-	@Bean
-	protected TimingAspect timingAspect() {
-		return new TimingAspect();
 	}
 
 }
