@@ -72,14 +72,19 @@ public class ApiDoc implements Serializable {
 		this.description = api.description();
 
 		Class<?> responseBodyClass = method.getReturnType();
-		if(Collection.class.isAssignableFrom(responseBodyClass)){
+		if (Collection.class.isAssignableFrom(responseBodyClass)) {
 			responseBodyType = "collection";
-		}else if(ResultPage.class.isAssignableFrom(responseBodyClass)){
+		} else if (ResultPage.class.isAssignableFrom(responseBodyClass)) {
 			responseBodyType = "resultPage";
 		}
 		if (method.getGenericReturnType() instanceof ParameterizedType) {
 			ParameterizedType pt = (ParameterizedType) method
 					.getGenericReturnType();
+			responseBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
+		}
+		if (responseBodyClass.getGenericSuperclass() instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) responseBodyClass
+					.getGenericSuperclass();
 			responseBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
 		}
 		Fields returnFields = apiDocMethod.getAnnotation(Fields.class);
@@ -180,14 +185,21 @@ public class ApiDoc implements Serializable {
 					Annotation anno = annotations[j];
 					if (anno instanceof RequestBody) {
 						Class<?> requestBodyClass = types[i];
-						if(Collection.class.isAssignableFrom(requestBodyClass)){
+						if (Collection.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "collection";
-						}else if(ResultPage.class.isAssignableFrom(requestBodyClass)){
+						} else if (ResultPage.class
+								.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "resultPage";
 						}
 						Type gtype = method.getGenericParameterTypes()[i];
 						if (gtype instanceof ParameterizedType) {
 							ParameterizedType pt = (ParameterizedType) gtype;
+							requestBodyClass = (Class<?>) pt
+									.getActualTypeArguments()[0];
+						}
+						if (requestBodyClass.getGenericSuperclass() instanceof ParameterizedType) {
+							ParameterizedType pt = (ParameterizedType) requestBodyClass
+									.getGenericSuperclass();
 							requestBodyClass = (Class<?>) pt
 									.getActualTypeArguments()[0];
 						}

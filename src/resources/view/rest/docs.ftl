@@ -52,9 +52,9 @@
 		      <div class="accordion-inner">
 		      	<#assign partial=Parameters.partial!/>
 		        <ul class="nav nav-list">
-					<li<#if partial=='prerequisite'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=prerequisite"/>" class="ajax view">接入准备</a></li>
-					<li<#if partial=='oauth2'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=oauth2"/>" class="ajax view">OAuth2</a></li>
-					<li<#if partial=='status'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=status"/>" class="ajax view">通用返回状态消息</a></li>
+					<li<#if partial=='prerequisite'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=prerequisite"/><#if version?has_content>&version=${version}</#if>" class="ajax view">接入准备</a></li>
+					<li<#if partial=='oauth2'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=oauth2"/><#if version?has_content>&version=${version}</#if>" class="ajax view">OAuth2</a></li>
+					<li<#if partial=='status'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=status"/><#if version?has_content>&version=${version}</#if>" class="ajax view">通用返回状态消息</a></li>
 				</ul>
 		      </div>
 		    </div>
@@ -71,7 +71,7 @@
 		      <div class="accordion-inner">
 		        <ul class="nav nav-list">
 					<#list apiModule.apiDocs as apiDoc>
-					<li<#if currentModule && api?has_content && api==apiDoc.name> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?module=${apiModule.name}&api=${apiDoc.name}"/>" class="ajax view">${apiDoc.name}</a></li>
+					<li<#if currentModule && api?has_content && api==apiDoc.name> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?module=${apiModule.name}&api=${apiDoc.name}"/><#if version?has_content>&version=${version}</#if>" class="ajax view">${apiDoc.name}</a></li>
 					</#list>
 				</ul>
 		      </div>

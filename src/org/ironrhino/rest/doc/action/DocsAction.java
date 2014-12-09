@@ -22,13 +22,13 @@ public class DocsAction extends BaseAction {
 	protected static List<ApiModuleObject> cache;
 
 	@Value("${apiBaseUrl:}")
-	private String apiBaseUrl;
+	protected String apiBaseUrl;
 
-	private String module;
+	protected String module;
 
-	private String api;
+	protected String api;
 
-	private ApiDoc apiDoc;
+	protected ApiDoc apiDoc;
 
 	public String getApiBaseUrl() {
 		if (StringUtils.isBlank(apiBaseUrl)) {
