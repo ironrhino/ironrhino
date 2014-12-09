@@ -42,6 +42,23 @@
   <div class="row">
     <div class="span3">
 		<div class="accordion" id="api_module_accordion">
+		  <div class="accordion-group">
+		    <div class="accordion-heading">
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api_module_accordion" href="#overview">
+		     	接入基础
+		      </a>
+		    </div>
+		    <div id="overview" class="accordion-body collapse<#if !module?has_content> in</#if>">
+		      <div class="accordion-inner">
+		      	<#assign partial=Parameters.partial!/>
+		        <ul class="nav nav-list">
+					<li<#if partial=='prerequisite'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=prerequisite"/>" class="ajax view">接入准备</a></li>
+					<li<#if partial=='oauth2'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=oauth2"/>" class="ajax view">OAuth2</a></li>
+					<li<#if partial=='status'> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?partial=status"/>" class="ajax view">通用返回状态消息</a></li>
+				</ul>
+		      </div>
+		    </div>
+		  </div>
 		<#list apiModules as apiModule>
 		  <div class="accordion-group">
 		    <div class="accordion-heading">
@@ -87,6 +104,8 @@
 					<#if apiDoc.sampleResponseBody?has_content><tr><td>响应消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;"><#noescape>${apiDoc.sampleResponseBody}</#noescape></code></td></tr></#if>
 				</tbody>
 			</table>
+		<#elseif partial?has_content>
+			<#include "${partial}.ftl"/>
 		</#if>
     </div>
   </div>

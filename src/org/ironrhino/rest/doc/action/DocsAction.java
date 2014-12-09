@@ -17,7 +17,7 @@ public class DocsAction extends BaseAction {
 
 	private static final long serialVersionUID = -2983503425168586385L;
 
-	private List<ApiModuleObject> apiModules;
+	private List<ApiModuleObject> apiModules = ApiDocHelper.getApiModules();
 
 	@Value("${apiBaseUrl:}")
 	private String apiBaseUrl;
@@ -29,6 +29,10 @@ public class DocsAction extends BaseAction {
 	private ApiDoc apiDoc;
 
 	public String getApiBaseUrl() {
+		if (StringUtils.isBlank(apiBaseUrl)) {
+			apiBaseUrl = RequestUtils.getBaseUrl(ServletActionContext
+					.getRequest()) + "/api";
+		}
 		return apiBaseUrl;
 	}
 
@@ -57,11 +61,6 @@ public class DocsAction extends BaseAction {
 	}
 
 	public String execute() {
-		apiModules = ApiDocHelper.getApiModules();
-		if (StringUtils.isBlank(apiBaseUrl)) {
-			apiBaseUrl = RequestUtils.getBaseUrl(ServletActionContext
-					.getRequest()) + "/api";
-		}
 		if (StringUtils.isNotBlank(module) && StringUtils.isNotBlank(api)) {
 			loop: for (ApiModuleObject apiModule : apiModules) {
 				if (module.equals(apiModule.getName())) {
@@ -75,6 +74,14 @@ public class DocsAction extends BaseAction {
 			}
 		}
 		return SUCCESS;
+	}
+
+	public String overview() {
+		if (StringUtils.isBlank(apiBaseUrl)) {
+			apiBaseUrl = RequestUtils.getBaseUrl(ServletActionContext
+					.getRequest()) + "/api";
+		}
+		return "overview";
 	}
 
 }
