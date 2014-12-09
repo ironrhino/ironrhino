@@ -3,6 +3,7 @@ package org.ironrhino.rest.doc;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,10 +59,6 @@ public class ApiDoc implements Serializable {
 
 	protected Map<String, String> dictionary = new HashMap<String, String>();
 
-	protected transient Class<?> requestBodyClass;
-
-	protected transient Class<?> responseBodyClass;
-
 	public ApiDoc(Class<?> apiDocClazz, Method apiDocMethod,
 			ObjectMapper objectMapper) throws Exception {
 		Class<?> clazz = apiDocClazz.getSuperclass();
@@ -72,11 +69,11 @@ public class ApiDoc implements Serializable {
 		this.name = api.value();
 		this.description = api.description();
 
-		responseBodyClass = method.getReturnType();
-		if (responseBodyClass == DeferredResult.class
-				|| responseBodyClass == Callable.class) {
-			Type t = method.getGenericReturnType();
-			responseBodyClass = ReflectionUtils.getGenericClass(t, 0);
+		Class<?> responseBodyClass = method.getReturnType();
+		if (method.getGenericReturnType() instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) method
+					.getGenericReturnType();
+			responseBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
 		}
 		Fields returnFields = apiDocMethod.getAnnotation(Fields.class);
 		if (returnFields != null)
@@ -175,8 +172,13 @@ public class ApiDoc implements Serializable {
 				for (int j = 0; j < annotations.length; j++) {
 					Annotation anno = annotations[j];
 					if (anno instanceof RequestBody) {
-						if (requestBodyClass == null)
-							requestBodyClass = types[i];
+						Class<?> requestBodyClass = types[i];
+						Type gtype = method.getGenericParameterTypes()[i];
+						if (gtype instanceof ParameterizedType) {
+							ParameterizedType pt = (ParameterizedType) gtype;
+							responseBodyClass = (Class<?>) pt
+									.getActualTypeArguments()[0];
+						}
 						if (fds != null) {
 							requestBody = FieldObject.from(requestBodyClass,
 									fds);
@@ -326,22 +328,6 @@ public class ApiDoc implements Serializable {
 
 	public void setDictionary(Map<String, String> dictionary) {
 		this.dictionary = dictionary;
-	}
-
-	public Class<?> getRequestBodyClass() {
-		return requestBodyClass;
-	}
-
-	public void setRequestBodyClass(Class<?> requestBodyClass) {
-		this.requestBodyClass = requestBodyClass;
-	}
-
-	public Class<?> getResponseBodyClass() {
-		return responseBodyClass;
-	}
-
-	public void setResponseBodyClass(Class<?> responseBodyClass) {
-		this.responseBodyClass = responseBodyClass;
 	}
 
 }

@@ -3,7 +3,9 @@ package org.ironrhino.rest.doc;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -175,6 +177,21 @@ public class FieldObject implements Serializable {
 			}
 		}
 		return list;
+	}
+
+	public List<FieldObject> getList() {
+		return Collections.emptyList();
+	}
+
+	public static void main(String[] args) throws Exception {
+		Method m = FieldObject.class.getMethod("getList", new Class[0]);
+		System.out.println(m.getReturnType().getClass());
+		System.out.println(m.getGenericReturnType().getClass());
+		
+		if (m.getGenericReturnType() instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType)m.getGenericReturnType();
+			System.out.println(pt.getActualTypeArguments()[0]);
+		}
 	}
 
 }
