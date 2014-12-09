@@ -6,13 +6,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
+import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.Field;
@@ -53,11 +53,13 @@ public class ApiDoc implements Serializable {
 
 	protected List<FieldObject> responseBody;
 
-	protected String sampleRequestBody;
+	protected String requestBodyType;
 
-	protected String sampleResponseBody;
+	protected String responseBodyType;
 
-	protected Map<String, String> dictionary = new HashMap<String, String>();
+	protected String requestBodySample;
+
+	protected String responseBodySample;
 
 	public ApiDoc(Class<?> apiDocClazz, Method apiDocMethod,
 			ObjectMapper objectMapper) throws Exception {
@@ -70,6 +72,11 @@ public class ApiDoc implements Serializable {
 		this.description = api.description();
 
 		Class<?> responseBodyClass = method.getReturnType();
+		if(Collection.class.isAssignableFrom(responseBodyClass)){
+			responseBodyType = "collection";
+		}else if(ResultPage.class.isAssignableFrom(responseBodyClass)){
+			responseBodyType = "resultPage";
+		}
 		if (method.getGenericReturnType() instanceof ParameterizedType) {
 			ParameterizedType pt = (ParameterizedType) method
 					.getGenericReturnType();
@@ -108,9 +115,9 @@ public class ApiDoc implements Serializable {
 		if (view == null && jsonView != null)
 			view = jsonView.value()[0];
 		if (view == null)
-			sampleResponseBody = objectMapper.writeValueAsString(sample);
+			responseBodySample = objectMapper.writeValueAsString(sample);
 		else
-			sampleResponseBody = objectMapper.writerWithView(view)
+			responseBodySample = objectMapper.writerWithView(view)
 					.writeValueAsString(sample);
 
 		Authorize authorize = method.getAnnotation(Authorize.class);
@@ -173,6 +180,11 @@ public class ApiDoc implements Serializable {
 					Annotation anno = annotations[j];
 					if (anno instanceof RequestBody) {
 						Class<?> requestBodyClass = types[i];
+						if(Collection.class.isAssignableFrom(requestBodyClass)){
+							requestBodyType = "collection";
+						}else if(ResultPage.class.isAssignableFrom(requestBodyClass)){
+							requestBodyType = "resultPage";
+						}
 						Type gtype = method.getGenericParameterTypes()[i];
 						if (gtype instanceof ParameterizedType) {
 							ParameterizedType pt = (ParameterizedType) gtype;
@@ -191,9 +203,9 @@ public class ApiDoc implements Serializable {
 									Object requestObject = m.invoke(instance,
 											new Object[0]);
 									if (requestObject instanceof String)
-										sampleRequestBody = (String) requestObject;
+										requestBodySample = (String) requestObject;
 									else
-										sampleRequestBody = objectMapper
+										requestBodySample = objectMapper
 												.writeValueAsString(requestObject);
 								} catch (NoSuchMethodException e) {
 
@@ -306,28 +318,36 @@ public class ApiDoc implements Serializable {
 		this.responseBody = responseBody;
 	}
 
-	public String getSampleRequestBody() {
-		return sampleRequestBody;
+	public String getRequestBodyType() {
+		return requestBodyType;
 	}
 
-	public void setSampleRequestBody(String sampleRequestBody) {
-		this.sampleRequestBody = sampleRequestBody;
+	public void setRequestBodyType(String requestBodyType) {
+		this.requestBodyType = requestBodyType;
 	}
 
-	public String getSampleResponseBody() {
-		return sampleResponseBody;
+	public String getResponseBodyType() {
+		return responseBodyType;
 	}
 
-	public void setSampleResponseBody(String sampleResponseBody) {
-		this.sampleResponseBody = sampleResponseBody;
+	public void setResponseBodyType(String responseBodyType) {
+		this.responseBodyType = responseBodyType;
 	}
 
-	public Map<String, String> getDictionary() {
-		return dictionary;
+	public String getRequestBodySample() {
+		return requestBodySample;
 	}
 
-	public void setDictionary(Map<String, String> dictionary) {
-		this.dictionary = dictionary;
+	public void setRequestBodySample(String requestBodySample) {
+		this.requestBodySample = requestBodySample;
+	}
+
+	public String getResponseBodySample() {
+		return responseBodySample;
+	}
+
+	public void setResponseBodySample(String responseBodySample) {
+		this.responseBodySample = responseBodySample;
 	}
 
 }

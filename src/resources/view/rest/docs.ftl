@@ -98,10 +98,10 @@
 					<#if apiDoc.pathVariables?has_content><tr><td>URL变量</td><td><@listFields fields=apiDoc.pathVariables/></td></tr></#if>
 					<#if apiDoc.requestParams?has_content><tr><td>请求参数</td><td><@listFields fields=apiDoc.requestParams/></td></tr></#if>
 					<#if apiDoc.requestHeaders?has_content><tr><td>请求头</td><td><@listFields fields=apiDoc.requestHeaders/></td></tr></#if>
-					<#if apiDoc.requestBody?has_content><tr><td>请求消息体</td><td><@listFields fields=apiDoc.requestBody/></td></tr></#if>
-					<#if apiDoc.sampleRequestBody?has_content><tr><td>请求消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;"><#noescape>${apiDoc.sampleRequestBody}</#noescape></code></td></tr></#if>
-					<#if apiDoc.responseBody?has_content><tr><td>响应消息体</td><td><@listFields fields=apiDoc.responseBody/></td></tr></#if>
-					<#if apiDoc.sampleResponseBody?has_content><tr><td>响应消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;"><#noescape>${apiDoc.sampleResponseBody}</#noescape></code></td></tr></#if>
+					<#if apiDoc.requestBody?has_content><tr><td>请求消息体<#if apiDoc.requestBodyType?has_content><br/><span class="label label-warning">${action.getText(apiDoc.requestBodyType)}</span></#if></td><td><@listFields fields=apiDoc.requestBody/></td></tr></#if>
+					<#if apiDoc.requestBodySample?has_content><tr><td>请求消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;"><#noescape>${apiDoc.requestBodySample}</#noescape></code></td></tr></#if>
+					<#if apiDoc.responseBody?has_content><tr><td>响应消息体<#if apiDoc.responseBodyType?has_content><br/><span class="label label-warning">${action.getText(apiDoc.responseBodyType)}</span></#if></td><td><@listFields fields=apiDoc.responseBody/></td></tr></#if>
+					<#if apiDoc.responseBodySample?has_content><tr><td>响应消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;"><#noescape>${apiDoc.responseBodySample}</#noescape></code></td></tr></#if>
 				</tbody>
 			</table>
 		<#elseif partial?has_content>
