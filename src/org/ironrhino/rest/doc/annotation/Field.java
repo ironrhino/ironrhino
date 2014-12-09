@@ -1,4 +1,4 @@
-package org.ironrhino.rest.annotation;
+package org.ironrhino.rest.doc.annotation;
 
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

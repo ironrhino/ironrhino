@@ -1,4 +1,4 @@
-package org.ironrhino.sample.api;
+package org.ironrhino.rest;
 
 import java.lang.reflect.Field;
 

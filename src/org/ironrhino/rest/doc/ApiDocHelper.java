@@ -1,4 +1,4 @@
-package org.ironrhino.rest.util;
+package org.ironrhino.rest.doc;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -14,11 +14,9 @@ import javassist.CtMethod;
 import javassist.bytecode.Descriptor;
 
 import org.ironrhino.core.util.ClassScanner;
-import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.rest.annotation.Api;
-import org.ironrhino.rest.annotation.ApiModule;
-import org.ironrhino.rest.model.ApiDoc;
-import org.ironrhino.rest.model.ApiModuleObject;
+import org.ironrhino.rest.ApiConfigBase;
+import org.ironrhino.rest.doc.annotation.Api;
+import org.ironrhino.rest.doc.annotation.ApiModule;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -83,8 +81,7 @@ public class ApiDocHelper {
 
 	public static List<ApiModuleObject> getApiModules() {
 		if (cache == null) {
-			ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
-			// TODO
+			ObjectMapper objectMapper = ApiConfigBase.createObjectMapper();
 			Collection<Class<?>> classes = ClassScanner.scanAnnotated(
 					ClassScanner.getAppPackages(), ApiModule.class);
 			List<ApiModuleObject> list = new ArrayList<>();

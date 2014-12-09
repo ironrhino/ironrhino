@@ -1,4 +1,4 @@
-package org.ironrhino.sample.api.intercept;
+package org.ironrhino.rest.component;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractJsonpResponseBodyAdvice;

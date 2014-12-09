@@ -1,4 +1,4 @@
-package org.ironrhino.sample.api.intercept;
+package org.ironrhino.rest.component;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -6,7 +6,7 @@ import org.aspectj.lang.annotation.Before;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.sample.api.RestStatus;
+import org.ironrhino.rest.RestStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RequestMapping;
 

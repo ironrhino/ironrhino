@@ -1,11 +1,11 @@
-package org.ironrhino.sample.api.intercept;
+package org.ironrhino.rest.component;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ironrhino.sample.api.RestStatus;
+import org.ironrhino.rest.RestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;

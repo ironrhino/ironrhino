@@ -1,4 +1,4 @@
-package org.ironrhino.rest.model;
+package org.ironrhino.rest.doc;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -13,9 +13,9 @@ import java.util.concurrent.Callable;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.ironrhino.rest.annotation.Api;
-import org.ironrhino.rest.annotation.Field;
-import org.ironrhino.rest.annotation.Fields;
+import org.ironrhino.rest.doc.annotation.Api;
+import org.ironrhino.rest.doc.annotation.Field;
+import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,11 +1,11 @@
 package org.ironrhino.sample.api.controller;
 
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.rest.annotation.Api;
-import org.ironrhino.rest.annotation.ApiModule;
-import org.ironrhino.rest.annotation.Field;
-import org.ironrhino.rest.annotation.Fields;
-import org.ironrhino.sample.api.RestStatus;
+import org.ironrhino.rest.RestStatus;
+import org.ironrhino.rest.doc.annotation.Api;
+import org.ironrhino.rest.doc.annotation.ApiModule;
+import org.ironrhino.rest.doc.annotation.Field;
+import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.security.model.User;
 import org.springframework.web.context.request.async.DeferredResult;
 

@@ -1,4 +1,4 @@
-package org.ironrhino.sample.api;
+package org.ironrhino.rest.component;
 
 import java.io.IOException;
 
@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.rest.RestStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 

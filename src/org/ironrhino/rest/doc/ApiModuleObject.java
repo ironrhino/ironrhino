@@ -1,4 +1,4 @@
-package org.ironrhino.rest.model;
+package org.ironrhino.rest.doc;
 
 import java.io.Serializable;
 import java.util.ArrayList;

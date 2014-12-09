@@ -1,4 +1,4 @@
-package org.ironrhino.rest.action;
+package org.ironrhino.rest.doc.action;
 
 import java.util.List;
 
@@ -7,9 +7,9 @@ import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.RequestUtils;
-import org.ironrhino.rest.model.ApiDoc;
-import org.ironrhino.rest.model.ApiModuleObject;
-import org.ironrhino.rest.util.ApiDocHelper;
+import org.ironrhino.rest.doc.ApiDoc;
+import org.ironrhino.rest.doc.ApiDocHelper;
+import org.ironrhino.rest.doc.ApiModuleObject;
 import org.springframework.beans.factory.annotation.Value;
 
 @AutoConfig

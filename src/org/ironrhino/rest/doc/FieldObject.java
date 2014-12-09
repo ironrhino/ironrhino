@@ -1,4 +1,4 @@
-package org.ironrhino.rest.model;
+package org.ironrhino.rest.doc;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.rest.annotation.Field;
-import org.ironrhino.rest.annotation.Fields;
+import org.ironrhino.rest.doc.annotation.Field;
+import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
 
 public class FieldObject implements Serializable {
