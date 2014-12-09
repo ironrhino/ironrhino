@@ -2,6 +2,7 @@ package org.ironrhino.rest.util;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -12,9 +13,16 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.bytecode.Descriptor;
 
+import org.ironrhino.core.util.ClassScanner;
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.annotation.Api;
+import org.ironrhino.rest.annotation.ApiModule;
+import org.ironrhino.rest.model.ApiDoc;
+import org.ironrhino.rest.model.ApiModuleObject;
 
-public class ReflectionHelper {
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class ApiDocHelper {
 
 	private static ClassPool classPool = ClassPool.getDefault();
 
@@ -69,6 +77,46 @@ public class ReflectionHelper {
 			}
 		});
 		return methods;
+	}
+
+	private static List<ApiModuleObject> cache = null;
+
+	public static List<ApiModuleObject> getApiModules() {
+		if (cache == null) {
+			ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
+			// TODO
+			Collection<Class<?>> classes = ClassScanner.scanAnnotated(
+					ClassScanner.getAppPackages(), ApiModule.class);
+			List<ApiModuleObject> list = new ArrayList<>();
+			for (Class<?> clazz : classes) {
+				ApiModule apiModule = clazz.getAnnotation(ApiModule.class);
+				String name = apiModule.value();
+				String description = apiModule.description();
+				ApiModuleObject apiModuleObject = null;
+				for (ApiModuleObject amo : list) {
+					if (amo.getName().equals(name)) {
+						apiModuleObject = amo;
+						break;
+					}
+				}
+				if (apiModuleObject == null) {
+					apiModuleObject = new ApiModuleObject();
+					apiModuleObject.setName(name);
+					apiModuleObject.setDescription(description);
+					list.add(apiModuleObject);
+				}
+				try {
+					List<Method> methods = findApiMethods(clazz);
+					for (Method m : methods)
+						apiModuleObject.getApiDocs().add(
+								new ApiDoc(clazz, m, objectMapper));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			cache = list;
+		}
+		return cache;
 	}
 
 }

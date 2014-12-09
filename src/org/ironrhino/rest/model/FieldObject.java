@@ -3,6 +3,7 @@ package org.ironrhino.rest.model;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,18 @@ public class FieldObject implements Serializable {
 
 			}
 		} else {
-			type = cls.getSimpleName().toLowerCase();
+			if (cls == Integer.class || cls == Integer.TYPE
+					|| cls == Short.class || cls == Short.TYPE
+					|| cls == Long.class || cls == Long.TYPE)
+				type = "integer";
+			else if (Number.class.isAssignableFrom(cls))
+				type = "float";
+			else if (cls == Boolean.class || cls == Boolean.TYPE)
+				type = "boolean";
+			else if (Date.class.isAssignableFrom(cls) || cls == String.class)
+				type = "string";
+			else
+				type = "object";
 		}
 		FieldObject field = new FieldObject(name, type, required);
 		if (StringUtils.isNotBlank(defaultValue))
