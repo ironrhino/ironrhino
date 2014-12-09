@@ -49,11 +49,12 @@
 		        ${apiModule.name}
 		      </a>
 		    </div>
-		    <div id="module${apiModule_index}" class="accordion-body collapse<#if module?has_content && module==apiModule.name> in</#if>">
+		    <#assign currentModule = module?has_content && module==apiModule.name>
+		    <div id="module${apiModule_index}" class="accordion-body collapse<#if currentModule> in</#if>">
 		      <div class="accordion-inner">
 		        <ul class="nav nav-list">
 					<#list apiModule.apiDocs as apiDoc>
-					<li<#if api?has_content && api==apiDoc.name> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?module=${apiModule.name}&api=${apiDoc.name}"/>" class="ajax view">${apiDoc.name}</a></li>
+					<li<#if currentModule && api?has_content && api==apiDoc.name> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?module=${apiModule.name}&api=${apiDoc.name}"/>" class="ajax view">${apiDoc.name}</a></li>
 					</#list>
 				</ul>
 		      </div>
