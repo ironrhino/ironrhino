@@ -2,7 +2,7 @@
 <table class="table">
 <thead>
 	<tr>
-		<th style="width:150px;">名字</th>
+		<th style="width:200px;">名字</th>
 		<th style="width:80px;">类型</th>
 		<th style="width:80px;">必填</th>
 		<th style="width:80px;">默认值</th>

@@ -85,7 +85,17 @@ public class ApiDoc implements Serializable {
 		if (responseBodyClass.getGenericSuperclass() instanceof ParameterizedType) {
 			ParameterizedType pt = (ParameterizedType) responseBodyClass
 					.getGenericSuperclass();
-			responseBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
+			Type type = pt.getActualTypeArguments()[0];
+			if (type instanceof Class) {
+				responseBodyClass = (Class<?>) type;
+			} else if (type instanceof ParameterizedType) {
+				pt = (ParameterizedType) type;
+				if (Collection.class.isAssignableFrom((Class<?>) pt
+						.getRawType())) {
+					responseBodyType = "collection";
+					responseBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
+				}
+			}
 		}
 		Fields returnFields = apiDocMethod.getAnnotation(Fields.class);
 		if (returnFields != null)
