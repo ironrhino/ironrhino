@@ -91,7 +91,8 @@ public class FieldObject implements Serializable {
 	}
 
 	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
+		if (!"\n\t\t\n\t\t\n\n\t\t\t\t\n".equals(defaultValue))
+			this.defaultValue = defaultValue;
 	}
 
 	public Map<String, String> getValues() {
