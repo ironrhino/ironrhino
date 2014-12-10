@@ -3,8 +3,8 @@
 <thead>
 	<tr>
 		<th style="width:200px;">名字</th>
-		<th style="width:80px;">类型</th>
-		<th style="width:80px;">必填</th>
+		<th style="width:60px;">类型</th>
+		<th style="width:60px;">必填</th>
 		<th style="width:80px;">默认值</th>
 		<th>备注</th>
 	</tr>
@@ -12,7 +12,16 @@
 <tbody>
 	<#list fields as field>
 	<tr>
-		<td>${field.name} <span class="label">${action.getText(field.label!field.name)}</span></td>
+		<td>${field.name} 
+		<#assign label=field.label!/>
+		<#if !label?has_content>
+		<#assign label=''/>
+		<#list field.name?split('.') as var>
+		<#assign label=label+action.getText(var)/>
+		</#list>
+		</#if>
+		<#if label!=field.name> <span class="label">${label}</span></#if>
+		</td>
 		<td>${field.type!} </td>
 		<td>${action.getText(field.required?string)} </td>
 		<td>${field.defaultValue!} </td>
