@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
+import org.springframework.web.bind.annotation.ValueConstants;
 
 public class FieldObject implements Serializable {
 
@@ -91,8 +92,7 @@ public class FieldObject implements Serializable {
 	}
 
 	public void setDefaultValue(String defaultValue) {
-		if (!"\n\t\t\n\t\t\n\n\t\t\t\t\n".equals(defaultValue))
-			this.defaultValue = defaultValue;
+		this.defaultValue = defaultValue;
 	}
 
 	public Map<String, String> getValues() {
@@ -132,7 +132,8 @@ public class FieldObject implements Serializable {
 				type = "object";
 		}
 		FieldObject field = new FieldObject(name, type, required);
-		if (StringUtils.isNotBlank(defaultValue))
+		if (StringUtils.isNotBlank(defaultValue)
+				&& !ValueConstants.DEFAULT_NONE.equals(defaultValue))
 			field.setDefaultValue(defaultValue);
 		if (values != null)
 			field.setValues(values);
@@ -171,7 +172,8 @@ public class FieldObject implements Serializable {
 				}
 			}
 			FieldObject field = new FieldObject(name, type, f.required());
-			if (StringUtils.isNotBlank(f.defaultValue()))
+			if (StringUtils.isNotBlank(f.defaultValue())
+					&& !ValueConstants.DEFAULT_NONE.equals(f.defaultValue()))
 				field.setDefaultValue(f.defaultValue());
 			if (StringUtils.isNotBlank(f.label()))
 				field.setLabel(f.label());
