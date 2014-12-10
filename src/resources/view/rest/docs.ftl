@@ -80,7 +80,7 @@
 		      <div class="accordion-inner">
 		        <ul class="nav nav-list">
 					<#list apiModule.apiDocs as apiDoc>
-					<li<#if currentModule && api?has_content && api==apiDoc.name> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?module=${apiModule.name}&api=${apiDoc.name}"/><#if version?has_content>&version=${version}</#if>" class="ajax view">${apiDoc.name}</a></li>
+					<li<#if currentModule && api?has_content && api==apiDoc.name> class="active"</#if> style="padding-left:10px;"><a href="<@url value="${actionBaseUrl}?module=${apiModule.name?url}&api=${apiDoc.name?url}"/><#if version?has_content>&version=${version}</#if>" class="ajax view">${apiDoc.name}</a></li>
 					</#list>
 				</ul>
 		      </div>
