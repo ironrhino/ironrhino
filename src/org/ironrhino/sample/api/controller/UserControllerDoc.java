@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-@ApiModule(value = "用户API", description = "跟用户打交道的api")
+@ApiModule(value = "用户API")
 public class UserControllerDoc extends UserController {
 
 	@Override
@@ -23,13 +23,7 @@ public class UserControllerDoc extends UserController {
 			@Field(name = "name", required = true), @Field(name = "email"),
 			@Field(name = "phone") })
 	public User self() {
-		User u = new User();
-		u.setId(CodecUtils.nextId());
-		u.setUsername("test");
-		u.setName("测试");
-		u.setEmail("test@test.com");
-		u.setPhone("13111111111");
-		return u;
+		return createUserForGet();
 	}
 
 	@Override
@@ -62,13 +56,7 @@ public class UserControllerDoc extends UserController {
 			@Field(name = "phone") })
 	public DeferredResult<User> get(String username) {
 		DeferredResult<User> result = new DeferredResult<User>();
-		User u = new User();
-		u.setId(CodecUtils.nextId());
-		u.setUsername("test");
-		u.setName("测试");
-		u.setEmail("test@test.com");
-		u.setPhone("13111111111");
-		result.setResult(u);
+		result.setResult(createUserForGet());
 		return result;
 	}
 
@@ -83,16 +71,6 @@ public class UserControllerDoc extends UserController {
 		return RestStatus.OK;
 	}
 
-	protected User createUserForPost() {
-		User u = new User();
-		u.setUsername("test123");
-		u.setPassword("newpassword");
-		u.setName("测试");
-		u.setEmail("test@test.com");
-		u.setPhone("13111111111");
-		return u;
-	}
-
 	@Override
 	@Api(value = "修改用户", description = "只传入需要修改的字段")
 	public RestStatus put(
@@ -102,15 +80,6 @@ public class UserControllerDoc extends UserController {
 					@Field(name = "name"), @Field(name = "email"),
 					@Field(name = "phone") }, sampleMethodName = "createUserForPut") User user) {
 		return RestStatus.OK;
-	}
-
-	protected User createUserForPut() {
-		User u = new User();
-		u.setPassword("newpassword");
-		u.setName("测试");
-		u.setEmail("test@test.com");
-		u.setPhone("13111111111");
-		return u;
 	}
 
 	@Override
@@ -125,6 +94,35 @@ public class UserControllerDoc extends UserController {
 			String username,
 			@Fields(value = { @Field(name = "password", required = true, description = "传入明文密码") }, sampleMethodName = "createUserForPassword") User user) {
 		return RestStatus.OK;
+	}
+
+	protected User createUserForGet() {
+		User u = new User();
+		u.setId(CodecUtils.nextId());
+		u.setUsername("test");
+		u.setName("测试");
+		u.setEmail("test@test.com");
+		u.setPhone("13111111111");
+		return u;
+	}
+
+	protected User createUserForPost() {
+		User u = new User();
+		u.setUsername("test123");
+		u.setPassword("newpassword");
+		u.setName("测试");
+		u.setEmail("test@test.com");
+		u.setPhone("13111111111");
+		return u;
+	}
+
+	protected User createUserForPut() {
+		User u = new User();
+		u.setPassword("newpassword");
+		u.setName("测试");
+		u.setEmail("test@test.com");
+		u.setPhone("13111111111");
+		return u;
 	}
 
 }
