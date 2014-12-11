@@ -108,41 +108,59 @@ public class ApiDoc implements Serializable {
 			}
 		}
 		Fields returnFields = apiDocMethod.getAnnotation(Fields.class);
-		responseBody = FieldObject.createList(responseBodyClass, returnFields, false);
+		responseBody = FieldObject.createList(responseBodyClass, returnFields,
+				false);
 		Object instance = apiDocClazz.newInstance();
-		Class<?>[] argTypes = apiDocMethod.getParameterTypes();
-		Object[] args = new Object[argTypes.length];
-		for (int i = 0; i < argTypes.length; i++) {
-			Class<?> type = argTypes[i];
-			if (type.isPrimitive()) {
-				if (Number.class.isAssignableFrom(type))
-					args[i] = 0;
-				else if (type == Boolean.TYPE)
-					args[i] = false;
-				else if (type == Byte.TYPE)
-					args[i] = (byte) 0;
-			} else {
-				args[i] = null;
+		if (returnFields != null
+				&& StringUtils.isNotBlank(returnFields.sampleMethodName())) {
+			try {
+				Method m = apiDocClazz.getDeclaredMethod(
+						returnFields.sampleMethodName(), new Class[0]);
+				m.setAccessible(true);
+				Object requestObject = m.invoke(instance, new Object[0]);
+				if (requestObject instanceof String)
+					responseBodySample = (String) requestObject;
+				else
+					responseBodySample = objectMapper
+							.writeValueAsString(requestObject);
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
 			}
+		} else {
+			Class<?>[] argTypes = apiDocMethod.getParameterTypes();
+			Object[] args = new Object[argTypes.length];
+			for (int i = 0; i < argTypes.length; i++) {
+				Class<?> type = argTypes[i];
+				if (type.isPrimitive()) {
+					if (Number.class.isAssignableFrom(type))
+						args[i] = 0;
+					else if (type == Boolean.TYPE)
+						args[i] = false;
+					else if (type == Byte.TYPE)
+						args[i] = (byte) 0;
+				} else {
+					args[i] = null;
+				}
+			}
+			Object sample = apiDocMethod.invoke(instance, args);
+			Class<?> view = null;
+			if (sample instanceof DeferredResult)
+				sample = ((DeferredResult<?>) sample).getResult();
+			else if (sample instanceof Callable)
+				sample = ((Callable<?>) sample).call();
+			else if (sample instanceof MappingJacksonValue) {
+				view = ((MappingJacksonValue) sample).getSerializationView();
+				sample = ((MappingJacksonValue) sample).getValue();
+			}
+			JsonView jsonView = method.getAnnotation(JsonView.class);
+			if (view == null && jsonView != null)
+				view = jsonView.value()[0];
+			if (view == null)
+				responseBodySample = objectMapper.writeValueAsString(sample);
+			else
+				responseBodySample = objectMapper.writerWithView(view)
+						.writeValueAsString(sample);
 		}
-		Object sample = apiDocMethod.invoke(instance, args);
-		Class<?> view = null;
-		if (sample instanceof DeferredResult)
-			sample = ((DeferredResult<?>) sample).getResult();
-		else if (sample instanceof Callable)
-			sample = ((Callable<?>) sample).call();
-		else if (sample instanceof MappingJacksonValue) {
-			view = ((MappingJacksonValue) sample).getSerializationView();
-			sample = ((MappingJacksonValue) sample).getValue();
-		}
-		JsonView jsonView = method.getAnnotation(JsonView.class);
-		if (view == null && jsonView != null)
-			view = jsonView.value()[0];
-		if (view == null)
-			responseBodySample = objectMapper.writeValueAsString(sample);
-		else
-			responseBodySample = objectMapper.writerWithView(view)
-					.writeValueAsString(sample);
 
 		Authorize authorize = method.getAnnotation(Authorize.class);
 		if (authorize == null)
@@ -222,8 +240,8 @@ public class ApiDoc implements Serializable {
 							requestBodyClass = (Class<?>) pt
 									.getActualTypeArguments()[0];
 						}
-						requestBody = FieldObject.createList(requestBodyClass, fds,
-								true);
+						requestBody = FieldObject.createList(requestBodyClass,
+								fds, true);
 						if (fds != null) {
 							if (StringUtils.isNotBlank(fds.sampleMethodName()))
 								try {
@@ -239,7 +257,7 @@ public class ApiDoc implements Serializable {
 										requestBodySample = objectMapper
 												.writeValueAsString(requestObject);
 								} catch (NoSuchMethodException e) {
-
+									e.printStackTrace();
 								}
 						}
 					}

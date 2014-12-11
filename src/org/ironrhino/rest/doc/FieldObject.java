@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -136,6 +137,8 @@ public class FieldObject implements Serializable {
 				type = "float";
 			else if (cls == Boolean.class || cls == Boolean.TYPE)
 				type = "boolean";
+			else if (Collection.class.isAssignableFrom(cls))
+				type = "array";
 			else if (Date.class.isAssignableFrom(cls) || cls == String.class)
 				type = "string";
 			else
