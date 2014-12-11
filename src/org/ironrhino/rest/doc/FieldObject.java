@@ -161,7 +161,7 @@ public class FieldObject implements Serializable {
 
 	public static List<FieldObject> createList(Class<?> domainClass,
 			Fields fields, boolean forRequest) {
-		if (fields != null) {
+		if (fields != null && fields.value().length > 0) {
 			List<FieldObject> list = new ArrayList<>(fields.value().length);
 			for (Field f : fields.value()) {
 				String type = f.type();

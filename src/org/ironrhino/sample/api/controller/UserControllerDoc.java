@@ -18,10 +18,6 @@ public class UserControllerDoc extends UserController {
 
 	@Override
 	@Api("获取当前用户信息")
-	@Fields({ @Field(name = "id", required = true),
-			@Field(name = "username", required = true),
-			@Field(name = "name", required = true), @Field(name = "email"),
-			@Field(name = "phone") })
 	public User self() {
 		return createUserForGet();
 	}
@@ -51,10 +47,6 @@ public class UserControllerDoc extends UserController {
 
 	@Override
 	@Api("获取用户")
-	@Fields({ @Field(name = "id", required = true),
-			@Field(name = "username", required = true),
-			@Field(name = "name", required = true), @Field(name = "email"),
-			@Field(name = "phone") })
 	public DeferredResult<User> get(String username) {
 		DeferredResult<User> result = new DeferredResult<User>();
 		result.setResult(createUserForGet());
