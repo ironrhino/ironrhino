@@ -16,3 +16,4 @@ mvn install:install-file -Dfile=../target/ironrhino-seucrity-loginrecord-1.0.jar
 mvn install:install-file -Dfile=../target/ironrhino-seucrity-oauth-client-1.0.jar -DgroupId=org.ironrhino -DartifactId=ironrhino-security-oauth-client -Dversion=1.0 -DpomFile=ironrhino-security-oauth-client.pom -Dpackaging=jar
 mvn install:install-file -Dfile=../target/ironrhino-seucrity-oauth-server-1.0.jar -DgroupId=org.ironrhino -DartifactId=ironrhino-security-oauth-server -Dversion=1.0 -DpomFile=ironrhino-security-oauth-server.pom -Dpackaging=jar
 mvn install:install-file -Dfile=../target/ironrhino-zookeeper-1.0.jar -DgroupId=org.ironrhino -DartifactId=ironrhino-zookeeper -Dversion=1.0 -DpomFile=ironrhino-zookeeper.pom -Dpackaging=jar
+mvn install:install-file -Dfile=../target/ironrhino-rest-1.0.jar -DgroupId=org.ironrhino -DartifactId=ironrhino-rest -Dversion=1.0 -DpomFile=ironrhino-rest.pom -Dpackaging=jar
