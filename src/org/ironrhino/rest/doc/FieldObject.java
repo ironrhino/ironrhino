@@ -214,8 +214,10 @@ public class FieldObject implements Serializable {
 				if (name.equals("class") || ignoreList.contains(name))
 					continue;
 				if (forRequest
-						&& (pd.getWriteMethod() == null || pd.getWriteMethod()
-								.getAnnotation(JsonIgnore.class) != null))
+						&& (pd.getReadMethod() == null
+								|| pd.getWriteMethod() == null || pd
+								.getWriteMethod().getAnnotation(
+										JsonIgnore.class) != null))
 					continue;
 				if (!forRequest
 						&& (pd.getReadMethod() == null || pd.getReadMethod()
@@ -228,13 +230,19 @@ public class FieldObject implements Serializable {
 					if (f.getAnnotation(JsonIgnore.class) != null)
 						continue;
 
-					if (!forRequest
-							&& Persistable.class.isAssignableFrom(domainClass)) {
-						if ("id".equals(name))
-							required = true;
-						if (f.getAnnotation(NaturalId.class) != null)
-							required = true;
+					if (Persistable.class.isAssignableFrom(domainClass)) {
+						if (forRequest) {
+							if ("id".equals(name))
+								continue;
+
+						} else {
+							if ("id".equals(name))
+								required = true;
+							if (f.getAnnotation(NaturalId.class) != null)
+								required = true;
+						}
 					}
+
 					if (!required) {
 						UiConfig uic = null;
 						if (pd.getReadMethod() != null) {
@@ -246,6 +254,8 @@ public class FieldObject implements Serializable {
 						if (uic != null && uic.required())
 							required = true;
 					}
+				} catch (NoSuchFieldException e) {
+					continue;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

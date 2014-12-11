@@ -99,14 +99,14 @@ public class UserControllerDoc extends UserController {
 		return u;
 	}
 
-	protected User createUserForPost() {
-		User u = new User();
-		u.setUsername("test123");
-		u.setPassword("newpassword");
-		u.setName("测试");
-		u.setEmail("test@test.com");
-		u.setPhone("13111111111");
-		return u;
+	protected ObjectNode createUserForPost() {
+		ObjectNode jsonNode = new ObjectMapper().createObjectNode();
+		jsonNode.put("username", "test123");
+		jsonNode.put("password", "newpassword");
+		jsonNode.put("name", "测试");
+		jsonNode.put("email", "test@test.com");
+		jsonNode.put("phone", "13111111111");
+		return jsonNode;
 	}
 
 	protected User createUserForPut() {
