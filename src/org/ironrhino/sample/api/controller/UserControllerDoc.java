@@ -28,10 +28,11 @@ public class UserControllerDoc extends UserController {
 
 	@Override
 	@Api(value = "修改当前用户信息", description = "只传入需要修改的字段")
-	public RestStatus put(@Fields({
-			@Field(name = "password", description = "传入明文密码"),
-			@Field(name = "name"), @Field(name = "email"),
-			@Field(name = "phone") }) User user) {
+	public RestStatus put(
+			@Fields(value = {
+					@Field(name = "password", description = "传入明文密码"),
+					@Field(name = "name"), @Field(name = "email"),
+					@Field(name = "phone") }, sampleMethodName = "createUserForPut") User user) {
 		return RestStatus.OK;
 	}
 

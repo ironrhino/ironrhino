@@ -2,7 +2,6 @@ package org.ironrhino.core.struts;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,11 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javassist.ClassClassPath;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtField;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -78,7 +72,7 @@ public class EntityClassHelper {
 			map = new HashMap<String, UiConfigImpl>();
 			PropertyDescriptor[] pds = org.springframework.beans.BeanUtils
 					.getPropertyDescriptors(entityClass);
-			List<String> fields = getFields(entityClass);
+			List<String> fields = ReflectionUtils.getAllFields(entityClass);
 			for (PropertyDescriptor pd : pds) {
 				String propertyName = pd.getName();
 				if (pd.getReadMethod() == null
@@ -618,33 +612,5 @@ public class EntityClassHelper {
 			return a.getDisplayOrder() - b.getDisplayOrder();
 		}
 	};
-
-	private static ClassPool classPool = ClassPool.getDefault();
-
-	private static List<String> getFields(Class<?> clazz) {
-		try {
-			classPool.insertClassPath(new ClassClassPath(clazz));
-			CtClass cc = classPool.get(clazz.getName());
-			List<CtClass> ctClasses = new ArrayList<CtClass>();
-			ctClasses.add(cc);
-			while (!(cc = cc.getSuperclass()).getName().equals(
-					Object.class.getName()))
-				ctClasses.add(0, cc);
-			List<String> fields = new ArrayList<String>();
-			for (CtClass ctc : ctClasses) {
-				for (CtField cf : ctc.getDeclaredFields()) {
-					int accessFlag = cf.getModifiers();
-					if (Modifier.isFinal(accessFlag)
-							|| Modifier.isStatic(accessFlag))
-						continue;
-					fields.add(cf.getName());
-				}
-			}
-			return fields;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
-		}
-	}
 
 }

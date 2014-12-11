@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import javassist.Modifier;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.metadata.UiConfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -35,8 +36,10 @@ public class RestStatus extends RuntimeException {
 	public static final RestStatus UNAUTHORIZED = valueOf(CODE_UNAUTHORIZED);
 	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND);
 
+	@UiConfig(required = true)
 	private String code;
 
+	@UiConfig(required = true)
 	private String status;
 
 	private String message;

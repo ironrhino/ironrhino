@@ -108,8 +108,7 @@ public class ApiDoc implements Serializable {
 			}
 		}
 		Fields returnFields = apiDocMethod.getAnnotation(Fields.class);
-		if (returnFields != null)
-			responseBody = FieldObject.from(responseBodyClass, returnFields);
+		responseBody = FieldObject.createList(responseBodyClass, returnFields, false);
 		Object instance = apiDocClazz.newInstance();
 		Class<?>[] argTypes = apiDocMethod.getParameterTypes();
 		Object[] args = new Object[argTypes.length];
@@ -223,9 +222,9 @@ public class ApiDoc implements Serializable {
 							requestBodyClass = (Class<?>) pt
 									.getActualTypeArguments()[0];
 						}
+						requestBody = FieldObject.createList(requestBodyClass, fds,
+								true);
 						if (fds != null) {
-							requestBody = FieldObject.from(requestBodyClass,
-									fds);
 							if (StringUtils.isNotBlank(fds.sampleMethodName()))
 								try {
 									Method m = apiDocClazz.getDeclaredMethod(

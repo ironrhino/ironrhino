@@ -4,16 +4,24 @@ import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.ValueConstants;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 public class FieldObject implements Serializable {
 
@@ -146,42 +154,97 @@ public class FieldObject implements Serializable {
 		return field;
 	}
 
-	public static List<FieldObject> from(Class<?> domainClass, Fields fields) {
-		List<FieldObject> list = new ArrayList<>(fields.value().length);
-		for (Field f : fields.value()) {
-			String type = f.type();
-			String name = f.name();
-			if (StringUtils.isBlank(type)) {
-				String[] arr = name.split("\\.");
-				PropertyDescriptor pd = null;
-				int i = 0;
-				Class<?> clazz = domainClass;
-				while (i < arr.length) {
-					pd = BeanUtils.getPropertyDescriptor(clazz, arr[i]);
-					if (pd == null)
-						break;
-					clazz = pd.getPropertyType();
-					i++;
+	public static List<FieldObject> createList(Class<?> domainClass,
+			Fields fields, boolean forRequest) {
+		if (fields != null) {
+			List<FieldObject> list = new ArrayList<>(fields.value().length);
+			for (Field f : fields.value()) {
+				String type = f.type();
+				String name = f.name();
+				if (StringUtils.isBlank(type)) {
+					String[] arr = name.split("\\.");
+					PropertyDescriptor pd = null;
+					int i = 0;
+					Class<?> clazz = domainClass;
+					while (i < arr.length) {
+						pd = BeanUtils.getPropertyDescriptor(clazz, arr[i]);
+						if (pd == null)
+							break;
+						clazz = pd.getPropertyType();
+						i++;
+					}
+					if (pd != null) {
+						list.add(create(name, pd.getPropertyType(),
+								f.required(), f.defaultValue(), f));
+						continue;
+					} else {
+						type = "string";
+					}
 				}
-				if (pd != null) {
-					list.add(create(name, pd.getPropertyType(), f.required(),
-							f.defaultValue(), f));
-					continue;
-				} else {
-					type = "string";
-				}
+				FieldObject field = new FieldObject(name, type, f.required());
+				if (StringUtils.isNotBlank(f.defaultValue())
+						&& !ValueConstants.DEFAULT_NONE
+								.equals(f.defaultValue()))
+					field.setDefaultValue(f.defaultValue());
+				if (StringUtils.isNotBlank(f.label()))
+					field.setLabel(f.label());
+				if (StringUtils.isNotBlank(f.description()))
+					field.setDescription(f.description());
+				list.add(field);
 			}
-			FieldObject field = new FieldObject(name, type, f.required());
-			if (StringUtils.isNotBlank(f.defaultValue())
-					&& !ValueConstants.DEFAULT_NONE.equals(f.defaultValue()))
-				field.setDefaultValue(f.defaultValue());
-			if (StringUtils.isNotBlank(f.label()))
-				field.setLabel(f.label());
-			if (StringUtils.isNotBlank(f.description()))
-				field.setDescription(f.description());
-			list.add(field);
+			return list;
+		} else {
+			List<FieldObject> list = new ArrayList<>();
+			final List<String> fieldNames = ReflectionUtils
+					.getAllFields(domainClass);
+			JsonIgnoreProperties jip = domainClass
+					.getAnnotation(JsonIgnoreProperties.class);
+			List<String> ignoreList = new ArrayList<>();
+			if (jip != null)
+				ignoreList.addAll(Arrays.asList(jip.value()));
+			PropertyDescriptor[] pds = BeanUtils
+					.getPropertyDescriptors(domainClass);
+			for (PropertyDescriptor pd : pds) {
+				String name = pd.getName();
+				if (name.equals("class") || ignoreList.contains(name))
+					continue;
+				if (forRequest
+						&& (pd.getWriteMethod() == null || pd.getWriteMethod()
+								.getAnnotation(JsonIgnore.class) != null))
+					continue;
+				if (!forRequest
+						&& (pd.getReadMethod() == null || pd.getReadMethod()
+								.getAnnotation(JsonIgnore.class) != null))
+					continue;
+				boolean required = false;
+				try {
+					java.lang.reflect.Field f = domainClass
+							.getDeclaredField(name);
+					if (f.getAnnotation(JsonIgnore.class) != null)
+						continue;
+					UiConfig uic = null;
+					if (pd.getReadMethod() != null) {
+						uic = pd.getReadMethod().getAnnotation(UiConfig.class);
+					}
+					if (uic == null)
+						uic = f.getAnnotation(UiConfig.class);
+					if (uic != null && uic.required())
+						required = true;
+				} catch (Exception e) {
+
+				}
+				list.add(create(name, pd.getPropertyType(), required, null,
+						null));
+			}
+			Collections.sort(list, new Comparator<FieldObject>() {
+				@Override
+				public int compare(FieldObject o1, FieldObject o2) {
+					return fieldNames.indexOf(o1.getName())
+							- fieldNames.indexOf(o2.getName());
+				}
+			});
+			return list;
 		}
-		return list;
 	}
 
 }

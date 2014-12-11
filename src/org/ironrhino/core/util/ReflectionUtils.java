@@ -8,7 +8,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
 
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -22,6 +30,34 @@ import org.springframework.core.ParameterNameDiscoverer;
 public class ReflectionUtils {
 
 	public static ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+
+	private static ClassPool classPool = ClassPool.getDefault();
+
+	public static List<String> getAllFields(Class<?> clazz) {
+		try {
+			classPool.insertClassPath(new ClassClassPath(clazz));
+			CtClass cc = classPool.get(clazz.getName());
+			List<CtClass> ctClasses = new ArrayList<CtClass>();
+			ctClasses.add(cc);
+			while (!(cc = cc.getSuperclass()).getName().equals(
+					Object.class.getName()))
+				ctClasses.add(0, cc);
+			List<String> fields = new ArrayList<String>();
+			for (CtClass ctc : ctClasses) {
+				for (CtField cf : ctc.getDeclaredFields()) {
+					int accessFlag = cf.getModifiers();
+					if (Modifier.isFinal(accessFlag)
+							|| Modifier.isStatic(accessFlag))
+						continue;
+					fields.add(cf.getName());
+				}
+			}
+			return fields;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
 
 	public static Class<?> getGenericClass(Class<?> clazz) {
 		return getGenericClass(clazz, 0);
