@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
@@ -218,20 +220,31 @@ public class FieldObject implements Serializable {
 					continue;
 				boolean required = false;
 				try {
-					java.lang.reflect.Field f = domainClass
-							.getDeclaredField(name);
+					java.lang.reflect.Field f = pd.getReadMethod()
+							.getDeclaringClass().getDeclaredField(name);
 					if (f.getAnnotation(JsonIgnore.class) != null)
 						continue;
-					UiConfig uic = null;
-					if (pd.getReadMethod() != null) {
-						uic = pd.getReadMethod().getAnnotation(UiConfig.class);
-					}
-					if (uic == null)
-						uic = f.getAnnotation(UiConfig.class);
-					if (uic != null && uic.required())
-						required = true;
-				} catch (Exception e) {
 
+					if (!forRequest
+							&& Persistable.class.isAssignableFrom(domainClass)) {
+						if ("id".equals(name))
+							required = true;
+						if (f.getAnnotation(NaturalId.class) != null)
+							required = true;
+					}
+					if (!required) {
+						UiConfig uic = null;
+						if (pd.getReadMethod() != null) {
+							uic = pd.getReadMethod().getAnnotation(
+									UiConfig.class);
+						}
+						if (uic == null)
+							uic = f.getAnnotation(UiConfig.class);
+						if (uic != null && uic.required())
+							required = true;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				list.add(create(name, pd.getPropertyType(), required, null,
 						null));
