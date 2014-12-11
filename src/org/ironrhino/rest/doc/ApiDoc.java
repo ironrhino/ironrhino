@@ -63,13 +63,49 @@ public class ApiDoc implements Serializable {
 
 	public ApiDoc(Class<?> apiDocClazz, Method apiDocMethod,
 			ObjectMapper objectMapper) throws Exception {
+
 		Class<?> clazz = apiDocClazz.getSuperclass();
 		Method method = clazz.getMethod(apiDocMethod.getName(),
 				apiDocMethod.getParameterTypes());
+		Object apiDocInstance = apiDocClazz.newInstance();
 
 		Api api = apiDocMethod.getAnnotation(Api.class);
 		this.name = api.value();
 		this.description = api.description();
+
+		Authorize authorize = method.getAnnotation(Authorize.class);
+		if (authorize == null)
+			authorize = clazz.getAnnotation(Authorize.class);
+		if (authorize != null) {
+			String ifAnyGranted = authorize.ifAnyGranted();
+			if (StringUtils.isNotBlank(ifAnyGranted))
+				requiredAuthorities = ifAnyGranted.split("\\s*,\\s*");
+		}
+
+		RequestMapping requestMapping = method
+				.getAnnotation(RequestMapping.class);
+		if (requestMapping != null) {
+			String murl = "";
+			String curl = "";
+			String[] values = requestMapping.value();
+			if (values.length > 0)
+				murl = values[0];
+			RequestMapping requestMappingWithClass = clazz
+					.getAnnotation(RequestMapping.class);
+			if (requestMappingWithClass != null) {
+				values = requestMappingWithClass.value();
+				if (values.length > 0)
+					curl = values[0];
+			}
+			if (StringUtils.isNotBlank(murl) | StringUtils.isNoneBlank(curl))
+				url = curl + murl;
+			RequestMethod[] rms = requestMapping.method();
+			if (rms.length > 0) {
+				methods = new String[rms.length];
+				for (int i = 0; i < rms.length; i++)
+					methods[i] = rms[i].name();
+			}
+		}
 
 		Class<?> responseBodyClass = method.getReturnType();
 		if (Collection.class.isAssignableFrom(responseBodyClass)) {
@@ -107,105 +143,49 @@ public class ApiDoc implements Serializable {
 				}
 			}
 		}
-		Fields returnFields = apiDocMethod.getAnnotation(Fields.class);
-		responseBody = FieldObject.createList(responseBodyClass, returnFields,
-				false);
-		Object instance = apiDocClazz.newInstance();
-		if (returnFields != null
-				&& StringUtils.isNotBlank(returnFields.sampleMethodName())) {
-			try {
-				Method m = apiDocClazz.getDeclaredMethod(
-						returnFields.sampleMethodName(), new Class[0]);
-				m.setAccessible(true);
-				Object requestObject = m.invoke(instance, new Object[0]);
-				if (requestObject instanceof String)
-					responseBodySample = (String) requestObject;
-				else
-					responseBodySample = objectMapper
-							.writeValueAsString(requestObject);
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			}
-		} else {
-			Class<?>[] argTypes = apiDocMethod.getParameterTypes();
-			Object[] args = new Object[argTypes.length];
-			for (int i = 0; i < argTypes.length; i++) {
-				Class<?> type = argTypes[i];
-				if (type.isPrimitive()) {
-					if (Number.class.isAssignableFrom(type))
-						args[i] = 0;
-					else if (type == Boolean.TYPE)
-						args[i] = false;
-					else if (type == Byte.TYPE)
-						args[i] = (byte) 0;
-				} else {
-					args[i] = null;
-				}
-			}
-			Object sample = apiDocMethod.invoke(instance, args);
+
+		Fields responseFields = apiDocMethod.getAnnotation(Fields.class);
+		responseBody = FieldObject.createList(responseBodyClass,
+				responseFields, false);
+
+		Object responseSample = ApiDocHelper.generateSample(apiDocInstance,
+				apiDocMethod, responseFields);
+		if (responseSample instanceof String) {
+			responseBodySample = (String) responseSample;
+		} else if (responseSample != null) {
 			Class<?> view = null;
-			if (sample instanceof DeferredResult)
-				sample = ((DeferredResult<?>) sample).getResult();
-			else if (sample instanceof Callable)
-				sample = ((Callable<?>) sample).call();
-			else if (sample instanceof MappingJacksonValue) {
-				view = ((MappingJacksonValue) sample).getSerializationView();
-				sample = ((MappingJacksonValue) sample).getValue();
+			if (responseSample instanceof DeferredResult)
+				responseSample = ((DeferredResult<?>) responseSample)
+						.getResult();
+			else if (responseSample instanceof Callable)
+				responseSample = ((Callable<?>) responseSample).call();
+			else if (responseSample instanceof MappingJacksonValue) {
+				view = ((MappingJacksonValue) responseSample)
+						.getSerializationView();
+				responseSample = ((MappingJacksonValue) responseSample)
+						.getValue();
 			}
 			JsonView jsonView = method.getAnnotation(JsonView.class);
 			if (view == null && jsonView != null)
 				view = jsonView.value()[0];
 			if (view == null)
-				responseBodySample = objectMapper.writeValueAsString(sample);
+				responseBodySample = objectMapper
+						.writeValueAsString(responseSample);
 			else
 				responseBodySample = objectMapper.writerWithView(view)
-						.writeValueAsString(sample);
+						.writeValueAsString(responseSample);
 		}
 
-		Authorize authorize = method.getAnnotation(Authorize.class);
-		if (authorize == null)
-			authorize = clazz.getAnnotation(Authorize.class);
-		if (authorize != null) {
-			String ifAnyGranted = authorize.ifAnyGranted();
-			if (StringUtils.isNotBlank(ifAnyGranted))
-				requiredAuthorities = ifAnyGranted.split("\\s*,\\s*");
-		}
-
-		RequestMapping requestMapping = method
-				.getAnnotation(RequestMapping.class);
-		if (requestMapping != null) {
-			String murl = "";
-			String curl = "";
-			String[] values = requestMapping.value();
-			if (values.length > 0)
-				murl = values[0];
-			RequestMapping requestMappingWithClass = clazz
-					.getAnnotation(RequestMapping.class);
-			if (requestMappingWithClass != null) {
-				values = requestMappingWithClass.value();
-				if (values.length > 0)
-					curl = values[0];
-			}
-			if (StringUtils.isNotBlank(murl) | StringUtils.isNoneBlank(curl))
-				url = curl + murl;
-			RequestMethod[] rms = requestMapping.method();
-			if (rms.length > 0) {
-				methods = new String[rms.length];
-				for (int i = 0; i < rms.length; i++)
-					methods[i] = rms[i].name();
-			}
-		}
-
-		Class<?>[] types = method.getParameterTypes();
-		if (types.length > 0) {
-			String[] names = ReflectionUtils.getParameterNames(method);
-			Annotation[][] apiDocArray = apiDocMethod.getParameterAnnotations();
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		if (parameterTypes.length > 0) {
+			String[] parameterNames = ReflectionUtils.getParameterNames(method);
+			Annotation[][] apiDocParameterAnnotations = apiDocMethod.getParameterAnnotations();
 			Annotation[][] array = method.getParameterAnnotations();
-			for (int i = 0; i < types.length; i++) {
-				Annotation[] apiDocAnnotations = apiDocArray[i];
+			for (int i = 0; i < parameterTypes.length; i++) {
+				Annotation[] apiDocAnnotations = apiDocParameterAnnotations[i];
 				Annotation[] annotations = array[i];
 				Field fd = null;
-				Fields fds = null;
+				Fields requestFields = null;
 				for (int j = 0; j < apiDocAnnotations.length; j++) {
 					Annotation anno = apiDocAnnotations[j];
 					if (anno instanceof Field) {
@@ -215,13 +195,13 @@ public class ApiDoc implements Serializable {
 				for (int j = 0; j < apiDocAnnotations.length; j++) {
 					Annotation anno = apiDocAnnotations[j];
 					if (anno instanceof Fields) {
-						fds = (Fields) anno;
+						requestFields = (Fields) anno;
 					}
 				}
 				for (int j = 0; j < annotations.length; j++) {
 					Annotation anno = annotations[j];
 					if (anno instanceof RequestBody) {
-						Class<?> requestBodyClass = types[i];
+						Class<?> requestBodyClass = parameterTypes[i];
 						if (Collection.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "collection";
 						} else if (ResultPage.class
@@ -241,44 +221,36 @@ public class ApiDoc implements Serializable {
 									.getActualTypeArguments()[0];
 						}
 						requestBody = FieldObject.createList(requestBodyClass,
-								fds, true);
-						if (fds != null) {
-							if (StringUtils.isNotBlank(fds.sampleMethodName()))
-								try {
-									Method m = apiDocClazz.getDeclaredMethod(
-											fds.sampleMethodName(),
-											new Class[0]);
-									m.setAccessible(true);
-									Object requestObject = m.invoke(instance,
-											new Object[0]);
-									if (requestObject instanceof String)
-										requestBodySample = (String) requestObject;
-									else
-										requestBodySample = objectMapper
-												.writeValueAsString(requestObject);
-								} catch (NoSuchMethodException e) {
-									e.printStackTrace();
-								}
+								requestFields, true);
+						if (requestFields != null) {
+							Object requestSample = ApiDocHelper.generateSample(
+									apiDocInstance, null, requestFields);
+							if (requestSample instanceof String) {
+								requestBodySample = (String) requestSample;
+							} else if (requestSample != null) {
+								requestBodySample = objectMapper
+										.writeValueAsString(requestSample);
+							}
 						}
 					}
 					if (anno instanceof PathVariable) {
 						PathVariable ann = (PathVariable) anno;
 						pathVariables.add(FieldObject.create(StringUtils
 								.isNotBlank(ann.value()) ? ann.value()
-								: names[i], types[i], true, null, fd));
+								: parameterNames[i], parameterTypes[i], true, null, fd));
 					}
 					if (anno instanceof RequestParam) {
 						RequestParam ann = (RequestParam) anno;
 						requestParams.add(FieldObject.create(StringUtils
 								.isNotBlank(ann.value()) ? ann.value()
-								: names[i], types[i], ann.required(), ann
+								: parameterNames[i], parameterTypes[i], ann.required(), ann
 								.defaultValue(), fd));
 					}
 					if (anno instanceof RequestHeader) {
 						RequestHeader ann = (RequestHeader) anno;
 						requestHeaders.add(FieldObject.create(StringUtils
 								.isNotBlank(ann.value()) ? ann.value()
-								: names[i], types[i], ann.required(), ann
+								: parameterNames[i], parameterTypes[i], ann.required(), ann
 								.defaultValue(), fd));
 					}
 				}

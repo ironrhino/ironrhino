@@ -13,10 +13,13 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.bytecode.Descriptor;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.rest.ApiConfigBase;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
+import org.ironrhino.rest.doc.annotation.Fields;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -113,6 +116,47 @@ public class ApiDocHelper {
 			}
 		}
 		return list;
+	}
+
+	public static Object generateSample(Object apiDocInstance,
+			Method apiDocMethod, Fields fields) throws Exception {
+		if (fields != null) {
+			if (StringUtils.isNotBlank(fields.sample()))
+				return fields.sample();
+			String sampleFileName = fields.sampleFileName();
+			if (StringUtils.isNotBlank(sampleFileName)) {
+				return StringUtils.join(IOUtils.readLines(apiDocInstance
+						.getClass().getResourceAsStream(sampleFileName),
+						"UTF-8"), "\n");
+			}
+			String sampleMethodName = fields.sampleMethodName();
+			if (StringUtils.isNotBlank(sampleMethodName)) {
+				Method m = apiDocInstance.getClass().getDeclaredMethod(
+						sampleMethodName, new Class[0]);
+				m.setAccessible(true);
+				return m.invoke(apiDocInstance, new Object[0]);
+			}
+		}
+		if (apiDocMethod != null) {
+			Class<?>[] argTypes = apiDocMethod.getParameterTypes();
+			Object[] args = new Object[argTypes.length];
+			for (int i = 0; i < argTypes.length; i++) {
+				Class<?> type = argTypes[i];
+				if (type.isPrimitive()) {
+					if (Number.class.isAssignableFrom(type))
+						args[i] = 0;
+					else if (type == Boolean.TYPE)
+						args[i] = false;
+					else if (type == Byte.TYPE)
+						args[i] = (byte) 0;
+				} else {
+					args[i] = null;
+				}
+			}
+			return apiDocMethod.invoke(apiDocInstance, args);
+		}
+		return null;
+
 	}
 
 }

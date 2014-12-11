@@ -13,6 +13,10 @@ public @interface Fields {
 
 	Field[] value();
 
+	String sample() default "";
+
 	String sampleMethodName() default "";
+
+	String sampleFileName() default "";
 
 }
