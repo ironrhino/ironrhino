@@ -67,7 +67,7 @@ public class HttpSessionFilter implements Filter {
 				return;
 			}
 		}
-		WrappedHttpSession session = new WrappedHttpSession(
+		final WrappedHttpSession session = new WrappedHttpSession(
 				(HttpServletRequest) request, (HttpServletResponse) response,
 				servletContext, httpSessionManager);
 		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(
@@ -88,39 +88,47 @@ public class HttpSessionFilter implements Filter {
 			}
 		else
 			chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
-		try {
-			session.save();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (!wrappedHttpRequest.isAsyncStarted()) {
+		if (!wrappedHttpRequest.isAsyncStarted()) {
+			try {
+				session.save();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
 				wrappedHttpResponse.commit();
-			} else {
-				wrappedHttpRequest.getAsyncContext().addListener(
-						new AsyncListener() {
+			}
+		} else {
+			wrappedHttpRequest.getAsyncContext().addListener(
+					new AsyncListener() {
 
-							@Override
-							public void onTimeout(AsyncEvent event)
-									throws IOException {
-							}
+						@Override
+						public void onStartAsync(AsyncEvent event)
+								throws IOException {
+						}
 
-							@Override
-							public void onStartAsync(AsyncEvent event)
-									throws IOException {
-							}
+						@Override
+						public void onTimeout(AsyncEvent event)
+								throws IOException {
+							onComplete(event);
+						}
 
-							@Override
-							public void onError(AsyncEvent event)
-									throws IOException {
-							}
+						@Override
+						public void onError(AsyncEvent event)
+								throws IOException {
+							onComplete(event);
+						}
 
-							@Override
-							public void onComplete(AsyncEvent event)
-									throws IOException {
+						@Override
+						public void onComplete(AsyncEvent event)
+								throws IOException {
+							try {
+								session.save();
+							} catch (Exception e) {
+								e.printStackTrace();
+							} finally {
 								wrappedHttpResponse.commit();
 							}
-						});
-			}
+						}
+					});
 		}
 	}
 
