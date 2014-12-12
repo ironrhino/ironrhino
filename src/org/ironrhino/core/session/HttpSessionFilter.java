@@ -108,13 +108,11 @@ public class HttpSessionFilter implements Filter {
 						@Override
 						public void onTimeout(AsyncEvent event)
 								throws IOException {
-							onComplete(event);
 						}
 
 						@Override
 						public void onError(AsyncEvent event)
 								throws IOException {
-							onComplete(event);
 						}
 
 						@Override
