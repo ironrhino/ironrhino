@@ -15,6 +15,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -42,7 +43,6 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 			ContentNegotiationConfigurer configurer) {
 		configurer.defaultContentType(MediaType.APPLICATION_JSON);
 		configurer.favorPathExtension(false);
-		configurer.ignoreAcceptHeader(true);
 	}
 
 	@Override
@@ -51,12 +51,16 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter();
 		jackson2.setObjectMapper(createObjectMapper());
 		converters.add(jackson2);
+		StringHttpMessageConverter string = new StringHttpMessageConverter();
+		string.setWriteAcceptCharset(false);
+		converters.add(string);
 	}
 
 	@Override
 	protected Map<String, MediaType> getDefaultMediaTypes() {
 		Map<String, MediaType> map = new HashMap<String, MediaType>();
 		map.put("json", MediaType.APPLICATION_JSON);
+		map.put("txt", MediaType.TEXT_PLAIN);
 		return map;
 	}
 
