@@ -12,10 +12,12 @@
 		<dependency>
 			<groupId>org.ironrhino</groupId>
 			<artifactId>ironrhino-core</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ironrhino</groupId>
 			<artifactId>ironrhino-fs</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>

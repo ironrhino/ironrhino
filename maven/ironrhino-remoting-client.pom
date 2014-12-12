@@ -12,6 +12,7 @@
 		<dependency>
 			<groupId>org.ironrhino</groupId>
 			<artifactId>ironrhino-remoting-common</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>
