@@ -81,6 +81,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	public FreeMarkerConfig freeMarkerConfig() {
 		FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
 		freeMarkerConfigurer.setTemplateLoaderPath("classpath:/resources/view");
+		freeMarkerConfigurer.setDefaultEncoding("UTF-8");
 		return freeMarkerConfigurer;
 	}
 
