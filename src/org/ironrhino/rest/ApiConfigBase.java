@@ -18,7 +18,10 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -67,6 +70,18 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Override
 	public void addFormatters(FormatterRegistry formatterRegistry) {
 		formatterRegistry.addConverter(new DateConverter());
+	}
+
+	@Override
+	protected void configureViewResolvers(ViewResolverRegistry registry) {
+		registry.freeMarker().suffix(".ftl");
+	}
+
+	@Bean
+	public FreeMarkerConfig freeMarkerConfig() {
+		FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
+		freeMarkerConfigurer.setTemplateLoaderPath("classpath:/resources/view");
+		return freeMarkerConfigurer;
 	}
 
 	@Bean
