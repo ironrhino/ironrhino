@@ -22,6 +22,7 @@ import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -74,7 +75,15 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	@Override
 	protected void configureViewResolvers(ViewResolverRegistry registry) {
-		registry.freeMarker().suffix(".ftl");
+		registry.freeMarker();
+	}
+
+	@Bean
+	public FreeMarkerViewResolver freeMarkerViewResolver() {
+		FreeMarkerViewResolver freeMarkerViewResolver = new FreeMarkerViewResolver();
+		freeMarkerViewResolver.setContentType("text/html; charset=UTF-8");
+		freeMarkerViewResolver.setSuffix(".ftl");
+		return freeMarkerViewResolver;
 	}
 
 	@Bean
