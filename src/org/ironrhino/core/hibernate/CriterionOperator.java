@@ -21,6 +21,8 @@ public enum CriterionOperator implements Displayable {
 	EQ(1) {
 		@Override
 		public boolean supports(Class<?> clazz) {
+			if (clazz == null)
+				return false;
 			return clazz == short.class || clazz == int.class
 					|| clazz == long.class || clazz == float.class
 					|| clazz == double.class || clazz == boolean.class

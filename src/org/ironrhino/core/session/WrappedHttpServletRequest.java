@@ -105,6 +105,7 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 				if (str.endsWith(key))
 					value = str.substring(0, str.length() - key.length());
 			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
