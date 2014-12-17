@@ -94,5 +94,7 @@ public @interface UiConfig {
 	String group() default "";
 
 	boolean suppressViewLink() default false;
+	
+	boolean embeddedAsSingle() default false;
 
 }
