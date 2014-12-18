@@ -178,7 +178,7 @@ public class EntityClassHelper {
 					} else {
 						embeddedClass = pd.getReadMethod().getReturnType();
 					}
-					if (uiConfig.embeddedAsSingle()) {
+					if (uiConfig != null && uiConfig.embeddedAsSingle()) {
 						embedded = null;
 						embeddedClass = null;
 					}
