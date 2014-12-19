@@ -1,5 +1,6 @@
 package org.ironrhino.core.util;
 
+import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,14 +10,10 @@ import java.util.Set;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.BaseTreeableEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 
 public class BeanUtils {
-
-	private static final Logger log = LoggerFactory.getLogger(BeanUtils.class);
 
 	public static boolean hasProperty(Class<?> clazz, String name) {
 		if (org.springframework.beans.BeanUtils.getPropertyDescriptor(clazz,
@@ -68,36 +65,91 @@ public class BeanUtils {
 		if (filter != null && !filter.accept(source))
 			throw new IllegalArgumentException(
 					"source object self must be accepted if you specify a filter");
+		T ret = null;
 		try {
-			T ret = (T) source.getClass().newInstance();
-			copyProperties(source, ret, ignoreProperties);
-			List<T> children = new ArrayList<T>();
-			for (T child : source.getChildren()) {
-				if (filter == null || filter.accept(child)) {
-					T t = deepClone(child, filter, ignoreProperties);
-					t.setParent(ret);
-					children.add(t);
-				}
-			}
-			ret.setChildren(children);
-			return ret;
+			ret = (T) source.getClass().newInstance();
 		} catch (Exception e) {
-			log.error("exception occurs", e);
-			return null;
+			throw new RuntimeException(e);
 		}
+		copyProperties(source, ret, ignoreProperties);
+		List<T> children = new ArrayList<T>();
+		for (T child : source.getChildren()) {
+			if (filter == null || filter.accept(child)) {
+				T t = deepClone(child, filter, ignoreProperties);
+				t.setParent(ret);
+				children.add(t);
+			}
+		}
+		ret.setChildren(children);
+		return ret;
+
 	}
 
 	public static Object convert(Class<?> beanClass, String propertyName,
-			String value) throws Exception {
-		return convert(beanClass.newInstance(), propertyName, value);
+			String value) {
+		try {
+			return convert(beanClass.newInstance(), propertyName, value);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static Object convert(Object bean, String propertyName, String value) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
-		bw.setConversionService(ApplicationContextUtils
-				.getBean(ConversionService.class));
+		ConversionService cs = ApplicationContextUtils
+				.getBean(ConversionService.class);
+		if (cs != null)
+			bw.setConversionService(cs);
 		bw.setPropertyValue(propertyName, value);
 		return bw.getPropertyValue(propertyName);
 	}
 
+	public static PropertyDescriptor getPropertyDescriptor(Class<?> beanClass,
+			String propertyName) {
+		if (propertyName.indexOf('.') == -1)
+			return org.springframework.beans.BeanUtils.getPropertyDescriptor(
+					beanClass, propertyName);
+		String[] arr = propertyName.split("\\.");
+		PropertyDescriptor pd = null;
+		int i = 0;
+		Class<?> clazz = beanClass;
+		while (i < arr.length) {
+			pd = BeanUtils.getPropertyDescriptor(clazz, arr[i]);
+			if (pd == null)
+				return null;
+			clazz = pd.getPropertyType();
+			i++;
+		}
+		return pd;
+	}
+
+	public static void setPropertyValue(Object bean, String propertyName,
+			Object propertyValue) {
+		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
+		if (propertyName.indexOf('.') == -1) {
+			bw.setPropertyValue(propertyName, propertyValue);
+			return;
+		}
+		String[] arr = propertyName.split("\\.");
+		int i = 0;
+		String name = null;
+		while (i < arr.length - 1) {
+			if (name == null)
+				name = arr[i];
+			else
+				name += "." + arr[i];
+			Object value = bw.getPropertyValue(name);
+			if (value == null) {
+				try {
+					value = getPropertyDescriptor(bean.getClass(), name)
+							.getPropertyType().newInstance();
+					bw.setPropertyValue(name, value);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+			i++;
+		}
+		bw.setPropertyValue(propertyName, propertyValue);
+	}
 }

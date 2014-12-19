@@ -29,6 +29,16 @@ public class BeanUtilsTest {
 		@NotInCopy
 		private String password;
 
+		private Team team;
+
+		public Team getTeam() {
+			return team;
+		}
+
+		public void setTeam(Team team) {
+			this.team = team;
+		}
+
 		public String getUsername() {
 			return username;
 		}
@@ -43,6 +53,29 @@ public class BeanUtilsTest {
 
 		public void setPassword(String password) {
 			this.password = password;
+		}
+
+	}
+
+	static class Team extends Base {
+		private String name;
+
+		private User owner;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public User getOwner() {
+			return owner;
+		}
+
+		public void setOwner(User owner) {
+			this.owner = owner;
 		}
 
 	}
@@ -94,6 +127,29 @@ public class BeanUtilsTest {
 		assertEquals(user2.getId(), "test");
 		assertEquals(user2.getUsername(), "username");
 		assertEquals(user2.getPassword(), "password");
+	}
+
+	@Test
+	public void getPropertyDescriptor() {
+		assertNull(BeanUtils.getPropertyDescriptor(User.class, "none"));
+		assertNull(BeanUtils.getPropertyDescriptor(User.class, "team.none"));
+		assertNotNull(BeanUtils.getPropertyDescriptor(User.class, "team"));
+		assertNotNull(BeanUtils.getPropertyDescriptor(User.class,
+				"team.owner.id"));
+	}
+
+	@Test
+	public void setPropertyValue() {
+		User u = new User();
+		Team team = new Team();
+		team.setName("test");
+		assertNull(u.getTeam());
+		BeanUtils.setPropertyValue(u, "team", team);
+		assertNotNull(u.getTeam());
+		u = new User();
+		BeanUtils.setPropertyValue(u, "team.name", "test");
+		assertNotNull(u.getTeam());
+		assertEquals("test", u.getTeam().getName());
 	}
 
 }

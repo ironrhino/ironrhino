@@ -167,17 +167,8 @@ public class FieldObject implements Serializable {
 				String type = f.type();
 				String name = f.name();
 				if (StringUtils.isBlank(type)) {
-					String[] arr = name.split("\\.");
-					PropertyDescriptor pd = null;
-					int i = 0;
-					Class<?> clazz = domainClass;
-					while (i < arr.length) {
-						pd = BeanUtils.getPropertyDescriptor(clazz, arr[i]);
-						if (pd == null)
-							break;
-						clazz = pd.getPropertyType();
-						i++;
-					}
+					PropertyDescriptor pd = org.ironrhino.core.util.BeanUtils
+							.getPropertyDescriptor(domainClass, name);
 					if (pd != null) {
 						list.add(create(name, pd.getPropertyType(),
 								f.required(), f.defaultValue(), f));
