@@ -1,5 +1,6 @@
 package org.ironrhino.core.hibernate;
 
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.struts.EntityClassHelper;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
+import org.ironrhino.core.util.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 
@@ -90,17 +92,18 @@ public class CriterionUtils {
 	public static CriteriaState filter(DetachedCriteria dc,
 			Class<? extends Persistable<?>> entityClass,
 			Map<String, UiConfigImpl> uiConfigs) {
+		Map<String, String[]> parameterMap = ServletActionContext.getRequest()
+				.getParameterMap();
+		String entityName = StringUtils.uncapitalize(entityClass
+				.getSimpleName());
+		Set<String> propertyNames = uiConfigs.keySet();
 		CriteriaState state = new CriteriaState();
 		try {
 			ConversionService conversionService = ApplicationContextUtils
 					.getBean(ConversionService.class);
-			Set<String> propertyNames = uiConfigs.keySet();
-			BeanWrapperImpl bw = new BeanWrapperImpl(entityClass.newInstance());
-			bw.setConversionService(conversionService);
-			String entityName = StringUtils.uncapitalize(entityClass
-					.getSimpleName());
-			Map<String, String[]> parameterMap = ServletActionContext
-					.getRequest().getParameterMap();
+			BeanWrapperImpl entityBeanWrapper = new BeanWrapperImpl(
+					entityClass.newInstance());
+			entityBeanWrapper.setConversionService(conversionService);
 			for (String parameterName : parameterMap.keySet()) {
 				String propertyName;
 				String[] parameterValues;
@@ -129,13 +132,13 @@ public class CriterionUtils {
 						s = s.substring(0, s.indexOf('.'));
 					UiConfigImpl config = uiConfigs.get(s);
 					if (config != null && !config.isExcludedFromOrdering()) {
-						if (propertyName.indexOf('.') > 0) {
+						int index;
+						if ((index = propertyName.indexOf('.')) > 0) {
 							String subPropertyName = propertyName
-									.substring(propertyName.indexOf('.') + 1);
-							propertyName = propertyName.substring(0,
-									propertyName.indexOf('.'));
+									.substring(index + 1);
+							propertyName = propertyName.substring(0, index);
 							if (propertyNames.contains(propertyName)) {
-								Class<?> type = bw
+								Class<?> type = entityBeanWrapper
 										.getPropertyType(propertyName);
 								if (Persistable.class.isAssignableFrom(type)) {
 									String alias = state.getAliases().get(
@@ -213,20 +216,28 @@ public class CriterionUtils {
 					propertyName = propertyName.substring(0,
 							propertyName.indexOf('.'));
 					if (propertyNames.contains(propertyName)) {
-						Class<?> type = bw.getPropertyType(propertyName);
+						Class<?> type = entityBeanWrapper
+								.getPropertyType(propertyName);
 						if (Persistable.class.isAssignableFrom(type)) {
-							BeanWrapperImpl bw2 = new BeanWrapperImpl(
+							BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(
 									type.newInstance());
-							bw2.setConversionService(conversionService);
-							if (!operator.isEffective(
-									bw2.getPropertyType(subPropertyName),
-									parameterValues))
+							subBeanWrapper
+									.setConversionService(conversionService);
+							PropertyDescriptor pd = BeanUtils
+									.getPropertyDescriptor(
+											subBeanWrapper.getWrappedClass(),
+											subPropertyName);
+							if (pd == null
+									|| !operator.isEffective(
+											pd.getPropertyType(),
+											parameterValues))
 								continue;
 							values = new Object[parameterValues.length];
 							for (int n = 0; n < values.length; n++) {
-								bw2.setPropertyValue(subPropertyName,
-										parameterValues[n]);
-								values[n] = bw2
+								BeanUtils.setPropertyValue(
+										subBeanWrapper.getWrappedInstance(),
+										subPropertyName, parameterValues[n]);
+								values[n] = subBeanWrapper
 										.getPropertyValue(subPropertyName);
 							}
 							String alias = state.getAliases().get(propertyName);
@@ -247,17 +258,22 @@ public class CriterionUtils {
 						}
 					}
 				} else if (propertyNames.contains(propertyName)) {
-					Class<?> type = bw.getPropertyType(propertyName);
+					Class<?> type = entityBeanWrapper
+							.getPropertyType(propertyName);
 					if (Persistable.class.isAssignableFrom(type)) {
 						@SuppressWarnings("unchecked")
 						BaseManager<?> em = ApplicationContextUtils
 								.getEntityManager((Class<? extends Persistable<?>>) type);
 						try {
-							BeanWrapperImpl bw2 = new BeanWrapperImpl(type);
-							bw2.setConversionService(conversionService);
-							bw2.setPropertyValue("id", parameterValues[0]);
-							Persistable<?> p = em.get((Serializable) bw2
-									.getPropertyValue("id"));
+							BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(
+									type);
+							subBeanWrapper
+									.setConversionService(conversionService);
+							subBeanWrapper.setPropertyValue("id",
+									parameterValues[0]);
+							Persistable<?> p = em
+									.get((Serializable) subBeanWrapper
+											.getPropertyValue("id"));
 							if (p == null) {
 								Map<String, NaturalId> naturalIds = AnnotationUtils
 										.getAnnotatedPropertyNameAndAnnotations(
@@ -265,9 +281,9 @@ public class CriterionUtils {
 								if (naturalIds.size() == 1) {
 									String name = naturalIds.entrySet()
 											.iterator().next().getKey();
-									bw2.setPropertyValue(name,
+									subBeanWrapper.setPropertyValue(name,
 											parameterValues[0]);
-									p = em.findOne((Serializable) bw2
+									p = em.findOne((Serializable) subBeanWrapper
 											.getPropertyValue(name));
 								}
 							}
@@ -287,9 +303,10 @@ public class CriterionUtils {
 							continue;
 						values = new Object[parameterValues.length];
 						for (int n = 0; n < values.length; n++) {
-							bw.setPropertyValue(propertyName,
+							entityBeanWrapper.setPropertyValue(propertyName,
 									parameterValues[n]);
-							values[n] = bw.getPropertyValue(propertyName);
+							values[n] = entityBeanWrapper
+									.getPropertyValue(propertyName);
 						}
 						Criterion criterion = operator.operator(propertyName,
 								values);
