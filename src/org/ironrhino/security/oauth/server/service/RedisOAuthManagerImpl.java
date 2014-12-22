@@ -306,11 +306,6 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		return authorizationRedisTemplate.opsForValue().multiGet(keys);
 	}
 
-	@Override
-	public void removeExpired() {
-	}
-
-	@Override
 	public void saveClient(Client client) {
 		if (client.isNew())
 			client.setId(CodecUtils.nextId());
@@ -322,7 +317,6 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 					client.getId());
 	}
 
-	@Override
 	public void deleteClient(Client client) {
 		if (client.isNew())
 			return;
@@ -333,7 +327,6 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 					client.getId());
 	}
 
-	@Override
 	public Client findClientById(String clientId) {
 		Client c = clientRedisTemplate.opsForValue().get(
 				NAMESPACE_CLIENT + clientId);

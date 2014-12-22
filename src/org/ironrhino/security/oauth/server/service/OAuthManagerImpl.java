@@ -20,6 +20,7 @@ import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,6 +32,9 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
 public class OAuthManagerImpl implements OAuthManager {
+
+	@Autowired
+	private ClientManager clientManager;
 
 	@Resource
 	private EntityManager entityManager;
@@ -204,7 +208,6 @@ public class OAuthManagerImpl implements OAuthManager {
 		return entityManager.findListByCriteria(dc);
 	}
 
-	@Override
 	@Trigger
 	@Scheduled(cron = "0 30 23 * * ?")
 	public void removeExpired() {
@@ -217,28 +220,15 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public void saveClient(Client client) {
-		entityManager.save(client);
-	}
-
-	@Override
-	public void deleteClient(Client client) {
-		entityManager.delete(client);
-	}
-
-	@Override
 	public Client findClientById(String clientId) {
-		entityManager.setEntityClass(Client.class);
-		Client c = (Client) entityManager.get(clientId);
-		return c != null && c.isEnabled() ? c : null;
+		return clientManager.get(clientId);
 	}
 
 	@Override
 	public List<Client> findClientByOwner(UserDetails owner) {
-		entityManager.setEntityClass(Client.class);
-		DetachedCriteria dc = entityManager.detachedCriteria();
+		DetachedCriteria dc = clientManager.detachedCriteria();
 		dc.add(Restrictions.eq("owner", owner));
 		dc.addOrder(Order.asc("createDate"));
-		return entityManager.findListByCriteria(dc);
+		return clientManager.findListByCriteria(dc);
 	}
 }

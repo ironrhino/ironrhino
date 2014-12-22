@@ -41,6 +41,9 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 
 	private RedisTemplate<String, Authorization> authorizationRedisTemplate;
 
+	@Autowired
+	private ClientManager clientManager;
+
 	@Resource
 	private EntityManager entityManager;
 
@@ -316,33 +319,16 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public void removeExpired() {
-	}
-
-	@Override
-	public void saveClient(Client client) {
-		entityManager.save(client);
-	}
-
-	@Override
-	public void deleteClient(Client client) {
-		entityManager.delete(client);
-	}
-
-	@Override
 	public Client findClientById(String clientId) {
-		entityManager.setEntityClass(Client.class);
-		Client c = (Client) entityManager.get(clientId);
-		return c != null && c.isEnabled() ? c : null;
+		return clientManager.get(clientId);
 	}
 
 	@Override
 	public List<Client> findClientByOwner(UserDetails owner) {
-		entityManager.setEntityClass(Client.class);
-		DetachedCriteria dc = entityManager.detachedCriteria();
+		DetachedCriteria dc = clientManager.detachedCriteria();
 		dc.add(Restrictions.eq("owner", owner));
 		dc.addOrder(Order.asc("createDate"));
-		return entityManager.findListByCriteria(dc);
+		return clientManager.findListByCriteria(dc);
 	}
 
 }

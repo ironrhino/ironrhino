@@ -39,12 +39,6 @@ public interface OAuthManager {
 
 	public long getExpireTime();
 
-	public void removeExpired();
-
-	public void saveClient(Client client);
-
-	public void deleteClient(Client client);
-
 	public Client findClientById(String clientId);
 
 	public List<Client> findClientByOwner(UserDetails user);
