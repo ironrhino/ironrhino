@@ -248,12 +248,38 @@ public class CriterionUtils {
 								dc.createAlias(propertyName, alias);
 								state.getAliases().put(propertyName, alias);
 							}
-							Criterion criterion = operator.operator(alias + "."
-									+ subPropertyName, values);
-							if (criterion != null) {
-								dc.add(criterion);
-								state.getCriteria().add(
-										alias + "." + subPropertyName);
+							if (subPropertyName.indexOf('.') < 0
+									|| subPropertyName.endsWith(".id")) {
+								Criterion criterion = operator.operator(alias
+										+ "." + subPropertyName, values);
+								if (criterion != null) {
+									dc.add(criterion);
+									state.getCriteria().add(
+											alias + "." + subPropertyName);
+								}
+							} else {
+								String[] arr = subPropertyName.split("\\.", 2);
+								String subname = propertyName + "." + arr[0];
+								String subalias = state.getAliases().get(
+										subname);
+								if (subalias == null) {
+									subalias = propertyName + "_" + arr[0]
+											+ "_";
+									while (state.getAliases().containsValue(
+											subalias))
+										subalias += "_";
+									dc.createAlias(alias + "." + arr[0],
+											subalias);
+									state.getAliases().put(subname, subalias);
+								}
+
+								Criterion criterion = operator.operator(
+										subalias + "." + arr[1], values);
+								if (criterion != null) {
+									dc.add(criterion);
+									state.getCriteria().add(
+											subalias + "." + arr[1]);
+								}
 							}
 						}
 					}
