@@ -3,11 +3,7 @@ package org.ironrhino.security.oauth.server.model;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.NaturalId;
@@ -22,7 +18,6 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.CodecUtils;
-import org.ironrhino.security.model.User;
 
 @AutoConfig
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
@@ -40,13 +35,11 @@ public class Authorization extends BaseEntity {
 	@NaturalId(mutable = true)
 	private String accessToken = CodecUtils.nextId();
 
-	@ManyToOne
-	@JoinColumn(name = "client", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private Client client;
+	@Column(length = 32)
+	@UiConfig(template = "<#if value?has_content><a href=\"<@url value='/oauth/client/view/${value}'/>\" rel=\"richtable\">${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('oauthManager').findClientById(value)}</a></#if>")
+	private String client;
 
-	@ManyToOne
-	@JoinColumn(name = "grantor", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private User grantor;
+	private String grantor;
 
 	@UiConfig(hiddenInList = @Hidden(true))
 	private String scope;
@@ -84,19 +77,19 @@ public class Authorization extends BaseEntity {
 		this.accessToken = accessToken;
 	}
 
-	public Client getClient() {
+	public String getClient() {
 		return client;
 	}
 
-	public void setClient(Client client) {
+	public void setClient(String client) {
 		this.client = client;
 	}
 
-	public User getGrantor() {
+	public String getGrantor() {
 		return grantor;
 	}
 
-	public void setGrantor(User grantor) {
+	public void setGrantor(String grantor) {
 		this.grantor = grantor;
 	}
 

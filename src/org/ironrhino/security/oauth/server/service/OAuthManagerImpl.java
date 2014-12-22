@@ -18,12 +18,12 @@ import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
-import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component("oauthManager")
@@ -61,7 +61,7 @@ public class OAuthManagerImpl implements OAuthManager {
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
-		auth.setClient(client);
+		auth.setClient(client.getId());
 		auth.setResponseType("token");
 		auth.setRefreshToken(CodecUtils.nextId());
 		entityManager.save(auth);
@@ -69,12 +69,12 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(Client client, User grantor) {
+	public Authorization grant(Client client, UserDetails grantor) {
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
-		auth.setClient(client);
-		auth.setGrantor(grantor);
+		auth.setClient(client.getId());
+		auth.setGrantor(grantor.getUsername());
 		auth.setResponseType("token");
 		auth.setRefreshToken(CodecUtils.nextId());
 		entityManager.save(auth);
@@ -89,7 +89,7 @@ public class OAuthManagerImpl implements OAuthManager {
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
-		auth.setClient(client);
+		auth.setClient(client.getId());
 		if (StringUtils.isNotBlank(scope))
 			auth.setScope(scope);
 		if (StringUtils.isNotBlank(responseType))
@@ -108,12 +108,12 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(String authorizationId, User grantor) {
+	public Authorization grant(String authorizationId, UserDetails grantor) {
 		entityManager.setEntityClass(Authorization.class);
 		Authorization auth = (Authorization) entityManager.get(authorizationId);
 		if (auth == null)
 			throw new IllegalArgumentException("BAD_AUTH");
-		auth.setGrantor(grantor);
+		auth.setGrantor(grantor.getUsername());
 		auth.setModifyDate(new Date());
 		if (!auth.isClientSide())
 			auth.setCode(CodecUtils.nextId());
@@ -140,7 +140,7 @@ public class OAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("NOT_SERVER_SIDE");
 		if (auth.getGrantor() == null)
 			throw new IllegalArgumentException("USER_NOT_GRANTED");
-		Client orig = auth.getClient();
+		Client orig = findClientById(auth.getClient());
 		if (!orig.getId().equals(client.getId()))
 			throw new IllegalArgumentException("CLIENT_ID_MISMATCH");
 		if (!orig.getSecret().equals(client.getSecret()))
@@ -159,12 +159,6 @@ public class OAuthManagerImpl implements OAuthManager {
 		entityManager.setEntityClass(Authorization.class);
 		Authorization auth = (Authorization) entityManager
 				.findByNaturalId(accessToken);
-		if (auth != null) {
-			if (auth.getClient() != null && !auth.getClient().isEnabled()) {
-				entityManager.delete(auth);
-				return null;
-			}
-		}
 		return auth;
 	}
 
@@ -180,10 +174,6 @@ public class OAuthManagerImpl implements OAuthManager {
 				"refreshToken", refreshToken);
 		if (auth == null)
 			throw new IllegalArgumentException("INVALID_TOKEN");
-		if (auth.getClient() != null && !auth.getClient().isEnabled()) {
-			entityManager.delete(auth);
-			return null;
-		}
 		auth.setAccessToken(CodecUtils.nextId());
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setModifyDate(new Date());
@@ -206,10 +196,10 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public List<Authorization> findAuthorizationsByGrantor(User grantor) {
+	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor) {
 		entityManager.setEntityClass(Authorization.class);
 		DetachedCriteria dc = entityManager.detachedCriteria();
-		dc.add(Restrictions.eq("grantor", grantor));
+		dc.add(Restrictions.eq("grantor", grantor.getUsername()));
 		dc.addOrder(Order.desc("modifyDate"));
 		return entityManager.findListByCriteria(dc);
 	}
@@ -244,7 +234,7 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public List<Client> findClientByOwner(User owner) {
+	public List<Client> findClientByOwner(UserDetails owner) {
 		entityManager.setEntityClass(Client.class);
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("owner", owner));

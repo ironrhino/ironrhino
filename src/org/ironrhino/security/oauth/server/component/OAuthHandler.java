@@ -16,6 +16,8 @@ import org.ironrhino.core.util.UserAgent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
@@ -37,6 +39,8 @@ public class OAuthHandler extends AccessHandler {
 	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST = "_OAUTH_REQUEST";
 	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT = "_OAUTH_CLIENT";
 	public static final String SESSION_ID_PREFIX = "tk_";
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Value("${oauth.api.pattern:/user/self,/oauth2/tokeninfo,/oauth2/revoketoken,/api/*}")
 	private String apiPattern;
@@ -113,26 +117,26 @@ public class OAuthHandler extends AccessHandler {
 						}
 					}
 					if (authorized) {
-						if (!(authorization.getClient() != null && !authorization
-								.getClient().isEnabled())) {
+						Client client = oauthManager
+								.findClientById(authorization.getClient());
+						if (client == null || client.isEnabled()) {
 							UserDetails ud = null;
 							if (authorization.getGrantor() != null) {
 								try {
 									ud = userDetailsService
 											.loadUserByUsername(authorization
-													.getGrantor().getUsername());
+													.getGrantor());
 								} catch (UsernameNotFoundException unf) {
-									unf.printStackTrace();
+									logger.error(unf.getMessage(), unf);
 								}
 
-							} else if (authorization.getClient() != null) {
+							} else if (client != null) {
 								try {
 									ud = userDetailsService
-											.loadUserByUsername(authorization
-													.getClient().getOwner()
-													.getUsername());
+											.loadUserByUsername(client
+													.getOwner().getUsername());
 								} catch (UsernameNotFoundException unf) {
-									unf.printStackTrace();
+									logger.error(unf.getMessage(), unf);
 								}
 							}
 							if (ud != null && ud.isEnabled()
@@ -159,7 +163,6 @@ public class OAuthHandler extends AccessHandler {
 										HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API,
 										SESSION_ID_PREFIX + token);
 							}
-							Client client = authorization.getClient();
 							if (client != null) {
 								request.setAttribute(
 										REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT,
@@ -196,9 +199,8 @@ public class OAuthHandler extends AccessHandler {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 					errorMessage);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		return true;
 	}
-
 }

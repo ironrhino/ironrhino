@@ -19,7 +19,6 @@ import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
@@ -31,6 +30,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -221,7 +221,7 @@ public class Oauth2Action extends BaseAction {
 			client = oauthManager.findClientById(client_id);
 			if (client == null)
 				throw new IllegalArgumentException("CLIENT_ID_INVALID");
-			User grantor = AuthzUtils.getUserDetails();
+			UserDetails grantor = AuthzUtils.getUserDetails();
 			if (!"force".equals(approval_prompt) && grantor != null) {
 				List<Authorization> auths = oauthManager
 						.findAuthorizationsByGrantor(grantor);
@@ -241,7 +241,7 @@ public class Oauth2Action extends BaseAction {
 			}
 			authorization = oauthManager.generate(client, redirect_uri, scope,
 					response_type);
-			client = authorization.getClient();
+			client = oauthManager.findClientById(authorization.getClient());
 			displayForNative = client.isNative();
 			setUid(authorization.getId());
 		} catch (Exception e) {
@@ -263,7 +263,7 @@ public class Oauth2Action extends BaseAction {
 	}
 
 	public String grant() {
-		User grantor = AuthzUtils.getUserDetails();
+		UserDetails grantor = AuthzUtils.getUserDetails();
 		if (grantor == null) {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			HttpServletResponse response = ServletActionContext.getResponse();
@@ -301,7 +301,7 @@ public class Oauth2Action extends BaseAction {
 				try {
 					usernamePasswordAuthenticationFilter.success(request,
 							response, authResult);
-					grantor = (User) authResult.getPrincipal();
+					grantor = (UserDetails) authResult.getPrincipal();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -310,7 +310,8 @@ public class Oauth2Action extends BaseAction {
 		try {
 			if (authorization == null)
 				authorization = oauthManager.grant(getUid(), grantor);
-			displayForNative = authorization.getClient().isNative();
+			client = oauthManager.findClientById(authorization.getClient());
+			displayForNative = client.isNative();
 			granted = true;
 			if (displayForNative) {
 				return INPUT;
@@ -387,7 +388,7 @@ public class Oauth2Action extends BaseAction {
 								.contains(UserRole.ROLE_ADMINISTRATOR))
 					throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
 				try {
-					User u = (User) userDetailsService
+					UserDetails u = userDetailsService
 							.loadUserByUsername(username);
 					if (!AuthzUtils.isPasswordValid(u, password))
 						throw new IllegalArgumentException("PASSWORD_MISMATCH");
@@ -546,9 +547,9 @@ public class Oauth2Action extends BaseAction {
 			tojson.put("error", "expired_token");
 		} else {
 			if (authorization.getClient() != null)
-				tojson.put("client_id", authorization.getClient().getId());
+				tojson.put("client_id", authorization.getClient());
 			if (authorization.getGrantor() != null)
-				tojson.put("username", authorization.getGrantor().getUsername());
+				tojson.put("username", authorization.getGrantor());
 			tojson.put("expires_in", authorization.getExpiresIn());
 			if (authorization.getScope() != null)
 				tojson.put("scope", authorization.getScope());

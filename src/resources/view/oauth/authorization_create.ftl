@@ -6,17 +6,17 @@
 <body>
 <@s.form action="create" method="post" class="ajax reset form-horizontal">
 	<div class="control-group listpick" data-options="{'url':'<@url value="/oauth/client/pick?columns=name"/>'}">
-	<@s.hidden id="clientId" name="authorization.client.id" class="listpick-id"/>
+	<@s.hidden name="authorization.client" class="listpick-id"/>
 	<label class="control-label" for="client">${action.getText('client')}</label>
 	<div class="controls">
-	<span class="listpick-name"><#if authorization.client??>${authorization.client.name}</#if></span>
+	<span class="listpick-name"></span>
 	</div>
 	</div>
-	<div class="control-group listpick" data-options="{'url':'<@url value="/user/pick?columns=username,name&enabled=true"/>'}">
-	<@s.hidden id="grantorId" name="authorization.grantor.id" class="required listpick-id"/>
+	<div class="control-group listpick" data-options="{'url':'<@url value="/user/pick?columns=username,name&enabled=true"/>','idindex':1}">
+	<@s.hidden name="authorization.grantor" class="required listpick-id"/>
 	<label class="control-label" for="grantor">${action.getText('grantor')}</label>
 	<div class="controls">
-	<span class="listpick-name"><#if authorization.grantor??>${authorization.grantor.username}</#if></span>
+	<span class="listpick-name"></span>
 	</div>
 	</div>
 	<@s.textfield label="%{getText('lifetime')}" name="authorization.lifetime" class="required span1"/>

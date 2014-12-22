@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
-import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,16 +29,15 @@ public class AuthorizationAction extends EntityAction<Authorization> {
 		this.authorization = authorization;
 	}
 
-	@InputConfig(methodName = "inputcreate")
+	@InputConfig(resultName = "create")
 	@Validations(requiredStrings = {
 	// @RequiredStringValidator(type = ValidatorType.FIELD, fieldName =
-	// "authorization.client.id", trim = true, key = "validation.required"),
-	@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "authorization.grantor.id", trim = true, key = "validation.required") })
+	// "authorization.client", trim = true, key = "validation.required"),
+	@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "authorization.grantor", trim = true, key = "validation.required") })
 	public String create() {
 		if (authorization == null)
 			return ACCESSDENIED;
-		if (authorization.getClient() != null
-				&& StringUtils.isBlank(authorization.getClient().getId()))
+		if (StringUtils.isBlank(authorization.getClient()))
 			authorization.setClient(null);
 		authorization.setRefreshToken(CodecUtils.nextId());
 		authorization.setResponseType("token");
@@ -47,19 +45,6 @@ public class AuthorizationAction extends EntityAction<Authorization> {
 		addActionMessage(getText("operate.success") + ",token:  "
 				+ authorization.getAccessToken());
 		return SUCCESS;
-	}
-
-	public String inputcreate() {
-		if (authorization == null)
-			authorization = new Authorization();
-		Client client = authorization.getClient();
-		if (client != null) {
-			client = getEntityManager(Client.class).get(client.getId());
-			authorization.setClient(client);
-			if (client.getOwner() != null)
-				authorization.setGrantor(client.getOwner());
-		}
-		return "create";
 	}
 
 }

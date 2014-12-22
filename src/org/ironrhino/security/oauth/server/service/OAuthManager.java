@@ -2,9 +2,9 @@ package org.ironrhino.security.oauth.server.service;
 
 import java.util.List;
 
-import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface OAuthManager {
 
@@ -12,14 +12,14 @@ public interface OAuthManager {
 
 	public Authorization grant(Client client);
 
-	public Authorization grant(Client client, User grantor);
+	public Authorization grant(Client client, UserDetails grantor);
 
 	public Authorization generate(Client client, String redirectUri,
 			String scope, String responseType) throws Exception;
 
 	public Authorization reuse(Authorization authorization);
 
-	public Authorization grant(String authorizationId, User grantor)
+	public Authorization grant(String authorizationId, UserDetails grantor)
 			throws Exception;
 
 	public void deny(String authorizationId);
@@ -35,7 +35,7 @@ public interface OAuthManager {
 
 	public void create(Authorization authorization);
 
-	public List<Authorization> findAuthorizationsByGrantor(User grantor);
+	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor);
 
 	public long getExpireTime();
 
@@ -47,6 +47,6 @@ public interface OAuthManager {
 
 	public Client findClientById(String clientId);
 
-	public List<Client> findClientByOwner(User user);
+	public List<Client> findClientByOwner(UserDetails user);
 
 }

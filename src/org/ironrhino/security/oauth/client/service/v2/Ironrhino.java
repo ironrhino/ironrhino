@@ -22,7 +22,7 @@ public class Ironrhino extends OAuth2Provider {
 	@Value("${ironrhino.scope:http://localhost/}")
 	private String scope;
 
-	@Value("${ironrhino.profileUrl:http://localhost/user/self}")
+	@Value("${ironrhino.profileUrl:http://localhost/api/user/@self}")
 	private String profileUrl;
 
 	@Override
