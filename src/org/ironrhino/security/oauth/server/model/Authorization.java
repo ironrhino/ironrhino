@@ -19,6 +19,8 @@ import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.CodecUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @AutoConfig
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
@@ -155,6 +157,7 @@ public class Authorization extends BaseEntity {
 		this.responseType = responseType;
 	}
 
+	@JsonIgnore
 	public boolean isClientSide() {
 		return "token".equals(responseType);
 	}
