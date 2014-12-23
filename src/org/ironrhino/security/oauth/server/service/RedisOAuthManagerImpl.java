@@ -67,9 +67,9 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	public Authorization grant(Client client) {
 		Client orig = findClientById(client.getClientId());
 		if (orig == null)
-			throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
+			throw new IllegalArgumentException("client_id_not_exists");
 		if (!orig.getSecret().equals(client.getSecret()))
-			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+			throw new IllegalArgumentException("client_secret_mismatch");
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
@@ -118,7 +118,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	public Authorization generate(Client client, String redirectUri,
 			String scope, String responseType) {
 		if (!client.supportsRedirectUri(redirectUri))
-			throw new IllegalArgumentException("REDIRECT_URI_MISMATCH");
+			throw new IllegalArgumentException("redirect_uri_mismatch");
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
@@ -159,7 +159,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth == null)
-			throw new IllegalArgumentException("BAD_AUTH");
+			throw new IllegalArgumentException("bad_auth");
 		auth.setGrantor(grantor.getUsername());
 		auth.setModifyDate(new Date());
 		if (auth.isClientSide()) {
@@ -193,7 +193,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		String key = NAMESPACE_AUTHORIZATION + code;
 		String id = stringRedisTemplate.opsForValue().get(key);
 		if (id == null)
-			throw new IllegalArgumentException("CODE_INVALID");
+			throw new IllegalArgumentException("code_invalid");
 		Authorization auth = null;
 		try {
 			auth = JsonUtils.fromJson(
@@ -203,18 +203,18 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth == null)
-			throw new IllegalArgumentException("CODE_INVALID");
+			throw new IllegalArgumentException("code_invalid");
 		if (auth.isClientSide())
-			throw new IllegalArgumentException("NOT_SERVER_SIDE");
+			throw new IllegalArgumentException("not_server_side");
 		if (auth.getGrantor() == null)
-			throw new IllegalArgumentException("USER_NOT_GRANTED");
+			throw new IllegalArgumentException("user_not_granted");
 		Client orig = findClientById(auth.getClient());
 		if (!orig.getId().equals(client.getId()))
-			throw new IllegalArgumentException("CLIENT_ID_MISMATCH");
+			throw new IllegalArgumentException("client_id_mismatch");
 		if (!orig.getSecret().equals(client.getSecret()))
-			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+			throw new IllegalArgumentException("client_secret_mismatch");
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
-			throw new IllegalArgumentException("REDIRECT_URI_MISMATCH");
+			throw new IllegalArgumentException("redirect_uri_mismatch");
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setModifyDate(new Date());
@@ -252,13 +252,13 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	public Authorization refresh(Client client, String refreshToken) {
 		Client orig = findClientById(client.getClientId());
 		if (orig == null)
-			throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
+			throw new IllegalArgumentException("client_id_not_exists");
 		if (!orig.getSecret().equals(client.getSecret()))
-			throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+			throw new IllegalArgumentException("client_secret_mismatch");
 		String keyRefreshToken = NAMESPACE_AUTHORIZATION + refreshToken;
 		String id = stringRedisTemplate.opsForValue().get(keyRefreshToken);
 		if (id == null)
-			throw new IllegalArgumentException("INVALID_TOKEN");
+			throw new IllegalArgumentException("invalid_token");
 		Authorization auth = null;
 		try {
 			auth = JsonUtils.fromJson(
@@ -268,7 +268,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth == null)
-			throw new IllegalArgumentException("INVALID_TOKEN");
+			throw new IllegalArgumentException("invalid_token");
 		stringRedisTemplate.delete(keyRefreshToken);
 		stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION
 				+ auth.getAccessToken());
