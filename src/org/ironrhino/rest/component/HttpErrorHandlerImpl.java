@@ -22,8 +22,6 @@ public class HttpErrorHandlerImpl implements HttpErrorHandler {
 				.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 		if (requestURI == null)
 			requestURI = request.getRequestURI();
-		if (!requestURI.startsWith("/api/"))
-			return false;
 		if (statusCode > 0)
 			response.setStatus(statusCode);
 		RestStatus rs = null;
@@ -34,9 +32,11 @@ public class HttpErrorHandlerImpl implements HttpErrorHandler {
 		case HttpServletResponse.SC_NOT_FOUND:
 			rs = RestStatus.NOT_FOUND;
 			break;
-
+		case HttpServletResponse.SC_BAD_REQUEST:
+			rs = RestStatus.valueOf(RestStatus.CODE_BAD_REQUEST, message);
+			break;
 		default:
-			rs = RestStatus.FORBIDDEN;
+			rs = RestStatus.valueOf(RestStatus.CODE_FORBIDDEN, message);
 			break;
 		}
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);

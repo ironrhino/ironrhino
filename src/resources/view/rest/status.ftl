@@ -15,6 +15,7 @@
 		<tr><td>4</td><td>NOT_FOUND</td><td>资源不存在</td></tr>
 		<tr><td>5</td><td>ALREADY_EXISTS</td><td>资源已经存在,违反唯一性约束</td></tr>
 		<tr><td>6</td><td>FIELD_INVALID</td><td>字段不合法,具体见详细错误信息</td></tr>
+		<tr><td>6</td><td>BAD_REQUEST</td><td>请求不合法,具体见详细错误信息</td></tr>
 		<tr><td>-1</td><td>INTERNAL_SERVER_ERROR</td><td>服务器内部错误,具体见详细错误信息</td></tr>
 	</tbody>
 </table>

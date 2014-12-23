@@ -1,8 +1,7 @@
 package org.ironrhino.rest;
 
 import java.lang.reflect.Field;
-
-import javassist.Modifier;
+import java.lang.reflect.Modifier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.UiConfig;
@@ -27,6 +26,8 @@ public class RestStatus extends RuntimeException {
 	public static final String CODE_ALREADY_EXISTS = "5";
 
 	public static final String CODE_FIELD_INVALID = "6";
+
+	public static final String CODE_BAD_REQUEST = "7";
 
 	public static final String CODE_INTERNAL_SERVER_ERROR = "-1";
 
