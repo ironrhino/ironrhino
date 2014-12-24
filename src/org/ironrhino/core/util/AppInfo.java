@@ -17,7 +17,7 @@ public class AppInfo {
 	public static final String KEY_APP_HOME = "app.home";
 
 	public static final String KEY_APP_BASEPACKAGE = "app.basePackage";
-	
+
 	public static final String KEY_APP_EXCLUDEFILTERREGEX = "app.excludeFilterRegex";
 
 	public static final String KEY_APP_VERSION = "app.version";
@@ -33,7 +33,7 @@ public class AppInfo {
 	private static String home;
 
 	private static String basePackage;
-	
+
 	private static String excludeFilterRegex;
 
 	private static String version = "1.0.0";
@@ -129,7 +129,7 @@ public class AppInfo {
 	public static void setAppBasePackage(String basePackage) {
 		AppInfo.basePackage = basePackage;
 	}
-	
+
 	public static void setExcludeFilterRegex(String excludeFilterRegex) {
 		AppInfo.excludeFilterRegex = excludeFilterRegex;
 	}
@@ -154,6 +154,9 @@ public class AppInfo {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getAppName()).append("-").append(_instanceId).append("@")
 				.append(getHostAddress());
+		int httpPort = getHttpPort();
+		if (httpPort > 0)
+			sb.append(':').append(httpPort);
 		return sb.toString();
 	}
 
@@ -175,7 +178,7 @@ public class AppInfo {
 	public static String getAppBasePackage() {
 		return basePackage;
 	}
-	
+
 	public static String getExcludeFilterRegex() {
 		return excludeFilterRegex;
 	}
