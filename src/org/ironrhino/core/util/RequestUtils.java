@@ -19,6 +19,11 @@ import org.apache.commons.lang3.StringUtils;
 
 public class RequestUtils {
 
+	public static boolean isInternalTesting(HttpServletRequest request) {
+		String qs = request.getQueryString();
+		return qs != null && qs.contains("_internal_testing_");
+	}
+
 	public static String serializeData(HttpServletRequest request) {
 		if (request.getMethod().equalsIgnoreCase("POST")
 				|| request.getMethod().equalsIgnoreCase("PUT")) {

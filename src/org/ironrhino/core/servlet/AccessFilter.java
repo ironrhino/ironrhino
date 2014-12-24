@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
+import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.RequestUtils;
@@ -96,6 +97,8 @@ public class AccessFilter implements Filter {
 
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
+		if (RequestUtils.isInternalTesting(request))
+			response.addHeader("X-Instance-Id", AppInfo.getInstanceId());
 
 		String uri = request.getRequestURI();
 		uri = uri.substring(request.getContextPath().length());
