@@ -61,12 +61,28 @@
 	<filter>
 		<async-supported>true</async-supported>
 		<filter-name>strutsPrepareFilter</filter-name>
-		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareFilter</filter-class>
+		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<init-param>
+			<param-name>targetFilterLifecycle</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>excludePatterns</param-name>
+			<param-value>/api/*,/remoting/*</param-value>
+		</init-param>
 	</filter>
 	<filter>
 		<async-supported>true</async-supported>
 		<filter-name>strutsExecuteFilter</filter-name>
-		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsExecuteFilter</filter-class>
+		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<init-param>
+			<param-name>targetFilterLifecycle</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>excludePatterns</param-name>
+			<param-value>/api/*,/remoting/*</param-value>
+		</init-param>
 	</filter>
 	<filter>
 		<async-supported>true</async-supported>
@@ -75,7 +91,11 @@
 		<init-param>  
 			<param-name>targetFilterLifecycle</param-name>  
 			<param-value>true</param-value>  
-		</init-param> 
+		</init-param>
+		<init-param>
+			<param-name>excludePatterns</param-name>
+			<param-value>/api/*,/remoting/*</param-value>
+		</init-param>
 		<init-param>
 			<param-name>configFile</param-name>
 			<param-value>resources/sitemesh/sitemesh.xml</param-value>
@@ -104,6 +124,8 @@
 	<filter-mapping>
 		<filter-name>openSessionInViewFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>strutsPrepareFilter</filter-name>

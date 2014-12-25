@@ -37,13 +37,30 @@ public class ErrorAction extends BaseAction {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		int errorcode = 404;
+		exception = (Exception) request
+				.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+		if (exception instanceof AccountStatusException) {
+			if (exception instanceof CredentialsExpiredException) {
+				UserDetails ud = AuthzUtils.getUserDetails();
+				if (ud != null) {
+					targetUrl = "/"
+							+ StringUtils.uncapitalize(ud.getClass()
+									.getSimpleName()) + "/password";
+					return REDIRECT;
+				}
+			}
+			addActionError(getText(exception.getClass().getName()));
+			return "accountStatus";
+		} else if (exception != null)
+			logger.error(exception.getMessage(), exception);
 		try {
 			errorcode = Integer.valueOf(getUid());
 		} catch (Exception e) {
 
 		}
 		if (httpErrorHandler != null
-				&& httpErrorHandler.handle(request, response, errorcode, null))
+				&& httpErrorHandler.handle(request, response, errorcode,
+						exception != null ? exception.getMessage() : null))
 			return NONE;
 		String result;
 		switch (errorcode) {
@@ -57,23 +74,6 @@ public class ErrorAction extends BaseAction {
 			result = NOTFOUND;
 			break;
 		case 500:
-			exception = (Exception) request
-					.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-			if (exception instanceof AccountStatusException) {
-				if (exception instanceof CredentialsExpiredException) {
-					UserDetails ud = AuthzUtils.getUserDetails();
-					if (ud != null) {
-						targetUrl = "/"
-								+ StringUtils.uncapitalize(ud.getClass()
-										.getSimpleName()) + "/password";
-						return REDIRECT;
-					}
-				}
-				addActionError(getText(exception.getClass().getName()));
-				return "accountStatus";
-			}
-			if (exception != null)
-				logger.error(exception.getMessage(), exception);
 			result = "internalServerError";
 			break;
 		default:
