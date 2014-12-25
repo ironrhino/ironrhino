@@ -39,6 +39,10 @@
 			<param-name>targetFilterLifecycle</param-name>
 			<param-value>true</param-value>
 		</init-param>
+		<init-param>
+			<param-name>excludePatterns</param-name>
+			<param-value>/remoting/*</param-value>
+		</init-param>
 	</filter>
 	<filter>
 		<async-supported>true</async-supported>
@@ -68,7 +72,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/api/*,/remoting/*</param-value>
+			<param-value>/remoting/*,/api/*</param-value>
 		</init-param>
 	</filter>
 	<filter>
@@ -81,7 +85,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/api/*,/remoting/*</param-value>
+			<param-value>/remoting/*,/api/*</param-value>
 		</init-param>
 	</filter>
 	<filter>
@@ -94,7 +98,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/api/*,/remoting/*</param-value>
+			<param-value>/remoting/*,/api/*</param-value>
 		</init-param>
 		<init-param>
 			<param-name>configFile</param-name>

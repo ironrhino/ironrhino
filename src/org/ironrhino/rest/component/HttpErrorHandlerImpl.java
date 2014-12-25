@@ -22,6 +22,9 @@ public class HttpErrorHandlerImpl implements HttpErrorHandler {
 				.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 		if (requestURI == null)
 			requestURI = request.getRequestURI();
+		if (!(requestURI.startsWith("/api/") || requestURI
+				.startsWith("/oauth/oauth2/")))
+			return false;
 		if (statusCode > 0)
 			response.setStatus(statusCode);
 		RestStatus rs = null;
