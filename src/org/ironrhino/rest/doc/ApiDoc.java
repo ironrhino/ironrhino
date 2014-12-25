@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
@@ -159,6 +160,8 @@ public class ApiDoc implements Serializable {
 						.getResult();
 			else if (responseSample instanceof Callable)
 				responseSample = ((Callable<?>) responseSample).call();
+			else if (responseSample instanceof Future)
+				responseSample = ((Future<?>) responseSample).get();
 			else if (responseSample instanceof MappingJacksonValue) {
 				view = ((MappingJacksonValue) responseSample)
 						.getSerializationView();
@@ -179,7 +182,8 @@ public class ApiDoc implements Serializable {
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		if (parameterTypes.length > 0) {
 			String[] parameterNames = ReflectionUtils.getParameterNames(method);
-			Annotation[][] apiDocParameterAnnotations = apiDocMethod.getParameterAnnotations();
+			Annotation[][] apiDocParameterAnnotations = apiDocMethod
+					.getParameterAnnotations();
 			Annotation[][] array = method.getParameterAnnotations();
 			for (int i = 0; i < parameterTypes.length; i++) {
 				Annotation[] apiDocAnnotations = apiDocParameterAnnotations[i];
@@ -237,21 +241,22 @@ public class ApiDoc implements Serializable {
 						PathVariable ann = (PathVariable) anno;
 						pathVariables.add(FieldObject.create(StringUtils
 								.isNotBlank(ann.value()) ? ann.value()
-								: parameterNames[i], parameterTypes[i], true, null, fd));
+								: parameterNames[i], parameterTypes[i], true,
+								null, fd));
 					}
 					if (anno instanceof RequestParam) {
 						RequestParam ann = (RequestParam) anno;
 						requestParams.add(FieldObject.create(StringUtils
 								.isNotBlank(ann.value()) ? ann.value()
-								: parameterNames[i], parameterTypes[i], ann.required(), ann
-								.defaultValue(), fd));
+								: parameterNames[i], parameterTypes[i], ann
+								.required(), ann.defaultValue(), fd));
 					}
 					if (anno instanceof RequestHeader) {
 						RequestHeader ann = (RequestHeader) anno;
 						requestHeaders.add(FieldObject.create(StringUtils
 								.isNotBlank(ann.value()) ? ann.value()
-								: parameterNames[i], parameterTypes[i], ann.required(), ann
-								.defaultValue(), fd));
+								: parameterNames[i], parameterTypes[i], ann
+								.required(), ann.defaultValue(), fd));
 					}
 				}
 			}
