@@ -2,7 +2,6 @@ package org.ironrhino.rest.doc;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -122,9 +121,10 @@ public class FieldObject implements Serializable {
 			type = "string";
 			values = new LinkedHashMap<String, String>();
 			try {
-				Method m = cls.getMethod("values", new Class[0]);
-				for (Enum<?> en : (Enum<?>[]) m.invoke(cls, new Object[0]))
+				for (Object o : cls.getEnumConstants()) {
+					Enum<?> en = (Enum<?>) o;
 					values.put(en.name(), en.toString());
+				}
 			} catch (Exception e) {
 
 			}
