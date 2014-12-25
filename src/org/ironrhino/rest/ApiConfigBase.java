@@ -17,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -92,6 +94,14 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 		freeMarkerConfigurer.setTemplateLoaderPath("classpath:/resources/view");
 		freeMarkerConfigurer.setDefaultEncoding("UTF-8");
 		return freeMarkerConfigurer;
+	}
+
+	@Bean
+	public MultipartResolver multipartResolver() {
+		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+		multipartResolver.setDefaultEncoding("UTF-8");
+		multipartResolver.setMaxUploadSize(4194304);
+		return multipartResolver;
 	}
 
 	@Bean
