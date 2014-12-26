@@ -7,6 +7,7 @@ import org.ironrhino.rest.doc.annotation.ApiModule;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.security.model.User;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ApiModule(value = "用户API")
+@Order(1)
 public class UserControllerDoc extends UserController {
 
 	@Override

@@ -3,6 +3,8 @@ package org.ironrhino.sample.api.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ironrhino.core.metadata.Authorize;
+import org.ironrhino.core.security.role.UserRole;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/upload")
+@Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class UploadController {
 
 	@RequestMapping(method = RequestMethod.GET)

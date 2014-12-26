@@ -1,6 +1,7 @@
 package org.ironrhino.rest.doc;
 
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.ValueConstants;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -139,8 +141,15 @@ public class FieldObject implements Serializable {
 				type = "boolean";
 			else if (Collection.class.isAssignableFrom(cls))
 				type = "array";
-			else if (Date.class.isAssignableFrom(cls) || cls == String.class)
+			else if (java.sql.Timestamp.class.isAssignableFrom(cls))
+				type = "timestamp";
+			else if (Date.class.isAssignableFrom(cls))
+				type = "date";
+			else if (cls == String.class)
 				type = "string";
+			else if (File.class.isAssignableFrom(cls)
+					|| MultipartFile.class.isAssignableFrom(cls))
+				type = "file";
 			else
 				type = "object";
 		}
