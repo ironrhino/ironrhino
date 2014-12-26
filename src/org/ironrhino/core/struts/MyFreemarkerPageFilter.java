@@ -16,7 +16,7 @@ import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
 import com.opensymphony.sitemesh.webapp.SiteMeshWebAppContext;
 import com.opensymphony.xwork2.inject.Inject;
 
-@Component("sitemesh")
+@Component("sitemeshFilter")
 @ResourcePresentConditional("resources/sitemesh/sitemesh.xml")
 public class MyFreemarkerPageFilter extends SiteMeshFilter {
 	/*

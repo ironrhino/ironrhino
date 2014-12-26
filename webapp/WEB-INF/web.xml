@@ -98,7 +98,7 @@
 	</filter>
 	<filter>
 		<async-supported>true</async-supported>
-		<filter-name>sitemesh</filter-name>
+		<filter-name>sitemeshFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
 		<init-param>  
 			<param-name>targetFilterLifecycle</param-name>  
@@ -147,7 +147,7 @@
 		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
 	<filter-mapping>
-		<filter-name>sitemesh</filter-name>
+		<filter-name>sitemeshFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
 		<dispatcher>ERROR</dispatcher>
