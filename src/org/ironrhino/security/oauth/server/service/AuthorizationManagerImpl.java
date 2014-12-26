@@ -6,11 +6,13 @@ import java.util.List;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.service.BaseManagerImpl;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
 public class AuthorizationManagerImpl extends BaseManagerImpl<Authorization>
 		implements AuthorizationManager {
 

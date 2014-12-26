@@ -17,6 +17,7 @@ import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "oauth_authorization")
 @Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), bottomButtons = "<button type=\"button\" class=\"btn\" data-view=\"create\">${action.getText('create')}</button> <button type=\"button\" class=\"btn confirm\" data-action=\"delete\" data-shown=\"selected\" data-filterselector=\":not([data-deletable='false'])\">${action.getText('delete')}</button> <button type=\"button\" class=\"btn reload\">${action.getText('reload')}</button> <button type=\"button\" class=\"btn filter\">${action.getText('filter')}</button>")
+@ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
 public class Authorization extends BaseEntity {
 
 	public static final int DEFAULT_LIFETIME = 3600;
