@@ -21,7 +21,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 public class CommonConfiguration {
 
 	@Bean
-	public PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+	public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
 		return new PropertySourcesPlaceholderConfigurer();
 	}
 
