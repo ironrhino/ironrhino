@@ -61,7 +61,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 
 	@Override
 	@Transactional(readOnly = true)
-	@CheckCache(key = "${path}", namespace = "page", eternal = true)
+	@CheckCache(key = "${path}", namespace = "page", eternal = true, cacheNull = true)
 	public Page getByPath(String path) {
 		Page page = findByNaturalId(path);
 		if (page != null) {

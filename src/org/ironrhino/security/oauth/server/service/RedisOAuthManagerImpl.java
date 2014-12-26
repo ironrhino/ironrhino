@@ -367,6 +367,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	}
 
 	public Client findClientById(String clientId) {
+		if (StringUtils.isBlank(clientId))
+			return null;
 		Client c = clientRedisTemplate.opsForValue().get(
 				NAMESPACE_CLIENT + clientId);
 		return c != null && c.isEnabled() ? c : null;

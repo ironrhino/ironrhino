@@ -66,7 +66,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 
 	@Override
 	@Transactional(readOnly = true)
-	@CheckCache(namespace = "user", key = "${username}")
+	@CheckCache(namespace = "user", key = "${username}", cacheNull = true)
 	public UserDetails loadUserByUsername(String username) {
 		if (StringUtils.isBlank(username))
 			return null;

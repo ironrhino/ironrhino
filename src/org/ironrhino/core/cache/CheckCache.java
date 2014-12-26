@@ -29,7 +29,7 @@ public @interface CheckCache {
 
 	boolean eternal() default false;
 
-	boolean cacheNull() default true;
+	boolean cacheNull() default false;
 
 	// mvel expression
 	String onHit() default "";
