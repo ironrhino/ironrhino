@@ -2,7 +2,6 @@ package org.ironrhino.core.servlet;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.Filter;
@@ -21,11 +20,20 @@ public class DelegatingFilter extends DelegatingFilterProxy {
 
 	private static Filter dummy = new DummyFilter();
 
-	private List<String> excludePatternsList = Collections.emptyList();
+	private List<String> excludePatternsList;
 
 	@Override
 	protected Filter initDelegate(WebApplicationContext wac)
 			throws ServletException {
+		String excludePatterns = getFilterConfig().getInitParameter(
+				"excludePatterns");
+		String str = wac.getEnvironment().getProperty(
+				getTargetBeanName() + ".excludePatterns");
+		if (str != null)
+			excludePatterns = str;
+		if (StringUtils.isNotBlank(excludePatterns))
+			excludePatternsList = Arrays.asList(excludePatterns
+					.split("\\s*,\\s*"));
 		try {
 			Filter delegate = wac.getBean(getTargetBeanName(), Filter.class);
 			if (isTargetFilterLifecycle()) {
@@ -36,16 +44,7 @@ public class DelegatingFilter extends DelegatingFilterProxy {
 			logger.warn("Use a dummy filter instead: " + e.getMessage());
 			return dummy;
 		}
-	}
 
-	@Override
-	protected void initFilterBean() throws ServletException {
-		String excludePatterns = getFilterConfig().getInitParameter(
-				"excludePatterns");
-		if (StringUtils.isNotBlank(excludePatterns))
-			excludePatternsList = Arrays.asList(excludePatterns
-					.split("\\s*,\\s*"));
-		super.initFilterBean();
 	}
 
 	@Override
@@ -54,7 +53,7 @@ public class DelegatingFilter extends DelegatingFilterProxy {
 		HttpServletRequest request = (HttpServletRequest) req;
 		String uri = request.getRequestURI();
 		uri = uri.substring(request.getContextPath().length());
-		if (excludePatternsList.size() > 0)
+		if (excludePatternsList != null)
 			for (String pattern : excludePatternsList)
 				if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri,
 						pattern)) {
