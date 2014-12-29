@@ -26,7 +26,7 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	public RestTemplate(Client client) {
 		super();
 		this.client = client;
-		setRequestFactory(new SimpleClientHttpRequestFactory(client));
+		setRequestFactory(new HttpComponentsClientHttpRequestFactory(client));
 		MappingJackson2HttpMessageConverter jackson2 = null;
 		for (HttpMessageConverter<?> hmc : getMessageConverters()) {
 			if (hmc instanceof MappingJackson2HttpMessageConverter) {
