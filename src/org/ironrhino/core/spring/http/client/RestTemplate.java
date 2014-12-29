@@ -2,8 +2,11 @@ package org.ironrhino.core.spring.http.client;
 
 import javax.annotation.PostConstruct;
 
+import org.ironrhino.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +21,18 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	public RestTemplate() {
 		super();
 		setRequestFactory(new SimpleClientHttpRequestFactory());
+		MappingJackson2HttpMessageConverter jackson2 = null;
+		for (HttpMessageConverter<?> hmc : getMessageConverters()) {
+			if (hmc instanceof MappingJackson2HttpMessageConverter) {
+				jackson2 = (MappingJackson2HttpMessageConverter) hmc;
+				break;
+			}
+		}
+		if (jackson2 == null) {
+			jackson2 = new MappingJackson2HttpMessageConverter();
+			getMessageConverters().add(jackson2);
+		}
+		jackson2.setObjectMapper(JsonUtils.createNewObjectMapper());
 	}
 
 	public RestTemplate(ClientHttpRequestFactory requestFactory) {

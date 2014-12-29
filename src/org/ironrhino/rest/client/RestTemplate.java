@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RequestCallback;
@@ -26,9 +27,18 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 		super();
 		this.client = client;
 		setRequestFactory(new SimpleClientHttpRequestFactory(client));
-		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter();
+		MappingJackson2HttpMessageConverter jackson2 = null;
+		for (HttpMessageConverter<?> hmc : getMessageConverters()) {
+			if (hmc instanceof MappingJackson2HttpMessageConverter) {
+				jackson2 = (MappingJackson2HttpMessageConverter) hmc;
+				break;
+			}
+		}
+		if (jackson2 == null) {
+			jackson2 = new MappingJackson2HttpMessageConverter();
+			getMessageConverters().add(jackson2);
+		}
 		jackson2.setObjectMapper(JsonUtils.createNewObjectMapper());
-		getMessageConverters().add(jackson2);
 	}
 
 	public int getConnectTimeout() {
