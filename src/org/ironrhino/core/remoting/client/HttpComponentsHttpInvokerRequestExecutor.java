@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -15,9 +14,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.client.HttpClients;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
@@ -34,9 +31,9 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 
 	private long timeToLive = 60;
 
-	private int defaultMaxPerRoute = 1000;
+	private int maxConnPerRoute = 1000;
 
-	private int maxTotal = 1000;
+	private int maxConnTotal = 1000;
 
 	public long getTimeToLive() {
 		return timeToLive;
@@ -46,34 +43,28 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 		this.timeToLive = timeToLive;
 	}
 
-	public int getDefaultMaxPerRoute() {
-		return defaultMaxPerRoute;
+	public int getMaxConnPerRoute() {
+		return maxConnPerRoute;
 	}
 
-	public void setDefaultMaxPerRoute(int defaultMaxPerRoute) {
-		this.defaultMaxPerRoute = defaultMaxPerRoute;
+	public void setMaxConnPerRoute(int maxConnPerRoute) {
+		this.maxConnPerRoute = maxConnPerRoute;
 	}
 
-	public int getMaxTotal() {
-		return maxTotal;
+	public int getMaxConnTotal() {
+		return maxConnTotal;
 	}
 
-	public void setMaxTotal(int maxTotal) {
-		this.maxTotal = maxTotal;
+	public void setMaxConnTotal(int maxConnTotal) {
+		this.maxConnTotal = maxConnTotal;
 	}
 
 	@PostConstruct
 	public void init() {
-		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(
-				timeToLive, TimeUnit.SECONDS);
-		connManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
-		connManager.setMaxTotal(maxTotal);
-		httpClient = HttpClientBuilder.create()
-				.setConnectionManager(connManager)
-				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-				.disableAuthCaching().disableAutomaticRetries()
-				.disableConnectionState().disableCookieManagement()
-				.disableRedirectHandling().build();
+		httpClient = HttpClients.custom().disableAuthCaching()
+				.disableAutomaticRetries().disableCookieManagement()
+				.disableRedirectHandling().setMaxConnPerRoute(maxConnPerRoute)
+				.setMaxConnTotal(maxConnTotal).build();
 	}
 
 	@Override

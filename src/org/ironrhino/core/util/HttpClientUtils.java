@@ -87,9 +87,8 @@ public class HttpClientUtils {
 				.setConnectionManager(connManager)
 				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
 				.setDefaultRequestConfig(requestConfig).disableAuthCaching()
-				.disableAutomaticRetries().disableConnectionState()
-				.disableCookieManagement().setDefaultHeaders(DEFAULT_HEADERS)
-				.build();
+				.disableAutomaticRetries().disableCookieManagement()
+				.setDefaultHeaders(DEFAULT_HEADERS).build();
 		return httpclient;
 	}
 
