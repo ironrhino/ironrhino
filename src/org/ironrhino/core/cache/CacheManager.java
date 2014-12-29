@@ -18,7 +18,7 @@ public interface CacheManager {
 
 	public Object get(String key, String namespace);
 
-	public Object get(String key, String namespace, int timeToLive,
+	public Object get(String key, String namespace, int timeToIdle,
 			TimeUnit timeUnit);
 
 	public void delete(String key, String namespace);

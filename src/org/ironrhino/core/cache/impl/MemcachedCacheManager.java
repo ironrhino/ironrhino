@@ -121,15 +121,15 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToLive,
+	public Object get(String key, String namespace, int timeToIdle,
 			TimeUnit timeUnit) {
 		if (key == null)
 			return null;
-		if (timeToLive <= 0)
+		if (timeToIdle <= 0)
 			return get(key, namespace);
 		try {
 			return memcached.getAndTouch(generateKey(key, namespace),
-					(int) timeUnit.toSeconds(timeToLive));
+					(int) timeUnit.toSeconds(timeToIdle));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;

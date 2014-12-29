@@ -72,13 +72,13 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToLive,
+	public Object get(String key, String namespace, int timeToIdle,
 			TimeUnit timeUnit) {
 		if (key == null)
 			return null;
 		String actualKey = generateKey(key, namespace);
-		if (timeToLive > 0)
-			redisTemplate.expire(actualKey, timeToLive, timeUnit);
+		if (timeToIdle > 0)
+			redisTemplate.expire(actualKey, timeToIdle, timeUnit);
 		return redisTemplate.opsForValue().get(actualKey);
 	}
 

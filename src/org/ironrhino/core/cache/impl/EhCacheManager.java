@@ -68,7 +68,7 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToLive,
+	public Object get(String key, String namespace, int timeToIdle,
 			TimeUnit timeUnit) {
 		if (key == null)
 			return null;
@@ -77,8 +77,8 @@ public class EhCacheManager implements CacheManager {
 			return null;
 		Element element = cache.get(key);
 		if (element != null) {
-			if (element.getTimeToIdle() != timeToLive) {
-				element.setTimeToIdle((int) timeUnit.toSeconds(timeToLive));
+			if (element.getTimeToIdle() != timeToIdle) {
+				element.setTimeToIdle((int) timeUnit.toSeconds(timeToIdle));
 				cache.put(element);
 			}
 			return element.getObjectValue();
