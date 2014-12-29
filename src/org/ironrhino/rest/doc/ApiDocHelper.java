@@ -17,6 +17,7 @@ import javassist.bytecode.Descriptor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ClassScanner;
+import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.rest.ApiConfigBase;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
@@ -129,9 +130,9 @@ public class ApiDocHelper {
 				InputStream is = apiDocInstance.getClass().getResourceAsStream(
 						sampleFileName);
 				if (is == null) {
-					throw new IllegalArgumentException(sampleFileName
+					throw new ErrorMessage(sampleFileName
 							+ " with " + apiDocInstance.getClass().getName()
-							+ "." + apiDocMethod.getName() + "() is not found!");
+							+ " is not found!");
 				}
 				return StringUtils.join(IOUtils.readLines(is, "UTF-8"), "\n");
 			}
