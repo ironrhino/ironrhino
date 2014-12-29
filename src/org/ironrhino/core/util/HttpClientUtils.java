@@ -75,8 +75,8 @@ public class HttpClientUtils {
 		else {
 			PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(
 					60, TimeUnit.SECONDS);
-			// cm.setDefaultMaxPerRoute(100);
-			// cm.setMaxTotal(1000);
+			cm.setDefaultMaxPerRoute(1000);
+			cm.setMaxTotal(1000);
 			connManager = cm;
 		}
 		RequestConfig requestConfig = RequestConfig.custom()

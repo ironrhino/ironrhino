@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -14,7 +15,9 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
@@ -29,9 +32,48 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 
 	private CloseableHttpClient httpClient;
 
+	private long timeToLive = 60;
+
+	private int defaultMaxPerRoute = 1000;
+
+	private int maxTotal = 1000;
+
+	public long getTimeToLive() {
+		return timeToLive;
+	}
+
+	public void setTimeToLive(long timeToLive) {
+		this.timeToLive = timeToLive;
+	}
+
+	public int getDefaultMaxPerRoute() {
+		return defaultMaxPerRoute;
+	}
+
+	public void setDefaultMaxPerRoute(int defaultMaxPerRoute) {
+		this.defaultMaxPerRoute = defaultMaxPerRoute;
+	}
+
+	public int getMaxTotal() {
+		return maxTotal;
+	}
+
+	public void setMaxTotal(int maxTotal) {
+		this.maxTotal = maxTotal;
+	}
+
 	@PostConstruct
 	public void init() {
-		httpClient = HttpClients.createMinimal();
+		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(
+				timeToLive, TimeUnit.SECONDS);
+		connManager.setDefaultMaxPerRoute(defaultMaxPerRoute);
+		connManager.setMaxTotal(maxTotal);
+		httpClient = HttpClientBuilder.create()
+				.setConnectionManager(connManager)
+				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+				.disableAuthCaching().disableAutomaticRetries()
+				.disableConnectionState().disableCookieManagement()
+				.disableRedirectHandling().build();
 	}
 
 	@Override
