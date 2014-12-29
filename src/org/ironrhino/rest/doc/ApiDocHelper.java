@@ -1,5 +1,6 @@
 package org.ironrhino.rest.doc;
 
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -125,9 +126,14 @@ public class ApiDocHelper {
 				return fields.sample();
 			String sampleFileName = fields.sampleFileName();
 			if (StringUtils.isNotBlank(sampleFileName)) {
-				return StringUtils.join(IOUtils.readLines(apiDocInstance
-						.getClass().getResourceAsStream(sampleFileName),
-						"UTF-8"), "\n");
+				InputStream is = apiDocInstance.getClass().getResourceAsStream(
+						sampleFileName);
+				if (is == null) {
+					throw new IllegalArgumentException(sampleFileName
+							+ " with " + apiDocInstance.getClass().getName()
+							+ "." + apiDocMethod.getName() + "() is not found!");
+				}
+				return StringUtils.join(IOUtils.readLines(is, "UTF-8"), "\n");
 			}
 			String sampleMethodName = fields.sampleMethodName();
 			if (StringUtils.isNotBlank(sampleMethodName)) {
