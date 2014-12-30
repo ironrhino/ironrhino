@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -246,17 +247,19 @@ public class ApiDoc implements Serializable {
 					}
 					if (anno instanceof RequestParam) {
 						RequestParam ann = (RequestParam) anno;
-						requestParams.add(FieldObject.create(StringUtils
-								.isNotBlank(ann.value()) ? ann.value()
-								: parameterNames[i], parameterTypes[i], ann
-								.required(), ann.defaultValue(), fd));
+						if (!Map.class.isAssignableFrom(parameterTypes[i]))
+							requestParams.add(FieldObject.create(StringUtils
+									.isNotBlank(ann.value()) ? ann.value()
+									: parameterNames[i], parameterTypes[i], ann
+									.required(), ann.defaultValue(), fd));
 					}
 					if (anno instanceof RequestHeader) {
 						RequestHeader ann = (RequestHeader) anno;
-						requestHeaders.add(FieldObject.create(StringUtils
-								.isNotBlank(ann.value()) ? ann.value()
-								: parameterNames[i], parameterTypes[i], ann
-								.required(), ann.defaultValue(), fd));
+						if (!Map.class.isAssignableFrom(parameterTypes[i]))
+							requestHeaders.add(FieldObject.create(StringUtils
+									.isNotBlank(ann.value()) ? ann.value()
+									: parameterNames[i], parameterTypes[i], ann
+									.required(), ann.defaultValue(), fd));
 					}
 				}
 			}
