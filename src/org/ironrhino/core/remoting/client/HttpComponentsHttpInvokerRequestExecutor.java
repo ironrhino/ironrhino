@@ -62,8 +62,9 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 	@PostConstruct
 	public void init() {
 		httpClient = HttpClients.custom().disableAuthCaching()
-				.disableAutomaticRetries().disableCookieManagement()
-				.disableRedirectHandling().setMaxConnPerRoute(maxConnPerRoute)
+				.disableAutomaticRetries().disableConnectionState()
+				.disableCookieManagement().disableRedirectHandling()
+				.setMaxConnPerRoute(maxConnPerRoute)
 				.setMaxConnTotal(maxConnTotal).build();
 	}
 

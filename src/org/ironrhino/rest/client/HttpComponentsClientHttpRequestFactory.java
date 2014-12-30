@@ -24,8 +24,9 @@ public class HttpComponentsClientHttpRequestFactory extends
 
 	public HttpComponentsClientHttpRequestFactory(Client client) {
 		HttpClient httpClient = HttpClients.custom().disableAuthCaching()
-				.disableAutomaticRetries().disableCookieManagement()
-				.setMaxConnPerRoute(1000).setMaxConnTotal(1000).build();
+				.disableAutomaticRetries().disableConnectionState()
+				.disableCookieManagement().setMaxConnPerRoute(1000)
+				.setMaxConnTotal(1000).build();
 		setHttpClient(httpClient);
 		this.client = client;
 		super.setConnectTimeout(connectTimeout);
