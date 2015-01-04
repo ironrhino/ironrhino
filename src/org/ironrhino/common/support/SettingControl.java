@@ -58,7 +58,8 @@ public class SettingControl implements
 	}
 
 	public void setValue(String key, String value) {
-		Setting s = settings.get(key);
+		entityManager.setEntityClass(Setting.class);
+		Setting s = entityManager.findByNaturalId(key);
 		if (s != null)
 			s.setValue(value);
 		else
@@ -67,7 +68,8 @@ public class SettingControl implements
 	}
 
 	public void setValue(String key, String value, boolean readonly) {
-		Setting s = settings.get(key);
+		entityManager.setEntityClass(Setting.class);
+		Setting s = entityManager.findByNaturalId(key);
 		if (s != null)
 			s.setValue(value);
 		else
@@ -78,7 +80,8 @@ public class SettingControl implements
 
 	public void setValue(String key, String value, boolean readonly,
 			boolean hidden) {
-		Setting s = settings.get(key);
+		entityManager.setEntityClass(Setting.class);
+		Setting s = entityManager.findByNaturalId(key);
 		if (s != null)
 			s.setValue(value);
 		else
