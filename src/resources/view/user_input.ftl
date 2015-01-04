@@ -28,7 +28,7 @@
 	</@s.param>
 	</#if>
 	</@s.checkboxlist>
-	<@s.submit value="%{getText('save')}" />
+	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>
 </html></#escape>

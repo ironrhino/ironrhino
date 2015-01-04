@@ -15,7 +15,7 @@
 	<@s.textfield label="%{getText('postcode')}" name="region.postcode" maxlength="6"/>
 	<@s.textfield label="%{getText('rank')}" name="region.rank" type="number" class="integer positive" min="1"/>
 	<@s.textfield label="%{getText('displayOrder')}" name="region.displayOrder" type="number" class="integer"/>
-	<@s.submit value="%{getText('save')}" />
+	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>
 </html></#escape>

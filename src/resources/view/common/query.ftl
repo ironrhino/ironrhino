@@ -97,7 +97,7 @@ $(function(){
 	<@s.textfield label="${var}" name="paramMap['${var}']"/>
 	</#list>
 	</#if>
-	<@s.submit value="%{getText('submit')}" />
+	<@s.submit value="%{getText('submit')}" class="btn-primary"/>
 	<#if resultPage??>
 	<#if resultPage.result?size gt 0>
 	<#assign map=resultPage.result[0]/>

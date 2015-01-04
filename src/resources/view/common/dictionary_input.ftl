@@ -31,8 +31,8 @@
 		</style>
 		<thead>
 			<tr>
-				<th style="width:33%;">${action.getText('label')}</th>
-				<th>${action.getText('value')}</th>
+				<th style="width:33%;">${action.getText('value')}</th>
+				<th>${action.getText('label')}</th>
 				<#if !(view=='embedded'||view=='brief')>
 				<th style="width:15%;">${action.getText('type')}</th>
 				</#if>
@@ -46,8 +46,8 @@
 			</#if>
 			<#list 0..size as index>
 			<tr class="linkage">
-				<td><@s.textfield theme="simple" name="dictionary.items[${index}].label" style="width:90%;"/></td>
 				<td><@s.textfield theme="simple" name="dictionary.items[${index}].value" style="width:90%;" class="required${(!((view=='embedded'||view=='brief')))?string(' showonadd linkage_component option',' ')}"/></td>
+				<td><@s.textfield theme="simple" name="dictionary.items[${index}].label" style="width:90%;"/></td>
 				<#if !(view=='embedded'||view=='brief')>
 				<td><select class="linkage_switch" style="width:100px;">
 						<option value="option">${action.getText('option')}</option>
@@ -59,7 +59,7 @@
 			</#list>
 		</tbody>
 	</table>
-	<@s.submit value="%{getText('save')}" />
+	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>
 </html></#escape>

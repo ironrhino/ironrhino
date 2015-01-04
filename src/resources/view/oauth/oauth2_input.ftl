@@ -40,7 +40,7 @@
 			</#if>
 			<div class="form-actions">
 			<#if Parameters.login??>
-				<@s.submit value="%{getText('login')}" theme="simple"/>
+				<@s.submit value="%{getText('login')}" theme="simple" class="btn-primary"/>
 			<#else>
 				<@s.submit value="%{getText('grant')}" theme="simple" class="btn-primary"/> <@s.submit value="%{getText('deny')}" theme="simple" onclick="document.getElementById('grant_form').action='deny';"/>
 			</#if>

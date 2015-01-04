@@ -365,7 +365,7 @@
 		</#if>
 		</#if>
 	</#list>
-	<@s.submit value="%{getText('save')}" cssClass="btn-primary"/>
+	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>
 </html></#escape>

@@ -12,7 +12,7 @@
 	<@s.textfield label="%{getText('name')}" name="name" class="span2" />
 	<@s.textfield label="%{getText('contact')}" name="contact" class="span6" />
 	<@s.textarea label="%{getText('content')}" name="content" class="span6" />
-	<@s.submit value="%{getText('submit')}"/>
+	<@s.submit value="%{getText('submit')}" class="btn-primary"/>
 </@s.form>
 </#if>
 </body>

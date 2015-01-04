@@ -17,7 +17,7 @@
 		</div>
 	</div>
 	</#list>
-	<@s.submit value="%{getText('save')}" />
+	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </div>
 </body>

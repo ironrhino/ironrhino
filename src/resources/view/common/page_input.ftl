@@ -131,7 +131,7 @@ $(function() {
 	</div>
 	</#if>
 	<div class="form-actions">
-	<@s.submit id="save" value="%{getText('save')}" theme="simple"/>
+	<@s.submit id="save" value="%{getText('save')}" theme="simple" class="btn-primary"/>
 	
 	<#if view!='embedded'>
 	<#if page?? && !page.new>
