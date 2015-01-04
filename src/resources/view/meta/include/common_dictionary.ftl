@@ -6,7 +6,7 @@
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
-	<select<#if name?has_content> name="${name}"</#if> class="<#if required> required</#if><#if disabled> disabled</#if><#if !strict> combobox</#if> ${dynamicAttributes['class']!}"<#list dynamicAttributes?keys as attr><#if attr!='class' && attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
+	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#list dynamicAttributes?keys as attr><#if attr!='class' && attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
 		<option value="${headerKey}">${headerValue}</option>
 		<#local exists=false>
 		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
