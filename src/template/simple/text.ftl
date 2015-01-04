@@ -35,10 +35,10 @@
  value="${parameters.nameValue?html}"<#rt/>
 </#if>
 <#if parameters.disabled!false>
- disabled="disabled"<#rt/>
+ disabled<#rt/>
 </#if>
 <#if parameters.readonly!false>
- readonly="readonly"<#rt/>
+ readonly<#rt/>
 </#if>
 <#if parameters.tabindex?has_content>
  tabindex="${parameters.tabindex?html}"<#rt/>

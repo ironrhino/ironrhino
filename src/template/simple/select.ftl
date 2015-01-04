@@ -1,6 +1,6 @@
 <#--
 /*
- * $Id: select.ftl 804072 2009-08-14 03:16:35Z musachy $
+ * $Id$
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,7 +23,10 @@
 <#setting number_format="#.#####">
 <select<#rt/>
 <#if parameters.name?has_content>
- name="${parameters.name?html}"<#rt/>
+ name="${(parameters.name!"")?html}"<#rt/>
+ </#if>
+<#if parameters.get("size")?has_content>
+ size="${parameters.get("size")?html}"<#rt/>
 </#if>
 <#if parameters.disabled!false>
  disabled="disabled"<#rt/>
@@ -34,16 +37,16 @@
 <#if parameters.id?has_content>
  id="${parameters.id?html}"<#rt/>
 </#if>
-<#include "/${parameters.templateDir}/simple/css.ftl" />
+<#include "/${parameters.templateDir}/${parameters.expandTheme}/css.ftl" />
 <#if parameters.title?has_content>
  title="${parameters.title?html}"<#rt/>
 </#if>
 <#if parameters.multiple!false>
  multiple="multiple"<#rt/>
 </#if>
-<#include "/${parameters.templateDir}/simple/scripting-events.ftl" />
-<#include "/${parameters.templateDir}/simple/common-attributes.ftl" />
-<#include "/${parameters.templateDir}/simple/dynamic-attributes.ftl" />
+<#include "/${parameters.templateDir}/${parameters.expandTheme}/scripting-events.ftl" />
+<#include "/${parameters.templateDir}/${parameters.expandTheme}/common-attributes.ftl" />
+<#include "/${parameters.templateDir}/${parameters.expandTheme}/dynamic-attributes.ftl" />
 >
 <#if parameters.headerKey?? && parameters.headerValue??>
     <option value="${parameters.headerKey?html}"
@@ -68,7 +71,16 @@
             <#assign itemKey = stack.findValue('top')/>
             <#assign itemKeyStr = stack.findString('top')>
         </#if>
-        <#if parameters.listValue?has_content>
+        <#if parameters.listValueKey?has_content>
+          <#-- checks the valueStack for the 'valueKey.' The valueKey is then looked-up in the locale file for it's 
+             localized value.  This is then used as a label -->
+          <#assign valueKey = stack.findString(parameters.listValueKey) />
+          <#if valueKey?has_content>
+              <#assign itemValue = struts.getText(valueKey) />
+          <#else>
+              <#assign itemValue = parameters.listValueKey />
+          </#if>
+        <#elseif parameters.listValue?has_content>
             <#if stack.findString(parameters.listValue)?has_content>
               <#assign itemValue = stack.findString(parameters.listValue)/>
             <#else>
@@ -77,18 +89,61 @@
         <#else>
             <#assign itemValue = stack.findString('top')/>
         </#if>
+        <#if parameters.listCssClass?has_content>
+            <#if stack.findString(parameters.listCssClass)?has_content>
+              <#assign itemCssClass= stack.findString(parameters.listCssClass)/>
+            <#else>
+              <#assign itemCssClass = ''/>
+            </#if>
+        </#if>
+        <#if parameters.listCssStyle?has_content>
+            <#if stack.findString(parameters.listCssStyle)?has_content>
+              <#assign itemCssStyle= stack.findString(parameters.listCssStyle)/>
+            <#else>
+              <#assign itemCssStyle = ''/>
+            </#if>
+        </#if>
+        <#if parameters.listTitle?has_content>
+            <#if stack.findString(parameters.listTitle)?has_content>
+              <#assign itemTitle= stack.findString(parameters.listTitle)/>
+            <#else>
+              <#assign itemTitle = ''/>
+            </#if>
+        </#if>
     <option value="${itemKeyStr?html}"<#rt/>
         <#if tag.contains(parameters.nameValue, itemKey) || tag.contains(parameters.nameValue, itemValue)>
  selected="selected"<#rt/>
         </#if>
+        <#if itemCssClass?has_content>
+ class="${itemCssClass?html}"<#rt/>
+        </#if>
+        <#if itemCssStyle?has_content>
+ style="${itemCssStyle?html}"<#rt/>
+        </#if>
+        <#if itemTitle?has_content>
+ title="${itemTitle?html}"<#rt/>
+        </#if>
     >${itemValue?html}</option><#lt/>
 </@s.iterator>
 
-<#include "/${parameters.templateDir}/simple/optgroup.ftl" />
+<#include "/${parameters.templateDir}/${parameters.expandTheme}/optgroup.ftl" />
 
 </select>
+
 <#if parameters.multiple!false>
-<input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.name?html}" value=""<#rt/>
+  <#if (parameters.id?has_content && parameters.name?has_content)>
+    <input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.name?html}" value=""<#rt/>
+  </#if>
+  <#if (parameters.id?has_content && !parameters.name?has_content)>
+    <input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.id?html}" value=""<#rt/>
+  </#if>
+  <#if ( !parameters.id?has_content && parameters.name?has_content)>
+    <input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.id?html}" value=""<#rt/>
+  </#if>
+   <#if ( !parameters.id?has_content && !parameters.name?has_content)>
+     <input type="hidden" id="" name="" value="" <#rt/>
+  </#if>
+  
 <#if parameters.disabled!false>
  disabled="disabled"<#rt/>
 </#if>
