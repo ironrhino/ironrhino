@@ -30,10 +30,10 @@
 				var t = $(this);
 				if (!t.html()) {
 					if (t.parent().parent().prop('tagName') == 'THEAD') {
-						t.html('<i class="glyphicon glyphicon-plus add"></i>');
+						t.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i>');
 					} else {
 						t
-								.html('<i class="glyphicon glyphicon-plus add"></i><i class="glyphicon glyphicon-minus remove"></i><i class="glyphicon glyphicon-arrow-up moveup"></i><i class="glyphicon glyphicon-arrow-down movedown"></i>');
+								.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i><i class="glyphicon glyphicon-minus manipulate remove clickable"></i><i class="glyphicon glyphicon-arrow-up manipulate moveup clickable"></i><i class="glyphicon glyphicon-arrow-down manipulate movedown clickable"></i>');
 					}
 				}
 			});

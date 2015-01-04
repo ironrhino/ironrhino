@@ -8030,24 +8030,32 @@ a.remove:hover {
   filter: alpha(opacity=40);
 }
 
-.icon-download-alt,.icon-download{
+.glyphicon-download-alt,.glyphicon-download{
  opacity: 0.2;
 }
-.icon-download-alt:hover,.icon-download:hover{
+.glyphicon-download-alt:hover,.glyphicon-download:hover{
  opacity: 0.5;
 }
 
 .drophover { 
 	border: 2px dashed #333 !important; 
 }
-.clickable[class*="icon-"],.datagrided [class*="icon-"]{
+.clickable[class*="glyphicon-"]{
 	opacity: 0.6;
   	filter: alpha(opacity=60);
-	cursor:pointer;
+	cursor: pointer;
 }
-.clickable[class*="icon-"]:hover,.datagrided [class*="icon-"]:hover{
-	opacity: 1;
-  	filter: alpha(opacity=1);
+.clickable[class*="glyphicon-"]:hover{
+	opacity: 1!important;
+  	filter: alpha(opacity=1)!important;
+}
+.datagrided tbody > tr > td > .manipulate[class*="glyphicon-"]{
+	opacity: 0;
+  	filter: alpha(opacity=0);
+}
+.datagrided tbody > tr:hover > td > .manipulate[class*="glyphicon-"]{
+	opacity: 0.6;
+  	filter: alpha(opacity=60);
 }
 .unselectable{
 	-webkit-user-select: none;
@@ -8056,7 +8064,7 @@ a.remove:hover {
 	-o-user-select: none;
 	user-select: none;
 }
-.datagrided [class*="icon-"]{
+.datagrided [class*="glyphicon-"]{
 	margin: 3px;
 }
 .codeblock{
