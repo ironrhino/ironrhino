@@ -108,6 +108,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/eaxy-0.1.jar"/>
 	<classpathentry kind="lib" path="lib/annotations-api-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/asm-5.0.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.1.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="webapp/WEB-INF/classes"/>
 </classpath>
