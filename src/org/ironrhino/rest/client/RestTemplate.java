@@ -12,6 +12,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 
@@ -85,6 +86,12 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 			T result = super.doExecute(url, method, requestCallback,
 					responseExtractor);
 			return result;
+		} catch (ResourceAccessException e) {
+			logger.error(e.getMessage(), e);
+			if (--attempts < 1)
+				throw e;
+			return doExecute(url, method, requestCallback, responseExtractor,
+					attempts);
 		} catch (HttpClientErrorException e) {
 			logger.error(e.getResponseBodyAsString(), e);
 			if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
