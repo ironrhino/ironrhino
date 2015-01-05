@@ -45,7 +45,7 @@ public class JsonCallClient extends RemoteInvocationBasedAccessor implements
 
 	private String contextPath;
 
-	private int maxRetryTimes = 3;
+	private int maxAttempts = 3;
 
 	private List<String> asyncMethods;
 
@@ -71,8 +71,8 @@ public class JsonCallClient extends RemoteInvocationBasedAccessor implements
 		this.contextPath = contextPath;
 	}
 
-	public void setMaxRetryTimes(int maxRetryTimes) {
-		this.maxRetryTimes = maxRetryTimes;
+	public void setMaxAttempts(int maxAttempts) {
+		this.maxAttempts = maxAttempts;
 	}
 
 	public void setAsyncMethods(String asyncMethods) {
@@ -127,7 +127,7 @@ public class JsonCallClient extends RemoteInvocationBasedAccessor implements
 					@Override
 					public void run() {
 						try {
-							invoke(invocation, maxRetryTimes);
+							invoke(invocation, maxAttempts);
 						} catch (Throwable e) {
 							log.error(e.getMessage(), e);
 						}
@@ -140,12 +140,11 @@ public class JsonCallClient extends RemoteInvocationBasedAccessor implements
 				return null;
 			}
 		}
-		return invoke(invocation, maxRetryTimes);
+		return invoke(invocation, maxAttempts);
 	}
 
-	public Object invoke(MethodInvocation invocation, int retryTimes)
+	public Object invoke(MethodInvocation invocation, int attempts)
 			throws Throwable {
-		retryTimes--;
 		try {
 			String url = getServiceUrl() + "/"
 					+ invocation.getMethod().getName();
@@ -187,7 +186,7 @@ public class JsonCallClient extends RemoteInvocationBasedAccessor implements
 				return null;
 			return JsonUtils.fromJson(responseBody, t);
 		} catch (ConnectTimeoutException e) {
-			if (retryTimes < 0)
+			if (--attempts < 1)
 				throw e;
 			if (urlFromDiscovery) {
 				serviceRegistry.evict(host);
@@ -197,7 +196,7 @@ public class JsonCallClient extends RemoteInvocationBasedAccessor implements
 					log.info("relocate service url:" + serviceUrl);
 				}
 			}
-			return invoke(invocation, retryTimes);
+			return invoke(invocation, attempts);
 		}
 	}
 

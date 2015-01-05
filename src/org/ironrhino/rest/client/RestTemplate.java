@@ -21,7 +21,7 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 
 	private Client client;
 
-	private int retryTimes = 1;
+	private int maxAttempts = 2;
 
 	public RestTemplate(Client client) {
 		super();
@@ -61,12 +61,12 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 		cf.setReadTimeout(readTimeout);
 	}
 
-	public int getRetryTimes() {
-		return retryTimes;
+	public int getMaxAttempts() {
+		return maxAttempts;
 	}
 
-	public void setRetryTimes(int retryTimes) {
-		this.retryTimes = retryTimes;
+	public void setMaxAttempts(int maxAttempts) {
+		this.maxAttempts = maxAttempts;
 	}
 
 	@Override
@@ -74,12 +74,12 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 			RequestCallback requestCallback,
 			ResponseExtractor<T> responseExtractor) throws RestClientException {
 		return doExecute(url, method, requestCallback, responseExtractor,
-				retryTimes);
+				maxAttempts);
 	}
 
 	protected <T> T doExecute(URI url, HttpMethod method,
 			RequestCallback requestCallback,
-			ResponseExtractor<T> responseExtractor, int retryTimes)
+			ResponseExtractor<T> responseExtractor, int attempts)
 			throws RestClientException {
 		try {
 			T result = super.doExecute(url, method, requestCallback,
@@ -98,10 +98,10 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 						client.getTokenStore().setToken(token);
 					}
 				}
-				if (retryTimes > 0) {
-					return doExecute(url, method, requestCallback,
-							responseExtractor, --retryTimes);
-				}
+				if (--attempts < 1)
+					throw e;
+				return doExecute(url, method, requestCallback,
+						responseExtractor, attempts);
 			}
 			throw e;
 		}

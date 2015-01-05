@@ -37,7 +37,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 
 	private String contextPath;
 
-	private int maxRetryTimes = 3;
+	private int maxAttempts = 3;
 
 	private List<String> asyncMethods;
 
@@ -59,8 +59,8 @@ public class HessianClient extends HessianProxyFactoryBean {
 		this.contextPath = contextPath;
 	}
 
-	public void setMaxRetryTimes(int maxRetryTimes) {
-		this.maxRetryTimes = maxRetryTimes;
+	public void setMaxAttempts(int maxAttempts) {
+		this.maxAttempts = maxAttempts;
 	}
 
 	public void setAsyncMethods(String asyncMethods) {
@@ -102,7 +102,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 		setHessian2(true);
 		final HessianProxyFactory proxyFactory = new HessianProxyFactory();
 		proxyFactory.setConnectionFactory(new HessianURLConnectionFactory() {
-			
+
 			{
 				setHessianProxyFactory(proxyFactory);
 			}
@@ -145,7 +145,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 					@Override
 					public void run() {
 						try {
-							invoke(invocation, maxRetryTimes);
+							invoke(invocation, maxAttempts);
 						} catch (Throwable e) {
 							log.error(e.getMessage(), e);
 						}
@@ -158,16 +158,15 @@ public class HessianClient extends HessianProxyFactoryBean {
 				return null;
 			}
 		}
-		return invoke(invocation, maxRetryTimes);
+		return invoke(invocation, maxAttempts);
 	}
 
-	public Object invoke(MethodInvocation invocation, int retryTimes)
+	public Object invoke(MethodInvocation invocation, int attempts)
 			throws Throwable {
-		retryTimes--;
 		try {
 			return super.invoke(invocation);
 		} catch (RemoteAccessException e) {
-			if (retryTimes < 0)
+			if (--attempts < 1)
 				throw e;
 			if (urlFromDiscovery) {
 				serviceRegistry.evict(host);
@@ -178,7 +177,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 					reset();
 				}
 			}
-			return invoke(invocation, retryTimes);
+			return invoke(invocation, attempts);
 		}
 	}
 

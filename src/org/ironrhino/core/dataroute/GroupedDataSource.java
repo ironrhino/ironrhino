@@ -27,7 +27,7 @@ public class GroupedDataSource extends AbstractDataSource implements
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	private int maxRetryTimes = 3;
+	private int maxAttempts = 3;
 
 	// inject starts
 	private String masterName;
@@ -84,8 +84,8 @@ public class GroupedDataSource extends AbstractDataSource implements
 		return groupName;
 	}
 
-	public void setMaxRetryTimes(int maxRetryTimes) {
-		this.maxRetryTimes = maxRetryTimes;
+	public void setMaxAttempts(int maxAttempts) {
+		this.maxAttempts = maxAttempts;
 	}
 
 	public RoundRobin<String> getReadRoundRobin() {
@@ -135,12 +135,11 @@ public class GroupedDataSource extends AbstractDataSource implements
 	@Override
 	public Connection getConnection(String username, String password)
 			throws SQLException {
-		return getConnection(username, password, maxRetryTimes);
+		return getConnection(username, password, maxAttempts);
 	}
 
 	public Connection getConnection(String username, String password,
-			int retryTimes) throws SQLException {
-		retryTimes--;
+			int attempts) throws SQLException {
 		DataSource ds = null;
 		String dbname = null;
 		if (DataRouteContext.isReadonly() && getReadRoundRobin() != null) {
@@ -163,7 +162,7 @@ public class GroupedDataSource extends AbstractDataSource implements
 			return conn;
 		} catch (SQLException e) {
 			log.error(e.getMessage(), e);
-			if (retryTimes < 0)
+			if (--attempts < 1)
 				throw e;
 			Integer failureTimes = failureCount.get(ds);
 			if (failureTimes == null)
@@ -181,7 +180,7 @@ public class GroupedDataSource extends AbstractDataSource implements
 				failureCount.put(ds, failureTimes);
 			}
 			StatLog.add(new Key("dataroute", true, groupName, dbname, "failed"));
-			return getConnection(username, password, retryTimes);
+			return getConnection(username, password, attempts);
 		}
 	}
 

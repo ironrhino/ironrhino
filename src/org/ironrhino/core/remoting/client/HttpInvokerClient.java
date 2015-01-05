@@ -32,7 +32,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	private String contextPath;
 
-	private int maxRetryTimes = 3;
+	private int maxAttempts = 3;
 
 	private List<String> asyncMethods;
 
@@ -58,8 +58,8 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 		this.contextPath = contextPath;
 	}
 
-	public void setMaxRetryTimes(int maxRetryTimes) {
-		this.maxRetryTimes = maxRetryTimes;
+	public void setMaxAttempts(int maxAttempts) {
+		this.maxAttempts = maxAttempts;
 	}
 
 	public void setAsyncMethods(String asyncMethods) {
@@ -125,7 +125,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 					@Override
 					public void run() {
 						try {
-							invoke(invocation, maxRetryTimes);
+							invoke(invocation, maxAttempts);
 						} catch (Throwable e) {
 							log.error(e.getMessage(), e);
 						}
@@ -138,16 +138,15 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 				return null;
 			}
 		}
-		return invoke(invocation, maxRetryTimes);
+		return invoke(invocation, maxAttempts);
 	}
 
-	public Object invoke(MethodInvocation invocation, int retryTimes)
+	public Object invoke(MethodInvocation invocation, int attempts)
 			throws Throwable {
-		retryTimes--;
 		try {
 			return super.invoke(invocation);
 		} catch (RemoteAccessException e) {
-			if (retryTimes < 0)
+			if (--attempts < 1)
 				throw e;
 			if (urlFromDiscovery) {
 				serviceRegistry.evict(host);
@@ -157,7 +156,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 					log.info("relocate service url:" + serviceUrl);
 				}
 			}
-			return invoke(invocation, retryTimes);
+			return invoke(invocation, attempts);
 		}
 	}
 
