@@ -1,10 +1,15 @@
 package org.ironrhino.sample.retry;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.annotation.EnableRetry;
 
-@EnableRetry
+@SuppressWarnings("serial")
 @Configuration
-public class RetryConfiguration {
+public class RetryConfiguration extends
+		org.springframework.retry.annotation.RetryConfiguration {
+
+	@Override
+	public int getOrder() {
+		return -100;
+	}
 
 }

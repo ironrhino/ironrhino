@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -18,7 +19,7 @@ public class TimingAspect extends BaseAspect {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	public TimingAspect() {
-		order = -1000;
+		order = Ordered.HIGHEST_PRECEDENCE + 1;
 	}
 
 	@Around("execution(public * *(..)) and @annotation(timing)")

@@ -7,12 +7,17 @@ import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.rest.RestStatus;
+import org.springframework.core.Ordered;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Aspect
 @ControllerAdvice
 public class AuthorizeAspect extends BaseAspect {
+
+	public AuthorizeAspect() {
+		order = Ordered.HIGHEST_PRECEDENCE;
+	}
 
 	@Before("execution(public * *(..)) and @annotation(requestMapping) and not @annotation(org.ironrhino.core.metadata.Authorize)")
 	public void authorizeClass(JoinPoint jp, RequestMapping requestMapping)

@@ -15,6 +15,7 @@ import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -35,7 +36,7 @@ public class CacheAspect extends BaseAspect {
 	private int mutexWait = DEFAULT_MUTEX_WAIT;
 
 	public CacheAspect() {
-		order = -100;
+		order = Ordered.HIGHEST_PRECEDENCE + 2;
 	}
 
 	@Around("execution(public * *(..)) and @annotation(checkCache)")
