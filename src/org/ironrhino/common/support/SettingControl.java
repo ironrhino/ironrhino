@@ -60,20 +60,30 @@ public class SettingControl implements
 	public void setValue(String key, String value) {
 		entityManager.setEntityClass(Setting.class);
 		Setting s = entityManager.findByNaturalId(key);
-		if (s != null)
+		if (s != null) {
+			if (value == null) {
+				entityManager.delete(s);
+				return;
+			}
 			s.setValue(value);
-		else
+		} else {
 			s = new Setting(key, value);
+		}
 		entityManager.save(s);
 	}
 
 	public void setValue(String key, String value, boolean readonly) {
 		entityManager.setEntityClass(Setting.class);
 		Setting s = entityManager.findByNaturalId(key);
-		if (s != null)
+		if (s != null) {
+			if (value == null) {
+				entityManager.delete(s);
+				return;
+			}
 			s.setValue(value);
-		else
+		} else {
 			s = new Setting(key, value);
+		}
 		s.setReadonly(readonly);
 		entityManager.save(s);
 	}
@@ -82,10 +92,15 @@ public class SettingControl implements
 			boolean hidden) {
 		entityManager.setEntityClass(Setting.class);
 		Setting s = entityManager.findByNaturalId(key);
-		if (s != null)
+		if (s != null) {
+			if (value == null) {
+				entityManager.delete(s);
+				return;
+			}
 			s.setValue(value);
-		else
+		} else {
 			s = new Setting(key, value);
+		}
 		s.setReadonly(readonly);
 		s.setHidden(hidden);
 		entityManager.save(s);
