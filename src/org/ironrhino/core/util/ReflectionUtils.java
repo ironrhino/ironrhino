@@ -34,6 +34,8 @@ public class ReflectionUtils {
 	private static ClassPool classPool = ClassPool.getDefault();
 
 	public static List<String> getAllFields(Class<?> clazz) {
+		if (clazz == Object.class)
+			return Collections.emptyList();
 		try {
 			classPool.insertClassPath(new ClassClassPath(clazz));
 			CtClass cc = classPool.get(clazz.getName());
