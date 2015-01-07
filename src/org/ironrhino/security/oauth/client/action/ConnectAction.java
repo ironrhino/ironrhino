@@ -19,11 +19,9 @@ import org.ironrhino.security.Constants;
 import org.ironrhino.security.event.LoginEvent;
 import org.ironrhino.security.event.SignupEvent;
 import org.ironrhino.security.model.User;
-import org.ironrhino.security.oauth.client.model.OAuthToken;
 import org.ironrhino.security.oauth.client.model.Profile;
 import org.ironrhino.security.oauth.client.service.OAuthProvider;
 import org.ironrhino.security.oauth.client.service.OAuthProviderManager;
-import org.ironrhino.security.oauth.client.util.OAuthTokenUtils;
 import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -95,7 +93,6 @@ public class ConnectAction extends BaseAction {
 			OAuthProvider provider = oauthProviderManager.lookup(getUid());
 			if (provider == null)
 				return ACCESSDENIED;
-			OAuthToken token = provider.getToken(request);
 			Profile p = provider.getProfile(request);
 			if (p == null) {
 				targetUrl = "/oauth/connect";
@@ -107,9 +104,6 @@ public class ConnectAction extends BaseAction {
 				LoginEvent loginEvent;
 				user = (User) userManager.loadUserByUsername(id);
 				if (user != null) {
-					OAuthTokenUtils.putTokenIntoUserAttribute(provider, user,
-							token);
-					userManager.save(user);
 					loginEvent = new LoginEvent(user, "oauth",
 							provider.getName());
 				} else {
@@ -125,8 +119,6 @@ public class ConnectAction extends BaseAction {
 						}
 					user.setName(StringUtils.isNotBlank(p.getName()) ? p
 							.getName() : p.getDisplayName());
-					OAuthTokenUtils.putTokenIntoUserAttribute(provider, user,
-							token);
 					userManager.save(user);
 					eventPublisher.publish(new SignupEvent(user, "oauth",
 							provider.getName()), Scope.LOCAL);
@@ -136,10 +128,6 @@ public class ConnectAction extends BaseAction {
 				}
 				AuthzUtils.autoLogin(user);
 				eventPublisher.publish(loginEvent, Scope.LOCAL);
-			} else {
-				OAuthTokenUtils
-						.putTokenIntoUserAttribute(provider, user, token);
-				userManager.save(user);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

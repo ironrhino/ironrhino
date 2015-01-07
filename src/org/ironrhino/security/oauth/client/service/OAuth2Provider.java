@@ -12,16 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.client.model.OAuth2Token;
 import org.ironrhino.security.oauth.client.model.OAuthToken;
 import org.ironrhino.security.oauth.client.model.Profile;
-import org.ironrhino.security.oauth.client.util.OAuthTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 public abstract class OAuth2Provider extends AbstractOAuthProvider {
 
@@ -199,7 +194,6 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 			}
 		}
 		return invoke(accessToken.getAccess_token(), protectedURL);
-
 	}
 
 	public String invoke(String accessToken, String protectedURL)
@@ -237,27 +231,14 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 
 	protected void saveToken(HttpServletRequest request, OAuth2Token token) {
 		token.setCreate_time(System.currentTimeMillis());
-		request.setAttribute(getName() + "_token", token.getSource());
+		request.getSession().setAttribute(getName() + "_token",
+				token.getSource());
 	}
 
 	protected OAuth2Token restoreToken(HttpServletRequest request)
 			throws Exception {
-		SecurityContext sc = (SecurityContext) request
-				.getSession()
-				.getAttribute(
-						HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
-		if (sc != null) {
-			Authentication auth = sc.getAuthentication();
-			if (auth != null && auth.getPrincipal() instanceof User) {
-				OAuth2Token token = (OAuth2Token) OAuthTokenUtils
-						.getTokenFromUserAttribute(this,
-								(User) auth.getPrincipal());
-				if (token != null)
-					return token;
-			}
-		}
 		String key = getName() + "_token";
-		String source = (String) request.getAttribute(key);
+		String source = (String) request.getSession().getAttribute(key);
 		if (StringUtils.isBlank(source))
 			return null;
 		return new OAuth2Token(source);
