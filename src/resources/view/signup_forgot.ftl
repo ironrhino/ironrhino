@@ -16,8 +16,8 @@
 <#if notlogin>
 <div class="row">
 	<div class="span6 offset3">
-	<div class="hero-unit">
 	<h2 class="caption">${action.getText('signup.forgot')}</h2>
+	<div class="hero-unit">
 	<@s.form method="post" action="forgot" class="ajax reset form-horizontal well">
 		<@s.textfield label="%{getText('email')}" name="email" type="email" class="required email"/>
 		<@captcha/>

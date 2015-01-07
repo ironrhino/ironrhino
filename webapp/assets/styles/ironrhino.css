@@ -7903,7 +7903,7 @@ body.welcome {
 	background: #DEDEDE;
 	background: linear-gradient(to bottom, #EFEFEF, #DEDEDE, #EFEFEF);	
 }
-body.welcome .hero-unit .caption {
+body.welcome .caption {
 	text-align: center;
 	text-shadow: 1px 1px 1px gray;
 	border-radius:20px;
