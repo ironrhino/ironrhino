@@ -99,7 +99,7 @@ public class ApiDoc implements Serializable {
 				if (values.length > 0)
 					curl = values[0];
 			}
-			if (StringUtils.isNotBlank(murl) | StringUtils.isNoneBlank(curl))
+			if (StringUtils.isNotBlank(murl) || StringUtils.isNotBlank(curl))
 				url = curl + murl;
 			RequestMethod[] rms = requestMapping.method();
 			if (rms.length > 0) {

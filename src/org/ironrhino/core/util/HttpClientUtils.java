@@ -241,7 +241,8 @@ public class HttpClientUtils {
 			return getDefaultInstance().execute(httpRequest,
 					new BasicResponseHandler(charset));
 		} finally {
-			httpRequest.releaseConnection();
+			if (httpRequest != null)
+				httpRequest.releaseConnection();
 		}
 	}
 

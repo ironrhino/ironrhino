@@ -226,7 +226,7 @@ public class Oauth2Action extends BaseAction {
 				List<Authorization> auths = oauthManager
 						.findAuthorizationsByGrantor(grantor);
 				for (Authorization auth : auths) {
-					if (Objects.equal(auth.getClient(), client)
+					if (Objects.equal(auth.getClient(), client.getId())
 							&& Objects.equal(auth.getResponseType(),
 									response_type)
 							&& Objects.equal(auth.getScope(), scope)) {
