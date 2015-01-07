@@ -19,7 +19,7 @@ public class TimingAspect extends BaseAspect {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	public TimingAspect() {
-		order = Ordered.HIGHEST_PRECEDENCE + 1;
+		order = Ordered.HIGHEST_PRECEDENCE + 2;
 	}
 
 	@Around("execution(public * *(..)) and @annotation(timing)")

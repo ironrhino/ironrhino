@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AuthorizeAspect extends BaseAspect {
 
 	public AuthorizeAspect() {
-		order = Ordered.HIGHEST_PRECEDENCE;
+		order = Ordered.HIGHEST_PRECEDENCE + 1;
 	}
 
 	@Before("execution(public * *(..)) and @annotation(requestMapping) and not @annotation(org.ironrhino.core.metadata.Authorize)")

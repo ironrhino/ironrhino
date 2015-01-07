@@ -36,7 +36,7 @@ public class CacheAspect extends BaseAspect {
 	private int mutexWait = DEFAULT_MUTEX_WAIT;
 
 	public CacheAspect() {
-		order = Ordered.HIGHEST_PRECEDENCE + 2;
+		order = Ordered.HIGHEST_PRECEDENCE + 3;
 	}
 
 	@Around("execution(public * *(..)) and @annotation(checkCache)")
