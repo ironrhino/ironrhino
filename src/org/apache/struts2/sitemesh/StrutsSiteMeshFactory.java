@@ -22,7 +22,7 @@ public class StrutsSiteMeshFactory extends DefaultFactory {
     }
 
     private boolean isInsideActionTag() {
-    	if(ServletActionContext.getRequest() == null)
+    	if(ServletActionContext.getContext() == null)
     		return false;
         Object attribute = ServletActionContext.getRequest().getAttribute(StrutsStatics.STRUTS_ACTION_TAG_INVOCATION);
         return (Boolean) ObjectUtils.defaultIfNull(attribute, Boolean.FALSE);
