@@ -10,13 +10,13 @@
 	<security:http use-expressions="true" access-denied-page="/error/handle/401"
 		entry-point-ref="entryPoint" access-decision-manager-ref="accessDecisionManager">
 		<security:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService"/>
-		<security:intercept-url pattern="/common/**" access="hasRole('ROLE_ADMINISTRATOR')" />
-		<security:intercept-url pattern="/setup" access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
+		<security:intercept-url pattern="/login*/**" access="permitAll" />
+		<security:intercept-url pattern="/oauth*/**" access="permitAll" />
+		<security:intercept-url pattern="/locale" access="permitAll" />
+		<security:intercept-url pattern="/setup" access="permitAll" />
 		<security:intercept-url pattern="/signup*/**" access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/signin*/**" access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
-		<security:intercept-url pattern="/login*/**" access="hasAnyRole('ROLE_BUILTIN_USER','ROLE_BUILTIN_ANONYMOUS')" />
-		<security:intercept-url pattern="/oauth*/**" access="hasAnyRole('ROLE_BUILTIN_USER','ROLE_BUILTIN_ANONYMOUS')" />
-		<security:intercept-url pattern="/locale" access="hasAnyRole('ROLE_BUILTIN_USER','ROLE_BUILTIN_ANONYMOUS')" />
+		<security:intercept-url pattern="/common/**" access="hasRole('ROLE_ADMINISTRATOR')" />
 		<security:intercept-url pattern="/**" access="hasRole('ROLE_BUILTIN_USER')" />
 		<security:session-management session-fixation-protection="migrateSession" />
 		<security:remember-me services-ref="rememberMeServices" />
