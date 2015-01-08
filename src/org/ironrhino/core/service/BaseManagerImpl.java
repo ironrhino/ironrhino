@@ -625,7 +625,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	@Override
 	public void iterate(int fetchSize, IterateCallback callback,
 			DetachedCriteria dc) {
-		iterate(fetchSize, callback, null, false);
+		iterate(fetchSize, callback, dc, false);
 	}
 
 	@Override
