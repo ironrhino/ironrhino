@@ -19,7 +19,7 @@
     border:1px solid #FBEED5;
     background: #FBEED5;
     padding:2px;
-	border-radius: 5px;
+	border-radius: 12px;
 }
 .loadmask-msg div {
     padding:5px 10px 5px 25px;
@@ -28,6 +28,7 @@
 	/*border:1px solid #a3bad9;*/
     color:#888;
     cursor:wait;
+    border-radius: 10px;
 }
 .masked {
     overflow: hidden !important;
