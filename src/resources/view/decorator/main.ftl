@@ -43,6 +43,7 @@ ${action.getText('browser.warning')}
 </div>
 </#if>
 <#include "include/top.ftl"/>
+<#if 'welcome'!=page.properties["meta.body_class"]!>
 <@authorize ifAnyGranted="ROLE_BUILTIN_USER">
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
@@ -76,6 +77,7 @@ ${action.getText('browser.warning')}
   </div>
 </div>
 </@authorize>
+</#if>
 <div id="content" class="container">
 <#if action.hasActionMessages() || action.hasActionErrors()>
 <div id="message">
