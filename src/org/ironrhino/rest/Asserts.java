@@ -20,8 +20,8 @@ public class Asserts {
 		for (String f : field) {
 			Object value = bw.getPropertyValue(f);
 			String str = null;
-			if (value instanceof String)
-				str = (String) value;
+			if (value != null)
+				str = String.valueOf(value);
 			if (StringUtils.isBlank(str))
 				throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, f
 						+ " shouldn't be blank");
