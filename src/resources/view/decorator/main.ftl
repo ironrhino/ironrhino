@@ -59,7 +59,7 @@ ${action.getText('browser.warning')}
 	          <i class="glyphicon glyphicon-user"></i> ${user?string} <span class="caret"></span>
 	        </a>
 	        <ul class="dropdown-menu">
-	          <li><a href="<@url value="${ssoServerBase!}/user/profile"/>" class="popmodal">${action.getText('profile')}</a></li>
+	          <li><a href="<@url value="${ssoServerBase!}/user/profile"/>" class="popmodal nocache">${action.getText('profile')}</a></li>
 	          <#if !user.getAttribute('oauth_provider')??>
 	          <li><a href="<@url value="${ssoServerBase!}/user/password"/>" class="popmodal">${action.getText('change')}${action.getText('password')}</a></li>
 	          </#if>
