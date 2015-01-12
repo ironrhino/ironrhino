@@ -37,6 +37,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
+import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Ordered;
 import org.ironrhino.core.model.Persistable;
@@ -88,8 +89,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	public void save(T obj) {
 		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(obj.getClass()
-					+ " is @Immutable");
+			throw new IllegalArgumentException(obj.getClass() + " is @"
+					+ Immutable.class.getSimpleName());
+		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
 		boolean isnew = obj.isNew();
 		GenericGenerator genericGenerator = AnnotationUtils
 				.getAnnotatedPropertyNameAndAnnotations(obj.getClass(),
@@ -100,9 +102,17 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 			Serializable id = obj.getId();
 			if (id == null)
 				throw new IllegalArgumentException(obj + " must have an ID");
-			DetachedCriteria dc = detachedCriteria();
-			dc.add(Restrictions.eq("id", id));
-			isnew = countByCriteria(dc) == 0;
+			if (appendOnly == null) {
+				DetachedCriteria dc = detachedCriteria();
+				dc.add(Restrictions.eq("id", id));
+				isnew = countByCriteria(dc) == 0;
+			} else {
+				isnew = true;
+			}
+		} else {
+			if (appendOnly != null && !isnew)
+				throw new IllegalArgumentException(obj.getClass() + " is @"
+						+ AppendOnly.class.getSimpleName());
 		}
 		ReflectionUtils.processCallback(obj, isnew ? PrePersist.class
 				: PreUpdate.class);
@@ -167,8 +177,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	public void update(T obj) {
 		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(obj.getClass()
-					+ " is @Immutable");
+			throw new IllegalArgumentException(obj.getClass() + " is @"
+					+ Immutable.class.getSimpleName());
+		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
+		if (appendOnly != null)
+			throw new IllegalArgumentException(obj.getClass() + " is @"
+					+ AppendOnly.class.getSimpleName());
 		if (obj.isNew())
 			throw new IllegalArgumentException(obj
 					+ " must be persisted before update");
@@ -182,8 +196,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	public void delete(T obj) {
 		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(obj.getClass()
-					+ " is @Immutable");
+			throw new IllegalArgumentException(obj.getClass() + " is @"
+					+ Immutable.class.getSimpleName());
+		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
+		if (appendOnly != null)
+			throw new IllegalArgumentException(obj.getClass() + " is @"
+					+ AppendOnly.class.getSimpleName());
 		checkDelete(obj);
 		ReflectionUtils.processCallback(obj, PreRemove.class);
 		sessionFactory.getCurrentSession().delete(obj);
@@ -193,8 +211,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	protected void checkDelete(T obj) {
 		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(obj.getClass()
-					+ " is @Immutable");
+			throw new IllegalArgumentException(obj.getClass() + " is @"
+					+ Immutable.class.getSimpleName());
+		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
+		if (appendOnly != null)
+			throw new IllegalArgumentException(obj.getClass() + " is @"
+					+ AppendOnly.class.getSimpleName());
 		deleteChecker.check(obj);
 	}
 
@@ -203,8 +225,13 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	public List<T> delete(Serializable... id) {
 		Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(getEntityClass()
-					+ " is @Immutable");
+			throw new IllegalArgumentException(getEntityClass() + " is @"
+					+ Immutable.class.getSimpleName());
+		AppendOnly appendOnly = getEntityClass()
+				.getAnnotation(AppendOnly.class);
+		if (appendOnly != null)
+			throw new IllegalArgumentException(getEntityClass() + " is @"
+					+ AppendOnly.class.getSimpleName());
 		if (id == null || id.length == 0 || id.length == 1 && id[0] == null)
 			return null;
 		if (id.length == 1 && id[0].getClass().isArray()) {

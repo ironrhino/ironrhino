@@ -29,6 +29,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
+import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.JsonConfig;
@@ -180,6 +181,15 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (immutable != null) {
 				_readonly = new ReadonlyImpl();
 				_readonly.setValue(true);
+				return _readonly;
+			}
+			AppendOnly appendOnly = getEntityClass().getAnnotation(
+					AppendOnly.class);
+			if (appendOnly != null) {
+				_readonly = new ReadonlyImpl();
+				_readonly.setValue(false);
+				_readonly.setExpression("!entity.new");
+				_readonly.setDeletable(false);
 				return _readonly;
 			}
 			Richtable rconfig = getClass().getAnnotation(Richtable.class);
