@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
@@ -174,6 +175,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public ReadonlyImpl getReadonly() {
 		if (_readonly == null) {
+			Immutable immutable = getEntityClass().getAnnotation(
+					Immutable.class);
+			if (immutable != null) {
+				_readonly = new ReadonlyImpl();
+				_readonly.setValue(true);
+				return _readonly;
+			}
 			Richtable rconfig = getClass().getAnnotation(Richtable.class);
 			if (rconfig == null)
 				rconfig = getEntityClass().getAnnotation(Richtable.class);

@@ -28,6 +28,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
@@ -85,6 +86,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	@Override
 	@Transactional
 	public void save(T obj) {
+		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
+		if (immutable != null)
+			throw new IllegalArgumentException(obj.getClass()
+					+ " is @Immutable");
 		boolean isnew = obj.isNew();
 		GenericGenerator genericGenerator = AnnotationUtils
 				.getAnnotatedPropertyNameAndAnnotations(obj.getClass(),
@@ -160,6 +165,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	@Override
 	@Transactional
 	public void update(T obj) {
+		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
+		if (immutable != null)
+			throw new IllegalArgumentException(obj.getClass()
+					+ " is @Immutable");
 		if (obj.isNew())
 			throw new IllegalArgumentException(obj
 					+ " must be persisted before update");
@@ -171,6 +180,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	@Override
 	@Transactional
 	public void delete(T obj) {
+		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
+		if (immutable != null)
+			throw new IllegalArgumentException(obj.getClass()
+					+ " is @Immutable");
 		checkDelete(obj);
 		ReflectionUtils.processCallback(obj, PreRemove.class);
 		sessionFactory.getCurrentSession().delete(obj);
@@ -178,12 +191,20 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	}
 
 	protected void checkDelete(T obj) {
+		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
+		if (immutable != null)
+			throw new IllegalArgumentException(obj.getClass()
+					+ " is @Immutable");
 		deleteChecker.check(obj);
 	}
 
 	@Override
 	@Transactional
 	public List<T> delete(Serializable... id) {
+		Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
+		if (immutable != null)
+			throw new IllegalArgumentException(getEntityClass()
+					+ " is @Immutable");
 		if (id == null || id.length == 0 || id.length == 1 && id[0] == null)
 			return null;
 		if (id.length == 1 && id[0].getClass().isArray()) {
