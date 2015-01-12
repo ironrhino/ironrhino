@@ -20,6 +20,7 @@ import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -50,6 +51,8 @@ public class ApiDoc implements Serializable {
 	protected List<FieldObject> requestParams = new ArrayList<FieldObject>();
 
 	protected List<FieldObject> requestHeaders = new ArrayList<FieldObject>();
+
+	protected List<FieldObject> cookieValues = new ArrayList<FieldObject>();
 
 	protected List<FieldObject> requestBody;
 
@@ -261,6 +264,14 @@ public class ApiDoc implements Serializable {
 									: parameterNames[i], parameterTypes[i], ann
 									.required(), ann.defaultValue(), fd));
 					}
+					if (anno instanceof CookieValue) {
+						CookieValue ann = (CookieValue) anno;
+						if (!Map.class.isAssignableFrom(parameterTypes[i]))
+							cookieValues.add(FieldObject.create(StringUtils
+									.isNotBlank(ann.value()) ? ann.value()
+									: parameterNames[i], parameterTypes[i], ann
+									.required(), ann.defaultValue(), fd));
+					}
 				}
 			}
 
@@ -329,6 +340,14 @@ public class ApiDoc implements Serializable {
 
 	public void setRequestHeaders(List<FieldObject> requestHeaders) {
 		this.requestHeaders = requestHeaders;
+	}
+
+	public List<FieldObject> getCookieValues() {
+		return cookieValues;
+	}
+
+	public void setCookieValues(List<FieldObject> cookieValues) {
+		this.cookieValues = cookieValues;
 	}
 
 	public List<FieldObject> getRequestBody() {
