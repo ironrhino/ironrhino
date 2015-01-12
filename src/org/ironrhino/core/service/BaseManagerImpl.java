@@ -161,13 +161,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 			}
 			return;
 		}
-		if (idAssigned)
-			if (isnew)
-				session.save(obj);
-			else
-				session.update(obj);
+		if (isnew)
+			session.save(obj);
 		else
-			session.saveOrUpdate(obj);
+			session.update(obj);
 		ReflectionUtils.processCallback(obj, isnew ? PostPersist.class
 				: PostUpdate.class);
 	}
