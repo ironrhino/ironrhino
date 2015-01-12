@@ -2,6 +2,8 @@ package org.ironrhino.sample.api;
 
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.rest.ApiConfigBase;
+import org.ironrhino.sample.api.interceptor.LoggingInteceptor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 //only for exclude-filter of root ctx
 @ControllerAdvice
@@ -23,4 +26,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 @EnableAspectJAutoProxy
 public class ApiConfig extends ApiConfigBase {
 
+	@Bean
+	public LoggingInteceptor loggingInteceptor() {
+		return new LoggingInteceptor();
+	}
+
+	@Override
+	protected void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(loggingInteceptor());
+	}
 }
