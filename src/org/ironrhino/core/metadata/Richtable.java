@@ -11,6 +11,8 @@ import org.ironrhino.core.model.ResultPage;
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Richtable {
+	
+	String alias() default "";
 
 	String formid() default "";
 

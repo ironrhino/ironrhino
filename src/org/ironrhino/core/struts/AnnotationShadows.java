@@ -554,6 +554,7 @@ public class AnnotationShadows {
 	public static class RichtableImpl implements Serializable {
 
 		private static final long serialVersionUID = 7346213812241502993L;
+		private String alias = "";
 		private String formid = "";
 		private boolean filterable = true;
 		private boolean celleditable = true;
@@ -578,6 +579,7 @@ public class AnnotationShadows {
 		public RichtableImpl(Richtable config) {
 			if (config == null)
 				return;
+			this.alias = config.alias();
 			this.formid = config.formid();
 			this.filterable = config.filterable();
 			this.celleditable = config.celleditable();
@@ -595,6 +597,14 @@ public class AnnotationShadows {
 			this.formHeader = config.formHeader();
 			this.formFooter = config.formFooter();
 			this.rowDynamicAttributes = config.rowDynamicAttributes();
+		}
+
+		public String getAlias() {
+			return alias;
+		}
+
+		public void setAlias(String alias) {
+			this.alias = alias;
 		}
 
 		public String getFormid() {
