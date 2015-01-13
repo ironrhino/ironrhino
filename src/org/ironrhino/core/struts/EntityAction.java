@@ -176,25 +176,26 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public ReadonlyImpl getReadonly() {
 		if (_readonly == null) {
+
+			Richtable rconfig = getClass().getAnnotation(Richtable.class);
+			if (rconfig == null)
+				rconfig = getEntityClass().getAnnotation(Richtable.class);
 			Immutable immutable = getEntityClass().getAnnotation(
 					Immutable.class);
-			if (immutable != null) {
+			if (immutable != null && rconfig == null) {
 				_readonly = new ReadonlyImpl();
 				_readonly.setValue(true);
 				return _readonly;
 			}
 			AppendOnly appendOnly = getEntityClass().getAnnotation(
 					AppendOnly.class);
-			if (appendOnly != null) {
+			if (appendOnly != null && rconfig == null) {
 				_readonly = new ReadonlyImpl();
 				_readonly.setValue(false);
 				_readonly.setExpression("!entity.new");
 				_readonly.setDeletable(false);
 				return _readonly;
 			}
-			Richtable rconfig = getClass().getAnnotation(Richtable.class);
-			if (rconfig == null)
-				rconfig = getEntityClass().getAnnotation(Richtable.class);
 			Readonly rc = null;
 			if (rconfig != null)
 				rc = rconfig.readonly();
