@@ -23,7 +23,10 @@ public class LoggingInteceptor extends HandlerInterceptorAdapter {
 	public void afterCompletion(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
-		logger.info("postHandle {} with exception {}", handler, ex);
+		if (ex == null)
+			logger.info("afterCompletion {}", handler);
+		else
+			logger.info("afterCompletion {} with exception {}", handler, ex);
 	}
 
 	@Override
@@ -36,7 +39,11 @@ public class LoggingInteceptor extends HandlerInterceptorAdapter {
 	public void postHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		logger.info("postHandle {} with modelAndView {}", handler, modelAndView);
+		if (modelAndView == null)
+			logger.info("postHandle {} ", handler);
+		else
+			logger.info("postHandle {} with modelAndView {}", handler,
+					modelAndView);
 	}
 
 }
