@@ -219,8 +219,8 @@ ${formHeader!}
 <#if createable><@btn view="input" label="create"/></#if>
 <#if celleditable><@btn action="save" confirm=true/></#if>
 <#if enableable>
-<button type="button" class="btn confirm" data-action="enable" data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])">${action.getText("enable")}</button>
-<button type="button" class="btn confirm" data-action="disable" data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])">${action.getText("disable")}</button>
+<@btn action="enable" confirm=true/>
+<@btn action="disable" confirm=true/>
 </#if>
 </#if>
 <#if !readonly||deletable><button type="button" class="btn confirm" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${action.getText("delete")}</button></#if>
@@ -231,8 +231,8 @@ ${formHeader!}
 <a class="btn ajax view" href="${actionBaseUrl}">${action.getText("upward")}</a>
 </#if>
 </#if>
-<button type="button" class="btn reload">${action.getText("reload")}</button>
-<#if filterable><button type="button" class="btn filter">${action.getText("filter")}</button></#if>
+<@btn class="reload"/>
+<#if filterable><@btn class="filter"/></#if>
 </#if>
 </div>
 </#if>
@@ -342,6 +342,6 @@ ${formFooter!}
 </#if>
 </#macro>
 
-<#macro btn view="" action="" label="" confirm=false>
-<button type="button" class="btn<#if confirm> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if>>${statics['org.ironrhino.core.struts.I18N'].getText(label?has_content?string(label,view?has_content?string(view,action)))}</button>
+<#macro btn view="" action="" class="" label="" confirm=false>
+<#if class?has_content><button type="button" class="btn ${class}">${statics['org.ironrhino.core.struts.I18N'].getText(label?has_content?string(label,class))}</button><#else><button type="button" class="btn<#if confirm> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if><#if action='delete'> data-shown="selected" data-filterselector=":not([data-deletable='false'])"<#elseif action='enable'> data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])"<#elseif action='disable'> data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])"</#if>>${statics['org.ironrhino.core.struts.I18N'].getText(label?has_content?string(label,view?has_content?string(view,action)))}</button></#if>
 </#macro>
