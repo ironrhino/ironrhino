@@ -38,7 +38,7 @@ public class ExceptionUtils {
 			maxDepth--;
 			t = t.getCause();
 			sb.append("\n").append(t.getClass().getName());
-			if (sb.indexOf(t.getMessage()) < 0)
+			if (t.getMessage() != null && sb.indexOf(t.getMessage()) < 0)
 				sb.append(":").append(t.getMessage());
 		}
 		return sb.toString();
