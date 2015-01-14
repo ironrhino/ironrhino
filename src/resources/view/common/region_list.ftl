@@ -6,13 +6,13 @@
 <body>
 <#assign columns={"name":{"cellEdit":"click"},"areacode":{"cellEdit":"click","width":"100px"},"postcode":{"cellEdit":"click","width":"100px"},"rank":{"cellEdit":"click","width":"100px"},"displayOrder":{"cellEdit":"click","width":"100px"}}>
 <#assign actionColumnButtons=r'
-<button type="button" class="btn" data-view="input">${action.getText("edit")}</button>
+<@btn view="input" label="edit"/>
 <a class="btn ajax view" href="${actionBaseUrl+"?parent="+entity.id}">${action.getText("enter")}</a>
 '>
 <#assign bottomButtons='
-<button type="button" class="btn" data-view="input">${action.getText("create")}</button>
-<button type="button" class="btn confirm" data-action="save">${action.getText("save")}</button>
-<button type="button" class="btn confirm" data-action="delete" data-shown="selected">${action.getText("delete")}</button>
+<@btn view="input" label="create"/>
+<@btn action="save" confirm=true/>
+<@btn action="delete" confirm=true/>
 '+r'
 <#if region?? && parent??>
 <#if region.parent??>

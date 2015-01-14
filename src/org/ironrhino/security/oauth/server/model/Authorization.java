@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(name = "oauth_authorization")
-@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), bottomButtons = "<button type=\"button\" class=\"btn\" data-view=\"create\">${action.getText('create')}</button> <button type=\"button\" class=\"btn confirm\" data-action=\"delete\" data-shown=\"selected\" data-filterselector=\":not([data-deletable='false'])\">${action.getText('delete')}</button> <button type=\"button\" class=\"btn reload\">${action.getText('reload')}</button> <button type=\"button\" class=\"btn filter\">${action.getText('filter')}</button>")
+@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
 @ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
 public class Authorization extends BaseEntity {
 
