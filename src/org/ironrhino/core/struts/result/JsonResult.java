@@ -25,6 +25,8 @@ public class JsonResult implements Result {
 		Object action = invocation.getAction();
 		Method method = BeanUtils.findDeclaredMethod(action.getClass(),
 				invocation.getProxy().getMethod(), new Class[0]);
+		if (method == null)
+			return "";
 		JsonConfig jsonConfig = method.getAnnotation(JsonConfig.class);
 		if (jsonConfig != null && StringUtils.isNotBlank(jsonConfig.root())) {
 			Object value = invocation.getStack().findValue(jsonConfig.root());

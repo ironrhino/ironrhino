@@ -141,13 +141,13 @@ ${formHeader!}
 <@buttons?interpret/>
 <#else>
 <#if viewable>
-<button type="button" class="btn" data-view="view">${action.getText("view")}</button>
+<@btn view="view"/>
 </#if>
 <#if editable && !entityReadonly>
-<button type="button" class="btn" data-view="input">${action.getText("edit")}</button>
+<@btn view="input" label="edit"/>
 </#if>
 <#if treeable??&&treeable>
-<button type="button" class="btn" data-view="move">${action.getText("move")}</button>
+<@btn view="move"/>
 <a class="btn ajax view" href="${actionBaseUrl}?parent=${entity.id}">${action.getText("enter")}</a>
 </#if>
 </#if>
@@ -216,8 +216,8 @@ ${formHeader!}
 <@buttons?interpret/>
 <#else>
 <#if !readonly>
-<#if createable><button type="button" class="btn" data-view="input">${action.getText("create")}</button></#if>
-<#if celleditable><button type="button" class="btn confirm" data-action="save">${action.getText("save")}</button></#if>
+<#if createable><@btn view="input" label="create"/></#if>
+<#if celleditable><@btn action="save" confirm=true/></#if>
 <#if enableable>
 <button type="button" class="btn confirm" data-action="enable" data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])">${action.getText("enable")}</button>
 <button type="button" class="btn confirm" data-action="disable" data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])">${action.getText("disable")}</button>
@@ -340,4 +340,8 @@ ${formFooter!}
 </table>
 </form>
 </#if>
+</#macro>
+
+<#macro btn view="" action="" label="" confirm=false>
+<button type="button" class="btn<#if confirm> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if>>${statics['org.ironrhino.core.struts.I18N'].getText(label?has_content?string(label,view?has_content?string(view,action)))}</button>
 </#macro>
