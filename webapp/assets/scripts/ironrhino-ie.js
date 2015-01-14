@@ -34144,7 +34144,7 @@ var Dialog = {
 		if (hasRow) {
 			d.dialog('option', 'width', '90%');
 		}
-		var height = d.height();
+		var height = d.outerHeight();
 		if (height >= $(window).height()) {
 			d.dialog('option', 'position', {
 						my : 'top',
