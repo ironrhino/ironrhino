@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -94,14 +95,15 @@ public class AccessFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
-
+		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
-		if (RequestUtils.isInternalTesting(request))
+		if (isRequestDispatcher && RequestUtils.isInternalTesting(request))
 			response.addHeader("X-Instance-Id", AppInfo.getInstanceId());
 
 		String uri = request.getRequestURI();
 		uri = uri.substring(request.getContextPath().length());
+
 		for (String pattern : excludePatternsList) {
 			if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri,
 					pattern)) {
@@ -110,7 +112,7 @@ public class AccessFilter implements Filter {
 			}
 		}
 
-		if (handlers != null)
+		if (isRequestDispatcher && handlers != null)
 			loop: for (AccessHandler handler : handlers) {
 				String excludePattern = handler.getExcludePattern();
 				if (StringUtils.isNotBlank(excludePattern)) {
@@ -165,19 +167,23 @@ public class AccessFilter implements Filter {
 				MDC.put(MDC_KEY_SESSION_ID, sessionId);
 			}
 		}
-		String requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
-		if (StringUtils.isBlank(requestId)) {
-			requestId = CodecUtils.nextId();
-			if (sessionId != null) {
-				requestId = new StringBuilder(sessionId).append('.')
-						.append(requestId).toString();
+		String requestId = (String) request.getAttribute(MDC_KEY_REQUEST_ID);
+		if (requestId == null) {
+			requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
+			if (StringUtils.isBlank(requestId)) {
+				requestId = CodecUtils.nextId();
+				if (sessionId != null) {
+					requestId = new StringBuilder(sessionId).append('.')
+							.append(requestId).toString();
+				}
+				response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 			}
-			response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
+			request.setAttribute(MDC_KEY_REQUEST_ID, requestId);
 		}
 		MDC.put("request", " request:" + requestId);
 		MDC.put(MDC_KEY_REQUEST_ID, requestId);
 		try {
-			if (print && !uri.startsWith("/assets/")
+			if (isRequestDispatcher && print && !uri.startsWith("/assets/")
 					&& !uri.startsWith("/remoting/")
 					&& request.getHeader("Last-Event-Id") == null)
 				accessLog.info("");
@@ -185,7 +191,7 @@ public class AccessFilter implements Filter {
 			long start = System.currentTimeMillis();
 			chain.doFilter(req, resp);
 			long responseTime = System.currentTimeMillis() - start;
-			if (responseTime > responseTimeThreshold) {
+			if (isRequestDispatcher && responseTime > responseTimeThreshold) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(RequestUtils.serializeData(request))
 						.append(" response time:").append(responseTime)
