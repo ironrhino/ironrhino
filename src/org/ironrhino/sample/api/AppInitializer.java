@@ -8,7 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
-import org.ironrhino.rest.RestFilter;
+import org.ironrhino.core.servlet.DelegatingFilter;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -29,8 +29,9 @@ public class AppInitializer implements WebApplicationInitializer {
 		dynamic.setAsyncSupported(true);
 		dynamic.setLoadOnStartup(1);
 		FilterRegistration.Dynamic dynamicFilter = servletContext.addFilter(
-				"restFilter", RestFilter.class);
+				"restFilter", DelegatingFilter.class);
+		dynamicFilter.setAsyncSupported(true);
 		dynamicFilter.addMappingForServletNames(
-				EnumSet.of(DispatcherType.REQUEST), false, "api");
+				EnumSet.of(DispatcherType.REQUEST), true, "api");
 	}
 }

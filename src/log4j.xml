@@ -39,6 +39,13 @@
 			<param name="ConversionPattern" value="%d %c %p %m%n"/>
 		</layout>
 	</appender>
+	<appender name="REST" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${app.home}/logs/rest.log"/>
+		<param name="encoding" value="utf-8"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %t%X{request} %X{method}%X{url} %m%n"/>
+		</layout>
+	</appender>
 	<appender name="ACCESS" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="file" value="${app.home}/logs/access.log"/>
 		<param name="encoding" value="utf-8"/>
@@ -92,6 +99,10 @@
 	<logger name="org.ironrhino.core.remoting" additivity="false">
 		<level value="INFO"/>
 		<appender-ref ref="REMOTING"/>
+	</logger>
+	<logger name="rest" additivity="false">
+		<level value="INFO"/>
+		<appender-ref ref="REST"/>
 	</logger>
 	<logger name="access" additivity="false">
 		<level value="INFO"/>
