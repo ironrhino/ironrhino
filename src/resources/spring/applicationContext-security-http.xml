@@ -6,7 +6,6 @@
 
 	<security:http pattern="/assets/**" security="none" />
 	<security:http pattern="/remoting/**" security="none" />
-	<security:http pattern="/api/**" security="none" />
 	<security:http use-expressions="true" access-denied-page="/error/handle/401"
 		entry-point-ref="entryPoint" access-decision-manager-ref="accessDecisionManager">
 		<security:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService"/>
@@ -14,6 +13,7 @@
 		<security:intercept-url pattern="/oauth*/**" access="permitAll" />
 		<security:intercept-url pattern="/locale" access="permitAll" />
 		<security:intercept-url pattern="/setup" access="permitAll" />
+		<security:intercept-url pattern="/api/**" access="permitAll" />
 		<security:intercept-url pattern="/signup*/**" access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/signin*/**" access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/common/**" access="hasRole('ROLE_ADMINISTRATOR')" />
