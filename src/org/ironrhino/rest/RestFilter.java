@@ -31,8 +31,8 @@ public class RestFilter extends OncePerRequestFilter {
 		String method = map.get(PARAMETER_NAME_METHOD);
 		if (StringUtils.isNotBlank(method)
 				|| request.getContentType() != null
-				&& !request.getContentType().startsWith(
-						MediaType.APPLICATION_JSON_VALUE))
+				&& request.getContentType().startsWith(
+						MediaType.TEXT_PLAIN_VALUE))
 			request = new WrappedHttpServletRequest(request,
 					StringUtils.isNotBlank(method) ? method.toUpperCase()
 							.trim() : request.getMethod());
