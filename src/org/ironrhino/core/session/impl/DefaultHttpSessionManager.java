@@ -286,6 +286,9 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	}
 
 	private void doSave(WrappedHttpSession session) {
+		if ("Upgrade".equalsIgnoreCase(session.getRequest().getHeader(
+				"Connection"))) // websocket
+			return;
 		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased)
 			cacheBased.save(session);
 		else
@@ -294,6 +297,9 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	}
 
 	private void doInvalidate(WrappedHttpSession session) {
+		if ("Upgrade".equalsIgnoreCase(session.getRequest().getHeader(
+				"Connection"))) // websocket
+			return;
 		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased)
 			cacheBased.invalidate(session);
 		else
