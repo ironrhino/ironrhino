@@ -46,5 +46,5 @@
 		p:defaultTimeout="${hibernate.transaction.defaultTimeount:-1}" />
 	<bean
 		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
-	<tx:annotation-driven order="0" />
+	<tx:annotation-driven order="0" proxy-target-class="true" />
 </beans>

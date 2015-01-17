@@ -22,7 +22,7 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @EnableScheduling
-@EnableAsync(order = -999)
+@EnableAsync(order = -999, proxyTargetClass = true)
 @Configuration
 public class SchedulingConfiguration implements SchedulingConfigurer,
 		AsyncConfigurer {
