@@ -2,10 +2,10 @@ package org.ironrhino.core.struts;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Hidden;
@@ -28,7 +28,7 @@ public class AnnotationShadows {
 		private int maxlength;
 		private String regex;
 		private boolean trim = true;
-		private Set<String> cssClasses = new LinkedHashSet<String>(0);
+		private Set<String> cssClasses = new ConcurrentSkipListSet<String>();
 		private String thCssClass = "";
 		private ReadonlyImpl readonly = new ReadonlyImpl();
 		private int displayOrder = Integer.MAX_VALUE;
@@ -42,7 +42,7 @@ public class AnnotationShadows {
 		private String viewTemplate = "";
 		private String inputTemplate = "";
 		private String width;
-		private Map<String, String> dynamicAttributes = new HashMap<String, String>(
+		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<String, String>(
 				0);
 		private String cellDynamicAttributes = "";
 		private boolean excludeIfNotEdited;
