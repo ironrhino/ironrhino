@@ -41,6 +41,9 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 
 	@Override
 	public void save(WrappedHttpSession session) {
+		if ("Upgrade".equalsIgnoreCase(session.getRequest().getHeader(
+				"Connection"))) // websocket
+			return;
 		String sessionString = sessionCompressorManager.compress(session);
 		if (session.isDirty() && StringUtils.isBlank(sessionString)) {
 			cacheManager.delete(session.getId(), CACHE_NAMESPACE);
