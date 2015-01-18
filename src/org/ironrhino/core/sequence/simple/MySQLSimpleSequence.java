@@ -104,8 +104,10 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 							}
 							int max = rs.getInt(1);
 							next = max - getCacheSize() + 1;
-							this.nextId.set(next);
-							this.maxId.set(max);
+							synchronized (this) {
+								this.nextId.set(next);
+								this.maxId.set(max);
+							}
 						} finally {
 							if (rs != null)
 								rs.close();
