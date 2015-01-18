@@ -16,6 +16,10 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 
 	private AtomicInteger maxId = new AtomicInteger(0);
 
+	public MySQLSimpleSequence() {
+		setCacheSize(10);
+	}
+
 	@Override
 	public void afterPropertiesSet() {
 		Connection con = null;
@@ -83,26 +87,27 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 			Statement stmt = null;
 			try {
 				con = getDataSource().getConnection();
-				con.setAutoCommit(false);
+				con.setAutoCommit(true);
 				stmt = con.createStatement();
 				String columnName = getSequenceName();
 				stmt.executeUpdate("UPDATE " + getTableName() + " SET "
 						+ columnName + " = LAST_INSERT_ID(" + columnName
 						+ " + " + getCacheSize() + ")");
-				con.commit();
-				ResultSet rs = stmt.executeQuery("SELECT LAST_INSERT_ID()");
+				ResultSet rs = null;
 				try {
+					rs = stmt.executeQuery("SELECT LAST_INSERT_ID()");
 					if (!rs.next()) {
 						throw new DataAccessResourceFailureException(
 								"LAST_INSERT_ID() failed after executing an update");
 					}
-					next = rs.getInt(1) - getCacheSize() + 1;
+					int max = rs.getInt(1);
+					next = max - getCacheSize() + 1;
 					this.nextId.set(next);
-					this.maxId.set(rs.getInt(1));
+					this.maxId.set(max);
 				} finally {
-					rs.close();
+					if (rs != null)
+						rs.close();
 				}
-
 			} catch (SQLException ex) {
 				throw new DataAccessResourceFailureException(
 						"Could not obtain last_insert_id()", ex);

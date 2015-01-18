@@ -36,18 +36,9 @@ public abstract class AbstractSequenceSimpleSequence extends
 		Connection con = null;
 		Statement stmt = null;
 		try {
-			con = getDataSource().getConnection();
-			con.setAutoCommit(false);
-			DatabaseMetaData dbmd = con.getMetaData();
-			ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "SEQUENCE" });
-			boolean seqExists = false; // TODO test
-			while (rs.next()) {
-				if (getTableName().equalsIgnoreCase(rs.getString(3))) {
-					seqExists = true;
-					break;
-				}
-			}
+			boolean seqExists = isSequenceExists();
 			if (!seqExists) {
+				con = getDataSource().getConnection();
 				stmt = con.createStatement();
 				stmt.execute(getCreateSequenceStatement());
 				con.commit();
@@ -139,6 +130,27 @@ public abstract class AbstractSequenceSimpleSequence extends
 			throws SQLException {
 		stmt.execute(getRestartSequenceStatement());
 		con.commit();
+	}
+
+	protected boolean isSequenceExists() throws SQLException {
+		Connection con = null;
+		boolean sequenceExists = false;
+		try {
+			con = getDataSource().getConnection();
+			DatabaseMetaData dbmd = con.getMetaData();
+			ResultSet rs = dbmd.getTables(null, null, "%",
+					new String[] { "SEQUENCE" });
+			while (rs.next()) {
+				if (getTableName().equalsIgnoreCase(rs.getString(3))) {
+					sequenceExists = true;
+					break;
+				}
+			}
+		} finally {
+			if (con != null)
+				con.close();
+		}
+		return sequenceExists;
 	}
 
 }

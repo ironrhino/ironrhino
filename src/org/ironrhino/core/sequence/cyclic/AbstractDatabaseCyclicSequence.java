@@ -20,7 +20,8 @@ public abstract class AbstractDatabaseCyclicSequence extends
 	}
 
 	public void setCacheSize(int cacheSize) {
-		this.cacheSize = cacheSize;
+		if (cacheSize > 0)
+			this.cacheSize = cacheSize;
 	}
 
 	public DataSource getDataSource() {
