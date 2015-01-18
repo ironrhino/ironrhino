@@ -20,33 +20,18 @@ public class StandaloneConcurrencyService implements ConcurrencyService {
 
 	@Override
 	public boolean tryAcquire(String name, int permits) {
-		Semaphore semaphore = semaphores.get(name);
-		if (semaphore == null) {
-			semaphores.putIfAbsent(name, new Semaphore(permits));
-			semaphore = semaphores.get(name);
-		}
-		return semaphore.tryAcquire();
+		return getSemaphore(name, permits).tryAcquire();
 	}
 
 	@Override
 	public boolean tryAcquire(String name, int permits, long timeout,
 			TimeUnit unit) throws InterruptedException {
-		Semaphore semaphore = semaphores.get(name);
-		if (semaphore == null) {
-			semaphores.putIfAbsent(name, new Semaphore(permits));
-			semaphore = semaphores.get(name);
-		}
-		return semaphore.tryAcquire(timeout, unit);
+		return getSemaphore(name, permits).tryAcquire(timeout, unit);
 	}
 
 	@Override
 	public void acquire(String name, int permits) throws InterruptedException {
-		Semaphore semaphore = semaphores.get(name);
-		if (semaphore == null) {
-			semaphores.putIfAbsent(name, new Semaphore(permits));
-			semaphore = semaphores.get(name);
-		}
-		semaphore.acquire();
+		getSemaphore(name, permits).acquire();
 	}
 
 	@Override
@@ -56,5 +41,16 @@ public class StandaloneConcurrencyService implements ConcurrencyService {
 			throw new IllegalArgumentException("Semaphore '" + name
 					+ " ' doesn't exists");
 		semaphore.release();
+	}
+
+	private Semaphore getSemaphore(String name, int permits) {
+		Semaphore semaphore = semaphores.get(name);
+		if (semaphore == null) {
+			Semaphore newSemaphore = new Semaphore(permits);
+			semaphore = semaphores.putIfAbsent(name, newSemaphore);
+			if (semaphore == null)
+				semaphore = newSemaphore;
+		}
+		return semaphore;
 	}
 }

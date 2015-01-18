@@ -21,21 +21,12 @@ public class StandaloneLockService implements LockService {
 
 	@Override
 	public boolean tryLock(String name) {
-		Lock lock = locks.get(name);
-		if (lock == null) {
-			locks.putIfAbsent(name, new ReentrantLock());
-			lock = locks.get(name);
-		}
-		return lock.tryLock();
+		return getLock(name).tryLock();
 	}
 
 	@Override
 	public boolean tryLock(String name, long timeout, TimeUnit unit) {
-		Lock lock = locks.get(name);
-		if (lock == null) {
-			locks.putIfAbsent(name, new ReentrantLock());
-			lock = locks.get(name);
-		}
+		Lock lock = getLock(name);
 		try {
 			return lock.tryLock(timeout, unit);
 		} catch (InterruptedException e) {
@@ -45,18 +36,22 @@ public class StandaloneLockService implements LockService {
 
 	@Override
 	public void lock(String name) {
-		Lock lock = locks.get(name);
-		if (lock == null) {
-			locks.putIfAbsent(name, new ReentrantLock());
-			lock = locks.get(name);
-		}
-		lock.lock();
+		getLock(name).lock();
 	}
 
 	@Override
 	public void unlock(String name) {
+		getLock(name).unlock();
+	}
+
+	private Lock getLock(String name) {
 		Lock lock = locks.get(name);
-		if (lock != null)
-			lock.unlock();
+		if (lock == null) {
+			Lock newLock = new ReentrantLock();
+			lock = locks.putIfAbsent(name, newLock);
+			if (lock == null)
+				lock = newLock;
+		}
+		return lock;
 	}
 }
