@@ -1,6 +1,7 @@
-package org.ironrhino.core.sequence;
+package org.ironrhino.core.sequence.simple;
 
-public class HSQLCyclicSequence extends AbstractSequenceCyclicSequence {
+
+public class HSQLSimpleSequence extends AbstractSequenceSimpleSequence {
 
 	@Override
 	protected String getCreateSequenceStatement() {

@@ -1,4 +1,5 @@
-package org.ironrhino.core.sequence;
+package org.ironrhino.core.sequence.cyclic;
+
 
 public class SqlServerCyclicSequence extends AbstractSequenceCyclicSequence {
 

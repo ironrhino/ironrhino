@@ -1,4 +1,4 @@
-package org.ironrhino.core.sequence;
+package org.ironrhino.core.sequence.cyclic;
 
 import java.util.Calendar;
 import java.util.Collections;

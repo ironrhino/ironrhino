@@ -1,4 +1,4 @@
-package org.ironrhino.core.sequence;
+package org.ironrhino.core.sequence.cyclic;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -67,7 +67,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 			con = getDataSource().getConnection();
 			con.setAutoCommit(false);
 			DatabaseMetaData dbmd = con.getMetaData();
-			ResultSet rs = dbmd.getTables(null, null, "%", null);
+			ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "TABLE" });
 			boolean tableExists = false;
 			while (rs.next()) {
 				if (getTableName().equalsIgnoreCase(rs.getString(3))) {

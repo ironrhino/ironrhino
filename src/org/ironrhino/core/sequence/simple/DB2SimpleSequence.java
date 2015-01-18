@@ -1,6 +1,6 @@
-package org.ironrhino.core.sequence;
+package org.ironrhino.core.sequence.simple;
 
-public class DB2CyclicSequence extends AbstractSequenceCyclicSequence {
+public class DB2SimpleSequence extends AbstractSequenceSimpleSequence {
 
 	@Override
 	protected String getCreateSequenceStatement() {
@@ -16,11 +16,6 @@ public class DB2CyclicSequence extends AbstractSequenceCyclicSequence {
 		return new StringBuilder("SELECT NEXTVAL FOR ")
 				.append(getActualSequenceName())
 				.append(" FROM SYSIBM.SYSDUMMY1").toString();
-	}
-
-	@Override
-	protected String getCurrentTimestamp() {
-		return "CURRENT TIMESTAMP";
 	}
 
 }

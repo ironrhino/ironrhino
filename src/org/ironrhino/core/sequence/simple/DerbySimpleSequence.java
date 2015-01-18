@@ -1,10 +1,10 @@
-package org.ironrhino.core.sequence;
+package org.ironrhino.core.sequence.simple;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DerbyCyclicSequence extends AbstractSequenceCyclicSequence {
+public class DerbySimpleSequence extends AbstractSequenceSimpleSequence {
 
 	@Override
 	protected String getCreateSequenceStatement() {

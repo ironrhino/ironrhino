@@ -5,17 +5,13 @@ import java.util.Date;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 
-public interface CyclicSequence {
-
-	public CycleType getCycleType();
+public interface CyclicSequence extends Sequence {
 
 	public long nextLongValue();
 
-	public int nextIntValue();
+	public CycleType getCycleType();
 
-	public String nextStringValue();
-
-	static enum CycleType {
+	public static enum CycleType {
 
 		MINUTE("yyyyMMddHHmm") {
 			@Override
@@ -74,7 +70,7 @@ public interface CyclicSequence {
 			return format.format(date);
 		}
 
-		boolean isSameCycle(Date last, Date now) {
+		public boolean isSameCycle(Date last, Date now) {
 			if (last == null)
 				return true;
 			Calendar lastCalendar = Calendar.getInstance();

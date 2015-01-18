@@ -1,4 +1,4 @@
-package org.ironrhino.core.sequence;
+package org.ironrhino.core.sequence.cyclic;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -17,18 +17,6 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 	private AtomicInteger nextId = new AtomicInteger(0);
 
 	private AtomicInteger maxId = new AtomicInteger(0);
-
-	private int cacheSize = 20;
-
-	@Override
-	public int getCacheSize() {
-		return cacheSize;
-	}
-
-	@Override
-	public void setCacheSize(int cacheSize) {
-		this.cacheSize = cacheSize;
-	}
 
 	@Override
 	public void afterPropertiesSet() {
