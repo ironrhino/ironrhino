@@ -82,7 +82,14 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 						}
 					}
 				});
-		return success ? restart : nextStringValue();
+		if (success)
+			return restart;
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return nextStringValue();
 	}
 
 	protected Date now() {

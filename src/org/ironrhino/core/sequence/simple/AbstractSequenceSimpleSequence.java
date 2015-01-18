@@ -1,7 +1,6 @@
 package org.ironrhino.core.sequence.simple;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -36,15 +35,11 @@ public abstract class AbstractSequenceSimpleSequence extends
 		Connection con = null;
 		Statement stmt = null;
 		try {
-			boolean seqExists = isSequenceExists();
-			if (!seqExists) {
-				con = getDataSource().getConnection();
-				stmt = con.createStatement();
-				stmt.execute(getCreateSequenceStatement());
-				con.commit();
-			}
+			con = getDataSource().getConnection();
+			stmt = con.createStatement();
+			stmt.execute(getCreateSequenceStatement());
+			con.commit();
 		} catch (SQLException ex) {
-			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
 		} finally {
 			if (stmt != null)
 				try {
@@ -100,29 +95,36 @@ public abstract class AbstractSequenceSimpleSequence extends
 	}
 
 	public void restart() {
-		Connection con = null;
-		Statement stmt = null;
-		try {
-			con = getDataSource().getConnection();
-			con.setAutoCommit(false);
-			stmt = con.createStatement();
-			restartSequence(con, stmt);
-			con.commit();
-		} catch (SQLException ex) {
-			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
-		} finally {
-			if (stmt != null)
+		if (getLockService().tryLock(getLockName())) {
+			try {
+				Connection con = null;
+				Statement stmt = null;
 				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+					con = getDataSource().getConnection();
+					con.setAutoCommit(false);
+					stmt = con.createStatement();
+					restartSequence(con, stmt);
+					con.commit();
+				} catch (SQLException ex) {
+					throw new DataAccessResourceFailureException(
+							ex.getMessage(), ex);
+				} finally {
+					if (stmt != null)
+						try {
+							stmt.close();
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					if (con != null)
+						try {
+							con.close();
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
 				}
-			if (con != null)
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+			} finally {
+				getLockService().unlock(getLockName());
+			}
 		}
 	}
 
@@ -130,27 +132,6 @@ public abstract class AbstractSequenceSimpleSequence extends
 			throws SQLException {
 		stmt.execute(getRestartSequenceStatement());
 		con.commit();
-	}
-
-	protected boolean isSequenceExists() throws SQLException {
-		Connection con = null;
-		boolean sequenceExists = false;
-		try {
-			con = getDataSource().getConnection();
-			DatabaseMetaData dbmd = con.getMetaData();
-			ResultSet rs = dbmd.getTables(null, null, "%",
-					new String[] { "SEQUENCE" });
-			while (rs.next()) {
-				if (getTableName().equalsIgnoreCase(rs.getString(3))) {
-					sequenceExists = true;
-					break;
-				}
-			}
-		} finally {
-			if (con != null)
-				con.close();
-		}
-		return sequenceExists;
 	}
 
 }

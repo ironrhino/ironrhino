@@ -122,10 +122,8 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 							}
 							int max = rs.getInt(1);
 							next = max - getCacheSize() + 1;
-							synchronized (this) {
-								this.nextId.set(next);
-								this.maxId.set(max);
-							}
+							this.nextId.set(next);
+							this.maxId.set(max);
 						} finally {
 							if (rs != null)
 								rs.close();

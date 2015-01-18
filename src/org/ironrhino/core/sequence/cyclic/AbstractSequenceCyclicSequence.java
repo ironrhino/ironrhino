@@ -67,7 +67,8 @@ public abstract class AbstractSequenceCyclicSequence extends
 			con = getDataSource().getConnection();
 			con.setAutoCommit(false);
 			DatabaseMetaData dbmd = con.getMetaData();
-			ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "TABLE" });
+			ResultSet rs = dbmd.getTables(null, null, "%",
+					new String[] { "TABLE" });
 			boolean tableExists = false;
 			while (rs.next()) {
 				if (getTableName().equalsIgnoreCase(rs.getString(3))) {
@@ -141,11 +142,24 @@ public abstract class AbstractSequenceCyclicSequence extends
 						getLockService().unlock(lockName);
 					}
 				} else {
+					if (stmt != null)
+						try {
+							stmt.close();
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					if (con != null)
+						try {
+							con.close();
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					return nextStringValue();
 				}
 			}
 			rs = stmt.executeQuery(getQuerySequenceStatement());
