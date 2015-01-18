@@ -83,47 +83,60 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 	public int nextIntValue() {
 		int next = 0;
 		if (this.maxId.get() <= this.nextId.get()) {
-			Connection con = null;
-			Statement stmt = null;
-			try {
-				con = getDataSource().getConnection();
-				con.setAutoCommit(true);
-				stmt = con.createStatement();
-				String columnName = getSequenceName();
-				stmt.executeUpdate("UPDATE " + getTableName() + " SET "
-						+ columnName + " = LAST_INSERT_ID(" + columnName
-						+ " + " + getCacheSize() + ")");
-				ResultSet rs = null;
+			if (getLockService().tryLock(getLockName())) {
 				try {
-					rs = stmt.executeQuery("SELECT LAST_INSERT_ID()");
-					if (!rs.next()) {
+					Connection con = null;
+					Statement stmt = null;
+					try {
+						con = getDataSource().getConnection();
+						con.setAutoCommit(true);
+						stmt = con.createStatement();
+						String columnName = getSequenceName();
+						stmt.executeUpdate("UPDATE " + getTableName() + " SET "
+								+ columnName + " = LAST_INSERT_ID("
+								+ columnName + " + " + getCacheSize() + ")");
+						ResultSet rs = null;
+						try {
+							rs = stmt.executeQuery("SELECT LAST_INSERT_ID()");
+							if (!rs.next()) {
+								throw new DataAccessResourceFailureException(
+										"LAST_INSERT_ID() failed after executing an update");
+							}
+							int max = rs.getInt(1);
+							next = max - getCacheSize() + 1;
+							this.nextId.set(next);
+							this.maxId.set(max);
+						} finally {
+							if (rs != null)
+								rs.close();
+						}
+					} catch (SQLException ex) {
 						throw new DataAccessResourceFailureException(
-								"LAST_INSERT_ID() failed after executing an update");
+								"Could not obtain last_insert_id()", ex);
+					} finally {
+						if (stmt != null)
+							try {
+								stmt.close();
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
+						if (con != null)
+							try {
+								con.close();
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
 					}
-					int max = rs.getInt(1);
-					next = max - getCacheSize() + 1;
-					this.nextId.set(next);
-					this.maxId.set(max);
 				} finally {
-					if (rs != null)
-						rs.close();
+					getLockService().unlock(getLockName());
 				}
-			} catch (SQLException ex) {
-				throw new DataAccessResourceFailureException(
-						"Could not obtain last_insert_id()", ex);
-			} finally {
-				if (stmt != null)
-					try {
-						stmt.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				if (con != null)
-					try {
-						con.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
+			} else {
+				try {
+					Thread.sleep(100);
+					return nextIntValue();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		} else {
 			next = this.nextId.incrementAndGet();

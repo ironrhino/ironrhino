@@ -51,6 +51,7 @@ public class DatabaseSimpleSequenceDelegate extends
 		seq.setPaddingLength(getPaddingLength());
 		seq.setTableName(getTableName());
 		seq.setSequenceName(getSequenceName());
+		seq.setLockService(getLockService());
 		seq.afterPropertiesSet();
 	}
 
