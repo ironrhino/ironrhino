@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -65,7 +66,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 		Statement stmt = null;
 		try {
 			con = getDataSource().getConnection();
-			con.setAutoCommit(false);
+			con.setAutoCommit(true);
 			DatabaseMetaData dbmd = con.getMetaData();
 			ResultSet rs = dbmd.getTables(null, null, "%",
 					new String[] { "TABLE" });
@@ -93,16 +94,14 @@ public abstract class AbstractSequenceCyclicSequence extends
 				if (!columnExists) {
 					stmt.execute(getAddColumnStatement());
 					stmt.execute(getCreateSequenceStatement());
-					con.commit();
 				}
 			} else {
 				stmt.execute(getCreateTableStatement());
 				stmt.execute(getInsertStatement());
 				stmt.execute(getCreateSequenceStatement());
-				con.commit();
 			}
 		} catch (SQLException ex) {
-			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
+			logger.error(ex.getMessage(), ex);
 		} finally {
 			if (stmt != null)
 				try {
@@ -128,15 +127,17 @@ public abstract class AbstractSequenceCyclicSequence extends
 		ResultSet rs = null;
 		try {
 			con = getDataSource().getConnection();
-			con.setAutoCommit(false);
+			con.setAutoCommit(true);
 			stmt = con.createStatement();
-			if (!isSameCycle(con, stmt)) {
+			Date[] array = getLastAndCurrentTimestamp(con, stmt);
+			Date lastTimestamp = array[0];
+			Date currentTimestamp = array[1];
+			if (!getCycleType().isSameCycle(lastTimestamp, currentTimestamp)) {
 				if (getLockService().tryLock(lockName)) {
 					try {
 						stmt.executeUpdate("UPDATE " + getTableName() + " SET "
 								+ getSequenceName() + "_TIMESTAMP = "
 								+ getCurrentTimestamp());
-						con.commit();
 						restartSequence(con, stmt);
 					} finally {
 						getLockService().unlock(lockName);
@@ -145,12 +146,14 @@ public abstract class AbstractSequenceCyclicSequence extends
 					if (stmt != null)
 						try {
 							stmt.close();
+							stmt = null;
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
 					if (con != null)
 						try {
 							con.close();
+							con = null;
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
@@ -169,7 +172,8 @@ public abstract class AbstractSequenceCyclicSequence extends
 			} finally {
 				rs.close();
 			}
-			con.commit();
+			return getStringValue(currentTimestamp, getPaddingLength(),
+					(int) nextId);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(
 					"Could not obtain next value of sequence", ex);
@@ -187,28 +191,27 @@ public abstract class AbstractSequenceCyclicSequence extends
 					e.printStackTrace();
 				}
 		}
-		return getStringValue(thisTimestamp, getPaddingLength(), (int) nextId);
 	}
 
-	protected boolean isSameCycle(Connection con, Statement stmt)
+	protected Date[] getLastAndCurrentTimestamp(Connection con, Statement stmt)
 			throws SQLException {
 		ResultSet rs = stmt.executeQuery("SELECT  " + getSequenceName()
 				+ "_TIMESTAMP," + getCurrentTimestamp() + " FROM "
 				+ getTableName());
 		try {
 			rs.next();
-			lastTimestamp = rs.getTimestamp(1);
-			thisTimestamp = rs.getTimestamp(2);
+			Date[] array = new Date[2];
+			array[0] = rs.getTimestamp(1);
+			array[1] = rs.getTimestamp(2);
+			return array;
 		} finally {
 			rs.close();
 		}
-		return getCycleType().isSameCycle(lastTimestamp, thisTimestamp);
 	}
 
 	protected void restartSequence(Connection con, Statement stmt)
 			throws SQLException {
 		stmt.execute(getRestartSequenceStatement());
-		con.commit();
 	}
 
 }

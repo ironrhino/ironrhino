@@ -26,7 +26,7 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 		Statement stmt = null;
 		try {
 			con = getDataSource().getConnection();
-			con.setAutoCommit(false);
+			con.setAutoCommit(true);
 			DatabaseMetaData dbmd = con.getMetaData();
 			ResultSet rs = dbmd.getTables(null, null, "%", null);
 			boolean tableExists = false;
@@ -53,16 +53,14 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 				if (!columnExists) {
 					stmt.execute("ALTER TABLE `" + getTableName() + "` ADD "
 							+ columnName + " INT NOT NULL DEFAULT 0");
-					con.commit();
 				}
 			} else {
 				stmt.execute("CREATE TABLE `" + getTableName() + "` ("
 						+ columnName + " INT NOT NULL DEFAULT 0) ");
 				stmt.execute("INSERT INTO `" + getTableName() + "` VALUES(0)");
-				con.commit();
 			}
 		} catch (SQLException ex) {
-			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
+			logger.error(ex.getMessage(), ex);
 		} finally {
 			if (stmt != null)
 				try {
@@ -150,12 +148,11 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 		Statement stmt = null;
 		try {
 			con = getDataSource().getConnection();
-			con.setAutoCommit(false);
+			con.setAutoCommit(true);
 			stmt = con.createStatement();
 			String columnName = getSequenceName();
 			stmt.executeUpdate("UPDATE " + getTableName() + " SET "
 					+ columnName + " = 0");
-			con.commit();
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
 		} finally {

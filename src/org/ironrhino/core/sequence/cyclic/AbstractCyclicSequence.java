@@ -5,15 +5,15 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.sequence.CyclicSequence;
 import org.ironrhino.core.util.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 
 public abstract class AbstractCyclicSequence implements CyclicSequence,
 		InitializingBean, BeanNameAware {
-
-	protected Date lastTimestamp;
-
-	protected Date thisTimestamp;
+	
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private CycleType cycleType = CycleType.DAY;
 

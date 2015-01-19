@@ -3,11 +3,15 @@ package org.ironrhino.core.sequence.simple;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.sequence.SimpleSequence;
 import org.ironrhino.core.util.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 
 public abstract class AbstractSimpleSequence implements SimpleSequence,
 		InitializingBean, BeanNameAware {
+	
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private String sequenceName;
 

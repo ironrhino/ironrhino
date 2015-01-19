@@ -36,10 +36,11 @@ public abstract class AbstractSequenceSimpleSequence extends
 		Statement stmt = null;
 		try {
 			con = getDataSource().getConnection();
+			con.setAutoCommit(true);
 			stmt = con.createStatement();
 			stmt.execute(getCreateSequenceStatement());
-			con.commit();
 		} catch (SQLException ex) {
+			logger.warn(ex.getMessage());
 		} finally {
 			if (stmt != null)
 				try {
@@ -64,7 +65,7 @@ public abstract class AbstractSequenceSimpleSequence extends
 		ResultSet rs = null;
 		try {
 			con = getDataSource().getConnection();
-			con.setAutoCommit(false);
+			con.setAutoCommit(true);
 			stmt = con.createStatement();
 			rs = stmt.executeQuery(getQuerySequenceStatement());
 			try {
@@ -73,7 +74,6 @@ public abstract class AbstractSequenceSimpleSequence extends
 			} finally {
 				rs.close();
 			}
-			con.commit();
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(
 					"Could not obtain next value of sequence", ex);
@@ -95,43 +95,39 @@ public abstract class AbstractSequenceSimpleSequence extends
 	}
 
 	public void restart() {
-		if (getLockService().tryLock(getLockName())) {
+		try {
+			Connection con = null;
+			Statement stmt = null;
 			try {
-				Connection con = null;
-				Statement stmt = null;
-				try {
-					con = getDataSource().getConnection();
-					con.setAutoCommit(false);
-					stmt = con.createStatement();
-					restartSequence(con, stmt);
-					con.commit();
-				} catch (SQLException ex) {
-					throw new DataAccessResourceFailureException(
-							ex.getMessage(), ex);
-				} finally {
-					if (stmt != null)
-						try {
-							stmt.close();
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-					if (con != null)
-						try {
-							con.close();
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-				}
+				con = getDataSource().getConnection();
+				con.setAutoCommit(true);
+				stmt = con.createStatement();
+				restartSequence(con, stmt);
+			} catch (SQLException ex) {
+				throw new DataAccessResourceFailureException(ex.getMessage(),
+						ex);
 			} finally {
-				getLockService().unlock(getLockName());
+				if (stmt != null)
+					try {
+						stmt.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				if (con != null)
+					try {
+						con.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 			}
+		} finally {
+			getLockService().unlock(getLockName());
 		}
 	}
 
 	protected void restartSequence(Connection con, Statement stmt)
 			throws SQLException {
 		stmt.execute(getRestartSequenceStatement());
-		con.commit();
 	}
 
 }

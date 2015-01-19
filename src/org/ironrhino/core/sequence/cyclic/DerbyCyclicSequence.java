@@ -24,7 +24,6 @@ public class DerbyCyclicSequence extends AbstractSequenceCyclicSequence {
 			throws SQLException {
 		stmt.execute("DROP SEQUENCE " + getActualSequenceName());
 		stmt.execute(getCreateSequenceStatement());
-		con.commit();
 	}
 
 }
