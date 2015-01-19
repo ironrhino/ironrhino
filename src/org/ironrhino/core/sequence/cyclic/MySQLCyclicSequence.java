@@ -7,16 +7,15 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 
 public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
-	private AtomicInteger nextId = new AtomicInteger(0);
+	private int nextId = 0;
 
-	private AtomicInteger maxId = new AtomicInteger(0);
+	private int maxId = 0;
 
 	public MySQLCyclicSequence() {
 		setCacheSize(10);
@@ -101,8 +100,8 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 				try {
 					boolean sameCycle = getCycleType().isSameCycle(
 							lastTimestamp, currentTimestamp);
-					if (sameCycle && this.maxId.get() > this.nextId.get()) {
-						next = this.nextId.incrementAndGet();
+					if (sameCycle && maxId > nextId) {
+						next = ++nextId;
 					} else {
 						if (sameCycle) {
 							stmt.executeUpdate("UPDATE " + getTableName()
@@ -127,8 +126,8 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 							}
 							int max = rs.getInt(1);
 							next = max - getCacheSize() + 1;
-							this.nextId.set(next);
-							this.maxId.set(max);
+							nextId = next;
+							maxId = max;
 						} finally {
 							if (rs != null)
 								rs.close();
@@ -161,7 +160,6 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 				}
 				return nextStringValue();
 			}
-
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(
 					"Could not obtain last_insert_id()", ex);
