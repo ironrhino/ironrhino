@@ -95,33 +95,28 @@ public abstract class AbstractSequenceSimpleSequence extends
 	}
 
 	public void restart() {
+		Connection con = null;
+		Statement stmt = null;
 		try {
-			Connection con = null;
-			Statement stmt = null;
-			try {
-				con = getDataSource().getConnection();
-				con.setAutoCommit(true);
-				stmt = con.createStatement();
-				restartSequence(con, stmt);
-			} catch (SQLException ex) {
-				throw new DataAccessResourceFailureException(ex.getMessage(),
-						ex);
-			} finally {
-				if (stmt != null)
-					try {
-						stmt.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				if (con != null)
-					try {
-						con.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-			}
+			con = getDataSource().getConnection();
+			con.setAutoCommit(true);
+			stmt = con.createStatement();
+			restartSequence(con, stmt);
+		} catch (SQLException ex) {
+			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
 		} finally {
-			getLockService().unlock(getLockName());
+			if (stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			if (con != null)
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 		}
 	}
 
