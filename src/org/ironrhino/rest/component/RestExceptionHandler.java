@@ -4,12 +4,17 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.ironrhino.rest.RestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -37,6 +42,29 @@ public class RestExceptionHandler {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			return RestStatus.valueOf(RestStatus.CODE_FORBIDDEN,
 					ex.getMessage());
+		}
+		if (ex instanceof MethodArgumentNotValidException) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			MethodArgumentNotValidException me = (MethodArgumentNotValidException) ex;
+			BindingResult bindingResult = me.getBindingResult();
+			StringBuilder sb = new StringBuilder();
+			for (FieldError fe : bindingResult.getFieldErrors()) {
+				sb.append(fe.getField()).append(": ")
+						.append(fe.getDefaultMessage()).append("; ");
+			}
+			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID,
+					sb.toString());
+		}
+		if (ex instanceof ConstraintViolationException) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			ConstraintViolationException cve = (ConstraintViolationException) ex;
+			StringBuilder sb = new StringBuilder();
+			for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
+				sb.append(cv.getPropertyPath()).append(": ")
+						.append(cv.getMessage()).append("; ");
+			}
+			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID,
+					sb.toString());
 		}
 		if (ex instanceof RestStatus) {
 			RestStatus rs = (RestStatus) ex;

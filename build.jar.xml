@@ -754,6 +754,12 @@
 				<zipgroupfileset file="${lib.dir}/asm-*.jar" />
 			</zip>
 			<delete file="${target.dir}/temp.jar" />
+			<zip destfile="${target.dir}/temp.jar">
+				<zipgroupfileset file="${lib.dir}/validation-api-*.jar" />
+				<zipgroupfileset file="${target.dir}/${core-jar.name}" />
+			</zip>
+			<delete file="${target.dir}/${core-jar.name}" />
+			<move file="${target.dir}/temp.jar" tofile="${target.dir}/${core-jar.name}" />
 		</target>
 
 	</project>

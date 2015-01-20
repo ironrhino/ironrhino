@@ -3,8 +3,12 @@ package org.ironrhino.core.struts;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import ognl.MethodFailedException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.slf4j.Logger;
@@ -38,8 +42,18 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 				if (action instanceof ValidationAware) {
 					ValidationAware validationAwareAction = (ValidationAware) action;
 					Throwable cause = e.getCause();
-
-					if (e instanceof OptimisticLockingFailureException
+					if (e instanceof ConstraintViolationException) {
+						ConstraintViolationException cve = (ConstraintViolationException) e;
+						for (ConstraintViolation<?> cv : cve
+								.getConstraintViolations()) {
+							validationAwareAction.addFieldError(
+									StringUtils
+											.uncapitalize(cv.getRootBeanClass()
+													.getSimpleName())
+											+ "." + cv.getPropertyPath(), cv
+											.getMessage());
+						}
+					} else if (e instanceof OptimisticLockingFailureException
 							|| cause instanceof OptimisticLockingFailureException) {
 						validationAwareAction.addActionError(findText(
 								"try.again.later", null));
