@@ -1,30 +1,47 @@
 (function($) {
-	$.fn.flotlinechart = function() {
+	$.fn.flotchart = function() {
 		$(this).each(function() {
-			var ul = $(this), data = [], lies = $('li', ul), istime = false, options = {
-				series : {
-					lines : {
-						show : true
+			var ul = $(this), data = [];
+			if (ul.data('least')
+					&& $('li', ul).length < parseInt(ul.data('least')))
+				return;
+			ul.wrap('<div class="plot-wrap" style="position:relative;"></div>');
+			var plot = $('<div></div>').insertAfter(ul).width(ul.width())
+					.height(ul.height());
+			$('<div style="position: absolute;width: 20px;height: 20px;font-size: 20px;'
+					+ (ul.hasClass('flotpiechart') ? 'bottom' : 'top')
+					+ ': 0px;right: 0px;cursor: pointer;"><i class="glyphicon glyphicon-list"></i></div>')
+					.insertAfter(plot).click(function() {
+						$('.glyphicon', this).toggleClass('glyphicon-list')
+								.toggleClass('glyphicon-picture');
+						ul.toggle();
+						plot.toggle();
+					});
+			if (ul.hasClass('flotlinechart')) {
+				var istime = false, options = {
+					series : {
+						lines : {
+							show : true
+						},
+						points : {
+							show : true
+						}
 					},
-					points : {
-						show : true
+					grid : {
+						hoverable : true
 					}
-				},
-				grid : {
-					hoverable : true
-				}
-			};
-			if (!ul.data('least') || lies.length > parseInt(ul.data('least'))) {
-				lies.each(function() {
+				};
+				$('li', ul).each(function() {
 							var point = [];
-							if ($('span', this).data('time')) {
+							var label = $('.label,span', this);
+							var value = $('.value,strong', this);
+							if (label.data('time')) {
 								istime = true;
-								point.push(parseInt($('span', this)
-										.data('time')));
+								point.push(parseInt(label.data('time')));
 							} else {
-								point.push(parseInt($('span', this).text()));
+								point.push(parseInt(label.text()));
 							}
-							point.push(parseInt($('strong', this).text()));
+							point.push(parseInt(value.text()));
 							data.push(point);
 						});
 				if (istime) {
@@ -33,9 +50,10 @@
 						timeformat : ul.data('timeformat') || '%m-%d'
 					}
 				}
-				$.plot(ul, [data], options);
+
+				$.plot(plot, [data], options);
 				var previousPoint = null;
-				ul.bind('plothover', function(event, pos, item) {
+				plot.bind('plothover', function(event, pos, item) {
 							if (item) {
 								if (previousPoint != item.dataIndex) {
 									previousPoint = item.dataIndex;
@@ -55,27 +73,18 @@
 								previousPoint = null;
 							}
 						});
-
-			}
-		});
-		return this;
-	};
-
-	$.fn.flotbarchart = function() {
-		$(this).each(function() {
-			var ul = $(this);
-			var data = [];
-			var xticks = [];
-			var lies = $('li', ul);
-			if (lies.length > 2) {
-				lies.each(function() {
+			} else if (ul.hasClass('flotbarchart')) {
+				var xticks = [];
+				$('li', ul).each(function() {
 							var point = [];
-							point.push(parseInt($('span', this).text()));
-							point.push(parseInt($('strong', this).text()));
+							var label = $('.label,span', this);
+							var value = $('.value,strong', this);
+							point.push(parseInt(label.text()));
+							point.push(parseInt(value.text()));
 							xticks.push(point[0]);
 							data.push(point);
 						});
-				$.plot(ul, [data], {
+				$.plot(plot, [data], {
 							series : {
 								bars : {
 									show : true
@@ -91,7 +100,7 @@
 							}
 						});
 				var previousPoint = null;
-				ul.bind('plothover', function(event, pos, item) {
+				plot.bind('plothover', function(event, pos, item) {
 							if (item) {
 								if (previousPoint != item.dataIndex) {
 									previousPoint = item.dataIndex;
@@ -106,62 +115,58 @@
 								previousPoint = null;
 							}
 						});
+			} else if (ul.hasClass('flotpiechart')) {
+				$('li', ul).each(function() {
+							var share = {};
+							var label = $('.label,span', this);
+							var value = $('.value,strong', this);
+							share.label = label.text();
+							share.data = parseInt(value.text());
+							data.push(share);
+						});
+				$.plot(plot, data, {
+					series : {
+						pie : {
+							show : true,
+							radius : 1,
+							label : {
+								show : true,
+								radius : 2 / 3,
+								formatter : function(label, series) {
+									return "<div style='font-size:8pt; text-align:center; padding:2px; color:white;'>"
+											+ label
+											+ "<br/>"
+											+ series.percent.toFixed(1)
+											+ "%</div>";
+								},
+								threshold : 0.1
+							}
+						}
+					},
+					legend : {
+						show : true
+					},
+					grid : {
+						// hoverable:true,
+						clickable : true
+					}
+				});
+				plot.bind('plotclick', function(event, pos, obj) {
+							if (!obj) {
+								$('#tooltip').remove();
+								return;
+							}
+							showTooltip(pos.pageX, pos.pageY, obj.series.label
+											+ ': ' + obj.series.data[0][1]);
+						});
 
 			}
 
-		});
-		return this;
-	}
-
-	$.fn.flotpiechart = function() {
-		$(this).each(function() {
-			var ul = $(this);
-			var data = [];
-			var lies = $('li', ul);
-			lies.each(function() {
-						var share = {};
-						share.label = $('span', this).text();
-						share.data = parseInt($('strong', this).text());
-						data.push(share);
-					});
-			$.plot(ul, data, {
-				series : {
-					pie : {
-						show : true,
-						radius : 1,
-						label : {
-							show : true,
-							radius : 2 / 3,
-							formatter : function(label, series) {
-								return "<div style='font-size:8pt; text-align:center; padding:2px; color:white;'>"
-										+ label
-										+ "<br/>"
-										+ series.percent.toFixed(1) + "%</div>";
-							},
-							threshold : 0.1
-						}
-					}
-				},
-				legend : {
-					show : true
-				},
-				grid : {
-					// hoverable:true,
-					clickable : true
-				}
-			});
-			ul.bind('plotclick', function(event, pos, obj) {
-						if (!obj) {
-							$('#tooltip').remove();
-							return;
-						}
-						showTooltip(pos.pageX, pos.pageY, obj.series.label
-										+ ': ' + obj.series.data[0][1]);
-					});
+			ul.hide();
 
 		});
 		return this;
-	}
+	};
 
 	function showTooltip(x, y, content) {
 		$('#tooltip').remove();
@@ -180,7 +185,6 @@
 })(jQuery);
 
 Observation.flot = function(container) {
-	$('ul.flotlinechart', container).flotlinechart();
-	$('ul.flotbarchart', container).flotbarchart();
-	$('ul.flotpiechart', container).flotpiechart();
+	$('ul.flotlinechart,ul.flotbarchart,ul.flotpiechart', container)
+			.flotchart();
 }
