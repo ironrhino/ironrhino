@@ -138,8 +138,8 @@ public abstract class AbstractSequenceCyclicSequence extends
 						stmt.executeUpdate("UPDATE " + getTableName() + " SET "
 								+ getSequenceName() + "_TIMESTAMP = "
 								+ getCurrentTimestamp());
-						currentTimestamp = getLastAndCurrentTimestamp(con, stmt)[0];
 						restartSequence(con, stmt);
+						currentTimestamp = getLastAndCurrentTimestamp(con, stmt)[0];
 					} finally {
 						getLockService().unlock(lockName);
 					}
