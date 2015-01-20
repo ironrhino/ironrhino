@@ -8811,7 +8811,6 @@ table.richtable td {
 }
 .richtable table td.action{
 	white-space:nowrap;
-	overflow:hidden;
 }
 .richtable tbody input.text,.richtable tbody textarea.text {
 	width: 90%;

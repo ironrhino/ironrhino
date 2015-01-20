@@ -38530,8 +38530,10 @@ Initialization.richtable = function() {
 						$('div.status', form).replaceWith($('div.status', div));
 					}
 				});
-
-			});
+			}).on('click', 'td.action .dropdown-menu li a', function() {
+						$('.dropdown-toggle', $(this).closest('.btn-group'))
+								.click();
+					});
 }
 Observation._richtable = function(container) {
 	$('form.criteria', container).each(function() {
