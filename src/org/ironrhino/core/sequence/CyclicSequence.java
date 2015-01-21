@@ -23,20 +23,19 @@ public interface CyclicSequence extends Sequence {
 			}
 
 			@Override
-			public void skipToNextCycleStart(Calendar cal) {
-				cal.add(Calendar.MINUTE, 1);
+			public void skipCycles(Calendar cal, int cycles) {
+				cal.add(Calendar.MINUTE, cycles);
+			}
+
+			@Override
+			public void skipToCycleStart(Calendar cal) {
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
 			}
 
-			@Override
-			public void skipToLastCycleEnd(Calendar cal) {
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				cal.add(Calendar.MILLISECOND, -1);
-			}
 		},
 		HOUR("yyyyMMddHH") {
+
 			@Override
 			public boolean isSameCycle(Calendar lastCal, Calendar nowCal) {
 				return DAY.isSameCycle(lastCal, nowCal)
@@ -45,19 +44,15 @@ public interface CyclicSequence extends Sequence {
 			}
 
 			@Override
-			public void skipToNextCycleStart(Calendar cal) {
-				cal.add(Calendar.HOUR_OF_DAY, 1);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
+			public void skipCycles(Calendar cal, int cycles) {
+				cal.add(Calendar.HOUR_OF_DAY, cycles);
 			}
 
 			@Override
-			public void skipToLastCycleEnd(Calendar cal) {
+			public void skipToCycleStart(Calendar cal) {
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
-				cal.add(Calendar.MILLISECOND, -1);
 			}
 
 		},
@@ -70,21 +65,17 @@ public interface CyclicSequence extends Sequence {
 			}
 
 			@Override
-			public void skipToNextCycleStart(Calendar cal) {
+			public void skipCycles(Calendar cal, int cycles) {
+				cal.add(Calendar.DAY_OF_MONTH, cycles);
+			}
+
+			@Override
+			public void skipToCycleStart(Calendar cal) {
 				cal.add(Calendar.DAY_OF_MONTH, 1);
 				cal.set(Calendar.HOUR_OF_DAY, 0);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
-			}
-
-			@Override
-			public void skipToLastCycleEnd(Calendar cal) {
-				cal.set(Calendar.HOUR_OF_DAY, 0);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				cal.add(Calendar.MILLISECOND, -1);
 			}
 
 		},
@@ -97,23 +88,18 @@ public interface CyclicSequence extends Sequence {
 			}
 
 			@Override
-			public void skipToNextCycleStart(Calendar cal) {
+			public void skipCycles(Calendar cal, int cycles) {
+				cal.add(Calendar.MONTH, cycles);
+			}
+
+			@Override
+			public void skipToCycleStart(Calendar cal) {
 				cal.add(Calendar.MONTH, 1);
 				cal.set(Calendar.DAY_OF_MONTH, 1);
 				cal.set(Calendar.HOUR_OF_DAY, 0);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
-			}
-
-			@Override
-			public void skipToLastCycleEnd(Calendar cal) {
-				cal.set(Calendar.DAY_OF_MONTH, 1);
-				cal.set(Calendar.HOUR_OF_DAY, 0);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				cal.add(Calendar.MILLISECOND, -1);
 			}
 
 		},
@@ -124,7 +110,12 @@ public interface CyclicSequence extends Sequence {
 			}
 
 			@Override
-			public void skipToNextCycleStart(Calendar cal) {
+			public void skipCycles(Calendar cal, int cycles) {
+				cal.add(Calendar.YEAR, cycles);
+			}
+
+			@Override
+			public void skipToCycleStart(Calendar cal) {
 				cal.add(Calendar.YEAR, 1);
 				cal.set(Calendar.MONTH, 0);
 				cal.set(Calendar.DAY_OF_MONTH, 1);
@@ -132,17 +123,6 @@ public interface CyclicSequence extends Sequence {
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
-			}
-
-			@Override
-			public void skipToLastCycleEnd(Calendar cal) {
-				cal.set(Calendar.MONTH, 0);
-				cal.set(Calendar.DAY_OF_MONTH, 1);
-				cal.set(Calendar.HOUR_OF_DAY, 0);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				cal.add(Calendar.MILLISECOND, -1);
 			}
 
 		};
@@ -170,23 +150,36 @@ public interface CyclicSequence extends Sequence {
 			return isSameCycle(lastCalendar, nowCalendar);
 		}
 
-		public Date getNextCycleStart(Date date) {
+		public Date getCycleStart(Date date) {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(date);
-			skipToNextCycleStart(cal);
+			skipToCycleStart(cal);
 			return cal.getTime();
 		}
 
-		public Date getLastCycleEnd(Date date) {
+		public Date getCycleEnd(Date date) {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(date);
-			skipToLastCycleEnd(cal);
+			skipToCycleEnd(cal);
 			return cal.getTime();
 		}
 
-		public abstract void skipToNextCycleStart(Calendar cal);
+		public Date skipCycles(Date date, int cycles) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			skipCycles(cal, cycles);
+			return cal.getTime();
+		}
 
-		public abstract void skipToLastCycleEnd(Calendar cal);
+		public abstract void skipToCycleStart(Calendar cal);
+
+		public void skipToCycleEnd(Calendar cal) {
+			skipCycles(cal, 1);
+			skipToCycleStart(cal);
+			cal.add(Calendar.MILLISECOND, -1);
+		}
+
+		public abstract void skipCycles(Calendar cal, int cycles);
 
 		public abstract boolean isSameCycle(Calendar lastCal, Calendar nowCal);
 
