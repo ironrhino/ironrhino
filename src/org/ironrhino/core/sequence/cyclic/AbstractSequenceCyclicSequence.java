@@ -14,6 +14,8 @@ import org.springframework.dao.DataAccessResourceFailureException;
 public abstract class AbstractSequenceCyclicSequence extends
 		AbstractDatabaseCyclicSequence {
 
+	static final long CRITICAL_THRESHOLD_TIME = 500;
+
 	protected String querySequenceStatement;
 
 	protected String queryTimestampStatement;
@@ -135,7 +137,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 			Result result = queryTimestampWithSequence(con, stmt);
 			if (getCycleType().isSameCycle(result.lastTimestamp,
 					result.currentTimestamp)) {
-				if (result.isCriticalPoint()) {
+				if (result.isCriticalPoint(getCycleType())) {
 					// timestamp updated but sequence not restarted
 					if (stmt != null)
 						try {
@@ -151,6 +153,11 @@ public abstract class AbstractSequenceCyclicSequence extends
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					return nextStringValue();
 				}
 				return getStringValue(result.currentTimestamp,
@@ -187,6 +194,11 @@ public abstract class AbstractSequenceCyclicSequence extends
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					return nextStringValue();
 				}
 			}
@@ -250,15 +262,17 @@ public abstract class AbstractSequenceCyclicSequence extends
 	}
 
 	private static class Result {
-		static final long CRITICAL_THRESHOLD_TIME = 1000;
-		static final long CRITICAL_THRESHOLD_SEQUENCE = 100;
+
 		int nextId;
 		Date currentTimestamp;
 		Date lastTimestamp;
 
-		boolean isCriticalPoint() {
+		boolean isCriticalPoint(CycleType cycleType) {
 			return currentTimestamp.getTime() - lastTimestamp.getTime() < CRITICAL_THRESHOLD_TIME
-					&& nextId > CRITICAL_THRESHOLD_SEQUENCE;
+					&& nextId > 100
+					|| cycleType.getCycleEnd(currentTimestamp).getTime()
+							- currentTimestamp.getTime() < CRITICAL_THRESHOLD_TIME
+					&& nextId < 5;
 		}
 
 	}
