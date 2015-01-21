@@ -60,8 +60,6 @@ public abstract class AbstractCyclicSequence implements CyclicSequence,
 	}
 
 	protected String getStringValue(Date date, int paddingLength, int nextId) {
-		if (date == null)
-			date = new Date();
 		return getCycleType().format(date)
 				+ NumberUtils.format(nextId, paddingLength);
 	}

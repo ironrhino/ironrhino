@@ -28,6 +28,13 @@ public interface CyclicSequence extends Sequence {
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
 			}
+
+			@Override
+			public void skipToLastCycleEnd(Calendar cal) {
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				cal.add(Calendar.MILLISECOND, -1);
+			}
 		},
 		HOUR("yyyyMMddHH") {
 			@Override
@@ -39,10 +46,18 @@ public interface CyclicSequence extends Sequence {
 
 			@Override
 			public void skipToNextCycleStart(Calendar cal) {
-				cal.add(Calendar.HOUR, 1);
+				cal.add(Calendar.HOUR_OF_DAY, 1);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
+			}
+
+			@Override
+			public void skipToLastCycleEnd(Calendar cal) {
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				cal.add(Calendar.MILLISECOND, -1);
 			}
 
 		},
@@ -57,10 +72,19 @@ public interface CyclicSequence extends Sequence {
 			@Override
 			public void skipToNextCycleStart(Calendar cal) {
 				cal.add(Calendar.DAY_OF_MONTH, 1);
-				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
+			}
+
+			@Override
+			public void skipToLastCycleEnd(Calendar cal) {
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				cal.add(Calendar.MILLISECOND, -1);
 			}
 
 		},
@@ -76,10 +100,20 @@ public interface CyclicSequence extends Sequence {
 			public void skipToNextCycleStart(Calendar cal) {
 				cal.add(Calendar.MONTH, 1);
 				cal.set(Calendar.DAY_OF_MONTH, 1);
-				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
+			}
+
+			@Override
+			public void skipToLastCycleEnd(Calendar cal) {
+				cal.set(Calendar.DAY_OF_MONTH, 1);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				cal.add(Calendar.MILLISECOND, -1);
 			}
 
 		},
@@ -94,10 +128,21 @@ public interface CyclicSequence extends Sequence {
 				cal.add(Calendar.YEAR, 1);
 				cal.set(Calendar.MONTH, 0);
 				cal.set(Calendar.DAY_OF_MONTH, 1);
-				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
 				cal.set(Calendar.MILLISECOND, 0);
+			}
+
+			@Override
+			public void skipToLastCycleEnd(Calendar cal) {
+				cal.set(Calendar.MONTH, 0);
+				cal.set(Calendar.DAY_OF_MONTH, 1);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				cal.add(Calendar.MILLISECOND, -1);
 			}
 
 		};
@@ -132,7 +177,16 @@ public interface CyclicSequence extends Sequence {
 			return cal.getTime();
 		}
 
+		public Date getLastCycleEnd(Date date) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			skipToLastCycleEnd(cal);
+			return cal.getTime();
+		}
+
 		public abstract void skipToNextCycleStart(Calendar cal);
+
+		public abstract void skipToLastCycleEnd(Calendar cal);
 
 		public abstract boolean isSameCycle(Calendar lastCal, Calendar nowCal);
 
