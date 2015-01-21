@@ -50,10 +50,11 @@
 <div class="container">
   <div class="row">
     <div class="span3">
-		<div class="accordion" id="api_module_accordion">
+		<div class="accordion" id="api-accordion">
+		<@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">
 		  <div class="accordion-group">
 		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api_module_accordion" href="#overview">
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#overview">
 		     	接入基础
 		      </a>
 		    </div>
@@ -68,10 +69,11 @@
 		      </div>
 		    </div>
 		  </div>
+		</@classPresentConditional>
 		<#list apiModules as apiModule>
 		  <div class="accordion-group">
 		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api_module_accordion" href="#module${apiModule_index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#module${apiModule_index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>
 		        ${apiModule.name}
 		      </a>
 		    </div>
