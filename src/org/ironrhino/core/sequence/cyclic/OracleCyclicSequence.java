@@ -9,7 +9,9 @@ public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 	@Override
 	protected String getQuerySequenceStatement() {
 		return new StringBuilder("SELECT ").append(getActualSequenceName())
-				.append(".NEXTVAL FROM DUAL").toString();
+				.append(".NEXTVAL,").append(getCurrentTimestamp()).append(",")
+				.append(getSequenceName()).append("_TIMESTAMP FROM ")
+				.append(getTableName()).toString();
 	}
 
 	@Override

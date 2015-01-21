@@ -1,13 +1,13 @@
 package org.ironrhino.core.sequence.cyclic;
 
-
 public class InformixCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
 		return new StringBuilder("SELECT ").append(getActualSequenceName())
-				.append(".NEXTVAL FROM INFORMIX.SYSTABLES WHERE TABID=1")
-				.toString();
+				.append(".NEXTVAL,").append(getCurrentTimestamp()).append(",")
+				.append(getSequenceName()).append("_TIMESTAMP FROM ")
+				.append(getTableName()).toString();
 	}
 
 	@Override

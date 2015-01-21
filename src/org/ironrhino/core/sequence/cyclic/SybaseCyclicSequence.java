@@ -1,6 +1,5 @@
 package org.ironrhino.core.sequence.cyclic;
 
-
 public class SybaseCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
@@ -11,7 +10,9 @@ public class SybaseCyclicSequence extends AbstractSequenceCyclicSequence {
 	@Override
 	protected String getQuerySequenceStatement() {
 		return new StringBuilder("SELECT ").append(getActualSequenceName())
-				.append(".NEXTVAL").toString();
+				.append(".NEXTVAL").append(",").append(getCurrentTimestamp())
+				.append(",").append(getSequenceName())
+				.append("_TIMESTAMP FROM ").append(getTableName()).toString();
 	}
 
 }
