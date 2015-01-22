@@ -245,7 +245,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 			return result;
 		} catch (SQLException ex) {
 			if (ex.getSQLState().equals("72000") && ex.getErrorCode() == 8004) { // ORA-08004
-				stmt.executeQuery("ALTER SEQUENCE " + getActualSequenceName()
+				stmt.execute("ALTER SEQUENCE " + getActualSequenceName()
 						+ " INCREMENT BY 1 MINVALUE 0");
 				return queryTimestampWithSequence(con, stmt);
 			}
