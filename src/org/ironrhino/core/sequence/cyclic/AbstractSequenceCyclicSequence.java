@@ -229,8 +229,9 @@ public abstract class AbstractSequenceCyclicSequence extends
 	private Result queryTimestampWithSequence(Connection con, Statement stmt)
 			throws SQLException {
 		Result result = new Result();
-		ResultSet rs = stmt.executeQuery(querySequenceStatement);
+		ResultSet rs = null;
 		try {
+			rs = stmt.executeQuery(querySequenceStatement);
 			rs.next();
 			result.nextId = rs.getInt(1);
 			if (rs.getMetaData().getColumnCount() > 1) {
@@ -242,8 +243,16 @@ public abstract class AbstractSequenceCyclicSequence extends
 				result.lastTimestamp = temp.lastTimestamp;
 			}
 			return result;
+		} catch (SQLException ex) {
+			if (ex.getSQLState().equals("72000") && ex.getErrorCode() == 8004) { // ORA-08004
+				stmt.executeQuery("ALTER SEQUENCE " + getActualSequenceName()
+						+ " INCREMENT BY 1 MINVALUE 0");
+				return queryTimestampWithSequence(con, stmt);
+			}
+			throw ex;
 		} finally {
-			rs.close();
+			if (rs != null)
+				rs.close();
 		}
 	}
 
