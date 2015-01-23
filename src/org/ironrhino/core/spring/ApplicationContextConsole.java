@@ -108,7 +108,7 @@ public class ApplicationContextConsole implements
 		return triggers;
 	}
 
-	public Object execute(String expression, Scope scope) throws Exception {
+	public Object execute(String expression, Scope scope) throws Throwable {
 		Object value = null;
 		if (expression.matches(SET_PROPERTY_EXPRESSION_PATTERN)) {
 			executeSetProperty(expression);
@@ -121,7 +121,7 @@ public class ApplicationContextConsole implements
 		return value;
 	}
 
-	private Object executeMethodInvocation(String expression) throws Exception {
+	private Object executeMethodInvocation(String expression) throws Throwable {
 		if (expression.matches(SIMPLE_METHOD_INVOCATION_EXPRESSION_PATTERN)) {
 			String[] arr = expression.split("\\.");
 			String beanName = arr[0].trim();
@@ -169,7 +169,7 @@ public class ApplicationContextConsole implements
 		String expression = event.getExpression();
 		try {
 			execute(expression, Scope.LOCAL);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			log.error("execute '" + expression + "' error", e);
 		}
 	}

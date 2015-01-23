@@ -89,7 +89,7 @@ public class SetupAction extends BaseAction {
 				String expression = "settingControl.getBooleanValue(\""
 						+ SETUP_ENABLED_KEY + "\",true)";
 				return (Boolean) console.execute(expression, Scope.LOCAL);
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 		return true;
@@ -105,7 +105,7 @@ public class SetupAction extends BaseAction {
 						+ SETUP_ENABLED_KEY + "\",\"false\",true,true)";
 				console.execute(expression, Scope.LOCAL);
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new ErrorMessage(e.getMessage());
 		}
