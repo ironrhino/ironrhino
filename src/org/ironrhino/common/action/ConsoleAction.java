@@ -76,10 +76,9 @@ public class ConsoleAction extends BaseAction {
 	public String executeJson() {
 		try {
 			result = applicationContextConsole.execute(expression, scope);
-		} catch (Exception e) {
-			Throwable throwable = e;
-			if (e instanceof InvocationTargetException)
-				throwable = ((InvocationTargetException) e)
+		} catch (Throwable throwable) {
+			if (throwable instanceof InvocationTargetException)
+				throwable = ((InvocationTargetException) throwable)
 						.getTargetException();
 			log.error(throwable.getMessage(), throwable);
 			String msg = throwable.getMessage();
