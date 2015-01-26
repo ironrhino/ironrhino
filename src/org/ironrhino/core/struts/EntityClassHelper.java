@@ -535,8 +535,8 @@ public class EntityClassHelper {
 					}
 					if (naturalIds.containsKey(pd.getName())) {
 						uci.setRequired(true);
-						if (naturalIds.size() == 1)
-							uci.addCssClass("checkavailable");
+						// if (naturalIds.size() == 1)
+						uci.addCssClass("checkavailable");
 					}
 					map.put(propertyName, uci);
 				}

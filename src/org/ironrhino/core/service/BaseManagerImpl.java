@@ -487,6 +487,11 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 		if (objects == null || objects.length == 0 || objects.length == 1
 				&& objects[0] == null)
 			return null;
+		for (Serializable ser : objects) {
+			if (ser == null || ser instanceof Persistable
+					&& ((Persistable) ser).isNew())
+				return null;
+		}
 		if (objects.length == 1 && objects[0].getClass().isArray()) {
 			Object[] objs = (Object[]) objects[0];
 			Serializable[] arr = new Serializable[objs.length];
@@ -523,6 +528,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 	public T findOne(boolean caseInsensitive, Serializable... objects) {
 		if (!caseInsensitive)
 			return findOne(objects);
+		for (Serializable ser : objects)
+			if (ser == null || ser instanceof Persistable
+					&& ((Persistable) ser).isNew())
+				return null;
 		String hql = "select entity from " + getEntityClass().getName()
 				+ " entity where ";
 		if (objects.length == 1) {

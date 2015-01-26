@@ -34315,7 +34315,10 @@ DateUtils = {
 						if (!t.val())
 							return;
 						var inputs = $('input[type=hidden]', t.closest('form'))
-								.not('[name^="__"]').not('.nocheck').add(t);
+								.not('[name^="__"]').not('.nocheck').filter(
+										function(i, v) {
+											return $(v).val()
+										}).add(t);
 						var url = t.data('checkurl');
 						if (!url) {
 							url = t.closest('form').prop('action');
@@ -34324,6 +34327,9 @@ DateUtils = {
 						}
 						ajax({
 									global : false,
+									headers : {
+										'X-Target-Field' : t.attr('name')
+									},
 									target : t.closest('form')[0],
 									url : url,
 									data : inputs.serialize()

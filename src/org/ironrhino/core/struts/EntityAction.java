@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Version;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
@@ -745,9 +746,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	protected boolean makeEntityValid() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String targetField = request.getHeader("X-Target-Field");
 		boolean idAssigned = isIdAssigned();
-		boolean fromList = "cell".equalsIgnoreCase(ServletActionContext
-				.getRequest().getHeader("X-Edit"));
+		boolean fromList = "cell".equalsIgnoreCase(request.getHeader("X-Edit"));
 		Map<String, UiConfigImpl> uiConfigs = getUiConfigs();
 		BaseManager<Persistable<?>> entityManager = getEntityManager(getEntityClass());
 		_entity = constructEntity();
@@ -824,8 +826,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				if (persisted != null) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
-						addFieldError(getEntityName() + "." + it.next(),
-								getText("validation.already.exists"));
+						String fieldName = getEntityName() + "." + it.next();
+						if (StringUtils.isBlank(targetField)
+								|| targetField.equals(fieldName))
+							addFieldError(fieldName,
+									getText("validation.already.exists"));
 					}
 					return false;
 				}
@@ -936,8 +941,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						&& !persisted.getId().equals(_entity.getId())) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
-						addFieldError(getEntityName() + "." + it.next(),
-								getText("validation.already.exists"));
+						String fieldName = getEntityName() + "." + it.next();
+						if (StringUtils.isBlank(targetField)
+								|| targetField.equals(fieldName))
+							addFieldError(fieldName,
+									getText("validation.already.exists"));
 					}
 					return false;
 				}
