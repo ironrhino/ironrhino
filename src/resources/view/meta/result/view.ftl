@@ -48,6 +48,8 @@
 							<#if displayDictionaryLabel??>
 								<#assign templateName><@config.templateName?interpret /></#assign>
 								<@displayDictionaryLabel dictionaryName=templateName value=value!/>
+							<#else>
+								${value!}
 							</#if>
 						<#elseif config.type=='schema'>
 							<#if printAttributes??>
@@ -114,6 +116,8 @@
 					<#if displayDictionaryLabel??>
 						<#assign templateName><@config.templateName?interpret /></#assign>
 						<@displayDictionaryLabel dictionaryName=templateName value=value!/>
+					<#else>
+						${value!}
 					</#if>
 				<#elseif config.type=='schema'>
 					<#if printAttributes??>
@@ -174,6 +178,8 @@
 									<#if displayDictionaryLabel??>
 										<#assign templateName><@config.templateName?interpret /></#assign>
 										<@displayDictionaryLabel dictionaryName=templateName value=value!/>
+									<#else>
+										${value!}
 									</#if>
 								<#elseif config.type=='imageupload'>
 									<#if value?has_content>
