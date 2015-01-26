@@ -537,6 +537,23 @@ public class EntityClassHelper {
 						uci.setRequired(true);
 						// if (naturalIds.size() == 1)
 						uci.addCssClass("checkavailable");
+						if (naturalIds.size() > 1) {
+							if (uci.getPropertyType() != null
+									&& Persistable.class.isAssignableFrom(uci
+											.getPropertyType())) {
+								List<String> list = new ArrayList<String>(
+										naturalIds.size() - 1);
+								for (String name : naturalIds.keySet())
+									if (!name.equals(pd.getName()))
+										list.add(StringUtils
+												.uncapitalize(entityClass
+														.getSimpleName())
+												+ "." + name);
+								uci.getDynamicAttributes().put(
+										"data-checkwith",
+										StringUtils.join(list, ","));
+							}
+						}
 					}
 					map.put(propertyName, uci);
 				}

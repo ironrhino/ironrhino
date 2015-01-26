@@ -74,7 +74,7 @@
 				<@s.select disabled=readonly id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='listpick'>
 				<div class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=config.pickUrl/>'}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
-					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="listpick-id ${config.cssClass}"/>
+					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 					<label class="control-label">${action.getText(label)}</label>
 					<div class="controls<#if readonly> text</#if>">
 					<span class="listpick-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
@@ -221,7 +221,7 @@
 						</div>
 					<#elseif config.type=='listpick'>
 						<div class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=config.pickUrl/>'}"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
-						<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="listpick-id ${config.cssClass}"/>
+						<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 						<label class="control-label">${action.getText(label)}</label>
 							<div class="controls<#if readonly> text</#if>">
 							<span class=" listpick-name"><#if entity[key][entry.key]??><#if entity[key][entry.key].fullname??>${entity[key][entry.key].fullname!}<#else>${entity[key][entry.key]!}</#if></#if></span>
@@ -322,7 +322,7 @@
 									<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 								<#elseif config.type=='listpick'>
 										<div class="<#if readonly>_</#if>listpick" data-options="{'url':'<@url value=config.pickUrl/>'}">
-										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="listpick-id ${config.cssClass}"/>
+										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 										<span class="listpick-name"><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></span>
 										</div>
 								<#elseif config.type=='treeselect'>

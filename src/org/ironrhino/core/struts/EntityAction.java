@@ -828,8 +828,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					while (it.hasNext()) {
 						String fieldName = getEntityName() + "." + it.next();
 						if (StringUtils.isBlank(targetField)
-								|| targetField.equals(fieldName))
-							addFieldError(fieldName,
+								|| targetField.equals(fieldName)
+								|| targetField.equals(fieldName + ".id"))
+							addFieldError(targetField == null ? fieldName
+									: targetField,
 									getText("validation.already.exists"));
 					}
 					return false;
@@ -943,8 +945,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					while (it.hasNext()) {
 						String fieldName = getEntityName() + "." + it.next();
 						if (StringUtils.isBlank(targetField)
-								|| targetField.equals(fieldName))
-							addFieldError(fieldName,
+								|| targetField.equals(fieldName)
+								|| targetField.equals(fieldName + ".id"))
+							addFieldError(targetField == null ? fieldName
+									: targetField,
 									getText("validation.already.exists"));
 					}
 					return false;
