@@ -139,6 +139,8 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 
 	@Override
 	public void restart() {
+		nextId = 0;
+		maxId = 0;
 		Connection con = null;
 		Statement stmt = null;
 		try {
@@ -165,5 +167,4 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 				}
 		}
 	}
-
 }
