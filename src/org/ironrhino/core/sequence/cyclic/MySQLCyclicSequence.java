@@ -13,14 +13,6 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
-	private int nextId = 0;
-
-	private int maxId = 0;
-
-	public MySQLCyclicSequence() {
-		setCacheSize(10);
-	}
-
 	@Override
 	public void afterPropertiesSet() {
 		Connection con = null;
@@ -85,7 +77,6 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
 	@Override
 	public String nextStringValue() throws DataAccessException {
-		int next = 0;
 		Connection con = null;
 		Statement stmt = null;
 		try {
@@ -93,52 +84,81 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			con.setAutoCommit(true);
 			stmt = con.createStatement();
 			String columnName = getSequenceName();
-			Date[] array = getLastAndCurrentTimestamp(con, stmt);
-			Date lastTimestamp = array[0];
-			Date currentTimestamp = array[1];
-			if (getLockService().tryLock(getLockName())) {
-				try {
-					boolean sameCycle = getCycleType().isSameCycle(
-							lastTimestamp, currentTimestamp);
-					if (sameCycle && maxId > nextId) {
-						next = ++nextId;
-					} else {
-						if (sameCycle) {
+			if (isSameCycle(con, stmt)) {
+				stmt.executeUpdate("UPDATE " + getTableName() + " SET "
+						+ columnName + " = LAST_INSERT_ID(" + columnName
+						+ " + 1)," + columnName
+						+ "_TIMESTAMP = UNIX_TIMESTAMP()");
+
+			} else {
+				if (getLockService().tryLock(getLockName())) {
+					try {
+						if (isSameCycle(con, stmt)) {
 							stmt.executeUpdate("UPDATE " + getTableName()
 									+ " SET " + columnName
-									+ " = LAST_INSERT_ID(" + columnName + " + "
-									+ getCacheSize() + ")," + columnName
+									+ " = LAST_INSERT_ID(" + columnName
+									+ " + 1)," + columnName
 									+ "_TIMESTAMP = UNIX_TIMESTAMP()");
-
 						} else {
 							stmt.executeUpdate("UPDATE " + getTableName()
 									+ " SET " + columnName
-									+ " = LAST_INSERT_ID(" + getCacheSize()
-									+ ")," + columnName
+									+ " = LAST_INSERT_ID(1)," + columnName
 									+ "_TIMESTAMP = UNIX_TIMESTAMP()");
 						}
-						ResultSet rs = null;
-						try {
-							rs = stmt.executeQuery("SELECT LAST_INSERT_ID()");
-							if (!rs.next()) {
-								throw new DataAccessResourceFailureException(
-										"LAST_INSERT_ID() failed after executing an update");
-							}
-							int max = rs.getInt(1);
-							next = max - getCacheSize() + 1;
-							nextId = next;
-							maxId = max;
-						} finally {
-							if (rs != null)
-								rs.close();
-						}
+					} finally {
+						getLockService().unlock(getLockName());
 					}
-					return getStringValue(currentTimestamp, getPaddingLength(),
-							next);
-				} finally {
-					getLockService().unlock(getLockName());
+				} else {
+					if (stmt != null)
+						try {
+							stmt.close();
+							stmt = null;
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					if (con != null)
+						try {
+							con.close();
+							con = null;
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					return nextStringValue();
 				}
-			} else {
+			}
+			int next;
+			Date currentTimestamp;
+			ResultSet rs = null;
+			try {
+				rs = stmt
+						.executeQuery("SELECT LAST_INSERT_ID(),"
+								+ getSequenceName()
+								+ "_TIMESTAMP FROM COMMON_SEQUENCE");
+				if (!rs.next()) {
+					throw new DataAccessResourceFailureException(
+							"LAST_INSERT_ID() failed after executing an update");
+				}
+				next = rs.getInt(1);
+				Long current = rs.getLong(2);
+				if (current < 10000000000L) // no mills
+					current *= 1000;
+				currentTimestamp = new Date(current);
+			} finally {
+				if (rs != null)
+					rs.close();
+			}
+			Date cycleStart = getCycleType().getCycleStart(currentTimestamp);
+			Date cycleEnd = getCycleType().getCycleEnd(currentTimestamp);
+			if (currentTimestamp.getTime() - cycleStart.getTime() < CRITICAL_THRESHOLD_TIME
+					&& next > 100
+					|| cycleEnd.getTime() - currentTimestamp.getTime() < CRITICAL_THRESHOLD_TIME
+					&& next < 5) {
+				// timestamp updated but sequence not restarted
 				if (stmt != null)
 					try {
 						stmt.close();
@@ -159,7 +179,9 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 					e.printStackTrace();
 				}
 				return nextStringValue();
+
 			}
+			return getStringValue(currentTimestamp, getPaddingLength(), next);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(
 					"Could not obtain last_insert_id()", ex);
@@ -180,21 +202,21 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
 	}
 
-	protected Date[] getLastAndCurrentTimestamp(Connection con, Statement stmt)
+	protected boolean isSameCycle(Connection con, Statement stmt)
 			throws SQLException {
-		ResultSet rs = stmt.executeQuery("SELECT  " + getSequenceName()
-				+ "_TIMESTAMP,UNIX_TIMESTAMP() FROM " + getTableName());
+		ResultSet rs = null;
 		try {
+			rs = stmt.executeQuery("SELECT  " + getSequenceName()
+					+ "_TIMESTAMP,UNIX_TIMESTAMP() FROM " + getTableName());
 			rs.next();
 			Long last = rs.getLong(1);
 			if (last < 10000000000L) // no mills
 				last *= 1000;
-			Date[] array = new Date[2];
-			array[0] = new Date(last);
-			array[1] = new Date(rs.getLong(2) * 1000);
-			return array;
+			return getCycleType().isSameCycle(new Date(last),
+					new Date(rs.getLong(2) * 1000));
 		} finally {
-			rs.close();
+			if (rs != null)
+				rs.close();
 		}
 	}
 

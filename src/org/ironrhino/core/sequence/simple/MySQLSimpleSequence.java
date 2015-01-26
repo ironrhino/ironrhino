@@ -6,22 +6,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.dao.DataAccessResourceFailureException;
 
 public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
-
-	private int nextId = 0;
-
-	private int maxId = 0;
-
-	private Lock lock = new ReentrantLock();
-
-	public MySQLSimpleSequence() {
-		setCacheSize(10);
-	}
 
 	@Override
 	public void afterPropertiesSet() {
@@ -82,65 +70,49 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 
 	@Override
 	public int nextIntValue() {
-		int next = 0;
-		lock.lock();
+		Connection con = null;
+		Statement stmt = null;
 		try {
-			if (maxId <= nextId) {
-				Connection con = null;
-				Statement stmt = null;
-				try {
-					con = getDataSource().getConnection();
-					con.setAutoCommit(true);
-					stmt = con.createStatement();
-					String columnName = getSequenceName();
-					stmt.executeUpdate("UPDATE " + getTableName() + " SET "
-							+ columnName + " = LAST_INSERT_ID(" + columnName
-							+ " + " + getCacheSize() + ")");
-					ResultSet rs = null;
-					try {
-						rs = stmt.executeQuery("SELECT LAST_INSERT_ID()");
-						if (!rs.next()) {
-							throw new DataAccessResourceFailureException(
-									"LAST_INSERT_ID() failed after executing an update");
-						}
-						int max = rs.getInt(1);
-						next = max - getCacheSize() + 1;
-						nextId = next;
-						maxId = max;
-					} finally {
-						if (rs != null)
-							rs.close();
-					}
-				} catch (SQLException ex) {
+			con = getDataSource().getConnection();
+			con.setAutoCommit(true);
+			stmt = con.createStatement();
+			String columnName = getSequenceName();
+			stmt.executeUpdate("UPDATE " + getTableName() + " SET "
+					+ columnName + " = LAST_INSERT_ID(" + columnName + " + 1)");
+			ResultSet rs = null;
+			try {
+				rs = stmt.executeQuery("SELECT LAST_INSERT_ID()");
+				if (!rs.next()) {
 					throw new DataAccessResourceFailureException(
-							"Could not obtain last_insert_id()", ex);
-				} finally {
-					if (stmt != null)
-						try {
-							stmt.close();
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-					if (con != null)
-						try {
-							con.close();
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
+							"LAST_INSERT_ID() failed after executing an update");
 				}
-			} else {
-				next = ++nextId;
+				return rs.getInt(1);
+			} finally {
+				if (rs != null)
+					rs.close();
 			}
-			return next;
+		} catch (SQLException ex) {
+			throw new DataAccessResourceFailureException(
+					"Could not obtain last_insert_id()", ex);
 		} finally {
-			lock.unlock();
+			if (stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			if (con != null)
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 		}
+
 	}
 
 	@Override
 	public void restart() {
-		nextId = 0;
-		maxId = 0;
 		Connection con = null;
 		Statement stmt = null;
 		try {

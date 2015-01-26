@@ -14,8 +14,6 @@ import org.springframework.dao.DataAccessResourceFailureException;
 public abstract class AbstractSequenceCyclicSequence extends
 		AbstractDatabaseCyclicSequence {
 
-	static final long CRITICAL_THRESHOLD_TIME = 500;
-
 	protected String querySequenceStatement;
 
 	protected String queryTimestampStatement;
