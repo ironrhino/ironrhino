@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <#escape x as x?html><html>
 <head>
-<title>${action.getText(entityName)}${action.getText('list')}</title>
+<title>${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}${action.getText('list')}</title>
 </head>
 <body>
 <#if Parameters.tab?has_content>
