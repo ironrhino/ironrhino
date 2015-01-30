@@ -1542,8 +1542,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 								.append(propertyName).append(" from ")
 								.append(getEntityClass().getSimpleName())
 								.append(" where ").append(propertyName)
-								.append(" like '").append(keyword).append("%'");
+								.append(" like :keyword");
 						Query q = session.createQuery(hql.toString());
+						q.setParameter("keyword", keyword + "%");
 						q.setMaxResults(20);
 						return q.list();
 					}
