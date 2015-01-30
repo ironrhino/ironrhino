@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
@@ -66,6 +70,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -1514,6 +1519,42 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public Collection<Persistable> getChildren() {
 		return children;
+	}
+
+	@JsonConfig(root = "suggestions")
+	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
+	public String suggestion() {
+		final String propertyName = getUid();
+		if (StringUtils.isBlank(propertyName) || StringUtils.isBlank(keyword))
+			return NONE;
+		UiConfigImpl uic = getUiConfigs().get(propertyName);
+		if (uic == null
+				|| !uic.isUnique()
+				&& !(getNaturalIds().size() == 1 && getNaturalIds()
+						.containsKey(propertyName)))
+			return NONE;
+		suggestions = getEntityManager(getEntityClass()).executeFind(
+				new HibernateCallback<List<String>>() {
+					@Override
+					public List<String> doInHibernate(Session session)
+							throws HibernateException, SQLException {
+						StringBuilder hql = new StringBuilder("select ")
+								.append(propertyName).append(" from ")
+								.append(getEntityClass().getSimpleName())
+								.append(" where ").append(propertyName)
+								.append(" like '").append(keyword).append("%'");
+						Query q = session.createQuery(hql.toString());
+						q.setMaxResults(20);
+						return q.list();
+					}
+				});
+		return JSON;
+	}
+
+	private List<String> suggestions;
+
+	public List<String> getSuggestions() {
+		return suggestions;
 	}
 
 	@Override
