@@ -332,9 +332,9 @@
 										</div>
 								<#else>
 									<#if config.cssClass?contains('datetime')>
-										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=(entity[key]?string('yyyy-MM-dd HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=(entity[key][index][entry.key]?string('yyyy-MM-dd HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 									<#elseif config.cssClass?contains('time')>
-										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=(entity[key]?string('HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=(entity[key][index][entry.key]?string('HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 									<#else>
 										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 									</#if>
