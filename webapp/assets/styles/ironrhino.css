@@ -8358,6 +8358,11 @@ input[type="checkbox"].custom + label.custom {
 	position: relative;
 }
 
+input[type="checkbox"][disabled].custom + label.custom {
+	cursor: not-allowed !important;
+	background-color: #eee !important;
+}
+
 input[type="checkbox"].custom + label.custom:hover {
 	background-color: #eaeaea;
 }
@@ -8392,6 +8397,11 @@ input[type="radio"].custom + label.custom {
 	vertical-align: middle;
 	margin-bottom: 0;
 	position: relative;
+}
+
+input[type="radio"][disabled].custom + label.custom {
+	cursor: not-allowed !important;
+	background-color: #eee !important;
 }
 
 input[type="radio"].custom + label.custom:hover {

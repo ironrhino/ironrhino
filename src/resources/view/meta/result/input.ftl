@@ -56,7 +56,10 @@
 				</#if>
 				<@s.textarea id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?string('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='checkbox'>
-				<@s.checkbox readonly=readonly id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=dynamicAttributes />
+				<#if readonly>
+					<@s.hidden name=entityName+"."+key/>
+				</#if>
+				<@s.checkbox disabled=readonly id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass+config.cssClass?has_content?string(' ','')+"custom" dynamicAttributes=dynamicAttributes />
 			<#elseif config.type=='enum'>
 				<#if readonly>
 					<@s.hidden name=entityName+"."+key value="${(entity[key].name())!}"/>
