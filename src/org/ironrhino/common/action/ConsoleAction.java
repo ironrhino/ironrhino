@@ -73,6 +73,9 @@ public class ConsoleAction extends BaseAction {
 			if (throwable instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable)
 						.getTargetException();
+			if (throwable.getCause() instanceof InvocationTargetException)
+				throwable = ((InvocationTargetException) throwable.getCause())
+						.getTargetException();
 			log.error(throwable.getMessage(), throwable);
 			String msg = throwable.getMessage();
 			addActionError(getText("error")
