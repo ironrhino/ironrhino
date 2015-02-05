@@ -21,7 +21,6 @@
 		return this;
 	};
 	function ajaxpanel(ele) {
-		ele.css('min-height', '100px');
 		if (ele.hasClass('tab-pane') && ele.hasClass('cache')
 				&& ele.hasClass('loaded'))
 			return;
@@ -33,19 +32,23 @@
 			quiet : true,
 			beforeSend : function() {
 				if (!ele.data('quiet'))
-					if (typeof $.fn.mask != 'undefined')
+					if (typeof $.fn.mask != 'undefined') {
+						if (ele.css('min-height') == '0px')
+							ele.data('mhc', 'true').css('min-height', '100px');
 						ele.mask(MessageBundle.get('ajax.loading'));
-					else
+					} else
 						ele.html('<div style="text-align:center;">'
 								+ MessageBundle.get('ajax.loading') + '</div>');
 			},
 			complete : function() {
-				if (!ele.data('quiet') && typeof $.fn.unmask != 'undefined')
+				if (!ele.data('quiet') && typeof $.fn.unmask != 'undefined') {
 					ele.unmask();
+					if (ele.data('mhc'))
+						ele.css('min-height', '');
+				}
 			},
 			success : function(data) {
 				ele.addClass('loaded');
-				ele.css('min-height', '');
 			}
 		};
 		if (url)
