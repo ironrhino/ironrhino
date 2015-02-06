@@ -319,8 +319,6 @@ public class JdbcQueryService {
 
 		if (databaseProduct == DatabaseProduct.ORACLE
 				&& databaseMajorVersion >= 12
-				|| databaseProduct == DatabaseProduct.SQLSERVER
-				&& databaseMajorVersion >= 11
 				|| databaseProduct == DatabaseProduct.POSTGRESQL
 				&& (databaseMajorVersion > 8 || databaseMajorVersion == 8
 						&& databaseMinorVersion >= 4)
@@ -334,6 +332,20 @@ public class JdbcQueryService {
 			else
 				sb.append(" offset ").append(offset)
 						.append(" rows fetch next ");
+			sb.append(limit).append(" rows only");
+			return namedParameterJdbcTemplate.queryForList(sb.toString(),
+					paramMap);
+		}
+
+		if (databaseProduct == DatabaseProduct.SQLSERVER
+				&& databaseMajorVersion >= 11
+				&& sql.toLowerCase().matches(".+\\s+order\\s+by\\s+.+")) {
+			// https://technet.microsoft.com/en-us/library/gg699618(v=sql.110).aspx
+			// OFFSET-FETCH can be used only with the ORDER BY clause.
+			StringBuilder sb = new StringBuilder(sql.length() + 45);
+			sb.append(sql);
+			sb.append(" offset ").append(offset).append(" rows fetch ")
+					.append(offset > 0 ? "next " : "first ");
 			sb.append(limit).append(" rows only");
 			return namedParameterJdbcTemplate.queryForList(sb.toString(),
 					paramMap);
