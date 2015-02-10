@@ -38,20 +38,20 @@ public class LoginAction extends BaseAction {
 
 	private static final long serialVersionUID = 2783386542815083811L;
 
-	private static Logger log = LoggerFactory.getLogger(LoginAction.class);
+	protected static Logger log = LoggerFactory.getLogger(LoginAction.class);
 
-	private String password;
+	protected String password;
 
-	private String username;
-
-	@Autowired
-	private transient UserDetailsService userDetailsService;
+	protected String username;
 
 	@Autowired
-	private transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
+	protected transient UserDetailsService userDetailsService;
 
 	@Autowired
-	private transient EventPublisher eventPublisher;
+	protected transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
+
+	@Autowired
+	protected transient EventPublisher eventPublisher;
 
 	public String getUsername() {
 		return username;
