@@ -8464,17 +8464,25 @@ select:hover,select:focus{
 ::-ms-expand {
 	 display: none;
 }
-.input-append.search input[type="text"]{
+.input-append.search input{
 	-webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
     border-right: 0;
+    padding-left: 10px;
+    padding-right: 0;
+    -webkit-border-radius:  1rem 0 0 1rem;
+    -moz-border-radius:  1rem 0 0 1rem;
+    border-radius: 1rem 0 0 1rem;
 }
 .input-append.search .add-on{
 	background-color: #fff;
     border: 1px solid #ccc;
 	border-left: 0;
 	margin-left: 0;
+	-webkit-border-radius: 0 1rem 1rem 0;
+	-moz-border-radius: 0 1rem 1rem 0;
+	border-radius: 0 1rem 1rem 0;
 }
 .input-append.search input[type="text"]:focus ~ .add-on{
 	border-color: rgba(82, 168, 236, 0.8);
