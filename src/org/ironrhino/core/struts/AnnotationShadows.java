@@ -57,6 +57,7 @@ public class AnnotationShadows {
 		private boolean excludedFromOrdering = false;
 		private String group = "";
 		private boolean searchable;
+		private boolean exactMatch;
 		private Set<String> nestSearchableProperties;
 		private Map<String, UiConfigImpl> embeddedUiConfigs;
 		private boolean suppressViewLink;
@@ -431,12 +432,12 @@ public class AnnotationShadows {
 			this.searchable = searchable;
 		}
 
-		public boolean isSuppressViewLink() {
-			return suppressViewLink;
+		public boolean isExactMatch() {
+			return exactMatch;
 		}
 
-		public void setSuppressViewLink(boolean suppressViewLink) {
-			this.suppressViewLink = suppressViewLink;
+		public void setExactMatch(boolean exactMatch) {
+			this.exactMatch = exactMatch;
 		}
 
 		public Set<String> getNestSearchableProperties() {
@@ -446,6 +447,14 @@ public class AnnotationShadows {
 		public void setNestSearchableProperties(
 				Set<String> nestSearchableProperties) {
 			this.nestSearchableProperties = nestSearchableProperties;
+		}
+
+		public boolean isSuppressViewLink() {
+			return suppressViewLink;
+		}
+
+		public void setSuppressViewLink(boolean suppressViewLink) {
+			this.suppressViewLink = suppressViewLink;
 		}
 
 		public Map<String, UiConfigImpl> getEmbeddedUiConfigs() {

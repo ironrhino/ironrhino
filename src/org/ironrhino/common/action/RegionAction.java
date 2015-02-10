@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.common.model.Region;
@@ -118,8 +117,8 @@ public class RegionAction extends BaseAction {
 				dc.addOrder(Order.asc("displayOrder"));
 				dc.addOrder(Order.asc("name"));
 				if (StringUtils.isNotBlank(keyword))
-					dc.add(CriterionUtils.like(keyword, MatchMode.ANYWHERE,
-							"name", "areacode", "postcode"));
+					dc.add(CriterionUtils.like(keyword, "name", "areacode",
+							"postcode"));
 				region.setChildren(entityManager.findListByCriteria(dc));
 			}
 			list = region.getChildren();

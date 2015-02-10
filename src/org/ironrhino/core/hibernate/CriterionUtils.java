@@ -29,34 +29,63 @@ public class CriterionUtils {
 
 	public static final String CRITERION_ORDER_SUFFIX = "-od";
 
-	public static Criterion like(String value, MatchMode mode, String... names) {
-		Criterion c = null;
+	public static Criterion like(String value, String... names) {
+		Criterion criterion = null;
 		int index = value.indexOf(':');
 		String field = null;
 		if (index > 0) {
 			field = value.substring(0, index);
-			value = value.substring(index + 1);
+			String value2 = value.substring(index + 1);
 			for (String name : names) {
 				if (name.equals(field) || name.equals(field + "AsString")) {
 					if (field.equals("tags")) {
-						c = matchTag(name, value);
+						criterion = matchTag(name, value2);
 					} else {
-						c = Restrictions.like(name, value, MatchMode.ANYWHERE);
+						criterion = Restrictions.like(name, value2,
+								MatchMode.ANYWHERE);
 					}
-					break;
-				}
-			}
-		} else {
-			for (String name : names) {
-				if (c == null) {
-					c = Restrictions.like(name, value, MatchMode.ANYWHERE);
-				} else {
-					c = Restrictions.or(c,
-							Restrictions.like(name, value, MatchMode.ANYWHERE));
+					return criterion;
 				}
 			}
 		}
-		return c;
+		for (String name : names) {
+			Criterion temp = Restrictions.like(name, value, MatchMode.ANYWHERE);
+			criterion = (criterion == null) ? temp : Restrictions.or(criterion,
+					temp);
+		}
+		return criterion;
+	}
+
+	public static Criterion like(String value, Map<String, MatchMode> map) {
+		Criterion criterion = null;
+		int index = value.indexOf(':');
+		String field = null;
+		if (index > 0) {
+			field = value.substring(0, index);
+			String value2 = value.substring(index + 1);
+			for (Map.Entry<String, MatchMode> entry : map.entrySet()) {
+				String name = entry.getKey();
+				if (name.equals(field) || name.equals(field + "AsString")) {
+					if (field.equals("tags")) {
+						criterion = matchTag(name, value2);
+					} else {
+						criterion = (entry.getValue() == MatchMode.EXACT) ? Restrictions
+								.eq(name, value) : Restrictions.like(name,
+								value2, entry.getValue());
+					}
+					return criterion;
+				}
+			}
+		}
+		for (Map.Entry<String, MatchMode> entry : map.entrySet()) {
+			String name = entry.getKey();
+			Criterion temp = (entry.getValue() == MatchMode.EXACT) ? Restrictions
+					.eq(name, value) : Restrictions.like(name, value,
+					entry.getValue());
+			criterion = (criterion == null) ? temp : Restrictions.or(criterion,
+					temp);
+		}
+		return criterion;
 	}
 
 	public static Criterion matchTag(String tagFieldName, String tag) {

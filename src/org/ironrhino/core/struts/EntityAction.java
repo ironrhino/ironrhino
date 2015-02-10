@@ -412,14 +412,17 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 			}
 			if (searchable && StringUtils.isNotBlank(keyword)) {
-				Set<String> propertyNamesInLike = new HashSet<String>();
+				Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<String, MatchMode>();
 				for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs()
 						.entrySet()) {
 					if (entry.getValue().isSearchable()
 							&& !entry.getValue().isExcludedFromLike()) {
 						if (String.class.equals(entry.getValue()
 								.getPropertyType())) {
-							propertyNamesInLike.add(entry.getKey());
+							propertyNamesInLike
+									.put(entry.getKey(), entry.getValue()
+											.isExactMatch() ? MatchMode.EXACT
+											: MatchMode.ANYWHERE);
 						} else if (Persistable.class.isAssignableFrom(entry
 								.getValue().getPropertyType())) {
 							Set<String> nestSearchableProperties = entry
@@ -437,18 +440,46 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 									criteriaState.getAliases().put(
 											entry.getKey(), alias);
 								}
-								for (String s : nestSearchableProperties)
-									propertyNamesInLike.add(new StringBuilder(
-											alias).append(".").append(s)
-											.toString());
+								for (String s : nestSearchableProperties) {
+									UiConfigImpl nestUci = EntityClassHelper
+											.getUiConfigs(
+													entry.getValue()
+															.getPropertyType())
+											.get(s);
+									if (nestUci == null)
+										continue;
+									propertyNamesInLike
+											.put(new StringBuilder(alias)
+													.append(".").append(s)
+													.toString(),
+													nestUci.isExactMatch() ? MatchMode.EXACT
+															: MatchMode.ANYWHERE);
+								}
+							}
+						} else if (entry.getValue().getEmbeddedUiConfigs() != null) {
+							Set<String> nestSearchableProperties = entry
+									.getValue().getNestSearchableProperties();
+							if (nestSearchableProperties != null
+									&& nestSearchableProperties.size() > 0) {
+								for (String s : nestSearchableProperties) {
+									UiConfigImpl nestUci = entry.getValue()
+											.getEmbeddedUiConfigs().get(s);
+									if (nestUci == null)
+										continue;
+									propertyNamesInLike
+											.put(new StringBuilder(entry
+													.getKey()).append(".")
+													.append(s).toString(),
+													nestUci.isExactMatch() ? MatchMode.EXACT
+															: MatchMode.ANYWHERE);
+								}
 							}
 						}
 
 					}
 				}
 				if (propertyNamesInLike.size() > 0)
-					dc.add(CriterionUtils.like(keyword, MatchMode.ANYWHERE,
-							propertyNamesInLike.toArray(new String[0])));
+					dc.add(CriterionUtils.like(keyword, propertyNamesInLike));
 			}
 			boolean resetPageSize;
 			if (resultPage == null) {

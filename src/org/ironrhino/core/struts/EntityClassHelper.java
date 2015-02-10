@@ -39,6 +39,7 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Attributable;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
@@ -522,6 +523,10 @@ public class EntityClassHelper {
 					if (searchableProperty != null || searchableId != null
 							|| searchableComponent != null) {
 						uci.setSearchable(true);
+						if (searchableId != null
+								|| searchableProperty != null
+								&& searchableProperty.index() == Index.NOT_ANALYZED)
+							uci.setExactMatch(true);
 						if (searchableComponent != null) {
 							String s = searchableComponent
 									.nestSearchableProperties();

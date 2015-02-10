@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.ironrhino.common.model.Page;
 import org.ironrhino.common.service.PageManager;
@@ -93,8 +92,7 @@ public class PageAction extends BaseAction {
 					for (String tag : tags.split("\\s*,\\s*"))
 						dc.add(CriterionUtils.matchTag("tagsAsString", tag));
 				} else {
-					dc.add(CriterionUtils.like(keyword, MatchMode.ANYWHERE,
-							"path", "title"));
+					dc.add(CriterionUtils.like(keyword, "path", "title"));
 				}
 			}
 			if (criteriaState.getOrderings().isEmpty()) {
