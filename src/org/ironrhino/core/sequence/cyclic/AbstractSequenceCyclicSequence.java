@@ -207,12 +207,14 @@ public abstract class AbstractSequenceCyclicSequence extends
 			if (stmt != null)
 				try {
 					stmt.close();
+					stmt = null;
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			if (con != null)
 				try {
 					con.close();
+					con = null;
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
