@@ -32,7 +32,8 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			stmt = con.createStatement();
 			String columnName = getSequenceName();
 			if (tableExists) {
-				rs = stmt.executeQuery("SELECT * FROM " + getTableName());
+				rs = stmt
+						.executeQuery("SELECT * FROM `" + getTableName() + "`");
 				boolean columnExists = false;
 				ResultSetMetaData metadata = rs.getMetaData();
 				for (int i = 0; i < metadata.getColumnCount(); i++) {
@@ -85,7 +86,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			stmt = con.createStatement();
 			String columnName = getSequenceName();
 			if (isSameCycle(con, stmt)) {
-				stmt.executeUpdate("UPDATE " + getTableName() + " SET "
+				stmt.executeUpdate("UPDATE `" + getTableName() + "` SET "
 						+ columnName + " = LAST_INSERT_ID(" + columnName
 						+ " + 1)," + columnName
 						+ "_TIMESTAMP = UNIX_TIMESTAMP()");
@@ -94,14 +95,14 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 				if (getLockService().tryLock(getLockName())) {
 					try {
 						if (isSameCycle(con, stmt)) {
-							stmt.executeUpdate("UPDATE " + getTableName()
-									+ " SET " + columnName
+							stmt.executeUpdate("UPDATE `" + getTableName()
+									+ "` SET " + columnName
 									+ " = LAST_INSERT_ID(" + columnName
 									+ " + 1)," + columnName
 									+ "_TIMESTAMP = UNIX_TIMESTAMP()");
 						} else {
-							stmt.executeUpdate("UPDATE " + getTableName()
-									+ " SET " + columnName
+							stmt.executeUpdate("UPDATE `" + getTableName()
+									+ "` SET " + columnName
 									+ " = LAST_INSERT_ID(1)," + columnName
 									+ "_TIMESTAMP = UNIX_TIMESTAMP()");
 						}
@@ -135,10 +136,9 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			Date currentTimestamp;
 			ResultSet rs = null;
 			try {
-				rs = stmt
-						.executeQuery("SELECT LAST_INSERT_ID(),"
-								+ getSequenceName()
-								+ "_TIMESTAMP FROM COMMON_SEQUENCE");
+				rs = stmt.executeQuery("SELECT LAST_INSERT_ID(),"
+						+ getSequenceName() + "_TIMESTAMP FROM `"
+						+ getTableName() + "`");
 				if (!rs.next()) {
 					throw new DataAccessResourceFailureException(
 							"LAST_INSERT_ID() failed after executing an update");
@@ -207,7 +207,8 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery("SELECT  " + getSequenceName()
-					+ "_TIMESTAMP,UNIX_TIMESTAMP() FROM " + getTableName());
+					+ "_TIMESTAMP,UNIX_TIMESTAMP() FROM `" + getTableName()
+					+ "`");
 			rs.next();
 			Long last = rs.getLong(1);
 			if (last < 10000000000L) // no mills
