@@ -322,7 +322,21 @@ select:hover,select:focus{
 ::-ms-expand {
 	 display: none;
 }
-
+.input-append.search input[type="text"]{
+	-webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-right: 0;
+}
+.input-append.search .add-on{
+	background-color: #fff;
+    border: 1px solid #ccc;
+	border-left: 0;
+	margin-left: 0;
+}
+.input-append.search input[type="text"]:focus ~ .add-on{
+	border-color: rgba(82, 168, 236, 0.8);
+}
 div.preview{
 	vertical-align: middle;
 	padding: 4px 6px;

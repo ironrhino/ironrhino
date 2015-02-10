@@ -238,7 +238,7 @@ ${formHeader!}
 </#if>
 <div class="search span<#if showBottomButtons>2<#else>3</#if>">
 <#if searchable>
-<span class="input-append">
+<span class="input-append search">
     <input type="text" name="keyword" value="${keyword!?html}" placeholder="${action.getText('search')}"/><span class="add-on"><i class="glyphicon glyphicon-search clickable"></i></span>
 </span>
 </#if>
