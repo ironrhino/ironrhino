@@ -15,7 +15,7 @@
 <button type="button" class="btn" onclick="$(\'#install\').toggle()">${action.getText("install")}</button>
 '>
 <@richtable entityName="install" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons showCheckColumn=false/>
-<form id="install" action="install/install" method="post" enctype="multipart/form-data" style="display:none;text-align:center;padding-top:20px;" class="form-inline">
+<form id="install" action="${actionBaseUrl}/install" method="post" enctype="multipart/form-data" style="display:none;text-align:center;padding-top:20px;" class="form-inline">
 <input type="file" name="file"/> <@s.submit theme="simple" value="${action.getText('upload')}"/>
 </form>
 </body>
