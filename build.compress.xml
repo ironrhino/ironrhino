@@ -156,10 +156,12 @@
 			</filelist>
 		</concat>
 		<replace file="${webapp.dir}/assets/scripts/ironrhino.js" token="@license" value="license" encoding="utf-8" />
+		<replace file="${webapp.dir}/assets/scripts/ironrhino.js" token="@copyright" value="copyright" encoding="utf-8" />
 		<java jar="${lib.dir}/closure-compiler.jar" fork="true">
 			<arg line=" --js=./webapp/assets/scripts/ironrhino.js --js_output_file=./webapp/assets/scripts/ironrhino-min.js" />
 		</java>
 		<replace file="${webapp.dir}/assets/scripts/ironrhino-lite.js" token="@license" value="license" encoding="utf-8" />
+		<replace file="${webapp.dir}/assets/scripts/ironrhino-lite.js" token="@copyright" value="copyright" encoding="utf-8" />
 		<java jar="${lib.dir}/closure-compiler.jar" fork="true">
 			<arg line=" --js=./webapp/assets/scripts/ironrhino-lite.js --js_output_file=./webapp/assets/scripts/ironrhino-lite-min.js" />
 		</java>

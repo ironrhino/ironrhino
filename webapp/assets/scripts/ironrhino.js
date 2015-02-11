@@ -18143,7 +18143,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 /**
@@ -19765,7 +19765,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 (function($)
@@ -20119,7 +20119,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 (function($)
@@ -20225,7 +20225,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 (function($)
@@ -21335,7 +21335,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 (function($)
@@ -21577,7 +21577,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 (function($)
@@ -21751,7 +21751,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 (function($)
@@ -22060,7 +22060,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 (function($)
@@ -22235,7 +22235,7 @@ function log() {
  * http://textextjs.com
  *
  * @version 1.3.1
- * @copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
+ * copyright Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
  * license MIT License
  */
 (function($)

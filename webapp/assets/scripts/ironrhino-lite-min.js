@@ -1,23 +1,3 @@
-/*
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
-*/
 (function(b,d,c){d=navigator.userAgent.toLowerCase();c=/(chrome)[ \/]([\w.]+)/.exec(d)||/(webkit)[ \/]([\w.]+)/.exec(d)||/(opera)(?:.*version|)[ \/]([\w.]+)/.exec(d)||/(msie) ([\w.]+)/.exec(d)||0>d.indexOf("compatible")&&/(mozilla)(?:.*? rv:([\w.]+)|)/.exec(d)||[];d=c[1]||"";c=c[2]||"0";var f={};d&&(f[d]=!0,f.version=c);f.chrome?f.webkit=!0:f.webkit&&(f.safari=!0);b.browser=f})(jQuery,window);
 jQuery.cookie=function(b,d,c){if(1<arguments.length&&(null===d||"object"!==typeof d)){c=jQuery.extend({},c);null===d&&(c.expires=-1);if("number"===typeof c.expires){var f=c.expires,e=c.expires=new Date;e.setDate(e.getDate()+f)}return document.cookie=[encodeURIComponent(b),"=",c.raw?String(d):encodeURIComponent(String(d)),c.expires?"; expires="+c.expires.toUTCString():"",c.path?"; path="+c.path:"",c.domain?"; domain="+c.domain:"",c.secure?"; secure":""].join("")}c=d||{};e=c.raw?function(b){return b}:
 decodeURIComponent;return(f=RegExp("(?:^|; )"+encodeURIComponent(b)+"=([^;]*)").exec(document.cookie))?e(f[1]):null};

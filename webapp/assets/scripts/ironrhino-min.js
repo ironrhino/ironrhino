@@ -1,23 +1,3 @@
-/*
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
- Copyright (C) 2011 Alex Gorbatchev. All rights reserved.
- license MIT License
-*/
 (function(b,g){"object"===typeof module&&"object"===typeof module.exports?module.exports=b.document?g(b,!0):function(b){if(!b.document)throw Error("jQuery requires a window with a document");return g(b)}:g(b)})("undefined"!==typeof window?window:this,function(b,g){function f(b){var e=b.length,h=p.type(b);return"function"===h||p.isWindow(b)?!1:1===b.nodeType&&e?!0:"array"===h||0===e||"number"===typeof e&&0<e&&e-1 in b}function d(b,e,h){if(p.isFunction(e))return p.grep(b,function(b,c){return!!e.call(b,
 c,b)!==h});if(e.nodeType)return p.grep(b,function(b){return b===e!==h});if("string"===typeof e){if(lb.test(e))return p.filter(e,b,h);e=p.filter(e,b)}return p.grep(b,function(b){return 0<=W.call(e,b)!==h})}function c(b,e){for(;(b=b[e])&&1!==b.nodeType;);return b}function k(b){var e=Qa[b]={};p.each(b.match(ca)||[],function(b,h){e[h]=!0});return e}function m(){M.removeEventListener("DOMContentLoaded",m,!1);b.removeEventListener("load",m,!1);p.ready()}function n(){Object.defineProperty(this.cache={},
 0,{get:function(){return{}}});this.expando=p.expando+n.uid++}function l(b,e,h){if(void 0===h&&1===b.nodeType)if(h="data-"+e.replace(mb,"-$1").toLowerCase(),h=b.getAttribute(h),"string"===typeof h){try{h="true"===h?!0:"false"===h?!1:"null"===h?null:+h+""===h?+h:nb.test(h)?p.parseJSON(h):h}catch(c){}X.set(b,e,h)}else h=void 0;return h}function e(){return!0}function h(){return!1}function q(){try{return M.activeElement}catch(b){}}function r(b,e){return p.nodeName(b,"table")&&p.nodeName(11!==e.nodeType?
