@@ -11,7 +11,6 @@ package com.opensymphony.module.sitemesh.mapper;
 
 import com.opensymphony.module.sitemesh.Config;
 import com.opensymphony.module.sitemesh.Decorator;
-import com.opensymphony.xwork2.util.ClassLoaderUtil;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -91,7 +90,10 @@ public class ConfigLoader {
     	Decorator decorator = (Decorator) decorators.get(name);
     	if(decorator == null){
     		String page = DEFAULT_DIR + name + ".ftl";
-    		URL url = ClassLoaderUtil.getResource(page.substring(1), getClass());
+    		String resourceName = page.substring(1);
+    		URL url = Thread.currentThread().getContextClassLoader().getResource(resourceName);
+    	    if (url == null)
+    	        url = getClass().getClassLoader().getResource(resourceName);
     		if(url != null){
     			decorator = new DefaultDecorator(name, page, null, null, null);
     			storeDecorator(decorator);
@@ -118,12 +120,12 @@ public class ConfigLoader {
 
             Document document;
             InputStream is = config.getServletContext().getResourceAsStream(configFileName.indexOf('/') == 0 ? configFileName : '/'+configFileName);
-            if (is == null){
+            if (is == null)
                 is = getClass().getClassLoader().getResourceAsStream(configFileName);
-                }
-            if (is == null){
+            if (is == null)
                 is = Thread.currentThread().getContextClassLoader().getResourceAsStream(configFileName);
-            }
+            if (is == null)
+                is = getClass().getClassLoader().getResourceAsStream(configFileName);
             document = builder.parse(is);
 
             // Parse the configuration document
