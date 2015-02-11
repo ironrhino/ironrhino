@@ -36,9 +36,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpmime-4.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/iText-2.1.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/iTextAsian-2.1.7.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-annotations-2.5.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-core-2.5.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-databind-2.5.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-annotations-2.5.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-core-2.5.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-databind-2.5.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jasperreports-5.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javamail-1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.18.2.jar"/>
@@ -61,7 +61,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-analysis-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-core-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.12.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.34.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.0.9.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
