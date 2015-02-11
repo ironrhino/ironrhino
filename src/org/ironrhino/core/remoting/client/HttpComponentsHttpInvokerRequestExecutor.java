@@ -9,12 +9,15 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.StatusLine;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.protocol.HttpContext;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
@@ -62,10 +65,20 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 	@PostConstruct
 	public void init() {
 		httpClient = HttpClients.custom().disableAuthCaching()
-				.disableAutomaticRetries().disableConnectionState()
-				.disableCookieManagement().disableRedirectHandling()
-				.setMaxConnPerRoute(maxConnPerRoute)
-				.setMaxConnTotal(maxConnTotal).build();
+				.disableConnectionState().disableCookieManagement()
+				.disableRedirectHandling().setMaxConnPerRoute(maxConnPerRoute)
+				.setMaxConnTotal(maxConnTotal)
+				.setRetryHandler(new HttpRequestRetryHandler() {
+					@Override
+					public boolean retryRequest(IOException ex,
+							int executionCount, HttpContext context) {
+						if (executionCount > 3)
+							return false;
+						if (ex instanceof NoHttpResponseException)
+							return true;
+						return false;
+					}
+				}).build();
 	}
 
 	@Override

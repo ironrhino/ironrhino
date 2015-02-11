@@ -1,8 +1,13 @@
 package org.ironrhino.rest.client;
 
+import java.io.IOException;
+
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.protocol.HttpContext;
 import org.slf4j.MDC;
 
 public class HttpComponentsClientHttpRequestFactory extends
@@ -24,9 +29,19 @@ public class HttpComponentsClientHttpRequestFactory extends
 
 	public HttpComponentsClientHttpRequestFactory(Client client) {
 		HttpClient httpClient = HttpClients.custom().disableAuthCaching()
-				.disableAutomaticRetries().disableConnectionState()
-				.disableCookieManagement().setMaxConnPerRoute(1000)
-				.setMaxConnTotal(1000).build();
+				.disableConnectionState().disableCookieManagement()
+				.setMaxConnPerRoute(1000).setMaxConnTotal(1000)
+				.setRetryHandler(new HttpRequestRetryHandler() {
+					@Override
+					public boolean retryRequest(IOException ex,
+							int executionCount, HttpContext context) {
+						if (executionCount > 3)
+							return false;
+						if (ex instanceof NoHttpResponseException)
+							return true;
+						return false;
+					}
+				}).build();
 		setHttpClient(httpClient);
 		this.client = client;
 		super.setConnectTimeout(connectTimeout);
