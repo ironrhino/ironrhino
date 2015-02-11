@@ -11,6 +11,7 @@ package com.opensymphony.module.sitemesh.mapper;
 
 import com.opensymphony.module.sitemesh.Config;
 import com.opensymphony.module.sitemesh.Decorator;
+import com.opensymphony.xwork2.util.ClassLoaderUtil;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -21,8 +22,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The ConfigLoader reads a configuration XML file that contains Decorator definitions
@@ -54,8 +57,9 @@ import java.util.Map;
  */
 public class ConfigLoader {
 
+	public static final String DEFAULT_DIR = "/resources/view/decorator/";
     
-    private Map<String,Decorator> decorators = new HashMap<String,Decorator>();
+    private Map<String,Decorator> decorators = new ConcurrentHashMap<String,Decorator>();
     
     private PathMapper pathMapper = new PathMapper();
 
@@ -84,7 +88,16 @@ public class ConfigLoader {
      * Retrieve Decorator based on name specified in configuration file.
      */
     public Decorator getDecoratorByName(String name) throws ServletException {
-        return (Decorator) decorators.get(name);
+    	Decorator decorator = (Decorator) decorators.get(name);
+    	if(decorator == null){
+    		String page = DEFAULT_DIR + name + ".ftl";
+    		URL url = ClassLoaderUtil.getResource(page.substring(1), getClass());
+    		if(url != null){
+    			decorator = new DefaultDecorator(name, page, null, null, null);
+    			storeDecorator(decorator);
+    		}
+    	}
+    	return decorator;
     }
 
     /** Get name of Decorator mapped to given path. */
