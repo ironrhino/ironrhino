@@ -53,7 +53,7 @@ $(function(){
 </script>
 </head>
 <body>
-<@s.form id="form" action="console" method="post" class="ajax focus form-inline well">
+<@s.form id="form" action="${actionBaseUrl}" method="post" class="ajax focus form-inline well">
 	<div class="row-fluid">
 	<div class="span6">
 	<span>${action.getText('expression')}: </span><@s.textfield theme="simple" id="expression" name="expression" class="required" style="width:80%;"/>

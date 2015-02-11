@@ -11,7 +11,7 @@
 </ul>
 <div class="tab-content">
 	<div id="decode" class="tab-pane active">
-		<@s.form id="qrcode_form" action="qrcode" method="post" enctype="multipart/form-data" class="form-horizontal">
+		<@s.form id="qrcode_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="form-horizontal">
 		<@s.hidden name="decode" value="true"/>
 		<@s.textfield id="decoded-content" label="%{getText('content')}" name="content" class="input-xxlarge">
 		<@s.param name="after"><button type="button" class="btn decodeqrcode" data-target="#decoded-content"><i class="glyphicon glyphicon-screenshot"></i></button></@s.param>
@@ -23,7 +23,7 @@
 		</@s.form>
 	</div>
 	<div id="encode" class="tab-pane">
-		<@s.form id="qrcode_form" action="qrcode" method="post" enctype="multipart/form-data" class="form-horizontal" target="_blank">
+		<@s.form id="qrcode_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="form-horizontal" target="_blank">
 		<@s.textfield label="%{getText('content')}" name="content" value="" class="input-xxlarge"/>
 		<@s.textfield label="%{getText('encoding')}" name="encoding" class="input-small"/>
 		<@s.textfield label="%{getText('width')}" type="number" name="width" class="integer positive" min="10"/>

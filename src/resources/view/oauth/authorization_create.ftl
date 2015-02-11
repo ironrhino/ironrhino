@@ -4,7 +4,7 @@
 <title>${action.getText('create')}${action.getText('authorization')}</title>
 </head>
 <body>
-<@s.form action="create" method="post" class="ajax reset form-horizontal">
+<@s.form action="${actionBaseUrl}/create" method="post" class="ajax reset form-horizontal">
 	<div class="control-group listpick" data-options="{'url':'<@url value="/oauth/client/pick?columns=name"/>'}">
 	<@s.hidden name="authorization.client" class="listpick-id"/>
 	<label class="control-label" for="client">${action.getText('client')}</label>

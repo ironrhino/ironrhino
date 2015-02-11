@@ -18,7 +18,7 @@
 	<div class="span6 offset3">
 	<h2 class="caption">${action.getText('signup')}</h2>
 	<div class="hero-unit">
-	<@s.form method="post" action="signup" class="ajax focus form-horizontal well">
+	<@s.form method="post" action="${actionBaseUrl}" class="ajax focus form-horizontal well">
 		<@s.textfield label="%{getText('email')}" name="email" type="email" class="span2 required checkavailable email" dynamicAttributes={"data-checkurl":"${getUrl('/signup/checkavailable')}"}/>
 		<@s.textfield label="%{getText('username')}" name="username" class="span2 checkavailable regex" dynamicAttributes={"data-regex":"${statics['org.ironrhino.security.model.User'].USERNAME_REGEX_FOR_SIGNUP}","data-checkurl":"${getUrl('/signup/checkavailable')}"}/>
 		<@s.password label="%{getText('password')}" name="password" class="required span2"/>
