@@ -20,7 +20,7 @@
 		<#assign label=label+action.getText(var)/>
 		</#list>
 		</#if>
-		<#if label!=field.name> <span class="label">${label}</span></#if>
+		<#if label!=field.name> <span class="label pull-right">${label}</span></#if>
 		</td>
 		<td>${field.type!} </td>
 		<td>${action.getText(field.required?string)} </td>
