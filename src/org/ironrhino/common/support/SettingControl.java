@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SettingControl implements
-		ApplicationListener<EntityOperationEvent> {
+		ApplicationListener<EntityOperationEvent<Setting>> {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -165,7 +165,7 @@ public class SettingControl implements
 	}
 
 	@Override
-	public void onApplicationEvent(EntityOperationEvent event) {
+	public void onApplicationEvent(EntityOperationEvent<Setting> event) {
 		if (event.getEntity() instanceof Setting) {
 			Setting settingInEvent = (Setting) event.getEntity();
 			if (event.getType() == EntityOperationType.CREATE) {

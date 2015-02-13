@@ -14,7 +14,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.context.ApplicationListener;
 
 public class BaseTreeControl<T extends BaseTreeableEntity<T>> implements
-		ApplicationListener<EntityOperationEvent> {
+		ApplicationListener<EntityOperationEvent<T>> {
 
 	private volatile T tree;
 
@@ -142,11 +142,10 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> implements
 	}
 
 	@Override
-	public void onApplicationEvent(EntityOperationEvent event) {
+	public void onApplicationEvent(EntityOperationEvent<T> event) {
 		if (tree == null)
 			return;
 		if (event.getEntity().getClass() == entityClass) {
-			@SuppressWarnings("unchecked")
 			T treeNode = (T) event.getEntity();
 			if (event.getType() == EntityOperationType.CREATE)
 				create(treeNode);

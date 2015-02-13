@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CmsActionMappingMatcher implements ActionMappingMatcher,
-		ApplicationListener<EntityOperationEvent> {
+		ApplicationListener<EntityOperationEvent<Setting>> {
 
 	public static final String DEFAULT_PAGE_PATH_PREFIX = "/p/";
 
@@ -241,7 +241,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher,
 	}
 
 	@Override
-	public void onApplicationEvent(EntityOperationEvent event) {
+	public void onApplicationEvent(EntityOperationEvent<Setting> event) {
 		if (event.getEntity() instanceof Setting) {
 			Setting setting = (Setting) event.getEntity();
 			String key = setting.getKey();

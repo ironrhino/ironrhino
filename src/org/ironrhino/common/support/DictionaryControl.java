@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DictionaryControl implements
-		ApplicationListener<EntityOperationEvent> {
+		ApplicationListener<EntityOperationEvent<Dictionary>> {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -84,7 +84,7 @@ public class DictionaryControl implements
 	}
 
 	@Override
-	public void onApplicationEvent(EntityOperationEvent event) {
+	public void onApplicationEvent(EntityOperationEvent<Dictionary> event) {
 		if (event.getEntity() instanceof Dictionary) {
 			Dictionary dictInEvent = (Dictionary) event.getEntity();
 			if (event.getType() == EntityOperationType.CREATE) {
