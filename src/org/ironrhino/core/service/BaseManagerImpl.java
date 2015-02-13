@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
+import org.hibernate.LockOptions;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.ScrollMode;
@@ -281,6 +282,15 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 		if (id == null)
 			return null;
 		return (T) sessionFactory.getCurrentSession().get(getEntityClass(), id);
+	}
+
+	@Override
+	@Transactional
+	public T get(Serializable id, LockOptions lockOptions) {
+		if (id == null)
+			return null;
+		return (T) sessionFactory.getCurrentSession().get(getEntityClass(), id,
+				lockOptions);
 	}
 
 	@Override

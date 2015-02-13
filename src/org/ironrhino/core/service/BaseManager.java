@@ -3,6 +3,7 @@ package org.ironrhino.core.service;
 import java.io.Serializable;
 import java.util.List;
 
+import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -20,6 +21,8 @@ public interface BaseManager<T extends Persistable<?>> {
 	public void update(T obj);
 
 	public T get(Serializable id);
+
+	public T get(Serializable id, LockOptions lockOptions);
 
 	public void evict(T obj);
 
