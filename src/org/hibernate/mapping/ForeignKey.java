@@ -129,6 +129,8 @@ public class ForeignKey extends Constraint {
 	}
 
 	public String sqlDropString(Dialect dialect, String defaultCatalog, String defaultSchema) {
+		// hacked by zhouyanming
+		/*
 		final StringBuilder buf = new StringBuilder( "alter table " );
 		buf.append( getTable().getQualifiedName(dialect, defaultCatalog, defaultSchema) );
 		buf.append( dialect.getDropForeignKeyString() );
@@ -140,6 +142,9 @@ public class ForeignKey extends Constraint {
 			buf.append( " if exists" );
 		}
 		return buf.toString();
+		*/
+		return "";
+		// hacked by zhouyanming
 	}
 
 	public boolean isCascadeDeleteEnabled() {
@@ -195,6 +200,7 @@ public class ForeignKey extends Constraint {
 	}
 	
 	// hacked by zhouyanming
+	@Override
 	public String sqlCreateString(Dialect dialect, Mapping p, String defaultCatalog, String defaultSchema) {
 		return "";
 	}
