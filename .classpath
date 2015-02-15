@@ -43,7 +43,8 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jasperreports-6.0.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javamail-1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.19.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.1.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.2.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-annotations-1.2.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jedis-2.6.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jericho-html-3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jpa-api-2.1.jar"/>
