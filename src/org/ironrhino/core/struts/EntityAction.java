@@ -48,9 +48,9 @@ import org.ironrhino.core.model.Ordered;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.model.Tuple;
+import org.ironrhino.core.search.SearchService;
 import org.ironrhino.core.search.SearchService.Mapper;
 import org.ironrhino.core.search.elasticsearch.ElasticSearchCriteria;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.service.BaseManager;
@@ -110,7 +110,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected BaseTreeableEntity parentEntity;
 
 	@Autowired(required = false)
-	private transient ElasticSearchService<Persistable<?>> elasticSearchService;
+	private transient SearchService<Persistable<?>> searchService;
 
 	@Autowired(required = false)
 	private transient ConversionService conversionService;
@@ -377,7 +377,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
 		if (ownerProperty != null
 				&& ownerProperty.getKey().isolate()
-				|| (!searchable || StringUtils.isBlank(keyword) || (searchable && elasticSearchService == null))) {
+				|| (!searchable || StringUtils.isBlank(keyword) || (searchable && searchService == null))) {
 			DetachedCriteria dc = entityManager.detachedCriteria();
 			if (ownerProperty != null) {
 				Owner owner = ownerProperty.getKey();
@@ -580,7 +580,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (richtableConfig != null)
 				resultPage.setPaginating(richtableConfig.paginating());
 			resultPage.setCriteria(criteria);
-			resultPage = elasticSearchService.search(resultPage,
+			resultPage = searchService.search(resultPage,
 					new Mapper<Persistable<?>>() {
 						@Override
 						public Persistable map(Persistable source) {
