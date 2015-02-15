@@ -697,7 +697,7 @@ public class LocalizedTextUtil {
         try {
         	String message = bundle.getString(key);
         	if (valueStack != null) 
-        		message = TextParseUtil.translateVariables(bundle.getString(key), valueStack);
+        		message = TextParseUtil.translateVariables(message, valueStack);
             MessageFormat mf = buildMessageFormat(message, locale);
             return formatWithNullDetection(mf, args);
         } catch (MissingResourceException e) {
