@@ -20,8 +20,9 @@
 	<#if versionPropertyName??>
 	<@s.hidden name="${entityName+'.'+versionPropertyName}" cssClass="version" />
 	</#if>
-	<#list uiConfigs?keys as key>
-		<#assign config=uiConfigs[key]>
+	<#list uiConfigs.entrySet() as entry>
+		<#assign key=entry.key>
+		<#assign config=entry.value>
 		<#assign templateName><@config.templateName?interpret /></#assign>
 		<#assign value=entity[key]!>
 		<#assign hidden=config.hiddenInInput.value>
