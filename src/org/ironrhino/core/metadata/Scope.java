@@ -1,9 +1,7 @@
 package org.ironrhino.core.metadata;
 
 import org.ironrhino.core.model.Displayable;
-
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.util.LocalizedTextUtil;
+import org.ironrhino.core.struts.I18N;
 
 public enum Scope implements Displayable {
 	LOCAL, // only this jvm
@@ -18,8 +16,7 @@ public enum Scope implements Displayable {
 	@Override
 	public String getDisplayName() {
 		try {
-			return LocalizedTextUtil.findText(getClass(), name(), ActionContext
-					.getContext().getLocale(), name(), null);
+			return I18N.getText(getClass(), name());
 		} catch (Exception e) {
 			return name();
 		}

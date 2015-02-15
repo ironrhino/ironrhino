@@ -11,10 +11,8 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.model.Displayable;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.DateUtils;
-
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.util.LocalizedTextUtil;
 
 public enum CriterionOperator implements Displayable {
 
@@ -444,8 +442,7 @@ public enum CriterionOperator implements Displayable {
 	@Override
 	public String getDisplayName() {
 		try {
-			return LocalizedTextUtil.findText(getClass(), name(), ActionContext
-					.getContext().getLocale(), name(), null);
+			return I18N.getText(getClass(), name());
 		} catch (Exception e) {
 			return name();
 		}

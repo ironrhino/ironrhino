@@ -1,9 +1,7 @@
 package org.ironrhino.common.model;
 
 import org.ironrhino.core.model.Displayable;
-
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.util.LocalizedTextUtil;
+import org.ironrhino.core.struts.I18N;
 
 public enum SchemaFieldType implements Displayable {
 	SELECT, CHECKBOX, INPUT, GROUP;
@@ -15,8 +13,7 @@ public enum SchemaFieldType implements Displayable {
 	@Override
 	public String getDisplayName() {
 		try {
-			return LocalizedTextUtil.findText(getClass(), name(), ActionContext
-					.getContext().getLocale(), name(), null);
+			return I18N.getText(getClass(), name());
 		} catch (Exception e) {
 			return name();
 		}
