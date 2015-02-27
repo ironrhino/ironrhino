@@ -37946,6 +37946,9 @@ if (window.FileReader)
 								upload(e.originalEvent.dataTransfer.files,
 										null, t);
 								return true;
+							}).on('click', 'li .remove', function() {
+								$(this).closest('li').remove();
+								return false;
 							});
 				});
 		return this;
