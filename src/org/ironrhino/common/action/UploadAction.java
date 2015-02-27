@@ -129,6 +129,10 @@ public class UploadAction extends BaseAction {
 		this.filename = filename;
 	}
 
+	public String[] getFilename() {
+		return filename;
+	}
+
 	public String getFileStoragePath() {
 		return settingControl.getStringValue(
 				Constants.SETTING_KEY_FILE_STORAGE_PATH, "/assets");
@@ -140,6 +144,7 @@ public class UploadAction extends BaseAction {
 	}
 
 	@Override
+	@JsonConfig(root = "filename")
 	@InputConfig(methodName = "list")
 	public String execute() {
 		if (file != null) {
@@ -149,6 +154,7 @@ public class UploadAction extends BaseAction {
 			if (arr == null || arr.length == 0)
 				arr = "jsp,jspx,php,asp,rb,py,sh".split(",");
 			List<String> excludes = Arrays.asList(arr);
+			String[] array = new String[file.length];
 			for (File f : file) {
 				String fn = fileFileName[i];
 				if (filename != null && filename.length > i)
@@ -156,14 +162,22 @@ public class UploadAction extends BaseAction {
 				String suffix = fn.substring(fn.lastIndexOf('.') + 1);
 				if (!excludes.contains(suffix))
 					try {
-						fileStorage.write(new FileInputStream(f),
-								createPath(fn, autorename));
+						String path = createPath(fn, autorename);
+						array[i] = new StringBuilder(
+								templateProvider.getAssetsBase())
+								.append(settingControl
+										.getStringValue(
+												Constants.SETTING_KEY_FILE_STORAGE_PATH,
+												"/assets")).append(path)
+								.toString();
+						fileStorage.write(new FileInputStream(f), path);
 					} catch (IOException e) {
 						e.printStackTrace();
 						throw new ErrorMessage(e.getMessage());
 					}
 				i++;
 			}
+			filename = array;
 			addActionMessage(getText("operate.success"));
 		} else if (StringUtils.isNotBlank(requestBody) && filename != null
 				&& filename.length > 0) {
@@ -179,7 +193,8 @@ public class UploadAction extends BaseAction {
 				throw new ErrorMessage(e.getMessage());
 			}
 		}
-		return list();
+		return ServletActionContext.getRequest().getParameter("json") != null ? JSON
+				: list();
 	}
 
 	public String list() {

@@ -47,6 +47,8 @@
 					var data = xhr.responseText;
 					if (data.indexOf('[') == 0 || data.indexOf('{') == 0)
 						data = $.parseJSON(data);
+					if (typeof options['success'] != 'undefined')
+						options['success'](data, xhr);
 					Ajax.handleResponse(data, options);
 				} else {
 					if (!files.length)

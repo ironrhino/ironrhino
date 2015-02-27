@@ -8512,6 +8512,20 @@ div.preview strong{
 div.sqleditor.preview{
 	min-width:90%;
 }
+
+form.imageuploadable ul.thumbnails{
+ min-height: 50px;
+}
+form.imageuploadable ul.thumbnails li{
+ position: relative;
+}
+form.imageuploadable ul.thumbnails li .remove{
+ position: absolute;
+ top: 5px;
+ right: 5px;
+ font-size: 2em;
+}
+
 .toolbar > [class*="span"]{
 	margin-top:0;
 	margin-bottom:0;

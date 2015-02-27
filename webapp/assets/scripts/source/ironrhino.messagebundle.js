@@ -54,6 +54,8 @@ MessageBundle = {
 		'save' : '保存',
 		'restore' : '还原',
 		'import' : '导入',
+		'upload' : '上传',
+		'snapshot' : '拍照',
 		'cancel' : '取消',
 		'error' : '错误',
 		'success' : '操作成功',
