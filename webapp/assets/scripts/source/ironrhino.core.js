@@ -617,8 +617,10 @@ Ajax = {
 									false);
 							Captcha.refresh()
 						}, 100);
-			if (!hasError && $(target).hasClass('reset') && target.reset)
+			if (!hasError && $(target).hasClass('reset') && target.reset) {
 				target.reset();
+				$(target).find('ul.resetable').html('');
+			}
 		}
 		Indicator.text = '';
 		Ajax.fire(target, 'oncomplete', data);
