@@ -33139,7 +33139,7 @@ Ajax = {
 						}, 100);
 			if (!hasError && $(target).hasClass('reset') && target.reset) {
 				target.reset();
-				$(target).find('ul.resetable').html('');
+				$(target).find('.resetable').html('');
 			}
 		}
 		Indicator.text = '';
