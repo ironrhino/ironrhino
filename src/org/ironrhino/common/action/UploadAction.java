@@ -18,8 +18,10 @@ import org.apache.struts2.ServletActionContext;
 import org.ironrhino.common.Constants;
 import org.ironrhino.common.support.SettingControl;
 import org.ironrhino.core.fs.FileStorage;
+import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
+import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.struts.TemplateProvider;
 import org.ironrhino.core.util.ErrorMessage;
@@ -240,6 +242,7 @@ public class UploadAction extends BaseAction {
 	}
 
 	@Override
+	@Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 	public String delete() {
 		String[] paths = getId();
 		if (paths != null) {
@@ -265,6 +268,7 @@ public class UploadAction extends BaseAction {
 		return list();
 	}
 
+	@Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 	public String rename() {
 		String oldName = getUid();
 		if (filename == null || filename.length == 0) {
