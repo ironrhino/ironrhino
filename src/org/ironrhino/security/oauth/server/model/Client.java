@@ -1,7 +1,12 @@
 package org.ironrhino.security.oauth.server.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
@@ -9,6 +14,7 @@ import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
@@ -19,18 +25,21 @@ import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.model.Attachmentable;
 import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.model.Enableable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @AutoConfig
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(name = "oauth_client")
 @Richtable(order = "name asc", celleditable = false)
-public class Client extends BaseEntity implements Enableable {
+public class Client extends BaseEntity implements Enableable, Attachmentable {
 
 	private static final long serialVersionUID = -7297737795748467475L;
 
@@ -71,6 +80,35 @@ public class Client extends BaseEntity implements Enableable {
 	@UiConfig(hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
 	@Column(insertable = false)
 	private Date modifyDate;
+
+	@Transient
+	private List<String> attachments = new ArrayList<String>(0);
+
+	public List<String> getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(List<String> attachments) {
+		this.attachments = attachments;
+	}
+
+	@NotInCopy
+	@JsonIgnore
+	@Column(name = "attachments")
+	@Access(AccessType.PROPERTY)
+	public String getAttachmentsAsString() {
+		if (attachments.size() > 0)
+			return StringUtils.join(attachments.iterator(), ',');
+		return null;
+	}
+
+	public void setAttachmentsAsString(String attachmentsAsString) {
+		attachments.clear();
+		if (StringUtils.isNotBlank(attachmentsAsString))
+			attachments.addAll(Arrays
+					.asList(org.ironrhino.core.util.StringUtils.trimTail(
+							attachmentsAsString, ",").split("\\s*,\\s*")));
+	}
 
 	@UiConfig(displayOrder = 2, width = "200px", alias = "client_id")
 	public String getClientId() {

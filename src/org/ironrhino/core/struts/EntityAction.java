@@ -73,6 +73,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opensymphony.xwork2.ActionContext;
@@ -140,7 +141,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public boolean isAttachmentable() {
-		return Attachmentable.class.isAssignableFrom(getEntityClass());
+		return Attachmentable.class.isAssignableFrom(getEntityClass())
+				&& ClassUtils.isPresent(
+						"org.ironrhino.common.action.UploadAction", getClass()
+								.getClassLoader());
 	}
 
 	public boolean isIdAssigned() {
