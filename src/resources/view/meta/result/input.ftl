@@ -4,7 +4,11 @@
 <title><#if !entity??><#assign entity=entityName?eval></#if><#assign isnew = !entity??||entity.new/><#assign isnew = !entity??||entity.new/><#if idAssigned><#assign isnew=!entity??||!entity.id?has_content/></#if><#if isnew>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
 </head>
 <body>
-<@s.form action="${actionBaseUrl}/save" method="post" cssClass="ajax form-horizontal${richtableConfig.importable?string(' importable','')} groupable">
+<#assign formDynamicAttributes={}/>
+<#if attachmentable>
+<#assign formDynamicAttributes=formDynamicAttributes+{'data-attachments':entity.attachmentsAsString!}/>
+</#if>
+<@s.form action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${richtableConfig.importable?string(' importable','')}${attachmentable?string(' attachmentable','')} groupable" dynamicAttributes=formDynamicAttributes>
 	<#if !isnew>
 	<#if !idAssigned>
 	<@s.hidden name="${entityName}.id" />

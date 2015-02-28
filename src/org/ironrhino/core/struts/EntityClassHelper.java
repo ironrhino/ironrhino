@@ -46,12 +46,12 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.struts.AnnotationShadows.HiddenImpl;
 import org.ironrhino.core.struts.AnnotationShadows.ReadonlyImpl;
 import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
-import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.core.annotation.AnnotationUtils;
 
 public class EntityClassHelper {
 
@@ -62,12 +62,12 @@ public class EntityClassHelper {
 		Map<String, UiConfigImpl> map = cache.get(entityClass);
 		if (map == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			synchronized (entityClass) {
-				GenericGenerator genericGenerator = AnnotationUtils
+				GenericGenerator genericGenerator = org.ironrhino.core.util.AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(entityClass,
 								GenericGenerator.class).get("id");
 				boolean idAssigned = genericGenerator != null
 						&& "assigned".equals(genericGenerator.strategy());
-				Map<String, NaturalId> naturalIds = AnnotationUtils
+				Map<String, NaturalId> naturalIds = org.ironrhino.core.util.AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(entityClass,
 								NaturalId.class);
 				Set<String> hides = new HashSet<String>();
@@ -79,12 +79,13 @@ public class EntityClassHelper {
 					String propertyName = pd.getName();
 					if (pd.getReadMethod() == null
 							|| pd.getWriteMethod() == null
-							&& pd.getReadMethod().getAnnotation(UiConfig.class) == null)
+							&& AnnotationUtils.findAnnotation(
+									pd.getReadMethod(), UiConfig.class) == null)
 						continue;
 					Class<?> declaredClass = pd.getReadMethod()
 							.getDeclaringClass();
-					Version version = pd.getReadMethod().getAnnotation(
-							Version.class);
+					Version version = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), Version.class);
 					if (version == null)
 						try {
 							Field f = declaredClass
@@ -95,8 +96,8 @@ public class EntityClassHelper {
 						}
 					if (version != null)
 						continue;
-					Transient trans = pd.getReadMethod().getAnnotation(
-							Transient.class);
+					Transient trans = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), Transient.class);
 					if (trans == null)
 						try {
 							Field f = declaredClass
@@ -105,8 +106,8 @@ public class EntityClassHelper {
 								trans = f.getAnnotation(Transient.class);
 						} catch (Exception e) {
 						}
-					UiConfig uiConfig = pd.getReadMethod().getAnnotation(
-							UiConfig.class);
+					UiConfig uiConfig = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), UiConfig.class);
 					if (uiConfig == null)
 						try {
 							Field f = declaredClass
@@ -125,8 +126,8 @@ public class EntityClassHelper {
 							|| pd.getReadMethod() == null
 							|| hides.contains(propertyName))
 						continue;
-					Column columnannotation = pd.getReadMethod().getAnnotation(
-							Column.class);
+					Column columnannotation = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), Column.class);
 					if (columnannotation == null)
 						try {
 							Field f = declaredClass
@@ -136,7 +137,8 @@ public class EntityClassHelper {
 										.getAnnotation(Column.class);
 						} catch (Exception e) {
 						}
-					Basic basic = pd.getReadMethod().getAnnotation(Basic.class);
+					Basic basic = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), Basic.class);
 					if (basic == null)
 						try {
 							Field f = declaredClass
@@ -145,7 +147,8 @@ public class EntityClassHelper {
 								basic = f.getAnnotation(Basic.class);
 						} catch (Exception e) {
 						}
-					Lob lob = pd.getReadMethod().getAnnotation(Lob.class);
+					Lob lob = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), Lob.class);
 					if (lob == null)
 						try {
 							Field f = declaredClass
@@ -154,8 +157,8 @@ public class EntityClassHelper {
 								lob = f.getAnnotation(Lob.class);
 						} catch (Exception e) {
 						}
-					OneToOne oneToOne = pd.getReadMethod().getAnnotation(
-							OneToOne.class);
+					OneToOne oneToOne = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), OneToOne.class);
 					if (oneToOne == null)
 						try {
 							Field f = declaredClass
@@ -164,8 +167,8 @@ public class EntityClassHelper {
 								oneToOne = f.getAnnotation(OneToOne.class);
 						} catch (Exception e) {
 						}
-					Embedded embedded = pd.getReadMethod().getAnnotation(
-							Embedded.class);
+					Embedded embedded = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), Embedded.class);
 					Class<?> embeddedClass = null;
 					if (embedded == null) {
 						try {
@@ -311,8 +314,9 @@ public class EntityClassHelper {
 							uci.setListValue(uci.getListKey());
 						}
 					} else if (Persistable.class.isAssignableFrom(returnType)) {
-						JoinColumn joincolumnannotation = pd.getReadMethod()
-								.getAnnotation(JoinColumn.class);
+						JoinColumn joincolumnannotation = AnnotationUtils
+								.findAnnotation(pd.getReadMethod(),
+										JoinColumn.class);
 						if (joincolumnannotation == null)
 							try {
 								Field f = declaredClass
@@ -358,8 +362,8 @@ public class EntityClassHelper {
 								}
 							}
 						}
-						ManyToOne manyToOne = pd.getReadMethod().getAnnotation(
-								ManyToOne.class);
+						ManyToOne manyToOne = AnnotationUtils.findAnnotation(
+								pd.getReadMethod(), ManyToOne.class);
 						if (manyToOne == null)
 							try {
 								Field f = declaredClass
@@ -455,8 +459,8 @@ public class EntityClassHelper {
 								uci.getDynamicAttributes().put("min", "0");
 						}
 					} else if (Date.class.isAssignableFrom(returnType)) {
-						Temporal temporal = pd.getReadMethod().getAnnotation(
-								Temporal.class);
+						Temporal temporal = AnnotationUtils.findAnnotation(
+								pd.getReadMethod(), Temporal.class);
 						if (temporal == null)
 							try {
 								Field f = declaredClass
@@ -486,8 +490,9 @@ public class EntityClassHelper {
 					}
 					if (columnannotation != null && columnannotation.unique())
 						uci.setUnique(true);
-					SearchableProperty searchableProperty = pd.getReadMethod()
-							.getAnnotation(SearchableProperty.class);
+					SearchableProperty searchableProperty = AnnotationUtils
+							.findAnnotation(pd.getReadMethod(),
+									SearchableProperty.class);
 					if (searchableProperty == null)
 						try {
 							Field f = declaredClass
@@ -497,8 +502,8 @@ public class EntityClassHelper {
 										.getAnnotation(SearchableProperty.class);
 						} catch (Exception e) {
 						}
-					SearchableId searchableId = pd.getReadMethod()
-							.getAnnotation(SearchableId.class);
+					SearchableId searchableId = AnnotationUtils.findAnnotation(
+							pd.getReadMethod(), SearchableId.class);
 					if (searchableId == null)
 						try {
 							Field f = declaredClass
@@ -508,8 +513,8 @@ public class EntityClassHelper {
 										.getAnnotation(SearchableId.class);
 						} catch (Exception e) {
 						}
-					SearchableComponent searchableComponent = pd
-							.getReadMethod().getAnnotation(
+					SearchableComponent searchableComponent = AnnotationUtils
+							.findAnnotation(pd.getReadMethod(),
 									SearchableComponent.class);
 					if (searchableComponent == null)
 						try {
@@ -630,12 +635,14 @@ public class EntityClassHelper {
 			if (bw.isReadableProperty("fullname"))
 				columns.add("fullname");
 		}
-		columns.addAll(AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(
-				entityClass, NaturalId.class).keySet());
+		columns.addAll(org.ironrhino.core.util.AnnotationUtils
+				.getAnnotatedPropertyNameAndAnnotations(entityClass,
+						NaturalId.class).keySet());
 		for (PropertyDescriptor pd : bw.getPropertyDescriptors()) {
 			if (pd.getReadMethod() == null)
 				continue;
-			UiConfig uic = pd.getReadMethod().getAnnotation(UiConfig.class);
+			UiConfig uic = AnnotationUtils.findAnnotation(pd.getReadMethod(),
+					UiConfig.class);
 			if (uic == null) {
 				try {
 					Field f = pd.getReadMethod().getDeclaringClass()

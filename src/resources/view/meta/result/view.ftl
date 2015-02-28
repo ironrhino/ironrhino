@@ -273,6 +273,19 @@
 		</#if>
 		</#if>
 	</#list>
+	<#if attachmentable && entity.attachments?has_content>
+	<#list entity.attachments as attachment>
+		<#assign filename=attachment?substring(attachment?last_index_of('/')+1) />
+		<#assign url=attachment?substring(0,attachment?last_index_of('/')+1)+filename?url />
+		<a href="${url}" target="_blank">
+		<#if attachment?ends_with('jpg')||attachment?ends_with('png')||attachment?ends_with('gif')||attachment?ends_with('bmp')||attachment?ends_with('webp')>
+		<img style="display:block;" src="${url}"/>
+		<#else>
+		<div>${filename}</div>
+		</#if>
+		</a>
+	</#list>
+	</#if>
 	<#if richtableConfig.exportable>
 	<div class="form-actions">
 		<a href="${actionBaseUrl}/export/${entity.id}" class="btn">${action.getText('export')}</a>

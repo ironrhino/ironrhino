@@ -42,6 +42,7 @@ import org.ironrhino.core.metadata.Owner;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.model.Attachmentable;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Enableable;
 import org.ironrhino.core.model.Ordered;
@@ -136,6 +137,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public boolean isTreeable() {
 		return BaseTreeableEntity.class.isAssignableFrom(getEntityClass());
+	}
+
+	public boolean isAttachmentable() {
+		return Attachmentable.class.isAssignableFrom(getEntityClass());
 	}
 
 	public boolean isIdAssigned() {
@@ -950,6 +955,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					editedPropertyNames.add(propertyName);
 					if (idAssigned && isnew)
 						editedPropertyNames.add("id");
+					if (isAttachmentable())
+						editedPropertyNames.add("attachments");
 				}
 				for (String name : editedPropertyNames)
 					bwp.setPropertyValue(name, bw.getPropertyValue(name));
@@ -1088,6 +1095,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							continue;
 					}
 					editedPropertyNames.add(propertyName);
+					if (isAttachmentable())
+						editedPropertyNames.add("attachments");
 				}
 				for (String name : editedPropertyNames)
 					bwp.setPropertyValue(name, bw.getPropertyValue(name));
