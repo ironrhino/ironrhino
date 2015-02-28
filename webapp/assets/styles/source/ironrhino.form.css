@@ -371,13 +371,13 @@ div.sqleditor.preview{
 	min-width:90%;
 }
 
-form.imageuploadable ul.thumbnails{
+form.attachmentable ul.thumbnails{
  min-height: 50px;
 }
-form.imageuploadable ul.thumbnails li{
+form.attachmentable ul.thumbnails li{
  position: relative;
 }
-form.imageuploadable ul.thumbnails li .remove{
+form.attachmentable ul.thumbnails li .remove{
  position: absolute;
  top: 5px;
  right: 5px;

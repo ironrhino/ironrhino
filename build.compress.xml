@@ -62,7 +62,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.richtable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.sqleditor.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.importableform.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.imageuploadableform.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.attachmentableform.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.groupable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treearea.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treeselect.js" />
@@ -124,7 +124,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.richtable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.sqleditor.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.importableform.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.imageuploadableform.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.attachmentableform.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.groupable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treearea.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treeselect.js" />
