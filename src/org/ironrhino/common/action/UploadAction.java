@@ -47,6 +47,8 @@ public class UploadAction extends BaseAction {
 
 	private boolean autorename;
 
+	private boolean json;
+
 	private Map<String, Boolean> files;
 
 	@Autowired
@@ -78,6 +80,14 @@ public class UploadAction extends BaseAction {
 
 	public void setAutorename(boolean autorename) {
 		this.autorename = autorename;
+	}
+
+	public boolean isJson() {
+		return json;
+	}
+
+	public void setJson(boolean json) {
+		this.json = json;
 	}
 
 	public void setFolder(String folder) {
@@ -193,8 +203,7 @@ public class UploadAction extends BaseAction {
 				throw new ErrorMessage(e.getMessage());
 			}
 		}
-		return ServletActionContext.getRequest().getParameter("json") != null ? JSON
-				: list();
+		return json ? JSON : list();
 	}
 
 	public String list() {
