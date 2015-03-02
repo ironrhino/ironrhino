@@ -25,7 +25,7 @@ public class DataRouteContext {
 		deque.push(bl);
 	}
 
-	public static boolean isReadonly() {
+	static boolean isReadonly() {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null || deque.size() == 0)
 			return false;
@@ -41,7 +41,7 @@ public class DataRouteContext {
 		deque.push(s);
 	}
 
-	public static String getName() {
+	static String getName() {
 		Deque<String> deque = name.get();
 		if (deque == null || deque.size() == 0)
 			return null;
