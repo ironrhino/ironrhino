@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.ironrhino.core.stat.Key;
@@ -89,19 +90,14 @@ public class GroupedDataSource extends AbstractDataSource implements
 	}
 
 	public RoundRobin<String> getReadRoundRobin() {
-		if (readRoundRobin == null) {
-			init();
-		}
 		return readRoundRobin;
 	}
 
 	public RoundRobin<String> getWriteRoundRobin() {
-		if (writeRoundRobin == null) {
-			init();
-		}
 		return writeRoundRobin;
 	}
 
+	@PostConstruct
 	public void init() {
 		Assert.notNull(masterName);
 		master = (DataSource) beanFactory.getBean(masterName);
