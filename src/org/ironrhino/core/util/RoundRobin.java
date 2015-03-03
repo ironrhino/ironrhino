@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RoundRobin<T> {
 
@@ -45,17 +45,15 @@ public class RoundRobin<T> {
 		int totalWeight = 0;
 		TargetWrapper<T> tw = null;
 		for (int i = 0; i < targetWrappers.size(); i++) {
-			TargetWrapper<T> temp = targetWrappers.get(i);
-			AtomicLong tempStat = temp.getStat();
-			if (!(usableChecker == null || usableChecker.isUsable(temp
+			TargetWrapper<T> target = targetWrappers.get(i);
+			AtomicInteger targetStat = target.getStat();
+			if (!(usableChecker == null || usableChecker.isUsable(target
 					.getTarget())))
 				continue;
-			long newStat = tempStat.get();
-			newStat += temp.getWeight();
-			totalWeight += temp.getWeight();
-			tempStat.set(newStat);
+			totalWeight += target.getWeight();
+			int newStat = targetStat.addAndGet(target.getWeight());
 			if (tw == null || newStat > tw.getStat().get())
-				tw = temp;
+				tw = target;
 		}
 		if (tw == null)
 			return null;
@@ -77,7 +75,7 @@ public class RoundRobin<T> {
 
 		private int weight = DEFAULT_WEIGHT;
 
-		private AtomicLong stat = new AtomicLong(0);
+		private AtomicInteger stat = new AtomicInteger(0);
 
 		public TargetWrapper(T target) {
 			this.target = target;
@@ -101,7 +99,7 @@ public class RoundRobin<T> {
 			this.weight = weight;
 		}
 
-		public AtomicLong getStat() {
+		public AtomicInteger getStat() {
 			return stat;
 		}
 	}
