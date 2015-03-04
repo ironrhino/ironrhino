@@ -18,6 +18,10 @@ public @interface SetupParameter {
 
 	boolean required() default true;
 
+	String cssClass() default "";
+
+	String dynamicAttributes() default ""; // json map
+
 	int displayOrder() default 0;
 
 }

@@ -6,12 +6,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
@@ -25,6 +28,7 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ErrorMessage;
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,13 +152,16 @@ public class SetupAction extends BaseAction {
 								Class<?> type = parameterTypes[i];
 								String _type = StringUtils.uncapitalize(type
 										.getSimpleName());
-								if (_type.equals("int") || _type.equals("long"))
+								if (type.isEnum())
+									_type = "enum";
+								else if (_type.equals("int")
+										|| _type.equals("long"))
 									_type = "integer";
 								else if (_type.equals("float")
 										|| _type.equals("bigdecimal"))
 									_type = "double";
 								setupParameters.add(new SetupParameterImpl(
-										parameterNames[i], _type, sp));
+										type, parameterNames[i], _type, sp));
 							}
 						}
 					}
@@ -165,6 +172,7 @@ public class SetupAction extends BaseAction {
 		return setupParameters;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void doSetup() throws Exception {
 		logger.info("setup started");
 		String[] beanNames = ctx.getBeanDefinitionNames();
@@ -215,7 +223,9 @@ public class SetupAction extends BaseAction {
 					Object v = pvalue;
 					Class<?> type = parameterTypes[i];
 					if (!type.equals(String.class)) {
-						if (type.equals(Integer.class)
+						if (type.isEnum()) {
+							v = Enum.valueOf((Class<? extends Enum>)type, pvalue);
+						} else if (type.equals(Integer.class)
 								|| type.equals(Integer.TYPE)) {
 							v = Integer.valueOf(pvalue);
 						} else if (type.equals(Long.class)
@@ -249,6 +259,8 @@ public class SetupAction extends BaseAction {
 
 		private static final long serialVersionUID = -3004203941981232510L;
 
+		private Class<?> parameterType;
+
 		private String name;
 
 		private String type = "string";
@@ -261,15 +273,21 @@ public class SetupAction extends BaseAction {
 
 		private boolean required;
 
+		private Set<String> cssClasses = new ConcurrentSkipListSet<String>();
+
+		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<String, String>(
+				0);
+
 		private int displayOrder;
 
 		public SetupParameterImpl() {
 
 		}
 
-		public SetupParameterImpl(String name, String type,
-				SetupParameter setupParameter) {
+		public SetupParameterImpl(Class<?> parameterType, String name,
+				String type, SetupParameter setupParameter) {
 			this();
+			this.parameterType = parameterType;
 			this.name = name;
 			if (StringUtils.isNotBlank(type))
 				this.type = type;
@@ -278,8 +296,27 @@ public class SetupAction extends BaseAction {
 				this.defaultValue = setupParameter.defaultValue();
 				this.placeholder = setupParameter.placeholder();
 				this.required = setupParameter.required();
+				if (StringUtils.isNotBlank(setupParameter.cssClass()))
+					this.cssClasses.addAll(Arrays.asList(setupParameter
+							.cssClass().split("\\s")));
+				if (StringUtils.isNotBlank(setupParameter.dynamicAttributes()))
+					try {
+						this.dynamicAttributes = JsonUtils.fromJson(
+								setupParameter.dynamicAttributes(),
+								JsonUtils.STRING_MAP_TYPE);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				this.displayOrder = setupParameter.displayOrder();
 			}
+		}
+
+		public Class<?> getParameterType() {
+			return parameterType;
+		}
+
+		public void setParameterType(Class<?> parameterType) {
+			this.parameterType = parameterType;
 		}
 
 		public String getName() {
@@ -328,6 +365,28 @@ public class SetupAction extends BaseAction {
 
 		public void setRequired(boolean required) {
 			this.required = required;
+		}
+
+		public String getCssClass() {
+			if (required)
+				addCssClass("required");
+			return StringUtils.join(cssClasses, " ");
+		}
+
+		public void addCssClass(String cssClass) {
+			this.cssClasses.add(cssClass);
+		}
+
+		public Set<String> getCssClasses() {
+			return cssClasses;
+		}
+
+		public Map<String, String> getDynamicAttributes() {
+			return dynamicAttributes;
+		}
+
+		public void setDynamicAttributes(Map<String, String> dynamicAttributes) {
+			this.dynamicAttributes = dynamicAttributes;
 		}
 
 		@Override
