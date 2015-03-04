@@ -52,7 +52,7 @@ org.apache.catalina.startup.ContextConfig.jarsToSkip=\\
 activiti-*.jar,antlr-*.jar,aopalliance-*.jar,aspectj*.jar,bonecp-*.jar,commons-*.jar,\\
 curator-*.jar,dom4j-*.jar,dynamicreports-*.jar,eaxy-*.jar,ehcache-*.jar,\\
 elasticsearch-*.jar,freemarker-*.jar,guava-*.jar,hessian-*.jar,hibernate-*.jar,\\
-http*.jar,iText*.jar, jackson-*.jar,jasperreports-*.jar,javamail-*.jar,\\
+http*.jar,itext*.jar, jackson-*.jar,jasperreports-*.jar,javamail-*.jar,\\
 javassist-*.jar,jboss-logging-*.jar,jedis-*.jar, jericho-*.jar,joda-*.jar,jpa-*.jar,\\
 jsoup-*.jar,jta-*.jar,log4j-*.jar,lucene-*.jar,mmseg4j-*.jar,\\
 mongo-java-driver-*.jar,mvel2-*.jar,mybatis-*.jar,mysql-*.jar,ognl-*.jar,pinyin4j-*.jar,\\
