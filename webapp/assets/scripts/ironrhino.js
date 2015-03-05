@@ -37443,6 +37443,27 @@ Initialization.richtable = function() {
 			}).on('click', 'td.action .dropdown-menu li a', function() {
 						$('.dropdown-toggle', $(this).closest('.btn-group'))
 								.click();
+					}).on('keydown', '.window-richtable form input',
+					function(evt) {
+						if (evt.keyCode == 13) {
+							var current, next;
+							var inputs = $('input:visible', $(this)
+											.closest('form'));
+							for (var i = 0; i < inputs.length; i++) {
+								var input = $(inputs[i]);
+								if (current && input.is(':not([readonly])')
+										&& input.is(':not([disabled])')) {
+									next = input;
+									break;
+								}
+								if (this == inputs[i])
+									current = input;
+							}
+							if (next) {
+								evt.preventDefault();
+								next.focus();
+							}
+						}
 					});
 }
 Observation._richtable = function(container) {
