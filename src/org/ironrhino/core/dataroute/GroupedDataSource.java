@@ -21,7 +21,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.AbstractDataSource;
-import org.springframework.util.Assert;
 
 public class GroupedDataSource extends AbstractDataSource implements
 		BeanNameAware {
@@ -99,12 +98,13 @@ public class GroupedDataSource extends AbstractDataSource implements
 
 	@PostConstruct
 	public void init() {
-		Assert.notNull(masterName);
-		master = (DataSource) beanFactory.getBean(masterName);
+		if (masterName != null)
+			master = (DataSource) beanFactory.getBean(masterName);
 		if (writeSlaveNames != null && writeSlaveNames.size() > 0) {
 			for (String name : writeSlaveNames.keySet())
 				writeSlaves.put(name, (DataSource) beanFactory.getBean(name));
-			writeSlaves.put(masterName, master);
+			if (masterName != null)
+				writeSlaves.put(masterName, master);
 			writeRoundRobin = new RoundRobin<String>(writeSlaveNames,
 					new RoundRobin.UsableChecker<String>() {
 						@Override
@@ -146,7 +146,7 @@ public class GroupedDataSource extends AbstractDataSource implements
 			dbname = getWriteRoundRobin().pick();
 			ds = writeSlaves.get(dbname);
 		}
-		if (ds == null) {
+		if (ds == null && masterName != null) {
 			dbname = masterName;
 			ds = master;
 		}
