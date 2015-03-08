@@ -366,6 +366,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 					client.getId());
 	}
 
+	@Override
 	public Client findClientById(String clientId) {
 		if (StringUtils.isBlank(clientId))
 			return null;

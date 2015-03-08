@@ -36,7 +36,7 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(
 				request, session);
 		final WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(
-				(HttpServletResponse) response, session);
+				response, session);
 		if (httpSessionFilterHooks != null)
 			try {
 				for (HttpSessionFilterHook httpSessionFilterHook : httpSessionFilterHooks)

@@ -71,16 +71,18 @@ public class InstallationManager {
 					return name.endsWith(".jar") || name.endsWith(".jar.bak");
 				}
 			});
-			for (File f : files) {
-				Map<String, String> manifest = FileUtils.parseManifestFile(f);
-				if (manifest == null || manifest.isEmpty()
-						|| !manifest.containsKey(IRONRHINO_COMPONENT_ID))
-					continue;
-				Component component = new Component(manifest);
-				component.setRealPath(f.getAbsolutePath());
-				(f.getName().endsWith(".jar") ? list : backupedComponents)
-						.add(component);
-			}
+			if (files != null)
+				for (File f : files) {
+					Map<String, String> manifest = FileUtils
+							.parseManifestFile(f);
+					if (manifest == null || manifest.isEmpty()
+							|| !manifest.containsKey(IRONRHINO_COMPONENT_ID))
+						continue;
+					Component component = new Component(manifest);
+					component.setRealPath(f.getAbsolutePath());
+					(f.getName().endsWith(".jar") ? list : backupedComponents)
+							.add(component);
+				}
 			Collections.sort(list, new Comparator<Component>() {
 				@Override
 				public int compare(Component o1, Component o2) {

@@ -195,11 +195,12 @@ public class PermitAction extends BaseAction {
 						}
 					}
 					Map<String, Collection<String>> map = temp.asMap();
-					resources = new LinkedHashMap<String, Collection<String>>();
+					Map<String, Collection<String>> tempMap = new LinkedHashMap<String, Collection<String>>();
 					List<String> groups = new ArrayList<String>(map.keySet());
 					Collections.sort(groups);
 					for (String group : groups)
-						resources.put(group, map.get(group));
+						tempMap.put(group, map.get(group));
+					resources = tempMap;
 				}
 			}
 		}

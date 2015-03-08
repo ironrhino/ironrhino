@@ -65,6 +65,7 @@ public class DocsAction extends BaseAction {
 		return apiDoc;
 	}
 
+	@Override
 	public String execute() {
 		if (StringUtils.isNotBlank(module) && StringUtils.isNotBlank(api)) {
 			loop: for (ApiModuleObject apiModule : getApiModules()) {

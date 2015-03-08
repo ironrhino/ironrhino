@@ -167,7 +167,7 @@ public class SettingControl implements
 	@Override
 	public void onApplicationEvent(EntityOperationEvent<Setting> event) {
 		if (event.getEntity() instanceof Setting) {
-			Setting settingInEvent = (Setting) event.getEntity();
+			Setting settingInEvent = event.getEntity();
 			if (event.getType() == EntityOperationType.CREATE) {
 				settings.put(settingInEvent.getKey(), settingInEvent);
 			} else {

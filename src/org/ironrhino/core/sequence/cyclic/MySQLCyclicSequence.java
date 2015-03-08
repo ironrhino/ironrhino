@@ -117,13 +117,12 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
-					if (con != null)
-						try {
-							con.close();
-							con = null;
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
+					try {
+						con.close();
+						con = null;
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -159,20 +158,18 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 					|| cycleEnd.getTime() - currentTimestamp.getTime() < CRITICAL_THRESHOLD_TIME
 					&& next < 5) {
 				// timestamp updated but sequence not restarted
-				if (stmt != null)
-					try {
-						stmt.close();
-						stmt = null;
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				if (con != null)
-					try {
-						con.close();
-						con = null;
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
+				try {
+					stmt.close();
+					stmt = null;
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				try {
+					con.close();
+					con = null;
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {

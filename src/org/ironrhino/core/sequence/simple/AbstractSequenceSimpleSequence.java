@@ -94,6 +94,7 @@ public abstract class AbstractSequenceSimpleSequence extends
 		return nextId;
 	}
 
+	@Override
 	public void restart() {
 		Connection con = null;
 		Statement stmt = null;

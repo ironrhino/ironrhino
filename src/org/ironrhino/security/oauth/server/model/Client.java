@@ -84,14 +84,17 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@Transient
 	private List<String> attachments = new ArrayList<String>(0);
 
+	@Override
 	public List<String> getAttachments() {
 		return attachments;
 	}
 
+	@Override
 	public void setAttachments(List<String> attachments) {
 		this.attachments = attachments;
 	}
 
+	@Override
 	@NotInCopy
 	@JsonIgnore
 	@Column(name = "attachments")
@@ -102,6 +105,7 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 		return null;
 	}
 
+	@Override
 	public void setAttachmentsAsString(String attachmentsAsString) {
 		attachments.clear();
 		if (StringUtils.isNotBlank(attachmentsAsString))

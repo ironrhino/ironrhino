@@ -52,6 +52,7 @@ public class HttpComponentsClientHttpRequestFactory extends
 		return connectTimeout;
 	}
 
+	@Override
 	public void setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
 		super.setConnectTimeout(connectTimeout);
@@ -61,6 +62,7 @@ public class HttpComponentsClientHttpRequestFactory extends
 		return readTimeout;
 	}
 
+	@Override
 	public void setReadTimeout(int readTimeout) {
 		this.readTimeout = readTimeout;
 		super.setReadTimeout(readTimeout);

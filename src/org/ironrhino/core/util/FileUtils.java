@@ -67,6 +67,8 @@ public class FileUtils {
 			throws Exception {
 		if (file.isDirectory()) {
 			File[] fl = file.listFiles();
+			if (fl == null)
+				return;
 			if (!base.equals(""))
 				out.putNextEntry(new ZipEntry(base + "/"));
 			base = base.length() == 0 ? "" : base + "/";

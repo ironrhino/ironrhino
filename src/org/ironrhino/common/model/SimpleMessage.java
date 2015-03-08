@@ -48,6 +48,7 @@ public class SimpleMessage implements Serializable {
 		this.content = content;
 	}
 
+	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}

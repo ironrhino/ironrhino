@@ -62,6 +62,7 @@ public class OAuthHandler extends AccessHandler {
 		return apiPattern;
 	}
 
+	@Override
 	public String getExcludePattern() {
 		return apiExcludePattern;
 	}

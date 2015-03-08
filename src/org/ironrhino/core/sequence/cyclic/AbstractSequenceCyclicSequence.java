@@ -144,7 +144,6 @@ public abstract class AbstractSequenceCyclicSequence extends
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
-					if (con != null)
 						try {
 							con.close();
 							con = null;
@@ -185,7 +184,6 @@ public abstract class AbstractSequenceCyclicSequence extends
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
-					if (con != null)
 						try {
 							con.close();
 							con = null;

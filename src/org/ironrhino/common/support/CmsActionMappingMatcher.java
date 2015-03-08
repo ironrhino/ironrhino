@@ -243,7 +243,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher,
 	@Override
 	public void onApplicationEvent(EntityOperationEvent<Setting> event) {
 		if (event.getEntity() instanceof Setting) {
-			Setting setting = (Setting) event.getEntity();
+			Setting setting = event.getEntity();
 			String key = setting.getKey();
 			if (key.equals(Constants.SETTING_KEY_CMS_SERIESES)) {
 				List<String> list = new ArrayList<String>();

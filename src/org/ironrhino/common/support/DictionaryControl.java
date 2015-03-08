@@ -86,7 +86,7 @@ public class DictionaryControl implements
 	@Override
 	public void onApplicationEvent(EntityOperationEvent<Dictionary> event) {
 		if (event.getEntity() instanceof Dictionary) {
-			Dictionary dictInEvent = (Dictionary) event.getEntity();
+			Dictionary dictInEvent = event.getEntity();
 			if (event.getType() == EntityOperationType.CREATE) {
 				map.put(dictInEvent.getName(), dictInEvent);
 			} else {

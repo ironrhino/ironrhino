@@ -146,7 +146,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> implements
 		if (tree == null)
 			return;
 		if (event.getEntity().getClass() == entityClass) {
-			T treeNode = (T) event.getEntity();
+			T treeNode = event.getEntity();
 			if (event.getType() == EntityOperationType.CREATE)
 				create(treeNode);
 			else if (event.getType() == EntityOperationType.UPDATE)

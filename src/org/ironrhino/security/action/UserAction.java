@@ -102,6 +102,7 @@ public class UserAction extends EntityAction<User> {
 		return userPasswordReadonly;
 	}
 
+	@Override
 	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {
 		String role = ServletActionContext.getRequest().getParameter("role");
 		if (StringUtils.isNotBlank(role))
@@ -284,6 +285,7 @@ public class UserAction extends EntityAction<User> {
 		return JSON;
 	}
 
+	@Override
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	public String pick() throws Exception {
 		return super.pick();

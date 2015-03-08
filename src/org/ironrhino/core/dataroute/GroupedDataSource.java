@@ -150,6 +150,8 @@ public class GroupedDataSource extends AbstractDataSource implements
 			dbname = masterName;
 			ds = master;
 		}
+		if (ds == null)
+			throw new IllegalStateException("No underlying DataSource found");
 		try {
 			Connection conn = username == null ? ds.getConnection() : ds
 					.getConnection(username, password);
