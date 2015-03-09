@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -14,6 +13,7 @@ import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
+import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.event.LoginEvent;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class LoginAction extends BaseAction {
 		} catch (AuthenticationException failed) {
 			if (failed instanceof InternalAuthenticationServiceException) {
 				log.error(failed.getMessage(), failed);
-				addActionError(ExceptionUtils.getRootCauseMessage(failed));
+				addActionError(ExceptionUtils.getRootMessage(failed));
 				return INPUT;
 			} else if (failed instanceof DisabledException)
 				addFieldError("username",
