@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -83,7 +84,8 @@ public class LoginAction extends BaseAction {
 					.attemptAuthentication(request, response);
 		} catch (AuthenticationException failed) {
 			if (failed instanceof InternalAuthenticationServiceException) {
-				addActionError(failed.getMessage());
+				log.error(failed.getMessage(), failed);
+				addActionError(ExceptionUtils.getRootCauseMessage(failed));
 				return INPUT;
 			} else if (failed instanceof DisabledException)
 				addFieldError("username",
