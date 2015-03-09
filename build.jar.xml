@@ -67,6 +67,8 @@
 	<property name="security-config-jar.includes" value="resources/spring/applicationContext-security*.xml" />
 	<property name="security-config-base-jar.name" value="ironrhino-security-config-base-${version}.jar" />
 	<property name="security-config-base-jar.includes" value="resources/spring/applicationContext-security-base.xml" />
+	<property name="security-config-http-jar.name" value="ironrhino-security-config-http-${version}.jar" />
+	<property name="security-config-http-jar.includes" value="resources/spring/applicationContext-security-http.xml" />
 	<property name="security-signup-jar.name" value="ironrhino-security-signup-${version}.jar" />
 	<property name="security-signup-jar.includes" value="org/ironrhino/security/action/SignupAction*,resources/view/signup*.ftl" />
 	<property name="security-loginrecord-jar.name" value="ironrhino-security-loginrecord-${version}.jar" />
@@ -270,6 +272,7 @@
 			<delete file="${target.dir}/${userdetailsservice-jar.name}" />
 			<delete file="${target.dir}/${security-config-jar.name}" />
 			<delete file="${target.dir}/${security-config-base-jar.name}" />
+			<delete file="${target.dir}/${security-config-http-jar.name}" />
 			<delete file="${target.dir}/${security-loginrecord-jar.name}" />
 			<delete file="${target.dir}/${security-acl-jar.name}" />
 			<delete file="${target.dir}/${security-oauth-client-jar.name}" />
@@ -662,10 +665,22 @@
 			</jar>
 			<jar jarfile="${target.dir}/${security-config-base-jar.name}" basedir="${classes.dir}" includes="${security-config-base-jar.includes}">
 				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-base-config" />
+					<attribute name="Implementation-Title" value="ironrhino-security-config-base" />
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-base-config" />
+					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-base" />
+					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+					<attribute name="Ironrhino-Component-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+				</manifest>
+			</jar>
+			<jar jarfile="${target.dir}/${security-config-http-jar.name}" basedir="${classes.dir}" includes="${security-config-http-jar.includes}">
+				<manifest>
+					<attribute name="Implementation-Title" value="ironrhino-security-config-http" />
+					<attribute name="Implementation-Vendor" value="ironrhino" />
+					<attribute name="Implementation-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-http" />
 					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
 					<attribute name="Ironrhino-Component-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
