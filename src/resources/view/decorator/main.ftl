@@ -57,7 +57,7 @@ ${action.getText('browser.warning')}
 		<div class="btn-group pull-right">
 			<#assign user = authentication("principal")>
 	        <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
-	          <i class="glyphicon glyphicon-user"></i> <#if user.isNew??>${user?string}<#elseif user.username??>${user.username!}<#else>${user?string}</#if> <span class="caret"></span>
+	          <i class="glyphicon glyphicon-user"></i> <#if user.name??>${user.name}<#elseif user.username??>${user.username}<#else>${(user?string)!}</#if> <span class="caret"></span>
 	        </a>
 	        <ul class="dropdown-menu">
 	          <#assign divider=false/>
