@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -38,16 +39,26 @@ public class AuthenticationSuccessHandler extends
 			HttpServletResponse response, Authentication authentication)
 			throws ServletException, IOException {
 		super.onAuthenticationSuccess(request, response, authentication);
-		User user = (User) authentication.getPrincipal();
-		if (multiVersionPasswordEncoder != null
-				&& authentication instanceof UsernamePasswordAuthenticationToken
-				&& !multiVersionPasswordEncoder.isLastVersion(user
-						.getPassword())) {
-			user.setLegiblePassword(authentication.getCredentials().toString());
-			userManager.save(user);
+		Object principal = authentication.getPrincipal();
+		String username;
+		if (principal instanceof User) {
+			User user = (User) principal;
+			username = user.getUsername();
+			if (multiVersionPasswordEncoder != null
+					&& authentication instanceof UsernamePasswordAuthenticationToken
+					&& !multiVersionPasswordEncoder.isLastVersion(user
+							.getPassword())) {
+				user.setLegiblePassword(authentication.getCredentials()
+						.toString());
+				userManager.save(user);
+			}
+		} else if (principal instanceof UserDetails) {
+			username = ((UserDetails) principal).getUsername();
+		} else {
+			username = String.valueOf(principal);
 		}
 		LoginRecord loginRecord = new LoginRecord();
-		loginRecord.setUsername(user.getUsername());
+		loginRecord.setUsername(username);
 		loginRecord.setAddress(RequestUtils.getRemoteAddr(request));
 		save(loginRecord);
 	}

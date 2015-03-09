@@ -57,15 +57,21 @@ ${action.getText('browser.warning')}
 		<div class="btn-group pull-right">
 			<#assign user = authentication("principal")>
 	        <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
-	          <i class="glyphicon glyphicon-user"></i> ${user?string} <span class="caret"></span>
+	          <i class="glyphicon glyphicon-user"></i> <#if user.isNew??>${user?string}<#elseif user.username??>${user.username!}<#else>${user?string}</#if> <span class="caret"></span>
 	        </a>
 	        <ul class="dropdown-menu">
+	          <#assign divider=false/>
+	          <#if user.isNew??>
 	          <li><a href="<@url value="${ssoServerBase!}/user/profile"/>" class="popmodal nocache">${action.getText('profile')}</a></li>
 	          <#if !user.getAttribute('oauth_provider')??>
 	          <li><a href="<@url value="${ssoServerBase!}/user/password"/>" class="popmodal">${action.getText('change')}${action.getText('password')}</a></li>
 	          </#if>
+	          <#assign divider=true/>
+	          </#if>
 	          <#if !request.getAttribute("javax.servlet.request.X509Certificate")??>
+	          <#if divider>
 	          <li class="divider"></li>
+	          </#if>
 	          <li><a href="<@url value="${ssoServerBase!}/logout"/>">${action.getText('logout')}</a></li>
 	          </#if>
 	        </ul>
