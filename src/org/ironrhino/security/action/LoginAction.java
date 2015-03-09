@@ -22,6 +22,7 @@ import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -81,7 +82,10 @@ public class LoginAction extends BaseAction {
 			authResult = usernamePasswordAuthenticationFilter
 					.attemptAuthentication(request, response);
 		} catch (AuthenticationException failed) {
-			if (failed instanceof DisabledException)
+			if (failed instanceof InternalAuthenticationServiceException) {
+				addActionError(failed.getMessage());
+				return INPUT;
+			} else if (failed instanceof DisabledException)
 				addFieldError("username",
 						getText(DisabledException.class.getName()));
 			else if (failed instanceof LockedException)
@@ -90,10 +94,11 @@ public class LoginAction extends BaseAction {
 			else if (failed instanceof AccountExpiredException)
 				addFieldError("username",
 						getText(AccountExpiredException.class.getName()));
-			else if (failed instanceof BadCredentialsException)
+			else if (failed instanceof BadCredentialsException) {
 				addFieldError("password",
 						getText(BadCredentialsException.class.getName()));
-			else if (failed instanceof CredentialsExpiredException) {
+				captchaManager.addCaptachaThreshold(request);
+			} else if (failed instanceof CredentialsExpiredException) {
 				addActionMessage(getText(CredentialsExpiredException.class
 						.getName()));
 				UserDetails ud = userDetailsService
@@ -101,7 +106,6 @@ public class LoginAction extends BaseAction {
 				authResult = new UsernamePasswordAuthenticationToken(ud,
 						ud.getPassword(), ud.getAuthorities());
 			}
-			captchaManager.addCaptachaThreshold(request);
 			try {
 				usernamePasswordAuthenticationFilter.unsuccess(request,
 						response, failed);
