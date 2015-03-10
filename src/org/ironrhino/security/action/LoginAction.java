@@ -10,6 +10,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
@@ -92,16 +93,19 @@ public class LoginAction extends BaseAction {
 				addActionError(ExceptionUtils.getRootMessage(failed));
 				return INPUT;
 			} else if (failed instanceof BadCredentialsException) {
-				addFieldError("password",
-						getText(BadCredentialsException.class.getName()));
+				addFieldError("password", getText(failed.getClass().getName()));
 				captchaManager.addCaptachaThreshold(request);
 			} else if (failed instanceof CredentialsExpiredException) {
-				addActionMessage(getText(CredentialsExpiredException.class
-						.getName()));
 				UserDetails ud = userDetailsService
 						.loadUserByUsername(username);
-				authResult = new UsernamePasswordAuthenticationToken(ud,
-						ud.getPassword(), ud.getAuthorities());
+				if (ud instanceof Persistable) {
+					addActionMessage(getText(failed.getClass().getName()));
+					authResult = new UsernamePasswordAuthenticationToken(ud,
+							ud.getPassword(), ud.getAuthorities());
+				} else {
+					addFieldError("password", getText(failed.getClass()
+							.getName()));
+				}
 			}
 			try {
 				usernamePasswordAuthenticationFilter.unsuccess(request,
