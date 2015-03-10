@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
@@ -82,21 +83,15 @@ public class LoginAction extends BaseAction {
 		try {
 			authResult = usernamePasswordAuthenticationFilter
 					.attemptAuthentication(request, response);
+		} catch (UsernameNotFoundException | DisabledException
+				| LockedException | AccountExpiredException failed) {
+			addFieldError("username", getText(failed.getClass().getName()));
 		} catch (AuthenticationException failed) {
 			if (failed instanceof InternalAuthenticationServiceException) {
 				log.error(failed.getMessage(), failed);
 				addActionError(ExceptionUtils.getRootMessage(failed));
 				return INPUT;
-			} else if (failed instanceof DisabledException)
-				addFieldError("username",
-						getText(DisabledException.class.getName()));
-			else if (failed instanceof LockedException)
-				addFieldError("username",
-						getText(LockedException.class.getName()));
-			else if (failed instanceof AccountExpiredException)
-				addFieldError("username",
-						getText(AccountExpiredException.class.getName()));
-			else if (failed instanceof BadCredentialsException) {
+			} else if (failed instanceof BadCredentialsException) {
 				addFieldError("password",
 						getText(BadCredentialsException.class.getName()));
 				captchaManager.addCaptachaThreshold(request);
