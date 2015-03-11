@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
@@ -55,6 +56,9 @@ public class LoginAction extends BaseAction {
 	protected transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
 
 	@Autowired
+	private transient AuthenticationManager authenticationManager;
+
+	@Autowired
 	protected transient EventPublisher eventPublisher;
 
 	public String getUsername() {
@@ -82,8 +86,9 @@ public class LoginAction extends BaseAction {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		Authentication authResult = null;
 		try {
-			authResult = usernamePasswordAuthenticationFilter
-					.attemptAuthentication(request, response);
+			authResult = authenticationManager
+					.authenticate(new UsernamePasswordAuthenticationToken(
+							username, password));
 		} catch (UsernameNotFoundException | DisabledException
 				| LockedException | AccountExpiredException failed) {
 			addFieldError("username", getText(failed.getClass().getName()));

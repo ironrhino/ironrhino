@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
+import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
@@ -24,10 +25,12 @@ import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -52,6 +55,9 @@ public class Oauth2Action extends BaseAction {
 
 	@Autowired
 	private transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
+
+	@Autowired
+	private transient AuthenticationManager authenticationManager;
 
 	private String username;
 	private String password;
@@ -269,26 +275,29 @@ public class Oauth2Action extends BaseAction {
 			HttpServletResponse response = ServletActionContext.getResponse();
 			Authentication authResult = null;
 			try {
-				authResult = usernamePasswordAuthenticationFilter
-						.attemptAuthentication(request, response);
+				authResult = authenticationManager
+						.authenticate(new UsernamePasswordAuthenticationToken(
+								username, password));
+			} catch (UsernameNotFoundException | DisabledException
+					| LockedException | AccountExpiredException failed) {
+				addFieldError("username", getText(failed.getClass().getName()));
 			} catch (AuthenticationException failed) {
-				if (failed instanceof DisabledException)
-					addFieldError("username",
-							getText(DisabledException.class.getName()));
-				else if (failed instanceof LockedException)
-					addFieldError("username",
-							getText(LockedException.class.getName()));
-				else if (failed instanceof AccountExpiredException)
-					addFieldError("username",
-							getText(AccountExpiredException.class.getName()));
-				else if (failed instanceof BadCredentialsException)
-					addFieldError("password",
-							getText(BadCredentialsException.class.getName()));
-				else if (failed instanceof CredentialsExpiredException)
-					addFieldError(
-							"password",
-							getText(CredentialsExpiredException.class.getName()));
-				captchaManager.addCaptachaThreshold(request);
+				if (failed instanceof BadCredentialsException) {
+					addFieldError("password", getText(failed.getClass()
+							.getName()));
+					captchaManager.addCaptachaThreshold(request);
+				} else if (failed instanceof CredentialsExpiredException) {
+					UserDetails ud = userDetailsService
+							.loadUserByUsername(username);
+					if (ud instanceof Persistable) {
+						addActionMessage(getText(failed.getClass().getName()));
+						authResult = new UsernamePasswordAuthenticationToken(
+								ud, ud.getPassword(), ud.getAuthorities());
+					} else {
+						addFieldError("password", getText(failed.getClass()
+								.getName()));
+					}
+				}
 				try {
 					usernamePasswordAuthenticationFilter.unsuccess(request,
 							response, failed);
@@ -388,10 +397,16 @@ public class Oauth2Action extends BaseAction {
 								.contains(UserRole.ROLE_ADMINISTRATOR))
 					throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
 				try {
+					try {
+						authenticationManager
+								.authenticate(new UsernamePasswordAuthenticationToken(
+										username, password));
+					} catch (AuthenticationException failed) {
+						throw new IllegalArgumentException(getText(failed
+								.getClass().getName()));
+					}
 					UserDetails u = userDetailsService
 							.loadUserByUsername(username);
-					if (!AuthzUtils.isPasswordValid(u, password))
-						throw new IllegalArgumentException("PASSWORD_MISMATCH");
 					authorization = oauthManager.grant(client, u);
 				} catch (UsernameNotFoundException e) {
 					throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
