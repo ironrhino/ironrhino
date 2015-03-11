@@ -20,15 +20,19 @@ import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,6 +47,8 @@ import com.google.common.base.Objects;
 public class Oauth2Action extends BaseAction {
 
 	private static final long serialVersionUID = 8175470892708878896L;
+
+	protected static Logger log = LoggerFactory.getLogger(Oauth2Action.class);
 
 	@Autowired
 	private transient OAuthManager oauthManager;
@@ -401,6 +407,10 @@ public class Oauth2Action extends BaseAction {
 						authenticationManager
 								.authenticate(new UsernamePasswordAuthenticationToken(
 										username, password));
+					} catch (InternalAuthenticationServiceException failed) {
+						log.error(failed.getMessage(), failed);
+						throw new IllegalArgumentException(
+								ExceptionUtils.getRootMessage(failed));
 					} catch (AuthenticationException failed) {
 						throw new IllegalArgumentException(getText(failed
 								.getClass().getName()));
