@@ -63,11 +63,11 @@ public class UploadFilesHandler extends AccessHandler {
 			OutputStream os = response.getOutputStream();
 			try {
 				IOUtils.copy(is, os);
-				os.close();
+				IOUtils.closeQuietly(os);
 			} catch (Exception e) {
 				// supress ClientAbortException
 			}
-			is.close();
+			IOUtils.closeQuietly(is);
 		} catch (FileNotFoundException fne) {
 			try {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);

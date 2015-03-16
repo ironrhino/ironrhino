@@ -1,6 +1,7 @@
 package org.ironrhino.core.security.util;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -42,12 +43,14 @@ public class RC4 {
 								+ file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RC4.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-						defaultKey = IOUtils.toString(RC4.class
-								.getResourceAsStream(DEFAULT_KEY_LOCATION),
-								"UTF-8");
-						log.info("using classpath resource "
-								+ RC4.class.getResource(DEFAULT_KEY_LOCATION)
-										.toString() + " as default key");
+						try (InputStream is = RC4.class
+								.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
+							defaultKey = IOUtils.toString(is, "UTF-8");
+							log.info("using classpath resource "
+									+ RC4.class.getResource(
+											DEFAULT_KEY_LOCATION).toString()
+									+ " as default key");
+						}
 					}
 				}
 			} catch (Exception e) {

@@ -82,11 +82,14 @@ public class MongoFileStorage implements FileStorage {
 			throw new IOException("path " + path
 					+ " is directory,can not be written");
 		ByteArrayOutputStream os = new ByteArrayOutputStream(512 * 1024);
-		IOUtils.copy(is, os);
-		file.setData(os.toByteArray());
-		file.setLastModified(System.currentTimeMillis());
-		os.close();
-		is.close();
+		try {
+			IOUtils.copy(is, os);
+			file.setData(os.toByteArray());
+			file.setLastModified(System.currentTimeMillis());
+		} finally {
+			IOUtils.closeQuietly(os);
+			IOUtils.closeQuietly(is);
+		}
 		mongoTemplate.save(file);
 	}
 

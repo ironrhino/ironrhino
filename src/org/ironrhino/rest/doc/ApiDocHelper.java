@@ -127,14 +127,16 @@ public class ApiDocHelper {
 				return fields.sample();
 			String sampleFileName = fields.sampleFileName();
 			if (StringUtils.isNotBlank(sampleFileName)) {
-				InputStream is = apiDocInstance.getClass().getResourceAsStream(
-						sampleFileName);
-				if (is == null) {
-					throw new ErrorMessage(sampleFileName
-							+ " with " + apiDocInstance.getClass().getName()
-							+ " is not found!");
+				try (InputStream is = apiDocInstance.getClass()
+						.getResourceAsStream(sampleFileName)) {
+					if (is == null) {
+						throw new ErrorMessage(sampleFileName + " with "
+								+ apiDocInstance.getClass().getName()
+								+ " is not found!");
+					}
+					return StringUtils.join(IOUtils.readLines(is, "UTF-8"),
+							"\n");
 				}
-				return StringUtils.join(IOUtils.readLines(is, "UTF-8"), "\n");
 			}
 			String sampleMethodName = fields.sampleMethodName();
 			if (StringUtils.isNotBlank(sampleMethodName)) {

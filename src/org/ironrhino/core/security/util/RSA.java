@@ -82,13 +82,15 @@ public class RSA {
 								+ file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-						password = IOUtils.toString(RSA.class
+						try (InputStream pis = RSA.class
 								.getResourceAsStream(DEFAULT_KEY_LOCATION
-										+ ".password"), "UTF-8");
-						log.info("using classpath resource "
-								+ RSA.class.getResource(
-										DEFAULT_KEY_LOCATION + ".password")
-										.toString() + " as default key");
+										+ ".password")) {
+							password = IOUtils.toString(pis, "UTF-8");
+							log.info("using classpath resource "
+									+ RSA.class.getResource(
+											DEFAULT_KEY_LOCATION + ".password")
+											.toString() + " as default key");
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -112,6 +114,7 @@ public class RSA {
 			CertificateException, IOException, UnrecoverableKeyException {
 		KeyStore ks = KeyStore.getInstance("pkcs12", "SunJSSE");
 		ks.load(is, password.toCharArray());
+		IOUtils.closeQuietly(is);
 		Enumeration<String> aliases = ks.aliases();
 		if (aliases.hasMoreElements()) {
 			String alias = aliases.nextElement();
