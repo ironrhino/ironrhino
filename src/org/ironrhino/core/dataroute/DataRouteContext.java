@@ -12,8 +12,12 @@ public class DataRouteContext {
 	private static ThreadLocal<Deque<String>> name = new ThreadLocal<Deque<String>>();
 
 	public static void reset() {
-		readonly.remove();
-		name.remove();
+		Deque<Boolean> readonlyDeque = readonly.get();
+		if (readonlyDeque != null && readonlyDeque.size() > 0)
+			readonlyDeque.clear();
+		Deque<String> nameDeque = name.get();
+		if (nameDeque != null && nameDeque.size() > 0)
+			nameDeque.clear();
 	}
 
 	public static void setReadonly(Boolean bl) {
