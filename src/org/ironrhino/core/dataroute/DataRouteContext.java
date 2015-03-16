@@ -16,7 +16,7 @@ public class DataRouteContext {
 		name.remove();
 	}
 
-	public static void setReadonly(boolean bl) {
+	public static void setReadonly(Boolean bl) {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null) {
 			deque = new LinkedList<Boolean>();
@@ -25,11 +25,19 @@ public class DataRouteContext {
 		deque.push(bl);
 	}
 
+	static Boolean removeReadonly() {
+		Deque<Boolean> deque = readonly.get();
+		if (deque == null) {
+			throw new IllegalStateException("readonly should be present");
+		}
+		return deque.pop();
+	}
+
 	static boolean isReadonly() {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null || deque.size() == 0)
 			return false;
-		return deque.pop();
+		return deque.getLast(); // outside scope win.
 	}
 
 	public static void setName(String s) {

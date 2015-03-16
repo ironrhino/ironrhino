@@ -35,9 +35,12 @@ public class DataRouteAspect extends BaseAspect {
 	@Around("execution(public * *(..)) and @annotation(transactional)")
 	public Object determineReadonly(ProceedingJoinPoint jp,
 			Transactional transactional) throws Throwable {
-		if (transactional.readOnly())
-			DataRouteContext.setReadonly(true);
-		return jp.proceed();
+		DataRouteContext.setReadonly(transactional.readOnly());
+		try {
+			return jp.proceed();
+		} finally {
+			DataRouteContext.removeReadonly();
+		}
 	}
 
 	@Around("execution(public * *(..)) and @annotation(dataRoute))")

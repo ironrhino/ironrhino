@@ -138,7 +138,9 @@ public class GroupedDataSource extends AbstractDataSource implements
 			int attempts) throws SQLException {
 		DataSource ds = null;
 		String dbname = null;
+		boolean read = false;
 		if (DataRouteContext.isReadonly() && getReadRoundRobin() != null) {
+			read = true;
 			dbname = getReadRoundRobin().pick();
 			ds = readSlaves.get(dbname);
 		}
@@ -155,6 +157,8 @@ public class GroupedDataSource extends AbstractDataSource implements
 		try {
 			Connection conn = username == null ? ds.getConnection() : ds
 					.getConnection(username, password);
+			if (read)
+				conn.setReadOnly(true);
 			failureCount.remove(ds);
 			StatLog.add(new Key("dataroute", true, groupName, dbname, "success"));
 			return conn;
