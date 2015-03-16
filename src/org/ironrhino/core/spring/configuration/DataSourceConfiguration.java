@@ -54,13 +54,21 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.maxConnectionAgeInSeconds:14400}")
 	private int maxConnectionAgeInSeconds;
 
-	@Value("${jdbc.connectionTestStatement:}")
+	@Value("${dataSource.connectionTestStatement:}")
 	private String connectionTestStatement;
 
-	@Value("${jdbc.QueryExecuteTimeLimitInMs:5000}")
+	@Value("${dataSource.QueryExecuteTimeLimitInMs:5000}")
 	private long queryExecuteTimeLimitInMs;
 
-	public @Bean(destroyMethod = "close") @Primary DataSource dataSource() {
+	@Value("${dataSource.disableJMX:true}")
+	private boolean disableJMX = true;
+
+	@Value("${dataSource.disableConnectionTracking:true}")
+	private boolean disableConnectionTracking = true;
+
+	@Bean(destroyMethod = "close")
+	@Primary
+	public DataSource dataSource() {
 		BoneCPDataSource ds = new BoneCPDataSource();
 		if (StringUtils.isNotBlank(driverClass))
 			ds.setDriverClass(driverClass);
@@ -73,8 +81,10 @@ public class DataSourceConfiguration {
 		ds.setIdleConnectionTestPeriodInMinutes(idleConnectionTestPeriodInMinutes);
 		ds.setIdleMaxAgeInMinutes(idleMaxAgeInMinutes);
 		ds.setMaxConnectionAgeInSeconds(maxConnectionAgeInSeconds);
-		ds.setConnectionHook(new MyConnectionHook());
+		ds.setDisableJMX(disableJMX);
+		ds.setDisableConnectionTracking(disableConnectionTracking);
 		ds.setQueryExecuteTimeLimitInMs(queryExecuteTimeLimitInMs);
+		ds.setConnectionHook(new MyConnectionHook());
 		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
 		if (StringUtils.isBlank(connectionTestStatement)
 				&& databaseProduct != null)
@@ -83,7 +93,9 @@ public class DataSourceConfiguration {
 		return ds;
 	}
 
-	public @Bean @Primary JdbcTemplate jdbcTemplate() {
+	@Bean
+	@Primary
+	public JdbcTemplate jdbcTemplate() {
 		return new JdbcTemplate(dataSource());
 	}
 
