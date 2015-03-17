@@ -143,16 +143,18 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> implements
 
 	@Override
 	public void onApplicationEvent(EntityOperationEvent<T> event) {
-		if (tree == null)
-			return;
-		if (event.getEntity().getClass() == entityClass) {
-			T treeNode = event.getEntity();
-			if (event.getType() == EntityOperationType.CREATE)
-				create(treeNode);
-			else if (event.getType() == EntityOperationType.UPDATE)
-				update(treeNode);
-			else if (event.getType() == EntityOperationType.DELETE)
-				delete(treeNode);
+		if (event.getEntity() instanceof BaseTreeableEntity) {
+			if (tree == null)
+				return;
+			if (event.getEntity().getClass() == entityClass) {
+				T treeNode = event.getEntity();
+				if (event.getType() == EntityOperationType.CREATE)
+					create(treeNode);
+				else if (event.getType() == EntityOperationType.UPDATE)
+					update(treeNode);
+				else if (event.getType() == EntityOperationType.DELETE)
+					delete(treeNode);
+			}
 		}
 	}
 }
