@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
-import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
@@ -287,29 +286,20 @@ public class Oauth2Action extends BaseAction {
 			} catch (UsernameNotFoundException | DisabledException
 					| LockedException | AccountExpiredException failed) {
 				addFieldError("username", getText(failed.getClass().getName()));
-			} catch (AuthenticationException failed) {
-				if (failed instanceof BadCredentialsException) {
-					addFieldError("password", getText(failed.getClass()
-							.getName()));
-					captchaManager.addCaptachaThreshold(request);
-				} else if (failed instanceof CredentialsExpiredException) {
-					UserDetails ud = userDetailsService
-							.loadUserByUsername(username);
-					if (ud instanceof Persistable) {
-						addActionMessage(getText(failed.getClass().getName()));
-						authResult = new UsernamePasswordAuthenticationToken(
-								ud, ud.getPassword(), ud.getAuthorities());
-					} else {
-						addFieldError("password", getText(failed.getClass()
-								.getName()));
-					}
-				}
+				return INPUT;
+			} catch (BadCredentialsException | CredentialsExpiredException failed) {
+				addFieldError("password", getText(failed.getClass().getName()));
+				captchaManager.addCaptachaThreshold(request);
 				try {
 					usernamePasswordAuthenticationFilter.unsuccess(request,
 							response, failed);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				return INPUT;
+			} catch (InternalAuthenticationServiceException failed) {
+				log.error(failed.getMessage(), failed);
+				addActionError(ExceptionUtils.getRootMessage(failed));
 				return INPUT;
 			}
 			if (authResult != null)

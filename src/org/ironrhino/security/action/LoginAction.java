@@ -29,7 +29,6 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -89,34 +88,35 @@ public class LoginAction extends BaseAction {
 			authResult = authenticationManager
 					.authenticate(new UsernamePasswordAuthenticationToken(
 							username, password));
+		} catch (InternalAuthenticationServiceException failed) {
+			log.error(failed.getMessage(), failed);
+			addActionError(ExceptionUtils.getRootMessage(failed));
 		} catch (UsernameNotFoundException | DisabledException
 				| LockedException | AccountExpiredException failed) {
 			addFieldError("username", getText(failed.getClass().getName()));
-		} catch (AuthenticationException failed) {
-			if (failed instanceof InternalAuthenticationServiceException) {
-				log.error(failed.getMessage(), failed);
-				addActionError(ExceptionUtils.getRootMessage(failed));
-				return INPUT;
-			} else if (failed instanceof BadCredentialsException) {
-				addFieldError("password", getText(failed.getClass().getName()));
-				captchaManager.addCaptachaThreshold(request);
-			} else if (failed instanceof CredentialsExpiredException) {
-				UserDetails ud = userDetailsService
-						.loadUserByUsername(username);
-				if (ud instanceof Persistable) {
-					addActionMessage(getText(failed.getClass().getName()));
-					authResult = new UsernamePasswordAuthenticationToken(ud,
-							ud.getPassword(), ud.getAuthorities());
-				} else {
-					addFieldError("password", getText(failed.getClass()
-							.getName()));
-				}
-			}
+		} catch (BadCredentialsException failed) {
+			addFieldError("password", getText(failed.getClass().getName()));
+			captchaManager.addCaptachaThreshold(request);
 			try {
 				usernamePasswordAuthenticationFilter.unsuccess(request,
 						response, failed);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
+			}
+		} catch (CredentialsExpiredException failed) {
+			UserDetails ud = userDetailsService.loadUserByUsername(username);
+			if (ud instanceof Persistable) {
+				addActionMessage(getText(failed.getClass().getName()));
+				authResult = new UsernamePasswordAuthenticationToken(ud,
+						ud.getPassword(), ud.getAuthorities());
+			} else {
+				addFieldError("password", getText(failed.getClass().getName()));
+				try {
+					usernamePasswordAuthenticationFilter.unsuccess(request,
+							response, failed);
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+				}
 			}
 		}
 		if (authResult != null)

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.ironrhino.core.spring.security.DefaultAuthenticationFailureHandler;
+import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.LoginRecord;
 import org.ironrhino.security.service.UserManager;
@@ -42,7 +43,7 @@ public class AuthenticationFailureHandler extends
 						.getUsernameParameter()));
 		loginRecord.setAddress(RequestUtils.getRemoteAddr(request));
 		loginRecord.setFailed(true);
-		loginRecord.setCause(e.getMessage());
+		loginRecord.setCause(I18N.getText(e.getClass().getName()));
 		if (loginRecord.getUsername() != null)
 			save(loginRecord);
 	}
