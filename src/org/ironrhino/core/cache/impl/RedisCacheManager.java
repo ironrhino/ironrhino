@@ -60,6 +60,18 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
+	public boolean exists(String key, String namespace) {
+		if (key == null)
+			return false;
+		try {
+			return redisTemplate.hasKey(generateKey(key, namespace));
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return false;
+		}
+	}
+
+	@Override
 	public Object get(String key, String namespace) {
 		if (key == null)
 			return null;

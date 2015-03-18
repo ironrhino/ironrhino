@@ -57,6 +57,16 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
+	public boolean exists(String key, String namespace) {
+		if (key == null)
+			return false;
+		Cache cache = getCache(namespace, false);
+		if (cache == null)
+			return false;
+		return cache.isKeyInCache(key);
+	}
+
+	@Override
 	public Object get(String key, String namespace) {
 		if (key == null)
 			return null;

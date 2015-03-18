@@ -109,6 +109,18 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
+	public boolean exists(String key, String namespace) {
+		if (key == null)
+			return false;
+		try {
+			return memcached.get(generateKey(key, namespace)) != null;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return false;
+		}
+	}
+
+	@Override
 	public Object get(String key, String namespace) {
 		if (key == null)
 			return null;

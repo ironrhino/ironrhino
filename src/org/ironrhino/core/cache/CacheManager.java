@@ -15,6 +15,8 @@ public interface CacheManager {
 
 	public void put(String key, Object value, int timeToIdle, int timeToLive,
 			TimeUnit timeUnit, String namespace);
+	
+	public boolean exists(String key, String namespace);
 
 	public Object get(String key, String namespace);
 
