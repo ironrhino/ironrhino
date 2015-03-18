@@ -161,18 +161,23 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 				try {
 					String[] array = sessionTracker
 							.split(SESSION_TRACKER_SEPERATOR);
-					sessionId = array[0];
-					if (array.length > 1)
-						creationTime = NumberUtils.xToDecimal(62, array[1])
-								.longValue();
-					if (array.length > 2)
-						lastAccessedTime = NumberUtils.xToDecimal(62, array[2])
-								.longValue();
-					boolean timeout = (lifetime > 0 && (now - creationTime > lifetime * 1000))
-							|| (now - lastAccessedTime > maxInactiveInterval * 1000);
-					if (timeout) {
-						invalidate(session);
-						return;
+					if (array.length == 1) {
+						session.setNew(true);
+						sessionId = CodecUtils.nextId(SALT);
+					} else {
+						sessionId = array[0];
+						if (array.length > 1)
+							creationTime = NumberUtils.xToDecimal(62, array[1])
+									.longValue();
+						if (array.length > 2)
+							lastAccessedTime = NumberUtils.xToDecimal(62,
+									array[2]).longValue();
+						boolean timeout = (lifetime > 0 && (now - creationTime > lifetime * 1000))
+								|| (now - lastAccessedTime > maxInactiveInterval * 1000);
+						if (timeout) {
+							invalidate(session);
+							return;
+						}
 					}
 				} catch (Exception e) {
 					invalidate(session);
