@@ -1,5 +1,6 @@
 package org.ironrhino.security.action;
 
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -16,6 +17,7 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.CurrentPassword;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.model.LabelValue;
+import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleManager;
 import org.ironrhino.core.struts.EntityAction;
@@ -23,6 +25,7 @@ import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -203,6 +206,19 @@ public class UserAction extends EntityAction<User> {
 		} catch (Exception e) {
 			addFieldError("user.roles", e.getLocalizedMessage());
 			return false;
+		}
+		BeanWrapperImpl bw = new BeanWrapperImpl(user);
+		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
+		for (PropertyDescriptor pd : pds) {
+			if (pd.getReadMethod() == null || pd.getWriteMethod() == null)
+				continue;
+			String name = pd.getName();
+			Object value = bw.getPropertyValue(name);
+			if (value instanceof Persistable) {
+				if (((Persistable<?>) value).isNew()) {
+					bw.setPropertyValue(name, null);
+				}
+			}
 		}
 		return true;
 	}
