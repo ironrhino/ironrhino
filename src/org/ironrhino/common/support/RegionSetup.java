@@ -27,6 +27,7 @@ import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.util.XmlUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -46,6 +47,7 @@ public class RegionSetup {
 	private EntityManager<Region> entityManager;
 
 	@Setup
+	@Async
 	public void setup() throws Exception {
 		entityManager.setEntityClass(Region.class);
 		if (entityManager.countAll() > 0)
