@@ -10,6 +10,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,11 @@ public class ErrorAction extends BaseAction {
 		int errorcode = 404;
 		exception = (Exception) request
 				.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-		if (exception instanceof AccountStatusException) {
+		if (exception instanceof ErrorMessage) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			addActionError(((ErrorMessage) exception).getLocalizedMessage());
+			return ERROR;
+		} else if (exception instanceof AccountStatusException) {
 			if (exception instanceof CredentialsExpiredException) {
 				UserDetails ud = AuthzUtils.getUserDetails();
 				if (ud != null) {

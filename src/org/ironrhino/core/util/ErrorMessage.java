@@ -1,11 +1,7 @@
 package org.ironrhino.core.util;
 
-import java.util.Locale;
-
 import org.apache.commons.lang3.StringUtils;
-
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.util.LocalizedTextUtil;
+import org.ironrhino.core.struts.I18N;
 
 public class ErrorMessage extends RuntimeException {
 
@@ -42,17 +38,13 @@ public class ErrorMessage extends RuntimeException {
 
 	@Override
 	public String getLocalizedMessage() {
-		Locale locale = Locale.getDefault();
-		if (ActionContext.getContext() != null)
-			locale = ActionContext.getContext().getLocale();
+
 		try {
 			StringBuilder sb = new StringBuilder();
-			sb.append(LocalizedTextUtil.findText(ErrorMessage.class, message,
-					locale, message, args));
+			sb.append(I18N.getText(ErrorMessage.class, message, args));
 			if (StringUtils.isNotBlank(submessage)) {
 				sb.append(" : ");
-				sb.append(LocalizedTextUtil.findText(ErrorMessage.class,
-						submessage, locale, submessage, args));
+				sb.append(I18N.getText(ErrorMessage.class, submessage, args));
 			}
 			return sb.toString();
 		} catch (IllegalArgumentException e) {

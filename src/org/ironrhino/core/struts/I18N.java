@@ -15,20 +15,36 @@ public class I18N {
 	}
 
 	public static String getText(Class<?> clazz, String key) {
+		return getText(clazz, key, null);
+	}
+
+	public static String getText(Class<?> clazz, String key, Object[] args) {
 		ActionContext context = ActionContext.getContext();
 		Locale locale = context != null ? context.getLocale() : Locale
 				.getDefault();
 		ValueStack vs = context != null ? context.getValueStack() : null;
-		return LocalizedTextUtil.findText(clazz, key, locale, key, null, vs);
+		try {
+			return LocalizedTextUtil
+					.findText(clazz, key, locale, key, args, vs);
+		} catch (Exception e) {
+			return key;
+		}
 	}
 
 	public static String getTextForEnum(Class<? extends Enum<?>> clazz) {
 		Map<String, String> map = new LinkedHashMap<String, String>();
 		for (Enum<?> en : clazz.getEnumConstants()) {
-			map.put(en.name(), LocalizedTextUtil.findText(clazz, en.name(),
-					ActionContext.getContext() != null ? ActionContext
-							.getContext().getLocale() : Locale.getDefault(), en
-							.name(), null));
+			try {
+				map.put(en.name(),
+						LocalizedTextUtil.findText(
+								clazz,
+								en.name(),
+								ActionContext.getContext() != null ? ActionContext
+										.getContext().getLocale() : Locale
+										.getDefault(), en.name(), null));
+			} catch (Exception e) {
+				map.put(en.name(), en.name());
+			}
 		}
 		return map.toString();
 	}
