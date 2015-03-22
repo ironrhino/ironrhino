@@ -11,13 +11,13 @@ import org.ironrhino.common.support.SettingControl;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.core.security.event.LoginEvent;
+import org.ironrhino.core.security.event.SignupEvent;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.Constants;
-import org.ironrhino.security.event.LoginEvent;
-import org.ironrhino.security.event.SignupEvent;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.client.model.Profile;
 import org.ironrhino.security.oauth.client.service.OAuthProvider;
@@ -104,7 +104,8 @@ public class ConnectAction extends BaseAction {
 				LoginEvent loginEvent;
 				user = (User) userManager.loadUserByUsername(id);
 				if (user != null) {
-					loginEvent = new LoginEvent(user, "oauth",
+					loginEvent = new LoginEvent(user.getUsername(),
+							RequestUtils.getRemoteAddr(request), "oauth",
 							provider.getName());
 				} else {
 					user = new User();
@@ -120,9 +121,11 @@ public class ConnectAction extends BaseAction {
 					user.setName(StringUtils.isNotBlank(p.getName()) ? p
 							.getName() : p.getDisplayName());
 					userManager.save(user);
-					eventPublisher.publish(new SignupEvent(user, "oauth",
+					eventPublisher.publish(new SignupEvent(user.getUsername(),
+							RequestUtils.getRemoteAddr(request), "oauth",
 							provider.getName()), Scope.LOCAL);
-					loginEvent = new LoginEvent(user, "oauth",
+					loginEvent = new LoginEvent(user.getUsername(),
+							RequestUtils.getRemoteAddr(request), "oauth",
 							provider.getName());
 					loginEvent.setFirst(true);
 				}

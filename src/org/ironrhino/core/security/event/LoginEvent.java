@@ -1,6 +1,4 @@
-package org.ironrhino.security.event;
-
-import org.springframework.security.core.userdetails.UserDetails;
+package org.ironrhino.core.security.event;
 
 public class LoginEvent extends AbstractEvent {
 
@@ -8,12 +6,13 @@ public class LoginEvent extends AbstractEvent {
 
 	private boolean first;
 
-	public LoginEvent(UserDetails user) {
-		super(user);
+	public LoginEvent(String username, String remoteAddr) {
+		super(username, remoteAddr);
 	}
 
-	public LoginEvent(UserDetails user, String from, String provider) {
-		super(user, from, provider);
+	public LoginEvent(String username, String remoteAddr, String from,
+			String provider) {
+		super(username, remoteAddr, from, provider);
 	}
 
 	public boolean isFirst() {

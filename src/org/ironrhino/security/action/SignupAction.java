@@ -3,7 +3,10 @@ package org.ironrhino.security.action;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.ironrhino.common.support.SettingControl;
 import org.ironrhino.core.event.EventPublisher;
@@ -12,14 +15,15 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.core.security.event.LoginEvent;
+import org.ironrhino.core.security.event.SignupEvent;
 import org.ironrhino.core.security.util.Blowfish;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
+import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.Constants;
-import org.ironrhino.security.event.LoginEvent;
-import org.ironrhino.security.event.SignupEvent;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
 import org.slf4j.Logger;
@@ -110,6 +114,7 @@ public class SignupAction extends BaseAction {
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "email", trim = true, key = "validation.required"),
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "password", trim = true, key = "validation.required") }, regexFields = { @RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "username", regex = User.USERNAME_REGEX_FOR_SIGNUP, key = "validation.invalid") }, emails = { @EmailValidator(type = ValidatorType.FIELD, fieldName = "email", key = "validation.invalid") }, fieldExpressions = { @FieldExpressionValidator(expression = "password == confirmPassword", fieldName = "confirmPassword", key = "validation.repeat.not.matched") })
 	public String execute() {
+		HttpServletRequest request = ServletActionContext.getRequest();
 		if (!settingControl.getBooleanValue(
 				Constants.SETTING_KEY_SIGNUP_ENABLED, false))
 			return ACCESSDENIED;
@@ -127,14 +132,17 @@ public class SignupAction extends BaseAction {
 		user.setLegiblePassword(password);
 		user.setEnabled(!activationRequired);
 		userManager.save(user);
-		eventPublisher.publish(new SignupEvent(user), Scope.LOCAL);
+		eventPublisher.publish(
+				new SignupEvent(user.getUsername(), RequestUtils
+						.getRemoteAddr(request)), Scope.LOCAL);
 		if (activationRequired) {
 			user.setPassword(password);// for send mail
 			addActionMessage(getText("signup.success"));
 			sendActivationMail(user);
 		} else {
 			AuthzUtils.autoLogin(user);
-			eventPublisher.publish(new LoginEvent(user), Scope.LOCAL);
+			eventPublisher.publish(new LoginEvent(user.getUsername(),
+					RequestUtils.getRemoteAddr(request)), Scope.LOCAL);
 		}
 		targetUrl = "/";
 		return REDIRECT;
@@ -178,7 +186,10 @@ public class SignupAction extends BaseAction {
 							.getUsername());
 					if (ud != null) {
 						AuthzUtils.autoLogin(ud);
-						LoginEvent loginEvent = new LoginEvent(ud);
+						LoginEvent loginEvent = new LoginEvent(
+								ud.getUsername(),
+								RequestUtils.getRemoteAddr(ServletActionContext
+										.getRequest()));
 						loginEvent.setFirst(true);
 						eventPublisher.publish(loginEvent, Scope.LOCAL);
 					}

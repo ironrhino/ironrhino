@@ -1,20 +1,20 @@
 package org.ironrhino.security.component;
 
-import org.ironrhino.core.security.event.LogoutEvent;
+import org.ironrhino.core.security.event.ProfileEditedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SimpleLogoutEventListener implements
-		ApplicationListener<LogoutEvent> {
+public class SimpleProfileEditedEventListener implements
+		ApplicationListener<ProfileEditedEvent> {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
-	public void onApplicationEvent(LogoutEvent event) {
-		logger.info(event.getUsername() + " logout");
+	public void onApplicationEvent(ProfileEditedEvent event) {
+		logger.info(event.getUsername() + " edited profile");
 	}
 
 }

@@ -11,18 +11,23 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.hibernate.criterion.DetachedCriteria;
+import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.CurrentPassword;
 import org.ironrhino.core.metadata.JsonConfig;
+import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.security.event.PasswordChangedEvent;
+import org.ironrhino.core.security.event.ProfileEditedEvent;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleManager;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
+import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.BeanWrapperImpl;
@@ -64,6 +69,9 @@ public class UserAction extends EntityAction<User> {
 
 	@Autowired
 	private transient UserRoleManager userRoleManager;
+
+	@Autowired
+	protected transient EventPublisher eventPublisher;
 
 	public List<LabelValue> getRoles() {
 		return roles;
@@ -247,6 +255,10 @@ public class UserAction extends EntityAction<User> {
 			user.setLegiblePassword(password);
 			userManager.save(user);
 			addActionMessage(getText("save.success"));
+			eventPublisher.publish(
+					new PasswordChangedEvent(user.getUsername(), RequestUtils
+							.getRemoteAddr(ServletActionContext.getRequest())),
+					Scope.LOCAL);
 		}
 		return "password";
 	}
@@ -271,6 +283,10 @@ public class UserAction extends EntityAction<User> {
 		userInSession.setPhone(user.getPhone());
 		userManager.save(userInSession);
 		addActionMessage(getText("save.success"));
+		eventPublisher.publish(
+				new ProfileEditedEvent(user.getUsername(), RequestUtils
+						.getRemoteAddr(ServletActionContext.getRequest())),
+				Scope.LOCAL);
 		return "profile";
 	}
 

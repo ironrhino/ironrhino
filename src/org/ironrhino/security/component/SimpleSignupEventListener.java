@@ -1,6 +1,6 @@
 package org.ironrhino.security.component;
 
-import org.ironrhino.security.event.SignupEvent;
+import org.ironrhino.core.security.event.SignupEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -14,7 +14,7 @@ public class SimpleSignupEventListener implements
 
 	@Override
 	public void onApplicationEvent(SignupEvent event) {
-		logger.info(event.getUser().getUsername()
+		logger.info(event.getUsername()
 				+ " signup"
 				+ (event.getProvider() == null ? "" : ",via "
 						+ event.getProvider()));

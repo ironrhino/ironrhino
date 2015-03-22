@@ -11,12 +11,12 @@ import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.security.event.LoginEvent;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.RequestUtils;
-import org.ironrhino.security.event.LoginEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,7 +126,8 @@ public class LoginAction extends BaseAction {
 				Object principal = authResult.getPrincipal();
 				if (principal instanceof UserDetails)
 					eventPublisher.publish(new LoginEvent(
-							(UserDetails) principal), Scope.LOCAL);
+							((UserDetails) principal).getUsername(),
+							RequestUtils.getRemoteAddr(request)), Scope.LOCAL);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}

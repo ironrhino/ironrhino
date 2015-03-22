@@ -8,8 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.core.security.event.LogoutEvent;
 import org.ironrhino.core.spring.security.DefaultLogoutSuccessHandler;
-import org.ironrhino.security.event.LogoutEvent;
+import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +29,10 @@ public class LogoutSuccessHandler extends DefaultLogoutSuccessHandler {
 			Object principal = authentication.getPrincipal();
 			if (principal instanceof UserDetails)
 				eventPublisher.publish(
-						new LogoutEvent((UserDetails) principal), Scope.LOCAL);
+						new LogoutEvent(
+								((UserDetails) principal).getUsername(),
+								RequestUtils.getRemoteAddr(request)),
+						Scope.LOCAL);
 		}
 	}
 
