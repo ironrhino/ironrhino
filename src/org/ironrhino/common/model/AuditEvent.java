@@ -48,6 +48,12 @@ public class AuditEvent extends BaseEntity {
 
 	}
 
+	public AuditEvent(String username, String address, String event) {
+		this.username = username;
+		this.address = address;
+		this.event = event;
+	}
+
 	public AuditEvent(AbstractEvent abstractEvent) {
 		this.username = abstractEvent.getUsername();
 		this.address = abstractEvent.getRemoteAddr();
