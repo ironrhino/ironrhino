@@ -908,6 +908,62 @@ Initialization.common = function() {
 		$('<section id="powered-by">Powered by Ironrhino</section>')
 				.appendTo(document.body);
 	}
+	$(document).on('click', '.scroll-list .load-more', function(e) {
+		var t = $(this);
+		if (t.hasClass('loading'))
+			return;
+		t.addClass('loading').data('orginaltext', t.text()).text(MessageBundle
+				.get('ajax.loading'));
+		var list = t.closest('.scroll-list');
+		var pagesize = 10;
+		if (list.data('pagesize'))
+			pagesize = parseInt(list.data('pagesize'));
+		var url = list.data('scrollurl') || document.location.href;
+		var params = {
+			since : $('.scroll-item:last', list).data('position')
+		}
+		var headers = {};
+		if (list.attr('id'))
+			headers['X-Fragment'] = list.attr('id');
+		$.ajax({
+			global : false,
+			url : url,
+			data : params,
+			headers : headers,
+			success : function(data) {
+				var items = $('<div/>').html(data).find('.scroll-item');
+				if (items.length < pagesize) {
+					t.prop('disabled', true);
+				} else {
+					$(window).bind('scroll', function() {
+						if ($(window).scrollTop() + $(window).height() > $(document)
+								.height()
+								- 10) {
+							$(window).unbind('scroll');
+							$('.scroll-list .load-more').click();
+						}
+					});
+				}
+				items.each(function(i, v) {
+							t.before(v);
+							_observe(v);
+						});
+			},
+			complete : function() {
+				t.removeClass('loading').text(t.data('orginaltext'));
+			}
+		});
+
+	});
+	if ($('.scroll-list .load-more').length)
+		$(window).scroll(function() {
+			if ($(window).scrollTop() + $(window).height() > $(document)
+					.height()
+					- 10) {
+				$(window).unbind('scroll');
+				$('.scroll-list .load-more').click();
+			}
+		});
 };
 
 var HISTORY_ENABLED = MODERN_BROWSER
