@@ -24,7 +24,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dynamicreports-core-4.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/eaxy-0.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ehcache-core-2.6.10.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/elasticsearch-1.4.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/elasticsearch-1.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/freemarker-2.3.20.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/guava-18.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hessian-4.0.38.jar"/>
@@ -51,15 +51,15 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jsoup-1.8.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jta-1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-analyzers-common-4.10.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-core-4.10.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-highlighter-4.10.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-join-4.10.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-memory-4.10.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-queries-4.10.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-queryparser-4.10.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-sandbox-4.10.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-suggest-4.10.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-analyzers-common-4.10.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-core-4.10.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-highlighter-4.10.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-join-4.10.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-memory-4.10.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-queries-4.10.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-queryparser-4.10.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-sandbox-4.10.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-suggest-4.10.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-analysis-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-core-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.13.0.jar"/>
