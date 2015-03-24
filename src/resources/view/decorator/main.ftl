@@ -60,6 +60,10 @@ ${action.getText('browser.warning')}
 	          <i class="glyphicon glyphicon-user"></i> <#if user.name??>${user.name}<#elseif user.username??>${user.username}<#else>${(user?string)!}</#if> <span class="caret"></span>
 	        </a>
 	        <ul class="dropdown-menu">
+	          <@resourcePresentConditional value="resources/view/audit.ftl">
+	          <li><a href="<@url value="/audit"/>" class="ajax view">${action.getText('auditEvent')}</a></li>
+	          <li class="divider"></li>
+	          </@resourcePresentConditional>
 	          <#assign divider=false/>
 	          <#if user.isNew??>
 	          <li><a href="<@url value="${ssoServerBase!}/user/profile"/>" class="popmodal nocache">${action.getText('profile')}</a></li>

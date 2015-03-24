@@ -61,6 +61,8 @@
 	<property name="common-qrcode-jar.includes" value="org/ironrhino/common/action/Qrcode*,resources/view/common/qrcode*" />
 	<property name="common-feedback-jar.name" value="ironrhino-common-feedback-${version}.jar" />
 	<property name="common-feedback-jar.includes" value="org/ironrhino/common/**/*Feedback*,resources/view/*Feedback*" />
+	<property name="common-audit-jar.name" value="ironrhino-common-audit-${version}.jar" />
+	<property name="common-audit-jar.includes" value="org/ironrhino/common/**/Audit*,resources/view/audit.ftl" />
 	<property name="security-jar.name" value="ironrhino-security-${version}.jar" />
 	<property name="userdetailsservice-jar.name" value="ironrhino-userdetailsservice-${version}.jar" />
 	<property name="security-config-jar.name" value="ironrhino-security-config-${version}.jar" />
@@ -268,6 +270,7 @@
 			<delete file="${target.dir}/${common-install-jar.name}" />
 			<delete file="${target.dir}/${common-qrcode-jar.name}" />
 			<delete file="${target.dir}/${common-feedback-jar.name}" />
+			<delete file="${target.dir}/${common-audit-jar.name}" />
 			<delete file="${target.dir}/${security-jar.name}" />
 			<delete file="${target.dir}/${userdetailsservice-jar.name}" />
 			<delete file="${target.dir}/${security-config-jar.name}" />
@@ -299,7 +302,7 @@
 			</jar>
 			<delete dir="${target.dir}/assets" />
 			<antcall target="append-revision-for-assets" />
-			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="META-INF/**,log4j.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-jar.includes},${zookeeper-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-stat-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-install-jar.includes},${common-qrcode-jar.includes},${common-feedback-jar.includes}">
+			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="META-INF/**,log4j.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-jar.includes},${zookeeper-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-stat-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-install-jar.includes},${common-qrcode-jar.includes},${common-feedback-jar.includes},${common-audit-jar.includes}">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-core" />
 					<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -621,6 +624,18 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-feedback" />
+					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+					<attribute name="Ironrhino-Component-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+				</manifest>
+			</jar>
+			<jar jarfile="${target.dir}/${common-audit-jar.name}" basedir="${classes.dir}" includes="${common-audit-jar.includes}">
+				<manifest>
+					<attribute name="Implementation-Title" value="ironrhino-common-audit" />
+					<attribute name="Implementation-Vendor" value="ironrhino" />
+					<attribute name="Implementation-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-audit" />
 					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
 					<attribute name="Ironrhino-Component-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
