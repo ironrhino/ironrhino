@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import org.elasticsearch.common.lang3.StringUtils;
 import org.ironrhino.core.event.AbstractAuditEvent;
@@ -25,6 +26,7 @@ import org.ironrhino.core.util.JsonUtils;
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
+@Table(indexes = { @javax.persistence.Index(columnList = "username,`date` desc") })
 @Searchable
 @Richtable(searchable = true, order = "date desc", readonly = @Readonly(true))
 public class AuditEvent extends BaseEntity {
