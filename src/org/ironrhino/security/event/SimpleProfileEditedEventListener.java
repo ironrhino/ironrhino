@@ -13,7 +13,8 @@ public class SimpleProfileEditedEventListener implements
 
 	@Override
 	public void onApplicationEvent(ProfileEditedEvent event) {
-		logger.info(event.getUsername() + " edited profile");
+		logger.info(event.getUsername() + " edited profile from {}",
+				event.getRemoteAddr());
 	}
 
 }

@@ -13,10 +13,11 @@ public class SimpleLoginEventListener implements
 
 	@Override
 	public void onApplicationEvent(LoginEvent event) {
-		logger.info(event.getUsername()
-				+ " login"
-				+ (event.getProvider() == null ? "" : ",via "
-						+ event.getProvider()));
+		logger.info(
+				event.getUsername()
+						+ " login from {}"
+						+ (event.getProvider() == null ? "" : ", via "
+								+ event.getProvider()), event.getRemoteAddr());
 	}
 
 }

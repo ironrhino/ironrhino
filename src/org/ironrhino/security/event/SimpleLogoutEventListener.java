@@ -13,7 +13,8 @@ public class SimpleLogoutEventListener implements
 
 	@Override
 	public void onApplicationEvent(LogoutEvent event) {
-		logger.info(event.getUsername() + " logout");
+		logger.info(event.getUsername() + " logout from {}",
+				event.getRemoteAddr());
 	}
 
 }

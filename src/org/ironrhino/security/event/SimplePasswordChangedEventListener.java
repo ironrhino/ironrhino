@@ -13,7 +13,8 @@ public class SimplePasswordChangedEventListener implements
 
 	@Override
 	public void onApplicationEvent(PasswordChangedEvent event) {
-		logger.info(event.getUsername() + " changed password");
+		logger.info(event.getUsername() + " changed password from {}",
+				event.getRemoteAddr());
 	}
 
 }
