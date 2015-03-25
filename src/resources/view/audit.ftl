@@ -8,7 +8,7 @@
 		<#list events as ev>
 		<div id="${ev.id}" class="scroll-item row-fluid" data-position="${ev.date.time}" style="padding-top:20px;">
 			<div class="span2"><em class="time" title="${ev.date?datetime}">${statics['org.ironrhino.core.util.DateUtils'].humanRead(ev.date)}</em></div>
-			<div class="span8"><strong><#if ev.event?ends_with('Event')>${action.getText(ev.event)}<#else>${ev.event}</#if></strong></div>
+			<div class="span8"><strong>${ev.displayEvent}</strong></div>
 			<div class="span2"><span class="label">${ev.address!}</span></div>
 		</div>
 		</#list>

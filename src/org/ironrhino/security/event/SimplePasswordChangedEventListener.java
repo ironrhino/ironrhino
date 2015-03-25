@@ -1,6 +1,5 @@
-package org.ironrhino.security.component;
+package org.ironrhino.security.event;
 
-import org.ironrhino.core.security.event.PasswordChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;

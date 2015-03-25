@@ -1,6 +1,8 @@
-package org.ironrhino.core.security.event;
+package org.ironrhino.security.event;
 
-public class PasswordChangedEvent extends AbstractEvent {
+import org.ironrhino.core.event.AbstractAuditEvent;
+
+public class PasswordChangedEvent extends AbstractAuditEvent {
 
 	private static final long serialVersionUID = 7854178610021098541L;
 

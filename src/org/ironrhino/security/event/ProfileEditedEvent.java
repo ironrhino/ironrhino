@@ -1,6 +1,8 @@
-package org.ironrhino.core.security.event;
+package org.ironrhino.security.event;
 
-public class ProfileEditedEvent extends AbstractEvent {
+import org.ironrhino.core.event.AbstractAuditEvent;
+
+public class ProfileEditedEvent extends AbstractAuditEvent {
 
 	private static final long serialVersionUID = 3596658507897245766L;
 

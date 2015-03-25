@@ -12,14 +12,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
+import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
+import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExceptionUtils;
+import org.ironrhino.core.util.RequestUtils;
+import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
@@ -48,6 +52,9 @@ public class Oauth2Action extends BaseAction {
 	private static final long serialVersionUID = 8175470892708878896L;
 
 	protected static Logger log = LoggerFactory.getLogger(Oauth2Action.class);
+
+	@Autowired
+	protected transient EventPublisher eventPublisher;
 
 	@Autowired
 	private transient OAuthManager oauthManager;
@@ -228,6 +235,8 @@ public class Oauth2Action extends BaseAction {
 	}
 
 	public String auth() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
 		try {
 			client = oauthManager.findClientById(client_id);
 			if (client == null)
@@ -257,14 +266,12 @@ public class Oauth2Action extends BaseAction {
 			setUid(authorization.getId());
 		} catch (Exception e) {
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(
-							ServletActionContext.getRequest(),
-							ServletActionContext.getResponse(),
+					&& httpErrorHandler.handle(request, response,
 							HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 				return NONE;
 			try {
-				ServletActionContext.getResponse().sendError(
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+						e.getMessage());
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -274,10 +281,10 @@ public class Oauth2Action extends BaseAction {
 	}
 
 	public String grant() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
 		UserDetails grantor = AuthzUtils.getUserDetails();
 		if (grantor == null) {
-			HttpServletRequest request = ServletActionContext.getRequest();
-			HttpServletResponse response = ServletActionContext.getResponse();
 			Authentication authResult = null;
 			try {
 				authResult = authenticationManager
@@ -343,14 +350,12 @@ public class Oauth2Action extends BaseAction {
 			}
 		} catch (Exception e) {
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(
-							ServletActionContext.getRequest(),
-							ServletActionContext.getResponse(),
+					&& httpErrorHandler.handle(request, response,
 							HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 				return NONE;
 			try {
-				ServletActionContext.getResponse().sendError(
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+						e.getMessage());
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -381,6 +386,8 @@ public class Oauth2Action extends BaseAction {
 
 	@JsonConfig(root = "tojson")
 	public String token() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
 		if ("password".equals(grant_type)) {
 			client = oauthManager.findClientById(client_id);
 			try {
@@ -413,15 +420,13 @@ public class Oauth2Action extends BaseAction {
 				}
 			} catch (Exception e) {
 				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(
-								ServletActionContext.getRequest(),
-								ServletActionContext.getResponse(),
+						&& httpErrorHandler.handle(request, response,
 								HttpServletResponse.SC_BAD_REQUEST,
 								e.getMessage()))
 					return NONE;
 				try {
-					ServletActionContext.getResponse().sendError(
-							HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+							e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -432,6 +437,10 @@ public class Oauth2Action extends BaseAction {
 			tojson.put("access_token", authorization.getAccessToken());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
+			eventPublisher.publish(
+					new AuthorizeEvent(username, RequestUtils
+							.getRemoteAddr(request), client.getName(),
+							grant_type), Scope.LOCAL);
 			return JSON;
 		} else if ("client_credential".equals(grant_type)) {
 			client = new Client();
@@ -441,15 +450,13 @@ public class Oauth2Action extends BaseAction {
 				authorization = oauthManager.grant(client);
 			} catch (Exception e) {
 				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(
-								ServletActionContext.getRequest(),
-								ServletActionContext.getResponse(),
+						&& httpErrorHandler.handle(request, response,
 								HttpServletResponse.SC_BAD_REQUEST,
 								e.getMessage()))
 					return NONE;
 				try {
-					ServletActionContext.getResponse().sendError(
-							HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+							e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -473,15 +480,13 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("refresh_token", authorization.getRefreshToken());
 			} catch (Exception e) {
 				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(
-								ServletActionContext.getRequest(),
-								ServletActionContext.getResponse(),
+						&& httpErrorHandler.handle(request, response,
 								HttpServletResponse.SC_BAD_REQUEST,
 								e.getMessage()))
 					return NONE;
 				try {
-					ServletActionContext.getResponse().sendError(
-							HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+							e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -493,14 +498,12 @@ public class Oauth2Action extends BaseAction {
 			if (!"authorization_code".equals(grant_type)) {
 				String message = "grant_type must be authorization_code";
 				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(
-								ServletActionContext.getRequest(),
-								ServletActionContext.getResponse(),
+						&& httpErrorHandler.handle(request, response,
 								HttpServletResponse.SC_BAD_REQUEST, message))
 					return NONE;
 				try {
-					ServletActionContext.getResponse().sendError(
-							HttpServletResponse.SC_BAD_REQUEST, message);
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+							message);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -516,17 +519,18 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
+				eventPublisher.publish(new AuthorizeEvent(username,
+						RequestUtils.getRemoteAddr(request), client.getName(),
+						grant_type), Scope.LOCAL);
 			} catch (Exception e) {
 				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(
-								ServletActionContext.getRequest(),
-								ServletActionContext.getResponse(),
+						&& httpErrorHandler.handle(request, response,
 								HttpServletResponse.SC_BAD_REQUEST,
 								e.getMessage()))
 					return NONE;
 				try {
-					ServletActionContext.getResponse().sendError(
-							HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+							e.getMessage());
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -538,24 +542,22 @@ public class Oauth2Action extends BaseAction {
 
 	@JsonConfig(root = "tojson")
 	public String info() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
 		if (access_token == null && token != null)
 			access_token = token;
 		tojson = new HashMap<String, Object>();
 		authorization = oauthManager.retrieve(access_token);
 		if (authorization == null) {
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(
-							ServletActionContext.getRequest(),
-							ServletActionContext.getResponse(),
+					&& httpErrorHandler.handle(request, response,
 							HttpServletResponse.SC_UNAUTHORIZED,
 							"invalid_token"))
 				return NONE;
 			tojson.put("error", "invalid_token");
 		} else if (authorization.getExpiresIn() < 0) {
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(
-							ServletActionContext.getRequest(),
-							ServletActionContext.getResponse(),
+					&& httpErrorHandler.handle(request, response,
 							HttpServletResponse.SC_UNAUTHORIZED,
 							"expired_token"))
 				return NONE;
