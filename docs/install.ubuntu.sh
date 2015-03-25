@@ -10,7 +10,7 @@ fi
 
 #install packages
 apt-get update
-apt-get --force-yes --yes install openjdk-7-jdk ant mysql-server subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
+apt-get --force-yes --yes install openjdk-7-jdk ant mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
 apt-get --force-yes --yes remove openjdk-6-jre-headless
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
