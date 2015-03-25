@@ -14,6 +14,10 @@ public class I18N {
 		return getText(I18N.class, key);
 	}
 
+	public static String getText(String key, Object[] args) {
+		return getText(I18N.class, key, args);
+	}
+
 	public static String getText(Class<?> clazz, String key) {
 		return getText(clazz, key, null);
 	}
