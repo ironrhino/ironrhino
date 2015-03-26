@@ -24,10 +24,10 @@
 					${hibernate.default_batch_fetch_size:10}
 				</prop>
 				<prop key="hibernate.order_inserts">
-					${hibernate.order_inserts:true}
+					${hibernate.order_inserts:false}
 				</prop>
 				<prop key="hibernate.order_updates">
-					${hibernate.order_updates:true}
+					${hibernate.order_updates:false}
 				</prop>
 				<prop key="hibernate.jdbc.fetch_size">
 					${hibernate.jdbc.fetch_size:20}
