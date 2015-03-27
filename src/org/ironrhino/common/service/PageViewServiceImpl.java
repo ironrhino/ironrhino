@@ -19,14 +19,10 @@ import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.HyperLogLogOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import redis.clients.jedis.Jedis;
 
 @Component
 public class PageViewServiceImpl implements PageViewService {
@@ -314,15 +310,9 @@ public class PageViewServiceImpl implements PageViewService {
 		sb.append(type).append(":").append(day);
 		String key = sb.toString();
 		sb.append(KEY_HYPERLOGLOG_SUFFIX);
-		final String key_hll = sb.toString();
-		Long result = stringRedisTemplate.execute(new RedisCallback<Long>() {
-			@Override
-			public Long doInRedis(RedisConnection rc)
-					throws DataAccessException {
-				Jedis jedis = (Jedis) rc.getNativeConnection();
-				return jedis.pfadd(key_hll, value);
-			}
-		});
+		HyperLogLogOperations<String, String> hll = stringRedisTemplate
+				.opsForHyperLogLog();
+		Long result = hll.add(sb.toString(), value);
 		if (result > 0) {
 			stringRedisTemplate.opsForValue().increment(key, 1);
 			return true;
