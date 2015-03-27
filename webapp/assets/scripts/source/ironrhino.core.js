@@ -169,9 +169,9 @@ Message = {
 		if (html) {
 			var parent = $('#content');
 			if ($('.ui-dialog:visible').length)
-				parent = $('.ui-dialog:visible .ui-dialog-content');
+				parent = $('.ui-dialog:visible .ui-dialog-content').last();
 			if ($('.modal:visible').length)
-				parent = $('.modal:visible .modal-body');
+				parent = $('.modal:visible .modal-body').last();
 			if (!$('#message', parent).length)
 				$('<div id="message"></div>').prependTo(parent);
 			var msg = $('#message', parent);

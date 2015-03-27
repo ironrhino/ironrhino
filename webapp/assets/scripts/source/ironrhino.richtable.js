@@ -61,13 +61,12 @@ Richtable = {
 		form = form || $('form.richtable');
 		reloadonclose = reloadonclose || false;
 		useiframe = useiframe || false;
-		var winid = '_window_';
-		if (form.closest('#_pick_window').length)
-			winid = '_window2_';
-		var win = $('#' + winid);
-		if (!win.length)
-			win = $('<div id="' + winid + '" class="window-richtable"></div>')
-					.appendTo(document.body).dialog();
+		var winindex = $(document).data('winindex') || 0;
+		winindex++;
+		$(document).data('winindex', winindex);
+		var winid = '_window_' + winindex;
+		var win = $('<div id="' + winid + '" class="window-richtable"></div>')
+				.appendTo(document.body).dialog();
 		if (!useiframe) {
 			// ajax replace
 			var target = win.get(0);
@@ -227,9 +226,9 @@ Richtable = {
 			opt.height = 600;
 		win.dialog(opt);
 		win.dialog('open');
-		win.closest('.ui-dialog').css('z-index',
-				winid == '_window_' ? '2000' : '2002');
+		win.closest('.ui-dialog').css('z-index', 2000);
 		$('.ui-dialog-titlebar-close', win.closest('.ui-dialog')).blur();
+		return winid;
 	},
 	click : function(event) {
 		var btn = event.target;
@@ -336,12 +335,10 @@ Richtable = {
 			var reloadonclose = typeof(options.reloadonclose) == 'undefined'
 					? (view != 'view' && !$(btn).hasClass('view'))
 					: options.reloadonclose;
-			Richtable.open(url, reloadonclose, options.iframe, form);
+			var winid = Richtable
+					.open(url, reloadonclose, options.iframe, form);
 			delete options.iframe;
 			delete options.reloadonclose;
-			var winid = '_window_';
-			if (form.closest('#_pick_window').length)
-				winid = '_window2_';
 			for (var key in options)
 				$('#' + winid).dialog('option', key, options[key]);
 			Dialog.adapt($('#' + winid));

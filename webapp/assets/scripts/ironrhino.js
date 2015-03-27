@@ -31849,9 +31849,9 @@ Message = {
 		if (html) {
 			var parent = $('#content');
 			if ($('.ui-dialog:visible').length)
-				parent = $('.ui-dialog:visible .ui-dialog-content');
+				parent = $('.ui-dialog:visible .ui-dialog-content').last();
 			if ($('.modal:visible').length)
-				parent = $('.modal:visible .modal-body');
+				parent = $('.modal:visible .modal-body').last();
 			if (!$('#message', parent).length)
 				$('<div id="message"></div>').prependTo(parent);
 			var msg = $('#message', parent);
@@ -37231,13 +37231,12 @@ Richtable = {
 		form = form || $('form.richtable');
 		reloadonclose = reloadonclose || false;
 		useiframe = useiframe || false;
-		var winid = '_window_';
-		if (form.closest('#_pick_window').length)
-			winid = '_window2_';
-		var win = $('#' + winid);
-		if (!win.length)
-			win = $('<div id="' + winid + '" class="window-richtable"></div>')
-					.appendTo(document.body).dialog();
+		var winindex = $(document).data('winindex') || 0;
+		winindex++;
+		$(document).data('winindex', winindex);
+		var winid = '_window_' + winindex;
+		var win = $('<div id="' + winid + '" class="window-richtable"></div>')
+				.appendTo(document.body).dialog();
 		if (!useiframe) {
 			// ajax replace
 			var target = win.get(0);
@@ -37397,9 +37396,9 @@ Richtable = {
 			opt.height = 600;
 		win.dialog(opt);
 		win.dialog('open');
-		win.closest('.ui-dialog').css('z-index',
-				winid == '_window_' ? '2000' : '2002');
+		win.closest('.ui-dialog').css('z-index', 2000);
 		$('.ui-dialog-titlebar-close', win.closest('.ui-dialog')).blur();
+		return winid;
 	},
 	click : function(event) {
 		var btn = event.target;
@@ -37506,12 +37505,10 @@ Richtable = {
 			var reloadonclose = typeof(options.reloadonclose) == 'undefined'
 					? (view != 'view' && !$(btn).hasClass('view'))
 					: options.reloadonclose;
-			Richtable.open(url, reloadonclose, options.iframe, form);
+			var winid = Richtable
+					.open(url, reloadonclose, options.iframe, form);
 			delete options.iframe;
 			delete options.reloadonclose;
-			var winid = '_window_';
-			if (form.closest('#_pick_window').length)
-				winid = '_window2_';
 			for (var key in options)
 				$('#' + winid).dialog('option', key, options[key]);
 			Dialog.adapt($('#' + winid));
@@ -38710,7 +38707,7 @@ Observation.groupable = function(container) {
 										|| 500
 							});
 					$('#_tree_window').closest('.ui-dialog').css('z-index',
-							'2010');
+							2500);
 					if (nametarget && nametarget.length)
 						options.value = val(options.name, current) || '';
 					if (options.type != 'treeview') {
@@ -38908,9 +38905,10 @@ Observation.treeselect = function(container) {
 				if (winid) {
 					$('#' + winid).remove();
 				} else {
-					var winid = '_pick_window';
-					if ($('#' + winid).length)
-						winid = '_pick_window2';
+					var winindex = $(document).data('winindex') || 0;
+					winindex++;
+					$(document).data('winindex', winindex);
+					var winid = '_window_' + winindex;
 					current.data('winid', winid);
 				}
 				var win = $('<div id="' + winid + '" title="'
@@ -38921,8 +38919,7 @@ Observation.treeselect = function(container) {
 							minHeight : current.data('_options').minHeight
 									|| 500
 						});
-				win.closest('.ui-dialog').css('z-index',
-						winid == '_pick_window' ? '2001' : '2003');
+				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
 					win.mask(MessageBundle.get('ajax.loading'));
 				else
@@ -39147,7 +39144,7 @@ Observation._imagepick = function(container) {
 									minWidth : 520,
 									minHeight : 400
 								});
-				win.closest('.ui-dialog').css('z-index', '2003');
+				win.closest('.ui-dialog').css('z-index', 2500);
 				if (typeof google == 'undefined') {
 					var script = document.createElement('script');
 					script.src = 'http://www.google.com/jsapi?callback=latlng_loadMaps';

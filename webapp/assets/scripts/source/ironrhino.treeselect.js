@@ -124,7 +124,7 @@
 										|| 500
 							});
 					$('#_tree_window').closest('.ui-dialog').css('z-index',
-							'2010');
+							2500);
 					if (nametarget && nametarget.length)
 						options.value = val(options.name, current) || '';
 					if (options.type != 'treeview') {

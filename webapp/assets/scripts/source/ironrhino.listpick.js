@@ -126,9 +126,10 @@
 				if (winid) {
 					$('#' + winid).remove();
 				} else {
-					var winid = '_pick_window';
-					if ($('#' + winid).length)
-						winid = '_pick_window2';
+					var winindex = $(document).data('winindex') || 0;
+					winindex++;
+					$(document).data('winindex', winindex);
+					var winid = '_window_' + winindex;
 					current.data('winid', winid);
 				}
 				var win = $('<div id="' + winid + '" title="'
@@ -139,8 +140,7 @@
 							minHeight : current.data('_options').minHeight
 									|| 500
 						});
-				win.closest('.ui-dialog').css('z-index',
-						winid == '_pick_window' ? '2001' : '2003');
+				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
 					win.mask(MessageBundle.get('ajax.loading'));
 				else
