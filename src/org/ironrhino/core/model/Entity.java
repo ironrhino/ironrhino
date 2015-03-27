@@ -3,8 +3,6 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.persistence.Id;
-
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.util.AnnotationUtils;
@@ -51,8 +49,7 @@ public abstract class Entity<PK extends Serializable> implements
 			return getClass().getName() + "{id=" + getId() + ",naturalId="
 					+ map.toString() + "}";
 		}
-		map = AnnotationUtils.getAnnotatedPropertyNameAndValues(this, Id.class);
-		Object id = map.values().iterator().next();
+		Object id = getId();
 		return String.valueOf(id);
 	}
 
