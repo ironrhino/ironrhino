@@ -11,7 +11,7 @@
 	<properties>
 		<aspectj.version>2.5.1</aspectj.version>
         <spring.version>4.1.5.RELEASE</spring.version>
-        <spring.security.version>3.2.6.RELEASE</spring.security.version>
+        <spring.security.version>4.0.0.RELEASE</spring.security.version>
         <struts.version>2.3.20</struts.version>
         <jackson.version>2.5.1</jackson.version>
         <slf4j.version>1.7.8</slf4j.version>
