@@ -10,8 +10,10 @@ Initialization.upload = function() {
 		$.alerts.prompt('', 'newfolder', '', function(t) {
 					if (t) {
 						var folder = $('#current_folder').text() + t;
-						var url = CONTEXT_PATH + '/common/upload/mkdir'
-								+ encodeURI(folder);
+						var url = $('#upload_form').attr('action');
+						if (!url)
+							url = CONTEXT_PATH + '/common/upload';
+						url += '/mkdir' + encodeURI(folder);
 						ajax({
 									url : url,
 									dataType : 'json',
@@ -19,9 +21,12 @@ Initialization.upload = function() {
 										$('#folder').val(folder);
 										$('#files button.reload').click();
 										if (typeof history.pushState != 'undefined') {
-											var url = CONTEXT_PATH
-													+ '/common/upload/list'
-													+ encodeURI(folder)
+											var url = $('#upload_form')
+													.attr('action');
+											if (!url)
+												url = CONTEXT_PATH
+														+ '/common/upload';
+											url += '/list' + encodeURI(folder)
 											history.pushState(url, '', url);
 										}
 									}
@@ -142,10 +147,13 @@ Observation.upload = function(container) {
 	}).blur(function() {
 		var oldvalue = $(this).data('oldvalue');
 		var newvalue = $(this).text();
-		if (oldvalue != newvalue)
+		if (oldvalue != newvalue) {
+			var url = $('#upload_form').attr('action');
+			if (!url)
+				url = CONTEXT_PATH + '/common/upload';
+			url += '/rename/' + encodeURI(oldvalue);
 			$.ajax({
-				url : CONTEXT_PATH + '/common/upload/rename/'
-						+ encodeURI(oldvalue),
+				url : url,
 				data : {
 					folder : $('#upload_form [name="folder"]').val(),
 					filename : newvalue
@@ -175,6 +183,7 @@ Observation.upload = function(container) {
 					$('#files button.reload').trigger('click');
 				}
 			});
+		}
 	});
 
 };
@@ -192,9 +201,13 @@ function deleteFiles(file) {
 	$.alerts.confirm(MessageBundle.get('confirm.delete'), MessageBundle
 					.get('select'), function(b) {
 				if (b) {
+					var url = $('#upload_form').attr('action');
+					if (!url)
+						url = CONTEXT_PATH + '/common/upload';
+					url += '/delete';
 					var options = {
 						type : $('#upload_form').attr('method'),
-						url : CONTEXT_PATH + '/common/upload/delete',
+						url : url,
 						dataType : 'json',
 						complete : function() {
 							$('#files button.reload').click();
