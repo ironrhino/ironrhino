@@ -27,7 +27,7 @@
 <link rel="shortcut icon" href="<@url value="/assets/images/favicon.ico"/>" />
 <link href="<@url value="/assets/styles/ironrhino${modernBrowser?string('-min','-ie')}.css"/>" media="all" rel="stylesheet" type="text/css" />
 <script src="<@url value="/assets/scripts/ironrhino${modernBrowser?string('-min','-ie')}.js"/>" type="text/javascript"<#if modernBrowser&&!head?contains('</script>')> defer</#if>></script>
-<#include "include/assets.ftl"/>
+<#include "include/assets.ftl" ignore_missing=true/>
 <#noescape>${head}</#noescape>
 </head>
 
@@ -42,7 +42,7 @@ ${action.getText('browser.warning')}
 </div>
 </div>
 </#if>
-<#include "include/top.ftl"/>
+<#include "include/top.ftl" ignore_missing=true/>
 <#if 'welcome'!=page.properties["meta.body_class"]!>
 <@authorize ifAnyGranted="ROLE_BUILTIN_USER">
 <div class="navbar navbar-fixed-top">
@@ -53,7 +53,7 @@ ${action.getText('browser.warning')}
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
 		</a>
-		<#include "include/brand.ftl"/>
+		<#include "include/brand.ftl" ignore_missing=true/>
 		<div class="btn-group pull-right">
 			<#assign user = authentication("principal")>
 	        <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
@@ -81,7 +81,7 @@ ${action.getText('browser.warning')}
 	        </ul>
 		</div>
 		<div class="nav-collapse">
-	        <#include "include/nav.ftl"/>
+	        <#include "include/nav.ftl" ignore_missing=true/>
       </div>
     </div>
   </div>
@@ -97,6 +97,6 @@ ${action.getText('browser.warning')}
 </#if>
 <#noescape>${body}</#noescape>
 </div>
-<#include "include/bottom.ftl"/>
+<#include "include/bottom.ftl" ignore_missing=true/>
 </body>
 </html></#escape></#compress>

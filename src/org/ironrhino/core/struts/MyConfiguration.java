@@ -4,14 +4,27 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Locale;
 
+import freemarker.core.ParseException;
 import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
+import freemarker.template.TemplateNotFoundException;
+import freemarker.template.Version;
 
 public class MyConfiguration extends Configuration {
 
 	private Collection<OverridableTemplateProvider> overridableTemplateProviders;
 
 	private Collection<FallbackTemplateProvider> fallbackTemplateProviders;
+
+	@Deprecated
+	public MyConfiguration() {
+		super();
+	}
+
+	public MyConfiguration(Version version) {
+		super(version);
+	}
 
 	public void setOverridableTemplateProviders(
 			Collection<OverridableTemplateProvider> overridableTemplateProviders) {
@@ -32,34 +45,44 @@ public class MyConfiguration extends Configuration {
 	}
 
 	@Override
-	public Template getTemplate(String name, Locale locale, String encoding,
-			boolean parse) throws IOException {
-		Template result = null;
+	public Template getTemplate(String name, Locale locale,
+			Object customLookupCondition, String encoding, boolean parseAsFTL,
+			boolean ignoreMissing) throws TemplateNotFoundException,
+			MalformedTemplateNameException, ParseException, IOException {
+		Template result;
 		if (overridableTemplateProviders != null) {
 			for (OverridableTemplateProvider overridableTemplateProvider : overridableTemplateProviders) {
 				result = overridableTemplateProvider.getTemplate(name, locale,
-						encoding, parse);
+						encoding, parseAsFTL);
 				if (result != null)
-					break;
+					return result;
 			}
 		}
-		if (result == null) {
-			try {
-				result = super.getTemplate(name, locale, encoding, parse);
-			} catch (IOException e) {
-				if (fallbackTemplateProviders != null) {
-					for (FallbackTemplateProvider fallbackTemplateProvider : fallbackTemplateProviders) {
-						result = fallbackTemplateProvider.getTemplate(name,
-								locale, encoding, parse);
-						if (result != null)
-							break;
-					}
-					if (result == null)
-						throw e;
+		try {
+			result = super.getTemplate(name, locale, customLookupCondition,
+					encoding, parseAsFTL, ignoreMissing);
+			if (result != null)
+				return result;
+			if (fallbackTemplateProviders != null) {
+				for (FallbackTemplateProvider fallbackTemplateProvider : fallbackTemplateProviders) {
+					result = fallbackTemplateProvider.getTemplate(name, locale,
+							encoding, parseAsFTL);
+					if (result != null)
+						return result;
 				}
 			}
+		} catch (TemplateNotFoundException e) {
+			if (fallbackTemplateProviders != null) {
+				for (FallbackTemplateProvider fallbackTemplateProvider : fallbackTemplateProviders) {
+					result = fallbackTemplateProvider.getTemplate(name, locale,
+							encoding, parseAsFTL);
+					if (result != null)
+						return result;
+				}
+			}
+			throw e;
 		}
-		return result;
+		return null;
 	}
 
 }
