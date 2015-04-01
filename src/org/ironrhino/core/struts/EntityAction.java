@@ -387,109 +387,6 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (ownerProperty != null
 				&& ownerProperty.getKey().isolate()
 				|| (!searchable || StringUtils.isBlank(keyword) || (searchable && elasticSearchService == null))) {
-			DetachedCriteria dc = entityManager.detachedCriteria();
-			if (ownerProperty != null) {
-				Owner owner = ownerProperty.getKey();
-				if (!(StringUtils.isNotBlank(owner.supervisorRole()) && AuthzUtils
-						.authorize(null, owner.supervisorRole(), null))
-						&& owner.isolate()) {
-					UserDetails ud = AuthzUtils.getUserDetails(ownerProperty
-							.getValue());
-					if (ud == null)
-						return ACCESSDENIED;
-					dc.add(Restrictions.eq(owner.propertyName(), ud));
-				}
-			}
-			CriteriaState criteriaState = CriterionUtils.filter(dc,
-					getEntityClass(), getUiConfigs());
-			prepare(dc, criteriaState);
-			if (isTreeable()) {
-				if (parent == null || parent < 1) {
-					dc.add(Restrictions.isNull("parent"));
-				} else {
-					parentEntity = (BaseTreeableEntity) entityManager
-							.get(parent);
-					String alias = criteriaState.getAliases().get("parent");
-					if (alias == null) {
-						alias = "parent_";
-						while (criteriaState.getAliases().containsValue(alias))
-							alias += "_";
-						dc.createAlias("parent", alias);
-						criteriaState.getAliases().put("parent", alias);
-					}
-					dc.add(Restrictions.eq(alias + ".id", parent));
-				}
-			}
-			if (searchable && StringUtils.isNotBlank(keyword)) {
-				Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<String, MatchMode>();
-				for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs()
-						.entrySet()) {
-					if (entry.getValue().isSearchable()
-							&& !entry.getValue().isExcludedFromLike()) {
-						if (String.class.equals(entry.getValue()
-								.getPropertyType())) {
-							propertyNamesInLike
-									.put(entry.getKey(), entry.getValue()
-											.isExactMatch() ? MatchMode.EXACT
-											: MatchMode.ANYWHERE);
-						} else if (Persistable.class.isAssignableFrom(entry
-								.getValue().getPropertyType())) {
-							Set<String> nestSearchableProperties = entry
-									.getValue().getNestSearchableProperties();
-							if (nestSearchableProperties != null
-									&& nestSearchableProperties.size() > 0) {
-								String alias = criteriaState.getAliases().get(
-										entry.getKey());
-								if (alias == null) {
-									alias = entry.getKey() + "_";
-									while (criteriaState.getAliases()
-											.containsValue(alias))
-										alias += "_";
-									dc.createAlias(entry.getKey(), alias);
-									criteriaState.getAliases().put(
-											entry.getKey(), alias);
-								}
-								for (String s : nestSearchableProperties) {
-									UiConfigImpl nestUci = EntityClassHelper
-											.getUiConfigs(
-													entry.getValue()
-															.getPropertyType())
-											.get(s);
-									if (nestUci == null)
-										continue;
-									propertyNamesInLike
-											.put(new StringBuilder(alias)
-													.append(".").append(s)
-													.toString(),
-													nestUci.isExactMatch() ? MatchMode.EXACT
-															: MatchMode.ANYWHERE);
-								}
-							}
-						} else if (entry.getValue().getEmbeddedUiConfigs() != null) {
-							Set<String> nestSearchableProperties = entry
-									.getValue().getNestSearchableProperties();
-							if (nestSearchableProperties != null
-									&& nestSearchableProperties.size() > 0) {
-								for (String s : nestSearchableProperties) {
-									UiConfigImpl nestUci = entry.getValue()
-											.getEmbeddedUiConfigs().get(s);
-									if (nestUci == null)
-										continue;
-									propertyNamesInLike
-											.put(new StringBuilder(entry
-													.getKey()).append(".")
-													.append(s).toString(),
-													nestUci.isExactMatch() ? MatchMode.EXACT
-															: MatchMode.ANYWHERE);
-								}
-							}
-						}
-
-					}
-				}
-				if (propertyNamesInLike.size() > 0)
-					dc.add(CriterionUtils.like(keyword, propertyNamesInLike));
-			}
 			boolean resetPageSize;
 			if (resultPage == null) {
 				resultPage = new ResultPage();
@@ -504,45 +401,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
 			if (richtableConfig != null && resultPage.getPaginating() == null)
 				resultPage.setPaginating(richtableConfig.paginating());
-			resultPage.setCriteria(dc);
-			if (criteriaState.getOrderings().isEmpty()) {
-				if (richtableConfig != null
-						&& StringUtils.isNotBlank(richtableConfig.order())) {
-					String[] ar = richtableConfig.order().split(",");
-					for (String s : ar) {
-						String[] arr = s.split("\\s+", 2);
-						String propertyName = arr[0];
-						if (propertyName.indexOf(".") > 0) {
-							String p1 = propertyName.substring(0,
-									propertyName.indexOf("."));
-							String p2 = propertyName.substring(propertyName
-									.indexOf(".") + 1);
-							Class type = bw.getPropertyType(p1);
-							if (Persistable.class.isAssignableFrom(type)) {
-								String alias = criteriaState.getAliases().get(
-										p1);
-								if (alias == null) {
-									alias = p1 + "_";
-									while (criteriaState.getAliases()
-											.containsValue(alias))
-										alias += "_";
-									dc.createAlias(p1, alias);
-									criteriaState.getAliases().put(p1, alias);
-								}
-								propertyName = alias + "." + p2;
-							}
-						}
-						if (arr.length == 2 && arr[1].equalsIgnoreCase("asc"))
-							dc.addOrder(Order.asc(propertyName));
-						else if (arr.length == 2
-								&& arr[1].equalsIgnoreCase("desc"))
-							dc.addOrder(Order.desc(propertyName));
-						else
-							dc.addOrder(Order.asc(propertyName));
-					}
-				} else if (Ordered.class.isAssignableFrom(getEntityClass()))
-					dc.addOrder(Order.asc("displayOrder"));
-			}
+			resultPage.setCriteria(doPrepareCriteria(entityManager, bw,
+					richtableConfig, searchable, ownerProperty));
 			resultPage = entityManager.findByResultPage(resultPage);
 		} else {
 			Set<String> searchableProperties = new HashSet<String>();
@@ -598,6 +458,165 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					});
 		}
 		return LIST;
+	}
+
+	public DetachedCriteria doPrepareCriteria() {
+		BaseManager entityManager = getEntityManager(getEntityClass());
+		BeanWrapperImpl bw;
+		try {
+			bw = new BeanWrapperImpl(getEntityClass().newInstance());
+		} catch (Exception e1) {
+			throw new RuntimeException(e1);
+		}
+		Richtable richtableConfig = getClass().getAnnotation(Richtable.class);
+		if (richtableConfig == null)
+			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
+		boolean searchable = isSearchable();
+		Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
+		return doPrepareCriteria(entityManager, bw, richtableConfig,
+				searchable, ownerProperty);
+	}
+
+	private DetachedCriteria doPrepareCriteria(BaseManager entityManager,
+			BeanWrapperImpl bw, Richtable richtableConfig, boolean searchable,
+			Tuple<Owner, Class<? extends UserDetails>> ownerProperty) {
+
+		DetachedCriteria dc = entityManager.detachedCriteria();
+		if (ownerProperty != null) {
+			Owner owner = ownerProperty.getKey();
+			if (!(StringUtils.isNotBlank(owner.supervisorRole()) && AuthzUtils
+					.authorize(null, owner.supervisorRole(), null))
+					&& owner.isolate()) {
+				UserDetails ud = AuthzUtils.getUserDetails(ownerProperty
+						.getValue());
+				dc.add(Restrictions.eq(owner.propertyName(), ud));
+			}
+		}
+		CriteriaState criteriaState = CriterionUtils.filter(dc,
+				getEntityClass(), getUiConfigs());
+		prepare(dc, criteriaState);
+		if (isTreeable()) {
+			if (parent == null || parent < 1) {
+				dc.add(Restrictions.isNull("parent"));
+			} else {
+				parentEntity = (BaseTreeableEntity) entityManager.get(parent);
+				String alias = criteriaState.getAliases().get("parent");
+				if (alias == null) {
+					alias = "parent_";
+					while (criteriaState.getAliases().containsValue(alias))
+						alias += "_";
+					dc.createAlias("parent", alias);
+					criteriaState.getAliases().put("parent", alias);
+				}
+				dc.add(Restrictions.eq(alias + ".id", parent));
+			}
+		}
+		if (searchable && StringUtils.isNotBlank(keyword)) {
+			Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<String, MatchMode>();
+			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs()
+					.entrySet()) {
+				if (entry.getValue().isSearchable()
+						&& !entry.getValue().isExcludedFromLike()) {
+					if (String.class.equals(entry.getValue().getPropertyType())) {
+						propertyNamesInLike.put(entry.getKey(), entry
+								.getValue().isExactMatch() ? MatchMode.EXACT
+								: MatchMode.ANYWHERE);
+					} else if (Persistable.class.isAssignableFrom(entry
+							.getValue().getPropertyType())) {
+						Set<String> nestSearchableProperties = entry.getValue()
+								.getNestSearchableProperties();
+						if (nestSearchableProperties != null
+								&& nestSearchableProperties.size() > 0) {
+							String alias = criteriaState.getAliases().get(
+									entry.getKey());
+							if (alias == null) {
+								alias = entry.getKey() + "_";
+								while (criteriaState.getAliases()
+										.containsValue(alias))
+									alias += "_";
+								dc.createAlias(entry.getKey(), alias);
+								criteriaState.getAliases().put(entry.getKey(),
+										alias);
+							}
+							for (String s : nestSearchableProperties) {
+								UiConfigImpl nestUci = EntityClassHelper
+										.getUiConfigs(
+												entry.getValue()
+														.getPropertyType())
+										.get(s);
+								if (nestUci == null)
+									continue;
+								propertyNamesInLike
+										.put(new StringBuilder(alias)
+												.append(".").append(s)
+												.toString(),
+												nestUci.isExactMatch() ? MatchMode.EXACT
+														: MatchMode.ANYWHERE);
+							}
+						}
+					} else if (entry.getValue().getEmbeddedUiConfigs() != null) {
+						Set<String> nestSearchableProperties = entry.getValue()
+								.getNestSearchableProperties();
+						if (nestSearchableProperties != null
+								&& nestSearchableProperties.size() > 0) {
+							for (String s : nestSearchableProperties) {
+								UiConfigImpl nestUci = entry.getValue()
+										.getEmbeddedUiConfigs().get(s);
+								if (nestUci == null)
+									continue;
+								propertyNamesInLike
+										.put(new StringBuilder(entry.getKey())
+												.append(".").append(s)
+												.toString(),
+												nestUci.isExactMatch() ? MatchMode.EXACT
+														: MatchMode.ANYWHERE);
+							}
+						}
+					}
+
+				}
+			}
+			if (propertyNamesInLike.size() > 0)
+				dc.add(CriterionUtils.like(keyword, propertyNamesInLike));
+		}
+
+		if (criteriaState.getOrderings().isEmpty()) {
+			if (richtableConfig != null
+					&& StringUtils.isNotBlank(richtableConfig.order())) {
+				String[] ar = richtableConfig.order().split(",");
+				for (String s : ar) {
+					String[] arr = s.split("\\s+", 2);
+					String propertyName = arr[0];
+					if (propertyName.indexOf(".") > 0) {
+						String p1 = propertyName.substring(0,
+								propertyName.indexOf("."));
+						String p2 = propertyName.substring(propertyName
+								.indexOf(".") + 1);
+						Class type = bw.getPropertyType(p1);
+						if (Persistable.class.isAssignableFrom(type)) {
+							String alias = criteriaState.getAliases().get(p1);
+							if (alias == null) {
+								alias = p1 + "_";
+								while (criteriaState.getAliases()
+										.containsValue(alias))
+									alias += "_";
+								dc.createAlias(p1, alias);
+								criteriaState.getAliases().put(p1, alias);
+							}
+							propertyName = alias + "." + p2;
+						}
+					}
+					if (arr.length == 2 && arr[1].equalsIgnoreCase("asc"))
+						dc.addOrder(Order.asc(propertyName));
+					else if (arr.length == 2 && arr[1].equalsIgnoreCase("desc"))
+						dc.addOrder(Order.desc(propertyName));
+					else
+						dc.addOrder(Order.asc(propertyName));
+				}
+			} else if (Ordered.class.isAssignableFrom(getEntityClass()))
+				dc.addOrder(Order.asc("displayOrder"));
+		}
+		return dc;
 	}
 
 	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {
