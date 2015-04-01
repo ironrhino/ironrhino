@@ -121,9 +121,12 @@ ${formHeader!}
 		${action.getText(value?string)}<#t>
 		<#elseif value?is_hash&&value.displayName??>
 		${value.displayName}<#t>
-		<#elseif value?is_date>
-		<#local classname=value.class.name/>
-		<#if classname=='java.sql.Date'>${value?date}<#elseif classname=='java.sql.Time'>${value?time}<#else>${value?datetime}</#if><#t>
+		<#elseif value?is_date_only>
+		${value?date}<#t>
+		<#elseif value?is_time>
+		${value?time}<#t>
+		<#elseif value?is_datetime>
+		${value?datetime}<#t>
 		<#else>
 		${value?xhtml}<#t>
 		</#if>
