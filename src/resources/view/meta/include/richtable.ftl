@@ -5,8 +5,8 @@
 <#local size = columns?keys?size>
 <#list columns?keys as name>
 <#local config = columns[name]>
-<#local cellName=((config['trimPrefix']??)?string('',entityName+'.'))+name>
-<@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellName=cellName cellEdit=config['cellEdit'] readonly=readonly resizable=(readonly&&name_has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
+<#local cellname=((config['trimPrefix']??)?string('',entityName+'.'))+name>
+<@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=config['cellEdit'] readonly=readonly resizable=(readonly&&name_has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
 </#list>
 <@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
 <#if resultPage??><#local list=resultPage.result></#if>
@@ -70,8 +70,8 @@ ${formHeader!}
 </#if>
 </#macro>
 
-<#macro rttheadtd name,alias='',title='',cellName='',cellEdit='',class='',width='',readonly=false,resizable=true,excludeIfNotEdited=false>
-<th<#if title?has_content> title="${action.getText(title)}"</#if><#if excludeIfNotEdited||class?has_content> class="<#if excludeIfNotEdited> excludeIfNotEdited</#if><#if class?has_content> ${class}</#if>"</#if><#if width?has_content> style="width:${width};"</#if><#if !readonly> data-cellName="${cellName}"</#if><#if cellEdit?has_content> data-cellEdit="${cellEdit}"</#if>>
+<#macro rttheadtd name,alias='',title='',cellname='',cellEdit='',class='',width='',readonly=false,resizable=true,excludeIfNotEdited=false>
+<th<#if title?has_content> title="${action.getText(title)}"</#if><#if excludeIfNotEdited||class?has_content> class="<#if excludeIfNotEdited> excludeIfNotEdited</#if><#if class?has_content> ${class}</#if>"</#if><#if width?has_content> style="width:${width};"</#if> data-cellname="${cellname}"<#if cellEdit?has_content> data-cellEdit="${cellEdit}"</#if>>
 <#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?substring(alias?last_index_of('.')+1)/></#if></#if>${action.getText(alias)}<#if resizable></span><span class="resizeBar visible-desktop"></span></#if>
 </th>
 </#macro>
