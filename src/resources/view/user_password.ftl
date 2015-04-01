@@ -13,7 +13,7 @@ ${action.getText('org.springframework.security.authentication.CredentialsExpired
 <@s.form action="${actionBaseUrl}/password" method="post" class="form-horizontal ajax focus reset">
 	<@s.password label="%{getText('currentPassword')}" name="currentPassword" class="required input-pattern" readonly=userProfileReadonly/>
 	<@s.password label="%{getText('password')}" name="password" class="required input-pattern" readonly=userProfileReadonly/>
-	<@s.password label="%{getText('confirmPassword')}" name="confirmPassword" class="required repeat input-pattern submit" dynamicAttributes={"data-repeatwith":"password"} readonly=userProfileReadonly/>
+	<@s.password label="%{getText('confirmPassword')}" name="confirmPassword" class="required repeat input-pattern submit" data\-repeatwith="password" readonly=userProfileReadonly/>
 	<@s.submit value="%{getText('save')}" class="btn-primary" disabled=userProfileReadonly/>
 </@s.form>
 </body>

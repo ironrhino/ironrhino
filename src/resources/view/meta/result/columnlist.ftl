@@ -34,7 +34,7 @@
 			<li><a href="<@url value="/${name}/p${page.path}"/><#if column?has_content>?column=${column}</#if>"><#if page.title?has_content><@page.title?interpret/></#if></a></li>
 		</#list>
 		</ul>
-		<@pagination class="ajax view history cache" dynamicAttributes={"data-replacement":"list"}/>
+		<@pagination class="ajax view history cache" data\-replacement="list"/>
     </div>
   </div>
 </div>

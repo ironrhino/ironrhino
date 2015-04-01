@@ -11,12 +11,12 @@
 		<@s.password label="%{getText('password')}" name="password"/>
 		<@s.password label="%{getText('confirmPassword')}" name="confirmPassword"/>
 	<#else>
-		<@s.textfield label="%{getText('username')}" name="user.username" class="required checkavailable regex" dynamicAttributes={"data-regex":"${statics['org.ironrhino.security.model.User'].USERNAME_REGEX}","data-checkurl":"${actionBaseUrl}/checkavailable"}/>
+		<@s.textfield label="%{getText('username')}" name="user.username" class="required checkavailable regex" data\-regex="${statics['org.ironrhino.security.model.User'].USERNAME_REGEX}" data\-checkurl="${actionBaseUrl}/checkavailable"/>
 		<@s.password label="%{getText('password')}" name="password" class="required"/>
 		<@s.password label="%{getText('confirmPassword')}" name="confirmPassword" class="required"/>
 	</#if>
 	<@s.textfield label="%{getText('name')}" name="user.name" class="required"/>
-	<@s.textfield label="%{getText('email')}" name="user.email" type="email" class="email checkavailable" dynamicAttributes={"data-checkurl":"${actionBaseUrl}/checkavailable"}/>
+	<@s.textfield label="%{getText('email')}" name="user.email" type="email" class="email checkavailable" data\-checkurl="${actionBaseUrl}/checkavailable"/>
 	<@s.textfield label="%{getText('phone')}" name="user.phone"/>
 	<@s.checkbox label="%{getText('enabled')}" name="user.enabled" class="custom" />
 	<@s.checkboxlist label="%{getText('role')}" name="user.roles" list="roles" listKey="value" listValue="label" class="custom">

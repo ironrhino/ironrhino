@@ -10,7 +10,7 @@
 	</#if>
 	<@s.hidden name="parent" />
 	<@s.textfield label="%{getText('name')}" name="region.name" class="required"/>
-	<@s.textfield label="%{getText('coordinate')}" name="region.coordinate" class="latlng" dynamicAttributes={"data-address":"${region.fullname!}"}/>
+	<@s.textfield label="%{getText('coordinate')}" name="region.coordinate" class="latlng" data\-address="${region.fullname!}"/>
 	<@s.textfield label="%{getText('areacode')}" name="region.areacode" maxlength="6"/>
 	<@s.textfield label="%{getText('postcode')}" name="region.postcode" maxlength="6"/>
 	<@s.textfield label="%{getText('rank')}" name="region.rank" type="number" class="integer positive" min="1"/>
