@@ -16,6 +16,7 @@ import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
@@ -77,6 +78,10 @@ public class RedisCacheManager implements CacheManager {
 			return null;
 		try {
 			return redisTemplate.opsForValue().get(generateKey(key, namespace));
+		} catch (SerializationFailedException e) {
+			log.warn(e.getMessage(), e);
+			delete(key, namespace);
+			return null;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -91,7 +96,16 @@ public class RedisCacheManager implements CacheManager {
 		String actualKey = generateKey(key, namespace);
 		if (timeToIdle > 0)
 			redisTemplate.expire(actualKey, timeToIdle, timeUnit);
-		return redisTemplate.opsForValue().get(actualKey);
+		try {
+			return redisTemplate.opsForValue().get(actualKey);
+		} catch (SerializationFailedException e) {
+			log.warn(e.getMessage(), e);
+			delete(key, namespace);
+			return null;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	@Override
