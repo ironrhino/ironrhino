@@ -41,7 +41,7 @@ $(function() {
 		$('#form').removeClass('dirty');
 			ed.isNotDirty = 1;
 			if($('#form').attr('action').indexOf('save')>0 && window.parent!=window){
-					$('.ui-dialog-titlebar-close',$('#_window_ ',window.parent.document).closest('.ui-dialog')).click();
+					$('.ui-dialog-titlebar-close',$('.window-richtable ',window.parent.document).closest('.ui-dialog')).click();
 					return;
 				}
 			var page = Ajax.jsonResult.page;
@@ -117,7 +117,7 @@ $(function() {
 	</ul>
 	<div class="tab-content">
 	<div id="_page_base" class="tab-pane active">
-	<@s.textfield id="page_path" label="%{getText('path')}" name="page.path" class="required checkavailable" style="width:600px;"/>
+	<@s.textfield id="page_path" label="%{getText('path')}" readonly=!page.new name="page.path" class="required checkavailable" style="width:600px;"/>
 	<@s.textfield label="%{getText('displayOrder')}" name="page.displayOrder" type="number" class="integer"/>
 	<@s.textfield label="%{getText('tag')}" name="page.tagsAsString"  class="tags" dynamicAttributes={"data-source":"${actionBaseUrl}/suggest"} style="width:600px;"/>
 	<@s.textfield label="%{getText('title')}" name="page.title" style="width:600px;"/>

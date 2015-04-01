@@ -51,7 +51,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	@SearchableProperty(index = Index.NOT_ANALYZED)
 	@Column(nullable = false)
 	@CaseInsensitive
-	@NaturalId(mutable = true)
+	@NaturalId
 	@UiConfig(alias = "path")
 	private String path;
 

@@ -183,7 +183,6 @@ public class PageAction extends BaseAction {
 				addActionError(getText("validation.version.conflict"));
 				return INPUT;
 			}
-			page.setPath(temp.getPath());
 			page.setTags(temp.getTags());
 			page.setDisplayOrder(temp.getDisplayOrder());
 			page.setTitle(temp.getTitle());
