@@ -111,6 +111,12 @@ select.empty option{
 input::-ms-reveal,input::-ms-clear {
 	display: none;
 }
+button.plain{
+	border:none;
+	background-color:transparent;
+	padding:0;
+	margin-top:-2px;
+}
 input[type="file"]::-webkit-file-upload-button{
    float: right;
    border: 1px solid #aaaaaa;

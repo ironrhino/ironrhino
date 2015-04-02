@@ -251,13 +251,19 @@ ${formHeader!}
 </#if>
 </div>
 <div class="status span<#if showBottomButtons>2<#else>3</#if>">
-<span>
+<#local totalResults=0/>
 <#if resultPage?? && resultPage.totalResults gt 0>
-${resultPage.totalResults}<span class="recordLabel"> ${action.getText('record')}</span>
+<#local totalResults=resultPage.totalResults/>
 <#elseif list?? && list?size gt 0>
-${list?size}<span class="recordLabel"> ${action.getText('record')}</span>
+<#local totalResults=list?size/>
 </#if>
+${totalResults}<span class="recordLabel"> ${action.getText('record')}</span>
+<#if totalResults gt 0 && action.csv??>
+<button type="submit" class="noajax plain" formaction="${actionBaseUrl}/csv">
+<span class="glyphicon glyphicon-download-alt clickable">
 </span>
+</button>
+</#if>
 </div>
 </div>
 ${formFooter!}
