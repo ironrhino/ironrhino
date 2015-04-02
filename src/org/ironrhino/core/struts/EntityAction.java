@@ -5,8 +5,12 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,6 +59,7 @@ import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.service.BaseManager;
+import org.ironrhino.core.service.BaseManager.IterateCallback;
 import org.ironrhino.core.service.BaseTreeControl;
 import org.ironrhino.core.struts.AnnotationShadows.HiddenImpl;
 import org.ironrhino.core.struts.AnnotationShadows.ReadonlyImpl;
@@ -63,6 +68,7 @@ import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -70,6 +76,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -116,6 +123,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	@Autowired(required = false)
 	private transient ConversionService conversionService;
+
+	@Value("${csv.default.encoding:GBK}")
+	private String csvDefaultEncoding = "GBK";
 
 	public boolean isSearchable() {
 		if (getEntityClass().getAnnotation(Searchable.class) != null)
@@ -1436,6 +1446,92 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		return SUCCESS;
+	}
+
+	public String csv() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		String columns = request.getParameter("columns");
+		List<String> columnsList = null;
+		final List<String> exportColumnsList = new ArrayList<>();
+		if (StringUtils.isNotBlank(columns))
+			columnsList = Arrays.asList(columns.split(","));
+		for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
+			String name = entry.getKey();
+			if (columnsList != null && !columnsList.contains(name))
+				continue;
+			UiConfigImpl uc = entry.getValue();
+			HiddenImpl hidden = uc.getHiddenInList();
+			if (hidden.isValue())
+				continue;
+			exportColumnsList.add(name);
+		}
+
+		DetachedCriteria dc = doPrepareCriteria();
+		BaseManager entityManager = getEntityManager(getEntityClass());
+		long count = entityManager.countByCriteria(dc);
+		if (count == 0) {
+			addActionError(getText("query.result.empty"));
+			return ERROR;
+		} else if (count > 10 * ResultPage.DEFAULT_MAX_PAGESIZE) {
+			addActionError(getText("query.result.number.exceed",
+					new String[] { String
+							.valueOf(10 * ResultPage.DEFAULT_MAX_PAGESIZE) }));
+			return ERROR;
+		}
+		response.setCharacterEncoding(csvDefaultEncoding);
+		response.setHeader("Content-type", "text/csv");
+		response.setHeader("Content-disposition",
+				"attachment;filename=data.csv");
+		final String columnSeperator = ",";
+		final String lineSeperator = "\r\n";
+		final PrintWriter writer = response.getWriter();
+		for (int i = 0; i < exportColumnsList.size(); i++) {
+			writer.print(getText(exportColumnsList.get(i)));
+			writer.print(i == exportColumnsList.size() - 1 ? lineSeperator
+					: columnSeperator);
+		}
+		entityManager.iterate(10, new IterateCallback() {
+			@Override
+			public void process(Object[] entityArray, Session session) {
+				for (Object en : entityArray) {
+					BeanWrapperImpl bw = new BeanWrapperImpl(en);
+					for (int i = 0; i < exportColumnsList.size(); i++) {
+						Object value = bw.getPropertyValue(exportColumnsList
+								.get(i));
+						String text;
+						if (value == null) {
+							text = "";
+						} else if (value instanceof Date) {
+							if (value instanceof Time) {
+								text = DateUtils.format((Date) value,
+										"HH:mm:ss");
+							} else if (value instanceof java.sql.Date) {
+								text = DateUtils.formatDate8((Date) value);
+							} else {
+								text = DateUtils.formatDatetime((Date) value);
+							}
+						} else {
+							text = String.valueOf(value);
+						}
+						if (text.contains(String.valueOf(columnSeperator))
+								|| text.contains("\"") || text.contains("\n")) {
+							if (text.contains("\""))
+								text = text.replaceAll("\"", "\"\"");
+							text = new StringBuilder(text.length() + 2)
+									.append("\"").append(text).append("\"")
+									.toString();
+						}
+						writer.print(text);
+						writer.print(i == exportColumnsList.size() - 1 ? lineSeperator
+								: columnSeperator);
+					}
+
+				}
+				writer.flush();
+			}
+		}, dc);
+		return NONE;
 	}
 
 	public String enable() throws Exception {

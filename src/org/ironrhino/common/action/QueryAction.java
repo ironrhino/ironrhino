@@ -22,6 +22,7 @@ import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
@@ -39,6 +40,9 @@ public class QueryAction extends BaseAction {
 	protected Map<String, String> paramMap = new HashMap<String, String>();
 
 	protected ResultPage<Map<String, Object>> resultPage;
+
+	@Value("${csv.default.encoding:GBK}")
+	private String csvDefaultEncoding = "GBK";
 
 	@Autowired
 	protected transient JdbcQueryService jdbcQueryService;
@@ -115,6 +119,7 @@ public class QueryAction extends BaseAction {
 				throw new ErrorMessage("query.result.number.exceed",
 						new Object[] { 10 * ResultPage.DEFAULT_MAX_PAGESIZE });
 			HttpServletResponse response = ServletActionContext.getResponse();
+			response.setCharacterEncoding(csvDefaultEncoding);
 			response.setHeader("Content-type", "text/csv");
 			response.setHeader("Content-disposition",
 					"attachment;filename=data.csv");
