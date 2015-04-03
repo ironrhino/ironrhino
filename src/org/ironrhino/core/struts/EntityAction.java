@@ -1454,6 +1454,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		String columns = request.getParameter("columns");
 		List<String> columnsList = null;
 		final List<String> exportColumnsList = new ArrayList<>();
+		final Map<String, Template> csvTemplates = new HashMap<>();
 		if (StringUtils.isNotBlank(columns))
 			columnsList = Arrays.asList(columns.split(","));
 		for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
@@ -1465,6 +1466,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (hidden.isValue())
 				continue;
 			exportColumnsList.add(name);
+			if (StringUtils.isNotBlank(uc.getCsvTemplate()))
+				csvTemplates.put(name, new Template(null, uc.getCsvTemplate(),
+						freemarkerManager.getConfig()));
 		}
 
 		DetachedCriteria dc = doPrepareCriteria();
@@ -1504,23 +1508,43 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						Object value = bw.getPropertyValue(exportColumnsList
 								.get(i));
 						String text;
-						if (value == null) {
-							text = "";
-						} else if (value instanceof Collection) {
-							text = StringUtils.join((Collection) value, ",");
-						} else if (value.getClass().isArray()) {
-							text = StringUtils.join((Object[]) value, ",");
-						} else if (value instanceof Date) {
-							if (value instanceof Time) {
-								text = DateUtils.format((Date) value,
-										"HH:mm:ss");
-							} else if (value instanceof java.sql.Date) {
-								text = DateUtils.formatDate8((Date) value);
-							} else {
-								text = DateUtils.formatDatetime((Date) value);
+						Template csvTemplate = csvTemplates
+								.get(exportColumnsList.get(i));
+						if (csvTemplate != null) {
+							StringWriter sw = new StringWriter();
+							Map<String, Object> rootMap = new HashMap<String, Object>(
+									4, 1);
+							rootMap.put("entity", en);
+							rootMap.put("value", value);
+							try {
+								csvTemplate.process(rootMap, sw);
+								text = sw.toString();
+							} catch (Exception e) {
+								text = e.getMessage();
 							}
 						} else {
-							text = String.valueOf(value);
+							if (value == null) {
+								text = "";
+							} else if (value instanceof Collection) {
+								text = StringUtils
+										.join((Collection) value, ",");
+							} else if (value.getClass().isArray()) {
+								text = StringUtils.join((Object[]) value, ",");
+							} else if (value instanceof Boolean) {
+								text = getText(value.toString());
+							} else if (value instanceof Date) {
+								if (value instanceof Time) {
+									text = DateUtils.format((Date) value,
+											"HH:mm:ss");
+								} else if (value instanceof java.sql.Date) {
+									text = DateUtils.formatDate8((Date) value);
+								} else {
+									text = DateUtils
+											.formatDatetime((Date) value);
+								}
+							} else {
+								text = String.valueOf(value);
+							}
 						}
 						if (text.contains(String.valueOf(columnSeperator))
 								|| text.contains("\"") || text.contains("\n")) {

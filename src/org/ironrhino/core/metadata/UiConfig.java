@@ -64,6 +64,8 @@ public @interface UiConfig {
 	String viewTemplate() default "";
 
 	String inputTemplate() default "";
+	
+	String csvTemplate() default "";
 
 	String width() default "";
 
