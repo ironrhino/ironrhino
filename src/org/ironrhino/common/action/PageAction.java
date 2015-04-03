@@ -59,7 +59,6 @@ public class PageAction extends EntityAction<Page> {
 		this.page = page;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public String execute() {
 		if (StringUtils.isBlank(keyword) || elasticSearchService == null) {

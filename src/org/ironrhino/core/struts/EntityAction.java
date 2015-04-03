@@ -112,14 +112,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	private Map<String, NaturalId> _naturalIds;
 
-	protected ResultPage resultPage;
+	protected ResultPage<EN> resultPage;
 
 	protected Long parent;
 
 	protected BaseTreeableEntity parentEntity;
 
 	@Autowired(required = false)
-	protected transient ElasticSearchService<Persistable<?>> elasticSearchService;
+	protected transient ElasticSearchService<EN> elasticSearchService;
 
 	@Autowired(required = false)
 	protected transient ConversionService conversionService;
@@ -379,10 +379,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				bw.setPropertyValue("id", keyword);
 				Serializable idvalue = (Serializable) bw.getPropertyValue("id");
 				if (idvalue != null) {
-					Persistable p = getEntityManager(getEntityClass()).get(
-							idvalue);
+					EN p = (EN) getEntityManager(getEntityClass()).get(idvalue);
 					if (p != null) {
-						resultPage = new ResultPage();
+						resultPage = new ResultPage<>();
 						resultPage.setPageNo(1);
 						resultPage.setTotalResults(1);
 						resultPage.setResult(Collections.singletonList(p));
@@ -460,17 +459,17 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPaginating(richtableConfig.paginating());
 			resultPage.setCriteria(criteria);
 			resultPage = elasticSearchService.search(resultPage,
-					new Mapper<Persistable<?>>() {
+					new Mapper<EN>() {
 						@Override
-						public Persistable map(Persistable source) {
-							return entityManager.get(source.getId());
+						public EN map(EN source) {
+							return (EN) entityManager.get(source.getId());
 						}
 					});
 		}
 		return LIST;
 	}
 
-	public DetachedCriteria doPrepareCriteria() {
+	private DetachedCriteria doPrepareCriteria() {
 		BaseManager entityManager = getEntityManager(getEntityClass());
 		BeanWrapperImpl bw;
 		try {
@@ -589,7 +588,6 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (propertyNamesInLike.size() > 0)
 				dc.add(CriterionUtils.like(keyword, propertyNamesInLike));
 		}
-
 		if (criteriaState.getOrderings().isEmpty()) {
 			if (richtableConfig != null
 					&& StringUtils.isNotBlank(richtableConfig.order())) {

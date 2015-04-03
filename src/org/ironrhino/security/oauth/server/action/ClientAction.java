@@ -47,7 +47,6 @@ public class ClientAction extends EntityAction<Client> {
 	}
 
 	@Authorize(ifAllGranted = UserRole.ROLE_BUILTIN_USER)
-	@SuppressWarnings("unchecked")
 	public String mine() {
 		BaseManager<Client> entityManager = getEntityManager(Client.class);
 		DetachedCriteria dc = entityManager.detachedCriteria();
