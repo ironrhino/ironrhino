@@ -71,6 +71,14 @@ public class JdbcQueryService {
 
 	private List<String> keywords = new ArrayList<String>();
 
+	@Value("${csv.maxRows:0}")
+	private int csvMaxRows;
+
+	public int getCsvMaxRows() {
+		return csvMaxRows > 0 ? csvMaxRows
+				: 1000 * ResultPage.DEFAULT_PAGE_SIZE;
+	}
+
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
@@ -511,7 +519,7 @@ public class JdbcQueryService {
 		resultPage.setPaginating(!hasLimit);
 		jdbcTemplate.setQueryTimeout(queryTimeout);
 		resultPage.setTotalResults(count(sql, paramMap));
-		if (resultPage.getTotalResults() > ResultPage.DEFAULT_MAX_PAGESIZE
+		if (resultPage.getTotalResults() > getCsvMaxRows()
 				&& (hasLimit || !(databaseProduct == DatabaseProduct.MYSQL
 						|| databaseProduct == DatabaseProduct.POSTGRESQL
 						|| databaseProduct == DatabaseProduct.H2
@@ -523,7 +531,7 @@ public class JdbcQueryService {
 						|| databaseProduct == DatabaseProduct.SQLSERVER
 						&& databaseMajorVersion >= 11 || databaseProduct == DatabaseProduct.DERBY)))
 			throw new ErrorMessage("query.result.number.exceed",
-					new Object[] { ResultPage.DEFAULT_MAX_PAGESIZE });
+					new Object[] { getCsvMaxRows() });
 		long time = System.currentTimeMillis();
 		jdbcTemplate.setQueryTimeout(queryTimeout);
 		resultPage.setResult(query(sql, paramMap, resultPage.getPageSize(),

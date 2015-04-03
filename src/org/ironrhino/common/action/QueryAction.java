@@ -41,7 +41,7 @@ public class QueryAction extends BaseAction {
 
 	protected ResultPage<Map<String, Object>> resultPage;
 
-	@Value("${csv.default.encoding:GBK}")
+	@Value("${csv.defaultEncoding:GBK}")
 	private String csvDefaultEncoding = "GBK";
 
 	@Autowired

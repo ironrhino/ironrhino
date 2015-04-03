@@ -124,8 +124,16 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	@Autowired(required = false)
 	protected transient ConversionService conversionService;
 
-	@Value("${csv.default.encoding:GBK}")
+	@Value("${csv.defaultEncoding:GBK}")
 	private String csvDefaultEncoding = "GBK";
+
+	@Value("${csv.maxRows:0}")
+	private int csvMaxRows;
+
+	public int getCsvMaxRows() {
+		return csvMaxRows > 0 ? csvMaxRows
+				: 1000 * ResultPage.DEFAULT_PAGE_SIZE;
+	}
 
 	public boolean isSearchable() {
 		if (getEntityClass().getAnnotation(Searchable.class) != null)
@@ -1472,13 +1480,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		DetachedCriteria dc = doPrepareCriteria();
 		BaseManager entityManager = getEntityManager(getEntityClass());
 		long count = entityManager.countByCriteria(dc);
+		int maxRows = getCsvMaxRows();
 		if (count == 0) {
 			addActionError(getText("query.result.empty"));
 			return ERROR;
-		} else if (count > 10 * ResultPage.DEFAULT_MAX_PAGESIZE) {
+		} else if (count > maxRows) {
 			addActionError(getText("query.result.number.exceed",
-					new String[] { String
-							.valueOf(10 * ResultPage.DEFAULT_MAX_PAGESIZE) }));
+					new String[] { String.valueOf(maxRows) }));
 			return ERROR;
 		}
 		response.setCharacterEncoding(csvDefaultEncoding);
