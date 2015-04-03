@@ -1487,7 +1487,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		final String lineSeperator = "\r\n";
 		final PrintWriter writer = response.getWriter();
 		for (int i = 0; i < exportColumnsList.size(); i++) {
-			writer.print(getText(exportColumnsList.get(i)));
+			String label = exportColumnsList.get(i);
+			UiConfigImpl uic = getUiConfigs().get(label);
+			if (uic != null && StringUtils.isNotBlank(uic.getAlias()))
+				label = uic.getAlias();
+			writer.print(getText(label));
 			writer.print(i == exportColumnsList.size() - 1 ? lineSeperator
 					: columnSeperator);
 		}
@@ -1502,6 +1506,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						String text;
 						if (value == null) {
 							text = "";
+						} else if (value instanceof Collection) {
+							text = StringUtils.join((Collection) value, ",");
+						} else if (value.getClass().isArray()) {
+							text = StringUtils.join((Object[]) value, ",");
 						} else if (value instanceof Date) {
 							if (value instanceof Time) {
 								text = DateUtils.format((Date) value,
