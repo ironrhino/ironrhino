@@ -119,10 +119,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected BaseTreeableEntity parentEntity;
 
 	@Autowired(required = false)
-	private transient ElasticSearchService<Persistable<?>> elasticSearchService;
+	protected transient ElasticSearchService<Persistable<?>> elasticSearchService;
 
 	@Autowired(required = false)
-	private transient ConversionService conversionService;
+	protected transient ConversionService conversionService;
 
 	@Value("${csv.default.encoding:GBK}")
 	private String csvDefaultEncoding = "GBK";
@@ -1743,9 +1743,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return JSON;
 	}
 
-	private List<String> suggestions;
+	protected List suggestions;
 
-	public List<String> getSuggestions() {
+	public List getSuggestions() {
 		return suggestions;
 	}
 

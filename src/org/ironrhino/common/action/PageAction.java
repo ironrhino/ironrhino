@@ -2,7 +2,6 @@ package org.ironrhino.common.action;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,18 +14,16 @@ import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.model.LabelValue;
-import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.search.elasticsearch.ElasticSearchCriteria;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
-import org.ironrhino.core.struts.BaseAction;
+import org.ironrhino.core.struts.EntityAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
-public class PageAction extends BaseAction {
+public class PageAction extends EntityAction<Page> {
 
 	private static final long serialVersionUID = 67252386921293136L;
 
@@ -34,19 +31,10 @@ public class PageAction extends BaseAction {
 
 	private boolean draft;
 
-	private ResultPage<Page> resultPage;
-
 	@Autowired
 	private transient PageManager pageManager;
 
 	private String cmsPath = "/p/";
-
-	@Autowired(required = false)
-	private transient ElasticSearchService<Page> elasticSearchService;
-
-	public Class<? extends Persistable<?>> getEntityClass() {
-		return Page.class;
-	}
 
 	@com.opensymphony.xwork2.inject.Inject(value = "ironrhino.cmsPath", required = false)
 	public void setCmsPath(String val) {
@@ -71,14 +59,7 @@ public class PageAction extends BaseAction {
 		this.page = page;
 	}
 
-	public ResultPage<Page> getResultPage() {
-		return resultPage;
-	}
-
-	public void setResultPage(ResultPage<Page> resultPage) {
-		this.resultPage = resultPage;
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public String execute() {
 		if (StringUtils.isBlank(keyword) || elasticSearchService == null) {
@@ -212,7 +193,8 @@ public class PageAction extends BaseAction {
 		return makeEntityValid() ? NONE : INPUT;
 	}
 
-	private boolean makeEntityValid() {
+	@Override
+	protected boolean makeEntityValid() {
 		String path = page.getPath().trim().toLowerCase();
 		if (!path.startsWith("/"))
 			path = "/" + path;
@@ -258,12 +240,7 @@ public class PageAction extends BaseAction {
 		return JSON;
 	}
 
-	private List<LabelValue> suggestions;
-
-	public List<LabelValue> getSuggestions() {
-		return suggestions;
-	}
-
+	@SuppressWarnings("unchecked")
 	@JsonConfig(root = "suggestions")
 	public String suggest() {
 		if (StringUtils.isBlank(keyword))

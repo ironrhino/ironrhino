@@ -60,7 +60,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 
 	@JsonIgnore
 	@Lob
-	@UiConfig(excludedFromCriteria = true)
+	@UiConfig(hidden = true, excludedFromCriteria = true)
 	private String head;
 
 	@JsonIgnore
@@ -197,6 +197,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 		this.tags = tags;
 	}
 
+	@UiConfig(hidden = true)
 	@NotInCopy
 	@JsonIgnore
 	@Column(name = "tags", length = 1024)
