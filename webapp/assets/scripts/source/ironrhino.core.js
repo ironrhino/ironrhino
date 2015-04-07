@@ -1190,6 +1190,7 @@ Observation.common = function(container) {
 		});
 	if (typeof $.fn.chosen != 'undefined')
 		$('.chosen', container).chosen({
+					search_contains : true,
 					placeholder_text : MessageBundle.get('select'),
 					no_results_text : ' '
 				});

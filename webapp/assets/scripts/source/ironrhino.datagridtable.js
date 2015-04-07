@@ -30,7 +30,8 @@
 				var t = $(this);
 				if (!t.html()) {
 					if (t.parent().parent().prop('tagName') == 'THEAD') {
-						t.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i>');
+						t
+								.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i>');
 					} else {
 						t
 								.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i><i class="glyphicon glyphicon-minus manipulate remove clickable"></i><i class="glyphicon glyphicon-arrow-up manipulate moveup clickable"></i><i class="glyphicon glyphicon-arrow-down manipulate movedown clickable"></i>');
@@ -131,6 +132,7 @@
 		if (typeof $.fn.chosen != 'undefined') {
 			$('.chosen-container', r).remove();
 			$('.chosen', r).show().data('chosen', false).chosen({
+						search_contains : true,
 						placeholder_text : MessageBundle.get('select'),
 						no_results_text : ' '
 					});
