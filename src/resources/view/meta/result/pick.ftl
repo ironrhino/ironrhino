@@ -74,6 +74,7 @@
 		<#else>
 			<#if uiConfigs?? && uiConfigs[column]??>
 				<#assign uiConfig = uiConfigs[column]/>
+				<#assign alias = uiConfig.alias!/>
 				<#assign width = uiConfig.width!/>
 				<#assign template = uiConfig.template!/>
 				<#if uiConfig.listTemplate?has_content>
@@ -84,10 +85,11 @@
 					<#assign template = r'<#if displayDictionaryLabel??><@displayDictionaryLabel dictionaryName="'+templateName+r'" value=value!/><#else>${value!}</#if>'/>
 				</#if>
 			<#else>
+				<#assign alias = ''/>
 				<#assign width = ''/>
 				<#assign template = ''/>	
 			</#if>
-			<#assign columns=columns+{column:{'width':width,'template':template}}/>
+			<#assign columns=columns+{column:{'alias':alias,'width':width,'template':template}}/>
 		</#if>
 	</#list>
 </#if>
