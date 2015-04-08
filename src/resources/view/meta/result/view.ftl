@@ -275,8 +275,8 @@
 	</#list>
 	<#if attachmentable && entity.attachments?has_content>
 	<#list entity.attachments as attachment>
-		<#assign filename=attachment?substring(attachment?last_index_of('/')+1) />
-		<#assign url=attachment?substring(0,attachment?last_index_of('/')+1)+filename?url />
+		<#assign filename=attachment?keep_after_last('/') />
+		<#assign url=attachment?keep_before_last('/')+'/'+filename?url />
 		<a href="${url}" target="_blank">
 		<#if attachment?ends_with('jpg')||attachment?ends_with('png')||attachment?ends_with('gif')||attachment?ends_with('bmp')||attachment?ends_with('webp')>
 		<img style="display:block;" src="${url}"/>

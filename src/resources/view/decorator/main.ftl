@@ -1,5 +1,5 @@
 <#assign charset=response.characterEncoding!'utf-8'/>
-<#assign requestURI=request.requestURI?substring(request.contextPath?length)/>
+<#assign requestURI=request.requestURI[request.contextPath?length..]/>
 <#assign modernBrowser = true/>
 <#assign ua = request.getAttribute('userAgent')!/>
 <#if ua?? && ua.name=='msie' && ua.majorVersion lt 9>

@@ -1,7 +1,7 @@
 <#if !entityName??>
 <#assign entityName=action.class.simpleName?uncap_first/>
 <#if entityName?ends_with('Action')>
-<#assign entityName=entityName?substring(0,entityName?length-6)/>
+<#assign entityName=entityName[0..entityName?length-7]/>
 </#if>
 </#if>
 <#assign requestURI=request.requestURI>

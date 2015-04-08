@@ -72,7 +72,7 @@ ${formHeader!}
 
 <#macro rttheadtd name,alias='',title='',cellname='',cellEdit='',class='',width='',readonly=false,resizable=true,excludeIfNotEdited=false>
 <th<#if title?has_content> title="${action.getText(title)}"</#if><#if excludeIfNotEdited||class?has_content> class="<#if excludeIfNotEdited> excludeIfNotEdited</#if><#if class?has_content> ${class}</#if>"</#if><#if width?has_content> style="width:${width};"</#if> data-cellname="${cellname}"<#if cellEdit?has_content> data-cellEdit="${cellEdit}"</#if>>
-<#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?substring(alias?last_index_of('.')+1)/></#if></#if>${action.getText(alias)}<#if resizable></span><span class="resizeBar visible-desktop"></span></#if>
+<#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?keep_after_last('.')/></#if></#if>${action.getText(alias)}<#if resizable></span><span class="resizeBar visible-desktop"></span></#if>
 </th>
 </#macro>
 <#macro rtmiddle width='50px' showActionColumn=true>
@@ -281,7 +281,7 @@ ${formFooter!}
 					<#if !label?has_content>
 						<#local label=entry.key/>
 						<#if label?index_of('.') gt 0>
-							<#local label=label?substring(label?last_index_of('.')+1)/>
+							<#local label=label?keep_after_last('.')/>
 						</#if>
 					</#if>
 					<#if entry.value.propertyType.enum>
@@ -323,7 +323,7 @@ ${formFooter!}
 					<#if !label?has_content>
 						<#local label=entry.key/>
 						<#if label?index_of('.') gt 0>
-							<#local label=label?substring(label?last_index_of('.')+1)/>
+							<#local label=label?keep_after_last('.')/>
 						</#if>
 					</#if>
 					<option value="${entry.key}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
