@@ -68,6 +68,7 @@
 </#if>
 <#assign columns={}>
 <#if columnNames??>
+	<#assign allwidthed = true/>
 	<#list columnNames as column>
 		<#if treeable && column == 'name'||column == 'fullname'>
 			<#assign columns=columns+{column:{'template':r'<#if entity.leaf??&&!entity.leaf><a href="${href}${href?contains("?")?string("&","?")+"parent="+entity.id}" class="ajax view" data-replacement="${entityName}_pick">${value}</a><#else>${value}</#if>'}}/>
@@ -75,7 +76,14 @@
 			<#if uiConfigs?? && uiConfigs[column]??>
 				<#assign uiConfig = uiConfigs[column]/>
 				<#assign alias = uiConfig.alias!/>
+				<#if !uiConfig.width?has_content>
+				<#assign allwidthed=false/>
+				</#if>
+				<#if allwidthed && !column_has_next>
+				<#assign width = ''/>
+				<#else>
 				<#assign width = uiConfig.width!/>
+				</#if>
 				<#assign template = uiConfig.template!/>
 				<#if uiConfig.listTemplate?has_content>
 				<#assign template = uiConfig.listTemplate/>
@@ -85,6 +93,7 @@
 					<#assign template = r'<#if displayDictionaryLabel??><@displayDictionaryLabel dictionaryName="'+templateName+r'" value=value!/><#else>${value!}</#if>'/>
 				</#if>
 			<#else>
+				<#assign allwidthed=false/>
 				<#assign alias = ''/>
 				<#assign width = ''/>
 				<#assign template = ''/>	
