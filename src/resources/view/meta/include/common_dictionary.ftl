@@ -6,7 +6,7 @@
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
-	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#list dynamicAttributes?keys as attr><#if attr!='class' && attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
+	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#list dynamicAttributes?keys as attr><#if attr!='class' && attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
 		<option value="${headerKey}">${headerValue}</option>
 		<#local exists=false>
 		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
@@ -69,7 +69,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			<#if !dictionary.groupable>
 				<#list items as lv>
 				<label for="${dictionaryName}-${index}" class="checkbox inline"><#t>
-				<input id="${dictionaryName}-${index}" type="checkbox" value="${lv.value}" class="custom"<#if value?seq_contains(lv.value)> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+				<input id="${dictionaryName}-${index}" type="checkbox" value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if value?seq_contains(lv.value)> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 				</label><#t>
 				<#local index=index+1>
 				</#list>
@@ -92,7 +92,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 						</#if>
 					<#else>
 						<label for="${dictionaryName}-${index}" class="checkbox inline"><#t>
-						<input id="${dictionaryName}-${index}" type="checkbox" class="custom" value="${lv.value}"<#if value?seq_contains(lv.value)> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+						<input id="${dictionaryName}-${index}" type="checkbox" class="custom ${dynamicAttributes['class']!}" value="${lv.value}"<#if value?seq_contains(lv.value)> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 						</label><#t>
 						<#if group?has_content && index==items?size-1>
 						</span><#lt>
@@ -105,7 +105,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 		<#list value as v>
 		<#if !dictionary?? || !(dictionary.itemsAsMap!)?keys?seq_contains(v)>
 		<label for="${dictionaryName}-${index}" class="checkbox inline"><#t>
-		<input id="${dictionaryName}-${index}" type="checkbox" class="custom" value="${v}"checked="checked"<#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${v}<#t>
+		<input id="${dictionaryName}-${index}" type="checkbox" class="custom ${dynamicAttributes['class']!}" value="${v}"checked="checked"<#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${v}<#t>
 		</label><#t>
 		<#local index = index+1/>
 		</#if>
@@ -126,7 +126,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			<#if !dictionary.groupable>
 				<#list items as lv>
 				<label for="${dictionaryName}-${index}" class="radio inline"><#t>
-				<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}" class="custom"<#if value==lv.value> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+				<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if value==lv.value> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 				</label><#t>
 				<#local index=index+1>
 				</#list>
@@ -149,7 +149,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 						</#if>
 					<#else>
 						<label for="${dictionaryName}-${index}" class="radio inline"><#t>
-						<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> class="custom" value="${lv.value}"<#if value==lv.value> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+						<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> class="custom ${dynamicAttributes['class']!}" value="${lv.value}"<#if value==lv.value> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 						</label><#t>
 						<#if group?has_content && index==items?size-1>
 						</span><#lt>
@@ -161,7 +161,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 		</#if>
 		<#if !dictionary?? || value?has_content && !(dictionary.itemsAsMap!)?keys?seq_contains(value)>
 		<label for="${dictionaryName}-${index}" class="radio inline"><#t>
-		<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> class="custom" value="${value}"checked="checked"<#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${value}<#t>
+		<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> class="custom ${dynamicAttributes['class']!}" value="${value}"checked="checked"<#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${value}<#t>
 		</label><#t>
 		<#local index = index+1/>
 		</#if>
