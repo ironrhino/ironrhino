@@ -12,6 +12,7 @@ body.main {
 body {
 	padding-top: 0;
 	padding-bottom: 0;
+	font-family: Tahoma, 'Microsoft Yahei', sans-serif;
 }
 .table.middle th, .table.middle td{
 	vertical-align: middle;
@@ -31,7 +32,7 @@ td.middle {
 }
 .navbar-fixed-top, .navbar-fixed-bottom{
 	z-index: 1000;
-	font-size:1.1em;
+	font-size:1.2em;
 }
 .modal {
 	z-index: 2050;
