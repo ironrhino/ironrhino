@@ -147,6 +147,7 @@ public class DefaultFactory extends BaseFactory {
         }
 
         Document doc = builder.parse(is);
+        is.close();
         Element root = doc.getDocumentElement();
         // Verify root element
         if (!"sitemesh".equalsIgnoreCase(root.getTagName())) {
@@ -172,6 +173,7 @@ public class DefaultFactory extends BaseFactory {
             throw new IllegalStateException("Cannot load excludes configuration file \"" + excludesFileName + "\" as specified in \"sitemesh.xml\" or \"sitemesh-default.xml\"");
 
         Document document = builder.parse(is);
+        is.close();
         Element root = document.getDocumentElement();
         NodeList sections = root.getChildNodes();
 

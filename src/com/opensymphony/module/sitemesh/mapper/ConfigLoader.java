@@ -127,6 +127,7 @@ public class ConfigLoader {
             if (is == null)
                 is = getClass().getClassLoader().getResourceAsStream(configFileName);
             document = builder.parse(is);
+            is.close();
 
             // Parse the configuration document
             parseConfig(document);
