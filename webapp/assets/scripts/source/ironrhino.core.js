@@ -60,6 +60,8 @@ Indicator = {
 		if (!iserror && !ind.hasClass('loading'))
 			ind.addClass('loading');
 		ind.html(Indicator.text || MessageBundle.get('ajax.loading'));
+		if (!iserror)
+			ind.prepend('<span class="icon-loading small"></span>');
 		ind.show();
 		Indicator.text = '';
 	},

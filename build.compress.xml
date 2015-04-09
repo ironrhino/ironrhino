@@ -196,6 +196,7 @@
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.filtercolumn.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.treearea.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pattern.css" />
+				<file name="${webapp.dir}/assets/styles/source/ironrhino.icon.css" />
 				<file name="${webapp.dir}/assets/styles/source/bootstrap-responsive.css" />
 			</filelist>
 		</concat>
@@ -206,6 +207,7 @@
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.core.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.form.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pagination.css" />
+				<file name="${webapp.dir}/assets/styles/source/ironrhino.icon.css" />
 			</filelist>
 		</concat>
 		<replaceregexp file="${webapp.dir}/assets/styles/ironrhino.css" match="^\/\*!" replace="/*" byline="true" encoding="utf-8" />

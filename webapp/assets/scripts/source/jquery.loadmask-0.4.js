@@ -80,7 +80,7 @@
 		
 		if(label !== undefined) {
 			var maskMsgDiv = $('<div class="loadmask-msg" style="display:none;"></div>');
-			maskMsgDiv.append('<div>' + label + '</div>');
+			maskMsgDiv.append('<div><span class="icon-loading"></span>' + label + '</div>');
 			element.append(maskMsgDiv);
 			
 			//calculate center position
