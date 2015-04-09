@@ -16,8 +16,12 @@
 .form-horizontal .span6 .controls {
 	margin-left: 200px;
 }
-div.form-horizontal  .control-label{
+.form-horizontal  .control-label{
 	font-weight: bold;
+	font-style: italic;
+}
+div.form-horizontal  .control-label{
+	cursor: text;
 }
 div.form-horizontal .controls,.controls.text {
 	padding-top: 5px;

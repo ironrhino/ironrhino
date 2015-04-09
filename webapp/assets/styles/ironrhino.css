@@ -7855,6 +7855,7 @@ body.main {
 body {
 	padding-top: 0;
 	padding-bottom: 0;
+	font-family: Tahoma, 'Microsoft Yahei', sans-serif;
 }
 .table.middle th, .table.middle td{
 	vertical-align: middle;
@@ -7874,7 +7875,7 @@ td.middle {
 }
 .navbar-fixed-top, .navbar-fixed-bottom{
 	z-index: 1000;
-	font-size:1.1em;
+	font-size:1.2em;
 }
 .modal {
 	z-index: 2050;
@@ -8163,8 +8164,12 @@ div.text-core{
 .form-horizontal .span6 .controls {
 	margin-left: 200px;
 }
-div.form-horizontal  .control-label{
+.form-horizontal  .control-label{
 	font-weight: bold;
+	font-style: italic;
+}
+div.form-horizontal  .control-label{
+	cursor: text;
 }
 div.form-horizontal .controls,.controls.text {
 	padding-top: 5px;
@@ -8829,11 +8834,14 @@ table .resizeBar {
 	background-color: #cccccc;
 	display: inline;
 }
-#_window_ form{
+.window-richtable form:first-child{
 	padding-top : 20px;
 }
-#_window_ form textarea.input-xxlarge,#_window_ form input.input-xxlarge {
+.window-richtable form:first-child textarea.input-xxlarge,.window-richtable form input.input-xxlarge {
 	width: 515px;
+}
+.window-listpick form.criteria select{
+	width: 200px;
 }
 table.richtable thead {
 	background: #DEDEDE;

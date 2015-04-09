@@ -1,8 +1,11 @@
-#_window_ form{
+.window-richtable form:first-child{
 	padding-top : 20px;
 }
-#_window_ form textarea.input-xxlarge,#_window_ form input.input-xxlarge {
+.window-richtable form:first-child textarea.input-xxlarge,.window-richtable form input.input-xxlarge {
 	width: 515px;
+}
+.window-listpick form.criteria select{
+	width: 200px;
 }
 table.richtable thead {
 	background: #DEDEDE;
