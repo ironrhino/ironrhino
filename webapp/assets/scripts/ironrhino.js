@@ -33588,7 +33588,9 @@ DateUtils = {
 })(jQuery);
 
 Observation.checkavailable = function(container) {
-	$(':input.checkavailable', container).checkavailable();
+	var c = $(container);
+	var selector = ':input.checkavailable';
+	c.is(selector) ? c.checkavailable() : $(selector, c).checkavailable();
 };
 (function($) {
 	$.ajaxupload = function(files, options) {
@@ -34139,7 +34141,9 @@ Observation.checkavailable = function(container) {
 })(jQuery);
 
 Observation.concatsnapshot = function(container) {
-	$('.concatsnapshot', container).concatsnapshot();
+	var c = $(container);
+	var selector = '.concatsnapshot';
+	c.is(selector) ? c.concatsnapshot() : $(selector, c).concatsnapshot();
 };
 (function($) {
 
@@ -34182,7 +34186,7 @@ Observation.concatsnapshot = function(container) {
 	function concatenateImages(files, target, field, maximum, error) {
 		if (files.length > maximum) {
 			Message.showActionError(MessageBundle.get(error
-							|| 'maximum.exceeded', files.length,
+									|| 'maximum.exceeded', files.length,
 							maximum), $(target).closest('form'));
 			return;
 		}
@@ -34285,7 +34289,9 @@ Observation.concatsnapshot = function(container) {
 })(jQuery);
 
 Observation.concatimage = function(container) {
-	$('.concatimage', container).concatimage();
+	var c = $(container);
+	var selector = '.concatimage';
+	c.is(selector) ? c.concatimage() : $(selector, c).concatimage();
 };
 (function($) {
 
@@ -34323,7 +34329,9 @@ Observation.concatimage = function(container) {
 })(jQuery);
 
 Observation.decodeqrcode = function(container) {
-	$('.decodeqrcode', container).decodeqrcode();
+	var c = $(container);
+	var selector = '.decodeqrcode';
+	c.is(selector) ? c.decodeqrcode() : $(selector, c).decodeqrcode();
 };
 (function($) {
 
@@ -34387,7 +34395,9 @@ Observation.decodeqrcode = function(container) {
 })(jQuery);
 
 Observation.encodeqrcode = function(container) {
-	$('.encodeqrcode', container).encodeqrcode();
+	var c = $(container);
+	var selector = '.encodeqrcode';
+	c.is(selector) ? c.encodeqrcode() : $(selector, c).encodeqrcode();
 };
 
 // ---------------------------------------------------------------------
@@ -35710,7 +35720,9 @@ Initialization.upload = function() {
 	});;
 }
 Observation.upload = function(container) {
-	var upload_form = $('#upload_form', container);
+	var c = $(container);
+	var selector = '#upload_form';
+	var upload_form = c.is(selector) ? c : $(selector, c);
 	if (upload_form.length && typeof window.FileReader != 'undefined') {
 		$('input[type="file"]', upload_form).change(function() {
 					if (uploadFiles(this.files)) {
@@ -36034,13 +36046,13 @@ function uploadFiles(files, filenames) {
 			options.replacement = ele.attr('id');
 		ajax(options);
 	}
+	$(document).on('click', '.ajaxpanel .load', function() {
+				$(this).closest('.ajaxpanel').trigger('load');
+			});
 })(jQuery);
 
 Observation.ajaxpanel = function(container) {
 	$('.ajaxpanel', container).ajaxpanel();
-	$('.ajaxpanel .load', container).click(function() {
-				$(this).closest('.ajaxpanel').trigger('load');
-			});
 };
 (function($) {
 
@@ -36410,8 +36422,9 @@ Observation.checkbox = function(container) {
 })(jQuery);
 
 Observation.sortableTable = function(container) {
-	if (!$.browser.msie || $.browser.version > 7)
-		$('table.sortable', container).sortableTable();
+	var c = $(container);
+	var selector = 'table.sortable';
+	c.is(selector) ? c.sortableTable() : $(selector, c).sortableTable();
 };
 (function($) {
 	$.fn.datagridTable = function(options) {
@@ -36643,131 +36656,93 @@ Observation.sortableTable = function(container) {
 })(jQuery);
 
 Observation.datagridTable = function(container) {
-	$('table.datagrid', container).datagridTable();
+	var c = $(container);
+	var selector = 'table.datagrid';
+	if (c.is(selector))
+		c.datagridTable();
+	$(selector, c).datagridTable();
 };
 (function($) {
 	$.fn.portal = function() {
 		if (arguments.length == 0) {
-			this
-					.addClass('clearfix')
-					.each(
-							function() {
-								var portal = $(this);
-								var savable = portal.hasClass('savable');
-								$('.portal-column', portal).sortable({
-									connectWith : '.portal-column',
-									handle : '.portlet-header',
-									opacity : 0.6,
-									receive : function(event, ui) {
-										var col = $(event.target);
-										if (col.hasClass('empty'))
-											col.removeClass('empty');
-										if (savable)
-											portal.portal('layout', 'save');
-									},
-									remove : function(event, ui) {
-										var col = $(event.target);
-										if ($('.portlet', col).length == 0)
-											col.addClass('empty');
-										if (savable)
-											portal.portal('layout', 'save');
-									},
-									sort : function(event, ui) {
-										if (savable)
-											portal.portal('layout', 'save');
-									}
-								});
-								$('.portlet', portal)
-										.each(
-												function() {
-													var header = $(
-															'.portlet-header',
-															this);
-													header
-															.append('<div class="portlet-icon"><a class="btn btn-fold"><i class="glyphicon glyphicon-chevron-up"></i></a><a class="btn btn-close"><i class="glyphicon glyphicon-remove"></i></a></div>');
-													if ($('.ajaxpanel', $(this)).length) {
-														$(
-																'<a class="btn btn-refresh"><i class="glyphicon glyphicon-refresh"></i></a>')
-																.insertBefore(
-																		$(
-																				'.portlet-header .btn-fold',
-																				this));
-													}
-												});
-								portal
-										.on(
-												'click',
-												'.portlet-header .btn-close',
-												function() {
-													var p = $(this).closest(
-															'.portlet');
-													var id = p.attr('id');
-													if (savable
-															&& window.localStorage
-															&& id) {
-														var hidden = localStorage[document.location.pathname
-																+ '_portal-hidden'];
-														if (hidden) {
-															var hidden = hidden
-																	.split(',');
-															if ($.inArray(id,
-																	hidden) < 0)
-																hidden.push(id);
-														} else {
-															hidden = [ id ];
-														}
-														localStorage[document.location.pathname
-																+ '_portal-hidden'] = hidden
-																.join(',');
-													}
-													p.remove();
-													addRestoreButton(portal);
-												})
-										.on(
-												'click',
-												'.portlet-header .btn-fold',
-												function() {
-													$('i', this)
-															.toggleClass(
-																	'glyphicon-chevron-up')
-															.toggleClass(
-																	'glyphicon-chevron-down');
-													$(this)
-															.closest('.portlet')
-															.find(
-																	'.portlet-content')
-															.toggle();
-												})
-										.on(
-												'click',
-												'.portlet-header .btn-refresh',
-												function() {
-													$(
-															'.ajaxpanel',
-															$(this).closest(
-																	'.portlet'))
-															.trigger('load');
-												}).on(
-												'click',
-												'.portal-footer .restore',
-												function() {
-													$(this).closest('.portal')
-															.portal('layout',
-																	'restore');
-												});
-								if (window.localStorage) {
-									var layout = localStorage[document.location.pathname
-											+ '_portal-layout'];
-									var hidden = localStorage[document.location.pathname
-											+ '_portal-hidden'];
-									if (layout || hidden) {
-										$(this).portal('layout', 'render',
-												layout, hidden);
-										if (savable)
-											addRestoreButton(portal);
-									}
-								}
-							});
+			this.addClass('clearfix').each(function() {
+				var portal = $(this);
+				var savable = portal.hasClass('savable');
+				$('.portal-column', portal).sortable({
+							connectWith : '.portal-column',
+							handle : '.portlet-header',
+							opacity : 0.6,
+							receive : function(event, ui) {
+								var col = $(event.target);
+								if (col.hasClass('empty'))
+									col.removeClass('empty');
+								if (savable)
+									portal.portal('layout', 'save');
+							},
+							remove : function(event, ui) {
+								var col = $(event.target);
+								if ($('.portlet', col).length == 0)
+									col.addClass('empty');
+								if (savable)
+									portal.portal('layout', 'save');
+							},
+							sort : function(event, ui) {
+								if (savable)
+									portal.portal('layout', 'save');
+							}
+						});
+				$('.portlet', portal).each(function() {
+					var header = $('.portlet-header', this);
+					header
+							.append('<div class="portlet-icon"><a class="btn btn-fold"><i class="glyphicon glyphicon-chevron-up"></i></a><a class="btn btn-close"><i class="glyphicon glyphicon-remove"></i></a></div>');
+					if ($('.ajaxpanel', $(this)).length) {
+						$(		'<a class="btn btn-refresh"><i class="glyphicon glyphicon-refresh"></i></a>')
+								.insertBefore($('.portlet-header .btn-fold',
+												this));
+					}
+				});
+				portal.on('click', '.portlet-header .btn-close', function() {
+					var p = $(this).closest('.portlet');
+					var id = p.attr('id');
+					if (savable && window.localStorage && id) {
+						var hidden = localStorage[document.location.pathname
+								+ '_portal-hidden'];
+						if (hidden) {
+							var hidden = hidden.split(',');
+							if ($.inArray(id, hidden) < 0)
+								hidden.push(id);
+						} else {
+							hidden = [id];
+						}
+						localStorage[document.location.pathname
+								+ '_portal-hidden'] = hidden.join(',');
+					}
+					p.remove();
+					addRestoreButton(portal);
+				}).on('click', '.portlet-header .btn-fold', function() {
+					$('i', this).toggleClass('glyphicon-chevron-up')
+							.toggleClass('glyphicon-chevron-down');
+					$(this).closest('.portlet').find('.portlet-content')
+							.toggle();
+				}).on('click', '.portlet-header .btn-refresh', function() {
+					$('.ajaxpanel', $(this).closest('.portlet'))
+							.trigger('load');
+				}).on('click', '.portal-footer .restore', function() {
+							$(this).closest('.portal').portal('layout',
+									'restore');
+						});
+				if (window.localStorage) {
+					var layout = localStorage[document.location.pathname
+							+ '_portal-layout'];
+					var hidden = localStorage[document.location.pathname
+							+ '_portal-hidden'];
+					if (layout || hidden) {
+						$(this).portal('layout', 'render', layout, hidden);
+						if (savable)
+							addRestoreButton(portal);
+					}
+				}
+			});
 			return this;
 		}
 		if (arguments[0] == 'layout') {
@@ -36776,9 +36751,10 @@ Observation.datagridTable = function(container) {
 				$('.portal-column', this.eq(0)).each(function() {
 					var portlets = [];
 					$('.portlet:visible', this).each(function() {
-						if ($(this).attr('id'))
-							portlets.push('"' + $(this).attr('id') + '"');
-					});
+								if ($(this).attr('id'))
+									portlets.push('"' + $(this).attr('id')
+											+ '"');
+							});
 					layout.push('[' + portlets.join(',') + ']');
 				});
 				return '[' + layout.join(',') + ']';
@@ -36786,8 +36762,8 @@ Observation.datagridTable = function(container) {
 				if (arguments[1] == 'save') {
 					if (localStorage) {
 						localStorage[document.location.pathname
-								+ '_portal-layout'] = this.eq(0).portal(
-								'layout');
+								+ '_portal-layout'] = this.eq(0)
+								.portal('layout');
 						addRestoreButton(this.eq(0));
 					}
 				} else if (arguments[1] == 'restore') {
@@ -36801,16 +36777,16 @@ Observation.datagridTable = function(container) {
 					var hidden = arguments[3];
 					hidden = hidden ? hidden.split(',') : [];
 					$('.portlet', this).each(function() {
-						var t = $(this);
-						var id = t.attr('id');
-						if (id && $.inArray(id, hidden) > -1)
-							t.remove();
-					});
-					for ( var i = 0; i < layout.length; i++) {
+								var t = $(this);
+								var id = t.attr('id');
+								if (id && $.inArray(id, hidden) > -1)
+									t.remove();
+							});
+					for (var i = 0; i < layout.length; i++) {
 						$('.portal-column:eq(' + i + ')', this).each(
 								function() {
 									var portlets = layout[i];
-									for ( var j = 0; j < portlets.length; j++) {
+									for (var j = 0; j < portlets.length; j++) {
 										$('#' + portlets[j]).appendTo(this)
 												.show();
 									}
@@ -36826,8 +36802,7 @@ Observation.datagridTable = function(container) {
 		if (!portal.find('.portal-footer .restore').length) {
 			var footer = portal.find('.portal-footer');
 			if (!footer.length)
-				footer = $(
-						'<div class="portal-footer"><button class="btn restore">'
+				footer = $('<div class="portal-footer"><button class="btn restore">'
 								+ MessageBundle.get('restore')
 								+ '</button></div>').appendTo(portal);
 			if (!footer.find('.restore').length)
@@ -36839,7 +36814,9 @@ Observation.datagridTable = function(container) {
 })(jQuery);
 
 Observation._portal = function(container) {
-	$('.portal', container).portal();
+	var c = $(container);
+	var selector = '.portal';
+	c.is(selector) ? c.portal() : $(selector, c).portal();
 };
 (function($) {
 	$(document).on('click', '.combobox .add-on', function(e) {
@@ -36877,68 +36854,73 @@ Observation._portal = function(container) {
 				return false;
 			});
 	$.fn.combobox = function() {
-		var t = $(this);
-		if (t.prop('tagName') == 'SELECT') {
-			var div = $('<div class="input-append combobox"><ul class="dropdown-menu combobox-menu" role="menu"></ul><input type="text" name="'
-					+ t.attr('name')
-					+ '" value="'
-					+ t.val()
-					+ '"/><span class="add-on"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
-					.insertBefore(t);
-			$('input', div).width(t.width() - 27);
-			if (t.hasClass('required'))
-				$('input', div).addClass('required');
-			var _menu = $('.combobox-menu', div);
-			t.children().each(function(i, v) {
-				if ($(v).prop('tagName') == 'OPTION' && $(v).attr('value')) {
-					$('<li><a href="#">' + $(v).attr('value') + '</a></li>')
-							.appendTo(_menu);
-				} else if ($(v).prop('tagName') == 'OPTGROUP') {
-					var label = $(v).attr('label');
-					var group = $('<li class="group"><a href="#">' + label
-							+ '</a><ul></ul></li>').appendTo(_menu);
-					group = $('ul', group);
-					$(v).children('option').each(function(i, v) {
+		$(this).each(function() {
+			var t = $(this);
+			if (t.prop('tagName') == 'SELECT') {
+				var div = $('<div class="input-append combobox"><ul class="dropdown-menu combobox-menu" role="menu"></ul><input type="text" name="'
+						+ t.attr('name')
+						+ '" value="'
+						+ t.val()
+						+ '"/><span class="add-on"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
+						.insertBefore(t);
+				$('input', div).width(t.width() - 27);
+				if (t.hasClass('required'))
+					$('input', div).addClass('required');
+				var _menu = $('.combobox-menu', div);
+				t.children().each(function(i, v) {
+					if ($(v).prop('tagName') == 'OPTION' && $(v).attr('value')) {
 						$('<li><a href="#">' + $(v).attr('value') + '</a></li>')
-								.appendTo(group);
+								.appendTo(_menu);
+					} else if ($(v).prop('tagName') == 'OPTGROUP') {
+						var label = $(v).attr('label');
+						var group = $('<li class="group"><a href="#">' + label
+								+ '</a><ul></ul></li>').appendTo(_menu);
+						group = $('ul', group);
+						$(v).children('option').each(function(i, v) {
+							$('<li><a href="#">' + $(v).attr('value')
+									+ '</a></li>').appendTo(group);
+						});
+					}
+				});
+				t.remove();
+				t = div;
+			}
+			var arr = [];
+			$('.combobox-menu li:not(.group)', t).each(function() {
+						arr.push($(this).text());
 					});
-				}
-			});
-			t.remove();
-			t = div;
-		}
-		var arr = [];
-		$('.combobox-menu li:not(.group)', t).each(function() {
-					arr.push($(this).text());
-				});
-		$('input', t).attr('data-provide', 'typeahead').attr('data-source',
-				JSON.stringify(arr));
-		var menu = $('.combobox-menu', t);
-		$('li.group ul', menu).addClass('unstyled');
-		$('li.group > a ', menu).css({
-					'font-weight' : 'bold'
-				});
-		$('li.group li a', menu).css({
-					'padding-left' : '25px'
-				});
-		t.css({
-					'display' : 'inline-block',
-					'position' : 'relative'
-				});
-		$('.add-on', t).css('cursor', 'pointer');
-		return t;
+			$('input', t).attr('data-provide', 'typeahead').attr('data-source',
+					JSON.stringify(arr));
+			var menu = $('.combobox-menu', t);
+			$('li.group ul', menu).addClass('unstyled');
+			$('li.group > a ', menu).css({
+						'font-weight' : 'bold'
+					});
+			$('li.group li a', menu).css({
+						'padding-left' : '25px'
+					});
+			t.css({
+						'display' : 'inline-block',
+						'position' : 'relative'
+					});
+			$('.add-on', t).css('cursor', 'pointer');
+		});
+		return this;
 	}
 })(jQuery);
 
 Observation.combobox = function(container) {
-	$('.combobox', container).each(function() {
-				$(this).combobox()
-			});
+	var c = $(container);
+	var selector = '.combobox';
+	c.is(selector) ? c.combobox() : $(selector, c).combobox();
 };
 Observation.tags = function(container) {
 	if (typeof $.fn.textext != 'undefined'
 			&& (!$.browser.msie || $.browser.version > '8')) {
-		$('input.tags', container).each(function() {
+		var c = $(container);
+		var selector = 'input.tags';
+		var ele = c.is(selector) ? c : $(selector, c);
+		ele.each(function() {
 			var t = $(this);
 			var options = {
 				prompt : '...',
@@ -37075,7 +37057,10 @@ Observation.tags = function(container) {
 	}
 };
 Observation.suggestion = function(container) {
-	$('input.suggestion', container).each(function() {
+	var c = $(container);
+	var selector = 'input.suggestion';
+	var ele = c.is(selector) ? c : $(selector, c);
+	ele.each(function() {
 				var t = $(this);
 				t.typeahead({
 							minLength : 2,
@@ -38063,7 +38048,8 @@ Observation._richtable = function(container) {
 (function($) {
 	var BLOCK_COMMENT = new RegExp('/\\*(?:.|[\\n\\r])*?\\*/', 'g');
 	var LINE_COMMENT = new RegExp('\r?\n?\\s*--.*\r?(\n|$)', 'g');
-	var PARAMETER = new RegExp('(:(\\w|[^\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)', 'g');
+	var PARAMETER = new RegExp(
+			'(:(\\w|[^\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)', 'g');
 	$.sqleditor = {
 		extractParameters : function(sql) {
 			sql = $.sqleditor.clearComments(sql);
@@ -38124,7 +38110,9 @@ Observation._richtable = function(container) {
 })(jQuery);
 
 Observation.sqleditor = function(container) {
-	$('.sqleditor', container).sqleditor();
+	var c = $(container);
+	var selector = '.sqleditor';
+	c.is(selector) ? c.sqleditor() : $(selector, c).sqleditor();
 };
 (function($) {
 
@@ -38132,7 +38120,7 @@ Observation.sqleditor = function(container) {
 		this.each(function() {
 					var t = $(this);
 					var button = $(' <button type="button" class="btn">'
-									+ MessageBundle.get('import') + '</button>')
+							+ MessageBundle.get('import') + '</button>')
 							.appendTo($('.form-actions', t)).click(function() {
 								$('<input type="file"/>').appendTo(t).hide()
 										.change(function() {
@@ -38290,7 +38278,9 @@ Observation.sqleditor = function(container) {
 
 if (window.FileReader)
 	Observation.importableform = function(container) {
-		$('form.importable', container).importableform();
+		var c = $(container);
+		var selector = 'form.importable';
+		c.is(selector) ? c.importableform() : $(selector, c).importableform();
 	};
 (function($) {
 
@@ -38429,7 +38419,10 @@ if (window.FileReader)
 })(jQuery);
 
 Observation.attachmentableform = function(container) {
-	$('form.attachmentable', container).attachmentableform();
+	var c = $(container);
+	var selector = 'form.attachmentable';
+	c.is(selector) ? c.attachmentableform() : $(selector, c)
+			.attachmentableform();
 };
 ;
 (function($) {
@@ -38485,7 +38478,9 @@ Observation.attachmentableform = function(container) {
 })(jQuery);
 
 Observation.groupable = function(container) {
-	$('.groupable', container).groupable();
+	var c = $(container);
+	var selector = '.groupable';
+	c.is(selector) ? c.groupable() : $(selector, c).groupable();
 };
 (function($) {
 	$.fn.treearea = function(treeoptions) {
@@ -38800,7 +38795,9 @@ Observation.groupable = function(container) {
 })(jQuery);
 
 Observation.treeselect = function(container) {
-	$('.treeselect', container).treeselect();
+	var c = $(container);
+	var selector = '.treeselect';
+	c.is(selector) ? c.treeselect() : $(selector, c).treeselect();
 };
 (function($) {
 	var current;
@@ -39106,7 +39103,9 @@ Observation.treeselect = function(container) {
 })(jQuery);
 
 Observation.listpick = function(container) {
-	$('.listpick', container).listpick();
+	var c = $(container);
+	var selector = '.listpick';
+	c.is(selector) ? c.listpick() : $(selector, c).listpick();
 };
 (function($) {
 	$.fn.imagepick = function() {
@@ -39137,7 +39136,9 @@ Observation.listpick = function(container) {
 })(jQuery);
 
 Observation._imagepick = function(container) {
-	$('input.imagepick', container).imagepick();
+	var c = $(container);
+	var selector = 'input.imagepick';
+	c.is(selector) ? c.imagepick() : $(selector, c).imagepick();
 };
 
 (function($) {
@@ -39319,7 +39320,9 @@ function latlng_getLatLng() {
 			latlng_resetMaps();
 }
 Observation.latlng = function(container) {
-	$('input.latlng', container).latlng();
+	var c = $(container);
+	var selector = 'input.latlng';
+	c.is(selector) ? c.latlng() : $(selector, c).latlng();
 };
 (function($) {
 	$.fn.editme = function() {
@@ -39353,7 +39356,9 @@ Observation.latlng = function(container) {
 })(jQuery);
 
 Observation.editme = function(container) {
-	$('.editme', container).editme();
+	var c = $(container);
+	var selector = '.editme';
+	c.is(selector) ? c.editme() : $(selector, c).editme();
 };
 (function($) {
 	$.fn.filtercolumn = function() {
@@ -39392,7 +39397,9 @@ Observation.editme = function(container) {
 })(jQuery);
 
 Observation.filtercolumn = function(container) {
-	$('table.filtercolumn', container).filtercolumn();
+	var c = $(container);
+	var selector = 'table.filtercolumn';
+	c.is(selector) ? c.filtercolumn() : $(selector, c).filtercolumn();
 };
 (function($) {
 	$.fn.pattern = function(_options) {
@@ -39582,8 +39589,8 @@ Observation.filtercolumn = function(container) {
 							var f = t.closest('form');
 							var inputed = true;
 							$(':input', f).each(function() {
-								if ($(	this).hasClass('required')
-										&& !$(	this).val())
+								if ($(this).hasClass('required')
+										&& !$(this).val())
 									inputed = false;
 							});
 							if (inputed)
@@ -39592,13 +39599,11 @@ Observation.filtercolumn = function(container) {
 					} else {
 						var msg = modal
 								.find('.message')
-								.html(	'<div class="alert alert-error unselectable" style="padding:0;">'
-												+ MessageBundle
-														.get(
-																'pattern.coords.invalid',
-																options.minCoords,
-																options.maxCoords)
-												+ '</div>');
+								.html('<div class="alert alert-error unselectable" style="padding:0;">'
+										+ MessageBundle.get(
+												'pattern.coords.invalid',
+												options.minCoords,
+												options.maxCoords) + '</div>');
 					}
 				};
 				modal.find('.pattern').pattern(options);
@@ -39608,6 +39613,8 @@ Observation.filtercolumn = function(container) {
 })(jQuery);
 
 Observation._patterninput = function(container) {
-	$('input.input-pattern', container).patterninput();
+	var c = $(container);
+	var selector = 'input.input-pattern';
+	c.is(selector) ? c.patterninput() : $(selector, c).patterninput();
 };
 

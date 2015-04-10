@@ -1,5 +1,8 @@
 Observation.suggestion = function(container) {
-	$('input.suggestion', container).each(function() {
+	var c = $(container);
+	var selector = 'input.suggestion';
+	var ele = c.is(selector) ? c : $(selector, c);
+	ele.each(function() {
 				var t = $(this);
 				t.typeahead({
 							minLength : 2,

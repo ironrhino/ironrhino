@@ -228,5 +228,9 @@
 })(jQuery);
 
 Observation.datagridTable = function(container) {
-	$('table.datagrid', container).datagridTable();
+	var c = $(container);
+	var selector = 'table.datagrid';
+	if (c.is(selector))
+		c.datagridTable();
+	$(selector, c).datagridTable();
 };

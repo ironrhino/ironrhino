@@ -27,5 +27,7 @@
 })(jQuery);
 
 Observation._imagepick = function(container) {
-	$('input.imagepick', container).imagepick();
+	var c = $(container);
+	var selector = 'input.imagepick';
+	c.is(selector) ? c.imagepick() : $(selector, c).imagepick();
 };

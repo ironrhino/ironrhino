@@ -177,5 +177,7 @@ function latlng_getLatLng() {
 			latlng_resetMaps();
 }
 Observation.latlng = function(container) {
-	$('input.latlng', container).latlng();
+	var c = $(container);
+	var selector = 'input.latlng';
+	c.is(selector) ? c.latlng() : $(selector, c).latlng();
 };

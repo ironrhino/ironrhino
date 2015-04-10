@@ -49,5 +49,7 @@
 })(jQuery);
 
 Observation.checkavailable = function(container) {
-	$(':input.checkavailable', container).checkavailable();
+	var c = $(container);
+	var selector = ':input.checkavailable';
+	c.is(selector) ? c.checkavailable() : $(selector, c).checkavailable();
 };

@@ -83,7 +83,9 @@ Initialization.upload = function() {
 	});;
 }
 Observation.upload = function(container) {
-	var upload_form = $('#upload_form', container);
+	var c = $(container);
+	var selector = '#upload_form';
+	var upload_form = c.is(selector) ? c : $(selector, c);
 	if (upload_form.length && typeof window.FileReader != 'undefined') {
 		$('input[type="file"]', upload_form).change(function() {
 					if (uploadFiles(this.files)) {

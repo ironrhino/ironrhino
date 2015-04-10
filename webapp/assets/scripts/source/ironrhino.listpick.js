@@ -302,5 +302,7 @@
 })(jQuery);
 
 Observation.listpick = function(container) {
-	$('.listpick', container).listpick();
+	var c = $(container);
+	var selector = '.listpick';
+	c.is(selector) ? c.listpick() : $(selector, c).listpick();
 };

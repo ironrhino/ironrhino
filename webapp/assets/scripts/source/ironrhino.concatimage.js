@@ -39,7 +39,7 @@
 	function concatenateImages(files, target, field, maximum, error) {
 		if (files.length > maximum) {
 			Message.showActionError(MessageBundle.get(error
-							|| 'maximum.exceeded', files.length,
+									|| 'maximum.exceeded', files.length,
 							maximum), $(target).closest('form'));
 			return;
 		}
@@ -142,5 +142,7 @@
 })(jQuery);
 
 Observation.concatimage = function(container) {
-	$('.concatimage', container).concatimage();
+	var c = $(container);
+	var selector = '.concatimage';
+	c.is(selector) ? c.concatimage() : $(selector, c).concatimage();
 };

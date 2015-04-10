@@ -60,7 +60,9 @@
 })(jQuery);
 
 Observation.encodeqrcode = function(container) {
-	$('.encodeqrcode', container).encodeqrcode();
+	var c = $(container);
+	var selector = '.encodeqrcode';
+	c.is(selector) ? c.encodeqrcode() : $(selector, c).encodeqrcode();
 };
 
 // ---------------------------------------------------------------------

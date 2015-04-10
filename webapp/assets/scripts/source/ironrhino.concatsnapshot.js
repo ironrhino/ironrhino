@@ -108,5 +108,7 @@
 })(jQuery);
 
 Observation.concatsnapshot = function(container) {
-	$('.concatsnapshot', container).concatsnapshot();
+	var c = $(container);
+	var selector = '.concatsnapshot';
+	c.is(selector) ? c.concatsnapshot() : $(selector, c).concatsnapshot();
 };

@@ -192,5 +192,7 @@
 })(jQuery);
 
 Observation.treeselect = function(container) {
-	$('.treeselect', container).treeselect();
+	var c = $(container);
+	var selector = '.treeselect';
+	c.is(selector) ? c.treeselect() : $(selector, c).treeselect();
 };

@@ -262,6 +262,7 @@
 })(jQuery);
 
 Observation.sortableTable = function(container) {
-	if (!$.browser.msie || $.browser.version > 7)
-		$('table.sortable', container).sortableTable();
+	var c = $(container);
+	var selector = 'table.sortable';
+	c.is(selector) ? c.sortableTable() : $(selector, c).sortableTable();
 };

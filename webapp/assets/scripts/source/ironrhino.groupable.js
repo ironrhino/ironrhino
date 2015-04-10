@@ -52,5 +52,7 @@
 })(jQuery);
 
 Observation.groupable = function(container) {
-	$('.groupable', container).groupable();
+	var c = $(container);
+	var selector = '.groupable';
+	c.is(selector) ? c.groupable() : $(selector, c).groupable();
 };

@@ -1,7 +1,10 @@
 Observation.tags = function(container) {
 	if (typeof $.fn.textext != 'undefined'
 			&& (!$.browser.msie || $.browser.version > '8')) {
-		$('input.tags', container).each(function() {
+		var c = $(container);
+		var selector = 'input.tags';
+		var ele = c.is(selector) ? c : $(selector, c);
+		ele.each(function() {
 			var t = $(this);
 			var options = {
 				prompt : '...',

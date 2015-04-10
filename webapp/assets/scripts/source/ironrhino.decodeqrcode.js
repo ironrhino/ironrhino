@@ -34,5 +34,7 @@
 })(jQuery);
 
 Observation.decodeqrcode = function(container) {
-	$('.decodeqrcode', container).decodeqrcode();
+	var c = $(container);
+	var selector = '.decodeqrcode';
+	c.is(selector) ? c.decodeqrcode() : $(selector, c).decodeqrcode();
 };

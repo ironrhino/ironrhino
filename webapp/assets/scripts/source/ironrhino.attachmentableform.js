@@ -135,5 +135,8 @@
 })(jQuery);
 
 Observation.attachmentableform = function(container) {
-	$('form.attachmentable', container).attachmentableform();
+	var c = $(container);
+	var selector = 'form.attachmentable';
+	c.is(selector) ? c.attachmentableform() : $(selector, c)
+			.attachmentableform();
 };

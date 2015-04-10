@@ -27,8 +27,8 @@
 							var f = t.closest('form');
 							var inputed = true;
 							$(':input', f).each(function() {
-								if ($(	this).hasClass('required')
-										&& !$(	this).val())
+								if ($(this).hasClass('required')
+										&& !$(this).val())
 									inputed = false;
 							});
 							if (inputed)
@@ -37,13 +37,11 @@
 					} else {
 						var msg = modal
 								.find('.message')
-								.html(	'<div class="alert alert-error unselectable" style="padding:0;">'
-												+ MessageBundle
-														.get(
-																'pattern.coords.invalid',
-																options.minCoords,
-																options.maxCoords)
-												+ '</div>');
+								.html('<div class="alert alert-error unselectable" style="padding:0;">'
+										+ MessageBundle.get(
+												'pattern.coords.invalid',
+												options.minCoords,
+												options.maxCoords) + '</div>');
 					}
 				};
 				modal.find('.pattern').pattern(options);
@@ -53,5 +51,7 @@
 })(jQuery);
 
 Observation._patterninput = function(container) {
-	$('input.input-pattern', container).patterninput();
+	var c = $(container);
+	var selector = 'input.input-pattern';
+	c.is(selector) ? c.patterninput() : $(selector, c).patterninput();
 };

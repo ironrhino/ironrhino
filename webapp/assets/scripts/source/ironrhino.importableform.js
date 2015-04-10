@@ -4,7 +4,7 @@
 		this.each(function() {
 					var t = $(this);
 					var button = $(' <button type="button" class="btn">'
-									+ MessageBundle.get('import') + '</button>')
+							+ MessageBundle.get('import') + '</button>')
 							.appendTo($('.form-actions', t)).click(function() {
 								$('<input type="file"/>').appendTo(t).hide()
 										.change(function() {
@@ -162,5 +162,7 @@
 
 if (window.FileReader)
 	Observation.importableform = function(container) {
-		$('form.importable', container).importableform();
+		var c = $(container);
+		var selector = 'form.importable';
+		c.is(selector) ? c.importableform() : $(selector, c).importableform();
 	};

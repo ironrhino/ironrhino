@@ -58,11 +58,11 @@
 			options.replacement = ele.attr('id');
 		ajax(options);
 	}
+	$(document).on('click', '.ajaxpanel .load', function() {
+				$(this).closest('.ajaxpanel').trigger('load');
+			});
 })(jQuery);
 
 Observation.ajaxpanel = function(container) {
 	$('.ajaxpanel', container).ajaxpanel();
-	$('.ajaxpanel .load', container).click(function() {
-				$(this).closest('.ajaxpanel').trigger('load');
-			});
 };
