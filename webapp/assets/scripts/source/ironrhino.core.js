@@ -1092,9 +1092,12 @@ Observation.common = function(container) {
 					if (!this.id)
 						this.id = ('a' + (i + Math.random())).replace('.', '')
 								.substring(0, 9);
-					if (!$(this).next('lable.custom').length)
+					var label = $(this).next('lable.custom');
+					if (!label.length)
 						$(this).after($('<label class="custom" for="' + this.id
 								+ '"></label>'));
+					else
+						label.attr('for', this.id);
 				});
 	$('.linkage', container).each(function() {
 		var c = $(this);

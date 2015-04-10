@@ -1,6 +1,6 @@
 <#macro renderTR region>
 <tr id="node-${region.id}"<#if region.parent??&&region.parent.id gt 0> class="child-of-node-${region.parent.id}"</#if>>
-        <td><input type="checkbox" name="id" value="${region.id}"/></td>
+        <td><input type="checkbox" class="custom" name="id" value="${region.id}"/></td>
         <td>${region.name}</td>
         <td>${region.fullname}</td>
 </tr>
@@ -21,9 +21,9 @@
 <table class="treeTable checkboxgroup" style="width:100%;">
   <thead>
     <tr>
-      <th style="width:10%"><input type="checkbox"/></th>
-      <th style="width:20%;">name</th>
-      <th style="width:70%;">fullname</th>
+      <th style="width:10%"><input type="checkbox" class="custom"/></th>
+      <th style="width:20%;">${action.getText('name')}</th>
+      <th style="width:70%;">${action.getText('fullname')}</th>
     </tr>
   </thead>
   <tbody>

@@ -33920,9 +33920,12 @@ Observation.common = function(container) {
 					if (!this.id)
 						this.id = ('a' + (i + Math.random())).replace('.', '')
 								.substring(0, 9);
-					if (!$(this).next('lable.custom').length)
+					var label = $(this).next('lable.custom');
+					if (!label.length)
 						$(this).after($('<label class="custom" for="' + this.id
 								+ '"></label>'));
+					else
+						label.attr('for', this.id);
 				});
 	$('.linkage', container).each(function() {
 		var c = $(this);
@@ -37668,6 +37671,20 @@ Observation.sortableTable = function(container) {
 		$('input[type=checkbox],input[type=radio]', r).prop('checked', false);
 		$(':input', r).not('.readonly').prop('readonly', false)
 				.removeAttr('keyupValidate');
+		if (MODERN_BROWSER)
+			$('input[type="checkbox"].custom,input[type="radio"].custom', r)
+					.each(function(i) {
+						$(this).hide();
+						if (!this.id)
+							this.id = ('a' + (i + Math.random())).replace('.',
+									'').substring(0, 9);
+						var label = $(this).next('lable.custom');
+						if (!label.length)
+							$(this).after($('<label class="custom" for="'
+									+ this.id + '"></label>'));
+						else
+							label.attr('for', this.id);
+					});
 		$('select.decrease', r).each(function() {
 			var selectedValues = $.map($('select.decrease', table), function(e,
 							i) {
