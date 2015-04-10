@@ -358,7 +358,8 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 	public Client findClientById(String clientId) {
 		if (StringUtils.isBlank(clientId))
 			return null;
-		return clientManager.get(clientId);
+		Client c = clientManager.get(clientId);
+		return c != null && c.isEnabled() ? c : null;
 	}
 
 	@Override

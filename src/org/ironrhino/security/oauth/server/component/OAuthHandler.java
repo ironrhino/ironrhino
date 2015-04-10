@@ -106,21 +106,30 @@ public class OAuthHandler extends AccessHandler {
 					String[] scopes = null;
 					if (StringUtils.isNotBlank(authorization.getScope()))
 						scopes = authorization.getScope().split("\\s");
-					boolean authorized = (scopes == null);
-					if (!authorized && scopes != null) {
+					boolean authorizedScope = (scopes == null);
+					if (!authorizedScope && scopes != null) {
 						for (String s : scopes) {
 							String requestURL = request.getRequestURL()
 									.toString();
 							if (requestURL.startsWith(s)) {
-								authorized = true;
+								authorizedScope = true;
 								break;
 							}
 						}
 					}
-					if (authorized) {
+					if (authorizedScope) {
 						Client client = oauthManager
 								.findClientById(authorization.getClient());
-						if (client == null || client.isEnabled()) {
+						if (client != null) {
+							request.setAttribute(
+									REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, client);
+							UserAgent ua = new UserAgent(
+									request.getHeader("User-Agent"));
+							ua.setAppId(client.getId());
+							ua.setAppName(client.getName());
+							request.setAttribute("userAgent", ua);
+						}
+						if (authorization.getClient() == null || client != null) {
 							UserDetails ud = null;
 							if (authorization.getGrantor() != null) {
 								try {
@@ -164,19 +173,9 @@ public class OAuthHandler extends AccessHandler {
 										HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API,
 										SESSION_ID_PREFIX + token);
 							}
-							if (client != null) {
-								request.setAttribute(
-										REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT,
-										client);
-								UserAgent ua = new UserAgent(
-										request.getHeader("User-Agent"));
-								ua.setAppId(client.getId());
-								ua.setAppName(client.getName());
-								request.setAttribute("userAgent", ua);
-							}
 							return false;
 						} else {
-							errorMessage = "client_disabled";
+							errorMessage = "invalid_client";
 						}
 					} else {
 						errorMessage = "unauthorized_scope";
