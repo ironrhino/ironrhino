@@ -48,7 +48,7 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 </#if>
 </#macro>
 
-<#function getUrl value includeContextPath=true includeQueryString=false secure=false>
+<#function getUrl value includeContextPath=true includeQueryString=false secure="">
 <#if value?starts_with('/assets/') && includeContextPath>
 	<#if assetsBase??>
 		<#local value=assetsBase+value>
@@ -58,17 +58,17 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 	<#return value>
 <#elseif value?starts_with('/')>
 	<#if request??>
-		<#if !request.isSecure() && secure>
+		<#if !request.isSecure() && secure=="true">
 			<#local value=statics['org.ironrhino.core.util.RequestUtils'].getBaseUrl(request,true,includeContextPath)+value>
-		<#elseif request.isSecure() && !secure>
+		<#elseif request.isSecure() && secure=="false">
 			<#local value=statics['org.ironrhino.core.util.RequestUtils'].getBaseUrl(request,false,includeContextPath)+value>
 		<#elseif includeContextPath>
 			<#local value=base+value>
 		</#if>
 	<#else>
-		<#if value?starts_with('http://') && secure>
+		<#if value?starts_with('http://') && secure=="true">
 			<#local value=value?replace('http://','https://')?replace('8080','8443')>
-		<#elseif value?starts_with('https://') && !secure>
+		<#elseif value?starts_with('https://') && secure=="false">
 			<#local value=value?replace('https://','http://')?replace('8443','8080')>
 		</#if>
 	</#if>
@@ -85,6 +85,6 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 <#return value>
 </#function>
 
-<#macro url value includeContextPath=true includeQueryString=false secure=false>
+<#macro url value includeContextPath=true includeQueryString=false secure="">
 ${getUrl(value,includeContextPath,includeQueryString,secure)}<#t>
 </#macro>
