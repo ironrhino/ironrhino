@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,7 @@ import org.ironrhino.core.spring.ApplicationContextConsole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -224,7 +226,8 @@ public class SetupAction extends BaseAction {
 					Class<?> type = parameterTypes[i];
 					if (!type.equals(String.class)) {
 						if (type.isEnum()) {
-							v = Enum.valueOf((Class<? extends Enum>)type, pvalue);
+							v = Enum.valueOf((Class<? extends Enum>) type,
+									pvalue);
 						} else if (type.equals(Integer.class)
 								|| type.equals(Integer.TYPE)) {
 							v = Integer.valueOf(pvalue);
@@ -242,6 +245,8 @@ public class SetupAction extends BaseAction {
 						} else if (type.equals(Boolean.class)
 								|| type.equals(Boolean.TYPE)) {
 							v = "true".equals(pvalue);
+						} else if (type.equals(Date.class)) {
+							v = DateUtils.parse(pvalue);
 						}
 					}
 					value[i] = v;
@@ -299,6 +304,8 @@ public class SetupAction extends BaseAction {
 				if (StringUtils.isNotBlank(setupParameter.cssClass()))
 					this.cssClasses.addAll(Arrays.asList(setupParameter
 							.cssClass().split("\\s")));
+				if (Date.class.isAssignableFrom(parameterType))
+					this.cssClasses.add("date");
 				if (StringUtils.isNotBlank(setupParameter.dynamicAttributes()))
 					try {
 						this.dynamicAttributes = JsonUtils.fromJson(
