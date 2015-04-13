@@ -44,7 +44,7 @@ ${action.getText('browser.warning')}
 </#if>
 <#include "include/top.ftl" ignore_missing=true/>
 <#if 'welcome'!=page.properties["meta.body_class"]!>
-<@authorize ifAnyGranted="ROLE_BUILTIN_USER">
+<@authorize ifNotGranted="ROLE_BUILTIN_ANONYMOUS">
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container">

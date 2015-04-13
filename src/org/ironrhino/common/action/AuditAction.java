@@ -5,15 +5,12 @@ import java.util.List;
 
 import org.ironrhino.common.model.AuditEvent;
 import org.ironrhino.common.service.AuditEventManager;
-import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
-import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @AutoConfig(namespace = "/")
-@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 public class AuditAction extends BaseAction {
 
 	private static final long serialVersionUID = 2526249000781826949L;
@@ -45,7 +42,10 @@ public class AuditAction extends BaseAction {
 
 	@Override
 	public String execute() throws Exception {
-		events = auditEventManager.findRecentEvents(AuthzUtils.getUsername(),
+		String username = AuthzUtils.getUsername();
+		if (username == null)
+			return ACCESSDENIED;
+		events = auditEventManager.findRecentEvents(username,
 				since != null ? new Date(since) : null, PAGESIZE);
 		return SUCCESS;
 	}
