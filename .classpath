@@ -98,6 +98,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-jasperreports-plugin-2.3.20.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-sitemesh-plugin-2.3.20.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-spring-plugin-2.3.20.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/validation-api-1.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xmemcached-2.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xwork-core-2.3.20.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zookeeper-3.4.6.jar"/>
@@ -111,7 +112,6 @@
 	<classpathentry kind="lib" path="lib/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/spring-test-4.1.5.jar"/>
-	<classpathentry kind="lib" path="lib/validation-api-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/websocket-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/yuicompressor.jar"/>
 	<classpathentry kind="output" path="webapp/WEB-INF/classes"/>

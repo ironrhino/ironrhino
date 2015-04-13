@@ -785,7 +785,7 @@
 			</zip>
 			<delete file="${target.dir}/temp.jar" />
 			<zip destfile="${target.dir}/temp.jar">
-				<zipgroupfileset file="${lib.dir}/validation-api-*.jar" />
+				<zipgroupfileset file="${webapp.dir}/WEB-INF/lib/validation-api-*.jar" />
 				<zipgroupfileset file="${target.dir}/${core-jar.name}" />
 			</zip>
 			<delete file="${target.dir}/${core-jar.name}" />
