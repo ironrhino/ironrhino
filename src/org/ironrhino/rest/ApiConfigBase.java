@@ -1,5 +1,6 @@
 package org.ironrhino.rest;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +14,10 @@ import org.ironrhino.rest.component.RestExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
@@ -54,10 +57,28 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Override
 	protected void configureMessageConverters(
 			List<HttpMessageConverter<?>> converters) {
-		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter();
+		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter() {
+
+			protected void writeInternal(Object object,
+					HttpOutputMessage outputMessage) throws IOException,
+					HttpMessageNotWritableException {
+				super.writeInternal(object, outputMessage);
+				outputMessage.getBody().close();
+			}
+
+		};
 		jackson2.setObjectMapper(createObjectMapper());
 		converters.add(jackson2);
-		StringHttpMessageConverter string = new StringHttpMessageConverter();
+		StringHttpMessageConverter string = new StringHttpMessageConverter(){
+
+			@Override
+			protected void writeInternal(String str,
+					HttpOutputMessage outputMessage) throws IOException {
+				super.writeInternal(str, outputMessage);
+				outputMessage.getBody().close();
+			}
+			
+		};
 		string.setWriteAcceptCharset(false);
 		converters.add(string);
 	}
