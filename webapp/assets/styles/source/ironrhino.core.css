@@ -34,6 +34,9 @@ td.middle {
 	z-index: 1000;
 	font-size:1.2em;
 }
+.navbar-fixed-top ul.nav li.active{
+  	font-weight: bold;
+}
 .modal {
 	z-index: 2050;
 }
