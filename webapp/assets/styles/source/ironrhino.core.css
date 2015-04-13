@@ -75,6 +75,10 @@ body.welcome .caption {
 	background-image: linear-gradient(to bottom,#fff,#e6e6e6);
 	margin-top: -40px;
 }
+body.welcome .hero-unit .message-container {
+	margin-top: -30px;
+	font-size: 15px;
+}
 body.welcome .hero-unit form {
 	border-width:10px;
 	border-radius: 40px;
