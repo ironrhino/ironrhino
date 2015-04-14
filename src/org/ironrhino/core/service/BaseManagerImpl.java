@@ -123,10 +123,18 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 			UserDetails user = AuthzUtils.getUserDetails();
 			if (isnew) {
 				r.setCreateDate(date);
-				r.setCreateUserDetails(user);
+				try {
+					r.setCreateUserDetails(user);
+				} catch (ClassCastException e) {
+					logger.warn(e.getMessage());
+				}
 			} else {
 				r.setModifyDate(date);
-				r.setModifyUserDetails(user);
+				try {
+					r.setModifyUserDetails(user);
+				} catch (ClassCastException e) {
+					logger.warn(e.getMessage());
+				}
 			}
 		}
 		Session session = sessionFactory.getCurrentSession();
