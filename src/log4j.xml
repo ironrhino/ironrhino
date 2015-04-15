@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="threshold" value="${console.logger.level}"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %c %p %m%n"/>
+		</layout>
+	</appender>
+	<appender name="APPLICATION" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${app.home}/logs/application.log"/>
+		<param name="encoding" value="utf-8"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %c %t%X{session}%X{request}%X{url} %p %m%n"/>
+		</layout>
+	</appender>
+	<appender name="ERROR" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${app.home}/logs/application-error.log"/>
+		<param name="encoding" value="utf-8"/>
+		<param name="threshold" value="ERROR"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %c %t%X{session}%X{request}%X{url} %p %m%n"/>
+		</layout>
+	</appender>
+	<appender name="HIBERNATE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${app.home}/logs/hibernate.log"/>
+		<param name="encoding" value="utf-8"/>
+		<param name="threshold" value="ALL"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %c %p %m%n"/>
+		</layout>
+	</appender>
+	<appender name="REMOTING" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${app.home}/logs/remoting.log"/>
+		<param name="encoding" value="utf-8"/>
+		<param name="threshold" value="INFO"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %c %p %m%n"/>
+		</layout>
+	</appender>
+	<appender name="REST" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${app.home}/logs/rest.log"/>
+		<param name="encoding" value="utf-8"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %t%X{request} %X{method}%X{url} %m%n"/>
+		</layout>
+	</appender>
+	<appender name="ACCESS" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${app.home}/logs/access.log"/>
+		<param name="encoding" value="utf-8"/>
+		<param name="threshold" value="INFO"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{session}%X{request}%n"/>
+		</layout>
+	</appender>
+	<appender name="ACCESS-WARN" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${app.home}/logs/access-warn.log"/>
+		<param name="encoding" value="utf-8"/>
+		<param name="threshold" value="WARN"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{session}%X{request} %m%n"/>
+		</layout>
+	</appender>
+   
+	<logger name="org.springframework.core.io.support.PathMatchingResourcePatternResolver">
+		<level value="ERROR"/>
+	</logger>
+	<logger name="org.springframework.core.type.classreading.AnnotationAttributesReadingVisitor">
+		<level value="ERROR"/>
+	</logger>
+	<logger name="org.springframework.security">
+		<level value="WARN"/>
+	</logger>
+	<logger name="org.hibernate.tool.hbm2ddl.TableMetadata">
+		<level value="WARN"/>
+	</logger>
+	<logger name="org.apache.struts2.config.AbstractBeanSelectionProvider">
+		<level value="WARN"/>
+	</logger>
+	<logger name="org.apache.struts2.components.ServletUrlRenderer">
+		<level value="ERROR"/>
+	</logger>
+	<logger name="com.opensymphony.xwork2.ognl.OgnlValueStack">
+		<level value="ERROR"/>
+	</logger>
+	<logger name="com.opensymphony.xwork2.config.providers.XmlConfigurationProvider">
+		<level value="ERROR"/>
+	</logger>
+	
+	<logger name="org.hibernate.SQL" additivity="false">
+		<level value="${hibernate.logger.level}"/>
+		<appender-ref ref="HIBERNATE"/>
+	</logger>
+	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" additivity="false">
+		<level value="${hibernate.logger.level}"/>
+		<appender-ref ref="HIBERNATE"/>
+	</logger>
+	<logger name="org.ironrhino.core.remoting" additivity="false">
+		<level value="INFO"/>
+		<appender-ref ref="REMOTING"/>
+	</logger>
+	<logger name="rest" additivity="false">
+		<level value="INFO"/>
+		<appender-ref ref="REST"/>
+	</logger>
+	<logger name="access" additivity="false">
+		<level value="INFO"/>
+		<appender-ref ref="ACCESS"/>
+	</logger>
+	<logger name="access-warn" additivity="false">
+		<level value="WARN"/>
+		<appender-ref ref="ACCESS-WARN"/>
+	</logger>
+	<root>
+		<level value="INFO"/>
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="APPLICATION"/>
+		<appender-ref ref="ERROR"/>
+	</root>
+	
+</log4j:configuration>
