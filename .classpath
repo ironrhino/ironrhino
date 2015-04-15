@@ -20,6 +20,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.7.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.7.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.7.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/disruptor-3.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dynamicreports-core-4.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/eaxy-0.1.jar"/>
@@ -50,7 +51,10 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jpa-api-2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jsoup-1.8.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jta-1.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-api-2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-core-2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-jcl-2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-slf4j-impl-2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-analyzers-common-4.10.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-core-4.10.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lucene-highlighter-4.10.4.jar"/>
@@ -71,7 +75,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.5.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.12.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-log4j12-1.7.12.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.4.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.1.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aspects-4.1.5.jar"/>

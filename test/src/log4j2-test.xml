@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<Configuration>
+	<Appenders>
+		<Console name="CONSOLE" target="SYSTEM_OUT">
+			<ThresholdFilter level="${sys:console.logger.level}"/>
+			<PatternLayout pattern="%d %c %p %m%n"/>
+		</Console>
+	</Appenders>
+	
+	<Loggers>
+		<Root level="INFO">
+			<AppenderRef ref="CONSOLE"/>
+		</Root>
+	</Loggers>
+	
+</Configuration>
