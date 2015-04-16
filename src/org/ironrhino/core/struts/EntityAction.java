@@ -465,6 +465,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
 			if (richtableConfig != null)
 				resultPage.setPaginating(richtableConfig.paginating());
+			prepare(criteria);
 			resultPage.setCriteria(criteria);
 			resultPage = elasticSearchService.search(resultPage,
 					new Mapper<EN>() {
@@ -636,6 +637,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {
+
+	}
+
+	protected void prepare(ElasticSearchCriteria esc) {
 
 	}
 
