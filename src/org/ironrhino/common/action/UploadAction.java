@@ -15,8 +15,6 @@ import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
-import org.ironrhino.common.Constants;
-import org.ironrhino.common.support.SettingControl;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -26,6 +24,7 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.struts.TemplateProvider;
 import org.ironrhino.core.util.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.google.common.io.Files;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -53,11 +52,14 @@ public class UploadAction extends BaseAction {
 
 	private Map<String, Boolean> files;
 
-	@Autowired
-	private transient FileStorage fileStorage;
+	@Value("${upload.excludeSuffix:jsp,jspx,php,asp,rb,py,sh}")
+	private String excludeSuffix;
+
+	@Value("${fileStorage.path:/assets}")
+	private String fileStoragePath;
 
 	@Autowired
-	private transient SettingControl settingControl;
+	private transient FileStorage fileStorage;
 
 	@Autowired
 	private transient TemplateProvider templateProvider;
@@ -146,8 +148,7 @@ public class UploadAction extends BaseAction {
 	}
 
 	public String getFileStoragePath() {
-		return settingControl.getStringValue(
-				Constants.SETTING_KEY_FILE_STORAGE_PATH, "/assets");
+		return fileStoragePath;
 	}
 
 	@Override
@@ -161,10 +162,7 @@ public class UploadAction extends BaseAction {
 	public String execute() {
 		if (file != null) {
 			int i = 0;
-			String[] arr = settingControl
-					.getStringArray("upload.excludeSuffix");
-			if (arr == null || arr.length == 0)
-				arr = "jsp,jspx,php,asp,rb,py,sh".split(",");
+			String[] arr = excludeSuffix.split(",");
 			List<String> excludes = Arrays.asList(arr);
 			String[] array = new String[file.length];
 			for (File f : file) {
@@ -177,10 +175,7 @@ public class UploadAction extends BaseAction {
 						String path = createPath(fn, autorename);
 						array[i] = new StringBuilder(
 								templateProvider.getAssetsBase())
-								.append(settingControl
-										.getStringValue(
-												Constants.SETTING_KEY_FILE_STORAGE_PATH,
-												"/assets")).append(path)
+								.append(getFileStoragePath()).append(path)
 								.toString();
 						fileStorage.write(new FileInputStream(f), path);
 					} catch (IOException e) {
@@ -317,13 +312,9 @@ public class UploadAction extends BaseAction {
 					if (!matches)
 						continue;
 				}
-				files.put(
-						new StringBuilder(templateProvider.getAssetsBase())
-								.append(settingControl
-										.getStringValue(
-												Constants.SETTING_KEY_FILE_STORAGE_PATH,
-												"/assets")).append(path)
-								.append("/").append(s).toString(), true);
+				files.put(new StringBuilder(templateProvider.getAssetsBase())
+						.append(getFileStoragePath()).append(path).append("/")
+						.append(s).toString(), true);
 			}
 		}
 		return JSON;
