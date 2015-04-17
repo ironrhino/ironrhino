@@ -227,8 +227,9 @@ rm -rf $ngigxfile
 fi
 if [ ! -f $ngigxfile ]; then
 cat>$ngigxfile<<EOF
+gzip    on;
 gzip_min_length  10240;
-gzip_types       text/xml text/css text/javascript application/x-javascript;
+gzip_types       text/plain text/xml text/css text/javascript application/javascript application/json application/x-javascript;
 limit_conn_zone  \$binary_remote_addr zone=addr:10m;
 upstream  backend  {
     server   localhost:8080;
