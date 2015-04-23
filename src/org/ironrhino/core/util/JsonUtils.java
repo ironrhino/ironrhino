@@ -5,12 +5,15 @@ import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Lob;
 
+import org.ironrhino.core.model.Displayable;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,6 +140,23 @@ public class JsonUtils {
 		return objectMapper.readValue(json, objectMapper
 				.getDeserializationConfig().getTypeFactory()
 				.constructType(type));
+	}
+
+	public static <T extends Enum<T>> String enumToJson(Class<T> clazz) {
+		T[] enums = clazz.getEnumConstants();
+		if (Displayable.class.isAssignableFrom(clazz)) {
+			Map<String, String> map = new LinkedHashMap<String, String>();
+			for (T en : enums) {
+				Displayable den = (Displayable) en;
+				map.put(den.getName(), den.getDisplayName());
+			}
+			return JsonUtils.toJson(map);
+		} else {
+			List<String> list = new ArrayList<String>();
+			for (T en : enums)
+				list.add(en.name());
+			return JsonUtils.toJson(list);
+		}
 	}
 
 	public static String unprettify(String json) {
