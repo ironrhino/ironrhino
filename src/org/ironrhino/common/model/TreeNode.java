@@ -35,8 +35,8 @@ public class TreeNode extends BaseTreeableEntity<TreeNode> implements
 
 	private static final long serialVersionUID = 8878337541387688086L;
 
-	@UiConfig(type = "textarea")
-	@Column(length = 2000)
+	@UiConfig(type = "textarea", displayOrder = 100)
+	@Column(length = 4000)
 	private String description;
 
 	@NotInCopy

@@ -62,7 +62,7 @@ public class Dictionary extends BaseEntity {
 
 	@SearchableProperty(boost = 3)
 	@UiConfig(type = "textarea")
-	@Column(length = 2000)
+	@Column(length = 4000)
 	private String description;
 
 	@SearchableComponent

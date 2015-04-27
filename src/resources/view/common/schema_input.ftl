@@ -16,9 +16,8 @@
 	<@s.hidden name="schema.strict"/>
 	<#else>
 	<div class="row-fluid">
-		<div class="span4"><span>${action.getText('name')}: </span><#if view=='brief'><@s.hidden name="schema.name"/>${schema.name!}<#else><@s.textfield theme="simple" name="schema.name" class="required checkavailable input-medium"/></#if></div>
-		<div class="span5"><span>${action.getText('description')}: </span><#if view=='brief'><@s.hidden name="schema.description" />${schema.description!}<#else><@s.textfield theme="simple" name="schema.description"/></#if></div>
-		<div class="span3"><span>${action.getText('strict')}: </span><#if view=='brief'><@s.hidden name="schema.strict" />${action.getText(schema.strict?string)}<#else><@s.checkbox theme="simple" name="schema.strict" class="custom"/></#if></div>
+		<div class="span6"><#if view=='brief'><@s.hidden name="schema.name"/>${schema.name!}<#else><@s.textfield theme="simple" name="schema.name" class="required checkavailable" placeholder=action.getText('name')/></#if></div>
+		<div class="span6"><span>${action.getText('strict')}: </span><#if view=='brief'><@s.hidden name="schema.strict" />${action.getText(schema.strict?string)}<#else><@s.checkbox theme="simple" name="schema.strict" class="custom"/></#if></div>
 	</div>
 	</#if>
 	<table class="datagrid nullable table table-condensed">
@@ -75,6 +74,11 @@
 			</#list>
 		</tbody>
 	</table>
+	<#if view!='embedded'>
+	<div class="row-fluid">
+		<div class="span10 offset1"><#if view=='brief'><@s.hidden name="schema.description" />${schema.description!}<#else><@s.textarea theme="simple" name="schema.description" style="width:90%;height:50px;" placeholder=action.getText('description') maxlength="4000"/></#if></div>
+	</div>	
+	</#if>
 	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>

@@ -15,8 +15,7 @@
 		<@s.hidden name="dictionary.description" />
 	<#else>
 	<div class="row-fluid">
-		<div class="span5"><span>${action.getText('name')}: </span><#if view=='brief'><@s.hidden name="dictionary.name"/>${dictionary.name!}<#else><@s.textfield theme="simple" name="dictionary.name" class="required checkavailable"/></#if></div>
-		<div class="span5"><span>${action.getText('description')}: </span><#if view=='brief'><@s.hidden name="dictionary.description"/>${dictionary.description!}<#else><@s.textfield theme="simple" name="dictionary.description" /></#if></div>
+		<div class="span4 offset4"><#if view=='brief'><@s.hidden name="dictionary.name"/>${dictionary.name!}<#else><@s.textfield theme="simple" name="dictionary.name" class="required checkavailable" placeholder=action.getText('name')/></#if></div>
 	</div>
 	</#if>
 	<table class="datagrid nullable table table-condensed">
@@ -59,6 +58,11 @@
 			</#list>
 		</tbody>
 	</table>
+	<#if view!='embedded'>
+	<div class="row-fluid">
+		<div class="span10 offset1"><#if view=='brief'><@s.hidden name="dictionary.description" />${dictionary.description!}<#else><@s.textarea theme="simple" name="dictionary.description" style="width:90%;height:50px;" placeholder=action.getText('description') maxlength="4000"/></#if></div>
+	</div>	
+	</#if>
 	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>
