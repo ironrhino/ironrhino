@@ -38,11 +38,11 @@ public class AuditEvent extends BaseEntity {
 	@SearchableProperty(index = Index.NOT_ANALYZED)
 	private String username;
 
-	@UiConfig(width = "150px")
+	@UiConfig(width = "130px")
 	@Column(name = "`date`")
 	private Date date = new Date();
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "150px")
 	@SearchableProperty
 	private String address;
 

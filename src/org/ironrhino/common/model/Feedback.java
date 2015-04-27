@@ -47,11 +47,11 @@ public class Feedback extends BaseEntity implements Recordable<UserDetails> {
 	@UiConfig(width = "100px")
 	private String domain;
 
-	@UiConfig(readonly = @Readonly(true), width = "150px")
+	@UiConfig(readonly = @Readonly(true), width = "130px")
 	@Column(updatable = false)
 	private Date createDate;
 
-	@UiConfig(readonly = @Readonly(true), width = "150px")
+	@UiConfig(readonly = @Readonly(true), width = "130px")
 	@Column(insertable = false)
 	private Date modifyDate;
 

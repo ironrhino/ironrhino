@@ -31,7 +31,7 @@ public class LoginRecord extends BaseEntity {
 	@SearchableProperty
 	private String username;
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "150px")
 	@SearchableProperty
 	private String address;
 
@@ -41,7 +41,7 @@ public class LoginRecord extends BaseEntity {
 	@SearchableProperty
 	private String cause;
 
-	@UiConfig(width = "150px")
+	@UiConfig(width = "130px")
 	@Column(name = "`date`")
 	private Date date = new Date();
 
