@@ -57,6 +57,8 @@ public class Schema extends BaseEntity {
 	private String name;
 
 	@SearchableProperty(boost = 3)
+	@UiConfig(type = "textarea")
+	@Column(length = 2000)
 	private String description;
 
 	@UiConfig(width = "100px")
