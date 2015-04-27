@@ -237,9 +237,7 @@
 							<ol class="unstyled">
 							<#list value as item>
 								<li>
-								<#if item?is_string||item?is_number||item?is_boolean||item?is_date_like>
-										${item!}
-								<#elseif item?is_sequence>
+								<#if item?is_sequence>
 										<ol class="unstyled" style="padding-bottom:10px;">
 										<#list item as it>
 											<li>${it}</li>
