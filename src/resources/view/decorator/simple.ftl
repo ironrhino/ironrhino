@@ -24,8 +24,8 @@
 </#if>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" href="<@url value="/assets/images/favicon.ico"/>" />
-<link href="<@url value="/assets/styles/ironrhino${modernBrowser?string('-min','')}.css"/>" media="all" rel="stylesheet" type="text/css" />
-<script src="<@url value="/assets/scripts/ironrhino${modernBrowser?string('-min','-ie')}.js"/>" type="text/javascript"<#if modernBrowser&&!head?contains('</script>')> defer</#if>></script>
+<link href="<@url value="/assets/styles/ironrhino-min.css"/>" media="all" rel="stylesheet" type="text/css" />
+<script src="<@url value="/assets/scripts/ironrhino-min.js"/>" type="text/javascript"<#if modernBrowser&&!head?contains('</script>')> defer</#if>></script>
 <#include "include/assets.ftl" ignore_missing=true/>
 <#noescape>${head}</#noescape>
 </head>
