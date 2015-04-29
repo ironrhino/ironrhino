@@ -62,6 +62,10 @@ public class RestStatus extends RuntimeException {
 		return code;
 	}
 
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	public String getStatus() {
 		return status;
 	}
@@ -73,6 +77,10 @@ public class RestStatus extends RuntimeException {
 	@Override
 	public String getMessage() {
 		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	public static RestStatus valueOf(String code) {
