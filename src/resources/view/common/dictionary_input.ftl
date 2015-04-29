@@ -5,7 +5,7 @@
 <title><#if dictionary.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('dictionary')}</title>
 </head>
 <body>
-<@s.form action="${actionBaseUrl}/save" method="post" class="ajax${view?has_content?string('',' importable')}" style="text-align:center;">
+<@s.form action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?string('',' importable')}">
 	<#if !dictionary.new>
 		<@s.hidden name="dictionary.id" />
 	</#if>
@@ -14,9 +14,8 @@
 		<@s.hidden name="dictionary.name"/>
 		<@s.hidden name="dictionary.description" />
 	<#else>
-	<div class="row-fluid">
-		<div class="span4 offset4"><#if view=='brief'><@s.hidden name="dictionary.name"/>${dictionary.name!}<#else><@s.textfield theme="simple" name="dictionary.name" class="required checkavailable" placeholder=action.getText('name')/></#if></div>
-	</div>
+	<#if view=='brief'><@s.hidden name="dictionary.name"/><h4>${dictionary.name!}</h4><#else><@s.textfield label="%{getText('name')}" name="dictionary.name" class="required checkavailable"/></#if>
+	<#if view=='brief'><@s.hidden name="dictionary.description"/><p style="white-space:pre-wrap;word-break:break-all;">${dictionary.description!}</p><#else><@s.textarea label="%{getText('description')}" name="dictionary.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
 	</#if>
 	<table class="datagrid nullable table table-condensed">
 	<@s.hidden name="__datagrid_dictionary.items" />
@@ -58,11 +57,6 @@
 			</#list>
 		</tbody>
 	</table>
-	<#if view!='embedded'>
-	<div class="row-fluid">
-		<div class="span10 offset1"><#if view=='brief'><@s.hidden name="dictionary.description" />${dictionary.description!}<#else><@s.textarea theme="simple" name="dictionary.description" style="width:90%;height:50px;" placeholder=action.getText('description') maxlength="4000"/></#if></div>
-	</div>	
-	</#if>
 	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>

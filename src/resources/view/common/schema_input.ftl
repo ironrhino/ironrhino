@@ -5,7 +5,7 @@
 <title><#if schema.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('schema')}</title>
 </head>
 <body>
-<@s.form id="schema_input" action="${actionBaseUrl}/save" method="post" class="ajax${view?has_content?string('',' importable')}" style="text-align:center;">
+<@s.form id="schema_input" action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?string('',' importable')}">
 	<#if !schema.new>
 		<@s.hidden name="schema.id" />
 	</#if>
@@ -15,10 +15,9 @@
 	<@s.hidden name="schema.description"/>
 	<@s.hidden name="schema.strict"/>
 	<#else>
-	<div class="row-fluid">
-		<div class="span6"><#if view=='brief'><@s.hidden name="schema.name"/>${schema.name!}<#else><@s.textfield theme="simple" name="schema.name" class="required checkavailable" placeholder=action.getText('name')/></#if></div>
-		<div class="span6"><span>${action.getText('strict')}: </span><#if view=='brief'><@s.hidden name="schema.strict" />${action.getText(schema.strict?string)}<#else><@s.checkbox theme="simple" name="schema.strict" class="custom"/></#if></div>
-	</div>
+	<#if view=='brief'><@s.hidden name="schema.name"/><h4>${schema.name!}<#if schema.strict> <span class="label">${action.getText('strict')}</span></#if></h4><#else><@s.textfield label="%{getText('name')}" name="schema.name" class="required checkavailable"/></#if>
+	<#if view=='brief'><@s.hidden name="schema.strict"/><#else><@s.checkbox label="%{getText('strict')}" name="schema.strict" class="custom"/></#if>
+	<#if view=='brief'><@s.hidden name="schema.description"/><p style="white-space:pre-wrap;word-break:break-all;">${schema.description!}</p><#else><@s.textarea label="%{getText('description')}" name="schema.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
 	</#if>
 	<table class="datagrid nullable table table-condensed">
 	<@s.hidden name="__datagrid_schema.fields" />
@@ -74,11 +73,6 @@
 			</#list>
 		</tbody>
 	</table>
-	<#if view!='embedded'>
-	<div class="row-fluid">
-		<div class="span10 offset1"><#if view=='brief'><@s.hidden name="schema.description" />${schema.description!}<#else><@s.textarea theme="simple" name="schema.description" style="width:90%;height:50px;" placeholder=action.getText('description') maxlength="4000"/></#if></div>
-	</div>	
-	</#if>
 	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>
