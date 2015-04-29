@@ -19,6 +19,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -166,6 +167,8 @@ public class ApiDoc implements Serializable {
 				responseSample = ((Callable<?>) responseSample).call();
 			else if (responseSample instanceof Future)
 				responseSample = ((Future<?>) responseSample).get();
+			else if (responseSample instanceof ResponseEntity)
+				responseSample = ((ResponseEntity<?>) responseSample).getBody();
 			else if (responseSample instanceof MappingJacksonValue) {
 				view = ((MappingJacksonValue) responseSample)
 						.getSerializationView();
