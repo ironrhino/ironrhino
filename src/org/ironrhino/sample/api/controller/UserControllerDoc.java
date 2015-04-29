@@ -28,16 +28,17 @@ public class UserControllerDoc extends UserController {
 	@Api(value = "修改当前用户信息", description = "只传入需要修改的字段")
 	public RestStatus put(
 			@Fields(value = {
-					@Field(name = "password", description = "传入明文密码"),
-					@Field(name = "name"), @Field(name = "email"),
-					@Field(name = "phone") }, sampleMethodName = "createUserForPut") User user) {
+					@Field(name = "password", required = false, description = "传入明文密码"),
+					@Field(name = "name", required = false),
+					@Field(name = "email", required = false),
+					@Field(name = "phone", required = false) }, sampleMethodName = "createUserForPut") User user) {
 		return RestStatus.OK;
 	}
 
 	@Override
 	@Api("校验当前用户密码")
 	public RestStatus validatePassword(
-			@Fields(value = { @Field(name = "password", required = true, description = "传入明文密码") }, sampleMethodName = "createUserForPassword") User user) {
+			@Fields(value = { @Field(name = "password", description = "传入明文密码") }, sampleMethodName = "createUserForPassword") User user) {
 		return RestStatus.OK;
 	}
 
@@ -59,10 +60,11 @@ public class UserControllerDoc extends UserController {
 	@Api("创建用户")
 	public RestStatus post(
 			@Fields(value = {
-					@Field(name = "username", required = true, description = "字母和数字组合"),
-					@Field(name = "password", required = true, description = "传入明文密码"),
-					@Field(name = "name", required = true),
-					@Field(name = "email"), @Field(name = "phone") }, sampleMethodName = "createUserForPost") User user) {
+					@Field(name = "username", description = "字母和数字组合"),
+					@Field(name = "password", description = "传入明文密码"),
+					@Field(name = "name"),
+					@Field(name = "email", required = false),
+					@Field(name = "phone", required = false) }, sampleMethodName = "createUserForPost") User user) {
 		return RestStatus.OK;
 	}
 
@@ -71,9 +73,10 @@ public class UserControllerDoc extends UserController {
 	public RestStatus put(
 			@Field(description = "字母和数字组合") String username,
 			@Fields(value = {
-					@Field(name = "password", description = "传入明文密码"),
-					@Field(name = "name"), @Field(name = "email"),
-					@Field(name = "phone") }, sampleMethodName = "createUserForPut") User user) {
+					@Field(name = "password", required = false, description = "传入明文密码"),
+					@Field(name = "name", required = false),
+					@Field(name = "email", required = false),
+					@Field(name = "phone", required = false) }, sampleMethodName = "createUserForPut") User user) {
 		return RestStatus.OK;
 	}
 
@@ -87,7 +90,7 @@ public class UserControllerDoc extends UserController {
 	@Api("校验用户密码")
 	public RestStatus validatePassword(
 			String username,
-			@Fields(value = { @Field(name = "password", required = true, description = "传入明文密码") }, sampleMethodName = "createUserForPassword") User user) {
+			@Fields(value = { @Field(name = "password", description = "传入明文密码") }, sampleMethodName = "createUserForPassword") User user) {
 		return RestStatus.OK;
 	}
 

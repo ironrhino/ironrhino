@@ -14,7 +14,7 @@ public @interface Field {
 
 	String type() default "";
 
-	boolean required() default false;
+	boolean required() default true;
 
 	String label() default "";
 
