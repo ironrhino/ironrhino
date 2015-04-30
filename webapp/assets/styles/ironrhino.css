@@ -7879,9 +7879,13 @@ td.middle {
 	z-index: 1000;
 	font-size:1.2em;
 }
-.navbar-fixed-top ul.nav li.active{
+.navbar-fixed-top ul.nav > li.active{
   	font-weight: bold;
-  	border-bottom: solid 2px #777;
+  	border-bottom: solid 2px #777 !important;
+}
+.navbar-fixed-top ul.nav > li:hover{
+  color: black;
+  border-bottom: solid 2px #ccc;
 }
 .modal {
 	z-index: 2050;
