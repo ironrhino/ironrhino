@@ -7881,6 +7881,7 @@ td.middle {
 }
 .navbar-fixed-top ul.nav li.active{
   	font-weight: bold;
+  	border-bottom: solid 2px #777;
 }
 .modal {
 	z-index: 2050;
