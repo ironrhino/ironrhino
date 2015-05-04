@@ -427,7 +427,7 @@ Richtable = {
 		cell.addClass('editing');
 		var template = '';
 		if (templateId) {
-			template = $('#' + templateId).text();
+			template = $.trim($('#' + templateId).text());
 		} else {
 			if (type == 'textarea')
 				template = '<textarea type="text" class="text"/>';
