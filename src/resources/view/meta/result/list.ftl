@@ -42,6 +42,9 @@
 	<#if !hidden && entry.value.hiddenInList.expression?has_content>
 	<#assign hidden=entry.value.hiddenInList.expression?eval/>
 	</#if>
+	<#if !hidden && Parameters[entry.key]?has_content && !Parameters[entry.key+'-op']?has_content>
+	<#assign hidden=true/>
+	</#if>
 	<#if !hidden>
 		<#assign size=size+1>
 	</#if>
@@ -54,6 +57,9 @@
 		<#assign hidden=config.hiddenInList.value>
 		<#if !hidden && config.hiddenInList.expression?has_content>
 		<#assign hidden=config.hiddenInList.expression?eval>
+		</#if>
+		<#if !hidden && Parameters[key]?has_content && !Parameters[key+'-op']?has_content>
+		<#assign hidden=true/>
 		</#if>
 		<#if !hidden>
 			<#assign label=key>
@@ -116,6 +122,9 @@
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval>
 	</#if>
+	<#if !hidden && Parameters[key]?has_content && !Parameters[key+'-op']?has_content>
+	<#assign hidden=true/>
+	</#if>
 	<#if !hidden>
 		<#assign dynamicAttributes={}>
 		<#if config.type=='listpick'&&richtableConfig.celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
@@ -148,6 +157,9 @@
 	<#assign hidden=config.hiddenInList.value>
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval/>
+	</#if>
+	<#if !hidden && Parameters[key]?has_content && !Parameters[key+'-op']?has_content>
+	<#assign hidden=true/>
 	</#if>
 	<#if !hidden>
 		<#if config.type=='enum'>
