@@ -132,7 +132,9 @@ public class Dictionary extends BaseEntity {
 				items.size() + 1, 1);
 		for (LabelValue lv : items)
 			if (StringUtils.isNotBlank(lv.getValue()))
-				map.put(lv.getValue(), lv.getLabel());
+				map.put(lv.getValue(),
+						StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel()
+								: lv.getValue());
 		return map;
 	}
 
@@ -156,7 +158,9 @@ public class Dictionary extends BaseEntity {
 					temp = new LinkedHashMap<String, String>();
 					map.put(group, temp);
 				}
-				temp.put(lv.getValue(), lv.getLabel());
+				temp.put(lv.getValue(),
+						StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel()
+								: lv.getValue());
 			}
 		}
 		return map;
