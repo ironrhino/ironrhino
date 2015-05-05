@@ -7,13 +7,13 @@
 <#if Parameters.tab?has_content>
 		<#if uiConfigs[Parameters.tab]??>
 		<#assign config=uiConfigs[Parameters.tab]>
-		<#if config.type=='checkbox'||config.type=='enum'>
+		<#if config.type=='checkbox'||config.type=='enum'||selectDictionary??&&config.type=='dictionary'>
 		<#assign propertyName=Parameters.tab>
 		</#if>
 		</#if>
 <#else>
 <#list uiConfigs.entrySet() as entry>
-	<#if entry.value.type=='enum'>
+	<#if entry.value.type=='enum'||selectDictionary??&&entry.value.type=='dictionary'>
 		<#assign propertyName=entry.key>
 		<#assign config=entry.value>
 		<#break/>
@@ -33,6 +33,11 @@
 	<#list values as value>
 	<li><a href="#${propertyName+'-'+value.name()}" data-toggle="tab">${value.displayName}</a></li>
 	</#list>
+	<#elseif selectDictionary??&&config.type=='dictionary'>
+	<#assign map=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getItemsAsMap(config.templateName!propertyName)>
+	<#list map.entrySet() as entry>
+	<li><a href="#${propertyName+'-'+entry.key}" data-toggle="tab">${entry.value}</a></li>
+	</#list>
 	<#elseif config.type=='checkbox'>
 	<li><a href="#${propertyName}-true" data-toggle="tab">${action.getText('true')}</a></li>
 	<li><a href="#${propertyName}-false" data-toggle="tab">${action.getText('false')}</a></li>
@@ -43,6 +48,11 @@
 	<#if config.type=='enum'>
 	<#list values as value>
 	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}${propertyName}=${value.name()}"></div>
+	</#list>
+	<#elseif selectDictionary??&&config.type=='dictionary'>
+	<#assign map=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getItemsAsMap(config.templateName!propertyName)>
+	<#list map.entrySet() as entry>
+	<div id="${propertyName+'-'+entry.key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}${propertyName}=${entry.key}"></div>
 	</#list>
 	<#elseif config.type=='checkbox'>
 	<div id="${propertyName}-true" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}${propertyName}=true"></div>
