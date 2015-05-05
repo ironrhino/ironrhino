@@ -47,16 +47,16 @@
 	<div id="all" class="tab-pane ajaxpanel active" data-url="${dataurl}"></div>
 	<#if config.type=='enum'>
 	<#list values as value>
-	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}${propertyName}=${value.name()}"></div>
+	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=${value.name()}"></div>
 	</#list>
 	<#elseif selectDictionary??&&config.type=='dictionary'>
 	<#assign map=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getItemsAsMap(config.templateName!propertyName)>
 	<#list map.entrySet() as entry>
-	<div id="${propertyName+'-'+entry.key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}${propertyName}=${entry.key}"></div>
+	<div id="${propertyName+'-'+entry.key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=${entry.key?url}"></div>
 	</#list>
 	<#elseif config.type=='checkbox'>
-	<div id="${propertyName}-true" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}${propertyName}=true"></div>
-	<div id="${propertyName}-false" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}${propertyName}=false"></div>
+	<div id="${propertyName}-true" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=true"></div>
+	<div id="${propertyName}-false" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=false"></div>
 	</#if>
 </div>
 </#if>
