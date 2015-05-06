@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="zip" basedir=".">
+	<import file="build.xml" />
+	<target name="zip">
+		<delete file="${target.dir}/ironrhino.zip" />
+		<antcall target="compile" />
+		<antcall target="jar" />
+		<zip destfile="${target.dir}/ironrhino.zip" basedir="${basedir}/.." includes="ironrhino/build.project.xml,ironrhino/webapp/WEB-INF/lib/*.jar,ironrhino/target/*.jar" />
+	</target>
+</project>
