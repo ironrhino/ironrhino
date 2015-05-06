@@ -5,6 +5,6 @@
 		<delete file="${target.dir}/ironrhino.zip" />
 		<antcall target="compile" />
 		<antcall target="jar" />
-		<zip destfile="${target.dir}/ironrhino.zip" basedir="${basedir}/.." includes="ironrhino/build.project.xml,ironrhino/webapp/WEB-INF/lib/*.jar,ironrhino/target/*.jar" />
+		<zip destfile="${target.dir}/ironrhino.zip" basedir="${basedir}/.." includes="ironrhino/build.project.xml,ironrhino/webapp/WEB-INF/lib/*.jar,ironrhino/lib/*.jar,ironrhino/target/*.jar" />
 	</target>
 </project>
