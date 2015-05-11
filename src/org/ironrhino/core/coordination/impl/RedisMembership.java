@@ -27,7 +27,7 @@ public class RedisMembership implements Membership {
 
 	@Override
 	public void join(final String group) throws Exception {
-		stringRedisTemplate.opsForList().rightPush(NAMESPACE + group,
+		stringRedisTemplate.opsForList().leftPush(NAMESPACE + group,
 				AppInfo.getInstanceId());
 	}
 
