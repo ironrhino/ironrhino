@@ -10,7 +10,7 @@ fi
 
 #install packages
 apt-get update
-apt-get --force-yes --yes install openjdk-7-jdk ant mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
+apt-get --force-yes --yes install openjdk-7-jdk mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
 apt-get --force-yes --yes remove openjdk-6-jre-headless
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
@@ -34,12 +34,21 @@ mkfontdir
 fc-cache -fv
 fi
 
+#install ant
+if [ ! -d ant ];then
+wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.gz
+tar xf apache-ant-*.tar.gz
+rm apache-ant-*.tar.gz
+mv apache-ant-* ant
+chown -R $USER:$USER ant
+fi
+
 #install tomcat
 if [ ! -d tomcat8080 ];then
 if ! $(ls -l apache-tomcat-*.tar.gz >/dev/null 2>&1) ; then
 wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.tar.gz
 fi
-tar xvf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
+tar xf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
 rename s/^apache-tomcat.*$/tomcat/g apache-tomcat-*
 cd tomcat && rm -rf bin/*.bat && rm -rf webapps/*
 cd conf
@@ -328,7 +337,7 @@ if [ -d .svn ];then
 svnupoutput=\`svn up --force\`
 echo "\$svnupoutput"
 if \$(echo "\$svnupoutput"|grep Updated >/dev/null 2>&1) ; then
-ant dist
+../ant/bin/ant dist
 fi
 elif [ -d .git ];then
 git reset --hard
@@ -336,11 +345,11 @@ git clean -df
 gitpulloutput=\`git pull 2>&1\`
 echo "\$gitpulloutput"
 if ! [[ \$gitpulloutput =~ up-to-date ]] ; then
-ant dist
+../ant/bin/ant dist
 fi
 fi
 if ! \$(ls -l target/ironrhino*.jar >/dev/null 2>&1) ; then
-ant dist
+../ant/bin/ant dist
 fi
 cd ..
 cd \$app
@@ -358,14 +367,14 @@ fi
 else
 echo 'no svn or git'
 fi
-ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT deploy
+../ant/bin/ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT deploy
 LANGUAGE=\$OLDLANGUAGE
 sleep 5
-ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 shutdown
+../ant/bin/ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 shutdown
 rm -rf /home/$USER/tomcat8081/webapps
 mkdir -p /home/$USER/tomcat8081/webapps
 cp -R /home/$USER/tomcat8080/webapps/ROOT /home/$USER/tomcat8081/webapps
-ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 startup
+../ant/bin/ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 startup
 fi
 EOF
 chown $USER:$USER deploy.sh
@@ -391,8 +400,8 @@ if [[ "\$app" =~ "/" ]] ; then
 app="\${app:0:-1}"
 fi
 cd \$app
-ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT rollback
-ant -Dserver.home=/home/$USER/tomcat8081 -Dwebapp.deploy.dir=/home/$USER/tomcat8081/webapps/ROOT -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 rollback
+../ant/bin/ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT rollback
+../ant/bin/ant -Dserver.home=/home/$USER/tomcat8081 -Dwebapp.deploy.dir=/home/$USER/tomcat8081/webapps/ROOT -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 rollback
 EOF
 chown $USER:$USER rollback.sh
 chmod +x rollback.sh
@@ -479,7 +488,7 @@ if ! which redis-server > /dev/null && ! $(ls -l redis-*.tar.gz >/dev/null 2>&1)
 wget http://download.redis.io/releases/redis-2.8.13.tar.gz
 fi
 if $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
-tar xvf redis-*.tar.gz >/dev/null && rm -rf redis-*.tar.gz
+tar xf redis-*.tar.gz >/dev/null && rm -rf redis-*.tar.gz
 rename s/^redis.*$/redis/g redis-*
 cd redis && make > /dev/null && make install > /dev/null
 cd utils && ./install_server.sh
