@@ -38,7 +38,7 @@ if [ ! -d jdk ];then
 wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jdk-7u80-linux-x64.tar.gz"
 tar xf jdk-*.tar.gz
 rm jdk-*.tar.gz
-mv jdk-* jdk
+mv jdk* jdk
 chown -R $USER:$USER jdk
 ln -s /home/$USER/jdk/bin/java /usr/bin/java
 fi
