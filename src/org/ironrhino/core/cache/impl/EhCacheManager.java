@@ -136,7 +136,8 @@ public class EhCacheManager implements CacheManager {
 		Cache cache = getCache(namespace, false);
 		if (cache != null)
 			for (String key : keys)
-				cache.remove(key);
+				if (StringUtils.isNotBlank(key))
+					cache.remove(key);
 	}
 
 	@Override

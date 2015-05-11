@@ -189,7 +189,8 @@ public class MemcachedCacheManager implements CacheManager {
 		if (keys == null)
 			return;
 		for (String key : keys)
-			delete(key, namespace);
+			if (StringUtils.isNotBlank(key))
+				delete(key, namespace);
 	}
 
 	@Override

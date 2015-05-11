@@ -5,9 +5,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.aop.BaseAspect;
@@ -111,13 +109,15 @@ public class CacheAspect extends BaseAspect {
 	}
 
 	@SuppressWarnings("unchecked")
-	@AfterReturning(pointcut = "@annotation(evictCache)", returning = "retval")
-	public void remove(JoinPoint jp, EvictCache evictCache, Object retval) {
+	@Around("execution(public * *(..)) and @annotation(evictCache)")
+	public void remove(ProceedingJoinPoint jp, EvictCache evictCache)
+			throws Throwable {
 		Map<String, Object> context = buildContext(jp);
-		putReturnValueIntoContext(context, retval);
 		String namespace = ExpressionUtils.evalString(evictCache.namespace(),
 				context);
 		List<String> keys = ExpressionUtils.evalList(evictCache.key(), context);
+		Object retval = jp.proceed();
+		putReturnValueIntoContext(context, retval);
 		if (isBypass() || keys == null || keys.size() == 0)
 			return;
 		if (StringUtils.isNotBlank(evictCache.renew())) {

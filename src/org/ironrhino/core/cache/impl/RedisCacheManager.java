@@ -184,10 +184,9 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mdelete(final Collection<String> keys, String namespace) {
+	public void mdelete(final Collection<String> keys, final String namespace) {
 		if (keys == null)
 			return;
-		final String ns = namespace;
 		try {
 			redisTemplate.execute(new RedisCallback() {
 				@Override
@@ -195,9 +194,9 @@ public class RedisCacheManager implements CacheManager {
 						throws DataAccessException {
 					conn.multi();
 					for (String key : keys)
-						if (key != null)
+						if (StringUtils.isNotBlank(key))
 							conn.del(redisTemplate.getKeySerializer()
-									.serialize(generateKey(key, ns)));
+									.serialize(generateKey(key, namespace)));
 					conn.exec();
 					return null;
 				}
