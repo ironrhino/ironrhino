@@ -10,7 +10,7 @@ fi
 
 #install packages
 apt-get update
-apt-get --force-yes --yes install openjdk-7-jdk mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
+apt-get --force-yes --yes install mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi
@@ -41,6 +41,7 @@ rm jdk-*.tar.gz
 mv jdk* jdk
 chown -R $USER:$USER jdk
 ln -s /home/$USER/jdk/bin/java /usr/bin/java
+ln -s /home/$USER/jdk/bin/javac /usr/bin/javac
 fi
 
 #install ant
@@ -50,6 +51,7 @@ tar xf apache-ant-*.tar.gz
 rm apache-ant-*.tar.gz
 mv apache-ant-* ant
 chown -R $USER:$USER ant
+ln -s /home/$USER/ant/bin/ant /usr/bin/ant
 fi
 
 #install tomcat
@@ -346,7 +348,7 @@ if [ -d .svn ];then
 svnupoutput=\`svn up --force\`
 echo "\$svnupoutput"
 if \$(echo "\$svnupoutput"|grep Updated >/dev/null 2>&1) ; then
-../ant/bin/ant dist
+ant dist
 fi
 elif [ -d .git ];then
 git reset --hard
@@ -354,11 +356,11 @@ git clean -df
 gitpulloutput=\`git pull 2>&1\`
 echo "\$gitpulloutput"
 if ! [[ \$gitpulloutput =~ up-to-date ]] ; then
-../ant/bin/ant dist
+ant dist
 fi
 fi
 if ! \$(ls -l target/ironrhino*.jar >/dev/null 2>&1) ; then
-../ant/bin/ant dist
+ant dist
 fi
 cd ..
 cd \$app
@@ -376,14 +378,14 @@ fi
 else
 echo 'no svn or git'
 fi
-../ant/bin/ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT deploy
+ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT deploy
 LANGUAGE=\$OLDLANGUAGE
 sleep 5
-../ant/bin/ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 shutdown
+ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 shutdown
 rm -rf /home/$USER/tomcat8081/webapps
 mkdir -p /home/$USER/tomcat8081/webapps
 cp -R /home/$USER/tomcat8080/webapps/ROOT /home/$USER/tomcat8081/webapps
-../ant/bin/ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 startup
+ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 startup
 fi
 EOF
 chown $USER:$USER deploy.sh
@@ -409,8 +411,8 @@ if [[ "\$app" =~ "/" ]] ; then
 app="\${app:0:-1}"
 fi
 cd \$app
-../ant/bin/ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT rollback
-../ant/bin/ant -Dserver.home=/home/$USER/tomcat8081 -Dwebapp.deploy.dir=/home/$USER/tomcat8081/webapps/ROOT -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 rollback
+ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT rollback
+ant -Dserver.home=/home/$USER/tomcat8081 -Dwebapp.deploy.dir=/home/$USER/tomcat8081/webapps/ROOT -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 rollback
 EOF
 chown $USER:$USER rollback.sh
 chmod +x rollback.sh
