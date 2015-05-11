@@ -11,7 +11,6 @@ fi
 #install packages
 apt-get update
 apt-get --force-yes --yes install openjdk-7-jdk mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
-apt-get --force-yes --yes remove openjdk-6-jre-headless
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi
@@ -32,6 +31,16 @@ cd /usr/share/fonts
 mkfontscale
 mkfontdir
 fc-cache -fv
+fi
+
+#install oracle jdk
+if [ ! -d jdk ];then
+wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jdk-7u80-linux-x64.tar.gz"
+tar xf jdk-*.tar.gz
+rm jdk-*.tar.gz
+mv jdk-* jdk
+chown -R $USER:$USER jdk
+ln -s /home/$USER/jdk/bin/java /usr/bin/java
 fi
 
 #install ant
