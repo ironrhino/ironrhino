@@ -4,6 +4,7 @@
 <title>${action.getText('index')}</title>
 </head>
 <body>
+<#if printSetting??>
 <div class="portal savable">
 	<ul class="portal-column">
 		<li id="announcement" class="portlet">
@@ -19,5 +20,6 @@
 		</li>
 	</ul>
 </div>
+</#if>
 </body>
 </html></#escape>
