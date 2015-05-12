@@ -23,20 +23,21 @@ public class ZooKeeperConfiguration {
 	@Value("${zooKeeper.sessionTimeout:60000}")
 	private int sessionTimeout;
 
-	public @Bean(initMethod = "start", destroyMethod = "close")
-	CuratorFramework curatorFramework() {
+	@Bean(initMethod = "start", destroyMethod = "close")
+	public CuratorFramework curatorFramework() {
 		CuratorFramework curatorFramework = CuratorFrameworkFactory.builder()
 				.connectString(connectString)
 				.retryPolicy(new ExponentialBackoffRetry(1000, 3))
 				.connectionTimeoutMs(connectionTimeout)
 				.sessionTimeoutMs(sessionTimeout).build();
-		curatorFramework.getCuratorListenable().addListener(defaultWatcher());
 		return curatorFramework;
 	}
 
-	public @Bean
-	DefaultWatcher defaultWatcher() {
-		return new DefaultWatcher();
+	@Bean
+	public DefaultWatcher defaultWatcher(CuratorFramework curatorFramework) {
+		DefaultWatcher defaultWatcher = new DefaultWatcher();
+		curatorFramework.getCuratorListenable().addListener(defaultWatcher);
+		return defaultWatcher;
 	}
 
 }
