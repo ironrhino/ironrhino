@@ -2,11 +2,14 @@
 <#escape x as x?html><html>
 <head>
 <title>${action.getText('access.denied')}</title>
-<#assign notlogin = false>
+<#assign redirectToLogin = false>
 <@authorize ifAllGranted="ROLE_BUILTIN_ANONYMOUS">
-<#assign notlogin = true>
+<#assign redirectToLogin = true>
 </@authorize>
-<#if notlogin>
+<@classPresentConditional value="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint" negated=true>
+<#assign redirectToLogin = false>
+</@classPresentConditional>
+<#if redirectToLogin>
 <#assign returnUrl=request.requestURL/>
 <#if request.queryString??>
 <#assign returnUrl=returnUrl+"?"+request.queryString/>
@@ -16,7 +19,7 @@
 </head>
 <body>
 <h3 style="text-align:center;">
-<#if notlogin>
+<#if redirectToLogin>
 <a href="<@url value="${ssoServerBase!}/login?targetUrl=${returnUrl?url}"/>">${action.getText('login.required')}</a>
 <#else>
 ${action.getText('access.denied')}
