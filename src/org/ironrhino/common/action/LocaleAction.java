@@ -17,6 +17,7 @@ import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 @AutoConfig(namespace = "/")
 public class LocaleAction extends BaseAction {
@@ -26,6 +27,9 @@ public class LocaleAction extends BaseAction {
 	private String lang;
 
 	private Locale[] availableLocales;
+	
+	@Value("${globalCookie:false}")
+	private boolean globalCookie;
 
 	@Autowired
 	private SettingControl settingControl;
@@ -64,7 +68,7 @@ public class LocaleAction extends BaseAction {
 			if (loc != null) {
 				RequestUtils.saveCookie(request, response,
 						httpSessionManager.getLocaleCookieName(),
-						loc.toString(), true);
+						loc.toString(), globalCookie);
 			} else {
 				RequestUtils.deleteCookie(request, response,
 						httpSessionManager.getLocaleCookieName(), true);

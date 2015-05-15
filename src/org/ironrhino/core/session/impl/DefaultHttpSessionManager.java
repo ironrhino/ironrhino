@@ -72,6 +72,9 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Value("${httpSessionManager.alwaysUseCacheBased:false}")
 	private boolean alwaysUseCacheBased;
 
+	@Value("${globalCookie:false}")
+	private boolean globalCookie;
+
 	public String getDefaultLocaleName() {
 		return defaultLocaleName;
 	}
@@ -238,7 +241,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			session.setSessionTracker(this.getSessionTracker(session));
 			RequestUtils.saveCookie(session.getRequest(),
 					session.getResponse(), getSessionTrackerName(),
-					session.getSessionTracker(), true);
+					session.getSessionTracker(), globalCookie);
 		}
 		if (checkRemoteAddr) {
 			if (!session.getAttrMap().isEmpty()

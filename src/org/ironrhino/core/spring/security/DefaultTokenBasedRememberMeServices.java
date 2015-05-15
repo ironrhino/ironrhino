@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.util.RequestUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
@@ -11,6 +12,9 @@ import org.springframework.util.StringUtils;
 
 public class DefaultTokenBasedRememberMeServices extends
 		TokenBasedRememberMeServices {
+
+	@Value("${globalCookie:false}")
+	private boolean globalCookie;
 
 	public DefaultTokenBasedRememberMeServices(String key,
 			UserDetailsService userDetailsService) {
@@ -46,7 +50,7 @@ public class DefaultTokenBasedRememberMeServices extends
 			HttpServletRequest request, HttpServletResponse response) {
 		String cookieValue = encodeCookie(tokens);
 		RequestUtils.saveCookie(request, response, getCookieName(),
-				cookieValue, maxAge, true, true);
+				cookieValue, maxAge, globalCookie, true);
 	}
 
 	@Override

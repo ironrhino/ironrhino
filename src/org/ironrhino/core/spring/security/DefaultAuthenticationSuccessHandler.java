@@ -23,6 +23,9 @@ public class DefaultAuthenticationSuccessHandler implements
 	@Value("${authenticationSuccessHandler.usernameInCookie:true}")
 	private boolean usernameInCookie;
 
+	@Value("${globalCookie:false}")
+	private boolean globalCookie;
+
 	@Value("${authenticationSuccessHandler.usernameInCookieMaxAge:31536000}")
 	private int usernameInCookieMaxAge;
 
@@ -32,8 +35,8 @@ public class DefaultAuthenticationSuccessHandler implements
 			throws ServletException, IOException {
 		if (usernameInCookie && request.isRequestedSessionIdFromCookie()) {
 			RequestUtils.saveCookie(request, response, COOKIE_NAME_LOGIN_USER,
-					authentication.getName(), usernameInCookieMaxAge, true,
-					false);
+					authentication.getName(), usernameInCookieMaxAge,
+					globalCookie, false);
 		}
 	}
 

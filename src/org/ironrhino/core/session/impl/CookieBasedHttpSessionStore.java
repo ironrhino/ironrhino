@@ -17,6 +17,7 @@ import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component("cookieBased")
@@ -29,6 +30,9 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 	public static final int SINGLE_COOKIE_SIZE = 2 * 1024;
 
 	private String sessionCookieName = DEFAULT_SESSION_COOKIE_NAME;
+
+	@Value("${globalCookie:false}")
+	private boolean globalCookie;
 
 	@Autowired
 	private SessionCompressorManager sessionCompressorManager;
@@ -62,8 +66,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 			String creationTime = NumberUtils.decimalToX(62,
 					BigInteger.valueOf(session.getCreationTime()));
 			String cookie = creationTime + sessionString;
-			saveCookie(session,
-					encrypt(cookie, session.getId()));
+			saveCookie(session, encrypt(cookie, session.getId()));
 		} else
 			clearCookie(session);
 	}
@@ -119,7 +122,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 						.getResponse(), i == 0 ? sessionCookieName
 						: sessionCookieName + (i - 1), value.substring(i
 						* SINGLE_COOKIE_SIZE, i == pieces - 1 ? value.length()
-						: (i + 1) * SINGLE_COOKIE_SIZE), true, true);
+						: (i + 1) * SINGLE_COOKIE_SIZE), globalCookie, true);
 		}
 	}
 
