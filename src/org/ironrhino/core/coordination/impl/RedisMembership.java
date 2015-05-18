@@ -70,7 +70,9 @@ public class RedisMembership implements Membership {
 									sb.toString()).trim();
 							if (!value.equals(member)) {
 								alive = false;
-								if (!members.contains(value))
+								if (!members.contains(value)
+										&& value.length() <= 100
+										&& value.matches("[\\w-]+@[\\w.:]+"))
 									stringRedisTemplate.opsForList().rightPush(
 											NAMESPACE + group, value);
 							}
