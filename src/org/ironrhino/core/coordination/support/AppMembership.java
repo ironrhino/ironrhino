@@ -15,8 +15,12 @@ public class AppMembership {
 
 	private String group = AppInfo.getAppName();
 
-	@Autowired
 	private Membership membership;
+
+	@Autowired
+	public AppMembership(Membership membership) {
+		this.membership = membership;
+	}
 
 	public boolean isLeader() throws Exception {
 		return membership.isLeader(group);

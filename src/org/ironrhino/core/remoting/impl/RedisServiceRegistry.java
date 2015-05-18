@@ -34,8 +34,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	private static final String NAMESPACE_HOSTS = NAMESPACE + "hosts:";
 
-	@Autowired
-	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Autowired
@@ -47,6 +45,12 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	private Map<String, String> discoveredServices = new HashMap<String, String>();
 
 	private boolean ready;
+
+	@Autowired
+	public RedisServiceRegistry(
+			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+		this.stringRedisTemplate = stringRedisTemplate;
+	}
 
 	@Override
 	protected void onReady() {

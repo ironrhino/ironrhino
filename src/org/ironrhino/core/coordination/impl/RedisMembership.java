@@ -21,9 +21,13 @@ public class RedisMembership implements Membership {
 
 	private static final String NAMESPACE = "membership:";
 
-	@Autowired
-	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
+
+	@Autowired
+	public RedisMembership(
+			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+		this.stringRedisTemplate = stringRedisTemplate;
+	}
 
 	@Override
 	public void join(final String group) throws Exception {

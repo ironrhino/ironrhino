@@ -26,7 +26,6 @@ public class ZooKeeperMembership implements Membership {
 
 	public static final String DEFAULT_ZOOKEEPER_PATH = "/membership";
 
-	@Autowired
 	private CuratorFramework curatorFramework;
 
 	@Autowired(required = false)
@@ -35,6 +34,11 @@ public class ZooKeeperMembership implements Membership {
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
 	private ConcurrentHashMap<String, LeaderLatch> latchs = new ConcurrentHashMap<String, LeaderLatch>();
+
+	@Autowired
+	public ZooKeeperMembership(CuratorFramework curatorFramework) {
+		this.curatorFramework = curatorFramework;
+	}
 
 	public void setZooKeeperPath(String zooKeeperPath) {
 		this.zooKeeperPath = zooKeeperPath;

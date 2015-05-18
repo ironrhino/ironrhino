@@ -19,14 +19,13 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	public static final String KEY_SEQUENCE = "seq:";
 
-	@Autowired
-	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundValueOperations<String, String> boundValueOperations;
 
-	public void setStringRedisTemplate(
-			RedisTemplate<String, String> stringRedisTemplate) {
+	@Autowired
+	public RedisCyclicSequence(
+			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
 		this.stringRedisTemplate = stringRedisTemplate;
 	}
 

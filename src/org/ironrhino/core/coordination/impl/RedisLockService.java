@@ -29,12 +29,16 @@ public class RedisLockService implements LockService {
 
 	protected Logger log = LoggerFactory.getLogger(getClass());
 
-	@Autowired
-	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Value("${lockService.timeout:300}")
 	private int timeout = 300;
+
+	@Autowired
+	public RedisLockService(
+			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+		this.stringRedisTemplate = stringRedisTemplate;
+	}
 
 	@Override
 	public boolean tryLock(String name) {

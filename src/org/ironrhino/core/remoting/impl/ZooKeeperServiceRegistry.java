@@ -31,7 +31,6 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	public static final String DEFAULT_ZOOKEEPER_PATH = "/remoting";
 
-	@Autowired
 	private CuratorFramework curatorFramework;
 
 	@Value("${serviceRegistry.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
@@ -44,6 +43,11 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	private String servicesParentPath;
 
 	private String hostsParentPath;
+
+	@Autowired
+	public ZooKeeperServiceRegistry(CuratorFramework curatorFramework) {
+		this.curatorFramework = curatorFramework;
+	}
 
 	@Override
 	public void prepare() {

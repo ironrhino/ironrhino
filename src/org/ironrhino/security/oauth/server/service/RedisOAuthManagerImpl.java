@@ -49,6 +49,15 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	// oauth:authorization:{refreshToken} -> id
 	// oauth:authorization:grantor:{username} -> [id]
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Autowired
+	public RedisOAuthManagerImpl(
+			RedisTemplate redisTemplate,
+			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+		this.clientRedisTemplate = redisTemplate;
+		this.stringRedisTemplate = stringRedisTemplate;
+	}
+
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
 	}
@@ -56,11 +65,6 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	@Override
 	public long getExpireTime() {
 		return expireTime;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void setRedisTemplate(RedisTemplate redisTemplate) {
-		this.clientRedisTemplate = redisTemplate;
 	}
 
 	@Override

@@ -24,14 +24,16 @@ public class ZooKeeperLockService implements LockService {
 
 	protected Logger log = LoggerFactory.getLogger(getClass());
 
-	@Autowired
 	private CuratorFramework curatorFramework;
 
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
 	private ConcurrentHashMap<String, InterProcessMutex> locks = new ConcurrentHashMap<String, InterProcessMutex>();
 
-	private StandaloneLockService standaloneLockService = new StandaloneLockService();
+	@Autowired
+	public ZooKeeperLockService(CuratorFramework curatorFramework) {
+		this.curatorFramework = curatorFramework;
+	}
 
 	public void setZooKeeperPath(String zooKeeperPath) {
 		this.zooKeeperPath = zooKeeperPath;
@@ -39,39 +41,28 @@ public class ZooKeeperLockService implements LockService {
 
 	@Override
 	public boolean tryLock(String name) {
-		if (standaloneLockService.tryLock(name)) {
-			return tryLock(name, 0, TimeUnit.MILLISECONDS);
-		} else {
-			return false;
-		}
+		return tryLock(name, 0, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public boolean tryLock(String name, long timeout, TimeUnit unit) {
-		if (standaloneLockService.tryLock(name)) {
-			InterProcessMutex lock = locks.get(name);
-			if (lock == null) {
-				locks.putIfAbsent(name, new InterProcessMutex(curatorFramework,
-						zooKeeperPath + "/" + name));
-				lock = locks.get(name);
-			}
-			boolean success = false;
-			try {
-				success = lock.acquire(timeout, unit);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-			if (!success)
-				standaloneLockService.unlock(name);
-			return success;
-		} else {
-			return false;
+		InterProcessMutex lock = locks.get(name);
+		if (lock == null) {
+			locks.putIfAbsent(name, new InterProcessMutex(curatorFramework,
+					zooKeeperPath + "/" + name));
+			lock = locks.get(name);
 		}
+		boolean success = false;
+		try {
+			success = lock.acquire(timeout, unit);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+		return success;
 	}
 
 	@Override
 	public void lock(String name) throws Exception {
-		standaloneLockService.lock(name);
 		InterProcessMutex lock = locks.get(name);
 		if (lock == null) {
 			locks.putIfAbsent(name, new InterProcessMutex(curatorFramework,
@@ -83,7 +74,6 @@ public class ZooKeeperLockService implements LockService {
 
 	@Override
 	public void unlock(String name) {
-		standaloneLockService.unlock(name);
 		InterProcessMutex lock = locks.get(name);
 		if (lock != null && lock.isAcquiredInThisProcess())
 			try {

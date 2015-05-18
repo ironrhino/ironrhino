@@ -15,6 +15,7 @@ import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.dao.DataAccessException;
@@ -33,7 +34,8 @@ public class RedisCacheManager implements CacheManager {
 
 	private RedisTemplate redisTemplate;
 
-	public void setRedisTemplate(RedisTemplate redisTemplate) {
+	@Autowired
+	public RedisCacheManager(RedisTemplate redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
 

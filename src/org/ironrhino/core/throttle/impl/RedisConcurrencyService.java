@@ -25,9 +25,13 @@ public class RedisConcurrencyService implements ConcurrencyService {
 
 	protected Logger log = LoggerFactory.getLogger(getClass());
 
-	@Autowired
-	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
+
+	@Autowired
+	public RedisConcurrencyService(
+			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+		this.stringRedisTemplate = stringRedisTemplate;
+	}
 
 	@Override
 	public boolean tryAcquire(String name, int permits) {
