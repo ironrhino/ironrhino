@@ -4,6 +4,9 @@ import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -11,10 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.coordination.Membership;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,23 +64,41 @@ public class RedisMembership implements Membership {
 					for (String member : members) {
 						if (member.equals(self))
 							continue;
-						boolean alive = true;
-						StringBuilder sb = new StringBuilder("http://");
-						sb.append(member.substring(member.lastIndexOf('@') + 1));
-						sb.append("/_ping");
+						boolean alive = false;
+						String url = new StringBuilder("http://")
+								.append(member.substring(member
+										.lastIndexOf('@') + 1))
+								.append("/_ping").toString();
 						try {
-							String value = HttpClientUtils.getResponseText(
-									sb.toString()).trim();
-							if (!value.equals(member)) {
-								alive = false;
-								if (!members.contains(value)
-										&& value.length() <= 100
-										&& value.matches("[\\w-]+@[\\w.:]+"))
-									stringRedisTemplate.opsForList().rightPush(
-											NAMESPACE + group, value);
+							HttpURLConnection conn = (HttpURLConnection) new URL(
+									url).openConnection();
+							conn.setConnectTimeout(3000);
+							conn.setReadTimeout(2000);
+							conn.setInstanceFollowRedirects(false);
+							conn.setDoOutput(false);
+							conn.setUseCaches(false);
+							conn.connect();
+							if (conn.getResponseCode() == 200) {
+								InputStream is = conn.getInputStream();
+								List<String> lines = IOUtils.readLines(is);
+								is.close();
+								if (lines.size() > 0) {
+									String value = lines.get(0).trim();
+									if (value.equals(member)) {
+										alive = true;
+									} else {
+										if (!members.contains(value)
+												&& value.length() <= 100
+												&& value.matches("[\\w-]+@[\\w.:]+"))
+											stringRedisTemplate.opsForList()
+													.rightPush(
+															NAMESPACE + group,
+															value);
+									}
+								}
 							}
+							conn.disconnect();
 						} catch (IOException e) {
-							alive = false;
 						}
 						if (!alive)
 							stringRedisTemplate.opsForList().remove(

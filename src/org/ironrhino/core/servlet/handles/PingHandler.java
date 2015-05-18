@@ -21,6 +21,7 @@ public class PingHandler extends AccessHandler {
 	@Override
 	public boolean handle(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
+		response.setContentType("text/plain");
 		response.getWriter().write(AppInfo.getInstanceId());
 		return true;
 	}
