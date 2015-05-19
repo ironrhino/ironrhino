@@ -89,11 +89,21 @@ public class RedisMembership implements Membership {
 									} else {
 										if (!members.contains(value)
 												&& value.length() <= 100
-												&& value.matches("[\\w-]+@[\\w.:]+"))
-											stringRedisTemplate.opsForList()
-													.rightPush(
-															NAMESPACE + group,
-															value);
+												&& value.matches("[\\w-]+@[\\w.:]+")) {
+											if (AppInfo.getAppName().equals(
+													value.substring(0, value
+															.lastIndexOf('-')))) {
+												stringRedisTemplate
+														.opsForList()
+														.rightPush(
+																NAMESPACE
+																		+ group,
+																value);
+											} else {
+												// multiple virtual host
+												alive = true;
+											}
+										}
 									}
 								}
 							}
