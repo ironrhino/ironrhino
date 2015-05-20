@@ -137,17 +137,17 @@ ${formHeader!}
 </td>
 </#macro>
 
-<#macro rttbodytrend entity showActionColumn=true buttons='' editable=true viewable=false entityReadonly=false>
+<#macro rttbodytrend entity showActionColumn=true buttons='' editable=true viewable=false entityReadonly=false inputWindowOptions="" viewWindowOptions="">
 <#if showActionColumn && (buttons?has_content || editable || viewable)>
 <td class="action">
 <#if buttons?has_content>
 <@buttons?interpret/>
 <#else>
 <#if viewable>
-<@btn view="view"/>
+<@btn view="view" windowoptions="${viewWindowOptions}"/>
 </#if>
 <#if editable && !entityReadonly>
-<@btn view="input" label="edit"/>
+<@btn view="input" label="edit" windowoptions="${inputWindowOptions}"/>
 </#if>
 <#if treeable??&&treeable>
 <@btn view="move"/>
@@ -159,7 +159,7 @@ ${formHeader!}
 </tr>
 </#macro>
 
-<#macro rtend showBottomButtons=true buttons='' readonly=false createable=true celleditable=true deletable=true enableable=false searchable=false filterable=true searchButtons='' showPageSize=true formFooter=''>
+<#macro rtend showBottomButtons=true buttons='' readonly=false createable=true celleditable=true deletable=true enableable=false searchable=false filterable=true searchButtons='' showPageSize=true formFooter='' inputWindowOptions="">
 <#if filterable>
 <#if !propertyNamesInCriteria?? && uiConfigs??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].filterPropertyNamesInCriteria(uiConfigs)>
@@ -219,7 +219,7 @@ ${formHeader!}
 <@buttons?interpret/>
 <#else>
 <#if !readonly>
-<#if createable><@btn view="input" label="create"/></#if>
+<#if createable><@btn view="input" label="create" windowoptions="${inputWindowOptions}"/></#if>
 <#if celleditable><@btn action="save" confirm=true/></#if>
 <#if enableable>
 <@btn action="enable" confirm=true/>

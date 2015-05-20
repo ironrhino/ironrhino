@@ -57,5 +57,9 @@ public @interface Richtable {
 	String rowDynamicAttributes() default "";
 
 	Readonly readonly() default @Readonly;
+	
+	String inputWindowOptions() default "";
+	
+	String viewWindowOptions() default "";
 
 }

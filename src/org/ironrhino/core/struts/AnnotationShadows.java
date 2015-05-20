@@ -591,6 +591,8 @@ public class AnnotationShadows {
 		private String formHeader = "";
 		private String formFooter = "";
 		private String rowDynamicAttributes = "";
+		private String inputWindowOptions = "";
+		private String viewWindowOptions = "";
 
 		public RichtableImpl() {
 		}
@@ -615,7 +617,8 @@ public class AnnotationShadows {
 			this.listFooter = config.listFooter();
 			this.formHeader = config.formHeader();
 			this.formFooter = config.formFooter();
-			this.rowDynamicAttributes = config.rowDynamicAttributes();
+			this.inputWindowOptions = config.inputWindowOptions();
+			this.viewWindowOptions = config.viewWindowOptions();
 		}
 
 		public String getAlias() {
@@ -760,6 +763,22 @@ public class AnnotationShadows {
 
 		public void setRowDynamicAttributes(String rowDynamicAttributes) {
 			this.rowDynamicAttributes = rowDynamicAttributes;
+		}
+
+		public String getInputWindowOptions() {
+			return inputWindowOptions;
+		}
+
+		public void setInputWindowOptions(String inputWindowOptions) {
+			this.inputWindowOptions = inputWindowOptions;
+		}
+
+		public String getViewWindowOptions() {
+			return viewWindowOptions;
+		}
+
+		public void setViewWindowOptions(String viewWindowOptions) {
+			this.viewWindowOptions = viewWindowOptions;
 		}
 
 	}
