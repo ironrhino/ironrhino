@@ -40,6 +40,8 @@ tar xf jdk-*.tar.gz
 rm jdk-*.tar.gz
 mv jdk* jdk
 chown -R $USER:$USER jdk
+echo JAVA_HOME=\"/home/$USER/jdk\" >> /etc/environment
+env JAVA_HOME=\"/home/$USER/jdk\"
 ln -s /home/$USER/jdk/bin/java /usr/bin/java
 ln -s /home/$USER/jdk/bin/javac /usr/bin/javac
 fi
