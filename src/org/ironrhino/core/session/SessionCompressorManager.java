@@ -109,7 +109,8 @@ public class SessionCompressorManager {
 									} else if (!ud.isAccountNonLocked()) {
 										throw new LockedException(username);
 									} else if (!ud.isCredentialsNonExpired()) {
-										if (!uri.endsWith("/password"))
+										if (!uri.endsWith("/password")
+												&& !uri.startsWith("/assets/"))
 											throw new CredentialsExpiredException(
 													username);
 									}
