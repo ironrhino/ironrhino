@@ -48,6 +48,9 @@ public class OAuthHandler extends AccessHandler {
 	@Value("${oauth.api.excludePattern:}")
 	private String apiExcludePattern;
 
+	@Value("${oauth.api.sessionFallback:true}")
+	private boolean sessionFallback = true;
+
 	@Autowired
 	private OAuthManager oauthManager;
 
@@ -56,6 +59,9 @@ public class OAuthHandler extends AccessHandler {
 
 	@Autowired(required = false)
 	private HttpErrorHandler httpErrorHandler;
+
+	@Autowired
+	private HttpSessionManager httpSessionManager;
 
 	@Override
 	public String getPattern() {
@@ -187,6 +193,12 @@ public class OAuthHandler extends AccessHandler {
 				errorMessage = "invalid_token";
 			}
 		} else {
+			if (sessionFallback) {
+				String sessionTracker = RequestUtils.getCookieValue(request,
+						httpSessionManager.getSessionTrackerName());
+				if (StringUtils.isNotBlank(sessionTracker))
+					return false;
+			}
 			errorMessage = "missing_token";
 		}
 		if (httpErrorHandler != null
