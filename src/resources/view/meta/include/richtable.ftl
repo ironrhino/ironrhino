@@ -127,6 +127,8 @@ ${formHeader!}
 		${value?time}<#t>
 		<#elseif value?is_datetime>
 		${value?datetime}<#t>
+		<#elseif value?is_date_like>
+		${value?datetime}<#t>
 		<#else>
 		${value?xhtml}<#t>
 		</#if>
