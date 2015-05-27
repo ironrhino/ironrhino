@@ -49,12 +49,16 @@
 				<#assign dynamicAttributes=dynamicAttributes+{'data-group':action.getText(config.group)}/>
 			</#if>
 			<#if config.inputTemplate?has_content>
+				<#if config.inputTemplate?index_of('<div class="control-group') gt -1>
+				<@config.inputTemplate?interpret/>
+				<#else>
 				<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
 					<label class="control-label">${action.getText(label)}</label>
 					<div class="controls">
 					<@config.inputTemplate?interpret/>
 					</div>
 				</div>
+				</#if>
 			<#elseif config.type=='textarea'>
 				<#if config.maxlength gt 0>
 				<#assign dynamicAttributes=dynamicAttributes+{"maxlength":config.maxlength}>
