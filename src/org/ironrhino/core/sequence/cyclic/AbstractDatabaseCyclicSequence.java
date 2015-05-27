@@ -11,7 +11,7 @@ public abstract class AbstractDatabaseCyclicSequence extends
 
 	private DataSource dataSource;
 
-	private String tableName = "common_sequence";
+	private String tableName = DEFAULT_TABLE_NAME;
 
 	private int cacheSize = 1;
 
