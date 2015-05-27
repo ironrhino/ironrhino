@@ -78,7 +78,7 @@ public class SqlUtils {
 			"\\s+order\\s+by\\s+.+$", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern PARAMETER_PATTERN = Pattern
-			.compile("(:(\\w|[^\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)");
+			.compile("(:(\\w|[^'\\)\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)");
 
 	private static final Pattern BLOCK_COMMENTS_PATTERN = Pattern
 			.compile("/\\*(?:.|[\\n\\r])*?\\*/");

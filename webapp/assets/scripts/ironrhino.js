@@ -38070,7 +38070,7 @@ Observation._richtable = function(container) {
 	var BLOCK_COMMENT = new RegExp('/\\*(?:.|[\\n\\r])*?\\*/', 'g');
 	var LINE_COMMENT = new RegExp('\r?\n?\\s*--.*\r?(\n|$)', 'g');
 	var PARAMETER = new RegExp(
-			'(:(\\w|[^\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)', 'g');
+			"(:(\\w|[^'\\)\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)", 'g');
 	$.sqleditor = {
 		extractParameters : function(sql) {
 			sql = $.sqleditor.clearComments(sql);
