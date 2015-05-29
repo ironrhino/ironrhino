@@ -78,6 +78,13 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
 	@Override
 	public String nextStringValue() throws DataAccessException {
+		return nextStringValue(3);
+	}
+
+	protected String nextStringValue(int maxAttempts)
+			throws DataAccessException {
+		if (maxAttempts < 0)
+			throw new IllegalArgumentException("max attempts reached");
 		Connection con = null;
 		Statement stmt = null;
 		try {
@@ -124,11 +131,11 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 						e.printStackTrace();
 					}
 					try {
-						Thread.sleep(100);
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					return nextStringValue();
+					return nextStringValue(--maxAttempts);
 				}
 			}
 			int next;
@@ -171,11 +178,11 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 					e.printStackTrace();
 				}
 				try {
-					Thread.sleep(100);
+					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				return nextStringValue();
+				return nextStringValue(--maxAttempts);
 
 			}
 			return getStringValue(currentTimestamp, getPaddingLength(), next);

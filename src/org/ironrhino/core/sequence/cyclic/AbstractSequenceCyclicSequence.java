@@ -126,6 +126,13 @@ public abstract class AbstractSequenceCyclicSequence extends
 
 	@Override
 	public String nextStringValue() throws DataAccessException {
+		return nextStringValue(3);
+	}
+
+	protected String nextStringValue(int maxAttempts)
+			throws DataAccessException {
+		if (maxAttempts < 0)
+			throw new IllegalArgumentException("max attempts reached");
 		Connection con = null;
 		Statement stmt = null;
 		try {
@@ -144,18 +151,18 @@ public abstract class AbstractSequenceCyclicSequence extends
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
-						try {
-							con.close();
-							con = null;
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
 					try {
-						Thread.sleep(100);
+						con.close();
+						con = null;
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					try {
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					return nextStringValue();
+					return nextStringValue(--maxAttempts);
 				}
 				return getStringValue(result.currentTimestamp,
 						getPaddingLength(), result.nextId);
@@ -184,18 +191,18 @@ public abstract class AbstractSequenceCyclicSequence extends
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
-						try {
-							con.close();
-							con = null;
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
 					try {
-						Thread.sleep(100);
+						con.close();
+						con = null;
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					try {
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					return nextStringValue();
+					return nextStringValue(--maxAttempts);
 				}
 			}
 		} catch (SQLException ex) {
