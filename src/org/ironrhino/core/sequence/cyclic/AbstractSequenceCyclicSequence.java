@@ -131,7 +131,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 
 	protected String nextStringValue(int maxAttempts)
 			throws DataAccessException {
-		if (maxAttempts < 0)
+		if (maxAttempts < 1)
 			throw new IllegalArgumentException("max attempts reached");
 		Connection con = null;
 		Statement stmt = null;
