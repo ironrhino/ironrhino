@@ -192,9 +192,10 @@ Richtable = {
 			closeOnEscape : false,
 			close : function() {
 				if (reloadonclose
-						&& ($('#' + winid + ' form.ajax')
-								.hasClass('forcereload') || !$('#' + winid
-								+ ' form.ajax').hasClass('dontreload'))) {
+						&& ($('#' + winid + ' form.richtable').length
+								|| $('#' + winid + ' form.ajax')
+										.hasClass('forcereload') || !$('#'
+								+ winid + ' form.ajax').hasClass('dontreload'))) {
 					$('.action .reload', form).addClass('clicked');
 					$(form).submit();
 				}
