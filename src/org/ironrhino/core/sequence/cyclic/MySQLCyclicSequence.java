@@ -142,9 +142,9 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			Date currentTimestamp;
 			ResultSet rs = null;
 			try {
-				rs = stmt.executeQuery("SELECT LAST_INSERT_ID(),"
-						+ getSequenceName() + "_TIMESTAMP FROM `"
-						+ getTableName() + "`");
+				rs = stmt
+						.executeQuery("SELECT LAST_INSERT_ID(),UNIX_TIMESTAMP() FROM `"
+								+ getTableName() + "`");
 				if (!rs.next()) {
 					throw new DataAccessResourceFailureException(
 							"LAST_INSERT_ID() failed after executing an update");

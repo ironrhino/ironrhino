@@ -282,7 +282,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 		Date lastTimestamp;
 
 		boolean isCriticalPoint(CycleType cycleType) {
-			return currentTimestamp.getTime() - lastTimestamp.getTime() < CRITICAL_THRESHOLD_TIME
+			return currentTimestamp.getTime() - cycleType.getCycleStart(currentTimestamp).getTime() < CRITICAL_THRESHOLD_TIME
 					&& nextId > 100
 					|| cycleType.getCycleEnd(currentTimestamp).getTime()
 							- currentTimestamp.getTime() < CRITICAL_THRESHOLD_TIME
