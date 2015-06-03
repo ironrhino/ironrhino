@@ -8,6 +8,7 @@ else
 USER="$SUDO_USER"
 fi
 
+
 #install packages
 apt-get update
 apt-get --force-yes --yes install mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
@@ -15,13 +16,6 @@ if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi
 
-#config mysql
-if [ -f "/etc/mysql/my.cnf" ] && ! $(more /etc/mysql/my.cnf|grep collation-server >/dev/null 2>&1) ; then
-sed -i '32i innodb_stats_on_metadata = off' /etc/mysql/my.cnf
-sed -i '32i collation-server = utf8_general_ci' /etc/mysql/my.cnf
-sed -i '32i character-set-server = utf8' /etc/mysql/my.cnf
-service mysql restart
-fi
 
 #install simsun font
 if [ -f "simsun.ttf" ]; then
@@ -32,6 +26,7 @@ mkfontscale
 mkfontdir
 fc-cache -fv
 fi
+
 
 #install oracle jdk
 if [ ! -d jdk ];then
@@ -46,6 +41,7 @@ ln -s /home/$USER/jdk/bin/java /usr/bin/java
 ln -s /home/$USER/jdk/bin/javac /usr/bin/javac
 fi
 
+
 #install ant
 if [ ! -d ant ];then
 wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.gz
@@ -55,6 +51,7 @@ mv apache-ant-* ant
 chown -R $USER:$USER ant
 ln -s /home/$USER/ant/bin/ant /usr/bin/ant
 fi
+
 
 #install tomcat
 if [ ! -d tomcat8080 ];then
@@ -108,7 +105,6 @@ sed -i '99i CATALINA_PID="/tmp/tomcat8081_pid"' tomcat8081/bin/catalina.sh
 sed -i '99i JAVA_OPTS="-Dport.http=8081 -Dport.shutdown=8006"' tomcat8081/bin/catalina.sh
 chown -R $USER:$USER tomcat*
 fi
-
 
 if [ ! -f /etc/init.d/tomcat8080 ]; then
 cat>/etc/init.d/tomcat8080<<EOF
@@ -235,6 +231,16 @@ rm -rf apache-tomcat-\$version
 EOF
 chown $USER:$USER upgrade_tomcat.sh
 chmod +x upgrade_tomcat.sh
+fi
+
+
+
+#config mysql
+if [ -f "/etc/mysql/my.cnf" ] && ! $(more /etc/mysql/my.cnf|grep collation-server >/dev/null 2>&1) ; then
+sed -i '32i innodb_stats_on_metadata = off' /etc/mysql/my.cnf
+sed -i '32i collation-server = utf8_general_ci' /etc/mysql/my.cnf
+sed -i '32i character-set-server = utf8' /etc/mysql/my.cnf
+service mysql restart
 fi
 
 
@@ -394,6 +400,7 @@ chown $USER:$USER deploy.sh
 chmod +x deploy.sh
 fi
 
+
 #generate rollback.sh
 if [ ! -f rollback.sh ]; then
 cat>rollback.sh<<EOF
@@ -420,6 +427,7 @@ chown $USER:$USER rollback.sh
 chmod +x rollback.sh
 fi
 
+
 #generate backup.sh
 if [ ! -f backup.sh ]; then
 cat>backup.sh<<EOF
@@ -438,6 +446,7 @@ EOF
 chown $USER:$USER backup.sh
 chmod +x backup.sh
 fi
+
 
 #generate exportdb.sh and importdb.sh
 if [ ! -f exportdb.sh ]; then
