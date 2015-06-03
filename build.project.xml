@@ -620,7 +620,7 @@
 
 
 	<target name="checkwebappdeployed">
-		<available property="webapp.deployed" file="${webapp.deploy.dir}/WEB-INF/web.xml" />
+		<available property="webapp.deployed" file="${webapp.deploy.dir}/WEB-INF" />
 	</target>
 
 	<target name="checkserverstarted">
