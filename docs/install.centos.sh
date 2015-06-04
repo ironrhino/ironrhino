@@ -8,25 +8,28 @@ else
 USER="$SUDO_USER"
 fi
 
+cat>/etc/yum.repos.d/mysql-community.repo<<EOF
+[mysql56-community]
+name=MySQL 5.6 Community Server
+baseurl=http://repo.mysql.com/yum/mysql-5.6-community/el/5/\$basearch/
+gpgcheck=0
+enabled=1
+EOF
+
+cat>/etc/yum.repos.d/nginx.repo<<EOF
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
+gpgcheck=0
+enabled=1
+EOF
+
 
 #install packages
-apt-get update
-apt-get --force-yes --yes install mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
+yum -y install mysql-server subversion git nginx chkconfig zip unzip wget iptables make gcc telnet
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi
-
-
-#install simsun font
-if [ -f "simsun.ttf" ]; then
-mv simsun.ttf /usr/share/fonts/truetype
-chmod 644 /usr/share/fonts/truetype/simsun.ttf
-cd /usr/share/fonts
-mkfontscale
-mkfontdir
-fc-cache -fv
-fi
-
 
 #install oracle jdk
 if [ ! -d jdk ];then
@@ -133,7 +136,7 @@ esac
 exit 0
 EOF
 chmod +x /etc/init.d/tomcat8080
-update-rc.d tomcat8080 defaults
+chkconfig tomcat8080 on
 fi
 
 if [ ! -f /etc/init.d/tomcat8081 ]; then
@@ -163,7 +166,7 @@ esac
 exit 0
 EOF
 chmod +x /etc/init.d/tomcat8081
-update-rc.d tomcat8081 defaults
+chkconfig tomcat8081 on
 fi
 
 if [ ! -f upgrade_tomcat.sh ]; then
@@ -236,11 +239,11 @@ fi
 
 
 #config mysql
-if [ -f "/etc/mysql/my.cnf" ] && ! $(more /etc/mysql/my.cnf|grep collation-server >/dev/null 2>&1) ; then
-sed -i '32i innodb_stats_on_metadata = off' /etc/mysql/my.cnf
-sed -i '32i collation-server = utf8_general_ci' /etc/mysql/my.cnf
-sed -i '32i character-set-server = utf8' /etc/mysql/my.cnf
-service mysql restart
+if [ -f "/etc/my.cnf" ] && ! $(more /etc/my.cnf|grep collation-server >/dev/null 2>&1) ; then
+sed -i '22i innodb_stats_on_metadata = off' /etc/my.cnf
+sed -i '22i collation-server = utf8_general_ci' /etc/my.cnf
+sed -i '22i character-set-server = utf8' /etc/my.cnf
+service mysqld restart
 fi
 
 
@@ -501,7 +504,7 @@ esac
 exit 0
 EOF
 chmod +x /etc/init.d/iptables
-update-rc.d iptables defaults
+chkconfig iptables on
 service iptables start
 fi
 
