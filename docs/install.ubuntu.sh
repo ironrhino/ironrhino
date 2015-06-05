@@ -44,7 +44,7 @@ fi
 
 #install ant
 if [ ! -d ant ];then
-wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.gz
+wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.5-bin.tar.gz
 tar xf apache-ant-*.tar.gz
 rm apache-ant-*.tar.gz
 mv apache-ant-* ant
@@ -507,7 +507,7 @@ fi
 
 #install redis
 if ! which redis-server > /dev/null && ! $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
-wget http://download.redis.io/releases/redis-3.0.1.tar.gz
+wget http://download.redis.io/releases/redis-3.0.2.tar.gz
 fi
 if $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
 tar xf redis-*.tar.gz >/dev/null && rm -rf redis-*.tar.gz
