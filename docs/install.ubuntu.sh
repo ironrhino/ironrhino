@@ -318,6 +318,7 @@ if [ ! -f "\$1" ]; then
     echo "file \$1 doesn't exists"
     exit 1
 fi
+app="\${app:0:-4}"
 running=0
 if [ -f /tmp/tomcat8080_pid ] && [ ! "\$( ps -P \`more /tmp/tomcat8080_pid\`|grep tomcat8080)" = "" ] ; then
 running=1
@@ -325,22 +326,22 @@ fi
 if [ \$running = 1 ];then
 /home/$USER/tomcat8080/bin/catalina.sh stop -force 
 fi
+if [ -d "/home/$USER/tomcat8080/webapps/\$app" ]; then
 rm -rf \$1.bak
-cd /home/$USER/tomcat8080/webapps/ROOT/
+cd /home/$USER/tomcat8080/webapps/\$app/
 zip -r \$1.bak *  >/dev/null 2>&1
 mv \$1.bak /home/$USER
 cd
-rm -rf /home/$USER/tomcat8080/webapps
-mkdir -p /home/$USER/tomcat8080/webapps
-unzip \$1 -d /home/$USER/tomcat8080/webapps/ROOT >/dev/null 2>&1
+fi
+rm -rf /home/$USER/tomcat8080/webapps/\$app
+unzip \$1 -d /home/$USER/tomcat8080/webapps/\$app >/dev/null 2>&1
 if [ \$running = 1 ];then
 /home/$USER/tomcat8080/bin/catalina.sh start
 sleep 60 
 /home/$USER/tomcat8081/bin/catalina.sh stop -force 
 fi
-rm -rf /home/$USER/tomcat8081/webapps
-mkdir -p /home/$USER/tomcat8081/webapps
-cp -R /home/$USER/tomcat8080/webapps/ROOT /home/$USER/tomcat8081/webapps
+rm -rf /home/$USER/tomcat8081/webapps/\$app
+cp -R /home/$USER/tomcat8080/webapps/\$app /home/$USER/tomcat8081/webapps
 if [ \$running = 1 ];then
 /home/$USER/tomcat8081/bin/catalina.sh start
 fi
