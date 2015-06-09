@@ -100,6 +100,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 		auths.add(new SimpleGrantedAuthority(UserRole.ROLE_BUILTIN_USER));
 		for (String role : user.getRoles())
 			auths.add(new SimpleGrantedAuthority(role));
+		user.setAuthorities(auths);
 		if (userRoleMappers != null)
 			for (UserRoleMapper mapper : userRoleMappers) {
 				String[] roles = mapper.map(user);
@@ -107,7 +108,6 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 					for (String role : roles)
 						auths.add(new SimpleGrantedAuthority(role));
 			}
-		user.setAuthorities(auths);
 	}
 
 	@Override
