@@ -71,7 +71,6 @@ public interface CyclicSequence extends Sequence {
 
 			@Override
 			public void skipToCycleStart(Calendar cal) {
-				cal.add(Calendar.DAY_OF_MONTH, 1);
 				cal.set(Calendar.HOUR_OF_DAY, 0);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
@@ -94,7 +93,6 @@ public interface CyclicSequence extends Sequence {
 
 			@Override
 			public void skipToCycleStart(Calendar cal) {
-				cal.add(Calendar.MONTH, 1);
 				cal.set(Calendar.DAY_OF_MONTH, 1);
 				cal.set(Calendar.HOUR_OF_DAY, 0);
 				cal.set(Calendar.MINUTE, 0);
@@ -116,7 +114,6 @@ public interface CyclicSequence extends Sequence {
 
 			@Override
 			public void skipToCycleStart(Calendar cal) {
-				cal.add(Calendar.YEAR, 1);
 				cal.set(Calendar.MONTH, 0);
 				cal.set(Calendar.DAY_OF_MONTH, 1);
 				cal.set(Calendar.HOUR_OF_DAY, 0);
