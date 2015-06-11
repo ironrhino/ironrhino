@@ -559,7 +559,7 @@ fi
 
 #git clone ironrhino
 if [ ! -d ironrhino ];then
-git clone https://github.com/ironrhino/ironrhino.git
+git clone --depth 1 https://github.com/ironrhino/ironrhino.git
 chown -R $USER:$USER ironrhino
 fi
 

@@ -26,7 +26,7 @@ EOF
 
 
 #install packages
-yum -y install mysql-server subversion git nginx chkconfig zip unzip wget iptables make gcc telnet
+yum -y install mysql-server subversion git nginx chkconfig zip unzip wget make gcc telnet
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi
@@ -475,40 +475,6 @@ chmod +x importdb.sh
 fi
 
 
-#iptables
-if [ ! -f /etc/init.d/iptables ]; then
-cat>/etc/init.d/iptables<<EOF
-#!/bin/sh
-#
-# Startup script for the tomcat
-#
-# chkconfig: 345 80 15
-# description: Tomcat
-user=$USER
-
-case "\$1" in
-start)
-	iptables -A INPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT
-	iptables -A INPUT -p tcp --dport 8080 -j DROP
-	iptables -A INPUT -p tcp --dport 8081 -j DROP
-	iptables -A INPUT -p tcp --dport 8005 -j DROP
-	iptables -A INPUT -p tcp --dport 8006 -j DROP
-       ;;
-stop)
-	iptables -F
-	iptables -X
-	iptables -Z
-       ;;
-*)
-       echo "Usage: \$0 {start|stop}"
-esac
-exit 0
-EOF
-chmod +x /etc/init.d/iptables
-chkconfig iptables on
-service iptables start
-fi
-
 #install redis
 if ! which redis-server > /dev/null && ! $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
 wget http://download.redis.io/releases/redis-3.0.2.tar.gz
@@ -562,7 +528,7 @@ fi
 
 #git clone ironrhino
 if [ ! -d ironrhino ];then
-git clone https://github.com/ironrhino/ironrhino.git
+git clone --depth 1 https://github.com/ironrhino/ironrhino.git
 chown -R $USER:$USER ironrhino
 fi
 
