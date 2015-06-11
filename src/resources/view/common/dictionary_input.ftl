@@ -5,7 +5,7 @@
 <title><#if dictionary.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('dictionary')}</title>
 </head>
 <body>
-<@s.form action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?string('',' importable')}">
+<@s.form id="dictionary_input" action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?string('',' importable')}">
 	<#if !dictionary.new>
 		<@s.hidden name="dictionary.id" />
 	</#if>

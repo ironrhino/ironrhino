@@ -4,7 +4,7 @@
 <title><#if region.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('region')}</title>
 </head>
 <body>
-<@s.form action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal">
+<@s.form id="region_input" action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal">
 	<#if !region.new>
 		<@s.hidden name="region.id" />
 	</#if>

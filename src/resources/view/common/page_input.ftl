@@ -26,21 +26,21 @@ $(function() {
 		setTimeout(function(){
 		var ed = tinymce.EditorManager.get('page_content');
 		$('#draft').click(function(){
-			if(!$('#form').hasClass('dirty')&&!ed.isDirty()) return false;
-			var action = $('#form').attr('action');
-			$('#form').attr('action',action.substring(0,action.lastIndexOf('/')+1)+'draft');
+			if(!$('#page_input').hasClass('dirty')&&!ed.isDirty()) return false;
+			var action = $('#page_input').attr('action');
+			$('#page_input').attr('action',action.substring(0,action.lastIndexOf('/')+1)+'draft');
 			ed.save();
 		});
 		$('#save').click(function(){
-			var action = $('#form').attr('action');
-			$('#form').attr('action',action.substring(0,action.lastIndexOf('/')+1)+'save');
+			var action = $('#page_input').attr('action');
+			$('#page_input').attr('action',action.substring(0,action.lastIndexOf('/')+1)+'save');
 			ed.save();
 		});
-		var form = $('#form');
+		var form = $('#page_input');
 		form[0].onsuccess = function(){
-		$('#form').removeClass('dirty');
+		$('#page_input').removeClass('dirty');
 			ed.isNotDirty = 1;
-			if($('#form').attr('action').indexOf('save')>0 && window.parent!=window){
+			if($('#page_input').attr('action').indexOf('save')>0 && window.parent!=window){
 					$('.ui-dialog-titlebar-close',$('.window-richtable ',window.parent.document).closest('.ui-dialog')).click();
 					return;
 				}
@@ -66,21 +66,21 @@ $(function() {
 			}
 		};
 		setInterval(function(){
-			if(($('#form').hasClass('dirty')||ed.isDirty())&&$('#page_path').val()&&$('#page_content').val()){
-				var action = $('#form').attr('action');
-				$('#form').attr('action',action.substring(0,action.lastIndexOf('/')+1)+'draft');
+			if(($('#page_input').hasClass('dirty')||ed.isDirty())&&$('#page_path').val()&&$('#page_content').val()){
+				var action = $('#page_input').attr('action');
+				$('#page_input').attr('action',action.substring(0,action.lastIndexOf('/')+1)+'draft');
 				ed.save();
 				form.submit();
 				}
 		},60000);
 		},1500);
 		$('input[name="page.path"],input[name="page.title"]').keyup(function(){
-			$('#form').addClass('dirty');
+			$('#page_input').addClass('dirty');
 		});
 		$('#drop').click(function(){
-			var form = $('#form');
-			var action = $('#form').attr('action');
-			$('#form').attr('action',action.substring(0,action.lastIndexOf('/')+1)+'drop');
+			var form = $('#page_input');
+			var action = $('#page_input').attr('action');
+			$('#page_input').attr('action',action.substring(0,action.lastIndexOf('/')+1)+'drop');
 			$('#page_content').text('');
 			form[0].onsuccess=function(){
 				document.location.href = document.location.href;
@@ -92,7 +92,7 @@ $(function() {
 </script>
 </head>
 <body>
-<@s.form id="form" action="${actionBaseUrl}/draft" method="post" class="ajax form-horizontal" style="padding-top:13px;">
+<@s.form id="page_input" action="${actionBaseUrl}/draft" method="post" class="ajax form-horizontal" style="padding-top:13px;">
 	<@s.hidden name="page.id" />
 	<@s.hidden name="page.version" class="version" />
 	<#if view=='embedded'>

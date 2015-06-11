@@ -8,7 +8,7 @@
 <#if attachmentable>
 <#assign formDynamicAttributes=formDynamicAttributes+{'data-attachments':entity.attachmentsAsString!}/>
 </#if>
-<@s.form action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${richtableConfig.importable?string(' importable','')}${attachmentable?string(' attachmentable','')} groupable" dynamicAttributes=formDynamicAttributes>
+<@s.form id="${entityName}_input" action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${richtableConfig.importable?string(' importable','')}${attachmentable?string(' attachmentable','')} groupable" dynamicAttributes=formDynamicAttributes>
 	<#if !isnew>
 	<#if !idAssigned>
 	<@s.hidden name="${entityName}.id" />

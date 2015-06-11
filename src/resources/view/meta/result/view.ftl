@@ -4,7 +4,7 @@
 <title>${action.getText('view')}${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
 </head>
 <body>
-	<div class="form-horizontal groupable">
+	<div id="${entityName}_view" class="form-horizontal groupable">
 	<#list uiConfigs.entrySet() as entry>
 		<#assign key=entry.key>
 		<#assign config=entry.value>

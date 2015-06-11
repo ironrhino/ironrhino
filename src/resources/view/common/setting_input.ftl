@@ -5,7 +5,7 @@
 <title><#if setting.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('setting')}</title>
 </head>
 <body>
-<@s.form action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${view?has_content?string('',' importable')}">
+<@s.form id="setting_input" action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${view?has_content?string('',' importable')}">
 	<#if !setting.new>
 		<@s.hidden name="setting.id"/>
 	</#if>
