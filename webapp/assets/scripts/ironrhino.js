@@ -33379,7 +33379,9 @@ var Dialog = {
 		}
 		d.dialog('moveToTop');
 		if (hasRow) {
-			d.dialog('option', 'width', '90%');
+			d.dialog('option', 'width', $(window).width() > 1345
+							? '90%'
+							: ($(window).width() > 1210 ? '95%' : '100%'));
 		}
 		var height = d.outerHeight();
 		if (height >= $(window).height()) {
