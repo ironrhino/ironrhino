@@ -29,6 +29,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.interceptor.annotations.Before;
 import com.opensymphony.xwork2.interceptor.annotations.BeforeResult;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
+import com.opensymphony.xwork2.util.ValueStack;
 
 public class BaseAction extends ActionSupport {
 
@@ -210,8 +211,10 @@ public class BaseAction extends ActionSupport {
 	public String preAction() throws Exception {
 		Authorize authorize = findAuthorize();
 		if (authorize != null) {
-			boolean authorized = AuthzUtils.authorize(authorize.ifAllGranted(),
-					authorize.ifAnyGranted(), authorize.ifNotGranted());
+			boolean authorized = AuthzUtils.authorize(
+					evalExpression(authorize.ifAllGranted()),
+					evalExpression(authorize.ifAnyGranted()),
+					evalExpression(authorize.ifNotGranted()));
 			if (!authorized && dynamicAuthorizerManager != null
 					&& !authorize.authorizer().equals(DynamicAuthorizer.class)) {
 				ActionProxy ap = ActionContext.getContext()
@@ -355,6 +358,29 @@ public class BaseAction extends ActionSupport {
 		if (authorize == null)
 			authorize = getClass().getAnnotation(Authorize.class);
 		return authorize;
+	}
+
+	private static String evalExpression(String str) {
+		if (StringUtils.isBlank(str))
+			return str;
+		ValueStack vs = ActionContext.getContext().getValueStack();
+		while (true) {
+			int start = str.indexOf("${");
+			if (start > -1) {
+				int end = str.indexOf('}', start + 2);
+				if (end > 0) {
+					String prefix = str.substring(0, start);
+					String exp = str.substring(start + 2, end);
+					String suffix = str.substring(end + 1);
+					str = prefix + vs.findString(exp) + suffix;
+				} else {
+					break;
+				}
+			} else {
+				break;
+			}
+		}
+		return str;
 	}
 
 }
