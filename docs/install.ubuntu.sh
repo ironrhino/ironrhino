@@ -8,6 +8,10 @@ else
 USER="$SUDO_USER"
 fi
 
+cat>>/etc/apt/sources.list<<EOF
+deb http://nginx.org/packages/ubuntu/ trusty nginx
+deb-src http://nginx.org/packages/ubuntu/ trusty nginx
+EOF
 
 #install packages
 apt-get update
@@ -335,6 +339,7 @@ cd
 fi
 rm -rf /home/$USER/tomcat8080/webapps/\$app
 unzip \$1 -d /home/$USER/tomcat8080/webapps/\$app >/dev/null 2>&1
+chmod -R +X /home/$USER/tomcat8080/webapps
 if [ \$running = 1 ];then
 /home/$USER/tomcat8080/bin/catalina.sh start
 sleep 60 
@@ -388,6 +393,7 @@ else
 echo 'no svn or git'
 fi
 ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT deploy
+chmod -R +X /home/$USER/tomcat8080/webapps
 LANGUAGE=\$OLDLANGUAGE
 sleep 5
 ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 shutdown
@@ -477,10 +483,10 @@ if [ ! -f /etc/init.d/iptables ]; then
 cat>/etc/init.d/iptables<<EOF
 #!/bin/sh
 #
-# Startup script for the tomcat
+# Startup script for the iptables
 #
 # chkconfig: 345 80 15
-# description: Tomcat
+# description: iptables
 user=$USER
 
 case "\$1" in

@@ -8,6 +8,8 @@ else
 USER="$SUDO_USER"
 fi
 
+chmod +x /home/$USER
+
 cat>/etc/yum.repos.d/mysql-community.repo<<EOF
 [mysql56-community]
 name=MySQL 5.6 Community Server
@@ -296,6 +298,7 @@ server {
         }
 }
 EOF
+setsebool -P httpd_can_network_connect=1 httpd_read_user_content=1
 service nginx restart
 fi
 
@@ -338,6 +341,7 @@ cd
 fi
 rm -rf /home/$USER/tomcat8080/webapps/\$app
 unzip \$1 -d /home/$USER/tomcat8080/webapps/\$app >/dev/null 2>&1
+chmod -R +X /home/$USER/tomcat8080/webapps
 if [ \$running = 1 ];then
 /home/$USER/tomcat8080/bin/catalina.sh start
 sleep 60 
@@ -391,6 +395,7 @@ else
 echo 'no svn or git'
 fi
 ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT deploy
+chmod -R +X /home/$USER/tomcat8080/webapps
 LANGUAGE=\$OLDLANGUAGE
 sleep 5
 ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 shutdown
