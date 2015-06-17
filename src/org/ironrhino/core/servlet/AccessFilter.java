@@ -38,6 +38,8 @@ public class AccessFilter implements Filter {
 	public static final String MDC_KEY_SESSION_ID = "sessionId";
 	public static final String MDC_KEY_REQUEST_ID = "requestId";
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
 	private Logger accessLog = LoggerFactory.getLogger("access");
 
 	private Logger accesWarnLog = LoggerFactory.getLogger("access-warn");
@@ -198,6 +200,9 @@ public class AccessFilter implements Filter {
 						.append("ms");
 				accesWarnLog.warn(sb.toString());
 			}
+		} catch (ServletException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
 		} finally {
 			MDC.clear();
 		}
