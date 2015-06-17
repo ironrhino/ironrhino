@@ -78,32 +78,32 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends
 				if (targetUrl.equals("/"))
 					targetUrl = "";
 			}
-			URL url = null;
 			try {
-				url = new URL(request.getRequestURL().toString());
+				URL url = new URL(request.getRequestURL().toString());
+				RedirectUrlBuilder urlBuilder = new RedirectUrlBuilder();
+				String scheme = url.getProtocol();
+				if (StringUtils.isNotBlank(request.getHeader("X-Real-Scheme")))
+					scheme = request.getHeader("X-Real-Scheme");
+				urlBuilder.setScheme(scheme);
+				if (url != null)
+					urlBuilder.setServerName(url.getHost());
+				int serverPort = getPortResolver().getServerPort(request);
+				urlBuilder.setPort(serverPort);
+				urlBuilder.setContextPath(request.getContextPath());
+				urlBuilder.setPathInfo(getLoginFormUrl());
+				if (isForceHttps() && "http".equals(scheme)
+						|| "https".equals(scheme)) {
+					urlBuilder.setScheme("https");
+					Integer httpsPort = getPortMapper().lookupHttpsPort(
+							serverPort);
+					if (httpsPort == null)
+						httpsPort = 443;
+					urlBuilder.setPort(httpsPort);
+				}
+				loginUrl = new StringBuilder(urlBuilder.getUrl());
 			} catch (MalformedURLException e) {
-
+				e.printStackTrace();
 			}
-			RedirectUrlBuilder urlBuilder = new RedirectUrlBuilder();
-			String scheme = request.getScheme();
-			if (StringUtils.isNotBlank(request.getHeader("X-Real-Scheme")))
-				scheme = request.getHeader("X-Real-Scheme");
-			int serverPort = getPortResolver().getServerPort(request);
-			urlBuilder.setScheme(scheme);
-			if (url != null)
-				urlBuilder.setServerName(url.getHost());
-			urlBuilder.setPort(serverPort);
-			urlBuilder.setContextPath(request.getContextPath());
-			urlBuilder.setPathInfo(getLoginFormUrl());
-			if (isForceHttps() && "http".equals(scheme)
-					|| "https".equals(scheme)) {
-				urlBuilder.setScheme("https");
-				Integer httpsPort = getPortMapper().lookupHttpsPort(serverPort);
-				if (httpsPort == null)
-					httpsPort = 443;
-				urlBuilder.setPort(httpsPort);
-			}
-			loginUrl = new StringBuilder(urlBuilder.getUrl());
 		} else {
 			loginUrl = new StringBuilder(ssoServerBase)
 					.append(getLoginFormUrl());
