@@ -227,7 +227,7 @@ public class EntityClassHelper {
 						Map<String, UiConfigImpl> map2 = getUiConfigs(embeddedClass);
 						for (UiConfigImpl ui : map2.values()) {
 							if (StringUtils.isBlank(ui.getGroup())
-									&& StringUtils.isNoneBlank(uci.getGroup()))
+									&& StringUtils.isNotBlank(uci.getGroup()))
 								ui.setGroup(uci.getGroup());
 						}
 						uci.setEmbeddedUiConfigs(map2);
