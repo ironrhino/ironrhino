@@ -1,6 +1,5 @@
 package org.ironrhino.core.spring.security;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -78,32 +77,22 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends
 				if (targetUrl.equals("/"))
 					targetUrl = "";
 			}
-			try {
-				URL url = new URL(request.getRequestURL().toString());
-				RedirectUrlBuilder urlBuilder = new RedirectUrlBuilder();
-				String scheme = url.getProtocol();
-				if (StringUtils.isNotBlank(request.getHeader("X-Real-Scheme")))
-					scheme = request.getHeader("X-Real-Scheme");
-				urlBuilder.setScheme(scheme);
-				if (url != null)
-					urlBuilder.setServerName(url.getHost());
-				int serverPort = getPortResolver().getServerPort(request);
-				urlBuilder.setPort(serverPort);
-				urlBuilder.setContextPath(request.getContextPath());
-				urlBuilder.setPathInfo(getLoginFormUrl());
-				if (isForceHttps() && "http".equals(scheme)
-						|| "https".equals(scheme)) {
-					urlBuilder.setScheme("https");
-					Integer httpsPort = getPortMapper().lookupHttpsPort(
-							serverPort);
-					if (httpsPort == null)
-						httpsPort = 443;
-					urlBuilder.setPort(httpsPort);
-				}
-				loginUrl = new StringBuilder(urlBuilder.getUrl());
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
+			RedirectUrlBuilder urlBuilder = new RedirectUrlBuilder();
+			String scheme = request.getScheme();
+			urlBuilder.setScheme(scheme);
+			urlBuilder.setServerName(request.getServerName());
+			int serverPort = getPortResolver().getServerPort(request);
+			urlBuilder.setPort(serverPort);
+			urlBuilder.setContextPath(request.getContextPath());
+			urlBuilder.setPathInfo(getLoginFormUrl());
+			if (isForceHttps() && !request.isSecure()) {
+				urlBuilder.setScheme("https");
+				Integer httpsPort = getPortMapper().lookupHttpsPort(serverPort);
+				if (httpsPort == null)
+					httpsPort = 443;
+				urlBuilder.setPort(httpsPort);
 			}
+			loginUrl = new StringBuilder(urlBuilder.getUrl());
 		} else {
 			loginUrl = new StringBuilder(ssoServerBase)
 					.append(getLoginFormUrl());

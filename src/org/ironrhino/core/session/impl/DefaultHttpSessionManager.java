@@ -209,8 +209,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 				String addr = (String) session
 						.getAttribute(SESSION_KEY_REMOTE_ADDR);
 				if (addr != null
-						&& !RequestUtils.getRemoteAddr(session.getRequest())
-								.equals(addr))
+						&& !session.getRequest().getRemoteAddr().equals(addr))
 					invalidate(session);
 			}
 		}
@@ -246,8 +245,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		if (checkRemoteAddr) {
 			if (!session.getAttrMap().isEmpty()
 					&& session.getAttribute(SESSION_KEY_REMOTE_ADDR) == null)
-				session.setAttribute(SESSION_KEY_REMOTE_ADDR,
-						RequestUtils.getRemoteAddr(session.getRequest()));
+				session.setAttribute(SESSION_KEY_REMOTE_ADDR, session
+						.getRequest().getRemoteAddr());
 		}
 		doSave(session);
 	}

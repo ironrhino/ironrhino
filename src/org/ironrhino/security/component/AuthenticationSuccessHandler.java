@@ -11,7 +11,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.password.MultiVersionPasswordEncoder;
-import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.LoginRecord;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
@@ -59,7 +58,7 @@ public class AuthenticationSuccessHandler extends
 		}
 		LoginRecord loginRecord = new LoginRecord();
 		loginRecord.setUsername(username);
-		loginRecord.setAddress(RequestUtils.getRemoteAddr(request));
+		loginRecord.setAddress(request.getRemoteAddr());
 		save(loginRecord);
 	}
 

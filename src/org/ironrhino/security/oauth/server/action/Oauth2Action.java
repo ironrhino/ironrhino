@@ -22,7 +22,6 @@ import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationF
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExceptionUtils;
-import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
@@ -438,9 +437,8 @@ public class Oauth2Action extends BaseAction {
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
 			eventPublisher.publish(
-					new AuthorizeEvent(username, RequestUtils
-							.getRemoteAddr(request), client.getName(),
-							grant_type), Scope.LOCAL);
+					new AuthorizeEvent(username, request.getRemoteAddr(),
+							client.getName(), grant_type), Scope.LOCAL);
 			return JSON;
 		} else if ("client_credential".equals(grant_type)) {
 			client = new Client();
@@ -519,9 +517,9 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
-				eventPublisher.publish(new AuthorizeEvent(username,
-						RequestUtils.getRemoteAddr(request), client.getName(),
-						grant_type), Scope.LOCAL);
+				eventPublisher.publish(
+						new AuthorizeEvent(username, request.getRemoteAddr(),
+								client.getName(), grant_type), Scope.LOCAL);
 			} catch (Exception e) {
 				if (httpErrorHandler != null
 						&& httpErrorHandler.handle(request, response,

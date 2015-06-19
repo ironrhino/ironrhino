@@ -127,7 +127,7 @@ public class LoginAction extends BaseAction {
 				if (principal instanceof UserDetails)
 					eventPublisher.publish(new LoginEvent(
 							((UserDetails) principal).getUsername(),
-							RequestUtils.getRemoteAddr(request)), Scope.LOCAL);
+							request.getRemoteAddr()), Scope.LOCAL);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}

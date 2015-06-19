@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
-import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -32,7 +31,7 @@ public class FirewallHandler extends AccessHandler {
 	@Override
 	public boolean handle(HttpServletRequest request,
 			HttpServletResponse response) {
-		String addr = RequestUtils.getRemoteAddr(request);
+		String addr = request.getRemoteAddr();
 		if (addr.equals("127.0.0.1")) {
 			String value = request.getParameter(KEY_ALLOWEDADDRPATTERN);
 			if (value != null) {

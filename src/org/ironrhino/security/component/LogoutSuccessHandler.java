@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.spring.security.DefaultLogoutSuccessHandler;
-import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.event.LogoutEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -31,8 +30,7 @@ public class LogoutSuccessHandler extends DefaultLogoutSuccessHandler {
 				eventPublisher.publish(
 						new LogoutEvent(
 								((UserDetails) principal).getUsername(),
-								RequestUtils.getRemoteAddr(request)),
-						Scope.LOCAL);
+								request.getRemoteAddr()), Scope.LOCAL);
 		}
 	}
 

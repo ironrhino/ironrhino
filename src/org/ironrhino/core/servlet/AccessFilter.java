@@ -98,7 +98,8 @@ public class AccessFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
 		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
-		HttpServletRequest request = (HttpServletRequest) req;
+		HttpServletRequest request = new ProxySupportHttpServletRequest(
+				(HttpServletRequest) req);
 		HttpServletResponse response = (HttpServletResponse) resp;
 		if (isRequestDispatcher && RequestUtils.isInternalTesting(request))
 			response.addHeader("X-Instance-Id", AppInfo.getInstanceId());
@@ -146,7 +147,7 @@ public class AccessFilter implements Filter {
 		if (request.getAttribute("userAgent") == null)
 			request.setAttribute("userAgent",
 					new UserAgent(request.getHeader("User-Agent")));
-		MDC.put("remoteAddr", RequestUtils.getRemoteAddr(request));
+		MDC.put("remoteAddr", request.getRemoteAddr());
 		MDC.put("method", request.getMethod());
 		StringBuffer url = request.getRequestURL();
 		if (StringUtils.isNotBlank(request.getQueryString()))
@@ -191,7 +192,7 @@ public class AccessFilter implements Filter {
 				accessLog.info("");
 
 			long start = System.currentTimeMillis();
-			chain.doFilter(req, resp);
+			chain.doFilter(request, response);
 			long responseTime = System.currentTimeMillis() - start;
 			if (isRequestDispatcher && responseTime > responseTimeThreshold) {
 				StringBuilder sb = new StringBuilder();

@@ -20,7 +20,6 @@ import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
-import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.Constants;
 import org.ironrhino.security.event.LoginEvent;
 import org.ironrhino.security.event.SignupEvent;
@@ -133,16 +132,18 @@ public class SignupAction extends BaseAction {
 		user.setEnabled(!activationRequired);
 		userManager.save(user);
 		eventPublisher.publish(
-				new SignupEvent(user.getUsername(), RequestUtils
-						.getRemoteAddr(request)), Scope.LOCAL);
+				new SignupEvent(user.getUsername(), request.getRemoteAddr()),
+				Scope.LOCAL);
 		if (activationRequired) {
 			user.setPassword(password);// for send mail
 			addActionMessage(getText("signup.success"));
 			sendActivationMail(user);
 		} else {
 			AuthzUtils.autoLogin(user);
-			eventPublisher.publish(new LoginEvent(user.getUsername(),
-					RequestUtils.getRemoteAddr(request)), Scope.LOCAL);
+			eventPublisher
+					.publish(
+							new LoginEvent(user.getUsername(), request
+									.getRemoteAddr()), Scope.LOCAL);
 		}
 		targetUrl = "/";
 		return REDIRECT;
@@ -187,9 +188,8 @@ public class SignupAction extends BaseAction {
 					if (ud != null) {
 						AuthzUtils.autoLogin(ud);
 						LoginEvent loginEvent = new LoginEvent(
-								ud.getUsername(),
-								RequestUtils.getRemoteAddr(ServletActionContext
-										.getRequest()));
+								ud.getUsername(), ServletActionContext
+										.getRequest().getRemoteAddr());
 						loginEvent.setFirst(true);
 						eventPublisher.publish(loginEvent, Scope.LOCAL);
 					}

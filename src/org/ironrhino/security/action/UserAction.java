@@ -25,7 +25,6 @@ import org.ironrhino.core.security.role.UserRoleManager;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
-import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.event.PasswordChangedEvent;
 import org.ironrhino.security.event.ProfileEditedEvent;
 import org.ironrhino.security.model.User;
@@ -255,9 +254,8 @@ public class UserAction extends EntityAction<User> {
 			user.setLegiblePassword(password);
 			userManager.save(user);
 			addActionMessage(getText("save.success"));
-			eventPublisher.publish(
-					new PasswordChangedEvent(user.getUsername(), RequestUtils
-							.getRemoteAddr(ServletActionContext.getRequest())),
+			eventPublisher.publish(new PasswordChangedEvent(user.getUsername(),
+					ServletActionContext.getRequest().getRemoteAddr()),
 					Scope.LOCAL);
 		}
 		return "password";
@@ -283,10 +281,10 @@ public class UserAction extends EntityAction<User> {
 		userInSession.setPhone(user.getPhone());
 		userManager.save(userInSession);
 		addActionMessage(getText("save.success"));
-		eventPublisher.publish(
-				new ProfileEditedEvent(user.getUsername(), RequestUtils
-						.getRemoteAddr(ServletActionContext.getRequest())),
-				Scope.LOCAL);
+		eventPublisher
+				.publish(new ProfileEditedEvent(user.getUsername(),
+						ServletActionContext.getRequest().getRemoteAddr()),
+						Scope.LOCAL);
 		return "profile";
 	}
 

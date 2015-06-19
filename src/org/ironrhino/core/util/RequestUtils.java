@@ -73,6 +73,12 @@ public class RequestUtils {
 		return map;
 	}
 
+	@Deprecated
+	/**
+	 * use request.getRemoteAddr() instead
+	 * @param request
+	 * @return
+	 */
 	public static String getRemoteAddr(HttpServletRequest request) {
 		String addr = request.getHeader("X-Real-IP");
 		if (StringUtils.isBlank(addr)) {

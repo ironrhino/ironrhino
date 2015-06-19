@@ -15,7 +15,6 @@ import org.ironrhino.core.session.WrappedHttpSession;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +120,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 			}
 		}
 		if (username != null) {
-			String ip = RequestUtils.getRemoteAddr(session.getRequest());
+			String ip = session.getRequest().getRemoteAddr();
 			String sessions = (String) cacheManager.get(username,
 					CACHE_NAMESPACE);
 			if (sessions == null) {

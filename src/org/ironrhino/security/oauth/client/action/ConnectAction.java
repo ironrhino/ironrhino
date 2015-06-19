@@ -105,7 +105,7 @@ public class ConnectAction extends BaseAction {
 				user = (User) userManager.loadUserByUsername(id);
 				if (user != null) {
 					loginEvent = new LoginEvent(user.getUsername(),
-							RequestUtils.getRemoteAddr(request), "oauth",
+							request.getRemoteAddr(), "oauth",
 							provider.getName());
 				} else {
 					user = new User();
@@ -122,10 +122,10 @@ public class ConnectAction extends BaseAction {
 							.getName() : p.getDisplayName());
 					userManager.save(user);
 					eventPublisher.publish(new SignupEvent(user.getUsername(),
-							RequestUtils.getRemoteAddr(request), "oauth",
+							request.getRemoteAddr(), "oauth",
 							provider.getName()), Scope.LOCAL);
 					loginEvent = new LoginEvent(user.getUsername(),
-							RequestUtils.getRemoteAddr(request), "oauth",
+							request.getRemoteAddr(), "oauth",
 							provider.getName());
 					loginEvent.setFirst(true);
 				}
