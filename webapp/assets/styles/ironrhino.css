@@ -8388,7 +8388,7 @@ input[type="checkbox"].custom + label.custom {
 	position: relative;
 }
 
-input[type="checkbox"][disabled].custom + label.custom {
+input[type="checkbox"][disabled].custom + label.custom, input[type="checkbox"][readonly].custom + label.custom {
 	cursor: not-allowed !important;
 	background-color: #eee !important;
 }
@@ -8429,7 +8429,7 @@ input[type="radio"].custom + label.custom {
 	position: relative;
 }
 
-input[type="radio"][disabled].custom + label.custom {
+input[type="radio"][disabled].custom + label.custom, input[type="radio"][readonly].custom + label.custom {
 	cursor: not-allowed !important;
 	background-color: #eee !important;
 }

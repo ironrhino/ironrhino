@@ -44,6 +44,9 @@
 <#if itemKey?has_content>
  value="${itemKeyStr?html}"<#rt/>
 </#if>
+<#if parameters.readonly!false>
+ readonly="readonly"<#rt/>
+</#if>
 <#if parameters.disabled!false>
  disabled="disabled"<#rt/>
 </#if>

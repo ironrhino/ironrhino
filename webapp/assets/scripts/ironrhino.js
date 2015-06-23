@@ -32439,7 +32439,12 @@ Initialization.common = function() {
 				$('.ui-dialog:visible').last()
 						.find('.ui-dialog-titlebar-close').click();
 		}
-	}).on('click', '#message .close,.message-container .close', function() {
+	}).on('click', 'label[for]', function(event) {
+				if ($(document.getElementById($(this).attr('for')))
+						.prop('readonly'))
+					event.preventDefault();
+			}).on('click', '#message .close,.message-container .close',
+			function() {
 				$('#message,.message-container').each(function(i, v) {
 							if (!$.trim($(v).text()))
 								$(v).remove();
