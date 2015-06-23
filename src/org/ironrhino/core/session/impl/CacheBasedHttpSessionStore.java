@@ -35,16 +35,16 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Autowired
-	private SessionCompressorManager sessionCompressorManager;
+	private CacheManager cacheManager;
 
 	@Autowired
-	private CacheManager cacheManager;
+	private SessionCompressorManager sessionCompressorManager;
 
 	@Value("${httpSessionManager.maximumSessions:0}")
 	private int maximumSessions;
 
-	public void setCacheManager(CacheManager cacheManager) {
+	@Autowired
+	public CacheBasedHttpSessionStore(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
 	}
 
