@@ -2,7 +2,7 @@ Initialization.upload = function() {
 	$(document).on('click', '#files button.reload', function() {
 				ajax({
 							type : $('#upload_form').attr('method'),
-							url : $('#upload_form').attr('action'),
+							url : $('#upload_form').prop('action'),
 							data : $('#upload_form').serialize(),
 							replacement : 'files'
 						});
@@ -10,7 +10,7 @@ Initialization.upload = function() {
 		$.alerts.prompt('', 'newfolder', '', function(t) {
 					if (t) {
 						var folder = $('#current_folder').text() + t;
-						var url = $('#upload_form').attr('action');
+						var url = $('#upload_form').prop('action');
 						if (!url)
 							url = CONTEXT_PATH + '/common/upload';
 						url += '/mkdir' + encodeURI(folder);
@@ -22,7 +22,7 @@ Initialization.upload = function() {
 										$('#files button.reload').click();
 										if (typeof history.pushState != 'undefined') {
 											var url = $('#upload_form')
-													.attr('action');
+													.prop('action');
 											if (!url)
 												url = CONTEXT_PATH
 														+ '/common/upload';
@@ -150,7 +150,7 @@ Observation.upload = function(container) {
 		var oldvalue = $(this).data('oldvalue');
 		var newvalue = $(this).text();
 		if (oldvalue != newvalue) {
-			var url = $('#upload_form').attr('action');
+			var url = $('#upload_form').prop('action');
 			if (!url)
 				url = CONTEXT_PATH + '/common/upload';
 			url += '/rename/' + encodeURI(oldvalue);
@@ -203,7 +203,7 @@ function deleteFiles(file) {
 	$.alerts.confirm(MessageBundle.get('confirm.delete'), MessageBundle
 					.get('select'), function(b) {
 				if (b) {
-					var url = $('#upload_form').attr('action');
+					var url = $('#upload_form').prop('action');
 					if (!url)
 						url = CONTEXT_PATH + '/common/upload';
 					url += '/delete';
@@ -245,7 +245,7 @@ function uploadFiles(files, filenames) {
 		if (filenames && filenames.length)
 			data.filename = filenames;
 		return $.ajaxupload(files, {
-					url : $('#upload_form').attr('action'),
+					url : $('#upload_form').prop('action'),
 					name : $('#upload_form input[type="file"]').attr('name'),
 					data : data,
 					beforeSend : Indicator.show,

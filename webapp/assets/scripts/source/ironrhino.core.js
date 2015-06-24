@@ -1125,7 +1125,7 @@ Observation.common = function(container) {
 				var t = $(this);
 				var f = $(this).closest('form');
 				var data = {};
-				var url = f.attr('action');
+				var url = f.prop('action');
 				if (url.indexOf('/') > -1) {
 					if (url.substring(url.lastIndexOf('/') + 1) == 'save')
 						url = url.substring(0, url.lastIndexOf('/')) + '/input';
@@ -1479,7 +1479,7 @@ Observation.common = function(container) {
 							|| form.parents('.ui-dialog,.tab-content').length)
 						pushstate = false;
 					if (pushstate && HISTORY_ENABLED) {
-						var url = form.attr('action');
+						var url = form.prop('action');
 						var index = url.indexOf('://');
 						if (index > -1) {
 							url = url.substring(index + 3);
