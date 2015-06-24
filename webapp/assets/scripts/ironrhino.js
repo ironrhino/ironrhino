@@ -32816,7 +32816,7 @@ Observation.common = function(container) {
 				var t = $(this);
 				var f = $(this).closest('form');
 				var data = {};
-				var url = f.attr('action');
+				var url = f.prop('action');
 				if (url.indexOf('/') > -1) {
 					if (url.substring(url.lastIndexOf('/') + 1) == 'save')
 						url = url.substring(0, url.lastIndexOf('/')) + '/input';
@@ -33170,7 +33170,7 @@ Observation.common = function(container) {
 							|| form.parents('.ui-dialog,.tab-content').length)
 						pushstate = false;
 					if (pushstate && HISTORY_ENABLED) {
-						var url = form.attr('action');
+						var url = form.prop('action');
 						var index = url.indexOf('://');
 						if (index > -1) {
 							url = url.substring(index + 3);
@@ -35653,7 +35653,7 @@ Initialization.upload = function() {
 	$(document).on('click', '#files button.reload', function() {
 				ajax({
 							type : $('#upload_form').attr('method'),
-							url : $('#upload_form').attr('action'),
+							url : $('#upload_form').prop('action'),
 							data : $('#upload_form').serialize(),
 							replacement : 'files'
 						});
@@ -35661,7 +35661,7 @@ Initialization.upload = function() {
 		$.alerts.prompt('', 'newfolder', '', function(t) {
 					if (t) {
 						var folder = $('#current_folder').text() + t;
-						var url = $('#upload_form').attr('action');
+						var url = $('#upload_form').prop('action');
 						if (!url)
 							url = CONTEXT_PATH + '/common/upload';
 						url += '/mkdir' + encodeURI(folder);
@@ -35673,7 +35673,7 @@ Initialization.upload = function() {
 										$('#files button.reload').click();
 										if (typeof history.pushState != 'undefined') {
 											var url = $('#upload_form')
-													.attr('action');
+													.prop('action');
 											if (!url)
 												url = CONTEXT_PATH
 														+ '/common/upload';
@@ -35801,7 +35801,7 @@ Observation.upload = function(container) {
 		var oldvalue = $(this).data('oldvalue');
 		var newvalue = $(this).text();
 		if (oldvalue != newvalue) {
-			var url = $('#upload_form').attr('action');
+			var url = $('#upload_form').prop('action');
 			if (!url)
 				url = CONTEXT_PATH + '/common/upload';
 			url += '/rename/' + encodeURI(oldvalue);
@@ -35854,7 +35854,7 @@ function deleteFiles(file) {
 	$.alerts.confirm(MessageBundle.get('confirm.delete'), MessageBundle
 					.get('select'), function(b) {
 				if (b) {
-					var url = $('#upload_form').attr('action');
+					var url = $('#upload_form').prop('action');
 					if (!url)
 						url = CONTEXT_PATH + '/common/upload';
 					url += '/delete';
@@ -35896,7 +35896,7 @@ function uploadFiles(files, filenames) {
 		if (filenames && filenames.length)
 			data.filename = filenames;
 		return $.ajaxupload(files, {
-					url : $('#upload_form').attr('action'),
+					url : $('#upload_form').prop('action'),
 					name : $('#upload_form input[type="file"]').attr('name'),
 					data : data,
 					beforeSend : Indicator.show,
@@ -37209,14 +37209,14 @@ $(function() {
 Richtable = {
 	getBaseUrl : function(form) {
 		form = form || $('form.richtable');
-		var action = form.attr('action');
+		var action = form.prop('action');
 		var entity = form.data('entity');
 		var url;
 		if (action.indexOf('/') == 0 || action.indexOf('://') > 0)
 			url = entity ? action.substring(0, action.lastIndexOf('/') + 1)
 					+ entity : action;
 		else
-			url = entity ? entity : form.attr('action');
+			url = entity ? entity : form.prop('action');
 		if (form.data('actionbaseurl'))
 			url = form.data('actionbaseurl');
 		var p = url.indexOf('?');
@@ -37311,7 +37311,7 @@ Richtable = {
 							if ($(
 									'input[type="hidden"][name="'
 											+ (form.data('entity') || form
-													.attr('action')) + '.id"]',
+													.prop('action')) + '.id"]',
 									inputform).val())
 								create = false;
 						}
@@ -37328,7 +37328,7 @@ Richtable = {
 									});
 						}
 					}
-					var action = inputform.attr('action');
+					var action = inputform.prop('action');
 					if (action.indexOf('http') != 0 && action.indexOf('/') != 0) {
 						action = pathname
 								+ (pathname.indexOf('/') == (pathname.length - 1)
@@ -37564,7 +37564,7 @@ Richtable = {
 				var row = this;
 				if ($('td.edited', row).length) {
 					modified = true;
-					var entity = form.data('entity') || form.attr('action');
+					var entity = form.data('entity') || form.prop('action');
 					var params = {};
 					var version = $(row).data('version');
 					if (version != undefined)
@@ -37783,7 +37783,7 @@ Initialization.richtable = function() {
 							return parseInt(v) + 1
 						});
 				$.ajax({
-					url : $(form).attr('action'),
+					url : $(form).prop('action'),
 					type : $(form).attr('method'),
 					data : form.serialize(),
 					success : function(data) {
@@ -37863,8 +37863,8 @@ Observation._richtable = function(container) {
 	$('form.criteria', container).each(function() {
 		var t = $(this);
 		var f = t.prev('form.richtable');
-		var entity = f.data('entity') || f.attr('action');
-		t.attr('action', f.attr('action')).data('replacement', f.attr('id'));
+		var entity = f.data('entity') || f.prop('action');
+		t.attr('action', f.prop('action')).data('replacement', f.attr('id'));
 		$('input[type="hidden"]', f).clone().prependTo(t).each(function() {
 			var name = $(this).attr('name');
 			if (name.indexOf('-op') == name.length - 3)
@@ -38318,7 +38318,7 @@ if (window.FileReader)
 			var t = $(this);
 			var folder = t.data('folder');
 			if (!folder) {
-				var action = t.attr('action');
+				var action = t.prop('action');
 				var index = action.lastIndexOf('/');
 				if (index > 0 && action.substring(index + 1) == 'save') {
 					action = action.substring(0, index);

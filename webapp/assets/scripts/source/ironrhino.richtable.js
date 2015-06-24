@@ -1,14 +1,14 @@
 Richtable = {
 	getBaseUrl : function(form) {
 		form = form || $('form.richtable');
-		var action = form.attr('action');
+		var action = form.prop('action');
 		var entity = form.data('entity');
 		var url;
 		if (action.indexOf('/') == 0 || action.indexOf('://') > 0)
 			url = entity ? action.substring(0, action.lastIndexOf('/') + 1)
 					+ entity : action;
 		else
-			url = entity ? entity : form.attr('action');
+			url = entity ? entity : form.prop('action');
 		if (form.data('actionbaseurl'))
 			url = form.data('actionbaseurl');
 		var p = url.indexOf('?');
@@ -103,7 +103,7 @@ Richtable = {
 							if ($(
 									'input[type="hidden"][name="'
 											+ (form.data('entity') || form
-													.attr('action')) + '.id"]',
+													.prop('action')) + '.id"]',
 									inputform).val())
 								create = false;
 						}
@@ -120,7 +120,7 @@ Richtable = {
 									});
 						}
 					}
-					var action = inputform.attr('action');
+					var action = inputform.prop('action');
 					if (action.indexOf('http') != 0 && action.indexOf('/') != 0) {
 						action = pathname
 								+ (pathname.indexOf('/') == (pathname.length - 1)
@@ -356,7 +356,7 @@ Richtable = {
 				var row = this;
 				if ($('td.edited', row).length) {
 					modified = true;
-					var entity = form.data('entity') || form.attr('action');
+					var entity = form.data('entity') || form.prop('action');
 					var params = {};
 					var version = $(row).data('version');
 					if (version != undefined)
@@ -575,7 +575,7 @@ Initialization.richtable = function() {
 							return parseInt(v) + 1
 						});
 				$.ajax({
-					url : $(form).attr('action'),
+					url : $(form).prop('action'),
 					type : $(form).attr('method'),
 					data : form.serialize(),
 					success : function(data) {
@@ -655,8 +655,8 @@ Observation._richtable = function(container) {
 	$('form.criteria', container).each(function() {
 		var t = $(this);
 		var f = t.prev('form.richtable');
-		var entity = f.data('entity') || f.attr('action');
-		t.attr('action', f.attr('action')).data('replacement', f.attr('id'));
+		var entity = f.data('entity') || f.prop('action');
+		t.attr('action', f.prop('action')).data('replacement', f.attr('id'));
 		$('input[type="hidden"]', f).clone().prependTo(t).each(function() {
 			var name = $(this).attr('name');
 			if (name.indexOf('-op') == name.length - 3)
