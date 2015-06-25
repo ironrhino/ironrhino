@@ -16644,6 +16644,9 @@ ctrlr.prototype.setObjectValue=function(data){
  * ajaxSubmit() provides a mechanism for immediately submitting
  * an HTML form using AJAX.
  */
+/**
+ * add by zhouyanming : formaction
+ */	
 $.fn.ajaxSubmit = function(options) {
 	// fast fail if nothing selected (http://dev.jquery.com/ticket/2752)
 	if (!this.length) {
@@ -16659,6 +16662,9 @@ $.fn.ajaxSubmit = function(options) {
 
 	method = this.attr('method');
 	action = this.attr('action');
+	var formaction = this.find('.clicked:submit').attr('formaction');
+	if(formaction)
+		action = formaction;
 	url = (typeof action === 'string') ? $.trim(action) : '';
 	url = url || window.location.href || '';
 	if (url) {
@@ -32439,7 +32445,9 @@ Initialization.common = function() {
 				$('.ui-dialog:visible').last()
 						.find('.ui-dialog-titlebar-close').click();
 		}
-	}).on('click', 'label[for]', function(event) {
+	}).on('click', 'form.ajax :submit', function() {
+				$(this).addClass('clicked');
+			}).on('click', 'label[for]', function(event) {
 				if ($(document.getElementById($(this).attr('for')))
 						.prop('readonly'))
 					event.preventDefault();
@@ -33236,7 +33244,7 @@ Observation.common = function(container) {
 						});
 			$(this).bind('submit', function(e) {
 						var form = $(this);
-						var btn = $('.clicked', form).removeClass('clicked');
+						var btn = $('.clicked', form);
 						if (!btn.length)
 							btn = $(':input:focus[type=submit]', form);
 						if (btn.hasClass('noajax'))
@@ -33256,6 +33264,7 @@ Observation.common = function(container) {
 						} else {
 							$(this).ajaxSubmit(options);
 						}
+						btn.removeClass('clicked');
 						return false;
 					});
 			return;
@@ -33635,9 +33644,13 @@ Observation.checkavailable = function(container) {
 		var xhr = new XMLHttpRequest();
 		var url = options.url;
 		if (!url)
-			if (options.target && options.target.tagName == 'FORM')
+			if (options.target && options.target.tagName == 'FORM') {
 				url = options.target.action;
-			else
+				var formaction = $(options.target).find('.clicked:submit')
+						.attr('formaction');
+				if (formaction)
+					url = formaction;
+			} else
 				url = document.location.href;
 		xhr.open('POST', url);
 		if (!files.length)

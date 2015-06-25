@@ -748,7 +748,9 @@ Initialization.common = function() {
 				$('.ui-dialog:visible').last()
 						.find('.ui-dialog-titlebar-close').click();
 		}
-	}).on('click', 'label[for]', function(event) {
+	}).on('click', 'form.ajax :submit', function() {
+				$(this).addClass('clicked');
+			}).on('click', 'label[for]', function(event) {
 				if ($(document.getElementById($(this).attr('for')))
 						.prop('readonly'))
 					event.preventDefault();
@@ -1545,7 +1547,7 @@ Observation.common = function(container) {
 						});
 			$(this).bind('submit', function(e) {
 						var form = $(this);
-						var btn = $('.clicked', form).removeClass('clicked');
+						var btn = $('.clicked', form);
 						if (!btn.length)
 							btn = $(':input:focus[type=submit]', form);
 						if (btn.hasClass('noajax'))
@@ -1565,6 +1567,7 @@ Observation.common = function(container) {
 						} else {
 							$(this).ajaxSubmit(options);
 						}
+						btn.removeClass('clicked');
 						return false;
 					});
 			return;

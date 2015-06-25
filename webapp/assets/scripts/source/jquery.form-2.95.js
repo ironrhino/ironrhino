@@ -43,6 +43,9 @@
  * ajaxSubmit() provides a mechanism for immediately submitting
  * an HTML form using AJAX.
  */
+/**
+ * add by zhouyanming : formaction
+ */	
 $.fn.ajaxSubmit = function(options) {
 	// fast fail if nothing selected (http://dev.jquery.com/ticket/2752)
 	if (!this.length) {
@@ -58,6 +61,9 @@ $.fn.ajaxSubmit = function(options) {
 
 	method = this.attr('method');
 	action = this.attr('action');
+	var formaction = this.find('.clicked:submit').attr('formaction');
+	if(formaction)
+		action = formaction;
 	url = (typeof action === 'string') ? $.trim(action) : '';
 	url = url || window.location.href || '';
 	if (url) {

@@ -27,9 +27,13 @@
 		var xhr = new XMLHttpRequest();
 		var url = options.url;
 		if (!url)
-			if (options.target && options.target.tagName == 'FORM')
+			if (options.target && options.target.tagName == 'FORM') {
 				url = options.target.action;
-			else
+				var formaction = $(options.target).find('.clicked:submit')
+						.attr('formaction');
+				if (formaction)
+					url = formaction;
+			} else
 				url = document.location.href;
 		xhr.open('POST', url);
 		if (!files.length)
