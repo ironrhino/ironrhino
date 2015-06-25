@@ -3031,6 +3031,7 @@ public class JedisConnection extends AbstractRedisConnection {
 	 * @param options
 	 * @return
 	 */
+	@SuppressWarnings("resource")
 	public Cursor<byte[]> sScan(byte[] key, long cursorId, ScanOptions options) {
 
 		return new KeyBoundCursor<byte[]>(key, cursorId, options) {
@@ -3066,6 +3067,7 @@ public class JedisConnection extends AbstractRedisConnection {
 	 * @param options
 	 * @return
 	 */
+	@SuppressWarnings("resource")
 	public Cursor<Entry<byte[], byte[]>> hScan(byte[] key, long cursorId, ScanOptions options) {
 
 		return new KeyBoundCursor<Map.Entry<byte[], byte[]>>(key, cursorId, options) {
