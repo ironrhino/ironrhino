@@ -1,5 +1,5 @@
 <#macro editAttributes schemaName merge=false attributes=[] parameterNamePrefix=""  headerKey="" headerValue="" ignoreIfNotFound=true dynamicAttributesMapping={}>
-	<#local schemaManager=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('schemaManager')/>
+	<#local schemaManager=beans['schemaManager']/>
 	<#if schemaName?is_string>
 		<#local schema=schemaManager.findOne(true,[schemaName])!>
 	<#elseif schemaName?is_sequence && schemaName?size gt 0>
@@ -189,7 +189,7 @@
 	</#if>
 </#macro>
 <#function getAttributeOptions schemaName name>
-	<#local schemaManager=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('schemaManager')/>
+	<#local schemaManager=beans['schemaManager']/>
 	<#if schemaName?is_string>
 		<#local schema=schemaManager.findOne(true,[schemaName])!>
 	<#elseif schemaName?is_sequence && schemaName?size gt 0>

@@ -27,7 +27,7 @@
 </#function>
 
 <#macro authorize ifAllGranted="" ifAnyGranted="" ifNotGranted="" authorizer="" resource="">
-	<#if statics['org.ironrhino.core.util.AuthzUtils'].authorize(ifAllGranted,ifAnyGranted,ifNotGranted) || (authorizer!="" &&  statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dynamicAuthorizerManager').authorize(authorizer,authentication("principal"),resource))>
+	<#if statics['org.ironrhino.core.util.AuthzUtils'].authorize(ifAllGranted,ifAnyGranted,ifNotGranted) || (authorizer!="" &&  beans['dynamicAuthorizerManager'].authorize(authorizer,authentication("principal"),resource))>
 		<#nested>
 	</#if>
 </#macro>

@@ -42,47 +42,38 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	private String base;
 
 	@Override
-	protected freemarker.template.Configuration createConfiguration(
-			ServletContext servletContext) throws TemplateException {
+	protected freemarker.template.Configuration createConfiguration(ServletContext servletContext)
+			throws TemplateException {
 		// Configuration configuration =
 		// super.createConfiguration(servletContext);
 		/** super.createConfiguration(servletContext) start **/
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			LocalizedTextUtil.setReloadBundles(true);
-		MyConfiguration configuration = new MyConfiguration(
-				Configuration.VERSION_2_3_22);
-		configuration
-				.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION ? TemplateExceptionHandler.IGNORE_HANDLER
-						: TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+		MyConfiguration configuration = new MyConfiguration(Configuration.VERSION_2_3_22);
+		configuration.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION
+				? TemplateExceptionHandler.IGNORE_HANDLER : TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 		if (mruMaxStrongSize > 0) {
-			configuration.setSetting(Configuration.CACHE_STORAGE_KEY, "strong:"
-					+ mruMaxStrongSize);
+			configuration.setSetting(Configuration.CACHE_STORAGE_KEY, "strong:" + mruMaxStrongSize);
 		}
 		if (templateUpdateDelay != null) {
-			configuration.setSetting(Configuration.TEMPLATE_UPDATE_DELAY_KEY,
-					templateUpdateDelay);
+			configuration.setSetting(Configuration.TEMPLATE_UPDATE_DELAY_KEY, templateUpdateDelay);
 		}
 		if (encoding != null) {
 			configuration.setDefaultEncoding(encoding);
 		}
 		configuration.setWhitespaceStripping(true);
 		/** super.createConfiguration(servletContext) end **/
-		configuration
-				.setOverridableTemplateProviders(WebApplicationContextUtils
-						.getWebApplicationContext(servletContext)
-						.getBeansOfType(OverridableTemplateProvider.class)
-						.values());
-		configuration.setFallbackTemplateProviders(WebApplicationContextUtils
-				.getWebApplicationContext(servletContext)
+		configuration.setOverridableTemplateProviders(WebApplicationContextUtils
+				.getWebApplicationContext(servletContext).getBeansOfType(OverridableTemplateProvider.class).values());
+		configuration.setFallbackTemplateProviders(WebApplicationContextUtils.getWebApplicationContext(servletContext)
 				.getBeansOfType(FallbackTemplateProvider.class).values());
-		TemplateProvider templateProvider = WebApplicationContextUtils
-				.getWebApplicationContext(servletContext).getBean(
-						"templateProvider", TemplateProvider.class);
+		TemplateProvider templateProvider = WebApplicationContextUtils.getWebApplicationContext(servletContext)
+				.getBean("templateProvider", TemplateProvider.class);
 		base = templateProvider.getAllSharedVariables().get("base");
 		Map<String, Object> globalVariables = new HashMap<String, Object>(8);
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
-		globalVariables.put("statics", new BeansWrapperBuilder(
-				Configuration.VERSION_2_3_22).build().getStaticModels());
+		globalVariables.put("statics", new BeansWrapperBuilder(Configuration.VERSION_2_3_22).build().getStaticModels());
+		globalVariables.put("beans", new BeansTemplateHashModel());
 		TemplateHashModelEx hash = new SimpleMapModel(globalVariables,
 				new BeansWrapperBuilder(Configuration.VERSION_2_3_22).build());
 		configuration.setAllSharedVariables(hash);
@@ -91,18 +82,15 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		configuration.setNumberFormat("0.##");
 		configuration.setURLEscapingCharset("UTF-8");
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
-			configuration.setSetting(Configuration.TEMPLATE_UPDATE_DELAY_KEY,
-					"5");
+			configuration.setSetting(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "5");
 		configuration.setCacheStorage(new StrongCacheStorage());
-		configuration
-				.setTemplateExceptionHandler(new TemplateExceptionHandler() {
-					@Override
-					public void handleTemplateException(TemplateException ex,
-							Environment env, Writer writer)
-							throws TemplateException {
-						log.error(ex.getMessage());
-					}
-				});
+		configuration.setTemplateExceptionHandler(new TemplateExceptionHandler() {
+			@Override
+			public void handleTemplateException(TemplateException ex, Environment env, Writer writer)
+					throws TemplateException {
+				log.error(ex.getMessage());
+			}
+		});
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 		ServletContextResourcePatternResolver servletContextResourcePatternResolver = new ServletContextResourcePatternResolver(
 				servletContext);
@@ -113,53 +101,45 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		String ftlClasspath = templateProvider.getFtlClasspath();
 		String ftlLocation = templateProvider.getFtlLocation();
 		try {
-			searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-					+ ftlClasspath + "/meta/import/*.ftl";
+			searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ftlClasspath + "/meta/import/*.ftl";
 			resources = resourcePatternResolver.getResources(searchPath);
 			for (Resource r : resources) {
 				location = r.getURL().toString();
 				namespace = location.substring(location.lastIndexOf('/') + 1);
 				namespace = namespace.substring(0, namespace.indexOf('.'));
-				configuration.addAutoImport(namespace,
-						location.substring(location.indexOf(ftlClasspath)));
+				configuration.addAutoImport(namespace, location.substring(location.indexOf(ftlClasspath)));
 			}
 		} catch (IOException e) {
 			log.debug(e.getMessage());
 		}
 		try {
 			searchPath = ftlLocation + "/meta/import/*.ftl";
-			resources = servletContextResourcePatternResolver
-					.getResources(searchPath);
+			resources = servletContextResourcePatternResolver.getResources(searchPath);
 			for (Resource r : resources) {
 				location = r.getURL().toString();
 				namespace = location.substring(location.lastIndexOf('/') + 1);
 				namespace = namespace.substring(0, namespace.indexOf('.'));
-				configuration.addAutoImport(namespace,
-						location.substring(location.indexOf(ftlLocation)));
+				configuration.addAutoImport(namespace, location.substring(location.indexOf(ftlLocation)));
 			}
 		} catch (IOException e) {
 			log.debug(e.getMessage());
 		}
 		try {
-			searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-					+ ftlClasspath + "/meta/include/*.ftl";
+			searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ftlClasspath + "/meta/include/*.ftl";
 			resources = resourcePatternResolver.getResources(searchPath);
 			for (Resource r : resources) {
 				location = r.getURL().toString();
-				configuration.addAutoInclude(location.substring(location
-						.indexOf(ftlClasspath)));
+				configuration.addAutoInclude(location.substring(location.indexOf(ftlClasspath)));
 			}
 		} catch (IOException e) {
 			log.debug(e.getMessage());
 		}
 		try {
 			searchPath = ftlLocation + "/meta/include/*.ftl";
-			resources = servletContextResourcePatternResolver
-					.getResources(searchPath);
+			resources = servletContextResourcePatternResolver.getResources(searchPath);
 			for (Resource r : resources) {
 				location = r.getURL().toString();
-				configuration.addAutoInclude(location.substring(location
-						.indexOf(ftlLocation)));
+				configuration.addAutoInclude(location.substring(location.indexOf(ftlLocation)));
 			}
 		} catch (IOException e) {
 			log.debug(e.getMessage());
@@ -168,11 +148,9 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	}
 
 	@Override
-	public ScopesHashModel buildTemplateModel(ValueStack stack, Object action,
-			ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response, ObjectWrapper wrapper) {
-		ScopesHashModel model = super.buildTemplateModel(stack, action,
-				servletContext, request, response, wrapper);
+	public ScopesHashModel buildTemplateModel(ValueStack stack, Object action, ServletContext servletContext,
+			HttpServletRequest request, HttpServletResponse response, ObjectWrapper wrapper) {
+		ScopesHashModel model = super.buildTemplateModel(stack, action, servletContext, request, response, wrapper);
 		if (StringUtils.isNotBlank(base))
 			model.put("base", base);
 		return model;

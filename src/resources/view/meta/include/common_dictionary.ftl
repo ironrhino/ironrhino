@@ -1,5 +1,5 @@
 <#macro selectDictionary dictionaryName name="" value="" required=false disabled=false headerKey="" headerValue="" strict=true dynamicAttributes...>
-	<#local dictionary=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getDictionary(dictionaryName)!>
+	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 	<#if dynamicAttributes['dynamicAttributes']??>
 		<#local dynamicAttributes=dynamicAttributes+dynamicAttributes['dynamicAttributes']/>
 	</#if>
@@ -48,7 +48,7 @@
 </#macro>
 
 <#function getDictionaryLabel dictionaryName value="">
-	<#return statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getDictionaryLabel(dictionaryName,value)>
+	<#return beans['dictionaryControl'].getDictionaryLabel(dictionaryName,value)>
 </#function>
 
 <#macro displayDictionaryLabel dictionaryName value="">
@@ -62,7 +62,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 	<#if dynamicAttributes['dynamicAttributes']??>
 		<#local dynamicAttributes=dynamicAttributes+dynamicAttributes['dynamicAttributes']/>
 	</#if>
-	<#local dictionary=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getDictionary(dictionaryName)!>
+	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 		<#local index = 0/>
 		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
 			<#local items = dictionary.items/>
@@ -119,7 +119,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
-	<#local dictionary=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getDictionary(dictionaryName)!>
+	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 		<#local index = 0/>
 		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
 			<#local items = dictionary.items/>

@@ -34,7 +34,7 @@
 	<li><a href="#${propertyName+'-'+value.name()}" data-toggle="tab">${value.displayName}</a></li>
 	</#list>
 	<#elseif selectDictionary??&&config.type=='dictionary'>
-	<#assign map=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getItemsAsMap(config.templateName!propertyName)>
+	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
 	<#list map.entrySet() as entry>
 	<li><a href="#${propertyName+'-'+entry.key}" data-toggle="tab">${entry.value}</a></li>
 	</#list>
@@ -50,7 +50,7 @@
 	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=${value.name()}"></div>
 	</#list>
 	<#elseif selectDictionary??&&config.type=='dictionary'>
-	<#assign map=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('dictionaryControl').getItemsAsMap(config.templateName!propertyName)>
+	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
 	<#list map.entrySet() as entry>
 	<div id="${propertyName+'-'+entry.key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=${entry.key?url}"></div>
 	</#list>

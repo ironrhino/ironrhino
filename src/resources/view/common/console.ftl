@@ -67,7 +67,7 @@ $(function(){
 </@s.form>
 <hr/>
 
-<#assign triggers = statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('applicationContextConsole').getTriggers()>
+<#assign triggers = beans['applicationContextConsole'].getTriggers()>
 <#if triggers?keys?size gt 0>
 <div id="trigger">
 	<ul class="thumbnails">
@@ -82,7 +82,7 @@ $(function(){
 </#if>
 
 <#if printSetting??>
-<#assign settings = statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('settingControl').getAllBooleanSettings()>
+<#assign settings = beans['settingControl'].getAllBooleanSettings()>
 <#if settings?size gt 0>
 <div id="switch">
 	<style scoped>

@@ -1,5 +1,5 @@
 <#macro includePage path abbr=0>
-<#local pageManager=statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('pageManager')>
+<#local pageManager=beans['pageManager']>
 <#if (Parameters.preview!)=='true' && (getSetting("cms.preview.open","false")=='true' || statics['org.ironrhino.core.util.AuthzUtils'].authorize("ROLE_ADMINISTRATOR","",""))>
 <#local page=pageManager.getDraftByPath(path)!>
 <#if !page.content?has_content>
