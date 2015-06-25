@@ -106,7 +106,7 @@
 						if (!this.id)
 							this.id = ('a' + (i + Math.random())).replace('.',
 									'').substring(0, 9);
-						var label = $(this).next('lable.custom');
+						var label = $(this).next('label.custom');
 						if (!label.length)
 							$(this).after($('<label class="custom" for="'
 									+ this.id + '"></label>'));
