@@ -302,7 +302,7 @@
 				exec.execute();
 				var gitlog = project.getProperty('gitlog');
 				if(gitlog&&gitlog.trim().length()>0){
-					var revision = gitlog.split('\n')[0].split('\\s+')[1];
+					var revision = gitlog.split('\n')[0].split(' ')[1];
 					if(revision.length() > 8)
 						revision = revision.substring(0,8);
 					project.setProperty('revision',revision);
@@ -384,7 +384,7 @@
 						exec.execute();
 						var gitlog = project.getProperty(name+'.gitlog');
 						if(gitlog&&gitlog.trim().length()>0){
-							revision = gitlog.split('\n')[0].split('\\s+')[1];
+							revision = gitlog.split('\n')[0].split(' ')[1];
 							if(revision.length() > 8)
 								revision = revision.substring(0,8);
 						}
