@@ -3,6 +3,7 @@ package org.ironrhino.core.session.impl;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.SessionCompressor;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 
 public class DefaultSessionCompressor implements SessionCompressor<Object> {
 
@@ -19,8 +20,7 @@ public class DefaultSessionCompressor implements SessionCompressor<Object> {
 			return null;
 		if (value instanceof String)
 			return (String) value;
-		return value.getClass().getName() + SEPERATOR + JsonUtils.toJson(value);
-
+		return ReflectionUtils.getActualClass(value).getName() + SEPERATOR + JsonUtils.toJson(value);
 	}
 
 	@Override

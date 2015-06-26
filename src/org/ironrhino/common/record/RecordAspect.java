@@ -13,6 +13,7 @@ import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,21 +41,18 @@ public class RecordAspect implements Ordered {
 	public void deleteBatch(List list) throws Throwable {
 		if (!AopContext.isBypass(this.getClass()) && list != null)
 			for (Object entity : list) {
-				RecordAware recordAware = entity.getClass().getAnnotation(
-						RecordAware.class);
+				RecordAware recordAware = entity.getClass().getAnnotation(RecordAware.class);
 				if (recordAware != null)
 					record((Persistable) entity, EntityOperationType.DELETE);
 			}
 	}
 
 	@Around("execution(* org.ironrhino.core.service.BaseManager.save(*)) and args(entity) and @args(recordAware)")
-	public Object save(ProceedingJoinPoint call, Persistable<?> entity,
-			RecordAware recordAware) throws Throwable {
+	public Object save(ProceedingJoinPoint call, Persistable<?> entity, RecordAware recordAware) throws Throwable {
 		boolean isNew = entity.isNew();
 		Object result = call.proceed();
 		if (!AopContext.isBypass(this.getClass()))
-			record(entity, isNew ? EntityOperationType.CREATE
-					: EntityOperationType.UPDATE);
+			record(entity, isNew ? EntityOperationType.CREATE : EntityOperationType.UPDATE);
 		return result;
 	}
 
@@ -75,7 +73,7 @@ public class RecordAspect implements Ordered {
 			}
 
 			record.setEntityId(String.valueOf(entity.getId()));
-			record.setEntityClass(entity.getClass().getName());
+			record.setEntityClass(ReflectionUtils.getActualClass(entity).getName());
 			record.setEntityToString(entity.toString());
 			record.setAction(action.name());
 			record.setRecordDate(new Date());

@@ -17,6 +17,7 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
+import javassist.util.proxy.ProxyObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -41,15 +42,13 @@ public class ReflectionUtils {
 			CtClass cc = classPool.get(clazz.getName());
 			List<CtClass> ctClasses = new ArrayList<CtClass>();
 			ctClasses.add(cc);
-			while (!(cc = cc.getSuperclass()).getName().equals(
-					Object.class.getName()))
+			while (!(cc = cc.getSuperclass()).getName().equals(Object.class.getName()))
 				ctClasses.add(0, cc);
 			List<String> fields = new ArrayList<String>();
 			for (CtClass ctc : ctClasses) {
 				for (CtField cf : ctc.getDeclaredFields()) {
 					int accessFlag = cf.getModifiers();
-					if (Modifier.isFinal(accessFlag)
-							|| Modifier.isStatic(accessFlag))
+					if (Modifier.isFinal(accessFlag) || Modifier.isStatic(accessFlag))
 						continue;
 					fields.add(cf.getName());
 				}
@@ -74,10 +73,16 @@ public class ReflectionUtils {
 			ParameterizedType pramType = (ParameterizedType) genType;
 			Type[] params = pramType.getActualTypeArguments();
 			if ((params != null) && (params.length > index))
-				return params[index] instanceof Class ? (Class<?>) params[index]
-						: null;
+				return params[index] instanceof Class ? (Class<?>) params[index] : null;
 		}
 		return null;
+	}
+
+	public static Class<?> getActualClass(Object object) {
+		Class<?> c = object.getClass();
+		if (object instanceof ProxyObject)
+			c = c.getSuperclass();
+		return c;
 	}
 
 	public static String[] getParameterNames(Constructor<?> ctor) {
@@ -89,8 +94,7 @@ public class ReflectionUtils {
 	}
 
 	private static String[] getParameterNames(Method method, Constructor<?> ctor) {
-		Annotation[][] annotations = method != null ? method
-				.getParameterAnnotations() : ctor.getParameterAnnotations();
+		Annotation[][] annotations = method != null ? method.getParameterAnnotations() : ctor.getParameterAnnotations();
 		String[] names = new String[annotations.length];
 		boolean allbind = true;
 		loop: for (int i = 0; i < annotations.length; i++) {
@@ -107,9 +111,8 @@ public class ReflectionUtils {
 			allbind = false;
 		}
 		if (!allbind) {
-			String[] namesDiscovered = method != null ? parameterNameDiscoverer
-					.getParameterNames(method) : parameterNameDiscoverer
-					.getParameterNames(ctor);
+			String[] namesDiscovered = method != null ? parameterNameDiscoverer.getParameterNames(method)
+					: parameterNameDiscoverer.getParameterNames(ctor);
 			if (namesDiscovered == null)
 				return null;
 			for (int i = 0; i < names.length; i++)
@@ -126,8 +129,7 @@ public class ReflectionUtils {
 		MethodSignature sig = (MethodSignature) jp.getSignature();
 		Method method;
 		try {
-			method = clz.getDeclaredMethod(sig.getName(),
-					sig.getParameterTypes());
+			method = clz.getDeclaredMethod(sig.getName(), sig.getParameterTypes());
 			if (method.isBridge())
 				method = BridgeMethodResolver.findBridgedMethod(method);
 			return getParameterNames(method);
@@ -160,8 +162,7 @@ public class ReflectionUtils {
 	public static Object getTargetObject(Object proxy) {
 		while (proxy instanceof Advised) {
 			try {
-				return getTargetObject(((Advised) proxy).getTargetSource()
-						.getTarget());
+				return getTargetObject(((Advised) proxy).getTargetSource().getTarget());
 			} catch (Exception e) {
 				e.printStackTrace();
 				return proxy;
@@ -170,13 +171,10 @@ public class ReflectionUtils {
 		return proxy;
 	}
 
-	public static void processCallback(Object obj,
-			Class<? extends Annotation> callbackAnnotation) {
-		Set<Method> methods = AnnotationUtils.getAnnotatedMethods(
-				obj.getClass(), callbackAnnotation);
+	public static void processCallback(Object obj, Class<? extends Annotation> callbackAnnotation) {
+		Set<Method> methods = AnnotationUtils.getAnnotatedMethods(obj.getClass(), callbackAnnotation);
 		for (Method m : methods) {
-			if (m.getParameterTypes().length == 0
-					&& m.getReturnType() == void.class
+			if (m.getParameterTypes().length == 0 && m.getReturnType() == void.class
 					&& Modifier.isPublic(m.getModifiers()))
 				try {
 					m.invoke(obj, new Object[0]);
@@ -190,8 +188,7 @@ public class ReflectionUtils {
 						if (cause instanceof RuntimeException)
 							throw (RuntimeException) cause;
 						else
-							throw new RuntimeException(cause.getMessage(),
-									cause);
+							throw new RuntimeException(cause.getMessage(), cause);
 					} else
 						throw new RuntimeException(e.getMessage(), e);
 				}
