@@ -9,7 +9,7 @@
 </@authorize>
 <#if !notlogin>
 <meta name="decorator" content="simple" />
-<meta http-equiv="refresh" content="0; url=<@url value="/"/>" />
+<meta http-equiv="refresh" content="0; url=<@url value=targetUrl!'/'/>" />
 </#if>
 </head>
 <body>
