@@ -15,28 +15,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
-public class DefaultAuthenticationSuccessHandler implements
-		AuthenticationSuccessHandler {
+public class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
 	public final static String COOKIE_NAME_LOGIN_USER = "U";
 
 	@Value("${authenticationSuccessHandler.usernameInCookie:true}")
 	private boolean usernameInCookie;
 
-	@Value("${globalCookie:false}")
-	private boolean globalCookie;
-
 	@Value("${authenticationSuccessHandler.usernameInCookieMaxAge:31536000}")
 	private int usernameInCookieMaxAge;
 
 	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request,
-			HttpServletResponse response, Authentication authentication)
-			throws ServletException, IOException {
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication) throws ServletException, IOException {
 		if (usernameInCookie && request.isRequestedSessionIdFromCookie()) {
-			RequestUtils.saveCookie(request, response, COOKIE_NAME_LOGIN_USER,
-					authentication.getName(), usernameInCookieMaxAge,
-					globalCookie, false);
+			RequestUtils.saveCookie(request, response, COOKIE_NAME_LOGIN_USER, authentication.getName(),
+					usernameInCookieMaxAge, false, false);
 		}
 	}
 
