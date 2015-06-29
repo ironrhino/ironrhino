@@ -11,7 +11,7 @@
   </#if>
   <#assign divider=true/>
   </#if>
-  <#if !request.getAttribute("javax.servlet.request.X509Certificate")??>
+  <#if !request.getAttribute("javax.servlet.request.X509Certificate")?? && beans['logoutSuccessHandler']??>
   <#if divider>
   <li class="divider"></li>
   </#if>
