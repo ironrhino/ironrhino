@@ -123,7 +123,11 @@ $(function() {
 	<@s.textfield label="%{getText('title')}" name="page.title" style="width:600px;"/>
 	</div>
 	<div id="_page_content" class="tab-pane">
-	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:800px;height:260px;"/>
+	<#assign dynamicAttributes={}>
+	<@classPresentConditional value="org.ironrhino.common.action.UploadAction">
+	<#assign dynamicAttributes={'data-uploadurl':'/common/upload'}>
+	</@classPresentConditional>
+	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:800px;height:260px;" dynamicAttributes=dynamicAttributes/>
 	</div>
 	<div id="_page_head" class="tab-pane">
 	<@s.textarea theme="simple" id="page_head" name="page.head" style="width:800px;height:300px;"/>

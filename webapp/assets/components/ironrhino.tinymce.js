@@ -1,12 +1,15 @@
 $(function() {
 	$(document).on('click', '.mce-i-image', function() {
-				setTimeout(function() {
-							var interval = setInterval(function() {
-										if (appendIcon())
-											clearInterval(interval);
-									}, 100);
-						}, 200);
-			}).on('click', '.mce-combobox button', function() {
+		var uploadurl = $('#' + tinymce.EditorManager.activeEditor.id)
+				.data('uploadurl');
+		if (uploadurl)
+			setTimeout(function() {
+						var interval = setInterval(function() {
+									if (appendIcon())
+										clearInterval(interval);
+								}, 100);
+					}, 200);
+	}).on('click', '.mce-combobox button', function() {
 		if (!$('#mce-browse-modal').length) {
 			var modal = $('<div id="mce-browse-modal" class="modal" style="z-index:65537;height:500px;"><input id="mce-browse-folder" type="hidden"/><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div id="mce-browse-modal-body" class="modal-body" style="height:400px;"></div><div  id="mce-browse-modal-footer" class="modal-footer"></div></div>')
 					.appendTo(document.body);
@@ -55,8 +58,7 @@ $(function() {
 		if (confirm(MessageBundle.get('confirm.delete'))) {
 			$.post(	CONTEXT_PATH
 							+ ($('#' + tinymce.EditorManager.activeEditor.id)
-									.data('uploadurl') || '/common/upload')
-							+ '/delete', {
+									.data('uploadurl')) + '/delete', {
 						folder : $('#mce-browse-folder').val(),
 						id : id
 					}, browse);
@@ -81,12 +83,10 @@ function appendIcon() {
 function browse() {
 	var folder = $('#mce-browse-folder').val() || '/';
 	var panel = $('#mce-browse-modal-body');
-	$.getJSON(
-			CONTEXT_PATH
-					+ ($('#' + tinymce.EditorManager.activeEditor.id)
-							.data('uploadurl') || '/common/upload')
-					+ '/files?folder=' + folder + '&suffix=jpg,gif,png,bmp',
-			function(data) {
+	$.getJSON(CONTEXT_PATH
+					+ $('#' + tinymce.EditorManager.activeEditor.id)
+							.data('uploadurl') + '/files?folder=' + folder
+					+ '&suffix=jpg,gif,png,bmp', function(data) {
 				var html = '';
 				$.each(data, function(key, val) {
 
@@ -146,9 +146,8 @@ function upload(files) {
 	var folder = $('#mce-browse-folder').val() || '/';
 	$.ajaxupload(files, {
 				url : CONTEXT_PATH
-						+ ($('#' + tinymce.EditorManager.activeEditor.id)
-								.data('uploadurl') || '/common/upload')
-						+ '?folder=' + folder,
+						+ $('#' + tinymce.EditorManager.activeEditor.id)
+								.data('uploadurl') + '?folder=' + folder,
 				onsuccess : browse
 			});
 }
