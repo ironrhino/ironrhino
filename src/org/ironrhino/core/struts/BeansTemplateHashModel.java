@@ -14,7 +14,7 @@ public class BeansTemplateHashModel implements TemplateHashModel {
 	public TemplateModel get(String name) throws TemplateModelException {
 		Object bean = ApplicationContextUtils.getBean(name);
 		if (bean == null)
-			throw new TemplateModelException("No such bean: " + name);
+			return null;
 		BeansWrapper wrapper = new BeansWrapper(Configuration.VERSION_2_3_22);
 		return wrapper.wrap(bean);
 	}
