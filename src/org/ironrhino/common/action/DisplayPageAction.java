@@ -1,7 +1,5 @@
 package org.ironrhino.common.action;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.common.model.Page;
@@ -47,8 +45,7 @@ public class DisplayPageAction extends BaseAction {
 	public String execute() {
 		if (preview) {
 			if (settingControl.getBooleanValue("cms.preview.open", false)
-					|| AuthzUtils.getRoleNames().contains(
-							UserRole.ROLE_ADMINISTRATOR)) {
+					|| AuthzUtils.getRoleNames().contains(UserRole.ROLE_ADMINISTRATOR)) {
 				page = pageManager.getDraftByPath(getUid());
 				if (StringUtils.isBlank(page.getContent())) {
 					preview = false;
@@ -61,12 +58,8 @@ public class DisplayPageAction extends BaseAction {
 		if (page == null)
 			page = pageManager.getByPath(getUid());
 		if (page == null) {
-			try {
-				ServletActionContext.getResponse().sendError(404);
-				return NONE;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			ServletActionContext.getResponse().setStatus(404);
+			return NOTFOUND;
 		}
 		return "page";
 	}
