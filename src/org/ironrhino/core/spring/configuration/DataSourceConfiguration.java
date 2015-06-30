@@ -24,8 +24,11 @@ import com.jolbox.bonecp.hooks.AbstractConnectionHook;
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class DataSourceConfiguration {
 
-	@Value("${jdbc.driverClassName:}")
+	@Value("${jdbc.driverClass:}")
 	private String driverClass;
+
+	@Value("${jdbc.driverClassName:}")
+	private String driverClassName;
 
 	@Value("${jdbc.url:jdbc:mysql:///${app.name}?createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&tinyInt1isBit=false}")
 	private String jdbcUrl;
@@ -71,6 +74,8 @@ public class DataSourceConfiguration {
 	public DataSource dataSource() {
 		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
 		BoneCPDataSource ds = new BoneCPDataSource();
+		if (StringUtils.isBlank(driverClass) && StringUtils.isNotBlank(driverClassName))
+			driverClass = driverClassName;
 		if (StringUtils.isNotBlank(driverClass))
 			ds.setDriverClass(driverClass);
 		else if (databaseProduct != null)
