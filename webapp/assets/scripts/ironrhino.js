@@ -36741,7 +36741,10 @@ Observation.datagridTable = function(container) {
 								.insertBefore($('.portlet-header .btn-fold',
 										this));
 						$('iframe', $(this))
-								.css('border', 0)
+								.css({
+											'border' : 0,
+											'width' : '100%'
+										})
 								.attr('onload',
 										'this.height = this.contentDocument.body.offsetHeight+10');
 					}
@@ -36769,21 +36772,45 @@ Observation.datagridTable = function(container) {
 							.toggleClass('glyphicon-chevron-down');
 					$(this).closest('.portlet').find('.portlet-content')
 							.toggle();
+					var p = $(this).closest('.portlet');
+					var id = p.attr('id');
+					if (savable && window.localStorage && id) {
+						var folded = localStorage[document.location.pathname
+								+ '_portal-folded'];
+						var folded = folded ? folded.split(',') : [];
+						var isfold = $('i', this)
+								.hasClass('glyphicon-chevron-down');
+						if (isfold) {
+							if ($.inArray(id, folded) < 0)
+								folded.push(id);
+						} else {
+							folded.splice($.inArray(id, folded), 1);
+						}
+						if (folded.length)
+							localStorage[document.location.pathname
+									+ '_portal-folded'] = folded.join(',');
+						else
+							delete localStorage[document.location.pathname
+									+ '_portal-folded']
+					}
+					addRestoreButton(portal);
 				}).on('click', '.portlet-header .btn-refresh', function() {
-					var portlet = $(this).closest('.portlet');
-					$('.ajaxpanel', portlet).trigger('load');
-					$('iframe', portlet).each(function(i, v) {
-								var mask = typeof $.fn.mask != 'undefined';
-								if (mask)
-									portlet.mask(MessageBundle
-											.get('ajax.loading'));
-								v.onload = function() {
-									if (mask)
-										portlet.unmask();
-								};
-								v.contentWindow.location.reload();
-							});
-				}).on('click', '.portal-footer .restore', function() {
+							var portlet = $(this).closest('.portlet');
+							$('.ajaxpanel', portlet).trigger('load');
+							$('iframe', portlet).each(function(i, v) {
+										var mask = typeof $.fn.mask != 'undefined';
+										var pc = portlet
+												.find('.portlet-content');
+										if (mask)
+											pc.mask(MessageBundle
+													.get('ajax.loading'));
+										v.onload = function() {
+											if (mask)
+												pc.unmask();
+										};
+										v.contentWindow.location.reload();
+									});
+						}).on('click', '.portal-footer .restore', function() {
 							$(this).closest('.portal').portal('layout',
 									'restore');
 						});
@@ -36792,8 +36819,11 @@ Observation.datagridTable = function(container) {
 							+ '_portal-layout'];
 					var hidden = localStorage[document.location.pathname
 							+ '_portal-hidden'];
-					if (layout || hidden) {
-						$(this).portal('layout', 'render', layout, hidden);
+					var folded = localStorage[document.location.pathname
+							+ '_portal-folded'];
+					if (layout || hidden || folded) {
+						$(this).portal('layout', 'render', layout, hidden,
+								folded);
 						if (savable)
 							addRestoreButton(portal);
 					}
@@ -36827,11 +36857,15 @@ Observation.datagridTable = function(container) {
 							+ '_portal-layout'];
 					delete localStorage[document.location.pathname
 							+ '_portal-hidden'];
+					delete localStorage[document.location.pathname
+							+ '_portal-folded'];
 					document.location.reload();
 				} else if (arguments[1] == 'render') {
 					var layout = $.parseJSON(arguments[2] || '[]');
 					var hidden = arguments[3];
 					hidden = hidden ? hidden.split(',') : [];
+					var folded = arguments[4];
+					folded = folded ? folded.split(',') : [];
 					$('.portlet', this).each(function() {
 								var t = $(this);
 								var id = t.attr('id');
@@ -36848,6 +36882,12 @@ Observation.datagridTable = function(container) {
 									}
 								});
 					}
+					$('.portlet', this).each(function() {
+								var t = $(this);
+								var id = t.attr('id');
+								if (id && $.inArray(id, folded) > -1)
+									t.find('.glyphicon-chevron-up').click();
+							});
 				}
 				return this;
 			}
