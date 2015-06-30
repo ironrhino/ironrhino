@@ -38567,7 +38567,7 @@ Observation.groupable = function(container) {
 	var c = $(container);
 	var selector = '.groupable';
 	c.is(selector) ? c.groupable() : $(selector, c).groupable();
-	selector = 'form[data-columns]';
+	selector = '[data-columns]';
 	c.is(selector) ? c.groupColumns() : $(selector, c).groupColumns();
 };
 (function($) {
