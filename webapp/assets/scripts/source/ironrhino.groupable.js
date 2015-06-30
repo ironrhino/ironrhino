@@ -80,7 +80,7 @@
 				});
 		// textarea.table newline
 		container
-				.find(' .controls textarea,.controls table,.controls .input-xxlarge')
+				.find('.controls textarea,.controls table,.controls .input-xxlarge,.controls .newline')
 				.each(function(i, v) {
 					var sdiv = $(v).closest('.control-group')
 							.parent('.' + span);
@@ -88,7 +88,12 @@
 						return;
 					var rdiv = $(sdiv).parent('.row');
 					sdiv.removeClass(span).addClass('span12');
-					sdiv.wrap('<div class="row"/>').parent().insertAfter(rdiv);
+					if (sdiv.is(':first-child'))
+						sdiv.wrap('<div class="row"/>').parent()
+								.insertBefore(rdiv);
+					else
+						sdiv.wrap('<div class="row"/>').parent()
+								.insertAfter(rdiv);
 				});
 
 	}
