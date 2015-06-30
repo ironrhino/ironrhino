@@ -1,7 +1,8 @@
 .portal-column { 
 	float: left;
 	}
-ul.portal-column { 
+.portal-column { 
+	min-height: 50px;
 	margin-left: 0;
 	list-style: none;
 	}
