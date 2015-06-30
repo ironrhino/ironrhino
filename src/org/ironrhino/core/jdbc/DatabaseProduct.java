@@ -18,7 +18,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "com.mysql.jdbc.Driver";
 		}
 
@@ -30,7 +30,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "org.postgresql.Driver";
 		}
 	},
@@ -41,7 +41,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "oracle.jdbc.OracleDriver";
 		}
 
@@ -68,7 +68,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "com.ibm.db2.jcc.DB2Driver";
 		}
 
@@ -101,7 +101,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "com.informix.jdbc.IfxDriver";
 		}
 
@@ -134,7 +134,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 		}
 
@@ -164,7 +164,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "com.sybase.jdbc4.jdbc.SybDriver";
 		}
 
@@ -195,7 +195,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "org.h2.Driver";
 		}
 
@@ -223,7 +223,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "org.hsqldb.jdbc.JDBCDriver";
 		}
 
@@ -261,7 +261,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getDefaultDriverClassName() {
+		public String getDefaultDriverClass() {
 			return "org.apache.derby.jdbc.ClientDriver";
 		}
 
@@ -323,7 +323,7 @@ public enum DatabaseProduct {
 
 	public abstract int getDefaultPort();
 
-	public abstract String getDefaultDriverClassName();
+	public abstract String getDefaultDriverClass();
 
 	public List<String> getKeywords() {
 		try (InputStream is = getClass().getResourceAsStream("keywords.txt")) {

@@ -69,9 +69,12 @@ public class DataSourceConfiguration {
 	@Bean(destroyMethod = "close")
 	@Primary
 	public DataSource dataSource() {
+		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
 		BoneCPDataSource ds = new BoneCPDataSource();
 		if (StringUtils.isNotBlank(driverClass))
 			ds.setDriverClass(driverClass);
+		else if (databaseProduct != null)
+			ds.setDriverClass(databaseProduct.getDefaultDriverClass());
 		ds.setJdbcUrl(jdbcUrl);
 		ds.setUsername(username);
 		ds.setPassword(password);
@@ -85,9 +88,7 @@ public class DataSourceConfiguration {
 		ds.setDisableConnectionTracking(disableConnectionTracking);
 		ds.setQueryExecuteTimeLimitInMs(queryExecuteTimeLimitInMs);
 		ds.setConnectionHook(new MyConnectionHook());
-		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
-		if (StringUtils.isBlank(connectionTestStatement)
-				&& databaseProduct != null)
+		if (StringUtils.isBlank(connectionTestStatement) && databaseProduct != null)
 			connectionTestStatement = databaseProduct.getValidationQuery();
 		ds.setConnectionTestStatement(connectionTestStatement);
 		return ds;
@@ -104,16 +105,14 @@ public class DataSourceConfiguration {
 		private Logger logger = LoggerFactory.getLogger("access-warn");
 
 		@Override
-		public void onQueryExecuteTimeLimitExceeded(ConnectionHandle handle,
-				Statement statement, String sql, Map<Object, Object> logParams,
-				long timeElapsedInNs) {
+		public void onQueryExecuteTimeLimitExceeded(ConnectionHandle handle, Statement statement, String sql,
+				Map<Object, Object> logParams, long timeElapsedInNs) {
 			boolean withParams = logParams != null && logParams.size() > 0;
 			StringBuilder sb = new StringBuilder(40);
 			sb.append(" executed /**/ {} /**/ in {} ms");
 			if (withParams)
 				sb.append(" with {}");
-			logger.warn(sb.toString(), sql,
-					TimeUnit.NANOSECONDS.toMillis(timeElapsedInNs), logParams);
+			logger.warn(sb.toString(), sql, TimeUnit.NANOSECONDS.toMillis(timeElapsedInNs), logParams);
 		}
 	}
 
