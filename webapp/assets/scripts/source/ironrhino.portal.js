@@ -36,10 +36,6 @@
 								.insertBefore($('.portlet-header .btn-fold',
 										this));
 						$('iframe', $(this))
-								.css({
-											'border' : 0,
-											'width' : '100%'
-										})
 								.attr('onload',
 										'this.height = this.contentDocument.body.offsetHeight+10');
 					}
