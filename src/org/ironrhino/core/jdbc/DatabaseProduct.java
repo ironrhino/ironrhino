@@ -17,6 +17,11 @@ public enum DatabaseProduct {
 			return 3306;
 		}
 
+		@Override
+		public String getDefaultDriverClassName() {
+			return "com.mysql.jdbc.Driver";
+		}
+
 	},
 	POSTGRESQL {
 		@Override
@@ -24,6 +29,10 @@ public enum DatabaseProduct {
 			return 5432;
 		}
 
+		@Override
+		public String getDefaultDriverClassName() {
+			return "org.postgresql.Driver";
+		}
 	},
 	ORACLE {
 		@Override
@@ -32,8 +41,12 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getJdbcUrl(String host, int port, String databaseName,
-				String params) {
+		public String getDefaultDriverClassName() {
+			return "oracle.jdbc.OracleDriver";
+		}
+
+		@Override
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 			sb.append(":thin:@//");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
@@ -55,8 +68,12 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getJdbcUrl(String host, int port, String databaseName,
-				String params) {
+		public String getDefaultDriverClassName() {
+			return "com.ibm.db2.jcc.DB2Driver";
+		}
+
+		@Override
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 			sb.append("://");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
@@ -84,8 +101,12 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getJdbcUrl(String host, int port, String databaseName,
-				String params) {
+		public String getDefaultDriverClassName() {
+			return "com.informix.jdbc.IfxDriver";
+		}
+
+		@Override
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 			sb.append("-sqli://");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
@@ -113,8 +134,12 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getJdbcUrl(String host, int port, String databaseName,
-				String params) {
+		public String getDefaultDriverClassName() {
+			return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+		}
+
+		@Override
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 			sb.append("://");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
@@ -139,13 +164,17 @@ public enum DatabaseProduct {
 		}
 
 		@Override
+		public String getDefaultDriverClassName() {
+			return "com.sybase.jdbc4.jdbc.SybDriver";
+		}
+
+		@Override
 		public String getJdbcUrlPrefix() {
 			return "jdbc:sybase:Tds";
 		}
 
 		@Override
-		public String getJdbcUrl(String host, int port, String databaseName,
-				String params) {
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 			sb.append(":");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
@@ -166,8 +195,12 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getJdbcUrl(String host, int port, String databaseName,
-				String params) {
+		public String getDefaultDriverClassName() {
+			return "org.h2.Driver";
+		}
+
+		@Override
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 			sb.append(":tcp://");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
@@ -190,13 +223,17 @@ public enum DatabaseProduct {
 		}
 
 		@Override
+		public String getDefaultDriverClassName() {
+			return "org.hsqldb.jdbc.JDBCDriver";
+		}
+
+		@Override
 		public String getJdbcUrlPrefix() {
 			return "jdbc:hsqldb";
 		}
 
 		@Override
-		public String getJdbcUrl(String host, int port, String databaseName,
-				String params) {
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 			sb.append(":hsql://");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
@@ -224,8 +261,12 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getJdbcUrl(String host, int port, String databaseName,
-				String params) {
+		public String getDefaultDriverClassName() {
+			return "org.apache.derby.jdbc.ClientDriver";
+		}
+
+		@Override
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 			sb.append("://");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
@@ -267,8 +308,7 @@ public enum DatabaseProduct {
 				return INFORMIX;
 			else if (nameOrUrl.toLowerCase().contains("microsoft"))
 				return SQLSERVER;
-			else if (nameOrUrl.toLowerCase().contains("sql server")
-					|| nameOrUrl.equals("Adaptive Server Enterprise")
+			else if (nameOrUrl.toLowerCase().contains("sql server") || nameOrUrl.equals("Adaptive Server Enterprise")
 					|| nameOrUrl.equals("ASE"))
 				return SYBASE;
 			else if (nameOrUrl.toLowerCase().equals("h2"))
@@ -282,6 +322,8 @@ public enum DatabaseProduct {
 	}
 
 	public abstract int getDefaultPort();
+
+	public abstract String getDefaultDriverClassName();
 
 	public List<String> getKeywords() {
 		try (InputStream is = getClass().getResourceAsStream("keywords.txt")) {
@@ -306,8 +348,7 @@ public enum DatabaseProduct {
 		return "jdbc:" + name().toLowerCase();
 	}
 
-	public String getJdbcUrl(String host, int port, String databaseName,
-			String params) {
+	public String getJdbcUrl(String host, int port, String databaseName, String params) {
 		StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
 		sb.append("://");
 		sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
