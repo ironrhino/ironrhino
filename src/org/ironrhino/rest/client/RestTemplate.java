@@ -20,11 +20,11 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private Client client;
+	private RestClient client;
 
 	private int maxAttempts = 2;
 
-	public RestTemplate(Client client) {
+	public RestTemplate(RestClient client) {
 		super();
 		this.client = client;
 		setRequestFactory(new HttpComponentsClientHttpRequestFactory(client));

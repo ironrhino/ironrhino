@@ -21,13 +21,13 @@ public class HttpComponentsClientHttpRequestFactory extends
 
 	public static final int DEFAULT_READTIMEOUT = 5000;
 
-	private Client client;
+	private RestClient client;
 
 	private int connectTimeout = DEFAULT_CONNECTTIMEOUT;
 
 	private int readTimeout = DEFAULT_READTIMEOUT;
 
-	public HttpComponentsClientHttpRequestFactory(Client client) {
+	public HttpComponentsClientHttpRequestFactory(RestClient client) {
 		HttpClient httpClient = HttpClients.custom().disableAuthCaching()
 				.disableConnectionState().disableCookieManagement()
 				.setMaxConnPerRoute(1000).setMaxConnTotal(1000)

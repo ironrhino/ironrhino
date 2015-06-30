@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-public class Client {
+public class RestClient {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -29,11 +29,11 @@ public class Client {
 
 	protected TokenStore tokenStore = new DefaultTokenStore();
 
-	public Client() {
+	public RestClient() {
 
 	}
 
-	public Client(String accessTokenEndpoint, String clientId,
+	public RestClient(String accessTokenEndpoint, String clientId,
 			String clientSecret) {
 		this.accessTokenEndpoint = accessTokenEndpoint;
 		this.clientId = clientId;

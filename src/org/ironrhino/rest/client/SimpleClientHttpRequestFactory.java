@@ -16,13 +16,13 @@ public class SimpleClientHttpRequestFactory extends
 
 	public static final int DEFAULT_READTIMEOUT = 5000;
 
-	private Client client;
+	private RestClient client;
 
 	private int connectTimeout = DEFAULT_CONNECTTIMEOUT;
 
 	private int readTimeout = DEFAULT_READTIMEOUT;
 
-	public SimpleClientHttpRequestFactory(Client client) {
+	public SimpleClientHttpRequestFactory(RestClient client) {
 		this.client = client;
 		super.setConnectTimeout(connectTimeout);
 		super.setReadTimeout(readTimeout);
