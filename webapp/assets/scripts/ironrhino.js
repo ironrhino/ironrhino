@@ -36736,10 +36736,14 @@ Observation.datagridTable = function(container) {
 					var header = $('.portlet-header', this);
 					header
 							.append('<div class="portlet-icon"><a class="btn btn-fold"><i class="glyphicon glyphicon-chevron-up"></i></a><a class="btn btn-close"><i class="glyphicon glyphicon-remove"></i></a></div>');
-					if ($('.ajaxpanel', $(this)).length) {
-						$(		'<a class="btn btn-refresh"><i class="glyphicon glyphicon-refresh"></i></a>')
+					if ($('.ajaxpanel,iframe', $(this)).length) {
+						$('<a class="btn btn-refresh"><i class="glyphicon glyphicon-refresh"></i></a>')
 								.insertBefore($('.portlet-header .btn-fold',
-												this));
+										this));
+						$('iframe', $(this))
+								.css('border', 0)
+								.attr('onload',
+										'this.height = this.contentDocument.body.offsetHeight+10');
 					}
 				});
 				portal.on('click', '.portlet-header .btn-close', function() {
@@ -36766,8 +36770,19 @@ Observation.datagridTable = function(container) {
 					$(this).closest('.portlet').find('.portlet-content')
 							.toggle();
 				}).on('click', '.portlet-header .btn-refresh', function() {
-					$('.ajaxpanel', $(this).closest('.portlet'))
-							.trigger('load');
+					var portlet = $(this).closest('.portlet');
+					$('.ajaxpanel', portlet).trigger('load');
+					$('iframe', portlet).each(function(i, v) {
+								var mask = typeof $.fn.mask != 'undefined';
+								if (mask)
+									portlet.mask(MessageBundle
+											.get('ajax.loading'));
+								v.onload = function() {
+									if (mask)
+										portlet.unmask();
+								};
+								v.contentWindow.location.reload();
+							});
 				}).on('click', '.portal-footer .restore', function() {
 							$(this).closest('.portal').portal('layout',
 									'restore');
@@ -36844,8 +36859,8 @@ Observation.datagridTable = function(container) {
 			var footer = portal.find('.portal-footer');
 			if (!footer.length)
 				footer = $('<div class="portal-footer"><button class="btn restore">'
-								+ MessageBundle.get('restore')
-								+ '</button></div>').appendTo(portal);
+						+ MessageBundle.get('restore') + '</button></div>')
+						.appendTo(portal);
 			if (!footer.find('.restore').length)
 				footer.append('<button class="btn restore">'
 						+ MessageBundle.get('restore') + '</button> ');
