@@ -11,17 +11,17 @@ import org.ironrhino.core.model.ResultPage;
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Richtable {
-	
+
 	String alias() default "";
 
 	String formid() default "";
 
 	String order() default "";
-	
+
 	boolean paginating() default true;
 
 	int defaultPageSize() default ResultPage.DEFAULT_PAGE_SIZE;
-	
+
 	boolean fixPageSize() default false;
 
 	boolean showPageSize() default true;
@@ -56,10 +56,12 @@ public @interface Richtable {
 
 	String rowDynamicAttributes() default "";
 
-	Readonly readonly() default @Readonly;
-	
+	Readonly readonly() default @Readonly ;
+
 	String inputWindowOptions() default "";
-	
+
 	String viewWindowOptions() default "";
+
+	int inputGridColumns() default 0;
 
 }

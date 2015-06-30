@@ -8,6 +8,9 @@
 <#if attachmentable>
 <#assign formDynamicAttributes=formDynamicAttributes+{'data-attachments':entity.attachmentsAsString!}/>
 </#if>
+<#if richtableConfig.inputGridColumns gt 0>
+<#assign formDynamicAttributes=formDynamicAttributes+{'data-columns':richtableConfig.inputGridColumns}/>
+</#if>
 <@s.form id="${entityName}_input" action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${richtableConfig.importable?string(' importable','')}${attachmentable?string(' attachmentable','')} groupable" dynamicAttributes=formDynamicAttributes>
 	<#if !isnew>
 	<#if !idAssigned>

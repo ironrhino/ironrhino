@@ -8166,11 +8166,23 @@ div.text-core{
 .form-horizontal .controls {
 	margin-left: 120px;
 }
-.form-horizontal .span3 .control-label,.form-horizontal .span2 .control-label,.form-horizontal .span1 .control-label{
+.form-horizontal .span2 .control-label,.form-horizontal .span1 .control-label{
 	width: 60px;
 }
-.form-horizontal .span3 .controls,.form-horizontal .span2 .controls,.form-horizontal .span1 .controls {
+.form-horizontal .span2 .controls,.form-horizontal .span1 .controls {
 	margin-left: 80px;
+}
+.form-horizontal .span3 .control-label{
+	width: 80px;
+}
+.form-horizontal .span3 .controls {
+	margin-left: 90px;
+}
+.form-horizontal .span3 .controls input,.form-horizontal .span3 .controls .uneditable-input{
+	width: 180px;
+}
+.form-horizontal .span3 .controls select{
+	width: 194px;
 }
 .form-horizontal .span6 .control-label{
 	width: 180px;

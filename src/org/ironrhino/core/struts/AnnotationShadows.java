@@ -43,8 +43,7 @@ public class AnnotationShadows {
 		private String inputTemplate = "";
 		private String csvTemplate = "";
 		private String width;
-		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<String, String>(
-				0);
+		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<String, String>(0);
 		private String cellDynamicAttributes = "";
 		private boolean excludeIfNotEdited;
 		private String listKey = UiConfig.DEFAULT_LIST_KEY;
@@ -66,8 +65,7 @@ public class AnnotationShadows {
 		public UiConfigImpl() {
 		}
 
-		public UiConfigImpl(String propertyName, Class<?> propertyType,
-				UiConfig config) {
+		public UiConfigImpl(String propertyName, Class<?> propertyType, UiConfig config) {
 			this.propertyType = propertyType;
 			if (config == null)
 				return;
@@ -98,9 +96,7 @@ public class AnnotationShadows {
 			this.width = config.width();
 			if (StringUtils.isNotBlank(config.dynamicAttributes()))
 				try {
-					this.dynamicAttributes = JsonUtils.fromJson(
-							config.dynamicAttributes(),
-							JsonUtils.STRING_MAP_TYPE);
+					this.dynamicAttributes = JsonUtils.fromJson(config.dynamicAttributes(), JsonUtils.STRING_MAP_TYPE);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -108,8 +104,7 @@ public class AnnotationShadows {
 			this.cellEdit = config.cellEdit();
 			this.excludeIfNotEdited = config.excludeIfNotEdited();
 			if (StringUtils.isNotBlank(config.cssClass()))
-				this.cssClasses.addAll(Arrays.asList(config.cssClass().split(
-						"\\s")));
+				this.cssClasses.addAll(Arrays.asList(config.cssClass().split("\\s")));
 			this.thCssClass = config.thCssClass();
 			this.optionsExpression = config.optionsExpression();
 			this.pickUrl = config.pickUrl();
@@ -454,8 +449,7 @@ public class AnnotationShadows {
 			return nestSearchableProperties;
 		}
 
-		public void setNestSearchableProperties(
-				Set<String> nestSearchableProperties) {
+		public void setNestSearchableProperties(Set<String> nestSearchableProperties) {
 			this.nestSearchableProperties = nestSearchableProperties;
 		}
 
@@ -471,8 +465,7 @@ public class AnnotationShadows {
 			return embeddedUiConfigs;
 		}
 
-		public void setEmbeddedUiConfigs(
-				Map<String, UiConfigImpl> embeddedUiConfigs) {
+		public void setEmbeddedUiConfigs(Map<String, UiConfigImpl> embeddedUiConfigs) {
 			this.embeddedUiConfigs = embeddedUiConfigs;
 		}
 
@@ -544,8 +537,7 @@ public class AnnotationShadows {
 				if (StringUtils.isBlank(this.expression))
 					this.expression = "!(value?? && value?string?has_content)";
 				else
-					this.expression = "!(value?? && value?string?has_content) || "
-							+ this.expression;
+					this.expression = "!(value?? && value?string?has_content) || " + this.expression;
 		}
 
 		public boolean isValue() {
@@ -593,6 +585,7 @@ public class AnnotationShadows {
 		private String rowDynamicAttributes = "";
 		private String inputWindowOptions = "";
 		private String viewWindowOptions = "";
+		private int inputGridColumns = 0;
 
 		public RichtableImpl() {
 		}
@@ -619,6 +612,8 @@ public class AnnotationShadows {
 			this.formFooter = config.formFooter();
 			this.inputWindowOptions = config.inputWindowOptions();
 			this.viewWindowOptions = config.viewWindowOptions();
+			if (config.inputGridColumns() < 5)
+				this.inputGridColumns = config.inputGridColumns();
 		}
 
 		public String getAlias() {
@@ -779,6 +774,14 @@ public class AnnotationShadows {
 
 		public void setViewWindowOptions(String viewWindowOptions) {
 			this.viewWindowOptions = viewWindowOptions;
+		}
+
+		public int getInputGridColumns() {
+			return inputGridColumns;
+		}
+
+		public void setInputGridColumns(int inputGridColumns) {
+			this.inputGridColumns = inputGridColumns;
 		}
 
 	}

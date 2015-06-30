@@ -38517,12 +38517,58 @@ Observation.attachmentableform = function(container) {
 		return this;
 	}
 
+	$.fn.groupColumns = function() {
+		this.each(function() {
+					var t = $(this);
+					var columns = parseInt(t.data('columns'));
+					var intab = t.find('.tab-pane > .control-group').length > 0;
+					if (intab) {
+						t.find('.tab-pane').each(function() {
+									transform($(this), columns);
+								});
+					} else {
+						transform(t, columns);
+					}
+				});
+		return this;
+	}
+
+	transform = function(container, columns) {
+		var span = 'span' + (12 / columns);
+		container.find('.control-group').each(function(i, v) {
+					var t = $(v);
+					if (i % columns == 0) {
+						t.wrap('<div class="row"><div class="' + span
+								+ '"/></div>');
+					} else {
+						var prev = t.prev('.row');
+						t.wrap('<div class="' + span + '"/>').parent()
+								.appendTo(prev);
+					}
+				});
+		// textarea.table newline
+		container
+				.find(' .controls textarea,.controls table,.controls .input-xxlarge')
+				.each(function(i, v) {
+					var sdiv = $(v).closest('.control-group')
+							.parent('.' + span);
+					if (!sdiv.length)
+						return;
+					var rdiv = $(sdiv).parent('.row');
+					sdiv.removeClass(span).addClass('span12');
+					sdiv.wrap('<div class="row"/>').parent().insertAfter(rdiv);
+				});
+
+	}
+
 })(jQuery);
 
 Observation.groupable = function(container) {
 	var c = $(container);
 	var selector = '.groupable';
 	c.is(selector) ? c.groupable() : $(selector, c).groupable();
+	selector = 'form[data-columns]';
+	c.is(selector) ? c.groupColumns() : $(selector, c).groupColumns();
 };
 (function($) {
 	$.fn.treearea = function(treeoptions) {
