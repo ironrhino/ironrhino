@@ -2,10 +2,12 @@
 <project default="zip" basedir=".">
 	<property name="project.name" value="ironrhino" />
 	<import file="build.xml" />
+	<import file="build.sources.xml" />
 	<target name="zip">
 		<delete file="${target.dir}/${project.name}.zip" />
 		<antcall target="compile" />
 		<antcall target="jar" />
+		<antcall target="jar-sources" />
 		<zip destfile="${target.dir}/${project.name}.zip" basedir="${basedir}/.." includes="${project.name}/build.project.xml,${project.name}/build.create.xml,${project.name}/.settings/**,${project.name}/.project,${project.name}/webapp/WEB-INF/lib/*.jar,${project.name}/lib/*.jar,${project.name}/target/*.jar" />
 	</target>
 </project>
