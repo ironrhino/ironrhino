@@ -38586,7 +38586,9 @@ Observation.attachmentableform = function(container) {
 
 	transform = function(container, columns) {
 		var span = 'span' + (12 / columns);
-		container.find('.control-group').each(function(i, v) {
+		container.find('.control-group').filter(function(i) {
+					return !$(this).parent('[class*="span"]').length;
+				}).each(function(i, v) {
 					var t = $(v);
 					if (i % columns == 0) {
 						t.wrap('<div class="row"><div class="' + span
@@ -38597,24 +38599,23 @@ Observation.attachmentableform = function(container) {
 								.appendTo(prev);
 					}
 				});
-		// textarea.table newline
-		container
-				.find('.controls textarea,.controls table,.controls .input-xxlarge,.controls .newline')
-				.each(function(i, v) {
-					var sdiv = $(v).closest('.control-group')
-							.parent('.' + span);
-					if (!sdiv.length)
-						return;
-					var rdiv = $(sdiv).parent('.row');
-					sdiv.removeClass(span).addClass('span12');
-					if (sdiv.is(':first-child'))
-						sdiv.wrap('<div class="row"/>').parent()
-								.insertBefore(rdiv);
-					else
-						sdiv.wrap('<div class="row"/>').parent()
-								.insertAfter(rdiv);
-				});
-
+		container.find('.controls')
+				.find('textarea,table,.input-xxlarge,.newline').each(
+						function(i, v) {
+							var sdiv = $(v).closest('.control-group')
+									.parent('.' + span);
+							if (!sdiv.length)
+								return;
+							var rdiv = $(sdiv).parent('.row');
+							sdiv.removeClass(span).addClass('span12');
+							if (sdiv.is(':first-child'))
+								sdiv.wrap('<div class="row"/>').parent()
+										.insertBefore(rdiv);
+							else
+								sdiv.wrap('<div class="row"/>').parent()
+										.insertAfter(rdiv);
+						});
+		container.find('.row:empty').remove();
 	}
 
 })(jQuery);
