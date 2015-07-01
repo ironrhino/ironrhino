@@ -11,6 +11,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.util.ExpressionUtils;
+import org.mvel2.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
@@ -38,11 +39,9 @@ public class CacheAspect extends BaseAspect {
 	}
 
 	@Around("execution(public * *(..)) and @annotation(checkCache)")
-	public Object get(ProceedingJoinPoint jp, CheckCache checkCache)
-			throws Throwable {
+	public Object get(ProceedingJoinPoint jp, CheckCache checkCache) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
-		String namespace = ExpressionUtils.evalString(checkCache.namespace(),
-				context);
+		String namespace = ExpressionUtils.evalString(checkCache.namespace(), context);
 		String key = ExpressionUtils.evalString(checkCache.key(), context);
 		if (key == null || isBypass())
 			return jp.proceed();
@@ -51,29 +50,24 @@ public class CacheAspect extends BaseAspect {
 		if (CacheContext.isForceFlush()) {
 			cacheManager.delete(key, namespace);
 		} else {
-			int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(),
-					context, 0);
-			Object value = (timeToIdle > 0 && !cacheManager
-					.supportsTimeToIdle()) ? cacheManager.get(key, namespace,
-					timeToIdle, checkCache.timeUnit()) : cacheManager.get(key,
-					namespace);
+			int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
+			Object value = (timeToIdle > 0 && !cacheManager.supportsTimeToIdle())
+					? cacheManager.get(key, namespace, timeToIdle, checkCache.timeUnit())
+					: cacheManager.get(key, namespace);
 			if (value != null) {
-				putReturnValueIntoContext(context,
-						value instanceof NullObject ? null : value);
+				putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
 				ExpressionUtils.eval(checkCache.onHit(), context);
 				return value instanceof NullObject ? null : value;
 			} else {
 				if (mutex) {
-					if (cacheManager.putIfAbsent(keyMutex, "",
-							Math.max(10000, mutexWait), TimeUnit.MILLISECONDS,
+					if (cacheManager.putIfAbsent(keyMutex, "", Math.max(10000, mutexWait), TimeUnit.MILLISECONDS,
 							namespace)) {
 						mutexed = true;
 					} else {
 						Thread.sleep(mutexWait);
 						value = cacheManager.get(key, namespace);
 						if (value != null) {
-							putReturnValueIntoContext(context,
-									value instanceof NullObject ? null : value);
+							putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
 							ExpressionUtils.eval(checkCache.onHit(), context);
 							return value instanceof NullObject ? null : value;
 						}
@@ -85,19 +79,14 @@ public class CacheAspect extends BaseAspect {
 		Object result = jp.proceed();
 		putReturnValueIntoContext(context, result);
 		if (ExpressionUtils.evalBoolean(checkCache.when(), context, true)) {
-			Object cacheResult = (result == null && checkCache.cacheNull()) ? NullObject
-					.get() : result;
+			Object cacheResult = (result == null && checkCache.cacheNull()) ? NullObject.get() : result;
 			if (cacheResult != null) {
 				if (checkCache.eternal()) {
-					cacheManager.put(key, cacheResult, 0,
-							checkCache.timeUnit(), namespace);
+					cacheManager.put(key, cacheResult, 0, checkCache.timeUnit(), namespace);
 				} else {
-					int timeToLive = ExpressionUtils.evalInt(
-							checkCache.timeToLive(), context, 0);
-					int timeToIdle = ExpressionUtils.evalInt(
-							checkCache.timeToIdle(), context, 0);
-					cacheManager.put(key, cacheResult, timeToIdle, timeToLive,
-							checkCache.timeUnit(), namespace);
+					int timeToLive = ExpressionUtils.evalInt(checkCache.timeToLive(), context, 0);
+					int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
+					cacheManager.put(key, cacheResult, timeToIdle, timeToLive, checkCache.timeUnit(), namespace);
 				}
 			}
 			if (result != null)
@@ -110,26 +99,34 @@ public class CacheAspect extends BaseAspect {
 
 	@SuppressWarnings("unchecked")
 	@Around("execution(public * *(..)) and @annotation(evictCache)")
-	public void remove(ProceedingJoinPoint jp, EvictCache evictCache)
-			throws Throwable {
+	public void remove(ProceedingJoinPoint jp, EvictCache evictCache) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
-		String namespace = ExpressionUtils.evalString(evictCache.namespace(),
-				context);
-		List<String> keys = ExpressionUtils.evalList(evictCache.key(), context);
+		String namespace = ExpressionUtils.evalString(evictCache.namespace(), context);
+		boolean fallback = false;
+		List<String> keys = null;
+		try {
+			keys = ExpressionUtils.evalList(evictCache.key(), context);
+		} catch (PropertyAccessException e) {
+			fallback = true; // required retval
+		}
 		Object retval = jp.proceed();
 		putReturnValueIntoContext(context, retval);
+		if (fallback)
+			keys = ExpressionUtils.evalList(evictCache.key(), context);
 		if (isBypass() || keys == null || keys.size() == 0)
 			return;
+		cacheManager.mdelete(keys, namespace);
+		ExpressionUtils.eval(evictCache.onEvict(), context);
 		if (StringUtils.isNotBlank(evictCache.renew())) {
 			Object value = ExpressionUtils.eval(evictCache.renew(), context);
+			// keys may be changed, eval again
+			if (!fallback)
+				keys = ExpressionUtils.evalList(evictCache.key(), context);
 			for (Object key : keys)
 				if (key != null)
-					cacheManager.put(key.toString(), value, 0,
-							TimeUnit.SECONDS, namespace);
-		} else {
-			cacheManager.mdelete(keys, namespace);
+					cacheManager.put(key.toString(), value, 0, TimeUnit.SECONDS, namespace);
 		}
-		ExpressionUtils.eval(evictCache.onEvict(), context);
+
 	}
 
 }
