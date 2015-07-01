@@ -82,9 +82,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-4.1.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-4.1.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-core-4.1.5.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-commons-1.10.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-mongodb-1.7.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-redis-1.5.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-commons-1.10.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-mongodb-1.7.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-redis-1.5.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-expression-4.1.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jdbc-4.1.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jms-4.1.5.jar"/>
