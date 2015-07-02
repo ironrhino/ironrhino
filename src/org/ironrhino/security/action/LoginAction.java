@@ -11,6 +11,7 @@ import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
@@ -94,6 +95,8 @@ public class LoginAction extends BaseAction {
 		} catch (UsernameNotFoundException | DisabledException
 				| LockedException | AccountExpiredException failed) {
 			addFieldError("username", getText(failed.getClass().getName()));
+		}catch (CredentialsNeedResetException failed) {
+			addFieldError("password", getText(failed.getClass().getName()));
 		} catch (BadCredentialsException failed) {
 			addFieldError("password", getText(failed.getClass().getName()));
 			captchaManager.addCaptachaThreshold(request);

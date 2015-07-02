@@ -18,6 +18,7 @@ import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.servlet.HttpErrorHandler;
+import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
@@ -293,7 +294,7 @@ public class Oauth2Action extends BaseAction {
 					| LockedException | AccountExpiredException failed) {
 				addFieldError("username", getText(failed.getClass().getName()));
 				return INPUT;
-			} catch (BadCredentialsException | CredentialsExpiredException failed) {
+			} catch (BadCredentialsException | CredentialsExpiredException | CredentialsNeedResetException failed) {
 				addFieldError("password", getText(failed.getClass().getName()));
 				captchaManager.addCaptachaThreshold(request);
 				try {
