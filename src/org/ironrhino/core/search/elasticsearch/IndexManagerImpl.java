@@ -31,6 +31,7 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.search.SearchHit;
 import org.hibernate.Session;
+import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
@@ -68,6 +69,9 @@ public class IndexManagerImpl implements IndexManager {
 	private Map<Class, Map<String, Object>> schemaMapping;
 
 	@Autowired
+	private LockService lockService;
+
+	@Autowired
 	private Client client;
 
 	@Resource
@@ -87,30 +91,25 @@ public class IndexManagerImpl implements IndexManager {
 	@PostConstruct
 	public void init() {
 		objectMapper = JsonUtils.createNewObjectMapper();
-		objectMapper
-				.setDateFormat(new SimpleDateFormat(DateUtils.DATETIME_ISO));
-		objectMapper
-				.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+		objectMapper.setDateFormat(new SimpleDateFormat(DateUtils.DATETIME_ISO));
+		objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
 
-					private static final long serialVersionUID = -2795053276465297328L;
+			private static final long serialVersionUID = -2795053276465297328L;
 
-					@Override
-					protected boolean _isIgnorable(Annotated a) {
-						if (a.getAnnotation(SearchableId.class) != null
-								|| a.getAnnotation(SearchableProperty.class) != null
-								|| a.getAnnotation(SearchableComponent.class) != null)
-							return false;
-						return super._isIgnorable(a);
-					}
+			@Override
+			protected boolean _isIgnorable(Annotated a) {
+				if (a.getAnnotation(SearchableId.class) != null || a.getAnnotation(SearchableProperty.class) != null
+						|| a.getAnnotation(SearchableComponent.class) != null)
+					return false;
+				return super._isIgnorable(a);
+			}
 
-				});
-		Collection<Class<?>> set = ClassScanner.scanAnnotated(
-				ClassScanner.getAppPackages(), Searchable.class);
+		});
+		Collection<Class<?>> set = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), Searchable.class);
 		typeClassMapping = new HashMap<String, Class>(set.size());
 		schemaMapping = new HashMap<Class, Map<String, Object>>(set.size());
 		for (Class c : set) {
-			Searchable searchable = (Searchable) c
-					.getAnnotation(Searchable.class);
+			Searchable searchable = (Searchable) c.getAnnotation(Searchable.class);
 			if (!searchable.root() || c.getSimpleName().contains("$"))
 				continue;
 			typeClassMapping.put(classToType(c), c);
@@ -129,8 +128,7 @@ public class IndexManagerImpl implements IndexManager {
 		}
 	}
 
-	private static Map<String, Object> getSchemaMapping(Class c,
-			boolean component) {
+	private static Map<String, Object> getSchemaMapping(Class c, boolean component) {
 		Map<String, Object> mapping = new HashMap<String, Object>();
 		Map<String, Object> properties = new HashMap<String, Object>();
 		if (component)
@@ -169,30 +167,24 @@ public class IndexManagerImpl implements IndexManager {
 			if (m != null) {
 				searchableId = m.getAnnotation(SearchableId.class);
 				searchableProperty = m.getAnnotation(SearchableProperty.class);
-				searchableComponent = m
-						.getAnnotation(SearchableComponent.class);
+				searchableComponent = m.getAnnotation(SearchableComponent.class);
 			}
 			try {
-				Field f = pd.getReadMethod().getDeclaringClass()
-						.getDeclaredField(name);
+				Field f = pd.getReadMethod().getDeclaringClass().getDeclaredField(name);
 				if (f != null) {
 					if (searchableId == null)
 						searchableId = f.getAnnotation(SearchableId.class);
 					if (searchableProperty == null)
-						searchableProperty = f
-								.getAnnotation(SearchableProperty.class);
+						searchableProperty = f.getAnnotation(SearchableProperty.class);
 					if (searchableComponent == null)
-						searchableComponent = f
-								.getAnnotation(SearchableComponent.class);
+						searchableComponent = f.getAnnotation(SearchableComponent.class);
 				}
 			} catch (Exception e) {
 			}
 			if (searchableId != null) {
-				properties.put(name, new PropertyMapping(componentType,
-						searchableId));
+				properties.put(name, new PropertyMapping(componentType, searchableId));
 			} else if (searchableProperty != null) {
-				properties.put(name, new PropertyMapping(componentType,
-						searchableProperty));
+				properties.put(name, new PropertyMapping(componentType, searchableProperty));
 			} else if (searchableComponent != null) {
 				properties.put(name, getSchemaMapping(componentType, true));
 			}
@@ -221,8 +213,7 @@ public class IndexManagerImpl implements IndexManager {
 
 		}
 
-		public PropertyMapping(Class propertyClass,
-				SearchableId searchableProperty) {
+		public PropertyMapping(Class propertyClass, SearchableId searchableProperty) {
 			this.type = searchableProperty.type();
 			if (StringUtils.isBlank(type)) {
 				if (propertyClass.isPrimitive())
@@ -238,13 +229,10 @@ public class IndexManagerImpl implements IndexManager {
 			if (StringUtils.isNotBlank(searchableProperty.format()))
 				this.format = searchableProperty.format();
 			Index index = searchableProperty.index();
-			if (index == Index.NO || index == Index.ANALYZED
-					|| index == Index.NOT_ANALYZED)
+			if (index == Index.NO || index == Index.ANALYZED || index == Index.NOT_ANALYZED)
 				this.index = index.name().toLowerCase();
-			if ("string".equals(this.type)
-					&& searchableProperty.index() != Index.NOT_ANALYZED
-					&& searchableProperty.index() != Index.NO
-					&& !searchableProperty.omit_norms()
+			if ("string".equals(this.type) && searchableProperty.index() != Index.NOT_ANALYZED
+					&& searchableProperty.index() != Index.NO && !searchableProperty.omit_norms()
 					&& searchableProperty.boost() != 1.0f)
 				this.boost = searchableProperty.boost();
 			Store store = searchableProperty.store();
@@ -263,15 +251,13 @@ public class IndexManagerImpl implements IndexManager {
 			if (searchableProperty.omit_norms())
 				this.omit_norms = searchableProperty.omit_norms();
 			if (searchableProperty.omit_term_freq_and_positions())
-				this.omit_term_freq_and_positions = searchableProperty
-						.omit_term_freq_and_positions();
+				this.omit_term_freq_and_positions = searchableProperty.omit_term_freq_and_positions();
 			if ("date".equals(this.type) || StringUtils.isNotBlank(this.format))
 				this.ignore_malformed = searchableProperty.ignore_malformed();
 
 		}
 
-		public PropertyMapping(Class propertyClass,
-				SearchableProperty searchableProperty) {
+		public PropertyMapping(Class propertyClass, SearchableProperty searchableProperty) {
 			this.type = searchableProperty.type();
 			if (StringUtils.isBlank(type)) {
 				if (propertyClass.isPrimitive())
@@ -287,13 +273,10 @@ public class IndexManagerImpl implements IndexManager {
 			if (StringUtils.isNotBlank(searchableProperty.format()))
 				this.format = searchableProperty.format();
 			Index index = searchableProperty.index();
-			if (index == Index.NO || index == Index.ANALYZED
-					|| index == Index.NOT_ANALYZED)
+			if (index == Index.NO || index == Index.ANALYZED || index == Index.NOT_ANALYZED)
 				this.index = index.name().toLowerCase();
-			if ("string".equals(this.type)
-					&& searchableProperty.index() != Index.NOT_ANALYZED
-					&& searchableProperty.index() != Index.NO
-					&& !searchableProperty.omit_norms()
+			if ("string".equals(this.type) && searchableProperty.index() != Index.NOT_ANALYZED
+					&& searchableProperty.index() != Index.NO && !searchableProperty.omit_norms()
 					&& searchableProperty.boost() != 1.0f)
 				this.boost = searchableProperty.boost();
 			Store store = searchableProperty.store();
@@ -312,8 +295,7 @@ public class IndexManagerImpl implements IndexManager {
 			if (searchableProperty.omit_norms())
 				this.omit_norms = searchableProperty.omit_norms();
 			if (searchableProperty.omit_term_freq_and_positions())
-				this.omit_term_freq_and_positions = searchableProperty
-						.omit_term_freq_and_positions();
+				this.omit_term_freq_and_positions = searchableProperty.omit_term_freq_and_positions();
 			if ("date".equals(this.type) || StringUtils.isNotBlank(this.format))
 				this.ignore_malformed = searchableProperty.ignore_malformed();
 		}
@@ -434,8 +416,7 @@ public class IndexManagerImpl implements IndexManager {
 			return omit_term_freq_and_positions;
 		}
 
-		public void setOmit_term_freq_and_positions(
-				Boolean omit_term_freq_and_positions) {
+		public void setOmit_term_freq_and_positions(Boolean omit_term_freq_and_positions) {
 			this.omit_term_freq_and_positions = omit_term_freq_and_positions;
 		}
 
@@ -450,18 +431,14 @@ public class IndexManagerImpl implements IndexManager {
 	}
 
 	private String entityToDocument(Persistable entity) {
-		Map<String, Object> map = AnnotationUtils
-				.getAnnotatedPropertyNameAndValues(entity, SearchableId.class,
-						SearchableProperty.class, SearchableComponent.class);
+		Map<String, Object> map = AnnotationUtils.getAnnotatedPropertyNameAndValues(entity, SearchableId.class,
+				SearchableProperty.class, SearchableComponent.class);
 		Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
 		while (it.hasNext()) {
 			Object value = it.next().getValue();
-			if (value == null || value instanceof String
-					&& StringUtils.isBlank((String) value)
-					|| value instanceof Collection
-					&& ((Collection) value).isEmpty()
-					|| value.getClass().isArray()
-					&& ((Object[]) value).length == 0)
+			if (value == null || value instanceof String && StringUtils.isBlank((String) value)
+					|| value instanceof Collection && ((Collection) value).isEmpty()
+					|| value.getClass().isArray() && ((Object[]) value).length == 0)
 				it.remove();
 		}
 		if (map.isEmpty())
@@ -488,47 +465,39 @@ public class IndexManagerImpl implements IndexManager {
 
 	@Override
 	public Object searchHitToEntity(SearchHit sh) throws Exception {
-		return objectMapper.readValue(sh.sourceAsString(),
-				typeToClass(sh.getType()));
+		return objectMapper.readValue(sh.sourceAsString(), typeToClass(sh.getType()));
 	}
 
 	@Override
 	public ListenableActionFuture<IndexResponse> index(Persistable entity) {
-		return client
-				.prepareIndex(getIndexName(), classToType(entity.getClass()),
-						String.valueOf(entity.getId()))
+		return client.prepareIndex(getIndexName(), classToType(entity.getClass()), String.valueOf(entity.getId()))
 				.setSource(entityToDocument(entity)).execute();
 	}
 
 	@Override
 	public ListenableActionFuture<DeleteResponse> delete(Persistable entity) {
-		return client.prepareDelete(getIndexName(),
-				classToType(entity.getClass()), String.valueOf(entity.getId()))
+		return client.prepareDelete(getIndexName(), classToType(entity.getClass()), String.valueOf(entity.getId()))
 				.execute();
 	}
 
 	private void initialize() {
 		IndicesAdminClient adminClient = client.admin().indices();
 		try {
-			IndicesExistsResponse ies = adminClient.exists(
-					new IndicesExistsRequest(getIndexName())).get();
+			IndicesExistsResponse ies = adminClient.exists(new IndicesExistsRequest(getIndexName())).get();
 			if (!ies.isExists())
-				adminClient.create(new CreateIndexRequest(getIndexName()))
-						.get();
+				adminClient.create(new CreateIndexRequest(getIndexName())).get();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		for (Map.Entry<Class, Map<String, Object>> entry : schemaMapping
-				.entrySet()) {
+		for (Map.Entry<Class, Map<String, Object>> entry : schemaMapping.entrySet()) {
 			HashMap<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
 			map.put(classToType(entry.getKey()), entry.getValue());
 			String mapping = JsonUtils.toJson(map);
 			if (logger.isDebugEnabled())
 				logger.debug("Mapping {} : {}", entry.getKey(), mapping);
 			try {
-				adminClient.preparePutMapping(getIndexName())
-						.setType(classToType(entry.getKey()))
-						.setSource(mapping).execute().get();
+				adminClient.preparePutMapping(getIndexName()).setType(classToType(entry.getKey())).setSource(mapping)
+						.execute().get();
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -538,20 +507,25 @@ public class IndexManagerImpl implements IndexManager {
 	@Override
 	@Trigger
 	public void rebuild() {
-		IndicesAdminClient adminClient = client.admin().indices();
-		try {
-			IndicesExistsResponse ies = adminClient.exists(
-					new IndicesExistsRequest(getIndexName())).get();
-			if (ies.isExists())
-				adminClient.delete(new DeleteIndexRequest(getIndexName()))
-						.get();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+		String lockName = "indexManager.rebuild()";
+		if (lockService.tryLock(lockName)) {
+			try {
+				IndicesAdminClient adminClient = client.admin().indices();
+				try {
+					IndicesExistsResponse ies = adminClient.exists(new IndicesExistsRequest(getIndexName())).get();
+					if (ies.isExists())
+						adminClient.delete(new DeleteIndexRequest(getIndexName())).get();
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+				initialize();
+				for (Class c : schemaMapping.keySet())
+					indexAll(classToType(c));
+				logger.info("rebuild completed");
+			} finally {
+				lockService.unlock(lockName);
+			}
 		}
-		initialize();
-		for (Class c : schemaMapping.keySet())
-			indexAll(classToType(c));
-		logger.info("rebuild completed");
 	}
 
 	@Override
@@ -566,15 +540,13 @@ public class IndexManagerImpl implements IndexManager {
 				indexed.addAndGet(entityArray.length);
 				for (Object obj : entityArray) {
 					Persistable p = (Persistable) obj;
-					bulkRequest.add(client.prepareIndex(getIndexName(),
-							classToType(p.getClass()),
-							String.valueOf(p.getId())).setSource(
-							entityToDocument(p)));
+					bulkRequest.add(
+							client.prepareIndex(getIndexName(), classToType(p.getClass()), String.valueOf(p.getId()))
+									.setSource(entityToDocument(p)));
 				}
 				try {
 					if (bulkRequest.numberOfActions() > 0) {
-						ListenableActionFuture<BulkResponse> br = bulkRequest
-								.execute();
+						ListenableActionFuture<BulkResponse> br = bulkRequest.execute();
 						br.addListener(bulkResponseActionListener);
 					}
 				} catch (Exception e) {
