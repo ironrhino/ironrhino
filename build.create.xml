@@ -18,7 +18,7 @@
 					var projectPackage = project.getProperty('project.basePackage');
 					if(!projectPackage)
 						projectPackage = 'com.' + projectName;
-					var features = project.getProperty('project.features')||'';
+					var features = project.getProperty('project.features')||'redis';
 					var basedir = project.getProperty('basedir');
 					var projectDir = basedir + '/../' + projectName;
 					var projectSrc = projectDir + '/src';
@@ -79,7 +79,7 @@
 					if(features.indexOf('search')<0)
 						excludes+='elasticsearch-*.jar,lucene-*.jar,mmseg4j-*.jar,';
 					if(features.indexOf('redis')<0)
-						excludes+='jedis-*.jar,commons-pool-*.jar,spring-data-redis-*.jar,';
+						excludes+='jedis-*.jar,commons-pool2-*.jar,spring-data-redis-*.jar,';
 					if(features.indexOf('rabbitmq')<0)
 						excludes+='rabbitmq-client-*.jar,spring-rabbit-*.jar,spring-amqp-*.jar,';
 					if(features.indexOf('mongodb')<0)
