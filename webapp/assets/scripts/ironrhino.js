@@ -36054,12 +36054,27 @@ function uploadFiles(files, filenames) {
 					} else
 						ele.html('<div style="text-align:center;">'
 								+ MessageBundle.get('ajax.loading') + '</div>');
+				if (ele.parent('.portlet-content').length) {
+					ele.css('height', window.getComputedStyle(ele[0]).height);
+				}
 			},
 			complete : function() {
 				if (!ele.data('quiet') && typeof $.fn.unmask != 'undefined') {
 					ele.unmask();
 					if (ele.data('mhc'))
 						ele.css('min-height', '');
+					if (ele.parent('.portlet-content').length) {
+						var height = window.getComputedStyle(ele[0]).height;
+						ele.css('height', 'auto');
+						var targetHeight = window.getComputedStyle(ele[0]).height;
+						ele.css('height', height);
+						setTimeout(function() {
+									ele.css('height', targetHeight);
+									setTimeout(function() {
+												ele.css('height', 'auto');
+											}, 5000);
+								}, 15);
+					}
 				}
 			},
 			success : function(data) {
@@ -36741,8 +36756,9 @@ Observation.datagridTable = function(container) {
 								.insertBefore($('.portlet-header .btn-fold',
 										this));
 						$('iframe', $(this))
+								.attr('scrolling', 'no')
 								.attr('onload',
-										'this.height = this.contentDocument.body.offsetHeight+10');
+										'this.style.height=(this.contentDocument.body.offsetHeight)+\'px\'');
 					}
 				});
 				portal.on('click', '.portlet-header .btn-close', function() {
@@ -36791,22 +36807,22 @@ Observation.datagridTable = function(container) {
 					}
 					addRestoreButton(portal);
 				}).on('click', '.portlet-header .btn-refresh', function() {
-							var portlet = $(this).closest('.portlet');
-							$('.ajaxpanel', portlet).trigger('load');
-							$('iframe', portlet).each(function(i, v) {
-										var mask = typeof $.fn.mask != 'undefined';
-										var pc = portlet
-												.find('.portlet-content');
-										if (mask)
-											pc.mask(MessageBundle
-													.get('ajax.loading'));
-										v.onload = function() {
-											if (mask)
-												pc.unmask();
-										};
-										v.contentWindow.location.reload();
-									});
-						}).on('click', '.portal-footer .restore', function() {
+					var portlet = $(this).closest('.portlet');
+					$('.ajaxpanel', portlet).trigger('load');
+					$('iframe', portlet).each(function(i, v) {
+						var mask = typeof $.fn.mask != 'undefined';
+						var pc = portlet.find('.portlet-content');
+						if (mask)
+							pc.mask(MessageBundle.get('ajax.loading'));
+						v.onload = function() {
+							if (mask)
+								pc.unmask();
+							this.style.height = (this.contentDocument.body.offsetHeight)
+									+ 'px';
+						};
+						v.contentWindow.location.reload(true);
+					});
+				}).on('click', '.portal-footer .restore', function() {
 							$(this).closest('.portal').portal('layout',
 									'restore');
 						});

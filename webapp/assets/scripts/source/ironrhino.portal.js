@@ -36,8 +36,9 @@
 								.insertBefore($('.portlet-header .btn-fold',
 										this));
 						$('iframe', $(this))
+								.attr('scrolling', 'no')
 								.attr('onload',
-										'this.height = this.contentDocument.body.offsetHeight+10');
+										'this.style.height=(this.contentDocument.body.offsetHeight)+\'px\'');
 					}
 				});
 				portal.on('click', '.portlet-header .btn-close', function() {
@@ -86,22 +87,22 @@
 					}
 					addRestoreButton(portal);
 				}).on('click', '.portlet-header .btn-refresh', function() {
-							var portlet = $(this).closest('.portlet');
-							$('.ajaxpanel', portlet).trigger('load');
-							$('iframe', portlet).each(function(i, v) {
-										var mask = typeof $.fn.mask != 'undefined';
-										var pc = portlet
-												.find('.portlet-content');
-										if (mask)
-											pc.mask(MessageBundle
-													.get('ajax.loading'));
-										v.onload = function() {
-											if (mask)
-												pc.unmask();
-										};
-										v.contentWindow.location.reload();
-									});
-						}).on('click', '.portal-footer .restore', function() {
+					var portlet = $(this).closest('.portlet');
+					$('.ajaxpanel', portlet).trigger('load');
+					$('iframe', portlet).each(function(i, v) {
+						var mask = typeof $.fn.mask != 'undefined';
+						var pc = portlet.find('.portlet-content');
+						if (mask)
+							pc.mask(MessageBundle.get('ajax.loading'));
+						v.onload = function() {
+							if (mask)
+								pc.unmask();
+							this.style.height = (this.contentDocument.body.offsetHeight)
+									+ 'px';
+						};
+						v.contentWindow.location.reload(true);
+					});
+				}).on('click', '.portal-footer .restore', function() {
 							$(this).closest('.portal').portal('layout',
 									'restore');
 						});

@@ -39,12 +39,27 @@
 					} else
 						ele.html('<div style="text-align:center;">'
 								+ MessageBundle.get('ajax.loading') + '</div>');
+				if (ele.parent('.portlet-content').length) {
+					ele.css('height', window.getComputedStyle(ele[0]).height);
+				}
 			},
 			complete : function() {
 				if (!ele.data('quiet') && typeof $.fn.unmask != 'undefined') {
 					ele.unmask();
 					if (ele.data('mhc'))
 						ele.css('min-height', '');
+					if (ele.parent('.portlet-content').length) {
+						var height = window.getComputedStyle(ele[0]).height;
+						ele.css('height', 'auto');
+						var targetHeight = window.getComputedStyle(ele[0]).height;
+						ele.css('height', height);
+						setTimeout(function() {
+									ele.css('height', targetHeight);
+									setTimeout(function() {
+												ele.css('height', 'auto');
+											}, 5000);
+								}, 15);
+					}
 				}
 			},
 			success : function(data) {

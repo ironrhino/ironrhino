@@ -8796,6 +8796,11 @@ form.attachmentable ul.thumbnails li .remove{
 	border:0;
 }
 
+.portlet-content > iframe, .portlet-content > .ajaxpanel{
+	height: 50px;
+	transition: height .2s;
+}
+
 .ui-sortable-placeholder { 
 	border: 1px dotted black; 
 	visibility: visible !important; 
