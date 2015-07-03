@@ -43,9 +43,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-databind-2.5.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jasperreports-6.0.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javamail-1.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.19.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-annotations-1.2.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.20.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.3.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-annotations-2.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jedis-2.7.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jericho-html-3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jpa-api-2.1.jar"/>
@@ -68,10 +68,10 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-core-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.13.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.5.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.35.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.36.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.0.11.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.11.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.12.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.5.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.12.jar"/>
@@ -107,8 +107,8 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xmemcached-2.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xwork-core-2.3.24.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zookeeper-3.4.6.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zxing-core-3.1.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zxing-javase-3.1.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zxing-core-3.2.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zxing-javase-3.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/annotations-api-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/asm-5.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/closure-compiler.jar"/>
