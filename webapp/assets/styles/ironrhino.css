@@ -8798,7 +8798,8 @@ form.attachmentable ul.thumbnails li .remove{
 
 .portlet-content > iframe, .portlet-content > .ajaxpanel{
 	height: 50px;
-	transition: height .2s;
+	overflow: hidden;
+	transition: height 0.25s;
 }
 
 .ui-sortable-placeholder { 
