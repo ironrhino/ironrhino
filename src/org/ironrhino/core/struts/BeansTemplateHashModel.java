@@ -15,7 +15,7 @@ public class BeansTemplateHashModel implements TemplateHashModel {
 		Object bean = ApplicationContextUtils.getBean(name);
 		if (bean == null)
 			return null;
-		BeansWrapper wrapper = new BeansWrapper(Configuration.VERSION_2_3_22);
+		BeansWrapper wrapper = new BeansWrapper(Configuration.VERSION_2_3_23);
 		return wrapper.wrap(bean);
 	}
 

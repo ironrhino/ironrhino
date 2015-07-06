@@ -85,7 +85,7 @@ Initialization.pageView = function() {
 <div id="pv_result">
 <#assign dataurl=actionBaseUrl+"/pv"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -108,7 +108,7 @@ Initialization.pageView = function() {
 <div id="uip_result">
 <#assign dataurl=actionBaseUrl+"/uip"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -132,7 +132,7 @@ Initialization.pageView = function() {
 <div id="usid_result">
 <#assign dataurl=actionBaseUrl+"/usid"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -155,7 +155,7 @@ Initialization.pageView = function() {
 <div id="uu_result">
 <#assign dataurl=actionBaseUrl+"/uu"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -184,7 +184,7 @@ Initialization.pageView = function() {
 <div id="url_result">
 <#assign dataurl=actionBaseUrl+"/url"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -212,7 +212,7 @@ Initialization.pageView = function() {
 <div id="fr_result">
 <#assign dataurl=actionBaseUrl+"/fr"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -240,7 +240,7 @@ Initialization.pageView = function() {
 <div id="pr_result">
 <#assign dataurl=actionBaseUrl+"/pr"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -269,7 +269,7 @@ Initialization.pageView = function() {
 <div id="ct_result">
 <#assign dataurl=actionBaseUrl+"/ct"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -297,7 +297,7 @@ Initialization.pageView = function() {
 <div id="kw_result">
 <#assign dataurl=actionBaseUrl+"/kw"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
@@ -325,7 +325,7 @@ Initialization.pageView = function() {
 <div id="se_result">
 <#assign dataurl=actionBaseUrl+"/se"/>
 <#if request.queryString?has_content>
-<#assign dataurl=dataurl+'?'+request.queryString/>
+<#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>

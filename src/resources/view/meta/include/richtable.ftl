@@ -5,8 +5,8 @@
 <#local size = columns?keys?size>
 <#list columns?keys as name>
 <#local config = columns[name]>
-<#local cellname=((config['trimPrefix']??)?string('',entityName+'.'))+name>
-<@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=config['cellEdit'] readonly=readonly resizable=(readonly&&name_has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
+<#local cellname=((config['trimPrefix']??)?then('',entityName+'.'))+name>
+<@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=config['cellEdit'] readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
 </#list>
 <@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
 <#if resultPage??><#local list=resultPage.result></#if>
@@ -22,7 +22,7 @@
 </#if>
 </#if>
 <#if celleditable&&!readonly&&entityReadonly>
-<#local _rowDynamicAttributes=_rowDynamicAttributes+{"data-readonly":"true"}>
+<#local _rowDynamicAttributes+={"data-readonly":"true"}>
 </#if>
 <@rttbodytrstart entity=entity showCheckColumn=showCheckColumn multipleCheck=multipleCheck rowid=rowid dynamicAttributes=_rowDynamicAttributes/>
 <#list columns?keys as name>
@@ -38,7 +38,7 @@
 	</#if>
 	<#local dynamicAttributes={}>
 	<#if config['readonlyExpression']?has_content && config['readonlyExpression']?eval>
-		<#local dynamicAttributes=dynamicAttributes+{'data-readonly':'true'}/>
+		<#local dynamicAttributes+={'data-readonly':'true'}/>
 	</#if>
 	<@rttbodytd entity=entity value=value celleditable=config['cellEdit']?? template=config['template']! cellDynamicAttributes=config['dynamicAttributes'] dynamicAttributes=dynamicAttributes/>
 </#list>
@@ -50,7 +50,7 @@
 <#macro rtstart formid='',action='',entityName='',resizable=true,sortable=true,includeParameters=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' dynamicAttributes...>
 <#local action=action?has_content?string(action,request.requestURI)>
 <#if dynamicAttributes['dynamicAttributes']??>
-<#local dynamicAttributes=dynamicAttributes+dynamicAttributes['dynamicAttributes']>
+<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
 <form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view history"<#if actionBaseUrl!=action> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName!=action&&entityName?has_content> data-entity="${entityName}"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
 ${formHeader!}
@@ -108,12 +108,12 @@ ${formHeader!}
 	<#local cellDynamicAttributes=_cellDynamicAttributes>
 </#if>
 <#if dynamicAttributes['dynamicAttributes']??>
-<#local dynamicAttributes=dynamicAttributes+dynamicAttributes['dynamicAttributes']>
+<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
 <#if cellDynamicAttributes['class']?? && dynamicAttributes['class']??>
-<#local cellDynamicAttributes=cellDynamicAttributes+{'class':dynamicAttributes['class']+' '+cellDynamicAttributes['class']}>
+<#local cellDynamicAttributes+={'class':dynamicAttributes['class']+' '+cellDynamicAttributes['class']}>
 </#if>
-<#local dynamicAttributes=dynamicAttributes+cellDynamicAttributes>
+<#local dynamicAttributes+=cellDynamicAttributes>
 <td<#if value??><#if !dynamicAttributes['data-cellvalue']??&&template?has_content||value?is_boolean> data-cellvalue="${value?string?html}"<#elseif value?is_hash&&value.displayName??> data-cellvalue="${value.name()?html}"</#if></#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>><#rt>
 <#if !template?has_content>
 	<#if value??>

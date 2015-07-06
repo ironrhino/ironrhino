@@ -26,7 +26,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/eaxy-0.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ehcache-core-2.6.11.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/elasticsearch-1.6.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/freemarker-2.3.22.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/freemarker-2.3.23.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/guava-18.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hessian-4.0.38.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-commons-annotations-4.0.5.jar"/>

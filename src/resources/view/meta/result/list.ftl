@@ -46,7 +46,7 @@
 	<#assign hidden=true/>
 	</#if>
 	<#if !hidden>
-		<#assign size=size+1>
+		<#assign size++>
 	</#if>
 </#list>
 <#assign viewable=richtableConfig.exportable>
@@ -87,7 +87,7 @@
 			<#else>
 				<#assign cellEdit=''/>
 			</#if>
-			<@rttheadtd name=label alias=config['alias']! width=config['width']! title=config['title']! class=config['thCssClass']! cellname=entityName+'.'+key cellEdit=cellEdit readonly=readonly.value excludeIfNotEdited=config.excludeIfNotEdited resizable=viewable||!(readonly.value&&!entry_has_next)/>
+			<@rttheadtd name=label alias=config['alias']! width=config['width']! title=config['title']! class=config['thCssClass']! cellname=entityName+'.'+key cellEdit=cellEdit readonly=readonly.value excludeIfNotEdited=config.excludeIfNotEdited resizable=viewable||!(readonly.value&&!entry?has_next)/>
 		<#else>
 			<#assign viewable=true>
 		</#if>
@@ -106,13 +106,13 @@
 </#if>
 </#if>
 <#if !readonly.value&&entityReadonly>
-<#assign rowDynamicAttributes=rowDynamicAttributes+{"data-readonly":"true"}>
+<#assign rowDynamicAttributes+={"data-readonly":"true"}>
 <#if !readonly.deletable>
-<#assign rowDynamicAttributes=rowDynamicAttributes+{"data-deletable":"false"}>
+<#assign rowDynamicAttributes+={"data-deletable":"false"}>
 </#if>
 </#if>
 <#if richtableConfig.celleditable&&versionPropertyName??>
-<#assign rowDynamicAttributes=rowDynamicAttributes+{"data-version":entity[versionPropertyName]}>
+<#assign rowDynamicAttributes+={"data-version":entity[versionPropertyName]}>
 </#if>
 <@rttbodytrstart entity=entity showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=rowDynamicAttributes/>
 <#list uiConfigs.entrySet() as entry>
@@ -131,11 +131,11 @@
 			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":(value.id?string)!,"data-options":"{'url':'"+config.pickUrl+"','name':'this','id':'this@data-cellvalue'}"}>
 		</#if>
 		<#if config.readonly.expression?has_content && config.readonly.expression?eval>
-		<#assign dynamicAttributes=dynamicAttributes+{'data-readonly':'true'}/>
+		<#assign dynamicAttributes+={'data-readonly':'true'}/>
 		</#if>
 		<#assign value = entity[key]!>
 		<#if config.type=='dictionary' && selectDictionary??>
-			<#assign dynamicAttributes=dynamicAttributes+{'data-cellvalue':value}/>
+			<#assign dynamicAttributes+={'data-cellvalue':value}/>
 			<#assign templateName><@config.templateName?interpret /></#assign>
 			<#assign value=getDictionaryLabel(templateName,value)/>	
 		</#if>

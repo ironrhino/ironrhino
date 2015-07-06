@@ -17,7 +17,7 @@
 		<#if !label?has_content>
 		<#assign label=''/>
 		<#list field.name?split('.') as var>
-		<#assign label=label+action.getText(var)/>
+		<#assign label+=action.getText(var)/>
 		</#list>
 		</#if>
 		<#if label!=field.name> <span class="label pull-right">${label}</span></#if>
@@ -73,12 +73,12 @@
 		<#list apiModules as apiModule>
 		  <div class="accordion-group">
 		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#module${apiModule_index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#module${apiModule?index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>
 		        ${apiModule.name}
 		      </a>
 		    </div>
 		    <#assign currentModule = module?has_content && module==apiModule.name>
-		    <div id="module${apiModule_index}" class="accordion-body collapse<#if currentModule> in</#if>">
+		    <div id="module${apiModule?index}" class="accordion-body collapse<#if currentModule> in</#if>">
 		      <div class="accordion-inner">
 		        <ul class="nav nav-list">
 					<#list apiModule.apiDocs as apiDoc>

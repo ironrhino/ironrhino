@@ -49,7 +49,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		/** super.createConfiguration(servletContext) start **/
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			LocalizedTextUtil.setReloadBundles(true);
-		MyConfiguration configuration = new MyConfiguration(Configuration.VERSION_2_3_22);
+		MyConfiguration configuration = new MyConfiguration(Configuration.VERSION_2_3_23);
 		configuration.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION
 				? TemplateExceptionHandler.IGNORE_HANDLER : TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 		if (mruMaxStrongSize > 0) {
@@ -72,10 +72,10 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		base = templateProvider.getAllSharedVariables().get("base");
 		Map<String, Object> globalVariables = new HashMap<String, Object>(8);
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
-		globalVariables.put("statics", new BeansWrapperBuilder(Configuration.VERSION_2_3_22).build().getStaticModels());
+		globalVariables.put("statics", new BeansWrapperBuilder(Configuration.VERSION_2_3_23).build().getStaticModels());
 		globalVariables.put("beans", new BeansTemplateHashModel());
 		TemplateHashModelEx hash = new SimpleMapModel(globalVariables,
-				new BeansWrapperBuilder(Configuration.VERSION_2_3_22).build());
+				new BeansWrapperBuilder(Configuration.VERSION_2_3_23).build());
 		configuration.setAllSharedVariables(hash);
 		configuration.setDateFormat("yyyy-MM-dd");
 		configuration.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");

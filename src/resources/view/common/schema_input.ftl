@@ -5,7 +5,7 @@
 <title><#if schema.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('schema')}</title>
 </head>
 <body>
-<@s.form id="schema_input" action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?string('',' importable')}">
+<@s.form id="schema_input" action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?then('',' importable')}">
 	<#if !schema.new>
 		<@s.hidden name="schema.id" />
 	</#if>

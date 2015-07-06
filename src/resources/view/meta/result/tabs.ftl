@@ -23,7 +23,7 @@
 <#if propertyName??>
 <#assign dataurl=actionBaseUrl/>
 <#if request.queryString??>
-<#assign dataurl=dataurl+'?'+request.queryString>
+<#assign dataurl+='?'+request.queryString>
 </#if>
 <ul class="nav nav-tabs">
 	<li><strong style="display:block;padding-top: 8px;padding-bottom: 8px;line-height: 20px;padding-right: 12px;padding-left: 12px;margin-right: 2px;">${action.getText(propertyName)}:</strong></li>
@@ -47,16 +47,16 @@
 	<div id="all" class="tab-pane ajaxpanel active" data-url="${dataurl}"></div>
 	<#if config.type=='enum'>
 	<#list values as value>
-	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=${value.name()}"></div>
+	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=${value.name()}"></div>
 	</#list>
 	<#elseif selectDictionary??&&config.type=='dictionary'>
 	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
 	<#list map.entrySet() as entry>
-	<div id="${propertyName+'-'+entry.key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=${entry.key?url}"></div>
+	<div id="${propertyName+'-'+entry.key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=${entry.key?url}"></div>
 	</#list>
 	<#elseif config.type=='checkbox'>
-	<div id="${propertyName}-true" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=true"></div>
-	<div id="${propertyName}-false" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?string('&','?')}tab=${propertyName}&${propertyName}=false"></div>
+	<div id="${propertyName}-true" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=true"></div>
+	<div id="${propertyName}-false" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=false"></div>
 	</#if>
 </div>
 </#if>

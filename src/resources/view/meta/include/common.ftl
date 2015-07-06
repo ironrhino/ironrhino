@@ -75,11 +75,11 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 </#if>
 <#local value=response.encodeURL(value)/>
 <#if includeQueryString && request?? && request.queryString?has_content && !request.queryString?matches('^_=\\d+$')>
-	<#local value=value+(value?index_of('?') gt 0)?string('&','?')/>
+	<#local value+=(value?index_of('?') gt 0)?then('&','?')/>
 	<#if request.queryString?index_of('&_=') gt 0>
-		<#local value=value+request.queryString?keep_before('&_=')/>
+		<#local value+=request.queryString?keep_before('&_=')/>
 	<#else>
-		<#local value=value+request.queryString/>
+		<#local value+=request.queryString/>
 	</#if>
 </#if>
 <#return value>

@@ -12,7 +12,7 @@
 <#if redirectToLogin>
 <#assign returnUrl=request.requestURL/>
 <#if request.queryString??>
-<#assign returnUrl=returnUrl+"?"+request.queryString/>
+<#assign returnUrl+="?"+request.queryString/>
 </#if>
 <meta http-equiv="refresh" content="0; url=<@url value="${ssoServerBase!}/login?targetUrl=${returnUrl?url}"/>" />
 </#if>

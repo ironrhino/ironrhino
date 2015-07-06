@@ -1,7 +1,7 @@
 <#macro pagination align="center" theme="" dynamicAttributes...>
 <#if resultPage.totalPage gt 1>
 <#if dynamicAttributes['dynamicAttributes']??>
-	<#local dynamicAttributes=dynamicAttributes+dynamicAttributes['dynamicAttributes']/>
+	<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']/>
 </#if>
 <#if theme=="simple">
 <ul class="pager">

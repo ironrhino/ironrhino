@@ -24,14 +24,14 @@
 		<#if uiConfigs[column]??>
 			<#assign config=uiConfigs[column]>
 			<#if config.shownInPick>
-				<#assign columnNames=columnNames+[column]>
+				<#assign columnNames+=[column]>
 			<#else>
 				<#assign shown=!config.hiddenInList.value>
 				<#if shown && config.hiddenInList.expression?has_content>
 				<#assign shown=!config.hiddenInList.expression?eval/>
 				</#if>
 				<#if shown>
-					<#assign columnNames=columnNames+[column]>
+					<#assign columnNames+=[column]>
 				</#if>
 			</#if>
 		</#if>
@@ -45,7 +45,7 @@
 	<#list uiConfigs.entrySet() as entry>
 		<#assign column=entry.key>
 		<#if (column=='name' && !propertyNames?seq_contains('fullname') || column=='fullname' || column=='code' || entry.value.shownInPick || naturalIds?? && naturalIds?keys?seq_contains(column))>
-			<#assign columnNames=columnNames+[column]>
+			<#assign columnNames+=[column]>
 		</#if>
 	</#list>
 </#if>
@@ -61,7 +61,7 @@
 		<#assign params=request.queryString?split('&')/>
 		<#list params as param>
 		<#if !(param?starts_with('_=')||param?starts_with('parent=')||param?starts_with('keyword='))>
-		<#assign href=href+(param_index==0)?string('?','&')+param>
+		<#assign href+=param?is_first?then('?','&')+param>
 		</#if>
 		</#list>
 	</#if>
@@ -71,7 +71,7 @@
 	<#assign allwidthed = true/>
 	<#list columnNames as column>
 		<#if treeable && column == 'name'||column == 'fullname'>
-			<#assign columns=columns+{column:{'template':r'<#if entity.leaf??&&!entity.leaf><a href="${href}${href?contains("?")?string("&","?")+"parent="+entity.id}" class="ajax view" data-replacement="${entityName}_pick">${value}</a><#else>${value}</#if>'}}/>
+			<#assign columns+={column:{'template':r'<#if entity.leaf??&&!entity.leaf><a href="${href}${href?contains("?")?string("&","?")+"parent="+entity.id}" class="ajax view" data-replacement="${entityName}_pick">${value}</a><#else>${value}</#if>'}}/>
 		<#else>
 			<#if uiConfigs?? && uiConfigs[column]??>
 				<#assign uiConfig = uiConfigs[column]/>
@@ -79,7 +79,7 @@
 				<#if !uiConfig.width?has_content>
 				<#assign allwidthed=false/>
 				</#if>
-				<#if allwidthed && !column_has_next>
+				<#if allwidthed && !column?has_next>
 				<#assign width = ''/>
 				<#else>
 				<#assign width = uiConfig.width!/>
@@ -98,7 +98,7 @@
 				<#assign width = ''/>
 				<#assign template = ''/>	
 			</#if>
-			<#assign columns=columns+{column:{'alias':alias,'width':width,'template':template}}/>
+			<#assign columns+={column:{'alias':alias,'width':width,'template':template}}/>
 		</#if>
 	</#list>
 </#if>
@@ -121,7 +121,7 @@
 <#else>
 <#assign bottomButtons=''/>
 </#if>
-<#assign bottomButtons=bottomButtons+r'
+<#assign bottomButtons+=r'
 <#if treeable&&Parameters.parent??>
 <a href="${href}<#if _parent?? && _parent gt 0>${href?contains("?")?string("&","?")+"parent="+_parent}</#if>" class="btn ajax view" data-replacement="${entityName}_pick">${action.getText("upward")}</a>
 </#if>

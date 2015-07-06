@@ -29,10 +29,10 @@
 <div id="c">
 <#assign dataurl='${actionBaseUrl}/data'/>
 <#if uid??>
-<#assign dataurl=dataurl+'/'+uid>
+<#assign dataurl+='/'+uid>
 </#if>
 <#if request.queryString??>
-<#assign dataurl=dataurl+'?'+request.queryString>
+<#assign dataurl+='?'+request.queryString>
 </#if>
 <div id="chart" class="chart" data-url="<@url value="${dataurl}"/>" style="width:1024px; height:300px;"<#if Parameters.live??> data-interval="${Parameters.interval?default('60000')}" data-quiet="true"</#if>>
 </div>

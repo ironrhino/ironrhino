@@ -1,7 +1,7 @@
 <#macro selectDictionary dictionaryName name="" value="" required=false disabled=false headerKey="" headerValue="" strict=true dynamicAttributes...>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 	<#if dynamicAttributes['dynamicAttributes']??>
-		<#local dynamicAttributes=dynamicAttributes+dynamicAttributes['dynamicAttributes']/>
+		<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']/>
 	</#if>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
@@ -34,7 +34,7 @@
 						</#if>
 					<#else>
 						<option value="${lv.value}"<#if value=lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?string(lv.label!,lv.value!)}</option>
-						<#if group?has_content && !lv_has_next>
+						<#if group?has_content && !lv?has_next>
 						</optgroup>
 						</#if>
 					</#if>
@@ -60,7 +60,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 	<#local value=[value]/>
 	</#if>
 	<#if dynamicAttributes['dynamicAttributes']??>
-		<#local dynamicAttributes=dynamicAttributes+dynamicAttributes['dynamicAttributes']/>
+		<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']/>
 	</#if>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 		<#local index = 0/>
@@ -71,7 +71,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 				<label for="${dictionaryName}-${index}" class="checkbox inline"><#t>
 				<input id="${dictionaryName}-${index}" type="checkbox" value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if value?seq_contains(lv.value)> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 				</label><#t>
-				<#local index=index+1>
+				<#local index++>
 				</#list>
 			<#else>
 				<#local group = ""/>
@@ -114,7 +114,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 
 <#macro radioDictionary dictionaryName name="" value="" dynamicAttributes...>
 	<#if dynamicAttributes['dynamicAttributes']??>
-		<#local dynamicAttributes=dynamicAttributes+dynamicAttributes['dynamicAttributes']/>
+		<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']/>
 	</#if>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
@@ -128,7 +128,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 				<label for="${dictionaryName}-${index}" class="radio inline"><#t>
 				<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if value==lv.value> checked="checked"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 				</label><#t>
-				<#local index=index+1>
+				<#local index++>
 				</#list>
 			<#else>
 				<#local group = ""/>
