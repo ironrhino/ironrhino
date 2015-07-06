@@ -48,7 +48,19 @@
 </#macro>
 
 <#macro rtstart formid='',action='',entityName='',resizable=true,sortable=true,includeParameters=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' dynamicAttributes...>
-<#local action=action?has_content?string(action,request.requestURI)>
+<#local parameterNamesInQueryString=[]>
+<#if !action?has_content>
+<#local action=request.requestURI>
+<#if request.queryString?has_content>
+<#list request.queryString?split('&') as pair>
+	<#local name=pair?keep_before('=')>
+	<#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&name!='check'&&!formHeader?contains(' name="'+name+'" ')>
+		<#local action+=action?contains('?')?then('&','?')+pair>
+		<#local parameterNamesInQueryString+=[name]>
+	</#if>
+</#list>
+</#if>
+</#if>
 <#if dynamicAttributes['dynamicAttributes']??>
 <#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
@@ -57,7 +69,7 @@ ${formHeader!}
 <#nested/>
 <#if includeParameters>
 <#list Parameters?keys as name>
-<#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&name!='check'&&!formHeader?contains(' name="'+name+'" ')>
+<#if !parameterNamesInQueryString?seq_contains(name)&&name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&name!='check'&&!formHeader?contains(' name="'+name+'" ')>
 <input type="hidden" name="${name}" value="${Parameters[name]}" />
 </#if>
 </#list>

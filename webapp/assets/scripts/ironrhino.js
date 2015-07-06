@@ -37944,7 +37944,7 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var f = t.prev('form.richtable');
 		var entity = f.data('entity') || f.prop('action');
-		t.attr('action', f.prop('action')).data('replacement', f.attr('id'));
+		t.attr('action', f.attr('action')).data('replacement', f.attr('id'));
 		$('input[type="hidden"]', f).clone().prependTo(t).each(function() {
 			var name = $(this).attr('name');
 			if (name.indexOf('-op') == name.length - 3)
