@@ -99,8 +99,7 @@ cat>server.xml<<EOF
 EOF
 cd ..
 cd ..
-sed -i '99i export SPRING_PROFILES_DEFAULT' tomcat/bin/catalina.sh
-sed -i '99i SPRING_PROFILES_DEFAULT="dual"' tomcat/bin/catalina.sh
+sed -i '99i export SPRING_PROFILES_DEFAULT=dual' tomcat/bin/catalina.sh
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:+UseParNewGC -XX:CMSMaxAbortablePrecleanTime=5 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
 mv tomcat tomcat8080
 cp -R tomcat8080 tomcat8081
