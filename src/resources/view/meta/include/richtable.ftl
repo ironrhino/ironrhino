@@ -33,7 +33,7 @@
 	<#if !name?contains('.')>
 		<#local value=entity[name]!>
 	<#else>
-		<#local value=('entity.'+name)?eval!>
+		<#local value=('(entity.'+name+')!')?eval>
 	</#if>
 	</#if>
 	<#local dynamicAttributes={}>
