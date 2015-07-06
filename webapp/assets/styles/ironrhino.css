@@ -8799,7 +8799,7 @@ form.attachmentable ul.thumbnails li .remove{
 .portlet-content > iframe, .portlet-content > .ajaxpanel{
 	height: 50px;
 	overflow: hidden;
-	transition: height 0.25s;
+	transition: height 0.25s ease;
 }
 
 .ui-sortable-placeholder { 
