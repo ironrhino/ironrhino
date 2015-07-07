@@ -1,7 +1,7 @@
 #!/bin/sh
 
 JDK_VERSION=8
-TOMCAT_VERSION=8
+TOMCAT_VERSION=7
 
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
