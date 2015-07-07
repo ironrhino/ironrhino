@@ -1,5 +1,8 @@
 #!/bin/sh
 
+JDK_VERSION=8
+TOMCAT_VERSION=8
+
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
 echo please run sudo $0
@@ -34,7 +37,12 @@ fi
 
 #install oracle jdk
 if [ ! -d jdk ];then
-wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jdk-7u80-linux-x64.tar.gz"
+if [ "$JDK_VERSION" = "7" ];then
+jdk_download_url="http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jdk-7u80-linux-x64.tar.gz"
+else
+jdk_download_url="http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.tar.gz"
+fi
+wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "$jdk_download_url"
 tar xf jdk-*.tar.gz
 rm jdk-*.tar.gz
 mv jdk* jdk
@@ -60,7 +68,12 @@ fi
 #install tomcat
 if [ ! -d tomcat8080 ];then
 if ! $(ls -l apache-tomcat-*.tar.gz >/dev/null 2>&1) ; then
-wget http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.62/bin/apache-tomcat-7.0.62.tar.gz
+if [ "$TOMCAT_VERSION" = "7" ];then
+tomcat_download_url="http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.62/bin/apache-tomcat-7.0.62.tar.gz"
+else
+tomcat_download_url="http://archive.apache.org/dist/tomcat/tomcat-8/v8.0.23/bin/apache-tomcat-8.0.23.tar.gz"
+fi
+wget "$tomcat_download_url"
 fi
 tar xf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
 mv apache-tomcat-* tomcat
@@ -68,6 +81,7 @@ cd tomcat && rm -rf bin/*.bat && rm -rf webapps/*
 cd conf
 sed -i  's/\s[3-4][a-x-]*manager.org.apache.juli.FileHandler,//g' logging.properties
 sed -i '/manager/d' logging.properties
+if [ "$TOMCAT_VERSION" = "7" ];then
 sed -i 's/tomcat7-websocket/*/g' catalina.properties
 sed -i '/ContextConfig.jarsToSkip/d' catalina.properties
 cat>>catalina.properties<<EOF
@@ -84,6 +98,58 @@ xmemcached-*.jar,xwork-*.jar,zookeeper-*.jar,zxing-*.jar,\\
 ojdbc*.jar,sqljdbc*.jar,postgresql-*.jar,db2*.jar,jconn*.jar,h2-*.jar,hsqldb-*.jar,\\
 ifxjdbc*.jar,derbyclient*.jar,rhino*.jar
 EOF
+else
+sed -i '108,$d' catalina.properties
+cat>>catalina.properties<<EOF
+tomcat.util.scan.StandardJarScanFilter.jarsToSkip=\\
+bootstrap.jar,commons-daemon.jar,tomcat-juli.jar,\\
+annotations-api.jar,el-api.jar,jsp-api.jar,servlet-api.jar,websocket-api.jar,\\
+catalina.jar,catalina-ant.jar,catalina-ha.jar,catalina-storeconfig.jar,\\
+catalina-tribes.jar,\\
+jasper.jar,jasper-el.jar,ecj-*.jar,\\
+tomcat-api.jar,tomcat-util.jar,tomcat-util-scan.jar,tomcat-coyote.jar,\\
+tomcat-dbcp.jar,tomcat-jni.jar,tomcat-websocket.jar,\\
+tomcat-i18n-en.jar,tomcat-i18n-es.jar,tomcat-i18n-fr.jar,tomcat-i18n-ja.jar,\\
+tomcat-juli-adapters.jar,catalina-jmx-remote.jar,catalina-ws.jar,\\
+tomcat-jdbc.jar,\\
+tools.jar,\\
+commons-beanutils*.jar,commons-codec*.jar,commons-collections*.jar,\\
+commons-dbcp*.jar,commons-digester*.jar,commons-fileupload*.jar,\\
+commons-httpclient*.jar,commons-io*.jar,commons-lang*.jar,commons-logging*.jar,\\
+commons-math*.jar,commons-pool*.jar,\\
+jstl.jar,taglibs-standard-spec-*.jar,\\
+geronimo-spec-jaxrpc*.jar,wsdl4j*.jar,\\
+ant.jar,ant-junit*.jar,aspectj*.jar,jmx.jar,h2*.jar,hibernate*.jar,httpclient*.jar,\\
+jmx-tools.jar,jta*.jar,log4j*.jar,mail*.jar,slf4j*.jar,\\
+xercesImpl.jar,xmlParserAPIs.jar,xml-apis.jar,\\
+junit.jar,junit-*.jar,ant-launcher.jar,\\
+cobertura-*.jar,asm-*.jar,dom4j-*.jar,icu4j-*.jar,jaxen-*.jar,jdom-*.jar,\\
+jetty-*.jar,oro-*.jar,servlet-api-*.jar,tagsoup-*.jar,xmlParserAPIs-*.jar,\\
+xom-*.jar,\\
+activiti-*.jar,antlr-*.jar,aopalliance-*.jar,aspectj*.jar,bonecp-*.jar,commons-*.jar,\\
+curator-*.jar,dom4j-*.jar,dynamicreports-*.jar,eaxy-*.jar,ehcache-*.jar,\\
+elasticsearch-*.jar,freemarker-*.jar,guava-*.jar,hessian-*.jar,hibernate-*.jar,\\
+http*.jar,itext*.jar, jackson-*.jar,jasperreports-*.jar,javamail-*.jar,\\
+javassist-*.jar,jboss-logging-*.jar,jedis-*.jar, jericho-*.jar,joda-*.jar,jpa-*.jar,\\
+jsoup-*.jar,jta-*.jar,log4j-*.jar,lucene-*.jar,mmseg4j-*.jar,\\
+mongo-java-driver-*.jar,mvel2-*.jar,mybatis-*.jar,mysql-*.jar,ognl-*.jar,pinyin4j-*.jar,\\
+poi-*.jar,rabbitmq-*.jar,sitemesh-*.jar,slf4j-*.jar,spring-*.jar,struts2-*.jar,\\
+xmemcached-*.jar,xwork-*.jar,zookeeper-*.jar,zxing-*.jar,\\
+ojdbc*.jar,sqljdbc*.jar,postgresql-*.jar,db2*.jar,jconn*.jar,h2-*.jar,hsqldb-*.jar,\\
+ifxjdbc*.jar,derbyclient*.jar,rhino*.jar
+# Default list of JAR files that should be scanned that overrides the default
+# jarsToSkip list above. This is typically used to include a specific JAR that
+# has been excluded by a broad file name pattern in the jarsToSkip list.
+# The list of JARs to scan may be over-ridden at a Context level for individual
+# scan types by configuring a JarScanner with a nested JarScanFilter.
+tomcat.util.scan.StandardJarScanFilter.jarsToScan=log4j-core*.jar,log4j-taglib*.jar
+# String cache configuration.
+tomcat.util.buf.StringCache.byte.enabled=true
+#tomcat.util.buf.StringCache.char.enabled=true
+#tomcat.util.buf.StringCache.trainThreshold=500000
+#tomcat.util.buf.StringCache.cacheSize=5000
+EOF
+fi
 cat>server.xml<<EOF
 <?xml version="1.0" encoding="utf-8"?>
 <Server port="\${port.shutdown}" shutdown="SHUTDOWN">
@@ -99,7 +165,11 @@ EOF
 cd ..
 cd ..
 sed -i '99i export SPRING_PROFILES_DEFAULT=dual' tomcat/bin/catalina.sh
+if [ "$JDK_VERSION" = "7" ];then
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:+UseParNewGC -XX:CMSMaxAbortablePrecleanTime=5 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
+else
+sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+DisableExplicitGC -XX:+UseG1GC -XX:SurvivorRatio=6 -XX:MaxGCPauseMillis=400 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=40 -XX:ConcGCThreads=2 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
+fi
 mv tomcat tomcat8080
 cp -R tomcat8080 tomcat8081
 sed -i '99i CATALINA_PID="/tmp/tomcat8080_pid"' tomcat8080/bin/catalina.sh
@@ -190,12 +260,7 @@ if [ ! -f apache-tomcat-\$version.tar.gz ];then
 wget http://archive.apache.org/dist/tomcat/tomcat-\${version:0:1}/v\$version/bin/apache-tomcat-\$version.tar.gz
 fi
 tar xf apache-tomcat-\$version.tar.gz && rm -rf apache-tomcat-\$version.tar.gz
-cd apache-tomcat-\$version && rm -rf bin/*.bat && rm -rf webapps/*
-cd conf
-sed -i  's/\s[3-4][a-x-]*manager.org.apache.juli.FileHandler,//g' logging.properties
-sed -i '/manager/d' logging.properties
-cd ..
-cd ..
+cd apache-tomcat-\$version && rm -rf bin/*.bat && rm -rf webapps/* && cd ..
 fi
 running=0
 if [ -f /tmp/tomcat8080_pid ] && [ ! "\$( ps -P \`more /tmp/tomcat8080_pid\`|grep tomcat8080)" = "" ] ; then
@@ -206,11 +271,13 @@ tomcat8080/bin/catalina.sh stop 10 -force
 fi
 cp tomcat8080/conf/server.xml .
 cp tomcat8080/conf/catalina.properties .
+cp tomcat8080/conf/logging.properties .
 cp tomcat8080/bin/catalina.sh .
 rm -rf tomcat8080
 cp -R apache-tomcat-\$version tomcat8080
 mv server.xml tomcat8080/conf/
 mv catalina.properties tomcat8080/conf/
+mv logging.properties tomcat8080/conf/
 mv catalina.sh tomcat8080/bin/
 cp -R tomcat8081/webapps* tomcat8080
 if [ \$running = 1 ];then
@@ -220,11 +287,13 @@ tomcat8081/bin/catalina.sh stop 10 -force
 fi
 cp tomcat8081/conf/server.xml .
 cp tomcat8081/conf/catalina.properties .
+cp tomcat8081/conf/logging.properties .
 cp tomcat8081/bin/catalina.sh .
 rm -rf tomcat8081
 cp -R apache-tomcat-\$version tomcat8081
 mv server.xml tomcat8081/conf/
 mv catalina.properties tomcat8081/conf/
+mv logging.properties tomcat8081/conf/
 mv catalina.sh tomcat8081/bin/
 cp -R tomcat8080/webapps* tomcat8081
 if [ \$running = 1 ];then
