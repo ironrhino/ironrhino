@@ -59,6 +59,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.suggestion.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.resizabletable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.pagination.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.popwindow.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.richtable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.sqleditor.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.importableform.js" />
