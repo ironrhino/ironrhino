@@ -74,6 +74,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
 		globalVariables.put("statics", new BeansWrapperBuilder(Configuration.VERSION_2_3_23).build().getStaticModels());
 		globalVariables.put("beans", new BeansTemplateHashModel());
+		globalVariables.put("properties", new PropertiesTemplateHashModel());
 		TemplateHashModelEx hash = new SimpleMapModel(globalVariables,
 				new BeansWrapperBuilder(Configuration.VERSION_2_3_23).build());
 		configuration.setAllSharedVariables(hash);
