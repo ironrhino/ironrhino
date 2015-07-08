@@ -33058,7 +33058,7 @@ Observation.common = function(container) {
 						var modalwidth = t.data('modalwidth');
 						$('<div id="'
 								+ id
-								+ '" class="modal hide fade in"'
+								+ '" class="modal pop hide fade in"'
 								+ (modalwidth ? ' style="width:' + modalwidth
 										+ ';"' : '')
 								+ '><div class="modal-header"><a class="close" data-dismiss="modal">&times;</a><h3 style="text-align:center;">'

@@ -7893,6 +7893,9 @@ td.middle {
 .modal-backdrop {
 	z-index: 2040;
 }
+.modal.pop .modal-body{
+  	max-height: none;
+}
 /*override bootstrap end*/
 /*override jqueryui start*/
 .ui-widget{
