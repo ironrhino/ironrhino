@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 <Configuration>
+	<Properties>
+    	<Property name="app.home">/app</Property>
+    	<Property name="console.logger.level">INFO</Property>
+    	<Property name="hibernate.logger.level">INFO</Property>
+  	</Properties>
 	<Appenders>
 		<Console name="CONSOLE" target="SYSTEM_OUT">
 			<ThresholdFilter level="${sys:console.logger.level}"/>
