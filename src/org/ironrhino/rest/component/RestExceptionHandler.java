@@ -26,8 +26,7 @@ public class RestExceptionHandler {
 
 	@ExceptionHandler(Throwable.class)
 	@ResponseBody
-	public RestStatus handleException(HttpServletRequest req,
-			HttpServletResponse response, Throwable ex) {
+	public RestStatus handleException(HttpServletRequest req, HttpServletResponse response, Throwable ex) {
 		if (ex instanceof HttpMediaTypeNotAcceptableException) {
 			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -40,8 +39,7 @@ public class RestExceptionHandler {
 		}
 		if (ex instanceof HttpRequestMethodNotSupportedException) {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-			return RestStatus.valueOf(RestStatus.CODE_FORBIDDEN,
-					ex.getMessage());
+			return RestStatus.valueOf(RestStatus.CODE_FORBIDDEN, ex.getMessage());
 		}
 		if (ex instanceof MethodArgumentNotValidException) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -49,41 +47,39 @@ public class RestExceptionHandler {
 			BindingResult bindingResult = me.getBindingResult();
 			StringBuilder sb = new StringBuilder();
 			for (FieldError fe : bindingResult.getFieldErrors()) {
-				sb.append(fe.getField()).append(": ")
-						.append(fe.getDefaultMessage()).append("; ");
+				sb.append(fe.getField()).append(": ").append(fe.getDefaultMessage()).append("; ");
 			}
-			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID,
-					sb.toString());
+			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
 		}
 		if (ex instanceof ConstraintViolationException) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			ConstraintViolationException cve = (ConstraintViolationException) ex;
 			StringBuilder sb = new StringBuilder();
 			for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
-				sb.append(cv.getPropertyPath()).append(": ")
-						.append(cv.getMessage()).append("; ");
+				sb.append(cv.getPropertyPath()).append(": ").append(cv.getMessage()).append("; ");
 			}
-			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID,
-					sb.toString());
+			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
 		}
-		if( ex.getCause() instanceof RestStatus)
+		if (ex.getCause() instanceof RestStatus)
 			ex = ex.getCause();
 		if (ex instanceof RestStatus) {
 			RestStatus rs = (RestStatus) ex;
-			if (rs.getCode().equals(RestStatus.CODE_REQUEST_TIMEOUT))
+			String code = rs.getCode();
+			if (code == null)
+				code = "";
+			if (code.equals(RestStatus.CODE_REQUEST_TIMEOUT))
 				response.setStatus(HttpServletResponse.SC_REQUEST_TIMEOUT);
-			else if (rs.getCode().equals(RestStatus.CODE_FORBIDDEN))
+			else if (code.equals(RestStatus.CODE_FORBIDDEN))
 				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			else if (rs.getCode().equals(RestStatus.CODE_UNAUTHORIZED))
+			else if (code.equals(RestStatus.CODE_UNAUTHORIZED))
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			else if (rs.getCode().equals(RestStatus.CODE_NOT_FOUND))
+			else if (code.equals(RestStatus.CODE_NOT_FOUND))
 				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return rs;
 		}
 		logger.error(ex.getMessage(), ex);
 		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		return RestStatus.valueOf(RestStatus.CODE_INTERNAL_SERVER_ERROR,
-				ex.getMessage());
+		return RestStatus.valueOf(RestStatus.CODE_INTERNAL_SERVER_ERROR, ex.getMessage());
 	}
 
 }
