@@ -66,6 +66,8 @@ public class RestExceptionHandler {
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID,
 					sb.toString());
 		}
+		if( ex.getCause() instanceof RestStatus)
+			ex = ex.getCause();
 		if (ex instanceof RestStatus) {
 			RestStatus rs = (RestStatus) ex;
 			if (rs.getCode().equals(RestStatus.CODE_REQUEST_TIMEOUT))
