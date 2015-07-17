@@ -4,7 +4,6 @@ import org.ironrhino.core.util.ApplicationContextUtils;
 
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.StringModel;
-import freemarker.template.Configuration;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -16,7 +15,7 @@ public class PropertiesTemplateHashModel implements TemplateHashModel {
 		String str = ApplicationContextUtils.getApplicationContext().getEnvironment().getProperty(name);
 		if (str == null)
 			return null;
-		BeansWrapper wrapper = new BeansWrapper(Configuration.VERSION_2_3_23);
+		BeansWrapper wrapper = new BeansWrapper(MyFreemarkerManager.DEFAULT_VERSION);
 		return new StringModel(str, wrapper);
 	}
 

@@ -34,8 +34,11 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateHashModelEx;
+import freemarker.template.Version;
 
 public class MyFreemarkerManager extends FreemarkerManager {
+
+	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_23;
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -49,9 +52,10 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		/** super.createConfiguration(servletContext) start **/
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			LocalizedTextUtil.setReloadBundles(true);
-		MyConfiguration configuration = new MyConfiguration(Configuration.VERSION_2_3_23);
-		configuration.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION
-				? TemplateExceptionHandler.IGNORE_HANDLER : TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+		MyConfiguration configuration = new MyConfiguration(DEFAULT_VERSION);
+		configuration
+				.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION ? TemplateExceptionHandler.IGNORE_HANDLER
+						: TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 		if (mruMaxStrongSize > 0) {
 			configuration.setSetting(Configuration.CACHE_STORAGE_KEY, "strong:" + mruMaxStrongSize);
 		}
@@ -72,11 +76,10 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		base = templateProvider.getAllSharedVariables().get("base");
 		Map<String, Object> globalVariables = new HashMap<String, Object>(8);
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
-		globalVariables.put("statics", new BeansWrapperBuilder(Configuration.VERSION_2_3_23).build().getStaticModels());
+		globalVariables.put("statics", new BeansWrapperBuilder(DEFAULT_VERSION).build().getStaticModels());
 		globalVariables.put("beans", new BeansTemplateHashModel());
 		globalVariables.put("properties", new PropertiesTemplateHashModel());
-		TemplateHashModelEx hash = new SimpleMapModel(globalVariables,
-				new BeansWrapperBuilder(Configuration.VERSION_2_3_23).build());
+		TemplateHashModelEx hash = new SimpleMapModel(globalVariables, new BeansWrapperBuilder(DEFAULT_VERSION).build());
 		configuration.setAllSharedVariables(hash);
 		configuration.setDateFormat("yyyy-MM-dd");
 		configuration.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
