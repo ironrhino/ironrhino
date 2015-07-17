@@ -85,7 +85,16 @@ public class SemanticVersion implements Serializable, Comparable<SemanticVersion
 			return this.minor - that.minor;
 		int thisPatch = this.patch != null ? this.patch : -1;
 		int thatPatch = that.patch != null ? that.patch : -1;
-		return thisPatch - thatPatch;
+		if (thisPatch != thatPatch)
+			return thisPatch - thatPatch;
+		if (this.prerelease != null && that.prerelease != null)
+			return this.prerelease.compareTo(that.prerelease);
+		else if (this.prerelease != null && that.prerelease == null)
+			return 1;
+		else if (this.prerelease == null && that.prerelease != null)
+			return -1;
+		else
+			return 0;
 	}
 
 	@Override
