@@ -51,10 +51,20 @@ Richtable = {
 				url += ids.join('&');
 			}
 		}
-		var data = $('input[type="hidden"],input[name="keyword"]', form)
-				.serialize();
-		if (includeParams && data)
-			url += (url.indexOf('?') > 0 ? '&' : '?') + data;
+		if (includeParams) {
+			var data = $('input[type="hidden"],input[name="keyword"]', form)
+					.serialize();
+			var qs = document.location.search;
+			if (qs)
+				qs = qs.substring(1);
+			if (data) {
+				if (qs)
+					qs += '&';
+				qs += data;
+			}
+			if (qs)
+				url += (url.indexOf('?') > 0 ? '&' : '?') + qs;
+		}
 		return url;
 	},
 	open : function(url, reloadonclose, useiframe, form) {
