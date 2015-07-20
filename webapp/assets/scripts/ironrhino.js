@@ -37420,11 +37420,13 @@ Richtable = {
 			}
 		}
 		if (includeParams) {
+			var action = form.attr('action');
+			var qs = '';
+			var index = action.indexOf('?');
+			if (index > -1)
+				qs = action.substring(index + 1);
 			var data = $('input[type="hidden"],input[name="keyword"]', form)
 					.serialize();
-			var qs = document.location.search;
-			if (qs)
-				qs = qs.substring(1);
 			if (data) {
 				if (qs)
 					qs += '&';
