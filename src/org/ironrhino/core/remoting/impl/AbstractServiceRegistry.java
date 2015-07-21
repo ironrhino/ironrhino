@@ -91,7 +91,12 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry,
 			Remoting remoting = clazz.getAnnotation(Remoting.class);
 			if (remoting != null) {
 				Class<?>[] classes = remoting.value();
-				if (classes == null || classes.length == 0) {
+				if(classes.length == 0){
+					Class<?>[] interfaces = clazz.getInterfaces();
+					if(interfaces.length > 0)
+						classes = interfaces;
+				}
+				if (classes.length == 0) {
 					log.warn(
 							"@Remoting on concrete class [{}] must assign interfaces to export services",
 							clazz.getName());

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component("userDetailsService")
 @Primary
-@Remoting(UserDetailsService.class)
+@Remoting
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DelegatedUserDetailsService implements UserDetailsService {
 
