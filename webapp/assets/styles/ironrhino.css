@@ -8780,6 +8780,11 @@ form.attachmentable ul.thumbnails li .remove{
 }
 .portlet-icon{
 	float:right;
+	margin-top: -9px;
+	display: none;
+}
+.portlet-header:hover .portlet-icon{
+	display: block;
 }
 .portlet-icon a{
 	clear:none;
