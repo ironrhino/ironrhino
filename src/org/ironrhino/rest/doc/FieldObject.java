@@ -115,8 +115,7 @@ public class FieldObject implements Serializable {
 		this.values = values;
 	}
 
-	public static FieldObject create(String name, Class<?> cls,
-			boolean required, String defaultValue, Field fd) {
+	public static FieldObject create(String name, Class<?> cls, boolean required, String defaultValue, Field fd) {
 		String type = null;
 		Map<String, String> values = null;
 		if (cls.isEnum()) {
@@ -131,10 +130,10 @@ public class FieldObject implements Serializable {
 
 			}
 		} else {
-			if (cls == Integer.class || cls == Integer.TYPE
-					|| cls == Short.class || cls == Short.TYPE
-					|| cls == Long.class || cls == Long.TYPE)
+			if (cls == Integer.class || cls == Integer.TYPE || cls == Short.class || cls == Short.TYPE)
 				type = "integer";
+			else if (cls == Long.class || cls == Long.TYPE)
+				type = "long";
 			else if (Number.class.isAssignableFrom(cls))
 				type = "float";
 			else if (cls == Boolean.class || cls == Boolean.TYPE)
@@ -147,15 +146,13 @@ public class FieldObject implements Serializable {
 				type = "date";
 			else if (cls == String.class)
 				type = "string";
-			else if (File.class.isAssignableFrom(cls)
-					|| MultipartFile.class.isAssignableFrom(cls))
+			else if (File.class.isAssignableFrom(cls) || MultipartFile.class.isAssignableFrom(cls))
 				type = "file";
 			else
 				type = "object";
 		}
 		FieldObject field = new FieldObject(name, type, required);
-		if (StringUtils.isNotBlank(defaultValue)
-				&& !ValueConstants.DEFAULT_NONE.equals(defaultValue))
+		if (StringUtils.isNotBlank(defaultValue) && !ValueConstants.DEFAULT_NONE.equals(defaultValue))
 			field.setDefaultValue(defaultValue);
 		if (values != null)
 			field.setValues(values);
@@ -168,28 +165,23 @@ public class FieldObject implements Serializable {
 		return field;
 	}
 
-	public static List<FieldObject> createList(Class<?> domainClass,
-			Fields fields, boolean forRequest) {
+	public static List<FieldObject> createList(Class<?> domainClass, Fields fields, boolean forRequest) {
 		if (fields != null && fields.value().length > 0) {
 			List<FieldObject> list = new ArrayList<>(fields.value().length);
 			for (Field f : fields.value()) {
 				String type = f.type();
 				String name = f.name();
 				if (StringUtils.isBlank(type)) {
-					PropertyDescriptor pd = org.ironrhino.core.util.BeanUtils
-							.getPropertyDescriptor(domainClass, name);
+					PropertyDescriptor pd = org.ironrhino.core.util.BeanUtils.getPropertyDescriptor(domainClass, name);
 					if (pd != null) {
-						list.add(create(name, pd.getPropertyType(),
-								f.required(), f.defaultValue(), f));
+						list.add(create(name, pd.getPropertyType(), f.required(), f.defaultValue(), f));
 						continue;
 					} else {
 						type = "string";
 					}
 				}
 				FieldObject field = new FieldObject(name, type, f.required());
-				if (StringUtils.isNotBlank(f.defaultValue())
-						&& !ValueConstants.DEFAULT_NONE
-								.equals(f.defaultValue()))
+				if (StringUtils.isNotBlank(f.defaultValue()) && !ValueConstants.DEFAULT_NONE.equals(f.defaultValue()))
 					field.setDefaultValue(f.defaultValue());
 				if (StringUtils.isNotBlank(f.label()))
 					field.setLabel(f.label());
@@ -200,33 +192,26 @@ public class FieldObject implements Serializable {
 			return list;
 		} else {
 			List<FieldObject> list = new ArrayList<>();
-			final List<String> fieldNames = ReflectionUtils
-					.getAllFields(domainClass);
-			JsonIgnoreProperties jip = domainClass
-					.getAnnotation(JsonIgnoreProperties.class);
+			final List<String> fieldNames = ReflectionUtils.getAllFields(domainClass);
+			JsonIgnoreProperties jip = domainClass.getAnnotation(JsonIgnoreProperties.class);
 			List<String> ignoreList = new ArrayList<>();
 			if (jip != null)
 				ignoreList.addAll(Arrays.asList(jip.value()));
-			PropertyDescriptor[] pds = BeanUtils
-					.getPropertyDescriptors(domainClass);
+			PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(domainClass);
 			for (PropertyDescriptor pd : pds) {
 				String name = pd.getName();
 				if (name.equals("class") || ignoreList.contains(name))
 					continue;
 				if (forRequest
-						&& (pd.getReadMethod() == null
-								|| pd.getWriteMethod() == null || pd
-								.getWriteMethod().getAnnotation(
-										JsonIgnore.class) != null))
+						&& (pd.getReadMethod() == null || pd.getWriteMethod() == null || pd.getWriteMethod()
+								.getAnnotation(JsonIgnore.class) != null))
 					continue;
 				if (!forRequest
-						&& (pd.getReadMethod() == null || pd.getReadMethod()
-								.getAnnotation(JsonIgnore.class) != null))
+						&& (pd.getReadMethod() == null || pd.getReadMethod().getAnnotation(JsonIgnore.class) != null))
 					continue;
 				boolean required = false;
 				try {
-					java.lang.reflect.Field f = pd.getReadMethod()
-							.getDeclaringClass().getDeclaredField(name);
+					java.lang.reflect.Field f = pd.getReadMethod().getDeclaringClass().getDeclaredField(name);
 					if (f.getAnnotation(JsonIgnore.class) != null)
 						continue;
 
@@ -246,8 +231,7 @@ public class FieldObject implements Serializable {
 					if (!required) {
 						UiConfig uic = null;
 						if (pd.getReadMethod() != null) {
-							uic = pd.getReadMethod().getAnnotation(
-									UiConfig.class);
+							uic = pd.getReadMethod().getAnnotation(UiConfig.class);
 						}
 						if (uic == null)
 							uic = f.getAnnotation(UiConfig.class);
@@ -259,14 +243,12 @@ public class FieldObject implements Serializable {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				list.add(create(name, pd.getPropertyType(), required, null,
-						null));
+				list.add(create(name, pd.getPropertyType(), required, null, null));
 			}
 			Collections.sort(list, new Comparator<FieldObject>() {
 				@Override
 				public int compare(FieldObject o1, FieldObject o2) {
-					return fieldNames.indexOf(o1.getName())
-							- fieldNames.indexOf(o2.getName());
+					return fieldNames.indexOf(o1.getName()) - fieldNames.indexOf(o2.getName());
 				}
 			});
 			return list;
