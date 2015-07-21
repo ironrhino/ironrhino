@@ -139,11 +139,16 @@ public class RedisCacheManager implements CacheManager {
 				public Object doInRedis(RedisConnection conn)
 						throws DataAccessException {
 					conn.multi();
-					conn.mSet(actualMap);
-					if (timeToLive > 0)
-						for (byte[] k : actualMap.keySet())
-							conn.expire(k, timeToLive);
-					conn.exec();
+					try{
+						conn.mSet(actualMap);
+						if (timeToLive > 0)
+							for (byte[] k : actualMap.keySet())
+								conn.expire(k, timeToLive);
+						conn.exec();
+					}catch(Exception e){
+						log.error(e.getMessage(), e);
+						conn.discard();
+					}
 					return null;
 				}
 			});
@@ -195,11 +200,16 @@ public class RedisCacheManager implements CacheManager {
 				public Object doInRedis(RedisConnection conn)
 						throws DataAccessException {
 					conn.multi();
-					for (String key : keys)
-						if (StringUtils.isNotBlank(key))
-							conn.del(redisTemplate.getKeySerializer()
-									.serialize(generateKey(key, namespace)));
-					conn.exec();
+					try{
+						for (String key : keys)
+							if (StringUtils.isNotBlank(key))
+								conn.del(redisTemplate.getKeySerializer()
+										.serialize(generateKey(key, namespace)));
+						conn.exec();
+					}catch(Exception e){
+						log.error(e.getMessage(), e);
+						conn.discard();
+					}
 					return null;
 				}
 			});
