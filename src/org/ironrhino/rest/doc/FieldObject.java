@@ -131,7 +131,7 @@ public class FieldObject implements Serializable {
 			}
 		} else {
 			if (cls == Integer.class || cls == Integer.TYPE || cls == Short.class || cls == Short.TYPE)
-				type = "integer";
+				type = "int";
 			else if (cls == Long.class || cls == Long.TYPE)
 				type = "long";
 			else if (Number.class.isAssignableFrom(cls))
