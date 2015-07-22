@@ -64,10 +64,10 @@ public class AppInfoListener implements ServletContextListener {
 		System.setProperty(AppInfo.KEY_STAGE, AppInfo.getStage().name());
 		System.setProperty(AppInfo.KEY_APP_HOME, AppInfo.getAppHome());
 		System.setProperty(AppInfo.KEY_APP_NAME, AppInfo.getAppName());
-		System.setProperty("Log4jContextSelector",
-				"org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
-		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
-			System.setProperty("AsyncLogger.RingBufferSize", "16384");
+//		System.setProperty("Log4jContextSelector",
+//				"org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+//		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
+//			System.setProperty("AsyncLogger.RingBufferSize", "16384");
 		System.setProperty("hibernate.logger.level",
 				AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
 		System.setProperty(
