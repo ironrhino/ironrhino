@@ -669,7 +669,7 @@
 		<exec executable="${server.startup.cmd}" dir="${server.home}" />
 		<waitfor checkevery="2" checkeveryunit="second" maxwait="180"
 			maxwaitunit="second">
-			<http url="http://localhost:${server.startup.port}/?_internal_testing_" />
+			<http url="http://localhost:${server.startup.port}/_ping?_internal_testing_" />
 		</waitfor>
 	</target>
 
