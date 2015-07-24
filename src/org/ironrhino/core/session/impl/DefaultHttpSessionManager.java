@@ -27,21 +27,13 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	private static final String SESSION_TRACKER_SEPERATOR = "-";
 
-	public static final int DEFAULT_LIFETIME = -1; // in seconds
-
-	public static final int DEFAULT_MAXINACTIVEINTERVAL = 43200; // in seconds
-
-	public static final int DEFAULT_MINACTIVEINTERVAL = 60;// in seconds
-
-	@Value("${httpSessionManager.sessionTrackerName:"
-			+ DEFAULT_SESSION_TRACKER_NAME + "}")
+	@Value("${httpSessionManager.sessionTrackerName:" + DEFAULT_SESSION_TRACKER_NAME + "}")
 	private String sessionTrackerName = DEFAULT_SESSION_TRACKER_NAME;
 
 	@Value("${httpSessionManager.supportSessionTrackerFromURL:false}")
 	private boolean supportSessionTrackerFromURL;
 
-	@Value("${httpSessionManager.localeCookieName:"
-			+ DEFAULT_COOKIE_NAME_LOCALE + "}")
+	@Value("${httpSessionManager.localeCookieName:" + DEFAULT_COOKIE_NAME_LOCALE + "}")
 	private String localeCookieName = DEFAULT_COOKIE_NAME_LOCALE;
 
 	@Value("${httpSessionManager.defaultLocaleName:}")
@@ -58,12 +50,10 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Value("${httpSessionManager.lifetime:" + DEFAULT_LIFETIME + "}")
 	private int lifetime;
 
-	@Value("${httpSessionManager.maxInactiveInterval:"
-			+ DEFAULT_MAXINACTIVEINTERVAL + "}")
+	@Value("${httpSessionManager.maxInactiveInterval:" + DEFAULT_MAXINACTIVEINTERVAL + "}")
 	private int maxInactiveInterval;
 
-	@Value("${httpSessionManager.minActiveInterval:"
-			+ DEFAULT_MINACTIVEINTERVAL + "}")
+	@Value("${httpSessionManager.minActiveInterval:" + DEFAULT_MINACTIVEINTERVAL + "}")
 	private int minActiveInterval;
 
 	@Value("${httpSessionManager.checkRemoteAddr:true}")
@@ -116,12 +106,10 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Override
 	public String getSessionId(HttpServletRequest request) {
-		String token = (String) request
-				.getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API);
+		String token = (String) request.getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API);
 		if (token != null)
 			return token;
-		String sessionTracker = RequestUtils.getCookieValue(request,
-				getSessionTrackerName());
+		String sessionTracker = RequestUtils.getCookieValue(request, getSessionTrackerName());
 		if (sessionTracker != null) {
 			sessionTracker = CodecUtils.swap(sessionTracker);
 			String[] array = sessionTracker.split(SESSION_TRACKER_SEPERATOR);
@@ -142,9 +130,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	public void initialize(WrappedHttpSession session) {
 
 		// simulated session
-		Map<String, Object> sessionMap = (Map<String, Object>) session
-				.getRequest().getAttribute(
-						REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
+		Map<String, Object> sessionMap = (Map<String, Object>) session.getRequest().getAttribute(
+				REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 		if (sessionMap != null) {
 			session.setAttrMap(sessionMap);
 			return;
@@ -162,19 +149,16 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			} else {
 				sessionTracker = CodecUtils.swap(sessionTracker);
 				try {
-					String[] array = sessionTracker
-							.split(SESSION_TRACKER_SEPERATOR);
+					String[] array = sessionTracker.split(SESSION_TRACKER_SEPERATOR);
 					if (array.length == 1) {
 						session.setNew(true);
 						sessionId = CodecUtils.nextId(SALT);
 					} else {
 						sessionId = array[0];
 						if (array.length > 1)
-							creationTime = NumberUtils.xToDecimal(62, array[1])
-									.longValue();
+							creationTime = NumberUtils.xToDecimal(62, array[1]).longValue();
 						if (array.length > 2)
-							lastAccessedTime = NumberUtils.xToDecimal(62,
-									array[2]).longValue();
+							lastAccessedTime = NumberUtils.xToDecimal(62, array[2]).longValue();
 						boolean timeout = (lifetime > 0 && (now - creationTime > lifetime * 1000))
 								|| (now - lastAccessedTime > maxInactiveInterval * 1000);
 						if (timeout) {
@@ -198,18 +182,15 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		session.setMinActiveInterval(minActiveInterval);
 		if (session.getSessionTracker() == null)
 			session.setSessionTracker(getSessionTracker(session));
-		sessionMap = (Map<String, Object>) session.getRequest().getAttribute(
-				REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO);
+		sessionMap = (Map<String, Object>) session.getRequest().getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO);
 		if (sessionMap != null) {
 			session.setAttrMap(sessionMap);
 			session.setDirty(true);
 		} else {
 			doInitialize(session);
 			if (checkRemoteAddr) {
-				String addr = (String) session
-						.getAttribute(SESSION_KEY_REMOTE_ADDR);
-				if (addr != null
-						&& !session.getRequest().getRemoteAddr().equals(addr))
+				String addr = (String) session.getAttribute(SESSION_KEY_REMOTE_ADDR);
+				if (addr != null && !session.getRequest().getRemoteAddr().equals(addr))
 					invalidate(session);
 			}
 		}
@@ -218,10 +199,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Override
 	public void save(WrappedHttpSession session) {
 		// simulated session
-		if (session.getRequest().getAttribute(
-				REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API) != null) {
-			session.getRequest().removeAttribute(
-					REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
+		if (session.getRequest().getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API) != null) {
+			session.getRequest().removeAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 			return;
 		}
 		boolean sessionTrackerChanged = false;
@@ -230,23 +209,19 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		}
 		if (session.isNew())
 			sessionTrackerChanged = true;
-		if (session.getNow() - session.getLastAccessedTime() > session
-				.getMinActiveInterval() * 1000) {
+		if (session.getNow() - session.getLastAccessedTime() > session.getMinActiveInterval() * 1000) {
 			session.setLastAccessedTime(session.getNow());
 			sessionTrackerChanged = true;
 		}
 		if (!session.isRequestedSessionIdFromURL() && sessionTrackerChanged) {
 			// if (sessionTrackerChanged) {
 			session.setSessionTracker(this.getSessionTracker(session));
-			RequestUtils.saveCookie(session.getRequest(),
-					session.getResponse(), getSessionTrackerName(),
+			RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
 					session.getSessionTracker(), globalCookie);
 		}
 		if (checkRemoteAddr) {
-			if (!session.getAttrMap().isEmpty()
-					&& session.getAttribute(SESSION_KEY_REMOTE_ADDR) == null)
-				session.setAttribute(SESSION_KEY_REMOTE_ADDR, session
-						.getRequest().getRemoteAddr());
+			if (!session.getAttrMap().isEmpty() && session.getAttribute(SESSION_KEY_REMOTE_ADDR) == null)
+				session.setAttribute(SESSION_KEY_REMOTE_ADDR, session.getRequest().getRemoteAddr());
 		}
 		doSave(session);
 	}
@@ -256,8 +231,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		session.setInvalid(true);
 		session.getAttrMap().clear();
 		if (!session.isRequestedSessionIdFromURL() || alwaysUseCacheBased) {
-			RequestUtils.deleteCookie(session.getRequest(),
-					session.getResponse(), getSessionTrackerName(), true);
+			RequestUtils.deleteCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(), true);
 		}
 		doInvalidate(session);
 		session.setId(CodecUtils.nextId(SALT));
@@ -268,8 +242,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Override
 	public String getSessionTracker(WrappedHttpSession session) {
-		String token = (String) session.getRequest().getAttribute(
-				REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API);
+		String token = (String) session.getRequest().getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API);
 		if (token != null)
 			return token;
 		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased)
@@ -277,11 +250,9 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		StringBuilder sb = new StringBuilder();
 		sb.append(session.getId());
 		sb.append(SESSION_TRACKER_SEPERATOR);
-		sb.append(NumberUtils.decimalToX(62,
-				BigInteger.valueOf(session.getCreationTime())));
+		sb.append(NumberUtils.decimalToX(62, BigInteger.valueOf(session.getCreationTime())));
 		sb.append(SESSION_TRACKER_SEPERATOR);
-		sb.append(NumberUtils.decimalToX(62,
-				BigInteger.valueOf(session.getLastAccessedTime())));
+		sb.append(NumberUtils.decimalToX(62, BigInteger.valueOf(session.getLastAccessedTime())));
 		return CodecUtils.swap(sb.toString());
 	}
 
@@ -293,8 +264,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	}
 
 	private void doSave(WrappedHttpSession session) {
-		if ("Upgrade".equalsIgnoreCase(session.getRequest().getHeader(
-				"Connection"))) // websocket
+		if ("Upgrade".equalsIgnoreCase(session.getRequest().getHeader("Connection"))) // websocket
 			return;
 		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased)
 			cacheBased.save(session);
@@ -304,8 +274,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	}
 
 	private void doInvalidate(WrappedHttpSession session) {
-		if ("Upgrade".equalsIgnoreCase(session.getRequest().getHeader(
-				"Connection"))) // websocket
+		if ("Upgrade".equalsIgnoreCase(session.getRequest().getHeader("Connection"))) // websocket
 			return;
 		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased)
 			cacheBased.invalidate(session);
@@ -315,8 +284,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Override
 	public Locale getLocale(HttpServletRequest request) {
-		String localeName = RequestUtils.getCookieValue(request,
-				localeCookieName);
+		String localeName = RequestUtils.getCookieValue(request, localeCookieName);
 		if (StringUtils.isBlank(localeName))
 			localeName = defaultLocaleName;
 		if (StringUtils.isNotBlank(localeName))

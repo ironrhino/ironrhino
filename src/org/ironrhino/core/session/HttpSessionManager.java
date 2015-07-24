@@ -7,9 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 public interface HttpSessionManager extends HttpSessionStore {
 
 	String REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API = "_session_id_in_request_for_api";
-	
+
 	String REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API = "_session_map_in_request_for_api";
-	
+
 	String REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO = "_session_map_in_request_for_sso";
 
 	String REQUEST_ATTRIBUTE_SESSION_TRACKER_IN_URL = "_session_tracker_in_url_";
@@ -17,6 +17,12 @@ public interface HttpSessionManager extends HttpSessionStore {
 	String DEFAULT_SESSION_TRACKER_NAME = "T";
 
 	String DEFAULT_COOKIE_NAME_LOCALE = "locale";
+
+	int DEFAULT_LIFETIME = -1; // in seconds
+
+	int DEFAULT_MAXINACTIVEINTERVAL = 43200; // in seconds
+
+	int DEFAULT_MINACTIVEINTERVAL = 60;// in seconds
 
 	public String getSessionId(HttpServletRequest request);
 
