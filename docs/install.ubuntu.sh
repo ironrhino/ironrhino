@@ -513,9 +513,9 @@ backupdir=/home/$USER/backup/\$date
 if test ! -d \$backupdir
 then  mkdir -p \$backupdir
 fi
-cp -r /var/lib/mysql/xiangling \$backupdir
-cp -r /home/$USER/web/assets/upload \$backupdir
-mysql -u root -D ironrhino -e "optimize table user;"
+#mysql -u root -D ironrhino -e "optimize table user;"
+cp -r /var/lib/mysql \$backupdir
+#cp -r /home/$USER/app/assets/upload \$backupdir
 olddate=`date +%F -d"-30 days"`
 rm -rf /home/$USER/backup/\$olddate*
 chown -R $USER:$USER /home/$USER/backup
