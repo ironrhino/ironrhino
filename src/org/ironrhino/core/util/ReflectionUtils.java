@@ -13,12 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javassist.ClassClassPath;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtField;
-import javassist.util.proxy.ProxyObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -27,6 +21,12 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.util.proxy.ProxyObject;
 
 public class ReflectionUtils {
 
@@ -138,11 +138,23 @@ public class ReflectionUtils {
 		}
 	}
 
+	public static Field getField(Class<?> clazz, String name) throws NoSuchFieldException {
+		try {
+			Field f = clazz.getDeclaredField(name);
+			f.setAccessible(true);
+			return f;
+		} catch (NoSuchFieldException e) {
+			if (clazz == Object.class)
+				throw e;
+			return getField(clazz.getSuperclass(), name);
+		}
+
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <T> T getFieldValue(Object o, String name) {
 		try {
-			Field f = o.getClass().getDeclaredField(name);
-			f.setAccessible(true);
+			Field f = getField(o.getClass(), name);
 			return (T) f.get(o);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
@@ -151,8 +163,7 @@ public class ReflectionUtils {
 
 	public static void setFieldValue(Object o, String name, Object value) {
 		try {
-			Field f = o.getClass().getDeclaredField(name);
-			f.setAccessible(true);
+			Field f = getField(o.getClass(), name);
 			f.set(o, value);
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);

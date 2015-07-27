@@ -16,6 +16,7 @@ import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ExceptionUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.event.LoginEvent;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
@@ -86,23 +88,23 @@ public class LoginAction extends BaseAction {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		Authentication authResult = null;
 		try {
-			authResult = authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(
-							username, password));
+			UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username, password);
+			WebAuthenticationDetailsSource wads = ReflectionUtils.getFieldValue(usernamePasswordAuthenticationFilter,
+					"authenticationDetailsSource");
+			attempt.setDetails(wads.buildDetails(request));
+			authResult = authenticationManager.authenticate(attempt);
 		} catch (InternalAuthenticationServiceException failed) {
 			log.error(failed.getMessage(), failed);
 			addActionError(ExceptionUtils.getRootMessage(failed));
-		} catch (UsernameNotFoundException | DisabledException
-				| LockedException | AccountExpiredException failed) {
+		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 			addFieldError("username", getText(failed.getClass().getName()));
-		}catch (CredentialsNeedResetException failed) {
+		} catch (CredentialsNeedResetException failed) {
 			addFieldError("password", getText(failed.getClass().getName()));
 		} catch (BadCredentialsException failed) {
 			addFieldError("password", getText(failed.getClass().getName()));
 			captchaManager.addCaptachaThreshold(request);
 			try {
-				usernamePasswordAuthenticationFilter.unsuccess(request,
-						response, failed);
+				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
@@ -110,13 +112,11 @@ public class LoginAction extends BaseAction {
 			UserDetails ud = userDetailsService.loadUserByUsername(username);
 			if (ud instanceof Persistable) {
 				addActionMessage(getText(failed.getClass().getName()));
-				authResult = new UsernamePasswordAuthenticationToken(ud,
-						ud.getPassword(), ud.getAuthorities());
+				authResult = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
 			} else {
 				addFieldError("password", getText(failed.getClass().getName()));
 				try {
-					usernamePasswordAuthenticationFilter.unsuccess(request,
-							response, failed);
+					usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}
@@ -124,13 +124,12 @@ public class LoginAction extends BaseAction {
 		}
 		if (authResult != null)
 			try {
-				usernamePasswordAuthenticationFilter.success(request, response,
-						authResult);
+				usernamePasswordAuthenticationFilter.success(request, response, authResult);
 				Object principal = authResult.getPrincipal();
 				if (principal instanceof UserDetails)
-					eventPublisher.publish(new LoginEvent(
-							((UserDetails) principal).getUsername(),
-							request.getRemoteAddr()), Scope.LOCAL);
+					eventPublisher.publish(
+							new LoginEvent(((UserDetails) principal).getUsername(), request.getRemoteAddr()),
+							Scope.LOCAL);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
@@ -142,8 +141,7 @@ public class LoginAction extends BaseAction {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		if (StringUtils.isBlank(targetUrl))
 			targetUrl = "/";
-		username = RequestUtils.getCookieValue(request,
-				DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
+		username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 		return SUCCESS;
 	}
 
