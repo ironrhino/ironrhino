@@ -5,5 +5,4 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 	<bean name="/hessian/*" class="org.ironrhino.core.remoting.server.HessianServer" />
 	<bean name="/httpinvoker/*" class="org.ironrhino.core.remoting.server.HttpInvokerServer" />
-	<bean name="/jsoncall/*/*" class="org.ironrhino.core.remoting.server.JsonCallServer" />
 </beans>
