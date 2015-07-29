@@ -464,6 +464,25 @@
 			preservelastmodified="true" failonerror="false">
 			<fileset dir="${webapp.dir}" includes="assets/**" />
 		</copy>
+		<script language="javascript">
+		<![CDATA[
+			try{
+				load('nashorn:mozilla_compat.js');
+			}catch(e){
+			}
+			importPackage(java.io);
+			importPackage(java.util);
+			var blowfish = new File(basedir+'/webapp/WEB-INF/classes/resources/key/blowfish');
+			if(!blowfish.exists()){
+				var key = UUID.randomUUID().toString().replaceAll('-','');
+				var echo = project.createTask("echo");
+				echo.setFile(blowfish);
+				echo.setMessage(key);
+				echo.perform();
+				print(blowfish + " doesn't exists, created new file with key '" + key + "'\n");
+			}
+		]]>
+		</script>
 		<jar jarfile="${target.dir}/${jar.name}" basedir="${classes.dir}">
 			<manifest>
 				<attribute name="Ironrhino-Component-Version" value="${version}" />
