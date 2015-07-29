@@ -138,7 +138,10 @@
 						.appendTo(document.body).dialog({
 							width : current.data('_options').width || 800,
 							minHeight : current.data('_options').minHeight
-									|| 500
+									|| 500,
+							close : function() {
+								win.html('').dialog('destroy').remove();
+							}
 						});
 				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
@@ -205,7 +208,7 @@
 															|| cell.text());
 										}
 									}
-									win.dialog('destroy').remove();
+									win.dialog('close');
 									return false;
 								});
 
@@ -271,7 +274,7 @@
 												.split(separator))
 												.join(separator));
 							}
-							win.dialog('destroy').remove();
+							win.dialog('close');
 							return false;
 						});
 					}
