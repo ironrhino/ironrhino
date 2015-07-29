@@ -101,7 +101,7 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 				if (key.length() > 10)
 					key = key.substring(key.length() - 10, key.length());
 				String str = URLDecoder
-						.decode(RC4.decrypt(value, key), "UTF-8");
+						.decode(RC4.decryptWithKey(value, key), "UTF-8");
 				if (str.endsWith(key))
 					value = str.substring(0, str.length() - key.length());
 			} catch (IllegalArgumentException e) {

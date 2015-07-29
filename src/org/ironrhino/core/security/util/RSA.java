@@ -1,22 +1,18 @@
 package org.ironrhino.core.security.util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
@@ -39,57 +35,60 @@ public class RSA {
 
 	public static final String DEFAULT_KEY_LOCATION = "/resources/key/rsa";
 	public static final String KEY_DIRECTORY = "/key/";
-	private static RSA rsa;
+	// thread safe
+	private static final ThreadLocal<SoftReference<RSA>> pool = new ThreadLocal<SoftReference<RSA>>() {
+		@Override
+		protected SoftReference<RSA> initialValue() {
+			try {
+				return new SoftReference<RSA>(new RSA());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+	};
+
+	private static URI defaultKeystoreURI;
+	private static String defaultPassword;
 
 	static {
-		InputStream is = null;
-		String password = null;
 		File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rsa");
 		if (file.exists()) {
-			try {
-				is = new FileInputStream(file);
-			} catch (FileNotFoundException e) {
-				log.error(e.getMessage(), e);
-			}
+			defaultKeystoreURI = file.toURI();
 			log.info("using file " + file.getAbsolutePath());
 		} else {
 			if (AppInfo.getStage() == Stage.PRODUCTION)
-				log.warn("file "
-						+ file.getAbsolutePath()
+				log.warn("file " + file.getAbsolutePath()
 						+ " doesn't exists, please use your own keystore in production!");
 			if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-				is = RSA.class.getResourceAsStream(DEFAULT_KEY_LOCATION);
-				log.info("using classpath resource "
-						+ RSA.class.getResource(DEFAULT_KEY_LOCATION)
-								.toString() + " as default keystore");
+				try {
+					defaultKeystoreURI = RSA.class.getResource(DEFAULT_KEY_LOCATION).toURI();
+					log.info("using classpath resource " + RSA.class.getResource(DEFAULT_KEY_LOCATION).toString()
+							+ " as default keystore");
+				} catch (URISyntaxException e) {
+					log.error(e.getMessage(), e);
+				}
 			}
 		}
 		String s = System.getProperty(AppInfo.getAppName() + ".rsa.password");
 		if (StringUtils.isNotBlank(s)) {
-			password = s;
-			log.info("using system property " + AppInfo.getAppName()
-					+ ".rc4 as default key");
+			defaultPassword = s;
+			log.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
 		} else {
 			try {
-				file = new File(AppInfo.getAppHome() + KEY_DIRECTORY
-						+ "rsa.password");
+				file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rsa.password");
 				if (file.exists()) {
-					password = FileUtils.readFileToString(file, "UTF-8");
+					defaultPassword = FileUtils.readFileToString(file, "UTF-8");
 					log.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						log.warn("file "
-								+ file.getAbsolutePath()
+						log.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-						try (InputStream pis = RSA.class
-								.getResourceAsStream(DEFAULT_KEY_LOCATION
-										+ ".password")) {
-							password = IOUtils.toString(pis, "UTF-8");
+						try (InputStream pis = RSA.class.getResourceAsStream(DEFAULT_KEY_LOCATION + ".password")) {
+							defaultPassword = IOUtils.toString(pis, "UTF-8");
 							log.info("using classpath resource "
-									+ RSA.class.getResource(
-											DEFAULT_KEY_LOCATION + ".password")
-											.toString() + " as default key");
+									+ RSA.class.getResource(DEFAULT_KEY_LOCATION + ".password").toString()
+									+ " as default key");
 						}
 					}
 				}
@@ -97,21 +96,18 @@ public class RSA {
 				log.error(e.getMessage(), e);
 			}
 		}
-		if (is != null && password != null)
-			try {
-				rsa = new RSA(is, password);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
+
 	}
 
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
 	private X509Certificate certificate;
 
-	public RSA(InputStream is, String password) throws KeyStoreException,
-			NoSuchProviderException, NoSuchAlgorithmException,
-			CertificateException, IOException, UnrecoverableKeyException {
+	public RSA() throws Exception {
+		this(defaultKeystoreURI.toURL().openStream(), defaultPassword);
+	}
+
+	public RSA(InputStream is, String password) throws Exception {
 		KeyStore ks = KeyStore.getInstance("pkcs12", "SunJSSE");
 		ks.load(is, password.toCharArray());
 		IOUtils.closeQuietly(is);
@@ -129,32 +125,28 @@ public class RSA {
 		return certificate;
 	}
 
-	public byte[] encrypt(byte[] input) throws NoSuchAlgorithmException,
-			NoSuchPaddingException, InvalidKeyException,
+	public byte[] encrypt(byte[] input) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
 			IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
 		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 		return cipher.doFinal(input);
 	}
 
-	public byte[] decrypt(byte[] input) throws NoSuchAlgorithmException,
-			NoSuchPaddingException, InvalidKeyException,
+	public byte[] decrypt(byte[] input) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
 			IllegalBlockSizeException, BadPaddingException {
 		Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
 		cipher.init(Cipher.DECRYPT_MODE, privateKey);
 		return cipher.doFinal(input);
 	}
 
-	public byte[] sign(byte[] input) throws NoSuchAlgorithmException,
-			InvalidKeyException, SignatureException {
+	public byte[] sign(byte[] input) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		Signature sig = Signature.getInstance("SHA1WithRSA");
 		sig.initSign(privateKey);
 		sig.update(input);
 		return sig.sign();
 	}
 
-	public boolean verify(byte[] input, byte[] signature)
-			throws NoSuchAlgorithmException, InvalidKeyException,
+	public boolean verify(byte[] input, byte[] signature) throws NoSuchAlgorithmException, InvalidKeyException,
 			SignatureException {
 		Signature sig = Signature.getInstance("SHA1WithRSA");
 		sig.initVerify(publicKey);
@@ -162,52 +154,63 @@ public class RSA {
 		return sig.verify(signature);
 	}
 
-	public static String encrypt(String str) {
+	public String encrypt(String str) {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.encodeBase64(rsa.encrypt(str
-					.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.encodeBase64(encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			log.error("encrypt exception!", ex);
 			return "";
 		}
 	}
 
-	public static String decrypt(String str) {
+	public String decrypt(String str) {
 		if (str == null)
 			return null;
 		try {
-			return new String(rsa.decrypt(Base64.decodeBase64(str
-					.getBytes("UTF-8"))), "UTF-8");
+			return new String(decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			log.error("decrypt exception!", ex);
 			return "";
 		}
 	}
 
-	public static String sign(String str) {
+	public String sign(String str) {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.encodeBase64(rsa.sign(str
-					.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.encodeBase64(sign(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			log.error("encrypt exception!", ex);
 			return "";
 		}
 	}
 
-	public static boolean verify(String str, String signature) {
+	public boolean verify(String str, String signature) {
 		if (str == null)
 			return false;
 		try {
-			return rsa.verify(str.getBytes("UTF-8"),
-					signature.getBytes("UTF-8"));
+			return verify(str.getBytes("UTF-8"), signature.getBytes("UTF-8"));
 		} catch (Exception ex) {
 			log.error("encrypt exception!", ex);
 			return false;
 		}
+	}
+
+	public static RSA getDefaultInstance() {
+		SoftReference<RSA> instanceRef = pool.get();
+		RSA instance;
+		if (instanceRef == null || (instance = instanceRef.get()) == null) {
+			try {
+				instance = new RSA();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			instanceRef = new SoftReference<RSA>(instance);
+			pool.set(instanceRef);
+		}
+		return instance;
 	}
 
 }

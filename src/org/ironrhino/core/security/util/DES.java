@@ -38,7 +38,7 @@ public class DES {
 		}
 	};
 
-	private static String defaultKey = null;
+	private static String defaultKey;
 	private Cipher enCipher;
 	private Cipher deCipher;
 
@@ -46,28 +46,22 @@ public class DES {
 		String s = System.getProperty(AppInfo.getAppName() + ".des");
 		if (StringUtils.isNotBlank(s)) {
 			defaultKey = s;
-			log.info("using system property " + AppInfo.getAppName()
-					+ ".des as default key");
+			log.info("using system property " + AppInfo.getAppName() + ".des as default key");
 		} else {
 			try {
-				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY
-						+ "des");
+				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "des");
 				if (file.exists()) {
 					defaultKey = FileUtils.readFileToString(file, "UTF-8");
 					log.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						log.warn("file "
-								+ file.getAbsolutePath()
+						log.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (DES.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-						try (InputStream is = DES.class
-								.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
+						try (InputStream is = DES.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
 							defaultKey = IOUtils.toString(is, "UTF-8");
 							log.info("using classpath resource "
-									+ DES.class.getResource(
-											DEFAULT_KEY_LOCATION).toString()
-									+ " as default key");
+									+ DES.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
 					}
 				}
@@ -76,7 +70,7 @@ public class DES {
 			}
 		}
 		if (defaultKey == null)
-			defaultKey = AppInfo.getAppName();
+			defaultKey = AppInfo.getAppName() + ":" + AppInfo.getAppBasePackage();
 		defaultKey = CodecUtils.fuzzify(defaultKey);
 	}
 
@@ -87,10 +81,8 @@ public class DES {
 	public DES(String key) {
 		key = DigestUtils.md5Hex(key).substring(0, KEY_LENGTH);
 		try {
-			SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(),
-					KEY_SPEC_NAME);
-			IvParameterSpec ivParameterSpec = new IvParameterSpec(
-					(key.substring(0, 8)).getBytes());
+			SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(), KEY_SPEC_NAME);
+			IvParameterSpec ivParameterSpec = new IvParameterSpec((key.substring(0, 8)).getBytes());
 			enCipher = Cipher.getInstance(CIPHER_NAME);
 			deCipher = Cipher.getInstance(CIPHER_NAME);
 			enCipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
@@ -100,7 +92,45 @@ public class DES {
 		}
 	}
 
-	private static DES getThreadLocalInstance() {
+	public byte[] encrypt(byte[] bytes) throws IllegalBlockSizeException, BadPaddingException {
+		return enCipher.doFinal(bytes);
+	}
+
+	public byte[] encrypt(byte[] bytes, int offset, int length) throws IllegalBlockSizeException, BadPaddingException {
+		return enCipher.doFinal(bytes, offset, length);
+	}
+
+	public byte[] decrypt(byte[] bytes) throws IllegalBlockSizeException, BadPaddingException {
+		return deCipher.doFinal(bytes);
+	}
+
+	public byte[] decrypt(byte[] bytes, int offset, int length) throws IllegalBlockSizeException, BadPaddingException {
+		return deCipher.doFinal(bytes, offset, length);
+	}
+
+	public String encrypt(String str) {
+		if (str == null)
+			return null;
+		try {
+			return new String(Base64.encodeBase64(encrypt(str.getBytes("UTF-8"))), "UTF-8");
+		} catch (Exception ex) {
+			log.error("encrypt exception!", ex);
+			return "";
+		}
+	}
+
+	public String decrypt(String str) {
+		if (str == null)
+			return null;
+		try {
+			return new String(decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
+		} catch (Exception ex) {
+			log.error("decrypt exception!", ex);
+			return "";
+		}
+	}
+
+	public static DES getDefaultInstance() {
 		SoftReference<DES> instanceRef = pool.get();
 		DES instance;
 		if (instanceRef == null || (instance = instanceRef.get()) == null) {
@@ -111,84 +141,24 @@ public class DES {
 		return instance;
 	}
 
-	public static String encrypt(String str) {
-		return encrypt(str, null);
-	}
-
 	public static String encryptWithSalt(String str, String salt) {
-		String key = DigestUtils.md5Hex(defaultKey + salt).substring(0,
-				KEY_LENGTH);
-		DES des = new DES(key);
+		DES des = new DES(defaultKey + salt);
 		try {
-			return new String(Base64.encodeBase64(des.encrypt(str
-					.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.encodeBase64(des.encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			log.error("encrypt exception!", ex);
 			return "";
 		}
-	}
-
-	public static String encrypt(String str, String key) {
-		if (str == null)
-			return null;
-		DES des = key == null ? getThreadLocalInstance() : new DES(key);
-		try {
-			return new String(Base64.encodeBase64(des.encrypt(str
-					.getBytes("UTF-8"))), "UTF-8");
-		} catch (Exception ex) {
-			log.error("encrypt exception!", ex);
-			return "";
-		}
-	}
-
-	public static String decrypt(String str) {
-		return decrypt(str, null);
 	}
 
 	public static String decryptWithSalt(String str, String salt) {
-		String key = DigestUtils.md5Hex(defaultKey + salt).substring(0,
-				KEY_LENGTH);
-		DES des = new DES(key);
+		DES des = new DES(defaultKey + salt);
 		try {
-			return new String(des.decrypt(Base64.decodeBase64(str
-					.getBytes("UTF-8"))), "UTF-8");
+			return new String(des.decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			log.error("decrypt exception!", ex);
 			return "";
 		}
-	}
-
-	public static String decrypt(String str, String key) {
-		if (str == null)
-			return null;
-		DES des = key == null ? getThreadLocalInstance() : new DES(key);
-		try {
-			return new String(des.decrypt(Base64.decodeBase64(str
-					.getBytes("UTF-8"))), "UTF-8");
-		} catch (Exception ex) {
-			log.error("decrypt exception!", ex);
-			return "";
-		}
-	}
-
-	public byte[] encrypt(byte[] bytes) throws IllegalBlockSizeException,
-			BadPaddingException {
-		return enCipher.doFinal(bytes);
-	}
-
-	public byte[] encrypt(byte[] bytes, int offset, int length)
-			throws IllegalBlockSizeException, BadPaddingException {
-		return enCipher.doFinal(bytes, offset, length);
-	}
-
-	public byte[] decrypt(byte[] bytes) throws IllegalBlockSizeException,
-			BadPaddingException {
-		return deCipher.doFinal(bytes);
-	}
-
-	public byte[] decrypt(byte[] bytes, int offset, int length)
-			throws IllegalBlockSizeException, BadPaddingException {
-		return deCipher.doFinal(bytes, offset, length);
 	}
 
 }

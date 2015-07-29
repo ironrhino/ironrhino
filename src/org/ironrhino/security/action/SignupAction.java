@@ -100,8 +100,7 @@ public class SignupAction extends BaseAction {
 
 	@Override
 	public String input() {
-		if (!settingControl.getBooleanValue(
-				Constants.SETTING_KEY_SIGNUP_ENABLED, false))
+		if (!settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false))
 			return ACCESSDENIED;
 		return SUCCESS;
 	}
@@ -114,8 +113,7 @@ public class SignupAction extends BaseAction {
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "password", trim = true, key = "validation.required") }, regexFields = { @RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "username", regex = User.USERNAME_REGEX_FOR_SIGNUP, key = "validation.invalid") }, emails = { @EmailValidator(type = ValidatorType.FIELD, fieldName = "email", key = "validation.invalid") }, fieldExpressions = { @FieldExpressionValidator(expression = "password == confirmPassword", fieldName = "confirmPassword", key = "validation.repeat.not.matched") })
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
-		if (!settingControl.getBooleanValue(
-				Constants.SETTING_KEY_SIGNUP_ENABLED, false))
+		if (!settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false))
 			return ACCESSDENIED;
 		if (StringUtils.isBlank(username))
 			username = userManager.suggestUsername(email);
@@ -123,27 +121,22 @@ public class SignupAction extends BaseAction {
 			return INPUT;
 		if (StringUtils.isBlank(password))
 			password = CodecUtils.randomString(10);
-		boolean activationRequired = settingControl.getBooleanValue(
-				Constants.SETTING_KEY_SIGNUP_ACTIVATION_REQUIRED, false);
+		boolean activationRequired = settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ACTIVATION_REQUIRED,
+				false);
 		User user = new User();
 		user.setEmail(email);
 		user.setUsername(username);
 		user.setLegiblePassword(password);
 		user.setEnabled(!activationRequired);
 		userManager.save(user);
-		eventPublisher.publish(
-				new SignupEvent(user.getUsername(), request.getRemoteAddr()),
-				Scope.LOCAL);
+		eventPublisher.publish(new SignupEvent(user.getUsername(), request.getRemoteAddr()), Scope.LOCAL);
 		if (activationRequired) {
 			user.setPassword(password);// for send mail
 			addActionMessage(getText("signup.success"));
 			sendActivationMail(user);
 		} else {
 			AuthzUtils.autoLogin(user);
-			eventPublisher
-					.publish(
-							new LoginEvent(user.getUsername(), request
-									.getRemoteAddr()), Scope.LOCAL);
+			eventPublisher.publish(new LoginEvent(user.getUsername(), request.getRemoteAddr()), Scope.LOCAL);
 		}
 		targetUrl = "/";
 		return REDIRECT;
@@ -156,15 +149,12 @@ public class SignupAction extends BaseAction {
 
 	private boolean check() {
 		boolean valid = true;
-		if (settingControl.getBooleanValue(
-				Constants.SETTING_KEY_SIGNUP_ENABLED, false)) {
-			if (StringUtils.isNotBlank(username)
-					&& userManager.findByNaturalId(username) != null) {
+		if (settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false)) {
+			if (StringUtils.isNotBlank(username) && userManager.findByNaturalId(username) != null) {
 				addFieldError("username", getText("validation.already.exists"));
 				valid = false;
 			}
-			if (StringUtils.isNotBlank(email)
-					&& userManager.findOne("email", email) != null) {
+			if (StringUtils.isNotBlank(email) && userManager.findOne("email", email) != null) {
 				addFieldError("email", getText("validation.already.exists"));
 				valid = false;
 			}
@@ -176,20 +166,17 @@ public class SignupAction extends BaseAction {
 	public String activate() {
 		String u = getUid();
 		if (u != null) {
-			String[] array = Blowfish.decrypt(u).split(",");
+			String[] array = Blowfish.getDefaultInstance().decrypt(u).split(",");
 			User user = userManager.get(array[0]);
-			if (user != null && !user.isEnabled()
-					&& user.getEmail().equals(array[1])) {
+			if (user != null && !user.isEnabled() && user.getEmail().equals(array[1])) {
 				user.setEnabled(true);
 				userManager.save(user);
 				try {
-					User ud = (User) userManager.loadUserByUsername(user
-							.getUsername());
+					User ud = (User) userManager.loadUserByUsername(user.getUsername());
 					if (ud != null) {
 						AuthzUtils.autoLogin(ud);
-						LoginEvent loginEvent = new LoginEvent(
-								ud.getUsername(), ServletActionContext
-										.getRequest().getRemoteAddr());
+						LoginEvent loginEvent = new LoginEvent(ud.getUsername(), ServletActionContext.getRequest()
+								.getRemoteAddr());
 						loginEvent.setFirst(true);
 						eventPublisher.publish(loginEvent, Scope.LOCAL);
 					}
@@ -230,10 +217,8 @@ public class SignupAction extends BaseAction {
 	private void sendActivationMail(User user) {
 		Map<String, Object> model = new HashMap<String, Object>(4);
 		model.put("user", user);
-		model.put(
-				"url",
-				"/signup/activate/"
-						+ Blowfish.encrypt(user.getId() + "," + user.getEmail()));
+		model.put("url",
+				"/signup/activate/" + Blowfish.getDefaultInstance().encrypt(user.getId() + "," + user.getEmail()));
 		SimpleMailMessage smm = new SimpleMailMessage();
 		smm.setTo(user + "<" + user.getEmail() + ">");
 		smm.setSubject(getText("mail.subject.user_activate"));

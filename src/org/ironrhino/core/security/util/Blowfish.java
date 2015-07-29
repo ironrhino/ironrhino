@@ -38,7 +38,7 @@ public class Blowfish {
 		}
 	};
 
-	private static String defaultKey = null;
+	private static String defaultKey;
 	private Cipher enCipher;
 	private Cipher deCipher;
 
@@ -46,28 +46,22 @@ public class Blowfish {
 		String s = System.getProperty(AppInfo.getAppName() + ".blowfish");
 		if (StringUtils.isNotBlank(s)) {
 			defaultKey = s;
-			log.info("using system property " + AppInfo.getAppName()
-					+ ".blowfish as default key");
+			log.info("using system property " + AppInfo.getAppName() + ".blowfish as default key");
 		} else {
 			try {
-				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY
-						+ "blowfish");
+				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "blowfish");
 				if (file.exists()) {
 					defaultKey = FileUtils.readFileToString(file, "UTF-8");
 					log.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						log.warn("file "
-								+ file.getAbsolutePath()
+						log.error("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (Blowfish.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-						try (InputStream is = Blowfish.class
-								.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
+						try (InputStream is = Blowfish.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
 							defaultKey = IOUtils.toString(is, "UTF-8");
 							log.info("using classpath resource "
-									+ Blowfish.class.getResource(
-											DEFAULT_KEY_LOCATION).toString()
-									+ " as default key");
+									+ Blowfish.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
 					}
 				}
@@ -76,7 +70,7 @@ public class Blowfish {
 			}
 		}
 		if (defaultKey == null)
-			defaultKey = AppInfo.getAppName();
+			defaultKey = AppInfo.getAppName() + ":" + AppInfo.getAppBasePackage();
 		defaultKey = CodecUtils.fuzzify(defaultKey);
 	}
 
@@ -87,10 +81,8 @@ public class Blowfish {
 	public Blowfish(String key) {
 		key = DigestUtils.md5Hex(key).substring(0, KEY_LENGTH);
 		try {
-			SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(),
-					KEY_SPEC_NAME);
-			IvParameterSpec ivParameterSpec = new IvParameterSpec(
-					(key.substring(0, 8)).getBytes());
+			SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(), KEY_SPEC_NAME);
+			IvParameterSpec ivParameterSpec = new IvParameterSpec((key.substring(0, 8)).getBytes());
 			enCipher = Cipher.getInstance(CIPHER_NAME);
 			deCipher = Cipher.getInstance(CIPHER_NAME);
 			enCipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
@@ -100,7 +92,45 @@ public class Blowfish {
 		}
 	}
 
-	private static Blowfish getThreadLocalInstance() {
+	public byte[] encrypt(byte[] bytes) throws IllegalBlockSizeException, BadPaddingException {
+		return enCipher.doFinal(bytes);
+	}
+
+	public byte[] encrypt(byte[] bytes, int offset, int length) throws IllegalBlockSizeException, BadPaddingException {
+		return enCipher.doFinal(bytes, offset, length);
+	}
+
+	public byte[] decrypt(byte[] bytes) throws IllegalBlockSizeException, BadPaddingException {
+		return deCipher.doFinal(bytes);
+	}
+
+	public byte[] decrypt(byte[] bytes, int offset, int length) throws IllegalBlockSizeException, BadPaddingException {
+		return deCipher.doFinal(bytes, offset, length);
+	}
+
+	public String encrypt(String str) {
+		if (str == null)
+			return null;
+		try {
+			return new String(Base64.encodeBase64(encrypt(str.getBytes("UTF-8"))), "UTF-8");
+		} catch (Exception ex) {
+			log.error("encrypt exception!", ex);
+			return "";
+		}
+	}
+
+	public String decrypt(String str) {
+		if (str == null)
+			return null;
+		try {
+			return new String(decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
+		} catch (Exception ex) {
+			log.error("decrypt exception!", ex);
+			return "";
+		}
+	}
+
+	public static Blowfish getDefaultInstance() {
 		SoftReference<Blowfish> instanceRef = pool.get();
 		Blowfish instance;
 		if (instanceRef == null || (instance = instanceRef.get()) == null) {
@@ -111,86 +141,24 @@ public class Blowfish {
 		return instance;
 	}
 
-	public static String encrypt(String str) {
-		return encrypt(str, null);
-	}
-
 	public static String encryptWithSalt(String str, String salt) {
-		String key = DigestUtils.md5Hex(defaultKey + salt).substring(0,
-				KEY_LENGTH);
-		Blowfish blowfish = new Blowfish(key);
+		Blowfish blowfish = new Blowfish(defaultKey + salt);
 		try {
-			return new String(Base64.encodeBase64(blowfish.encrypt(str
-					.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.encodeBase64(blowfish.encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			log.error("encrypt exception!", ex);
 			return "";
 		}
-	}
-
-	public static String encrypt(String str, String key) {
-		if (str == null)
-			return null;
-		Blowfish blowfish = key == null ? getThreadLocalInstance()
-				: new Blowfish(key);
-		try {
-			return new String(Base64.encodeBase64(blowfish.encrypt(str
-					.getBytes("UTF-8"))), "UTF-8");
-		} catch (Exception ex) {
-			log.error("encrypt exception!", ex);
-			return "";
-		}
-	}
-
-	public static String decrypt(String str) {
-		return decrypt(str, null);
 	}
 
 	public static String decryptWithSalt(String str, String salt) {
-		String key = DigestUtils.md5Hex(defaultKey + salt).substring(0,
-				KEY_LENGTH);
-		Blowfish blowfish = new Blowfish(key);
+		Blowfish blowfish = new Blowfish(defaultKey + salt);
 		try {
-			return new String(blowfish.decrypt(Base64.decodeBase64(str
-					.getBytes("UTF-8"))), "UTF-8");
+			return new String(blowfish.decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			log.error("decrypt exception!", ex);
 			return "";
 		}
-	}
-
-	public static String decrypt(String str, String key) {
-		if (str == null)
-			return null;
-		Blowfish blowfish = key == null ? getThreadLocalInstance()
-				: new Blowfish(key);
-		try {
-			return new String(blowfish.decrypt(Base64.decodeBase64(str
-					.getBytes("UTF-8"))), "UTF-8");
-		} catch (Exception ex) {
-			log.error("decrypt exception!", ex);
-			return "";
-		}
-	}
-
-	public byte[] encrypt(byte[] bytes) throws IllegalBlockSizeException,
-			BadPaddingException {
-		return enCipher.doFinal(bytes);
-	}
-
-	public byte[] encrypt(byte[] bytes, int offset, int length)
-			throws IllegalBlockSizeException, BadPaddingException {
-		return enCipher.doFinal(bytes, offset, length);
-	}
-
-	public byte[] decrypt(byte[] bytes) throws IllegalBlockSizeException,
-			BadPaddingException {
-		return deCipher.doFinal(bytes);
-	}
-
-	public byte[] decrypt(byte[] bytes, int offset, int length)
-			throws IllegalBlockSizeException, BadPaddingException {
-		return deCipher.doFinal(bytes, offset, length);
 	}
 
 }

@@ -2,10 +2,10 @@ package org.ironrhino.core.security.util;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -22,34 +22,35 @@ public class RC4 {
 	public static final String DEFAULT_KEY_LOCATION = "/resources/key/rc4";
 	public static final String KEY_DIRECTORY = "/key/";
 
-	private static String defaultKey = null;
+	private static final ThreadLocal<SoftReference<RC4>> pool = new ThreadLocal<SoftReference<RC4>>() {
+		@Override
+		protected SoftReference<RC4> initialValue() {
+			return new SoftReference<RC4>(new RC4());
+		}
+	};
+
+	private static String defaultKey;
 
 	static {
 		String s = System.getProperty(AppInfo.getAppName() + ".rc4");
 		if (StringUtils.isNotBlank(s)) {
 			defaultKey = s;
-			log.info("using system property " + AppInfo.getAppName()
-					+ ".rc4 as default key");
+			log.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
 		} else {
 			try {
-				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY
-						+ "rc4");
+				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rc4");
 				if (file.exists()) {
 					defaultKey = FileUtils.readFileToString(file, "UTF-8");
 					log.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						log.warn("file "
-								+ file.getAbsolutePath()
+						log.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RC4.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-						try (InputStream is = RC4.class
-								.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
+						try (InputStream is = RC4.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
 							defaultKey = IOUtils.toString(is, "UTF-8");
 							log.info("using classpath resource "
-									+ RC4.class.getResource(
-											DEFAULT_KEY_LOCATION).toString()
-									+ " as default key");
+									+ RC4.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
 					}
 				}
@@ -58,7 +59,7 @@ public class RC4 {
 			}
 		}
 		if (defaultKey == null)
-			defaultKey = AppInfo.getAppName();
+			defaultKey = AppInfo.getAppName() + ":" + AppInfo.getAppBasePackage();
 		defaultKey = CodecUtils.fuzzify(defaultKey);
 	}
 
@@ -123,60 +124,47 @@ public class RC4 {
 		return result;
 	}
 
-	public static String encrypt(String input) {
+	public String encrypt(String input) {
 		if (input == null)
 			return null;
-		RC4 rc4 = new RC4(defaultKey);
 		try {
-			return Hex.encodeHexString(rc4.rc4(URLEncoder
-					.encode(input, "UTF-8").getBytes("UTF-8")));
+			return Hex.encodeHexString(rc4(URLEncoder.encode(input, "UTF-8").getBytes("UTF-8")));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return input;
 		}
 	}
 
-	public static String decrypt(String input) {
+	public String decrypt(String input) {
 		if (input == null)
 			return null;
-		RC4 rc4 = new RC4(defaultKey);
 		try {
-			return URLDecoder.decode(
-					new String(rc4.rc4(Hex.decodeHex(input.toCharArray())),
-							"UTF-8"), "UTF-8");
+			return URLDecoder.decode(new String(rc4(Hex.decodeHex(input.toCharArray())), "UTF-8"), "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return input;
 		}
 	}
 
-	public static String encrypt(String input, String key) {
-		if (key == null || input == null)
-			return null;
-		RC4 rc4 = new RC4(key);
-		try {
-			return Hex.encodeHexString(rc4.rc4(URLEncoder
-					.encode(input, "UTF-8").getBytes("UTF-8")));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return input;
+	public static RC4 getDefaultInstance() {
+		SoftReference<RC4> instanceRef = pool.get();
+		RC4 instance;
+		if (instanceRef == null || (instance = instanceRef.get()) == null) {
+			instance = new RC4();
+			instanceRef = new SoftReference<RC4>(instance);
+			pool.set(instanceRef);
 		}
+		return instance;
 	}
 
-	public static String decrypt(String input, String key) {
-		if (key == null || input == null)
-			return null;
+	public static String encryptWithKey(String str, String key) {
 		RC4 rc4 = new RC4(key);
-		try {
-			return URLDecoder.decode(
-					new String(rc4.rc4(Hex.decodeHex(input.toCharArray())),
-							"UTF-8"), "UTF-8");
-		} catch (DecoderException de) {
-			return input;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return input;
-		}
+		return rc4.encrypt(str);
+	}
+
+	public static String decryptWithKey(String str, String key) {
+		RC4 rc4 = new RC4(key);
+		return rc4.decrypt(str);
 	}
 
 }
