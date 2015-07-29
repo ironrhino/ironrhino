@@ -272,7 +272,7 @@ ${formHeader!}
 <#local totalResults=list?size/>
 </#if>
 ${totalResults}<span class="recordLabel"> ${action.getText('record')}</span>
-<#if !request.requestURI?ends_with('/pick') && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
+<#if request.requestURI?ends_with(actionBaseUrl) && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
 <button type="submit" class="noajax plain" formaction="${actionBaseUrl}/csv">
 <span class="glyphicon glyphicon-download-alt clickable">
 </span>
