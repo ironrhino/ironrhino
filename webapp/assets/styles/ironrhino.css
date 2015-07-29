@@ -7896,6 +7896,9 @@ td.middle {
 .modal.pop .modal-body{
   	max-height: none;
 }
+.tab-content {
+    overflow: visible;
+}
 /*override bootstrap end*/
 /*override jqueryui start*/
 .ui-widget{
@@ -7911,7 +7914,7 @@ td.middle {
 .ui-dialog-titlebar-close:hover,a.close:hover,a.remove:hover,.modal-close button.close:hover{
 	transform:rotate(360deg);
 }
-/*override bootstrap end*/
+/*override jqueryui end*/
 body.main > #content > form:first-child {
 	margin-top: 20px;
 }
