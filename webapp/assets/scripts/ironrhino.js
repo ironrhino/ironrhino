@@ -32779,11 +32779,17 @@ Observation.common = function(container) {
 						else if (t.hasClass('time'))
 							t.attr('maxlength', '8');
 						else if (t.hasClass('integer'))
-							t.attr('maxlength', '11');
+							t.attr('maxlength', t.hasClass('positive')
+											? '9'
+											: '10');
 						else if (t.hasClass('long'))
-							t.attr('maxlength', '20');
+							t.attr('maxlength', t.hasClass('positive')
+											? '18'
+											: '19');
 						else if (t.hasClass('double'))
-							t.attr('maxlength', '22');
+							t.attr('maxlength', t.hasClass('positive')
+											? '21'
+											: '22');
 						else
 							t.attr('maxlength', '255');
 					}
