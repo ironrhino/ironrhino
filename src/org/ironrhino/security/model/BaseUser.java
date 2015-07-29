@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -107,7 +107,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 	@Transient
 	@JsonIgnore
 	@UiConfig(displayOrder = 100, alias = "role", template = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next> </#if></#list>", csvTemplate = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next>,</#if></#list>")
-	private Set<String> roles = new HashSet<String>(0);
+	private Set<String> roles = new LinkedHashSet<String>(0);
 
 	@NotInCopy
 	@JsonIgnore
