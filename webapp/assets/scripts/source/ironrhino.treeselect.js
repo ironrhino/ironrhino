@@ -84,8 +84,7 @@
 				separator : '',
 				id : '.treeselect-id',
 				name : '.treeselect-name',
-				full : true,
-				cache : true
+				full : true
 			}
 			$.extend(options, (new Function("return "
 							+ (current.data('options') || '{}')))());
@@ -111,49 +110,45 @@
 			}
 			var func = function(event) {
 				current = $(event.target).closest('.treeselect');
-				if (!options.cache)
-					$('#_tree_window').remove();
-				if (!$('#_tree_window').length) {
-					$('<div id="_tree_window" title="'
-							+ MessageBundle.get('select')
-							+ '"><div id="_tree_"></div></div>')
-							.appendTo(document.body);
-					$('#_tree_window').dialog({
-								width : current.data('_options').width || 500,
-								minHeight : current.data('_options').minHeight
-										|| 500
-							});
-					$('#_tree_window').closest('.ui-dialog').css('z-index',
-							2500);
-					if (nametarget && nametarget.length)
-						options.value = val(options.name, current) || '';
-					if (options.type != 'treeview') {
-						options.click = function(treenode) {
-							doclick(treenode, options);
-						};
-						$('#_tree_').treearea(options);
-					} else {
-						var treeviewoptions = {
-							url : options.url,
-							click : function() {
-								var treenode = $(this).closest('li')
-										.data('treenode');
-								doclick(treenode, options);
-							},
-							collapsed : true,
-							placeholder : MessageBundle.get('ajax.loading'),
-							unique : true,
-							separator : options.separator,
-							value : options.value,
-							root : options.root
-						};
-						if (!options.cache)
-							treeviewoptions.url = treeviewoptions.url + '?r='
-									+ Math.random();
-						$('#_tree_').treeview(treeviewoptions);
-					}
+				var winid = '_tree_window';
+				current.data('winid', winid);
+				$('#' + winid).remove();
+				var win = $('<div id="' + winid + '" title="'
+						+ MessageBundle.get('select')
+						+ '"><div class="tree"></div></div>')
+						.appendTo(document.body);
+				win.dialog({
+							width : current.data('_options').width || 500,
+							minHeight : current.data('_options').minHeight
+									|| 500,
+							close : function() {
+								win.html('').dialog('destroy').remove();
+							}
+						});
+				win.closest('.ui-dialog').css('z-index', 2500);
+				if (nametarget && nametarget.length)
+					options.value = val(options.name, current) || '';
+				if (options.type != 'treeview') {
+					options.click = function(treenode) {
+						doclick(current, treenode, options);
+					};
+					win.find('.tree').treearea(options);
 				} else {
-					$('#_tree_window').dialog('open');
+					var treeviewoptions = {
+						url : options.url,
+						click : function() {
+							var treenode = $(this).closest('li')
+									.data('treenode');
+							doclick(current, treenode, options);
+						},
+						collapsed : true,
+						placeholder : MessageBundle.get('ajax.loading'),
+						unique : true,
+						separator : options.separator,
+						value : options.value,
+						root : options.root
+					};
+					win.find('.tree').treeview(treeviewoptions);
 				}
 
 			};
@@ -168,7 +163,7 @@
 		return this;
 	};
 
-	function doclick(treenode, options) {
+	function doclick(current, treenode, options) {
 		if (options.name) {
 			var nametarget = find(options.name, current);
 			var name = options.full ? treenode.fullname : treenode.name;
@@ -184,7 +179,7 @@
 			if (idtarget.is(':input'))
 				idtarget.data('treenode', treenode);
 		}
-		$('#_tree_window').dialog('close');
+		$('#' + current.data('winid')).dialog('close');
 		if (options.select)
 			options.select(treenode);
 	}
