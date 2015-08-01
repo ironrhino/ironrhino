@@ -20,11 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.EventListener;
 
-public abstract class AbstractServiceRegistry implements ServiceRegistry,
-		ApplicationListener<InstanceLifecycleEvent> {
+public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	protected Logger log = LoggerFactory.getLogger(getClass());
 
@@ -91,9 +90,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry,
 			Remoting remoting = clazz.getAnnotation(Remoting.class);
 			if (remoting != null) {
 				Class<?>[] classes = remoting.value();
-				if(classes.length == 0){
+				if (classes.length == 0) {
 					Class<?>[] interfaces = clazz.getInterfaces();
-					if(interfaces.length > 0)
+					if (interfaces.length > 0)
 						classes = interfaces;
 				}
 				if (classes.length == 0) {
@@ -208,7 +207,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry,
 			unregister(serviceName);
 	}
 
-	@Override
+	@EventListener
 	public void onApplicationEvent(InstanceLifecycleEvent event) {
 		if (handle(event))
 			return;

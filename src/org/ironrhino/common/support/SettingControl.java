@@ -28,13 +28,12 @@ import org.ironrhino.core.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SettingControl implements
-		ApplicationListener<EntityOperationEvent<Setting>> {
+public class SettingControl {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -164,30 +163,27 @@ public class SettingControl implements
 		return new String[0];
 	}
 
-	@Override
+	@EventListener
 	public void onApplicationEvent(EntityOperationEvent<Setting> event) {
-		if (event.getEntity() instanceof Setting) {
-			Setting settingInEvent = event.getEntity();
-			if (event.getType() == EntityOperationType.CREATE) {
-				settings.put(settingInEvent.getKey(), settingInEvent);
-			} else {
-				Setting settingInMemory = null;
-				for (Setting setting : settings.values()) {
-					if (setting.getId().equals(settingInEvent.getId())) {
-						settingInMemory = setting;
-						break;
-					}
+		Setting settingInEvent = event.getEntity();
+		if (event.getType() == EntityOperationType.CREATE) {
+			settings.put(settingInEvent.getKey(), settingInEvent);
+		} else {
+			Setting settingInMemory = null;
+			for (Setting setting : settings.values()) {
+				if (setting.getId().equals(settingInEvent.getId())) {
+					settingInMemory = setting;
+					break;
 				}
-				if (settingInMemory != null)
-					if (event.getType() == EntityOperationType.UPDATE) {
-						settings.remove(settingInMemory.getKey());
-						BeanUtils.copyProperties(settingInEvent,
-								settingInMemory);
-						settings.put(settingInMemory.getKey(), settingInMemory);
-					} else if (event.getType() == EntityOperationType.DELETE) {
-						settings.remove(settingInMemory.getKey());
-					}
 			}
+			if (settingInMemory != null)
+				if (event.getType() == EntityOperationType.UPDATE) {
+					settings.remove(settingInMemory.getKey());
+					BeanUtils.copyProperties(settingInEvent, settingInMemory);
+					settings.put(settingInMemory.getKey(), settingInMemory);
+				} else if (event.getType() == EntityOperationType.DELETE) {
+					settings.remove(settingInMemory.getKey());
+				}
 		}
 	}
 

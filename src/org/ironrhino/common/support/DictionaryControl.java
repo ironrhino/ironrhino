@@ -25,13 +25,12 @@ import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DictionaryControl implements
-		ApplicationListener<EntityOperationEvent<Dictionary>> {
+public class DictionaryControl {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -83,29 +82,27 @@ public class DictionaryControl implements
 		return value;
 	}
 
-	@Override
+	@EventListener
 	public void onApplicationEvent(EntityOperationEvent<Dictionary> event) {
-		if (event.getEntity() instanceof Dictionary) {
-			Dictionary dictInEvent = event.getEntity();
-			if (event.getType() == EntityOperationType.CREATE) {
-				map.put(dictInEvent.getName(), dictInEvent);
-			} else {
-				Dictionary dictInMemory = null;
-				for (Dictionary dictionary : map.values()) {
-					if (dictionary.getId().equals(dictInEvent.getId())) {
-						dictInMemory = dictionary;
-						break;
-					}
+		Dictionary dictInEvent = event.getEntity();
+		if (event.getType() == EntityOperationType.CREATE) {
+			map.put(dictInEvent.getName(), dictInEvent);
+		} else {
+			Dictionary dictInMemory = null;
+			for (Dictionary dictionary : map.values()) {
+				if (dictionary.getId().equals(dictInEvent.getId())) {
+					dictInMemory = dictionary;
+					break;
 				}
-				if (dictInMemory != null)
-					if (event.getType() == EntityOperationType.UPDATE) {
-						map.remove(dictInMemory.getName());
-						BeanUtils.copyProperties(dictInEvent, dictInMemory);
-						map.put(dictInMemory.getName(), dictInMemory);
-					} else if (event.getType() == EntityOperationType.DELETE) {
-						map.remove(dictInMemory.getName());
-					}
 			}
+			if (dictInMemory != null)
+				if (event.getType() == EntityOperationType.UPDATE) {
+					map.remove(dictInMemory.getName());
+					BeanUtils.copyProperties(dictInEvent, dictInMemory);
+					map.put(dictInMemory.getName(), dictInMemory);
+				} else if (event.getType() == EntityOperationType.DELETE) {
+					map.remove(dictInMemory.getName());
+				}
 		}
 	}
 

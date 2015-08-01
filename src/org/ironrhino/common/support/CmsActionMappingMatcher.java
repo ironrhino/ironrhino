@@ -27,12 +27,11 @@ import org.ironrhino.core.struts.mapper.DefaultActionMapper;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CmsActionMappingMatcher implements ActionMappingMatcher,
-		ApplicationListener<EntityOperationEvent<Setting>> {
+public class CmsActionMappingMatcher implements ActionMappingMatcher {
 
 	public static final String DEFAULT_PAGE_PATH_PREFIX = "/p/";
 
@@ -240,39 +239,37 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher,
 		issuesList = list;
 	}
 
-	@Override
+	@EventListener
 	public void onApplicationEvent(EntityOperationEvent<Setting> event) {
-		if (event.getEntity() instanceof Setting) {
-			Setting setting = event.getEntity();
-			String key = setting.getKey();
-			if (key.equals(Constants.SETTING_KEY_CMS_SERIESES)) {
-				List<String> list = new ArrayList<String>();
-				if (StringUtils.isNotBlank(serieses))
-					for (String s : serieses.split("\\s*,\\s*"))
-						list.add(s);
-				if (StringUtils.isNotBlank(setting.getValue()))
-					for (String s : setting.getValue().split("\\s*,\\s*"))
-						list.add(s);
-				seriesesList = list;
-			} else if (key.equals(Constants.SETTING_KEY_CMS_COLUMNS)) {
-				List<String> list = new ArrayList<String>();
-				if (StringUtils.isNotBlank(columns))
-					for (String s : columns.split("\\s*,\\s*"))
-						list.add(s);
-				if (StringUtils.isNotBlank(setting.getValue()))
-					for (String s : setting.getValue().split("\\s*,\\s*"))
-						list.add(s);
-				columnsList = list;
-			} else if (key.equals(Constants.SETTING_KEY_CMS_ISSUES)) {
-				List<String> list = new ArrayList<String>();
-				if (StringUtils.isNotBlank(issues))
-					for (String s : issues.split("\\s*,\\s*"))
-						list.add(s);
-				if (StringUtils.isNotBlank(setting.getValue()))
-					for (String s : setting.getValue().split("\\s*,\\s*"))
-						list.add(s);
-				issuesList = list;
-			}
+		Setting setting = event.getEntity();
+		String key = setting.getKey();
+		if (key.equals(Constants.SETTING_KEY_CMS_SERIESES)) {
+			List<String> list = new ArrayList<String>();
+			if (StringUtils.isNotBlank(serieses))
+				for (String s : serieses.split("\\s*,\\s*"))
+					list.add(s);
+			if (StringUtils.isNotBlank(setting.getValue()))
+				for (String s : setting.getValue().split("\\s*,\\s*"))
+					list.add(s);
+			seriesesList = list;
+		} else if (key.equals(Constants.SETTING_KEY_CMS_COLUMNS)) {
+			List<String> list = new ArrayList<String>();
+			if (StringUtils.isNotBlank(columns))
+				for (String s : columns.split("\\s*,\\s*"))
+					list.add(s);
+			if (StringUtils.isNotBlank(setting.getValue()))
+				for (String s : setting.getValue().split("\\s*,\\s*"))
+					list.add(s);
+			columnsList = list;
+		} else if (key.equals(Constants.SETTING_KEY_CMS_ISSUES)) {
+			List<String> list = new ArrayList<String>();
+			if (StringUtils.isNotBlank(issues))
+				for (String s : issues.split("\\s*,\\s*"))
+					list.add(s);
+			if (StringUtils.isNotBlank(setting.getValue()))
+				for (String s : setting.getValue().split("\\s*,\\s*"))
+					list.add(s);
+			issuesList = list;
 		}
 	}
 }

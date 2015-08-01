@@ -24,12 +24,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApplicationContextConsole implements
-		ApplicationListener<ExpressionEvent> {
+public class ApplicationContextConsole {
 
 	private static final String SET_PROPERTY_EXPRESSION_PATTERN = "^\\s*[a-zA-Z][a-zA-Z0-9_\\-]*\\.[a-zA-Z][a-zA-Z0-9_]*\\s*=\\s*.+\\s*$";
 
@@ -162,7 +161,7 @@ public class ApplicationContextConsole implements
 		}
 	}
 
-	@Override
+	@EventListener
 	public void onApplicationEvent(ExpressionEvent event) {
 		if (event.isLocal())
 			return;

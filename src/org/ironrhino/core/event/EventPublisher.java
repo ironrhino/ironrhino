@@ -4,15 +4,14 @@ import org.ironrhino.core.metadata.Scope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EventPublisher implements
-		ApplicationListener<ApplicationContextEvent> {
+public class EventPublisher {
 
 	@Autowired
 	private ApplicationEventPublisher publisher;
@@ -28,7 +27,7 @@ public class EventPublisher implements
 			publisher.publishEvent(event);
 	}
 
-	@Override
+	@EventListener
 	public void onApplicationEvent(ApplicationContextEvent event) {
 		if (event.getApplicationContext().getParent() != null)
 			return;

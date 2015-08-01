@@ -2,16 +2,15 @@ package org.ironrhino.security.event;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SimpleSignupEventListener implements
-		ApplicationListener<SignupEvent> {
+public class SimpleSignupEventListener {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Override
+	@EventListener
 	public void onApplicationEvent(SignupEvent event) {
 		logger.info(
 				event.getUsername()

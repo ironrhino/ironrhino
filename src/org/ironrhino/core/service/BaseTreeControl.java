@@ -11,10 +11,9 @@ import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 
-public class BaseTreeControl<T extends BaseTreeableEntity<T>> implements
-		ApplicationListener<EntityOperationEvent<T>> {
+public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 
 	private volatile T tree;
 
@@ -141,7 +140,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> implements
 			t.getParent().getChildren().remove(t);
 	}
 
-	@Override
+	@EventListener
 	public void onApplicationEvent(EntityOperationEvent<T> event) {
 		if (event.getEntity() instanceof BaseTreeableEntity) {
 			if (tree == null)
