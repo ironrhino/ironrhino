@@ -78,8 +78,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 		try {
 			T t = entityClass.newInstance();
 			t.setChildren(new ArrayList<T>());
-			BeanUtils.copyProperties(treeNode, t, new String[] { "parent",
-					"children" });
+			BeanUtils.copyProperties(treeNode, t, new String[] { "parent", "children" });
 			t.setParent(parent);
 			parent.getChildren().add(t);
 			if (parent.getChildren() instanceof List)
@@ -94,8 +93,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 		T t = tree.getDescendantOrSelfById(treeNode.getId());
 		if (t == null)
 			return;
-		boolean needsort = t.compareTo(treeNode) != 0
-				|| !t.getFullId().equals(treeNode.getFullId());
+		boolean needsort = t.compareTo(treeNode) != 0 || !t.getFullId().equals(treeNode.getFullId());
 		if (!t.getFullId().equals(treeNode.getFullId())) {
 			t.getParent().getChildren().remove(t);
 			String str = treeNode.getFullId();
@@ -117,8 +115,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 			newParent.getChildren().add(t);
 			resetChildren(t);
 		}
-		BeanUtils.copyProperties(treeNode, t, new String[] { "parent",
-				"children" });
+		BeanUtils.copyProperties(treeNode, t, new String[] { "parent", "children" });
 		if (needsort && t.getParent().getChildren() instanceof List)
 			Collections.sort((List) t.getParent().getChildren());
 	}
@@ -126,8 +123,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 	private void resetChildren(T treeNode) {
 		if (treeNode.isHasChildren())
 			for (T t : treeNode.getChildren()) {
-				String fullId = (t.getParent()).getFullId()
-						+ String.valueOf(t.getId()) + ".";
+				String fullId = (t.getParent()).getFullId() + String.valueOf(t.getId()) + ".";
 				t.setFullId(fullId);
 				t.setLevel(fullId.split("\\.").length);
 				resetChildren(t);
@@ -142,18 +138,16 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 
 	@EventListener
 	public void onApplicationEvent(EntityOperationEvent<T> event) {
-		if (event.getEntity() instanceof BaseTreeableEntity) {
-			if (tree == null)
-				return;
-			if (event.getEntity().getClass() == entityClass) {
-				T treeNode = event.getEntity();
-				if (event.getType() == EntityOperationType.CREATE)
-					create(treeNode);
-				else if (event.getType() == EntityOperationType.UPDATE)
-					update(treeNode);
-				else if (event.getType() == EntityOperationType.DELETE)
-					delete(treeNode);
-			}
+		if (tree == null)
+			return;
+		if (event.getEntity().getClass() == entityClass) {
+			T treeNode = event.getEntity();
+			if (event.getType() == EntityOperationType.CREATE)
+				create(treeNode);
+			else if (event.getType() == EntityOperationType.UPDATE)
+				update(treeNode);
+			else if (event.getType() == EntityOperationType.DELETE)
+				delete(treeNode);
 		}
 	}
 }
