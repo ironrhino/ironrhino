@@ -21,6 +21,8 @@ public class EnumToEnumConverter implements ConditionalGenericConverter {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+		if(source == null)
+			return null;
 		Enum<?> s = (Enum<?>) source;
 		try {
 			return Enum.valueOf((Class<Enum>) targetType.getObjectType(), s.name());
