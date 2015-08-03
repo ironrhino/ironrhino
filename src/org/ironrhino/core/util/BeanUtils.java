@@ -10,24 +10,32 @@ import java.util.Set;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.BaseTreeableEntity;
+import org.ironrhino.core.spring.converter.EnumToEnumConverter;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 public class BeanUtils {
 
+	static DefaultConversionService conversionService = new DefaultConversionService();
+
+	static {
+		conversionService.addConverter(new EnumToEnumConverter());
+	}
+
 	public static boolean hasProperty(Class<?> clazz, String name) {
-		if (org.springframework.beans.BeanUtils.getPropertyDescriptor(clazz,
-				name) != null)
+		if (org.springframework.beans.BeanUtils.getPropertyDescriptor(clazz, name) != null)
 			return true;
 		return false;
 	}
 
-	public static void copyPropertiesIfNotNull(Object source, Object target,
-			String... properties) {
+	public static void copyPropertiesIfNotNull(Object source, Object target, String... properties) {
 		if (properties.length == 0)
 			return;
 		BeanWrapperImpl bws = new BeanWrapperImpl(source);
+		bws.setConversionService(conversionService);
 		BeanWrapperImpl bwt = new BeanWrapperImpl(target);
+		bwt.setConversionService(conversionService);
 		for (String propertyName : properties) {
 			Object value = bws.getPropertyValue(propertyName);
 			if (value != null)
@@ -35,36 +43,54 @@ public class BeanUtils {
 		}
 	}
 
-	public static void copyProperties(Map<String, Object> source,
-			Object target, String... ignoreProperties) {
+	public static void copyProperties(Map<String, Object> source, Object target, String... ignoreProperties) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(target);
+		bw.setConversionService(conversionService);
 		for (Map.Entry<String, Object> entry : source.entrySet()) {
 			if (bw.isWritableProperty(entry.getKey()))
 				bw.setPropertyValue(entry.getKey(), entry.getValue());
 		}
 	}
 
-	public static void copyProperties(Object source, Object target,
-			String... ignoreProperties) {
+	public static void copyProperties(Object source, Object target, String... ignoreProperties) {
 		Set<String> ignores = new HashSet<String>();
-		ignores.addAll(AnnotationUtils.getAnnotatedPropertyNames(
-				source.getClass(), NotInCopy.class));
+		ignores.addAll(AnnotationUtils.getAnnotatedPropertyNames(source.getClass(), NotInCopy.class));
 		ignores.addAll(Arrays.asList(ignoreProperties));
-		org.springframework.beans.BeanUtils.copyProperties(source, target,
-				ignores.toArray(ignoreProperties));
+		BeanWrapperImpl bws = new BeanWrapperImpl(source);
+		bws.setConversionService(conversionService);
+		PropertyDescriptor[] sourcePds = bws.getPropertyDescriptors();
+		BeanWrapperImpl bwt = new BeanWrapperImpl(target);
+		bwt.setConversionService(conversionService);
+		PropertyDescriptor[] targetPds = bwt.getPropertyDescriptors();
+		for (PropertyDescriptor sourcePd : sourcePds) {
+			if (sourcePd.getReadMethod() == null)
+				continue;
+			String name = sourcePd.getName();
+			if (ignores.contains(name))
+				continue;
+			PropertyDescriptor targetPd = null;
+			for (PropertyDescriptor pd : targetPds) {
+				if (pd.getName().equals(name)) {
+					targetPd = pd;
+					break;
+				}
+			}
+			if (targetPd == null || targetPd.getWriteMethod() == null)
+				continue;
+			Object value = bws.getPropertyValue(name);
+			bwt.setPropertyValue(name, value);
+		}
 	}
 
-	public static <T extends BaseTreeableEntity<T>> T deepClone(T source,
-			String... ignoreProperties) {
+	public static <T extends BaseTreeableEntity<T>> T deepClone(T source, String... ignoreProperties) {
 		return deepClone(source, null, ignoreProperties);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends BaseTreeableEntity<T>> T deepClone(T source,
-			ObjectFilter filter, String... ignoreProperties) {
+	public static <T extends BaseTreeableEntity<T>> T deepClone(T source, ObjectFilter filter,
+			String... ignoreProperties) {
 		if (filter != null && !filter.accept(source))
-			throw new IllegalArgumentException(
-					"source object self must be accepted if you specify a filter");
+			throw new IllegalArgumentException("source object self must be accepted if you specify a filter");
 		T ret = null;
 		try {
 			ret = (T) source.getClass().newInstance();
@@ -85,8 +111,7 @@ public class BeanUtils {
 
 	}
 
-	public static Object convert(Class<?> beanClass, String propertyName,
-			String value) {
+	public static Object convert(Class<?> beanClass, String propertyName, String value) {
 		try {
 			return convert(beanClass.newInstance(), propertyName, value);
 		} catch (Exception e) {
@@ -96,19 +121,17 @@ public class BeanUtils {
 
 	public static Object convert(Object bean, String propertyName, String value) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
-		ConversionService cs = ApplicationContextUtils
-				.getBean(ConversionService.class);
+		bw.setConversionService(conversionService);
+		ConversionService cs = ApplicationContextUtils.getBean(ConversionService.class);
 		if (cs != null)
 			bw.setConversionService(cs);
 		bw.setPropertyValue(propertyName, value);
 		return bw.getPropertyValue(propertyName);
 	}
 
-	public static PropertyDescriptor getPropertyDescriptor(Class<?> beanClass,
-			String propertyName) {
+	public static PropertyDescriptor getPropertyDescriptor(Class<?> beanClass, String propertyName) {
 		if (propertyName.indexOf('.') == -1)
-			return org.springframework.beans.BeanUtils.getPropertyDescriptor(
-					beanClass, propertyName);
+			return org.springframework.beans.BeanUtils.getPropertyDescriptor(beanClass, propertyName);
 		String[] arr = propertyName.split("\\.");
 		PropertyDescriptor pd = null;
 		int i = 0;
@@ -123,9 +146,9 @@ public class BeanUtils {
 		return pd;
 	}
 
-	public static void setPropertyValue(Object bean, String propertyName,
-			Object propertyValue) {
+	public static void setPropertyValue(Object bean, String propertyName, Object propertyValue) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
+		bw.setConversionService(conversionService);
 		if (propertyName.indexOf('.') == -1) {
 			bw.setPropertyValue(propertyName, propertyValue);
 			return;
@@ -141,8 +164,7 @@ public class BeanUtils {
 			Object value = bw.getPropertyValue(name);
 			if (value == null) {
 				try {
-					value = getPropertyDescriptor(bean.getClass(), name)
-							.getPropertyType().newInstance();
+					value = getPropertyDescriptor(bean.getClass(), name).getPropertyType().newInstance();
 					bw.setPropertyValue(name, value);
 				} catch (Exception e) {
 					throw new RuntimeException(e);

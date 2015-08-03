@@ -57,10 +57,16 @@ public class BeanUtilsTest {
 
 	}
 
+	static enum TeamType {
+		A, B
+	}
+
 	static class Team extends Base {
 		private String name;
 
 		private User owner;
+
+		private TeamType type;
 
 		public String getName() {
 			return name;
@@ -76,6 +82,51 @@ public class BeanUtilsTest {
 
 		public void setOwner(User owner) {
 			this.owner = owner;
+		}
+
+		public TeamType getType() {
+			return type;
+		}
+
+		public void setType(TeamType type) {
+			this.type = type;
+		}
+
+	}
+
+	static enum TeamType2 {
+		A, B
+	}
+
+	static class Team2 extends Base {
+		private String name;
+
+		private User owner;
+
+		private TeamType2 type;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public User getOwner() {
+			return owner;
+		}
+
+		public void setOwner(User owner) {
+			this.owner = owner;
+		}
+
+		public TeamType2 getType() {
+			return type;
+		}
+
+		public void setType(TeamType2 type) {
+			this.type = type;
 		}
 
 	}
@@ -122,8 +173,7 @@ public class BeanUtilsTest {
 
 		User user2 = new User();
 		user2.setPassword("password");
-		BeanUtils.copyPropertiesIfNotNull(user1, user2, "id", "username",
-				"password");
+		BeanUtils.copyPropertiesIfNotNull(user1, user2, "id", "username", "password");
 		assertEquals(user2.getId(), "test");
 		assertEquals(user2.getUsername(), "username");
 		assertEquals(user2.getPassword(), "password");
@@ -134,8 +184,7 @@ public class BeanUtilsTest {
 		assertNull(BeanUtils.getPropertyDescriptor(User.class, "none"));
 		assertNull(BeanUtils.getPropertyDescriptor(User.class, "team.none"));
 		assertNotNull(BeanUtils.getPropertyDescriptor(User.class, "team"));
-		assertNotNull(BeanUtils.getPropertyDescriptor(User.class,
-				"team.owner.id"));
+		assertNotNull(BeanUtils.getPropertyDescriptor(User.class, "team.owner.id"));
 	}
 
 	@Test
@@ -150,6 +199,22 @@ public class BeanUtilsTest {
 		BeanUtils.setPropertyValue(u, "team.name", "test");
 		assertNotNull(u.getTeam());
 		assertEquals("test", u.getTeam().getName());
+	}
+
+	@Test
+	public void testCopyEnumByName() {
+		Team team = new Team();
+		team.setName("name");
+		team.setType(TeamType.A);
+		Team team1 = new Team();
+		BeanUtils.copyProperties(team, team1);
+		assertEquals(team.getName(), team1.getName());
+		assertEquals(team.getType().name(), team1.getType().name());
+		Team2 team2 = new Team2();
+		BeanUtils.copyProperties(team, team2);
+		assertEquals(team.getName(), team2.getName());
+		assertEquals(team.getType().name(), team2.getType().name());
+
 	}
 
 }
