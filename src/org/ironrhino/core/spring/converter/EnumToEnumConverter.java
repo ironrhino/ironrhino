@@ -22,7 +22,11 @@ public class EnumToEnumConverter implements ConditionalGenericConverter {
 	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
 		Enum<?> s = (Enum<?>) source;
-		return Enum.valueOf((Class<Enum>) targetType.getObjectType(), s.name());
+		try {
+			return Enum.valueOf((Class<Enum>) targetType.getObjectType(), s.name());
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
 	}
 
 }
