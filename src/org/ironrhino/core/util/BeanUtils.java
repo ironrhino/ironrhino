@@ -11,6 +11,7 @@ import java.util.Set;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.spring.converter.EnumToEnumConverter;
+import org.ironrhino.core.spring.converter.SerializableToSerializableConverter;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -21,6 +22,7 @@ public class BeanUtils {
 
 	static {
 		conversionService.addConverter(new EnumToEnumConverter());
+		conversionService.addConverter(new SerializableToSerializableConverter());
 	}
 
 	public static boolean hasProperty(Class<?> clazz, String name) {

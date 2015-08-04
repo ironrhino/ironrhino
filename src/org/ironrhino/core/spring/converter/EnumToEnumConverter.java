@@ -15,17 +15,17 @@ public class EnumToEnumConverter implements ConditionalGenericConverter {
 
 	@Override
 	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
-		return sourceType.getObjectType() != targetType.getObjectType();
+		return !sourceType.getType().equals(targetType.getType());
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-		if(source == null)
+		if (source == null)
 			return null;
 		Enum<?> s = (Enum<?>) source;
 		try {
-			return Enum.valueOf((Class<Enum>) targetType.getObjectType(), s.name());
+			return Enum.valueOf((Class<Enum>) targetType.getType(), s.name());
 		} catch (IllegalArgumentException e) {
 			return null;
 		}
