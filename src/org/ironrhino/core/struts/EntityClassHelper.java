@@ -245,6 +245,8 @@ public class EntityClassHelper {
 							&& pd.getName().equals("attributes")) {
 						uci.setType("attributes");
 					}
+					if(pd.getWriteMethod() == null)
+						uci.setExcludedFromCriteria(true);
 					if (trans != null) {
 						uci.setExcludedFromCriteria(true);
 						uci.setExcludedFromLike(true);
