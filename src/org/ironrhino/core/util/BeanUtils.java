@@ -54,7 +54,7 @@ public class BeanUtils {
 		}
 	}
 
-	public static void copyProperties(Object source, Object target, String... ignoreProperties) {
+	public static void copyProperties(Object source, Object target, boolean ignoreNullValue, String... ignoreProperties) {
 		Set<String> ignores = new HashSet<String>();
 		ignores.addAll(AnnotationUtils.getAnnotatedPropertyNames(source.getClass(), NotInCopy.class));
 		ignores.addAll(Arrays.asList(ignoreProperties));
@@ -80,8 +80,13 @@ public class BeanUtils {
 			if (targetPd == null || targetPd.getWriteMethod() == null)
 				continue;
 			Object value = bws.getPropertyValue(name);
-			bwt.setPropertyValue(name, value);
+			if (!ignoreNullValue || value != null)
+				bwt.setPropertyValue(name, value);
 		}
+	}
+
+	public static void copyProperties(Object source, Object target, String... ignoreProperties) {
+		copyProperties(source, target, false, ignoreProperties);
 	}
 
 	public static <T extends BaseTreeableEntity<T>> T deepClone(T source, String... ignoreProperties) {
