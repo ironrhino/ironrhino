@@ -38043,28 +38043,37 @@ Observation._richtable = function(container) {
 		var f = t.prev('form.richtable');
 		var entity = f.data('entity') || f.prop('action');
 		t.attr('action', f.attr('action')).data('replacement', f.attr('id'));
-		$('input[type="hidden"]', f).clone().prependTo(t).each(function() {
-			var name = $(this).attr('name');
-			if (name.indexOf('-op') == name.length - 3)
-				name = name.substring(0, name.length - 3);
-			if (name.indexOf(entity + '.') == 0)
-				name = name.substring(name.indexOf('.') + 1);
-			$('table.criteria select.property option', t).each(function() {
-				var v = $(this).attr('value');
-				if (v == name || v.indexOf(name + '.') == 0
-						|| name.indexOf(v + '.') == 0)
-					$(this).remove();
-			});
-			if (name.indexOf('-od') == name.length - 3) {
-				name = name.substring(0, name.length - 3);
-				$('table.ordering select.property option', t).each(function() {
+		var qs = t.attr('action');
+		var index = qs.indexOf('?');
+		qs = index > -1 ? qs.substring(index + 1) : '';
+		if (qs) {
+			var arr = qs.split('&');
+			for (var i = 0; i < arr.length; i++) {
+				var arr2 = arr[i].split('=', 2);
+				var name = arr2[0];
+				if (name.indexOf('-op') == name.length - 3)
+					name = name.substring(0, name.length - 3);
+				if (name.indexOf(entity + '.') == 0)
+					name = name.substring(name.indexOf('.') + 1);
+				$('table.criteria select.property option', t).each(function() {
 					var v = $(this).attr('value');
 					if (v == name || v.indexOf(name + '.') == 0
 							|| name.indexOf(v + '.') == 0)
 						$(this).remove();
 				});
+				if (name.indexOf('-od') == name.length - 3) {
+					name = name.substring(0, name.length - 3);
+					$('table.ordering select.property option', t).each(
+							function() {
+								var v = $(this).attr('value');
+								if (v == name || v.indexOf(name + '.') == 0
+										|| name.indexOf(v + '.') == 0)
+									$(this).remove();
+							});
+				}
+
 			}
-		});
+		}
 		$('table.criteria select.property', t).change(function() {
 			var t = $(this);
 			var operator = $('select.operator', t.closest('tr'));
