@@ -49,11 +49,18 @@
 						echo.setMessage('@AutoConfig(namespace = "/")\npackage '+projectPackage+';\nimport org.ironrhino.core.metadata.AutoConfig;');
 						echo.perform();
 					}
-					var file = new File(projectSrc+'/resources/i18n/'+projectName+'/messages_zh_CN.properties');
+					file = new File(projectSrc+'/resources/i18n/'+projectName+'/messages_zh_CN.properties');
 					if(!file.exists()){
-						echo = project.createTask("echo");
+						var echo = project.createTask("echo");
 						echo.setFile(file);
 						echo.setMessage('#'+projectName+'='+projectName);
+						echo.perform();
+					}
+					file = new File(testSrc+'/package-info.java');
+					if(!file.exists()){
+						var echo = project.createTask("echo");
+						echo.setFile(file);
+						echo.setMessage('');
 						echo.perform();
 					}
 					var copy = project.createTask('copy');
@@ -118,13 +125,13 @@
 					file = new File(projectSrc+'/ironrhino.properties');
 					if(!file.exists()){
 						var echo = project.createTask("echo");
-						echo.setFile(new File(projectSrc+'/ironrhino.properties'));
+						echo.setFile(file);
 						echo.setMessage('app.name='+projectName+'\napp.basePackage='+projectPackage);
 						echo.perform();
 					}
 					file = new File(projectSrc+'/resources/view/decorator/include/nav.ftl');
 					if(!file.exists()){
-						echo = project.createTask("echo");
+						var echo = project.createTask("echo");
 						echo.setFile(file);
 						echo.setMessage('<ul class="nav">\n  <li><a href="<@url value="/"/>" class="ajax view">${action.getText("index")}</a></li>\n  <@authorize ifAnyGranted="ROLE_ADMINISTRATOR">\n  <li><a href="<@url value="/user"/>" class="ajax view">${action.getText("user")}</a></li>\n</@authorize>\n</ul>');
 						echo.perform();
@@ -157,7 +164,7 @@
 					classpath.push('</classpath>');
 					file = new File(projectDir+'/.classpath');
 					if(!file.exists()){
-						echo = project.createTask("echo");
+						var echo = project.createTask("echo");
 						echo.setFile(file);
 						echo.setMessage(classpath.join('\n'));
 						echo.perform();
@@ -166,14 +173,14 @@
 					if(!file.exists()){
 						var echo = project.createTask("echo");
 						echo.setFile(file);
-						echo.setMessage('lib\ntarget\ntest/classes\nwebapp/WEB-INF/classes\nwebapp/WEB-INF/lib');
+						echo.setMessage('lib\ntarget\ntest/classes\nwebapp/WEB-INF/classes\nwebapp/WEB-INF/lib\n.svnignore');
 						echo.perform();
 					}
 					file = new File(projectDir+'/.svnignore');
 					if(!file.exists()){
 						var echo = project.createTask("echo");
 						echo.setFile(file);
-						echo.setMessage('lib/* target/* test/classes/* webapp/WEB-INF/classes/* webapp/WEB-INF/lib/*');
+						echo.setMessage('lib/* target/* test/classes/* webapp/WEB-INF/classes/* webapp/WEB-INF/lib/* .gitignore');
 						echo.perform();
 					}			
 					print('*********************************\n');
