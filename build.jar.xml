@@ -779,8 +779,9 @@
 				<zipgroupfileset file="${target.dir}/temp.jar" />
 				<zipgroupfileset file="${lib.dir}/jetty-*.jar" />
 				<zipgroupfileset file="${lib.dir}/servlet-api-*.jar" />
-				<zipgroupfileset file="${lib.dir}/websocket-api-*.jar" />
 				<zipgroupfileset file="${lib.dir}/annotations-api-*.jar" />
+				<zipgroupfileset file="${lib.dir}/el-api-*.jar" />
+				<zipgroupfileset file="${lib.dir}/websocket-api-*.jar" />
 				<zipgroupfileset file="${lib.dir}/asm-*.jar" />
 			</zip>
 			<delete file="${target.dir}/temp.jar" />
