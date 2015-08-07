@@ -312,7 +312,7 @@
 		</script>
 	</target>
 	
-	<target name="append-revision-for-assets">
+	<target name="append-revision-for-assets" depends="set-revision">
 		<script language="javascript">
 						<![CDATA[
 			try{
@@ -446,6 +446,39 @@
 		<move file="${webapp.dir}/assetsbak" tofile="${webapp.dir}/assets"
 			preservelastmodified="true" failonerror="false" />
 	</target>
+	
+	<target name="unzip-overrides">
+		<mkdir dir="${target.dir}/classes" />
+		<move todir="${target.dir}/classes" preservelastmodified="true">
+			<fileset dir="${webapp.dir}/WEB-INF/classes" />
+		</move>
+		<path id="ironrhino-core.jar.id">
+		  <fileset dir="${webapp.dir}/WEB-INF/lib">
+		      <include name="ironrhino-core-*.jar" />
+		  </fileset>
+		</path>
+		<property name="ironrhino-core.jar" refid="ironrhino-core.jar.id" />
+		<mkdir dir="${classes.dir}"/>
+		<unzip src="${ironrhino-core.jar}"
+		       dest="${classes.dir}">
+		    <patternset>
+		        <include name="com/**"/>
+		        <include name="org/**"/>
+		        <exclude name="org/ironrhino/**"/>
+		    	<include name="template/**"/>
+		    </patternset>
+		</unzip>
+		<copy todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${target.dir}/classes" />
+		</copy>
+	</target>
+
+	<target name="reset-overrides">
+		<delete dir="${classes.dir}"/>
+		<move todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${target.dir}/classes" />
+		</move>
+	</target>
 
 	<target name="jar" depends="compile">
 		<script language="javascript">
@@ -454,16 +487,9 @@
 				project.executeTarget('pre-jar');
 			]]>
 		</script>
-		<mkdir dir="${target.dir}" />
-		<delete file="${target.dir}/${jar.name}" />
-		<antcall target="set-revision" />
 		<antcall target="unzip-assets" />
 		<antcall target="append-revision-for-assets" />
 		<antcall target="reset-assets" />
-		<copy todir="${classes.dir}/META-INF/resources"
-			preservelastmodified="true" failonerror="false">
-			<fileset dir="${webapp.dir}" includes="assets/**" />
-		</copy>
 		<script language="javascript">
 		<![CDATA[
 			try{
@@ -489,7 +515,6 @@
 				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 			</manifest>
 		</jar>
-		<delete dir="${classes.dir}/META-INF/resources" />
 		<antcall target="reset-append-revision-for-assets" />
 		<script language="javascript">
 			<![CDATA[
@@ -508,20 +533,12 @@
 			]]>
 		</script>	
 		<antcall target="unzip-assets" />
-		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
-			preservelastmodified="true" />
-		<mkdir dir="${target.dir}/classes" />
-		<move todir="${target.dir}/classes" preservelastmodified="true">
-			<fileset dir="${webapp.dir}/WEB-INF/classes" />
-		</move>
+		<antcall target="append-revision-for-assets" />
+		<antcall target="unzip-overrides" />
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
 			needxmlfile="false" excludes="**/upload/**,assetsbak/**,**/ironrhino-assets-*.jar" />
-		<move file="${webapp.dir}/WEB-INF/lib/${jar.name}" todir="${target.dir}"
-			preservelastmodified="true" />
-		<move todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
-			<fileset dir="${target.dir}/classes" />
-		</move>
-		<delete dir="${target.dir}/classes" />
+		<antcall target="reset-overrides" />
+		<antcall target="reset-append-revision-for-assets" />
 		<antcall target="reset-assets" />
 		<script language="javascript">
 			<![CDATA[
@@ -538,21 +555,15 @@
 			if(project.getTargets().containsKey('pre-war2'))
 				project.executeTarget('pre-war2');
 			]]>
-		</script>			
-		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
-			preservelastmodified="true" />
-		<mkdir dir="${target.dir}/classes" />
-		<move todir="${target.dir}/classes" preservelastmodified="true">
-			<fileset dir="${webapp.dir}/WEB-INF/classes" />
-		</move>
+		</script>
+		<antcall target="unzip-assets" />
+		<antcall target="append-revision-for-assets" />
+		<antcall target="reset-assets" />
+		<antcall target="unzip-overrides" />
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
-			needxmlfile="false" excludes="assets/**" />
-		<move file="${webapp.dir}/WEB-INF/lib/${jar.name}" todir="${target.dir}"
-			preservelastmodified="true" />
-		<move todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
-			<fileset dir="${target.dir}/classes" />
-		</move>
-		<delete dir="${target.dir}/classes" />
+			needxmlfile="false" />
+		<antcall target="reset-overrides" />
+		<antcall target="reset-append-revision-for-assets" />
 		<script language="javascript">
 			<![CDATA[
 			if(project.getTargets().containsKey('post-war2'))
@@ -569,12 +580,6 @@
 				project.executeTarget('pre-war-standalone');
 			]]>
 		</script>
-		<move file="${target.dir}/${jar.name}" todir="${webapp.dir}/WEB-INF/lib"
-			preservelastmodified="true" />
-		<mkdir dir="${target.dir}/classes" />
-		<move todir="${target.dir}/classes" preservelastmodified="true">
-			<fileset dir="${webapp.dir}/WEB-INF/classes" />
-		</move>
 		<mkdir dir="${webapp.dir}/WEB-INF/libext" />
 		<copy tofile="${webapp.dir}/WEB-INF/libext/bootstrap.jar" failonerror="false">
 			<fileset file="${lib.dir}/bootstrap*.jar" />	
@@ -610,17 +615,18 @@
 		        </archives>
 		    </restrict>
 		</copy>
+		<antcall target="unzip-assets" />
+		<antcall target="append-revision-for-assets" />
+		<antcall target="reset-assets" />
+		<antcall target="unzip-overrides" />
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
-			needxmlfile="false" excludes="assets/**">
+			needxmlfile="false">
 			<manifest>
 				<attribute name="Main-Class" value="bootstrap.Main" />
 			</manifest>
-		</war>	
-		<move file="${webapp.dir}/WEB-INF/lib/${jar.name}" todir="${target.dir}"
-			preservelastmodified="true" />
-		<move todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
-			<fileset dir="${target.dir}/classes" />
-		</move>
+		</war>
+		<antcall target="reset-overrides" />
+		<antcall target="reset-append-revision-for-assets" />
 		<delete dir="${webapp.dir}/bootstrap" />
 		<delete dir="${webapp.dir}/WEB-INF/libext" />
 		<delete dir="${target.dir}/classes" />
