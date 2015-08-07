@@ -1,7 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
-JDK_VERSION=8
-TOMCAT_VERSION=7
+ANT_VERSION=1.9.6
+JDK_VERSION=8u45-b14
+TOMCAT_VERSION=8.0.24
+REDIS_VERSION=3.0.3
+#JDK_VERSION=7u80-b15
+#TOMCAT_VERSION=7.0.63
 
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
@@ -38,12 +42,9 @@ fi
 
 #install oracle jdk
 if [ ! -d jdk ];then
-if [ "$JDK_VERSION" = "7" ];then
-jdk_download_url="http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jdk-7u80-linux-x64.tar.gz"
-else
-jdk_download_url="http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.tar.gz"
+if ! $(ls -l jdk-*linux-x64.tar.gz >/dev/null 2>&1) ; then
+wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/$JDK_VERSION/jdk-${JDK_VERSION:0:-4}-linux-x64.tar.gz"
 fi
-wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "$jdk_download_url"
 tar xf jdk-*.tar.gz
 rm jdk-*.tar.gz
 mv jdk* jdk
@@ -57,7 +58,9 @@ fi
 
 #install ant
 if [ ! -d ant ];then
-wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.5-bin.tar.gz
+if ! $(ls -l apache-ant-*.tar.gz >/dev/null 2>&1) ; then
+wget http://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
+fi
 tar xf apache-ant-*.tar.gz
 rm apache-ant-*.tar.gz
 mv apache-ant-* ant
@@ -69,12 +72,7 @@ fi
 #install tomcat
 if [ ! -d tomcat8080 ];then
 if ! $(ls -l apache-tomcat-*.tar.gz >/dev/null 2>&1) ; then
-if [ "$TOMCAT_VERSION" = "7" ];then
-tomcat_download_url="http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.62/bin/apache-tomcat-7.0.62.tar.gz"
-else
-tomcat_download_url="http://archive.apache.org/dist/tomcat/tomcat-8/v8.0.23/bin/apache-tomcat-8.0.23.tar.gz"
-fi
-wget "$tomcat_download_url"
+wget "http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION:0:1}/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz"
 fi
 tar xf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
 mv apache-tomcat-* tomcat
@@ -82,7 +80,7 @@ cd tomcat && rm -rf bin/*.bat && rm -rf webapps/*
 cd conf
 sed -i  's/\s[3-4][a-x-]*manager.org.apache.juli.FileHandler,//g' logging.properties
 sed -i '/manager/d' logging.properties
-if [ "$TOMCAT_VERSION" = "7" ];then
+if [ "${TOMCAT_VERSION:0:1}" = "7" ];then
 sed -i 's/tomcat7-websocket/*/g' catalina.properties
 sed -i '/ContextConfig.jarsToSkip/d' catalina.properties
 cat>>catalina.properties<<EOF
@@ -166,7 +164,7 @@ EOF
 cd ..
 cd ..
 sed -i '99i export SPRING_PROFILES_DEFAULT=dual' tomcat/bin/catalina.sh
-if [ "$JDK_VERSION" = "7" ];then
+if [ "${JDK_VERSION:0:1}" = "7" ];then
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:+UseParNewGC -XX:CMSMaxAbortablePrecleanTime=5 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
 else
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+DisableExplicitGC -XX:+UseG1GC -XX:SurvivorRatio=6 -XX:MaxGCPauseMillis=400 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=40 -XX:ConcGCThreads=2 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
@@ -242,6 +240,8 @@ fi
 
 if [ ! -f upgrade_tomcat.sh ]; then
 cat>upgrade_tomcat.sh<<EOF
+#!/bin/bash
+
 if [ -n "\$SUDO_USER" ];then
 	echo please do not run with sudo
 	exit 1
@@ -376,6 +376,8 @@ fi
 #generate deploy.sh
 if [ ! -f deploy.sh ]; then
 cat>deploy.sh<<EOF
+#!/bin/bash
+
 #must not run with sudo
 if [ -n "\$SUDO_USER" ];then
 	echo please do not run with sudo
@@ -483,6 +485,8 @@ fi
 #generate rollback.sh
 if [ ! -f rollback.sh ]; then
 cat>rollback.sh<<EOF
+#!/bin/bash
+
 if [ -n "\$SUDO_USER" ];then
 	echo please do not run with sudo
 	exit 1
@@ -510,6 +514,8 @@ fi
 #generate backup.sh
 if [ ! -f backup.sh ]; then
 cat>backup.sh<<EOF
+#!/bin/bash
+
 date=\`date +%Y-%m-%d\`
 backupdir=/home/$USER/backup/\$date
 if test ! -d \$backupdir
@@ -530,6 +536,8 @@ fi
 #generate exportdb.sh and importdb.sh
 if [ ! -f exportdb.sh ]; then
 cat>exportdb.sh<<EOF
+#!/bin/bash
+
 DB_NAME=test
 DB_USERNAME=root
 DB_PASSWORD=secret
@@ -552,7 +560,7 @@ fi
 
 #install redis
 if ! which redis-server > /dev/null && ! $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
-wget http://download.redis.io/releases/redis-3.0.2.tar.gz
+wget http://download.redis.io/releases/redis-$REDIS_VERSION.tar.gz
 fi
 if $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
 tar xf redis-*.tar.gz >/dev/null && rm -rf redis-*.tar.gz
@@ -566,6 +574,8 @@ fi
 
 if [ ! -f upgrade_redis.sh ]; then
 cat>upgrade_redis.sh<<EOF
+#!/bin/bash
+
 #must run with sudo
 if [ ! -n "\$SUDO_USER" ];then
 echo please run sudo \$0
