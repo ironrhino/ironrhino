@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.UiConfig;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({ "localizedMessage", "cause", "stackTrace", "suppressed" })
@@ -32,10 +33,10 @@ public class RestStatus extends RuntimeException {
 	public static final String CODE_INTERNAL_SERVER_ERROR = "-1";
 
 	public static final RestStatus OK = valueOf(CODE_OK);
-	public static final RestStatus REQUEST_TIMEOUT = valueOf(CODE_REQUEST_TIMEOUT);
-	public static final RestStatus FORBIDDEN = valueOf(CODE_FORBIDDEN);
-	public static final RestStatus UNAUTHORIZED = valueOf(CODE_UNAUTHORIZED);
-	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND);
+	public static final RestStatus REQUEST_TIMEOUT = valueOf(CODE_REQUEST_TIMEOUT, null, 408);
+	public static final RestStatus FORBIDDEN = valueOf(CODE_FORBIDDEN, null, 403);
+	public static final RestStatus UNAUTHORIZED = valueOf(CODE_UNAUTHORIZED, null, 401);
+	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND, null, 404);
 
 	@UiConfig(required = true)
 	private String code;
@@ -45,17 +46,28 @@ public class RestStatus extends RuntimeException {
 
 	private String message;
 
-	public RestStatus(String code, String status) {
+	@JsonIgnore
+	private Integer httpStatusCode;
+
+	protected RestStatus(String code, String status) {
 		super(status);
 		this.code = code;
 		this.status = status;
 	}
 
-	public RestStatus(String code, String status, String message) {
+	protected RestStatus(String code, String status, String message) {
 		super(message);
 		this.code = code;
 		this.status = status;
 		this.message = message;
+	}
+
+	protected RestStatus(String code, String status, String message, Integer httpStatusCode) {
+		super(message);
+		this.code = code;
+		this.status = status;
+		this.message = message;
+		this.httpStatusCode = httpStatusCode;
 	}
 
 	public String getCode() {
@@ -72,6 +84,14 @@ public class RestStatus extends RuntimeException {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Integer getHttpStatusCode() {
+		return httpStatusCode;
+	}
+
+	public void setHttpStatusCode(Integer httpStatusCode) {
+		this.httpStatusCode = httpStatusCode;
 	}
 
 	@Override
@@ -95,13 +115,18 @@ public class RestStatus extends RuntimeException {
 		return new RestStatus(code, status, message);
 	}
 
-	private static String findStatus(String code) {
+	public static RestStatus valueOf(String code, String message, Integer httpStatusCode) {
+		if (StringUtils.isBlank(message) && httpStatusCode == null)
+			return valueOf(code);
+		String status = findStatus(code);
+		return new RestStatus(code, status, message, httpStatusCode);
+	}
+
+	protected static String findStatus(String code) {
 		try {
 			for (Field f : RestStatus.class.getDeclaredFields())
-				if (Modifier.isStatic(f.getModifiers())
-						&& Modifier.isFinal(f.getModifiers())
-						&& f.getType() == String.class
-						&& f.get(null).equals(code)) {
+				if (Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers())
+						&& f.getType() == String.class && f.get(null).equals(code)) {
 					String status = f.getName();
 					if (status.startsWith("CODE_"))
 						status = status.substring(5);

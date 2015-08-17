@@ -64,19 +64,8 @@ public class RestExceptionHandler {
 			ex = ex.getCause();
 		if (ex instanceof RestStatus) {
 			RestStatus rs = (RestStatus) ex;
-			String code = rs.getCode();
-			if (code == null)
-				code = "";
-			if (code.equals(RestStatus.CODE_REQUEST_TIMEOUT))
-				response.setStatus(HttpServletResponse.SC_REQUEST_TIMEOUT);
-			else if (code.equals(RestStatus.CODE_FORBIDDEN))
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			else if (code.equals(RestStatus.CODE_UNAUTHORIZED))
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			else if (code.equals(RestStatus.CODE_NOT_FOUND))
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			else
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			Integer httpStatusCode = rs.getHttpStatusCode();
+			response.setStatus(httpStatusCode != null ? httpStatusCode : HttpServletResponse.SC_BAD_REQUEST);
 			return rs;
 		}
 		logger.error(ex.getMessage(), ex);
