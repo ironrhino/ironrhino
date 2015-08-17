@@ -75,6 +75,8 @@ public class RestExceptionHandler {
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			else if (code.equals(RestStatus.CODE_NOT_FOUND))
 				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			else
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return rs;
 		}
 		logger.error(ex.getMessage(), ex);
