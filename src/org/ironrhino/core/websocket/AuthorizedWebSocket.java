@@ -29,8 +29,7 @@ public class AuthorizedWebSocket {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	private final Set<Session> sessions = Collections
-			.newSetFromMap(new ConcurrentHashMap<Session, Boolean>());
+	private final Set<Session> sessions = Collections.newSetFromMap(new ConcurrentHashMap<Session, Boolean>());
 
 	protected boolean authorize(UserDetails user) {
 		return true;
@@ -40,15 +39,10 @@ public class AuthorizedWebSocket {
 		for (Session s : sessions)
 			if (s.isOpen()) {
 				try {
-					if (roles.length == 0
-							|| AuthzUtils
-									.authorizeUserDetails(
-											userDetailsService
-													.loadUserByUsername((String) s
-															.getUserProperties()
-															.get(USER_PROPERTIES_NAME_USERNAME)),
-											null, StringUtils.join(roles, ","),
-											null))
+					if (roles.length == 0 || AuthzUtils.authorizeUserDetails(
+							userDetailsService.loadUserByUsername(
+									(String) s.getUserProperties().get(USER_PROPERTIES_NAME_USERNAME)),
+							null, StringUtils.join(roles, ","), null))
 						s.getBasicRemote().sendText(message);
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
@@ -63,8 +57,7 @@ public class AuthorizedWebSocket {
 			if (s.isOpen())
 				try {
 					if (p.evaluate(userDetailsService
-							.loadUserByUsername((String) s.getUserProperties()
-									.get(USER_PROPERTIES_NAME_USERNAME))))
+							.loadUserByUsername((String) s.getUserProperties().get(USER_PROPERTIES_NAME_USERNAME))))
 						s.getBasicRemote().sendText(message);
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
@@ -72,9 +65,7 @@ public class AuthorizedWebSocket {
 	}
 
 	public void onMessage(Session session, String message) {
-		logger.info("received from {} : {}",
-				session.getUserProperties().get(USER_PROPERTIES_NAME_USERNAME),
-				message);
+		logger.info("received from {} : {}", session.getUserProperties().get(USER_PROPERTIES_NAME_USERNAME), message);
 	}
 
 	public void onOpen(Session session) {
@@ -82,21 +73,21 @@ public class AuthorizedWebSocket {
 		Object principal = session.getUserPrincipal();
 		if (principal instanceof UsernamePasswordAuthenticationToken) {
 			UsernamePasswordAuthenticationToken upat = (UsernamePasswordAuthenticationToken) principal;
-			principal = upat.getPrincipal();
-			if (principal instanceof UserDetails)
-				user = (UserDetails) principal;
+			if (upat.isAuthenticated()) {
+				principal = upat.getPrincipal();
+				if (principal instanceof UserDetails)
+					user = (UserDetails) principal;
+			}
 		}
 		if (user == null || !authorize(user)) {
 			try {
 				session.getBasicRemote().sendText("access.denied");
-				session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE,
-						"access.denied"));
+				session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE, "access.denied"));
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
 		} else {
-			session.getUserProperties().put(USER_PROPERTIES_NAME_USERNAME,
-					user.getUsername());
+			session.getUserProperties().put(USER_PROPERTIES_NAME_USERNAME, user.getUsername());
 			sessions.add(session);
 		}
 	}
@@ -112,8 +103,7 @@ public class AuthorizedWebSocket {
 			sessions.remove(session);
 			if (session.isOpen())
 				try {
-					session.close(new CloseReason(CloseCodes.CLOSED_ABNORMALLY,
-							err.getMessage()));
+					session.close(new CloseReason(CloseCodes.CLOSED_ABNORMALLY, err.getMessage()));
 				} catch (IllegalStateException | IOException e) {
 				}
 		} else {
