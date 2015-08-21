@@ -13,7 +13,7 @@ import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 @AutoConfig
 @Searchable
 @Entity
-@Table(name = "`user`")
+@Table(name = "user")
 @Richtable(order = "username asc")
 @ClassPresentConditional("org.ironrhino.security.service.UserManagerImpl")
 public class User extends BaseUser {

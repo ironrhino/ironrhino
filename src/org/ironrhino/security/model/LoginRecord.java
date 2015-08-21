@@ -42,7 +42,7 @@ public class LoginRecord extends BaseEntity {
 	private String cause;
 
 	@UiConfig(width = "130px")
-	@Column(name = "`date`")
+	@Column(name = "date")
 	private Date date = new Date();
 
 	public String getUsername() {

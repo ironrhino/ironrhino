@@ -26,7 +26,7 @@ import org.ironrhino.core.util.JsonUtils;
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
-@Table(indexes = { @javax.persistence.Index(columnList = "username,`date` desc") })
+@Table(indexes = { @javax.persistence.Index(columnList = "username,date desc") })
 @Searchable
 @Richtable(searchable = true, order = "date desc", readonly = @Readonly(true))
 public class AuditEvent extends BaseEntity {
@@ -39,7 +39,7 @@ public class AuditEvent extends BaseEntity {
 	private String username;
 
 	@UiConfig(width = "130px")
-	@Column(name = "`date`")
+	@Column(name = "date")
 	private Date date = new Date();
 
 	@UiConfig(width = "150px")
@@ -48,7 +48,7 @@ public class AuditEvent extends BaseEntity {
 
 	@UiConfig(template = "${entity.displayEvent!}")
 	@SearchableProperty
-	@Column(name = "`event`", nullable = false)
+	@Column(name = "event", nullable = false)
 	private String event;
 
 	public AuditEvent() {

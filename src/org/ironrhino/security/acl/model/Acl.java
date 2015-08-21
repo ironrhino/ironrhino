@@ -30,7 +30,7 @@ public class Acl extends BaseEntity {
 
 	@CaseInsensitive
 	@NaturalId(mutable = true)
-	@Column(name = "`resource`", length = 150, nullable = false)
+	@Column(name = "resource", length = 150, nullable = false)
 	private String resource;
 
 	@UiConfig(width = "100px")

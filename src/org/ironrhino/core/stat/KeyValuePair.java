@@ -18,7 +18,7 @@ public class KeyValuePair implements Serializable {
 	@Transient
 	protected Value value;
 
-	@Column(name = "`date`", nullable = false)
+	@Column(name = "date", nullable = false)
 	protected Date date;
 
 	@Column(nullable = false)

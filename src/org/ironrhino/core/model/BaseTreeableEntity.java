@@ -52,7 +52,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 	@SearchableProperty
 	protected String name;
 
-	@Column(name = "`level`")
+	@Column(name = "level")
 	@UiConfig(hidden = true)
 	protected int level;
 

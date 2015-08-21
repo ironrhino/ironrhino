@@ -37,7 +37,7 @@ public class Setting extends BaseEntity implements Recordable<UserDetails> {
 	@SearchableProperty(boost = 3)
 	@CaseInsensitive
 	@NaturalId(mutable = true)
-	@Column(name = "`key`", nullable = false)
+	@Column(name = "key", nullable = false)
 	private String key = "";
 
 	@UiConfig(type = "textarea", width = "400px")

@@ -41,7 +41,7 @@ public class Feedback extends BaseEntity implements Recordable<UserDetails> {
 
 	@SearchableProperty(boost = 3)
 	@UiConfig(hiddenInList = @Hidden(true), type = "textarea")
-	@Column(name = "`comment`", length = 4000)
+	@Column(name = "comment", length = 4000)
 	private String comment;
 
 	@UiConfig(width = "100px")
