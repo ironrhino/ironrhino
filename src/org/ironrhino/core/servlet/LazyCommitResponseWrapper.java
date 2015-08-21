@@ -18,7 +18,7 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
 	private String location;
 
-	private int status;
+	private int status = HttpServletResponse.SC_OK;
 
 	private String message;
 
@@ -52,6 +52,11 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 		return buffer.getWriter();
 	}
 
+	@Override
+	public int getStatus() {
+		return this.status;
+	}
+	
 	@Override
 	public void setStatus(int sc) {
 		this.status = sc;
