@@ -5,10 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -61,7 +59,8 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@NotInCopy
 	@UiConfig(width = "150px")
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "owner", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT) )
+	
+	@JoinColumn(name = "owner")
 	private User owner;
 
 	@UiConfig(width = "80px")
