@@ -27,6 +27,7 @@ public class RestExceptionHandler {
 	@ExceptionHandler(Throwable.class)
 	@ResponseBody
 	public RestStatus handleException(HttpServletRequest req, HttpServletResponse response, Throwable ex) {
+		Integer oldStatus = response.getStatus();
 		if (ex instanceof HttpMediaTypeNotAcceptableException) {
 			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -64,12 +65,15 @@ public class RestExceptionHandler {
 			ex = ex.getCause();
 		if (ex instanceof RestStatus) {
 			RestStatus rs = (RestStatus) ex;
-			Integer httpStatusCode = rs.getHttpStatusCode();
-			response.setStatus(httpStatusCode != null ? httpStatusCode : HttpServletResponse.SC_BAD_REQUEST);
+			if (oldStatus == HttpServletResponse.SC_OK) {
+				Integer httpStatusCode = rs.getHttpStatusCode();
+				response.setStatus(httpStatusCode != null ? httpStatusCode : HttpServletResponse.SC_BAD_REQUEST);
+			}
 			return rs;
 		}
 		logger.error(ex.getMessage(), ex);
-		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		if (oldStatus == HttpServletResponse.SC_OK)
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		return RestStatus.valueOf(RestStatus.CODE_INTERNAL_SERVER_ERROR, ex.getMessage());
 	}
 
