@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SessionFactoryBean extends
-		org.springframework.orm.hibernate4.LocalSessionFactoryBean {
+		org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
