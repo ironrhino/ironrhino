@@ -246,7 +246,7 @@
 								<#elseif item?is_hash_ex>
 										<ul class="unstyled" style="padding-bottom:10px;">
 										<#list item?keys as k>
-											<#if k!='class' && item[k]?? && !item[k]?is_method>
+											<#if k!='class' && item[k]?? && !item[k]?is_method && item['set'+k?cap_first]??>
 											<li><em>${action.getText(k)}:</em> ${item[k]?string}</li>
 											</#if>
 										</#list>
