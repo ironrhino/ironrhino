@@ -146,16 +146,16 @@ Richtable = {
 					if (!inputform.hasClass('view')
 							&& !inputform.hasClass('keepopen')) {
 						$('button[type=submit]', inputform).click(function(e) {
-							inputform[0].onsuccess = function() {
-								$(this).removeClass('dirty');
-								$(this).removeClass('dontreload');
+							$(e.target).closest('form')[0].onsuccess = function() {
+								inputform.removeClass('dirty');
+								inputform.removeClass('dontreload');
 								if (!$(e.target).closest('button')
-										.hasClass('sequential_create'))
+										.hasClass('sequential_create')) {
 									// setTimeout(function()
 									// {
 									$('#' + winid).dialog('close');
-								// }, 1000);
-
+									// }, 1000);
+								}
 							};
 						});
 					}
