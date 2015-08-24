@@ -8347,6 +8347,7 @@ span.checkboxgroup{
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
+	white-space: pre-wrap;
 }
 .field-error-content:before{
     content:'';
