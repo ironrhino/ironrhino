@@ -104,8 +104,11 @@
 
 	function appendAttachments(form, attachments) {
 		ul = form.find('ul.attachments');
-		if (attachments && typeof attachments == 'string')
-			attachments = attachments.split(',');
+		if (attachments && typeof attachments == 'string') {
+			if (attachments.indexOf('[') == 0)
+				attachments = attachments.substring(1, attachments.length - 1);
+			attachments = attachments.split(/\s*,\s*/);
+		}
 		if (attachments)
 			for (var i = 0; i < attachments.length; i++) {
 				var path = attachments[i];

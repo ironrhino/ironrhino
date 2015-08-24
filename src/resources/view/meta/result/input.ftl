@@ -6,7 +6,7 @@
 <body>
 <#assign formDynamicAttributes={}/>
 <#if attachmentable>
-<#assign formDynamicAttributes+={'data-attachments':entity.attachmentsAsString!}/>
+<#assign formDynamicAttributes+={'data-attachments':entity.attachments!}/>
 </#if>
 <#if richtableConfig.inputGridColumns gt 0>
 <#assign formDynamicAttributes+={'data-columns':richtableConfig.inputGridColumns}/>
