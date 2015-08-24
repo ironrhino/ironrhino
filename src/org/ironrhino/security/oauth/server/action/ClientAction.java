@@ -82,8 +82,8 @@ public class ClientAction extends EntityAction<Client> {
 			}
 			if (list.size() > 0) {
 				for (Client temp : list) {
-					if (AuthzUtils.getUsername().equals(
-							temp.getOwner().getUsername())) {
+					if (AuthzUtils.authorize(null, UserRole.ROLE_ADMINISTRATOR, null)
+							|| AuthzUtils.getUsername().equals(temp.getOwner().getUsername())) {
 						temp.setEnabled(false);
 						entityManager.save(temp);
 					}
