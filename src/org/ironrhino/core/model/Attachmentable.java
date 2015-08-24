@@ -11,8 +11,4 @@ public interface Attachmentable {
 
 	public void setAttachments(List<String> attachments);
 
-	@UiConfig(hidden = true)
-	public String getAttachmentsAsString();
-
-	public void setAttachmentsAsString(String str);
 }

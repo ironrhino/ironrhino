@@ -1,23 +1,21 @@
 package org.ironrhino.security.oauth.server.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
+import org.ironrhino.core.hibernate.convert.StringListConverter;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
@@ -31,8 +29,6 @@ import org.ironrhino.core.model.Enableable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @AutoConfig
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
@@ -55,33 +51,33 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@Column(nullable = false)
 	private String secret = CodecUtils.nextId();
 
-	@UiConfig(cssClass = "input-xxlarge", hiddenInList = @Hidden(true))
+	@UiConfig(cssClass = "input-xxlarge", hiddenInList = @Hidden(true) )
 	private String redirectUri;
 
-	@UiConfig(cssClass = "input-xxlarge", type = "textarea", hiddenInList = @Hidden(true))
+	@UiConfig(cssClass = "input-xxlarge", type = "textarea", hiddenInList = @Hidden(true) )
 	@Column(length = 4000)
 	private String description;
 
 	@NotInCopy
 	@UiConfig(width = "150px")
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "owner", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	@JoinColumn(name = "owner", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT) )
 	private User owner;
 
 	@UiConfig(width = "80px")
 	private boolean enabled = true;
 
 	@NotInCopy
-	@UiConfig(hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInInput = @Hidden(true) , hiddenInList = @Hidden(true) )
 	@Column(updatable = false)
 	private Date createDate = new Date();
 
 	@NotInCopy
-	@UiConfig(hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInInput = @Hidden(true) , hiddenInList = @Hidden(true) )
 	@Column(insertable = false)
 	private Date modifyDate;
 
-	@Transient
+	@Convert(converter = StringListConverter.class)
 	private List<String> attachments = new ArrayList<String>(0);
 
 	@Override
@@ -92,26 +88,6 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@Override
 	public void setAttachments(List<String> attachments) {
 		this.attachments = attachments;
-	}
-
-	@Override
-	@NotInCopy
-	@JsonIgnore
-	@Column(name = "attachments")
-	@Access(AccessType.PROPERTY)
-	public String getAttachmentsAsString() {
-		if (attachments.size() > 0)
-			return StringUtils.join(attachments.iterator(), ',');
-		return null;
-	}
-
-	@Override
-	public void setAttachmentsAsString(String attachmentsAsString) {
-		attachments.clear();
-		if (StringUtils.isNotBlank(attachmentsAsString))
-			attachments.addAll(Arrays
-					.asList(org.ironrhino.core.util.StringUtils.trimTail(
-							attachmentsAsString, ",").split("\\s*,\\s*")));
 	}
 
 	@UiConfig(displayOrder = 2, width = "200px", alias = "client_id")
@@ -191,8 +167,7 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	}
 
 	public boolean supportsRedirectUri(String redirectUri) {
-		return StringUtils.isBlank(this.redirectUri)
-				|| this.redirectUri.equals(redirectUri);
+		return StringUtils.isBlank(this.redirectUri) || this.redirectUri.equals(redirectUri);
 	}
 
 	@UiConfig(hidden = true)
@@ -204,8 +179,7 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	public boolean equals(Object other) {
 		if (other instanceof Client) {
 			Client that = (Client) other;
-			if (this.getId().equals(that.getId())
-					&& this.getSecret().equals(that.getSecret())
+			if (this.getId().equals(that.getId()) && this.getSecret().equals(that.getSecret())
 					&& supportsRedirectUri(that.getRedirectUri()))
 				return true;
 		}
@@ -216,4 +190,5 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	public int hashCode() {
 		return id != null ? id.hashCode() : -1;
 	}
+	
 }

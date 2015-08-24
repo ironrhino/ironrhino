@@ -8,7 +8,4 @@ public interface Attributable {
 
 	public void setAttributes(List<Attribute> attributes);
 
-	public String getAttributesAsString();
-
-	public void setAttributesAsString(String str);
 }

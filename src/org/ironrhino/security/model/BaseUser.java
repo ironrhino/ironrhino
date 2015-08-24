@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -18,6 +19,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
+import org.ironrhino.core.hibernate.convert.StringMapConverter;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
@@ -31,7 +33,6 @@ import org.ironrhino.core.security.role.RoledUserDetails;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.core.util.JsonUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.ClassUtils;
 
@@ -39,8 +40,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @MappedSuperclass
-public class BaseUser extends BaseEntity implements RoledUserDetails,
-		Recordable<BaseUser>, Enableable {
+public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable<BaseUser>, Enableable {
 
 	private static final long serialVersionUID = -6135434863820342822L;
 
@@ -111,7 +111,8 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 
 	@NotInCopy
 	@JsonIgnore
-	@Transient
+	@Column(length = 4000)
+	@Convert(converter=StringMapConverter.class)
 	@UiConfig(hidden = true)
 	private Map<String, String> attributes;
 
@@ -352,29 +353,9 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 		this.attributes = attributes;
 	}
 
-	@Column(name = "attributes", length = 4000)
-	@Access(AccessType.PROPERTY)
-	@JsonIgnore
-	@UiConfig(hidden = true)
-	public String getAttributesAsString() {
-		if (attributes == null || attributes.isEmpty())
-			return null;
-		return JsonUtils.toJson(attributes);
-	}
-
-	public void setAttributesAsString(String str) {
-		if (StringUtils.isNotBlank(str))
-			try {
-				attributes = JsonUtils.fromJson(str, JsonUtils.STRING_MAP_TYPE);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-	}
-
 	public <T extends Persistable<?>> T getExtra(Class<T> clazz) {
 		T extra = null;
-		BaseManager<T> baseManager = ApplicationContextUtils
-				.getEntityManager(clazz);
+		BaseManager<T> baseManager = ApplicationContextUtils.getEntityManager(clazz);
 		if (baseManager != null)
 			extra = baseManager.get(getId());
 		return extra;
@@ -385,8 +366,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails,
 		Class<? extends Persistable<?>> clazz = null;
 		if (ClassUtils.isPresent(className, getClass().getClassLoader())) {
 			try {
-				clazz = (Class<? extends Persistable<?>>) Class
-						.forName(className);
+				clazz = (Class<? extends Persistable<?>>) Class.forName(className);
 			} catch (ClassNotFoundException e) {
 				throw new IllegalArgumentException(className + " not found");
 			}
