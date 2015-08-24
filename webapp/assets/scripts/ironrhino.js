@@ -37466,7 +37466,8 @@ Richtable = {
 				var hash = document.location.hash;
 				if (hash.indexOf('!') == 1)
 					pathname = CONTEXT_PATH + hash.substring(2);
-				$('#' + winid + ' form.ajax').each(function() {
+				var inputforms = $('#' + winid + ' form.ajax');
+				inputforms.each(function() {
 					var inputform = $(this);
 					$(':input:visible', inputform).filter(function(i) {
 						return $(this).attr('name')
@@ -37521,8 +37522,8 @@ Richtable = {
 							&& !inputform.hasClass('keepopen')) {
 						$('button[type=submit]', inputform).click(function(e) {
 							$(e.target).closest('form')[0].onsuccess = function() {
-								inputform.removeClass('dirty');
-								inputform.removeClass('dontreload');
+								inputforms.removeClass('dirty');
+								inputforms.removeClass('dontreload');
 								if (!$(e.target).closest('button')
 										.hasClass('sequential_create')) {
 									// setTimeout(function()
