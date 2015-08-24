@@ -99,7 +99,7 @@ public class CacheAspect extends BaseAspect {
 
 	@SuppressWarnings("unchecked")
 	@Around("execution(public * *(..)) and @annotation(evictCache)")
-	public void remove(ProceedingJoinPoint jp, EvictCache evictCache) throws Throwable {
+	public Object remove(ProceedingJoinPoint jp, EvictCache evictCache) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
 		String namespace = ExpressionUtils.evalString(evictCache.namespace(), context);
 		boolean fallback = false;
@@ -114,7 +114,7 @@ public class CacheAspect extends BaseAspect {
 		if (fallback)
 			keys = ExpressionUtils.evalList(evictCache.key(), context);
 		if (isBypass() || keys == null || keys.size() == 0)
-			return;
+			return retval;
 		cacheManager.mdelete(keys, namespace);
 		ExpressionUtils.eval(evictCache.onEvict(), context);
 		if (StringUtils.isNotBlank(evictCache.renew())) {
@@ -126,7 +126,7 @@ public class CacheAspect extends BaseAspect {
 				if (key != null)
 					cacheManager.put(key.toString(), value, 0, TimeUnit.SECONDS, namespace);
 		}
-
+		return retval;
 	}
 
 }
