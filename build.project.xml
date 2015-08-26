@@ -16,7 +16,7 @@
 	<property name="server.shutdown.port" value="8005" />
 	<property name="webapp.deploy.dir" value="${server.home}/webapps/ROOT" />
 	<property file="build.properties" />
-	<property name="version" value="1.0" />
+	<property name="version" value="2.0" />
 	<property name="jar.name" value="app-${version}.jar" />
 	
 	<import file="build.include.xml" optional="true"/>
@@ -185,8 +185,8 @@
 				project.executeTarget('pre-compile');
 			]]>
 		</script>
-		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source"
-			srcdir="${src.dir}" destdir="${classes.dir}" encoding="UTF-8" includejavaruntime="true">
+		<javac includeantruntime="false" includejavaruntime="true" debug="true" debuglevel="lines,vars,source"
+			srcdir="${src.dir}" destdir="${classes.dir}" encoding="UTF-8">
 			<classpath refid="lib.classpath" />
 		</javac>
 		<copy todir="${classes.dir}" preservelastmodified="true">
@@ -210,7 +210,7 @@
 				project.executeTarget('pre-test');
 			]]>
 		</script>
-		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source"
+		<javac includeantruntime="false" includejavaruntime="true" debug="true" debuglevel="lines,vars,source"
 			srcdir="${test.src.dir}" destdir="${test.classes.dir}" encoding="utf-8">
 			<classpath>
 				<path refid="lib.classpath" />
