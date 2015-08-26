@@ -1,24 +1,17 @@
 package org.ironrhino.core.jdbc;
 
 import org.ironrhino.core.model.Displayable;
-import org.ironrhino.core.struts.I18N;
 
 public enum SqlVerb implements Displayable {
 
 	SELECT, UPDATE, INSERT, MERGE, DELETE, CREATE, ALTER, DROP, CALL, RENAME, COMMENT, GRANT, REVOKE, BACKUP;
 
-	@Override
 	public String getName() {
-		return this.name();
+		return name();
 	}
 
-	@Override
 	public String getDisplayName() {
-		try {
-			return I18N.getText(getClass(), name());
-		} catch (Exception e) {
-			return name();
-		}
+		return Displayable.super.getDisplayName();
 	}
 
 	public static SqlVerb parse(String name) {
