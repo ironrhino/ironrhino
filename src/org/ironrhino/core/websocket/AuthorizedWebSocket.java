@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
 import javax.websocket.CloseReason;
@@ -12,7 +13,6 @@ import javax.websocket.Session;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.core.util.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class AuthorizedWebSocket {
 		for (Session s : sessions)
 			if (s.isOpen())
 				try {
-					if (p.evaluate(userDetailsService
+					if (p.test(userDetailsService
 							.loadUserByUsername((String) s.getUserProperties().get(USER_PROPERTIES_NAME_USERNAME))))
 						s.getBasicRemote().sendText(message);
 				} catch (IOException e) {

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.BaseTreeableEntity;
@@ -94,9 +95,9 @@ public class BeanUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends BaseTreeableEntity<T>> T deepClone(T source, ObjectFilter filter,
+	public static <T extends BaseTreeableEntity<T>> T deepClone(T source, Predicate<T> filter,
 			String... ignoreProperties) {
-		if (filter != null && !filter.accept(source))
+		if (filter != null && !filter.test(source))
 			throw new IllegalArgumentException("source object self must be accepted if you specify a filter");
 		T ret = null;
 		try {
@@ -107,7 +108,7 @@ public class BeanUtils {
 		copyProperties(source, ret, ignoreProperties);
 		List<T> children = new ArrayList<T>();
 		for (T child : source.getChildren()) {
-			if (filter == null || filter.accept(child)) {
+			if (filter == null || filter.test(child)) {
 				T t = deepClone(child, filter, ignoreProperties);
 				t.setParent(ret);
 				children.add(t);
