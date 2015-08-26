@@ -95,8 +95,7 @@ public class ConsistentHash<K, V> {
 				Object node = keys.next();
 				int n = nodes.get(node).intValue() * pointsPerWeight;
 				for (int i = 0; i < n; i++)
-					points[point++] = new Point(hash.hash(node.toString() + "/"
-							+ i), node);
+					points[point++] = new Point(hash.hash(node.toString() + "/" + i), node);
 			}
 			Arrays.sort(points);
 		} finally {
@@ -136,6 +135,7 @@ public class ConsistentHash<K, V> {
 		}
 	}
 
+	@FunctionalInterface
 	public static interface Hash {
 		public long hash(String s);
 	}
@@ -182,8 +182,7 @@ public class ConsistentHash<K, V> {
 			}
 
 			if (buf.remaining() > 0) {
-				ByteBuffer finish = ByteBuffer.allocate(4).order(
-						ByteOrder.LITTLE_ENDIAN);
+				ByteBuffer finish = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
 				// for big-endian version, use this first:
 				// finish.position(4-buf.remaining());
 				finish.put(buf).rewind();
@@ -229,8 +228,7 @@ public class ConsistentHash<K, V> {
 			}
 
 			if (buf.remaining() > 0) {
-				ByteBuffer finish = ByteBuffer.allocate(8).order(
-						ByteOrder.LITTLE_ENDIAN);
+				ByteBuffer finish = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
 				// for big-endian version, do this first:
 				// finish.position(8-buf.remaining());
 				finish.put(buf).rewind();

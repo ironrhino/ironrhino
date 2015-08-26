@@ -15,12 +15,11 @@ public interface SearchService<T> {
 
 	public List<T> search(SearchCriteria searchCriteria, Mapper<T> mapper);
 
-	public List<T> search(SearchCriteria searchCriteria, Mapper<T> mapper,
-			int limit);
+	public List<T> search(SearchCriteria searchCriteria, Mapper<T> mapper, int limit);
 
-	public Map<String, Integer> countTermsByField(
-			SearchCriteria searchCriteria, String field);
+	public Map<String, Integer> countTermsByField(SearchCriteria searchCriteria, String field);
 
+	@FunctionalInterface
 	public static interface Mapper<T> {
 
 		public T map(T source);

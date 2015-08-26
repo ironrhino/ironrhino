@@ -38,11 +38,9 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public List<T> findListByCriteria(DetachedCriteria dc);
 
-	public List<T> findBetweenListByCriteria(final DetachedCriteria dc,
-			int from, int end);
+	public List<T> findBetweenListByCriteria(final DetachedCriteria dc, int from, int end);
 
-	public List<T> findListByCriteria(DetachedCriteria dc, int pageNo,
-			int pageSize);
+	public List<T> findListByCriteria(DetachedCriteria dc, int pageNo, int pageSize);
 
 	public ResultPage<T> findByResultPage(ResultPage<T> resultPage);
 
@@ -68,12 +66,11 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public void iterate(int fetchSize, IterateCallback callback);
 
-	public void iterate(int fetchSize, IterateCallback callback,
-			DetachedCriteria dc);
+	public void iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc);
 
-	public void iterate(int fetchSize, IterateCallback callback,
-			DetachedCriteria dc, boolean commitPerFetch);
+	public void iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc, boolean commitPerFetch);
 
+	@FunctionalInterface
 	public static interface IterateCallback {
 		public void process(Object[] entityArray, Session session);
 	}

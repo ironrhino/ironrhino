@@ -32,8 +32,7 @@ public class HtmlUtils {
 
 	public static String getTreeViewHtml(BaseTreeableEntity t) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<li id=\"" + t.getId() + "\"><span>" + t.getName()
-				+ "</span>");
+		sb.append("<li id=\"" + t.getId() + "\"><span>" + t.getName() + "</span>");
 		if (t.getChildren().size() > 0) {
 			sb.append("<ul>");
 			for (Object c : t.getChildren())
@@ -48,11 +47,9 @@ public class HtmlUtils {
 		Source source = new Source(html);
 		Iterator<Element> it = source.getAllElements().iterator();
 		if (it.hasNext()) {
-			return org.apache.commons.lang3.StringUtils.abbreviate(it.next()
-					.getTextExtractor().toString(), abbr);
+			return org.apache.commons.lang3.StringUtils.abbreviate(it.next().getTextExtractor().toString(), abbr);
 		} else
-			return org.apache.commons.lang3.StringUtils.abbreviate(
-					source.toString(), abbr);
+			return org.apache.commons.lang3.StringUtils.abbreviate(source.toString(), abbr);
 	}
 
 	public static String compress(String html, String[] id) throws Exception {
@@ -88,6 +85,7 @@ public class HtmlUtils {
 		return outputDocument.toString();
 	}
 
+	@FunctionalInterface
 	public static interface Replacer {
 		public String replace(StartTag st, Attribute attr);
 	}

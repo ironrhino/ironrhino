@@ -2,6 +2,7 @@ package org.ironrhino.core.stat.analysis;
 
 public class TreeWalker {
 
+	@FunctionalInterface
 	static interface Visitor {
 		void visit(TreeNode node);
 	}

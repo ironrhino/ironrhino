@@ -34,8 +34,7 @@ public class RoundRobin<T> {
 		if (targets == null || targets.size() == 0)
 			throw new IllegalArgumentException("no target");
 		for (Map.Entry<T, Integer> entry : targets.entrySet()) {
-			TargetWrapper<T> tw = new TargetWrapper<T>(entry.getKey(),
-					entry.getValue());
+			TargetWrapper<T> tw = new TargetWrapper<T>(entry.getKey(), entry.getValue());
 			targetWrappers.add(tw);
 		}
 		this.usableChecker = usableChecker;
@@ -47,8 +46,7 @@ public class RoundRobin<T> {
 		for (int i = 0; i < targetWrappers.size(); i++) {
 			TargetWrapper<T> target = targetWrappers.get(i);
 			AtomicInteger targetStat = target.getStat();
-			if (!(usableChecker == null || usableChecker.isUsable(target
-					.getTarget())))
+			if (!(usableChecker == null || usableChecker.isUsable(target.getTarget())))
 				continue;
 			totalWeight += target.getWeight();
 			int newStat = targetStat.addAndGet(target.getWeight());
@@ -61,6 +59,7 @@ public class RoundRobin<T> {
 		return tw.getTarget();
 	}
 
+	@FunctionalInterface
 	public static interface UsableChecker<T> {
 
 		boolean isUsable(T target);
