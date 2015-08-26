@@ -4,9 +4,9 @@ import org.ironrhino.core.struts.I18N;
 
 public interface Displayable {
 
-	public String getName();
+	String getName();
 
-	public default String getDisplayName() {
+	default String getDisplayName() {
 		try {
 			return I18N.getText(getClass(), getName());
 		} catch (Exception e) {
