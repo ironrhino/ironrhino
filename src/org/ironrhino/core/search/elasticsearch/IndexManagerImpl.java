@@ -40,7 +40,6 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.search.elasticsearch.annotations.Store;
-import org.ironrhino.core.service.BaseManager.IterateCallback;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ClassScanner;
@@ -119,11 +118,8 @@ public class IndexManagerImpl implements IndexManager {
 		if (client instanceof NodeClient) {
 			NodeClient nc = (NodeClient) client;
 			if ("memory".equals(nc.settings().get("index.store.type")))
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						rebuild();
-					}
+				new Thread(() -> {
+					rebuild();
 				}).start();
 		}
 	}
@@ -533,25 +529,22 @@ public class IndexManagerImpl implements IndexManager {
 		Class clz = typeToClass(type);
 		entityManager.setEntityClass(clz);
 		final AtomicLong indexed = new AtomicLong();
-		entityManager.iterate(20, new IterateCallback() {
-			@Override
-			public void process(Object[] entityArray, Session session) {
-				BulkRequestBuilder bulkRequest = client.prepareBulk();
-				indexed.addAndGet(entityArray.length);
-				for (Object obj : entityArray) {
-					Persistable p = (Persistable) obj;
-					bulkRequest.add(
-							client.prepareIndex(getIndexName(), classToType(p.getClass()), String.valueOf(p.getId()))
-									.setSource(entityToDocument(p)));
+		entityManager.iterate(20, (Object[] entityArray, Session session) -> {
+			BulkRequestBuilder bulkRequest = client.prepareBulk();
+			indexed.addAndGet(entityArray.length);
+			for (Object obj : entityArray) {
+				Persistable p = (Persistable) obj;
+				bulkRequest
+						.add(client.prepareIndex(getIndexName(), classToType(p.getClass()), String.valueOf(p.getId()))
+								.setSource(entityToDocument(p)));
+			}
+			try {
+				if (bulkRequest.numberOfActions() > 0) {
+					ListenableActionFuture<BulkResponse> br = bulkRequest.execute();
+					br.addListener(bulkResponseActionListener);
 				}
-				try {
-					if (bulkRequest.numberOfActions() > 0) {
-						ListenableActionFuture<BulkResponse> br = bulkRequest.execute();
-						br.addListener(bulkResponseActionListener);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 		logger.info("indexed {} for {}", indexed.get(), type);

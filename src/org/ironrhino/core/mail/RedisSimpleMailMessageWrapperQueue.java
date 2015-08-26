@@ -8,9 +8,8 @@ import javax.annotation.PreDestroy;
 import org.ironrhino.core.redis.RedisQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class RedisSimpleMailMessageWrapperQueue extends
-		RedisQueue<SimpleMailMessageWrapper> implements
-		SimpleMailMessageWrapperQueue {
+public class RedisSimpleMailMessageWrapperQueue extends RedisQueue<SimpleMailMessageWrapper>
+		implements SimpleMailMessageWrapperQueue {
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
@@ -24,21 +23,16 @@ public class RedisSimpleMailMessageWrapperQueue extends
 	@PostConstruct
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
-		Runnable task = new Runnable() {
-
-			@Override
-			public void run() {
-				while (!stop) {
-					try {
-						SimpleMailMessageWrapper smmw = queue.take();
-						consume(smmw);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-
+		Runnable task = () -> {
+			while (!stop) {
+				try {
+					SimpleMailMessageWrapper smmw = queue.take();
+					consume(smmw);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-			}
 
+			}
 		};
 		if (executorService != null)
 			executorService.execute(task);

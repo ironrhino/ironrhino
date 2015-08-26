@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -90,10 +89,8 @@ public class SetupAction extends BaseAction {
 			return false;
 		if (ctx.containsBean("settingControl"))
 			try {
-				ApplicationContextConsole console = ctx
-						.getBean(ApplicationContextConsole.class);
-				String expression = "settingControl.getBooleanValue(\""
-						+ SETUP_ENABLED_KEY + "\",true)";
+				ApplicationContextConsole console = ctx.getBean(ApplicationContextConsole.class);
+				String expression = "settingControl.getBooleanValue(\"" + SETUP_ENABLED_KEY + "\",true)";
 				return (Boolean) console.execute(expression, Scope.LOCAL);
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -105,10 +102,8 @@ public class SetupAction extends BaseAction {
 		try {
 			doSetup();
 			if (ctx.containsBean("settingControl")) {
-				ApplicationContextConsole console = ctx
-						.getBean(ApplicationContextConsole.class);
-				String expression = "settingControl.setValue(\""
-						+ SETUP_ENABLED_KEY + "\",\"false\",true,true)";
+				ApplicationContextConsole console = ctx.getBean(ApplicationContextConsole.class);
+				String expression = "settingControl.setValue(\"" + SETUP_ENABLED_KEY + "\",\"false\",true,true)";
 				console.execute(expression, Scope.LOCAL);
 			}
 		} catch (Throwable e) {
@@ -124,25 +119,19 @@ public class SetupAction extends BaseAction {
 			setupParameters = new ArrayList<SetupParameterImpl>();
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
-				if (StringUtils.isAlphanumeric(beanName)
-						&& ctx.isSingleton(beanName)) {
-					String beanClassName = ctx.getBeanFactory()
-							.getBeanDefinition(beanName).getBeanClassName();
-					Class<?> clz = beanClassName != null ? Class
-							.forName(beanClassName) : ReflectionUtils
-							.getTargetObject(ctx.getBean(beanName)).getClass();
-					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(
-							clz, Setup.class);
+				if (StringUtils.isAlphanumeric(beanName) && ctx.isSingleton(beanName)) {
+					String beanClassName = ctx.getBeanFactory().getBeanDefinition(beanName).getBeanClassName();
+					Class<?> clz = beanClassName != null ? Class.forName(beanClassName)
+							: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
+					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Setup.class);
 					for (Method m : methods) {
 						int modifiers = m.getModifiers();
 						if (Modifier.isPublic(modifiers)) {
 							if (m.getParameterTypes().length == 0)
 								continue;
-							String[] parameterNames = ReflectionUtils.parameterNameDiscoverer
-									.getParameterNames(m);
+							String[] parameterNames = ReflectionUtils.parameterNameDiscoverer.getParameterNames(m);
 							Class<?>[] parameterTypes = m.getParameterTypes();
-							Annotation[][] annotationArrays = m
-									.getParameterAnnotations();
+							Annotation[][] annotationArrays = m.getParameterAnnotations();
 							for (int i = 0; i < annotationArrays.length; i++) {
 								Annotation[] arr = annotationArrays[i];
 								SetupParameter sp = null;
@@ -152,18 +141,14 @@ public class SetupAction extends BaseAction {
 										break;
 									}
 								Class<?> type = parameterTypes[i];
-								String _type = StringUtils.uncapitalize(type
-										.getSimpleName());
+								String _type = StringUtils.uncapitalize(type.getSimpleName());
 								if (type.isEnum())
 									_type = "enum";
-								else if (_type.equals("int")
-										|| _type.equals("long"))
+								else if (_type.equals("int") || _type.equals("long"))
 									_type = "integer";
-								else if (_type.equals("float")
-										|| _type.equals("bigdecimal"))
+								else if (_type.equals("float") || _type.equals("bigdecimal"))
 									_type = "double";
-								setupParameters.add(new SetupParameterImpl(
-										type, parameterNames[i], _type, sp));
+								setupParameters.add(new SetupParameterImpl(type, parameterNames[i], _type, sp));
 							}
 						}
 					}
@@ -178,32 +163,24 @@ public class SetupAction extends BaseAction {
 	public void doSetup() throws Exception {
 		logger.info("setup started");
 		String[] beanNames = ctx.getBeanDefinitionNames();
-		Map<Method, Object> methods = new TreeMap<Method, Object>(
-				new Comparator<Method>() {
-					@Override
-					public int compare(Method m1, Method m2) {
-						int order1 = org.springframework.core.Ordered.LOWEST_PRECEDENCE, order2 = org.springframework.core.Ordered.LOWEST_PRECEDENCE;
-						Order o = m1.getAnnotation(Order.class);
-						if (o != null)
-							order1 = o.value();
-						o = m2.getAnnotation(Order.class);
-						if (o != null)
-							order2 = o.value();
-						return order1 == order2 ? m1.toString().compareTo(
-								m2.toString()) : order1 < order2 ? -1 : 1;
-					}
-				});
+		Map<Method, Object> methods = new TreeMap<Method, Object>((Method m1, Method m2) -> {
+			int order1 = org.springframework.core.Ordered.LOWEST_PRECEDENCE,
+					order2 = org.springframework.core.Ordered.LOWEST_PRECEDENCE;
+			Order o = m1.getAnnotation(Order.class);
+			if (o != null)
+				order1 = o.value();
+			o = m2.getAnnotation(Order.class);
+			if (o != null)
+				order2 = o.value();
+			return order1 == order2 ? m1.toString().compareTo(m2.toString()) : order1 < order2 ? -1 : 1;
+		});
 		for (String beanName : beanNames)
-			if (StringUtils.isAlphanumeric(beanName)
-					&& ctx.isSingleton(beanName)) {
-				String beanClassName = ctx.getBeanFactory()
-						.getBeanDefinition(beanName).getBeanClassName();
-				Class<?> clz = beanClassName != null ? Class
-						.forName(beanClassName) : ReflectionUtils
-						.getTargetObject(ctx.getBean(beanName)).getClass();
+			if (StringUtils.isAlphanumeric(beanName) && ctx.isSingleton(beanName)) {
+				String beanClassName = ctx.getBeanFactory().getBeanDefinition(beanName).getBeanClassName();
+				Class<?> clz = beanClassName != null ? Class.forName(beanClassName)
+						: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
 				Object bean = ctx.getBean(beanName);
-				for (Method m : AnnotationUtils.getAnnotatedMethods(clz,
-						Setup.class))
+				for (Method m : AnnotationUtils.getAnnotatedMethods(clz, Setup.class))
 					methods.put(m, bean);
 			}
 		for (Map.Entry<Method, Object> entry : methods.entrySet()) {
@@ -215,35 +192,27 @@ public class SetupAction extends BaseAction {
 			if (m.getParameterTypes().length == 0) {
 				m.invoke(entry.getValue(), new Object[0]);
 			} else {
-				String[] parameterNames = ReflectionUtils.parameterNameDiscoverer
-						.getParameterNames(m);
+				String[] parameterNames = ReflectionUtils.parameterNameDiscoverer.getParameterNames(m);
 				Class<?>[] parameterTypes = m.getParameterTypes();
 				Object[] value = new Object[parameterNames.length];
 				for (int i = 0; i < parameterNames.length; i++) {
-					String pvalue = ServletActionContext.getRequest()
-							.getParameter(parameterNames[i]);
+					String pvalue = ServletActionContext.getRequest().getParameter(parameterNames[i]);
 					Object v = pvalue;
 					Class<?> type = parameterTypes[i];
 					if (!type.equals(String.class)) {
 						if (type.isEnum()) {
-							v = Enum.valueOf((Class<? extends Enum>) type,
-									pvalue);
-						} else if (type.equals(Integer.class)
-								|| type.equals(Integer.TYPE)) {
+							v = Enum.valueOf((Class<? extends Enum>) type, pvalue);
+						} else if (type.equals(Integer.class) || type.equals(Integer.TYPE)) {
 							v = Integer.valueOf(pvalue);
-						} else if (type.equals(Long.class)
-								|| type.equals(Long.TYPE)) {
+						} else if (type.equals(Long.class) || type.equals(Long.TYPE)) {
 							v = Long.valueOf(pvalue);
-						} else if (type.equals(Float.class)
-								|| type.equals(Float.TYPE)) {
+						} else if (type.equals(Float.class) || type.equals(Float.TYPE)) {
 							v = Float.valueOf(pvalue);
-						} else if (type.equals(Double.class)
-								|| type.equals(Double.TYPE)) {
+						} else if (type.equals(Double.class) || type.equals(Double.TYPE)) {
 							v = Double.valueOf(pvalue);
 						} else if (type.equals(BigDecimal.class)) {
 							v = new BigDecimal(pvalue);
-						} else if (type.equals(Boolean.class)
-								|| type.equals(Boolean.TYPE)) {
+						} else if (type.equals(Boolean.class) || type.equals(Boolean.TYPE)) {
 							v = "true".equals(pvalue);
 						} else if (type.equals(Date.class)) {
 							v = DateUtils.parse(pvalue);
@@ -259,8 +228,7 @@ public class SetupAction extends BaseAction {
 		logger.info("setup finished");
 	}
 
-	public static class SetupParameterImpl implements Serializable,
-			Ordered<SetupParameterImpl> {
+	public static class SetupParameterImpl implements Serializable, Ordered<SetupParameterImpl> {
 
 		private static final long serialVersionUID = -3004203941981232510L;
 
@@ -280,8 +248,7 @@ public class SetupAction extends BaseAction {
 
 		private Set<String> cssClasses = new ConcurrentSkipListSet<String>();
 
-		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<String, String>(
-				0);
+		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<String, String>(0);
 
 		private int displayOrder;
 
@@ -289,8 +256,7 @@ public class SetupAction extends BaseAction {
 
 		}
 
-		public SetupParameterImpl(Class<?> parameterType, String name,
-				String type, SetupParameter setupParameter) {
+		public SetupParameterImpl(Class<?> parameterType, String name, String type, SetupParameter setupParameter) {
 			this();
 			this.parameterType = parameterType;
 			this.name = name;
@@ -302,14 +268,12 @@ public class SetupAction extends BaseAction {
 				this.placeholder = setupParameter.placeholder();
 				this.required = setupParameter.required();
 				if (StringUtils.isNotBlank(setupParameter.cssClass()))
-					this.cssClasses.addAll(Arrays.asList(setupParameter
-							.cssClass().split("\\s")));
+					this.cssClasses.addAll(Arrays.asList(setupParameter.cssClass().split("\\s")));
 				if (Date.class.isAssignableFrom(parameterType))
 					this.cssClasses.add("date");
 				if (StringUtils.isNotBlank(setupParameter.dynamicAttributes()))
 					try {
-						this.dynamicAttributes = JsonUtils.fromJson(
-								setupParameter.dynamicAttributes(),
+						this.dynamicAttributes = JsonUtils.fromJson(setupParameter.dynamicAttributes(),
 								JsonUtils.STRING_MAP_TYPE);
 					} catch (Exception e) {
 						e.printStackTrace();

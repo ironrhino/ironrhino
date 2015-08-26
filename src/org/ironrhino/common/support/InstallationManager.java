@@ -1,12 +1,10 @@
 package org.ironrhino.common.support;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,29 +63,20 @@ public class InstallationManager {
 		backupedComponents = new ArrayList<Component>();
 		File dir = new File(this.directory);
 		if (dir.isDirectory()) {
-			File[] files = dir.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".jar") || name.endsWith(".jar.bak");
-				}
+			File[] files = dir.listFiles((File dir2, String name) -> {
+				return name.endsWith(".jar") || name.endsWith(".jar.bak");
 			});
 			if (files != null)
 				for (File f : files) {
-					Map<String, String> manifest = FileUtils
-							.parseManifestFile(f);
-					if (manifest == null || manifest.isEmpty()
-							|| !manifest.containsKey(IRONRHINO_COMPONENT_ID))
+					Map<String, String> manifest = FileUtils.parseManifestFile(f);
+					if (manifest == null || manifest.isEmpty() || !manifest.containsKey(IRONRHINO_COMPONENT_ID))
 						continue;
 					Component component = new Component(manifest);
 					component.setRealPath(f.getAbsolutePath());
-					(f.getName().endsWith(".jar") ? list : backupedComponents)
-							.add(component);
+					(f.getName().endsWith(".jar") ? list : backupedComponents).add(component);
 				}
-			Collections.sort(list, new Comparator<Component>() {
-				@Override
-				public int compare(Component o1, Component o2) {
-					return o1.getId().compareTo(o2.getId());
-				}
+			Collections.sort(list, (Component o1, Component o2) -> {
+				return o1.getId().compareTo(o2.getId());
 			});
 			this.installedComponents = new ArrayList<Component>();
 			for (Component c : list)
@@ -142,10 +131,8 @@ public class InstallationManager {
 				for (Component c : getInstalledComponents()) {
 					if (c.getId().equals(entry.getKey())) {
 						if (c.getVersion().compareTo(entry.getValue()) < 0)
-							throw new ErrorMessage(entry.getKey()
-									+ " required version(" + entry.getValue()
-									+ "),but version(" + c.getVersion()
-									+ ") found!");
+							throw new ErrorMessage(entry.getKey() + " required version(" + entry.getValue()
+									+ "),but version(" + c.getVersion() + ") found!");
 						else
 							satisfied = true;
 						break;
@@ -175,8 +162,7 @@ public class InstallationManager {
 				throw new ErrorMessage("component has installed");
 			try {
 				new File(oldcomp.getRealPath() + ".bak").delete();
-				org.apache.commons.io.FileUtils.moveFile(
-						new File(oldcomp.getRealPath()),
+				org.apache.commons.io.FileUtils.moveFile(new File(oldcomp.getRealPath()),
 						new File(oldcomp.getRealPath() + ".bak"));
 			} catch (IOException e) {
 				throw new ErrorMessage(e.getMessage());
@@ -184,8 +170,7 @@ public class InstallationManager {
 			oldcomp.setRealPath(oldcomp.getRealPath() + ".bak");
 			getBackupedComponents().add(oldcomp);
 		}
-		String newfilename = new StringBuilder(directory)
-				.append(File.separator).append(newcomp.getId()).append("-")
+		String newfilename = new StringBuilder(directory).append(File.separator).append(newcomp.getId()).append("-")
 				.append(newcomp.getVersion()).append(".jar").toString();
 		try {
 			org.apache.commons.io.FileUtils.copyFile(f, new File(newfilename));
@@ -206,18 +191,15 @@ public class InstallationManager {
 			if (c.getDependence() == null)
 				continue;
 			if (c.getDependence().keySet().contains(id))
-				throw new ErrorMessage("installed component(" + c.getId()
-						+ ") requires component(" + id
+				throw new ErrorMessage("installed component(" + c.getId() + ") requires component(" + id
 						+ ") and cannot be uninstalled");
 		}
 		if (comp == null)
-			throw new ErrorMessage("component(" + id
-					+ ") doesn't installed yet");
+			throw new ErrorMessage("component(" + id + ") doesn't installed yet");
 		try {
 			new File(comp.getRealPath() + ".uninstall").delete();
-			org.apache.commons.io.FileUtils.moveFile(
-					new File(comp.getRealPath()), new File(comp.getRealPath()
-							+ ".uninstall"));
+			org.apache.commons.io.FileUtils.moveFile(new File(comp.getRealPath()),
+					new File(comp.getRealPath() + ".uninstall"));
 		} catch (IOException e) {
 			throw new ErrorMessage(e.getMessage());
 		}
@@ -248,10 +230,8 @@ public class InstallationManager {
 			if (c.getDependence().keySet().contains(id)) {
 				String requiredVersion = c.getDependence().get(id);
 				if (requiredVersion.compareTo(backcomp.getVersion()) > 0)
-					throw new ErrorMessage("installed component(" + c.getId()
-							+ ") require version(" + requiredVersion
-							+ ") ,and rollback is version("
-							+ backcomp.getVersion() + "),cannot rollback it");
+					throw new ErrorMessage("installed component(" + c.getId() + ") require version(" + requiredVersion
+							+ ") ,and rollback is version(" + backcomp.getVersion() + "),cannot rollback it");
 			}
 		}
 
@@ -260,13 +240,11 @@ public class InstallationManager {
 			getInstalledComponents().remove(instcomp);
 		}
 
-		String newfilename = new StringBuilder(directory)
-				.append(File.separator).append(backcomp.getId()).append("-")
+		String newfilename = new StringBuilder(directory).append(File.separator).append(backcomp.getId()).append("-")
 				.append(backcomp.getVersion()).append(".jar").toString();
 		try {
 			new File(newfilename).delete();
-			org.apache.commons.io.FileUtils.moveFile(
-					new File(backcomp.getRealPath()), new File(newfilename));
+			org.apache.commons.io.FileUtils.moveFile(new File(backcomp.getRealPath()), new File(newfilename));
 		} catch (IOException e) {
 			throw new ErrorMessage(e.getMessage());
 		}

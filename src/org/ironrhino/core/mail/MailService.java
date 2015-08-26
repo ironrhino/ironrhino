@@ -42,8 +42,7 @@ public class MailService {
 		this.forceLocalAsync = forceLocalAsync;
 	}
 
-	public void setForceLocalAsyncFailureThreshold(
-			int forceLocalAsyncFailureThreshold) {
+	public void setForceLocalAsyncFailureThreshold(int forceLocalAsyncFailureThreshold) {
 		this.forceLocalAsyncFailureThreshold = forceLocalAsyncFailureThreshold;
 	}
 
@@ -54,11 +53,8 @@ public class MailService {
 	public void send(final SimpleMailMessage smm, final boolean useHtmlFormat) {
 		if ((simpleMailMessageWrapperQueue == null) || forceLocalAsync) {
 			// localAsync
-			Runnable task = new Runnable() {
-				@Override
-				public void run() {
-					mailSender.send(smm, useHtmlFormat);
-				}
+			Runnable task = () -> {
+				mailSender.send(smm, useHtmlFormat);
 			};
 			if (executorService != null)
 				executorService.execute(task);
@@ -68,9 +64,7 @@ public class MailService {
 		}
 		try {
 			if (simpleMailMessageWrapperQueue != null)
-				simpleMailMessageWrapperQueue
-						.produce(new SimpleMailMessageWrapper(smm,
-								useHtmlFormat));
+				simpleMailMessageWrapperQueue.produce(new SimpleMailMessageWrapper(smm, useHtmlFormat));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			_failureCount++;
@@ -82,13 +76,11 @@ public class MailService {
 		}
 	}
 
-	public void send(SimpleMailMessage smm, String templateName,
-			Map<String, Object> model) {
+	public void send(SimpleMailMessage smm, String templateName, Map<String, Object> model) {
 		send(smm, templateName, model, true);
 	}
 
-	public void send(SimpleMailMessage smm, String templateName,
-			Map<String, Object> model, boolean useHtmlFormat) {
+	public void send(SimpleMailMessage smm, String templateName, Map<String, Object> model, boolean useHtmlFormat) {
 		if (templateProvider == null)
 			throw new RuntimeException("No templateProvider setted");
 		model.put("sendmail", true);

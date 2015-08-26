@@ -18,9 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.serializer.support.SerializationFailedException;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -40,23 +38,19 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void put(String key, Object value, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		put(key, value, -1, timeToLive, timeUnit, namespace);
 	}
 
 	@Override
-	public void put(String key, Object value, int timeToIdle, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void put(String key, Object value, int timeToIdle, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (key == null || value == null)
 			return;
 		try {
 			if (timeToLive > 0)
-				redisTemplate.opsForValue().set(generateKey(key, namespace),
-						value, timeToLive, timeUnit);
+				redisTemplate.opsForValue().set(generateKey(key, namespace), value, timeToLive, timeUnit);
 			else
-				redisTemplate.opsForValue().set(generateKey(key, namespace),
-						value);
+				redisTemplate.opsForValue().set(generateKey(key, namespace), value);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -91,8 +85,7 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToIdle,
-			TimeUnit timeUnit) {
+	public Object get(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
 		if (key == null)
 			return null;
 		String actualKey = generateKey(key, namespace);
@@ -122,35 +115,27 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mput(Map<String, Object> map, final int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void mput(Map<String, Object> map, final int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (map == null)
 			return;
 		try {
 			final Map<byte[], byte[]> actualMap = new HashMap<byte[], byte[]>();
 			for (Map.Entry<String, Object> entry : map.entrySet())
-				actualMap.put(
-						redisTemplate.getKeySerializer().serialize(
-								generateKey(entry.getKey(), namespace)),
-						redisTemplate.getValueSerializer().serialize(
-								entry.getValue()));
-			redisTemplate.execute(new RedisCallback<Object>() {
-				@Override
-				public Object doInRedis(RedisConnection conn)
-						throws DataAccessException {
-					conn.multi();
-					try{
-						conn.mSet(actualMap);
-						if (timeToLive > 0)
-							for (byte[] k : actualMap.keySet())
-								conn.expire(k, timeToLive);
-						conn.exec();
-					}catch(Exception e){
-						log.error(e.getMessage(), e);
-						conn.discard();
-					}
-					return null;
+				actualMap.put(redisTemplate.getKeySerializer().serialize(generateKey(entry.getKey(), namespace)),
+						redisTemplate.getValueSerializer().serialize(entry.getValue()));
+			redisTemplate.execute((RedisConnection conn) -> {
+				conn.multi();
+				try {
+					conn.mSet(actualMap);
+					if (timeToLive > 0)
+						for (byte[] k : actualMap.keySet())
+							conn.expire(k, timeToLive);
+					conn.exec();
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+					conn.discard();
 				}
+				return null;
 			});
 
 		} catch (Exception e) {
@@ -164,23 +149,15 @@ public class RedisCacheManager implements CacheManager {
 			return null;
 		final List<byte[]> _keys = new ArrayList<byte[]>();
 		for (String key : keys)
-			_keys.add(redisTemplate.getKeySerializer().serialize(
-					generateKey(key, namespace)));
+			_keys.add(redisTemplate.getKeySerializer().serialize(generateKey(key, namespace)));
 		try {
-			List<byte[]> values = (List<byte[]>) redisTemplate
-					.execute(new RedisCallback<List<byte[]>>() {
-						@Override
-						public List<byte[]> doInRedis(RedisConnection conn)
-								throws DataAccessException {
-							return conn.mGet(_keys.toArray(new byte[0][0]));
-						}
-					});
+			List<byte[]> values = (List<byte[]>) redisTemplate.execute((RedisConnection conn) -> {
+				return conn.mGet(_keys.toArray(new byte[0][0]));
+			});
 			Map<String, Object> map = new HashMap<String, Object>();
 			int i = 0;
 			for (String key : keys) {
-				map.put(key,
-						redisTemplate.getValueSerializer().deserialize(
-								values.get(i)));
+				map.put(key, redisTemplate.getValueSerializer().deserialize(values.get(i)));
 				i++;
 			}
 			return map;
@@ -195,23 +172,18 @@ public class RedisCacheManager implements CacheManager {
 		if (keys == null)
 			return;
 		try {
-			redisTemplate.execute(new RedisCallback() {
-				@Override
-				public Object doInRedis(RedisConnection conn)
-						throws DataAccessException {
-					conn.multi();
-					try{
-						for (String key : keys)
-							if (StringUtils.isNotBlank(key))
-								conn.del(redisTemplate.getKeySerializer()
-										.serialize(generateKey(key, namespace)));
-						conn.exec();
-					}catch(Exception e){
-						log.error(e.getMessage(), e);
-						conn.discard();
-					}
-					return null;
+			redisTemplate.execute((RedisConnection conn) -> {
+				conn.multi();
+				try {
+					for (String key : keys)
+						if (StringUtils.isNotBlank(key))
+							conn.del(redisTemplate.getKeySerializer().serialize(generateKey(key, namespace)));
+					conn.exec();
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+					conn.discard();
 				}
+				return null;
 			});
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -233,12 +205,10 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public boolean putIfAbsent(String key, Object value, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
 			String actrualkey = generateKey(key, namespace);
-			boolean success = redisTemplate.opsForValue().setIfAbsent(
-					actrualkey, value);
+			boolean success = redisTemplate.opsForValue().setIfAbsent(actrualkey, value);
 			if (success && timeToLive > 0)
 				redisTemplate.expire(actrualkey, timeToLive, timeUnit);
 			return success;
@@ -248,12 +218,10 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public long increment(String key, long delta, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
 			String actrualkey = generateKey(key, namespace);
-			long result = redisTemplate.opsForValue().increment(actrualkey,
-					delta);
+			long result = redisTemplate.opsForValue().increment(actrualkey, delta);
 			if (timeToLive > 0)
 				redisTemplate.expire(actrualkey, timeToLive, timeUnit);
 			return result;
@@ -264,8 +232,7 @@ public class RedisCacheManager implements CacheManager {
 
 	private String generateKey(String key, String namespace) {
 		if (StringUtils.isNotBlank(namespace)) {
-			StringBuilder sb = new StringBuilder(namespace.length()
-					+ key.length() + 1);
+			StringBuilder sb = new StringBuilder(namespace.length() + key.length() + 1);
 			sb.append(namespace);
 			sb.append(':');
 			sb.append(key);

@@ -21,8 +21,7 @@ public class StatLog {
 
 	private static final Condition condition = timerLock.newCondition();
 
-	private static final ConcurrentHashMap<Key, Value> data = new ConcurrentHashMap<Key, Value>(
-			64);
+	private static final ConcurrentHashMap<Key, Value> data = new ConcurrentHashMap<Key, Value>(64);
 
 	private static Thread writeThread;
 
@@ -63,24 +62,19 @@ public class StatLog {
 	}
 
 	private static void startNewThread() {
-		writeThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					timerLock.lock();
-					try {
-						condition.await(StatLogSettings.getIntervalUnit(),
-								TimeUnit.SECONDS);
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						timerLock.unlock();
-					}
-					StatLog.write();
+		writeThread = new Thread(() -> {
+			while (true) {
+				timerLock.lock();
+				try {
+					condition.await(StatLogSettings.getIntervalUnit(), TimeUnit.SECONDS);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					timerLock.unlock();
 				}
+				StatLog.write();
 			}
-
-		}, StatLogSettings.WRITETHREAD_NAME);
+		} , StatLogSettings.WRITETHREAD_NAME);
 		writeThread.setDaemon(true);
 		writeThread.start();
 	}
@@ -95,21 +89,17 @@ public class StatLog {
 			long current = System.currentTimeMillis();
 			Key key = entry.getKey();
 			Value value = entry.getValue();
-			if (((!checkInterval || (current - key.getLastWriteTime())
-					/ StatLogSettings.getIntervalUnit() > key
-						.getIntervalMultiple()))
-					&& (value.getLongValue() > 0 || value.getDoubleValue() > 0)) {
+			if (((!checkInterval || (current - key.getLastWriteTime()) / StatLogSettings.getIntervalUnit() > key
+					.getIntervalMultiple())) && (value.getLongValue() > 0 || value.getDoubleValue() > 0)) {
 				key.setLastWriteTime(current);
 				output(key, value);
-				temp.put(key,
-						new Value(value.getLongValue(), value.getDoubleValue()));
+				temp.put(key, new Value(value.getLongValue(), value.getDoubleValue()));
 			}
 		}
 		for (Map.Entry<Key, Value> entry : temp.entrySet()) {
 			Key key = entry.getKey();
 			Value value = data.get(key);
-			value.add(-entry.getValue().getLongValue(), -entry.getValue()
-					.getDoubleValue());
+			value.add(-entry.getValue().getLongValue(), -entry.getValue().getDoubleValue());
 		}
 	}
 
@@ -127,12 +117,10 @@ public class StatLog {
 					bufferedWriter.close();
 				if (fileOutputStream != null)
 					fileOutputStream.close();
-				fileOutputStream = new FileOutputStream(
-						StatLogSettings.getLogFile(StatLogSettings.STAT_LOG_FILE_NAME
-								+ DateUtils.format(lastDate,
-										StatLogSettings.DATE_STYLE)), true);
-				bufferedWriter = new BufferedWriter(new OutputStreamWriter(
-						fileOutputStream, StatLogSettings.ENCODING));
+				fileOutputStream = new FileOutputStream(StatLogSettings.getLogFile(
+						StatLogSettings.STAT_LOG_FILE_NAME + DateUtils.format(lastDate, StatLogSettings.DATE_STYLE)),
+						true);
+				bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream, StatLogSettings.ENCODING));
 			}
 			bufferedWriter.write(sb.toString());
 			bufferedWriter.write('\n');

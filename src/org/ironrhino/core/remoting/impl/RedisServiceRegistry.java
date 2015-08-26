@@ -47,8 +47,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	private boolean ready;
 
 	@Autowired
-	public RedisServiceRegistry(
-			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+	public RedisServiceRegistry(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
 		this.stringRedisTemplate = stringRedisTemplate;
 	}
 
@@ -56,8 +55,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	protected void onReady() {
 		Set<String> services = getExportServices().keySet();
 		if (!services.isEmpty()) {
-			ExportServicesEvent event = new ExportServicesEvent(
-					new ArrayList<String>(services));
+			ExportServicesEvent event = new ExportServicesEvent(new ArrayList<String>(services));
 			eventPublisher.publish(event, Scope.GLOBAL);
 		}
 		writeDiscoveredServices();
@@ -74,22 +72,19 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	protected void lookup(String serviceName) {
-		List<String> list = stringRedisTemplate.opsForList().range(
-				NAMESPACE_SERVICES + serviceName, 0, -1);
+		List<String> list = stringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + serviceName, 0, -1);
 		if (list != null && list.size() > 0)
 			importServices.put(serviceName, list);
 	}
 
 	@Override
 	protected void doRegister(String serviceName, String host) {
-		stringRedisTemplate.opsForList().rightPush(
-				NAMESPACE_SERVICES + serviceName, host);
+		stringRedisTemplate.opsForList().rightPush(NAMESPACE_SERVICES + serviceName, host);
 	}
 
 	@Override
 	protected void doUnregister(String serviceName, String host) {
-		stringRedisTemplate.opsForList().remove(
-				NAMESPACE_SERVICES + serviceName, 0, host);
+		stringRedisTemplate.opsForList().remove(NAMESPACE_SERVICES + serviceName, 0, host);
 	}
 
 	@Override
@@ -103,12 +98,8 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	protected void writeDiscoveredServices() {
 		if (discoveredServices.size() == 0)
 			return;
-		Runnable task = new Runnable() {
-			@Override
-			public void run() {
-				stringRedisTemplate.opsForHash().putAll(NAMESPACE_HOSTS + host,
-						discoveredServices);
-			}
+		Runnable task = () -> {
+			stringRedisTemplate.opsForHash().putAll(NAMESPACE_HOSTS + host, discoveredServices);
 		};
 		if (executorService != null)
 			executorService.execute(task);
@@ -128,8 +119,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	public Collection<String> getHostsForService(String service) {
-		List<String> list = stringRedisTemplate.opsForList().range(
-				NAMESPACE_SERVICES + service, 0, -1);
+		List<String> list = stringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1);
 		List<String> hosts = new ArrayList<String>(list.size());
 		hosts.addAll(list);
 		Collections.sort(hosts);
@@ -140,8 +130,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	public Map<String, String> getDiscoveredServices(String host) {
 		if (host.indexOf(':') < 0)
 			host += ":" + DEFAULT_PORT;
-		Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(
-				NAMESPACE_HOSTS + host);
+		Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(NAMESPACE_HOSTS + host);
 		Map<String, String> services = new TreeMap<String, String>();
 		for (Map.Entry<Object, Object> entry : map.entrySet())
 			services.put((String) entry.getKey(), (String) entry.getValue());

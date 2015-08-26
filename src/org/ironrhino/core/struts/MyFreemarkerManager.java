@@ -53,9 +53,8 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			LocalizedTextUtil.setReloadBundles(true);
 		MyConfiguration configuration = new MyConfiguration(DEFAULT_VERSION);
-		configuration
-				.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION ? TemplateExceptionHandler.IGNORE_HANDLER
-						: TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+		configuration.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION
+				? TemplateExceptionHandler.IGNORE_HANDLER : TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 		if (mruMaxStrongSize > 0) {
 			configuration.setSetting(Configuration.CACHE_STORAGE_KEY, "strong:" + mruMaxStrongSize);
 		}
@@ -79,7 +78,8 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		globalVariables.put("statics", new BeansWrapperBuilder(DEFAULT_VERSION).build().getStaticModels());
 		globalVariables.put("beans", new BeansTemplateHashModel());
 		globalVariables.put("properties", new PropertiesTemplateHashModel());
-		TemplateHashModelEx hash = new SimpleMapModel(globalVariables, new BeansWrapperBuilder(DEFAULT_VERSION).build());
+		TemplateHashModelEx hash = new SimpleMapModel(globalVariables,
+				new BeansWrapperBuilder(DEFAULT_VERSION).build());
 		configuration.setAllSharedVariables(hash);
 		configuration.setDateFormat("yyyy-MM-dd");
 		configuration.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
@@ -88,12 +88,8 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			configuration.setSetting(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "5");
 		configuration.setCacheStorage(new StrongCacheStorage());
-		configuration.setTemplateExceptionHandler(new TemplateExceptionHandler() {
-			@Override
-			public void handleTemplateException(TemplateException ex, Environment env, Writer writer)
-					throws TemplateException {
-				log.error(ex.getMessage());
-			}
+		configuration.setTemplateExceptionHandler((TemplateException ex, Environment env, Writer writer) -> {
+			log.error(ex.getMessage());
 		});
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 		ServletContextResourcePatternResolver servletContextResourcePatternResolver = new ServletContextResourcePatternResolver(

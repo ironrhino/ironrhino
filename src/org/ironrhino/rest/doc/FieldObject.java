@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -202,9 +201,8 @@ public class FieldObject implements Serializable {
 				String name = pd.getName();
 				if (name.equals("class") || ignoreList.contains(name))
 					continue;
-				if (forRequest
-						&& (pd.getReadMethod() == null || pd.getWriteMethod() == null || pd.getWriteMethod()
-								.getAnnotation(JsonIgnore.class) != null))
+				if (forRequest && (pd.getReadMethod() == null || pd.getWriteMethod() == null
+						|| pd.getWriteMethod().getAnnotation(JsonIgnore.class) != null))
 					continue;
 				if (!forRequest
 						&& (pd.getReadMethod() == null || pd.getReadMethod().getAnnotation(JsonIgnore.class) != null))
@@ -245,11 +243,8 @@ public class FieldObject implements Serializable {
 				}
 				list.add(create(name, pd.getPropertyType(), required, null, null));
 			}
-			Collections.sort(list, new Comparator<FieldObject>() {
-				@Override
-				public int compare(FieldObject o1, FieldObject o2) {
-					return fieldNames.indexOf(o1.getName()) - fieldNames.indexOf(o2.getName());
-				}
+			Collections.sort(list, (FieldObject o1, FieldObject o2) -> {
+				return fieldNames.indexOf(o1.getName()) - fieldNames.indexOf(o2.getName());
 			});
 			return list;
 		}

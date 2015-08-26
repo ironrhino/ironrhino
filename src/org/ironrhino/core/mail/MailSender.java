@@ -2,7 +2,6 @@ package org.ironrhino.core.mail;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
@@ -48,22 +47,17 @@ public class MailSender {
 		if (smm.getTo() == null || smm.getTo().length == 0)
 			smm.setTo(defaultTo);
 		for (final String to : smm.getTo()) {
-			javaMailSender.send(new MimeMessagePreparator() {
-				@Override
-				public void prepare(MimeMessage mimeMessage)
-						throws MessagingException {
-					MimeMessageHelper message = new MimeMessageHelper(
-							mimeMessage, true, "UTF-8");
-					if (StringUtils.isNotBlank(smm.getFrom()))
-						message.setFrom(encode(smm.getFrom()));
-					else
-						message.setFrom(encode(defaultFrom));
-					if (StringUtils.isNotBlank(smm.getReplyTo()))
-						message.setReplyTo(encode(smm.getReplyTo()));
-					message.setTo(encode(to));
-					message.setSubject(smm.getSubject());
-					message.setText(smm.getText(), useHtmlFormat);
-				}
+			javaMailSender.send((MimeMessage mimeMessage) -> {
+				MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+				if (StringUtils.isNotBlank(smm.getFrom()))
+					message.setFrom(encode(smm.getFrom()));
+				else
+					message.setFrom(encode(defaultFrom));
+				if (StringUtils.isNotBlank(smm.getReplyTo()))
+					message.setReplyTo(encode(smm.getReplyTo()));
+				message.setTo(encode(to));
+				message.setSubject(smm.getSubject());
+				message.setText(smm.getText(), useHtmlFormat);
 			});
 		}
 	}

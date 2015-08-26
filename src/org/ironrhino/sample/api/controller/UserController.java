@@ -46,8 +46,7 @@ public class UserController {
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	public RestStatus validatePassword(@RequestBody User user) {
 		boolean valid = AuthzUtils.isPasswordValid(user.getPassword());
-		return valid ? RestStatus.OK : RestStatus.valueOf(
-				RestStatus.CODE_FIELD_INVALID, "password invalid");
+		return valid ? RestStatus.OK : RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, "password invalid");
 	}
 
 	// @RequestMapping(value = "/{username}", method = RequestMethod.GET)
@@ -60,16 +59,12 @@ public class UserController {
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
 	public DeferredResult<User> get(final @PathVariable String username) {
-		final DeferredResult<User> dr = new DeferredResult<User>(5000L,
-				RestStatus.REQUEST_TIMEOUT);
-		executorService.submit(new Runnable() {
-			@Override
-			public void run() {
-				User u = (User) userManager.loadUserByUsername(username);
-				if (u == null)
-					dr.setErrorResult(RestStatus.NOT_FOUND);
-				dr.setResult(u);
-			}
+		final DeferredResult<User> dr = new DeferredResult<User>(5000L, RestStatus.REQUEST_TIMEOUT);
+		executorService.submit(() -> {
+			User u = (User) userManager.loadUserByUsername(username);
+			if (u == null)
+				dr.setErrorResult(RestStatus.NOT_FOUND);
+			dr.setResult(u);
 		});
 		return dr;
 	}
@@ -79,13 +74,11 @@ public class UserController {
 		Asserts.notBlank(user, "username", "password", "name");
 		User u = (User) userManager.loadUserByUsername(user.getUsername());
 		if (u != null)
-			throw RestStatus.valueOf(RestStatus.CODE_ALREADY_EXISTS,
-					"username already exists");
+			throw RestStatus.valueOf(RestStatus.CODE_ALREADY_EXISTS, "username already exists");
 		if (StringUtils.isNotBlank(user.getEmail())) {
 			u = (User) userManager.loadUserByUsername(user.getEmail());
 			if (u != null)
-				throw RestStatus.valueOf(RestStatus.CODE_ALREADY_EXISTS,
-						"email already exists");
+				throw RestStatus.valueOf(RestStatus.CODE_ALREADY_EXISTS, "email already exists");
 		}
 		u = new User();
 		u.setUsername(user.getUsername());
@@ -122,15 +115,12 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/{username}/password", method = RequestMethod.PATCH)
-	public RestStatus validatePassword(@PathVariable String username,
-			@RequestBody User user) {
+	public RestStatus validatePassword(@PathVariable String username, @RequestBody User user) {
 		User u = (User) userManager.loadUserByUsername(username);
 		if (u == null)
-			throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID,
-					"username invalid");
+			throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, "username invalid");
 		boolean valid = AuthzUtils.isPasswordValid(u, user.getPassword());
-		return valid ? RestStatus.OK : RestStatus.valueOf(
-				RestStatus.CODE_FIELD_INVALID, "password invalid");
+		return valid ? RestStatus.OK : RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, "password invalid");
 	}
 
 }

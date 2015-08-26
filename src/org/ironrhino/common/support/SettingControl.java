@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +86,7 @@ public class SettingControl {
 		entityManager.save(s);
 	}
 
-	public void setValue(String key, String value, boolean readonly,
-			boolean hidden) {
+	public void setValue(String key, String value, boolean readonly, boolean hidden) {
 		entityManager.setEntityClass(Setting.class);
 		Setting s = entityManager.findByNaturalId(key);
 		if (s != null) {
@@ -136,11 +134,8 @@ public class SettingControl {
 			if ("true".equals(value) || "false".equals(value))
 				list.add(s);
 		}
-		Collections.sort(list, new Comparator<Setting>() {
-			@Override
-			public int compare(Setting o1, Setting o2) {
-				return o1.getKey().compareTo(o2.getKey());
-			}
+		Collections.sort(list, (Setting o1, Setting o2) -> {
+			return o1.getKey().compareTo(o2.getKey());
 		});
 		return list;
 	}
@@ -192,18 +187,15 @@ public class SettingControl {
 	public void setup() {
 		entityManager.setEntityClass(Setting.class);
 		Date now = new Date();
-		Setting sd = entityManager
-				.findOne(Constants.SETTING_KEY_SETUP_DATETIME);
+		Setting sd = entityManager.findOne(Constants.SETTING_KEY_SETUP_DATETIME);
 		if (sd == null) {
-			sd = new Setting(Constants.SETTING_KEY_SETUP_DATETIME,
-					DateUtils.formatDatetime(now));
+			sd = new Setting(Constants.SETTING_KEY_SETUP_DATETIME, DateUtils.formatDatetime(now));
 			sd.setReadonly(true);
 			entityManager.save(sd);
 		}
 		sd = entityManager.findOne(Constants.SETTING_KEY_SETUP_TIMESTAMP);
 		if (sd == null) {
-			sd = new Setting(Constants.SETTING_KEY_SETUP_TIMESTAMP,
-					String.valueOf(now.getTime()));
+			sd = new Setting(Constants.SETTING_KEY_SETUP_TIMESTAMP, String.valueOf(now.getTime()));
 			sd.setReadonly(true);
 			sd.setHidden(true);
 			entityManager.save(sd);

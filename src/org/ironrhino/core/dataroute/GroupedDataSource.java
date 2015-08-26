@@ -22,8 +22,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 
-public class GroupedDataSource extends AbstractDataSource implements
-		BeanNameAware {
+public class GroupedDataSource extends AbstractDataSource implements BeanNameAware {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -105,37 +104,27 @@ public class GroupedDataSource extends AbstractDataSource implements
 				writeSlaves.put(name, (DataSource) beanFactory.getBean(name));
 			if (masterName != null)
 				writeSlaves.put(masterName, master);
-			writeRoundRobin = new RoundRobin<String>(writeSlaveNames,
-					new RoundRobin.UsableChecker<String>() {
-						@Override
-						public boolean isUsable(String target) {
-							DataSource ds = writeSlaves.get(target);
-							return !deadDataSources.contains(ds);
-						}
-					});
+			writeRoundRobin = new RoundRobin<String>(writeSlaveNames, (String target) -> {
+				DataSource ds = writeSlaves.get(target);
+				return !deadDataSources.contains(ds);
+			});
 		}
 		if (readSlaveNames != null && readSlaveNames.size() > 0) {
 			for (String name : readSlaveNames.keySet())
 				readSlaves.put(name, (DataSource) beanFactory.getBean(name));
-			readRoundRobin = new RoundRobin<String>(readSlaveNames,
-					new RoundRobin.UsableChecker<String>() {
-						@Override
-						public boolean isUsable(String target) {
-							DataSource ds = readSlaves.get(target);
-							return !deadDataSources.contains(ds);
-						}
-					});
+			readRoundRobin = new RoundRobin<String>(readSlaveNames, (String target) -> {
+				DataSource ds = readSlaves.get(target);
+				return !deadDataSources.contains(ds);
+			});
 		}
 	}
 
 	@Override
-	public Connection getConnection(String username, String password)
-			throws SQLException {
+	public Connection getConnection(String username, String password) throws SQLException {
 		return getConnection(username, password, maxAttempts);
 	}
 
-	public Connection getConnection(String username, String password,
-			int attempts) throws SQLException {
+	public Connection getConnection(String username, String password, int attempts) throws SQLException {
 		DataSource ds = null;
 		String dbname = null;
 		boolean read = false;
@@ -155,8 +144,7 @@ public class GroupedDataSource extends AbstractDataSource implements
 		if (ds == null)
 			throw new IllegalStateException("No underlying DataSource found");
 		try {
-			Connection conn = username == null ? ds.getConnection() : ds
-					.getConnection(username, password);
+			Connection conn = username == null ? ds.getConnection() : ds.getConnection(username, password);
 			if (read)
 				conn.setReadOnly(true);
 			failureCount.remove(ds);
@@ -174,10 +162,8 @@ public class GroupedDataSource extends AbstractDataSource implements
 			if (failureTimes == deadFailureThreshold) {
 				failureCount.remove(ds);
 				deadDataSources.add(ds);
-				log.error("datasource [" + groupName + ":" + dbname
-						+ "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-				StatLog.add(new Key("dataroute", false, groupName, dbname,
-						"down"));
+				log.error("datasource [" + groupName + ":" + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				StatLog.add(new Key("dataroute", false, groupName, dbname, "down"));
 			} else {
 				failureCount.put(ds, failureTimes);
 			}
@@ -200,23 +186,20 @@ public class GroupedDataSource extends AbstractDataSource implements
 				conn.close();
 				it.remove();
 				String dbname = null;
-				for (Map.Entry<String, DataSource> entry : writeSlaves
-						.entrySet()) {
+				for (Map.Entry<String, DataSource> entry : writeSlaves.entrySet()) {
 					if (entry.getValue() == ds) {
 						dbname = entry.getKey();
 						break;
 					}
 				}
 				if (dbname == null)
-					for (Map.Entry<String, DataSource> entry : readSlaves
-							.entrySet()) {
+					for (Map.Entry<String, DataSource> entry : readSlaves.entrySet()) {
 						if (entry.getValue() == ds) {
 							dbname = entry.getKey();
 							break;
 						}
 					}
-				log.warn("datasource[" + groupName + ":" + dbname
-						+ "] recovered");
+				log.warn("datasource[" + groupName + ":" + dbname + "] recovered");
 			} catch (Exception e) {
 				log.debug(e.getMessage(), e);
 			}

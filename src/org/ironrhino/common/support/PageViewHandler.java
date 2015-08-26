@@ -29,24 +29,17 @@ public class PageViewHandler extends AccessHandler {
 	private HttpSessionManager httpSessionManager;
 
 	@Override
-	public boolean handle(final HttpServletRequest request,
-			HttpServletResponse response) {
-		if (pageViewService != null
-				&& request.getMethod().equalsIgnoreCase("GET")
-				&& !RequestUtils.isInternalTesting(request)
-				&& !request.getRequestURI().startsWith("/assets/")
+	public boolean handle(final HttpServletRequest request, HttpServletResponse response) {
+		if (pageViewService != null && request.getMethod().equalsIgnoreCase("GET")
+				&& !RequestUtils.isInternalTesting(request) && !request.getRequestURI().startsWith("/assets/")
 				&& !request.getRequestURI().endsWith("/favicon.ico")) {
 			final String remoteAddr = request.getRemoteAddr();
 			final String requestURL = request.getRequestURL().toString();
 			final String sessionId = httpSessionManager.getSessionId(request);
 			final String username = RequestUtils.getCookieValue(request, "U");
 			final String referer = request.getHeader("Referer");
-			Runnable task = new Runnable() {
-				@Override
-				public void run() {
-					pageViewService.put(new Date(), remoteAddr, requestURL,
-							sessionId, username, referer);
-				}
+			Runnable task = () -> {
+				pageViewService.put(new Date(), remoteAddr, requestURL, sessionId, username, referer);
 			};
 			if (executorService != null)
 				executorService.execute(task);

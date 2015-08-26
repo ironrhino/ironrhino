@@ -17,8 +17,7 @@ import org.springframework.util.Assert;
 
 public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
-	private static Logger log = LoggerFactory
-			.getLogger(HttpInvokerClient.class);
+	private static Logger log = LoggerFactory.getLogger(HttpInvokerClient.class);
 
 	private HttpInvokerRequestExecutor httpInvokerRequestExecutor;
 
@@ -89,8 +88,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 	}
 
 	@Override
-	public void setHttpInvokerRequestExecutor(
-			HttpInvokerRequestExecutor httpInvokerRequestExecutor) {
+	public void setHttpInvokerRequestExecutor(HttpInvokerRequestExecutor httpInvokerRequestExecutor) {
 		this.httpInvokerRequestExecutor = httpInvokerRequestExecutor;
 	}
 
@@ -121,14 +119,11 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 		if (asyncMethods != null) {
 			String name = invocation.getMethod().getName();
 			if (asyncMethods.contains(name)) {
-				Runnable task = new Runnable() {
-					@Override
-					public void run() {
-						try {
-							invoke(invocation, maxAttempts);
-						} catch (Throwable e) {
-							log.error(e.getMessage(), e);
-						}
+				Runnable task = () -> {
+					try {
+						invoke(invocation, maxAttempts);
+					} catch (Throwable e) {
+						log.error(e.getMessage(), e);
 					}
 				};
 				if (executorService != null)
@@ -141,8 +136,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 		return invoke(invocation, maxAttempts);
 	}
 
-	public Object invoke(MethodInvocation invocation, int attempts)
-			throws Throwable {
+	public Object invoke(MethodInvocation invocation, int attempts) throws Throwable {
 		try {
 			return super.invoke(invocation);
 		} catch (RemoteAccessException e) {

@@ -37,8 +37,7 @@ public class TestConfiguration {
 
 		public static final int LOOP = 10000;
 
-		private ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>(
-				THREADS * LOOP * 2);
+		private ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>(THREADS * LOOP * 2);
 
 		private ExecutorService es = Executors.newFixedThreadPool(THREADS);
 
@@ -51,32 +50,27 @@ public class TestConfiguration {
 			final AtomicInteger count = new AtomicInteger();
 			long time = System.currentTimeMillis();
 			for (int i = 0; i < THREADS; i++) {
-				es.execute(new Runnable() {
-
-					@Override
-					public void run() {
-						for (int i = 0; i < LOOP; i++) {
-							try {
-								String id = sequence.nextStringValue();
-								Long time = System.currentTimeMillis();
-								Long old = map.putIfAbsent(id, time);
-								if (old != null)
-									System.out.println(id + " , old=" + old
-											+ " , new=" + time);
-								else
-									count.incrementAndGet();
-							} catch (Throwable e) {
-								e.printStackTrace();
-							}
+				es.execute(() -> {
+					for (int j = 0; j < LOOP; j++) {
+						try {
+							String id = sequence.nextStringValue();
+							Long time2 = System.currentTimeMillis();
+							Long old = map.putIfAbsent(id, time2);
+							if (old != null)
+								System.out.println(id + " , old=" + old + " , new=" + time2);
+							else
+								count.incrementAndGet();
+						} catch (Throwable e) {
+							e.printStackTrace();
 						}
-						cdl.countDown();
 					}
+					cdl.countDown();
 				});
 			}
 			es.shutdown();
 			cdl.await();
-			System.out.println("completed " + count.get() + " requests in "
-					+ (System.currentTimeMillis() - time) + "ms");
+			System.out
+					.println("completed " + count.get() + " requests in " + (System.currentTimeMillis() - time) + "ms");
 		}
 	}
 

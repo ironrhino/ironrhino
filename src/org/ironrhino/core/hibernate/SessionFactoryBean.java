@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +18,7 @@ import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SessionFactoryBean extends
-		org.springframework.orm.hibernate5.LocalSessionFactoryBean {
+public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -40,24 +38,19 @@ public class SessionFactoryBean extends
 	@Override
 	public void afterPropertiesSet() throws IOException {
 		Properties properties = getHibernateProperties();
-		if (StringUtils.isBlank(properties
-				.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
-			properties.put(AvailableSettings.DIALECT_RESOLVERS,
-					MyDialectResolver.class.getName());
+		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
+			properties.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
 		Map<String, Class<?>> added = new HashMap<String, Class<?>>();
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		Collection<Class<?>> scaned = ClassScanner.scanAnnotated(
-				ClassScanner.getAppPackages(), Entity.class);
+		Collection<Class<?>> scaned = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), Entity.class);
 		if (annotatedClasses != null)
 			for (Class<?> c : annotatedClasses)
-				if (!added.containsKey(c.getSimpleName())
-						|| !c.isAssignableFrom(added.get(c.getSimpleName()))) {
+				if (!added.containsKey(c.getSimpleName()) || !c.isAssignableFrom(added.get(c.getSimpleName()))) {
 					classes.add(c);
 					added.put(c.getSimpleName(), c);
 				}
 		for (Class<?> c : scaned)
-			if (!added.containsKey(c.getSimpleName())
-					|| !c.isAssignableFrom(added.get(c.getSimpleName()))) {
+			if (!added.containsKey(c.getSimpleName()) || !c.isAssignableFrom(added.get(c.getSimpleName()))) {
 				classes.add(c);
 				added.put(c.getSimpleName(), c);
 			}
@@ -68,8 +61,7 @@ public class SessionFactoryBean extends
 			for (Class<?> clz : temp) {
 				boolean exclude = false;
 				for (String s : arr) {
-					if (org.ironrhino.core.util.StringUtils.matchesWildcard(
-							clz.getName(), s)) {
+					if (org.ironrhino.core.util.StringUtils.matchesWildcard(clz.getName(), s)) {
 						exclude = true;
 						break;
 					}
@@ -78,11 +70,8 @@ public class SessionFactoryBean extends
 					classes.add(clz);
 			}
 		}
-		Collections.sort(classes, new Comparator<Class<?>>() {
-			@Override
-			public int compare(Class<?> a, Class<?> b) {
-				return a.getName().compareTo(b.getName());
-			}
+		Collections.sort(classes, (Class<?> a, Class<?> b) -> {
+			return a.getName().compareTo(b.getName());
 		});
 		annotatedClasses = classes.toArray(new Class<?>[0]);
 		logger.info("annotatedClasses: ");

@@ -43,8 +43,7 @@ public class ElasticSearchService<T> implements SearchService<T> {
 	private IndexManager indexManager;
 
 	public SearchRequestBuilder prepareSearch() {
-		return client
-				.prepareSearch(new String[] { indexManager.getIndexName() });
+		return client.prepareSearch(new String[] { indexManager.getIndexName() });
 	}
 
 	@Override
@@ -92,13 +91,12 @@ public class ElasticSearchService<T> implements SearchService<T> {
 	}
 
 	@Override
-	public List<T> search(SearchCriteria searchCriteria, Mapper mapper) {
+	public List<T> search(SearchCriteria searchCriteria, Mapper<T> mapper) {
 		return search(searchCriteria, mapper, -1);
 	}
 
 	@Override
-	public List<T> search(SearchCriteria searchCriteria, Mapper mapper,
-			int limit) {
+	public List<T> search(SearchCriteria searchCriteria, Mapper mapper, int limit) {
 		ElasticSearchCriteria criteria = (ElasticSearchCriteria) searchCriteria;
 		if (criteria == null)
 			return null;
@@ -126,8 +124,7 @@ public class ElasticSearchService<T> implements SearchService<T> {
 	}
 
 	@Override
-	public Map<String, Integer> countTermsByField(
-			SearchCriteria searchCriteria, String field) {
+	public Map<String, Integer> countTermsByField(SearchCriteria searchCriteria, String field) {
 		ElasticSearchCriteria criteria = (ElasticSearchCriteria) searchCriteria;
 		if (criteria == null)
 			return null;
@@ -151,8 +148,7 @@ public class ElasticSearchService<T> implements SearchService<T> {
 		return Collections.emptyMap();
 	}
 
-	private static Pattern wildcardQueryPattern = Pattern
-			.compile("\\w+:.*[\\?\\*].*");
+	private static Pattern wildcardQueryPattern = Pattern.compile("\\w+:.*[\\?\\*].*");
 
 	private SearchRequestBuilder criteria2builder(ElasticSearchCriteria criteria) {
 		String[] indices = criteria.getIndices();
@@ -166,15 +162,13 @@ public class ElasticSearchService<T> implements SearchService<T> {
 		QueryBuilder qb = criteria.getQueryBuilder();
 		String query = criteria.getQuery();
 		if (qb == null && StringUtils.isBlank(query))
-			throw new NullPointerException(
-					"queryBuilder is null and queryString is blank");
+			throw new NullPointerException("queryBuilder is null and queryString is blank");
 		if (qb == null && StringUtils.isNotBlank(query)) {
 			if (wildcardQueryPattern.matcher(query).matches()) {
 				String[] arr = query.split(":", 2);
 				qb = QueryBuilders.wildcardQuery(arr[0], arr[1]);
 			} else {
-				QueryStringQueryBuilder qsqb = new QueryStringQueryBuilder(
-						query);
+				QueryStringQueryBuilder qsqb = new QueryStringQueryBuilder(query);
 				qsqb.defaultOperator(Operator.AND);
 				qb = qsqb;
 			}
@@ -182,8 +176,7 @@ public class ElasticSearchService<T> implements SearchService<T> {
 		srb.setQuery(qb);
 		Map<String, Boolean> sorts = criteria.getSorts();
 		for (Map.Entry<String, Boolean> entry : sorts.entrySet())
-			srb.addSort(entry.getKey(), entry.getValue() ? SortOrder.DESC
-					: SortOrder.ASC);
+			srb.addSort(entry.getKey(), entry.getValue() ? SortOrder.DESC : SortOrder.ASC);
 		return srb;
 	}
 

@@ -11,7 +11,6 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -19,8 +18,7 @@ import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.serializer.SerializationException;
 
 @SuppressWarnings("rawtypes")
-public abstract class RedisTopic<T extends Serializable> implements
-		org.ironrhino.core.message.Topic<T> {
+public abstract class RedisTopic<T extends Serializable> implements org.ironrhino.core.message.Topic<T> {
 
 	protected String channelName;
 
@@ -50,21 +48,16 @@ public abstract class RedisTopic<T extends Serializable> implements
 	@SuppressWarnings("unchecked")
 	public void afterPropertiesSet() {
 		Topic globalTopic = new ChannelTopic(getChannelName(Scope.GLOBAL));
-		Topic applicationTopic = new ChannelTopic(
-				getChannelName(Scope.APPLICATION));
-		messageListenerContainer.addMessageListener(new MessageListener() {
-			@Override
-			public void onMessage(Message message, byte[] pattern) {
-				try {
-					subscribe((T) redisTemplate.getValueSerializer()
-							.deserialize(message.getBody()));
-				} catch (SerializationException e) {
-					// message from other app
-					if (!(e.getCause() instanceof ClassNotFoundException))
-						throw e;
-				}
+		Topic applicationTopic = new ChannelTopic(getChannelName(Scope.APPLICATION));
+		messageListenerContainer.addMessageListener((Message message, byte[] pattern) -> {
+			try {
+				subscribe((T) redisTemplate.getValueSerializer().deserialize(message.getBody()));
+			} catch (SerializationException e) {
+				// message from other app
+				if (!(e.getCause() instanceof ClassNotFoundException))
+					throw e;
 			}
-		}, Arrays.asList(globalTopic, applicationTopic));
+		} , Arrays.asList(globalTopic, applicationTopic));
 	}
 
 	protected String getChannelName(Scope scope) {
@@ -79,11 +72,8 @@ public abstract class RedisTopic<T extends Serializable> implements
 	@Override
 	public void publish(final T message, Scope scope) {
 		if (scope == null || scope == Scope.LOCAL) {
-			Runnable task = new Runnable() {
-				@Override
-				public void run() {
-					subscribe(message);
-				}
+			Runnable task = () -> {
+				subscribe(message);
 			};
 			if (executorService != null)
 				executorService.execute(task);
