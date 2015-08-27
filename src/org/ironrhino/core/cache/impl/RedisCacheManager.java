@@ -151,9 +151,8 @@ public class RedisCacheManager implements CacheManager {
 		for (String key : keys)
 			_keys.add(redisTemplate.getKeySerializer().serialize(generateKey(key, namespace)));
 		try {
-			List<byte[]> values = (List<byte[]>) redisTemplate.execute((RedisConnection conn) -> {
-				return conn.mGet(_keys.toArray(new byte[0][0]));
-			});
+			List<byte[]> values = (List<byte[]>) redisTemplate
+					.execute((RedisConnection conn) -> conn.mGet(_keys.toArray(new byte[0][0])));
 			Map<String, Object> map = new HashMap<String, Object>();
 			int i = 0;
 			for (String key : keys) {

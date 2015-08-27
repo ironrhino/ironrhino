@@ -243,7 +243,7 @@ public class FieldObject implements Serializable {
 				}
 				list.add(create(name, pd.getPropertyType(), required, null, null));
 			}
-			Collections.sort(list, (FieldObject o1, FieldObject o2) -> {
+			Collections.sort(list, (o1, o2) -> {
 				return fieldNames.indexOf(o1.getName()) - fieldNames.indexOf(o2.getName());
 			});
 			return list;

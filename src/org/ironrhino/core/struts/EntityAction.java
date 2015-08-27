@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
@@ -421,9 +420,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPaginating(richtableConfig.paginating());
 			prepare(criteria);
 			resultPage.setCriteria(criteria);
-			resultPage = elasticSearchService.search(resultPage, (EN source) -> {
-				return (EN) entityManager.get(source.getId());
-			});
+			resultPage = elasticSearchService.search(resultPage, (source) -> (EN) entityManager.get(source.getId()));
 		}
 		return LIST;
 	}
@@ -1303,7 +1300,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			writer.print(getText(label));
 			writer.print(i == exportColumnsList.size() - 1 ? lineSeperator : columnSeperator);
 		}
-		entityManager.iterate(10, (Object[] entityArray, Session session) -> {
+		entityManager.iterate(10, (entityArray, session) -> {
 			for (Object en : entityArray) {
 				BeanWrapperImpl bw = new BeanWrapperImpl(en);
 				for (int i = 0; i < exportColumnsList.size(); i++) {
@@ -1504,7 +1501,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (uic == null
 				|| !uic.isUnique() && !(getNaturalIds().size() == 1 && getNaturalIds().containsKey(propertyName)))
 			return NONE;
-		suggestions = getEntityManager(getEntityClass()).executeFind((Session session) -> {
+		suggestions = getEntityManager(getEntityClass()).executeFind((session) -> {
 			StringBuilder hql = new StringBuilder("select ").append(propertyName).append(" from ")
 					.append(getEntityClass().getSimpleName()).append(" where ").append(propertyName)
 					.append(" like :keyword");

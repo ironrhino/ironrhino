@@ -126,9 +126,7 @@ public class RegionAction extends BaseAction {
 			criteria.setQuery(query);
 			criteria.setTypes(new String[] { "region" });
 			criteria.addSort("displayOrder", false);
-			list = elasticSearchService.search(criteria, (Region source) -> {
-				return entityManager.get(source.getId());
-			});
+			list = elasticSearchService.search(criteria, (source) -> entityManager.get(source.getId()));
 		}
 		return LIST;
 	}

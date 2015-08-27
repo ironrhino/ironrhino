@@ -53,9 +53,7 @@ public class MailService {
 	public void send(final SimpleMailMessage smm, final boolean useHtmlFormat) {
 		if ((simpleMailMessageWrapperQueue == null) || forceLocalAsync) {
 			// localAsync
-			Runnable task = () -> {
-				mailSender.send(smm, useHtmlFormat);
-			};
+			Runnable task = () -> mailSender.send(smm, useHtmlFormat);
 			if (executorService != null)
 				executorService.execute(task);
 			else

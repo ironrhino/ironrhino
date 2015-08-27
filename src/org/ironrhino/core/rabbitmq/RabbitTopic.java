@@ -75,9 +75,7 @@ public abstract class RabbitTopic<T extends Serializable> implements Topic<T> {
 	@Override
 	public void publish(final T message, Scope scope) {
 		if (scope == null || scope == Scope.LOCAL) {
-			Runnable task = () -> {
-				subscribe(message);
-			};
+			Runnable task = () -> subscribe(message);
 			if (executorService != null)
 				executorService.execute(task);
 			else

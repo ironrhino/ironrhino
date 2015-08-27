@@ -38,9 +38,7 @@ public class PageViewHandler extends AccessHandler {
 			final String sessionId = httpSessionManager.getSessionId(request);
 			final String username = RequestUtils.getCookieValue(request, "U");
 			final String referer = request.getHeader("Referer");
-			Runnable task = () -> {
-				pageViewService.put(new Date(), remoteAddr, requestURL, sessionId, username, referer);
-			};
+			Runnable task = () -> pageViewService.put(new Date(), remoteAddr, requestURL, sessionId, username, referer);
 			if (executorService != null)
 				executorService.execute(task);
 			else

@@ -82,9 +82,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	protected Date now() {
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(stringRedisTemplate.execute((RedisConnection connection) -> {
-			return connection.time();
-		}));
+		cal.setTimeInMillis(stringRedisTemplate.execute((RedisConnection connection) -> connection.time()));
 		return cal.getTime();
 	}
 

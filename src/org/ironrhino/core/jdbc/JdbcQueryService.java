@@ -3,7 +3,6 @@ package org.ironrhino.core.jdbc;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -417,7 +416,7 @@ public class JdbcQueryService {
 		}
 
 		final ColumnMapRowMapper crm = new ColumnMapRowMapper();
-		return namedParameterJdbcTemplate.execute(sql, paramMap, (PreparedStatement preparedStatement) -> {
+		return namedParameterJdbcTemplate.execute(sql, paramMap, (preparedStatement) -> {
 			preparedStatement.setMaxRows(offset + limit);
 			ResultSet rs = preparedStatement.executeQuery();
 			List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(limit);

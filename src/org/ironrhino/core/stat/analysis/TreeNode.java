@@ -118,7 +118,7 @@ public class TreeNode implements Serializable {
 	}
 
 	public void calculate() {
-		TreeWalker.Visitor vistor = (TreeNode node) -> {
+		TreeWalker.Visitor vistor = (node) -> {
 			if (node.isLeaf())
 				return;
 			long longValue = 0;

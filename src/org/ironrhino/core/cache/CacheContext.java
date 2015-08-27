@@ -4,10 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.htmlparser.jericho.Attribute;
-import net.htmlparser.jericho.StartTag;
-import ognl.OgnlContext;
-
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.ExpressionUtils;
@@ -17,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionContext;
+
+import ognl.OgnlContext;
 
 public class CacheContext {
 
@@ -66,7 +64,7 @@ public class CacheContext {
 		}
 	}
 
-	static Replacer replacer = (StartTag st, Attribute attr) -> {
+	static Replacer replacer = (st, attr) -> {
 		if (!st.getName().equals("a") || !attr.getKey().equals("href"))
 			return null;
 		String href = attr.getValue();

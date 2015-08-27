@@ -10,7 +10,6 @@ import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -49,7 +48,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	public void afterPropertiesSet() {
 		Topic globalTopic = new ChannelTopic(getChannelName(Scope.GLOBAL));
 		Topic applicationTopic = new ChannelTopic(getChannelName(Scope.APPLICATION));
-		messageListenerContainer.addMessageListener((Message message, byte[] pattern) -> {
+		messageListenerContainer.addMessageListener((message, pattern) -> {
 			try {
 				subscribe((T) redisTemplate.getValueSerializer().deserialize(message.getBody()));
 			} catch (SerializationException e) {
@@ -72,9 +71,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	@Override
 	public void publish(final T message, Scope scope) {
 		if (scope == null || scope == Scope.LOCAL) {
-			Runnable task = () -> {
-				subscribe(message);
-			};
+			Runnable task = () -> subscribe(message);
 			if (executorService != null)
 				executorService.execute(task);
 			else

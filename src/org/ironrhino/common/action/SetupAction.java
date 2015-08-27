@@ -163,7 +163,7 @@ public class SetupAction extends BaseAction {
 	public void doSetup() throws Exception {
 		logger.info("setup started");
 		String[] beanNames = ctx.getBeanDefinitionNames();
-		Map<Method, Object> methods = new TreeMap<Method, Object>((Method m1, Method m2) -> {
+		Map<Method, Object> methods = new TreeMap<Method, Object>((m1, m2) -> {
 			int order1 = org.springframework.core.Ordered.LOWEST_PRECEDENCE,
 					order2 = org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 			Order o = m1.getAnnotation(Order.class);

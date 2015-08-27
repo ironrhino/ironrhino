@@ -6,7 +6,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hibernate.Session;
 import org.ironrhino.core.spring.security.DefaultAuthenticationFailureHandler;
 import org.ironrhino.core.struts.I18N;
 import org.ironrhino.security.model.LoginRecord;
@@ -41,9 +40,6 @@ public class AuthenticationFailureHandler extends DefaultAuthenticationFailureHa
 	}
 
 	private void save(final LoginRecord loginRecord) {
-		userManager.execute((Session session) -> {
-			session.save(loginRecord);
-			return null;
-		});
+		userManager.execute((session) -> session.save(loginRecord));
 	}
 }

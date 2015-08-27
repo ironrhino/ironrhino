@@ -98,9 +98,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	protected void writeDiscoveredServices() {
 		if (discoveredServices.size() == 0)
 			return;
-		Runnable task = () -> {
-			stringRedisTemplate.opsForHash().putAll(NAMESPACE_HOSTS + host, discoveredServices);
-		};
+		Runnable task = () -> stringRedisTemplate.opsForHash().putAll(NAMESPACE_HOSTS + host, discoveredServices);
 		if (executorService != null)
 			executorService.execute(task);
 		else

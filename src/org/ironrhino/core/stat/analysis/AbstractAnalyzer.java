@@ -130,7 +130,7 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 		sb.append(new SimpleDateFormat(StatLogSettings.DATE_STYLE).format(date));
 		final String suffix = sb.toString();
 		File dir = StatLogSettings.getLogFileDirectory();
-		dir.listFiles((File f) -> {
+		dir.listFiles((f) -> {
 			String name = f.getName();
 			if (localhost && name.equals(suffix)) {
 				map.put(name.substring(0, name.lastIndexOf(StatLogSettings.SEPARATOR)), f);

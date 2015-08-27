@@ -63,9 +63,7 @@ public class InstallationManager {
 		backupedComponents = new ArrayList<Component>();
 		File dir = new File(this.directory);
 		if (dir.isDirectory()) {
-			File[] files = dir.listFiles((File dir2, String name) -> {
-				return name.endsWith(".jar") || name.endsWith(".jar.bak");
-			});
+			File[] files = dir.listFiles((dir2, name) -> name.endsWith(".jar") || name.endsWith(".jar.bak"));
 			if (files != null)
 				for (File f : files) {
 					Map<String, String> manifest = FileUtils.parseManifestFile(f);
@@ -75,9 +73,7 @@ public class InstallationManager {
 					component.setRealPath(f.getAbsolutePath());
 					(f.getName().endsWith(".jar") ? list : backupedComponents).add(component);
 				}
-			Collections.sort(list, (Component o1, Component o2) -> {
-				return o1.getId().compareTo(o2.getId());
-			});
+			Collections.sort(list, (o1, o2) -> o1.getId().compareTo(o2.getId()));
 			this.installedComponents = new ArrayList<Component>();
 			for (Component c : list)
 				addInstalledComponent(c);

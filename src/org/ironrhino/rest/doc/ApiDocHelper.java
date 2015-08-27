@@ -37,7 +37,7 @@ public class ApiDocHelper {
 		}
 		classPool.insertClassPath(new ClassClassPath(apiDocClass));
 		final CtClass cc = classPool.get(apiDocClass.getName());
-		Collections.sort(methods, (Method o1, Method o2) -> {
+		Collections.sort(methods, (o1, o2) -> {
 			int line1 = 0;
 			int line2 = 1;
 			try {

@@ -134,9 +134,7 @@ public class SettingControl {
 			if ("true".equals(value) || "false".equals(value))
 				list.add(s);
 		}
-		Collections.sort(list, (Setting o1, Setting o2) -> {
-			return o1.getKey().compareTo(o2.getKey());
-		});
+		Collections.sort(list, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
 		return list;
 	}
 

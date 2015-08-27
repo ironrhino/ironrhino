@@ -6,7 +6,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hibernate.Session;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.password.MultiVersionPasswordEncoder;
 import org.ironrhino.security.model.LoginRecord;
@@ -55,9 +54,6 @@ public class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHa
 	}
 
 	private void save(final LoginRecord loginRecord) {
-		userManager.execute((Session session) -> {
-			session.save(loginRecord);
-			return null;
-		});
+		userManager.execute((session) -> session.save(loginRecord));
 	}
 }

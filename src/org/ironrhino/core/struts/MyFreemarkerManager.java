@@ -1,7 +1,6 @@
 package org.ironrhino.core.struts;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +25,6 @@ import com.opensymphony.xwork2.util.LocalizedTextUtil;
 import com.opensymphony.xwork2.util.ValueStack;
 
 import freemarker.cache.StrongCacheStorage;
-import freemarker.core.Environment;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.ext.beans.SimpleMapModel;
 import freemarker.template.Configuration;
@@ -88,7 +86,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			configuration.setSetting(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "5");
 		configuration.setCacheStorage(new StrongCacheStorage());
-		configuration.setTemplateExceptionHandler((TemplateException ex, Environment env, Writer writer) -> {
+		configuration.setTemplateExceptionHandler((ex, env, writer) -> {
 			log.error(ex.getMessage());
 		});
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();

@@ -16,7 +16,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.protocol.HttpContext;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
@@ -64,7 +63,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 	public void init() {
 		httpClient = HttpClients.custom().disableAuthCaching().disableConnectionState().disableCookieManagement()
 				.disableRedirectHandling().setMaxConnPerRoute(maxConnPerRoute).setMaxConnTotal(maxConnTotal)
-				.setRetryHandler((IOException ex, int executionCount, HttpContext context) -> {
+				.setRetryHandler((ex, executionCount, context) -> {
 					if (executionCount > 3)
 						return false;
 					if (ex instanceof NoHttpResponseException)

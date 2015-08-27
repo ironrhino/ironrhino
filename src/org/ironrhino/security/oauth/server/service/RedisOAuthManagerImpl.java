@@ -346,9 +346,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		for (String id : ids)
 			keys.add(NAMESPACE_CLIENT + id);
 		List<Client> list = clientRedisTemplate.opsForValue().multiGet(keys);
-		Collections.sort(list, (Client o1, Client o2) -> {
-			return o1.getCreateDate().compareTo(o2.getCreateDate());
-		});
+		Collections.sort(list, (o1, o2) -> o1.getCreateDate().compareTo(o2.getCreateDate()));
 		return list;
 	}
 

@@ -47,7 +47,7 @@ public class MailSender {
 		if (smm.getTo() == null || smm.getTo().length == 0)
 			smm.setTo(defaultTo);
 		for (final String to : smm.getTo()) {
-			javaMailSender.send((MimeMessage mimeMessage) -> {
+			javaMailSender.send((mimeMessage) -> {
 				MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 				if (StringUtils.isNotBlank(smm.getFrom()))
 					message.setFrom(encode(smm.getFrom()));

@@ -30,7 +30,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.search.SearchHit;
-import org.hibernate.Session;
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.model.Persistable;
@@ -118,9 +117,7 @@ public class IndexManagerImpl implements IndexManager {
 		if (client instanceof NodeClient) {
 			NodeClient nc = (NodeClient) client;
 			if ("memory".equals(nc.settings().get("index.store.type")))
-				new Thread(() -> {
-					rebuild();
-				}).start();
+				new Thread(this::rebuild).start();
 		}
 	}
 
@@ -529,7 +526,7 @@ public class IndexManagerImpl implements IndexManager {
 		Class clz = typeToClass(type);
 		entityManager.setEntityClass(clz);
 		final AtomicLong indexed = new AtomicLong();
-		entityManager.iterate(20, (Object[] entityArray, Session session) -> {
+		entityManager.iterate(20, (entityArray, session) -> {
 			BulkRequestBuilder bulkRequest = client.prepareBulk();
 			indexed.addAndGet(entityArray.length);
 			for (Object obj : entityArray) {
