@@ -16,7 +16,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-lang3-3.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.4.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.4.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.8.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.8.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.8.0.jar"/>
@@ -67,7 +67,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-analysis-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mmseg4j-core-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.13.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.5.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.6.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.36.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.0.11.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
