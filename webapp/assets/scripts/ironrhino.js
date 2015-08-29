@@ -36084,6 +36084,27 @@ function uploadFiles(files, filenames) {
 				}
 			},
 			success : function(data) {
+				if (url && url.indexOf('://') > 0
+						&& !UrlUtils.isSameDomain(document.location.href, url)) {
+					var base1 = url.substring(0, url.indexOf('/', url
+											.indexOf('://')
+											+ 3));
+					var base2 = url.substring(0, url.lastIndexOf('/') + 1);
+					$('a,form,button', ele).each(function() {
+						var t = $(this);
+						var arr = 'href,action,formaction'.split(',');
+						for (var k = 0; k < arr.length; k++) {
+							var attr = arr[k];
+							var value = t.attr(attr);
+							if (value && value.indexOf('://') < 0) {
+								t.attr(attr, (value.indexOf('/') == 0
+												? base1
+												: base2)
+												+ value);
+							}
+						}
+					});
+				}
 				ele.addClass('loaded');
 			}
 		};
