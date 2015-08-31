@@ -39,8 +39,6 @@ public interface OAuthManager {
 
 	public void deleteAuthorizationsByGrantor(String grantor, GrantType grantType);
 
-	public long getExpireTime();
-
 	public Client findClientById(String clientId);
 
 	public List<Client> findClientByOwner(UserDetails user);

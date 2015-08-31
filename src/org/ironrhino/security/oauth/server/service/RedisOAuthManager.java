@@ -18,22 +18,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class RedisOAuthManagerImpl implements OAuthManager {
+public class RedisOAuthManager extends AbstractOAuthManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
-	@Value("${oauth.authorization.lifetime:0}")
-	private int authorizationLifetime;
-
-	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
-	private long expireTime;
-
-	@Value("${oauth.authorization.exclusive:false}")
-	private boolean exclusive;
 
 	private RedisTemplate<String, Client> clientRedisTemplate;
 
@@ -55,7 +45,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Autowired
-	public RedisOAuthManagerImpl(RedisTemplate redisTemplate,
+	public RedisOAuthManager(RedisTemplate redisTemplate,
 			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
 		this.clientRedisTemplate = redisTemplate;
 		this.stringRedisTemplate = stringRedisTemplate;
@@ -63,11 +53,6 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
-	}
-
-	@Override
-	public long getExpireTime() {
-		return expireTime;
 	}
 
 	@Override

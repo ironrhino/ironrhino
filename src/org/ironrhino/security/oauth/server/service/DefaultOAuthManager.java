@@ -20,7 +20,6 @@ import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.model.GrantType;
 import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,31 +28,13 @@ import org.springframework.stereotype.Component;
 @Component("oauthManager")
 @Profile({ DEFAULT, DUAL, CLOUD })
 @ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
-public class OAuthManagerImpl implements OAuthManager {
+public class DefaultOAuthManager extends AbstractOAuthManager {
 
 	@Autowired
 	private ClientManager clientManager;
 
 	@Autowired
 	private AuthorizationManager authorizationManager;
-
-	@Value("${oauth.authorization.lifetime:3600}")
-	private int authorizationLifetime;
-
-	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
-	private long expireTime;
-
-	@Value("${oauth.authorization.exclusive:false}")
-	private boolean exclusive;
-
-	public void setExpireTime(long expireTime) {
-		this.expireTime = expireTime;
-	}
-
-	@Override
-	public long getExpireTime() {
-		return expireTime;
-	}
 
 	@Override
 	public Authorization grant(Client client) {

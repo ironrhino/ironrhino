@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,18 +35,9 @@ import org.springframework.stereotype.Component;
 @Profile(CLUSTER)
 @SuppressWarnings({ "rawtypes" })
 @ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
-public class HybirdOAuthManagerImpl implements OAuthManager {
+public class HybirdOAuthManager extends AbstractOAuthManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
-	@Value("${oauth.authorization.lifetime:0}")
-	private int authorizationLifetime;
-
-	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
-	private long expireTime;
-
-	@Value("${oauth.authorization.exclusive:false}")
-	private boolean exclusive;
 
 	@Autowired
 	private ClientManager clientManager;
@@ -70,11 +60,6 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
-	}
-
-	@Override
-	public long getExpireTime() {
-		return expireTime;
 	}
 
 	@Override
