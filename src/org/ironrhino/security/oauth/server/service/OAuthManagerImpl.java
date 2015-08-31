@@ -196,6 +196,17 @@ public class OAuthManagerImpl implements OAuthManager {
 		return authorizationManager.findListByCriteria(dc);
 	}
 
+	@Override
+	public void deleteAuthorizationsByGrantor(UserDetails grantor, GrantType grantType) {
+		DetachedCriteria dc = authorizationManager.detachedCriteria();
+		dc.add(Restrictions.eq("grantor", grantor.getUsername()));
+		if (grantType != null)
+			dc.add(Restrictions.eq("grantType", grantType));
+		List<Authorization> list = authorizationManager.findListByCriteria(dc);
+		for (Authorization authorization : list)
+			authorizationManager.delete(authorization);
+	}
+
 	@Trigger
 	@Scheduled(cron = "0 30 23 * * ?")
 	public void removeExpired() {

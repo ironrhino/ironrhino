@@ -324,6 +324,23 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
+	public void deleteAuthorizationsByGrantor(UserDetails grantor, GrantType grantType) {
+		List<Authorization> list = findAuthorizationsByGrantor(grantor);
+		boolean removeAll = grantType == null;
+		for (Authorization authorization : list)
+			if (removeAll || authorization.getGrantType() == grantType) {
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getId());
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getAccessToken());
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getRefreshToken());
+				if (!removeAll)
+					stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername(), 0,
+							authorization.getId());
+			}
+		if (removeAll)
+			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername());
+	}
+
+	@Override
 	public Client findClientById(String clientId) {
 		if (StringUtils.isBlank(clientId))
 			return null;

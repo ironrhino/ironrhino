@@ -316,6 +316,23 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		return result;
 	}
 
+	@Override
+	public void deleteAuthorizationsByGrantor(UserDetails grantor, GrantType grantType) {
+		List<Authorization> list = findAuthorizationsByGrantor(grantor);
+		boolean removeAll = grantType == null;
+		for (Authorization authorization : list)
+			if (removeAll || authorization.getGrantType() == grantType) {
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getId());
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getAccessToken());
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getRefreshToken());
+				if (!removeAll)
+					stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername(), 0,
+							authorization.getId());
+			}
+		if (removeAll)
+			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername());
+	}
+
 	public void saveClient(Client client) {
 		if (client.isNew())
 			client.setId(CodecUtils.nextId());

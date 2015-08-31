@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.ironrhino.security.oauth.server.model.GrantType;
 import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -35,6 +36,8 @@ public interface OAuthManager {
 	public void create(Authorization authorization);
 
 	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor);
+
+	public void deleteAuthorizationsByGrantor(UserDetails grantor, GrantType grantType);
 
 	public long getExpireTime();
 
