@@ -33,59 +33,64 @@ public class ClientAction extends EntityAction<Client> {
 		this.client = client;
 	}
 
+	@Override
+	@Authorize(ifAllGranted = UserRole.ROLE_BUILTIN_USER)
+	public String checkavailable() {
+		return super.checkavailable();
+	}
+
 	@InputConfig(resultName = "apply")
 	@Authorize(ifAllGranted = UserRole.ROLE_BUILTIN_USER)
 	@Validations(requiredStrings = {
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "client.name", trim = true, key = "validation.required"),
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "client.redirectUri", trim = true, key = "validation.required") })
 	public String apply() {
-		BaseManager<Client> entityManager = getEntityManager(Client.class);
+		client.setEnabled(false);
 		client.setOwner(AuthzUtils.<User> getUserDetails());
-		entityManager.save(client);
+		getEntityManager(Client.class).save(client);
 		addActionMessage(getText("save.success"));
 		return SUCCESS;
 	}
 
 	@Authorize(ifAllGranted = UserRole.ROLE_BUILTIN_USER)
 	public String mine() {
-		BaseManager<Client> entityManager = getEntityManager(Client.class);
-		DetachedCriteria dc = entityManager.detachedCriteria();
+		BaseManager<Client> clientManager = getEntityManager(Client.class);
+		DetachedCriteria dc = clientManager.detachedCriteria();
 		dc.add(Restrictions.eq("owner", AuthzUtils.<User> getUserDetails()));
 		if (resultPage == null)
 			resultPage = new ResultPage<>();
 		resultPage.setCriteria(dc);
-		resultPage = entityManager.findByResultPage(resultPage);
+		resultPage = clientManager.findByResultPage(resultPage);
 		return "mine";
 	}
 
 	@Authorize(ifAllGranted = UserRole.ROLE_BUILTIN_USER)
 	public String show() {
-		BaseManager<Client> entityManager = getEntityManager(Client.class);
-		client = entityManager.get(getUid());
+		client = getEntityManager(Client.class).get(getUid());
 		return "show";
 	}
 
 	@Override
 	@Authorize(ifAllGranted = UserRole.ROLE_BUILTIN_USER)
 	public String disable() {
-		BaseManager<Client> entityManager = getEntityManager(Client.class);
+		BaseManager<Client> clientManager = getEntityManager(Client.class);
 		String[] id = getId();
 		if (id != null) {
 			List<Client> list;
 			if (id.length == 1) {
 				list = new ArrayList<>(1);
-				list.add(entityManager.get(id[0]));
+				list.add(clientManager.get(id[0]));
 			} else {
-				DetachedCriteria dc = entityManager.detachedCriteria();
+				DetachedCriteria dc = clientManager.detachedCriteria();
 				dc.add(Restrictions.in("id", id));
-				list = entityManager.findListByCriteria(dc);
+				list = clientManager.findListByCriteria(dc);
 			}
 			if (list.size() > 0) {
 				for (Client temp : list) {
 					if (AuthzUtils.authorize(null, UserRole.ROLE_ADMINISTRATOR, null)
 							|| AuthzUtils.getUsername().equals(temp.getOwner().getUsername())) {
 						temp.setEnabled(false);
-						entityManager.save(temp);
+						clientManager.save(temp);
 					}
 				}
 				addActionMessage(getText("operate.success"));

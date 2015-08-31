@@ -32,9 +32,10 @@ public class AuthorizationAction extends EntityAction<Authorization> {
 
 	@InputConfig(resultName = "create")
 	@Validations(requiredStrings = {
-	// @RequiredStringValidator(type = ValidatorType.FIELD, fieldName =
-	// "authorization.client", trim = true, key = "validation.required"),
-	@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "authorization.grantor", trim = true, key = "validation.required") })
+			// @RequiredStringValidator(type = ValidatorType.FIELD, fieldName =
+			// "authorization.client", trim = true, key =
+			// "validation.required"),
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "authorization.grantor", trim = true, key = "validation.required") })
 	public String create() {
 		if (authorization == null)
 			return ACCESSDENIED;
@@ -43,8 +44,7 @@ public class AuthorizationAction extends EntityAction<Authorization> {
 		authorization.setRefreshToken(CodecUtils.nextId());
 		authorization.setResponseType(ResponseType.token);
 		oauthManager.create(authorization);
-		addActionMessage(getText("operate.success") + ",token:  "
-				+ authorization.getAccessToken());
+		addActionMessage("create token: " + authorization.getAccessToken());
 		return SUCCESS;
 	}
 

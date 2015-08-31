@@ -1,11 +1,26 @@
 <!DOCTYPE html>
 <#escape x as x?html><html>
 <head>
-<title>${action.getText('apply')}${action.getText('client')}</title>
+<title>${action.getText('view')}${action.getText('client')}</title>
 </head>
 <body>
-	<p>client_id:<span style="margin-left:5px;font-weight:bold;">${client.id}</span></p>
-	<p>client_secret:<span style="margin-left:5px;font-weight:bold;">${client.secret}</span></p>
-	<p>${action.getText('description')}:<span style="margin-left:5px;font-weight:bold;">${client.description}</span></p>
+<div class="form-horizontal">
+	<div class="control-group">
+		<label class="control-label">client_id</label>
+		<div class="controls">${client.id}</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">client_secret</label>
+		<div class="controls">${client.secret}</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">${action.getText('enabled')}</label>
+		<div class="controls">${action.getText(client.enabled?string)}</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">${action.getText('description')}</label>
+		<div class="controls">${client.description!}</div>
+	</div>
+</div>	
 </body>
 </html></#escape>

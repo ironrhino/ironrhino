@@ -36,7 +36,7 @@ public class Authorization extends BaseEntity {
 
 	private static final long serialVersionUID = -559379341059695550L;
 
-	@UiConfig(width = "200px", alias = "access_token")
+	@UiConfig(width = "180px", alias = "access_token")
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	private String accessToken = CodecUtils.nextId();
@@ -54,7 +54,7 @@ public class Authorization extends BaseEntity {
 	@Column(unique = true)
 	private String code;
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "60px")
 	private int lifetime = DEFAULT_LIFETIME;
 
 	@UiConfig(hiddenInList = @Hidden(true) , alias = "refresh_token")
@@ -66,7 +66,7 @@ public class Authorization extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private ResponseType responseType = ResponseType.code;
 
-	@UiConfig(width = "100px", alias = "grant_type")
+	@UiConfig(width = "120px", alias = "grant_type")
 	@Column(length = 20)
 	@Enumerated(EnumType.STRING)
 	private GrantType grantType = GrantType.authorization_code;
