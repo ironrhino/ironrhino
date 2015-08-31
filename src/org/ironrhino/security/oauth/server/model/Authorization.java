@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.NaturalId;
@@ -26,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(name = "oauth_authorization")
-@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
+@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true) , bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
 @ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
 public class Authorization extends BaseEntity {
 
@@ -45,23 +47,29 @@ public class Authorization extends BaseEntity {
 
 	private String grantor;
 
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true) )
 	private String scope;
 
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true) )
 	@Column(unique = true)
 	private String code;
 
 	@UiConfig(width = "100px")
 	private int lifetime = DEFAULT_LIFETIME;
 
-	@UiConfig(hiddenInList = @Hidden(true), alias = "refresh_token")
+	@UiConfig(hiddenInList = @Hidden(true) , alias = "refresh_token")
 	@Column(unique = true)
 	private String refreshToken;
 
 	@UiConfig(width = "100px", alias = "response_type")
-	@Column(nullable = false)
-	private String responseType = "code";
+	@Column(nullable = false, length = 10)
+	@Enumerated(EnumType.STRING)
+	private ResponseType responseType = ResponseType.code;
+
+	@UiConfig(width = "100px", alias = "grant_type")
+	@Column(length = 20)
+	@Enumerated(EnumType.STRING)
+	private GrantType grantType = GrantType.authorization_code;
 
 	@NotInCopy
 	@UiConfig(width = "130px")
@@ -130,8 +138,7 @@ public class Authorization extends BaseEntity {
 	}
 
 	public int getExpiresIn() {
-		return lifetime > 0 ? lifetime
-				- (int) ((System.currentTimeMillis() - modifyDate.getTime()) / 1000)
+		return lifetime > 0 ? lifetime - (int) ((System.currentTimeMillis() - modifyDate.getTime()) / 1000)
 				: Integer.MAX_VALUE;
 	}
 
@@ -151,12 +158,20 @@ public class Authorization extends BaseEntity {
 		this.code = code;
 	}
 
-	public String getResponseType() {
+	public ResponseType getResponseType() {
 		return responseType;
 	}
 
-	public void setResponseType(String responseType) {
+	public void setResponseType(ResponseType responseType) {
 		this.responseType = responseType;
+	}
+
+	public GrantType getGrantType() {
+		return grantType;
+	}
+
+	public void setGrantType(GrantType grantType) {
+		this.grantType = grantType;
 	}
 
 	@JsonIgnore

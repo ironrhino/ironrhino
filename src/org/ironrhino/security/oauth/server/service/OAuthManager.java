@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface OAuthManager {
@@ -14,18 +15,16 @@ public interface OAuthManager {
 
 	public Authorization grant(Client client, UserDetails grantor);
 
-	public Authorization generate(Client client, String redirectUri,
-			String scope, String responseType) throws Exception;
+	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType)
+			throws Exception;
 
 	public Authorization reuse(Authorization authorization);
 
-	public Authorization grant(String authorizationId, UserDetails grantor)
-			throws Exception;
+	public Authorization grant(String authorizationId, UserDetails grantor) throws Exception;
 
 	public void deny(String authorizationId);
 
-	public Authorization authenticate(String code, Client client)
-			throws Exception;
+	public Authorization authenticate(String code, Client client) throws Exception;
 
 	public Authorization retrieve(String accessToken);
 

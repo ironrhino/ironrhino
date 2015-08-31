@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,8 @@ import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.ironrhino.security.oauth.server.model.GrantType;
+import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +46,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import com.google.common.base.Objects;
 
 @AutoConfig
 public class Oauth2Action extends BaseAction {
@@ -78,8 +79,8 @@ public class Oauth2Action extends BaseAction {
 	private String redirect_uri;
 	private String scope;
 	private String code;
-	private String response_type;
-	private String grant_type;
+	private ResponseType response_type;
+	private GrantType grant_type;
 	private String state;
 	private String access_token;
 	private String refresh_token;
@@ -177,11 +178,11 @@ public class Oauth2Action extends BaseAction {
 		this.client_secret = client_secret;
 	}
 
-	public String getGrant_type() {
+	public GrantType getGrant_type() {
 		return grant_type;
 	}
 
-	public void setGrant_type(String grant_type) {
+	public void setGrant_type(GrantType grant_type) {
 		this.grant_type = grant_type;
 	}
 
@@ -201,11 +202,11 @@ public class Oauth2Action extends BaseAction {
 		this.scope = scope;
 	}
 
-	public String getResponse_type() {
+	public ResponseType getResponse_type() {
 		return response_type;
 	}
 
-	public void setResponse_type(String response_type) {
+	public void setResponse_type(ResponseType response_type) {
 		this.response_type = response_type;
 	}
 
@@ -243,13 +244,11 @@ public class Oauth2Action extends BaseAction {
 				throw new IllegalArgumentException("CLIENT_ID_INVALID");
 			UserDetails grantor = AuthzUtils.getUserDetails();
 			if (!"force".equals(approval_prompt) && grantor != null) {
-				List<Authorization> auths = oauthManager
-						.findAuthorizationsByGrantor(grantor);
+				List<Authorization> auths = oauthManager.findAuthorizationsByGrantor(grantor);
 				for (Authorization auth : auths) {
-					if (Objects.equal(auth.getClient(), client.getId())
-							&& Objects.equal(auth.getResponseType(),
-									response_type)
-							&& Objects.equal(auth.getScope(), scope)) {
+					if (Objects.equals(auth.getClient(), client.getId())
+							&& Objects.equals(auth.getResponseType(), response_type)
+							&& Objects.equals(auth.getScope(), scope)) {
 						authorization = auth;
 						break;
 					}
@@ -259,19 +258,16 @@ public class Oauth2Action extends BaseAction {
 					return grant();
 				}
 			}
-			authorization = oauthManager.generate(client, redirect_uri, scope,
-					response_type);
+			authorization = oauthManager.generate(client, redirect_uri, scope, response_type);
 			client = oauthManager.findClientById(authorization.getClient());
 			displayForNative = client.isNative();
 			setUid(authorization.getId());
 		} catch (Exception e) {
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response,
-							HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
+					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 				return NONE;
 			try {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						e.getMessage());
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -288,18 +284,15 @@ public class Oauth2Action extends BaseAction {
 			Authentication authResult = null;
 			try {
 				authResult = authenticationManager
-						.authenticate(new UsernamePasswordAuthenticationToken(
-								username, password));
-			} catch (UsernameNotFoundException | DisabledException
-					| LockedException | AccountExpiredException failed) {
+						.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 				addFieldError("username", getText(failed.getClass().getName()));
 				return INPUT;
 			} catch (BadCredentialsException | CredentialsExpiredException | CredentialsNeedResetException failed) {
 				addFieldError("password", getText(failed.getClass().getName()));
 				captchaManager.addCaptachaThreshold(request);
 				try {
-					usernamePasswordAuthenticationFilter.unsuccess(request,
-							response, failed);
+					usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -311,8 +304,7 @@ public class Oauth2Action extends BaseAction {
 			}
 			if (authResult != null)
 				try {
-					usernamePasswordAuthenticationFilter.success(request,
-							response, authResult);
+					usernamePasswordAuthenticationFilter.success(request, response, authResult);
 					grantor = (UserDetails) authResult.getPrincipal();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -331,18 +323,14 @@ public class Oauth2Action extends BaseAction {
 				StringBuilder sb = new StringBuilder(redirect_uri);
 				if (authorization.isClientSide()) {
 					sb.append("#");
-					sb.append("access_token=").append(
-							authorization.getAccessToken());
-					sb.append("&expires_in=").append(
-							authorization.getExpiresIn());
+					sb.append("access_token=").append(authorization.getAccessToken());
+					sb.append("&expires_in=").append(authorization.getExpiresIn());
 				} else {
-					sb.append(sb.indexOf("?") > 0 ? "&" : "?").append("code=")
-							.append(authorization.getCode());
+					sb.append(sb.indexOf("?") > 0 ? "&" : "?").append("code=").append(authorization.getCode());
 				}
 				if (StringUtils.isNotBlank(state))
 					try {
-						sb.append("&state=").append(
-								URLEncoder.encode(state, "UTF-8"));
+						sb.append("&state=").append(URLEncoder.encode(state, "UTF-8"));
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
 					}
@@ -350,12 +338,10 @@ public class Oauth2Action extends BaseAction {
 			}
 		} catch (Exception e) {
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response,
-							HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
+					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 				return NONE;
 			try {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						e.getMessage());
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -372,8 +358,7 @@ public class Oauth2Action extends BaseAction {
 			return INPUT;
 		}
 		StringBuilder sb = new StringBuilder(redirect_uri);
-		sb.append(sb.indexOf("?") > 0 ? "&" : "?")
-				.append("error=access_denied");
+		sb.append(sb.indexOf("?") > 0 ? "&" : "?").append("error=access_denied");
 		if (StringUtils.isNotBlank(state))
 			try {
 				sb.append("&state=").append(URLEncoder.encode(state, "UTF-8"));
@@ -388,45 +373,35 @@ public class Oauth2Action extends BaseAction {
 	public String token() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
-		if ("password".equals(grant_type)) {
+		if (grant_type == GrantType.password) {
 			client = oauthManager.findClientById(client_id);
 			try {
 				if (client == null)
 					throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
 				if (!client.getSecret().equals(client_secret))
 					throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
-				if (client.getOwner() == null
-						|| !client.getOwner().getRoles()
-								.contains(UserRole.ROLE_ADMINISTRATOR))
+				if (client.getOwner() == null || !client.getOwner().getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
 					throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
 				try {
 					try {
-						authenticationManager
-								.authenticate(new UsernamePasswordAuthenticationToken(
-										username, password));
+						authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 					} catch (InternalAuthenticationServiceException failed) {
 						log.error(failed.getMessage(), failed);
-						throw new IllegalArgumentException(
-								ExceptionUtils.getRootMessage(failed));
+						throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
 					} catch (AuthenticationException failed) {
-						throw new IllegalArgumentException(getText(failed
-								.getClass().getName()));
+						throw new IllegalArgumentException(getText(failed.getClass().getName()));
 					}
-					UserDetails u = userDetailsService
-							.loadUserByUsername(username);
+					UserDetails u = userDetailsService.loadUserByUsername(username);
 					authorization = oauthManager.grant(client, u);
 				} catch (UsernameNotFoundException e) {
 					throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
 				}
 			} catch (Exception e) {
-				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(request, response,
-								HttpServletResponse.SC_BAD_REQUEST,
-								e.getMessage()))
+				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
+						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -438,24 +413,21 @@ public class Oauth2Action extends BaseAction {
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
 			eventPublisher.publish(
-					new AuthorizeEvent(username, request.getRemoteAddr(),
-							client.getName(), grant_type), Scope.LOCAL);
+					new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type.name()),
+					Scope.LOCAL);
 			return JSON;
-		} else if ("client_credential".equals(grant_type)) {
+		} else if (grant_type == GrantType.client_credential) {
 			client = new Client();
 			client.setId(client_id);
 			client.setSecret(client_secret);
 			try {
 				authorization = oauthManager.grant(client);
 			} catch (Exception e) {
-				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(request, response,
-								HttpServletResponse.SC_BAD_REQUEST,
-								e.getMessage()))
+				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
+						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -467,7 +439,7 @@ public class Oauth2Action extends BaseAction {
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
 			return JSON;
-		} else if ("refresh_token".equals(grant_type)) {
+		} else if (grant_type == GrantType.refresh_token) {
 			client = new Client();
 			client.setId(client_id);
 			client.setSecret(client_secret);
@@ -478,14 +450,11 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
 			} catch (Exception e) {
-				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(request, response,
-								HttpServletResponse.SC_BAD_REQUEST,
-								e.getMessage()))
+				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
+						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -494,15 +463,13 @@ public class Oauth2Action extends BaseAction {
 			}
 			return JSON;
 		} else {
-			if (!"authorization_code".equals(grant_type)) {
+			if (grant_type != GrantType.authorization_code) {
 				String message = "grant_type must be authorization_code";
 				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(request, response,
-								HttpServletResponse.SC_BAD_REQUEST, message))
+						&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, message))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							message);
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -519,17 +486,14 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
 				eventPublisher.publish(
-						new AuthorizeEvent(username, request.getRemoteAddr(),
-								client.getName(), grant_type), Scope.LOCAL);
+						new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type.name()),
+						Scope.LOCAL);
 			} catch (Exception e) {
-				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(request, response,
-								HttpServletResponse.SC_BAD_REQUEST,
-								e.getMessage()))
+				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
+						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -549,16 +513,12 @@ public class Oauth2Action extends BaseAction {
 		authorization = oauthManager.retrieve(access_token);
 		if (authorization == null) {
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response,
-							HttpServletResponse.SC_UNAUTHORIZED,
-							"invalid_token"))
+					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_UNAUTHORIZED, "invalid_token"))
 				return NONE;
 			tojson.put("error", "invalid_token");
 		} else if (authorization.getExpiresIn() < 0) {
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response,
-							HttpServletResponse.SC_UNAUTHORIZED,
-							"expired_token"))
+					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_UNAUTHORIZED, "expired_token"))
 				return NONE;
 			tojson.put("error", "expired_token");
 		} else {

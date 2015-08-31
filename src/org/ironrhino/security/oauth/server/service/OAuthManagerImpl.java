@@ -17,6 +17,8 @@ import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.ironrhino.security.oauth.server.model.GrantType;
+import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -61,7 +63,8 @@ public class OAuthManagerImpl implements OAuthManager {
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client.getId());
-		auth.setResponseType("token");
+		auth.setResponseType(ResponseType.token);
+		auth.setGrantType(GrantType.client_credential);
 		auth.setRefreshToken(CodecUtils.nextId());
 		authorizationManager.save(auth);
 		return auth;
@@ -74,15 +77,15 @@ public class OAuthManagerImpl implements OAuthManager {
 			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client.getId());
 		auth.setGrantor(grantor.getUsername());
-		auth.setResponseType("token");
+		auth.setResponseType(ResponseType.token);
+		auth.setGrantType(GrantType.password);
 		auth.setRefreshToken(CodecUtils.nextId());
 		authorizationManager.save(auth);
 		return auth;
 	}
 
 	@Override
-	public Authorization generate(Client client, String redirectUri,
-			String scope, String responseType) {
+	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType) {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		Authorization auth = new Authorization();
@@ -91,7 +94,7 @@ public class OAuthManagerImpl implements OAuthManager {
 		auth.setClient(client.getId());
 		if (StringUtils.isNotBlank(scope))
 			auth.setScope(scope);
-		if (StringUtils.isNotBlank(responseType))
+		if (responseType != null)
 			auth.setResponseType(responseType);
 		authorizationManager.save(auth);
 		return auth;
@@ -144,6 +147,7 @@ public class OAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setGrantType(GrantType.authorization_code);
 		auth.setModifyDate(new Date());
 		authorizationManager.save(auth);
 		return auth;
@@ -151,8 +155,7 @@ public class OAuthManagerImpl implements OAuthManager {
 
 	@Override
 	public Authorization retrieve(String accessToken) {
-		Authorization auth = authorizationManager
-				.findByAccessToken(accessToken);
+		Authorization auth = authorizationManager.findByAccessToken(accessToken);
 		return auth;
 	}
 
@@ -163,8 +166,7 @@ public class OAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("client_id_not_exists");
 		if (!orig.getSecret().equals(client.getSecret()))
 			throw new IllegalArgumentException("client_secret_mismatch");
-		Authorization auth = authorizationManager.findOne("refreshToken",
-				refreshToken);
+		Authorization auth = authorizationManager.findOne("refreshToken", refreshToken);
 		if (auth == null)
 			throw new IllegalArgumentException("invalid_token");
 		auth.setAccessToken(CodecUtils.nextId());
@@ -199,10 +201,8 @@ public class OAuthManagerImpl implements OAuthManager {
 	public void removeExpired() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, (int) (-expireTime));
-		authorizationManager
-				.executeUpdate(
-						"delete from Authorization a where lifetime >0 and a.modifyDate < ?1",
-						cal.getTime());
+		authorizationManager.executeUpdate("delete from Authorization a where lifetime >0 and a.modifyDate < ?1",
+				cal.getTime());
 	}
 
 	@Override

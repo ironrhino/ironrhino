@@ -12,6 +12,8 @@ import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.ironrhino.security.oauth.server.model.GrantType;
+import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +80,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client.getId());
 		auth.setRefreshToken(CodecUtils.nextId());
-		auth.setResponseType("token");
+		auth.setResponseType(ResponseType.token);
+		auth.setGrantType(GrantType.client_credential);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
@@ -97,7 +100,8 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		auth.setClient(client.getId());
 		auth.setGrantor(grantor.getUsername());
 		auth.setRefreshToken(CodecUtils.nextId());
-		auth.setResponseType("token");
+		auth.setResponseType(ResponseType.token);
+		auth.setGrantType(GrantType.password);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
@@ -109,7 +113,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization generate(Client client, String redirectUri, String scope, String responseType) {
+	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType) {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		Authorization auth = new Authorization();
@@ -119,7 +123,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		auth.setClient(client.getId());
 		if (StringUtils.isNotBlank(scope))
 			auth.setScope(scope);
-		if (StringUtils.isNotBlank(responseType))
+		if (responseType != null)
 			auth.setResponseType(responseType);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
@@ -200,6 +204,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setGrantType(GrantType.authorization_code);
 		auth.setModifyDate(new Date());
 		stringRedisTemplate.delete(key);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
