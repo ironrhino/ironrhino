@@ -8586,6 +8586,7 @@ form.attachmentable ul.thumbnails li .remove{
 	text-align:center;
 }
 .toolbar .status{
+	line-height: 30px;
 	text-align:right;
 }
 @media (min-width: 480px) and (max-width: 767px) {
@@ -8633,15 +8634,16 @@ form.attachmentable ul.thumbnails li .remove{
 }
 .toolbar .pagination .inputPage {
 	width: 25px;
-	height: 22px;
-	line-height: 22px;
-	margin-bottom: -4px;
+	height: 20px;
+	padding-top: 6px;
+    padding-bottom: 2px;
+	line-height: 20px;
 	text-align:right;
 }
 .toolbar .pagination .totalPage {
 	min-width: 25px;
-	height: 22px;
-	line-height: 22px;
+	height: 20px;
+	line-height: 20px;
 	text-align:left;
 }
 .toolbar .pagination .pageSize {
@@ -8650,13 +8652,19 @@ form.attachmentable ul.thumbnails li .remove{
     -moz-border-radius: 3px;
     border-radius: 3px;
 	width: 60px;
-	height: 32px;
+	height: 30px;
+	line-height: 20px;
+	margin: 0;
 }
 .toolbar .pagination a[href] .glyphicon{
 	color: #555;
 }
 
+.toolbar .input-append.search{
+	margin: 0;
+}
 .toolbar input[name="keyword"]{
+	margin: 0;
 	width:100px;
 	-moz-transition: width .2s ease-in .5s;
 	-webkit-transition: width .2s ease-in .5s;
@@ -8675,7 +8683,7 @@ form.attachmentable ul.thumbnails li .remove{
 }
 .toolbar .pagination a{
 	padding:0 8px;
-	line-height: 30px;
+	line-height: 28px;
 }
 .toolbar .pagination li.disabled a i{
 	filter: Alpha(Opacity=50); 
@@ -8696,7 +8704,7 @@ form.attachmentable ul.thumbnails li .remove{
   line-height: 20px;
   background-color: transparent;
   border: 0;
-  margin-bottom: 0px;
+  margin: 0px;
 }
 .toolbar .pagination span.add-on {
   float: none;
