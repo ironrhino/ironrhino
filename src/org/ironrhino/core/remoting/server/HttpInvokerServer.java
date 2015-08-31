@@ -19,11 +19,11 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<Class<?>>();
+	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<>();
 
-	private static ThreadLocal<Object> service = new ThreadLocal<Object>();
+	private static ThreadLocal<Object> service = new ThreadLocal<>();
 
-	private Map<Class<?>, Object> proxies = new HashMap<Class<?>, Object>();
+	private Map<Class<?>, Object> proxies = new HashMap<>();
 
 	private ServiceRegistry serviceRegistry;
 

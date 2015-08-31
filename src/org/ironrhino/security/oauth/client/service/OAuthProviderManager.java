@@ -17,7 +17,7 @@ public class OAuthProviderManager {
 	public List<OAuthProvider> getProviders() {
 		if (providers == null)
 			return Collections.emptyList();
-		List<OAuthProvider> list = new ArrayList<OAuthProvider>(
+		List<OAuthProvider> list = new ArrayList<>(
 				providers.size());
 		for (OAuthProvider p : providers)
 			if (p.isEnabled())

@@ -6,10 +6,12 @@ public enum Gender implements Displayable {
 
 	MALE, FEMALE;
 
+	@Override
 	public String getName() {
 		return name();
 	}
 
+	@Override
 	public String getDisplayName() {
 		return Displayable.super.getDisplayName();
 	}

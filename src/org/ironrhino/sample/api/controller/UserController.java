@@ -59,7 +59,7 @@ public class UserController {
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
 	public DeferredResult<User> get(final @PathVariable String username) {
-		final DeferredResult<User> dr = new DeferredResult<User>(5000L, RestStatus.REQUEST_TIMEOUT);
+		final DeferredResult<User> dr = new DeferredResult<>(5000L, RestStatus.REQUEST_TIMEOUT);
 		executorService.submit(() -> {
 			User u = (User) userManager.loadUserByUsername(username);
 			if (u == null)

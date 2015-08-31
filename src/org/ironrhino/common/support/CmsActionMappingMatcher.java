@@ -74,7 +74,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				ActionMapping mapping = new ActionMapping();
 				mapping.setNamespace(DisplayPageAction.NAMESPACE);
 				mapping.setName(DisplayPageAction.ACTION_NAME);
-				Map<String, Object> params = new HashMap<String, Object>(8);
+				Map<String, Object> params = new HashMap<>(8);
 				params.put(AbstractActionMapper.ID,
 						URLDecoder.decode(pagePath, encoding));
 				mapping.setParams(params);
@@ -89,7 +89,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 					ActionMapping mapping = new ActionMapping();
 					mapping.setNamespace(SeriesPageAction.NAMESPACE);
 					mapping.setName(SeriesPageAction.ACTION_NAME);
-					Map<String, Object> params = new HashMap<String, Object>(8);
+					Map<String, Object> params = new HashMap<>(8);
 					params.put("name", name);
 					String pn = request
 							.getParameter(ResultPage.PAGENO_PARAM_NAME);
@@ -119,7 +119,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 					ActionMapping mapping = new ActionMapping();
 					mapping.setNamespace(ColumnPageAction.NAMESPACE);
 					mapping.setName(ColumnPageAction.ACTION_NAME);
-					Map<String, Object> params = new HashMap<String, Object>(8);
+					Map<String, Object> params = new HashMap<>(8);
 					params.put("name", name);
 					String pn = request
 							.getParameter(ResultPage.PAGENO_PARAM_NAME);
@@ -164,7 +164,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 					ActionMapping mapping = new ActionMapping();
 					mapping.setNamespace(IssuePageAction.NAMESPACE);
 					mapping.setName(IssuePageAction.ACTION_NAME);
-					Map<String, Object> params = new HashMap<String, Object>(8);
+					Map<String, Object> params = new HashMap<>(8);
 					params.put("name", name);
 					String pn = request
 							.getParameter(ResultPage.PAGENO_PARAM_NAME);
@@ -204,7 +204,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 	}
 
 	private void buildSerieses() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(serieses))
 			for (String s : serieses.split("\\s*,\\s*"))
 				list.add(s);
@@ -216,7 +216,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 	}
 
 	private void buildColumns() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(columns))
 			for (String s : columns.split("\\s*,\\s*"))
 				list.add(s);
@@ -228,7 +228,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 	}
 
 	private void buildIssues() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(issues))
 			for (String s : issues.split("\\s*,\\s*"))
 				list.add(s);
@@ -244,7 +244,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 		Setting setting = event.getEntity();
 		String key = setting.getKey();
 		if (key.equals(Constants.SETTING_KEY_CMS_SERIESES)) {
-			List<String> list = new ArrayList<String>();
+			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(serieses))
 				for (String s : serieses.split("\\s*,\\s*"))
 					list.add(s);
@@ -253,7 +253,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 					list.add(s);
 			seriesesList = list;
 		} else if (key.equals(Constants.SETTING_KEY_CMS_COLUMNS)) {
-			List<String> list = new ArrayList<String>();
+			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(columns))
 				for (String s : columns.split("\\s*,\\s*"))
 					list.add(s);
@@ -262,7 +262,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 					list.add(s);
 			columnsList = list;
 		} else if (key.equals(Constants.SETTING_KEY_CMS_ISSUES)) {
-			List<String> list = new ArrayList<String>();
+			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(issues))
 				for (String s : issues.split("\\s*,\\s*"))
 					list.add(s);

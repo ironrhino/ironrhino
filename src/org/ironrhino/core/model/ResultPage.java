@@ -61,7 +61,7 @@ public class ResultPage<T> implements Serializable {
 	@JsonIgnore
 	private int start = -1;
 
-	private Collection<T> result = new ArrayList<T>(0);
+	private Collection<T> result = new ArrayList<>(0);
 
 	public int getStart() {
 		return (this.pageNo - 1) * this.pageSize;

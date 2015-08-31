@@ -77,7 +77,7 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	private Date modifyDate;
 
 	@Convert(converter = StringListConverter.class)
-	private List<String> attachments = new ArrayList<String>(0);
+	private List<String> attachments = new ArrayList<>(0);
 
 	@Override
 	public List<String> getAttachments() {

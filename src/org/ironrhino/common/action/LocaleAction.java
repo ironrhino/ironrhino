@@ -27,7 +27,7 @@ public class LocaleAction extends BaseAction {
 	private String lang;
 
 	private Locale[] availableLocales;
-	
+
 	@Value("${globalCookie:false}")
 	private boolean globalCookie;
 
@@ -66,12 +66,10 @@ public class LocaleAction extends BaseAction {
 				}
 			}
 			if (loc != null) {
-				RequestUtils.saveCookie(request, response,
-						httpSessionManager.getLocaleCookieName(),
-						loc.toString(), globalCookie);
+				RequestUtils.saveCookie(request, response, httpSessionManager.getLocaleCookieName(), loc.toString(),
+						globalCookie);
 			} else {
-				RequestUtils.deleteCookie(request, response,
-						httpSessionManager.getLocaleCookieName(), true);
+				RequestUtils.deleteCookie(request, response, httpSessionManager.getLocaleCookieName(), true);
 			}
 			targetUrl = "/";
 			return REDIRECT;
@@ -81,11 +79,10 @@ public class LocaleAction extends BaseAction {
 				lang = locale.toString();
 		}
 		availableLocales = Locale.getAvailableLocales();
-		String[] locales = settingControl
-				.getStringArray(Constants.SETTING_KEY_AVAILABLE_LOCALES);
+		String[] locales = settingControl.getStringArray(Constants.SETTING_KEY_AVAILABLE_LOCALES);
 		if (locales != null && locales.length > 0) {
 			List<String> _locales = Arrays.asList(locales);
-			List<Locale> list = new ArrayList<Locale>(locales.length);
+			List<Locale> list = new ArrayList<>(locales.length);
 			for (Locale locale : availableLocales) {
 				if (_locales.contains(locale.toString()))
 					list.add(locale);

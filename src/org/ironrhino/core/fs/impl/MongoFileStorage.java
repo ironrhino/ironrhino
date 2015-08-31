@@ -219,7 +219,7 @@ public class MongoFileStorage implements FileStorage {
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null || !file.isDirectory())
 			return null;
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		List<File> files = mongoTemplate.find(
 				new Query(where("path").regex(
 						"^" + path.replaceAll("\\.", "\\\\.") + "/[^/]*$")),
@@ -237,7 +237,7 @@ public class MongoFileStorage implements FileStorage {
 	@Override
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
 		path = Files.simplifyPath(path);
-		final Map<String, Boolean> map = new HashMap<String, Boolean>();
+		final Map<String, Boolean> map = new HashMap<>();
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null || !file.isDirectory())
 			return Collections.emptyMap();
@@ -249,10 +249,10 @@ public class MongoFileStorage implements FileStorage {
 			String name = f.getPath();
 			map.put(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory());
 		}
-		List<Map.Entry<String, Boolean>> list = new ArrayList<Map.Entry<String, Boolean>>(
+		List<Map.Entry<String, Boolean>> list = new ArrayList<>(
 				map.entrySet());
 		Collections.sort(list, comparator);
-		Map<String, Boolean> sortedMap = new LinkedHashMap<String, Boolean>();
+		Map<String, Boolean> sortedMap = new LinkedHashMap<>();
 		for (Map.Entry<String, Boolean> entry : list)
 			sortedMap.put(entry.getKey(), entry.getValue());
 		return sortedMap;

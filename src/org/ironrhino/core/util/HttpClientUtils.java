@@ -37,7 +37,7 @@ import org.apache.http.util.EntityUtils;
 
 public class HttpClientUtils {
 
-	private static Set<Header> DEFAULT_HEADERS = new HashSet<Header>();
+	private static Set<Header> DEFAULT_HEADERS = new HashSet<>();
 
 	static {
 		DEFAULT_HEADERS
@@ -160,7 +160,7 @@ public class HttpClientUtils {
 			String charset) throws IOException {
 		HttpPost httpRequest = new HttpPost(url);
 		if (params != null && params.size() > 0) {
-			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+			List<NameValuePair> nvps = new ArrayList<>();
 			for (Map.Entry<String, String> entry : params.entrySet())
 				nvps.add(new BasicNameValuePair(entry.getKey(), entry
 						.getValue()));

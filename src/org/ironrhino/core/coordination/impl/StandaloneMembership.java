@@ -18,13 +18,13 @@ import org.springframework.stereotype.Component;
 @ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
 public class StandaloneMembership implements Membership {
 
-	private Map<String, List<String>> groups = new HashMap<String, List<String>>();
+	private Map<String, List<String>> groups = new HashMap<>();
 
 	@Override
 	public void join(String group) {
 		List<String> members = groups.get(group);
 		if (members == null) {
-			members = new ArrayList<String>();
+			members = new ArrayList<>();
 			groups.put(group, members);
 		}
 		String instanceId = AppInfo.getInstanceId();

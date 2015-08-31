@@ -17,7 +17,7 @@ public class SchemaField implements Serializable {
 	private String name;
 
 	@SearchableProperty(boost = 2, index = Index.NOT_ANALYZED)
-	private List<String> values = new ArrayList<String>();
+	private List<String> values = new ArrayList<>();
 
 	@SearchableProperty(index = Index.NO)
 	private SchemaFieldType type;

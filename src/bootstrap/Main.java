@@ -26,8 +26,7 @@ public class Main {
 		if ((majorVersion < 2) && (minorVersion < 7)) {
 			System.err.println("requires Java 7 or later.");
 			System.err.println("Your java version is " + javaVersion);
-			System.err
-					.println("Java Home:  " + System.getProperty("java.home"));
+			System.err.println("Java Home:  " + System.getProperty("java.home"));
 			System.exit(0);
 		}
 		Main main = new Main();
@@ -39,29 +38,23 @@ public class Main {
 		URL warUrl = protectionDomain.getCodeSource().getLocation();
 		System.out.println(warUrl.getPath());
 		List<URL> jarUrls = extractJettyJarsFromWar(warUrl.getPath());
-		ClassLoader urlClassLoader = new URLClassLoader(
-				jarUrls.toArray(new URL[jarUrls.size()]));
+		ClassLoader urlClassLoader = new URLClassLoader(jarUrls.toArray(new URL[jarUrls.size()]));
 		Thread.currentThread().setContextClassLoader(urlClassLoader);
-		Class<?> jettyUtil = urlClassLoader
-				.loadClass("bootstrap.JettyLauncher");
-		Method mainMethod = jettyUtil.getMethod("start",
-				new Class[] { URL.class });
+		Class<?> jettyUtil = urlClassLoader.loadClass("bootstrap.JettyLauncher");
+		Method mainMethod = jettyUtil.getMethod("start", new Class[] { URL.class });
 		mainMethod.invoke(null, new Object[] { warUrl });
 	}
 
-	private List<URL> extractJettyJarsFromWar(String warPath)
-			throws IOException {
+	private List<URL> extractJettyJarsFromWar(String warPath) throws IOException {
 		try (JarFile jarFile = new JarFile(warPath)) {
-			List<URL> jarUrls = new ArrayList<URL>();
+			List<URL> jarUrls = new ArrayList<>();
 			for (String entryPath : this.jettyJars) {
 				File tmpFile;
 				try {
-					tmpFile = File.createTempFile(
-							entryPath.replaceAll("/", "_"), "war");
+					tmpFile = File.createTempFile(entryPath.replaceAll("/", "_"), "war");
 				} catch (IOException e) {
 					String tmpdir = System.getProperty("java.io.tmpdir");
-					throw new IOException("Failed to extract " + entryPath
-							+ " to " + tmpdir, e);
+					throw new IOException("Failed to extract " + entryPath + " to " + tmpdir, e);
 				}
 				JarEntry jarEntry = jarFile.getJarEntry(entryPath);
 				try (InputStream inStream = jarFile.getInputStream(jarEntry)) {

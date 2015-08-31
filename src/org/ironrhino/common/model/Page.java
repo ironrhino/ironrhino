@@ -85,7 +85,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	@NotInCopy
 	@SearchableProperty(index = Index.NOT_ANALYZED)
 	@Transient
-	private Set<String> tags = new LinkedHashSet<String>(0);
+	private Set<String> tags = new LinkedHashSet<>(0);
 
 	@NotInCopy
 	@SearchableProperty
@@ -257,7 +257,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	}
 
 	public List<Image> getImages() {
-		List<Image> images = new ArrayList<Image>();
+		List<Image> images = new ArrayList<>();
 		if (StringUtils.isNotBlank(content)) {
 			Elements elements = Jsoup.parse(content).select("img");
 			for (int i = 0; i < elements.size(); i++) {

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @ResourcePresentConditional(value = "resources/spring/applicationContext-throttle.xml", negated = true)
 public class StandaloneConcurrencyService implements ConcurrencyService {
 
-	private ConcurrentHashMap<String, Semaphore> semaphores = new ConcurrentHashMap<String, Semaphore>();
+	private ConcurrentHashMap<String, Semaphore> semaphores = new ConcurrentHashMap<>();
 
 	@Override
 	public boolean tryAcquire(String name, int permits) {

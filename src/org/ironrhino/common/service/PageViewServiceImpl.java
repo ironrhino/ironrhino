@@ -346,7 +346,7 @@ public class PageViewServiceImpl implements PageViewService {
 				sb.toString(), type);
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split(",");
-			return new Pair<String, Long>(arr[0], Long.valueOf(arr[1]));
+			return new Pair<>(arr[0], Long.valueOf(arr[1]));
 		}
 		return null;
 	}
@@ -381,7 +381,7 @@ public class PageViewServiceImpl implements PageViewService {
 		String key = sb.toString();
 		Set<String> set = stringRedisTemplate.opsForZSet().reverseRange(key, 0,
 				top - 1);
-		Map<String, Long> map = new LinkedHashMap<String, Long>();
+		Map<String, Long> map = new LinkedHashMap<>();
 		for (String member : set)
 			map.put(member, stringRedisTemplate.opsForZSet().score(key, member)
 					.longValue());

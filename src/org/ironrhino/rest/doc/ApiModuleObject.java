@@ -12,7 +12,7 @@ public class ApiModuleObject implements Serializable {
 
 	private String description;
 
-	private List<ApiDoc> apiDocs = new ArrayList<ApiDoc>();
+	private List<ApiDoc> apiDocs = new ArrayList<>();
 
 	public String getName() {
 		return name;

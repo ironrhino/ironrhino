@@ -138,7 +138,7 @@ public class JdbcUpdateService {
 	public void validate(String sql) {
 		sql = SqlUtils.trim(sql);
 		Set<String> names = SqlUtils.extractParameters(sql);
-		Map<String, Object> paramMap = new HashMap<String, Object>();
+		Map<String, Object> paramMap = new HashMap<>();
 		for (String name : names)
 			paramMap.put(name, "0");
 		validateAndConvertTypes(sql, paramMap);

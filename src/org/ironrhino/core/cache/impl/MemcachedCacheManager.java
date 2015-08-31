@@ -173,7 +173,7 @@ public class MemcachedCacheManager implements CacheManager {
 	public Map<String, Object> mget(Collection<String> keys, String namespace) {
 		if (keys == null)
 			return null;
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (String key : keys)
 			list.add(generateKey(key, namespace));
 		try {

@@ -47,7 +47,7 @@ public class RequestUtils {
 
 	public static Map<String, String> getParametersMap(
 			HttpServletRequest request) {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		for (Map.Entry<String, String[]> entry : request.getParameterMap()
 				.entrySet()) {
 			String name = entry.getKey();
@@ -62,7 +62,7 @@ public class RequestUtils {
 			String queryString) {
 		if (StringUtils.isBlank(queryString))
 			return Collections.emptyMap();
-		Map<String, String> map = new LinkedHashMap<String, String>();
+		Map<String, String> map = new LinkedHashMap<>();
 		for (String s : queryString.split("&")) {
 			if (StringUtils.isBlank(s))
 				continue;

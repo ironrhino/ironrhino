@@ -5,7 +5,7 @@ import java.util.List;
 
 public class AopContext {
 
-	private static ThreadLocal<List<Class<?>>> bypass = new ThreadLocal<List<Class<?>>>();
+	private static ThreadLocal<List<Class<?>>> bypass = new ThreadLocal<>();
 
 	public static void reset() {
 		bypass.remove();
@@ -14,7 +14,7 @@ public class AopContext {
 	public static void setBypass(Class<?> clazz) {
 		List<Class<?>> list = bypass.get();
 		if (list == null)
-			list = new ArrayList<Class<?>>(5);
+			list = new ArrayList<>(5);
 		list.add(clazz);
 		bypass.set(list);
 	}

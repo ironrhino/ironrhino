@@ -21,7 +21,7 @@ public class StatLog {
 
 	private static final Condition condition = timerLock.newCondition();
 
-	private static final ConcurrentHashMap<Key, Value> data = new ConcurrentHashMap<Key, Value>(64);
+	private static final ConcurrentHashMap<Key, Value> data = new ConcurrentHashMap<>(64);
 
 	private static Thread writeThread;
 
@@ -84,7 +84,7 @@ public class StatLog {
 	}
 
 	private static void write(boolean checkInterval) {
-		Map<Key, Value> temp = new HashMap<Key, Value>();
+		Map<Key, Value> temp = new HashMap<>();
 		for (Map.Entry<Key, Value> entry : data.entrySet()) {
 			long current = System.currentTimeMillis();
 			Key key = entry.getKey();

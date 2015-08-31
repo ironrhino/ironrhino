@@ -7,9 +7,9 @@ public class DataRouteContext {
 
 	public static final int DEFAULT_DATASOURCE_WEIGHT = 1;
 
-	private static ThreadLocal<Deque<Boolean>> readonly = new ThreadLocal<Deque<Boolean>>();
+	private static ThreadLocal<Deque<Boolean>> readonly = new ThreadLocal<>();
 
-	private static ThreadLocal<Deque<String>> name = new ThreadLocal<Deque<String>>();
+	private static ThreadLocal<Deque<String>> name = new ThreadLocal<>();
 
 	public static void reset() {
 		Deque<Boolean> readonlyDeque = readonly.get();
@@ -23,7 +23,7 @@ public class DataRouteContext {
 	public static void setReadonly(Boolean bl) {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null) {
-			deque = new LinkedList<Boolean>();
+			deque = new LinkedList<>();
 			readonly.set(deque);
 		}
 		deque.push(bl);
@@ -47,7 +47,7 @@ public class DataRouteContext {
 	public static void setName(String s) {
 		Deque<String> deque = name.get();
 		if (deque == null) {
-			deque = new LinkedList<String>();
+			deque = new LinkedList<>();
 			name.set(deque);
 		}
 		deque.push(s);

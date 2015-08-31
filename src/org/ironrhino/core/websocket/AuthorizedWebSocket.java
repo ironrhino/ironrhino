@@ -29,7 +29,7 @@ public class AuthorizedWebSocket {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	private final Set<Session> sessions = Collections.newSetFromMap(new ConcurrentHashMap<Session, Boolean>());
+	private final Set<Session> sessions = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
 	protected boolean authorize(UserDetails user) {
 		return true;

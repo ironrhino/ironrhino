@@ -42,7 +42,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
-	private Map<String, String> discoveredServices = new HashMap<String, String>();
+	private Map<String, String> discoveredServices = new HashMap<>();
 
 	private boolean ready;
 
@@ -55,7 +55,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	protected void onReady() {
 		Set<String> services = getExportServices().keySet();
 		if (!services.isEmpty()) {
-			ExportServicesEvent event = new ExportServicesEvent(new ArrayList<String>(services));
+			ExportServicesEvent event = new ExportServicesEvent(new ArrayList<>(services));
 			eventPublisher.publish(event, Scope.GLOBAL);
 		}
 		writeDiscoveredServices();
@@ -108,7 +108,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public Collection<String> getAllServices() {
 		Set<String> keys = stringRedisTemplate.keys(NAMESPACE_SERVICES + "*");
-		List<String> services = new ArrayList<String>(keys.size());
+		List<String> services = new ArrayList<>(keys.size());
 		for (String s : keys)
 			services.add(s.substring(NAMESPACE_SERVICES.length()));
 		Collections.sort(services);
@@ -118,7 +118,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public Collection<String> getHostsForService(String service) {
 		List<String> list = stringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1);
-		List<String> hosts = new ArrayList<String>(list.size());
+		List<String> hosts = new ArrayList<>(list.size());
 		hosts.addAll(list);
 		Collections.sort(hosts);
 		return hosts;
@@ -129,7 +129,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		if (host.indexOf(':') < 0)
 			host += ":" + DEFAULT_PORT;
 		Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(NAMESPACE_HOSTS + host);
-		Map<String, String> services = new TreeMap<String, String>();
+		Map<String, String> services = new TreeMap<>();
 		for (Map.Entry<Object, Object> entry : map.entrySet())
 			services.put((String) entry.getKey(), (String) entry.getValue());
 		return services;

@@ -36,7 +36,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Value("${serviceRegistry.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
-	private Map<String, String> discoveredServices = new HashMap<String, String>();
+	private Map<String, String> discoveredServices = new HashMap<>();
 
 	private boolean ready;
 
@@ -116,7 +116,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		try {
 			List<String> list = curatorFramework.getChildren().forPath(
 					servicesParentPath);
-			List<String> services = new ArrayList<String>(list.size());
+			List<String> services = new ArrayList<>(list.size());
 			services.addAll(list);
 			Collections.sort(services);
 			return services;
@@ -135,7 +135,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 					.forPath(
 							new StringBuilder().append(servicesParentPath)
 									.append("/").append(service).toString());
-			List<String> hosts = new ArrayList<String>(list.size());
+			List<String> hosts = new ArrayList<>(list.size());
 			hosts.addAll(list);
 			Collections.sort(hosts);
 			return hosts;
@@ -156,7 +156,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			String sdata = new String(data);
 			Map<String, String> map = JsonUtils.fromJson(sdata,
 					JsonUtils.STRING_MAP_TYPE);
-			Map<String, String> services = new TreeMap<String, String>();
+			Map<String, String> services = new TreeMap<>();
 			services.putAll(map);
 			return services;
 		} catch (Exception e) {

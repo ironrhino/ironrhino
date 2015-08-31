@@ -85,7 +85,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 	}
 
 	private String getCookie(WrappedHttpSession session) {
-		Map<String, String> cookieMap = new HashMap<String, String>(4, 1);
+		Map<String, String> cookieMap = new HashMap<>(4, 1);
 		Cookie[] cookies = session.getRequest().getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies)

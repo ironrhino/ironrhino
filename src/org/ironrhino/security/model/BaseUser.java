@@ -107,7 +107,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	@Transient
 	@JsonIgnore
 	@UiConfig(displayOrder = 100, alias = "role", template = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next> </#if></#list>", csvTemplate = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next>,</#if></#list>")
-	private Set<String> roles = new LinkedHashSet<String>(0);
+	private Set<String> roles = new LinkedHashSet<>(0);
 
 	@NotInCopy
 	@JsonIgnore
@@ -338,7 +338,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 
 	public void setAttribute(String key, String value) {
 		if (attributes == null)
-			attributes = new HashMap<String, String>(4);
+			attributes = new HashMap<>(4);
 		if (value == null)
 			attributes.remove(key);
 		else

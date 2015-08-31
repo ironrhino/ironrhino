@@ -140,7 +140,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 					for (int i = 0; i < list.size() - maximumSessions; i++) {
 						String id = list.get(i);
 						try {
-							Map<String, String> map = new HashMap<String, String>();
+							Map<String, String> map = new HashMap<>();
 							map.put(SESSION_KEY_KICKED_OUT_FROM, ip);
 							map.put(SESSION_KEY_KICKED_OUT_DATE,
 									DateUtils.formatDatetime(new Date()));

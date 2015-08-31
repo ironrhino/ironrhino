@@ -77,7 +77,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 		}
 		try {
 			T t = entityClass.newInstance();
-			t.setChildren(new ArrayList<T>());
+			t.setChildren(new ArrayList<>());
 			BeanUtils.copyProperties(treeNode, t, new String[] { "parent", "children" });
 			t.setParent(parent);
 			parent.getChildren().add(t);

@@ -81,7 +81,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 			p = page;
 		}
 		p.setDraftDate(new Date());
-		Map<String, String> draft = new HashMap<String, String>(8);
+		Map<String, String> draft = new HashMap<>(8);
 		draft.put("path", page.getPath());
 		draft.put("title", page.getTitle());
 		draft.put("content", page.getContent());
@@ -285,7 +285,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 			}
 			return map;
 		} else {
-			final Map<String, Integer> map = new HashMap<String, Integer>();
+			final Map<String, Integer> map = new HashMap<>();
 			DetachedCriteria dc = detachedCriteria();
 			dc.add(Restrictions.like("tagsAsString", keyword,
 					MatchMode.ANYWHERE));
@@ -302,11 +302,11 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 				}
 			}
 
-			List<Map.Entry<String, Integer>> _list = new ArrayList<Map.Entry<String, Integer>>(
+			List<Map.Entry<String, Integer>> _list = new ArrayList<>(
 					map.entrySet());
 			Collections.sort(_list, ValueThenKeyComparator
 					.<String, Integer> getDefaultInstance());
-			Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+			Map<String, Integer> sortedMap = new LinkedHashMap<>();
 			for (Map.Entry<String, Integer> entry : _list)
 				sortedMap.put(entry.getKey(), entry.getValue());
 			return sortedMap;

@@ -28,7 +28,7 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 			logger.error("no PasswordDigester found");
 			return;
 		}
-		map = new TreeMap<Integer, VersionedPasswordEncoder>();
+		map = new TreeMap<>();
 		for (VersionedPasswordEncoder pd : versions) {
 			map.put(pd.getVersion(), pd);
 		}

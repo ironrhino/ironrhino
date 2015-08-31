@@ -36,7 +36,7 @@ public class I18N {
 	}
 
 	public static String getTextForEnum(Class<? extends Enum<?>> clazz) {
-		Map<String, String> map = new LinkedHashMap<String, String>();
+		Map<String, String> map = new LinkedHashMap<>();
 		for (Enum<?> en : clazz.getEnumConstants()) {
 			try {
 				map.put(en.name(),

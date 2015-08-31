@@ -40,8 +40,8 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		Properties properties = getHibernateProperties();
 		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
 			properties.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
-		Map<String, Class<?>> added = new HashMap<String, Class<?>>();
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		Map<String, Class<?>> added = new HashMap<>();
+		List<Class<?>> classes = new ArrayList<>();
 		Collection<Class<?>> scaned = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), Entity.class);
 		if (annotatedClasses != null)
 			for (Class<?> c : annotatedClasses)
@@ -56,7 +56,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			}
 		if (StringUtils.isNotBlank(excludeFilter)) {
 			Collection<Class<?>> temp = classes;
-			classes = new ArrayList<Class<?>>();
+			classes = new ArrayList<>();
 			String[] arr = excludeFilter.split("\\s*,\\s*");
 			for (Class<?> clz : temp) {
 				boolean exclude = false;

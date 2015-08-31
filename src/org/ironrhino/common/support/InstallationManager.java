@@ -59,8 +59,8 @@ public class InstallationManager {
 	}
 
 	private synchronized void scanComponents() {
-		List<Component> list = new ArrayList<Component>();
-		backupedComponents = new ArrayList<Component>();
+		List<Component> list = new ArrayList<>();
+		backupedComponents = new ArrayList<>();
 		File dir = new File(this.directory);
 		if (dir.isDirectory()) {
 			File[] files = dir.listFiles((dir2, name) -> name.endsWith(".jar") || name.endsWith(".jar.bak"));
@@ -74,7 +74,7 @@ public class InstallationManager {
 					(f.getName().endsWith(".jar") ? list : backupedComponents).add(component);
 				}
 			Collections.sort(list, (o1, o2) -> o1.getId().compareTo(o2.getId()));
-			this.installedComponents = new ArrayList<Component>();
+			this.installedComponents = new ArrayList<>();
 			for (Component c : list)
 				addInstalledComponent(c);
 		}
@@ -272,7 +272,7 @@ public class InstallationManager {
 			String dependence = manifest.get(IRONRHINO_COMPONENT_DEPENDENCE);
 			if (StringUtils.isNotBlank(dependence)) {
 				String[] arr = dependence.split("\\s*,\\s*");
-				Map<String, String> map = new HashMap<String, String>();
+				Map<String, String> map = new HashMap<>();
 				for (String s : arr) {
 					String[] arr2 = s.split(";", 2);
 					map.put(arr2[0], arr2.length > 1 ? arr2[1] : "1.0");

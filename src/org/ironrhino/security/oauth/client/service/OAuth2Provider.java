@@ -139,7 +139,7 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 				logger.error(errormsg);
 				throw new RuntimeException(errormsg);
 			}
-			Map<String, String> params = new HashMap<String, String>(8);
+			Map<String, String> params = new HashMap<>(8);
 			params.put("code", request.getParameter("code"));
 			params.put("client_id", getClientId());
 			params.put("client_secret", getClientSecret());
@@ -198,7 +198,7 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 
 	public String invoke(String accessToken, String protectedURL)
 			throws Exception {
-		Map<String, String> map = new HashMap<String, String>(2, 1);
+		Map<String, String> map = new HashMap<>(2, 1);
 		if (!isUseAuthorizationHeader())
 			map.put(getAccessTokenParameterName(), accessToken);
 		else
@@ -214,7 +214,7 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 	}
 
 	public OAuth2Token refreshToken(OAuth2Token accessToken) throws Exception {
-		Map<String, String> params = new HashMap<String, String>(8);
+		Map<String, String> params = new HashMap<>(8);
 		params.put("client_id", getClientId());
 		params.put("client_secret", getClientSecret());
 		params.put("refresh_token", accessToken.getRefresh_token());

@@ -39,7 +39,7 @@ public class Chart implements Serializable {
 	private String bg_colour = "#ffffff";
 
 	private int num_decimals = 2;
-	private Collection<Element> elements = new ArrayList<Element>();
+	private Collection<Element> elements = new ArrayList<>();
 	private Legend legend;
 	private Tooltip tooltip;
 

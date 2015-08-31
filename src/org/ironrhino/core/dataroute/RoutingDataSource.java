@@ -34,7 +34,7 @@ public class RoutingDataSource extends AbstractDataSource {
 	public void setGroups(List<GroupedDataSource> list) {
 		if (routingMap != null)
 			throw new IllegalArgumentException("already injected by routingMap");
-		routingMap = new LinkedHashMap<String, DataSource>();
+		routingMap = new LinkedHashMap<>();
 		for (GroupedDataSource gds : list)
 			routingMap.put(gds.getGroupName(), gds);
 		mainGroup = list.get(0);

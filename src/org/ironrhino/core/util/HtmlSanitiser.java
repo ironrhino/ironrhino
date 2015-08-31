@@ -20,7 +20,7 @@ import net.htmlparser.jericho.Tag;
 
 public class HtmlSanitiser {
 
-	private static final Set<String> VALID_ELEMENT_NAMES = new HashSet<String>(
+	private static final Set<String> VALID_ELEMENT_NAMES = new HashSet<>(
 			Arrays.asList(new String[] { HTMLElementName.DIV,
 					HTMLElementName.SPAN, HTMLElementName.STRONG,
 					HTMLElementName.EM, HTMLElementName.BR, HTMLElementName.P,
@@ -30,7 +30,7 @@ public class HtmlSanitiser {
 					HTMLElementName.TBODY, HTMLElementName.TR,
 					HTMLElementName.TH, HTMLElementName.TD }));
 
-	private static final Set<String> VALID_ATTRIBUTE_NAMES = new HashSet<String>(
+	private static final Set<String> VALID_ATTRIBUTE_NAMES = new HashSet<>(
 			Arrays.asList(new String[] { "id", "class", "href", "target",
 					"title", "style", "align" }));
 

@@ -86,10 +86,10 @@ public class StatControl {
 				Analyzer analyzer = new AbstractAnalyzer(file) {
 					Calendar calendar = Calendar.getInstance();
 					int currentHour = 0;
-					Map<Key, Value> map = new HashMap<Key, Value>();
+					Map<Key, Value> map = new HashMap<>();
 
 					private void save() {
-						Map<Key, Value> sortedMap = new TreeMap<Key, Value>(map);
+						Map<Key, Value> sortedMap = new TreeMap<>(map);
 						for (Map.Entry<Key, Value> entry : sortedMap.entrySet())
 							entityManager.save(new Stat(entry.getKey(), entry
 									.getValue(), new Date(entry.getKey()
@@ -241,7 +241,7 @@ public class StatControl {
 			analyzer.analyze();
 			return analyzer.getResult();
 		} else {
-			return new HashMap<String, List<TreeNode>>();
+			return new HashMap<>();
 		}
 	}
 

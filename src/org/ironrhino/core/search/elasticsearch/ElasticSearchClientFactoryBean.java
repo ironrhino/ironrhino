@@ -41,7 +41,7 @@ public class ElasticSearchClientFactoryBean implements FactoryBean<Client>,
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if (StringUtils.isBlank(connectString)) {
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, String> map = new HashMap<>();
 			map.put("path.home", AppInfo.getAppHome() + "/search");
 			if (settings != null)
 				map.putAll(settings);
@@ -50,7 +50,7 @@ public class ElasticSearchClientFactoryBean implements FactoryBean<Client>,
 			Node node = nodeBuilder().settings(settings).node();
 			client = node.client();
 		} else {
-			Map<String, String> map = new HashMap<String, String>();
+			Map<String, String> map = new HashMap<>();
 			if (settings != null)
 				map.putAll(settings);
 			Settings settings = ImmutableSettings.settingsBuilder().put(map)

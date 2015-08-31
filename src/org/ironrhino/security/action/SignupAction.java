@@ -202,7 +202,7 @@ public class SignupAction extends BaseAction {
 			user.setLegiblePassword(password);
 			userManager.save(user);
 			user.setPassword(password);
-			Map<String, Object> model = new HashMap<String, Object>(4);
+			Map<String, Object> model = new HashMap<>(4);
 			model.put("user", user);
 			model.put("url", "/user/password");
 			SimpleMailMessage smm = new SimpleMailMessage();
@@ -215,7 +215,7 @@ public class SignupAction extends BaseAction {
 	}
 
 	private void sendActivationMail(User user) {
-		Map<String, Object> model = new HashMap<String, Object>(4);
+		Map<String, Object> model = new HashMap<>(4);
 		model.put("user", user);
 		model.put("url",
 				"/signup/activate/" + Blowfish.getDefaultInstance().encrypt(user.getId() + "," + user.getEmail()));

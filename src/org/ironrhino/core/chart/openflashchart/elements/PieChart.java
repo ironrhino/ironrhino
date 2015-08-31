@@ -160,7 +160,7 @@ public class PieChart extends Element {
 
 	private synchronized void checkColours() {
 		if (colours == null)
-			colours = new ArrayList<String>();
+			colours = new ArrayList<>();
 	}
 
 	public Boolean getNoLabels() {

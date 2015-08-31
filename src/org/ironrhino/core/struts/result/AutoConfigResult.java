@@ -36,7 +36,7 @@ public class AutoConfigResult extends FreemarkerResult {
 	@Inject(value = "ironrhino.view.ftl.classpath", required = false)
 	private static String ftlClasspath = DEFAULT_FTL_CLASSPATH;
 
-	private static ThreadLocal<String> styleHolder = new ThreadLocal<String>();
+	private static ThreadLocal<String> styleHolder = new ThreadLocal<>();
 
 	public static void setStyle(String style) {
 		styleHolder.set(style);
@@ -64,7 +64,7 @@ public class AutoConfigResult extends FreemarkerResult {
 		doExecute(finalLocation, invocation);
 	}
 
-	private static Map<String, String> cache = new ConcurrentHashMap<String, String>(
+	private static Map<String, String> cache = new ConcurrentHashMap<>(
 			256);
 
 	@Override

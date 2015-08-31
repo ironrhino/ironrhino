@@ -40,7 +40,7 @@ public class RSA {
 		@Override
 		protected SoftReference<RSA> initialValue() {
 			try {
-				return new SoftReference<RSA>(new RSA());
+				return new SoftReference<>(new RSA());
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -207,7 +207,7 @@ public class RSA {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			instanceRef = new SoftReference<RSA>(instance);
+			instanceRef = new SoftReference<>(instance);
 			pool.set(instanceRef);
 		}
 		return instance;

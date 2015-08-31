@@ -45,7 +45,7 @@ public class ApplicationContextConsole {
 	@Autowired
 	private EventPublisher eventPublisher;
 
-	private Map<String, Object> beans = new HashMap<String, Object>();
+	private Map<String, Object> beans = new HashMap<>();
 
 	private Map<String, Scope> triggers;
 
@@ -68,7 +68,7 @@ public class ApplicationContextConsole {
 
 	public Map<String, Scope> getTriggers() {
 		if (triggers == null) {
-			triggers = new TreeMap<String, Scope>();
+			triggers = new TreeMap<>();
 			// triggers.put("freemarkerConfiguration.clearTemplateCache()",
 			// Scope.APPLICATION);
 			String[] beanNames = ctx.getBeanDefinitionNames();

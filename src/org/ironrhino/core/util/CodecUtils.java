@@ -20,8 +20,7 @@ public class CodecUtils {
 		@Override
 		protected SoftReference<MessageDigest> initialValue() {
 			try {
-				return new SoftReference<MessageDigest>(
-						MessageDigest.getInstance("MD5"));
+				return new SoftReference<>(MessageDigest.getInstance("MD5"));
 			} catch (NoSuchAlgorithmException e) {
 				throw new IllegalStateException("md5 algorythm found");
 			}
@@ -33,8 +32,7 @@ public class CodecUtils {
 		@Override
 		protected SoftReference<MessageDigest> initialValue() {
 			try {
-				return new SoftReference<MessageDigest>(
-						MessageDigest.getInstance("SHA"));
+				return new SoftReference<>(MessageDigest.getInstance("SHA"));
 			} catch (NoSuchAlgorithmException e) {
 				throw new IllegalStateException("sha algorythm found");
 			}
@@ -47,7 +45,7 @@ public class CodecUtils {
 		if (instanceRef == null || (md5 = instanceRef.get()) == null) {
 			try {
 				md5 = MessageDigest.getInstance("MD5");
-				instanceRef = new SoftReference<MessageDigest>(md5);
+				instanceRef = new SoftReference<>(md5);
 			} catch (NoSuchAlgorithmException e) {
 				throw new IllegalStateException("md5 algorythm found");
 			}
@@ -92,7 +90,7 @@ public class CodecUtils {
 		if (instanceRef == null || (sha = instanceRef.get()) == null) {
 			try {
 				sha = MessageDigest.getInstance("SHA");
-				instanceRef = new SoftReference<MessageDigest>(sha);
+				instanceRef = new SoftReference<>(sha);
 			} catch (NoSuchAlgorithmException e) {
 				throw new IllegalStateException("sha algorythm found");
 			}
@@ -133,8 +131,7 @@ public class CodecUtils {
 
 	public static String fuzzify(String input) {
 		try {
-			byte[] bytes = Base64
-					.encodeBase64(input.getBytes(DEFAULT_ENCODING));
+			byte[] bytes = Base64.encodeBase64(input.getBytes(DEFAULT_ENCODING));
 			swap(bytes);
 			return new String(bytes);
 		} catch (UnsupportedEncodingException e) {
@@ -231,8 +228,7 @@ public class CodecUtils {
 		BigInteger i = new BigInteger(hex, 16);
 		BigInteger radix = BigInteger.valueOf(62);
 		while (i.compareTo(radix) >= 0) {
-			buf[charPos--] = NumberUtils.NUMBERS
-					.charAt(i.mod(radix).intValue());
+			buf[charPos--] = NumberUtils.NUMBERS.charAt(i.mod(radix).intValue());
 			i = i.divide(radix);
 		}
 		buf[charPos] = NumberUtils.NUMBERS.charAt(i.intValue());

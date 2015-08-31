@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * jvnet/glassfish/comms/clb/core/util/ConsistentHash.java
  */
 public class ConsistentHash<K, V> {
-	private Map<V, Integer> nodes = new HashMap<V, Integer>();
+	private Map<V, Integer> nodes = new HashMap<>();
 	private int totalWeights;
 	private Point<V>[] points;
 	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);

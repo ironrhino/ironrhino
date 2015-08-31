@@ -21,11 +21,11 @@ public class HessianServer extends HessianServiceExporter {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<Class<?>>();
+	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<>();
 
-	private static ThreadLocal<Object> service = new ThreadLocal<Object>();
+	private static ThreadLocal<Object> service = new ThreadLocal<>();
 
-	private Map<Class<?>, HessianSkeleton> skeletons = new HashMap<Class<?>, HessianSkeleton>();
+	private Map<Class<?>, HessianSkeleton> skeletons = new HashMap<>();
 
 	private ServiceRegistry serviceRegistry;
 

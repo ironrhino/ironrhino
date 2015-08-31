@@ -62,26 +62,22 @@ public class ConsoleAction extends BaseAction {
 
 	@Override
 	@InputConfig(resultName = "success")
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "expression", trim = true, key = "validation.required") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "expression", trim = true, key = "validation.required") })
 	public String execute() throws Exception {
 		try {
 			result = applicationContextConsole.execute(expression, scope);
-			addActionMessage(getText("operate.success")
-					+ (result != null ? (":" + JsonUtils.toJson(result)) : ""));
+			addActionMessage(getText("operate.success") + (result != null ? (":" + JsonUtils.toJson(result)) : ""));
 			return SUCCESS;
 		} catch (Throwable throwable) {
 			if (throwable instanceof InvocationTargetException)
-				throwable = ((InvocationTargetException) throwable)
-						.getTargetException();
+				throwable = ((InvocationTargetException) throwable).getTargetException();
 			if (throwable.getCause() instanceof InvocationTargetException)
-				throwable = ((InvocationTargetException) throwable.getCause())
-						.getTargetException();
+				throwable = ((InvocationTargetException) throwable.getCause()).getTargetException();
 			log.error(throwable.getMessage(), throwable);
 			String msg = throwable.getMessage();
-			addActionError(getText("error")
-					+ (StringUtils.isNotBlank(msg) ? (": " + throwable
-							.getMessage()) : ""));
-			Map<String, Collection<String>> map = new HashMap<String, Collection<String>>();
+			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + throwable.getMessage()) : ""));
+			Map<String, Collection<String>> map = new HashMap<>();
 			map.put("actionErrors", getActionErrors());
 			return ERROR;
 
@@ -89,21 +85,19 @@ public class ConsoleAction extends BaseAction {
 	}
 
 	@InputConfig(resultName = "success")
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "expression", trim = true, key = "validation.required") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "expression", trim = true, key = "validation.required") })
 	@JsonConfig(root = "result")
 	public String executeJson() {
 		try {
 			result = applicationContextConsole.execute(expression, scope);
 		} catch (Throwable throwable) {
 			if (throwable instanceof InvocationTargetException)
-				throwable = ((InvocationTargetException) throwable)
-						.getTargetException();
+				throwable = ((InvocationTargetException) throwable).getTargetException();
 			log.error(throwable.getMessage(), throwable);
 			String msg = throwable.getMessage();
-			addActionError(getText("error")
-					+ (StringUtils.isNotBlank(msg) ? (": " + throwable
-							.getMessage()) : ""));
-			Map<String, Collection<String>> map = new HashMap<String, Collection<String>>();
+			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + throwable.getMessage()) : ""));
+			Map<String, Collection<String>> map = new HashMap<>();
 			map.put("actionErrors", getActionErrors());
 			result = map;
 		}

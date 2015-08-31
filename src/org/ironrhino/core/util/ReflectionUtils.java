@@ -40,11 +40,11 @@ public class ReflectionUtils {
 		try {
 			classPool.insertClassPath(new ClassClassPath(clazz));
 			CtClass cc = classPool.get(clazz.getName());
-			List<CtClass> ctClasses = new ArrayList<CtClass>();
+			List<CtClass> ctClasses = new ArrayList<>();
 			ctClasses.add(cc);
 			while (!(cc = cc.getSuperclass()).getName().equals(Object.class.getName()))
 				ctClasses.add(0, cc);
-			List<String> fields = new ArrayList<String>();
+			List<String> fields = new ArrayList<>();
 			for (CtClass ctc : ctClasses) {
 				for (CtField cf : ctc.getDeclaredFields()) {
 					int accessFlag = cf.getModifiers();

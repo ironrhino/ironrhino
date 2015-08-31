@@ -129,19 +129,17 @@ public class MonitorAction extends BaseAction {
 				result = statControl.getResult(date, localhost);
 			}
 			if (namespace != null) {
-				Map<String, List<TreeNode>> temp = new HashMap<String, List<TreeNode>>();
+				Map<String, List<TreeNode>> temp = new HashMap<>();
 				temp.put(namespace, result.get(namespace));
 				result = temp;
 			}
 			if (StringUtils.isNotBlank(filter)) {
-				for (Map.Entry<String, List<TreeNode>> entry : result
-						.entrySet()) {
+				for (Map.Entry<String, List<TreeNode>> entry : result.entrySet()) {
 					Iterator<TreeNode> it = entry.getValue().iterator();
 					while (it.hasNext()) {
 						TreeNode node = it.next();
 						String path = node.getName();
-						if (filter.equals(path)
-								|| filter.startsWith(path + ">")) {
+						if (filter.equals(path) || filter.startsWith(path + ">")) {
 							node.filter(filter);
 							node.calculate();
 						} else
@@ -150,7 +148,7 @@ public class MonitorAction extends BaseAction {
 				}
 			}
 		} catch (Exception e) {
-			result = new HashMap<String, List<TreeNode>>();
+			result = new HashMap<>();
 		}
 		return SUCCESS;
 	}
@@ -164,8 +162,7 @@ public class MonitorAction extends BaseAction {
 
 	@JsonConfig(root = "chart")
 	public String data() {
-		chart = statControl.getChart(Key.fromString(getUid()), date, vtype,
-				ctype, localhost);
+		chart = statControl.getChart(Key.fromString(getUid()), date, vtype, ctype, localhost);
 		return JSON;
 	}
 }

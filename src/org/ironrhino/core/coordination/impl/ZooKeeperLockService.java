@@ -28,7 +28,7 @@ public class ZooKeeperLockService implements LockService {
 
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
-	private ConcurrentHashMap<String, InterProcessMutex> locks = new ConcurrentHashMap<String, InterProcessMutex>();
+	private ConcurrentHashMap<String, InterProcessMutex> locks = new ConcurrentHashMap<>();
 
 	@Autowired
 	public ZooKeeperLockService(CuratorFramework curatorFramework) {

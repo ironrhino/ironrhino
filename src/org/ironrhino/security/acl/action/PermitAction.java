@@ -195,8 +195,8 @@ public class PermitAction extends BaseAction {
 						}
 					}
 					Map<String, Collection<String>> map = temp.asMap();
-					Map<String, Collection<String>> tempMap = new LinkedHashMap<String, Collection<String>>();
-					List<String> groups = new ArrayList<String>(map.keySet());
+					Map<String, Collection<String>> tempMap = new LinkedHashMap<>();
+					List<String> groups = new ArrayList<>(map.keySet());
 					Collections.sort(groups);
 					for (String group : groups)
 						tempMap.put(group, map.get(group));
@@ -230,7 +230,7 @@ public class PermitAction extends BaseAction {
 		if (StringUtils.isBlank(role))
 			return ACCESSDENIED;
 		List<Acl> acls = aclManager.findAclsByRole(role);
-		List<String> permitted = new ArrayList<String>();
+		List<String> permitted = new ArrayList<>();
 		for (Acl acl : acls) {
 			if (acl.isPermitted())
 				permitted.add(acl.getResource());

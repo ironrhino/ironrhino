@@ -47,13 +47,13 @@ public class ApiDoc implements Serializable {
 
 	protected String[] methods;
 
-	protected List<FieldObject> pathVariables = new ArrayList<FieldObject>();
+	protected List<FieldObject> pathVariables = new ArrayList<>();
 
-	protected List<FieldObject> requestParams = new ArrayList<FieldObject>();
+	protected List<FieldObject> requestParams = new ArrayList<>();
 
-	protected List<FieldObject> requestHeaders = new ArrayList<FieldObject>();
+	protected List<FieldObject> requestHeaders = new ArrayList<>();
 
-	protected List<FieldObject> cookieValues = new ArrayList<FieldObject>();
+	protected List<FieldObject> cookieValues = new ArrayList<>();
 
 	protected List<FieldObject> requestBody;
 

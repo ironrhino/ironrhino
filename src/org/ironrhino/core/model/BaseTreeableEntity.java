@@ -64,7 +64,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "parent")
 	@OrderBy("displayOrder,name")
-	protected Collection<T> children = new HashSet<T>(0);
+	protected Collection<T> children = new HashSet<>(0);
 
 	@JsonIgnore
 	public String getFullId() {
@@ -229,7 +229,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 
 	@JsonIgnore
 	public List<T> getDescendants() {
-		List<T> ids = new ArrayList<T>();
+		List<T> ids = new ArrayList<>();
 		if (!this.isLeaf())
 			for (Object obj : this.getChildren()) {
 				collect((T) obj, ids);
@@ -239,7 +239,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 
 	@JsonIgnore
 	public List<T> getDescendantsAndSelf() {
-		List<T> ids = new ArrayList<T>();
+		List<T> ids = new ArrayList<>();
 		collect((T) this, ids);
 		return ids;
 	}

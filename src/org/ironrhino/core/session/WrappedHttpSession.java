@@ -34,7 +34,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private transient ServletContext context;
 
-	private Map<String, Object> attrMap = new HashMap<String, Object>(8);
+	private Map<String, Object> attrMap = new HashMap<>(8);
 
 	private long creationTime;
 
@@ -166,7 +166,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	@Override
 	public Enumeration<String> getAttributeNames() {
-		return new IteratorEnumeration<String>(attrMap.keySet().iterator());
+		return new IteratorEnumeration<>(attrMap.keySet().iterator());
 	}
 
 	@Override
@@ -302,7 +302,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	@Deprecated
 	public String[] getValueNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 
 		for (Enumeration<String> e = getAttributeNames(); e.hasMoreElements();) {
 			names.add(e.nextElement());

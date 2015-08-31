@@ -68,7 +68,7 @@ public class IssuePageAction extends BaseAction {
 	@Override
 	public String execute() {
 		if (resultPage == null)
-			resultPage = new ResultPage<Page>();
+			resultPage = new ResultPage<>();
 		ElasticSearchCriteria criteria = new ElasticSearchCriteria();
 		criteria.addSort("createDate", true);
 		resultPage.setCriteria(criteria);

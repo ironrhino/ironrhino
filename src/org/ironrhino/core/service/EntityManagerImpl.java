@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class EntityManagerImpl<T extends Persistable<?>> extends
 		BaseManagerImpl<T> implements EntityManager<T> {
 
-	private ThreadLocal<Class<T>> entityClassHolder = new ThreadLocal<Class<T>>();
+	private ThreadLocal<Class<T>> entityClassHolder = new ThreadLocal<>();
 
 	@Override
 	public void setEntityClass(Class<T> clazz) {

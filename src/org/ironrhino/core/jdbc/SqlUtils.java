@@ -40,7 +40,7 @@ public class SqlUtils {
 		if (StringUtils.isBlank(sql))
 			return Collections.emptySet();
 		sql = clearComments(sql);
-		Set<String> names = new LinkedHashSet<String>();
+		Set<String> names = new LinkedHashSet<>();
 		Matcher m = PARAMETER_PATTERN.matcher(sql);
 		while (m.find())
 			names.add(m.group(1).substring(1));
@@ -58,7 +58,7 @@ public class SqlUtils {
 		sql = clearComments(sql);
 		Pattern tablePattern = Pattern.compile(frontKeyword + "\\s+([\\w\\."
 				+ quoteString + ",\\s]+)", Pattern.CASE_INSENSITIVE);
-		Set<String> names = new LinkedHashSet<String>();
+		Set<String> names = new LinkedHashSet<>();
 		Matcher m = tablePattern.matcher(sql);
 		while (m.find()) {
 			String arr[] = m.group(1).split(",");

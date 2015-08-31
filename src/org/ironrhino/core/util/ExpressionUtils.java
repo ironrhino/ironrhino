@@ -15,9 +15,9 @@ import org.mvel2.templates.TemplateRuntime;
 
 public class ExpressionUtils {
 
-	private static Map<String, CompiledTemplate> templateCache = new ConcurrentHashMap<String, CompiledTemplate>();
+	private static Map<String, CompiledTemplate> templateCache = new ConcurrentHashMap<>();
 
-	private static Map<String, CompiledExpression> expressionCache = new ConcurrentHashMap<String, CompiledExpression>();
+	private static Map<String, CompiledExpression> expressionCache = new ConcurrentHashMap<>();
 
 	public static Object evalExpression(String expression,
 			Map<String, ?> context) {

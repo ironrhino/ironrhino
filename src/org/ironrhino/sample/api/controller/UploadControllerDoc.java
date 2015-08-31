@@ -15,7 +15,7 @@ public class UploadControllerDoc extends UploadController {
 	@Override
 	@Api("上传文件")
 	public Map<String, Object> upload(String name, MultipartFile file) {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		result.put("name", "name");
 		result.put("size", 10000);
 		result.put("contentType", "application/zip");

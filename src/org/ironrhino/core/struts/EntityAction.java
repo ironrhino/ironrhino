@@ -381,7 +381,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			resultPage.setCriteria(doPrepareCriteria(entityManager, bw, richtableConfig, searchable, ownerProperty));
 			resultPage = entityManager.findByResultPage(resultPage);
 		} else {
-			Set<String> searchableProperties = new HashSet<String>();
+			Set<String> searchableProperties = new HashSet<>();
 			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 				if (entry.getValue().isSearchable())
 					searchableProperties.add(entry.getKey());
@@ -472,7 +472,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		if (searchable && StringUtils.isNotBlank(keyword)) {
-			Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<String, MatchMode>();
+			Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<>();
 			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 				if (entry.getValue().isSearchable() && !entry.getValue().isExcludedFromLike()) {
 					if (String.class.equals(entry.getValue().getPropertyType())) {
@@ -824,7 +824,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				bw.setConversionService(conversionService);
 				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 				bwp.setConversionService(conversionService);
-				Set<String> editedPropertyNames = new HashSet<String>();
+				Set<String> editedPropertyNames = new HashSet<>();
 				String propertyName = null;
 				for (String parameterName : ServletActionContext.getRequest().getParameterMap().keySet()) {
 					if (parameterName.startsWith(getEntityName() + '.')
@@ -931,7 +931,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					}
 				}
 
-				Set<String> editedPropertyNames = new HashSet<String>();
+				Set<String> editedPropertyNames = new HashSet<>();
 				String propertyName = null;
 				for (String parameterName : ServletActionContext.getRequest().getParameterMap().keySet()) {
 					if (parameterName.startsWith(getEntityName() + '.')
@@ -1053,7 +1053,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				Template template = new Template(null, "${(" + expression + ")?string!}",
 						freemarkerManager.getConfig());
 				StringWriter sw = new StringWriter();
-				Map<String, Object> rootMap = new HashMap<String, Object>(2, 1);
+				Map<String, Object> rootMap = new HashMap<>(2, 1);
 				rootMap.put("entity", entity);
 				template.process(rootMap, sw);
 				return sw.toString().equals("true");
@@ -1070,7 +1070,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				Template template = new Template(null, "${(" + expression + ")?string!}",
 						freemarkerManager.getConfig());
 				StringWriter sw = new StringWriter();
-				Map<String, Object> rootMap = new HashMap<String, Object>(4, 1);
+				Map<String, Object> rootMap = new HashMap<>(4, 1);
 				rootMap.put("entity", entity);
 				rootMap.put("value", value);
 				template.process(rootMap, sw);
@@ -1097,7 +1097,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (!UserDetails.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("property " + propertyName + " of bean " + getEntityClass()
 					+ " is not instanceof " + UserDetails.class);
-		return new Tuple<Owner, Class<? extends UserDetails>>(owner, type);
+		return new Tuple<>(owner, type);
 	}
 
 	@Override
@@ -1145,7 +1145,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 			}
 		}
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
+		Map<String, Object> map = new LinkedHashMap<>();
 		Set<String> jsonIgnores = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), JsonIgnore.class);
 		for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 			if (jsonIgnores.contains(entry.getKey()))
@@ -1309,7 +1309,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					Template csvTemplate = csvTemplates.get(exportColumnsList.get(i));
 					if (csvTemplate != null) {
 						StringWriter sw = new StringWriter();
-						Map<String, Object> rootMap = new HashMap<String, Object>(4, 1);
+						Map<String, Object> rootMap = new HashMap<>(4, 1);
 						rootMap.put("entity", en);
 						rootMap.put("value", value);
 						try {

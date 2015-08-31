@@ -30,9 +30,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Autowired
 	private ConfigurableApplicationContext ctx;
 
-	protected Map<String, List<String>> importServices = new ConcurrentHashMap<String, List<String>>();
+	protected Map<String, List<String>> importServices = new ConcurrentHashMap<>();
 
-	protected Map<String, Object> exportServices = new HashMap<String, Object>();
+	protected Map<String, Object> exportServices = new HashMap<>();
 
 	protected String host;
 

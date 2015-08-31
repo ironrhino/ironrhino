@@ -47,7 +47,7 @@ public class DictionaryControl {
 	public void refresh() {
 		entityManager.setEntityClass(Dictionary.class);
 		List<Dictionary> list = entityManager.findAll(Order.asc("name"));
-		Map<String, Dictionary> temp = new ConcurrentHashMap<String, Dictionary>();
+		Map<String, Dictionary> temp = new ConcurrentHashMap<>();
 		for (Dictionary d : list)
 			temp.put(d.getName(), d);
 		map = temp;

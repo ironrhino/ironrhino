@@ -15,9 +15,9 @@ import org.ironrhino.core.stat.Value;
 
 public class PeriodAnalyzer extends AbstractAnalyzer<List<Value>> {
 
-	private List<Value> result = new ArrayList<Value>(24);
+	private List<Value> result = new ArrayList<>(24);
 
-	private Map<String, List<Value>> perHostResult = new TreeMap<String, List<Value>>();
+	private Map<String, List<Value>> perHostResult = new TreeMap<>();
 
 	private Key key;
 
@@ -103,7 +103,7 @@ public class PeriodAnalyzer extends AbstractAnalyzer<List<Value>> {
 		if (perHostEnabled) {
 			List<Value> list = perHostResult.get(pair.getHost());
 			if (list == null) {
-				list = new ArrayList<Value>(24);
+				list = new ArrayList<>(24);
 				for (int i = 0; i < 24; i++)
 					list.add(new Value());
 				perHostResult.put(pair.getHost(), list);

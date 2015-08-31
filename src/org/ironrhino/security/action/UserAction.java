@@ -122,7 +122,7 @@ public class UserAction extends EntityAction<User> {
 	@Override
 	public String input() {
 		Map<String, String> map = userRoleManager.getAllRoles(true);
-		roles = new ArrayList<LabelValue>(map.size());
+		roles = new ArrayList<>(map.size());
 		for (Map.Entry<String, String> entry : map.entrySet())
 			roles.add(new LabelValue(
 					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue()
@@ -140,7 +140,7 @@ public class UserAction extends EntityAction<User> {
 			for (String r : userRoles) {
 				if (!map.containsKey(r)) {
 					if (hiddenRoles == null)
-						hiddenRoles = new LinkedHashSet<String>();
+						hiddenRoles = new LinkedHashSet<>();
 					hiddenRoles.add(r);
 				}
 			}
@@ -307,7 +307,7 @@ public class UserAction extends EntityAction<User> {
 		Map<String, String> map = userRoleManager
 				.getAllRoles(ServletActionContext.getRequest().getParameter(
 						"excludeBuiltin") != null);
-		roles = new ArrayList<LabelValue>(map.size());
+		roles = new ArrayList<>(map.size());
 		for (Map.Entry<String, String> entry : map.entrySet())
 			roles.add(new LabelValue(
 					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue()

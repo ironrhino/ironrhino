@@ -96,7 +96,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 	}
 
 	private void populateAuthorities(User user) {
-		List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
+		List<GrantedAuthority> auths = new ArrayList<>();
 		auths.add(new SimpleGrantedAuthority(UserRole.ROLE_BUILTIN_USER));
 		for (String role : user.getRoles())
 			auths.add(new SimpleGrantedAuthority(role));

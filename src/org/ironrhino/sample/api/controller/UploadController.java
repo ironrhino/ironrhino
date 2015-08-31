@@ -26,7 +26,7 @@ public class UploadController {
 	@ResponseBody
 	public Map<String, Object> upload(@RequestParam("name") String name,
 			@RequestParam("file") MultipartFile file) {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		result.put("name", name);
 		if (!file.isEmpty()) {
 			result.put("size", file.getSize());

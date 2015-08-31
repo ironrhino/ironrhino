@@ -52,7 +52,7 @@ public class ClientAction extends EntityAction<Client> {
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("owner", AuthzUtils.<User> getUserDetails()));
 		if (resultPage == null)
-			resultPage = new ResultPage<Client>();
+			resultPage = new ResultPage<>();
 		resultPage.setCriteria(dc);
 		resultPage = entityManager.findByResultPage(resultPage);
 		return "mine";
@@ -73,7 +73,7 @@ public class ClientAction extends EntityAction<Client> {
 		if (id != null) {
 			List<Client> list;
 			if (id.length == 1) {
-				list = new ArrayList<Client>(1);
+				list = new ArrayList<>(1);
 				list.add(entityManager.get(id[0]));
 			} else {
 				DetachedCriteria dc = entityManager.detachedCriteria();

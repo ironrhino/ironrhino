@@ -35,7 +35,7 @@ public class RedisMembership implements Membership {
 
 	private RedisTemplate<String, String> stringRedisTemplate;
 
-	private Set<String> groups = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+	private Set<String> groups = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
 	@Autowired
 	private TaskScheduler taskScheduler;

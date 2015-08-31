@@ -49,7 +49,7 @@ public class SettingControl {
 	public void refresh() {
 		entityManager.setEntityClass(Setting.class);
 		List<Setting> list = entityManager.findAll(Order.asc("key"));
-		Map<String, Setting> temp = new ConcurrentHashMap<String, Setting>();
+		Map<String, Setting> temp = new ConcurrentHashMap<>();
 		for (Setting s : list)
 			temp.put(s.getKey(), s);
 		settings = temp;
@@ -128,7 +128,7 @@ public class SettingControl {
 	}
 
 	public List<Setting> getAllBooleanSettings() {
-		List<Setting> list = new ArrayList<Setting>();
+		List<Setting> list = new ArrayList<>();
 		for (Setting s : settings.values()) {
 			String value = s.getValue();
 			if ("true".equals(value) || "false".equals(value))

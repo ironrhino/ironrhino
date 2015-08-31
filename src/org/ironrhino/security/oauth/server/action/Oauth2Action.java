@@ -1,6 +1,7 @@
 package org.ironrhino.security.oauth.server.action;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -89,7 +90,7 @@ public class Oauth2Action extends BaseAction {
 	private Authorization authorization;
 	private Client client;
 
-	private Map<String, Object> tojson;
+	private Map<String, Serializable> tojson;
 	private boolean displayForNative;
 	private boolean granted;
 	private boolean denied;
@@ -110,7 +111,7 @@ public class Oauth2Action extends BaseAction {
 		this.password = password;
 	}
 
-	public Map<String, Object> getTojson() {
+	public Map<String, Serializable> getTojson() {
 		return tojson;
 	}
 
@@ -408,7 +409,7 @@ public class Oauth2Action extends BaseAction {
 				}
 				return NONE;
 			}
-			tojson = new HashMap<String, Object>();
+			tojson = new HashMap<>();
 			tojson.put("access_token", authorization.getAccessToken());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
@@ -434,7 +435,7 @@ public class Oauth2Action extends BaseAction {
 				}
 				return NONE;
 			}
-			tojson = new HashMap<String, Object>();
+			tojson = new HashMap<>();
 			tojson.put("access_token", authorization.getAccessToken());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
@@ -445,7 +446,7 @@ public class Oauth2Action extends BaseAction {
 			client.setSecret(client_secret);
 			try {
 				authorization = oauthManager.refresh(client, refresh_token);
-				tojson = new HashMap<String, Object>();
+				tojson = new HashMap<>();
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
@@ -481,7 +482,7 @@ public class Oauth2Action extends BaseAction {
 			client.setRedirectUri(redirect_uri);
 			try {
 				authorization = oauthManager.authenticate(code, client);
-				tojson = new HashMap<String, Object>();
+				tojson = new HashMap<>();
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
@@ -509,7 +510,7 @@ public class Oauth2Action extends BaseAction {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		if (access_token == null && token != null)
 			access_token = token;
-		tojson = new HashMap<String, Object>();
+		tojson = new HashMap<>();
 		authorization = oauthManager.retrieve(access_token);
 		if (authorization == null) {
 			if (httpErrorHandler != null

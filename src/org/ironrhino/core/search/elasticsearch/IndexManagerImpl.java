@@ -104,8 +104,8 @@ public class IndexManagerImpl implements IndexManager {
 
 		});
 		Collection<Class<?>> set = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), Searchable.class);
-		typeClassMapping = new HashMap<String, Class>(set.size());
-		schemaMapping = new HashMap<Class, Map<String, Object>>(set.size());
+		typeClassMapping = new HashMap<>(set.size());
+		schemaMapping = new HashMap<>(set.size());
 		for (Class c : set) {
 			Searchable searchable = (Searchable) c.getAnnotation(Searchable.class);
 			if (!searchable.root() || c.getSimpleName().contains("$"))
@@ -122,8 +122,8 @@ public class IndexManagerImpl implements IndexManager {
 	}
 
 	private static Map<String, Object> getSchemaMapping(Class c, boolean component) {
-		Map<String, Object> mapping = new HashMap<String, Object>();
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> mapping = new HashMap<>();
+		Map<String, Object> properties = new HashMap<>();
 		if (component)
 			mapping.put("type", "object");
 		mapping.put("properties", properties);
@@ -483,7 +483,7 @@ public class IndexManagerImpl implements IndexManager {
 			logger.error(e.getMessage(), e);
 		}
 		for (Map.Entry<Class, Map<String, Object>> entry : schemaMapping.entrySet()) {
-			HashMap<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+			HashMap<String, Map<String, Object>> map = new HashMap<>();
 			map.put(classToType(entry.getKey()), entry.getValue());
 			String mapping = JsonUtils.toJson(map);
 			if (logger.isDebugEnabled())

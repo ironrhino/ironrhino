@@ -137,7 +137,7 @@ public class ElasticSearchService<T> implements SearchService<T> {
 		try {
 			SearchResponse response = srb.execute().get();
 			StringTerms aggr = response.getAggregations().get(field);
-			Map<String, Integer> result = new LinkedHashMap<String, Integer>();
+			Map<String, Integer> result = new LinkedHashMap<>();
 			for (Terms.Bucket bucket : aggr.getBuckets()) {
 				result.put(bucket.getKey(), (int) bucket.getDocCount());
 			}

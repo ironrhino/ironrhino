@@ -119,7 +119,7 @@ public class RedisCacheManager implements CacheManager {
 		if (map == null)
 			return;
 		try {
-			final Map<byte[], byte[]> actualMap = new HashMap<byte[], byte[]>();
+			final Map<byte[], byte[]> actualMap = new HashMap<>();
 			for (Map.Entry<String, Object> entry : map.entrySet())
 				actualMap.put(redisTemplate.getKeySerializer().serialize(generateKey(entry.getKey(), namespace)),
 						redisTemplate.getValueSerializer().serialize(entry.getValue()));
@@ -147,13 +147,13 @@ public class RedisCacheManager implements CacheManager {
 	public Map<String, Object> mget(Collection<String> keys, String namespace) {
 		if (keys == null)
 			return null;
-		final List<byte[]> _keys = new ArrayList<byte[]>();
+		final List<byte[]> _keys = new ArrayList<>();
 		for (String key : keys)
 			_keys.add(redisTemplate.getKeySerializer().serialize(generateKey(key, namespace)));
 		try {
 			List<byte[]> values = (List<byte[]>) redisTemplate
 					.execute((RedisConnection conn) -> conn.mGet(_keys.toArray(new byte[0][0])));
-			Map<String, Object> map = new HashMap<String, Object>();
+			Map<String, Object> map = new HashMap<>();
 			int i = 0;
 			for (String key : keys) {
 				map.put(key, redisTemplate.getValueSerializer().deserialize(values.get(i)));

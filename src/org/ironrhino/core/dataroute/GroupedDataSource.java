@@ -41,17 +41,17 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 
 	private DataSource master;
 
-	private Map<String, DataSource> writeSlaves = new HashMap<String, DataSource>();
+	private Map<String, DataSource> writeSlaves = new HashMap<>();
 
-	private Map<String, DataSource> readSlaves = new HashMap<String, DataSource>();
+	private Map<String, DataSource> readSlaves = new HashMap<>();
 
 	private RoundRobin<String> readRoundRobin;
 
 	private RoundRobin<String> writeRoundRobin;
 
-	private Set<DataSource> deadDataSources = new HashSet<DataSource>();
+	private Set<DataSource> deadDataSources = new HashSet<>();
 
-	private Map<DataSource, Integer> failureCount = new ConcurrentHashMap<DataSource, Integer>();
+	private Map<DataSource, Integer> failureCount = new ConcurrentHashMap<>();
 
 	private int deadFailureThreshold = 3;
 
@@ -104,13 +104,13 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 				writeSlaves.put(name, (DataSource) beanFactory.getBean(name));
 			if (masterName != null)
 				writeSlaves.put(masterName, master);
-			writeRoundRobin = new RoundRobin<String>(writeSlaveNames,
+			writeRoundRobin = new RoundRobin<>(writeSlaveNames,
 					(target) -> !deadDataSources.contains(writeSlaves.get(target)));
 		}
 		if (readSlaveNames != null && readSlaveNames.size() > 0) {
 			for (String name : readSlaveNames.keySet())
 				readSlaves.put(name, (DataSource) beanFactory.getBean(name));
-			readRoundRobin = new RoundRobin<String>(readSlaveNames,
+			readRoundRobin = new RoundRobin<>(readSlaveNames,
 					(target) -> !deadDataSources.contains(readSlaves.get(target)));
 		}
 	}

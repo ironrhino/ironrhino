@@ -98,7 +98,7 @@ public class WebProxyFilter implements Filter {
 		if (httpRequest instanceof HttpEntityEnclosingRequestBase) {
 			Enumeration<String> en = request.getParameterNames();
 			if (en.hasMoreElements()) {
-				List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+				List<NameValuePair> nvps = new ArrayList<>();
 				while (en.hasMoreElements()) {
 					String name = en.nextElement();
 					for (String value : request.getParameterValues(name))

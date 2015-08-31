@@ -34,7 +34,7 @@ public class Blowfish {
 	private static final ThreadLocal<SoftReference<Blowfish>> pool = new ThreadLocal<SoftReference<Blowfish>>() {
 		@Override
 		protected SoftReference<Blowfish> initialValue() {
-			return new SoftReference<Blowfish>(new Blowfish());
+			return new SoftReference<>(new Blowfish());
 		}
 	};
 
@@ -135,7 +135,7 @@ public class Blowfish {
 		Blowfish instance;
 		if (instanceRef == null || (instance = instanceRef.get()) == null) {
 			instance = new Blowfish();
-			instanceRef = new SoftReference<Blowfish>(instance);
+			instanceRef = new SoftReference<>(instance);
 			pool.set(instanceRef);
 		}
 		return instance;

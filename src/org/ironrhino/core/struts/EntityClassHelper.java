@@ -55,7 +55,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 public class EntityClassHelper {
 
-	private static Map<Class<?>, Map<String, UiConfigImpl>> cache = new ConcurrentHashMap<Class<?>, Map<String, UiConfigImpl>>(
+	private static Map<Class<?>, Map<String, UiConfigImpl>> cache = new ConcurrentHashMap<>(
 			64);
 
 	public static Map<String, UiConfigImpl> getUiConfigs(Class<?> entityClass) {
@@ -70,8 +70,8 @@ public class EntityClassHelper {
 				Map<String, NaturalId> naturalIds = org.ironrhino.core.util.AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(entityClass,
 								NaturalId.class);
-				Set<String> hides = new HashSet<String>();
-				map = new HashMap<String, UiConfigImpl>();
+				Set<String> hides = new HashSet<>();
+				map = new HashMap<>();
 				PropertyDescriptor[] pds = org.springframework.beans.BeanUtils
 						.getPropertyDescriptors(entityClass);
 				List<String> fields = ReflectionUtils.getAllFields(entityClass);
@@ -538,7 +538,7 @@ public class EntityClassHelper {
 							String s = searchableComponent
 									.nestSearchableProperties();
 							if (StringUtils.isNotBlank(s)) {
-								Set<String> nestSearchableProperties = new LinkedHashSet<String>();
+								Set<String> nestSearchableProperties = new LinkedHashSet<>();
 								nestSearchableProperties.addAll(Arrays.asList(s
 										.split("\\s*,\\s*")));
 								uci.setNestSearchableProperties(nestSearchableProperties);
@@ -553,7 +553,7 @@ public class EntityClassHelper {
 							if (uci.getPropertyType() != null
 									&& Persistable.class.isAssignableFrom(uci
 											.getPropertyType())) {
-								List<String> list = new ArrayList<String>(
+								List<String> list = new ArrayList<>(
 										naturalIds.size() - 1);
 								for (String name : naturalIds.keySet())
 									if (!name.equals(pd.getName()))
@@ -569,10 +569,10 @@ public class EntityClassHelper {
 					}
 					map.put(propertyName, uci);
 				}
-				List<Map.Entry<String, UiConfigImpl>> list = new ArrayList<Map.Entry<String, UiConfigImpl>>(
+				List<Map.Entry<String, UiConfigImpl>> list = new ArrayList<>(
 						map.entrySet());
 				Collections.sort(list, comparator);
-				Map<String, UiConfigImpl> sortedMap = new LinkedHashMap<String, UiConfigImpl>();
+				Map<String, UiConfigImpl> sortedMap = new LinkedHashMap<>();
 				for (Map.Entry<String, UiConfigImpl> entry : list)
 					sortedMap.put(entry.getKey(), entry.getValue());
 				map = sortedMap;
@@ -584,7 +584,7 @@ public class EntityClassHelper {
 
 	public static Map<String, UiConfigImpl> filterPropertyNamesInCriteria(
 			Map<String, UiConfigImpl> uiConfigs) {
-		Map<String, UiConfigImpl> propertyNamesInCriterion = new LinkedHashMap<String, UiConfigImpl>();
+		Map<String, UiConfigImpl> propertyNamesInCriterion = new LinkedHashMap<>();
 		for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
 			if (!entry.getValue().isExcludedFromCriteria()
 					&& !entry.getKey().endsWith("AsString")
@@ -621,7 +621,7 @@ public class EntityClassHelper {
 				: new StringBuilder("/").append(StringUtils
 						.uncapitalize(entityClass.getSimpleName()));
 		sb.append("/pick");
-		Set<String> columns = new LinkedHashSet<String>();
+		Set<String> columns = new LinkedHashSet<>();
 		BeanWrapperImpl bw = new BeanWrapperImpl(entityClass);
 		if (BaseTreeableEntity.class.isAssignableFrom(entityClass)) {
 			FullnameSeperator fs = entityClass

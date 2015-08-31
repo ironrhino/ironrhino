@@ -5,10 +5,12 @@ import org.ironrhino.core.model.Displayable;
 public enum SchemaFieldType implements Displayable {
 	SELECT, CHECKBOX, INPUT, GROUP;
 
+	@Override
 	public String getName() {
 		return name();
 	}
 
+	@Override
 	public String getDisplayName() {
 		return Displayable.super.getDisplayName();
 	}

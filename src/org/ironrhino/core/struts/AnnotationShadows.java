@@ -28,7 +28,7 @@ public class AnnotationShadows {
 		private int maxlength;
 		private String regex;
 		private boolean trim = true;
-		private Set<String> cssClasses = new ConcurrentSkipListSet<String>();
+		private Set<String> cssClasses = new ConcurrentSkipListSet<>();
 		private String thCssClass = "";
 		private ReadonlyImpl readonly = new ReadonlyImpl();
 		private int displayOrder = Integer.MAX_VALUE;
@@ -43,7 +43,7 @@ public class AnnotationShadows {
 		private String inputTemplate = "";
 		private String csvTemplate = "";
 		private String width;
-		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<String, String>(0);
+		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<>(0);
 		private String cellDynamicAttributes = "";
 		private boolean excludeIfNotEdited;
 		private String listKey = UiConfig.DEFAULT_LIST_KEY;

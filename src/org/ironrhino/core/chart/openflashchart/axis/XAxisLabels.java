@@ -70,6 +70,6 @@ public class XAxisLabels extends Label {
 
 	private synchronized void checkLabels() {
 		if (labels == null)
-			labels = new ArrayList<Object>();
+			labels = new ArrayList<>();
 	}
 }

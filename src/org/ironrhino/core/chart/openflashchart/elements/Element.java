@@ -21,7 +21,7 @@ public abstract class Element implements Serializable {
 	private Boolean gradientFill;
 	@JsonProperty("key-on-click")
 	private String key_on_click;
-	private List<Object> values = new ArrayList<Object>();
+	private List<Object> values = new ArrayList<>();
 
 	protected Element(String type) {
 		this.type = type;

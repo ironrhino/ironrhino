@@ -108,7 +108,7 @@ public class RegionSetup {
 		}
 		AopContext.setBypass(PublishAspect.class);
 		entityManager.save(region);
-		List<Region> list = new ArrayList<Region>();
+		List<Region> list = new ArrayList<>();
 		for (Region child : region.getChildren())
 			list.add(child);
 		Collections.sort(list);
@@ -117,14 +117,14 @@ public class RegionSetup {
 	}
 
 	private static Map<String, String> regionAreacodeMap() {
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 		try (InputStream is = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("resources/data/region_code.txt")) {
 			lines = IOUtils.readLines(is, "utf-8");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		for (String line : lines) {
 			if (StringUtils.isBlank(line))
 				continue;
@@ -163,7 +163,7 @@ public class RegionSetup {
 
 			@Override
 			public Iterator<String> getPrefixes(String namespaceURI) {
-				List<String> prefix = new ArrayList<String>();
+				List<String> prefix = new ArrayList<>();
 				prefix.add("kml");
 				return prefix.iterator();
 			}

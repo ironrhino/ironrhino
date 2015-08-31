@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RoundRobin<T> {
 
-	protected List<TargetWrapper<T>> targetWrappers = new ArrayList<TargetWrapper<T>>();
+	protected List<TargetWrapper<T>> targetWrappers = new ArrayList<>();
 
 	protected UsableChecker<T> usableChecker;
 
@@ -20,7 +20,7 @@ public class RoundRobin<T> {
 		if (targets == null || targets.size() == 0)
 			throw new IllegalArgumentException("no target");
 		for (T target : targets) {
-			TargetWrapper<T> tw = new TargetWrapper<T>(target);
+			TargetWrapper<T> tw = new TargetWrapper<>(target);
 			targetWrappers.add(tw);
 		}
 		this.usableChecker = usableChecker;
@@ -34,7 +34,7 @@ public class RoundRobin<T> {
 		if (targets == null || targets.size() == 0)
 			throw new IllegalArgumentException("no target");
 		for (Map.Entry<T, Integer> entry : targets.entrySet()) {
-			TargetWrapper<T> tw = new TargetWrapper<T>(entry.getKey(), entry.getValue());
+			TargetWrapper<T> tw = new TargetWrapper<>(entry.getKey(), entry.getValue());
 			targetWrappers.add(tw);
 		}
 		this.usableChecker = usableChecker;

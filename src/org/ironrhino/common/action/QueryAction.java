@@ -37,7 +37,7 @@ public class QueryAction extends BaseAction {
 
 	protected List<String> tables;
 
-	protected Map<String, String> paramMap = new HashMap<String, String>();
+	protected Map<String, String> paramMap = new HashMap<>();
 
 	protected ResultPage<Map<String, Object>> resultPage;
 
@@ -93,9 +93,9 @@ public class QueryAction extends BaseAction {
 				}
 			}
 			if (resultPage == null) {
-				resultPage = new ResultPage<Map<String, Object>>();
+				resultPage = new ResultPage<>();
 			}
-			Map<String, String> copy = new HashMap<String, String>();
+			Map<String, String> copy = new HashMap<>();
 			copy.putAll(paramMap);
 			resultPage.setCriteria(new QueryCriteria(sql, copy));
 			resultPage = jdbcQueryService.query(resultPage);
@@ -121,8 +121,7 @@ public class QueryAction extends BaseAction {
 			HttpServletResponse response = ServletActionContext.getResponse();
 			response.setCharacterEncoding(csvDefaultEncoding);
 			response.setHeader("Content-type", "text/csv");
-			response.setHeader("Content-disposition",
-					"attachment;filename=data.csv");
+			response.setHeader("Content-disposition", "attachment;filename=data.csv");
 			final PrintWriter writer = response.getWriter();
 			jdbcQueryService.query(sql, paramMap, new LineHandler() {
 				@Override

@@ -42,24 +42,19 @@ public class JavaSourceExecutor {
 
 	public static Class<?> compile(String code) throws Exception {
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		StandardJavaFileManager stdFileManager = compiler
-				.getStandardFileManager(null, null, null);
-		JavaFileManager fileManager = new ForwardingJavaFileManager<StandardJavaFileManager>(
-				stdFileManager) {
+		StandardJavaFileManager stdFileManager = compiler.getStandardFileManager(null, null, null);
+		JavaFileManager fileManager = new ForwardingJavaFileManager<StandardJavaFileManager>(stdFileManager) {
 
 			@Override
-			public JavaFileObject getJavaFileForOutput(Location location,
-					final String className, Kind kind, FileObject sibling)
-					throws IOException {
-				JavaFileObject jfo = super.getJavaFileForOutput(location,
-						className, kind, sibling);
+			public JavaFileObject getJavaFileForOutput(Location location, final String className, Kind kind,
+					FileObject sibling) throws IOException {
+				JavaFileObject jfo = super.getJavaFileForOutput(location, className, kind, sibling);
 				return new ForwardingJavaFileObject<JavaFileObject>(jfo) {
 
 					@Override
 					public OutputStream openOutputStream() throws IOException {
 						ByteArrayOutputStream bos = new ByteArrayOutputStream();
-						ByteArrayClassLoader.getInstance().defineClass(
-								className, bos);
+						ByteArrayClassLoader.getInstance().defineClass(className, bos);
 						return bos;
 					}
 				};
@@ -67,18 +62,15 @@ public class JavaSourceExecutor {
 		};
 		code = complete(code);
 		JavaSource source = new JavaSource(extractClassName(code), code);
-		List<JavaFileObject> list = new ArrayList<JavaFileObject>();
+		List<JavaFileObject> list = new ArrayList<>();
 		list.add(source);
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-		compiler.getTask(null, fileManager, diagnostics, null, null, list)
-				.call();
+		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+		compiler.getTask(null, fileManager, diagnostics, null, null, list).call();
 		fileManager.close();
-		List<Diagnostic<? extends JavaFileObject>> diagnos = diagnostics
-				.getDiagnostics();
+		List<Diagnostic<? extends JavaFileObject>> diagnos = diagnostics.getDiagnostics();
 		if (diagnos.size() > 0) {
 			StringBuilder sb = new StringBuilder();
-			for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics
-					.getDiagnostics()) {
+			for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
 				sb.append("Error [");
 				sb.append(diagnostic.getMessage(null));
 				sb.append("] on line ");
@@ -88,8 +80,7 @@ public class JavaSourceExecutor {
 			}
 			throw new RuntimeException(sb.toString());
 		}
-		return ByteArrayClassLoader.getInstance().loadClass(
-				source.getClassName());
+		return ByteArrayClassLoader.getInstance().loadClass(source.getClassName());
 	}
 
 	private static String complete(String code) {
@@ -132,8 +123,7 @@ public class JavaSourceExecutor {
 		private String className;
 
 		JavaSource(String className, String code) {
-			super(URI.create("string:///" + className.replace('.', '/')
-					+ Kind.SOURCE.extension), Kind.SOURCE);
+			super(URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
 			this.className = className;
 			this.code = code;
 		}
@@ -159,7 +149,7 @@ public class JavaSourceExecutor {
 					}
 				});
 
-		private Map<String, ByteArrayOutputStream> bytes = new HashMap<String, ByteArrayOutputStream>();
+		private Map<String, ByteArrayOutputStream> bytes = new HashMap<>();
 
 		public static ByteArrayClassLoader getInstance() {
 			return instance;

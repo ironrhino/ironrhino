@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class StackedBarChart extends Element {
 
 	private static final long serialVersionUID = -4495162733156231531L;
-	private List<Key> keys = new ArrayList<Key>();
+	private List<Key> keys = new ArrayList<>();
 
 	public StackedBarChart() {
 		super("bar_stack");
@@ -75,7 +75,7 @@ public class StackedBarChart extends Element {
 		private List<Object> values;
 
 		public Stack() {
-			values = new ArrayList<Object>();
+			values = new ArrayList<>();
 		}
 
 		Stack(List<Object> values) {

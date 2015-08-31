@@ -34,7 +34,7 @@ public class SessionCompressorManager {
 
 	public String compress(WrappedHttpSession session) {
 		Map<String, Object> map = session.getAttrMap();
-		Map<String, String> compressedMap = new HashMap<String, String>();
+		Map<String, String> compressedMap = new HashMap<>();
 		for (Map.Entry<String, Object> entry : map.entrySet()) {
 			String key = entry.getKey();
 			Object value = entry.getValue();

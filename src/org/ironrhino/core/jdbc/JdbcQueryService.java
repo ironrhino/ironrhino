@@ -67,7 +67,7 @@ public class JdbcQueryService {
 
 	private String quoteString = "\"";
 
-	private List<String> keywords = new ArrayList<String>();
+	private List<String> keywords = new ArrayList<>();
 
 	@Value("${csv.maxRows:0}")
 	private int csvMaxRows;
@@ -158,7 +158,7 @@ public class JdbcQueryService {
 
 	@Transactional(readOnly = true)
 	public List<String> getTables() {
-		List<String> tables = new ArrayList<String>();
+		List<String> tables = new ArrayList<>();
 		Connection con = DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
 		try {
 			DatabaseMetaData dbmd = con.getMetaData();
@@ -183,7 +183,7 @@ public class JdbcQueryService {
 	public void validate(String sql) {
 		sql = SqlUtils.trim(sql);
 		Set<String> names = SqlUtils.extractParameters(sql);
-		Map<String, Object> paramMap = new HashMap<String, Object>();
+		Map<String, Object> paramMap = new HashMap<>();
 		for (String name : names)
 			paramMap.put(name, "19700101");
 		validateAndConvertTypes(sql, paramMap);
@@ -419,7 +419,7 @@ public class JdbcQueryService {
 		return namedParameterJdbcTemplate.execute(sql, paramMap, (preparedStatement) -> {
 			preparedStatement.setMaxRows(offset + limit);
 			ResultSet rs = preparedStatement.executeQuery();
-			List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(limit);
+			List<Map<String, Object>> result = new ArrayList<>(limit);
 			int i = 0;
 			while (rs.next()) {
 				if (i >= offset)

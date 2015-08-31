@@ -120,7 +120,7 @@ public class XmlUtilsTest {
 		User user = new User();
 		user.setUsername("test");
 		user.setPassword("password");
-		List<Name> names = new ArrayList<Name>();
+		List<Name> names = new ArrayList<>();
 		user.setNames(names);
 		Name name = new Name();
 		name.setFirst("hello");

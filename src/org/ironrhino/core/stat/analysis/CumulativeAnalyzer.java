@@ -16,7 +16,7 @@ import org.ironrhino.core.util.NumberUtils;
 
 public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNode>>> {
 
-	private Map<String, List<TreeNode>> result = new TreeMap<String, List<TreeNode>>();
+	private Map<String, List<TreeNode>> result = new TreeMap<>();
 
 	public CumulativeAnalyzer(boolean localhost) throws FileNotFoundException {
 		super(localhost);
@@ -49,7 +49,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 			return;
 		List<TreeNode> list = result.get(pair.getKey().getNamespace());
 		if (list == null)
-			list = new ArrayList<TreeNode>();
+			list = new ArrayList<>();
 		result.put(pair.getKey().getNamespace(), list);
 		int level = pair.getKey().getLevel();
 		for (int i = 1; i <= level; i++) {

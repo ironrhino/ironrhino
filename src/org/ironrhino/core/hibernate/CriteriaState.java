@@ -11,12 +11,12 @@ public class CriteriaState implements Serializable {
 
 	private static final long serialVersionUID = 5124542493138454854L;
 
-	private Map<String, String> aliases = new HashMap<String, String>(4);
+	private Map<String, String> aliases = new HashMap<>(4);
 
-	private Map<String, Boolean> orderings = new LinkedHashMap<String, Boolean>(
+	private Map<String, Boolean> orderings = new LinkedHashMap<>(
 			4);
 
-	private Set<String> criteria = new HashSet<String>();
+	private Set<String> criteria = new HashSet<>();
 
 	public Map<String, String> getAliases() {
 		return aliases;

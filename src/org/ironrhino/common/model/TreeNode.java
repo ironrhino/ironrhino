@@ -36,7 +36,7 @@ public class TreeNode extends BaseTreeableEntity<TreeNode>implements Attributabl
 	@Column(length = 4000)
 	@Convert(converter=AttributeListConverter.class)
 	@UiConfig(hiddenInList = @Hidden(true) )
-	private List<Attribute> attributes = new ArrayList<Attribute>();
+	private List<Attribute> attributes = new ArrayList<>();
 
 	public TreeNode() {
 

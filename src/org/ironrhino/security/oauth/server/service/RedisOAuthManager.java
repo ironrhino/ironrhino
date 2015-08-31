@@ -293,11 +293,11 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		List<String> tokens = stringRedisTemplate.opsForList().range(keyForList, 0, -1);
 		if (tokens == null || tokens.isEmpty())
 			return Collections.emptyList();
-		List<String> keys = new ArrayList<String>(tokens.size());
+		List<String> keys = new ArrayList<>(tokens.size());
 		for (String token : tokens)
 			keys.add(NAMESPACE_AUTHORIZATION + token);
 		List<String> list = stringRedisTemplate.opsForValue().multiGet(keys);
-		List<Authorization> result = new ArrayList<Authorization>(list.size());
+		List<Authorization> result = new ArrayList<>(list.size());
 		for (String json : list) {
 			try {
 				result.add(JsonUtils.fromJson(json, Authorization.class));
@@ -353,7 +353,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		Set<String> ids = stringRedisTemplate.opsForSet().members(NAMESPACE_CLIENT_OWNER + owner.getUsername());
 		if (ids == null || ids.isEmpty())
 			return Collections.emptyList();
-		List<String> keys = new ArrayList<String>(ids.size());
+		List<String> keys = new ArrayList<>(ids.size());
 		for (String id : ids)
 			keys.add(NAMESPACE_CLIENT + id);
 		List<Client> list = clientRedisTemplate.opsForValue().multiGet(keys);

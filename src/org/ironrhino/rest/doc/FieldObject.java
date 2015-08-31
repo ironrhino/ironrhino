@@ -119,7 +119,7 @@ public class FieldObject implements Serializable {
 		Map<String, String> values = null;
 		if (cls.isEnum()) {
 			type = "string";
-			values = new LinkedHashMap<String, String>();
+			values = new LinkedHashMap<>();
 			try {
 				for (Object o : cls.getEnumConstants()) {
 					Enum<?> en = (Enum<?>) o;

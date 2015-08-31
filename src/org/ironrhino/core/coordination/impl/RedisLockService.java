@@ -100,7 +100,7 @@ public class RedisLockService implements LockService {
 		String key = NAMESPACE + name;
 		String value = AppInfo.getInstanceId();
 		String str = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return 0 end";
-		RedisScript<Long> script = new DefaultRedisScript<Long>(str, Long.class);
+		RedisScript<Long> script = new DefaultRedisScript<>(str, Long.class);
 		Long ret = stringRedisTemplate.execute(script,
 				Collections.singletonList(key), value);
 		if (ret == 0)

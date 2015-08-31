@@ -146,7 +146,7 @@ public class JsonUtilsTest {
 
 	@Test
 	public void testFromJsonUsingTypeReference() {
-		List<User> users = new ArrayList<User>();
+		List<User> users = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			User u = new User();
 			u.setUsername("username");
@@ -173,8 +173,8 @@ public class JsonUtilsTest {
 	@Test
 	public void testResultPage() throws JsonParseException,
 			JsonMappingException, IOException {
-		ResultPage<User> rp = new ResultPage<User>();
-		List<User> users = new ArrayList<User>();
+		ResultPage<User> rp = new ResultPage<>();
+		List<User> users = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			User u = new User();
 			u.setUsername("username");

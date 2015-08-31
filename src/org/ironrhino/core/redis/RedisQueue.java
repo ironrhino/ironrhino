@@ -35,7 +35,7 @@ public abstract class RedisQueue<T extends Serializable> implements
 
 	@PostConstruct
 	public void afterPropertiesSet() {
-		queue = new DefaultRedisList<T>(queueName, redisTemplate);
+		queue = new DefaultRedisList<>(queueName, redisTemplate);
 
 	}
 

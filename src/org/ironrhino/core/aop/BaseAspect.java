@@ -32,7 +32,7 @@ public class BaseAspect implements Ordered {
 	}
 
 	protected Map<String, Object> buildContext(JoinPoint jp) {
-		Map<String, Object> context = new HashMap<String, Object>();
+		Map<String, Object> context = new HashMap<>();
 		Object[] args = jp.getArgs();
 		String[] paramNames = ReflectionUtils.getParameterNames(jp);
 		if (paramNames == null) {

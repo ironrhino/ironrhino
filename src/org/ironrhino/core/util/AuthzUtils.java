@@ -74,7 +74,7 @@ public class AuthzUtils {
 	}
 
 	public static List<String> getRoleNames() {
-		List<String> roleNames = new ArrayList<String>();
+		List<String> roleNames = new ArrayList<>();
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
 			Collection<? extends GrantedAuthority> authz = SecurityContextHolder
 					.getContext().getAuthentication().getAuthorities();
@@ -88,7 +88,7 @@ public class AuthzUtils {
 	}
 
 	public static List<String> getRoleNamesFromUserDetails(UserDetails user) {
-		List<String> roleNames = new ArrayList<String>();
+		List<String> roleNames = new ArrayList<>();
 		Collection<? extends GrantedAuthority> authz = user.getAuthorities();
 		if (authz != null)
 			for (GrantedAuthority var : authz)

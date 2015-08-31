@@ -33,7 +33,7 @@ public class ZooKeeperMembership implements Membership {
 
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
-	private ConcurrentHashMap<String, LeaderLatch> latchs = new ConcurrentHashMap<String, LeaderLatch>();
+	private ConcurrentHashMap<String, LeaderLatch> latchs = new ConcurrentHashMap<>();
 
 	@Autowired
 	public ZooKeeperMembership(CuratorFramework curatorFramework) {
@@ -105,7 +105,7 @@ public class ZooKeeperMembership implements Membership {
 		if (latch == null)
 			throw new Exception("Please join group " + group + " first");
 		Collection<Participant> participants = latch.getParticipants();
-		List<String> list = new ArrayList<String>(participants.size());
+		List<String> list = new ArrayList<>(participants.size());
 		for (Participant p : participants)
 			list.add(p.getId());
 		return list;

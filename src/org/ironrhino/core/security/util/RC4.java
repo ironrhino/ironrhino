@@ -25,7 +25,7 @@ public class RC4 {
 	private static final ThreadLocal<SoftReference<RC4>> pool = new ThreadLocal<SoftReference<RC4>>() {
 		@Override
 		protected SoftReference<RC4> initialValue() {
-			return new SoftReference<RC4>(new RC4());
+			return new SoftReference<>(new RC4());
 		}
 	};
 
@@ -151,7 +151,7 @@ public class RC4 {
 		RC4 instance;
 		if (instanceRef == null || (instance = instanceRef.get()) == null) {
 			instance = new RC4();
-			instanceRef = new SoftReference<RC4>(instance);
+			instanceRef = new SoftReference<>(instance);
 			pool.set(instanceRef);
 		}
 		return instance;

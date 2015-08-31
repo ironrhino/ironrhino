@@ -102,7 +102,7 @@ public class Taobao extends OAuth2Provider {
 	protected String invoke(String protectedURL, Map<String, String> params,
 			Map<String, String> headers) throws IOException {
 		if (params == null)
-			params = new HashMap<String, String>(8);
+			params = new HashMap<>(8);
 		params.put("format", "json");
 		params.put("v", "2.0");
 		params.put("sign_method", "md5");
@@ -111,7 +111,7 @@ public class Taobao extends OAuth2Provider {
 	}
 
 	private String sign(String protectedURL, Map<String, String> params) {
-		Map<String, String> map = new TreeMap<String, String>();
+		Map<String, String> map = new TreeMap<>();
 		if (protectedURL.indexOf('?') > 0) {
 			String queryString = protectedURL.substring(protectedURL
 					.indexOf('?') + 1);

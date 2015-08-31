@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
 public class StandaloneLockService implements LockService {
 
-	private ConcurrentHashMap<String, Lock> locks = new ConcurrentHashMap<String, Lock>();
+	private ConcurrentHashMap<String, Lock> locks = new ConcurrentHashMap<>();
 
 	@Override
 	public boolean tryLock(String name) {

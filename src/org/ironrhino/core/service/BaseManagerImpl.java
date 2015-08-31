@@ -268,7 +268,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 		id = arr;
 		List<T> list;
 		if (id.length == 1) {
-			list = new ArrayList<T>(1);
+			list = new ArrayList<>(1);
 			list.add(get(id[0]));
 		} else {
 			DetachedCriteria dc = detachedCriteria();
@@ -322,7 +322,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 		boolean notEmpty = it.hasNext();
 		if (notEmpty) {
 			// remove order
-			orderEntries = new ArrayList<OrderEntry>();
+			orderEntries = new ArrayList<>();
 			while (it.hasNext()) {
 				orderEntries.add(it.next());
 				it.remove();
@@ -363,7 +363,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 			return c.list();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return new ArrayList<T>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -386,7 +386,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 			return c.list();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return new ArrayList<T>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -569,7 +569,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 		if (doubles == 1) {
 			hql += "lower(entity." + String.valueOf(objects[0]) + ")=lower(?1)";
 		} else {
-			List<String> list = new ArrayList<String>(doubles);
+			List<String> list = new ArrayList<>(doubles);
 			for (int i = 0; i < doubles; i++)
 				list.add("lower(entity." + String.valueOf(objects[2 * i])
 						+ ")=lower(?" + (i + 1) + ")");
@@ -614,7 +614,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements
 
 	private <TE extends BaseTreeableEntity<TE>> void assemble(TE te,
 			List<TE> list) throws Exception {
-		List<TE> children = new ArrayList<TE>();
+		List<TE> children = new ArrayList<>();
 		Iterator<TE> it = list.iterator();
 		while (it.hasNext()) {
 			TE r = it.next();

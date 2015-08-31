@@ -56,7 +56,7 @@ public class BeanUtils {
 	}
 
 	public static void copyProperties(Object source, Object target, boolean ignoreNullValue, String... ignoreProperties) {
-		Set<String> ignores = new HashSet<String>();
+		Set<String> ignores = new HashSet<>();
 		ignores.addAll(AnnotationUtils.getAnnotatedPropertyNames(source.getClass(), NotInCopy.class));
 		ignores.addAll(Arrays.asList(ignoreProperties));
 		BeanWrapperImpl bws = new BeanWrapperImpl(source);
@@ -106,7 +106,7 @@ public class BeanUtils {
 			throw new RuntimeException(e);
 		}
 		copyProperties(source, ret, ignoreProperties);
-		List<T> children = new ArrayList<T>();
+		List<T> children = new ArrayList<>();
 		for (T child : source.getChildren()) {
 			if (filter == null || filter.test(child)) {
 				T t = deepClone(child, filter, ignoreProperties);

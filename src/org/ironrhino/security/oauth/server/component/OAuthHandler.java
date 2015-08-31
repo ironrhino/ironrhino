@@ -164,7 +164,7 @@ public class OAuthHandler extends AccessHandler {
 										ud, ud.getPassword(),
 										ud.getAuthorities());
 								sc.setAuthentication(auth);
-								Map<String, Object> sessionMap = new HashMap<String, Object>(
+								Map<String, Object> sessionMap = new HashMap<>(
 										2, 1);
 								sessionMap
 										.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,

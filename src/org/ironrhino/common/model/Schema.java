@@ -67,7 +67,7 @@ public class Schema extends BaseEntity {
 	@SearchableComponent
 	@UiConfig(hiddenInList = @Hidden(true))
 	@Transient
-	private List<SchemaField> fields = new ArrayList<SchemaField>();
+	private List<SchemaField> fields = new ArrayList<>();
 
 	@Version
 	private int version = -1;
@@ -137,7 +137,7 @@ public class Schema extends BaseEntity {
 	public Schema merge(Schema other) {
 		if (other != null)
 			fields.addAll(other.getFields());
-		Set<String> names = new HashSet<String>();
+		Set<String> names = new HashSet<>();
 		Iterator<SchemaField> it = fields.iterator();
 		while (it.hasNext()) {
 			SchemaField f = it.next();
@@ -156,7 +156,7 @@ public class Schema extends BaseEntity {
 		if (fields != null && fields.size() > 0) {
 			boolean hasGroup = false;
 			boolean needApendBlankGroup = false;
-			Set<String> names = new HashSet<String>();
+			Set<String> names = new HashSet<>();
 			for (int i = 0; i < fields.size(); i++) {
 				SchemaField f = fields.get(i);
 				if (f.getType().equals(SchemaFieldType.GROUP)) {
@@ -189,7 +189,7 @@ public class Schema extends BaseEntity {
 								"validation.required");
 						throw ve;
 					} else {
-						Set<String> set = new HashSet<String>();
+						Set<String> set = new HashSet<>();
 						for (int j = 0; j < values.size(); j++) {
 							String value = values.get(j);
 							if (StringUtils.isBlank(value)) {

@@ -115,7 +115,7 @@ public class LocalFileStorage implements FileStorage {
 
 	@Override
 	public List<String> listFiles(String path) {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		new File(directory, path).listFiles((f) -> {
 			if (f.isFile()) {
 				list.add(f.getName());
@@ -127,14 +127,14 @@ public class LocalFileStorage implements FileStorage {
 
 	@Override
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
-		final Map<String, Boolean> map = new HashMap<String, Boolean>();
+		final Map<String, Boolean> map = new HashMap<>();
 		new File(directory, path).listFiles((f) -> {
 			map.put(f.getName(), f.isFile());
 			return false;
 		});
-		List<Map.Entry<String, Boolean>> list = new ArrayList<Map.Entry<String, Boolean>>(map.entrySet());
+		List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
 		Collections.sort(list, comparator);
-		Map<String, Boolean> sortedMap = new LinkedHashMap<String, Boolean>();
+		Map<String, Boolean> sortedMap = new LinkedHashMap<>();
 		for (Map.Entry<String, Boolean> entry : list)
 			sortedMap.put(entry.getKey(), entry.getValue());
 		return sortedMap;

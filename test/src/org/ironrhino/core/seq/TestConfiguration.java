@@ -37,7 +37,7 @@ public class TestConfiguration {
 
 		public static final int LOOP = 10000;
 
-		private ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>(THREADS * LOOP * 2);
+		private ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<>(THREADS * LOOP * 2);
 
 		private ExecutorService es = Executors.newFixedThreadPool(THREADS);
 

@@ -34,7 +34,7 @@ public class JsonResult implements Result {
 		}
 
 		boolean hasErrors = false;
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		if (action instanceof ValidationAware) {
 			ValidationAware validationAwareAction = (ValidationAware) action;
 			if (validationAwareAction.hasErrors()) {

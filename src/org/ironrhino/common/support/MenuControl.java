@@ -49,7 +49,7 @@ public class MenuControl {
 			return null;
 		Container container = ctx.getContainer();
 		container.inject(this);
-		Map<String, Pair<Menu, Authorize>> mapping = new HashMap<String, Pair<Menu, Authorize>>();
+		Map<String, Pair<Menu, Authorize>> mapping = new HashMap<>();
 		Collection<PackageConfig> pcs = ((AutoConfigPackageProvider) packageProvider)
 				.getAllPackageConfigs();
 		for (PackageConfig pc : pcs) {
@@ -68,7 +68,7 @@ public class MenuControl {
 											: "/").append(ac.getName());
 							mapping.put(
 									sb.toString(),
-									new Pair<Menu, Authorize>(menu, entityClass
+									new Pair<>(menu, entityClass
 											.getAnnotation(Authorize.class)));
 						}
 						continue;
@@ -81,7 +81,7 @@ public class MenuControl {
 						sb.append(pc.getNamespace())
 								.append(pc.getNamespace().endsWith("/") ? ""
 										: "/").append(ac.getName());
-						mapping.put(sb.toString(), new Pair<Menu, Authorize>(
+						mapping.put(sb.toString(), new Pair<>(
 								menuOnClass, authorizeOnClass));
 					}
 					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(
@@ -95,7 +95,7 @@ public class MenuControl {
 										: "/").append(ac.getName());
 						if (!m.getName().equals("execute"))
 							sb.append("/").append(m.getName());
-						mapping.put(sb.toString(), new Pair<Menu, Authorize>(
+						mapping.put(sb.toString(), new Pair<>(
 								menu, authorize == null ? authorizeOnClass
 										: authorize));
 					}
@@ -119,7 +119,7 @@ public class MenuControl {
 	}
 
 	private void filterUnauthorized(MenuNode node) {
-		List<MenuNode> list = new ArrayList<MenuNode>();
+		List<MenuNode> list = new ArrayList<>();
 		Collection<MenuNode> children = node.getChildren();
 		Iterator<MenuNode> it = children.iterator();
 		while (it.hasNext()) {
@@ -234,7 +234,7 @@ public class MenuControl {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private MenuNode assemble(final Map<String, Pair<Menu, Authorize>> mapping) {
 		MenuNode root = new MenuNode();
-		List<Map.Entry<String, Pair<Menu, Authorize>>> list = new ArrayList<Map.Entry<String, Pair<Menu, Authorize>>>(
+		List<Map.Entry<String, Pair<Menu, Authorize>>> list = new ArrayList<>(
 				mapping.entrySet());
 		Collections.sort(list,
 				new ValueThenKeyComparator<String, Pair<Menu, Authorize>>() {
@@ -263,7 +263,7 @@ public class MenuControl {
 						mn.setName(str);
 						mn.setParent(parent);
 						if (!(parent.getChildren() instanceof List)) {
-							List<MenuNode> children = new ArrayList<MenuNode>();
+							List<MenuNode> children = new ArrayList<>();
 							children.addAll(parent.getChildren());
 							parent.setChildren(children);
 						}
@@ -275,7 +275,7 @@ public class MenuControl {
 			}
 			node.setParent(parent);
 			if (!(parent.getChildren() instanceof List)) {
-				List<MenuNode> children = new ArrayList<MenuNode>();
+				List<MenuNode> children = new ArrayList<>();
 				children.addAll(parent.getChildren());
 				parent.setChildren(children);
 			}

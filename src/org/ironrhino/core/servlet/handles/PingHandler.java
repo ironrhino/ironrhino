@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 @Order(Integer.MIN_VALUE + 2)
 public class PingHandler extends AccessHandler {
 
+	@Override
 	public String getPattern() {
 		return "/_ping";
 	}

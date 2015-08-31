@@ -25,7 +25,7 @@ public class ImageCaptcha {
 
 	private static Random random = new Random();
 
-	private static List<String> fonts = new ArrayList<String>();
+	private static List<String> fonts = new ArrayList<>();
 
 	private BufferedImage image;
 

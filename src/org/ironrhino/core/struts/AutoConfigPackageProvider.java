@@ -63,13 +63,13 @@ public class AutoConfigPackageProvider implements PackageProvider {
 	private ObjectFactory objectFactory;
 
 	protected Map<String, Set<String>> configPackages() {
-		Map<String, Set<String>> packages = new HashMap<String, Set<String>>();
-		Set<String> packagePrefixes = new HashSet<String>();
+		Map<String, Set<String>> packages = new HashMap<>();
+		Set<String> packagePrefixes = new HashSet<>();
 		for (String pck : ClassScanner.getAppPackages()) {
 			int i = pck.indexOf('.');
 			packagePrefixes.add(i > 0 ? pck.substring(0, i) : pck);
 		}
-		Set<Class<?>> packageInfos = new HashSet<Class<?>>();
+		Set<Class<?>> packageInfos = new HashSet<>();
 		for (String packagePrefix : packagePrefixes)
 			packageInfos.addAll(ClassScanner.scanAnnotatedPackage(packagePrefix,
 					AutoConfig.class));
@@ -86,7 +86,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 									.lastIndexOf('.') + 1);
 				Set<String> set = packages.get(ac.namespace());
 				if (set == null) {
-					set = new HashSet<String>();
+					set = new HashSet<>();
 					packages.put(defaultNamespace, set);
 				}
 
@@ -108,7 +108,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 				}
 				Set<String> set = packages.get(defaultNamespace);
 				if (set == null) {
-					set = new HashSet<String>();
+					set = new HashSet<>();
 					packages.put(defaultNamespace, set);
 				}
 				for (String p : packs.split("\\s*,\\s*")) {
@@ -134,7 +134,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 		String searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
 				+ GLOBAL_MESSAGES_PATTERN;
-		Map<String, String> messageBunldes = new HashMap<String, String>();
+		Map<String, String> messageBunldes = new HashMap<>();
 		try {
 			Resource[] resources = resourcePatternResolver
 					.getResources(searchPath);
@@ -228,7 +228,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 								+ (packageConfig.getNamespace().endsWith("/") ? ""
 										: "/") + ac.getName());
 				} else {
-					Map<String, ActionConfig> actionConfigs = new LinkedHashMap<String, ActionConfig>(
+					Map<String, ActionConfig> actionConfigs = new LinkedHashMap<>(
 							pc.getActionConfigs());
 					for (String actionName : packageConfig.getActionConfigs()
 							.keySet()) {
@@ -301,7 +301,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		ActionConfig.Builder builder = new ActionConfig.Builder(packageName,
 				actionName, actionClass).addResultConfig(autoCofigResult);
 		if (StringUtils.isNotBlank(ac.fileupload())) {
-			Map<String, String> params = new HashMap<String, String>();
+			Map<String, String> params = new HashMap<>();
 			params.put("allowedTypes", ac.fileupload());
 			List<InterceptorMapping> interceptors = InterceptorBuilder
 					.constructInterceptorReference(pkgConfig, "fileUpload",
@@ -349,9 +349,9 @@ public class AutoConfigPackageProvider implements PackageProvider {
 
 	private static class PackageLoader {
 
-		private Map<String, PackageConfig.Builder> packageConfigBuilders = new HashMap<String, PackageConfig.Builder>();
+		private Map<String, PackageConfig.Builder> packageConfigBuilders = new HashMap<>();
 
-		private Map<PackageConfig.Builder, PackageConfig.Builder> childToParent = new HashMap<PackageConfig.Builder, PackageConfig.Builder>();
+		private Map<PackageConfig.Builder, PackageConfig.Builder> childToParent = new HashMap<>();
 
 		public PackageConfig.Builder getPackage(String name) {
 			return packageConfigBuilders.get(name);
@@ -362,7 +362,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		}
 
 		public Collection<PackageConfig> createPackageConfigs() {
-			Map<String, PackageConfig> configs = new HashMap<String, PackageConfig>();
+			Map<String, PackageConfig> configs = new HashMap<>();
 
 			Set<PackageConfig.Builder> builders;
 			while ((builders = findPackagesWithNoParents()).size() > 0) {
@@ -386,7 +386,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		}
 
 		Set<PackageConfig.Builder> findPackagesWithNoParents() {
-			Set<PackageConfig.Builder> builders = new HashSet<PackageConfig.Builder>();
+			Set<PackageConfig.Builder> builders = new HashSet<>();
 			for (PackageConfig.Builder child : packageConfigBuilders.values()) {
 				if (!childToParent.containsKey(child)) {
 					builders.add(child);
@@ -397,7 +397,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 
 	}
 
-	private static Map<String, Class<?>> entityClassURLMapping = new ConcurrentHashMap<String, Class<?>>();
+	private static Map<String, Class<?>> entityClassURLMapping = new ConcurrentHashMap<>();
 
 	public String[] getNamespaceAndActionName(Class<?> cls,
 			String defaultNamespace) {

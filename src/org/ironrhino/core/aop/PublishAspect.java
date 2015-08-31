@@ -32,7 +32,7 @@ public class PublishAspect extends BaseAspect {
 				PublishAware publishAware = entity.getClass().getAnnotation(
 						PublishAware.class);
 				if (publishAware != null)
-					eventPublisher.publish(new EntityOperationEvent<Persistable<?>>(
+					eventPublisher.publish(new EntityOperationEvent<>(
 							(Persistable) entity, EntityOperationType.DELETE),
 							publishAware.scope());
 			}
@@ -45,7 +45,7 @@ public class PublishAspect extends BaseAspect {
 		Object result = call.proceed();
 		if (!isBypass()) {
 			if (eventPublisher != null)
-				eventPublisher.publish(new EntityOperationEvent<Persistable<?>>(entity,
+				eventPublisher.publish(new EntityOperationEvent<>(entity,
 						isNew ? EntityOperationType.CREATE
 								: EntityOperationType.UPDATE), publishAware
 						.scope());
@@ -58,7 +58,7 @@ public class PublishAspect extends BaseAspect {
 		if (isBypass())
 			return;
 		if (eventPublisher != null)
-			eventPublisher.publish(new EntityOperationEvent<Persistable<?>>(entity,
+			eventPublisher.publish(new EntityOperationEvent<>(entity,
 					EntityOperationType.DELETE), publishAware.scope());
 	}
 

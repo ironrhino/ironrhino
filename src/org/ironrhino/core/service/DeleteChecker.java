@@ -42,11 +42,11 @@ public class DeleteChecker {
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	private Map<Class<?>, List<Tuple<Class<?>, String>>> mapping = new HashMap<Class<?>, List<Tuple<Class<?>, String>>>();
+	private Map<Class<?>, List<Tuple<Class<?>, String>>> mapping = new HashMap<>();
 
-	private Map<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>> componentMapping = new HashMap<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>>();
+	private Map<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>> componentMapping = new HashMap<>();
 
-	private Map<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>> collectionMapping = new HashMap<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>>();
+	private Map<Class<?>, List<Tuple<Class<?>, Tuple<String, String>>>> collectionMapping = new HashMap<>();
 
 	@PostConstruct
 	public void init() {
@@ -64,10 +64,10 @@ public class DeleteChecker {
 					Class<?> referrer = mtoType.getReturnedClass();
 					List<Tuple<Class<?>, String>> list = mapping.get(referrer);
 					if (list == null) {
-						list = new ArrayList<Tuple<Class<?>, String>>();
+						list = new ArrayList<>();
 						mapping.put(referrer, list);
 					}
-					list.add(new Tuple<Class<?>, String>(cm.getMappedClass(),
+					list.add(new Tuple<>(cm.getMappedClass(),
 							name));
 				} else if (type instanceof OneToOneType) {
 					OneToOneType otoType = (OneToOneType) type;
@@ -94,10 +94,10 @@ public class DeleteChecker {
 						List<Tuple<Class<?>, String>> list = mapping
 								.get(referrer);
 						if (list == null) {
-							list = new ArrayList<Tuple<Class<?>, String>>();
+							list = new ArrayList<>();
 							mapping.put(referrer, list);
 						}
-						list.add(new Tuple<Class<?>, String>(cm
+						list.add(new Tuple<>(cm
 								.getMappedClass(), name));
 					}
 				} else if (type instanceof CollectionType) {
@@ -119,12 +119,12 @@ public class DeleteChecker {
 									List<Tuple<Class<?>, Tuple<String, String>>> list = collectionMapping
 											.get(referrer);
 									if (list == null) {
-										list = new ArrayList<Tuple<Class<?>, Tuple<String, String>>>();
+										list = new ArrayList<>();
 										collectionMapping.put(referrer, list);
 									}
-									list.add(new Tuple<Class<?>, Tuple<String, String>>(
+									list.add(new Tuple<>(
 											cm.getMappedClass(),
-											new Tuple<String, String>(name, f
+											new Tuple<>(name, f
 													.getName())));
 								}
 							}
@@ -151,12 +151,12 @@ public class DeleteChecker {
 									List<Tuple<Class<?>, Tuple<String, String>>> list = componentMapping
 											.get(referrer);
 									if (list == null) {
-										list = new ArrayList<Tuple<Class<?>, Tuple<String, String>>>();
+										list = new ArrayList<>();
 										componentMapping.put(referrer, list);
 									}
-									list.add(new Tuple<Class<?>, Tuple<String, String>>(
+									list.add(new Tuple<>(
 											cm.getMappedClass(),
-											new Tuple<String, String>(name, f
+											new Tuple<>(name, f
 													.getName())));
 								}
 							}

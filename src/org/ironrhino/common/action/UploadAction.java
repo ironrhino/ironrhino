@@ -116,8 +116,7 @@ public class UploadAction extends BaseAction {
 					StringBuilder sb = new StringBuilder();
 					try {
 						for (int i = 1; i < arr.length; i++) {
-							sb.append("/").append(
-									URLEncoder.encode(arr[i], "UTF-8"));
+							sb.append("/").append(URLEncoder.encode(arr[i], "UTF-8"));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -173,10 +172,8 @@ public class UploadAction extends BaseAction {
 				if (!excludes.contains(suffix))
 					try {
 						String path = createPath(fn, autorename);
-						array[i] = new StringBuilder(
-								templateProvider.getAssetsBase())
-								.append(getFileStoragePath()).append(path)
-								.toString();
+						array[i] = new StringBuilder(templateProvider.getAssetsBase()).append(getFileStoragePath())
+								.append(path).toString();
 						fileStorage.write(new FileInputStream(f), path);
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -186,13 +183,10 @@ public class UploadAction extends BaseAction {
 			}
 			filename = array;
 			addActionMessage(getText("operate.success"));
-		} else if (StringUtils.isNotBlank(requestBody) && filename != null
-				&& filename.length > 0) {
+		} else if (StringUtils.isNotBlank(requestBody) && filename != null && filename.length > 0) {
 			if (requestBody.startsWith("data:image"))
-				requestBody = requestBody
-						.substring(requestBody.indexOf(',') + 1);
-			InputStream is = new ByteArrayInputStream(
-					Base64.decodeBase64(requestBody));
+				requestBody = requestBody.substring(requestBody.indexOf(',') + 1);
+			InputStream is = new ByteArrayInputStream(Base64.decodeBase64(requestBody));
 			try {
 				fileStorage.write(is, createPath(filename[0], autorename));
 			} catch (IOException e) {
@@ -221,13 +215,11 @@ public class UploadAction extends BaseAction {
 			if (folder.length() > 0 && !folder.startsWith("/"))
 				folder = "/" + folder;
 		}
-		files = new LinkedHashMap<String, Boolean>();
+		files = new LinkedHashMap<>();
 		if (StringUtils.isNotBlank(folder))
 			files.put("..", Boolean.FALSE);
-		files.putAll(fileStorage.listFilesAndDirectory(Files
-				.simplifyPath(getUploadRootDir() + folder)));
-		return ServletActionContext.getRequest().getParameter("pick") != null ? "pick"
-				: LIST;
+		files.putAll(fileStorage.listFilesAndDirectory(Files.simplifyPath(getUploadRootDir() + folder)));
+		return ServletActionContext.getRequest().getParameter("pick") != null ? "pick" : LIST;
 	}
 
 	@Override
@@ -242,10 +234,8 @@ public class UploadAction extends BaseAction {
 		String[] paths = getId();
 		if (paths != null) {
 			for (String path : paths) {
-				if (!fileStorage.delete(Files.simplifyPath(getUploadRootDir()
-						+ "/" + folder + "/" + path)))
-					addActionError(getText("delete.forbidden",
-							new String[] { path }));
+				if (!fileStorage.delete(Files.simplifyPath(getUploadRootDir() + "/" + folder + "/" + path)))
+					addActionError(getText("delete.forbidden", new String[] { path }));
 			}
 		}
 		return list();
@@ -257,8 +247,7 @@ public class UploadAction extends BaseAction {
 			if (!path.startsWith("/"))
 				path = "/" + path;
 			folder = path;
-			fileStorage.mkdir(Files.simplifyPath(getUploadRootDir()
-					+ (folder.startsWith("/") ? "" : "/") + folder));
+			fileStorage.mkdir(Files.simplifyPath(getUploadRootDir() + (folder.startsWith("/") ? "" : "/") + folder));
 		}
 		return list();
 	}
@@ -273,21 +262,16 @@ public class UploadAction extends BaseAction {
 		String newName = filename[0];
 		if (oldName.equals(newName))
 			return list();
-		if (!fileStorage.exists(Files.simplifyPath(getUploadRootDir() + "/"
-				+ folder + "/" + oldName))) {
+		if (!fileStorage.exists(Files.simplifyPath(getUploadRootDir() + "/" + folder + "/" + oldName))) {
 			addActionError(getText("validation.not.exists"));
 			return list();
 		}
-		if (fileStorage.exists(Files.simplifyPath(getUploadRootDir() + "/"
-				+ folder + "/" + newName))) {
+		if (fileStorage.exists(Files.simplifyPath(getUploadRootDir() + "/" + folder + "/" + newName))) {
 			addActionError(getText("validation.already.exists"));
 			return list();
 		}
-		fileStorage.rename(
-				Files.simplifyPath(getUploadRootDir() + "/" + folder + "/"
-						+ oldName),
-				Files.simplifyPath(getUploadRootDir() + "/" + folder + "/"
-						+ newName));
+		fileStorage.rename(Files.simplifyPath(getUploadRootDir() + "/" + folder + "/" + oldName),
+				Files.simplifyPath(getUploadRootDir() + "/" + folder + "/" + newName));
 		return list();
 	}
 
@@ -295,7 +279,7 @@ public class UploadAction extends BaseAction {
 	public String files() {
 		String path = Files.simplifyPath(getUploadRootDir() + "/" + folder);
 		Map<String, Boolean> map = fileStorage.listFilesAndDirectory(path);
-		files = new LinkedHashMap<String, Boolean>();
+		files = new LinkedHashMap<>();
 		String[] suffixes = null;
 		if (StringUtils.isNotBlank(suffix))
 			suffixes = suffix.toLowerCase().split("\\s*,\\s*");
@@ -312,9 +296,8 @@ public class UploadAction extends BaseAction {
 					if (!matches)
 						continue;
 				}
-				files.put(new StringBuilder(templateProvider.getAssetsBase())
-						.append(getFileStoragePath()).append(path).append("/")
-						.append(s).toString(), true);
+				files.put(new StringBuilder(templateProvider.getAssetsBase()).append(getFileStoragePath()).append(path)
+						.append("/").append(s).toString(), true);
 			}
 		}
 		return JSON;

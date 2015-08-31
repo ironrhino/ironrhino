@@ -78,7 +78,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 		Map<String, String> map = null;
 
 		if (isIncludeCallbackWhenRequestToken()) {
-			map = new HashMap<String, String>(2, 1);
+			map = new HashMap<>(2, 1);
 			map.put("oauth_callback", targetUrl);
 		}
 		if (isUseAuthorizationHeader()) {
@@ -119,7 +119,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 			OAuth1Token requestToken = restoreToken(request, "request");
 			removeToken(request, "request");
 			String oauth_verifier = request.getParameter("oauth_verifier");
-			Map<String, String> map = new HashMap<String, String>(4, 1);
+			Map<String, String> map = new HashMap<>(4, 1);
 			map.put("oauth_token", requestToken.getToken());
 			if (oauth_verifier != null)
 				map.put("oauth_verifier", oauth_verifier);
@@ -237,7 +237,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 					.append(Utils.percentEncode(entry.getValue()))
 					.append("\",");
 		sb.deleteCharAt(sb.length() - 1);
-		Map<String, String> map = new HashMap<String, String>(2, 1);
+		Map<String, String> map = new HashMap<>(2, 1);
 		map.put("Authorization", sb.toString());
 		return map;
 	}
@@ -258,7 +258,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 
 	protected Map<String, String> getOAuthParams(String method, String url,
 			Map<String, String> params, String token, String tokenSecret) {
-		Map<String, String> oauthparams = new HashMap<String, String>();
+		Map<String, String> oauthparams = new HashMap<>();
 		oauthparams.put("oauth_consumer_key", getConsumerKey());
 		oauthparams.put("oauth_timestamp", Utils.getTimestamp());
 		oauthparams.put("oauth_nonce", Utils.getNonce());
@@ -266,7 +266,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 			oauthparams.put("oauth_token", token);
 		oauthparams.put("oauth_signature_method", "HMAC-SHA1");
 		oauthparams.put("oauth_version", "1.0");
-		Map<String, String> temp = new HashMap<String, String>();
+		Map<String, String> temp = new HashMap<>();
 		if (params != null) {
 			temp.putAll(params);
 			for (Map.Entry<String, String> entry : params.entrySet())
@@ -351,7 +351,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 				}
 			}
 			sb.append(percentEncode(usb.toString())).append('&');
-			TreeMap<String, String> map = new TreeMap<String, String>();
+			TreeMap<String, String> map = new TreeMap<>();
 			map.putAll(params);
 			StringBuilder psb = new StringBuilder();
 			for (Map.Entry<String, String> entry : map.entrySet())

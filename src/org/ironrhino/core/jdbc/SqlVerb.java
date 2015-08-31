@@ -6,10 +6,12 @@ public enum SqlVerb implements Displayable {
 
 	SELECT, UPDATE, INSERT, MERGE, DELETE, CREATE, ALTER, DROP, CALL, RENAME, COMMENT, GRANT, REVOKE, BACKUP;
 
+	@Override
 	public String getName() {
 		return name();
 	}
 
+	@Override
 	public String getDisplayName() {
 		return Displayable.super.getDisplayName();
 	}

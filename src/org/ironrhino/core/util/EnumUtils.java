@@ -12,7 +12,7 @@ public class EnumUtils {
 	public static <T extends Enum<T>> Map<String, String> enumToMap(
 			Class<T> clazz) {
 		T[] enums = clazz.getEnumConstants();
-		Map<String, String> map = new LinkedHashMap<String, String>();
+		Map<String, String> map = new LinkedHashMap<>();
 		if (Displayable.class.isAssignableFrom(clazz)) {
 			for (T en : enums) {
 				Displayable den = (Displayable) en;
@@ -27,7 +27,7 @@ public class EnumUtils {
 
 	public static <T extends Enum<T>> List<String> enumToList(Class<T> clazz) {
 		T[] enums = clazz.getEnumConstants();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (T en : enums)
 			list.add(en.name());
 		return list;

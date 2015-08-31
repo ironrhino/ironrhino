@@ -33,9 +33,9 @@ public class ClassScanner {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private final List<TypeFilter> includeFilters = new LinkedList<TypeFilter>();
+	private final List<TypeFilter> includeFilters = new LinkedList<>();
 
-	private final List<TypeFilter> excludeFilters = new LinkedList<TypeFilter>();
+	private final List<TypeFilter> excludeFilters = new LinkedList<>();
 
 	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
 			this.resourcePatternResolver);
@@ -84,7 +84,7 @@ public class ClassScanner {
 			Class<? extends Annotation> annotation) {
 		ClassScanner cs = new ClassScanner();
 		cs.addIncludeFilter(new CustomAnnotationTypeFilter(annotation));
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		List<Class<?>> classes = new ArrayList<>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));
 		Collections.sort(classes, ClassComparator.INSTANCE);
@@ -97,7 +97,7 @@ public class ClassScanner {
 		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
 			cs.addIncludeFilter(new CustomAnnotationTypeFilter(anno));
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		List<Class<?>> classes = new ArrayList<>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));
 		Collections.sort(classes, ClassComparator.INSTANCE);
@@ -109,7 +109,7 @@ public class ClassScanner {
 		ClassScanner cs = new ClassScanner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
-		List<Class<?>> list = new ArrayList<Class<?>>();
+		List<Class<?>> list = new ArrayList<>();
 		list.addAll(cs.doScan(basePackage));
 		Collections.sort(list, ClassComparator.INSTANCE);
 		return list;
@@ -120,7 +120,7 @@ public class ClassScanner {
 		ClassScanner cs = new ClassScanner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
-		List<Class<?>> list = new ArrayList<Class<?>>();
+		List<Class<?>> list = new ArrayList<>();
 		for (String s : basePackages)
 			list.addAll(cs.doScan(s));
 		Collections.sort(list, ClassComparator.INSTANCE);
@@ -150,7 +150,7 @@ public class ClassScanner {
 	public Collection<Class<?>> doScan(String basePackage, String pattern) {
 		if (org.apache.commons.lang3.StringUtils.isBlank(pattern))
 			pattern = "/**/*.class";
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		List<Class<?>> classes = new ArrayList<>();
 		Resource resource = null;
 		try {
 			String searchPath = new StringBuilder(
@@ -215,7 +215,7 @@ public class ClassScanner {
 				appBasePackage = "org.ironrhino";
 			}
 			String[] arr = appBasePackage.split(",+");
-			Set<String> packages = new TreeSet<String>();
+			Set<String> packages = new TreeSet<>();
 			Collection<Class<?>> componentScans = scanAnnotated(arr,
 					ComponentScan.class);
 			for (Class<?> c : componentScans) {
@@ -225,7 +225,7 @@ public class ClassScanner {
 			packages.addAll(Arrays.asList(arr));
 			return packages.toArray(new String[0]);
 		} else {
-			Set<String> packages = new TreeSet<String>();
+			Set<String> packages = new TreeSet<>();
 			for (Package p : Package.getPackages()) {
 				String name = p.getName();
 				if (isExcludePackage(name))

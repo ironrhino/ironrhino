@@ -59,6 +59,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 			List<HttpMessageConverter<?>> converters) {
 		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter() {
 
+			@Override
 			protected void writeInternal(Object object,
 					HttpOutputMessage outputMessage) throws IOException,
 					HttpMessageNotWritableException {
@@ -85,7 +86,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	@Override
 	protected Map<String, MediaType> getDefaultMediaTypes() {
-		Map<String, MediaType> map = new HashMap<String, MediaType>();
+		Map<String, MediaType> map = new HashMap<>();
 		map.put("json", MediaType.APPLICATION_JSON);
 		map.put("txt", MediaType.TEXT_PLAIN);
 		return map;

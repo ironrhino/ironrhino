@@ -34,7 +34,7 @@ public class DES {
 	private static final ThreadLocal<SoftReference<DES>> pool = new ThreadLocal<SoftReference<DES>>() {
 		@Override
 		protected SoftReference<DES> initialValue() {
-			return new SoftReference<DES>(new DES());
+			return new SoftReference<>(new DES());
 		}
 	};
 
@@ -135,7 +135,7 @@ public class DES {
 		DES instance;
 		if (instanceRef == null || (instance = instanceRef.get()) == null) {
 			instance = new DES();
-			instanceRef = new SoftReference<DES>(instance);
+			instanceRef = new SoftReference<>(instance);
 			pool.set(instanceRef);
 		}
 		return instance;

@@ -14,7 +14,7 @@ public class TextFileIterator<T> implements Iterator<T> {
 
 	File currentFile;
 
-	List<File> files = new ArrayList<File>();
+	List<File> files = new ArrayList<>();
 
 	String encoding;
 
