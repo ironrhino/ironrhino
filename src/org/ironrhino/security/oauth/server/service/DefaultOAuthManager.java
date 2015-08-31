@@ -57,7 +57,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	@Override
 	public Authorization grant(Client client, String grantor) {
 		if (exclusive)
-			deleteAuthorizationsByGrantor(grantor, GrantType.password);
+			deleteAuthorizationsByGrantor(grantor, client.getId(), GrantType.password);
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
@@ -132,7 +132,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		if (exclusive)
-			deleteAuthorizationsByGrantor(auth.getGrantor(), GrantType.authorization_code);
+			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setGrantType(GrantType.authorization_code);
@@ -185,9 +185,11 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public void deleteAuthorizationsByGrantor(String grantor, GrantType grantType) {
+	public void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType) {
 		DetachedCriteria dc = authorizationManager.detachedCriteria();
 		dc.add(Restrictions.eq("grantor", grantor));
+		if (client != null)
+			dc.add(Restrictions.eq("client", client));
 		if (grantType != null)
 			dc.add(Restrictions.eq("grantType", grantType));
 		List<Authorization> list = authorizationManager.findListByCriteria(dc);

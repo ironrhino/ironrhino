@@ -82,7 +82,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 	@Override
 	public Authorization grant(Client client, String grantor) {
 		if (exclusive)
-			deleteAuthorizationsByGrantor(grantor, GrantType.password);
+			deleteAuthorizationsByGrantor(grantor, client.getId(), GrantType.password);
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
@@ -193,7 +193,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		if (exclusive)
-			deleteAuthorizationsByGrantor(auth.getGrantor(), GrantType.authorization_code);
+			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setGrantType(GrantType.authorization_code);
@@ -309,20 +309,17 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public void deleteAuthorizationsByGrantor(String grantor, GrantType grantType) {
+	public void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType) {
 		List<Authorization> list = findAuthorizationsByGrantor(grantor);
-		boolean removeAll = grantType == null;
 		for (Authorization authorization : list)
-			if (removeAll || authorization.getGrantType() == grantType) {
+			if ((client == null || client.equals(authorization.getClient()))
+					&& (grantType == null || grantType == authorization.getGrantType())) {
 				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getId());
 				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getAccessToken());
 				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getRefreshToken());
-				if (!removeAll)
-					stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor, 0,
-							authorization.getId());
+				stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor, 0,
+						authorization.getId());
 			}
-		if (removeAll)
-			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION_GRANTOR + grantor);
 	}
 
 	public void saveClient(Client client) {

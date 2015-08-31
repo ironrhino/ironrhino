@@ -37,7 +37,7 @@ public interface OAuthManager {
 
 	public List<Authorization> findAuthorizationsByGrantor(String grantor);
 
-	public void deleteAuthorizationsByGrantor(String grantor, GrantType grantType);
+	public void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType);
 
 	public Client findClientById(String clientId);
 
