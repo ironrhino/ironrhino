@@ -244,7 +244,7 @@ public class Oauth2Action extends BaseAction {
 				throw new IllegalArgumentException("CLIENT_ID_INVALID");
 			UserDetails grantor = AuthzUtils.getUserDetails();
 			if (!"force".equals(approval_prompt) && grantor != null) {
-				List<Authorization> auths = oauthManager.findAuthorizationsByGrantor(grantor);
+				List<Authorization> auths = oauthManager.findAuthorizationsByGrantor(grantor.getUsername());
 				for (Authorization auth : auths) {
 					if (Objects.equals(auth.getClient(), client.getId())
 							&& Objects.equals(auth.getResponseType(), response_type)
@@ -313,7 +313,7 @@ public class Oauth2Action extends BaseAction {
 		}
 		try {
 			if (authorization == null)
-				authorization = oauthManager.grant(getUid(), grantor);
+				authorization = oauthManager.grant(getUid(), grantor.getUsername());
 			client = oauthManager.findClientById(authorization.getClient());
 			displayForNative = client.isNative();
 			granted = true;
@@ -392,7 +392,7 @@ public class Oauth2Action extends BaseAction {
 						throw new IllegalArgumentException(getText(failed.getClass().getName()));
 					}
 					UserDetails u = userDetailsService.loadUserByUsername(username);
-					authorization = oauthManager.grant(client, u);
+					authorization = oauthManager.grant(client, u.getUsername());
 				} catch (UsernameNotFoundException e) {
 					throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
 				}

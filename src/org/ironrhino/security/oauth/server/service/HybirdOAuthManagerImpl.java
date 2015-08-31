@@ -46,6 +46,9 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
 	private long expireTime;
 
+	@Value("${oauth.authorization.exclusive:false}")
+	private boolean exclusive;
+
 	@Autowired
 	private ClientManager clientManager;
 
@@ -99,13 +102,15 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(Client client, UserDetails grantor) {
+	public Authorization grant(Client client, String grantor) {
+		if (exclusive)
+			deleteAuthorizationsByGrantor(grantor, GrantType.password);
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client.getId());
-		auth.setGrantor(grantor.getUsername());
+		auth.setGrantor(grantor);
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
@@ -150,7 +155,7 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(String authorizationId, UserDetails grantor) {
+	public Authorization grant(String authorizationId, String grantor) {
 		String key = NAMESPACE_AUTHORIZATION + authorizationId;
 		Authorization auth = null;
 		try {
@@ -160,7 +165,7 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 		}
 		if (auth == null)
 			throw new IllegalArgumentException("bad_auth");
-		auth.setGrantor(grantor.getUsername());
+		auth.setGrantor(grantor);
 		auth.setModifyDate(new Date());
 		if (auth.isClientSide()) {
 			stringRedisTemplate.delete(key);
@@ -209,6 +214,8 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("client_secret_mismatch");
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
+		if (exclusive)
+			deleteAuthorizationsByGrantor(auth.getGrantor(), GrantType.authorization_code);
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setGrantType(GrantType.authorization_code);
@@ -303,8 +310,8 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor) {
-		String keyForList = NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername();
+	public List<Authorization> findAuthorizationsByGrantor(String grantor) {
+		String keyForList = NAMESPACE_AUTHORIZATION_GRANTOR + grantor;
 		List<String> tokens = stringRedisTemplate.opsForList().range(keyForList, 0, -1);
 		if (tokens == null || tokens.isEmpty())
 			return Collections.emptyList();
@@ -324,7 +331,7 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public void deleteAuthorizationsByGrantor(UserDetails grantor, GrantType grantType) {
+	public void deleteAuthorizationsByGrantor(String grantor, GrantType grantType) {
 		List<Authorization> list = findAuthorizationsByGrantor(grantor);
 		boolean removeAll = grantType == null;
 		for (Authorization authorization : list)
@@ -333,11 +340,11 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getAccessToken());
 				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getRefreshToken());
 				if (!removeAll)
-					stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername(), 0,
+					stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor, 0,
 							authorization.getId());
 			}
 		if (removeAll)
-			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername());
+			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION_GRANTOR + grantor);
 	}
 
 	@Override

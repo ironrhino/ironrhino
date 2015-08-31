@@ -14,14 +14,14 @@ public interface OAuthManager {
 
 	public Authorization grant(Client client);
 
-	public Authorization grant(Client client, UserDetails grantor);
+	public Authorization grant(Client client, String grantor);
 
 	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType)
 			throws Exception;
 
 	public Authorization reuse(Authorization authorization);
 
-	public Authorization grant(String authorizationId, UserDetails grantor) throws Exception;
+	public Authorization grant(String authorizationId, String grantor) throws Exception;
 
 	public void deny(String authorizationId);
 
@@ -35,9 +35,9 @@ public interface OAuthManager {
 
 	public void create(Authorization authorization);
 
-	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor);
+	public List<Authorization> findAuthorizationsByGrantor(String grantor);
 
-	public void deleteAuthorizationsByGrantor(UserDetails grantor, GrantType grantType);
+	public void deleteAuthorizationsByGrantor(String grantor, GrantType grantType);
 
 	public long getExpireTime();
 

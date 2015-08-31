@@ -43,6 +43,9 @@ public class OAuthManagerImpl implements OAuthManager {
 	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
 	private long expireTime;
 
+	@Value("${oauth.authorization.exclusive:false}")
+	private boolean exclusive;
+
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
 	}
@@ -71,12 +74,14 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(Client client, UserDetails grantor) {
+	public Authorization grant(Client client, String grantor) {
+		if (exclusive)
+			deleteAuthorizationsByGrantor(grantor, GrantType.password);
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client.getId());
-		auth.setGrantor(grantor.getUsername());
+		auth.setGrantor(grantor);
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
 		auth.setRefreshToken(CodecUtils.nextId());
@@ -110,11 +115,11 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(String authorizationId, UserDetails grantor) {
+	public Authorization grant(String authorizationId, String grantor) {
 		Authorization auth = authorizationManager.get(authorizationId);
 		if (auth == null)
 			throw new IllegalArgumentException("bad_auth");
-		auth.setGrantor(grantor.getUsername());
+		auth.setGrantor(grantor);
 		auth.setModifyDate(new Date());
 		if (!auth.isClientSide())
 			auth.setCode(CodecUtils.nextId());
@@ -145,6 +150,8 @@ public class OAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("client_secret_mismatch");
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
+		if (exclusive)
+			deleteAuthorizationsByGrantor(auth.getGrantor(), GrantType.authorization_code);
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setGrantType(GrantType.authorization_code);
@@ -189,17 +196,17 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor) {
+	public List<Authorization> findAuthorizationsByGrantor(String grantor) {
 		DetachedCriteria dc = authorizationManager.detachedCriteria();
-		dc.add(Restrictions.eq("grantor", grantor.getUsername()));
+		dc.add(Restrictions.eq("grantor", grantor));
 		dc.addOrder(Order.desc("modifyDate"));
 		return authorizationManager.findListByCriteria(dc);
 	}
 
 	@Override
-	public void deleteAuthorizationsByGrantor(UserDetails grantor, GrantType grantType) {
+	public void deleteAuthorizationsByGrantor(String grantor, GrantType grantType) {
 		DetachedCriteria dc = authorizationManager.detachedCriteria();
-		dc.add(Restrictions.eq("grantor", grantor.getUsername()));
+		dc.add(Restrictions.eq("grantor", grantor));
 		if (grantType != null)
 			dc.add(Restrictions.eq("grantType", grantType));
 		List<Authorization> list = authorizationManager.findListByCriteria(dc);
