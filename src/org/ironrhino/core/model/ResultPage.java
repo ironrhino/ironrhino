@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.ServletActionContext;
+import org.ironrhino.core.servlet.RequestContext;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -143,8 +143,7 @@ public class ResultPage<T> implements Serializable {
 	}
 
 	public int getTotalPage() {
-		totalPage = (int) (totalResults % pageSize == 0 ? totalResults
-				/ pageSize : totalResults / pageSize + 1);
+		totalPage = (int) (totalResults % pageSize == 0 ? totalResults / pageSize : totalResults / pageSize + 1);
 		return totalPage;
 	}
 
@@ -196,11 +195,10 @@ public class ResultPage<T> implements Serializable {
 	}
 
 	public String renderUrl(int pn) {
-		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletRequest request = RequestContext.getRequest();
 		String requestURI = (String) request.getAttribute("struts.request_uri");
 		if (requestURI == null)
-			requestURI = (String) request
-					.getAttribute("javax.servlet.forward.request_uri");
+			requestURI = (String) request.getAttribute("javax.servlet.forward.request_uri");
 		if (requestURI == null)
 			requestURI = request.getRequestURI();
 		StringBuilder sb = new StringBuilder(requestURI);
@@ -211,22 +209,16 @@ public class ResultPage<T> implements Serializable {
 			if (pn <= 1)
 				return sb.toString();
 			else
-				return sb
-						.append(StringUtils.isNotBlank(parameterString) ? "&"
-								: "?").append(PAGENO_PARAM_NAME).append("=")
-						.append(pn).toString();
+				return sb.append(StringUtils.isNotBlank(parameterString) ? "&" : "?").append(PAGENO_PARAM_NAME)
+						.append("=").append(pn).toString();
 		} else {
 			if (pn <= 1)
-				return sb
-						.append(StringUtils.isNotBlank(parameterString) ? "&"
-								: "?").append(PAGESIZE_PARAM_NAME).append("=")
-						.append(pageSize).toString();
-			else
-				return sb
-						.append(StringUtils.isNotBlank(parameterString) ? "&"
-								: "?").append(PAGENO_PARAM_NAME).append("=")
-						.append(pn).append("&").append(PAGESIZE_PARAM_NAME)
+				return sb.append(StringUtils.isNotBlank(parameterString) ? "&" : "?").append(PAGESIZE_PARAM_NAME)
 						.append("=").append(pageSize).toString();
+			else
+				return sb.append(StringUtils.isNotBlank(parameterString) ? "&" : "?").append(PAGENO_PARAM_NAME)
+						.append("=").append(pn).append("&").append(PAGESIZE_PARAM_NAME).append("=").append(pageSize)
+						.toString();
 		}
 	}
 
@@ -235,26 +227,19 @@ public class ResultPage<T> implements Serializable {
 	private String _getParameterString() {
 		if (_parameterString == null) {
 			StringBuilder sb = new StringBuilder();
-			Map<String, String[]> map = ServletActionContext.getRequest()
-					.getParameterMap();
+			Map<String, String[]> map = RequestContext.getRequest().getParameterMap();
 			for (Map.Entry<String, String[]> entry : map.entrySet()) {
 				String name = entry.getKey();
 				String[] values = entry.getValue();
-				if (values.length == 1
-						&& values[0].equals("")
-						|| name.equals("_")
-						|| name.equals(PAGENO_PARAM_NAME)
+				if (values.length == 1 && values[0].equals("") || name.equals("_") || name.equals(PAGENO_PARAM_NAME)
 						|| name.equals(PAGESIZE_PARAM_NAME)
-						|| name.startsWith(StringUtils
-								.uncapitalize(ResultPage.class.getSimpleName()) + '.'))
+						|| name.startsWith(StringUtils.uncapitalize(ResultPage.class.getSimpleName()) + '.'))
 					continue;
 				try {
 					for (String value : values)
 						sb.append(name)
-								.append('=')
-								.append(URLEncoder.encode(
-										value.length() > 256 ? value.substring(
-												0, 256) : value, "UTF-8"))
+								.append('=').append(URLEncoder
+										.encode(value.length() > 256 ? value.substring(0, 256) : value, "UTF-8"))
 								.append('&');
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();

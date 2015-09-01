@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts2.ServletActionContext;
+import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.HtmlUtils;
@@ -36,8 +36,8 @@ public class CacheContext {
 
 	public static boolean isForceFlush() {
 		try {
-			return ServletActionContext.getRequest() != null
-					&& ServletActionContext.getRequest().getParameter(FORCE_FLUSH_PARAM_NAME) != null;
+			return RequestContext.getRequest() != null
+					&& RequestContext.getRequest().getParameter(FORCE_FLUSH_PARAM_NAME) != null;
 		} catch (Exception e) {
 			return false;
 		}
@@ -52,7 +52,7 @@ public class CacheContext {
 			scope = eval(scope).toString();
 			String content = (String) getCacheManager().get(completeKey(key, scope), NAMESPACE_PAGE_FRAGMENT);
 			if (content != null) {
-				if (ServletActionContext.getRequest().isRequestedSessionIdFromCookie())
+				if (RequestContext.getRequest().isRequestedSessionIdFromCookie())
 					return content;
 				else
 					return HtmlUtils.process(content, replacer);
@@ -69,7 +69,7 @@ public class CacheContext {
 			return null;
 		String href = attr.getValue();
 		StringBuilder sb = new StringBuilder().append(attr.getName()).append("=\"");
-		sb.append(ServletActionContext.getResponse().encodeURL(href));
+		sb.append(RequestContext.getResponse().encodeURL(href));
 		sb.append("\"");
 		return sb.toString();
 	};
@@ -90,7 +90,7 @@ public class CacheContext {
 	}
 
 	private static String completeKey(String key, String scope) {
-		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletRequest request = RequestContext.getRequest();
 		StringBuilder sb = new StringBuilder();
 		sb.append(key);
 		if (scope.equalsIgnoreCase("session"))
