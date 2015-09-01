@@ -48,8 +48,7 @@ public class AccessFilter implements Filter {
 
 	public static final boolean DEFAULT_PRINT = true;
 
-	@Value("${accessFilter.responseTimeThreshold:"
-			+ DEFAULT_RESPONSETIMETHRESHOLD + "}")
+	@Value("${accessFilter.responseTimeThreshold:" + DEFAULT_RESPONSETIMETHRESHOLD + "}")
 	public long responseTimeThreshold = DEFAULT_RESPONSETIMETHRESHOLD;
 
 	@Value("${accessFilter.print:" + DEFAULT_PRINT + "}")
@@ -85,8 +84,7 @@ public class AccessFilter implements Filter {
 	@PostConstruct
 	public void _init() {
 		if (StringUtils.isNotBlank(excludePatterns))
-			excludePatternsList = Arrays.asList(excludePatterns
-					.split("\\s*,\\s*"));
+			excludePatternsList = Arrays.asList(excludePatterns.split("\\s*,\\s*"));
 	}
 
 	@Override
@@ -95,117 +93,113 @@ public class AccessFilter implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+			throws IOException, ServletException {
 		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
-		HttpServletRequest request = new ProxySupportHttpServletRequest(
-				(HttpServletRequest) req);
+		HttpServletRequest request = new ProxySupportHttpServletRequest((HttpServletRequest) req);
 		HttpServletResponse response = (HttpServletResponse) resp;
-		if (isRequestDispatcher && RequestUtils.isInternalTesting(request))
-			response.addHeader("X-Instance-Id", AppInfo.getInstanceId());
+		RequestContext.set(request, response);
+		try {
+			if (isRequestDispatcher && RequestUtils.isInternalTesting(request))
+				response.addHeader("X-Instance-Id", AppInfo.getInstanceId());
 
-		String uri = request.getRequestURI();
-		uri = uri.substring(request.getContextPath().length());
+			String uri = request.getRequestURI();
+			uri = uri.substring(request.getContextPath().length());
 
-		for (String pattern : excludePatternsList) {
-			if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri,
-					pattern)) {
-				chain.doFilter(req, resp);
-				return;
+			for (String pattern : excludePatternsList) {
+				if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pattern)) {
+					chain.doFilter(req, resp);
+					return;
+				}
 			}
-		}
 
-		if (isRequestDispatcher && handlers != null)
-			loop: for (AccessHandler handler : handlers) {
-				String excludePattern = handler.getExcludePattern();
-				if (StringUtils.isNotBlank(excludePattern)) {
-					String[] arr = excludePattern.split("\\s*,\\s*");
-					for (String pa : arr)
-						if (org.ironrhino.core.util.StringUtils
-								.matchesWildcard(uri, pa)) {
-							continue loop;
+			if (isRequestDispatcher && handlers != null)
+				loop: for (AccessHandler handler : handlers) {
+					String excludePattern = handler.getExcludePattern();
+					if (StringUtils.isNotBlank(excludePattern)) {
+						String[] arr = excludePattern.split("\\s*,\\s*");
+						for (String pa : arr)
+							if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pa)) {
+								continue loop;
+							}
+					}
+					String pattern = handler.getPattern();
+					boolean matched = StringUtils.isBlank(pattern);
+					if (!matched) {
+						String[] arr = pattern.split("\\s*,\\s*");
+						for (String pa : arr)
+							if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pa)) {
+								matched = true;
+								break;
+							}
+					}
+					if (matched) {
+						if (handler.handle(request, response)) {
+							return;
 						}
-				}
-				String pattern = handler.getPattern();
-				boolean matched = StringUtils.isBlank(pattern);
-				if (!matched) {
-					String[] arr = pattern.split("\\s*,\\s*");
-					for (String pa : arr)
-						if (org.ironrhino.core.util.StringUtils
-								.matchesWildcard(uri, pa)) {
-							matched = true;
-							break;
-						}
-				}
-				if (matched) {
-					if (handler.handle(request, response)) {
-						return;
 					}
 				}
-			}
 
-		if (request.getAttribute("userAgent") == null)
-			request.setAttribute("userAgent",
-					new UserAgent(request.getHeader("User-Agent")));
-		MDC.put("remoteAddr", request.getRemoteAddr());
-		MDC.put("method", request.getMethod());
-		StringBuffer url = request.getRequestURL();
-		if (StringUtils.isNotBlank(request.getQueryString()))
-			url.append('?').append(request.getQueryString());
-		MDC.put("url", " " + url.toString());
-		String s = request.getHeader("User-Agent");
-		if (s != null)
-			MDC.put("userAgent", " UserAgent:" + s);
-		s = request.getHeader("Referer");
-		if (s != null)
-			MDC.put("referer", " Referer:" + s);
-		s = RequestUtils.getCookieValue(request,
-				DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
-		MDC.put("username", s != null ? " " + s : " ");
-		String sessionId = null;
-		if (httpSessionManager != null) {
-			sessionId = httpSessionManager.getSessionId(request);
-			if (sessionId != null) {
-				MDC.put("session", " session:" + sessionId);
-				MDC.put(MDC_KEY_SESSION_ID, sessionId);
-			}
-		}
-		String requestId = (String) request.getAttribute(MDC_KEY_REQUEST_ID);
-		if (requestId == null) {
-			requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
-			if (StringUtils.isBlank(requestId)) {
-				requestId = CodecUtils.nextId();
+			if (request.getAttribute("userAgent") == null)
+				request.setAttribute("userAgent", new UserAgent(request.getHeader("User-Agent")));
+			MDC.put("remoteAddr", request.getRemoteAddr());
+			MDC.put("method", request.getMethod());
+			StringBuffer url = request.getRequestURL();
+			if (StringUtils.isNotBlank(request.getQueryString()))
+				url.append('?').append(request.getQueryString());
+			MDC.put("url", " " + url.toString());
+			String s = request.getHeader("User-Agent");
+			if (s != null)
+				MDC.put("userAgent", " UserAgent:" + s);
+			s = request.getHeader("Referer");
+			if (s != null)
+				MDC.put("referer", " Referer:" + s);
+			s = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
+			MDC.put("username", s != null ? " " + s : " ");
+			String sessionId = null;
+			if (httpSessionManager != null) {
+				sessionId = httpSessionManager.getSessionId(request);
 				if (sessionId != null) {
-					requestId = new StringBuilder(sessionId).append('.')
-							.append(requestId).toString();
+					MDC.put("session", " session:" + sessionId);
+					MDC.put(MDC_KEY_SESSION_ID, sessionId);
 				}
-				response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 			}
-			request.setAttribute(MDC_KEY_REQUEST_ID, requestId);
-		}
-		MDC.put("request", " request:" + requestId);
-		MDC.put(MDC_KEY_REQUEST_ID, requestId);
-		try {
-			if (isRequestDispatcher && print && !uri.startsWith("/assets/")
-					&& !uri.startsWith("/remoting/")
-					&& request.getHeader("Last-Event-Id") == null)
-				accessLog.info("");
+			String requestId = (String) request.getAttribute(MDC_KEY_REQUEST_ID);
+			if (requestId == null) {
+				requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
+				if (StringUtils.isBlank(requestId)) {
+					requestId = CodecUtils.nextId();
+					if (sessionId != null) {
+						requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
+					}
+					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
+				}
+				request.setAttribute(MDC_KEY_REQUEST_ID, requestId);
+			}
+			MDC.put("request", " request:" + requestId);
+			MDC.put(MDC_KEY_REQUEST_ID, requestId);
+			try {
+				if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")
+						&& request.getHeader("Last-Event-Id") == null)
+					accessLog.info("");
 
-			long start = System.currentTimeMillis();
-			chain.doFilter(request, response);
-			long responseTime = System.currentTimeMillis() - start;
-			if (isRequestDispatcher && responseTime > responseTimeThreshold) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(RequestUtils.serializeData(request))
-						.append(" response time:").append(responseTime)
-						.append("ms");
-				accesWarnLog.warn(sb.toString());
+				long start = System.currentTimeMillis();
+				chain.doFilter(request, response);
+				long responseTime = System.currentTimeMillis() - start;
+				if (isRequestDispatcher && responseTime > responseTimeThreshold) {
+					StringBuilder sb = new StringBuilder();
+					sb.append(RequestUtils.serializeData(request)).append(" response time:").append(responseTime)
+							.append("ms");
+					accesWarnLog.warn(sb.toString());
+				}
+			} catch (ServletException e) {
+				logger.error(e.getMessage(), e);
+				throw e;
+			} finally {
+				MDC.clear();
 			}
-		} catch (ServletException e) {
-			logger.error(e.getMessage(), e);
-			throw e;
 		} finally {
-			MDC.clear();
+			RequestContext.reset();
 		}
 	}
 
