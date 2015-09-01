@@ -4,7 +4,6 @@
 	<import file="build.xml" />
 	<import file="build.sources.xml" />
 	<target name="zip">
-		<delete dir="${target.dir}" />
 		<antcall target="compile" />
 		<antcall target="jar" />
 		<antcall target="jar-sources" />
