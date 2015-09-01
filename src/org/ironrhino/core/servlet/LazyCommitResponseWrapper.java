@@ -18,7 +18,7 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
 	private String location;
 
-	private int status = HttpServletResponse.SC_OK;
+	private int status;
 
 	private String message;
 
@@ -54,9 +54,9 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
 	@Override
 	public int getStatus() {
-		return this.status;
+		return status > 0 ? this.status : super.getStatus();
 	}
-	
+
 	@Override
 	public void setStatus(int sc) {
 		this.status = sc;
@@ -146,8 +146,7 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 		public PrintWriter getWriter() {
 			if (bufferedWriter == null) {
 				if (bufferedStream != null) {
-					throw new IllegalStateException(
-							"response.getWriter() called after response.getOutputStream()");
+					throw new IllegalStateException("response.getWriter() called after response.getOutputStream()");
 				}
 				bufferedWriter = new CharArrayWriter(128);
 				exposedWriter = new PrintWriter(bufferedWriter);
@@ -158,8 +157,7 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 		public ServletOutputStream getOutputStream() {
 			if (bufferedStream == null) {
 				if (bufferedWriter != null) {
-					throw new IllegalStateException(
-							"response.getOutputStream() called after response.getWriter()");
+					throw new IllegalStateException("response.getOutputStream() called after response.getWriter()");
 				}
 				bufferedStream = new ByteArrayOutputStream(SIZE);
 				exposedStream = new ServletOutputStream() {
