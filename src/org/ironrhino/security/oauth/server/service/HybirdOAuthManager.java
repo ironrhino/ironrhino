@@ -15,6 +15,7 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
@@ -77,6 +78,10 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.client_credential);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
@@ -99,6 +104,10 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
@@ -151,6 +160,10 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 		if (auth == null)
 			throw new IllegalArgumentException("bad_auth");
 		auth.setGrantor(grantor);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setModifyDate(new Date());
 		if (auth.isClientSide()) {
 			stringRedisTemplate.delete(key);

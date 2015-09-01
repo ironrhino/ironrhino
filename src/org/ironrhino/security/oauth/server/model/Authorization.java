@@ -61,7 +61,7 @@ public class Authorization extends BaseEntity {
 	@Column(unique = true)
 	private String refreshToken;
 
-	@UiConfig(width = "100px", alias = "response_type")
+	@UiConfig(hiddenInList = @Hidden(true) , alias = "response_type")
 	@Column(nullable = false, length = 10)
 	@Enumerated(EnumType.STRING)
 	private ResponseType responseType = ResponseType.code;
@@ -70,6 +70,9 @@ public class Authorization extends BaseEntity {
 	@Column(length = 20)
 	@Enumerated(EnumType.STRING)
 	private GrantType grantType = GrantType.authorization_code;
+
+	@UiConfig(width = "130px")
+	private String address;
 
 	@NotInCopy
 	@UiConfig(width = "130px")
@@ -172,6 +175,14 @@ public class Authorization extends BaseEntity {
 
 	public void setGrantType(GrantType grantType) {
 		this.grantType = grantType;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	@JsonIgnore

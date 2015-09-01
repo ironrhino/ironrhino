@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
@@ -70,6 +71,10 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.client_credential);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
@@ -92,6 +97,10 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
@@ -144,6 +153,10 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		if (auth == null)
 			throw new IllegalArgumentException("bad_auth");
 		auth.setGrantor(grantor);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setModifyDate(new Date());
 		if (auth.isClientSide()) {
 			stringRedisTemplate.delete(key);

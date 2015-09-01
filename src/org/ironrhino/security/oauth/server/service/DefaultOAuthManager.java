@@ -13,6 +13,7 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
@@ -49,6 +50,10 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		auth.setClient(client.getId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.client_credential);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setRefreshToken(CodecUtils.nextId());
 		authorizationManager.save(auth);
 		return auth;
@@ -65,6 +70,10 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		auth.setGrantor(grantor);
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setRefreshToken(CodecUtils.nextId());
 		authorizationManager.save(auth);
 		return auth;
@@ -101,6 +110,10 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		if (auth == null)
 			throw new IllegalArgumentException("bad_auth");
 		auth.setGrantor(grantor);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setModifyDate(new Date());
 		if (!auth.isClientSide())
 			auth.setCode(CodecUtils.nextId());
