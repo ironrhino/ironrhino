@@ -7942,6 +7942,15 @@ body.welcome .hero-unit form {
 	border-width:10px;
 	border-radius: 40px;
 }
+body.welcome .hero-unit button[type="submit"]:only-child {
+	width: 170px;
+    height: 30px;
+    font-size: 18px;
+}
+body.welcome.zh .hero-unit button[type="submit"]:only-child {
+	letter-spacing: 15px;
+    text-indent: 10px;
+}
 @media (orientation:landscape) and (max-height: 400px) {
   body.welcome {
 	padding-top: 0;
