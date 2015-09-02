@@ -32877,23 +32877,28 @@ Observation.common = function(container) {
 						option.format = t.data('format') || 'yyyy-MM-dd';
 						option.pickTime = false;
 					}
-					t.datetimepicker(option).on('changeDate', function(e) {
-								t.trigger('validate').trigger('conjunct');
-								var dp = t.data('datetimepicker');
-								if (dp && dp.widget.is(':visible'))
-									dp.hide();
-							})
-					// .on('show', function(e) {
-					// $('input.date,input.datetime,input.time',
-					// t.closest('form')).not('[readonly]')
-					// .not('[disabled]').not(t).each(function(i, v) {
-					// var dp = $(v)
-					// .data('datetimepicker');
-					// if (dp && dp.widget.is(':visible'))
-					// dp.hide();
-					// });
-					// })
-					;
+					t.focus(function() {
+						var dp = t.data('datetimepicker');
+						if (!dp) {
+							t.datetimepicker(option).on('changeDate',
+									function(e) {
+										t.data('changed', true);
+										if (t.hasClass('date'))
+											t.blur();
+									});
+							dp = t.data('datetimepicker');
+							dp.show();
+						}
+					}).blur(function() {
+						var dp = t.data('datetimepicker');
+						if (dp) {
+							if (t.data('changed'))
+								t.removeData('changed').trigger('validate')
+										.trigger('conjunct');
+							dp.widget.remove();
+							t.removeData('datetimepicker');
+						}
+					});
 				});
 	if (typeof $.fn.treeTable != 'undefined')
 		$('.treeTable', container).each(function() {
