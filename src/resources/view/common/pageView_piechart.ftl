@@ -4,7 +4,7 @@
 <title>${action.getText('pageView')}</title>
 </head>
 <body>
-<h3 style="text-align:center;"><#if date??>${date?string('yyyy-MM-dd')}<#else>${action.getText('total')}</#if></h3>
+<h4 style="text-align:center;"><#if date??>${date?string('yyyy-MM-dd')}<#else>${action.getText('total')}</#if></h4>
 <ul class="unstyled flotpiechart" style="height:300px;">
 	<#if dataMap??>
 	<#list dataMap?keys as key>
