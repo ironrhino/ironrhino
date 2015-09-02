@@ -2,7 +2,7 @@
 	$.fn.flotchart = function() {
 		$(this).each(function() {
 			var ul = $(this), data = [];
-			if (ul.data('least')
+			if ($('li', ul).length == 0 || ul.data('least')
 					&& $('li', ul).length < parseInt(ul.data('least')))
 				return;
 			ul.wrap('<div class="plot-wrap" style="position:relative;"></div>');
@@ -10,7 +10,7 @@
 					.height(ul.height());
 			$('<div style="position: absolute;width: 20px;height: 20px;font-size: 20px;'
 					+ (ul.hasClass('flotpiechart') ? 'bottom' : 'top')
-					+ ': 0px;right: 0px;cursor: pointer;"><i class="glyphicon glyphicon-list"></i></div>')
+					+ ': 15px;right: 20px;cursor: pointer;"><i class="glyphicon glyphicon-list"></i></div>')
 					.insertAfter(plot).click(function() {
 						$('.glyphicon', this).toggleClass('glyphicon-list')
 								.toggleClass('glyphicon-picture');
