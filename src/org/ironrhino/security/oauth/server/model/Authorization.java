@@ -187,7 +187,7 @@ public class Authorization extends BaseEntity {
 
 	@JsonIgnore
 	public boolean isClientSide() {
-		return "token".equals(responseType);
+		return ResponseType.token == responseType;
 	}
 
 }
