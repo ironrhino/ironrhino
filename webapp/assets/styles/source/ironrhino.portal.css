@@ -25,6 +25,7 @@
 	padding-bottom: 100px;
 	}
 .portlet { 
+	display: block;
 	border: 1px solid #DEDEDE;
 	border-radius: 5px;
 	-webkit-border-radius: 5px;
@@ -83,6 +84,13 @@
 
 .portlet-icon a i{
 	margin-left:-4px;
+}
+.portlet-fullscreen{
+	margin-left: 0;
+	margin-right: 0;
+}
+.portlet-fullscreen .portlet-icon a.btn-fold,.portlet-fullscreen .portlet-icon a.btn-close{
+	display: none;
 }
 
 .portlet-content{
