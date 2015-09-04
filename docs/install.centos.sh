@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ANT_VERSION=1.9.6
-JDK_VERSION=8u45-b14
-TOMCAT_VERSION=8.0.24
+JDK_VERSION=8u60-b27
+TOMCAT_VERSION=8.0.26
 REDIS_VERSION=3.0.3
 #JDK_VERSION=7u80-b15
-#TOMCAT_VERSION=7.0.63
+#TOMCAT_VERSION=7.0.64
 
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
@@ -442,7 +442,11 @@ elif [ -d .git ];then
 git reset --hard
 git clean -df
 gitpulloutput=\`git pull 2>&1\`
+ret=\$?
 echo "\$gitpulloutput"
+if [ \$ret -ne 0 ]; then
+        exit \$ret
+fi
 if ! [[ \$gitpulloutput =~ up-to-date ]] ; then
 ant dist
 fi
@@ -455,20 +459,20 @@ cd \$app
 if [ -d .svn ];then
 svn revert -R .
 svn up --force
+ret=\$?
 elif [ -d .git ];then
 git reset --hard
-#git clean -f
-gitpulloutput=\`git pull 2>&1\`
-echo "\$gitpulloutput"
-if [[ \$gitpulloutput =~ fatal: ]] ; then
-exit 1
-fi
+git pull
+ret=\$?
 else
 echo 'no svn or git'
 fi
+LANGUAGE=\$OLDLANGUAGE
+if [ \$ret -ne 0 ]; then
+        exit \$ret
+fi
 ant -Dserver.home=/home/$USER/tomcat8080 -Dwebapp.deploy.dir=/home/$USER/tomcat8080/webapps/ROOT deploy
 chmod -R +X /home/$USER/tomcat8080/webapps
-LANGUAGE=\$OLDLANGUAGE
 sleep 5
 ant -Dserver.home=/home/$USER/tomcat8081 -Dserver.shutdown.port=8006 -Dserver.startup.port=8081 shutdown
 rm -rf /home/$USER/tomcat8081/webapps
