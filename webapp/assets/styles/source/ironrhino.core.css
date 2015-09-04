@@ -34,6 +34,9 @@ td.middle {
 	z-index: 1000;
 	font-size:1.2em;
 }
+.navbar-fixed-top ul.nav > li{
+	border-top:solid 2px transparent;
+}
 .navbar-fixed-top ul.nav > li.active{
   	font-weight: bold;
   	border-top: solid 2px #777 !important;
@@ -121,6 +124,11 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
   .hero-unit{
 	padding-left: 10px;
 	padding-right: 10px;
+  }
+}
+@media (max-width: 960px) {
+  body.welcome .form-actions{
+  	text-align: center;
   }
 }
 #indicator {
