@@ -14,8 +14,9 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
 	private WrappedHttpSession session;
 
-	public WrappedHttpServletRequest(HttpServletRequest request,
-			WrappedHttpSession session) {
+	private volatile Map<String, String[]> parameterMap;
+
+	public WrappedHttpServletRequest(HttpServletRequest request, WrappedHttpSession session) {
 		super(request);
 		this.session = session;
 	}
@@ -58,50 +59,49 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public Locale getLocale() {
-		Locale locale = session.getHttpSessionManager().getLocale(
-				(HttpServletRequest) this.getRequest());
+		Locale locale = session.getHttpSessionManager().getLocale((HttpServletRequest) this.getRequest());
 		return locale;
 	}
 
 	@Override
 	public String getParameter(String name) {
-		String value = super.getParameter(name);
-		return decryptIfNecessary(name, value);
+		String[] values = getParameterMap().get(name);
+		return values != null ? values[0] : null;
 	}
 
 	@Override
 	public Map<String, String[]> getParameterMap() {
-		Map<String, String[]> map = super.getParameterMap();
-		for (Map.Entry<String, String[]> entry : map.entrySet()) {
-			String name = entry.getKey();
-			String[] value = entry.getValue();
-			for (int i = 0; i < value.length; i++)
-				value[i] = decryptIfNecessary(name, value[i]);
+		if (parameterMap == null) {
+			synchronized (this) {
+				if (parameterMap == null) {
+					Map<String, String[]> map = super.getParameterMap();
+					for (Map.Entry<String, String[]> entry : map.entrySet()) {
+						String name = entry.getKey();
+						String[] value = entry.getValue();
+						for (int i = 0; i < value.length; i++)
+							value[i] = decryptIfNecessary(name, value[i]);
+					}
+					parameterMap = map;
+				}
+			}
 		}
-		return map;
+		return parameterMap;
 	}
 
 	@Override
 	public String[] getParameterValues(String name) {
-		String[] value = super.getParameterValues(name);
-		if (value == null)
-			return value;
-		for (int i = 0; i < value.length; i++)
-			value[i] = decryptIfNecessary(name, value[i]);
-		return value;
+		return getParameterMap().get(name);
 	}
 
 	private String decryptIfNecessary(String name, String value) {
-		if (value != null && name.toLowerCase().endsWith("password")
-				&& value.length() >= 20) {
+		if (value != null && name.toLowerCase().endsWith("password") && value.length() >= 20) {
 			String key = session.getSessionTracker();
 			if (!isRequestedSessionIdFromCookie())
 				return value;
 			try {
 				if (key.length() > 10)
 					key = key.substring(key.length() - 10, key.length());
-				String str = URLDecoder
-						.decode(RC4.decryptWithKey(value, key), "UTF-8");
+				String str = URLDecoder.decode(RC4.decryptWithKey(value, key), "UTF-8");
 				if (str.endsWith(key))
 					value = str.substring(0, str.length() - key.length());
 			} catch (IllegalArgumentException e) {
