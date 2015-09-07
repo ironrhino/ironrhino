@@ -21,8 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
-public class SecurityContextSessionCompressor implements
-		SessionCompressor<SecurityContext> {
+public class SecurityContextSessionCompressor implements SessionCompressor<SecurityContext> {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -31,8 +30,7 @@ public class SecurityContextSessionCompressor implements
 
 	@Override
 	public boolean supportsKey(String key) {
-		return HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY
-				.equals(key);
+		return HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY.equals(key);
 	}
 
 	@Override
@@ -67,14 +65,11 @@ public class SecurityContextSessionCompressor implements
 				String[] arr = string.split(",", 2);
 				String username = arr[1];
 				String password = arr[0];
-				UserDetails ud = userDetailsService
-						.loadUserByUsername(username);
-				if (StringUtils.isEmpty(ud.getPassword())
-						&& StringUtils.isBlank(password)
-						|| !StringUtils.isEmpty(ud.getPassword())
-						&& CodecUtils.md5Hex(ud.getPassword()).equals(password)) {
-					sc.setAuthentication(new UsernamePasswordAuthenticationToken(
-							ud, ud.getPassword(), ud.getAuthorities()));
+				UserDetails ud = userDetailsService.loadUserByUsername(username);
+				if (ud.getPassword() == null && StringUtils.isBlank(password)
+						|| ud.getPassword() != null && CodecUtils.md5Hex(ud.getPassword()).equals(password)) {
+					sc.setAuthentication(
+							new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities()));
 				}
 			} catch (UsernameNotFoundException e) {
 				logger.warn(e.getMessage());
