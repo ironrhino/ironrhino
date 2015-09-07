@@ -30,7 +30,7 @@
 				$('.portlet', portal).each(function() {
 					var header = $('.portlet-header', this);
 					header
-							.append('<div class="portlet-icon"><a class="btn btn-fold"><i class="glyphicon glyphicon-chevron-up"></i></a><a class="btn btn-close"><i class="glyphicon glyphicon-remove"></i></a><a class="btn btn-fullscreen"><i class="glyphicon glyphicon-fullscreen"></i></a></div>');
+							.append('<div class="portlet-icon"><a class="btn btn-fold"><i class="glyphicon glyphicon-chevron-up"></i></a><a class="btn btn-close"><i class="glyphicon glyphicon-remove"></i></a><a class="btn btn-resize"><i class="glyphicon glyphicon-resize-full"></i></a></div>');
 					if ($('.ajaxpanel,iframe', $(this)).length) {
 						$('<a class="btn btn-refresh"><i class="glyphicon glyphicon-refresh"></i></a>')
 								.insertBefore($('.portlet-header .btn-fold',
@@ -59,16 +59,22 @@
 					}
 					p.remove();
 					addRestoreButton(portal);
-				}).on('click', '.portlet-header .btn-fullscreen', function() {
+				}).on('click', '.portlet-header .btn-resize', function() {
 					var p = $(this).closest('.portlet')
 							.toggleClass('portlet-fullscreen');
 					var portal = p.closest('.portal');
 					if (p.hasClass('portlet-fullscreen')) {
-						p.wrap('<div class="replaceme"></div>');
+						p.wrap('<div class="replaceme"></div>')
+								.find('.btn-resize i')
+								.removeClass('glyphicon-resize-full')
+								.addClass('glyphicon-resize-small');
 						$('.portlet', portal).fadeOut(200, function() {
 									p.prependTo(portal).fadeIn(200);
 								});
 					} else {
+						p.hide().find('.btn-resize i')
+								.removeClass('glyphicon-resize-small')
+								.addClass('glyphicon-resize-full');
 						portal.find('.replaceme').replaceWith(p);
 						$('.portlet', portal).fadeIn();
 					}
