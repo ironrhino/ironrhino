@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Configuration>
 	<Properties>
-    	<Property name="app.home">/app</Property>
+    	<Property name="app.home">/tmp/app</Property>
     	<Property name="port.http"></Property>
     	<Property name="console.logger.level">INFO</Property>
     	<Property name="hibernate.logger.level">INFO</Property>
