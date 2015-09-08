@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Fields {
 
-	Field[] value() default {};
+	Field[]value() default {};
 
 	String sample() default "";
 

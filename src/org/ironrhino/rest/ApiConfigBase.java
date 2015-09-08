@@ -36,8 +36,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	public static ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
-		objectMapper
-				.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
 	}
@@ -48,21 +47,18 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	}
 
 	@Override
-	protected void configureContentNegotiation(
-			ContentNegotiationConfigurer configurer) {
+	protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 		configurer.defaultContentType(MediaType.APPLICATION_JSON);
 		configurer.favorPathExtension(false);
 	}
 
 	@Override
-	protected void configureMessageConverters(
-			List<HttpMessageConverter<?>> converters) {
+	protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter() {
 
 			@Override
-			protected void writeInternal(Object object,
-					HttpOutputMessage outputMessage) throws IOException,
-					HttpMessageNotWritableException {
+			protected void writeInternal(Object object, HttpOutputMessage outputMessage)
+					throws IOException, HttpMessageNotWritableException {
 				super.writeInternal(object, outputMessage);
 				outputMessage.getBody().close();
 			}
@@ -70,15 +66,14 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 		};
 		jackson2.setObjectMapper(createObjectMapper());
 		converters.add(jackson2);
-		StringHttpMessageConverter string = new StringHttpMessageConverter(){
+		StringHttpMessageConverter string = new StringHttpMessageConverter() {
 
 			@Override
-			protected void writeInternal(String str,
-					HttpOutputMessage outputMessage) throws IOException {
+			protected void writeInternal(String str, HttpOutputMessage outputMessage) throws IOException {
 				super.writeInternal(str, outputMessage);
 				outputMessage.getBody().close();
 			}
-			
+
 		};
 		string.setWriteAcceptCharset(false);
 		converters.add(string);

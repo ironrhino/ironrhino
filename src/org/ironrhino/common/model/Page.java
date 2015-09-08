@@ -43,8 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "common_page")
 @Richtable(searchable = true)
-public class Page extends BaseEntity implements Recordable<UserDetails>,
-		Ordered<Page> {
+public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered<Page> {
 
 	private static final long serialVersionUID = 4688382703803043164L;
 
@@ -67,7 +66,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	@SearchableProperty
 	@Lob
 	@Column(nullable = false)
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true) )
 	private String content;
 
 	@SearchableProperty
@@ -211,8 +210,8 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	public void setTagsAsString(String tagsAsString) {
 		tags.clear();
 		if (StringUtils.isNotBlank(tagsAsString))
-			tags.addAll(Arrays.asList(org.ironrhino.core.util.StringUtils
-					.trimTail(tagsAsString, ",").split("\\s*,\\s*")));
+			tags.addAll(
+					Arrays.asList(org.ironrhino.core.util.StringUtils.trimTail(tagsAsString, ",").split("\\s*,\\s*")));
 	}
 
 	@Override
@@ -252,8 +251,8 @@ public class Page extends BaseEntity implements Recordable<UserDetails>,
 	}
 
 	public String abbreviate(int size) {
-		return StringUtils.isNotBlank(content) ? StringUtils.abbreviate(
-				Jsoup.parse(content).text().trim(), size).trim() : null;
+		return StringUtils.isNotBlank(content) ? StringUtils.abbreviate(Jsoup.parse(content).text().trim(), size).trim()
+				: null;
 	}
 
 	public List<Image> getImages() {

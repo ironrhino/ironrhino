@@ -57,8 +57,7 @@ public class StringUtils {
 					// 3. wordIndex > index，说明index到wordIndex -
 					// 1处全部是大写，以upperCaseWord处理。
 					if ((wordIndex == length) || (wordIndex > index)) {
-						index = parseUpperCaseWord(buffer, str, index,
-								wordIndex);
+						index = parseUpperCaseWord(buffer, str, index, wordIndex);
 					} else {
 						index = parseTitleCaseWord(buffer, str, index);
 					}
@@ -85,8 +84,7 @@ public class StringUtils {
 			return buffer.toString();
 		}
 
-		private int parseUpperCaseWord(StringBuffer buffer, String str,
-				int index, int length) {
+		private int parseUpperCaseWord(StringBuffer buffer, String str, int index, int length) {
 			char ch = str.charAt(index++);
 
 			// 首字母，必然存在且为大写。
@@ -105,8 +103,7 @@ public class StringUtils {
 			return index - 1;
 		}
 
-		private int parseLowerCaseWord(StringBuffer buffer, String str,
-				int index) {
+		private int parseLowerCaseWord(StringBuffer buffer, String str, int index) {
 			char ch = str.charAt(index++);
 
 			// 首字母，必然存在且为小写。
@@ -132,8 +129,7 @@ public class StringUtils {
 			return index - 1;
 		}
 
-		private int parseTitleCaseWord(StringBuffer buffer, String str,
-				int index) {
+		private int parseTitleCaseWord(StringBuffer buffer, String str, int index) {
 			char ch = str.charAt(index++);
 
 			// 首字母，必然存在且为大写。
@@ -186,8 +182,7 @@ public class StringUtils {
 		}
 
 		protected boolean isDelimiter(char ch) {
-			return !Character.isUpperCase(ch) && !Character.isLowerCase(ch)
-					&& !Character.isDigit(ch);
+			return !Character.isUpperCase(ch) && !Character.isLowerCase(ch) && !Character.isDigit(ch);
 		}
 
 		protected abstract void startSentence(StringBuffer buffer, char ch);
@@ -440,7 +435,7 @@ public class StringUtils {
 		} catch (BadHanyuPinyinOutputFormatCombination e) {
 			e.printStackTrace();
 		}
-		if (array == null)// not chinese
+		if (array == null) // not chinese
 			array = new String[] { String.valueOf(c) };
 		return array;
 	}

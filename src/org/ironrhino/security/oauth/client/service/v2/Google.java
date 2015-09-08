@@ -57,8 +57,7 @@ public class Google extends OAuth2Provider {
 	}
 
 	public String getAccessKey() {
-		return settingControl.getStringValue("oauth." + getName()
-				+ ".accessKey");
+		return settingControl.getStringValue("oauth." + getName() + ".accessKey");
 	}
 
 	@Override
@@ -68,8 +67,7 @@ public class Google extends OAuth2Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content,
-				JsonNode.class);
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
 		Profile p = new Profile();
 		p.setUid(generateUid(data.get("id").textValue()));
 		p.setDisplayName(data.get("name").textValue());
@@ -83,8 +81,8 @@ public class Google extends OAuth2Provider {
 	}
 
 	@Override
-	protected String invoke(String protectedURL, Map<String, String> params,
-			Map<String, String> headers) throws IOException {
+	protected String invoke(String protectedURL, Map<String, String> params, Map<String, String> headers)
+			throws IOException {
 		if (params == null)
 			params = new HashMap<>(2, 1);
 		if (StringUtils.isNotBlank(getAccessKey()))

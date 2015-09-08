@@ -38,8 +38,7 @@ public class QueryCriteria implements Serializable {
 
 	@Override
 	public String toString() {
-		return "QueryCriteria [query=" + query + ", parameters=" + parameters
-				+ "]";
+		return "QueryCriteria [query=" + query + ", parameters=" + parameters + "]";
 	}
 
 }

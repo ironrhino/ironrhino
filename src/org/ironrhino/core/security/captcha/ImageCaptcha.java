@@ -31,8 +31,7 @@ public class ImageCaptcha {
 
 	static {
 		GraphicsEnvironment.getLocalGraphicsEnvironment().preferLocaleFonts();
-		String[] names = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getAvailableFontFamilyNames(Locale.CHINA);
+		String[] names = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames(Locale.CHINA);
 		for (String s : names) {
 			char c = s.charAt(0);
 			if (Character.isLowerCase(c) || Character.isUpperCase(c)) {
@@ -45,9 +44,8 @@ public class ImageCaptcha {
 	public ImageCaptcha(String challenge, String fuzzifiedChallenge) {
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = image.createGraphics();
-		char[] use = fonts.size() > 0
-				&& StringUtils.isNotBlank(fuzzifiedChallenge) ? fuzzifiedChallenge
-				.toCharArray() : challenge.toCharArray();
+		char[] use = fonts.size() > 0 && StringUtils.isNotBlank(fuzzifiedChallenge) ? fuzzifiedChallenge.toCharArray()
+				: challenge.toCharArray();
 		g.setColor(new Color(240, 240, 240));
 		g.fillRect(0, 0, 200, 50);
 		for (int i = 0; i < use.length; i++) {
@@ -56,16 +54,15 @@ public class ImageCaptcha {
 			// g.setColor(new
 			// Color((int)(Math.random()*256),0,(int)(Math.random()*256)));
 			g.setPaint(getPaint(p, size));
-			g.setFont(new Font(fonts.size() > 0 ? fonts.get((int) (Math
-					.random() * fonts.size())) : "Arial", getFace(), size));
+			g.setFont(new Font(fonts.size() > 0 ? fonts.get((int) (Math.random() * fonts.size())) : "Arial", getFace(),
+					size));
 			g.drawString("" + use[i], p.x, p.y);
 		}
 		g.setStroke(new BasicStroke(1.0f));
 		g.setPaint(null);
 		for (int i = 0; i < use.length; i++) {
 			g.setColor(new Color(random.nextInt(0x00FFFFFFF)));
-			g.drawLine(random.nextInt(200), random.nextInt(50),
-					random.nextInt(200), random.nextInt(50));
+			g.drawLine(random.nextInt(200), random.nextInt(50), random.nextInt(200), random.nextInt(50));
 		}
 		Random random = new Random();
 		for (int i = 0; i < 88; i++) {
@@ -88,10 +85,8 @@ public class ImageCaptcha {
 	}
 
 	private static Paint getPaint(Point p, int size) {
-		GradientPaint gp = new GradientPaint(p.x, p.y, new Color(
-				random.nextInt(256), 0, random.nextInt(256)), p.x, p.y - size,
-				new Color(random.nextInt(256), random.nextInt(256), random
-						.nextInt(256)));
+		GradientPaint gp = new GradientPaint(p.x, p.y, new Color(random.nextInt(256), 0, random.nextInt(256)), p.x,
+				p.y - size, new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
 		return gp;
 	}
 

@@ -66,8 +66,7 @@ public class SessionCompressorManager {
 		if (StringUtils.isNotBlank(str)) {
 			Map<String, String> compressedMap = null;
 			try {
-				compressedMap = JsonUtils.fromJson(str,
-						JsonUtils.STRING_MAP_TYPE);
+				compressedMap = JsonUtils.fromJson(str, JsonUtils.STRING_MAP_TYPE);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 				session.invalidate();
@@ -91,28 +90,22 @@ public class SessionCompressorManager {
 						if (value == null)
 							continue;
 						if (value instanceof SecurityContext) {
-							Authentication auth = ((SecurityContext) value)
-									.getAuthentication();
-							Object principal = auth != null ? auth
-									.getPrincipal() : null;
+							Authentication auth = ((SecurityContext) value).getAuthentication();
+							Object principal = auth != null ? auth.getPrincipal() : null;
 							if (principal instanceof UserDetails) {
 								UserDetails ud = (UserDetails) principal;
 								String username = ud.getUsername();
-								String uri = RequestUtils.getRequestUri(session
-										.getRequest());
+								String uri = RequestUtils.getRequestUri(session.getRequest());
 								if (!uri.endsWith("/logout")) {
 									if (!ud.isEnabled()) {
 										throw new DisabledException(username);
 									} else if (!ud.isAccountNonExpired()) {
-										throw new AccountExpiredException(
-												username);
+										throw new AccountExpiredException(username);
 									} else if (!ud.isAccountNonLocked()) {
 										throw new LockedException(username);
 									} else if (!ud.isCredentialsNonExpired()) {
-										if (!uri.endsWith("/password")
-												&& !uri.startsWith("/assets/"))
-											throw new CredentialsExpiredException(
-													username);
+										if (!uri.endsWith("/password") && !uri.startsWith("/assets/"))
+											throw new CredentialsExpiredException(username);
 									}
 								}
 							}
@@ -122,8 +115,7 @@ public class SessionCompressorManager {
 					} catch (AccountStatusException e) {
 						throw e;
 					} catch (Exception e) {
-						log.error("uncompress error for " + key
-								+ ",it won't be restored", e);
+						log.error("uncompress error for " + key + ",it won't be restored", e);
 					}
 				}
 		}

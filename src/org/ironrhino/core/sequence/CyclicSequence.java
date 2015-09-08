@@ -16,9 +16,7 @@ public interface CyclicSequence extends Sequence {
 		MINUTE("yyyyMMddHHmm") {
 			@Override
 			public boolean isSameCycle(Calendar lastCal, Calendar nowCal) {
-				return HOUR.isSameCycle(lastCal, nowCal)
-						&& nowCal.get(Calendar.MINUTE) <= lastCal
-								.get(Calendar.MINUTE);
+				return HOUR.isSameCycle(lastCal, nowCal) && nowCal.get(Calendar.MINUTE) <= lastCal.get(Calendar.MINUTE);
 
 			}
 
@@ -39,8 +37,7 @@ public interface CyclicSequence extends Sequence {
 			@Override
 			public boolean isSameCycle(Calendar lastCal, Calendar nowCal) {
 				return DAY.isSameCycle(lastCal, nowCal)
-						&& nowCal.get(Calendar.HOUR_OF_DAY) <= lastCal
-								.get(Calendar.HOUR_OF_DAY);
+						&& nowCal.get(Calendar.HOUR_OF_DAY) <= lastCal.get(Calendar.HOUR_OF_DAY);
 			}
 
 			@Override
@@ -60,8 +57,7 @@ public interface CyclicSequence extends Sequence {
 			@Override
 			public boolean isSameCycle(Calendar lastCal, Calendar nowCal) {
 				return MONTH.isSameCycle(lastCal, nowCal)
-						&& nowCal.get(Calendar.DAY_OF_YEAR) <= lastCal
-								.get(Calendar.DAY_OF_YEAR);
+						&& nowCal.get(Calendar.DAY_OF_YEAR) <= lastCal.get(Calendar.DAY_OF_YEAR);
 			}
 
 			@Override
@@ -81,9 +77,7 @@ public interface CyclicSequence extends Sequence {
 		MONTH("yyyyMM") {
 			@Override
 			public boolean isSameCycle(Calendar lastCal, Calendar nowCal) {
-				return YEAR.isSameCycle(lastCal, nowCal)
-						&& nowCal.get(Calendar.MONTH) <= lastCal
-								.get(Calendar.MONTH);
+				return YEAR.isSameCycle(lastCal, nowCal) && nowCal.get(Calendar.MONTH) <= lastCal.get(Calendar.MONTH);
 			}
 
 			@Override

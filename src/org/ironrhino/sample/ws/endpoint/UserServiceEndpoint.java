@@ -10,8 +10,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 @Component
 @WebService(serviceName = "UserService", targetNamespace = "http://sample.ironrhino.org")
-public class UserServiceEndpoint extends SpringBeanAutowiringSupport implements
-		UserService {
+public class UserServiceEndpoint extends SpringBeanAutowiringSupport implements UserService {
 
 	@Autowired
 	private UserManager userManager;

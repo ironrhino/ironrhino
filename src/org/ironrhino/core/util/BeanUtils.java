@@ -55,7 +55,8 @@ public class BeanUtils {
 		}
 	}
 
-	public static void copyProperties(Object source, Object target, boolean ignoreNullValue, String... ignoreProperties) {
+	public static void copyProperties(Object source, Object target, boolean ignoreNullValue,
+			String... ignoreProperties) {
 		Set<String> ignores = new HashSet<>();
 		ignores.addAll(AnnotationUtils.getAnnotatedPropertyNames(source.getClass(), NotInCopy.class));
 		ignores.addAll(Arrays.asList(ignoreProperties));

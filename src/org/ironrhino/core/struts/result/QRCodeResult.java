@@ -28,8 +28,7 @@ public class QRCodeResult implements Result {
 
 	@Override
 	public void execute(ActionInvocation invocation) throws Exception {
-		String content = invocation.getStack().findValue("responseBody")
-				.toString();
+		String content = invocation.getStack().findValue("responseBody").toString();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		response.setContentType("image/" + format);
 		if (!response.containsHeader("Cache-Control")) {
@@ -37,7 +36,6 @@ public class QRCodeResult implements Result {
 			response.setHeader("Pragma", "no-cache");
 			response.setDateHeader("Expires", 0);
 		}
-		BarcodeUtils.encodeQRCode(content, encoding, format, width, height,
-				response.getOutputStream());
+		BarcodeUtils.encodeQRCode(content, encoding, format, width, height, response.getOutputStream());
 	}
 }

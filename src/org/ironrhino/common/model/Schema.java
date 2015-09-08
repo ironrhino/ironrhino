@@ -65,7 +65,7 @@ public class Schema extends BaseEntity {
 	private boolean strict;
 
 	@SearchableComponent
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true) )
 	@Transient
 	private List<SchemaField> fields = new ArrayList<>();
 
@@ -165,28 +165,23 @@ public class Schema extends BaseEntity {
 				}
 				if (StringUtils.isBlank(f.getName())) {
 					ValidationException ve = new ValidationException();
-					ve.addFieldError("schema.fields[" + i + "].name",
-							"validation.required");
+					ve.addFieldError("schema.fields[" + i + "].name", "validation.required");
 					throw ve;
 				} else {
 					if (names.contains(f.getName())) {
 						ValidationException ve = new ValidationException();
-						ve.addFieldError("schema.fields[" + i + "].name",
-								"validation.already.exists");
+						ve.addFieldError("schema.fields[" + i + "].name", "validation.already.exists");
 						throw ve;
 					} else {
 						names.add(f.getName());
 					}
 				}
-				if (f.getType().equals(SchemaFieldType.SELECT)
-						|| f.getType().equals(SchemaFieldType.CHECKBOX)) {
+				if (f.getType().equals(SchemaFieldType.SELECT) || f.getType().equals(SchemaFieldType.CHECKBOX)) {
 					List<String> values = f.getValues();
 					if (values == null || values.size() == 0
-							|| values.size() == 1
-							&& StringUtils.isBlank(values.get(0))) {
+							|| values.size() == 1 && StringUtils.isBlank(values.get(0))) {
 						ValidationException ve = new ValidationException();
-						ve.addFieldError("schema.fields[" + i + "].values[0]",
-								"validation.required");
+						ve.addFieldError("schema.fields[" + i + "].values[0]", "validation.required");
 						throw ve;
 					} else {
 						Set<String> set = new HashSet<>();
@@ -194,15 +189,12 @@ public class Schema extends BaseEntity {
 							String value = values.get(j);
 							if (StringUtils.isBlank(value)) {
 								ValidationException ve = new ValidationException();
-								ve.addFieldError("schema.fields[" + i
-										+ "].values[" + j + "]",
-										"validation.required");
+								ve.addFieldError("schema.fields[" + i + "].values[" + j + "]", "validation.required");
 								throw ve;
 							} else {
 								if (set.contains(value)) {
 									ValidationException ve = new ValidationException();
-									ve.addFieldError("schema.fields[" + i
-											+ "].values[" + j + "]",
+									ve.addFieldError("schema.fields[" + i + "].values[" + j + "]",
 											"validation.already.exists");
 									throw ve;
 								} else {

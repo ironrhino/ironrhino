@@ -28,7 +28,7 @@ import org.ironrhino.core.util.JsonUtils;
 @Entity
 @Table(indexes = { @javax.persistence.Index(columnList = "username,date desc") })
 @Searchable
-@Richtable(searchable = true, order = "date desc", readonly = @Readonly(true))
+@Richtable(searchable = true, order = "date desc", readonly = @Readonly(true) )
 public class AuditEvent extends BaseEntity {
 
 	private static final long serialVersionUID = -7691080078972338500L;
@@ -63,8 +63,7 @@ public class AuditEvent extends BaseEntity {
 		this.event = event;
 	}
 
-	public AuditEvent(String username, Date date, String address,
-			String eventKey, String... arguments) {
+	public AuditEvent(String username, Date date, String address, String eventKey, String... arguments) {
 		this.username = username;
 		this.address = address;
 		if (date != null)
@@ -80,10 +79,8 @@ public class AuditEvent extends BaseEntity {
 	}
 
 	public AuditEvent(AbstractAuditEvent abstractEvent) {
-		this(abstractEvent.getUsername(),
-				new Date(abstractEvent.getTimestamp()), abstractEvent
-						.getRemoteAddr(), abstractEvent.getClass().getName(),
-				abstractEvent.getArguments());
+		this(abstractEvent.getUsername(), new Date(abstractEvent.getTimestamp()), abstractEvent.getRemoteAddr(),
+				abstractEvent.getClass().getName(), abstractEvent.getArguments());
 	}
 
 	public String getUsername() {
@@ -123,8 +120,7 @@ public class AuditEvent extends BaseEntity {
 			return "";
 		if (JsonUtils.isValidJson(event)) {
 			try {
-				Map<String, String> map = JsonUtils.fromJson(event,
-						JsonUtils.STRING_MAP_TYPE);
+				Map<String, String> map = JsonUtils.fromJson(event, JsonUtils.STRING_MAP_TYPE);
 				String key = map.get("key");
 				String[] arguments = map.get("arguments").split(",");
 				return I18N.getText(key, arguments);

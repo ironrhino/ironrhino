@@ -15,8 +15,7 @@ public class RedisSimpleSequence extends AbstractSimpleSequence {
 	private BoundValueOperations<String, String> boundValueOperations;
 
 	@Autowired
-	public RedisSimpleSequence(
-			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+	public RedisSimpleSequence(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
 		this.stringRedisTemplate = stringRedisTemplate;
 	}
 
@@ -24,8 +23,7 @@ public class RedisSimpleSequence extends AbstractSimpleSequence {
 	public void afterPropertiesSet() {
 		Assert.hasText(getSequenceName());
 		Assert.isTrue(getPaddingLength() > 0);
-		boundValueOperations = stringRedisTemplate.boundValueOps(KEY_SEQUENCE
-				+ getSequenceName());
+		boundValueOperations = stringRedisTemplate.boundValueOps(KEY_SEQUENCE + getSequenceName());
 		boundValueOperations.setIfAbsent("0");
 	}
 

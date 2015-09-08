@@ -8,9 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 
-public abstract class AbstractSimpleSequence implements SimpleSequence,
-		InitializingBean, BeanNameAware {
-	
+public abstract class AbstractSimpleSequence implements SimpleSequence, InitializingBean, BeanNameAware {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private String sequenceName;
@@ -44,14 +43,11 @@ public abstract class AbstractSimpleSequence implements SimpleSequence,
 	public void setBeanName(String beanName) {
 		if (StringUtils.isNotBlank(beanName)) {
 			if (beanName.endsWith("SimpleSequence")) {
-				beanName = beanName.substring(0, beanName.length()
-						- "SimpleSequence".length());
+				beanName = beanName.substring(0, beanName.length() - "SimpleSequence".length());
 			} else if (beanName.endsWith("Sequence")) {
-				beanName = beanName.substring(0,
-						beanName.length() - "Sequence".length());
+				beanName = beanName.substring(0, beanName.length() - "Sequence".length());
 			} else if (beanName.endsWith("Seq")) {
-				beanName = beanName.substring(0,
-						beanName.length() - "Seq".length());
+				beanName = beanName.substring(0, beanName.length() - "Seq".length());
 			}
 			this.beanName = beanName;
 		}

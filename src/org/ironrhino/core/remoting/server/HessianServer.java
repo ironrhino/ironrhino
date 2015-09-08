@@ -34,8 +34,8 @@ public class HessianServer extends HessianServiceExporter {
 	}
 
 	@Override
-	public void handleRequest(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String uri = request.getRequestURI();
 		try {
 			String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
@@ -51,31 +51,26 @@ public class HessianServer extends HessianServiceExporter {
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					ex.getMessage());
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
 		} finally {
 			serviceInterface.remove();
 		}
 	}
 
 	@Override
-	public void invoke(InputStream inputStream, OutputStream outputStream)
-			throws Throwable {
-		doInvoke(skeletons.get(getServiceInterface()), inputStream,
-				outputStream);
+	public void invoke(InputStream inputStream, OutputStream outputStream) throws Throwable {
+		doInvoke(skeletons.get(getServiceInterface()), inputStream, outputStream);
 	}
 
 	@Override
 	public void prepare() {
 		if (serviceRegistry != null) {
-			for (Map.Entry<String, Object> entry : serviceRegistry
-					.getExportServices().entrySet()) {
+			for (Map.Entry<String, Object> entry : serviceRegistry.getExportServices().entrySet()) {
 				try {
 					Class<?> intf = Class.forName(entry.getKey());
 					serviceInterface.set(intf);
 					service.set(entry.getValue());
-					skeletons.put(intf, new HessianSkeleton(
-							getProxyForService(), getServiceInterface()));
+					skeletons.put(intf, new HessianSkeleton(getProxyForService(), getServiceInterface()));
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}

@@ -36,21 +36,18 @@ public class RedisConcurrencyService implements ConcurrencyService {
 	@Override
 	public boolean tryAcquire(String name, int permits) {
 		String key = NAMESPACE + name;
-		boolean success = stringRedisTemplate.opsForValue().increment(key, 1)
-				.intValue() <= permits;
+		boolean success = stringRedisTemplate.opsForValue().increment(key, 1).intValue() <= permits;
 		if (!success)
 			stringRedisTemplate.opsForValue().increment(key, -1);
 		return success;
 	}
 
 	@Override
-	public boolean tryAcquire(String name, int permits, long timeout,
-			TimeUnit unit) throws InterruptedException {
+	public boolean tryAcquire(String name, int permits, long timeout, TimeUnit unit) throws InterruptedException {
 		if (timeout <= 0)
 			return tryAcquire(name, permits);
 		String key = NAMESPACE + name;
-		boolean success = stringRedisTemplate.opsForValue().increment(key, 1)
-				.intValue() <= permits;
+		boolean success = stringRedisTemplate.opsForValue().increment(key, 1).intValue() <= permits;
 		if (!success)
 			stringRedisTemplate.opsForValue().increment(key, -1);
 		long millisTimeout = unit.toMillis(timeout);
@@ -59,8 +56,7 @@ public class RedisConcurrencyService implements ConcurrencyService {
 			Thread.sleep(100);
 			if ((System.currentTimeMillis() - start) >= millisTimeout)
 				break;
-			success = stringRedisTemplate.opsForValue().increment(key, 1)
-					.intValue() <= permits;
+			success = stringRedisTemplate.opsForValue().increment(key, 1).intValue() <= permits;
 			if (!success)
 				stringRedisTemplate.opsForValue().increment(key, -1);
 		}
@@ -70,8 +66,7 @@ public class RedisConcurrencyService implements ConcurrencyService {
 	@Override
 	public void acquire(String name, int permits) {
 		String key = NAMESPACE + name;
-		boolean success = stringRedisTemplate.opsForValue().increment(key, 1)
-				.intValue() <= permits;
+		boolean success = stringRedisTemplate.opsForValue().increment(key, 1).intValue() <= permits;
 		if (!success)
 			stringRedisTemplate.opsForValue().increment(key, -1);
 		while (!success) {
@@ -80,8 +75,7 @@ public class RedisConcurrencyService implements ConcurrencyService {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			success = stringRedisTemplate.opsForValue().increment(key, 1)
-					.intValue() <= permits;
+			success = stringRedisTemplate.opsForValue().increment(key, 1).intValue() <= permits;
 			if (!success)
 				stringRedisTemplate.opsForValue().increment(key, -1);
 		}

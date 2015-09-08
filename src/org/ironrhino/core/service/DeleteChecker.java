@@ -57,8 +57,7 @@ public class DeleteChecker {
 			for (String name : names) {
 				Type type = cm.getPropertyType(name);
 				if (type instanceof ManyToOneType) {
-					if (BaseTreeableEntity.class.isAssignableFrom(cm
-							.getMappedClass()) && name.equals("parent"))
+					if (BaseTreeableEntity.class.isAssignableFrom(cm.getMappedClass()) && name.equals("parent"))
 						continue;
 					ManyToOneType mtoType = (ManyToOneType) type;
 					Class<?> referrer = mtoType.getReturnedClass();
@@ -67,21 +66,17 @@ public class DeleteChecker {
 						list = new ArrayList<>();
 						mapping.put(referrer, list);
 					}
-					list.add(new Tuple<>(cm.getMappedClass(),
-							name));
+					list.add(new Tuple<>(cm.getMappedClass(), name));
 				} else if (type instanceof OneToOneType) {
 					OneToOneType otoType = (OneToOneType) type;
 					Class<?> referrer = otoType.getReturnedClass();
 					PrimaryKeyJoinColumn pkjc = null;
-					PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(
-							cm.getMappedClass(), name);
+					PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(cm.getMappedClass(), name);
 					if (pd != null) {
-						Class<?> declaredClass = pd.getReadMethod() != null ? pd
-								.getReadMethod().getDeclaringClass() : cm
-								.getMappedClass();
+						Class<?> declaredClass = pd.getReadMethod() != null ? pd.getReadMethod().getDeclaringClass()
+								: cm.getMappedClass();
 						if (pd.getReadMethod() != null)
-							pkjc = pd.getReadMethod().getAnnotation(
-									PrimaryKeyJoinColumn.class);
+							pkjc = pd.getReadMethod().getAnnotation(PrimaryKeyJoinColumn.class);
 						if (pkjc == null)
 							try {
 								Field f = declaredClass.getDeclaredField(name);
@@ -91,24 +86,20 @@ public class DeleteChecker {
 							}
 					}
 					if (pkjc == null) {
-						List<Tuple<Class<?>, String>> list = mapping
-								.get(referrer);
+						List<Tuple<Class<?>, String>> list = mapping.get(referrer);
 						if (list == null) {
 							list = new ArrayList<>();
 							mapping.put(referrer, list);
 						}
-						list.add(new Tuple<>(cm
-								.getMappedClass(), name));
+						list.add(new Tuple<>(cm.getMappedClass(), name));
 					}
 				} else if (type instanceof CollectionType) {
-					if (BaseTreeableEntity.class.isAssignableFrom(cm
-							.getMappedClass()) && name.equals("children"))
+					if (BaseTreeableEntity.class.isAssignableFrom(cm.getMappedClass()) && name.equals("children"))
 						continue;
 					CollectionType collectionType = (CollectionType) type;
 					CollectionMetadata collectionMetadata = sessionFactory
 							.getCollectionMetadata(collectionType.getRole());
-					Class<?> componentClass = collectionMetadata
-							.getElementType().getReturnedClass();
+					Class<?> componentClass = collectionMetadata.getElementType().getReturnedClass();
 					try {
 						Class<?> superClass = componentClass;
 						while (true) {
@@ -116,22 +107,17 @@ public class DeleteChecker {
 								if (f.getAnnotation(ManyToOne.class) != null
 										|| f.getAnnotation(OneToOne.class) != null) {
 									Class<?> referrer = f.getType();
-									List<Tuple<Class<?>, Tuple<String, String>>> list = collectionMapping
-											.get(referrer);
+									List<Tuple<Class<?>, Tuple<String, String>>> list = collectionMapping.get(referrer);
 									if (list == null) {
 										list = new ArrayList<>();
 										collectionMapping.put(referrer, list);
 									}
-									list.add(new Tuple<>(
-											cm.getMappedClass(),
-											new Tuple<>(name, f
-													.getName())));
+									list.add(new Tuple<>(cm.getMappedClass(), new Tuple<>(name, f.getName())));
 								}
 							}
 							superClass = superClass.getSuperclass();
 							if (superClass.equals(Object.class)
-									|| superClass
-											.getAnnotation(MappedSuperclass.class) == null)
+									|| superClass.getAnnotation(MappedSuperclass.class) == null)
 								break;
 						}
 					} catch (Exception e) {
@@ -148,22 +134,17 @@ public class DeleteChecker {
 								if (f.getAnnotation(ManyToOne.class) != null
 										|| f.getAnnotation(OneToOne.class) != null) {
 									Class<?> referrer = f.getType();
-									List<Tuple<Class<?>, Tuple<String, String>>> list = componentMapping
-											.get(referrer);
+									List<Tuple<Class<?>, Tuple<String, String>>> list = componentMapping.get(referrer);
 									if (list == null) {
 										list = new ArrayList<>();
 										componentMapping.put(referrer, list);
 									}
-									list.add(new Tuple<>(
-											cm.getMappedClass(),
-											new Tuple<>(name, f
-													.getName())));
+									list.add(new Tuple<>(cm.getMappedClass(), new Tuple<>(name, f.getName())));
 								}
 							}
 							superClass = superClass.getSuperclass();
 							if (superClass.equals(Object.class)
-									|| superClass
-											.getAnnotation(MappedSuperclass.class) == null)
+									|| superClass.getAnnotation(MappedSuperclass.class) == null)
 								break;
 						}
 					} catch (Exception e) {
@@ -181,60 +162,45 @@ public class DeleteChecker {
 		if (entity instanceof Enableable) {
 			Enableable enableable = (Enableable) entity;
 			if (enableable.isEnabled())
-				throw new ErrorMessage("delete.forbidden",
-						new Object[] { entity }, "delete.forbidden.notdisabled");
+				throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.notdisabled");
 		}
-		List<Tuple<Class<?>, String>> references = mapping.get(entity
-				.getClass());
+		List<Tuple<Class<?>, String>> references = mapping.get(entity.getClass());
 		if (references != null && references.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, String> tuple : references) {
 				Criteria c = session.createCriteria(tuple.getKey());
 				c.add(Restrictions.eq(tuple.getValue(), entity));
-				c.setProjection(Projections.projectionList().add(
-						Projections.rowCount()));
+				c.setProjection(Projections.projectionList().add(Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
 				if (count > 0)
-					throw new ErrorMessage("delete.forbidden",
-							new Object[] { entity },
-							"delete.forbidden.referrer");
+					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.referrer");
 			}
 		}
-		List<Tuple<Class<?>, Tuple<String, String>>> componentReferences = componentMapping
-				.get(entity.getClass());
+		List<Tuple<Class<?>, Tuple<String, String>>> componentReferences = componentMapping.get(entity.getClass());
 		if (componentReferences != null && componentReferences.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, Tuple<String, String>> tuple : componentReferences) {
 				Criteria c = session.createCriteria(tuple.getKey());
 				Tuple<String, String> value = tuple.getValue();
-				c.add(Restrictions.eq(value.getKey() + "." + value.getValue(),
-						entity));
-				c.setProjection(Projections.projectionList().add(
-						Projections.rowCount()));
+				c.add(Restrictions.eq(value.getKey() + "." + value.getValue(), entity));
+				c.setProjection(Projections.projectionList().add(Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
 				if (count > 0)
-					throw new ErrorMessage("delete.forbidden",
-							new Object[] { entity },
-							"delete.forbidden.referrer");
+					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.referrer");
 			}
 		}
-		List<Tuple<Class<?>, Tuple<String, String>>> collectionReferences = collectionMapping
-				.get(entity.getClass());
+		List<Tuple<Class<?>, Tuple<String, String>>> collectionReferences = collectionMapping.get(entity.getClass());
 		if (collectionReferences != null && collectionReferences.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, Tuple<String, String>> tuple : collectionReferences) {
 				Criteria c = session.createCriteria(tuple.getKey());
 				Tuple<String, String> value = tuple.getValue();
 				c.createAlias(value.getKey(), value.getKey())
-						.add(Restrictions.eq(
-								value.getKey() + "." + value.getValue(), entity));
-				c.setProjection(Projections.projectionList().add(
-						Projections.rowCount()));
+						.add(Restrictions.eq(value.getKey() + "." + value.getValue(), entity));
+				c.setProjection(Projections.projectionList().add(Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
 				if (count > 0)
-					throw new ErrorMessage("delete.forbidden",
-							new Object[] { entity },
-							"delete.forbidden.referrer");
+					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.referrer");
 			}
 		}
 	}

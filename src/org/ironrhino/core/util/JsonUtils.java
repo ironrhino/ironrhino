@@ -57,48 +57,42 @@ public class JsonUtils {
 		final ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setDateFormat(new SimpleDateFormat(DEFAULT_DATE_FORMAT));
 		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		objectMapper
-				.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+		objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
 
-					private static final long serialVersionUID = 8855888602140931060L;
+			private static final long serialVersionUID = 8855888602140931060L;
 
-					@Override
-					protected boolean _isIgnorable(Annotated a) {
-						boolean b = super._isIgnorable(a);
-						if (!b) {
-							Lob lob = a.getAnnotation(Lob.class);
-							b = lob != null
-									&& a.getAnnotation(JsonProperty.class) == null;
-						}
-						return b;
-					}
+			@Override
+			protected boolean _isIgnorable(Annotated a) {
+				boolean b = super._isIgnorable(a);
+				if (!b) {
+					Lob lob = a.getAnnotation(Lob.class);
+					b = lob != null && a.getAnnotation(JsonProperty.class) == null;
+				}
+				return b;
+			}
 
-				});
+		});
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-		objectMapper.registerModule(new SimpleModule().addDeserializer(
-				Date.class, new JsonDeserializer<Date>() {
-					@Override
-					public Date deserialize(JsonParser jsonparser,
-							DeserializationContext deserializationcontext)
-							throws IOException, JsonProcessingException {
-						String date = jsonparser.getText();
-						DateFormat df = objectMapper.getDeserializationConfig()
-								.getDateFormat();
-						if (df != null) {
-							DateFormat clone = (DateFormat) df.clone();
-							try {
-								return clone.parse(date);
-							} catch (ParseException e) {
-							}
-						}
-						Date d = DateUtils.parse(date);
-						if (d == null)
-							throw new RuntimeException(date
-									+ " is not valid date");
-						return d;
+		objectMapper.registerModule(new SimpleModule().addDeserializer(Date.class, new JsonDeserializer<Date>() {
+			@Override
+			public Date deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+					throws IOException, JsonProcessingException {
+				String date = jsonparser.getText();
+				DateFormat df = objectMapper.getDeserializationConfig().getDateFormat();
+				if (df != null) {
+					DateFormat clone = (DateFormat) df.clone();
+					try {
+						return clone.parse(date);
+					} catch (ParseException e) {
 					}
-				}));
+				}
+				Date d = DateUtils.parse(date);
+				if (d == null)
+					throw new RuntimeException(date + " is not valid date");
+				return d;
+			}
+		}));
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
@@ -133,11 +127,9 @@ public class JsonUtils {
 		return objectMapper.readValue(json, cls);
 	}
 
-	public static <T> T fromJson(String json, Type type)
-			throws JsonParseException, JsonMappingException, IOException {
-		return objectMapper.readValue(json, objectMapper
-				.getDeserializationConfig().getTypeFactory()
-				.constructType(type));
+	public static <T> T fromJson(String json, Type type) throws JsonParseException, JsonMappingException, IOException {
+		return objectMapper.readValue(json,
+				objectMapper.getDeserializationConfig().getTypeFactory().constructType(type));
 	}
 
 	public static <T extends Enum<T>> String enumToJson(Class<T> clazz) {
@@ -162,8 +154,7 @@ public class JsonUtils {
 		ObjectMapper objectMapper = getObjectMapper();
 		try {
 			JsonNode node = objectMapper.readValue(json, JsonNode.class);
-			ObjectWriter writer = objectMapper
-					.writer(new DefaultPrettyPrinter());
+			ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
 			return writer.writeValueAsString(node);
 		} catch (Exception e) {
 			return json;

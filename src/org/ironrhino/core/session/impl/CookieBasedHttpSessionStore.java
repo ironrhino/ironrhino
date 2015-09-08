@@ -46,8 +46,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 		String cookie = getCookie(session);
 		if (StringUtils.isNotBlank(cookie)) {
 			cookie = decrypt(cookie, session.getId());
-			String creationTime = NumberUtils.decimalToX(62,
-					BigInteger.valueOf(session.getCreationTime()));
+			String creationTime = NumberUtils.decimalToX(62, BigInteger.valueOf(session.getCreationTime()));
 			if (cookie.startsWith("{") || cookie.startsWith(creationTime)) {
 				cookie = cookie.substring(creationTime.length());
 				sessionCompressorManager.uncompress(session, cookie);
@@ -63,8 +62,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 			return;
 		String sessionString = sessionCompressorManager.compress(session);
 		if (StringUtils.isNotBlank(sessionString)) {
-			String creationTime = NumberUtils.decimalToX(62,
-					BigInteger.valueOf(session.getCreationTime()));
+			String creationTime = NumberUtils.decimalToX(62, BigInteger.valueOf(session.getCreationTime()));
 			String cookie = creationTime + sessionString;
 			saveCookie(session, encrypt(cookie, session.getId()));
 		} else
@@ -91,8 +89,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 			for (Cookie cookie : cookies)
 				if (cookie.getName().startsWith(sessionCookieName)) {
 					try {
-						cookieMap.put(cookie.getName(),
-								URLDecoder.decode(cookie.getValue(), "UTF-8"));
+						cookieMap.put(cookie.getName(), URLDecoder.decode(cookie.getValue(), "UTF-8"));
 					} catch (Exception e) {
 						log.error(e.getMessage(), e);
 					}
@@ -100,8 +97,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 		}
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < cookieMap.size(); i++) {
-			String s = i == 0 ? cookieMap.get(sessionCookieName) : cookieMap
-					.get(sessionCookieName + (i - 1));
+			String s = i == 0 ? cookieMap.get(sessionCookieName) : cookieMap.get(sessionCookieName + (i - 1));
 			if (s == null) {
 				clearCookie(session);
 				return null;
@@ -118,11 +114,12 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 			if (value.length() % SINGLE_COOKIE_SIZE != 0)
 				pieces++;
 			for (int i = 0; i < pieces; i++)
-				RequestUtils.saveCookie(session.getRequest(), session
-						.getResponse(), i == 0 ? sessionCookieName
-						: sessionCookieName + (i - 1), value.substring(i
-						* SINGLE_COOKIE_SIZE, i == pieces - 1 ? value.length()
-						: (i + 1) * SINGLE_COOKIE_SIZE), globalCookie, true);
+				RequestUtils
+						.saveCookie(session.getRequest(), session.getResponse(),
+								i == 0 ? sessionCookieName : sessionCookieName + (i - 1),
+								value.substring(i * SINGLE_COOKIE_SIZE,
+										i == pieces - 1 ? value.length() : (i + 1) * SINGLE_COOKIE_SIZE),
+								globalCookie, true);
 		}
 	}
 
@@ -131,8 +128,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 		if (cookies != null) {
 			for (Cookie cookie : cookies)
 				if (cookie.getName().startsWith(sessionCookieName)) {
-					RequestUtils.deleteCookie(session.getRequest(),
-							session.getResponse(), cookie.getName(), true);
+					RequestUtils.deleteCookie(session.getRequest(), session.getResponse(), cookie.getName(), true);
 				}
 		}
 	}

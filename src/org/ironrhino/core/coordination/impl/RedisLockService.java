@@ -35,8 +35,7 @@ public class RedisLockService implements LockService {
 	private int timeout = 300;
 
 	@Autowired
-	public RedisLockService(
-			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+	public RedisLockService(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
 		this.stringRedisTemplate = stringRedisTemplate;
 	}
 
@@ -44,8 +43,7 @@ public class RedisLockService implements LockService {
 	public boolean tryLock(String name) {
 		String key = NAMESPACE + name;
 		String value = AppInfo.getInstanceId();
-		boolean success = stringRedisTemplate.opsForValue().setIfAbsent(key,
-				value);
+		boolean success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 		if (success)
 			stringRedisTemplate.expire(key, timeout, TimeUnit.SECONDS);
 		return success;
@@ -57,8 +55,7 @@ public class RedisLockService implements LockService {
 			return tryLock(name);
 		String key = NAMESPACE + name;
 		String value = AppInfo.getInstanceId();
-		boolean success = stringRedisTemplate.opsForValue().setIfAbsent(key,
-				value);
+		boolean success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 		long millisTimeout = unit.toMillis(timeout);
 		long start = System.currentTimeMillis();
 		while (!success) {
@@ -80,8 +77,7 @@ public class RedisLockService implements LockService {
 	public void lock(String name) {
 		String key = NAMESPACE + name;
 		String value = AppInfo.getInstanceId();
-		boolean success = stringRedisTemplate.opsForValue().setIfAbsent(key,
-				value);
+		boolean success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 		while (!success) {
 			try {
 				Thread.sleep(100);
@@ -101,8 +97,7 @@ public class RedisLockService implements LockService {
 		String value = AppInfo.getInstanceId();
 		String str = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return 0 end";
 		RedisScript<Long> script = new DefaultRedisScript<>(str, Long.class);
-		Long ret = stringRedisTemplate.execute(script,
-				Collections.singletonList(key), value);
+		Long ret = stringRedisTemplate.execute(script, Collections.singletonList(key), value);
 		if (ret == 0)
 			log.error("Lock [{}] is not hold by instance [{}]", name, value);
 	}

@@ -12,13 +12,11 @@ public class MySQL56Dialect extends MySQL5Dialect {
 		registerColumnType(Types.TIMESTAMP, "datetime(6)");
 
 		// cp from MySQL57InnoDBDialect
-		final SQLFunction currentTimestampFunction = new StaticPrecisionFspTimestampFunction(
-				"now", 6);
+		final SQLFunction currentTimestampFunction = new StaticPrecisionFspTimestampFunction("now", 6);
 		registerFunction("now", currentTimestampFunction);
 		registerFunction("current_timestamp", currentTimestampFunction);
 		registerFunction("localtime", currentTimestampFunction);
 		registerFunction("localtimestamp", currentTimestampFunction);
-		registerFunction("sysdate", new StaticPrecisionFspTimestampFunction(
-				"sysdate", 6));
+		registerFunction("sysdate", new StaticPrecisionFspTimestampFunction("sysdate", 6));
 	}
 }

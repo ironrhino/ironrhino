@@ -39,8 +39,7 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 		if (rawPassword == null)
 			return null;
 		VersionedPasswordEncoder pd = map.get(map.lastKey());
-		return new StringBuilder(pd.encode(rawPassword)).append('#')
-				.append(pd.getVersion()).toString();
+		return new StringBuilder(pd.encode(rawPassword)).append('#').append(pd.getVersion()).toString();
 	}
 
 	@Override
@@ -56,9 +55,7 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 		VersionedPasswordEncoder pd = map.get(version);
 		if (pd == null) {
 			pd = map.get(map.lastKey());
-			logger.warn(
-					"no PasswordDigester of version {}, use version {} instead ",
-					version, map.lastKey());
+			logger.warn("no PasswordDigester of version {}, use version {} instead ", version, map.lastKey());
 		}
 		return pd.matches(rawPassword, encodedPassword);
 	}

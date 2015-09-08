@@ -32,22 +32,18 @@ public class CmsTemplateProvider implements FallbackTemplateProvider {
 	}
 
 	@Override
-	public Template getTemplate(String name, Locale locale, String encoding,
-			boolean parse) throws IOException {
+	public Template getTemplate(String name, Locale locale, String encoding, boolean parse) throws IOException {
 		if (!name.startsWith("/"))
 			name = "/" + name;
 		String path = null;
 		if (name.startsWith(AutoConfigResult.DEFAULT_FTL_CLASSPATH))
-			path = name.substring(AutoConfigResult.DEFAULT_FTL_CLASSPATH
-					.length());
+			path = name.substring(AutoConfigResult.DEFAULT_FTL_CLASSPATH.length());
 		if (name.startsWith(AutoConfigResult.DEFAULT_FTL_LOCATION))
-			path = name.substring(AutoConfigResult.DEFAULT_FTL_LOCATION
-					.length());
+			path = name.substring(AutoConfigResult.DEFAULT_FTL_LOCATION.length());
 		if (path != null) {
 			Page page = pageManager.getByPath(path);
 			if (page != null && StringUtils.isNotBlank(page.getContent()))
-				return new Template(name, new StringReader(page.getContent()),
-						configuration);
+				return new Template(name, new StringReader(page.getContent()), configuration);
 		}
 		return null;
 	}

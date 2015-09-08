@@ -4,8 +4,7 @@ import org.springframework.context.annotation.Configuration;
 
 @SuppressWarnings("serial")
 @Configuration
-public class RetryConfiguration extends
-		org.springframework.retry.annotation.RetryConfiguration {
+public class RetryConfiguration extends org.springframework.retry.annotation.RetryConfiguration {
 
 	@Override
 	public int getOrder() {

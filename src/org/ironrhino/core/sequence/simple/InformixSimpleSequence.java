@@ -5,8 +5,7 @@ public class InformixSimpleSequence extends AbstractSequenceSimpleSequence {
 	@Override
 	protected String getQuerySequenceStatement() {
 		return new StringBuilder("SELECT ").append(getActualSequenceName())
-				.append(".NEXTVAL FROM INFORMIX.SYSTABLES WHERE TABID=1")
-				.toString();
+				.append(".NEXTVAL FROM INFORMIX.SYSTABLES WHERE TABID=1").toString();
 	}
 
 }

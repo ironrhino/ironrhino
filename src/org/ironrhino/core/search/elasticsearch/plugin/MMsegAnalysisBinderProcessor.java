@@ -8,8 +8,7 @@ import org.elasticsearch.index.analysis.AnalysisModule;
  * @url https://github.com/medcl/elasticsearch-analysis-mmseg
  * 
  */
-public class MMsegAnalysisBinderProcessor extends
-		AnalysisModule.AnalysisBinderProcessor {
+public class MMsegAnalysisBinderProcessor extends AnalysisModule.AnalysisBinderProcessor {
 
 	@Override
 	public void processTokenFilters(TokenFiltersBindings tokenFiltersBindings) {
@@ -18,8 +17,7 @@ public class MMsegAnalysisBinderProcessor extends
 
 	@Override
 	public void processTokenizers(TokenizersBindings tokenizersBindings) {
-		tokenizersBindings.processTokenizer("mmseg",
-				MMsegTokenizerFactory.class);
+		tokenizersBindings.processTokenizer("mmseg", MMsegTokenizerFactory.class);
 		super.processTokenizers(tokenizersBindings);
 	}
 

@@ -53,8 +53,7 @@ public class Netease extends OAuth1Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content,
-				JsonNode.class);
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
 		String uid = data.get("id").textValue();
 		String name = data.get("name").textValue();
 		String displayName = data.get("screen_name").textValue();

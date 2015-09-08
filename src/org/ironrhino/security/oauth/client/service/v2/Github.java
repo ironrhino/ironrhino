@@ -58,8 +58,7 @@ public class Github extends OAuth2Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content,
-				JsonNode.class);
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
 		String uid = data.get("login").textValue();
 		Profile p = new Profile();
 		p.setUid(generateUid(uid));

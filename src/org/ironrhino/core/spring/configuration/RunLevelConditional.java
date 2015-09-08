@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Conditional;
 public @interface RunLevelConditional {
 
 	public RunLevel value() default RunLevel.NORMAL;
-	
+
 	public boolean negated() default false;
 
 }

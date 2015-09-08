@@ -22,8 +22,7 @@ public class StatLogSettings {
 
 	public static final String STAT_LOG_FILE_NAME = "stat.log";
 
-	private static final Logger log = LoggerFactory
-			.getLogger(StatLogSettings.class);
+	private static final Logger log = LoggerFactory.getLogger(StatLogSettings.class);
 
 	private static int intervalUnit = 60; // senconds
 
@@ -44,8 +43,7 @@ public class StatLogSettings {
 	}
 
 	public static String getLogFile(String filename) {
-		return new File(getLogFileDirectory(), AppInfo.getHostName()
-				+ SEPARATOR + filename).getAbsolutePath();
+		return new File(getLogFileDirectory(), AppInfo.getHostName() + SEPARATOR + filename).getAbsolutePath();
 	}
 
 }

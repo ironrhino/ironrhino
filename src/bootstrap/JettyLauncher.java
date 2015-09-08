@@ -23,16 +23,13 @@ public class JettyLauncher {
 		if (p != null && p.trim().length() > 0)
 			port = Integer.valueOf(p);
 		Server server = new Server(port);
-		Configuration.ClassList classlist = Configuration.ClassList
-				.setServerDefault(server);
-		classlist.addBefore(
-				"org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
+		Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
+		classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
 				"org.eclipse.jetty.annotations.AnnotationConfiguration");
 		WebAppContext context = new WebAppContext();
 		context.setContextPath("/");
 		context.setWar(warUrl.toExternalForm());
-		File tempDir = new File(new File(System.getProperty("user.home")),
-				".jetty");
+		File tempDir = new File(new File(System.getProperty("user.home")), ".jetty");
 		tempDir.mkdirs();
 		context.setTempDirectory(tempDir);
 		context.setServer(server);
@@ -50,9 +47,8 @@ public class JettyLauncher {
 		private static final long serialVersionUID = 8492638656439246491L;
 
 		@Override
-		protected void doGet(HttpServletRequest request,
-				HttpServletResponse response) throws ServletException,
-				IOException {
+		protected void doGet(HttpServletRequest request, HttpServletResponse response)
+				throws ServletException, IOException {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}

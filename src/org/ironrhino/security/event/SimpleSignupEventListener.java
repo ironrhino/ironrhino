@@ -12,11 +12,8 @@ public class SimpleSignupEventListener {
 
 	@EventListener
 	public void onApplicationEvent(SignupEvent event) {
-		logger.info(
-				event.getUsername()
-						+ " signup from {}"
-						+ (event.getProvider() == null ? "" : ", via "
-								+ event.getProvider()), event.getRemoteAddr());
+		logger.info(event.getUsername() + " signup from {}"
+				+ (event.getProvider() == null ? "" : ", via " + event.getProvider()), event.getRemoteAddr());
 	}
 
 }

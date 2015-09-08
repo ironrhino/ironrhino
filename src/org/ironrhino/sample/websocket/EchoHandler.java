@@ -25,8 +25,7 @@ public class EchoHandler extends TextWebSocketHandler {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	private final Set<WebSocketSession> sessions = Collections
-			.newSetFromMap(new ConcurrentHashMap<>());
+	private final Set<WebSocketSession> sessions = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
 	public void broadcast(String message, String... roles) {
 		for (WebSocketSession s : sessions)

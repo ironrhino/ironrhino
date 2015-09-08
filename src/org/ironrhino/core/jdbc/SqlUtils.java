@@ -20,20 +20,16 @@ public class SqlUtils {
 	public static String clearComments(String sql) {
 		if (StringUtils.isBlank(sql))
 			return sql;
-		return LINE_COMMENTS_PATTERN
-				.matcher(BLOCK_COMMENTS_PATTERN.matcher(sql).replaceAll(""))
-				.replaceAll("\n").replaceAll("\n+", "\n").trim();
+		return LINE_COMMENTS_PATTERN.matcher(BLOCK_COMMENTS_PATTERN.matcher(sql).replaceAll("")).replaceAll("\n")
+				.replaceAll("\n+", "\n").trim();
 	}
 
 	public static String highlight(String sql) {
 		if (StringUtils.isBlank(sql))
 			return sql;
-		return PARAMETER_PATTERN.matcher(
-				LINE_COMMENTS_PATTERN.matcher(
-						BLOCK_COMMENTS_PATTERN.matcher(sql).replaceAll(
-								"<span class=\"comment\">$0</span>"))
-						.replaceAll("\n<span class=\"comment\">$1</span>\n"))
-				.replaceAll("<strong>$0</strong>");
+		return PARAMETER_PATTERN.matcher(LINE_COMMENTS_PATTERN
+				.matcher(BLOCK_COMMENTS_PATTERN.matcher(sql).replaceAll("<span class=\"comment\">$0</span>"))
+				.replaceAll("\n<span class=\"comment\">$1</span>\n")).replaceAll("<strong>$0</strong>");
 	}
 
 	public static Set<String> extractParameters(String sql) {
@@ -51,13 +47,12 @@ public class SqlUtils {
 		return extractTables(sql, quoteString, "from");
 	}
 
-	public static Set<String> extractTables(String sql, String quoteString,
-			String frontKeyword) {
+	public static Set<String> extractTables(String sql, String quoteString, String frontKeyword) {
 		if (StringUtils.isBlank(sql))
 			return Collections.emptySet();
 		sql = clearComments(sql);
-		Pattern tablePattern = Pattern.compile(frontKeyword + "\\s+([\\w\\."
-				+ quoteString + ",\\s]+)", Pattern.CASE_INSENSITIVE);
+		Pattern tablePattern = Pattern.compile(frontKeyword + "\\s+([\\w\\." + quoteString + ",\\s]+)",
+				Pattern.CASE_INSENSITIVE);
 		Set<String> names = new LinkedHashSet<>();
 		Matcher m = tablePattern.matcher(sql);
 		while (m.find()) {
@@ -74,16 +69,13 @@ public class SqlUtils {
 		return m.replaceAll("");
 	}
 
-	private static final Pattern ORDERBY_PATTERN = Pattern.compile(
-			"\\s+order\\s+by\\s+.+$", Pattern.CASE_INSENSITIVE);
+	private static final Pattern ORDERBY_PATTERN = Pattern.compile("\\s+order\\s+by\\s+.+$", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern PARAMETER_PATTERN = Pattern
 			.compile("(:(\\w|[^'\\)\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)");
 
-	private static final Pattern BLOCK_COMMENTS_PATTERN = Pattern
-			.compile("/\\*(?:.|[\\n\\r])*?\\*/");
+	private static final Pattern BLOCK_COMMENTS_PATTERN = Pattern.compile("/\\*(?:.|[\\n\\r])*?\\*/");
 
-	private static final Pattern LINE_COMMENTS_PATTERN = Pattern
-			.compile("\r?\n?([ \\t]*--.*)\r?(\n|$)");
+	private static final Pattern LINE_COMMENTS_PATTERN = Pattern.compile("\r?\n?([ \\t]*--.*)\r?(\n|$)");
 
 }

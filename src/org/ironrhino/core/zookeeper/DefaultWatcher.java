@@ -16,8 +16,7 @@ public class DefaultWatcher implements CuratorListener {
 	private Collection<WatchedEventListener> eventListeners;
 
 	@Override
-	public void eventReceived(CuratorFramework curatorFramework,
-			CuratorEvent event) throws Exception {
+	public void eventReceived(CuratorFramework curatorFramework, CuratorEvent event) throws Exception {
 		if (event.getType() != CuratorEventType.WATCHED)
 			return;
 		String path = event.getPath();
@@ -29,20 +28,17 @@ public class DefaultWatcher implements CuratorListener {
 						EventType wet = we.getType();
 						switch (wet) {
 						case NodeCreated:
-							listener.onNodeCreated(path, curatorFramework
-									.getData().watched().forPath(path));
+							listener.onNodeCreated(path, curatorFramework.getData().watched().forPath(path));
 							break;
 						case NodeDeleted:
 							listener.onNodeDeleted(path);
 							break;
 						case NodeDataChanged:
-							listener.onNodeDataChanged(path, curatorFramework
-									.getData().watched().forPath(path));
+							listener.onNodeDataChanged(path, curatorFramework.getData().watched().forPath(path));
 							break;
 						case NodeChildrenChanged:
 							listener.onNodeChildrenChanged(path,
-									curatorFramework.getChildren().watched()
-											.forPath(path));
+									curatorFramework.getChildren().watched().forPath(path));
 							break;
 						default:
 							break;

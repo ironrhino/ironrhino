@@ -17,8 +17,7 @@ public class UsernameRoleMapper implements UserRoleMapper {
 	}
 
 	public static String map(String username) {
-		return new StringBuilder("USERNAME(").append(username).append(")")
-				.toString();
+		return new StringBuilder("USERNAME(").append(username).append(")").toString();
 	}
 
 }

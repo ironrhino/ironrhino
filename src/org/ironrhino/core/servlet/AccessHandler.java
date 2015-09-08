@@ -15,8 +15,7 @@ public class AccessHandler {
 		return null;
 	}
 
-	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		return false;
 	}
 

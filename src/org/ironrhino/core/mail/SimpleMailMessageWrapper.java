@@ -19,8 +19,7 @@ public class SimpleMailMessageWrapper implements Serializable {
 		this.simpleMailMessage = simpleMailMessage;
 	}
 
-	public SimpleMailMessageWrapper(SimpleMailMessage simpleMailMessage,
-			boolean useHtmlFormat) {
+	public SimpleMailMessageWrapper(SimpleMailMessage simpleMailMessage, boolean useHtmlFormat) {
 		this.simpleMailMessage = simpleMailMessage;
 		this.useHtmlFormat = useHtmlFormat;
 	}

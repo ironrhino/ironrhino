@@ -49,9 +49,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		Map<String, Object> params = mapping.getParams();
 		try {
 			if (method != null && params != null && params.containsKey(ID))
-				sb.append("/"
-						+ URLEncoder.encode((String) params.get(ID),
-								getEncoding()));
+				sb.append("/" + URLEncoder.encode((String) params.get(ID), getEncoding()));
 		} catch (UnsupportedEncodingException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -59,8 +57,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 	}
 
 	@Override
-	public ActionMapping getMapping(HttpServletRequest request,
-			ConfigurationManager configManager) {
+	public ActionMapping getMapping(HttpServletRequest request, ConfigurationManager configManager) {
 		ActionMapping mapping = null;
 		String uri = getUri(request);
 		Configuration config = configManager.getConfiguration();
@@ -76,15 +73,12 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			PackageConfig pc = (PackageConfig) var;
 			String ns = pc.getNamespace();
 			if (!uri.equals(ns) && uri.startsWith(ns)) {
-				if (namespace == null
-						|| (namespace != null && ns.length() >= namespace
-								.length())) {
+				if (namespace == null || (namespace != null && ns.length() >= namespace.length())) {
 					String temp = uri.substring(ns.length());
 					if ("".equals(temp) || "/".equals(temp))
 						continue;
 					String[] array = StringUtils.split(temp, "/", 2);
-					name = org.ironrhino.core.util.StringUtils
-							.toCamelCase(array[0]);
+					name = org.ironrhino.core.util.StringUtils.toCamelCase(array[0]);
 					if (pc.getActionConfigs().containsKey(name))
 						namespace = ns;
 				}
@@ -94,8 +88,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		if (namespace == null) {
 			if (actionMappingMatchers == null)
 				actionMappingMatchers = WebApplicationContextUtils
-						.getWebApplicationContext(
-								ServletActionContext.getServletContext())
+						.getWebApplicationContext(ServletActionContext.getServletContext())
 						.getBeansOfType(ActionMappingMatcher.class).values();
 			for (ActionMappingMatcher amm : actionMappingMatchers) {
 				mapping = amm.tryMatch(request, this);
@@ -104,8 +97,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			}
 
 			String location = AutoConfigResult
-					.getTemplateLocation(org.ironrhino.core.util.StringUtils
-							.toCamelCase(uri));
+					.getTemplateLocation(org.ironrhino.core.util.StringUtils.toCamelCase(uri));
 			if (location != null) {
 				mapping = new ActionMapping();
 				mapping.setNamespace(DirectTemplateAction.NAMESPACE);

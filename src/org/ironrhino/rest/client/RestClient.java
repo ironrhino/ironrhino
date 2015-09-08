@@ -22,8 +22,7 @@ public class RestClient {
 
 	protected String clientSecret;
 
-	protected RestTemplate restTemplate = new org.ironrhino.rest.client.RestTemplate(
-			this);
+	protected RestTemplate restTemplate = new org.ironrhino.rest.client.RestTemplate(this);
 
 	protected RestTemplate internalRestTemplate = new RestTemplate();
 
@@ -33,8 +32,7 @@ public class RestClient {
 
 	}
 
-	public RestClient(String accessTokenEndpoint, String clientId,
-			String clientSecret) {
+	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret) {
 		this.accessTokenEndpoint = accessTokenEndpoint;
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
@@ -88,15 +86,13 @@ public class RestClient {
 				params.put("client_secret", getClientSecret());
 				params.put("refresh_token", token.getRefreshToken());
 				try {
-					token = internalRestTemplate
-							.getForObject(
-									accessTokenEndpoint
-											+ "?grant_type=refresh_token&refresh_token={refresh_token}&client_id={client_id}&client_secret={client_secret}",
-									Token.class, params);
+					token = internalRestTemplate.getForObject(
+							accessTokenEndpoint
+									+ "?grant_type=refresh_token&refresh_token={refresh_token}&client_id={client_id}&client_secret={client_secret}",
+							Token.class, params);
 				} catch (HttpClientErrorException e) {
 					if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)
-							&& e.getResponseBodyAsString().toLowerCase()
-									.contains("invalid_token")) {
+							&& e.getResponseBodyAsString().toLowerCase().contains("invalid_token")) {
 						token = null;
 						tokenStore.setToken(null);
 					} else {
@@ -110,11 +106,10 @@ public class RestClient {
 				params.put("grant_type", "client_credential");
 				params.put("client_id", getClientId());
 				params.put("client_secret", getClientSecret());
-				token = internalRestTemplate
-						.getForObject(
-								accessTokenEndpoint
-										+ "?grant_type=client_credential&client_id={client_id}&client_secret={client_secret}",
-								Token.class, params);
+				token = internalRestTemplate.getForObject(
+						accessTokenEndpoint
+								+ "?grant_type=client_credential&client_id={client_id}&client_secret={client_secret}",
+						Token.class, params);
 				tokenStore.setToken(token);
 			}
 		}

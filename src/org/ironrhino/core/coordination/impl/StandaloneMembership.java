@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component("membership")
-@Profile( DEFAULT)
+@Profile(DEFAULT)
 @ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
 public class StandaloneMembership implements Membership {
 

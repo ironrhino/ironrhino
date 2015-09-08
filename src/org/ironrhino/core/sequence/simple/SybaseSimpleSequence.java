@@ -4,8 +4,7 @@ public class SybaseSimpleSequence extends AbstractSequenceSimpleSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT ").append(getActualSequenceName())
-				.append(".NEXTVAL").toString();
+		return new StringBuilder("SELECT ").append(getActualSequenceName()).append(".NEXTVAL").toString();
 	}
 
 }

@@ -17,8 +17,7 @@ import com.opensymphony.module.sitemesh.Decorator;
 import com.opensymphony.sitemesh.Content;
 import com.opensymphony.xwork2.ActionContext;
 
-public class MyOldDecorator2NewStrutsFreemarkerDecorator extends
-		OldDecorator2NewStrutsFreemarkerDecorator {
+public class MyOldDecorator2NewStrutsFreemarkerDecorator extends OldDecorator2NewStrutsFreemarkerDecorator {
 
 	public static final String X_FRAGMENT = "X-Fragment";
 
@@ -27,16 +26,14 @@ public class MyOldDecorator2NewStrutsFreemarkerDecorator extends
 	}
 
 	@Override
-	protected void render(Content content, HttpServletRequest request,
-			HttpServletResponse response, ServletContext servletContext,
-			ActionContext ctx) throws ServletException, IOException {
+	protected void render(Content content, HttpServletRequest request, HttpServletResponse response,
+			ServletContext servletContext, ActionContext ctx) throws ServletException, IOException {
 		String replacement = request.getHeader(X_FRAGMENT);
 		if (StringUtils.isNotBlank(replacement)) {
 			if ("_".equals(replacement)) {
 				Writer writer = response.getWriter();
 				try {
-					writer.append("<title>").append(content.getTitle())
-							.append("</title>");
+					writer.append("<title>").append(content.getTitle()).append("</title>");
 					content.writeBody(writer);
 					writer.flush();
 					return;
@@ -47,11 +44,9 @@ public class MyOldDecorator2NewStrutsFreemarkerDecorator extends
 				try {
 					StringWriter writer = new StringWriter();
 					content.writeBody(writer);
-					String compressed = HtmlUtils.compress(writer.toString(),
-							replacement.split(","));
+					String compressed = HtmlUtils.compress(writer.toString(), replacement.split(","));
 					if (compressed == null || compressed.length() == 0) {
-						super.render(content, request, response,
-								servletContext, ctx);
+						super.render(content, request, response, servletContext, ctx);
 					} else {
 						response.getWriter().write(compressed);
 						response.getWriter().flush();

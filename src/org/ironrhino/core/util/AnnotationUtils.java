@@ -25,8 +25,7 @@ import org.springframework.core.annotation.Order;
 @SuppressWarnings("unchecked")
 public class AnnotationUtils {
 
-	private static Map<String, Object> cache = new ConcurrentHashMap<String, Object>(
-			256);
+	private static Map<String, Object> cache = new ConcurrentHashMap<String, Object>(256);
 
 	private static ValueThenKeyComparator<Method, Integer> comparator = new ValueThenKeyComparator<Method, Integer>() {
 		@Override
@@ -35,17 +34,14 @@ public class AnnotationUtils {
 		}
 	};
 
-	public static Method getAnnotatedMethod(Class<?> clazz,
-			Class<? extends Annotation> annotaionClass) {
-		Iterator<Method> it = getAnnotatedMethods(clazz, annotaionClass)
-				.iterator();
+	public static Method getAnnotatedMethod(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
+		Iterator<Method> it = getAnnotatedMethods(clazz, annotaionClass).iterator();
 		if (it.hasNext())
 			return it.next();
 		return null;
 	}
 
-	public static Set<Method> getAnnotatedMethods(Class<?> clazz,
-			Class<? extends Annotation> annotaionClass) {
+	public static Set<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("getAnnotatedMethods:");
 		sb.append(clazz.getName());
@@ -64,8 +60,7 @@ public class AnnotationUtils {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			List<Map.Entry<Method, Integer>> list = new ArrayList<Map.Entry<Method, Integer>>(
-					map.entrySet());
+			List<Map.Entry<Method, Integer>> list = new ArrayList<Map.Entry<Method, Integer>>(map.entrySet());
 			Collections.sort(list, comparator);
 			methods = new LinkedHashSet<Method>();
 			for (Map.Entry<Method, Integer> entry : list)
@@ -75,8 +70,7 @@ public class AnnotationUtils {
 		return methods;
 	}
 
-	public static Set<String> getAnnotatedPropertyNames(Class<?> clazz,
-			Class<? extends Annotation> annotaionClass) {
+	public static Set<String> getAnnotatedPropertyNames(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("getAnnotatedPropertyNames:");
 		sb.append(clazz.getName());
@@ -95,11 +89,9 @@ public class AnnotationUtils {
 							set.add(f.getName());
 					cls = cls.getSuperclass();
 				}
-				PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz)
-						.getPropertyDescriptors();
+				PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
 				for (PropertyDescriptor pd : pds)
-					if (pd.getReadMethod() != null
-							&& pd.getReadMethod().getAnnotation(annotaionClass) != null)
+					if (pd.getReadMethod() != null && pd.getReadMethod().getAnnotation(annotaionClass) != null)
 						set.add(pd.getName());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -110,15 +102,14 @@ public class AnnotationUtils {
 	}
 
 	@SafeVarargs
-	public static Map<String, Object> getAnnotatedPropertyNameAndValues(
-			Object object, Class<? extends Annotation>... annotaionClass) {
+	public static Map<String, Object> getAnnotatedPropertyNameAndValues(Object object,
+			Class<? extends Annotation>... annotaionClass) {
 		if (annotaionClass.length == 0)
 			return Collections.emptyMap();
 		Map<String, Object> map = new HashMap<String, Object>();
 		Set<String> propertyNames = new HashSet<String>();
 		for (Class<? extends Annotation> clz : annotaionClass)
-			propertyNames.addAll(getAnnotatedPropertyNames(object.getClass(),
-					clz));
+			propertyNames.addAll(getAnnotatedPropertyNames(object.getClass(), clz));
 		BeanWrapperImpl bw = new BeanWrapperImpl(object);
 		try {
 			for (String key : propertyNames) {
@@ -130,8 +121,8 @@ public class AnnotationUtils {
 		return map;
 	}
 
-	public static <T extends Annotation> Map<String, T> getAnnotatedPropertyNameAndAnnotations(
-			Class<?> clazz, Class<T> annotaionClass) {
+	public static <T extends Annotation> Map<String, T> getAnnotatedPropertyNameAndAnnotations(Class<?> clazz,
+			Class<T> annotaionClass) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("getAnnotatedPropertyNameAndAnnotations:");
 		sb.append(clazz.getName());
@@ -147,18 +138,13 @@ public class AnnotationUtils {
 					Field[] fs = cls.getDeclaredFields();
 					for (Field f : fs)
 						if (f.getAnnotation(annotaionClass) != null)
-							map.put(f.getName(),
-									f.getAnnotation(annotaionClass));
+							map.put(f.getName(), f.getAnnotation(annotaionClass));
 					cls = cls.getSuperclass();
 				}
-				PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz)
-						.getPropertyDescriptors();
+				PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
 				for (PropertyDescriptor pd : pds)
-					if (pd.getReadMethod() != null
-							&& pd.getReadMethod().getAnnotation(annotaionClass) != null)
-						map.put(pd.getName(),
-								pd.getReadMethod()
-										.getAnnotation(annotaionClass));
+					if (pd.getReadMethod() != null && pd.getReadMethod().getAnnotation(annotaionClass) != null)
+						map.put(pd.getName(), pd.getReadMethod().getAnnotation(annotaionClass));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -167,8 +153,8 @@ public class AnnotationUtils {
 		return map;
 	}
 
-	public static <T extends Annotation> T getAnnotation(Class<?> clazz,
-			Class<T> annotationClass, String methodName, Class<?>... paramTypes) {
+	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationClass, String methodName,
+			Class<?>... paramTypes) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("getAnnotation:");
 		sb.append(clazz.getName());
@@ -184,10 +170,8 @@ public class AnnotationUtils {
 		String key = sb.toString();
 		Object annotation = cache.get(key);
 		if (annotation == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
-			Method method = org.springframework.beans.BeanUtils.findMethod(
-					clazz, methodName, paramTypes);
-			annotation = method != null ? method.getAnnotation(annotationClass)
-					: null;
+			Method method = org.springframework.beans.BeanUtils.findMethod(clazz, methodName, paramTypes);
+			annotation = method != null ? method.getAnnotation(annotationClass) : null;
 			if (annotation == null)
 				annotation = NullObject.get();
 			cache.put(key, annotation);
@@ -197,8 +181,7 @@ public class AnnotationUtils {
 		return null;
 	}
 
-	public static <T extends Annotation> T getAnnotation(Class<?> clazz,
-			Class<T> annotationClass) {
+	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationClass) {
 		T annotation = null;
 		Class<?> c = clazz;
 		while (annotation == null && c != null) {

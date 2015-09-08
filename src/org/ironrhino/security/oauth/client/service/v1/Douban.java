@@ -56,13 +56,10 @@ public class Douban extends OAuth1Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		Document doc = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder()
+		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 				.parse(new InputSource(new StringReader(content)));
-		String uid = doc.getElementsByTagName("db:uid").item(0)
-				.getTextContent();
-		String displayName = doc.getElementsByTagName("title").item(0)
-				.getTextContent();
+		String uid = doc.getElementsByTagName("db:uid").item(0).getTextContent();
+		String displayName = doc.getElementsByTagName("title").item(0).getTextContent();
 		Profile p = new Profile();
 		p.setUid(generateUid(uid));
 		p.setDisplayName(displayName);

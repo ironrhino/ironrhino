@@ -16,22 +16,16 @@ import org.springframework.web.servlet.DispatcherServlet;
 public class AppInitializer implements WebApplicationInitializer {
 
 	@Override
-	public void onStartup(ServletContext servletContext)
-			throws ServletException {
+	public void onStartup(ServletContext servletContext) throws ServletException {
 
-		ServletRegistration.Dynamic dynamic = servletContext.addServlet("api",
-				DispatcherServlet.class);
-		dynamic.setInitParameter("contextClass",
-				AnnotationConfigWebApplicationContext.class.getName());
-		dynamic.setInitParameter("contextConfigLocation",
-				ApiConfig.class.getName());
+		ServletRegistration.Dynamic dynamic = servletContext.addServlet("api", DispatcherServlet.class);
+		dynamic.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
+		dynamic.setInitParameter("contextConfigLocation", ApiConfig.class.getName());
 		dynamic.addMapping("/api/*");
 		dynamic.setAsyncSupported(true);
 		dynamic.setLoadOnStartup(1);
-		FilterRegistration.Dynamic dynamicFilter = servletContext.addFilter(
-				"restFilter", DelegatingFilter.class);
+		FilterRegistration.Dynamic dynamicFilter = servletContext.addFilter("restFilter", DelegatingFilter.class);
 		dynamicFilter.setAsyncSupported(true);
-		dynamicFilter.addMappingForServletNames(
-				EnumSet.of(DispatcherType.REQUEST), true, "api");
+		dynamicFilter.addMappingForServletNames(EnumSet.of(DispatcherType.REQUEST), true, "api");
 	}
 }

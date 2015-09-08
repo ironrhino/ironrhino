@@ -16,14 +16,11 @@ import org.springframework.stereotype.Component;
 public class HttpErrorHandlerImpl implements HttpErrorHandler {
 
 	@Override
-	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response, int statusCode, String message) {
-		String requestURI = (String) request
-				.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, int statusCode, String message) {
+		String requestURI = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 		if (requestURI == null)
 			requestURI = request.getRequestURI();
-		if (!(requestURI.startsWith("/api/") || requestURI
-				.startsWith("/oauth/oauth2/")))
+		if (!(requestURI.startsWith("/api/") || requestURI.startsWith("/oauth/oauth2/")))
 			return false;
 		if (statusCode > 0)
 			response.setStatus(statusCode);

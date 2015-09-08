@@ -25,10 +25,8 @@ public class ZooKeeperConfiguration {
 
 	@Bean(initMethod = "start", destroyMethod = "close")
 	public CuratorFramework curatorFramework() {
-		CuratorFramework curatorFramework = CuratorFrameworkFactory.builder()
-				.connectString(connectString)
-				.retryPolicy(new ExponentialBackoffRetry(1000, 3))
-				.connectionTimeoutMs(connectionTimeout)
+		CuratorFramework curatorFramework = CuratorFrameworkFactory.builder().connectString(connectString)
+				.retryPolicy(new ExponentialBackoffRetry(1000, 3)).connectionTimeoutMs(connectionTimeout)
 				.sessionTimeoutMs(sessionTimeout).build();
 		return curatorFramework;
 	}

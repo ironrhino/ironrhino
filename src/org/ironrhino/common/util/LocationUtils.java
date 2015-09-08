@@ -17,14 +17,11 @@ public class LocationUtils {
 	public static final String[] nations = "满族,蒙古族,回族,朝鲜族,达斡尔族,畲族,土家族,苗族,侗族,瑶族,壮族,各族,仫佬族,毛南族,黎族,羌族,彝族,藏族,仡佬族,布依族,水族,傣族,哈尼族,纳西族,傈僳族,拉祜族,佤族,白族,景颇族,独龙族,怒族,普米族,布朗族,哈萨克族,东乡族,裕固族,土族,保安族,撒拉族"
 			.split(",");
 
-	public static List<String> autonomousRegions = Arrays
-			.asList("内蒙古,新疆,西藏,广西,宁夏".split(","));
+	public static List<String> autonomousRegions = Arrays.asList("内蒙古,新疆,西藏,广西,宁夏".split(","));
 
-	public static List<String> specialAdministrativeRegions = Arrays
-			.asList("香港,澳门".split(","));
+	public static List<String> specialAdministrativeRegions = Arrays.asList("香港,澳门".split(","));
 
-	public static List<String> municipalities = Arrays.asList("北京,上海,天津,重庆"
-			.split(","));
+	public static List<String> municipalities = Arrays.asList("北京,上海,天津,重庆".split(","));
 
 	public static final Map<String, String> mapping = new HashMap<String, String>() {
 		private static final long serialVersionUID = 1843445431842190721L;
@@ -54,8 +51,7 @@ public class LocationUtils {
 			try {
 				loc = LocationParser.parseLocal(value);
 				if (loc != null && StringUtils.isBlank(loc.getSecondArea())) {
-					if (specialAdministrativeRegions.contains(loc
-							.getFirstArea())
+					if (specialAdministrativeRegions.contains(loc.getFirstArea())
 							|| municipalities.contains(loc.getFirstArea()))
 						loc.setSecondArea(loc.getFirstArea());
 					else
@@ -68,8 +64,7 @@ public class LocationUtils {
 			if (loc == null || loc.getFirstArea() == null) {
 				try {
 					String json = HttpClientUtils
-							.getResponseText("http://ip.taobao.com/service/getIpInfo.php?ip="
-									+ value);
+							.getResponseText("http://ip.taobao.com/service/getIpInfo.php?ip=" + value);
 					JsonNode node = JsonUtils.fromJson(json, JsonNode.class);
 					if (node != null && node.get("code").asInt() == 0) {
 						node = node.get("data");
@@ -86,12 +81,9 @@ public class LocationUtils {
 			}
 		} else if (StringUtils.isNumeric(value)) {
 			try {
-				String xml = HttpClientUtils
-						.getResponseText("http://www.youdao.com/smartresult-xml/search.s?type="
-								+ (value.length() == 18 ? "id" : "mobile")
-								+ "&q=" + value);
-				String location = XmlUtils.eval(
-						"/smartresult/product/location", xml);
+				String xml = HttpClientUtils.getResponseText("http://www.youdao.com/smartresult-xml/search.s?type="
+						+ (value.length() == 18 ? "id" : "mobile") + "&q=" + value);
+				String location = XmlUtils.eval("/smartresult/product/location", xml);
 				if (StringUtils.isNotBlank(location)) {
 					loc = new Location();
 					loc.setLocation(location.trim());
@@ -109,23 +101,19 @@ public class LocationUtils {
 		}
 		if (value.length() >= 2) {
 			String s = value.substring(0, 2);
-			if (specialAdministrativeRegions.contains(s)
-					|| municipalities.contains(s)) {
+			if (specialAdministrativeRegions.contains(s) || municipalities.contains(s)) {
 				loc = new Location();
 				loc.setLocation(value);
 				loc.setFirstArea(s);
 				loc.setSecondArea(s);
 				int index = value.indexOf("市");
-				value = index > 0 ? value.substring(index + 1) : value
-						.substring(s.length());
+				value = index > 0 ? value.substring(index + 1) : value.substring(s.length());
 				if (StringUtils.isNotBlank(value)) {
 					if ((index = value.indexOf("区")) > 0) {
-						loc.setThirdArea(LocationUtils.shortenName(value
-								.substring(0, index + 1)));
+						loc.setThirdArea(LocationUtils.shortenName(value.substring(0, index + 1)));
 						value = value.substring(index + 1);
 					} else if ((index = value.indexOf("县")) > 0) {
-						loc.setThirdArea(LocationUtils.shortenName(value
-								.substring(0, index + 1)));
+						loc.setThirdArea(LocationUtils.shortenName(value.substring(0, index + 1)));
 						value = value.substring(index + 1);
 					}
 				}
@@ -139,8 +127,7 @@ public class LocationUtils {
 					loc.setLocation(value);
 					loc.setFirstArea(str);
 					int index = value.indexOf("自治区");
-					value = index > 0 ? value.substring(index + 3) : value
-							.substring(str.length());
+					value = index > 0 ? value.substring(index + 3) : value.substring(str.length());
 					if (StringUtils.isNotBlank(value)) {
 						boolean hasSecond = true;
 						if ((index = value.indexOf("市")) > 0) {

@@ -82,27 +82,23 @@ public class MemcachedCacheManager implements CacheManager {
 
 	private MemcachedClient build(String serverAddress) throws IOException {
 		Assert.hasLength(serverAddress);
-		MemcachedClientBuilder builder = new XMemcachedClientBuilder(
-				AddrUtil.getAddresses(serverAddress));
+		MemcachedClientBuilder builder = new XMemcachedClientBuilder(AddrUtil.getAddresses(serverAddress));
 		builder.setSessionLocator(new KetamaMemcachedSessionLocator());
 		builder.setCommandFactory(new BinaryCommandFactory());
 		return builder.build();
 	}
 
 	@Override
-	public void put(String key, Object value, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		put(key, value, -1, timeToLive, timeUnit, namespace);
 	}
 
 	@Override
-	public void put(String key, Object value, int timeToIdle, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void put(String key, Object value, int timeToIdle, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (key == null || value == null)
 			return;
 		try {
-			memcached.setWithNoReply(generateKey(key, namespace),
-					(int) timeUnit.toSeconds(timeToLive), value);
+			memcached.setWithNoReply(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive), value);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -133,15 +129,13 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToIdle,
-			TimeUnit timeUnit) {
+	public Object get(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
 		if (key == null)
 			return null;
 		if (timeToIdle <= 0)
 			return get(key, namespace);
 		try {
-			return memcached.getAndTouch(generateKey(key, namespace),
-					(int) timeUnit.toSeconds(timeToIdle));
+			return memcached.getAndTouch(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToIdle));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -160,13 +154,11 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mput(Map<String, Object> map, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void mput(Map<String, Object> map, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (map == null)
 			return;
 		for (Map.Entry<String, Object> entry : map.entrySet())
-			put(entry.getKey(), entry.getValue(), timeToLive, timeUnit,
-					namespace);
+			put(entry.getKey(), entry.getValue(), timeToLive, timeUnit, namespace);
 	}
 
 	@Override
@@ -206,11 +198,9 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public boolean putIfAbsent(String key, Object value, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
-			return memcached.add(generateKey(key, namespace),
-					(int) timeUnit.toSeconds(timeToLive), value);
+			return memcached.add(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive), value);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return false;
@@ -218,11 +208,10 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public long increment(String key, long delta, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
-			return memcached.incr(generateKey(key, namespace), delta, delta,
-					2000, (int) timeUnit.toSeconds(timeToLive));
+			return memcached.incr(generateKey(key, namespace), delta, delta, 2000,
+					(int) timeUnit.toSeconds(timeToLive));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return -1;
@@ -231,8 +220,7 @@ public class MemcachedCacheManager implements CacheManager {
 
 	private String generateKey(String key, String namespace) {
 		if (StringUtils.isNotBlank(namespace)) {
-			StringBuilder sb = new StringBuilder(namespace.length()
-					+ key.length() + 1);
+			StringBuilder sb = new StringBuilder(namespace.length() + key.length() + 1);
 			sb.append(namespace);
 			sb.append(':');
 			sb.append(key);

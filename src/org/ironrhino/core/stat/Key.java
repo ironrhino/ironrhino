@@ -38,8 +38,7 @@ public class Key implements Serializable, Comparable<Key> {
 		names = strings;
 	}
 
-	public Key(String namespace, int intervalMultiple, boolean cumulative,
-			String... strings) {
+	public Key(String namespace, int intervalMultiple, boolean cumulative, String... strings) {
 		if (intervalMultiple > 0)
 			this.intervalMultiple = intervalMultiple;
 		this.namespace = namespace;
@@ -129,8 +128,8 @@ public class Key implements Serializable, Comparable<Key> {
 
 	@Override
 	public String toString() {
-		return (StringUtils.isNotBlank(namespace) ? namespace + ":" : "")
-				+ StringUtils.join(names, '>') + (cumulative ? "" : ",0");
+		return (StringUtils.isNotBlank(namespace) ? namespace + ":" : "") + StringUtils.join(names, '>')
+				+ (cumulative ? "" : ",0");
 	}
 
 	public static Key fromString(String s) {

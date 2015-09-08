@@ -31,8 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @MappedSuperclass
-public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
-		Entity<Long> implements Treeable<T>, Ordered {
+public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends Entity<Long>implements Treeable<T>, Ordered {
 
 	private static final long serialVersionUID = 2462271646391940930L;
 
@@ -112,8 +111,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 
 	@JsonIgnore
 	public String getFullnameSeperator() {
-		FullnameSeperator fs = getClass()
-				.getAnnotation(FullnameSeperator.class);
+		FullnameSeperator fs = getClass().getAnnotation(FullnameSeperator.class);
 		if (fs != null)
 			return fs.seperator();
 		return "/";
@@ -291,8 +289,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends
 	public boolean equals(Object object) {
 		if (object == this)
 			return true;
-		if (object == null || this.getClass() != object.getClass()
-				|| this.hashCode() == 0 || object.hashCode() == 0)
+		if (object == null || this.getClass() != object.getClass() || this.hashCode() == 0 || object.hashCode() == 0)
 			return false;
 		return this.hashCode() == object.hashCode();
 	}

@@ -48,8 +48,7 @@ public class ZooKeeperMembership implements Membership {
 	public void join(final String group) throws Exception {
 		LeaderLatch latch = latchs.get(group);
 		if (latch == null) {
-			latch = new LeaderLatch(curatorFramework, zooKeeperPath + "/"
-					+ group, AppInfo.getInstanceId());
+			latch = new LeaderLatch(curatorFramework, zooKeeperPath + "/" + group, AppInfo.getInstanceId());
 			LeaderLatch old = latchs.putIfAbsent(group, latch);
 			if (old == null) {
 				latch.start();

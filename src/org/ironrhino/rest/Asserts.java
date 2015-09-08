@@ -10,8 +10,7 @@ public class Asserts {
 		for (String f : field) {
 			Object value = bw.getPropertyValue(f);
 			if (value == null)
-				throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, f
-						+ " shouldn't be null");
+				throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, f + " shouldn't be null");
 		}
 	}
 
@@ -23,8 +22,7 @@ public class Asserts {
 			if (value != null)
 				str = String.valueOf(value);
 			if (StringUtils.isBlank(str))
-				throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, f
-						+ " shouldn't be blank");
+				throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, f + " shouldn't be blank");
 		}
 	}
 

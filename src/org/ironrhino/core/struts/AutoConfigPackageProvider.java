@@ -42,8 +42,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 
 	public static final String GLOBAL_MESSAGES_PATTERN = "resources/i18n/**/*.properties";
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(AutoConfigPackageProvider.class);
+	private static final Logger logger = LoggerFactory.getLogger(AutoConfigPackageProvider.class);
 
 	@Inject(value = "ironrhino.autoconfig.parent.package", required = false)
 	private String parentPackage = "ironrhino-default";
@@ -71,8 +70,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		}
 		Set<Class<?>> packageInfos = new HashSet<>();
 		for (String packagePrefix : packagePrefixes)
-			packageInfos.addAll(ClassScanner.scanAnnotatedPackage(packagePrefix,
-					AutoConfig.class));
+			packageInfos.addAll(ClassScanner.scanAnnotatedPackage(packagePrefix, AutoConfig.class));
 		for (Class<?> packageInfo : packageInfos) {
 			String name = packageInfo.getName();
 			String packageName = name.substring(0, name.lastIndexOf('.'));
@@ -81,9 +79,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 				logger.info("Loading autoconfig from " + name);
 				String defaultNamespace = ac.namespace();
 				if (defaultNamespace.equals(""))
-					defaultNamespace = "/"
-							+ packageName.substring(packageName
-									.lastIndexOf('.') + 1);
+					defaultNamespace = "/" + packageName.substring(packageName.lastIndexOf('.') + 1);
 				Set<String> set = packages.get(ac.namespace());
 				if (set == null) {
 					set = new HashSet<>();
@@ -112,13 +108,11 @@ public class AutoConfigPackageProvider implements PackageProvider {
 					packages.put(defaultNamespace, set);
 				}
 				for (String p : packs.split("\\s*,\\s*")) {
-					for (Map.Entry<String, Set<String>> entry : packages
-							.entrySet()) {
+					for (Map.Entry<String, Set<String>> entry : packages.entrySet()) {
 						if (entry.getValue().contains(p)) {
 							entry.getValue().remove(p);
-							logger.warn(
-									"package {} have been overriden from {} to {} in struts.xml",
-									p, entry.getKey(), defaultNamespace);
+							logger.warn("package {} have been overriden from {} to {} in struts.xml", p, entry.getKey(),
+									defaultNamespace);
 						}
 					}
 					set.add(p);
@@ -132,25 +126,18 @@ public class AutoConfigPackageProvider implements PackageProvider {
 	public void init(Configuration configuration) throws ConfigurationException {
 		this.configuration = configuration;
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-		String searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
-				+ GLOBAL_MESSAGES_PATTERN;
+		String searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + GLOBAL_MESSAGES_PATTERN;
 		Map<String, String> messageBunldes = new HashMap<>();
 		try {
-			Resource[] resources = resourcePatternResolver
-					.getResources(searchPath);
+			Resource[] resources = resourcePatternResolver.getResources(searchPath);
 			for (Resource res : resources) {
 				String name = res.getURI().toString();
-				String source = name.substring(0,
-						name.indexOf("/resources/i18n/"));
+				String source = name.substring(0, name.indexOf("/resources/i18n/"));
 				name = name.substring(name.indexOf("resources/i18n/"));
-				name = org.ironrhino.core.util.StringUtils.trimLocale(name
-						.substring(0, name.lastIndexOf('.')));
-				name = org.springframework.util.ClassUtils
-						.convertResourcePathToClassName(name);
-				if (messageBunldes.containsKey(name)
-						&& !source.equals(messageBunldes.get(name))) {
-					logger.warn("Global messages " + name + " ignored from "
-							+ source + ",will load from "
+				name = org.ironrhino.core.util.StringUtils.trimLocale(name.substring(0, name.lastIndexOf('.')));
+				name = org.springframework.util.ClassUtils.convertResourcePathToClassName(name);
+				if (messageBunldes.containsKey(name) && !source.equals(messageBunldes.get(name))) {
+					logger.warn("Global messages " + name + " ignored from " + source + ",will load from "
 							+ messageBunldes.get(name));
 				} else {
 					messageBunldes.put(name, source);
@@ -173,8 +160,8 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		for (Map.Entry<String, Set<String>> entry : packages.entrySet()) {
 			String defaultNamespace = entry.getKey();
 			Set<String> currentPackages = entry.getValue();
-			Collection<Class<?>> classes = ClassScanner.scanAnnotated(
-					currentPackages.toArray(new String[0]), AutoConfig.class);
+			Collection<Class<?>> classes = ClassScanner.scanAnnotated(currentPackages.toArray(new String[0]),
+					AutoConfig.class);
 			if (classes.size() == 0)
 				continue;
 			packageLoader = new PackageLoader();
@@ -185,10 +172,8 @@ public class AutoConfigPackageProvider implements PackageProvider {
 				String thisPackage = clazz.getPackage().getName();
 				String currentPackage = null;
 				for (String s : currentPackages) {
-					if ((thisPackage.startsWith(s + ".") || thisPackage
-							.equals(s))
-							&& (currentPackage == null || s.length() > currentPackage
-									.length()))
+					if ((thisPackage.startsWith(s + ".") || thisPackage.equals(s))
+							&& (currentPackage == null || s.length() > currentPackage.length()))
 						currentPackage = s;
 				}
 				String anotherPackage = null;
@@ -197,65 +182,44 @@ public class AutoConfigPackageProvider implements PackageProvider {
 						continue;
 					Set<String> set = packages.get(ns);
 					for (String s : set) {
-						if ((thisPackage.startsWith(s + ".") || thisPackage
-								.equals(s))
-								&& (anotherPackage == null || s.length() > anotherPackage
-										.length()))
+						if ((thisPackage.startsWith(s + ".") || thisPackage.equals(s))
+								&& (anotherPackage == null || s.length() > anotherPackage.length()))
 							anotherPackage = s;
 					}
 				}
-				if (anotherPackage != null
-						&& anotherPackage.length() > currentPackage.length())
+				if (anotherPackage != null && anotherPackage.length() > currentPackage.length())
 					inAnotherPackage = true;
 				if (inAnotherPackage)
 					continue;
 				processAutoConfigClass(clazz, defaultNamespace);
 			}
-			for (PackageConfig packageConfig : packageLoader
-					.createPackageConfigs()) {
-				PackageConfig pc = configuration.getPackageConfig(packageConfig
-						.getName());
+			for (PackageConfig packageConfig : packageLoader.createPackageConfigs()) {
+				PackageConfig pc = configuration.getPackageConfig(packageConfig.getName());
 				if (pc == null) {
 					// add package
-					configuration.addPackageConfig(packageConfig.getName(),
-							packageConfig);
-					for (ActionConfig ac : packageConfig.getActionConfigs()
-							.values())
-						logger.info("mapping "
-								+ ac.getClassName()
-								+ " to "
-								+ packageConfig.getNamespace()
-								+ (packageConfig.getNamespace().endsWith("/") ? ""
-										: "/") + ac.getName());
+					configuration.addPackageConfig(packageConfig.getName(), packageConfig);
+					for (ActionConfig ac : packageConfig.getActionConfigs().values())
+						logger.info("mapping " + ac.getClassName() + " to " + packageConfig.getNamespace()
+								+ (packageConfig.getNamespace().endsWith("/") ? "" : "/") + ac.getName());
 				} else {
-					Map<String, ActionConfig> actionConfigs = new LinkedHashMap<>(
-							pc.getActionConfigs());
-					for (String actionName : packageConfig.getActionConfigs()
-							.keySet()) {
+					Map<String, ActionConfig> actionConfigs = new LinkedHashMap<>(pc.getActionConfigs());
+					for (String actionName : packageConfig.getActionConfigs().keySet()) {
 						if (actionConfigs.containsKey(actionName)) {
 							// ignore if action already exists
-							logger.warn(actionConfigs.get(actionName)
-									+ " exists for action class '"
-									+ actionConfigs.get(actionName)
-											.getClassName()
+							logger.warn(actionConfigs.get(actionName) + " exists for action class '"
+									+ actionConfigs.get(actionName).getClassName()
 									+ "',ignore autoconfig on action class '"
-									+ packageConfig.getActionConfigs()
-											.get(actionName).getClassName()
-									+ "'");
+									+ packageConfig.getActionConfigs().get(actionName).getClassName() + "'");
 							continue;
 						}
-						ActionConfig ac = packageConfig.getActionConfigs().get(
-								actionName);
+						ActionConfig ac = packageConfig.getActionConfigs().get(actionName);
 						actionConfigs.put(actionName, ac);
-						logger.info("mapping " + ac.getClassName() + " to "
-								+ pc.getNamespace()
-								+ (pc.getNamespace().endsWith("/") ? "" : "/")
-								+ ac.getName());
+						logger.info("mapping " + ac.getClassName() + " to " + pc.getNamespace()
+								+ (pc.getNamespace().endsWith("/") ? "" : "/") + ac.getName());
 					}
 					// this is a trick
 					try {
-						Field field = PackageConfig.class
-								.getDeclaredField("actionConfigs");
+						Field field = PackageConfig.class.getDeclaredField("actionConfigs");
 						field.setAccessible(true);
 						field.set(pc, actionConfigs);
 					} catch (Exception e) {
@@ -283,33 +247,27 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		}
 		PackageConfig.Builder pkgConfig = loadPackageConfig(packageName);
 		try {
-			PackageConfig packageConfig = ReflectionUtils.getFieldValue(
-					pkgConfig, "target");
-			ActionConfig existsConfig = packageConfig.getActionConfigs().get(
-					actionName);
+			PackageConfig packageConfig = ReflectionUtils.getFieldValue(pkgConfig, "target");
+			ActionConfig existsConfig = packageConfig.getActionConfigs().get(actionName);
 			if (existsConfig != null) {
 				logger.warn("{} already mapped with {},skip {}",
-						(namespace.endsWith("/") ? namespace : namespace + "/")
-								+ actionName, existsConfig.getClassName(), cls);
+						(namespace.endsWith("/") ? namespace : namespace + "/") + actionName,
+						existsConfig.getClassName(), cls);
 				return;
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		ResultConfig autoCofigResult = new ResultConfig.Builder("*",
-				AutoConfigResult.class.getName()).build();
-		ActionConfig.Builder builder = new ActionConfig.Builder(packageName,
-				actionName, actionClass).addResultConfig(autoCofigResult);
+		ResultConfig autoCofigResult = new ResultConfig.Builder("*", AutoConfigResult.class.getName()).build();
+		ActionConfig.Builder builder = new ActionConfig.Builder(packageName, actionName, actionClass)
+				.addResultConfig(autoCofigResult);
 		if (StringUtils.isNotBlank(ac.fileupload())) {
 			Map<String, String> params = new HashMap<>();
 			params.put("allowedTypes", ac.fileupload());
-			List<InterceptorMapping> interceptors = InterceptorBuilder
-					.constructInterceptorReference(pkgConfig, "fileUpload",
-							params, null, objectFactory);
-			interceptors
-					.addAll(InterceptorBuilder.constructInterceptorReference(
-							pkgConfig, "annotationDefaultStack", null, null,
-							objectFactory));
+			List<InterceptorMapping> interceptors = InterceptorBuilder.constructInterceptorReference(pkgConfig,
+					"fileUpload", params, null, objectFactory);
+			interceptors.addAll(InterceptorBuilder.constructInterceptorReference(pkgConfig, "annotationDefaultStack",
+					null, null, objectFactory));
 			builder.interceptors(interceptors);
 		}
 		ActionConfig actionConfig = builder.build();
@@ -327,13 +285,11 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		if (pkgConfig == null) {
 			pkgConfig = new PackageConfig.Builder(packageName);
 			pkgConfig.namespace(namespace);
-			PackageConfig parent = configuration
-					.getPackageConfig(parentPackage);
+			PackageConfig parent = configuration.getPackageConfig(parentPackage);
 			if (parent != null) {
 				pkgConfig.addParent(parent);
 			} else {
-				logger.error("Unable to locate parent package: "
-						+ parentPackage);
+				logger.error("Unable to locate parent package: " + parentPackage);
 			}
 			packageLoader.registerPackage(pkgConfig);
 		} else if (pkgConfig.getNamespace() == null) {
@@ -371,10 +327,9 @@ public class AutoConfigPackageProvider implements PackageProvider {
 					configs.put(config.getName(), config);
 					packageConfigBuilders.remove(config.getName());
 
-					for (Iterator<Map.Entry<PackageConfig.Builder, PackageConfig.Builder>> i = childToParent
-							.entrySet().iterator(); i.hasNext();) {
-						Map.Entry<PackageConfig.Builder, PackageConfig.Builder> entry = i
-								.next();
+					for (Iterator<Map.Entry<PackageConfig.Builder, PackageConfig.Builder>> i = childToParent.entrySet()
+							.iterator(); i.hasNext();) {
+						Map.Entry<PackageConfig.Builder, PackageConfig.Builder> entry = i.next();
 						if (entry.getValue() == parent) {
 							entry.getKey().addParent(config);
 							i.remove();
@@ -399,8 +354,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 
 	private static Map<String, Class<?>> entityClassURLMapping = new ConcurrentHashMap<>();
 
-	public String[] getNamespaceAndActionName(Class<?> cls,
-			String defaultNamespace) {
+	public String[] getNamespaceAndActionName(Class<?> cls, String defaultNamespace) {
 		String actionName = null;
 		String namespace = null;
 		String actionClass = null;
@@ -413,8 +367,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			actionClass = cls.getName().replace("model", "action") + "Action";
 			if (!ClassUtils.isPresent(actionClass, getClass().getClassLoader()))
 				actionClass = defaultActionClass;
-			entityClassURLMapping.put(namespace
-					+ (namespace.endsWith("/") ? "" : "/") + actionName, cls);
+			entityClassURLMapping.put(namespace + (namespace.endsWith("/") ? "" : "/") + actionName, cls);
 		} else if (Action.class.isAssignableFrom(cls)) {
 			actionName = StringUtils.uncapitalize(cls.getSimpleName());
 			if (actionName.endsWith("Action"))
@@ -432,13 +385,11 @@ public class AutoConfigPackageProvider implements PackageProvider {
 	}
 
 	public static Class<?> getEntityClass(String namespace, String actionName) {
-		return entityClassURLMapping.get(namespace
-				+ (namespace.endsWith("/") ? "" : "/") + actionName);
+		return entityClassURLMapping.get(namespace + (namespace.endsWith("/") ? "" : "/") + actionName);
 	}
 
 	public static String getEntityUrl(Class<?> entityClass) {
-		for (Map.Entry<String, Class<?>> entry : entityClassURLMapping
-				.entrySet())
+		for (Map.Entry<String, Class<?>> entry : entityClassURLMapping.entrySet())
 			if (entry.getValue().equals(entityClass))
 				return entry.getKey();
 		return null;

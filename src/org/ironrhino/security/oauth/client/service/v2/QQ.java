@@ -63,25 +63,20 @@ public class QQ extends OAuth2Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		content = content.substring(content.indexOf('(') + 1,
-				content.lastIndexOf(')'));
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content,
-				JsonNode.class);
+		content = content.substring(content.indexOf('(') + 1, content.lastIndexOf(')'));
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
 		Profile p = new Profile();
 		p.setUid(data.get("openid").textValue());
 		return p;
 	}
 
 	@Override
-	protected void postProcessProfile(Profile p, String accessToken)
-			throws Exception {
+	protected void postProcessProfile(Profile p, String accessToken) throws Exception {
 		String uid = p.getUid();
 		p.setUid(generateUid(uid));
 		String content = invoke(accessToken,
-				"https://graph.qq.com/user/get_user_info?oauth_consumer_key="
-						+ getClientId() + "&openid=" + uid);
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content,
-				JsonNode.class);
+				"https://graph.qq.com/user/get_user_info?oauth_consumer_key=" + getClientId() + "&openid=" + uid);
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
 		p.setDisplayName(data.get("nickname").textValue());
 		p.setName(data.get("nickname").textValue());
 	}

@@ -63,8 +63,7 @@ public class Weibo extends OAuth2Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content,
-				JsonNode.class);
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
 		Profile p = new Profile();
 		String uid = data.get("uid").asText();
 		p.setUid(uid);
@@ -72,14 +71,11 @@ public class Weibo extends OAuth2Provider {
 	}
 
 	@Override
-	protected void postProcessProfile(Profile p, String accessToken)
-			throws Exception {
+	protected void postProcessProfile(Profile p, String accessToken) throws Exception {
 		String uid = p.getUid();
 		p.setUid(generateUid(uid));
-		String content = invoke(accessToken,
-				"https://api.weibo.com/2/users/show.json?uid=" + uid);
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content,
-				JsonNode.class);
+		String content = invoke(accessToken, "https://api.weibo.com/2/users/show.json?uid=" + uid);
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
 		p.setDisplayName(data.get("screen_name").textValue());
 		p.setName(data.get("name").textValue());
 		p.setLocation(data.get("location").textValue());

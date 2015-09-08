@@ -157,9 +157,8 @@ public class JsonUtilsTest {
 		}
 		String json = JsonUtils.toJson(users);
 		try {
-			List<User> list = JsonUtils.fromJson(json,
-					new TypeReference<List<User>>() {
-					});
+			List<User> list = JsonUtils.fromJson(json, new TypeReference<List<User>>() {
+			});
 			assertEquals(users.size(), list.size());
 			assertEquals(users.get(0).getUsername(), list.get(0).getUsername());
 			assertEquals(users.get(0).getAge(), list.get(0).getAge());
@@ -171,8 +170,7 @@ public class JsonUtilsTest {
 	}
 
 	@Test
-	public void testResultPage() throws JsonParseException,
-			JsonMappingException, IOException {
+	public void testResultPage() throws JsonParseException, JsonMappingException, IOException {
 		ResultPage<User> rp = new ResultPage<>();
 		List<User> users = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
@@ -185,9 +183,8 @@ public class JsonUtilsTest {
 		}
 		rp.setResult(users);
 		String json = JsonUtils.toJson(rp);
-		ResultPage<User> rp2 = JsonUtils.fromJson(json,
-				new TypeReference<ResultPage<User>>() {
-				});
+		ResultPage<User> rp2 = JsonUtils.fromJson(json, new TypeReference<ResultPage<User>>() {
+		});
 		assertEquals(rp.getResult().size(), rp2.getResult().size());
 		assertEquals(User.class, rp2.getResult().iterator().next().getClass());
 		String json2 = JsonUtils.toJson(rp2);

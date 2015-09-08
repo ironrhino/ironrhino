@@ -23,17 +23,13 @@ public class DelegatingFilter extends DelegatingFilterProxy {
 	private List<String> excludePatternsList;
 
 	@Override
-	protected Filter initDelegate(WebApplicationContext wac)
-			throws ServletException {
-		String excludePatterns = getFilterConfig().getInitParameter(
-				"excludePatterns");
-		String str = wac.getEnvironment().getProperty(
-				getTargetBeanName() + ".excludePatterns");
+	protected Filter initDelegate(WebApplicationContext wac) throws ServletException {
+		String excludePatterns = getFilterConfig().getInitParameter("excludePatterns");
+		String str = wac.getEnvironment().getProperty(getTargetBeanName() + ".excludePatterns");
 		if (str != null)
 			excludePatterns = str;
 		if (StringUtils.isNotBlank(excludePatterns))
-			excludePatternsList = Arrays.asList(excludePatterns
-					.split("\\s*,\\s*"));
+			excludePatternsList = Arrays.asList(excludePatterns.split("\\s*,\\s*"));
 		try {
 			Filter delegate = wac.getBean(getTargetBeanName(), Filter.class);
 			if (isTargetFilterLifecycle()) {
@@ -48,15 +44,14 @@ public class DelegatingFilter extends DelegatingFilterProxy {
 	}
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse res,
-			FilterChain chain) throws ServletException, IOException {
+	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+			throws ServletException, IOException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		String uri = request.getRequestURI();
 		uri = uri.substring(request.getContextPath().length());
 		if (excludePatternsList != null)
 			for (String pattern : excludePatternsList)
-				if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri,
-						pattern)) {
+				if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pattern)) {
 					chain.doFilter(req, res);
 					return;
 				}

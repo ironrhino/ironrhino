@@ -48,16 +48,14 @@ public class CacheBasedTokenStore implements TokenStore {
 
 	@Override
 	public Token getToken() {
-		return (Token) cacheManager.get(cacheKey, cacheNamespace, timeToIdle,
-				TimeUnit.SECONDS);
+		return (Token) cacheManager.get(cacheKey, cacheNamespace, timeToIdle, TimeUnit.SECONDS);
 	}
 
 	@Override
 	public void setToken(Token token) {
 		if (token == null)
 			cacheManager.delete(cacheKey, cacheNamespace);
-		cacheManager.put(cacheKey, token, timeToIdle, -1, TimeUnit.SECONDS,
-				cacheNamespace);
+		cacheManager.put(cacheKey, token, timeToIdle, -1, TimeUnit.SECONDS, cacheNamespace);
 	}
 
 }

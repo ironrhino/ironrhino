@@ -33,8 +33,7 @@ public class DataRouteAspect extends BaseAspect {
 	}
 
 	@Around("execution(public * *(..)) and @annotation(transactional)")
-	public Object determineReadonly(ProceedingJoinPoint jp,
-			Transactional transactional) throws Throwable {
+	public Object determineReadonly(ProceedingJoinPoint jp, Transactional transactional) throws Throwable {
 		DataRouteContext.setReadonly(transactional.readOnly());
 		try {
 			return jp.proceed();
@@ -44,11 +43,9 @@ public class DataRouteAspect extends BaseAspect {
 	}
 
 	@Around("execution(public * *(..)) and @annotation(dataRoute))")
-	public Object determineGroup(ProceedingJoinPoint jp, DataRoute dataRoute)
-			throws Throwable {
+	public Object determineGroup(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
-		String groupName = ExpressionUtils.evalString(dataRoute.value(),
-				context);
+		String groupName = ExpressionUtils.evalString(dataRoute.value(), context);
 		if (StringUtils.isNotBlank(groupName))
 			DataRouteContext.setName(groupName);
 		return jp.proceed();
@@ -56,8 +53,7 @@ public class DataRouteAspect extends BaseAspect {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Around("execution(public * *(..)) and target(baseManager)")
-	public Object determineGroup(ProceedingJoinPoint jp, BaseManager baseManager)
-			throws Throwable {
+	public Object determineGroup(ProceedingJoinPoint jp, BaseManager baseManager) throws Throwable {
 		DataRoute dataRoute = null;
 		Object target = jp.getTarget();
 		if (target != null)
@@ -69,8 +65,7 @@ public class DataRouteAspect extends BaseAspect {
 		}
 		if (dataRoute != null) {
 			Map<String, Object> context = buildContext(jp);
-			String groupName = ExpressionUtils.evalString(dataRoute.value(),
-					context);
+			String groupName = ExpressionUtils.evalString(dataRoute.value(), context);
 			if (StringUtils.isNotBlank(groupName))
 				DataRouteContext.setName(groupName);
 		}

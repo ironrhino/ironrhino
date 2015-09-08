@@ -31,8 +31,7 @@ public class MMsegTokenizerFactory extends AbstractTokenizerFactory {
 	private String seg_type;
 
 	@Inject
-	public MMsegTokenizerFactory(Index index,
-			@IndexSettings Settings indexSettings, Environment env,
+	public MMsegTokenizerFactory(Index index, @IndexSettings Settings indexSettings, Environment env,
 			@Assisted String name, @Assisted Settings settings) {
 		super(index, indexSettings, name, settings);
 

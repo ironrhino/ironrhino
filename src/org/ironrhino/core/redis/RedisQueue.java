@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.support.collections.DefaultRedisList;
 
-public abstract class RedisQueue<T extends Serializable> implements
-		org.ironrhino.core.message.Queue<T> {
+public abstract class RedisQueue<T extends Serializable> implements org.ironrhino.core.message.Queue<T> {
 
 	protected String queueName;
 

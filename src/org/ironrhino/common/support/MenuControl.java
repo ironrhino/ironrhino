@@ -50,54 +50,42 @@ public class MenuControl {
 		Container container = ctx.getContainer();
 		container.inject(this);
 		Map<String, Pair<Menu, Authorize>> mapping = new HashMap<>();
-		Collection<PackageConfig> pcs = ((AutoConfigPackageProvider) packageProvider)
-				.getAllPackageConfigs();
+		Collection<PackageConfig> pcs = ((AutoConfigPackageProvider) packageProvider).getAllPackageConfigs();
 		for (PackageConfig pc : pcs) {
 			Collection<ActionConfig> acs = pc.getActionConfigs().values();
 			for (ActionConfig ac : acs) {
 				try {
 					Class<?> c = Class.forName(ac.getClassName());
 					if (EntityAction.class.equals(c)) {
-						Class<?> entityClass = AutoConfigPackageProvider
-								.getEntityClass(pc.getNamespace(), ac.getName());
+						Class<?> entityClass = AutoConfigPackageProvider.getEntityClass(pc.getNamespace(),
+								ac.getName());
 						Menu menu = entityClass.getAnnotation(Menu.class);
 						if (menu != null) {
 							StringBuilder sb = new StringBuilder();
-							sb.append(pc.getNamespace())
-									.append(pc.getNamespace().endsWith("/") ? ""
-											: "/").append(ac.getName());
-							mapping.put(
-									sb.toString(),
-									new Pair<>(menu, entityClass
-											.getAnnotation(Authorize.class)));
+							sb.append(pc.getNamespace()).append(pc.getNamespace().endsWith("/") ? "" : "/")
+									.append(ac.getName());
+							mapping.put(sb.toString(), new Pair<>(menu, entityClass.getAnnotation(Authorize.class)));
 						}
 						continue;
 					}
 					Menu menuOnClass = c.getAnnotation(Menu.class);
-					Authorize authorizeOnClass = c
-							.getAnnotation(Authorize.class);
+					Authorize authorizeOnClass = c.getAnnotation(Authorize.class);
 					if (menuOnClass != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(pc.getNamespace())
-								.append(pc.getNamespace().endsWith("/") ? ""
-										: "/").append(ac.getName());
-						mapping.put(sb.toString(), new Pair<>(
-								menuOnClass, authorizeOnClass));
+						sb.append(pc.getNamespace()).append(pc.getNamespace().endsWith("/") ? "" : "/")
+								.append(ac.getName());
+						mapping.put(sb.toString(), new Pair<>(menuOnClass, authorizeOnClass));
 					}
-					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(
-							c, Menu.class);
+					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(c, Menu.class);
 					for (Method m : methods) {
 						Menu menu = m.getAnnotation(Menu.class);
 						Authorize authorize = m.getAnnotation(Authorize.class);
 						StringBuilder sb = new StringBuilder();
-						sb.append(pc.getNamespace())
-								.append(pc.getNamespace().endsWith("/") ? ""
-										: "/").append(ac.getName());
+						sb.append(pc.getNamespace()).append(pc.getNamespace().endsWith("/") ? "" : "/")
+								.append(ac.getName());
 						if (!m.getName().equals("execute"))
 							sb.append("/").append(m.getName());
-						mapping.put(sb.toString(), new Pair<>(
-								menu, authorize == null ? authorizeOnClass
-										: authorize));
+						mapping.put(sb.toString(), new Pair<>(menu, authorize == null ? authorizeOnClass : authorize));
 					}
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
@@ -131,8 +119,7 @@ public class MenuControl {
 				it.remove();
 			}
 		}
-		if (list.size() == 0 && node.getUrl() == null
-				&& node.getParent() != null)
+		if (list.size() == 0 && node.getUrl() == null && node.getParent() != null)
 			node.getParent().getChildren().remove(node);
 		else
 			node.setChildren(list);
@@ -142,14 +129,13 @@ public class MenuControl {
 		Authorize authorize = node.getAuthorize();
 		if (authorize == null || node.getUrl() == null)
 			return true;
-		boolean authorized = AuthzUtils.authorize(authorize.ifAllGranted(),
-				authorize.ifAnyGranted(), authorize.ifNotGranted());
+		boolean authorized = AuthzUtils.authorize(authorize.ifAllGranted(), authorize.ifAnyGranted(),
+				authorize.ifNotGranted());
 		if (!authorized && dynamicAuthorizerManager != null
 				&& !authorize.authorizer().equals(DynamicAuthorizer.class)) {
 			String resource = node.getUrl();
 			UserDetails user = AuthzUtils.getUserDetails();
-			authorized = dynamicAuthorizerManager.authorize(
-					authorize.authorizer(), user, resource);
+			authorized = dynamicAuthorizerManager.authorize(authorize.authorizer(), user, resource);
 		}
 		return authorized;
 	}
@@ -194,8 +180,7 @@ public class MenuControl {
 
 		@Override
 		public int hashCode() {
-			return url == null ? (name == null ? 0 : name.hashCode()) : url
-					.hashCode();
+			return url == null ? (name == null ? 0 : name.hashCode()) : url.hashCode();
 		}
 
 		@Override
@@ -234,17 +219,13 @@ public class MenuControl {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private MenuNode assemble(final Map<String, Pair<Menu, Authorize>> mapping) {
 		MenuNode root = new MenuNode();
-		List<Map.Entry<String, Pair<Menu, Authorize>>> list = new ArrayList<>(
-				mapping.entrySet());
-		Collections.sort(list,
-				new ValueThenKeyComparator<String, Pair<Menu, Authorize>>() {
-					@Override
-					protected int compareValue(Pair<Menu, Authorize> a,
-							Pair<Menu, Authorize> b) {
-						return a.getA().parents().length
-								- b.getA().parents().length;
-					}
-				});
+		List<Map.Entry<String, Pair<Menu, Authorize>>> list = new ArrayList<>(mapping.entrySet());
+		Collections.sort(list, new ValueThenKeyComparator<String, Pair<Menu, Authorize>>() {
+			@Override
+			protected int compareValue(Pair<Menu, Authorize> a, Pair<Menu, Authorize> b) {
+				return a.getA().parents().length - b.getA().parents().length;
+			}
+		});
 		for (Map.Entry<String, Pair<Menu, Authorize>> entry : list) {
 			String url = entry.getKey();
 			Menu menu = entry.getValue().getA();

@@ -64,8 +64,7 @@ public class RegionSetup {
 		String shortName = LocationUtils.shortenName(region.getName());
 		region.setAreacode(regionAreacodeMap.get(region.getName()));
 		if (regionCoordinateMap != null) {
-			List<String> coordinateAndParentName = regionCoordinateMap
-					.get(region.getName());
+			List<String> coordinateAndParentName = regionCoordinateMap.get(region.getName());
 			if (coordinateAndParentName.isEmpty())
 				coordinateAndParentName = regionCoordinateMap.get(shortName);
 			for (String s : coordinateAndParentName) {
@@ -73,16 +72,12 @@ public class RegionSetup {
 				String coordinate = arr[0];
 				String parentName = arr[1];
 				if (region.getParent() != null) {
-					if (parentName.length() >= 2
-							&& region.getParent().getName().length() > 2
-							&& parentName.contains(region.getParent().getName()
-									.substring(0, 2))) {
+					if (parentName.length() >= 2 && region.getParent().getName().length() > 2
+							&& parentName.contains(region.getParent().getName().substring(0, 2))) {
 						String[] arr2 = coordinate.split(",");
 						Coordinate c = new Coordinate();
-						c.setLatitude(NumberUtils.round(
-								Double.valueOf(arr2[1]), 6));
-						c.setLongitude(NumberUtils.round(
-								Double.valueOf(arr2[0]), 6));
+						c.setLatitude(NumberUtils.round(Double.valueOf(arr2[1]), 6));
+						c.setLongitude(NumberUtils.round(Double.valueOf(arr2[0]), 6));
 						region.setCoordinate(c);
 						break;
 					}
@@ -169,12 +164,9 @@ public class RegionSetup {
 			}
 		};
 		try {
-			nodeList = XmlUtils.evalNodeList(
-					"//kml:Placemark",
-					new InputStreamReader(Thread.currentThread()
-							.getContextClassLoader()
-							.getResourceAsStream("resources/data/region.kml"),
-							"utf-8"), nsContext);
+			nodeList = XmlUtils.evalNodeList("//kml:Placemark", new InputStreamReader(
+					Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/data/region.kml"),
+					"utf-8"), nsContext);
 		} catch (UnsupportedEncodingException e) {
 			return null;
 		}
@@ -234,9 +226,7 @@ public class RegionSetup {
 		return "";
 	}
 
-	private static List<String> rank1cities = Arrays
-			.asList("北京,上海,广州,深圳,香港,澳门,台北".split(","));
-	private static List<String> rank2cities = Arrays
-			.asList("天津,重庆,杭州,南京,成都,武汉,西安,沈阳,大连,青岛,厦门".split(","));
+	private static List<String> rank1cities = Arrays.asList("北京,上海,广州,深圳,香港,澳门,台北".split(","));
+	private static List<String> rank2cities = Arrays.asList("天津,重庆,杭州,南京,成都,武汉,西安,沈阳,大连,青岛,厦门".split(","));
 
 }

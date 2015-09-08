@@ -38,8 +38,7 @@ public class BaseAspect implements Ordered {
 		if (paramNames == null) {
 			if (!warnNoDebugSymbolInformation) {
 				warnNoDebugSymbolInformation = true;
-				log.warn("Unable to resolve method parameter names for method: "
-						+ jp.getStaticPart().getSignature()
+				log.warn("Unable to resolve method parameter names for method: " + jp.getStaticPart().getSignature()
 						+ ". Debug symbol information is required if you are using parameter names in expressions.");
 			}
 		} else {
@@ -59,8 +58,7 @@ public class BaseAspect implements Ordered {
 		return context;
 	}
 
-	protected void putReturnValueIntoContext(Map<String, Object> context,
-			Object value) {
+	protected void putReturnValueIntoContext(Map<String, Object> context, Object value) {
 		context.put("retval", value);
 	}
 

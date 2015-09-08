@@ -4,8 +4,8 @@ public class DB2CyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getCreateSequenceStatement() {
-		StringBuilder sb = new StringBuilder("CREATE SEQUENCE ").append(
-				getActualSequenceName()).append(" AS BIGINT START WITH 1");
+		StringBuilder sb = new StringBuilder("CREATE SEQUENCE ").append(getActualSequenceName())
+				.append(" AS BIGINT START WITH 1");
 		if (getCacheSize() > 1)
 			sb.append(" CACHE ").append(getCacheSize());
 		return sb.toString();
@@ -13,10 +13,8 @@ public class DB2CyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT NEXTVAL FOR ")
-				.append(getActualSequenceName()).append(",")
-				.append(getCurrentTimestamp()).append(",")
-				.append(getSequenceName()).append("_TIMESTAMP FROM ")
+		return new StringBuilder("SELECT NEXTVAL FOR ").append(getActualSequenceName()).append(",")
+				.append(getCurrentTimestamp()).append(",").append(getSequenceName()).append("_TIMESTAMP FROM ")
 				.append(getTableName()).toString();
 	}
 

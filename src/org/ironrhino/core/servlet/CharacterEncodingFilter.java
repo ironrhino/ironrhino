@@ -31,11 +31,9 @@ public class CharacterEncodingFilter extends OncePerRequestFilter {
 	}
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-			HttpServletResponse response, FilterChain filterChain)
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		Map<String, String> map = RequestUtils
-				.parseParametersFromQueryString(request.getQueryString());
+		Map<String, String> map = RequestUtils.parseParametersFromQueryString(request.getQueryString());
 		String inputEncoding = map.get(PARAMETER_NAME_INPUT_ENCODING);
 		String outputEncoding = map.get(PARAMETER_NAME_OUTPUT_ENCODING);
 		if (StringUtils.isNotBlank(inputEncoding))

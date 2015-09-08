@@ -13,15 +13,14 @@ public class LoggingInteceptor extends HandlerInterceptorAdapter {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
-	public boolean preHandle(HttpServletRequest request,
-			HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		logger.info("preHandle {}", handler);
 		return true;
 	}
 
 	@Override
-	public void afterCompletion(HttpServletRequest request,
-			HttpServletResponse response, Object handler, Exception ex)
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 		if (ex == null)
 			logger.info("afterCompletion {}", handler);
@@ -30,20 +29,18 @@ public class LoggingInteceptor extends HandlerInterceptorAdapter {
 	}
 
 	@Override
-	public void afterConcurrentHandlingStarted(HttpServletRequest request,
-			HttpServletResponse response, Object handler) throws Exception {
+	public void afterConcurrentHandlingStarted(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		logger.info("afterConcurrentHandlingStarted {}", handler);
 	}
 
 	@Override
-	public void postHandle(HttpServletRequest request,
-			HttpServletResponse response, Object handler,
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
 		if (modelAndView == null)
 			logger.info("postHandle {} ", handler);
 		else
-			logger.info("postHandle {} with modelAndView {}", handler,
-					modelAndView);
+			logger.info("postHandle {} with modelAndView {}", handler, modelAndView);
 	}
 
 }

@@ -20,19 +20,14 @@ import net.htmlparser.jericho.Tag;
 
 public class HtmlSanitiser {
 
-	private static final Set<String> VALID_ELEMENT_NAMES = new HashSet<>(
-			Arrays.asList(new String[] { HTMLElementName.DIV,
-					HTMLElementName.SPAN, HTMLElementName.STRONG,
-					HTMLElementName.EM, HTMLElementName.BR, HTMLElementName.P,
-					HTMLElementName.B, HTMLElementName.I, HTMLElementName.OL,
-					HTMLElementName.UL, HTMLElementName.LI, HTMLElementName.A,
-					HTMLElementName.TABLE, HTMLElementName.THEAD,
-					HTMLElementName.TBODY, HTMLElementName.TR,
-					HTMLElementName.TH, HTMLElementName.TD }));
+	private static final Set<String> VALID_ELEMENT_NAMES = new HashSet<>(Arrays.asList(new String[] {
+			HTMLElementName.DIV, HTMLElementName.SPAN, HTMLElementName.STRONG, HTMLElementName.EM, HTMLElementName.BR,
+			HTMLElementName.P, HTMLElementName.B, HTMLElementName.I, HTMLElementName.OL, HTMLElementName.UL,
+			HTMLElementName.LI, HTMLElementName.A, HTMLElementName.TABLE, HTMLElementName.THEAD, HTMLElementName.TBODY,
+			HTMLElementName.TR, HTMLElementName.TH, HTMLElementName.TD }));
 
 	private static final Set<String> VALID_ATTRIBUTE_NAMES = new HashSet<>(
-			Arrays.asList(new String[] { "id", "class", "href", "target",
-					"title", "style", "align" }));
+			Arrays.asList(new String[] { "id", "class", "href", "target", "title", "style", "align" }));
 
 	private static final Object VALID_MARKER = new Object();
 
@@ -40,13 +35,11 @@ public class HtmlSanitiser {
 		return sanitise(pseudoHTML, false);
 	}
 
-	public static String sanitise(String pseudoHTML,
-			boolean stripInvalidElements) {
+	public static String sanitise(String pseudoHTML, boolean stripInvalidElements) {
 		return sanitise(pseudoHTML, stripInvalidElements, false);
 	}
 
-	public static String sanitise(String pseudoHTML,
-			boolean stripInvalidElements, boolean formatWhiteSpace) {
+	public static String sanitise(String pseudoHTML, boolean stripInvalidElements, boolean formatWhiteSpace) {
 		Source source = new Source(pseudoHTML);
 		source.fullSequentialParse();
 		OutputDocument outputDocument = new OutputDocument(source);
@@ -61,12 +54,10 @@ public class HtmlSanitiser {
 				// text
 				outputDocument.remove(tag);
 			}
-			reencodeTextSegment(source, outputDocument, pos, tag.getBegin(),
-					formatWhiteSpace);
+			reencodeTextSegment(source, outputDocument, pos, tag.getBegin(), formatWhiteSpace);
 			pos = tag.getEnd();
 		}
-		reencodeTextSegment(source, outputDocument, pos, source.getEnd(),
-				formatWhiteSpace);
+		reencodeTextSegment(source, outputDocument, pos, source.getEnd(), formatWhiteSpace);
 		return outputDocument.toString();
 	}
 
@@ -76,18 +67,17 @@ public class HtmlSanitiser {
 			return false;
 		if (tag.getTagType() == StartTagType.NORMAL) {
 			Element element = tag.getElement();
-			if (HTMLElements.getEndTagRequiredElementNames().contains(
-					elementName)) {
+			if (HTMLElements.getEndTagRequiredElementNames().contains(elementName)) {
 				if (element.getEndTag() == null)
 					return false; // refect start tag if its required end tag is
 				// missing
-			} else if (HTMLElements.getEndTagOptionalElementNames().contains(
-					elementName)) {
+			} else if (HTMLElements.getEndTagOptionalElementNames().contains(elementName)) {
 				if (elementName == HTMLElementName.LI && !isValidLITag(tag))
 					return false; // reject invalid LI tags
 				if (element.getEndTag() == null)
-					outputDocument.insert(element.getEnd(),
-							getEndTagHTML(elementName)); // insert optional end
+					outputDocument.insert(element.getEnd(), getEndTagHTML(elementName)); // insert
+																							// optional
+																							// end
 				// tag if it is
 				// missing
 			}
@@ -111,8 +101,8 @@ public class HtmlSanitiser {
 			return false; // ignore LI elements without a parent
 		if (parentElement.getStartTag().getUserData() != VALID_MARKER)
 			return false; // ignore LI elements who's parent is not valid
-		return parentElement.getName() == HTMLElementName.UL
-				|| parentElement.getName() == HTMLElementName.OL; // only accept
+		return parentElement.getName() == HTMLElementName.UL || parentElement.getName() == HTMLElementName.OL; // only
+																												// accept
 		// LI tags
 		// who's
 		// immediate
@@ -120,15 +110,13 @@ public class HtmlSanitiser {
 		// UL or OL.
 	}
 
-	private static void reencodeTextSegment(Source source,
-			OutputDocument outputDocument, int begin, int end,
+	private static void reencodeTextSegment(Source source, OutputDocument outputDocument, int begin, int end,
 			boolean formatWhiteSpace) {
 		if (begin >= end)
 			return;
 		Segment textSegment = new Segment(source, begin, end);
 		String decodedText = CharacterReference.decode(textSegment);
-		String encodedText = formatWhiteSpace ? CharacterReference
-				.encodeWithWhiteSpaceFormatting(decodedText)
+		String encodedText = formatWhiteSpace ? CharacterReference.encodeWithWhiteSpaceFormatting(decodedText)
 				: CharacterReference.encode(decodedText);
 		outputDocument.replace(textSegment, encodedText);
 	}
@@ -148,16 +136,14 @@ public class HtmlSanitiser {
 			}
 		}
 		if (startTag.getElement().getEndTag() == null
-				&& !HTMLElements.getEndTagOptionalElementNames().contains(
-						startTag.getName()))
+				&& !HTMLElements.getEndTagOptionalElementNames().contains(startTag.getName()))
 			sb.append(" /");
 		sb.append('>');
 		return sb;
 	}
 
 	private static String getEndTagHTML(String tagName) {
-		return new StringBuilder().append("</").append(tagName).append('>')
-				.toString();
+		return new StringBuilder().append("</").append(tagName).append('>').toString();
 	}
 
 }

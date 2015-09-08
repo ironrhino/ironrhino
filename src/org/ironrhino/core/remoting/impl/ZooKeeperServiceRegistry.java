@@ -26,8 +26,7 @@ import org.springframework.stereotype.Component;
 @Component("serviceRegistry")
 @Profile(CLUSTER)
 @ResourcePresentConditional(value = "resources/spring/applicationContext-remoting.xml", negated = true)
-public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
-		WatchedEventListener {
+public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements WatchedEventListener {
 
 	public static final String DEFAULT_ZOOKEEPER_PATH = "/remoting";
 
@@ -63,11 +62,9 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	@Override
 	protected void lookup(String serviceName) {
-		String path = new StringBuilder(servicesParentPath).append("/")
-				.append(serviceName).toString();
+		String path = new StringBuilder(servicesParentPath).append("/").append(serviceName).toString();
 		try {
-			List<String> children = curatorFramework.getChildren().watched()
-					.forPath(path);
+			List<String> children = curatorFramework.getChildren().watched().forPath(path);
 			if (children != null && children.size() > 0)
 				importServices.put(serviceName, children);
 		} catch (Exception e) {
@@ -77,12 +74,10 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	@Override
 	public void doRegister(String serviceName, String host) {
-		String path = new StringBuilder().append(servicesParentPath)
-				.append("/").append(serviceName).append("/").append(host)
-				.toString();
+		String path = new StringBuilder().append(servicesParentPath).append("/").append(serviceName).append("/")
+				.append(host).toString();
 		try {
-			curatorFramework.create().creatingParentsIfNeeded()
-					.withMode(CreateMode.EPHEMERAL).forPath(path);
+			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -99,12 +94,10 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	protected void writeDiscoveredServices() {
 		if (discoveredServices.size() == 0)
 			return;
-		String path = new StringBuilder().append(hostsParentPath).append("/")
-				.append(host).toString();
+		String path = new StringBuilder().append(hostsParentPath).append("/").append(host).toString();
 		byte[] data = JsonUtils.toJson(discoveredServices).getBytes();
 		try {
-			curatorFramework.create().creatingParentsIfNeeded()
-					.withMode(CreateMode.EPHEMERAL).inBackground()
+			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).inBackground()
 					.forPath(path, data);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -114,8 +107,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public Collection<String> getAllServices() {
 		try {
-			List<String> list = curatorFramework.getChildren().forPath(
-					servicesParentPath);
+			List<String> list = curatorFramework.getChildren().forPath(servicesParentPath);
 			List<String> services = new ArrayList<>(list.size());
 			services.addAll(list);
 			Collections.sort(services);
@@ -129,12 +121,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public Collection<String> getHostsForService(String service) {
 		try {
-			List<String> list = curatorFramework
-					.getChildren()
-					.watched()
-					.forPath(
-							new StringBuilder().append(servicesParentPath)
-									.append("/").append(service).toString());
+			List<String> list = curatorFramework.getChildren().watched()
+					.forPath(new StringBuilder().append(servicesParentPath).append("/").append(service).toString());
 			List<String> hosts = new ArrayList<>(list.size());
 			hosts.addAll(list);
 			Collections.sort(hosts);
@@ -150,12 +138,10 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		if (host.indexOf(':') < 0)
 			host += ":" + DEFAULT_PORT;
 		try {
-			String path = new StringBuilder().append(hostsParentPath)
-					.append("/").append(host).toString();
+			String path = new StringBuilder().append(hostsParentPath).append("/").append(host).toString();
 			byte[] data = curatorFramework.getData().forPath(path);
 			String sdata = new String(data);
-			Map<String, String> map = JsonUtils.fromJson(sdata,
-					JsonUtils.STRING_MAP_TYPE);
+			Map<String, String> map = JsonUtils.fromJson(sdata, JsonUtils.STRING_MAP_TYPE);
 			Map<String, String> services = new TreeMap<>();
 			services.putAll(map);
 			return services;
@@ -169,8 +155,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public boolean supports(String path) {
 		if (path != null && path.startsWith(servicesParentPath)) {
-			String serviceName = path
-					.substring(servicesParentPath.length() + 1);
+			String serviceName = path.substring(servicesParentPath.length() + 1);
 			return importServices.containsKey(serviceName);
 		}
 		return false;
@@ -199,8 +184,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	@Override
 	protected boolean handle(InstanceLifecycleEvent event) {
-		return event instanceof ExportServicesEvent
-				|| event instanceof InstanceShutdownEvent;
+		return event instanceof ExportServicesEvent || event instanceof InstanceShutdownEvent;
 		// zookeeper has onNodeChildrenChanged
 	}
 

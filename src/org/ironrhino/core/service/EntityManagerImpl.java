@@ -6,8 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
-public class EntityManagerImpl<T extends Persistable<?>> extends
-		BaseManagerImpl<T> implements EntityManager<T> {
+public class EntityManagerImpl<T extends Persistable<?>> extends BaseManagerImpl<T>implements EntityManager<T> {
 
 	private ThreadLocal<Class<T>> entityClassHolder = new ThreadLocal<>();
 

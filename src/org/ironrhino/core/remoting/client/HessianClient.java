@@ -112,8 +112,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 				HessianConnection conn = super.open(url);
 				String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 				if (requestId != null)
-					conn.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID,
-							requestId);
+					conn.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
 				return conn;
 			}
 
@@ -161,8 +160,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 		return invoke(invocation, maxAttempts);
 	}
 
-	public Object invoke(MethodInvocation invocation, int attempts)
-			throws Throwable {
+	public Object invoke(MethodInvocation invocation, int attempts) throws Throwable {
 		try {
 			return super.invoke(invocation);
 		} catch (RemoteAccessException e) {

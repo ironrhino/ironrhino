@@ -12,8 +12,7 @@ public class SimplePasswordChangedEventListener {
 
 	@EventListener
 	public void onApplicationEvent(PasswordChangedEvent event) {
-		logger.info(event.getUsername() + " changed password from {}",
-				event.getRemoteAddr());
+		logger.info(event.getUsername() + " changed password from {}", event.getRemoteAddr());
 	}
 
 }

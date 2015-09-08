@@ -28,15 +28,12 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 	private List<HttpSessionFilterHook> httpSessionFilterHooks;
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-			HttpServletResponse response, FilterChain chain)
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		final WrappedHttpSession session = new WrappedHttpSession(request,
-				response, servletContext, httpSessionManager);
-		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(
-				request, session);
-		final WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(
-				response, session);
+		final WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext,
+				httpSessionManager);
+		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(request, session);
+		final WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(response, session);
 		if (httpSessionFilterHooks != null)
 			try {
 				for (HttpSessionFilterHook httpSessionFilterHook : httpSessionFilterHooks)
@@ -44,8 +41,7 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 				chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
 			} finally {
 				for (int i = httpSessionFilterHooks.size() - 1; i > -1; i--) {
-					HttpSessionFilterHook httpSessionFilterHook = httpSessionFilterHooks
-							.get(i);
+					HttpSessionFilterHook httpSessionFilterHook = httpSessionFilterHooks.get(i);
 					httpSessionFilterHook.afterDoFilter();
 				}
 			}
@@ -60,36 +56,31 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 				wrappedHttpResponse.commit();
 			}
 		} else {
-			wrappedHttpRequest.getAsyncContext().addListener(
-					new AsyncListener() {
+			wrappedHttpRequest.getAsyncContext().addListener(new AsyncListener() {
 
-						@Override
-						public void onStartAsync(AsyncEvent event)
-								throws IOException {
-						}
+				@Override
+				public void onStartAsync(AsyncEvent event) throws IOException {
+				}
 
-						@Override
-						public void onTimeout(AsyncEvent event)
-								throws IOException {
-						}
+				@Override
+				public void onTimeout(AsyncEvent event) throws IOException {
+				}
 
-						@Override
-						public void onError(AsyncEvent event)
-								throws IOException {
-						}
+				@Override
+				public void onError(AsyncEvent event) throws IOException {
+				}
 
-						@Override
-						public void onComplete(AsyncEvent event)
-								throws IOException {
-							try {
-								session.save();
-							} catch (Exception e) {
-								e.printStackTrace();
-							} finally {
-								wrappedHttpResponse.commit();
-							}
-						}
-					});
+				@Override
+				public void onComplete(AsyncEvent event) throws IOException {
+					try {
+						session.save();
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
+						wrappedHttpResponse.commit();
+					}
+				}
+			});
 		}
 
 	}

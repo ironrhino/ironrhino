@@ -31,10 +31,8 @@ public class RefererResult implements Result {
 			url = request.getHeader("Referer");
 		if (StringUtils.isBlank(url))
 			url = RequestUtils.getBaseUrl(request);
-		if (includeQueryString
-				|| request.getHeader(INCLUDE_QUERY_STRING) != null)
-			url += (url.indexOf('?') > 0 ? "&" : "?")
-					+ request.getQueryString();
+		if (includeQueryString || request.getHeader(INCLUDE_QUERY_STRING) != null)
+			url += (url.indexOf('?') > 0 ? "&" : "?") + request.getQueryString();
 		response.sendRedirect(response.encodeRedirectURL(url));
 	}
 }

@@ -146,8 +146,8 @@ public class RSA {
 		return sig.sign();
 	}
 
-	public boolean verify(byte[] input, byte[] signature) throws NoSuchAlgorithmException, InvalidKeyException,
-			SignatureException {
+	public boolean verify(byte[] input, byte[] signature)
+			throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		Signature sig = Signature.getInstance("SHA1WithRSA");
 		sig.initVerify(publicKey);
 		sig.update(input);

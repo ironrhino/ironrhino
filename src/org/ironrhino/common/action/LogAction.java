@@ -30,12 +30,10 @@ public class LogAction extends BaseAction {
 	}
 
 	public String download() {
-		File file = new File(AppInfo.getAppHome() + File.separator + "logs",
-				getUid());
+		File file = new File(AppInfo.getAppHome() + File.separator + "logs", getUid());
 		if (file.exists()) {
 			HttpServletResponse response = ServletActionContext.getResponse();
-			response.addHeader("Content-Disposition", "attachment;filename="
-					+ getUid());
+			response.addHeader("Content-Disposition", "attachment;filename=" + getUid());
 			response.setContentType("application/octet-stream");
 			try {
 				FileInputStream fis = new FileInputStream(file);
@@ -77,8 +75,7 @@ public class LogAction extends BaseAction {
 		final HttpServletResponse response = ServletActionContext.getResponse();
 		response.setContentType("text/event-stream");
 		response.setHeader("Cache-Control", "no-cache");
-		File file = new File(AppInfo.getAppHome() + File.separator + "logs",
-				getUid());
+		File file = new File(AppInfo.getAppHome() + File.separator + "logs", getUid());
 		try {
 			Writer w = response.getWriter();
 			w.write("retry: 5000\n\n");
@@ -101,8 +98,7 @@ public class LogAction extends BaseAction {
 				while ((line = raf.readLine()) != null) {
 					position = raf.getFilePointer();
 					w.write("data: ");
-					w.write(new String(line.getBytes("ISO-8859-1"), "UTF-8")
-							+ "\n");
+					w.write(new String(line.getBytes("ISO-8859-1"), "UTF-8") + "\n");
 				}
 				raf.close();
 				w.write("id: " + position + "\n\n");

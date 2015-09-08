@@ -103,10 +103,8 @@ public class JdbcUpdateService {
 	public void init() {
 		if (queryTimeout > 0)
 			jdbcTemplate.setQueryTimeout(queryTimeout);
-		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
-				jdbcTemplate);
-		Connection con = DataSourceUtils.getConnection(jdbcTemplate
-				.getDataSource());
+		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+		Connection con = DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
 		try {
 			catalog = con.getCatalog();
 			try {
@@ -117,8 +115,7 @@ public class JdbcUpdateService {
 			DatabaseMetaData dbmd = con.getMetaData();
 			supportsBatchUpdates = dbmd.supportsBatchUpdates();
 			if (databaseProduct == null)
-				databaseProduct = DatabaseProduct.parse(dbmd
-						.getDatabaseProductName());
+				databaseProduct = DatabaseProduct.parse(dbmd.getDatabaseProductName());
 			if (databaseMajorVersion == 0)
 				databaseMajorVersion = dbmd.getDatabaseMajorVersion();
 			if (databaseMinorVersion == 0)
@@ -129,8 +126,7 @@ public class JdbcUpdateService {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
-			DataSourceUtils
-					.releaseConnection(con, jdbcTemplate.getDataSource());
+			DataSourceUtils.releaseConnection(con, jdbcTemplate.getDataSource());
 		}
 	}
 
@@ -143,30 +139,23 @@ public class JdbcUpdateService {
 			paramMap.put(name, "0");
 		validateAndConvertTypes(sql, paramMap);
 		if (restricted) {
-			for (String table : SqlUtils.extractTables(sql, quoteString,
-					"update")) {
+			for (String table : SqlUtils.extractTables(sql, quoteString, "update")) {
 				if (table.indexOf('.') < 0)
 					continue;
-				if (table.startsWith(quoteString)
-						&& table.endsWith(quoteString)
-						&& !table.substring(1, table.length() - 1).contains(
-								quoteString))
+				if (table.startsWith(quoteString) && table.endsWith(quoteString)
+						&& !table.substring(1, table.length() - 1).contains(quoteString))
 					continue;
 				String[] arr = table.split("\\.");
 				if (arr.length == 2) {
 					String prefix = arr[0].replaceAll(quoteString, "");
-					if (!prefix.equalsIgnoreCase(catalog)
-							&& !prefix.equalsIgnoreCase(schema)) {
-						throw new ErrorMessage("query.access.denied",
-								new Object[] { table });
+					if (!prefix.equalsIgnoreCase(catalog) && !prefix.equalsIgnoreCase(schema)) {
+						throw new ErrorMessage("query.access.denied", new Object[] { table });
 					}
 				} else if (arr.length > 2) {
 					String prefix1 = arr[0].replaceAll(quoteString, "");
 					String prefix2 = arr[1].replaceAll(quoteString, "");
-					if (!prefix1.equalsIgnoreCase(catalog)
-							&& !prefix2.equalsIgnoreCase(schema)) {
-						throw new ErrorMessage("query.access.denied",
-								new Object[] { table });
+					if (!prefix1.equalsIgnoreCase(catalog) && !prefix2.equalsIgnoreCase(schema)) {
+						throw new ErrorMessage("query.access.denied", new Object[] { table });
 					}
 				}
 			}
@@ -181,22 +170,13 @@ public class JdbcUpdateService {
 			Throwable t = bse.getCause();
 			if (t.getClass().getSimpleName().equals("PSQLException")) {
 				String error = t.getMessage().toLowerCase();
-				if ((error.indexOf("smallint") > 0
-						|| error.indexOf("bigint") > 0
-						|| error.indexOf("bigserial") > 0
-						|| error.indexOf("integer") > 0
-						|| error.indexOf("serial") > 0
-						|| error.indexOf("numeric") > 0
-						|| error.indexOf("decimal") > 0
-						|| error.indexOf("real") > 0
-						|| error.indexOf("double precision") > 0
-						|| error.indexOf("money") > 0
-						|| error.indexOf("timestamp") > 0
-						|| error.indexOf("date") > 0 || error.indexOf("time") > 0)
-						&& error.indexOf("character varying") > 0
-						&& error.indexOf("：") > 0) {
-					int location = Integer.valueOf(error.substring(
-							error.lastIndexOf("：") + 1).trim());
+				if ((error.indexOf("smallint") > 0 || error.indexOf("bigint") > 0 || error.indexOf("bigserial") > 0
+						|| error.indexOf("integer") > 0 || error.indexOf("serial") > 0 || error.indexOf("numeric") > 0
+						|| error.indexOf("decimal") > 0 || error.indexOf("real") > 0
+						|| error.indexOf("double precision") > 0 || error.indexOf("money") > 0
+						|| error.indexOf("timestamp") > 0 || error.indexOf("date") > 0 || error.indexOf("time") > 0)
+						&& error.indexOf("character varying") > 0 && error.indexOf("：") > 0) {
+					int location = Integer.valueOf(error.substring(error.lastIndexOf("：") + 1).trim());
 					String paramName = sql.substring(location);
 					paramName = paramName.substring(paramName.indexOf(":") + 1);
 					paramName = paramName.split("\\s")[0].split("\\)")[0];
@@ -205,25 +185,17 @@ public class JdbcUpdateService {
 						String value = object.toString();
 						if (error.indexOf("small") > 0)
 							paramMap.put(paramName, Short.valueOf(value));
-						else if (error.indexOf("bigint") > 0
-								|| error.indexOf("bigserial") > 0)
+						else if (error.indexOf("bigint") > 0 || error.indexOf("bigserial") > 0)
 							paramMap.put(paramName, Long.valueOf(value));
-						else if (error.indexOf("integer") > 0
-								|| error.indexOf("serial") > 0)
+						else if (error.indexOf("integer") > 0 || error.indexOf("serial") > 0)
 							paramMap.put(paramName, Integer.valueOf(value));
-						else if (error.indexOf("numeric") > 0
-								|| error.indexOf("decimal") > 0
-								|| error.indexOf("real") > 0
-								|| error.indexOf("double precision") > 0
+						else if (error.indexOf("numeric") > 0 || error.indexOf("decimal") > 0
+								|| error.indexOf("real") > 0 || error.indexOf("double precision") > 0
 								|| error.indexOf("money") > 0)
 							paramMap.put(paramName, new BigDecimal(value));
-						else if (error.indexOf("timestamp") > 0
-								|| error.indexOf("date") > 0
+						else if (error.indexOf("timestamp") > 0 || error.indexOf("date") > 0
 								|| error.indexOf("time") > 0)
-							paramMap.put(
-									paramName,
-									value.equals("0") ? new Date() : DateUtils
-											.parse(value));
+							paramMap.put(paramName, value.equals("0") ? new Date() : DateUtils.parse(value));
 						validateAndConvertTypes(sql, paramMap);
 						return;
 					}
@@ -232,8 +204,7 @@ public class JdbcUpdateService {
 			String cause = "";
 			if (t instanceof SQLException)
 				cause = t.getMessage();
-			throw new ErrorMessage("query.bad.sql.grammar",
-					new Object[] { cause });
+			throw new ErrorMessage("query.bad.sql.grammar", new Object[] { cause });
 		} catch (DataAccessException e) {
 			throw new ErrorMessage(e.getMessage());
 		}
@@ -262,12 +233,9 @@ public class JdbcUpdateService {
 	@Transactional
 	public int[] executeBatch(String[] sql) {
 		boolean batch = supportsBatchUpdates;
-		if (batch
-				&& (databaseProduct == DatabaseProduct.SYBASE || databaseProduct == DatabaseProduct.SQLSERVER)) {
+		if (batch && (databaseProduct == DatabaseProduct.SYBASE || databaseProduct == DatabaseProduct.SQLSERVER)) {
 			for (int i = 0; i < sql.length; i++) {
-				if (i > 0
-						&& CREATE_OR_ALTER_PROCEDURE_OR_FUNCTION_PATTERN
-								.matcher(sql[i]).find()) {
+				if (i > 0 && CREATE_OR_ALTER_PROCEDURE_OR_FUNCTION_PATTERN.matcher(sql[i]).find()) {
 					// create/alter procedure/function must be the first command
 					batch = false;
 					break;
@@ -301,7 +269,6 @@ public class JdbcUpdateService {
 	}
 
 	private static final Pattern CREATE_OR_ALTER_PROCEDURE_OR_FUNCTION_PATTERN = Pattern
-			.compile("(create|alter)\\s+(procedure|function)",
-					Pattern.CASE_INSENSITIVE);
+			.compile("(create|alter)\\s+(procedure|function)", Pattern.CASE_INSENSITIVE);
 
 }

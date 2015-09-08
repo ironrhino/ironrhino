@@ -46,13 +46,12 @@ public class DynamicReportsResult extends StrutsResultSupport {
 	}
 
 	@Override
-	protected void doExecute(String finalLocation, ActionInvocation invocation)
-			throws Exception {
+	protected void doExecute(String finalLocation, ActionInvocation invocation) throws Exception {
 		initializeProperties(invocation);
-		HttpServletRequest request = (HttpServletRequest) invocation
-				.getInvocationContext().get(StrutsStatics.HTTP_REQUEST);
-		HttpServletResponse response = (HttpServletResponse) invocation
-				.getInvocationContext().get(StrutsStatics.HTTP_RESPONSE);
+		HttpServletRequest request = (HttpServletRequest) invocation.getInvocationContext()
+				.get(StrutsStatics.HTTP_REQUEST);
+		HttpServletResponse response = (HttpServletResponse) invocation.getInvocationContext()
+				.get(StrutsStatics.HTTP_RESPONSE);
 
 		// Handle IE special case: it sends a "contype" request first.
 		if ("contype".equals(request.getHeader("User-Agent"))) {
@@ -71,14 +70,12 @@ public class DynamicReportsResult extends StrutsResultSupport {
 		ValueStack stack = invocation.getStack();
 		if (StringUtils.isBlank(jasperReportBuilder))
 			jasperReportBuilder = "jasperReportBuilder";
-		JasperReportBuilder jrb = (JasperReportBuilder) stack
-				.findValue(jasperReportBuilder);
+		JasperReportBuilder jrb = (JasperReportBuilder) stack.findValue(jasperReportBuilder);
 
 		// Export the print object to the desired output format
 		if (contentDisposition != null || documentName != null) {
 			final StringBuffer tmp = new StringBuffer();
-			tmp.append((contentDisposition == null) ? "inline"
-					: contentDisposition);
+			tmp.append((contentDisposition == null) ? "inline" : contentDisposition);
 
 			if (documentName != null) {
 				tmp.append("; filename=");
@@ -101,8 +98,7 @@ public class DynamicReportsResult extends StrutsResultSupport {
 		}
 	}
 
-	private void initializeProperties(ActionInvocation invocation)
-			throws Exception {
+	private void initializeProperties(ActionInvocation invocation) throws Exception {
 		ValueStack stack = invocation.getStack();
 		format = conditionalParse(format, invocation);
 		if (StringUtils.isEmpty(format))
@@ -111,8 +107,7 @@ public class DynamicReportsResult extends StrutsResultSupport {
 			format = "PDF";
 
 		if (contentDisposition != null)
-			contentDisposition = conditionalParse(contentDisposition,
-					invocation);
+			contentDisposition = conditionalParse(contentDisposition, invocation);
 		if (StringUtils.isEmpty(contentDisposition))
 			contentDisposition = (String) stack.findValue("contentDisposition");
 

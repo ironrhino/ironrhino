@@ -14,8 +14,7 @@ public class ExpressionEvent extends BaseEvent<String> {
 
 	@Override
 	public String toString() {
-		return getClass().getName() + "[source=" + getSource() + ",timestamp="
-				+ getTimestamp() + "]";
+		return getClass().getName() + "[source=" + getSource() + ",timestamp=" + getTimestamp() + "]";
 	}
 
 }

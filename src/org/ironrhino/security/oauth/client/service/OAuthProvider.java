@@ -15,8 +15,7 @@ public interface OAuthProvider extends Comparable<OAuthProvider> {
 
 	public boolean isEnabled();
 
-	public String getAuthRedirectURL(HttpServletRequest request,
-			String targetUrl) throws Exception;
+	public String getAuthRedirectURL(HttpServletRequest request, String targetUrl) throws Exception;
 
 	public Profile getProfile(HttpServletRequest request) throws Exception;
 

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
-public class OpenSessionInViewFilter extends
-		org.springframework.orm.hibernate5.support.OpenSessionInViewFilter {
+public class OpenSessionInViewFilter extends org.springframework.orm.hibernate5.support.OpenSessionInViewFilter {
 
 }

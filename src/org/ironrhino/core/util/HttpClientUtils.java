@@ -40,15 +40,11 @@ public class HttpClientUtils {
 	private static Set<Header> DEFAULT_HEADERS = new HashSet<>();
 
 	static {
-		DEFAULT_HEADERS
-				.add(new BasicHeader(
-						"User-Agent",
-						"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.16 Safari/537.36"));
-		DEFAULT_HEADERS
-				.add(new BasicHeader("Accept",
-						"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"));
-		DEFAULT_HEADERS.add(new BasicHeader("Accept-Encoding",
-				"gzip,deflate,sdch"));
+		DEFAULT_HEADERS.add(new BasicHeader("User-Agent",
+				"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.16 Safari/537.36"));
+		DEFAULT_HEADERS.add(new BasicHeader("Accept",
+				"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"));
+		DEFAULT_HEADERS.add(new BasicHeader("Accept-Encoding", "gzip,deflate,sdch"));
 	}
 
 	static class HttpClientHolder {
@@ -73,23 +69,17 @@ public class HttpClientUtils {
 		if (single)
 			connManager = new BasicHttpClientConnectionManager();
 		else {
-			PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(
-					60, TimeUnit.SECONDS);
+			PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(60, TimeUnit.SECONDS);
 			cm.setDefaultMaxPerRoute(1000);
 			cm.setMaxTotal(1000);
 			connManager = cm;
 		}
-		RequestConfig requestConfig = RequestConfig.custom()
-				.setCircularRedirectsAllowed(true)
-				.setConnectTimeout(connectTimeout)
-				.setExpectContinueEnabled(true).build();
-		CloseableHttpClient httpclient = HttpClientBuilder.create()
-				.setConnectionManager(connManager)
-				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-				.setDefaultRequestConfig(requestConfig).disableAuthCaching()
-				.disableAutomaticRetries().disableConnectionState()
-				.disableCookieManagement().setDefaultHeaders(DEFAULT_HEADERS)
-				.build();
+		RequestConfig requestConfig = RequestConfig.custom().setCircularRedirectsAllowed(true)
+				.setConnectTimeout(connectTimeout).setExpectContinueEnabled(true).build();
+		CloseableHttpClient httpclient = HttpClientBuilder.create().setConnectionManager(connManager)
+				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy()).setDefaultRequestConfig(requestConfig)
+				.disableAuthCaching().disableAutomaticRetries().disableConnectionState().disableCookieManagement()
+				.setDefaultHeaders(DEFAULT_HEADERS).build();
 		return httpclient;
 	}
 
@@ -97,33 +87,27 @@ public class HttpClientUtils {
 		return getResponseText(url, null, "UTF-8");
 	}
 
-	public static String getResponseText(String url, Map<String, String> params)
-			throws IOException {
+	public static String getResponseText(String url, Map<String, String> params) throws IOException {
 		return getResponseText(url, params, "UTF-8");
 	}
 
-	public static String getResponseText(String url,
-			Map<String, String> params, Map<String, String> headers)
+	public static String getResponseText(String url, Map<String, String> params, Map<String, String> headers)
 			throws IOException {
 		return getResponseText(url, params, headers, "UTF-8");
 	}
 
-	public static String getResponseText(String url,
-			Map<String, String> params, String charset) throws IOException {
+	public static String getResponseText(String url, Map<String, String> params, String charset) throws IOException {
 		return getResponseText(url, params, null, charset);
 	}
 
-	public static String getResponseText(String url,
-			Map<String, String> params, Map<String, String> headers,
+	public static String getResponseText(String url, Map<String, String> params, Map<String, String> headers,
 			String charset) throws IOException {
 		HttpGet httpRequest = null;
 		StringBuilder sb = new StringBuilder(url);
 		if (params != null && params.size() > 0) {
 			sb.append(url.indexOf('?') < 0 ? '?' : '&');
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				sb.append(entry.getKey()).append("=")
-						.append(URLEncoder.encode(entry.getValue(), charset))
-						.append("&");
+				sb.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(), charset)).append("&");
 			}
 			sb.deleteCharAt(sb.length() - 1);
 		}
@@ -132,61 +116,53 @@ public class HttpClientUtils {
 			for (Map.Entry<String, String> entry : headers.entrySet())
 				httpRequest.addHeader(entry.getKey(), entry.getValue());
 		try {
-			return getDefaultInstance().execute(httpRequest,
-					new BasicResponseHandler(charset));
+			return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
 		} finally {
 			httpRequest.releaseConnection();
 		}
 	}
 
-	public static String postResponseText(String url, Map<String, String> params)
-			throws IOException {
+	public static String postResponseText(String url, Map<String, String> params) throws IOException {
 		return postResponseText(url, params, "UTF-8");
 	}
 
-	public static String postResponseText(String url,
-			Map<String, String> params, Map<String, String> headers)
+	public static String postResponseText(String url, Map<String, String> params, Map<String, String> headers)
 			throws IOException {
 		return postResponseText(url, params, headers, "UTF-8");
 	}
 
-	public static String postResponseText(String url,
-			Map<String, String> params, String charset) throws IOException {
+	public static String postResponseText(String url, Map<String, String> params, String charset) throws IOException {
 		return postResponseText(url, params, null, charset);
 	}
 
-	public static String postResponseText(String url,
-			Map<String, String> params, Map<String, String> headers,
+	public static String postResponseText(String url, Map<String, String> params, Map<String, String> headers,
 			String charset) throws IOException {
 		HttpPost httpRequest = new HttpPost(url);
 		if (params != null && params.size() > 0) {
 			List<NameValuePair> nvps = new ArrayList<>();
 			for (Map.Entry<String, String> entry : params.entrySet())
-				nvps.add(new BasicNameValuePair(entry.getKey(), entry
-						.getValue()));
+				nvps.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			httpRequest.setEntity(new UrlEncodedFormEntity(nvps, charset));
 		}
 		if (headers != null && headers.size() > 0)
 			for (Map.Entry<String, String> entry : headers.entrySet())
 				httpRequest.addHeader(entry.getKey(), entry.getValue());
 		try {
-			return getDefaultInstance().execute(httpRequest,
-					new BasicResponseHandler(charset));
+			return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
 		} finally {
 			httpRequest.releaseConnection();
 		}
 	}
 
-	public static String postResponseText(String url, String body,
-			Map<String, String> headers, String charset) throws IOException {
+	public static String postResponseText(String url, String body, Map<String, String> headers, String charset)
+			throws IOException {
 		HttpPost httpRequest = new HttpPost(url);
 		httpRequest.setEntity(new StringEntity(body, charset));
 		if (headers != null && headers.size() > 0)
 			for (Map.Entry<String, String> entry : headers.entrySet())
 				httpRequest.addHeader(entry.getKey(), entry.getValue());
 		try {
-			return getDefaultInstance().execute(httpRequest,
-					new BasicResponseHandler(charset));
+			return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
 		} finally {
 			httpRequest.releaseConnection();
 		}
@@ -196,8 +172,7 @@ public class HttpClientUtils {
 		return invoke("POST", url, entity);
 	}
 
-	public static String post(String url, String entity, String charset)
-			throws IOException {
+	public static String post(String url, String entity, String charset) throws IOException {
 		return invoke("POST", url, entity, charset);
 	}
 
@@ -205,8 +180,7 @@ public class HttpClientUtils {
 		return invoke("PUT", url, entity);
 	}
 
-	public static String put(String url, String entity, String charset)
-			throws IOException {
+	public static String put(String url, String entity, String charset) throws IOException {
 		return invoke("PUT", url, entity, charset);
 	}
 
@@ -218,13 +192,11 @@ public class HttpClientUtils {
 		return invoke("GET", url, null);
 	}
 
-	private static String invoke(String method, String url, String entity)
-			throws IOException {
+	private static String invoke(String method, String url, String entity) throws IOException {
 		return invoke(method, url, entity, "UTF-8");
 	}
 
-	private static String invoke(String method, String url, String entity,
-			String charset) throws IOException {
+	private static String invoke(String method, String url, String entity, String charset) throws IOException {
 		HttpRequestBase httpRequest = null;
 		if (method.equalsIgnoreCase("GET"))
 			httpRequest = new HttpGet(url);
@@ -235,11 +207,9 @@ public class HttpClientUtils {
 		else if (method.equalsIgnoreCase("DELETE"))
 			httpRequest = new HttpDelete(url);
 		if (entity != null)
-			((HttpEntityEnclosingRequestBase) httpRequest)
-					.setEntity(new StringEntity(entity, charset));
+			((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new StringEntity(entity, charset));
 		try {
-			return getDefaultInstance().execute(httpRequest,
-					new BasicResponseHandler(charset));
+			return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
 		} finally {
 			if (httpRequest != null)
 				httpRequest.releaseConnection();
@@ -263,17 +233,14 @@ public class HttpClientUtils {
 		}
 
 		@Override
-		public String handleResponse(final HttpResponse response)
-				throws HttpResponseException, IOException {
+		public String handleResponse(final HttpResponse response) throws HttpResponseException, IOException {
 			final StatusLine statusLine = response.getStatusLine();
 			final HttpEntity entity = response.getEntity();
 			if (statusLine.getStatusCode() >= 300) {
 				EntityUtils.consume(entity);
-				throw new HttpResponseException(statusLine.getStatusCode(),
-						statusLine.getReasonPhrase());
+				throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
 			}
-			return entity == null ? null : EntityUtils
-					.toString(entity, charset);
+			return entity == null ? null : EntityUtils.toString(entity, charset);
 		}
 
 	}

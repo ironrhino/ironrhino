@@ -27,11 +27,9 @@ public interface PageManager extends BaseManager<Page> {
 
 	public List<Page> findListByTag(int limit, String... tag);
 
-	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage,
-			String tag);
+	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage, String tag);
 
-	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage,
-			String... tag);
+	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage, String... tag);
 
 	public Map<String, Integer> findMatchedTags(String keyword);
 

@@ -12,8 +12,7 @@ public class SimpleProfileEditedEventListener {
 
 	@EventListener
 	public void onApplicationEvent(ProfileEditedEvent event) {
-		logger.info(event.getUsername() + " edited profile from {}",
-				event.getRemoteAddr());
+		logger.info(event.getUsername() + " edited profile from {}", event.getRemoteAddr());
 	}
 
 }

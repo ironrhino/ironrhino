@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Conditional;
 public @interface StageConditional {
 
 	public Stage value() default Stage.PRODUCTION;
-	
+
 	public boolean negated() default false;
 
 }

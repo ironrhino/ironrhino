@@ -28,12 +28,10 @@ public class TemplateProvider {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@Value("${ironrhino.view.ftl.location:"
-			+ AutoConfigResult.DEFAULT_FTL_LOCATION + "}")
+	@Value("${ironrhino.view.ftl.location:" + AutoConfigResult.DEFAULT_FTL_LOCATION + "}")
 	private String ftlLocation;
 
-	@Value("${ironrhino.view.ftl.classpath:"
-			+ AutoConfigResult.DEFAULT_FTL_CLASSPATH + "}")
+	@Value("${ironrhino.view.ftl.classpath:" + AutoConfigResult.DEFAULT_FTL_CLASSPATH + "}")
 	private String ftlClasspath;
 
 	@Value("${base:}")
@@ -83,11 +81,9 @@ public class TemplateProvider {
 		if (StringUtils.isNotBlank(base))
 			base = org.ironrhino.core.util.StringUtils.trimTailSlash(base);
 		if (StringUtils.isNotBlank(assetsBase))
-			assetsBase = org.ironrhino.core.util.StringUtils
-					.trimTailSlash(assetsBase);
+			assetsBase = org.ironrhino.core.util.StringUtils.trimTailSlash(assetsBase);
 		if (StringUtils.isNotBlank(ssoServerBase))
-			ssoServerBase = org.ironrhino.core.util.StringUtils
-					.trimTailSlash(ssoServerBase);
+			ssoServerBase = org.ironrhino.core.util.StringUtils.trimTailSlash(ssoServerBase);
 	}
 
 	private Configuration getConfiguration() {
@@ -96,9 +92,7 @@ public class TemplateProvider {
 				Container con = ActionContext.getContext().getContainer();
 				FreemarkerManager freemarkerManager = con
 						.getInstance(org.apache.struts2.views.freemarker.FreemarkerManager.class);
-				configuration = freemarkerManager
-						.getConfiguration(ServletActionContext
-								.getServletContext());
+				configuration = freemarkerManager.getConfiguration(ServletActionContext.getServletContext());
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
@@ -111,38 +105,29 @@ public class TemplateProvider {
 		return getTemplate(name, loc, getConfiguration().getEncoding(loc), true);
 	}
 
-	public Template getTemplate(String name, Locale locale, String encoding)
-			throws IOException {
+	public Template getTemplate(String name, Locale locale, String encoding) throws IOException {
 		return getTemplate(name, locale, encoding, true);
 	}
 
 	public Template getTemplate(String name, Locale locale) throws IOException {
-		return getTemplate(name, locale,
-				getConfiguration().getEncoding(locale), true);
+		return getTemplate(name, locale, getConfiguration().getEncoding(locale), true);
 	}
 
-	public Template getTemplate(String name, String encoding)
-			throws IOException {
+	public Template getTemplate(String name, String encoding) throws IOException {
 		return getTemplate(name, getConfiguration().getLocale(), encoding, true);
 	}
 
-	public Template getTemplate(String name, Locale locale, String encoding,
-			boolean parse) throws IOException {
+	public Template getTemplate(String name, Locale locale, String encoding, boolean parse) throws IOException {
 		if (name.startsWith(ftlLocation) || name.startsWith(ftlClasspath))
-			return getConfiguration()
-					.getTemplate(name, locale, encoding, parse);
-		String templateName = ftlLocation + (name.indexOf('/') != 0 ? "/" : "")
-				+ name;
+			return getConfiguration().getTemplate(name, locale, encoding, parse);
+		String templateName = ftlLocation + (name.indexOf('/') != 0 ? "/" : "") + name;
 		Template t = null;
 		try {
-			t = getConfiguration().getTemplate(templateName, locale, encoding,
-					parse);
+			t = getConfiguration().getTemplate(templateName, locale, encoding, parse);
 		} catch (FileNotFoundException e) {
 			if (t == null) {
-				templateName = ftlClasspath
-						+ (name.indexOf('/') != 0 ? "/" : "") + name;
-				t = getConfiguration().getTemplate(templateName, locale,
-						encoding, parse);
+				templateName = ftlClasspath + (name.indexOf('/') != 0 ? "/" : "") + name;
+				t = getConfiguration().getTemplate(templateName, locale, encoding, parse);
 			}
 		}
 		return t;

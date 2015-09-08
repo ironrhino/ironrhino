@@ -30,23 +30,15 @@ public class AppInfoListener implements ServletContextListener {
 			SERVLET_CONTEXT = event.getServletContext();
 		Properties appProperties = getAppProperties();
 		String defaultProfiles = null;
-		if (StringUtils
-				.isBlank(System
-						.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME))) {
+		if (StringUtils.isBlank(System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME))) {
 			defaultProfiles = System
-					.getenv(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME
-							.replaceAll("\\.", "_").toUpperCase());
+					.getenv(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME.replaceAll("\\.", "_").toUpperCase());
 			if (StringUtils.isNotBlank(defaultProfiles)) {
-				System.setProperty(
-						AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME,
-						defaultProfiles);
+				System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
 			} else {
-				defaultProfiles = appProperties
-						.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
+				defaultProfiles = appProperties.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 				if (StringUtils.isNotBlank(defaultProfiles)) {
-					System.setProperty(
-							AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME,
-							defaultProfiles);
+					System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
 				}
 			}
 		}
@@ -64,40 +56,30 @@ public class AppInfoListener implements ServletContextListener {
 		System.setProperty(AppInfo.KEY_STAGE, AppInfo.getStage().name());
 		System.setProperty(AppInfo.KEY_APP_HOME, AppInfo.getAppHome());
 		System.setProperty(AppInfo.KEY_APP_NAME, AppInfo.getAppName());
-		System.setProperty("Log4jContextSelector",
-				"org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+		System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
 		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
 			System.setProperty("AsyncLogger.RingBufferSize", "16384");
-		System.setProperty("hibernate.logger.level",
-				AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
-		System.setProperty(
-				"console.logger.level",
-				AppInfo.getStage() == Stage.PRODUCTION
-						&& (System.getProperty("os.name") == null || !System
-								.getProperty("os.name").startsWith("Windows")) ? "ERROR"
-						: "INFO");
+		System.setProperty("hibernate.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
+		System.setProperty("console.logger.level", AppInfo.getStage() == Stage.PRODUCTION
+				&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))
+						? "ERROR" : "INFO");
 		String context = SERVLET_CONTEXT.getRealPath("/");
 		if (context == null)
 			context = "";
 		System.setProperty("app.context", context);
 
-		String appBasePackage = appProperties
-				.getProperty(AppInfo.KEY_APP_BASEPACKAGE);
+		String appBasePackage = appProperties.getProperty(AppInfo.KEY_APP_BASEPACKAGE);
 		if (StringUtils.isBlank(appBasePackage))
 			appBasePackage = "com." + AppInfo.getAppName();
 		AppInfo.setAppBasePackage(appBasePackage);
 		System.setProperty(AppInfo.KEY_APP_BASEPACKAGE, appBasePackage);
-		String excludeFilterRegex = appProperties
-				.getProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX);
+		String excludeFilterRegex = appProperties.getProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX);
 		if (StringUtils.isNotBlank(excludeFilterRegex)) {
 			AppInfo.setExcludeFilterRegex(excludeFilterRegex);
-			System.setProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX,
-					excludeFilterRegex);
+			System.setProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX, excludeFilterRegex);
 		}
 		String userTimezone = System.getProperty("user.timezone");
-		if (StringUtils.isBlank(userTimezone)
-				|| !TimeZone.getTimeZone(userTimezone).getID()
-						.equals(userTimezone)) {
+		if (StringUtils.isBlank(userTimezone) || !TimeZone.getTimeZone(userTimezone).getID().equals(userTimezone)) {
 			userTimezone = "Asia/Shanghai";
 			TimeZone older = TimeZone.getDefault();
 			TimeZone newer = TimeZone.getTimeZone(userTimezone);
@@ -108,10 +90,8 @@ public class AppInfoListener implements ServletContextListener {
 		logger.info("default timezone {}", TimeZone.getDefault().getID());
 		logger.info(
 				"app.name={},app.version={},app.instanceid={},app.stage={},app.runlevel={},app.home={},hostname={},hostaddress={},profiles={}",
-				AppInfo.getAppName(), AppInfo.getAppVersion(), AppInfo
-						.getInstanceId(), AppInfo.getStage().toString(),
-				AppInfo.getRunLevel().toString(), AppInfo.getAppHome(), AppInfo
-						.getHostName(), AppInfo.getHostAddress(),
+				AppInfo.getAppName(), AppInfo.getAppVersion(), AppInfo.getInstanceId(), AppInfo.getStage().toString(),
+				AppInfo.getRunLevel().toString(), AppInfo.getAppHome(), AppInfo.getHostName(), AppInfo.getHostAddress(),
 				defaultProfiles != null ? defaultProfiles : "default");
 	}
 
@@ -119,10 +99,9 @@ public class AppInfoListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent event) {
 		logger.info(
 				"app.name={},app.version={},app.instanceid={},app.stage={},app.runlevel={},app.home={},hostname={},hostaddress={} is shutdown",
-				AppInfo.getAppName(), AppInfo.getAppVersion(), AppInfo
-						.getInstanceId(), AppInfo.getStage().toString(),
-				AppInfo.getRunLevel().toString(), AppInfo.getAppHome(), AppInfo
-						.getHostName(), AppInfo.getHostAddress());
+				AppInfo.getAppName(), AppInfo.getAppVersion(), AppInfo.getInstanceId(), AppInfo.getStage().toString(),
+				AppInfo.getRunLevel().toString(), AppInfo.getAppHome(), AppInfo.getHostName(),
+				AppInfo.getHostAddress());
 		SERVLET_CONTEXT = null;
 	}
 

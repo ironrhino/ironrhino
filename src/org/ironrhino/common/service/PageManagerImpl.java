@@ -30,8 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class PageManagerImpl extends BaseManagerImpl<Page> implements
-		PageManager {
+public class PageManagerImpl extends BaseManagerImpl<Page>implements PageManager {
 
 	@Autowired(required = false)
 	private transient ElasticSearchService<Page> elasticSearchService;
@@ -118,8 +117,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 	@Override
 	public void pullDraft(Page page) {
 		try {
-			Map<String, String> map = JsonUtils.fromJson(page.getDraft(),
-					JsonUtils.STRING_MAP_TYPE);
+			Map<String, String> map = JsonUtils.fromJson(page.getDraft(), JsonUtils.STRING_MAP_TYPE);
 			page.setPath(map.get("path"));
 			page.setTitle(map.get("title"));
 			page.setContent(map.get("content"));
@@ -210,16 +208,14 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 
 	@Override
 	@Transactional(readOnly = true)
-	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage,
-			String tag) {
+	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage, String tag) {
 		return findResultPageByTag(resultPage, new String[] { tag });
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
-	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage,
-			String... tag) {
+	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage, String... tag) {
 		if (tag.length == 0 || StringUtils.isBlank(tag[0])) {
 			resultPage.setResult(Collections.EMPTY_LIST);
 			return resultPage;
@@ -254,10 +250,8 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 			for (int i = 0; i < tag.length; i++)
 				if (StringUtils.isNotBlank(tag[i]))
 					dc.add(CriterionUtils.matchTag("tagsAsString", tag[i]));
-			for (Map.Entry<String, Boolean> entry : criteria.getSorts()
-					.entrySet())
-				dc.addOrder(entry.getValue() ? Order.desc(entry.getKey())
-						: Order.asc(entry.getKey()));
+			for (Map.Entry<String, Boolean> entry : criteria.getSorts().entrySet())
+				dc.addOrder(entry.getValue() ? Order.desc(entry.getKey()) : Order.asc(entry.getKey()));
 			resultPage.setCriteria(dc);
 			resultPage = findByResultPage(resultPage);
 		}
@@ -272,11 +266,9 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 			return Collections.EMPTY_MAP;
 		if (elasticSearchService != null) {
 			ElasticSearchCriteria cc = new ElasticSearchCriteria();
-			cc.setQuery(new StringBuilder("tags:").append(keyword).append("*")
-					.toString());
+			cc.setQuery(new StringBuilder("tags:").append(keyword).append("*").toString());
 			cc.setTypes(new String[] { "page" });
-			Map<String, Integer> map = elasticSearchService.countTermsByField(
-					cc, "tags");
+			Map<String, Integer> map = elasticSearchService.countTermsByField(cc, "tags");
 			Iterator<Map.Entry<String, Integer>> it = map.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<String, Integer> entry = it.next();
@@ -287,8 +279,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 		} else {
 			final Map<String, Integer> map = new HashMap<>();
 			DetachedCriteria dc = detachedCriteria();
-			dc.add(Restrictions.like("tagsAsString", keyword,
-					MatchMode.ANYWHERE));
+			dc.add(Restrictions.like("tagsAsString", keyword, MatchMode.ANYWHERE));
 			List<Page> list = findListByCriteria(dc);
 			for (Page p : list) {
 				for (String tag : p.getTags()) {
@@ -302,10 +293,8 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 				}
 			}
 
-			List<Map.Entry<String, Integer>> _list = new ArrayList<>(
-					map.entrySet());
-			Collections.sort(_list, ValueThenKeyComparator
-					.<String, Integer> getDefaultInstance());
+			List<Map.Entry<String, Integer>> _list = new ArrayList<>(map.entrySet());
+			Collections.sort(_list, ValueThenKeyComparator.<String, Integer> getDefaultInstance());
 			Map<String, Integer> sortedMap = new LinkedHashMap<>();
 			for (Map.Entry<String, Integer> entry : _list)
 				sortedMap.put(entry.getKey(), entry.getValue());
@@ -315,8 +304,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements
 	}
 
 	protected static String encodeURL(String content) {
-		return content != null ? content.replaceAll("\"(/assets/[^\"]*)\"",
-				"\"<@url value=\"$1\"/>\"") : null;
+		return content != null ? content.replaceAll("\"(/assets/[^\"]*)\"", "\"<@url value=\"$1\"/>\"") : null;
 	}
 
 }

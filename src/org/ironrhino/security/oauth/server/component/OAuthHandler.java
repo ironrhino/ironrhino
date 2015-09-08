@@ -74,11 +74,9 @@ public class OAuthHandler extends AccessHandler {
 	}
 
 	@Override
-	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		String errorMessage = null;
-		Map<String, String> map = RequestUtils
-				.parseParametersFromQueryString(request.getQueryString());
+		Map<String, String> map = RequestUtils.parseParametersFromQueryString(request.getQueryString());
 		String token = map.get("oauth_token");
 		if (token == null)
 			token = map.get("access_token");
@@ -115,8 +113,7 @@ public class OAuthHandler extends AccessHandler {
 					boolean authorizedScope = (scopes == null);
 					if (!authorizedScope && scopes != null) {
 						for (String s : scopes) {
-							String requestURL = request.getRequestURL()
-									.toString();
+							String requestURL = request.getRequestURL().toString();
 							if (requestURL.startsWith(s)) {
 								authorizedScope = true;
 								break;
@@ -124,13 +121,10 @@ public class OAuthHandler extends AccessHandler {
 						}
 					}
 					if (authorizedScope) {
-						Client client = oauthManager
-								.findClientById(authorization.getClient());
+						Client client = oauthManager.findClientById(authorization.getClient());
 						if (client != null) {
-							request.setAttribute(
-									REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, client);
-							UserAgent ua = new UserAgent(
-									request.getHeader("User-Agent"));
+							request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, client);
+							UserAgent ua = new UserAgent(request.getHeader("User-Agent"));
 							ua.setAppId(client.getId());
 							ua.setAppName(client.getName());
 							request.setAttribute("userAgent", ua);
@@ -139,44 +133,29 @@ public class OAuthHandler extends AccessHandler {
 							UserDetails ud = null;
 							if (authorization.getGrantor() != null) {
 								try {
-									ud = userDetailsService
-											.loadUserByUsername(authorization
-													.getGrantor());
+									ud = userDetailsService.loadUserByUsername(authorization.getGrantor());
 								} catch (UsernameNotFoundException unf) {
 									logger.error(unf.getMessage(), unf);
 								}
 
 							} else if (client != null) {
 								try {
-									ud = userDetailsService
-											.loadUserByUsername(client
-													.getOwner().getUsername());
+									ud = userDetailsService.loadUserByUsername(client.getOwner().getUsername());
 								} catch (UsernameNotFoundException unf) {
 									logger.error(unf.getMessage(), unf);
 								}
 							}
-							if (ud != null && ud.isEnabled()
-									&& ud.isAccountNonExpired()
-									&& ud.isAccountNonLocked()) {
-								SecurityContext sc = SecurityContextHolder
-										.getContext();
-								Authentication auth = new UsernamePasswordAuthenticationToken(
-										ud, ud.getPassword(),
+							if (ud != null && ud.isEnabled() && ud.isAccountNonExpired() && ud.isAccountNonLocked()) {
+								SecurityContext sc = SecurityContextHolder.getContext();
+								Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(),
 										ud.getAuthorities());
 								sc.setAuthentication(auth);
-								Map<String, Object> sessionMap = new HashMap<>(
-										2, 1);
-								sessionMap
-										.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-												sc);
-								request.setAttribute(
-										HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API,
+								Map<String, Object> sessionMap = new HashMap<>(2, 1);
+								sessionMap.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
+								request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API,
 										sessionMap);
-								request.setAttribute(
-										REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST,
-										true);
-								request.setAttribute(
-										HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API,
+								request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
+								request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API,
 										SESSION_ID_PREFIX + token);
 							}
 							return false;
@@ -202,14 +181,12 @@ public class OAuthHandler extends AccessHandler {
 			errorMessage = "missing_token";
 		}
 		if (httpErrorHandler != null
-				&& httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_UNAUTHORIZED, errorMessage))
+				&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_UNAUTHORIZED, errorMessage))
 			return true;
 		try {
 			if (errorMessage != null)
 				response.getWriter().write(errorMessage);
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-					errorMessage);
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}

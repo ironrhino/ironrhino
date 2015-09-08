@@ -38,8 +38,7 @@ public class ErrorAction extends BaseAction {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		int errorcode = 404;
-		exception = (Exception) request
-				.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+		exception = (Exception) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 		if (exception instanceof ErrorMessage) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			addActionError(((ErrorMessage) exception).getLocalizedMessage());
@@ -48,9 +47,7 @@ public class ErrorAction extends BaseAction {
 			if (exception instanceof CredentialsExpiredException) {
 				UserDetails ud = AuthzUtils.getUserDetails();
 				if (ud != null) {
-					targetUrl = "/"
-							+ StringUtils.uncapitalize(ud.getClass()
-									.getSimpleName()) + "/password";
+					targetUrl = "/" + StringUtils.uncapitalize(ud.getClass().getSimpleName()) + "/password";
 					return REDIRECT;
 				}
 			}
@@ -63,9 +60,8 @@ public class ErrorAction extends BaseAction {
 		} catch (Exception e) {
 
 		}
-		if (httpErrorHandler != null
-				&& httpErrorHandler.handle(request, response, errorcode,
-						exception != null ? exception.getMessage() : null))
+		if (httpErrorHandler != null && httpErrorHandler.handle(request, response, errorcode,
+				exception != null ? exception.getMessage() : null))
 			return NONE;
 		String result;
 		switch (errorcode) {

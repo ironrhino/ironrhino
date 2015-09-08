@@ -36,8 +36,7 @@ public class XmlUtils {
 		}
 	}
 
-	public static String eval(String xpath, Reader reader,
-			NamespaceContext nsContext) {
+	public static String eval(String xpath, Reader reader, NamespaceContext nsContext) {
 		try {
 			XPath _xpath = XPathFactory.newInstance().newXPath();
 			_xpath.setNamespaceContext(nsContext);
@@ -53,30 +52,26 @@ public class XmlUtils {
 		return eval(xpath, new StringReader(source));
 	}
 
-	public static String eval(String xpath, String source,
-			NamespaceContext nsContext) {
+	public static String eval(String xpath, String source, NamespaceContext nsContext) {
 		return eval(xpath, new StringReader(source), nsContext);
 	}
 
 	public static NodeList evalNodeList(String xpath, Reader reader) {
 		try {
 			XPathExpression xpe = _xpath.compile(xpath);
-			return (NodeList) xpe.evaluate(new InputSource(reader),
-					XPathConstants.NODESET);
+			return (NodeList) xpe.evaluate(new InputSource(reader), XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public static NodeList evalNodeList(String xpath, Reader reader,
-			NamespaceContext nsContext) {
+	public static NodeList evalNodeList(String xpath, Reader reader, NamespaceContext nsContext) {
 		try {
 			XPath _xpath = XPathFactory.newInstance().newXPath();
 			_xpath.setNamespaceContext(nsContext);
 			XPathExpression xpe = _xpath.compile(xpath);
-			return (NodeList) xpe.evaluate(new InputSource(reader),
-					XPathConstants.NODESET);
+			return (NodeList) xpe.evaluate(new InputSource(reader), XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 			return null;
@@ -87,14 +82,12 @@ public class XmlUtils {
 		return evalNodeList(xpath, new StringReader(source));
 	}
 
-	public static NodeList evalNodeList(String xpath, String source,
-			NamespaceContext nsContext) {
+	public static NodeList evalNodeList(String xpath, String source, NamespaceContext nsContext) {
 		return evalNodeList(xpath, new StringReader(source), nsContext);
 	}
 
 	private static JAXBContext initContext() {
-		Collection<Class<?>> classes = ClassScanner.scanAnnotated(
-				ClassScanner.getAppPackages(), XmlRootElement.class);
+		Collection<Class<?>> classes = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), XmlRootElement.class);
 		try {
 			return JAXBContext.newInstance(classes.toArray(new Class[0]));
 		} catch (JAXBException e) {
@@ -107,18 +100,15 @@ public class XmlUtils {
 		if (obj == null)
 			return null;
 		Marshaller marshaller = context.createMarshaller();
-		marshaller
-				.setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, "UTF-8");
-		marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT,
-				Boolean.TRUE);
+		marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, "UTF-8");
+		marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		StringWriter sw = new StringWriter();
 		marshaller.marshal(obj, sw);
 		return sw.toString();
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T fromXml(String xml, Class<T> clazz)
-			throws JAXBException {
+	public static <T> T fromXml(String xml, Class<T> clazz) throws JAXBException {
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		return (T) unmarshaller.unmarshal(new StringReader(xml));
 	}

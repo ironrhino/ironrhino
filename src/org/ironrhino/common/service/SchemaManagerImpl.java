@@ -5,7 +5,6 @@ import org.ironrhino.core.service.BaseManagerImpl;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SchemaManagerImpl extends BaseManagerImpl<Schema> implements
-		SchemaManager {
+public class SchemaManagerImpl extends BaseManagerImpl<Schema>implements SchemaManager {
 
 }

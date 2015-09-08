@@ -12,36 +12,29 @@ public class DateUtils {
 
 	public static final String DATE10 = "yyyy-MM-dd";
 
-	private static final FastDateFormat DATE10_DF = FastDateFormat
-			.getInstance(DATE10);
+	private static final FastDateFormat DATE10_DF = FastDateFormat.getInstance(DATE10);
 
 	public static final String DATE8 = "yyyyMMdd";
 
-	private static final FastDateFormat DATE8_DF = FastDateFormat
-			.getInstance(DATE8);
+	private static final FastDateFormat DATE8_DF = FastDateFormat.getInstance(DATE8);
 
 	public static final String YEARMONTH = "yyyyMM";
 
-	private static final FastDateFormat YEARMONTH_DF = FastDateFormat
-			.getInstance(YEARMONTH);
+	private static final FastDateFormat YEARMONTH_DF = FastDateFormat.getInstance(YEARMONTH);
 
 	public static final String DATETIME = "yyyy-MM-dd HH:mm:ss";
 
-	private static final FastDateFormat DATETIME_DF = FastDateFormat
-			.getInstance(DATETIME);
+	private static final FastDateFormat DATETIME_DF = FastDateFormat.getInstance(DATETIME);
 
 	public static final String DATETIME_ISO = "yyyy-MM-dd'T'HH:mm:ss";
 
-	private static final FastDateFormat DATETIME_ISO_DF = FastDateFormat
-			.getInstance(DATETIME_ISO);
+	private static final FastDateFormat DATETIME_ISO_DF = FastDateFormat.getInstance(DATETIME_ISO);
 
 	public static final String TIMESTAMP = "yyyy-MM-dd HH:mm:ss.SSS";
 
-	private static final FastDateFormat TIMESTAMP_DF = FastDateFormat
-			.getInstance(TIMESTAMP);
+	private static final FastDateFormat TIMESTAMP_DF = FastDateFormat.getInstance(TIMESTAMP);
 
-	public static final String[] ACCEPT_DATE_FORMATS = { "yyyy/MM/dd",
-			DATETIME, DATETIME_ISO, DATE10 };
+	public static final String[] ACCEPT_DATE_FORMATS = { "yyyy/MM/dd", DATETIME, DATETIME_ISO, DATE10 };
 
 	public static String formatDate10(Date date) {
 		return DATE10_DF.format(date);
@@ -81,8 +74,7 @@ public class DateUtils {
 	public static int getIntervalDays(Date startDate, Date endDate) {
 		startDate = beginOfDay(startDate);
 		endDate = beginOfDay(endDate);
-		return (int) TimeUnit.DAYS.convert(
-				endDate.getTime() - startDate.getTime(), TimeUnit.MILLISECONDS) + 1;
+		return (int) TimeUnit.DAYS.convert(endDate.getTime() - startDate.getTime(), TimeUnit.MILLISECONDS) + 1;
 	}
 
 	public static boolean isSpanLeapDay(Date startDate, Date endDate) {
@@ -221,8 +213,7 @@ public class DateUtils {
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		cal.add(Calendar.MILLISECOND, -1);
-		cal.set(Calendar.DAY_OF_MONTH,
-				cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
 		return cal.getTime();
 	}
 
@@ -235,8 +226,7 @@ public class DateUtils {
 		int month = cal.get(Calendar.MONTH);
 		int day = cal.get(Calendar.DAY_OF_MONTH);
 		cal.setTime(date2);
-		return year == cal.get(Calendar.YEAR)
-				&& month == cal.get(Calendar.MONTH)
+		return year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH)
 				&& day == cal.get(Calendar.DAY_OF_MONTH);
 	}
 
@@ -251,8 +241,7 @@ public class DateUtils {
 	public static boolean isEndOfMonth(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
-		return cal.get(Calendar.DAY_OF_MONTH) == cal
-				.getActualMaximum(Calendar.DAY_OF_MONTH);
+		return cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 	}
 
 	public static boolean isEndOfYear(Date date) {
@@ -308,14 +297,12 @@ public class DateUtils {
 			return false;
 		if (!isLunar) {
 			Date today = new Date();
-			return formatDate8(today).substring(4).equals(
-					formatDate8(date).substring(4));
+			return formatDate8(today).substring(4).equals(formatDate8(date).substring(4));
 		} else {
 			Calendar cal = Calendar.getInstance();
 			Lunar lunar = new Lunar(cal);
 			Date today = lunar.toDate();
-			return formatDate8(today).substring(4).equals(
-					formatDate8(date).substring(4));
+			return formatDate8(today).substring(4).equals(formatDate8(date).substring(4));
 		}
 	}
 
@@ -329,32 +316,22 @@ public class DateUtils {
 		private int month;
 		private int day;
 		private boolean leap;
-		final static String chineseNumber[] = { "一", "二", "三", "四", "五", "六",
-				"七", "八", "九", "十", "十一", "十二" };
-		static FastDateFormat chineseDateFormat = FastDateFormat
-				.getInstance("yyyy年MM月dd日");
-		final static long[] lunarInfo = new long[] { 0x04bd8, 0x04ae0, 0x0a570,
-				0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,
-				0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0,
-				0x0ada2, 0x095b0, 0x14977, 0x04970, 0x0a4b0, 0x0b4b5, 0x06a50,
-				0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970, 0x06566,
-				0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0,
-				0x1c8d7, 0x0c950, 0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4,
-				0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557, 0x06ca0, 0x0b550,
-				0x15355, 0x04da0, 0x0a5d0, 0x14573, 0x052d0, 0x0a9a8, 0x0e950,
-				0x06aa0, 0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260,
-				0x0f263, 0x0d950, 0x05b57, 0x056a0, 0x096d0, 0x04dd5, 0x04ad0,
-				0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b5a0, 0x195a6,
-				0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40,
-				0x0af46, 0x0ab60, 0x09570, 0x04af5, 0x04970, 0x064b0, 0x074a3,
-				0x0ea50, 0x06b58, 0x055c0, 0x0ab60, 0x096d5, 0x092e0, 0x0c960,
-				0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0,
-				0x092d0, 0x0cab5, 0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9,
-				0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930, 0x07954, 0x06aa0,
-				0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65,
-				0x0d530, 0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0,
-				0x1d0b6, 0x0d250, 0x0d520, 0x0dd45, 0x0b5a0, 0x056d0, 0x055b2,
-				0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0 };
+		final static String chineseNumber[] = { "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" };
+		static FastDateFormat chineseDateFormat = FastDateFormat.getInstance("yyyy年MM月dd日");
+		final static long[] lunarInfo = new long[] { 0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554,
+				0x056a0, 0x09ad0, 0x055d2, 0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2,
+				0x095b0, 0x14977, 0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2,
+				0x04970, 0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950,
+				0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557, 0x06ca0,
+				0x0b550, 0x15355, 0x04da0, 0x0a5d0, 0x14573, 0x052d0, 0x0a9a8, 0x0e950, 0x06aa0, 0x0aea6, 0x0ab50,
+				0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0, 0x096d0, 0x04dd5, 0x04ad0,
+				0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b5a0, 0x195a6, 0x095b0, 0x049b0, 0x0a974, 0x0a4b0,
+				0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570, 0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50,
+				0x06b58, 0x055c0, 0x0ab60, 0x096d5, 0x092e0, 0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0,
+				0x0abb7, 0x025d0, 0x092d0, 0x0cab5, 0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0,
+				0x15176, 0x052b0, 0x0a930, 0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260,
+				0x0ea65, 0x0d530, 0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520,
+				0x0dd45, 0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0 };
 
 		// ====== 传回农历 y年的总天数
 		final private static int yearDays(int y) {
@@ -392,17 +369,14 @@ public class DateUtils {
 
 		// ====== 传回农历 y年的生肖
 		final public String animalsYear() {
-			final String[] Animals = new String[] { "鼠", "牛", "虎", "兔", "龙",
-					"蛇", "马", "羊", "猴", "鸡", "狗", "猪" };
+			final String[] Animals = new String[] { "鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪" };
 			return Animals[(year - 4) % 12];
 		}
 
 		// ====== 传入 月日的offset 传回干支, 0=甲子
 		final private static String cyclicalm(int num) {
-			final String[] Gan = new String[] { "甲", "乙", "丙", "丁", "戊", "己",
-					"庚", "辛", "壬", "癸" };
-			final String[] Zhi = new String[] { "子", "丑", "寅", "卯", "辰", "巳",
-					"午", "未", "申", "酉", "戌", "亥" };
+			final String[] Gan = new String[] { "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸" };
+			final String[] Zhi = new String[] { "子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥" };
 			return (Gan[num % 10] + Zhi[num % 12]);
 		}
 
@@ -431,8 +405,7 @@ public class DateUtils {
 			baseCalendar.set(Calendar.MINUTE, 0);
 			baseCalendar.set(Calendar.SECOND, 0);
 			// 求出和1900年1月31日相差的天数
-			int offset = (int) ((cal.getTime().getTime() - baseCalendar
-					.getTimeInMillis()) / 86400000L);
+			int offset = (int) ((cal.getTime().getTime() - baseCalendar.getTimeInMillis()) / 86400000L);
 			dayCyl = offset + 40;
 			monCyl = 14;
 
@@ -520,8 +493,7 @@ public class DateUtils {
 
 		@Override
 		public String toString() {
-			return year + "年" + (leap ? "闰" : "") + chineseNumber[month - 1]
-					+ "月" + getChinaDayString(day);
+			return year + "年" + (leap ? "闰" : "") + chineseNumber[month - 1] + "月" + getChinaDayString(day);
 		}
 
 	}

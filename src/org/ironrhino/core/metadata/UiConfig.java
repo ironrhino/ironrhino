@@ -43,15 +43,19 @@ public @interface UiConfig {
 
 	boolean unique() default false;
 
-	Readonly readonly() default @Readonly;
+	Readonly readonly() default @Readonly
+	;
 
 	boolean hidden() default false;
 
-	Hidden hiddenInList() default @Hidden;
+	Hidden hiddenInList() default @Hidden
+	;
 
-	Hidden hiddenInInput() default @Hidden;
+	Hidden hiddenInInput() default @Hidden
+	;
 
-	Hidden hiddenInView() default @Hidden;
+	Hidden hiddenInView() default @Hidden
+	;
 
 	boolean shownInPick() default false;
 
@@ -64,7 +68,7 @@ public @interface UiConfig {
 	String viewTemplate() default "";
 
 	String inputTemplate() default "";
-	
+
 	String csvTemplate() default "";
 
 	String width() default "";
@@ -96,7 +100,7 @@ public @interface UiConfig {
 	String group() default "";
 
 	boolean suppressViewLink() default false;
-	
+
 	boolean embeddedAsSingle() default false;
 
 }

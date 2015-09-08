@@ -42,8 +42,7 @@ public class Text implements Serializable {
 
 	}
 
-	public static String createStyle(int fontsize, String color,
-			String textalign) {
+	public static String createStyle(int fontsize, String color, String textalign) {
 		StringBuilder sb = new StringBuilder();
 		if (fontsize != 0) {
 			sb.append("font-size: ");

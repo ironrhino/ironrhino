@@ -16,8 +16,7 @@ public class LoginEvent extends AbstractAuditEvent {
 		super(username, remoteAddr);
 	}
 
-	public LoginEvent(String username, String remoteAddr, String from,
-			String provider) {
+	public LoginEvent(String username, String remoteAddr, String from, String provider) {
 		super(username, remoteAddr);
 		this.from = from;
 		this.provider = provider;

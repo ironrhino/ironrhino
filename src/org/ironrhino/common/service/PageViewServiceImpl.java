@@ -36,8 +36,7 @@ public class PageViewServiceImpl implements PageViewService {
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Override
-	public void put(Date date, String ip, String url, String sessionId,
-			String username, String referer) {
+	public void put(Date date, String ip, String url, String sessionId, String username, String referer) {
 		if (stringRedisTemplate == null)
 			return;
 		String domain = null;
@@ -100,22 +99,18 @@ public class PageViewServiceImpl implements PageViewService {
 		stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), url, 1);
 	}
 
-	private void analyzeReferer(String day, String url, String referer,
-			String domain) {
-		if (StringUtils.isBlank(referer)
-				|| RequestUtils.isSameOrigin(url, referer))
+	private void analyzeReferer(String day, String url, String referer, String domain) {
+		if (StringUtils.isBlank(referer) || RequestUtils.isSameOrigin(url, referer))
 			return;
 
 		StringBuilder sb = new StringBuilder(KEY_PAGE_VIEW);
 		if (StringUtils.isNotBlank(domain))
 			sb.append(domain).append(":");
 		sb.append("fr");
-		stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), referer,
-				1);
+		stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), referer, 1);
 		sb.append(":");
 		sb.append(day);
-		stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), referer,
-				1);
+		stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), referer, 1);
 
 		String[] result = parseSearchUrl(referer);
 		if (result == null)
@@ -127,24 +122,20 @@ public class PageViewServiceImpl implements PageViewService {
 			if (StringUtils.isNotBlank(domain))
 				sb.append(domain).append(":");
 			sb.append("se");
-			stringRedisTemplate.opsForZSet().incrementScore(sb.toString(),
-					searchengine, 1);
+			stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), searchengine, 1);
 			sb.append(":");
 			sb.append(day);
-			stringRedisTemplate.opsForZSet().incrementScore(sb.toString(),
-					searchengine, 1);
+			stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), searchengine, 1);
 		}
 		if (StringUtils.isNotBlank(keyword)) {
 			sb = new StringBuilder(KEY_PAGE_VIEW);
 			if (StringUtils.isNotBlank(domain))
 				sb.append(domain).append(":");
 			sb.append("kw");
-			stringRedisTemplate.opsForZSet().incrementScore(sb.toString(),
-					keyword, 1);
+			stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), keyword, 1);
 			sb.append(":");
 			sb.append(day);
-			stringRedisTemplate.opsForZSet().incrementScore(sb.toString(),
-					keyword, 1);
+			stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), keyword, 1);
 		}
 	}
 
@@ -157,12 +148,10 @@ public class PageViewServiceImpl implements PageViewService {
 				if (StringUtils.isNotBlank(domain))
 					sb.append(domain).append(":");
 				sb.append("loc:pr");
-				stringRedisTemplate.opsForZSet().incrementScore(sb.toString(),
-						province, 1);
+				stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), province, 1);
 				sb.append(":");
 				sb.append(day);
-				stringRedisTemplate.opsForZSet().incrementScore(sb.toString(),
-						province, 1);
+				stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), province, 1);
 			}
 			String city = loc.getSecondArea();
 			if (StringUtils.isNotBlank(city)) {
@@ -170,12 +159,10 @@ public class PageViewServiceImpl implements PageViewService {
 				if (StringUtils.isNotBlank(domain))
 					sb.append(domain).append(":");
 				sb.append("loc:ct");
-				stringRedisTemplate.opsForZSet().incrementScore(sb.toString(),
-						city, 1);
+				stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), city, 1);
 				sb.append(":");
 				sb.append(day);
-				stringRedisTemplate.opsForZSet().incrementScore(sb.toString(),
-						city, 1);
+				stringRedisTemplate.opsForZSet().incrementScore(sb.toString(), city, 1);
 			}
 		}
 	}
@@ -184,8 +171,7 @@ public class PageViewServiceImpl implements PageViewService {
 	public Set<String> getDomains() {
 		if (stringRedisTemplate == null)
 			return Collections.emptySet();
-		return stringRedisTemplate.opsForSet().members(
-				KEY_PAGE_VIEW + "domains");
+		return stringRedisTemplate.opsForSet().members(KEY_PAGE_VIEW + "domains");
 	}
 
 	@Override
@@ -229,14 +215,12 @@ public class PageViewServiceImpl implements PageViewService {
 	}
 
 	@Override
-	public Map<String, Long> getTopPageViewUrls(String day, int top,
-			String domain) {
+	public Map<String, Long> getTopPageViewUrls(String day, int top, String domain) {
 		return getTop(day, "url", top, domain);
 	}
 
 	@Override
-	public Map<String, Long> getTopForeignReferers(String day, int top,
-			String domain) {
+	public Map<String, Long> getTopForeignReferers(String day, int top, String domain) {
 		return getTop(day, "fr", top, domain);
 	}
 
@@ -246,8 +230,7 @@ public class PageViewServiceImpl implements PageViewService {
 	}
 
 	@Override
-	public Map<String, Long> getTopSearchEngines(String day, int top,
-			String domain) {
+	public Map<String, Long> getTopSearchEngines(String day, int top, String domain) {
 		return getTop(day, "se", top, domain);
 	}
 
@@ -270,29 +253,23 @@ public class PageViewServiceImpl implements PageViewService {
 		cal.add(Calendar.DAY_OF_YEAR, -1);
 		Date yesterday = cal.getTime();
 		String day = DateUtils.formatDate8(yesterday);
-		stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-				.append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX)
-				.toString());
-		stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-				.append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX)
-				.toString());
-		stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-				.append("uu:").append(day).append(KEY_HYPERLOGLOG_SUFFIX)
-				.toString());
+		stringRedisTemplate.delete(
+				new StringBuilder(KEY_PAGE_VIEW).append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+		stringRedisTemplate.delete(
+				new StringBuilder(KEY_PAGE_VIEW).append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+		stringRedisTemplate.delete(
+				new StringBuilder(KEY_PAGE_VIEW).append("uu:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
 		updateMax(day, "pv", null);
 		updateMax(day, "uip", null);
 		updateMax(day, "usid", null);
 		updateMax(day, "uu", null);
 		for (String domain : getDomains()) {
-			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-					.append(domain).append(":").append("uip:").append(day)
-					.append(KEY_HYPERLOGLOG_SUFFIX).toString());
-			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-					.append(domain).append(":").append("usid:").append(day)
-					.append(KEY_HYPERLOGLOG_SUFFIX).toString());
-			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW)
-					.append(domain).append(":").append("uu:").append(day)
-					.append(KEY_HYPERLOGLOG_SUFFIX).toString());
+			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uip:")
+					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("usid:")
+					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uu:")
+					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
 			updateMax(day, "pv", domain);
 			updateMax(day, "uip", domain);
 			updateMax(day, "usid", domain);
@@ -300,8 +277,7 @@ public class PageViewServiceImpl implements PageViewService {
 		}
 	}
 
-	private boolean addUnique(String day, String type, final String value,
-			String domain) {
+	private boolean addUnique(String day, String type, final String value, String domain) {
 		if (StringUtils.isBlank(value))
 			return false;
 		StringBuilder sb = new StringBuilder(KEY_PAGE_VIEW);
@@ -310,8 +286,7 @@ public class PageViewServiceImpl implements PageViewService {
 		sb.append(type).append(":").append(day);
 		String key = sb.toString();
 		sb.append(KEY_HYPERLOGLOG_SUFFIX);
-		HyperLogLogOperations<String, String> hll = stringRedisTemplate
-				.opsForHyperLogLog();
+		HyperLogLogOperations<String, String> hll = stringRedisTemplate.opsForHyperLogLog();
 		Long result = hll.add(sb.toString(), value);
 		if (result > 0) {
 			stringRedisTemplate.opsForValue().increment(key, 1);
@@ -342,8 +317,7 @@ public class PageViewServiceImpl implements PageViewService {
 		if (StringUtils.isNotBlank(domain))
 			sb.append(domain).append(":");
 		sb.append("max");
-		String str = (String) stringRedisTemplate.opsForHash().get(
-				sb.toString(), type);
+		String str = (String) stringRedisTemplate.opsForHash().get(sb.toString(), type);
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split(",");
 			return new Pair<>(arr[0], Long.valueOf(arr[1]));
@@ -368,8 +342,7 @@ public class PageViewServiceImpl implements PageViewService {
 			stringRedisTemplate.opsForHash().put(key, type, day + "," + value);
 	}
 
-	public Map<String, Long> getTop(String day, String type, int top,
-			String domain) {
+	public Map<String, Long> getTop(String day, String type, int top, String domain) {
 		if (stringRedisTemplate == null)
 			return Collections.emptyMap();
 		StringBuilder sb = new StringBuilder(KEY_PAGE_VIEW);
@@ -379,12 +352,10 @@ public class PageViewServiceImpl implements PageViewService {
 		if (day != null)
 			sb.append(":").append(day);
 		String key = sb.toString();
-		Set<String> set = stringRedisTemplate.opsForZSet().reverseRange(key, 0,
-				top - 1);
+		Set<String> set = stringRedisTemplate.opsForZSet().reverseRange(key, 0, top - 1);
 		Map<String, Long> map = new LinkedHashMap<>();
 		for (String member : set)
-			map.put(member, stringRedisTemplate.opsForZSet().score(key, member)
-					.longValue());
+			map.put(member, stringRedisTemplate.opsForZSet().score(key, member).longValue());
 		return map;
 	}
 
@@ -394,12 +365,10 @@ public class PageViewServiceImpl implements PageViewService {
 			String host = url.getHost();
 			String query = url.getQuery();
 			for (Map.Entry<String, String> entry : searchengines.entrySet()) {
-				if (host.indexOf(entry.getKey() + ".") == 0
-						|| host.indexOf("." + entry.getKey() + ".") > 0) {
+				if (host.indexOf(entry.getKey() + ".") == 0 || host.indexOf("." + entry.getKey() + ".") > 0) {
 					String[] result = new String[2];
 					result[0] = entry.getKey();
-					result[1] = RequestUtils.getValueFromQueryString(query,
-							entry.getValue());
+					result[1] = RequestUtils.getValueFromQueryString(query, entry.getValue());
 					return result;
 				}
 			}
@@ -411,6 +380,7 @@ public class PageViewServiceImpl implements PageViewService {
 
 	private static Map<String, String> searchengines = new HashMap<String, String>() {
 		private static final long serialVersionUID = 1L;
+
 		{
 			put("google", "q");
 			put("bing", "q");

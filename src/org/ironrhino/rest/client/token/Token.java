@@ -75,8 +75,7 @@ public class Token implements java.io.Serializable {
 
 	@Override
 	public String toString() {
-		return "OAuthToken [accessToken=" + accessToken + ", expiresIn="
-				+ expiresIn + ", refreshToken=" + refreshToken
+		return "OAuthToken [accessToken=" + accessToken + ", expiresIn=" + expiresIn + ", refreshToken=" + refreshToken
 				+ ", createTime=" + createTime + "]";
 	}
 

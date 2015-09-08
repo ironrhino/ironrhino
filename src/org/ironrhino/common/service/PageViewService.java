@@ -8,8 +8,7 @@ import org.ironrhino.common.model.tuples.Pair;
 
 public interface PageViewService {
 
-	public void put(Date date, String ip, String url, String sessionId,
-			String username, String referer);
+	public void put(Date date, String ip, String url, String sessionId, String username, String referer);
 
 	public Set<String> getDomains();
 
@@ -29,16 +28,13 @@ public interface PageViewService {
 
 	public Pair<String, Long> getMaxUniqueUsername(String domain);
 
-	public Map<String, Long> getTopPageViewUrls(String day, int top,
-			String domain);
+	public Map<String, Long> getTopPageViewUrls(String day, int top, String domain);
 
-	public Map<String, Long> getTopForeignReferers(String day, int top,
-			String domain);
+	public Map<String, Long> getTopForeignReferers(String day, int top, String domain);
 
 	public Map<String, Long> getTopKeywords(String day, int top, String domain);
 
-	public Map<String, Long> getTopSearchEngines(String day, int top,
-			String domain);
+	public Map<String, Long> getTopSearchEngines(String day, int top, String domain);
 
 	public Map<String, Long> getTopProvinces(String day, int top, String domain);
 

@@ -24,8 +24,7 @@ import com.opensymphony.xwork2.util.LocalizedTextUtil;
 public class ExceptionInterceptor extends AbstractInterceptor {
 
 	private static final long serialVersionUID = 6419734583295725844L;
-	protected static final Logger log = LoggerFactory
-			.getLogger(ExceptionInterceptor.class);
+	protected static final Logger log = LoggerFactory.getLogger(ExceptionInterceptor.class);
 
 	@Override
 	public String intercept(ActionInvocation invocation) throws Exception {
@@ -44,45 +43,32 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 					Throwable cause = e.getCause();
 					if (e instanceof ConstraintViolationException) {
 						ConstraintViolationException cve = (ConstraintViolationException) e;
-						for (ConstraintViolation<?> cv : cve
-								.getConstraintViolations()) {
-							validationAwareAction.addFieldError(
-									StringUtils
-											.uncapitalize(cv.getRootBeanClass()
-													.getSimpleName())
-											+ "." + cv.getPropertyPath(), cv
-											.getMessage());
+						for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
+							validationAwareAction
+									.addFieldError(StringUtils.uncapitalize(cv.getRootBeanClass().getSimpleName()) + "."
+											+ cv.getPropertyPath(), cv.getMessage());
 						}
 					} else if (e instanceof OptimisticLockingFailureException
 							|| cause instanceof OptimisticLockingFailureException) {
-						validationAwareAction.addActionError(findText(
-								"try.again.later", null));
+						validationAwareAction.addActionError(findText("try.again.later", null));
 					} else {
 						if (cause != null)
 							while (cause.getCause() != null)
 								cause = cause.getCause();
-						if (e instanceof ValidationException
-								|| cause instanceof ValidationException) {
+						if (e instanceof ValidationException || cause instanceof ValidationException) {
 							ValidationException ve = (ValidationException) ((e instanceof ValidationException) ? e
 									: cause);
 							for (String s : ve.getActionMessages())
-								validationAwareAction
-										.addActionMessage(findText(s, null));
+								validationAwareAction.addActionMessage(findText(s, null));
 							for (String s : ve.getActionErrors())
-								validationAwareAction.addActionError(findText(
-										s, null));
-							for (Map.Entry<String, List<String>> entry : ve
-									.getFieldErrors().entrySet()) {
+								validationAwareAction.addActionError(findText(s, null));
+							for (Map.Entry<String, List<String>> entry : ve.getFieldErrors().entrySet()) {
 								for (String s : entry.getValue())
-									validationAwareAction.addFieldError(
-											entry.getKey(), findText(s, null));
+									validationAwareAction.addFieldError(entry.getKey(), findText(s, null));
 							}
-						} else if (e instanceof ErrorMessage
-								|| cause instanceof ErrorMessage) {
-							ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e
-									: cause);
-							validationAwareAction.addActionError(em
-									.getLocalizedMessage());
+						} else if (e instanceof ErrorMessage || cause instanceof ErrorMessage) {
+							ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e : cause);
+							validationAwareAction.addActionError(em.getLocalizedMessage());
 						} else {
 
 							String msg = e.getMessage();
@@ -106,8 +92,8 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 			return null;
 		text = text.replaceAll("\\{", "[");
 		text = text.replaceAll("\\}", "]");
-		return LocalizedTextUtil.findText(ExceptionInterceptor.class, text,
-				ActionContext.getContext().getLocale(), text, args);
+		return LocalizedTextUtil.findText(ExceptionInterceptor.class, text, ActionContext.getContext().getLocale(),
+				text, args);
 	}
 
 }

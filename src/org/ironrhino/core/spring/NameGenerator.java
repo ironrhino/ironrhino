@@ -10,11 +10,9 @@ public class NameGenerator extends AnnotationBeanNameGenerator {
 
 	@Override
 	protected String buildDefaultBeanName(BeanDefinition definition) {
-		String shortClassName = ClassUtils.getShortName(definition
-				.getBeanClassName());
+		String shortClassName = ClassUtils.getShortName(definition.getBeanClassName());
 		if (shortClassName.endsWith("Impl") && shortClassName.length() > 4)
-			shortClassName = shortClassName.substring(0,
-					shortClassName.length() - 4);
+			shortClassName = shortClassName.substring(0, shortClassName.length() - 4);
 		return Introspector.decapitalize(shortClassName);
 	}
 

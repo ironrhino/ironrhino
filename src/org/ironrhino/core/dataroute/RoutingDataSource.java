@@ -41,8 +41,7 @@ public class RoutingDataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public Connection getConnection(String username, String password)
-			throws SQLException {
+	public Connection getConnection(String username, String password) throws SQLException {
 		DataSource ds = null;
 		String groupName = DataRouteContext.getName();
 		if (groupName != null) {
@@ -51,8 +50,7 @@ public class RoutingDataSource extends AbstractDataSource {
 			ds = getMainGroup();
 		}
 		if (ds == null)
-			throw new IllegalArgumentException("group name '" + groupName
-					+ "' not found");
+			throw new IllegalArgumentException("group name '" + groupName + "' not found");
 		return ds.getConnection(username, password);
 	}
 

@@ -14,8 +14,7 @@ public class SignupEvent extends AbstractAuditEvent {
 		super(username, remoteAddr);
 	}
 
-	public SignupEvent(String username, String remoteAddr, String from,
-			String provider) {
+	public SignupEvent(String username, String remoteAddr, String from, String provider) {
 		super(username, remoteAddr);
 		this.from = from;
 		this.provider = provider;

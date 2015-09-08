@@ -77,8 +77,7 @@ public class SchemaField implements Serializable {
 	public boolean equals(Object o) {
 		if (o instanceof SchemaField) {
 			SchemaField that = (SchemaField) o;
-			return that.getName() != null
-					&& that.getName().equals(this.getName());
+			return that.getName() != null && that.getName().equals(this.getName());
 		}
 		return false;
 	}

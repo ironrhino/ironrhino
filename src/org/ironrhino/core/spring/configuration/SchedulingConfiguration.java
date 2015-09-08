@@ -24,8 +24,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @EnableScheduling
 @EnableAsync(order = -999, proxyTargetClass = true)
 @Configuration
-public class SchedulingConfiguration implements SchedulingConfigurer,
-		AsyncConfigurer {
+public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfigurer {
 
 	@Value("${taskScheduler.poolSize:5}")
 	private int taskSchedulerPoolSize = 5;
@@ -50,26 +49,22 @@ public class SchedulingConfiguration implements SchedulingConfigurer,
 
 	@Bean(destroyMethod = "shutdown")
 	public ScheduledExecutorService taskSchedulerThreadPool() {
-		return Executors.newScheduledThreadPool(taskSchedulerPoolSize,
-				new NameableThreadFactory("taskScheduler"));
+		return Executors.newScheduledThreadPool(taskSchedulerPoolSize, new NameableThreadFactory("taskScheduler"));
 	}
 
 	@Bean(destroyMethod = "shutdown")
 	public ExecutorService taskExecutorThreadPool() {
-		return Executors.newFixedThreadPool(taskExecutorPoolSize,
-				new NameableThreadFactory("taskExecutor"));
+		return Executors.newFixedThreadPool(taskExecutorPoolSize, new NameableThreadFactory("taskExecutor"));
 	}
 
 	@Override
 	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 		return new AsyncUncaughtExceptionHandler() {
 
-			private Logger logger = LoggerFactory
-					.getLogger(AsyncUncaughtExceptionHandler.class);
+			private Logger logger = LoggerFactory.getLogger(AsyncUncaughtExceptionHandler.class);
 
 			@Override
-			public void handleUncaughtException(Throwable ex, Method method,
-					Object... args) {
+			public void handleUncaughtException(Throwable ex, Method method, Object... args) {
 				logger.error("method ( " + method.toString() + " ) error", ex);
 			}
 

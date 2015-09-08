@@ -26,8 +26,7 @@ public class MyConfiguration extends Configuration {
 		super(version);
 	}
 
-	public void setOverridableTemplateProviders(
-			Collection<OverridableTemplateProvider> overridableTemplateProviders) {
+	public void setOverridableTemplateProviders(Collection<OverridableTemplateProvider> overridableTemplateProviders) {
 		if (overridableTemplateProviders != null) {
 			this.overridableTemplateProviders = overridableTemplateProviders;
 			for (OverridableTemplateProvider overridableTemplateProvider : overridableTemplateProviders)
@@ -35,8 +34,7 @@ public class MyConfiguration extends Configuration {
 		}
 	}
 
-	public void setFallbackTemplateProviders(
-			Collection<FallbackTemplateProvider> fallbackTemplateProviders) {
+	public void setFallbackTemplateProviders(Collection<FallbackTemplateProvider> fallbackTemplateProviders) {
 		if (fallbackTemplateProviders != null) {
 			this.fallbackTemplateProviders = fallbackTemplateProviders;
 			for (FallbackTemplateProvider fallbackTemplateProvider : fallbackTemplateProviders)
@@ -45,28 +43,24 @@ public class MyConfiguration extends Configuration {
 	}
 
 	@Override
-	public Template getTemplate(String name, Locale locale,
-			Object customLookupCondition, String encoding, boolean parseAsFTL,
-			boolean ignoreMissing) throws TemplateNotFoundException,
-			MalformedTemplateNameException, ParseException, IOException {
+	public Template getTemplate(String name, Locale locale, Object customLookupCondition, String encoding,
+			boolean parseAsFTL, boolean ignoreMissing)
+					throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
 		Template result;
 		if (overridableTemplateProviders != null) {
 			for (OverridableTemplateProvider overridableTemplateProvider : overridableTemplateProviders) {
-				result = overridableTemplateProvider.getTemplate(name, locale,
-						encoding, parseAsFTL);
+				result = overridableTemplateProvider.getTemplate(name, locale, encoding, parseAsFTL);
 				if (result != null)
 					return result;
 			}
 		}
 		try {
-			result = super.getTemplate(name, locale, customLookupCondition,
-					encoding, parseAsFTL, ignoreMissing);
+			result = super.getTemplate(name, locale, customLookupCondition, encoding, parseAsFTL, ignoreMissing);
 			if (result != null)
 				return result;
 			if (fallbackTemplateProviders != null) {
 				for (FallbackTemplateProvider fallbackTemplateProvider : fallbackTemplateProviders) {
-					result = fallbackTemplateProvider.getTemplate(name, locale,
-							encoding, parseAsFTL);
+					result = fallbackTemplateProvider.getTemplate(name, locale, encoding, parseAsFTL);
 					if (result != null)
 						return result;
 				}
@@ -74,8 +68,7 @@ public class MyConfiguration extends Configuration {
 		} catch (TemplateNotFoundException e) {
 			if (fallbackTemplateProviders != null) {
 				for (FallbackTemplateProvider fallbackTemplateProvider : fallbackTemplateProviders) {
-					result = fallbackTemplateProvider.getTemplate(name, locale,
-							encoding, parseAsFTL);
+					result = fallbackTemplateProvider.getTemplate(name, locale, encoding, parseAsFTL);
 					if (result != null)
 						return result;
 				}

@@ -45,8 +45,7 @@ public class AuditAction extends BaseAction {
 		String username = AuthzUtils.getUsername();
 		if (username == null)
 			return ACCESSDENIED;
-		events = auditEventManager.findRecentEvents(username,
-				since != null ? new Date(since) : null, PAGESIZE);
+		events = auditEventManager.findRecentEvents(username, since != null ? new Date(since) : null, PAGESIZE);
 		return SUCCESS;
 	}
 

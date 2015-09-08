@@ -8,25 +8,21 @@ import java.sql.Statement;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 
-public abstract class AbstractSequenceSimpleSequence extends
-		AbstractDatabaseSimpleSequence {
+public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSimpleSequence {
 
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT NEXTVAL('")
-				.append(getActualSequenceName()).append("')").toString();
+		return new StringBuilder("SELECT NEXTVAL('").append(getActualSequenceName()).append("')").toString();
 	}
 
 	protected String getCreateSequenceStatement() {
-		StringBuilder sb = new StringBuilder("CREATE SEQUENCE ")
-				.append(getActualSequenceName());
+		StringBuilder sb = new StringBuilder("CREATE SEQUENCE ").append(getActualSequenceName());
 		if (getCacheSize() > 1)
 			sb.append(" CACHE ").append(getCacheSize());
 		return sb.toString();
 	}
 
 	protected String getRestartSequenceStatement() {
-		return new StringBuilder("ALTER SEQUENCE ")
-				.append(getActualSequenceName()).append(" RESTART WITH 1")
+		return new StringBuilder("ALTER SEQUENCE ").append(getActualSequenceName()).append(" RESTART WITH 1")
 				.toString();
 	}
 
@@ -75,8 +71,7 @@ public abstract class AbstractSequenceSimpleSequence extends
 				rs.close();
 			}
 		} catch (SQLException ex) {
-			throw new DataAccessResourceFailureException(
-					"Could not obtain next value of sequence", ex);
+			throw new DataAccessResourceFailureException("Could not obtain next value of sequence", ex);
 		} finally {
 			if (stmt != null)
 				try {
@@ -121,8 +116,7 @@ public abstract class AbstractSequenceSimpleSequence extends
 		}
 	}
 
-	protected void restartSequence(Connection con, Statement stmt)
-			throws SQLException {
+	protected void restartSequence(Connection con, Statement stmt) throws SQLException {
 		stmt.execute(getRestartSequenceStatement());
 	}
 

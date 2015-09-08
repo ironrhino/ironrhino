@@ -26,8 +26,7 @@ public class DefaultFrequencyService implements FrequencyService {
 	}
 
 	@Override
-	public void increment(String name, long delta, int duration,
-			TimeUnit timeUnit) {
+	public void increment(String name, long delta, int duration, TimeUnit timeUnit) {
 		cacheManager.increment(name, delta, duration, timeUnit, NAMESPACE);
 	}
 

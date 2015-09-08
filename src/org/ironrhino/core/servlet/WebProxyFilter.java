@@ -48,8 +48,8 @@ public class WebProxyFilter implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 		URL requestURL = new URL(request.getRequestURL().toString());
@@ -59,8 +59,7 @@ public class WebProxyFilter implements Filter {
 				return;
 			URL url = new URL(referer);
 			if (!url.getProtocol().equalsIgnoreCase(requestURL.getProtocol())
-					|| !url.getHost().equalsIgnoreCase(requestURL.getHost())
-					|| url.getPort() != requestURL.getPort())
+					|| !url.getHost().equalsIgnoreCase(requestURL.getHost()) || url.getPort() != requestURL.getPort())
 				return;
 		}
 		String uri = requestURL.toString();
@@ -102,12 +101,10 @@ public class WebProxyFilter implements Filter {
 				while (en.hasMoreElements()) {
 					String name = en.nextElement();
 					for (String value : request.getParameterValues(name))
-						if (queryString == null
-								|| !queryString.contains(name + "="))
+						if (queryString == null || !queryString.contains(name + "="))
 							nvps.add(new BasicNameValuePair(name, value));
 				}
-				((HttpEntityEnclosingRequestBase) httpRequest)
-						.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
+				((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
 			}
 		}
 

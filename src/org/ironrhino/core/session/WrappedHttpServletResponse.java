@@ -8,8 +8,7 @@ public class WrappedHttpServletResponse extends LazyCommitResponseWrapper {
 
 	private WrappedHttpSession session;
 
-	public WrappedHttpServletResponse(HttpServletResponse response,
-			WrappedHttpSession session) {
+	public WrappedHttpServletResponse(HttpServletResponse response, WrappedHttpSession session) {
 		super(response);
 		this.session = session;
 	}

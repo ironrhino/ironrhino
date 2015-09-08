@@ -32,8 +32,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	}
 
 	@Override
-	public void handleRequest(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String uri = request.getRequestURI();
 		try {
 			String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
@@ -42,8 +42,11 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			RemoteInvocation invocation = readRemoteInvocation(request);
 			Object proxy = getProxyForService();
 			if (proxy != null) {
-				RemoteInvocationResult result = invokeAndCreateResult(
-						invocation, proxy); // getProxy is final cannot override
+				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy); // getProxy
+																							// is
+																							// final
+																							// cannot
+																							// override
 				writeRemoteInvocationResult(request, response, result);
 			} else {
 				String msg = "No Service:" + getServiceInterface().getName();
@@ -52,8 +55,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					ex.getMessage());
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
 		} finally {
 			serviceInterface.remove();
 		}
@@ -62,8 +64,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	public void prepare() {
 		if (serviceRegistry != null) {
-			for (Map.Entry<String, Object> entry : serviceRegistry
-					.getExportServices().entrySet()) {
+			for (Map.Entry<String, Object> entry : serviceRegistry.getExportServices().entrySet()) {
 				try {
 					Class<?> intf = Class.forName(entry.getKey());
 					serviceInterface.set(intf);

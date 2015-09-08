@@ -64,8 +64,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 	}
 
 	@Override
-	public ActionMapping tryMatch(HttpServletRequest request,
-			DefaultActionMapper actionMapper) {
+	public ActionMapping tryMatch(HttpServletRequest request, DefaultActionMapper actionMapper) {
 		String uri = RequestUtils.getRequestUri(request);
 		String encoding = actionMapper.getEncoding();
 		try {
@@ -75,75 +74,63 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				mapping.setNamespace(DisplayPageAction.NAMESPACE);
 				mapping.setName(DisplayPageAction.ACTION_NAME);
 				Map<String, Object> params = new HashMap<>(8);
-				params.put(AbstractActionMapper.ID,
-						URLDecoder.decode(pagePath, encoding));
+				params.put(AbstractActionMapper.ID, URLDecoder.decode(pagePath, encoding));
 				mapping.setParams(params);
 				return mapping;
 			}
 			for (String name : seriesesList) {
-				String pageurl = new StringBuilder("/")
-						.append(URLEncoder.encode(name, encoding))
+				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding))
 						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
-				if (uri.equals("/" + URLEncoder.encode(name, encoding))
-						|| uri.startsWith(pageurl)) {
+				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();
 					mapping.setNamespace(SeriesPageAction.NAMESPACE);
 					mapping.setName(SeriesPageAction.ACTION_NAME);
 					Map<String, Object> params = new HashMap<>(8);
 					params.put("name", name);
-					String pn = request
-							.getParameter(ResultPage.PAGENO_PARAM_NAME);
+					String pn = request.getParameter(ResultPage.PAGENO_PARAM_NAME);
 					if (StringUtils.isNumeric(pn))
 						params.put("resultPage.pageNo", pn);
-					String ps = request
-							.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
+					String ps = request.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
 					if (StringUtils.isNumeric(ps))
 						params.put("resultPage.pageSize", ps);
 					if (uri.startsWith(pageurl)) {
-						params.put(AbstractActionMapper.ID,
-								uri.substring(pageurl.length()));
+						params.put(AbstractActionMapper.ID, uri.substring(pageurl.length()));
 					}
 					mapping.setParams(params);
 					return mapping;
 				}
 			}
 			for (String name : columnsList) {
-				String listurl = new StringBuilder("/")
-						.append(URLEncoder.encode(name, encoding))
-						.append("/list/").toString();
-				String pageurl = new StringBuilder("/")
-						.append(URLEncoder.encode(name, encoding))
+				String listurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append("/list/")
+						.toString();
+				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding))
 						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
-				if (uri.equals("/" + URLEncoder.encode(name, encoding))
-						|| uri.startsWith(listurl) || uri.startsWith(pageurl)) {
+				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(listurl)
+						|| uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();
 					mapping.setNamespace(ColumnPageAction.NAMESPACE);
 					mapping.setName(ColumnPageAction.ACTION_NAME);
 					Map<String, Object> params = new HashMap<>(8);
 					params.put("name", name);
-					String pn = request
-							.getParameter(ResultPage.PAGENO_PARAM_NAME);
+					String pn = request.getParameter(ResultPage.PAGENO_PARAM_NAME);
 					if (StringUtils.isNumeric(pn))
 						params.put("resultPage.pageNo", pn);
-					String ps = request
-							.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
+					String ps = request.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
 					if (StringUtils.isNumeric(ps))
 						params.put("resultPage.pageSize", ps);
 					if (uri.startsWith(listurl)) {
 						mapping.setMethod("list");
 						try {
-							params.put(AbstractActionMapper.ID, URLDecoder
-									.decode(uri.substring(listurl.length()),
-											encoding));
+							params.put(AbstractActionMapper.ID,
+									URLDecoder.decode(uri.substring(listurl.length()), encoding));
 						} catch (UnsupportedEncodingException e) {
 							e.printStackTrace();
 						}
 					} else if (uri.startsWith(pageurl)) {
 						mapping.setMethod("p");
 						try {
-							params.put(AbstractActionMapper.ID, URLDecoder
-									.decode(uri.substring(pageurl.length()),
-											encoding));
+							params.put(AbstractActionMapper.ID,
+									URLDecoder.decode(uri.substring(pageurl.length()), encoding));
 						} catch (UnsupportedEncodingException e) {
 							e.printStackTrace();
 						}
@@ -153,42 +140,36 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				}
 			}
 			for (String name : issuesList) {
-				String listurl = new StringBuilder("/")
-						.append(URLEncoder.encode(name, encoding))
-						.append("/list/").toString();
-				String pageurl = new StringBuilder("/")
-						.append(URLEncoder.encode(name, encoding))
+				String listurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append("/list/")
+						.toString();
+				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding))
 						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
-				if (uri.equals("/" + URLEncoder.encode(name, encoding))
-						|| uri.startsWith(listurl) || uri.startsWith(pageurl)) {
+				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(listurl)
+						|| uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();
 					mapping.setNamespace(IssuePageAction.NAMESPACE);
 					mapping.setName(IssuePageAction.ACTION_NAME);
 					Map<String, Object> params = new HashMap<>(8);
 					params.put("name", name);
-					String pn = request
-							.getParameter(ResultPage.PAGENO_PARAM_NAME);
+					String pn = request.getParameter(ResultPage.PAGENO_PARAM_NAME);
 					if (StringUtils.isNumeric(pn))
 						params.put("resultPage.pageNo", pn);
-					String ps = request
-							.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
+					String ps = request.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
 					if (StringUtils.isNumeric(ps))
 						params.put("resultPage.pageSize", ps);
 					if (uri.startsWith(listurl)) {
 						mapping.setMethod("list");
 						try {
-							params.put(AbstractActionMapper.ID, URLDecoder
-									.decode(uri.substring(listurl.length()),
-											encoding));
+							params.put(AbstractActionMapper.ID,
+									URLDecoder.decode(uri.substring(listurl.length()), encoding));
 						} catch (UnsupportedEncodingException e) {
 							e.printStackTrace();
 						}
 					} else if (uri.startsWith(pageurl)) {
 						mapping.setMethod("p");
 						try {
-							params.put(AbstractActionMapper.ID, URLDecoder
-									.decode(uri.substring(pageurl.length()),
-											encoding));
+							params.put(AbstractActionMapper.ID,
+									URLDecoder.decode(uri.substring(pageurl.length()), encoding));
 						} catch (UnsupportedEncodingException e) {
 							e.printStackTrace();
 						}
@@ -209,8 +190,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 			for (String s : serieses.split("\\s*,\\s*"))
 				list.add(s);
 		if (settingControl != null)
-			for (String s : settingControl
-					.getStringArray(Constants.SETTING_KEY_CMS_SERIESES))
+			for (String s : settingControl.getStringArray(Constants.SETTING_KEY_CMS_SERIESES))
 				list.add(s);
 		seriesesList = list;
 	}
@@ -221,8 +201,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 			for (String s : columns.split("\\s*,\\s*"))
 				list.add(s);
 		if (settingControl != null)
-			for (String s : settingControl
-					.getStringArray(Constants.SETTING_KEY_CMS_COLUMNS))
+			for (String s : settingControl.getStringArray(Constants.SETTING_KEY_CMS_COLUMNS))
 				list.add(s);
 		columnsList = list;
 	}
@@ -233,8 +212,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 			for (String s : issues.split("\\s*,\\s*"))
 				list.add(s);
 		if (settingControl != null)
-			for (String s : settingControl
-					.getStringArray(Constants.SETTING_KEY_CMS_ISSUES))
+			for (String s : settingControl.getStringArray(Constants.SETTING_KEY_CMS_ISSUES))
 				list.add(s);
 		issuesList = list;
 	}

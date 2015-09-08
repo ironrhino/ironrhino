@@ -2,8 +2,7 @@ package org.ironrhino.core.sequence.simple;
 
 import javax.sql.DataSource;
 
-public abstract class AbstractDatabaseSimpleSequence extends
-		AbstractSimpleSequence {
+public abstract class AbstractDatabaseSimpleSequence extends AbstractSimpleSequence {
 
 	private DataSource dataSource;
 

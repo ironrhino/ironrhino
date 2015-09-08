@@ -27,11 +27,11 @@ public class Feedback extends BaseEntity implements Recordable<UserDetails> {
 	private static final long serialVersionUID = 7857273372050062349L;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true) )
 	private String name;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true) )
 	private String contact;
 
 	@SearchableProperty(boost = 3)
@@ -40,22 +40,22 @@ public class Feedback extends BaseEntity implements Recordable<UserDetails> {
 	private String content;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(hiddenInList = @Hidden(true), type = "textarea")
+	@UiConfig(hiddenInList = @Hidden(true) , type = "textarea")
 	@Column(name = "comment", length = 4000)
 	private String comment;
 
 	@UiConfig(width = "100px")
 	private String domain;
 
-	@UiConfig(readonly = @Readonly(true), width = "130px")
+	@UiConfig(readonly = @Readonly(true) , width = "130px")
 	@Column(updatable = false)
 	private Date createDate;
 
-	@UiConfig(readonly = @Readonly(true), width = "130px")
+	@UiConfig(readonly = @Readonly(true) , width = "130px")
 	@Column(insertable = false)
 	private Date modifyDate;
 
-	@UiConfig(readonly = @Readonly(true), width = "80px")
+	@UiConfig(readonly = @Readonly(true) , width = "80px")
 	@Column(insertable = false)
 	private String modifyUser;
 

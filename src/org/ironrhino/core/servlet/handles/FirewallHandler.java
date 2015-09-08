@@ -29,8 +29,7 @@ public class FirewallHandler extends AccessHandler {
 	}
 
 	@Override
-	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		String addr = request.getRemoteAddr();
 		if (addr.equals("127.0.0.1")) {
 			String value = request.getParameter(KEY_ALLOWEDADDRPATTERN);
@@ -39,9 +38,7 @@ public class FirewallHandler extends AccessHandler {
 					this.allowedAddrPattern = value;
 				response.setContentType("text/plain");
 				try {
-					response.getWriter().write(
-							KEY_ALLOWEDADDRPATTERN + "="
-									+ this.allowedAddrPattern);
+					response.getWriter().write(KEY_ALLOWEDADDRPATTERN + "=" + this.allowedAddrPattern);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

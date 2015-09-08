@@ -97,15 +97,13 @@ public class QrcodeAction extends BaseAction {
 	public String execute() {
 		try {
 			if (decode) {
-				if (file == null && StringUtils.isBlank(url)
-						&& StringUtils.isBlank(requestBody)) {
+				if (file == null && StringUtils.isBlank(url) && StringUtils.isBlank(requestBody)) {
 					addActionError("validation.required");
 					return SUCCESS;
 				}
 				if (file != null)
 					try {
-						content = BarcodeUtils.decode(
-								new FileInputStream(file), encoding);
+						content = BarcodeUtils.decode(new FileInputStream(file), encoding);
 					} catch (NotFoundException e) {
 						addActionError(getText("notfound"));
 					}
@@ -117,11 +115,10 @@ public class QrcodeAction extends BaseAction {
 					}
 				else if (StringUtils.isNotBlank(requestBody)) {
 					if (requestBody.startsWith("data:image"))
-						requestBody = requestBody.substring(requestBody
-								.indexOf(',') + 1);
+						requestBody = requestBody.substring(requestBody.indexOf(',') + 1);
 					try {
-						content = BarcodeUtils.decode(new ByteArrayInputStream(
-								Base64.decodeBase64(requestBody)), encoding);
+						content = BarcodeUtils.decode(new ByteArrayInputStream(Base64.decodeBase64(requestBody)),
+								encoding);
 					} catch (NotFoundException e) {
 						content = "";
 					}

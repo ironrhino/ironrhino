@@ -46,17 +46,13 @@ public class AutoConfigResult extends FreemarkerResult {
 	public void execute(ActionInvocation invocation) throws Exception {
 		if (invocation.getResultCode().equals(Action.NONE))
 			return;
-		if (invocation.getResultCode().equals(Action.SUCCESS)
-				&& !invocation.getProxy().getMethod().equals("")
+		if (invocation.getResultCode().equals(Action.SUCCESS) && !invocation.getProxy().getMethod().equals("")
 				&& !invocation.getProxy().getMethod().equals("execute")) {
 			ActionContext ctx = invocation.getInvocationContext();
-			HttpServletRequest request = (HttpServletRequest) ctx
-					.get(StrutsStatics.HTTP_REQUEST);
-			HttpServletResponse response = (HttpServletResponse) ctx
-					.get(StrutsStatics.HTTP_RESPONSE);
+			HttpServletRequest request = (HttpServletRequest) ctx.get(StrutsStatics.HTTP_REQUEST);
+			HttpServletResponse response = (HttpServletResponse) ctx.get(StrutsStatics.HTTP_RESPONSE);
 			String namespace = invocation.getProxy().getNamespace();
-			String url = namespace + (namespace.endsWith("/") ? "" : "/")
-					+ invocation.getProxy().getActionName();
+			String url = namespace + (namespace.endsWith("/") ? "" : "/") + invocation.getProxy().getActionName();
 			response.sendRedirect(request.getContextPath() + url);
 			return;
 		}
@@ -64,8 +60,7 @@ public class AutoConfigResult extends FreemarkerResult {
 		doExecute(finalLocation, invocation);
 	}
 
-	private static Map<String, String> cache = new ConcurrentHashMap<>(
-			256);
+	private static Map<String, String> cache = new ConcurrentHashMap<>(256);
 
 	@Override
 	protected String conditionalParse(String param, ActionInvocation invocation) {
@@ -83,18 +78,14 @@ public class AutoConfigResult extends FreemarkerResult {
 		if (location == null) {
 			templateName = getTemplateName(namespace, actionName, result, false);
 			location = cache.get(templateName);
-			if (location == null
-					|| AppInfo.getStage() == Stage.DEVELOPMENT) {
-				ServletContext context = ServletActionContext
-						.getServletContext();
+			if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
+				ServletContext context = ServletActionContext.getServletContext();
 				URL url = null;
 				location = getTemplateLocation(templateName);
 				if (location == null) {
 					if (StringUtils.isNotBlank(styleHolder.get())) {
-						location = new StringBuilder().append(ftlLocation)
-								.append("/meta/result/").append(result)
-								.append(".").append(styleHolder.get())
-								.append(".ftl").toString();
+						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(result)
+								.append(".").append(styleHolder.get()).append(".ftl").toString();
 						try {
 							url = context.getResource(location);
 						} catch (MalformedURLException e) {
@@ -102,8 +93,7 @@ public class AutoConfigResult extends FreemarkerResult {
 						}
 					}
 					if (url == null) {
-						location = new StringBuilder().append(ftlLocation)
-								.append("/meta/result/").append(result)
+						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(result)
 								.append(".ftl").toString();
 						try {
 							url = context.getResource(location);
@@ -111,18 +101,13 @@ public class AutoConfigResult extends FreemarkerResult {
 							e.printStackTrace();
 						}
 					}
-					if (url == null
-							&& StringUtils.isNotBlank(styleHolder.get())) {
-						location = new StringBuilder().append(ftlClasspath)
-								.append("/meta/result/").append(result)
-								.append(".").append(styleHolder.get())
-								.append(".ftl").toString();
-						url = ClassLoaderUtil.getResource(
-								location.substring(1), AutoConfigResult.class);
+					if (url == null && StringUtils.isNotBlank(styleHolder.get())) {
+						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(result)
+								.append(".").append(styleHolder.get()).append(".ftl").toString();
+						url = ClassLoaderUtil.getResource(location.substring(1), AutoConfigResult.class);
 					}
 					if (url == null)
-						location = new StringBuilder().append(ftlClasspath)
-								.append("/meta/result/").append(result)
+						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(result)
 								.append(".ftl").toString();
 				}
 				cache.put(templateName, location);
@@ -137,18 +122,15 @@ public class AutoConfigResult extends FreemarkerResult {
 		if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			ServletContext context = ServletActionContext.getServletContext();
 			URL url = null;
-			location = new StringBuilder().append(ftlLocation)
-					.append(templateName).append(".ftl").toString();
+			location = new StringBuilder().append(ftlLocation).append(templateName).append(".ftl").toString();
 			try {
 				url = context.getResource(location);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
 			if (url == null) {
-				location = new StringBuilder().append(ftlClasspath)
-						.append(templateName).append(".ftl").toString();
-				url = ClassLoaderUtil.getResource(location.substring(1),
-						AutoConfigResult.class);
+				location = new StringBuilder().append(ftlClasspath).append(templateName).append(".ftl").toString();
+				url = ClassLoaderUtil.getResource(location.substring(1), AutoConfigResult.class);
 			}
 			if (url == null)
 				location = "";
@@ -157,8 +139,7 @@ public class AutoConfigResult extends FreemarkerResult {
 		return StringUtils.isEmpty(location) ? null : location;
 	}
 
-	private String getTemplateName(String namespace, String actionName,
-			String result, boolean withStyle) {
+	private String getTemplateName(String namespace, String actionName, String result, boolean withStyle) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(namespace).append('/').append(actionName);
 		if (!result.equals(Action.SUCCESS))

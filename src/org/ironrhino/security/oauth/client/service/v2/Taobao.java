@@ -62,8 +62,7 @@ public class Taobao extends OAuth2Provider {
 		StringBuilder sb = new StringBuilder(profileUrl);
 		sb.append("&app_key=").append(getClientId()).append("&timestamp=");
 		try {
-			sb.append(URLEncoder.encode(DateUtils.formatDatetime(new Date()),
-					"UTF-8"));
+			sb.append(URLEncoder.encode(DateUtils.formatDatetime(new Date()), "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -82,8 +81,7 @@ public class Taobao extends OAuth2Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content,
-				JsonNode.class);
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
 		JsonNode response = data.get("user_buyer_get_response");
 		if (response == null)
 			response = data.get("user_seller_get_response");
@@ -99,8 +97,8 @@ public class Taobao extends OAuth2Provider {
 	}
 
 	@Override
-	protected String invoke(String protectedURL, Map<String, String> params,
-			Map<String, String> headers) throws IOException {
+	protected String invoke(String protectedURL, Map<String, String> params, Map<String, String> headers)
+			throws IOException {
 		if (params == null)
 			params = new HashMap<>(8);
 		params.put("format", "json");
@@ -113,8 +111,7 @@ public class Taobao extends OAuth2Provider {
 	private String sign(String protectedURL, Map<String, String> params) {
 		Map<String, String> map = new TreeMap<>();
 		if (protectedURL.indexOf('?') > 0) {
-			String queryString = protectedURL.substring(protectedURL
-					.indexOf('?') + 1);
+			String queryString = protectedURL.substring(protectedURL.indexOf('?') + 1);
 			String[] arr = queryString.split("&");
 			for (String s : arr) {
 				String[] arr2 = s.split("=");

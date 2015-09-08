@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractOAuthProvider implements OAuthProvider {
 
-	protected static Logger logger = LoggerFactory
-			.getLogger(OAuthProvider.class);
+	protected static Logger logger = LoggerFactory.getLogger(OAuthProvider.class);
 
 	@Autowired
 	protected SettingControl settingControl;
@@ -27,14 +26,11 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
 
 	@Override
 	public boolean isEnabled() {
-		return !forceDisabled
-				&& settingControl.getBooleanValue("oauth." + getName()
-						+ ".enabled", true);
+		return !forceDisabled && settingControl.getBooleanValue("oauth." + getName() + ".enabled", true);
 	}
 
 	public int getDisplayOrder() {
-		return settingControl.getIntValue("oauth." + getName()
-				+ ".displayOrder", 0);
+		return settingControl.getIntValue("oauth." + getName() + ".displayOrder", 0);
 	}
 
 	protected boolean isUseAuthorizationHeader() {
@@ -51,8 +47,7 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
 
 	public abstract String getProfileUrl();
 
-	protected abstract Profile getProfileFromContent(String content)
-			throws Exception;
+	protected abstract Profile getProfileFromContent(String content) throws Exception;
 
 	@Override
 	public String toString() {

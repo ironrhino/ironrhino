@@ -42,8 +42,7 @@ public class FilledBarChart extends BarChart {
 			super(top, bottom);
 		}
 
-		public Bar(Number top, Number bottom, String colour,
-				String outlineColour) {
+		public Bar(Number top, Number bottom, String colour, String outlineColour) {
 			super(top, bottom);
 			setColour(colour);
 			setOutlineColour(outlineColour);

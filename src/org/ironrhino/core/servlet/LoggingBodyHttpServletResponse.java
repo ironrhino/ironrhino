@@ -19,8 +19,7 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 
 	private ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
 
-	public LoggingBodyHttpServletResponse(HttpServletResponse response,
-			Logger logger) {
+	public LoggingBodyHttpServletResponse(HttpServletResponse response, Logger logger) {
 		super(response);
 		this.logger = logger;
 	}
@@ -68,8 +67,7 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 									encoding = "UTF-8";
 								MDC.remove("method");
 								MDC.remove("url");
-								logger.info("\n{}", new String(bytes, 0,
-										bytes.length, encoding));
+								logger.info("\n{}", new String(bytes, 0, bytes.length, encoding));
 							}
 						}
 

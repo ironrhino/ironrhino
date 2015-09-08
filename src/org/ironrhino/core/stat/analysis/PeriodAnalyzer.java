@@ -27,26 +27,22 @@ public class PeriodAnalyzer extends AbstractAnalyzer<List<Value>> {
 
 	Calendar calendar = Calendar.getInstance();
 
-	public PeriodAnalyzer(Key key, boolean localhost)
-			throws FileNotFoundException {
+	public PeriodAnalyzer(Key key, boolean localhost) throws FileNotFoundException {
 		super(localhost);
 		this.key = key;
 	}
 
-	public PeriodAnalyzer(Key key, Date date, boolean localhost)
-			throws FileNotFoundException {
+	public PeriodAnalyzer(Key key, Date date, boolean localhost) throws FileNotFoundException {
 		super(date, localhost);
 		this.key = key;
 	}
 
-	public PeriodAnalyzer(Key key, Date[] dates, boolean localhost)
-			throws FileNotFoundException {
+	public PeriodAnalyzer(Key key, Date[] dates, boolean localhost) throws FileNotFoundException {
 		super(dates, localhost);
 		this.key = key;
 	}
 
-	public PeriodAnalyzer(Key key, Date start, Date end, boolean localhost)
-			throws FileNotFoundException {
+	public PeriodAnalyzer(Key key, Date start, Date end, boolean localhost) throws FileNotFoundException {
 		super(start, end, localhost);
 		this.key = key;
 	}

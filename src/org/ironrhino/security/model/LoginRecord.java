@@ -21,7 +21,7 @@ import org.ironrhino.core.security.role.UserRole;
 @Entity
 @Searchable
 @Table(name = "loginrecord")
-@Richtable(searchable = true, order = "date desc", readonly = @Readonly(true))
+@Richtable(searchable = true, order = "date desc", readonly = @Readonly(true) )
 public class LoginRecord extends BaseEntity {
 
 	private static final long serialVersionUID = -7691080078972338500L;

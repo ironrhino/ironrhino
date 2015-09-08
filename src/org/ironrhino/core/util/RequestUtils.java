@@ -25,18 +25,15 @@ public class RequestUtils {
 	}
 
 	public static String serializeData(HttpServletRequest request) {
-		if (request.getMethod().equalsIgnoreCase("POST")
-				|| request.getMethod().equalsIgnoreCase("PUT")) {
+		if (request.getMethod().equalsIgnoreCase("POST") || request.getMethod().equalsIgnoreCase("PUT")) {
 			StringBuilder sb = new StringBuilder();
 			Map<String, String[]> map = request.getParameterMap();
 			for (Map.Entry<String, String[]> entry : map.entrySet()) {
 				if (entry.getKey().toLowerCase().contains("password"))
 					continue;
 				for (String value : entry.getValue()) {
-					sb.append(entry.getKey())
-							.append('=')
-							.append(value.length() > 256 ? value.substring(0,
-									256) : value).append('&');
+					sb.append(entry.getKey()).append('=').append(value.length() > 256 ? value.substring(0, 256) : value)
+							.append('&');
 				}
 			}
 			return sb.toString();
@@ -45,11 +42,9 @@ public class RequestUtils {
 		return queryString != null ? queryString : "";
 	}
 
-	public static Map<String, String> getParametersMap(
-			HttpServletRequest request) {
+	public static Map<String, String> getParametersMap(HttpServletRequest request) {
 		Map<String, String> map = new HashMap<>();
-		for (Map.Entry<String, String[]> entry : request.getParameterMap()
-				.entrySet()) {
+		for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
 			String name = entry.getKey();
 			String[] value = entry.getValue();
 			if (value != null && value.length > 0)
@@ -58,8 +53,7 @@ public class RequestUtils {
 		return map;
 	}
 
-	public static Map<String, String> parseParametersFromQueryString(
-			String queryString) {
+	public static Map<String, String> parseParametersFromQueryString(String queryString) {
 		if (StringUtils.isBlank(queryString))
 			return Collections.emptyMap();
 		Map<String, String> map = new LinkedHashMap<>();
@@ -76,6 +70,7 @@ public class RequestUtils {
 	@Deprecated
 	/**
 	 * use request.getRemoteAddr() instead
+	 * 
 	 * @param request
 	 * @return
 	 */
@@ -102,19 +97,15 @@ public class RequestUtils {
 	public static String getBaseUrl(HttpServletRequest request) {
 		String url = request.getRequestURL().toString();
 		String ctxPath = request.getContextPath();
-		return url.substring(
-				0,
-				url.indexOf(StringUtils.isBlank(ctxPath) ? "/" : ctxPath,
-						url.indexOf("://") + 3)
-						+ ctxPath.length());
+		return url.substring(0,
+				url.indexOf(StringUtils.isBlank(ctxPath) ? "/" : ctxPath, url.indexOf("://") + 3) + ctxPath.length());
 	}
 
 	public static String getBaseUrl(HttpServletRequest request, boolean secured) {
 		return getBaseUrl(request, secured, true);
 	}
 
-	public static String getBaseUrl(HttpServletRequest request,
-			boolean secured, boolean includeContextPath) {
+	public static String getBaseUrl(HttpServletRequest request, boolean secured, boolean includeContextPath) {
 		String host = "localhost";
 		String protocol = "http";
 		int port = 80;
@@ -129,8 +120,7 @@ public class RequestUtils {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		if ((protocol.equalsIgnoreCase("https") && secured)
-				|| (protocol.equalsIgnoreCase("http") && !secured)) {
+		if ((protocol.equalsIgnoreCase("https") && secured) || (protocol.equalsIgnoreCase("http") && !secured)) {
 			return getBaseUrl(request);
 		}
 		StringBuilder sb = new StringBuilder();
@@ -150,8 +140,7 @@ public class RequestUtils {
 
 	public static String getRequestUri(HttpServletRequest request) {
 		// handle http dispatcher includes.
-		String uri = (String) request
-				.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
+		String uri = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
 		if (uri == null) {
 			uri = request.getRequestURI();
 			uri = uri.substring(request.getContextPath().length());
@@ -159,8 +148,7 @@ public class RequestUtils {
 		return trimPathParameter(uri);
 	}
 
-	public static String getCookieValue(HttpServletRequest request,
-			String cookieName) {
+	public static String getCookieValue(HttpServletRequest request, String cookieName) {
 		Cookie[] cookies = request.getCookies();
 		if (cookies == null)
 			return null;
@@ -174,43 +162,34 @@ public class RequestUtils {
 		return null;
 	}
 
-	public static void saveCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName, String cookieValue) {
+	public static void saveCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
+			String cookieValue) {
 		saveCookie(request, response, cookieName, cookieValue, false);
 	}
 
-	public static void saveCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName,
+	public static void saveCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
 			String cookieValue, boolean global) {
-		saveCookie(request, response, cookieName, cookieValue, -1, global,
-				false);
+		saveCookie(request, response, cookieName, cookieValue, -1, global, false);
 	}
 
-	public static void saveCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName,
+	public static void saveCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
 			String cookieValue, boolean global, boolean httpOnly) {
-		saveCookie(request, response, cookieName, cookieValue, -1, global,
-				httpOnly);
+		saveCookie(request, response, cookieName, cookieValue, -1, global, httpOnly);
 	}
 
-	public static void saveCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName,
+	public static void saveCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
 			String cookieValue, int maxAge, boolean global, boolean httpOnly) {
 		String domain = null;
-		String path = "".equals(request.getContextPath()) ? "/" : request
-				.getContextPath();
+		String path = "".equals(request.getContextPath()) ? "/" : request.getContextPath();
 		if (global) {
 			domain = parseGlobalDomain(request.getServerName());
 			path = "/";
 		}
-		saveCookie(request, response, cookieName, cookieValue, maxAge, domain,
-				path, httpOnly);
+		saveCookie(request, response, cookieName, cookieValue, maxAge, domain, path, httpOnly);
 	}
 
-	public static void saveCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName,
-			String cookieValue, int maxAge, String domain, String path,
-			boolean httpOnly) {
+	public static void saveCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
+			String cookieValue, int maxAge, String domain, String path, boolean httpOnly) {
 		try {
 			cookieValue = URLEncoder.encode(cookieValue, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -224,25 +203,23 @@ public class RequestUtils {
 		response.addCookie(cookie);
 	}
 
-	public static void deleteCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName) {
+	public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
 		deleteCookie(request, response, cookieName, false);
 	}
 
-	public static void deleteCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName, boolean global) {
-		deleteCookie(request, response, cookieName, "".equals(request
-				.getContextPath()) ? "/" : request.getContextPath(), global);
+	public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
+			boolean global) {
+		deleteCookie(request, response, cookieName,
+				"".equals(request.getContextPath()) ? "/" : request.getContextPath(), global);
 	}
 
-	public static void deleteCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName, String path) {
+	public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
+			String path) {
 		deleteCookie(request, response, cookieName, path, false);
 	}
 
-	public static void deleteCookie(HttpServletRequest request,
-			HttpServletResponse response, String cookieName, String path,
-			boolean global) {
+	public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
+			String path, boolean global) {
 		String domain = null;
 		if (global) {
 			domain = parseGlobalDomain(request.getServerName());
@@ -269,8 +246,7 @@ public class RequestUtils {
 			if (host2 == null)
 				host2 = "localhost";
 			return host1.equalsIgnoreCase(host2)
-					|| parseGlobalDomain(host1, host1).equalsIgnoreCase(
-							parseGlobalDomain(host2, host2));
+					|| parseGlobalDomain(host1, host1).equalsIgnoreCase(parseGlobalDomain(host2, host2));
 		} catch (MalformedURLException e) {
 			return false;
 		}
@@ -330,7 +306,7 @@ public class RequestUtils {
 		return host != null ? host : _default;
 	}
 
-	private static String[] topDoubleDomains = new String[] { ".com.cn",
-			".edu.cn", ".org.cn", ".net.cn", ".co.uk", "co.kr", "co.jp" };
+	private static String[] topDoubleDomains = new String[] { ".com.cn", ".edu.cn", ".org.cn", ".net.cn", ".co.uk",
+			"co.kr", "co.jp" };
 
 }

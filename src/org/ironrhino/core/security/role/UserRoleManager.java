@@ -67,8 +67,7 @@ public class UserRoleManager {
 	public Set<String> getStaticRoles() {
 		if (staticRoles == null) {
 			Set<String> temp = new LinkedHashSet<>();
-			Collection<Class<?>> set = ClassScanner.scanAssignable(
-					ClassScanner.getAppPackages(), UserRole.class);
+			Collection<Class<?>> set = ClassScanner.scanAssignable(ClassScanner.getAppPackages(), UserRole.class);
 			for (Class<?> c : set) {
 				if (Enum.class.isAssignableFrom(c)) {
 					for (Object en : c.getEnumConstants()) {
@@ -104,8 +103,7 @@ public class UserRoleManager {
 		for (String role : staticRoles)
 			roles.put(role, I18N.getText(role));
 		for (Map.Entry<String, String> entry : customRoles.entrySet()) {
-			String value = StringUtils.isNotBlank(entry.getValue()) ? entry
-					.getValue() : entry.getKey();
+			String value = StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : entry.getKey();
 			roles.put(entry.getKey(), I18N.getText(value));
 		}
 		return roles;
@@ -140,8 +138,7 @@ public class UserRoleManager {
 						includes.add(role);
 				if (includes.size() > 1) {
 					throw new ErrorMessage("validation.mutex.violation",
-							new Object[] { StringUtils.join(
-									displayRoles(includes), ",") });
+							new Object[] { StringUtils.join(displayRoles(includes), ",") });
 				}
 			}
 		}

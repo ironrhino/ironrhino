@@ -66,23 +66,18 @@ public class LocationParser {
 			LocationParser instance = Holder.instance;
 			if (instance == null || !instance.available)
 				return null;
-			String[] loc = instance.parseLocation(InetAddress.getByName(host)
-					.getAddress());
-			String string = (loc[0] != null ? loc[0] : "")
-					+ (loc[1] != null ? loc[1] : "");
+			String[] loc = instance.parseLocation(InetAddress.getByName(host).getAddress());
+			String string = (loc[0] != null ? loc[0] : "") + (loc[1] != null ? loc[1] : "");
 			Location location = new Location(string);
 			for (String s : LocationUtils.autonomousRegions)
 				if (string.startsWith(s)) {
 					location.setFirstArea(s);
 					if (string.indexOf("自治区") > 0)
-						location.setSecondArea(string.substring(
-								string.indexOf("自治区") + 3, string.indexOf("市")));
+						location.setSecondArea(string.substring(string.indexOf("自治区") + 3, string.indexOf("市")));
 					else
-						location.setSecondArea(string.substring(s.length(),
-								string.indexOf("市")));
+						location.setSecondArea(string.substring(s.length(), string.indexOf("市")));
 					if (string.indexOf("区") > string.indexOf("市"))
-						location.setThirdArea(string.substring(
-								string.indexOf("市") + 1, string.indexOf("区")));
+						location.setThirdArea(string.substring(string.indexOf("市") + 1, string.indexOf("区")));
 					return location;
 				}
 
@@ -95,22 +90,17 @@ public class LocationParser {
 			if (string.indexOf("省") > 0) {
 				location.setFirstArea(string.substring(0, string.indexOf("省")));
 				if (string.indexOf("市") > string.indexOf("省") + 1)
-					location.setSecondArea(string.substring(
-							string.indexOf("省") + 1, string.indexOf("市")));
+					location.setSecondArea(string.substring(string.indexOf("省") + 1, string.indexOf("市")));
 				if (string.indexOf("区") > string.indexOf("市") + 1)
-					location.setThirdArea(string.substring(
-							string.indexOf("市") + 1, string.indexOf("区")));
+					location.setThirdArea(string.substring(string.indexOf("市") + 1, string.indexOf("区")));
 				return location;
 			} else {
 				if (string.indexOf("市") > 0)
-					location.setFirstArea(string.substring(0,
-							string.indexOf("市")));
+					location.setFirstArea(string.substring(0, string.indexOf("市")));
 				if (string.indexOf("区") > string.indexOf("市") + 1)
-					location.setSecondArea(string.substring(
-							string.indexOf("市") + 1, string.indexOf("区")));
+					location.setSecondArea(string.substring(string.indexOf("市") + 1, string.indexOf("区")));
 				if (string.indexOf("县") > string.indexOf("市") + 1)
-					location.setSecondArea(string.substring(
-							string.indexOf("县") + 1, string.indexOf("区")));
+					location.setSecondArea(string.substring(string.indexOf("县") + 1, string.indexOf("区")));
 				return location;
 			}
 		} catch (Exception e) {
@@ -274,8 +264,7 @@ public class LocationParser {
 	private String readString(long offset) throws Exception {
 		file.seek(offset);
 		int i;
-		for (i = 0, buf[i] = file.readByte(); buf[i] != 0; buf[++i] = file
-				.readByte())
+		for (i = 0, buf[i] = file.readByte(); buf[i] != 0; buf[++i] = file.readByte())
 			;
 		if (i != 0)
 			return new String(buf, 0, i, "GBK");

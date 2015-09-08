@@ -46,8 +46,7 @@ public abstract class RabbitQueue<T extends Serializable> implements Queue<T> {
 
 	@PostConstruct
 	public void init() {
-		rabbitAdmin.declareQueue(new org.springframework.amqp.core.Queue(
-				queueName, durable, false, false));
+		rabbitAdmin.declareQueue(new org.springframework.amqp.core.Queue(queueName, durable, false, false));
 	}
 
 	@Override

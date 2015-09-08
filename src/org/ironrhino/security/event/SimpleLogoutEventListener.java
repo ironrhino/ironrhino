@@ -12,8 +12,7 @@ public class SimpleLogoutEventListener {
 
 	@EventListener
 	public void onApplicationEvent(LogoutEvent event) {
-		logger.info(event.getUsername() + " logout from {}",
-				event.getRemoteAddr());
+		logger.info(event.getUsername() + " logout from {}", event.getRemoteAddr());
 	}
 
 }

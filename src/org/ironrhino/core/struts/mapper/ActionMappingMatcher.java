@@ -6,7 +6,6 @@ import org.apache.struts2.dispatcher.mapper.ActionMapping;
 
 public interface ActionMappingMatcher {
 
-	public ActionMapping tryMatch(HttpServletRequest request,
-			DefaultActionMapper actionMapper);
+	public ActionMapping tryMatch(HttpServletRequest request, DefaultActionMapper actionMapper);
 
 }

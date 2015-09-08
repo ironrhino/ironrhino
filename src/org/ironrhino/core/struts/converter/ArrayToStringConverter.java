@@ -19,8 +19,7 @@ public class ArrayToStringConverter extends StrutsTypeConverter {
 	public String convertToString(Map arg0, Object o) {
 		if (o == null)
 			return null;
-		return (o instanceof String[]) ? StringUtils.join((String[]) o, ",")
-				: o.toString();
+		return (o instanceof String[]) ? StringUtils.join((String[]) o, ",") : o.toString();
 	}
 
 }

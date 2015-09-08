@@ -12,10 +12,8 @@ public class RunLevelCondition implements Condition {
 
 	@Override
 	public boolean matches(ConditionContext ctx, AnnotatedTypeMetadata metadata) {
-		Map<String, Object> attributes = metadata
-				.getAnnotationAttributes(RunLevelConditional.class.getName());
-		return matches((RunLevel) attributes.get("value"),
-				(Boolean) attributes.get("negated"));
+		Map<String, Object> attributes = metadata.getAnnotationAttributes(RunLevelConditional.class.getName());
+		return matches((RunLevel) attributes.get("value"), (Boolean) attributes.get("negated"));
 	}
 
 	public static boolean matches(RunLevel runLevel, boolean negated) {

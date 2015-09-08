@@ -62,8 +62,7 @@ public class MongoFileStorage implements FileStorage {
 					if (index < 0)
 						break;
 					String parent = path.substring(0, index);
-					File parentFile = mongoTemplate
-							.findById(parent, File.class);
+					File parentFile = mongoTemplate.findById(parent, File.class);
 					if (parentFile == null) {
 						parentFile = new File();
 						parentFile.setPath(parent);
@@ -71,16 +70,13 @@ public class MongoFileStorage implements FileStorage {
 						parentFile.setLastModified(System.currentTimeMillis());
 						mongoTemplate.save(parentFile);
 					} else if (!parentFile.isDirectory())
-						throw new IOException("parent " + parent
-								+ " is not directory while writing path "
-								+ path);
+						throw new IOException("parent " + parent + " is not directory while writing path " + path);
 				}
 			}
 			file = new File();
 			file.setPath(path);
 		} else if (file.isDirectory())
-			throw new IOException("path " + path
-					+ " is directory,can not be written");
+			throw new IOException("path " + path + " is directory,can not be written");
 		ByteArrayOutputStream os = new ByteArrayOutputStream(512 * 1024);
 		try {
 			IOUtils.copy(is, os);
@@ -151,10 +147,9 @@ public class MongoFileStorage implements FileStorage {
 			return false;
 		if (file.isDirectory()) {
 			int size = mongoTemplate
-					.find(new Query(where("path").regex(
-							"^" + path.replaceAll("\\.", "\\\\.") + "/.*"))
-							.limit(1),
-							File.class).size();
+					.find(new Query(where("path").regex("^" + path.replaceAll("\\.", "\\\\.") + "/.*")).limit(1),
+							File.class)
+					.size();
 			if (size > 0)
 				return false;
 		}
@@ -220,10 +215,8 @@ public class MongoFileStorage implements FileStorage {
 		if (file == null || !file.isDirectory())
 			return null;
 		List<String> list = new ArrayList<>();
-		List<File> files = mongoTemplate.find(
-				new Query(where("path").regex(
-						"^" + path.replaceAll("\\.", "\\\\.") + "/[^/]*$")),
-				File.class);
+		List<File> files = mongoTemplate
+				.find(new Query(where("path").regex("^" + path.replaceAll("\\.", "\\\\.") + "/[^/]*$")), File.class);
 		for (File f : files) {
 			if (f.isDirectory())
 				continue;
@@ -241,16 +234,13 @@ public class MongoFileStorage implements FileStorage {
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null || !file.isDirectory())
 			return Collections.emptyMap();
-		List<File> files = mongoTemplate.find(
-				new Query(where("path").regex(
-						"^" + path.replaceAll("\\.", "\\\\.") + "/[^/]*$")),
-				File.class);
+		List<File> files = mongoTemplate
+				.find(new Query(where("path").regex("^" + path.replaceAll("\\.", "\\\\.") + "/[^/]*$")), File.class);
 		for (File f : files) {
 			String name = f.getPath();
 			map.put(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory());
 		}
-		List<Map.Entry<String, Boolean>> list = new ArrayList<>(
-				map.entrySet());
+		List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
 		Collections.sort(list, comparator);
 		Map<String, Boolean> sortedMap = new LinkedHashMap<>();
 		for (Map.Entry<String, Boolean> entry : list)

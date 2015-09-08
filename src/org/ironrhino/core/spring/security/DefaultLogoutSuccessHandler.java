@@ -11,9 +11,8 @@ import org.springframework.security.web.authentication.AbstractAuthenticationTar
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.util.StringUtils;
 
-public class DefaultLogoutSuccessHandler extends
-		AbstractAuthenticationTargetUrlRequestHandler implements
-		LogoutSuccessHandler {
+public class DefaultLogoutSuccessHandler extends AbstractAuthenticationTargetUrlRequestHandler
+		implements LogoutSuccessHandler {
 
 	private boolean useReferer;
 
@@ -27,8 +26,7 @@ public class DefaultLogoutSuccessHandler extends
 	}
 
 	@Override
-	protected String determineTargetUrl(HttpServletRequest request,
-			HttpServletResponse response) {
+	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
 		String targetUrl = getDefaultTargetUrl();
 		if (StringUtils.hasText(request.getParameter("targetUrl"))) {
 			targetUrl = request.getParameter("targetUrl");
@@ -41,8 +39,7 @@ public class DefaultLogoutSuccessHandler extends
 	}
 
 	@Override
-	public void onLogoutSuccess(HttpServletRequest request,
-			HttpServletResponse response, Authentication authentication)
+	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
 		super.handle(request, response, authentication);
 	}

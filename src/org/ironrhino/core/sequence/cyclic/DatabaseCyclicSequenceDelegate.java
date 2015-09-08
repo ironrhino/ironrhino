@@ -6,8 +6,7 @@ import java.sql.DatabaseMetaData;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
-public class DatabaseCyclicSequenceDelegate extends
-		AbstractDatabaseCyclicSequence {
+public class DatabaseCyclicSequenceDelegate extends AbstractDatabaseCyclicSequence {
 
 	private AbstractDatabaseCyclicSequence seq = null;
 
@@ -17,8 +16,7 @@ public class DatabaseCyclicSequenceDelegate extends
 		DatabaseProduct databaseProduct = null;
 		try {
 			DatabaseMetaData dbmd = con.getMetaData();
-			databaseProduct = DatabaseProduct.parse(dbmd
-					.getDatabaseProductName().toLowerCase());
+			databaseProduct = DatabaseProduct.parse(dbmd.getDatabaseProductName().toLowerCase());
 		} finally {
 			DataSourceUtils.releaseConnection(con, getDataSource());
 		}
@@ -43,8 +41,7 @@ public class DatabaseCyclicSequenceDelegate extends
 		else if (databaseProduct == DatabaseProduct.DERBY)
 			seq = new DerbyCyclicSequence();
 		else
-			throw new RuntimeException("not implemented for database "
-					+ databaseProduct);
+			throw new RuntimeException("not implemented for database " + databaseProduct);
 		seq.setDataSource(getDataSource());
 		if (getCacheSize() > 1)
 			seq.setCacheSize(getCacheSize());

@@ -36,8 +36,7 @@ public class UploadFilesHandler extends AccessHandler {
 	}
 
 	@Override
-	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		long since = request.getDateHeader("If-Modified-Since");
 		String uri = request.getRequestURI();
 		String path = uri.substring(uri.indexOf('/', 1));

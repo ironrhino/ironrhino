@@ -12,10 +12,8 @@ public class StageCondition implements Condition {
 
 	@Override
 	public boolean matches(ConditionContext ctx, AnnotatedTypeMetadata metadata) {
-		Map<String, Object> attributes = metadata
-				.getAnnotationAttributes(StageConditional.class.getName());
-		return matches((Stage) attributes.get("value"),
-				(Boolean) attributes.get("negated"));
+		Map<String, Object> attributes = metadata.getAnnotationAttributes(StageConditional.class.getName());
+		return matches((Stage) attributes.get("value"), (Boolean) attributes.get("negated"));
 	}
 
 	public static boolean matches(Stage stage, boolean negated) {

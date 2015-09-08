@@ -76,8 +76,7 @@ public class DictionaryControl {
 			return null;
 		for (Map.Entry<String, String> entry : getItemsAsMap(name).entrySet()) {
 			if (value.equals(entry.getKey()))
-				return StringUtils.isNotBlank(entry.getValue()) ? entry
-						.getValue() : entry.getKey();
+				return StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : entry.getKey();
 		}
 		return value;
 	}
@@ -122,8 +121,7 @@ public class DictionaryControl {
 				if (StringUtils.isBlank(s) || s.trim().startsWith("#")) {
 					if (name != null && items != null) {
 						temp = entityManager.findOne(name);
-						if (AppInfo.getStage() == Stage.DEVELOPMENT
-								&& temp != null) {
+						if (AppInfo.getStage() == Stage.DEVELOPMENT && temp != null) {
 							entityManager.delete(temp);
 							temp = null;
 						}
@@ -149,8 +147,7 @@ public class DictionaryControl {
 					String[] arr = s.split("\\s*=\\s*", 2);
 					if (items == null)
 						items = new ArrayList<>();
-					items.add(new LabelValue(arr.length > 1 ? arr[1] : null,
-							arr[0]));
+					items.add(new LabelValue(arr.length > 1 ? arr[1] : null, arr[0]));
 				}
 			}
 			if (name != null && items != null) {

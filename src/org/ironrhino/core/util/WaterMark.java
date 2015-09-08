@@ -27,13 +27,11 @@ public class WaterMark {
 		return mark(image, mark.getFile());
 	}
 
-	public static BufferedImage mark(Image image, File markFile)
-			throws IOException {
+	public static BufferedImage mark(Image image, File markFile) throws IOException {
 		int widthOriginal = image.getWidth(null);
 		int heightOriginal = image.getHeight(null);
 
-		BufferedImage bufImage = new BufferedImage(widthOriginal,
-				heightOriginal, BufferedImage.TYPE_INT_RGB);
+		BufferedImage bufImage = new BufferedImage(widthOriginal, heightOriginal, BufferedImage.TYPE_INT_RGB);
 
 		float alpha = 0.25f;
 		Graphics2D g2d = bufImage.createGraphics();
@@ -42,16 +40,14 @@ public class WaterMark {
 		int widthWaterMark = imageWaterMark.getWidth(null);
 		int heightWaterMark = imageWaterMark.getHeight(null);
 
-		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
-				alpha));
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
 
 		// g2d.drawImage(imageWaterMark, widthOriginal - widthWaterMark,
 		// heightOriginal - heightWaterMark, widthWaterMark,
 		// heightWaterMark, null);
 
-		g2d.drawImage(imageWaterMark, (widthOriginal - widthWaterMark) / 2,
-				(heightOriginal - heightWaterMark) / 2, widthWaterMark,
-				heightWaterMark, null);
+		g2d.drawImage(imageWaterMark, (widthOriginal - widthWaterMark) / 2, (heightOriginal - heightWaterMark) / 2,
+				widthWaterMark, heightWaterMark, null);
 
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 		g2d.dispose();

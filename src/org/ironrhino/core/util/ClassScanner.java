@@ -42,16 +42,13 @@ public class ClassScanner {
 
 	public ClassScanner() {
 		if (AppInfo.getExcludeFilterRegex() != null)
-			addExcludeFilter(new RegexPatternTypeFilter(Pattern.compile(AppInfo
-					.getExcludeFilterRegex())));
+			addExcludeFilter(new RegexPatternTypeFilter(Pattern.compile(AppInfo.getExcludeFilterRegex())));
 	}
 
 	@Autowired(required = false)
 	public void setResourceLoader(ResourceLoader resourceLoader) {
-		this.resourcePatternResolver = ResourcePatternUtils
-				.getResourcePatternResolver(resourceLoader);
-		this.metadataReaderFactory = new CachingMetadataReaderFactory(
-				resourceLoader);
+		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
+		this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
 	}
 
 	public final ResourceLoader getResourceLoader() {
@@ -72,16 +69,14 @@ public class ClassScanner {
 	}
 
 	@SafeVarargs
-	public static Collection<Class<?>> scanAnnotated(String basePackage,
-			Class<? extends Annotation>... annotations) {
+	public static Collection<Class<?>> scanAnnotated(String basePackage, Class<? extends Annotation>... annotations) {
 		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
 			cs.addIncludeFilter(new CustomAnnotationTypeFilter(anno));
 		return cs.doScan(basePackage);
 	}
 
-	public static Collection<Class<?>> scanAnnotated(String[] basePackages,
-			Class<? extends Annotation> annotation) {
+	public static Collection<Class<?>> scanAnnotated(String[] basePackages, Class<? extends Annotation> annotation) {
 		ClassScanner cs = new ClassScanner();
 		cs.addIncludeFilter(new CustomAnnotationTypeFilter(annotation));
 		List<Class<?>> classes = new ArrayList<>();
@@ -104,8 +99,7 @@ public class ClassScanner {
 		return classes;
 	}
 
-	public static Collection<Class<?>> scanAssignable(String basePackage,
-			Class<?>... classes) {
+	public static Collection<Class<?>> scanAssignable(String basePackage, Class<?>... classes) {
 		ClassScanner cs = new ClassScanner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
@@ -115,8 +109,7 @@ public class ClassScanner {
 		return list;
 	}
 
-	public static Collection<Class<?>> scanAssignable(String[] basePackages,
-			Class<?>... classes) {
+	public static Collection<Class<?>> scanAssignable(String[] basePackages, Class<?>... classes) {
 		ClassScanner cs = new ClassScanner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
@@ -153,23 +146,17 @@ public class ClassScanner {
 		List<Class<?>> classes = new ArrayList<>();
 		Resource resource = null;
 		try {
-			String searchPath = new StringBuilder(
-					ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX)
-					.append(org.springframework.util.ClassUtils
-							.convertClassNameToResourcePath(basePackage))
+			String searchPath = new StringBuilder(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX)
+					.append(org.springframework.util.ClassUtils.convertClassNameToResourcePath(basePackage))
 					.append(pattern).toString();
-			Resource[] resources = this.resourcePatternResolver
-					.getResources(searchPath);
+			Resource[] resources = this.resourcePatternResolver.getResources(searchPath);
 			for (int i = 0; i < resources.length; i++) {
 				resource = resources[i];
 				if (resource.isReadable()) {
-					MetadataReader metadataReader = this.metadataReaderFactory
-							.getMetadataReader(resource);
-					if ((includeFilters.size() == 0 && excludeFilters.size() == 0)
-							|| matches(metadataReader)) {
+					MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
+					if ((includeFilters.size() == 0 && excludeFilters.size() == 0) || matches(metadataReader)) {
 						try {
-							classes.add(Class.forName(metadataReader
-									.getClassMetadata().getClassName()));
+							classes.add(Class.forName(metadataReader.getClassMetadata().getClassName()));
 						} catch (ClassNotFoundException e) {
 							e.printStackTrace();
 						}
@@ -216,8 +203,7 @@ public class ClassScanner {
 			}
 			String[] arr = appBasePackage.split(",+");
 			Set<String> packages = new TreeSet<>();
-			Collection<Class<?>> componentScans = scanAnnotated(arr,
-					ComponentScan.class);
+			Collection<Class<?>> componentScans = scanAnnotated(arr, ComponentScan.class);
 			for (Class<?> c : componentScans) {
 				ComponentScan cs = c.getAnnotation(ComponentScan.class);
 				packages.addAll(Arrays.asList(cs.value()));
@@ -234,8 +220,7 @@ public class ClassScanner {
 				if (deep <= 2)
 					packages.add(name);
 				else
-					packages.add(name.substring(0,
-							name.indexOf(".", name.indexOf(".") + 1)));
+					packages.add(name.substring(0, name.indexOf(".", name.indexOf(".") + 1)));
 			}
 			return packages.toArray(new String[0]);
 		}
@@ -252,18 +237,13 @@ public class ClassScanner {
 		return false;
 	}
 
-	private static String[] excludePackages = new String[] { "java", "javax",
-			"com.sun", "sun", "org.w3c", "org.xml", "antlr", "com.bea",
-			"com.caucho", "com.chenlb", "com.fasterxml", "com.google",
-			"com.ibm", "com.jolbox", "com.microsoft", "com.mongodb",
-			"com.mysql", "com.opensymphony", "com.oracle", "com.rabbitmq",
-			"com.taobao", "com.vmware", "freemarker", "javassist", "jsr166y",
-			"net.htmlparser", "net.sf", "net.sourceforge", "ognl", "oracle",
-			"org.antlr", "org.aopalliance", "org.apache", "org.aspectj",
-			"org.bson", "org.cloudfoundry", "org.codehaus",
-			"org.elasticsearch", "org.dom4j", "org.eclipse", "org.hibernate",
-			"org.ietf", "org.jboss", "org.jcp", "org.mvel2", "org.postgresql",
-			"org.slf4j", "org.springframework", "org.tartarus",
+	private static String[] excludePackages = new String[] { "java", "javax", "com.sun", "sun", "org.w3c", "org.xml",
+			"antlr", "com.bea", "com.caucho", "com.chenlb", "com.fasterxml", "com.google", "com.ibm", "com.jolbox",
+			"com.microsoft", "com.mongodb", "com.mysql", "com.opensymphony", "com.oracle", "com.rabbitmq", "com.taobao",
+			"com.vmware", "freemarker", "javassist", "jsr166y", "net.htmlparser", "net.sf", "net.sourceforge", "ognl",
+			"oracle", "org.antlr", "org.aopalliance", "org.apache", "org.aspectj", "org.bson", "org.cloudfoundry",
+			"org.codehaus", "org.elasticsearch", "org.dom4j", "org.eclipse", "org.hibernate", "org.ietf", "org.jboss",
+			"org.jcp", "org.mvel2", "org.postgresql", "org.slf4j", "org.springframework", "org.tartarus",
 			"org.ironrhino.core", "redis", "weblogic" };
 
 }

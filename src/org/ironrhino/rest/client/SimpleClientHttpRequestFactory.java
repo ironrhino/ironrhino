@@ -5,8 +5,7 @@ import java.net.HttpURLConnection;
 
 import org.slf4j.MDC;
 
-public class SimpleClientHttpRequestFactory extends
-		org.springframework.http.client.SimpleClientHttpRequestFactory {
+public class SimpleClientHttpRequestFactory extends org.springframework.http.client.SimpleClientHttpRequestFactory {
 
 	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-Id";
 
@@ -49,15 +48,13 @@ public class SimpleClientHttpRequestFactory extends
 	}
 
 	@Override
-	protected void prepareConnection(HttpURLConnection connection,
-			String httpMethod) throws IOException {
+	protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
 		super.prepareConnection(connection, httpMethod);
 		String requestId = MDC.get(MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			connection.addRequestProperty(HTTP_HEADER_REQUEST_ID, requestId);
 		if (client != null)
-			connection.addRequestProperty("Authorization",
-					"Bearer " + client.fetchAccessToken());
+			connection.addRequestProperty("Authorization", "Bearer " + client.fetchAccessToken());
 
 	}
 

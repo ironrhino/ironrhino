@@ -29,8 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Order(0)
-public class UserManagerImpl extends BaseManagerImpl<User> implements
-		UserManager {
+public class UserManagerImpl extends BaseManagerImpl<User>implements UserManager {
 
 	public static final String CACHE_NAMESPACE = "user";
 
@@ -87,8 +86,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 		if (passwordExpiresInDays > 0) {
 			Date passwordModifyDate = user.getPasswordModifyDate();
 			if (passwordModifyDate != null
-					&& DateUtils.addDays(passwordModifyDate,
-							passwordExpiresInDays).before(new Date()))
+					&& DateUtils.addDays(passwordModifyDate, passwordExpiresInDays).before(new Date()))
 				user.setPasswordExpired(true);
 		}
 		populateAuthorities(user);
@@ -120,20 +118,15 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements
 				if (path.length() > 1) {
 					candidate = path.substring(1);
 					if (candidate.endsWith("/"))
-						candidate = candidate.substring(0,
-								candidate.length() - 1);
+						candidate = candidate.substring(0, candidate.length() - 1);
 				} else {
-					candidate = candidate
-							.substring(candidate.indexOf("://") + 3);
-					String temp = candidate
-							.substring(0, candidate.indexOf('.'));
+					candidate = candidate.substring(candidate.indexOf("://") + 3);
+					String temp = candidate.substring(0, candidate.indexOf('.'));
 					if (!temp.equalsIgnoreCase("www")) {
 						candidate = temp;
 					} else {
-						candidate = candidate
-								.substring(candidate.indexOf('.') + 1);
-						candidate = candidate.substring(0,
-								candidate.indexOf('.'));
+						candidate = candidate.substring(candidate.indexOf('.') + 1);
+						candidate = candidate.substring(0, candidate.indexOf('.'));
 					}
 				}
 			} catch (MalformedURLException e) {

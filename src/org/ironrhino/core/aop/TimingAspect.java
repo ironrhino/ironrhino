@@ -23,8 +23,7 @@ public class TimingAspect extends BaseAspect {
 	}
 
 	@Around("execution(public * *(..)) and @annotation(timing)")
-	public Object timing(ProceedingJoinPoint jp, Timing timing)
-			throws Throwable {
+	public Object timing(ProceedingJoinPoint jp, Timing timing) throws Throwable {
 		long time = System.currentTimeMillis();
 		Object result = null;
 		Throwable throwable = null;
@@ -35,8 +34,7 @@ public class TimingAspect extends BaseAspect {
 		}
 		time = System.currentTimeMillis() - time;
 		String method = jp.getStaticPart().getSignature().toLongString();
-		logger.info("method[ {} ] tooks {} ms and {}", method, time,
-				throwable == null ? "success" : "fail");
+		logger.info("method[ {} ] tooks {} ms and {}", method, time, throwable == null ? "success" : "fail");
 		if (StringUtils.isNotBlank(timing.value())) {
 			Map<String, Object> context = buildContext(jp);
 			context.put("method", method);

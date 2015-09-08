@@ -20,8 +20,8 @@ public abstract class AbstractAuditEvent extends BaseEvent<String> {
 	public String getRemoteAddr() {
 		return remoteAddr;
 	}
-	
-	public String[] getArguments(){
+
+	public String[] getArguments() {
 		return null;
 	}
 

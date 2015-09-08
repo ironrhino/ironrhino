@@ -16,8 +16,7 @@ public class DictionaryUserRoleProvider implements UserRoleProvider {
 
 	@Override
 	public Map<String, String> getRoles() {
-		return dictionaryControl
-				.getItemsAsMap(DICTIONARY_NAME_CUSTOM_USER_ROLE);
+		return dictionaryControl.getItemsAsMap(DICTIONARY_NAME_CUSTOM_USER_ROLE);
 	}
 
 }

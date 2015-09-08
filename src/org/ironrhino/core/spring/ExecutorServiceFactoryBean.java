@@ -10,16 +10,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 @Component("executorService")
-public class ExecutorServiceFactoryBean implements
-		FactoryBean<ExecutorService>, InitializingBean, DisposableBean {
+public class ExecutorServiceFactoryBean implements FactoryBean<ExecutorService>, InitializingBean, DisposableBean {
 
 	private ExecutorService executorService;
 
 	@Override
 	public void afterPropertiesSet() {
-		executorService = Executors
-				.newCachedThreadPool(new NameableThreadFactory(
-						"executorService"));
+		executorService = Executors.newCachedThreadPool(new NameableThreadFactory("executorService"));
 	}
 
 	@Override

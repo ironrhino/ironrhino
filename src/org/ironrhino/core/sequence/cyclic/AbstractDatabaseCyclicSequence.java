@@ -4,9 +4,8 @@ import javax.sql.DataSource;
 
 import org.ironrhino.core.coordination.LockService;
 
-public abstract class AbstractDatabaseCyclicSequence extends
-		AbstractCyclicSequence {
-	
+public abstract class AbstractDatabaseCyclicSequence extends AbstractCyclicSequence {
+
 	static final long CRITICAL_THRESHOLD_TIME = 500;
 
 	private DataSource dataSource;

@@ -29,26 +29,21 @@ public class PublishAspect extends BaseAspect {
 	public void deleteBatch(List list) throws Throwable {
 		if (!isBypass() && eventPublisher != null && list != null)
 			for (Object entity : list) {
-				PublishAware publishAware = entity.getClass().getAnnotation(
-						PublishAware.class);
+				PublishAware publishAware = entity.getClass().getAnnotation(PublishAware.class);
 				if (publishAware != null)
-					eventPublisher.publish(new EntityOperationEvent<>(
-							(Persistable) entity, EntityOperationType.DELETE),
+					eventPublisher.publish(new EntityOperationEvent<>((Persistable) entity, EntityOperationType.DELETE),
 							publishAware.scope());
 			}
 	}
 
 	@Around("execution(* org.ironrhino.core.service.BaseManager.save(*)) and args(entity) and @args(publishAware)")
-	public Object save(ProceedingJoinPoint call, Persistable<?> entity,
-			PublishAware publishAware) throws Throwable {
+	public Object save(ProceedingJoinPoint call, Persistable<?> entity, PublishAware publishAware) throws Throwable {
 		boolean isNew = entity.isNew();
 		Object result = call.proceed();
 		if (!isBypass()) {
 			if (eventPublisher != null)
 				eventPublisher.publish(new EntityOperationEvent<>(entity,
-						isNew ? EntityOperationType.CREATE
-								: EntityOperationType.UPDATE), publishAware
-						.scope());
+						isNew ? EntityOperationType.CREATE : EntityOperationType.UPDATE), publishAware.scope());
 		}
 		return result;
 	}
@@ -58,8 +53,8 @@ public class PublishAspect extends BaseAspect {
 		if (isBypass())
 			return;
 		if (eventPublisher != null)
-			eventPublisher.publish(new EntityOperationEvent<>(entity,
-					EntityOperationType.DELETE), publishAware.scope());
+			eventPublisher.publish(new EntityOperationEvent<>(entity, EntityOperationType.DELETE),
+					publishAware.scope());
 	}
 
 }

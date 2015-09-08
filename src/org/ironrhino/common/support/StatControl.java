@@ -91,9 +91,8 @@ public class StatControl {
 					private void save() {
 						Map<Key, Value> sortedMap = new TreeMap<>(map);
 						for (Map.Entry<Key, Value> entry : sortedMap.entrySet())
-							entityManager.save(new Stat(entry.getKey(), entry
-									.getValue(), new Date(entry.getKey()
-									.getLastWriteTime()), host));
+							entityManager.save(new Stat(entry.getKey(), entry.getValue(),
+									new Date(entry.getKey().getLastWriteTime()), host));
 						map.clear();
 					}
 
@@ -125,15 +124,13 @@ public class StatControl {
 							map.put(lastKey, lastValue);
 						} else {
 							if (calendar.get(Calendar.HOUR_OF_DAY) == currentHour) {
-								lastKey.setLastWriteTime(pair.getDate()
-										.getTime());
+								lastKey.setLastWriteTime(pair.getDate().getTime());
 								lastValue.cumulate(pair.getValue());
 							} else {
 								save();
 								lastKey = pair.getKey();
 								lastValue = pair.getValue();
-								lastKey.setLastWriteTime(pair.getDate()
-										.getTime());
+								lastKey.setLastWriteTime(pair.getDate().getTime());
 								map.put(lastKey, lastValue);
 							}
 						}
@@ -172,8 +169,7 @@ public class StatControl {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, List<TreeNode>> getResult(Date from, Date to,
-			boolean localhost) {
+	public Map<String, List<TreeNode>> getResult(Date from, Date to, boolean localhost) {
 		Date today = new Date();
 		if (from == null)
 			throw new IllegalArgumentException("from is null");
@@ -218,18 +214,16 @@ public class StatControl {
 				if (list.size() > 0) {
 					Iterator<? extends KeyValuePair> it1 = list.iterator();
 					if (criticalDate != null) {
-						Iterator<? extends KeyValuePair> it2 = new CumulativeAnalyzer(
-								criticalDate, to, localhost).iterate();
-						analyzer = new CumulativeAnalyzer(
-								new CompositeIterator(it1, it2));
+						Iterator<? extends KeyValuePair> it2 = new CumulativeAnalyzer(criticalDate, to, localhost)
+								.iterate();
+						analyzer = new CumulativeAnalyzer(new CompositeIterator(it1, it2));
 					} else {
 						analyzer = new CumulativeAnalyzer(it1);
 					}
 
 				} else {
 					if (criticalDate != null) {
-						analyzer = new CumulativeAnalyzer(criticalDate, to,
-								localhost);
+						analyzer = new CumulativeAnalyzer(criticalDate, to, localhost);
 					}
 				}
 			} catch (FileNotFoundException e) {
@@ -249,8 +243,7 @@ public class StatControl {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(to);
 		Date criticalDate = null;
-		while (AbstractAnalyzer.hasLogFile(cal.getTime(), localhost)
-				&& !DateUtils.isSameDay(criticalDate, from)) {
+		while (AbstractAnalyzer.hasLogFile(cal.getTime(), localhost) && !DateUtils.isSameDay(criticalDate, from)) {
 			criticalDate = cal.getTime();
 			cal.add(Calendar.DAY_OF_YEAR, -1);
 		}
@@ -258,21 +251,16 @@ public class StatControl {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Value> getPeriodResult(Key key, Date date, boolean cumulative,
-			boolean localhost) {
-		return (List<Value>) getPeriodResult(key, date, cumulative, false,
-				localhost);
+	public List<Value> getPeriodResult(Key key, Date date, boolean cumulative, boolean localhost) {
+		return (List<Value>) getPeriodResult(key, date, cumulative, false, localhost);
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, List<Value>> getPerHostPeriodResult(Key key, Date date,
-			boolean cumulative) {
-		return (Map<String, List<Value>>) getPeriodResult(key, date,
-				cumulative, true);
+	public Map<String, List<Value>> getPerHostPeriodResult(Key key, Date date, boolean cumulative) {
+		return (Map<String, List<Value>>) getPeriodResult(key, date, cumulative, true);
 	}
 
-	private Object getPeriodResult(Key key, Date date, boolean cumulative,
-			boolean perHost, boolean localhost) {
+	private Object getPeriodResult(Key key, Date date, boolean cumulative, boolean perHost, boolean localhost) {
 		PeriodAnalyzer analyzer;
 		try {
 			analyzer = new PeriodAnalyzer(key, date, localhost);
@@ -306,8 +294,7 @@ public class StatControl {
 		return analyzer.getResult();
 	}
 
-	public Chart getChart(Key key, Date date, String vtype, String ctype,
-			boolean localhost) {
+	public Chart getChart(Key key, Date date, String vtype, String ctype, boolean localhost) {
 		boolean isdouble = "d".equalsIgnoreCase(vtype);
 		boolean isline = "line".equalsIgnoreCase(ctype);
 		Chart chart = new Chart();

@@ -57,8 +57,7 @@ public class LabelValue implements Serializable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isNotBlank(label) || StringUtils.isNotBlank(value)) {
-			sb.append(value).append(" = ")
-					.append(StringUtils.isNotBlank(label) ? label : value);
+			sb.append(value).append(" = ").append(StringUtils.isNotBlank(label) ? label : value);
 		}
 		return sb.toString();
 	}

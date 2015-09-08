@@ -19,14 +19,12 @@ import com.chenlb.mmseg4j.analysis.MaxWordAnalyzer;
  * @url https://github.com/medcl/elasticsearch-analysis-mmseg
  * 
  */
-public class MMsegAnalyzerProvider extends
-		AbstractIndexAnalyzerProvider<MMSegAnalyzer> {
+public class MMsegAnalyzerProvider extends AbstractIndexAnalyzerProvider<MMSegAnalyzer> {
 
 	private final MMSegAnalyzer analyzer;
 
 	@Inject
-	public MMsegAnalyzerProvider(Index index,
-			@IndexSettings Settings indexSettings, Environment env,
+	public MMsegAnalyzerProvider(Index index, @IndexSettings Settings indexSettings, Environment env,
 			@Assisted String name, @Assisted Settings settings) {
 		super(index, indexSettings, name, settings);
 		String path = new File(env.configFile(), "mmseg").getPath();

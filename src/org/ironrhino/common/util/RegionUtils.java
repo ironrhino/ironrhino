@@ -9,16 +9,13 @@ public class RegionUtils {
 		Location loc = LocationUtils.parse(value);
 		if (loc == null)
 			return null;
-		Region firstRegion = getChildOrSelfByName(regionTree,
-				loc.getFirstArea());
+		Region firstRegion = getChildOrSelfByName(regionTree, loc.getFirstArea());
 		if (firstRegion == null)
 			return null;
-		Region secondRegion = getChildOrSelfByName(firstRegion,
-				loc.getSecondArea());
+		Region secondRegion = getChildOrSelfByName(firstRegion, loc.getSecondArea());
 		if (secondRegion == null)
 			return firstRegion;
-		Region thirdRegion = getChildOrSelfByName(secondRegion,
-				loc.getThirdArea());
+		Region thirdRegion = getChildOrSelfByName(secondRegion, loc.getThirdArea());
 		return thirdRegion != null ? thirdRegion : secondRegion;
 	}
 
@@ -56,22 +53,19 @@ public class RegionUtils {
 	public static boolean isAutonomousRegion(Region region) {
 		if (region == null || StringUtils.isBlank(region.getName()))
 			return false;
-		return LocationUtils.autonomousRegions.contains(LocationUtils
-				.shortenName(region.getName()));
+		return LocationUtils.autonomousRegions.contains(LocationUtils.shortenName(region.getName()));
 	}
 
 	public static boolean isSpecialAdministrativeRegion(Region region) {
 		if (region == null || StringUtils.isBlank(region.getName()))
 			return false;
-		return LocationUtils.specialAdministrativeRegions
-				.contains(LocationUtils.shortenName(region.getName()));
+		return LocationUtils.specialAdministrativeRegions.contains(LocationUtils.shortenName(region.getName()));
 	}
 
 	public static boolean isMunicipalities(Region region) {
 		if (region == null || StringUtils.isBlank(region.getName()))
 			return false;
-		return LocationUtils.municipalities.contains(LocationUtils
-				.shortenName(region.getName()));
+		return LocationUtils.municipalities.contains(LocationUtils.shortenName(region.getName()));
 	}
 
 	public static Region getCity(Region region) {

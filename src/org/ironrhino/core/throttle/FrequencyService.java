@@ -6,7 +6,6 @@ public interface FrequencyService {
 
 	public int available(String name, int limits);
 
-	public void increment(String name, long delta, int duration,
-			TimeUnit timeUnit);
+	public void increment(String name, long delta, int duration, TimeUnit timeUnit);
 
 }

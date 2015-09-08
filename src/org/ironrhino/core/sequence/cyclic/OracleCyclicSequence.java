@@ -13,33 +13,28 @@ public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT ").append(getActualSequenceName())
-				.append(".NEXTVAL,").append(getCurrentTimestamp()).append(",")
-				.append(getSequenceName()).append("_TIMESTAMP FROM ")
+		return new StringBuilder("SELECT ").append(getActualSequenceName()).append(".NEXTVAL,")
+				.append(getCurrentTimestamp()).append(",").append(getSequenceName()).append("_TIMESTAMP FROM ")
 				.append(getTableName()).toString();
 	}
 
 	@Override
-	protected void restartSequence(Connection con, Statement stmt)
-			throws SQLException {
+	protected void restartSequence(Connection con, Statement stmt) throws SQLException {
 		boolean autoCommit = con.getAutoCommit();
 		con.setAutoCommit(false);
 		int current;
 		ResultSet rs = null;
 		try {
-			rs = stmt.executeQuery("SELECT " + getActualSequenceName()
-					+ ".NEXTVAL FROM DUAL");
+			rs = stmt.executeQuery("SELECT " + getActualSequenceName() + ".NEXTVAL FROM DUAL");
 			rs.next();
 			current = rs.getInt(1);
 		} finally {
 			if (rs != null)
 				rs.close();
 		}
-		stmt.execute("ALTER SEQUENCE " + getActualSequenceName()
-				+ " INCREMENT BY -" + current + " MINVALUE 0");
+		stmt.execute("ALTER SEQUENCE " + getActualSequenceName() + " INCREMENT BY -" + current + " MINVALUE 0");
 		stmt.execute("SELECT " + getActualSequenceName() + ".NEXTVAL FROM DUAL");
-		stmt.execute("ALTER SEQUENCE " + getActualSequenceName()
-				+ " INCREMENT BY 1 MINVALUE 0");
+		stmt.execute("ALTER SEQUENCE " + getActualSequenceName() + " INCREMENT BY 1 MINVALUE 0");
 		con.commit();
 		con.setAutoCommit(autoCommit);
 	}
@@ -75,8 +70,7 @@ public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 			try {
 				rs.next();
 				Date currentTimestamp = rs.getTimestamp(1);
-				Date cycleStart = getCycleType()
-						.getCycleStart(currentTimestamp);
+				Date cycleStart = getCycleType().getCycleStart(currentTimestamp);
 				Date cycleEnd = getCycleType().getCycleEnd(currentTimestamp);
 				return currentTimestamp.getTime() - cycleStart.getTime() < CRITICAL_THRESHOLD_TIME
 						|| cycleEnd.getTime() - currentTimestamp.getTime() < CRITICAL_THRESHOLD_TIME;
@@ -84,8 +78,7 @@ public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 				rs.close();
 			}
 		} catch (SQLException ex) {
-			throw new DataAccessResourceFailureException(
-					"Could not obtain current_timestamp", ex);
+			throw new DataAccessResourceFailureException("Could not obtain current_timestamp", ex);
 		} finally {
 
 			if (stmt != null)

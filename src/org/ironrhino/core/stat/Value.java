@@ -52,8 +52,7 @@ public class Value implements Serializable {
 	}
 
 	public double addDoubleValue(double value) {
-		return ((double) doubleValue.getAndAdd((long) (value * PRECISION)))
-				/ PRECISION;
+		return ((double) doubleValue.getAndAdd((long) (value * PRECISION))) / PRECISION;
 	}
 
 	public double getDoubleValue() {
@@ -62,8 +61,7 @@ public class Value implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.valueOf(getLongValue()) + ","
-				+ String.valueOf(getDoubleValue());
+		return String.valueOf(getLongValue()) + "," + String.valueOf(getDoubleValue());
 	}
 
 	public static Value fromString(String s) {

@@ -12,14 +12,11 @@ import org.ironrhino.common.model.Region;
 public class RegionParser {
 
 	public static List<Region> parse() throws IOException {
-		return parse(Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("resources/data/region.txt"));
+		return parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/data/region.txt"));
 	}
 
-	public static List<Region> parse(InputStream inputStream)
-			throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(
-				inputStream, "utf-8"));
+	public static List<Region> parse(InputStream inputStream) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
 		List<String> segments = new ArrayList<>();
 		String line;
 		boolean end = false;

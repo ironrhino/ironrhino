@@ -15,8 +15,7 @@ public class NumberUtils {
 	}
 
 	public static BigDecimal parseAmount(String value) throws ParseException {
-		return new BigDecimal(new DecimalFormat("#,##0.00").parse(value)
-				.doubleValue());
+		return new BigDecimal(new DecimalFormat("#,##0.00").parse(value).doubleValue());
 	}
 
 	public static String format(int value, int digit) {
@@ -35,8 +34,7 @@ public class NumberUtils {
 	}
 
 	public static double round(double value, int decimalDigits) {
-		return round(new BigDecimal(String.valueOf(value)), decimalDigits)
-				.doubleValue();
+		return round(new BigDecimal(String.valueOf(value)), decimalDigits).doubleValue();
 	}
 
 	public static BigDecimal round(BigDecimal bd, int decimalDigits) {
@@ -46,8 +44,7 @@ public class NumberUtils {
 		String s = String.valueOf(bd.intValue());
 		if (!s.equals("0"))
 			precision += s.length();
-		return new BigDecimal(bd.round(
-				new MathContext(precision, RoundingMode.HALF_UP)).doubleValue());
+		return new BigDecimal(bd.round(new MathContext(precision, RoundingMode.HALF_UP)).doubleValue());
 	}
 
 	public static String formatPercent(double value, int fractionDigits) {
@@ -59,8 +56,7 @@ public class NumberUtils {
 
 	public static String decimalToX(int scale, BigInteger decimalValue) {
 		if (scale > NUMBERS.length())
-			throw new IllegalArgumentException("n must less or equal to "
-					+ NUMBERS.length());
+			throw new IllegalArgumentException("n must less or equal to " + NUMBERS.length());
 		BigInteger bscale = BigInteger.valueOf(scale);
 		boolean negative = decimalValue.compareTo(BigInteger.valueOf(0)) < 0;
 		if (negative)
@@ -80,15 +76,13 @@ public class NumberUtils {
 
 	public static BigInteger xToDecimal(int scale, String xScaleValue) {
 		if (scale > NUMBERS.length())
-			throw new IllegalArgumentException("n must less or equal to "
-					+ NUMBERS.length());
+			throw new IllegalArgumentException("n must less or equal to " + NUMBERS.length());
 		BigInteger bscale = BigInteger.valueOf(scale);
 		String a = NUMBERS.substring(0, scale);
 		BigInteger c = BigInteger.valueOf(1);
 		BigInteger t = BigInteger.valueOf(0);
 		for (int x = xScaleValue.length() - 1; x > -1; x--) {
-			t = t.add(c.multiply(BigInteger.valueOf(a.indexOf(xScaleValue
-					.charAt(x)))));
+			t = t.add(c.multiply(BigInteger.valueOf(a.indexOf(xScaleValue.charAt(x)))));
 			c = c.multiply(bscale);
 		}
 		return t;
@@ -98,15 +92,13 @@ public class NumberUtils {
 		return decimalToX(yScale, xToDecimal(xScale, value));
 	}
 
-	private static final String[] CNUMBERS = { "零", "壹", "贰", "叁", "肆", "伍",
-			"陆", "柒", "捌", "玖" };
-	private static final String[] IUNIT = { "元", "拾", "佰", "仟", "万", "拾", "佰",
-			"仟", "亿", "拾", "佰", "仟", "万", "拾", "佰", "仟" };
+	private static final String[] CNUMBERS = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
+	private static final String[] IUNIT = { "元", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "万", "拾", "佰",
+			"仟" };
 	private static final String[] DUNIT = { "角", "分", "厘" };
 
 	public static String toChineseUpperCase(double input) {
-		return _toChineseUpperCase(new BigDecimal(String.valueOf(input))
-				.toString());
+		return _toChineseUpperCase(new BigDecimal(String.valueOf(input)).toString());
 	}
 
 	public static String toChineseUpperCase(BigDecimal input) {
@@ -150,8 +142,7 @@ public class NumberUtils {
 			isMust5 = false;
 		}
 		int[] decimals = _toArray(decimal);
-		return _getChineseUpperCaseInteger(integers, isMust5)
-				+ _getChineseUpperCaseDecimal(decimals);
+		return _getChineseUpperCaseInteger(integers, isMust5) + _getChineseUpperCaseDecimal(decimals);
 	}
 
 	private static int[] _toArray(String number) {
@@ -162,8 +153,7 @@ public class NumberUtils {
 		return array;
 	}
 
-	private static String _getChineseUpperCaseInteger(int[] integers,
-			boolean isMust5) {
+	private static String _getChineseUpperCaseInteger(int[] integers, boolean isMust5) {
 		StringBuffer chineseInteger = new StringBuffer("");
 		int length = integers.length;
 		for (int i = 0; i < length; i++) {
@@ -180,8 +170,7 @@ public class NumberUtils {
 				if ((length - i) > 1 && integers[i + 1] != 0)
 					key += CNUMBERS[0];
 			}
-			chineseInteger.append(integers[i] == 0 ? key
-					: (CNUMBERS[integers[i]] + IUNIT[length - i - 1]));
+			chineseInteger.append(integers[i] == 0 ? key : (CNUMBERS[integers[i]] + IUNIT[length - i - 1]));
 		}
 		return chineseInteger.toString();
 	}
@@ -191,8 +180,7 @@ public class NumberUtils {
 		for (int i = 0; i < decimals.length; i++) {
 			if (i == 3)
 				break;
-			chineseDecimal.append(decimals[i] == 0 ? ""
-					: (CNUMBERS[decimals[i]] + DUNIT[i]));
+			chineseDecimal.append(decimals[i] == 0 ? "" : (CNUMBERS[decimals[i]] + DUNIT[i]));
 		}
 		return chineseDecimal.toString();
 	}

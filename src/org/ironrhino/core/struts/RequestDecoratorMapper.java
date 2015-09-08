@@ -23,13 +23,11 @@ public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 	private String decoratorParameter = "decorator";
 
 	@Override
-	public void init(Config config, Properties properties,
-			DecoratorMapper parent) throws InstantiationException {
+	public void init(Config config, Properties properties, DecoratorMapper parent) throws InstantiationException {
 		super.init(config, properties, parent);
 		sc = config.getServletContext();
 		sc.setAttribute(this.getClass().getName(), this);
-		decoratorParameter = properties.getProperty("decorator.parameter",
-				"decorator");
+		decoratorParameter = properties.getProperty("decorator.parameter", "decorator");
 	}
 
 	@Override
@@ -40,8 +38,7 @@ public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 			String decorator = (String) attr;
 			result = getNamedDecorator(request, decorator);
 			if (result == null) {
-				String location = "/WEB-INF/view/ftl/decorator/" + decorator
-						+ ".ftl";
+				String location = "/WEB-INF/view/ftl/decorator/" + decorator + ".ftl";
 				URL url = null;
 				try {
 					url = config.getServletContext().getResource(location);
@@ -49,8 +46,7 @@ public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 					e.printStackTrace();
 				}
 				if (url == null) {
-					location = "/resources/view/decorator/" + decorator
-							+ ".ftl";
+					location = "/resources/view/decorator/" + decorator + ".ftl";
 				}
 				result = new DefaultDecorator(decorator, location, null);
 			}
@@ -65,9 +61,8 @@ public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 	}
 
 	public static void setDecorator(String name) {
-		RequestDecoratorMapper rdm = (RequestDecoratorMapper) ServletActionContext
-				.getServletContext().getAttribute(
-						RequestDecoratorMapper.class.getName());
+		RequestDecoratorMapper rdm = (RequestDecoratorMapper) ServletActionContext.getServletContext()
+				.getAttribute(RequestDecoratorMapper.class.getName());
 		if (rdm != null)
 			rdm.setDecorator(ServletActionContext.getRequest(), name);
 	}

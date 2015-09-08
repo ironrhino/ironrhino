@@ -35,11 +35,9 @@ public class IndexAspect implements Ordered {
 	public void deleteBatch(List list) throws Throwable {
 		if (!AopContext.isBypass(this.getClass()) && list != null)
 			for (Object entity : list) {
-				Searchable searchable = entity.getClass().getAnnotation(
-						Searchable.class);
+				Searchable searchable = entity.getClass().getAnnotation(Searchable.class);
 				if (searchable != null) {
-					ListenableActionFuture<DeleteResponse> laf = indexManager
-							.delete((Persistable) entity);
+					ListenableActionFuture<DeleteResponse> laf = indexManager.delete((Persistable) entity);
 					laf.addListener(deleteResponseActionListener);
 				}
 			}
@@ -48,18 +46,15 @@ public class IndexAspect implements Ordered {
 	@AfterReturning("execution(* org.ironrhino.core.service.BaseManager.delete(*)) and args(entity) and @args(searchable)")
 	public void delete(Persistable entity, Searchable searchable) {
 		if (!AopContext.isBypass(this.getClass())) {
-			ListenableActionFuture<DeleteResponse> laf = indexManager
-					.delete(entity);
+			ListenableActionFuture<DeleteResponse> laf = indexManager.delete(entity);
 			laf.addListener(deleteResponseActionListener);
 		}
 	}
 
 	@AfterReturning("execution(* org.ironrhino.core.service.BaseManager.save(*)) and args(entity) and @args(searchable)")
-	public void save(Persistable entity, Searchable searchable)
-			throws Throwable {
+	public void save(Persistable entity, Searchable searchable) throws Throwable {
 		if (!AopContext.isBypass(this.getClass())) {
-			ListenableActionFuture<IndexResponse> laf = indexManager
-					.index(entity);
+			ListenableActionFuture<IndexResponse> laf = indexManager.index(entity);
 			laf.addListener(indexResponseActionListener);
 		}
 	}
@@ -77,8 +72,7 @@ public class IndexAspect implements Ordered {
 		@Override
 		public void onResponse(DeleteResponse response) {
 			if (!response.isFound())
-				logger.warn("index is not found where deleting{} of {} ",
-						response.getId(), response.getType());
+				logger.warn("index is not found where deleting{} of {} ", response.getId(), response.getType());
 		}
 
 		@Override

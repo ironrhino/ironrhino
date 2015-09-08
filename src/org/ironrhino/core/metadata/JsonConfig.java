@@ -12,6 +12,6 @@ public @interface JsonConfig {
 
 	String root() default "";
 
-	String[] propertyName() default {};
+	String[]propertyName() default {};
 
 }

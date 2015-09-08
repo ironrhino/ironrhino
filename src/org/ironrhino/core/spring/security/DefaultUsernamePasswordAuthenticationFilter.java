@@ -14,8 +14,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-public class DefaultUsernamePasswordAuthenticationFilter extends
-		UsernamePasswordAuthenticationFilter {
+public class DefaultUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	@Autowired
 	protected AuthenticationFailureHandler authenticationFailureHandler;
@@ -31,14 +30,12 @@ public class DefaultUsernamePasswordAuthenticationFilter extends
 		setAuthenticationSuccessHandler(authenticationSuccessHandler);
 	}
 
-	public void success(HttpServletRequest request,
-			HttpServletResponse response, Authentication authResult)
+	public void success(HttpServletRequest request, HttpServletResponse response, Authentication authResult)
 			throws IOException, ServletException {
 		super.successfulAuthentication(request, response, null, authResult);
 	}
 
-	public void unsuccess(HttpServletRequest request,
-			HttpServletResponse response, AuthenticationException failed)
+	public void unsuccess(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
 			throws IOException, ServletException {
 		super.unsuccessfulAuthentication(request, response, failed);
 	}

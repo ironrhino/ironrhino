@@ -94,9 +94,8 @@ public class BaseAction extends ActionSupport {
 	public String getCsrf() {
 		if (csrfRequired && csrf == null) {
 			csrf = CodecUtils.nextId();
-			RequestUtils.saveCookie(ServletActionContext.getRequest(),
-					ServletActionContext.getResponse(), COOKIE_NAME_CSRF, csrf,
-					false, true);
+			RequestUtils.saveCookie(ServletActionContext.getRequest(), ServletActionContext.getResponse(),
+					COOKIE_NAME_CSRF, csrf, false, true);
 		}
 		return csrf;
 	}
@@ -123,13 +122,10 @@ public class BaseAction extends ActionSupport {
 
 	public String getActionBaseUrl() {
 		if (actionBaseUrl == null) {
-			ActionProxy proxy = ActionContext.getContext()
-					.getActionInvocation().getProxy();
+			ActionProxy proxy = ActionContext.getContext().getActionInvocation().getProxy();
 			String namespace = proxy.getNamespace();
-			StringBuilder sb = new StringBuilder(ServletActionContext
-					.getRequest().getContextPath()).append(namespace)
-					.append(namespace.endsWith("/") ? "" : "/")
-					.append(proxy.getActionName());
+			StringBuilder sb = new StringBuilder(ServletActionContext.getRequest().getContextPath()).append(namespace)
+					.append(namespace.endsWith("/") ? "" : "/").append(proxy.getActionName());
 			actionBaseUrl = sb.toString();
 		}
 		return actionBaseUrl;
@@ -167,13 +163,11 @@ public class BaseAction extends ActionSupport {
 	}
 
 	public boolean isUseJson() {
-		return JSON.equalsIgnoreCase(ServletActionContext.getRequest()
-				.getHeader("X-Data-Type"));
+		return JSON.equalsIgnoreCase(ServletActionContext.getRequest().getHeader("X-Data-Type"));
 	}
 
 	public boolean isAjax() {
-		return "XMLHttpRequest".equalsIgnoreCase(ServletActionContext
-				.getRequest().getHeader("X-Requested-With"));
+		return "XMLHttpRequest".equalsIgnoreCase(ServletActionContext.getRequest().getHeader("X-Requested-With"));
 	}
 
 	@Override
@@ -211,23 +205,18 @@ public class BaseAction extends ActionSupport {
 	public String preAction() throws Exception {
 		Authorize authorize = findAuthorize();
 		if (authorize != null) {
-			boolean authorized = AuthzUtils.authorize(
-					evalExpression(authorize.ifAllGranted()),
-					evalExpression(authorize.ifAnyGranted()),
-					evalExpression(authorize.ifNotGranted()));
+			boolean authorized = AuthzUtils.authorize(evalExpression(authorize.ifAllGranted()),
+					evalExpression(authorize.ifAnyGranted()), evalExpression(authorize.ifNotGranted()));
 			if (!authorized && dynamicAuthorizerManager != null
 					&& !authorize.authorizer().equals(DynamicAuthorizer.class)) {
-				ActionProxy ap = ActionContext.getContext()
-						.getActionInvocation().getProxy();
+				ActionProxy ap = ActionContext.getContext().getActionInvocation().getProxy();
 				StringBuilder sb = new StringBuilder(ap.getNamespace());
 				sb.append(ap.getNamespace().endsWith("/") ? "" : "/");
 				sb.append(ap.getActionName());
-				sb.append(ap.getMethod().equals("execute") ? "" : "/"
-						+ ap.getMethod());
+				sb.append(ap.getMethod().equals("execute") ? "" : "/" + ap.getMethod());
 				String resource = sb.toString();
 				UserDetails user = AuthzUtils.getUserDetails();
-				authorized = dynamicAuthorizerManager.authorize(
-						authorize.authorizer(), user, resource);
+				authorized = dynamicAuthorizerManager.authorize(authorize.authorizer(), user, resource);
 			}
 			if (!authorized) {
 				addActionError(getText("access.denied"));
@@ -236,8 +225,7 @@ public class BaseAction extends ActionSupport {
 		}
 		Captcha captcha = getAnnotation(Captcha.class);
 		if (captcha != null && captchaManager != null) {
-			boolean[] array = captchaManager.isCaptchaRequired(
-					ServletActionContext.getRequest(), captcha);
+			boolean[] array = captchaManager.isCaptchaRequired(ServletActionContext.getRequest(), captcha);
 			captchaRequired = array[0];
 			firstReachCaptchaThreshold = array[1];
 		}
@@ -252,21 +240,18 @@ public class BaseAction extends ActionSupport {
 		if (inputConfig != null && "GET".equalsIgnoreCase(method)) {
 			returnInput = true;
 			if (!inputConfig.methodName().equals("")) {
-				ActionInvocation ai = ActionContext.getContext()
-						.getActionInvocation();
+				ActionInvocation ai = ActionContext.getContext().getActionInvocation();
 				originalActionName = ai.getProxy().getActionName();
 				originalMethod = ai.getProxy().getMethod();
 				// ai.getProxy().setMethod(annotation.methodName());
-				return (String) this.getClass()
-						.getMethod(inputConfig.methodName()).invoke(this);
+				return (String) this.getClass().getMethod(inputConfig.methodName()).invoke(this);
 			} else {
 				return inputConfig.resultName();
 			}
 		}
 		if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)) {
 			try {
-				BufferedReader reader = ServletActionContext.getRequest()
-						.getReader();
+				BufferedReader reader = ServletActionContext.getRequest().getReader();
 				StringBuilder sb = new StringBuilder();
 				String line;
 				while ((line = reader.readLine()) != null)
@@ -285,18 +270,14 @@ public class BaseAction extends ActionSupport {
 
 	@Override
 	public void validate() {
-		if (captchaManager != null
-				&& captchaRequired
-				&& !firstReachCaptchaThreshold
+		if (captchaManager != null && captchaRequired && !firstReachCaptchaThreshold
 				&& !captchaManager.verify(ServletActionContext.getRequest(),
-						ServletActionContext.getRequest().getSession().getId(),
-						true))
+						ServletActionContext.getRequest().getSession().getId(), true))
 			addFieldError(CaptchaManager.KEY_CAPTCHA, getText("captcha.error"));
 		if (csrfRequired) {
-			String value = RequestUtils.getCookieValue(
-					ServletActionContext.getRequest(), COOKIE_NAME_CSRF);
-			RequestUtils.deleteCookie(ServletActionContext.getRequest(),
-					ServletActionContext.getResponse(), COOKIE_NAME_CSRF);
+			String value = RequestUtils.getCookieValue(ServletActionContext.getRequest(), COOKIE_NAME_CSRF);
+			RequestUtils.deleteCookie(ServletActionContext.getRequest(), ServletActionContext.getResponse(),
+					COOKIE_NAME_CSRF);
 			if (csrf == null || !csrf.equals(value))
 				addActionError(getText("csrf.error"));
 		}
@@ -309,12 +290,9 @@ public class BaseAction extends ActionSupport {
 			return;
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpSession session = request.getSession();
-		String currentPasswordThreshold = (String) session
-				.getAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD);
-		int threshold = StringUtils.isNumeric(currentPasswordThreshold) ? Integer
-				.valueOf(currentPasswordThreshold) : 0;
-		boolean valid = currentPassword != null
-				&& AuthzUtils.isPasswordValid(currentPassword);
+		String currentPasswordThreshold = (String) session.getAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD);
+		int threshold = StringUtils.isNumeric(currentPasswordThreshold) ? Integer.valueOf(currentPasswordThreshold) : 0;
+		boolean valid = currentPassword != null && AuthzUtils.isPasswordValid(currentPassword);
 		if (!valid) {
 			addFieldError("currentPassword", getText("currentPassword.error"));
 			threshold++;
@@ -322,8 +300,7 @@ public class BaseAction extends ActionSupport {
 				session.invalidate();
 				targetUrl = RequestUtils.getRequestUri(request);
 			} else {
-				session.setAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD,
-						String.valueOf(threshold));
+				session.setAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD, String.valueOf(threshold));
 			}
 		} else {
 			session.removeAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD);
@@ -332,25 +309,19 @@ public class BaseAction extends ActionSupport {
 
 	@BeforeResult
 	public void preResult() throws Exception {
-		if (StringUtils.isNotBlank(targetUrl)
-				&& !hasErrors()
-				&& RequestUtils.isSameOrigin(ServletActionContext.getRequest()
-						.getRequestURL().toString(), targetUrl)) {
-			targetUrl = ServletActionContext.getResponse().encodeRedirectURL(
-					targetUrl);
-			ServletActionContext.getResponse().setHeader("X-Redirect-To",
-					targetUrl);
+		if (StringUtils.isNotBlank(targetUrl) && !hasErrors()
+				&& RequestUtils.isSameOrigin(ServletActionContext.getRequest().getRequestURL().toString(), targetUrl)) {
+			targetUrl = ServletActionContext.getResponse().encodeRedirectURL(targetUrl);
+			ServletActionContext.getResponse().setHeader("X-Redirect-To", targetUrl);
 		}
-		if (!(returnInput || !isAjax()
-				|| (captchaRequired && firstReachCaptchaThreshold) || !(isUseJson() || hasErrors())))
-			ActionContext.getContext().getActionInvocation()
-					.setResultCode(JSON);
+		if (!(returnInput || !isAjax() || (captchaRequired && firstReachCaptchaThreshold)
+				|| !(isUseJson() || hasErrors())))
+			ActionContext.getContext().getActionInvocation().setResultCode(JSON);
 	}
 
 	protected <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
 		return AnnotationUtils.getAnnotation(getClass(), annotationClass,
-				ActionContext.getContext().getActionInvocation().getProxy()
-						.getMethod());
+				ActionContext.getContext().getActionInvocation().getProxy().getMethod());
 	}
 
 	protected Authorize findAuthorize() {

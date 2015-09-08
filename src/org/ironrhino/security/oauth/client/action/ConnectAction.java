@@ -66,12 +66,10 @@ public class ConnectAction extends BaseAction {
 				OAuthProvider provider = oauthProviderManager.lookup(getUid());
 				if (provider == null)
 					return ACCESSDENIED;
-				StringBuilder sb = new StringBuilder(
-						RequestUtils.getBaseUrl(request));
+				StringBuilder sb = new StringBuilder(RequestUtils.getBaseUrl(request));
 				sb.append("/oauth/connect/auth/").append(provider.getName());
 				if (StringUtils.isNotBlank(targetUrl))
-					sb.append("?targetUrl=").append(
-							URLEncoder.encode(targetUrl, "UTF-8"));
+					sb.append("?targetUrl=").append(URLEncoder.encode(targetUrl, "UTF-8"));
 				targetUrl = provider.getAuthRedirectURL(request, sb.toString());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -104,8 +102,7 @@ public class ConnectAction extends BaseAction {
 				LoginEvent loginEvent;
 				user = (User) userManager.loadUserByUsername(id);
 				if (user != null) {
-					loginEvent = new LoginEvent(user.getUsername(),
-							request.getRemoteAddr(), "oauth",
+					loginEvent = new LoginEvent(user.getUsername(), request.getRemoteAddr(), "oauth",
 							provider.getName());
 				} else {
 					user = new User();
@@ -118,14 +115,12 @@ public class ConnectAction extends BaseAction {
 						} catch (UsernameNotFoundException e1) {
 							user.setEmail(p.getEmail());
 						}
-					user.setName(StringUtils.isNotBlank(p.getName()) ? p
-							.getName() : p.getDisplayName());
+					user.setName(StringUtils.isNotBlank(p.getName()) ? p.getName() : p.getDisplayName());
 					userManager.save(user);
-					eventPublisher.publish(new SignupEvent(user.getUsername(),
-							request.getRemoteAddr(), "oauth",
-							provider.getName()), Scope.LOCAL);
-					loginEvent = new LoginEvent(user.getUsername(),
-							request.getRemoteAddr(), "oauth",
+					eventPublisher.publish(
+							new SignupEvent(user.getUsername(), request.getRemoteAddr(), "oauth", provider.getName()),
+							Scope.LOCAL);
+					loginEvent = new LoginEvent(user.getUsername(), request.getRemoteAddr(), "oauth",
 							provider.getName());
 					loginEvent.setFirst(true);
 				}
@@ -145,9 +140,7 @@ public class ConnectAction extends BaseAction {
 	}
 
 	private boolean isEnabled() {
-		return settingControl.getBooleanValue(
-				Constants.SETTING_KEY_SIGNUP_ENABLED, false)
-				&& settingControl.getBooleanValue(
-						Constants.SETTING_KEY_OAUTH_ENABLED, false);
+		return settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false)
+				&& settingControl.getBooleanValue(Constants.SETTING_KEY_OAUTH_ENABLED, false);
 	}
 }

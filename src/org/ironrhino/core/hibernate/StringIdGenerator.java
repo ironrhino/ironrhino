@@ -10,8 +10,7 @@ import org.ironrhino.core.util.CodecUtils;
 public class StringIdGenerator implements IdentifierGenerator {
 
 	@Override
-	public Serializable generate(SessionImplementor session, Object obj)
-			throws HibernateException {
+	public Serializable generate(SessionImplementor session, Object obj) throws HibernateException {
 		return CodecUtils.nextId();
 	}
 

@@ -14,8 +14,7 @@ public class AuthorizeEvent extends AbstractAuditEvent {
 		super(username, remoteAddr);
 	}
 
-	public AuthorizeEvent(String username, String remoteAddr, String clientId,
-			String grantType) {
+	public AuthorizeEvent(String username, String remoteAddr, String clientId, String grantType) {
 		super(username, remoteAddr);
 		this.client = clientId;
 		this.grantType = grantType;

@@ -17,52 +17,35 @@ public class CustomAnnotationTypeFilter extends AnnotationTypeFilter {
 		super(annotationType);
 	}
 
-	public CustomAnnotationTypeFilter(
-			Class<? extends Annotation> annotationType,
-			boolean considerMetaAnnotations) {
+	public CustomAnnotationTypeFilter(Class<? extends Annotation> annotationType, boolean considerMetaAnnotations) {
 		super(annotationType, considerMetaAnnotations, false);
 	}
 
-	public CustomAnnotationTypeFilter(
-			Class<? extends Annotation> annotationType,
-			boolean considerMetaAnnotations, boolean considerInterfaces) {
+	public CustomAnnotationTypeFilter(Class<? extends Annotation> annotationType, boolean considerMetaAnnotations,
+			boolean considerInterfaces) {
 		super(annotationType, considerMetaAnnotations, considerInterfaces);
 	}
 
 	@Override
-	public boolean match(MetadataReader mr, MetadataReaderFactory mrf)
-			throws IOException {
+	public boolean match(MetadataReader mr, MetadataReaderFactory mrf) throws IOException {
 		if (!super.match(mr, mrf))
 			return false;
 		AnnotationMetadata metadata = mr.getAnnotationMetadata();
-		Map<String, Object> attributes = metadata
-				.getAnnotationAttributes(RunLevelConditional.class.getName());
+		Map<String, Object> attributes = metadata.getAnnotationAttributes(RunLevelConditional.class.getName());
 		if (attributes != null
-				&& !RunLevelCondition.matches(
-						(RunLevel) attributes.get("value"),
-						(Boolean) attributes.get("negated")))
+				&& !RunLevelCondition.matches((RunLevel) attributes.get("value"), (Boolean) attributes.get("negated")))
 			return false;
-		attributes = metadata.getAnnotationAttributes(StageConditional.class
-				.getName());
+		attributes = metadata.getAnnotationAttributes(StageConditional.class.getName());
 		if (attributes != null
-				&& !StageCondition.matches((Stage) attributes.get("value"),
-						(Boolean) attributes.get("negated")))
+				&& !StageCondition.matches((Stage) attributes.get("value"), (Boolean) attributes.get("negated")))
 			return false;
-		attributes = metadata
-				.getAnnotationAttributes(ClassPresentConditional.class
-						.getName());
-		if (attributes != null
-				&& !ClassPresentCondition.matches(
-						(String) attributes.get("value"),
-						(Boolean) attributes.get("negated")))
+		attributes = metadata.getAnnotationAttributes(ClassPresentConditional.class.getName());
+		if (attributes != null && !ClassPresentCondition.matches((String) attributes.get("value"),
+				(Boolean) attributes.get("negated")))
 			return false;
-		attributes = metadata
-				.getAnnotationAttributes(ResourcePresentConditional.class
-						.getName());
-		if (attributes != null
-				&& !ResourcePresentCondition.matches(
-						(String) attributes.get("value"),
-						(Boolean) attributes.get("negated")))
+		attributes = metadata.getAnnotationAttributes(ResourcePresentConditional.class.getName());
+		if (attributes != null && !ResourcePresentCondition.matches((String) attributes.get("value"),
+				(Boolean) attributes.get("negated")))
 			return false;
 		return true;
 	}

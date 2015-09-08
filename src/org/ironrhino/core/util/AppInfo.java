@@ -77,8 +77,7 @@ public class AppInfo {
 		String name = null;
 		String address = "127.0.0.1";
 		try {
-			InetAddress[] addresses = InetAddress.getAllByName(InetAddress
-					.getLocalHost().getHostName());
+			InetAddress[] addresses = InetAddress.getAllByName(InetAddress.getLocalHost().getHostName());
 			for (InetAddress addr : addresses) {
 				String ip = addr.getHostAddress();
 				if (ip.split("\\.").length != 4 || ip.startsWith("169.254."))
@@ -152,8 +151,7 @@ public class AppInfo {
 
 	public static String getInstanceId() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getAppName()).append("-").append(_instanceId).append("@")
-				.append(getHostAddress());
+		sb.append(getAppName()).append("-").append(_instanceId).append("@").append(getHostAddress());
 		int httpPort = getHttpPort();
 		if (httpPort > 0)
 			sb.append(':').append(httpPort);
@@ -169,8 +167,7 @@ public class AppInfo {
 			String userhome = System.getProperty("user.home");
 			if (userhome.indexOf("nonexistent") >= 0) // for cloudfoundry
 				userhome = System.getenv().get("HOME");
-			home = userhome.replace('\\', File.separatorChar) + File.separator
-					+ name;
+			home = userhome.replace('\\', File.separatorChar) + File.separator + name;
 		}
 		return home;
 	}

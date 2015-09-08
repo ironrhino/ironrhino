@@ -37,23 +37,19 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void put(String key, Object value, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		put(key, value, -1, timeToLive, timeUnit, namespace);
 	}
 
 	@Override
-	public void put(String key, Object value, int timeToIdle, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void put(String key, Object value, int timeToIdle, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (key == null || value == null)
 			return;
 		Cache cache = getCache(namespace, true);
 		if (cache != null)
 			cache.put(new Element(key, value, timeToLive <= 0 ? true : null,
-					timeToIdle > 0 ? (int) timeUnit.toSeconds(timeToIdle)
-							: null,
-					timeToIdle <= 0 && timeToLive > 0 ? (int) timeUnit
-							.toSeconds(timeToLive) : null));
+					timeToIdle > 0 ? (int) timeUnit.toSeconds(timeToIdle) : null,
+					timeToIdle <= 0 && timeToLive > 0 ? (int) timeUnit.toSeconds(timeToLive) : null));
 	}
 
 	@Override
@@ -78,8 +74,7 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToIdle,
-			TimeUnit timeUnit) {
+	public Object get(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
 		if (key == null)
 			return null;
 		Cache cache = getCache(namespace, false);
@@ -106,16 +101,13 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mput(Map<String, Object> map, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public void mput(Map<String, Object> map, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (map == null)
 			return;
 		Cache cache = getCache(namespace, true);
 		for (Map.Entry<String, Object> entry : map.entrySet())
-			cache.put(new Element(entry.getKey(), entry.getValue(),
-					timeToLive <= 0 ? true : null, null,
-					timeToLive > 0 ? (int) timeUnit.toSeconds(timeToLive)
-							: null));
+			cache.put(new Element(entry.getKey(), entry.getValue(), timeToLive <= 0 ? true : null, null,
+					timeToLive > 0 ? (int) timeUnit.toSeconds(timeToLive) : null));
 	}
 
 	@Override
@@ -152,36 +144,31 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
-	public boolean putIfAbsent(String key, Object value, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (key == null || value == null)
 			return false;
 		Cache cache = getCache(namespace, true);
 		if (cache != null)
-			return cache.putIfAbsent(new Element(key, value,
-					timeToLive <= 0 ? true : null, null, (int) timeUnit
-							.toSeconds(timeToLive))) == null;
+			return cache.putIfAbsent(new Element(key, value, timeToLive <= 0 ? true : null, null,
+					(int) timeUnit.toSeconds(timeToLive))) == null;
 		else
 			return false;
 	}
 
 	@Override
-	public long increment(String key, long delta, int timeToLive,
-			TimeUnit timeUnit, String namespace) {
+	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (key == null || delta == 0)
 			return -1;
 		Cache cache = getCache(namespace, true);
 		if (cache != null) {
-			Element element = cache.putIfAbsent(new Element(key,
-					new Long(delta), timeToLive <= 0 ? true : null, null,
+			Element element = cache.putIfAbsent(new Element(key, new Long(delta), timeToLive <= 0 ? true : null, null,
 					(int) timeUnit.toSeconds(timeToLive)));
 			if (element == null) {
 				return delta;
 			} else {
 				long value = ((long) element.getObjectValue()) + delta;
-				cache.put(new Element(key, new Long(value),
-						timeToLive <= 0 ? true : null, null, (int) timeUnit
-								.toSeconds(timeToLive)));
+				cache.put(new Element(key, new Long(value), timeToLive <= 0 ? true : null, null,
+						(int) timeUnit.toSeconds(timeToLive)));
 				return value;
 			}
 		} else

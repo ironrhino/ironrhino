@@ -26,8 +26,7 @@ public class FileUtils {
 		if (!file.exists() || !file.canRead())
 			throw new RuntimeException(file + "doesn't exists or cannot read");
 		if (file.isDirectory()) {
-			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(
-					zipFile));
+			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
 			zipDirctory(out, file, "");
 			out.close();
 		} else {
@@ -63,8 +62,7 @@ public class FileUtils {
 		return new File(zipFile);
 	}
 
-	private static void zipDirctory(ZipOutputStream out, File file, String base)
-			throws Exception {
+	private static void zipDirctory(ZipOutputStream out, File file, String base) throws Exception {
 		if (file.isDirectory()) {
 			File[] fl = file.listFiles();
 			if (fl == null)
@@ -95,8 +93,7 @@ public class FileUtils {
 			if (attrs == null)
 				return null;
 			Map<String, String> map = new HashMap<>();
-			for (Map.Entry<Object, Object> entry : mf.getMainAttributes()
-					.entrySet())
+			for (Map.Entry<Object, Object> entry : mf.getMainAttributes().entrySet())
 				map.put(entry.getKey().toString(), entry.getValue().toString());
 			return map;
 		} catch (IOException e) {

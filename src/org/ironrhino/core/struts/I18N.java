@@ -24,12 +24,10 @@ public class I18N {
 
 	public static String getText(Class<?> clazz, String key, Object[] args) {
 		ActionContext context = ActionContext.getContext();
-		Locale locale = context != null ? context.getLocale() : Locale
-				.getDefault();
+		Locale locale = context != null ? context.getLocale() : Locale.getDefault();
 		ValueStack vs = context != null ? context.getValueStack() : null;
 		try {
-			return LocalizedTextUtil
-					.findText(clazz, key, locale, key, args, vs);
+			return LocalizedTextUtil.findText(clazz, key, locale, key, args, vs);
 		} catch (Exception e) {
 			return key;
 		}
@@ -41,11 +39,9 @@ public class I18N {
 			try {
 				map.put(en.name(),
 						LocalizedTextUtil.findText(
-								clazz,
-								en.name(),
-								ActionContext.getContext() != null ? ActionContext
-										.getContext().getLocale() : Locale
-										.getDefault(), en.name(), null));
+								clazz, en.name(), ActionContext.getContext() != null
+										? ActionContext.getContext().getLocale() : Locale.getDefault(),
+								en.name(), null));
 			} catch (Exception e) {
 				map.put(en.name(), en.name());
 			}

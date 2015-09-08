@@ -23,8 +23,8 @@ public class JsonResult implements Result {
 
 	private String generateJson(ActionInvocation invocation) {
 		Object action = invocation.getAction();
-		Method method = BeanUtils.findDeclaredMethod(action.getClass(),
-				invocation.getProxy().getMethod(), new Class[0]);
+		Method method = BeanUtils.findDeclaredMethod(action.getClass(), invocation.getProxy().getMethod(),
+				new Class[0]);
 		if (method == null)
 			return "";
 		JsonConfig jsonConfig = method.getAnnotation(JsonConfig.class);
@@ -40,12 +40,10 @@ public class JsonResult implements Result {
 			if (validationAwareAction.hasErrors()) {
 				hasErrors = true;
 				if (validationAwareAction.hasActionErrors()) {
-					map.put("actionErrors",
-							validationAwareAction.getActionErrors());
+					map.put("actionErrors", validationAwareAction.getActionErrors());
 				}
 				if (validationAwareAction.hasFieldErrors()) {
-					map.put("fieldErrors",
-							validationAwareAction.getFieldErrors());
+					map.put("fieldErrors", validationAwareAction.getFieldErrors());
 				}
 				return JsonUtils.toJson(map);
 			}
@@ -54,16 +52,14 @@ public class JsonResult implements Result {
 			// }
 			if (validationAwareAction.hasActionMessages()) {
 				// map.put("hasActionMessages", true);
-				map.put("actionMessages",
-						validationAwareAction.getActionMessages());
+				map.put("actionMessages", validationAwareAction.getActionMessages());
 			}
 			// else {
 			// map.put("hasActionMessages", false);
 			// }
 		}
 		if (!hasErrors) {
-			if (jsonConfig == null || jsonConfig.propertyName() == null
-					|| jsonConfig.propertyName().length == 0) {
+			if (jsonConfig == null || jsonConfig.propertyName() == null || jsonConfig.propertyName().length == 0) {
 				return JsonUtils.toJson(map);
 			}
 			String[] propertyNameArray = jsonConfig.propertyName();
@@ -87,8 +83,7 @@ public class JsonResult implements Result {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		String encoding = response.getCharacterEncoding();
 		if (StringUtils.isNotBlank(jsonp))
-			response.setContentType("application/javascript;charset="
-					+ encoding);
+			response.setContentType("application/javascript;charset=" + encoding);
 		else
 			response.setContentType("application/json;charset=" + encoding);
 		if (!response.containsHeader("Cache-Control")) {

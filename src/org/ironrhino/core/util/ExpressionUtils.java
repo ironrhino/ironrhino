@@ -19,8 +19,7 @@ public class ExpressionUtils {
 
 	private static Map<String, CompiledExpression> expressionCache = new ConcurrentHashMap<>();
 
-	public static Object evalExpression(String expression,
-			Map<String, ?> context) {
+	public static Object evalExpression(String expression, Map<String, ?> context) {
 		if (StringUtils.isBlank(expression))
 			return expression;
 
@@ -50,8 +49,7 @@ public class ExpressionUtils {
 		return obj.toString();
 	}
 
-	public static boolean evalBoolean(String template, Map<String, ?> context,
-			boolean defaultValue) {
+	public static boolean evalBoolean(String template, Map<String, ?> context, boolean defaultValue) {
 		if (StringUtils.isBlank(template))
 			return defaultValue;
 		Object obj = eval(template, context);
@@ -62,8 +60,7 @@ public class ExpressionUtils {
 		return Boolean.parseBoolean(obj.toString());
 	}
 
-	public static int evalInt(String template, Map<String, ?> context,
-			int defaultValue) {
+	public static int evalInt(String template, Map<String, ?> context, int defaultValue) {
 		if (StringUtils.isBlank(template))
 			return defaultValue;
 		Object obj = eval(template, context);
@@ -74,8 +71,7 @@ public class ExpressionUtils {
 		return Integer.parseInt(obj.toString());
 	}
 
-	public static long evalLong(String template, Map<String, ?> context,
-			long defaultValue) {
+	public static long evalLong(String template, Map<String, ?> context, long defaultValue) {
 		if (StringUtils.isBlank(template))
 			return defaultValue;
 		Object obj = eval(template, context);
@@ -86,8 +82,7 @@ public class ExpressionUtils {
 		return Long.parseLong(obj.toString());
 	}
 
-	public static double evalDouble(String template, Map<String, ?> context,
-			double defaultValue) {
+	public static double evalDouble(String template, Map<String, ?> context, double defaultValue) {
 		if (StringUtils.isBlank(template))
 			return defaultValue;
 		Object obj = eval(template, context);

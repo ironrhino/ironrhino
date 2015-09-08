@@ -112,7 +112,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	@NotInCopy
 	@JsonIgnore
 	@Column(length = 4000)
-	@Convert(converter=StringMapConverter.class)
+	@Convert(converter = StringMapConverter.class)
 	@UiConfig(hidden = true)
 	private Map<String, String> attributes;
 
@@ -208,8 +208,8 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	public void setRolesAsString(String rolesAsString) {
 		roles.clear();
 		if (StringUtils.isNotBlank(rolesAsString))
-			roles.addAll(Arrays.asList(org.ironrhino.core.util.StringUtils
-					.trimTail(rolesAsString, ",").split("\\s*,\\s*")));
+			roles.addAll(
+					Arrays.asList(org.ironrhino.core.util.StringUtils.trimTail(rolesAsString, ",").split("\\s*,\\s*")));
 	}
 
 	@Override

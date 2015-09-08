@@ -38,15 +38,12 @@ public class MyFreemarkerPageFilter extends SiteMeshFilter {
 		ServletContext sc = filterConfig.getServletContext();
 		Factory instance = (Factory) sc.getAttribute(SITEMESH_FACTORY);
 		if (instance == null)
-			sc.setAttribute(SITEMESH_FACTORY, new StrutsSiteMeshFactory(
-					new Config(filterConfig)));
+			sc.setAttribute(SITEMESH_FACTORY, new StrutsSiteMeshFactory(new Config(filterConfig)));
 	}
 
 	@Override
-	protected DecoratorSelector initDecoratorSelector(
-			SiteMeshWebAppContext webAppContext) {
+	protected DecoratorSelector initDecoratorSelector(SiteMeshWebAppContext webAppContext) {
 		Factory factory = Factory.getInstance(new Config(filterConfig));
-		return new MyFreemarkerMapper2DecoratorSelector(
-				factory.getDecoratorMapper());
+		return new MyFreemarkerMapper2DecoratorSelector(factory.getDecoratorMapper());
 	}
 }

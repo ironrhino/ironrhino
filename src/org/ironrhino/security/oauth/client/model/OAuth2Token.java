@@ -48,8 +48,7 @@ public class OAuth2Token extends OAuthToken {
 					create_time = node.asLong();
 				} else {
 					create_time = System.currentTimeMillis();
-					StringBuilder sb = new StringBuilder(source.substring(0,
-							source.length() - 1));
+					StringBuilder sb = new StringBuilder(source.substring(0, source.length() - 1));
 					sb.append(",\"create_time\":");
 					sb.append(create_time);
 					sb.append("}");
@@ -121,8 +120,7 @@ public class OAuth2Token extends OAuthToken {
 		this.create_time = create_time;
 		if (expires_in > 0) {
 			if (JsonUtils.isValidJson(source)) {
-				StringBuilder sb = new StringBuilder(source.substring(0,
-						source.length() - 1));
+				StringBuilder sb = new StringBuilder(source.substring(0, source.length() - 1));
 				sb.append(",\"create_time\":");
 				sb.append(create_time);
 				sb.append("}");

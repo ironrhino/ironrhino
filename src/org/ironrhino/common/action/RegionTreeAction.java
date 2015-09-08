@@ -54,8 +54,7 @@ public class RegionTreeAction extends BaseAction {
 			region = regionTreeControl.getTree().getDescendantOrSelfById(parent);
 		if (region != null)
 			children = region.getChildren();
-		ServletActionContext.getResponse().setHeader("Cache-Control",
-				"max-age=86400");
+		ServletActionContext.getResponse().setHeader("Cache-Control", "max-age=86400");
 		return JSON;
 	}
 
@@ -66,8 +65,7 @@ public class RegionTreeAction extends BaseAction {
 			if (parent < 1)
 				region = regionTreeControl.getTree();
 			else
-				region = regionTreeControl.getTree().getDescendantOrSelfById(
-						parent);
+				region = regionTreeControl.getTree().getDescendantOrSelfById(parent);
 			children = region.getChildren();
 		}
 		return SUCCESS;

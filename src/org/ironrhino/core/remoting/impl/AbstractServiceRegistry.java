@@ -47,15 +47,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@SuppressWarnings("unchecked")
 	public void init() {
-		host = AppInfo.getHostAddress()
-				+ ":"
-				+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort()
-						: DEFAULT_PORT);
+		host = AppInfo.getHostAddress() + ":" + (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_PORT);
 		prepare();
 		String[] beanNames = ctx.getBeanDefinitionNames();
 		for (String beanName : beanNames) {
-			BeanDefinition bd = ctx.getBeanFactory()
-					.getBeanDefinition(beanName);
+			BeanDefinition bd = ctx.getBeanFactory().getBeanDefinition(beanName);
 			if (!bd.isSingleton())
 				continue;
 			String beanClassName = bd.getBeanClassName();
@@ -68,11 +64,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				log.error(e.getMessage(), e);
 				continue;
 			}
-			if (beanClassName.startsWith("org.ironrhino.core.remoting.client.")
-					&& beanClassName.endsWith("Client")) {
+			if (beanClassName.startsWith("org.ironrhino.core.remoting.client.") && beanClassName.endsWith("Client")) {
 				// remoting_client
-				String serviceName = (String) bd.getPropertyValues()
-						.getPropertyValue("serviceInterface").getValue();
+				String serviceName = (String) bd.getPropertyValues().getPropertyValue("serviceInterface").getValue();
 				importServices.put(serviceName, Collections.EMPTY_LIST);
 			} else {
 				export(clazz, beanName, beanClassName);
@@ -96,24 +90,20 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 						classes = interfaces;
 				}
 				if (classes.length == 0) {
-					log.warn(
-							"@Remoting on concrete class [{}] must assign interfaces to export services",
+					log.warn("@Remoting on concrete class [{}] must assign interfaces to export services",
 							clazz.getName());
 				} else {
 					for (Class<?> inte : classes) {
 						if (!inte.isInterface()) {
-							log.warn(
-									"class [{}] in @Remoting on class [{}] must be interface",
-									inte.getName(), clazz.getName());
+							log.warn("class [{}] in @Remoting on class [{}] must be interface", inte.getName(),
+									clazz.getName());
 						} else if (!inte.isAssignableFrom(clazz)) {
-							log.warn(
-									" class [{}] must implements interface [{}] in @Remoting",
-									clazz.getName(), inte.getName());
+							log.warn(" class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
+									inte.getName());
 						} else {
-							exportServices.put(inte.getName(),
-									ctx.getBean(beanName));
-							log.info(" exported service [{}] for bean [{}#{}]",
-									inte.getName(), beanClassName, beanName);
+							exportServices.put(inte.getName(), ctx.getBean(beanName));
+							log.info(" exported service [{}] for bean [{}#{}]", inte.getName(), beanClassName,
+									beanName);
 						}
 					}
 				}
@@ -128,8 +118,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			Remoting remoting = clazz.getAnnotation(Remoting.class);
 			if (remoting != null) {
 				exportServices.put(clazz.getName(), ctx.getBean(beanName));
-				log.info(" exported service [{}] for bean [{}#{}]",
-						clazz.getName(), beanClassName, beanName);
+				log.info(" exported service [{}] for bean [{}#{}]", clazz.getName(), beanClassName, beanName);
 			}
 			for (Class<?> c : clazz.getInterfaces())
 				export(c, beanName, beanClassName);
@@ -149,8 +138,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	public String discover(String serviceName) {
 		List<String> hosts = getImportServices().get(serviceName);
 		if (hosts != null && hosts.size() > 0) {
-			String host = hosts.get(ThreadLocalRandom.current().nextInt(
-					hosts.size()));
+			String host = hosts.get(ThreadLocalRandom.current().nextInt(hosts.size()));
 			onDiscover(serviceName, host);
 			return host;
 		} else {

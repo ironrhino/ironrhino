@@ -41,8 +41,8 @@ public class OptimizeTrafficFilter implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest rq, ServletResponse rs,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest rq, ServletResponse rs, FilterChain chain)
+			throws IOException, ServletException {
 		if (!etag && !compress)
 			chain.doFilter(rq, rs);
 		HttpServletRequest request = (HttpServletRequest) rq;
@@ -57,45 +57,35 @@ public class OptimizeTrafficFilter implements Filter {
 				response.setHeader("ETag", token);
 				String previousToken = request.getHeader("If-None-Match");
 				if (previousToken != null && previousToken.equals(token)) {
-					response.setHeader("Last-Modified",
-							request.getHeader("If-Modified-Since"));
+					response.setHeader("Last-Modified", request.getHeader("If-Modified-Since"));
 					response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
 					notmodified = true;
 				} else {
 					Calendar cal = Calendar.getInstance();
 					cal.set(Calendar.MILLISECOND, 0);
 					Date lastModified = cal.getTime();
-					response.setDateHeader("Last-Modified",
-							lastModified.getTime());
+					response.setDateHeader("Last-Modified", lastModified.getTime());
 				}
 			}
 			if (!notmodified) {
-				if (compress && brw.getContentType() != null
-						&& brw.getContentType().indexOf("text") >= 0) {
-					String acceptEncoding = request
-							.getHeader("Accept-Encoding");
+				if (compress && brw.getContentType() != null && brw.getContentType().indexOf("text") >= 0) {
+					String acceptEncoding = request.getHeader("Accept-Encoding");
 					if (acceptEncoding != null) {
 						acceptEncoding = acceptEncoding.toLowerCase();
 						if (acceptEncoding.indexOf("gzip") >= 0) {
-							ByteArrayOutputStream boas = new ByteArrayOutputStream(
-									10 * 1024);
+							ByteArrayOutputStream boas = new ByteArrayOutputStream(10 * 1024);
 							GZIPOutputStream gzos = new GZIPOutputStream(boas);
 							gzos.write(bytes);
 							gzos.flush();
 							gzos.close();
 							bytes = boas.toByteArray();
-							response.setHeader(
-									"Content-Encoding",
-									acceptEncoding.indexOf("x-gzip") >= 0 ? "x-gzip"
-											: "gzip");
+							response.setHeader("Content-Encoding",
+									acceptEncoding.indexOf("x-gzip") >= 0 ? "x-gzip" : "gzip");
 						} else if (acceptEncoding.indexOf("deflate") >= 0) {
 							// has problem with IE6
-							ByteArrayOutputStream boas = new ByteArrayOutputStream(
-									bytes.length / 2);
-							DeflaterOutputStream dfos = new DeflaterOutputStream(
-									boas, new Deflater(
-											Deflater.BEST_COMPRESSION),
-									bytes.length / 2);
+							ByteArrayOutputStream boas = new ByteArrayOutputStream(bytes.length / 2);
+							DeflaterOutputStream dfos = new DeflaterOutputStream(boas,
+									new Deflater(Deflater.BEST_COMPRESSION), bytes.length / 2);
 							dfos.write(bytes);
 							dfos.flush();
 							dfos.close();
@@ -127,8 +117,7 @@ public class OptimizeTrafficFilter implements Filter {
 		if ("false".equals(filterConfig.getInitParameter("compress")))
 			compress = false;
 		if (filterConfig.getInitParameter("cacheSeconds") != null)
-			cacheSeconds = Integer.valueOf(filterConfig
-					.getInitParameter("cacheSeconds"));
+			cacheSeconds = Integer.valueOf(filterConfig.getInitParameter("cacheSeconds"));
 	}
 
 	@Override

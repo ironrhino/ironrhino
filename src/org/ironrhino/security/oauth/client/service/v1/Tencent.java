@@ -63,8 +63,7 @@ public class Tencent extends OAuth1Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		JsonNode data = JsonUtils.getObjectMapper()
-				.readValue(content, JsonNode.class).get("data");
+		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class).get("data");
 		JsonNode node = data.get("uid");
 		String uid = null;
 		String name = data.get("name").textValue();

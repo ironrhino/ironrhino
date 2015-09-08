@@ -52,14 +52,11 @@ public class ApplicationContextConsole {
 	public Map<String, Object> getBeans() {
 		if (beans.isEmpty()) {
 			if (servletContext != null)
-				beans.put(
-						"freemarkerConfiguration",
-						servletContext
-								.getAttribute(FreemarkerManager.CONFIG_SERVLET_CONTEXT_KEY));
+				beans.put("freemarkerConfiguration",
+						servletContext.getAttribute(FreemarkerManager.CONFIG_SERVLET_CONTEXT_KEY));
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
-				if (StringUtils.isAlphanumeric(beanName.replaceAll("_", ""))
-						&& ctx.isSingleton(beanName))
+				if (StringUtils.isAlphanumeric(beanName.replaceAll("_", "")) && ctx.isSingleton(beanName))
 					beans.put(beanName, ctx.getBean(beanName));
 			}
 		}
@@ -73,27 +70,18 @@ public class ApplicationContextConsole {
 			// Scope.APPLICATION);
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
-				if (StringUtils.isAlphanumeric(beanName)
-						&& ctx.isSingleton(beanName)) {
+				if (StringUtils.isAlphanumeric(beanName) && ctx.isSingleton(beanName)) {
 					try {
-						String beanClassName = ctx.getBeanDefinition(beanName)
-								.getBeanClassName();
-						Class<?> clz = beanClassName != null ? Class
-								.forName(beanClassName) : ReflectionUtils
-								.getTargetObject(ctx.getBean(beanName))
-								.getClass();
-						Set<Method> methods = AnnotationUtils
-								.getAnnotatedMethods(clz, Trigger.class);
+						String beanClassName = ctx.getBeanDefinition(beanName).getBeanClassName();
+						Class<?> clz = beanClassName != null ? Class.forName(beanClassName)
+								: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
+						Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);
 						for (Method m : methods) {
 							int modifiers = m.getModifiers();
-							if (Modifier.isPublic(modifiers)
-									&& m.getParameterTypes().length == 0) {
-								StringBuilder expression = new StringBuilder(
-										beanName);
-								expression.append(".").append(m.getName())
-										.append("()");
-								triggers.put(expression.toString(), m
-										.getAnnotation(Trigger.class).scope());
+							if (Modifier.isPublic(modifiers) && m.getParameterTypes().length == 0) {
+								StringBuilder expression = new StringBuilder(beanName);
+								expression.append(".").append(m.getName()).append("()");
+								triggers.put(expression.toString(), m.getAnnotation(Trigger.class).scope());
 							}
 						}
 					} catch (NoSuchBeanDefinitionException e) {
@@ -115,8 +103,7 @@ public class ApplicationContextConsole {
 			value = executeMethodInvocation(expression);
 		}
 		if (scope != null && scope != Scope.LOCAL)
-			eventPublisher.publish(new ExpressionEvent(expression),
-					Scope.GLOBAL);
+			eventPublisher.publish(new ExpressionEvent(expression), Scope.GLOBAL);
 		return value;
 	}
 
@@ -128,14 +115,12 @@ public class ApplicationContextConsole {
 			methodName = methodName.substring(0, methodName.indexOf('('));
 			Object bean = getBeans().get(beanName);
 			if (bean == null)
-				throw new IllegalArgumentException("bean[" + beanName
-						+ "] doesn't exists");
+				throw new IllegalArgumentException("bean[" + beanName + "] doesn't exists");
 			try {
 				Method m = bean.getClass().getMethod(methodName, new Class[0]);
 				return m.invoke(bean, new Object[0]);
 			} catch (NoSuchMethodException e) {
-				throw new IllegalArgumentException("bean[" + beanName
-						+ "] has no such method: " + arr[1]);
+				throw new IllegalArgumentException("bean[" + beanName + "] has no such method: " + arr[1]);
 			}
 		} else {
 			return ExpressionUtils.evalExpression(expression, getBeans());
@@ -146,13 +131,11 @@ public class ApplicationContextConsole {
 		try {
 			Object bean = null;
 			if (expression.indexOf('=') > 0) {
-				bean = getBeans().get(
-						expression.substring(0, expression.indexOf('.')));
+				bean = getBeans().get(expression.substring(0, expression.indexOf('.')));
 			}
 			ExpressionUtils.evalExpression(expression, getBeans());
 			if (bean != null) {
-				Method m = AnnotationUtils.getAnnotatedMethod(bean.getClass(),
-						PostPropertiesReset.class);
+				Method m = AnnotationUtils.getAnnotatedMethod(bean.getClass(), PostPropertiesReset.class);
 				if (m != null)
 					m.invoke(bean, new Object[0]);
 			}

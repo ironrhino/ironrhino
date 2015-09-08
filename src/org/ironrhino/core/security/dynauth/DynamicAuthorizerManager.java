@@ -18,21 +18,17 @@ public class DynamicAuthorizerManager {
 	@Autowired(required = false)
 	private List<DynamicAuthorizer> authorizers;
 
-	public boolean authorize(Class<?> authorizer, UserDetails user,
-			String resource) {
+	public boolean authorize(Class<?> authorizer, UserDetails user, String resource) {
 		return authorize(authorizer.getName(), user, resource);
 	}
 
-	public boolean authorize(String authorizer, UserDetails user,
-			String resource) {
+	public boolean authorize(String authorizer, UserDetails user, String resource) {
 		if (authorizers != null) {
 			for (DynamicAuthorizer entry : authorizers) {
 				if (entry.getClass().getName().equals(authorizer))
 					return entry.authorize(user, resource);
 			}
-			logger.error(
-					"not found authorizer [{}] in spring applicationContext",
-					authorizer);
+			logger.error("not found authorizer [{}] in spring applicationContext", authorizer);
 		}
 		return false;
 	}

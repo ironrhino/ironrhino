@@ -17,8 +17,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public class ElasticSearchClientFactoryBean implements FactoryBean<Client>,
-		InitializingBean, DisposableBean {
+public class ElasticSearchClientFactoryBean implements FactoryBean<Client>, InitializingBean, DisposableBean {
 
 	private Client client;
 
@@ -45,22 +44,19 @@ public class ElasticSearchClientFactoryBean implements FactoryBean<Client>,
 			map.put("path.home", AppInfo.getAppHome() + "/search");
 			if (settings != null)
 				map.putAll(settings);
-			Settings settings = ImmutableSettings.settingsBuilder().put(map)
-					.build();
+			Settings settings = ImmutableSettings.settingsBuilder().put(map).build();
 			Node node = nodeBuilder().settings(settings).node();
 			client = node.client();
 		} else {
 			Map<String, String> map = new HashMap<>();
 			if (settings != null)
 				map.putAll(settings);
-			Settings settings = ImmutableSettings.settingsBuilder().put(map)
-					.build();
+			Settings settings = ImmutableSettings.settingsBuilder().put(map).build();
 			TransportClient tclient = new TransportClient(settings);
 			for (String s : connectString.split("\\s*,\\s*")) {
 				String arr[] = s.trim().split(":", 2);
-				tclient.addTransportAddress(new InetSocketTransportAddress(
-						arr[0], arr.length == 2 ? Integer.valueOf(arr[1])
-								: 9300));
+				tclient.addTransportAddress(
+						new InetSocketTransportAddress(arr[0], arr.length == 2 ? Integer.valueOf(arr[1]) : 9300));
 			}
 			client = tclient;
 		}

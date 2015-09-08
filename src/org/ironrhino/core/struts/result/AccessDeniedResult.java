@@ -14,10 +14,9 @@ public class AccessDeniedResult extends AutoConfigResult {
 
 	private static final long serialVersionUID = 5774314746245962433L;
 
-	static boolean springSecurityPresent = ClassUtils
-			.isPresent(
-					"org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint",
-					AccessDeniedResult.class.getClassLoader());
+	static boolean springSecurityPresent = ClassUtils.isPresent(
+			"org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint",
+			AccessDeniedResult.class.getClassLoader());
 
 	@Override
 	public void execute(ActionInvocation invocation) throws Exception {
@@ -28,9 +27,8 @@ public class AccessDeniedResult extends AutoConfigResult {
 			HttpServletResponse response = ServletActionContext.getResponse();
 			if (AuthzUtils.getUserDetails() == null) {
 				if (defaultLoginUrlAuthenticationEntryPoint != null)
-					response.sendRedirect(response
-							.encodeRedirectURL(defaultLoginUrlAuthenticationEntryPoint
-									.buildRedirectUrlToLoginPage(request)));
+					response.sendRedirect(response.encodeRedirectURL(
+							defaultLoginUrlAuthenticationEntryPoint.buildRedirectUrlToLoginPage(request)));
 				else
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} else {

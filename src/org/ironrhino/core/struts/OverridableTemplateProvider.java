@@ -10,7 +10,6 @@ public interface OverridableTemplateProvider {
 
 	public void setConfiguration(Configuration configuration);
 
-	public Template getTemplate(String name, Locale locale, String encoding,
-			boolean parseAsFTL) throws IOException;
+	public Template getTemplate(String name, Locale locale, String encoding, boolean parseAsFTL) throws IOException;
 
 }

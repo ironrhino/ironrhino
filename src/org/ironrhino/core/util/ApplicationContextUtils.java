@@ -14,8 +14,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ApplicationContextUtils {
 
 	public static ApplicationContext getApplicationContext() {
-		return WebApplicationContextUtils
-				.getWebApplicationContext(AppInfoListener.SERVLET_CONTEXT);
+		return WebApplicationContextUtils.getWebApplicationContext(AppInfoListener.SERVLET_CONTEXT);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -34,7 +33,7 @@ public class ApplicationContextUtils {
 			return null;
 		}
 	}
-	
+
 	public static <T> Map<String, T> getBeansOfType(Class<T> t) {
 		try {
 			return getApplicationContext().getBeansOfType(t);
@@ -44,16 +43,12 @@ public class ApplicationContextUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Persistable<?>> BaseManager<T> getEntityManager(
-			Class<T> entityClass) {
-		String entityManagerName = StringUtils.uncapitalize(entityClass
-				.getSimpleName()) + "Manager";
+	public static <T extends Persistable<?>> BaseManager<T> getEntityManager(Class<T> entityClass) {
+		String entityManagerName = StringUtils.uncapitalize(entityClass.getSimpleName()) + "Manager";
 		try {
-			return (BaseManager<T>) getApplicationContext().getBean(
-					entityManagerName);
+			return (BaseManager<T>) getApplicationContext().getBean(entityManagerName);
 		} catch (NoSuchBeanDefinitionException e) {
-			EntityManager<T> entityManager = ApplicationContextUtils
-					.getBean(EntityManager.class);
+			EntityManager<T> entityManager = ApplicationContextUtils.getBean(EntityManager.class);
 			entityManager.setEntityClass(entityClass);
 			return entityManager;
 		}

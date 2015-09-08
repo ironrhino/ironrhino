@@ -12,11 +12,8 @@ public class SimpleLoginEventListener {
 
 	@EventListener
 	public void onApplicationEvent(LoginEvent event) {
-		logger.info(
-				event.getUsername()
-						+ " login from {}"
-						+ (event.getProvider() == null ? "" : ", via "
-								+ event.getProvider()), event.getRemoteAddr());
+		logger.info(event.getUsername() + " login from {}"
+				+ (event.getProvider() == null ? "" : ", via " + event.getProvider()), event.getRemoteAddr());
 	}
 
 }

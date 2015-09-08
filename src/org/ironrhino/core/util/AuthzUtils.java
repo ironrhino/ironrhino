@@ -20,8 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AuthzUtils {
 
 	public static Object authentication(String property) {
-		Authentication auth = SecurityContextHolder.getContext()
-				.getAuthentication();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null)
 			return null;
 		if (auth.getPrincipal() == null)
@@ -34,20 +33,17 @@ public class AuthzUtils {
 		}
 	}
 
-	public static boolean authorize(String ifAllGranted, String ifAnyGranted,
+	public static boolean authorize(String ifAllGranted, String ifAnyGranted, String ifNotGranted) {
+		return authorizeRoles(getRoleNames(), ifAllGranted, ifAnyGranted, ifNotGranted);
+	}
+
+	public static boolean authorizeUserDetails(UserDetails user, String ifAllGranted, String ifAnyGranted,
 			String ifNotGranted) {
-		return authorizeRoles(getRoleNames(), ifAllGranted, ifAnyGranted,
-				ifNotGranted);
+		return authorizeRoles(getRoleNamesFromUserDetails(user), ifAllGranted, ifAnyGranted, ifNotGranted);
 	}
 
-	public static boolean authorizeUserDetails(UserDetails user,
-			String ifAllGranted, String ifAnyGranted, String ifNotGranted) {
-		return authorizeRoles(getRoleNamesFromUserDetails(user), ifAllGranted,
-				ifAnyGranted, ifNotGranted);
-	}
-
-	public static boolean authorizeRoles(List<String> roles,
-			String ifAllGranted, String ifAnyGranted, String ifNotGranted) {
+	public static boolean authorizeRoles(List<String> roles, String ifAllGranted, String ifAnyGranted,
+			String ifNotGranted) {
 		if (StringUtils.isNotBlank(ifAllGranted)) {
 			String[] arr = ifAllGranted.split("\\s*,\\s*");
 			for (String s : arr)
@@ -76,8 +72,8 @@ public class AuthzUtils {
 	public static List<String> getRoleNames() {
 		List<String> roleNames = new ArrayList<>();
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
-			Collection<? extends GrantedAuthority> authz = SecurityContextHolder
-					.getContext().getAuthentication().getAuthorities();
+			Collection<? extends GrantedAuthority> authz = SecurityContextHolder.getContext().getAuthentication()
+					.getAuthorities();
 			if (authz != null)
 				for (GrantedAuthority var : authz)
 					roleNames.add(var.getAuthority());
@@ -139,33 +135,27 @@ public class AuthzUtils {
 	@SuppressWarnings("unchecked")
 	public static <T extends UserDetails> T getUserDetails(Class<T> clazz) {
 		UserDetails ud = getUserDetails();
-		return ud != null && clazz.isAssignableFrom(ud.getClass()) ? (T) ud
-				: null;
+		return ud != null && clazz.isAssignableFrom(ud.getClass()) ? (T) ud : null;
 	}
 
 	public static void autoLogin(UserDetails ud) {
 		SecurityContext sc = SecurityContextHolder.getContext();
-		Authentication auth = new UsernamePasswordAuthenticationToken(ud,
-				ud.getPassword(), ud.getAuthorities());
+		Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
 		sc.setAuthentication(auth);
 	}
 
 	public static String encodePassword(UserDetails ud, String input) {
-		PasswordEncoder encoder = ApplicationContextUtils
-				.getBean(PasswordEncoder.class);
+		PasswordEncoder encoder = ApplicationContextUtils.getBean(PasswordEncoder.class);
 		return encoder.encode(input);
 	}
 
 	public static boolean isPasswordValid(UserDetails ud, String password) {
-		PasswordEncoder encoder = ApplicationContextUtils
-				.getBean(PasswordEncoder.class);
+		PasswordEncoder encoder = ApplicationContextUtils.getBean(PasswordEncoder.class);
 		return encoder.matches(password, ud.getPassword());
 	}
 
 	public static boolean isPasswordValid(String password) {
-		Object principal = SecurityContextHolder.getContext()
-				.getAuthentication().getPrincipal();
-		return principal instanceof UserDetails ? isPasswordValid(
-				(UserDetails) principal, password) : false;
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return principal instanceof UserDetails ? isPasswordValid((UserDetails) principal, password) : false;
 	}
 }

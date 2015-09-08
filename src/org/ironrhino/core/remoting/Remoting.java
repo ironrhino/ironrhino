@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Remoting {
 
-	Class<?>[] value() default {};
+	Class<?>[]value() default {};
 
 }

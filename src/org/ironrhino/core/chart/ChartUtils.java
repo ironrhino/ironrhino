@@ -20,9 +20,8 @@ public class ChartUtils {
 		return first * ((int) Math.pow(10, digit - 1));
 	}
 
-	private static final String[] colors = new String[] { "#ee4400", "#94ee00",
-			"#00eee6", "#ee00c7", "#9800ee", "#524141", "#173652", "#36520d",
-			"#d1d900", "#00d96d" };
+	private static final String[] colors = new String[] { "#ee4400", "#94ee00", "#00eee6", "#ee00c7", "#9800ee",
+			"#524141", "#173652", "#36520d", "#d1d900", "#00d96d" };
 
 	public static String caculateColor(int seed) {
 		if (seed < colors.length)
@@ -40,15 +39,13 @@ public class ChartUtils {
 		return sb.toString();
 	}
 
-	private static final String[] stepColors = new String[] { "#ffeeee",
-			"#ffaaaa", "#ff8888", "#ff5555", "#ff0000" };
+	private static final String[] stepColors = new String[] { "#ffeeee", "#ffaaaa", "#ff8888", "#ff5555", "#ff0000" };
 
 	public static String caculateStepColor(Number max, Number value) {
 		int steps = stepColors.length;
 		double single = max.doubleValue() / steps;
 		for (int i = 0; i < steps; i++) {
-			if (value.doubleValue() >= single * i
-					&& value.doubleValue() < single * (i + 1))
+			if (value.doubleValue() >= single * i && value.doubleValue() < single * (i + 1))
 				return stepColors[i];
 		}
 		return stepColors[stepColors.length - 1];

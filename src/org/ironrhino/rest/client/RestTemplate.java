@@ -71,27 +71,21 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	}
 
 	@Override
-	protected <T> T doExecute(URI url, HttpMethod method,
-			RequestCallback requestCallback,
+	protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback,
 			ResponseExtractor<T> responseExtractor) throws RestClientException {
-		return doExecute(url, method, requestCallback, responseExtractor,
-				maxAttempts);
+		return doExecute(url, method, requestCallback, responseExtractor, maxAttempts);
 	}
 
-	protected <T> T doExecute(URI url, HttpMethod method,
-			RequestCallback requestCallback,
-			ResponseExtractor<T> responseExtractor, int attempts)
-			throws RestClientException {
+	protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback,
+			ResponseExtractor<T> responseExtractor, int attempts) throws RestClientException {
 		try {
-			T result = super.doExecute(url, method, requestCallback,
-					responseExtractor);
+			T result = super.doExecute(url, method, requestCallback, responseExtractor);
 			return result;
 		} catch (ResourceAccessException e) {
 			logger.error(e.getMessage(), e);
 			if (--attempts < 1)
 				throw e;
-			return doExecute(url, method, requestCallback, responseExtractor,
-					attempts);
+			return doExecute(url, method, requestCallback, responseExtractor, attempts);
 		} catch (HttpClientErrorException e) {
 			logger.error(e.getResponseBodyAsString(), e);
 			if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
@@ -107,8 +101,7 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 				}
 				if (--attempts < 1)
 					throw e;
-				return doExecute(url, method, requestCallback,
-						responseExtractor, attempts);
+				return doExecute(url, method, requestCallback, responseExtractor, attempts);
 			}
 			throw e;
 		}

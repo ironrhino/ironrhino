@@ -24,35 +24,27 @@ public class CorsHandler extends AccessHandler {
 	private String xFrameOptions = "SAMEORIGIN";
 
 	@Override
-	public boolean handle(HttpServletRequest request,
-			HttpServletResponse response) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		response.setHeader("X-Powered-By", "Ironrhino");
 		response.setHeader("X-Frame-Options", xFrameOptions);
 		String origin = request.getHeader("Origin");
 		if (StringUtils.isNotBlank(origin)) {
-			if (!("Upgrade".equalsIgnoreCase(request.getHeader("Connection")) && "WebSocket"
-					.equalsIgnoreCase(request.getHeader("Upgrade")))) {
+			if (!("Upgrade".equalsIgnoreCase(request.getHeader("Connection"))
+					&& "WebSocket".equalsIgnoreCase(request.getHeader("Upgrade")))) {
 				String url = request.getRequestURL().toString();
-				if (openForAllOrigin || openForSameOrigin
-						&& RequestUtils.isSameOrigin(url, origin)
-						&& !url.startsWith(origin)) {
+				if (openForAllOrigin
+						|| openForSameOrigin && RequestUtils.isSameOrigin(url, origin) && !url.startsWith(origin)) {
 					response.setHeader("Access-Control-Allow-Origin", origin);
-					response.setHeader("Access-Control-Allow-Credentials",
-							"true");
-					String requestMethod = request
-							.getHeader("Access-Control-Request-Method");
-					String requestHeaders = request
-							.getHeader("Access-Control-Request-Headers");
+					response.setHeader("Access-Control-Allow-Credentials", "true");
+					String requestMethod = request.getHeader("Access-Control-Request-Method");
+					String requestHeaders = request.getHeader("Access-Control-Request-Headers");
 					String method = request.getMethod();
-					if (method.equalsIgnoreCase("OPTIONS")
-							&& (requestMethod != null || requestHeaders != null)) {
+					if (method.equalsIgnoreCase("OPTIONS") && (requestMethod != null || requestHeaders != null)) {
 						// preflighted request
 						if (StringUtils.isNotBlank(requestMethod))
-							response.setHeader("Access-Control-Allow-Methods",
-									requestMethod);
+							response.setHeader("Access-Control-Allow-Methods", requestMethod);
 						if (StringUtils.isNotBlank(requestHeaders))
-							response.setHeader("Access-Control-Allow-Headers",
-									requestHeaders);
+							response.setHeader("Access-Control-Allow-Headers", requestHeaders);
 						response.setHeader("Access-Control-Max-Age", "36000");
 						return true;
 					}

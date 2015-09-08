@@ -10,8 +10,7 @@ import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApplicationEventMulticaster extends
-		SimpleApplicationEventMulticaster {
+public class ApplicationEventMulticaster extends SimpleApplicationEventMulticaster {
 
 	@Autowired(required = false)
 	@Qualifier("executorService")

@@ -11,8 +11,7 @@ import java.util.Date;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 
-public abstract class AbstractSequenceCyclicSequence extends
-		AbstractDatabaseCyclicSequence {
+public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyclicSequence {
 
 	protected String querySequenceStatement;
 
@@ -27,55 +26,47 @@ public abstract class AbstractSequenceCyclicSequence extends
 	}
 
 	protected String getCreateTableStatement() {
-		return new StringBuilder("CREATE TABLE ").append(getTableName())
-				.append(" (").append(getSequenceName()).append("_TIMESTAMP ")
-				.append(getTimestampColumnType()).append(")").toString();
+		return new StringBuilder("CREATE TABLE ").append(getTableName()).append(" (").append(getSequenceName())
+				.append("_TIMESTAMP ").append(getTimestampColumnType()).append(")").toString();
 	}
 
 	protected String getAddColumnStatement() {
-		return new StringBuilder("ALTER TABLE ").append(getTableName())
-				.append(" ADD ").append(getSequenceName())
-				.append("_TIMESTAMP ").append(getTimestampColumnType())
-				.append(" DEFAULT ").append(getCurrentTimestamp()).toString();
+		return new StringBuilder("ALTER TABLE ").append(getTableName()).append(" ADD ").append(getSequenceName())
+				.append("_TIMESTAMP ").append(getTimestampColumnType()).append(" DEFAULT ")
+				.append(getCurrentTimestamp()).toString();
 	}
 
 	protected String getInsertStatement() {
-		return new StringBuilder("INSERT INTO ").append(getTableName())
-				.append(" VALUES(").append(getCurrentTimestamp()).append(")")
-				.toString();
+		return new StringBuilder("INSERT INTO ").append(getTableName()).append(" VALUES(").append(getCurrentTimestamp())
+				.append(")").toString();
 	}
 
 	protected abstract String getQuerySequenceStatement();
 
 	protected String getCreateSequenceStatement() {
-		StringBuilder sb = new StringBuilder("CREATE SEQUENCE ")
-				.append(getActualSequenceName());
+		StringBuilder sb = new StringBuilder("CREATE SEQUENCE ").append(getActualSequenceName());
 		if (getCacheSize() > 1)
 			sb.append(" CACHE ").append(getCacheSize());
 		return sb.toString();
 	}
 
 	protected String getRestartSequenceStatement() {
-		return new StringBuilder("ALTER SEQUENCE ")
-				.append(getActualSequenceName()).append(" RESTART WITH 1")
+		return new StringBuilder("ALTER SEQUENCE ").append(getActualSequenceName()).append(" RESTART WITH 1")
 				.toString();
 	}
 
 	@Override
 	public void afterPropertiesSet() {
 		querySequenceStatement = getQuerySequenceStatement();
-		queryTimestampStatement = new StringBuilder("SELECT  ")
-				.append(getCurrentTimestamp()).append(",")
-				.append(getSequenceName()).append("_TIMESTAMP")
-				.append(" FROM ").append(getTableName()).toString();
+		queryTimestampStatement = new StringBuilder("SELECT  ").append(getCurrentTimestamp()).append(",")
+				.append(getSequenceName()).append("_TIMESTAMP").append(" FROM ").append(getTableName()).toString();
 		Connection con = null;
 		Statement stmt = null;
 		try {
 			con = getDataSource().getConnection();
 			con.setAutoCommit(true);
 			DatabaseMetaData dbmd = con.getMetaData();
-			ResultSet rs = dbmd.getTables(null, null, "%",
-					new String[] { "TABLE" });
+			ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "TABLE" });
 			boolean tableExists = false;
 			while (rs.next()) {
 				if (getTableName().equalsIgnoreCase(rs.getString(3))) {
@@ -90,8 +81,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 				boolean columnExists = false;
 				ResultSetMetaData metadata = rs.getMetaData();
 				for (int i = 0; i < metadata.getColumnCount(); i++) {
-					if ((columnName + "_TIMESTAMP").equalsIgnoreCase(metadata
-							.getColumnName(i + 1))) {
+					if ((columnName + "_TIMESTAMP").equalsIgnoreCase(metadata.getColumnName(i + 1))) {
 						columnExists = true;
 						break;
 					}
@@ -129,8 +119,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 		return nextStringValue(3);
 	}
 
-	protected String nextStringValue(int maxAttempts)
-			throws DataAccessException {
+	protected String nextStringValue(int maxAttempts) throws DataAccessException {
 		if (maxAttempts < 1)
 			throw new IllegalArgumentException("max attempts reached");
 		Connection con = null;
@@ -140,8 +129,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 			con.setAutoCommit(true);
 			stmt = con.createStatement();
 			Result result = queryTimestampWithSequence(con, stmt);
-			if (getCycleType().isSameCycle(result.lastTimestamp,
-					result.currentTimestamp)) {
+			if (getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp)) {
 				if (result.isCriticalPoint(getCycleType())) {
 					// timestamp updated but sequence not restarted
 					if (stmt != null)
@@ -164,22 +152,18 @@ public abstract class AbstractSequenceCyclicSequence extends
 					}
 					return nextStringValue(--maxAttempts);
 				}
-				return getStringValue(result.currentTimestamp,
-						getPaddingLength(), result.nextId);
+				return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
 			} else {
 				if (getLockService().tryLock(getLockName())) {
 					try {
 						result = queryTimestampWithSequence(con, stmt);
-						if (!getCycleType().isSameCycle(result.lastTimestamp,
-								result.currentTimestamp)) {
-							stmt.executeUpdate("UPDATE " + getTableName()
-									+ " SET " + getSequenceName()
+						if (!getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp)) {
+							stmt.executeUpdate("UPDATE " + getTableName() + " SET " + getSequenceName()
 									+ "_TIMESTAMP = " + getCurrentTimestamp());
 							restartSequence(con, stmt);
 							result = queryTimestampWithSequence(con, stmt);
 						}
-						return getStringValue(result.currentTimestamp,
-								getPaddingLength(), result.nextId);
+						return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
 					} finally {
 						getLockService().unlock(getLockName());
 					}
@@ -206,8 +190,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 				}
 			}
 		} catch (SQLException ex) {
-			throw new DataAccessResourceFailureException(
-					"Could not obtain next value of sequence", ex);
+			throw new DataAccessResourceFailureException("Could not obtain next value of sequence", ex);
 		} finally {
 			if (stmt != null)
 				try {
@@ -226,13 +209,11 @@ public abstract class AbstractSequenceCyclicSequence extends
 		}
 	}
 
-	protected void restartSequence(Connection con, Statement stmt)
-			throws SQLException {
+	protected void restartSequence(Connection con, Statement stmt) throws SQLException {
 		stmt.execute(getRestartSequenceStatement());
 	}
 
-	private Result queryTimestampWithSequence(Connection con, Statement stmt)
-			throws SQLException {
+	private Result queryTimestampWithSequence(Connection con, Statement stmt) throws SQLException {
 		Result result = new Result();
 		ResultSet rs = null;
 		try {
@@ -250,8 +231,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 			return result;
 		} catch (SQLException ex) {
 			if (ex.getSQLState().equals("72000") && ex.getErrorCode() == 8004) { // ORA-08004
-				stmt.execute("ALTER SEQUENCE " + getActualSequenceName()
-						+ " INCREMENT BY 1 MINVALUE 0");
+				stmt.execute("ALTER SEQUENCE " + getActualSequenceName() + " INCREMENT BY 1 MINVALUE 0");
 				return queryTimestampWithSequence(con, stmt);
 			}
 			throw ex;
@@ -261,8 +241,7 @@ public abstract class AbstractSequenceCyclicSequence extends
 		}
 	}
 
-	private Result queryTimestamp(Connection con, Statement stmt)
-			throws SQLException {
+	private Result queryTimestamp(Connection con, Statement stmt) throws SQLException {
 		Result result = new Result();
 		ResultSet rs = stmt.executeQuery(queryTimestampStatement);
 		try {
@@ -282,11 +261,10 @@ public abstract class AbstractSequenceCyclicSequence extends
 		Date lastTimestamp;
 
 		boolean isCriticalPoint(CycleType cycleType) {
-			return currentTimestamp.getTime() - cycleType.getCycleStart(currentTimestamp).getTime() < CRITICAL_THRESHOLD_TIME
-					&& nextId > 100
+			return currentTimestamp.getTime()
+					- cycleType.getCycleStart(currentTimestamp).getTime() < CRITICAL_THRESHOLD_TIME && nextId > 100
 					|| cycleType.getCycleEnd(currentTimestamp).getTime()
-							- currentTimestamp.getTime() < CRITICAL_THRESHOLD_TIME
-					&& nextId < 5;
+							- currentTimestamp.getTime() < CRITICAL_THRESHOLD_TIME && nextId < 5;
 		}
 
 	}

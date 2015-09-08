@@ -14,8 +14,7 @@ public class SettingDynamicAuthorizer implements DynamicAuthorizer {
 
 	@Override
 	public boolean authorize(UserDetails user, String resource) {
-		String ifAnyGranted = settingControl.getStringValue("resource:"
-				+ resource);
+		String ifAnyGranted = settingControl.getStringValue("resource:" + resource);
 		return AuthzUtils.authorize(null, ifAnyGranted, null);
 	}
 

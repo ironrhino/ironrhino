@@ -20,17 +20,14 @@ public class LogoutSuccessHandler extends DefaultLogoutSuccessHandler {
 	private transient EventPublisher eventPublisher;
 
 	@Override
-	public void onLogoutSuccess(HttpServletRequest request,
-			HttpServletResponse response, Authentication authentication)
+	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
 		super.onLogoutSuccess(request, response, authentication);
 		if (authentication != null) {
 			Object principal = authentication.getPrincipal();
 			if (principal instanceof UserDetails)
 				eventPublisher.publish(
-						new LogoutEvent(
-								((UserDetails) principal).getUsername(),
-								request.getRemoteAddr()), Scope.LOCAL);
+						new LogoutEvent(((UserDetails) principal).getUsername(), request.getRemoteAddr()), Scope.LOCAL);
 		}
 	}
 

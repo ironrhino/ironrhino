@@ -110,7 +110,10 @@ public class SignupAction extends BaseAction {
 	@InputConfig(methodName = "input")
 	@Validations(requiredStrings = {
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "email", trim = true, key = "validation.required"),
-			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "password", trim = true, key = "validation.required") }, regexFields = { @RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "username", regex = User.USERNAME_REGEX_FOR_SIGNUP, key = "validation.invalid") }, emails = { @EmailValidator(type = ValidatorType.FIELD, fieldName = "email", key = "validation.invalid") }, fieldExpressions = { @FieldExpressionValidator(expression = "password == confirmPassword", fieldName = "confirmPassword", key = "validation.repeat.not.matched") })
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "password", trim = true, key = "validation.required") }, regexFields = {
+					@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "username", regex = User.USERNAME_REGEX_FOR_SIGNUP, key = "validation.invalid") }, emails = {
+							@EmailValidator(type = ValidatorType.FIELD, fieldName = "email", key = "validation.invalid") }, fieldExpressions = {
+									@FieldExpressionValidator(expression = "password == confirmPassword", fieldName = "confirmPassword", key = "validation.repeat.not.matched") })
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		if (!settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false))
@@ -142,7 +145,9 @@ public class SignupAction extends BaseAction {
 		return REDIRECT;
 	}
 
-	@Validations(regexFields = { @RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "username", regex = User.USERNAME_REGEX_FOR_SIGNUP, key = "validation.invalid") }, emails = { @EmailValidator(type = ValidatorType.FIELD, fieldName = "email", key = "validation.invalid") })
+	@Validations(regexFields = {
+			@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "username", regex = User.USERNAME_REGEX_FOR_SIGNUP, key = "validation.invalid") }, emails = {
+					@EmailValidator(type = ValidatorType.FIELD, fieldName = "email", key = "validation.invalid") })
 	public String checkavailable() {
 		return check() ? NONE : INPUT;
 	}
@@ -175,8 +180,8 @@ public class SignupAction extends BaseAction {
 					User ud = (User) userManager.loadUserByUsername(user.getUsername());
 					if (ud != null) {
 						AuthzUtils.autoLogin(ud);
-						LoginEvent loginEvent = new LoginEvent(ud.getUsername(), ServletActionContext.getRequest()
-								.getRemoteAddr());
+						LoginEvent loginEvent = new LoginEvent(ud.getUsername(),
+								ServletActionContext.getRequest().getRemoteAddr());
 						loginEvent.setFirst(true);
 						eventPublisher.publish(loginEvent, Scope.LOCAL);
 					}
@@ -192,7 +197,9 @@ public class SignupAction extends BaseAction {
 
 	@InputConfig(resultName = "forgot")
 	@Captcha(always = true)
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "email", trim = true, key = "validation.required") }, emails = { @EmailValidator(type = ValidatorType.FIELD, fieldName = "email", key = "validation.invalid") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "email", trim = true, key = "validation.required") }, emails = {
+					@EmailValidator(type = ValidatorType.FIELD, fieldName = "email", key = "validation.invalid") })
 	public String forgot() {
 		User user = userManager.findOne("email", email);
 		if (user == null) {

@@ -16,11 +16,8 @@ public class ResourcePresentCondition implements Condition {
 
 	@Override
 	public boolean matches(ConditionContext ctx, AnnotatedTypeMetadata metadata) {
-		Map<String, Object> attributes = metadata
-				.getAnnotationAttributes(ResourcePresentConditional.class
-						.getName());
-		return matches((String) attributes.get("value"),
-				(Boolean) attributes.get("negated"));
+		Map<String, Object> attributes = metadata.getAnnotationAttributes(ResourcePresentConditional.class.getName());
+		return matches((String) attributes.get("value"), (Boolean) attributes.get("negated"));
 	}
 
 	public static boolean matches(String value, boolean negated) {

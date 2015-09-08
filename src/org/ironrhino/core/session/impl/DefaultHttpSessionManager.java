@@ -130,8 +130,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	public void initialize(WrappedHttpSession session) {
 
 		// simulated session
-		Map<String, Object> sessionMap = (Map<String, Object>) session.getRequest().getAttribute(
-				REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
+		Map<String, Object> sessionMap = (Map<String, Object>) session.getRequest()
+				.getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 		if (sessionMap != null) {
 			session.setAttrMap(sessionMap);
 			return;

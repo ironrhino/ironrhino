@@ -57,11 +57,9 @@ public class UserAgent implements Serializable {
 					platform = "android";
 					String[] arr = userAgent.split(";");
 					if (arr.length > 2 && arr[2].indexOf("Build") > 0) {
-						device = arr[2].substring(0,
-								arr[2].indexOf("Build") - 1).trim();
+						device = arr[2].substring(0, arr[2].indexOf("Build") - 1).trim();
 					} else if (arr.length > 4 && arr[4].indexOf("Build") > 0) {
-						device = arr[4].substring(0,
-								arr[4].indexOf("Build") - 1).trim();
+						device = arr[4].substring(0, arr[4].indexOf("Build") - 1).trim();
 					}
 					return;
 				}
@@ -83,8 +81,7 @@ public class UserAgent implements Serializable {
 					platform = "osx";
 				} else if (lower.contains("android")) {
 					platform = "android";
-				} else if (lower.contains("iphone") || lower.contains("ipad")
-						|| lower.contains("ios")) {
+				} else if (lower.contains("iphone") || lower.contains("ipad") || lower.contains("ios")) {
 					platform = "ios";
 				}
 
@@ -96,8 +93,7 @@ public class UserAgent implements Serializable {
 					name = "msie";
 					String str = "MSIE";
 					int index = userAgent.indexOf(str) + str.length() + 1;
-					version = userAgent.substring(index,
-							userAgent.indexOf(";", index));
+					version = userAgent.substring(index, userAgent.indexOf(";", index));
 				} else if (userAgent.contains("Mozilla")) {
 					name = "mozilla";
 				}

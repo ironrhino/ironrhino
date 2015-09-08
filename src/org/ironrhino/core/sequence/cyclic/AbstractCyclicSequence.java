@@ -10,9 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 
-public abstract class AbstractCyclicSequence implements CyclicSequence,
-		InitializingBean, BeanNameAware {
-	
+public abstract class AbstractCyclicSequence implements CyclicSequence, InitializingBean, BeanNameAware {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private CycleType cycleType = CycleType.DAY;
@@ -60,22 +59,18 @@ public abstract class AbstractCyclicSequence implements CyclicSequence,
 	}
 
 	protected String getStringValue(Date date, int paddingLength, int nextId) {
-		return getCycleType().format(date)
-				+ NumberUtils.format(nextId, paddingLength);
+		return getCycleType().format(date) + NumberUtils.format(nextId, paddingLength);
 	}
 
 	@Override
 	public void setBeanName(String beanName) {
 		if (StringUtils.isNotBlank(beanName)) {
 			if (beanName.endsWith("CyclicSequence")) {
-				beanName = beanName.substring(0, beanName.length()
-						- "CyclicSequence".length());
+				beanName = beanName.substring(0, beanName.length() - "CyclicSequence".length());
 			} else if (beanName.endsWith("Sequence")) {
-				beanName = beanName.substring(0,
-						beanName.length() - "Sequence".length());
+				beanName = beanName.substring(0, beanName.length() - "Sequence".length());
 			} else if (beanName.endsWith("Seq")) {
-				beanName = beanName.substring(0,
-						beanName.length() - "Seq".length());
+				beanName = beanName.substring(0, beanName.length() - "Seq".length());
 			}
 			this.beanName = beanName;
 		}

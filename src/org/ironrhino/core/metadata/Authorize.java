@@ -19,7 +19,7 @@ public @interface Authorize {
 
 	String ifNotGranted() default "";
 
-	Class<? extends DynamicAuthorizer> authorizer() default DynamicAuthorizer.class;
+	Class<? extends DynamicAuthorizer>authorizer() default DynamicAuthorizer.class;
 
 	String resourceGroup() default "";
 

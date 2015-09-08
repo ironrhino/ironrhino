@@ -51,21 +51,15 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 	@Override
 	public void initialize(WrappedHttpSession session) {
 		String sessionString;
-		if (!cacheManager.supportsTimeToIdle()
-				&& cacheManager.supportsUpdateTimeToLive())
-			sessionString = (String) cacheManager.get(session.getId(),
-					CACHE_NAMESPACE, session.getMaxInactiveInterval(),
-					TimeUnit.SECONDS);
+		if (!cacheManager.supportsTimeToIdle() && cacheManager.supportsUpdateTimeToLive())
+			sessionString = (String) cacheManager.get(session.getId(), CACHE_NAMESPACE,
+					session.getMaxInactiveInterval(), TimeUnit.SECONDS);
 		else
-			sessionString = (String) cacheManager.get(session.getId(),
-					CACHE_NAMESPACE);
+			sessionString = (String) cacheManager.get(session.getId(), CACHE_NAMESPACE);
 		sessionCompressorManager.uncompress(session, sessionString);
-		if (maximumSessions > 0
-				&& session.getAttribute(SESSION_KEY_KICKED_OUT_FROM) != null) {
-			String ip = (String) session
-					.getAttribute(SESSION_KEY_KICKED_OUT_FROM);
-			String date = (String) session
-					.getAttribute(SESSION_KEY_KICKED_OUT_DATE);
+		if (maximumSessions > 0 && session.getAttribute(SESSION_KEY_KICKED_OUT_FROM) != null) {
+			String ip = (String) session.getAttribute(SESSION_KEY_KICKED_OUT_FROM);
+			String date = (String) session.getAttribute(SESSION_KEY_KICKED_OUT_DATE);
 			invalidate(session);
 			throw new ErrorMessage("kicked.out", new String[] { date, ip });
 		}
@@ -80,20 +74,16 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 		}
 		if (cacheManager.supportsTimeToIdle()) {
 			if (session.isDirty())
-				cacheManager.put(session.getId(), sessionString,
-						session.getMaxInactiveInterval(), -1, TimeUnit.SECONDS,
+				cacheManager.put(session.getId(), sessionString, session.getMaxInactiveInterval(), -1, TimeUnit.SECONDS,
 						CACHE_NAMESPACE);
 		} else if (cacheManager.supportsUpdateTimeToLive()) {
 			if (session.isDirty())
-				cacheManager.put(session.getId(), sessionString, -1,
-						session.getMaxInactiveInterval(), TimeUnit.SECONDS,
+				cacheManager.put(session.getId(), sessionString, -1, session.getMaxInactiveInterval(), TimeUnit.SECONDS,
 						CACHE_NAMESPACE);
 		} else {
 			if (session.isDirty()
-					|| session.getNow() - session.getLastAccessedTime() > session
-							.getMinActiveInterval() * 1000)
-				cacheManager.put(session.getId(), sessionString,
-						session.getMaxInactiveInterval(), TimeUnit.SECONDS,
+					|| session.getNow() - session.getLastAccessedTime() > session.getMinActiveInterval() * 1000)
+				cacheManager.put(session.getId(), sessionString, session.getMaxInactiveInterval(), TimeUnit.SECONDS,
 						CACHE_NAMESPACE);
 		}
 		if (maximumSessions > 0 && session.isDirty()) {
@@ -107,8 +97,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 
 	public void kickoutOtherSession(WrappedHttpSession session) {
 		String username = null;
-		Object value = session
-				.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+		Object value = session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
 		if (value != null) {
 			Authentication auth = ((SecurityContext) value).getAuthentication();
 			if (auth.isAuthenticated()) {
@@ -121,8 +110,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 		}
 		if (username != null) {
 			String ip = session.getRequest().getRemoteAddr();
-			String sessions = (String) cacheManager.get(username,
-					CACHE_NAMESPACE);
+			String sessions = (String) cacheManager.get(username, CACHE_NAMESPACE);
 			if (sessions == null) {
 				sessions = session.getId();
 			} else {
@@ -130,8 +118,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 				String[] arr = sessions.split(",");
 				for (String id : arr) {
 					String str = (String) cacheManager.get(id, CACHE_NAMESPACE);
-					if (str != null
-							&& !str.contains(SESSION_KEY_KICKED_OUT_FROM))
+					if (str != null && !str.contains(SESSION_KEY_KICKED_OUT_FROM))
 						list.add(id);
 				}
 				if (!list.contains(session.getId()))
@@ -142,24 +129,19 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 						try {
 							Map<String, String> map = new HashMap<>();
 							map.put(SESSION_KEY_KICKED_OUT_FROM, ip);
-							map.put(SESSION_KEY_KICKED_OUT_DATE,
-									DateUtils.formatDatetime(new Date()));
-							cacheManager.put(id, JsonUtils.toJson(map),
-									session.getMaxInactiveInterval(),
+							map.put(SESSION_KEY_KICKED_OUT_DATE, DateUtils.formatDatetime(new Date()));
+							cacheManager.put(id, JsonUtils.toJson(map), session.getMaxInactiveInterval(),
 									TimeUnit.SECONDS, CACHE_NAMESPACE);
-							logger.info(
-									"user[{}] session[{}] is kicked out by session[{}] from {}",
-									username, id, session.getId(), ip);
+							logger.info("user[{}] session[{}] is kicked out by session[{}] from {}", username, id,
+									session.getId(), ip);
 						} catch (Exception e) {
 							logger.error(e.getMessage(), e);
 						}
 					}
 				}
-				sessions = StringUtils.join(list.subList(list.size()
-						- maximumSessions, list.size()), ",");
+				sessions = StringUtils.join(list.subList(list.size() - maximumSessions, list.size()), ",");
 			}
-			cacheManager.put(username, sessions, 12, TimeUnit.HOURS,
-					CACHE_NAMESPACE);
+			cacheManager.put(username, sessions, 12, TimeUnit.HOURS, CACHE_NAMESPACE);
 		}
 	}
 

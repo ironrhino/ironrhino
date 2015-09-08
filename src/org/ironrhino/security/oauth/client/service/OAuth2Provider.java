@@ -20,8 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class OAuth2Provider extends AbstractOAuthProvider {
 
-	protected static Logger logger = LoggerFactory
-			.getLogger(OAuth2Provider.class);
+	protected static Logger logger = LoggerFactory.getLogger(OAuth2Provider.class);
 
 	public abstract String getAuthorizeUrl();
 
@@ -37,13 +36,11 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 	}
 
 	public String getClientId() {
-		return settingControl
-				.getStringValue("oauth." + getName() + ".clientId");
+		return settingControl.getStringValue("oauth." + getName() + ".clientId");
 	}
 
 	public String getClientSecret() {
-		return settingControl.getStringValue("oauth." + getName()
-				+ ".clientSecret");
+		return settingControl.getStringValue("oauth." + getName() + ".clientSecret");
 	}
 
 	@Override
@@ -74,8 +71,7 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 	}
 
 	@Override
-	public String getAuthRedirectURL(HttpServletRequest request,
-			String targetUrl) throws Exception {
+	public String getAuthRedirectURL(HttpServletRequest request, String targetUrl) throws Exception {
 		OAuth2Token accessToken = restoreToken(request);
 		if (accessToken != null) {
 			if (accessToken.isExpired()) {
@@ -95,16 +91,14 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 			state = targetUrl.substring(targetUrl.lastIndexOf('=') + 1);
 			targetUrl = targetUrl.substring(0, targetUrl.indexOf('?'));
 		}
-		StringBuilder sb = new StringBuilder(getAuthorizeUrl()).append('?')
-				.append("client_id").append('=').append(getClientId())
-				.append('&').append("redirect_uri").append('=')
+		StringBuilder sb = new StringBuilder(getAuthorizeUrl()).append('?').append("client_id").append('=')
+				.append(getClientId()).append('&').append("redirect_uri").append('=')
 				.append(URLEncoder.encode(targetUrl, "UTF-8"));
 		sb.append("&response_type=code");
 		String scope = getScope();
 		if (StringUtils.isNotBlank(scope))
 			try {
-				sb.append('&').append("scope").append('=')
-						.append(URLEncoder.encode(scope, "UTF-8"));
+				sb.append('&').append("scope").append('=').append(URLEncoder.encode(scope, "UTF-8"));
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -131,11 +125,8 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 		if (accessToken == null) {
 			String error = request.getParameter("error");
 			if (StringUtils.isNotBlank(error)) {
-				String errormsg = "error: "
-						+ error
-						+ ",url: "
-						+ request.getRequestURL().append("?")
-								.append(request.getQueryString()).toString();
+				String errormsg = "error: " + error + ",url: "
+						+ request.getRequestURL().append("?").append(request.getQueryString()).toString();
 				logger.error(errormsg);
 				throw new RuntimeException(errormsg);
 			}
@@ -147,11 +138,9 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 			params.put("grant_type", "authorization_code");
 			String content = null;
 			try {
-				content = HttpClientUtils.postResponseText(
-						getAccessTokenEndpoint(), params);
+				content = HttpClientUtils.postResponseText(getAccessTokenEndpoint(), params);
 			} catch (Exception e) {
-				logger.error(
-						getAccessTokenEndpoint() + "," + params.toString(), e);
+				logger.error(getAccessTokenEndpoint() + "," + params.toString(), e);
 			}
 			accessToken = new OAuth2Token(content);
 			if (accessToken.getAccess_token() == null)
@@ -176,12 +165,10 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 		}
 	}
 
-	protected void postProcessProfile(Profile p, String accessToken)
-			throws Exception {
+	protected void postProcessProfile(Profile p, String accessToken) throws Exception {
 	}
 
-	public String invoke(HttpServletRequest request, String protectedURL)
-			throws Exception {
+	public String invoke(HttpServletRequest request, String protectedURL) throws Exception {
 		OAuth2Token accessToken = restoreToken(request);
 		if (accessToken == null)
 			throw new IllegalAccessException("must already authorized");
@@ -196,20 +183,17 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 		return invoke(accessToken.getAccess_token(), protectedURL);
 	}
 
-	public String invoke(String accessToken, String protectedURL)
-			throws Exception {
+	public String invoke(String accessToken, String protectedURL) throws Exception {
 		Map<String, String> map = new HashMap<>(2, 1);
 		if (!isUseAuthorizationHeader())
 			map.put(getAccessTokenParameterName(), accessToken);
 		else
-			map.put(getAuthorizationHeaderName(), getAuthorizationHeaderType()
-					+ " " + accessToken);
-		return invoke(protectedURL, isUseAuthorizationHeader() ? null : map,
-				isUseAuthorizationHeader() ? map : null);
+			map.put(getAuthorizationHeaderName(), getAuthorizationHeaderType() + " " + accessToken);
+		return invoke(protectedURL, isUseAuthorizationHeader() ? null : map, isUseAuthorizationHeader() ? map : null);
 	}
 
-	protected String invoke(String protectedURL, Map<String, String> params,
-			Map<String, String> headers) throws IOException {
+	protected String invoke(String protectedURL, Map<String, String> params, Map<String, String> headers)
+			throws IOException {
 		return HttpClientUtils.getResponseText(protectedURL, params, headers);
 	}
 
@@ -219,8 +203,7 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 		params.put("client_secret", getClientSecret());
 		params.put("refresh_token", accessToken.getRefresh_token());
 		params.put("grant_type", "refresh_token");
-		String content = HttpClientUtils.postResponseText(
-				getAccessTokenEndpoint(), params);
+		String content = HttpClientUtils.postResponseText(getAccessTokenEndpoint(), params);
 		try {
 			return JsonUtils.fromJson(content, OAuth2Token.class);
 		} catch (Exception e) {
@@ -231,12 +214,10 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 
 	protected void saveToken(HttpServletRequest request, OAuth2Token token) {
 		token.setCreate_time(System.currentTimeMillis());
-		request.getSession().setAttribute(getName() + "_token",
-				token.getSource());
+		request.getSession().setAttribute(getName() + "_token", token.getSource());
 	}
 
-	protected OAuth2Token restoreToken(HttpServletRequest request)
-			throws Exception {
+	protected OAuth2Token restoreToken(HttpServletRequest request) throws Exception {
 		String key = getName() + "_token";
 		String source = (String) request.getSession().getAttribute(key);
 		if (StringUtils.isBlank(source))

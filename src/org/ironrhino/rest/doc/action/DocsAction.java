@@ -32,8 +32,7 @@ public class DocsAction extends BaseAction {
 
 	public String getApiBaseUrl() {
 		if (StringUtils.isBlank(apiBaseUrl)) {
-			apiBaseUrl = RequestUtils.getBaseUrl(ServletActionContext
-					.getRequest()) + "/api";
+			apiBaseUrl = RequestUtils.getBaseUrl(ServletActionContext.getRequest()) + "/api";
 		}
 		return apiBaseUrl;
 	}

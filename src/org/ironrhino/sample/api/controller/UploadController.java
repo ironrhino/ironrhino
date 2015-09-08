@@ -24,8 +24,7 @@ public class UploadController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> upload(@RequestParam("name") String name,
-			@RequestParam("file") MultipartFile file) {
+	public Map<String, Object> upload(@RequestParam("name") String name, @RequestParam("file") MultipartFile file) {
 		Map<String, Object> result = new HashMap<>();
 		result.put("name", name);
 		if (!file.isEmpty()) {

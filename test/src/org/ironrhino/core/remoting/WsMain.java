@@ -8,8 +8,7 @@ public class WsMain {
 	public static void main(String[] args) {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"classpath*:org/ironrhino/core/remoting/test_ws.xml");
-		System.out.println(ctx.getBean(UserService.class).suggestUsername(
-				"admin"));
+		System.out.println(ctx.getBean(UserService.class).suggestUsername("admin"));
 		ctx.close();
 	}
 

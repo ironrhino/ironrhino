@@ -35,23 +35,16 @@ public class RestFilter extends OncePerRequestFilter {
 	private boolean loggingBody = true;
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-			HttpServletResponse response, FilterChain filterChain)
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		Map<String, String> map = RequestUtils
-				.parseParametersFromQueryString(request.getQueryString());
+		Map<String, String> map = RequestUtils.parseParametersFromQueryString(request.getQueryString());
 		String method = map.get(PARAMETER_NAME_METHOD);
 		if (StringUtils.isNotBlank(method)
-				|| request.getContentType() != null
-				&& request.getContentType().startsWith(
-						MediaType.TEXT_PLAIN_VALUE))
+				|| request.getContentType() != null && request.getContentType().startsWith(MediaType.TEXT_PLAIN_VALUE))
 			request = new WrappedHttpServletRequest(request,
-					StringUtils.isNotBlank(method) ? method.toUpperCase()
-							.trim() : request.getMethod());
-		if (loggingBody
-				&& (request.getContentType() == null || request
-						.getContentType().startsWith(
-								MediaType.APPLICATION_JSON_VALUE))) {
+					StringUtils.isNotBlank(method) ? method.toUpperCase().trim() : request.getMethod());
+		if (loggingBody && (request.getContentType() == null
+				|| request.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE))) {
 			if (request.getMethod().equalsIgnoreCase("GET")) {
 				logger.info("");
 			} else {
@@ -62,13 +55,11 @@ public class RestFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	private static class WrappedHttpServletRequest extends
-			HttpServletRequestWrapper {
+	private static class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
 		private String method;
 
-		public WrappedHttpServletRequest(HttpServletRequest request,
-				String method) {
+		public WrappedHttpServletRequest(HttpServletRequest request, String method) {
 			super(request);
 			this.method = method;
 		}
@@ -94,8 +85,7 @@ public class RestFilter extends OncePerRequestFilter {
 		@Override
 		public Enumeration<String> getHeaders(String name) {
 			if (StringUtils.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE, name)) {
-				return Collections.enumeration(Arrays
-						.asList(MediaType.APPLICATION_JSON_VALUE));
+				return Collections.enumeration(Arrays.asList(MediaType.APPLICATION_JSON_VALUE));
 			}
 			return super.getHeaders(name);
 		}

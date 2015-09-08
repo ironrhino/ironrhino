@@ -42,8 +42,8 @@ public class CaptchaFilter implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 		String token = request.getParameter("token");
@@ -54,9 +54,7 @@ public class CaptchaFilter implements Filter {
 			response.setHeader("Cache-Control", "no-cache");
 			response.setDateHeader("Expires", 0);
 			String challenge = captchaManager.getChallenge(request, token);
-			ImageIO.write(
-					new ImageCaptcha(challenge, captchaManager
-							.fuzzifyChallenge(challenge)).getImage(), "JPEG",
+			ImageIO.write(new ImageCaptcha(challenge, captchaManager.fuzzifyChallenge(challenge)).getImage(), "JPEG",
 					response.getOutputStream());
 			response.getOutputStream().close();
 			return;

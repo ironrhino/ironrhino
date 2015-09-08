@@ -38,7 +38,7 @@ public class BeanUtilsTest {
 	}
 
 	public static class User extends Base {
-		
+
 		private static final long serialVersionUID = -1634488900558289348L;
 		private String username;
 		@NotInCopy
@@ -83,7 +83,7 @@ public class BeanUtilsTest {
 	}
 
 	public static class User2 extends Base {
-		
+
 		private static final long serialVersionUID = 5095445311043690504L;
 		private String username;
 		@NotInCopy
@@ -122,7 +122,7 @@ public class BeanUtilsTest {
 	}
 
 	public static class Team extends Base {
-		
+
 		private static final long serialVersionUID = 8360294456202382419L;
 
 		private String name;
@@ -172,7 +172,7 @@ public class BeanUtilsTest {
 	}
 
 	public static class Team2 extends Base {
-		
+
 		private static final long serialVersionUID = 3455118342183020069L;
 
 		private String name;

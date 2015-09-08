@@ -24,8 +24,7 @@ public class StandaloneConcurrencyService implements ConcurrencyService {
 	}
 
 	@Override
-	public boolean tryAcquire(String name, int permits, long timeout,
-			TimeUnit unit) throws InterruptedException {
+	public boolean tryAcquire(String name, int permits, long timeout, TimeUnit unit) throws InterruptedException {
 		return getSemaphore(name, permits).tryAcquire(timeout, unit);
 	}
 
@@ -38,8 +37,7 @@ public class StandaloneConcurrencyService implements ConcurrencyService {
 	public void release(String name) {
 		Semaphore semaphore = semaphores.get(name);
 		if (semaphore == null)
-			throw new IllegalArgumentException("Semaphore '" + name
-					+ " ' doesn't exists");
+			throw new IllegalArgumentException("Semaphore '" + name + " ' doesn't exists");
 		semaphore.release();
 	}
 

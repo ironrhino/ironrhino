@@ -3,8 +3,7 @@ package org.ironrhino.core.util;
 import java.util.Comparator;
 import java.util.Map;
 
-public class ValueThenKeyComparator<K, V> implements
-		Comparator<Map.Entry<K, V>> {
+public class ValueThenKeyComparator<K, V> implements Comparator<Map.Entry<K, V>> {
 
 	@SuppressWarnings("rawtypes")
 	private final static ValueThenKeyComparator DEFAULT_INSTANCE = new ValueThenKeyComparator();

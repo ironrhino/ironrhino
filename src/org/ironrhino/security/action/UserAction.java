@@ -125,8 +125,8 @@ public class UserAction extends EntityAction<User> {
 		roles = new ArrayList<>(map.size());
 		for (Map.Entry<String, String> entry : map.entrySet())
 			roles.add(new LabelValue(
-					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue()
-							: getText(entry.getKey()), entry.getKey()));
+					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : getText(entry.getKey()),
+					entry.getKey()));
 		String id = getUid();
 		if (StringUtils.isNotBlank(id)) {
 			user = userManager.get(id);
@@ -151,7 +151,10 @@ public class UserAction extends EntityAction<User> {
 	@Override
 	@Validations(requiredStrings = {
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "user.username", trim = true, key = "validation.required"),
-			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "user.name", trim = true, key = "validation.required") }, emails = { @EmailValidator(fieldName = "user.email", key = "validation.invalid") }, regexFields = { @RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") }, fieldExpressions = { @FieldExpressionValidator(expression = "password == confirmPassword", fieldName = "confirmPassword", key = "validation.repeat.not.matched") })
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "user.name", trim = true, key = "validation.required") }, emails = {
+					@EmailValidator(fieldName = "user.email", key = "validation.invalid") }, regexFields = {
+							@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") }, fieldExpressions = {
+									@FieldExpressionValidator(expression = "password == confirmPassword", fieldName = "confirmPassword", key = "validation.repeat.not.matched") })
 	public String save() {
 		if (!makeEntityValid())
 			return INPUT;
@@ -161,7 +164,8 @@ public class UserAction extends EntityAction<User> {
 	}
 
 	@Override
-	@Validations(regexFields = { @RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") })
+	@Validations(regexFields = {
+			@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") })
 	public String checkavailable() {
 		return makeEntityValid() ? NONE : INPUT;
 	}
@@ -176,15 +180,12 @@ public class UserAction extends EntityAction<User> {
 			if (StringUtils.isNotBlank(user.getUsername())) {
 				user.setUsername(user.getUsername().toLowerCase());
 				if (userManager.findByNaturalId(user.getUsername()) != null) {
-					addFieldError("user.username",
-							getText("validation.already.exists"));
+					addFieldError("user.username", getText("validation.already.exists"));
 					return false;
 				}
 			}
-			if (StringUtils.isNotBlank(user.getEmail())
-					&& userManager.findOne("email", user.getEmail()) != null) {
-				addFieldError("user.email",
-						getText("validation.already.exists"));
+			if (StringUtils.isNotBlank(user.getEmail()) && userManager.findOne("email", user.getEmail()) != null) {
+				addFieldError("user.email", getText("validation.already.exists"));
 				return false;
 			}
 			user.setLegiblePassword(password);
@@ -196,11 +197,9 @@ public class UserAction extends EntityAction<User> {
 			if (temp.getUsername() != null) {
 				user = userManager.findByNaturalId(temp.getUsername());
 			}
-			if (StringUtils.isNotBlank(temp.getEmail())
-					&& !temp.getEmail().equals(user.getEmail())
+			if (StringUtils.isNotBlank(temp.getEmail()) && !temp.getEmail().equals(user.getEmail())
 					&& userManager.findOne("email", temp.getEmail()) != null) {
-				addFieldError("user.email",
-						getText("validation.already.exists"));
+				addFieldError("user.email", getText("validation.already.exists"));
 				return false;
 			}
 			BeanUtils.copyProperties(temp, user);
@@ -243,7 +242,9 @@ public class UserAction extends EntityAction<User> {
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	@InputConfig(resultName = "password")
 	@CurrentPassword
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, trim = true, fieldName = "password", key = "validation.required") }, expressions = { @ExpressionValidator(expression = "password == confirmPassword", key = "validation.repeat.not.matched") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, trim = true, fieldName = "password", key = "validation.required") }, expressions = {
+					@ExpressionValidator(expression = "password == confirmPassword", key = "validation.repeat.not.matched") })
 	public String password() {
 		if (userPasswordReadonly) {
 			addActionError(getText("access.denied"));
@@ -254,8 +255,8 @@ public class UserAction extends EntityAction<User> {
 			user.setLegiblePassword(password);
 			userManager.save(user);
 			addActionMessage(getText("save.success"));
-			eventPublisher.publish(new PasswordChangedEvent(user.getUsername(),
-					ServletActionContext.getRequest().getRemoteAddr()),
+			eventPublisher.publish(
+					new PasswordChangedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),
 					Scope.LOCAL);
 		}
 		return "password";
@@ -263,7 +264,9 @@ public class UserAction extends EntityAction<User> {
 
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	@InputConfig(methodName = "inputprofile")
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "user.name", trim = true, key = "validation.required") }, emails = { @EmailValidator(fieldName = "user.email", key = "validation.invalid") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "user.name", trim = true, key = "validation.required") }, emails = {
+					@EmailValidator(fieldName = "user.email", key = "validation.invalid") })
 	public String profile() {
 		if (userProfileReadonly) {
 			addActionError(getText("access.denied"));
@@ -281,10 +284,9 @@ public class UserAction extends EntityAction<User> {
 		userInSession.setPhone(user.getPhone());
 		userManager.save(userInSession);
 		addActionMessage(getText("save.success"));
-		eventPublisher
-				.publish(new ProfileEditedEvent(user.getUsername(),
-						ServletActionContext.getRequest().getRemoteAddr()),
-						Scope.LOCAL);
+		eventPublisher.publish(
+				new ProfileEditedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),
+				Scope.LOCAL);
 		return "profile";
 	}
 
@@ -305,13 +307,12 @@ public class UserAction extends EntityAction<User> {
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	public String roles() {
 		Map<String, String> map = userRoleManager
-				.getAllRoles(ServletActionContext.getRequest().getParameter(
-						"excludeBuiltin") != null);
+				.getAllRoles(ServletActionContext.getRequest().getParameter("excludeBuiltin") != null);
 		roles = new ArrayList<>(map.size());
 		for (Map.Entry<String, String> entry : map.entrySet())
 			roles.add(new LabelValue(
-					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue()
-							: getText(entry.getKey()), entry.getKey()));
+					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : getText(entry.getKey()),
+					entry.getKey()));
 		return JSON;
 	}
 

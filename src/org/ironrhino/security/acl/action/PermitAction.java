@@ -94,99 +94,62 @@ public class PermitAction extends BaseAction {
 					Collection<PackageConfig> pcs = ((AutoConfigPackageProvider) packageProvider)
 							.getAllPackageConfigs();
 					for (PackageConfig pc : pcs) {
-						Collection<ActionConfig> acs = pc.getActionConfigs()
-								.values();
+						Collection<ActionConfig> acs = pc.getActionConfigs().values();
 						for (ActionConfig ac : acs) {
 							try {
 								Class<?> c = Class.forName(ac.getClassName());
 								if (!BaseAction.class.isAssignableFrom(c))
 									continue;
 								if (EntityAction.class.equals(c)) {
-									Class<?> entityClass = AutoConfigPackageProvider
-											.getEntityClass(pc.getNamespace(),
-													ac.getName());
-									Authorize authorize = entityClass
-											.getAnnotation(Authorize.class);
-									if (authorize != null
-											&& !authorize.authorizer().equals(
-													DynamicAuthorizer.class)) {
+									Class<?> entityClass = AutoConfigPackageProvider.getEntityClass(pc.getNamespace(),
+											ac.getName());
+									Authorize authorize = entityClass.getAnnotation(Authorize.class);
+									if (authorize != null && !authorize.authorizer().equals(DynamicAuthorizer.class)) {
 										StringBuilder sb = new StringBuilder();
-										sb.append(pc.getNamespace())
-												.append(pc.getNamespace()
-														.endsWith("/") ? ""
-														: "/")
+										sb.append(pc.getNamespace()).append(pc.getNamespace().endsWith("/") ? "" : "/")
 												.append(ac.getName());
 										String s = sb.toString();
 										temp.put(authorize.resourceGroup(), s);
-										temp.put(authorize.resourceGroup(), s
-												+ "/input");
-										temp.put(authorize.resourceGroup(), s
-												+ "/save");
-										temp.put(authorize.resourceGroup(), s
-												+ "/delete");
+										temp.put(authorize.resourceGroup(), s + "/input");
+										temp.put(authorize.resourceGroup(), s + "/save");
+										temp.put(authorize.resourceGroup(), s + "/delete");
 									}
 									continue;
 								}
-								Authorize authorizeOnClass = c
-										.getAnnotation(Authorize.class);
+								Authorize authorizeOnClass = c.getAnnotation(Authorize.class);
 								if (authorizeOnClass == null
-										|| authorizeOnClass
-												.authorizer()
-												.equals(DynamicAuthorizer.class)) {
-									Set<Method> methods = AnnotationUtils
-											.getAnnotatedMethods(c,
-													Authorize.class);
+										|| authorizeOnClass.authorizer().equals(DynamicAuthorizer.class)) {
+									Set<Method> methods = AnnotationUtils.getAnnotatedMethods(c, Authorize.class);
 									for (Method m : methods) {
-										Authorize authorize = m
-												.getAnnotation(Authorize.class);
-										if (!authorize.authorizer().equals(
-												DynamicAuthorizer.class)) {
+										Authorize authorize = m.getAnnotation(Authorize.class);
+										if (!authorize.authorizer().equals(DynamicAuthorizer.class)) {
 											StringBuilder sb = new StringBuilder();
 											sb.append(pc.getNamespace())
-													.append(pc.getNamespace()
-															.endsWith("/") ? ""
-															: "/")
+													.append(pc.getNamespace().endsWith("/") ? "" : "/")
 													.append(ac.getName());
 											if (!m.getName().equals("execute"))
-												sb.append("/").append(
-														m.getName());
-											temp.put(authorize.resourceGroup(),
-													sb.toString());
+												sb.append("/").append(m.getName());
+											temp.put(authorize.resourceGroup(), sb.toString());
 										}
 									}
 								} else if (authorizeOnClass != null
-										&& !authorizeOnClass
-												.authorizer()
-												.equals(DynamicAuthorizer.class)) {
+										&& !authorizeOnClass.authorizer().equals(DynamicAuthorizer.class)) {
 									for (Method m : c.getMethods()) {
 										int mod = m.getModifiers();
-										if (!Modifier.isPublic(mod)
-												|| Modifier.isStatic(mod)
-												|| !m.getReturnType().equals(
-														String.class)
+										if (!Modifier.isPublic(mod) || Modifier.isStatic(mod)
+												|| !m.getReturnType().equals(String.class)
 												|| m.getParameterTypes().length != 0)
 											continue;
-										Authorize authorize = m
-												.getAnnotation(Authorize.class);
-										if (authorize != null
-												&& authorize
-														.authorizer()
-														.equals(DynamicAuthorizer.class))
+										Authorize authorize = m.getAnnotation(Authorize.class);
+										if (authorize != null && authorize.authorizer().equals(DynamicAuthorizer.class))
 											continue;
 										StringBuilder sb = new StringBuilder();
-										sb.append(pc.getNamespace())
-												.append(pc.getNamespace()
-														.endsWith("/") ? ""
-														: "/")
+										sb.append(pc.getNamespace()).append(pc.getNamespace().endsWith("/") ? "" : "/")
 												.append(ac.getName());
 										if (!m.getName().equals("execute"))
 											sb.append("/").append(m.getName());
-										temp.put(
-												authorize != null ? authorize
-														.resourceGroup()
-														: authorizeOnClass
-																.resourceGroup(),
-												sb.toString());
+										temp.put(authorize != null ? authorize.resourceGroup()
+												: authorizeOnClass.resourceGroup(), sb.toString());
 									}
 								}
 							} catch (ClassNotFoundException e) {
@@ -220,8 +183,7 @@ public class PermitAction extends BaseAction {
 	public String input() {
 		if (StringUtils.isBlank(role) && StringUtils.isNotBlank(username)) {
 			try {
-				UserDetails user = userDetailsService
-						.loadUserByUsername(username);
+				UserDetails user = userDetailsService.loadUserByUsername(username);
 				role = UsernameRoleMapper.map(user.getUsername());
 			} catch (UsernameNotFoundException e) {
 				addActionError(getText("validation.not.exists"));
