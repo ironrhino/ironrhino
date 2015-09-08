@@ -586,6 +586,7 @@ public class AnnotationShadows {
 		private String inputWindowOptions = "";
 		private String viewWindowOptions = "";
 		private int inputGridColumns = 0;
+		private int viewGridColumns = 0;
 
 		public RichtableImpl() {
 		}
@@ -614,6 +615,14 @@ public class AnnotationShadows {
 			this.viewWindowOptions = config.viewWindowOptions();
 			if (config.inputGridColumns() < 5)
 				this.inputGridColumns = config.inputGridColumns();
+			if (config.viewGridColumns() < 5)
+				this.viewGridColumns = config.viewGridColumns();
+			if (config.gridColumns() > 0 && config.gridColumns() < 5) {
+				if (this.inputGridColumns == 0)
+					this.inputGridColumns = config.gridColumns();
+				if (this.viewGridColumns == 0)
+					this.viewGridColumns = config.gridColumns();
+			}
 		}
 
 		public String getAlias() {
@@ -782,6 +791,14 @@ public class AnnotationShadows {
 
 		public void setInputGridColumns(int inputGridColumns) {
 			this.inputGridColumns = inputGridColumns;
+		}
+
+		public int getViewGridColumns() {
+			return viewGridColumns;
+		}
+
+		public void setViewGridColumns(int viewGridColumns) {
+			this.viewGridColumns = viewGridColumns;
 		}
 
 	}
