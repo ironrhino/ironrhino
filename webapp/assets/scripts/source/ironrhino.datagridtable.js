@@ -41,7 +41,7 @@
 			if ($(this).parents('.datagrided').length)
 				return;
 			$('tbody input:last', this).keydown(function(event) {
-						if (event.keyCode == 13) {
+						if (event.keyCode == 13 && !$(this).hasClass('tags')) {
 							event.preventDefault();
 							addRow(event, options);
 						}
@@ -132,6 +132,16 @@
 				if (selected)
 					t.prop('disabled', true).css('display', 'none');
 			});
+		});
+		$('input.tags', r).each(function() {
+			var t = $(this);
+			var p = t.closest('.text-core');
+			t.attr('name', $('input[type="hidden"]', p).attr('name')).attr(
+					'style', '').attr('value','').show();
+			p.replaceWith(t[0].outerHTML);
+			setTimeout(function() {
+						r.find('input.tags').tags();
+					}, 100);
 		});
 		$('.datagrided tr', r).each(function(i) {
 					if (i > 0)

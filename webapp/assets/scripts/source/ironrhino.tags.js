@@ -1,10 +1,6 @@
-Observation.tags = function(container) {
-	if (typeof $.fn.textext != 'undefined'
-			&& (!$.browser.msie || $.browser.version > '8')) {
-		var c = $(container);
-		var selector = 'input.tags';
-		var ele = c.is(selector) ? c : $(selector, c);
-		ele.each(function() {
+(function($) {
+	$.fn.tags = function() {
+		$(this).each(function() {
 			var t = $(this);
 			var options = {
 				prompt : '...',
@@ -137,6 +133,15 @@ Observation.tags = function(container) {
 						if (t.hasClass('required') || t.val())
 							$(this).trigger('enterKeyPress').val('');
 					});
-		});
-	}
+		})
+		return this;
+	};
+})(jQuery);
+Observation.tags = function(container) {
+	var c = $(container);
+	var selector = 'input.tags';
+	if (c.is(selector))
+		c.tags();
+	else
+		$(selector, c).tags();
 };

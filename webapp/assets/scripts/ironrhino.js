@@ -36543,7 +36543,7 @@ Observation.sortableTable = function(container) {
 			if ($(this).parents('.datagrided').length)
 				return;
 			$('tbody input:last', this).keydown(function(event) {
-						if (event.keyCode == 13) {
+						if (event.keyCode == 13 && !$(this).hasClass('tags')) {
 							event.preventDefault();
 							addRow(event, options);
 						}
@@ -36634,6 +36634,16 @@ Observation.sortableTable = function(container) {
 				if (selected)
 					t.prop('disabled', true).css('display', 'none');
 			});
+		});
+		$('input.tags', r).each(function() {
+			var t = $(this);
+			var p = t.closest('.text-core');
+			t.attr('name', $('input[type="hidden"]', p).attr('name')).attr(
+					'style', '').attr('value','').show();
+			p.replaceWith(t[0].outerHTML);
+			setTimeout(function() {
+						r.find('input.tags').tags();
+					}, 100);
 		});
 		$('.datagrided tr', r).each(function(i) {
 					if (i > 0)
@@ -37073,13 +37083,9 @@ Observation.combobox = function(container) {
 	var selector = '.combobox';
 	c.is(selector) ? c.combobox() : $(selector, c).combobox();
 };
-Observation.tags = function(container) {
-	if (typeof $.fn.textext != 'undefined'
-			&& (!$.browser.msie || $.browser.version > '8')) {
-		var c = $(container);
-		var selector = 'input.tags';
-		var ele = c.is(selector) ? c : $(selector, c);
-		ele.each(function() {
+(function($) {
+	$.fn.tags = function() {
+		$(this).each(function() {
 			var t = $(this);
 			var options = {
 				prompt : '...',
@@ -37212,8 +37218,17 @@ Observation.tags = function(container) {
 						if (t.hasClass('required') || t.val())
 							$(this).trigger('enterKeyPress').val('');
 					});
-		});
-	}
+		})
+		return this;
+	};
+})(jQuery);
+Observation.tags = function(container) {
+	var c = $(container);
+	var selector = 'input.tags';
+	if (c.is(selector))
+		c.tags();
+	else
+		$(selector, c).tags();
 };
 Observation.suggestion = function(container) {
 	var c = $(container);
