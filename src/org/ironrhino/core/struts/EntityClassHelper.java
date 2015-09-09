@@ -2,6 +2,8 @@ package org.ironrhino.core.struts;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -258,6 +260,32 @@ public class EntityClassHelper {
 					if (lob != null || uci.getMaxlength() > 255)
 						uci.setExcludedFromOrdering(true);
 					Class<?> returnType = pd.getPropertyType();
+					if (returnType.isArray()) {
+						Class<?> clazz = returnType.getComponentType();
+						if (clazz.isEnum() || clazz == String.class) {
+							uci.setMultiple(true);
+							returnType = clazz;
+							uci.setPropertyType(returnType);
+							uci.addCssClass("custom");
+							uci.setThCssClass("excludeIfNotEdited");
+						}
+					}
+					if (Collection.class.isAssignableFrom(returnType)) {
+						Type type = pd.getReadMethod().getGenericReturnType();
+						if (type instanceof ParameterizedType) {
+							type = ((ParameterizedType) type).getActualTypeArguments()[0];
+							if (type instanceof Class) {
+								Class<?> clazz = (Class<?>) type;
+								if (clazz.isEnum() || clazz == String.class) {
+									uci.setMultiple(true);
+									returnType = clazz;
+									uci.setPropertyType(returnType);
+									uci.addCssClass("custom");
+									uci.setThCssClass("excludeIfNotEdited");
+								}
+							}
+						}
+					}
 					if (returnType.isEnum()) {
 						uci.setType("enum");
 						try {

@@ -64,7 +64,7 @@
 								${action.getText(value?string)}
 							<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 								${value?string}
-							<#elseif value?is_sequence>
+							<#elseif value?is_indexable>
 								<ol class="unstyled">
 								<#list value as item>
 									<li>
@@ -72,7 +72,7 @@
 										${action.getText(item?string)}
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
-									<#elseif item?is_sequence>
+									<#elseif item?is_indexable>
 											<ol class="unstyled" style="padding-bottom:10px;">
 											<#list item as it>
 												<li>${it}</li>
@@ -196,7 +196,7 @@
 											${action.getText(value?string)}
 										<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 											${value?string}
-										<#elseif value?is_sequence>
+										<#elseif value?is_indexable>
 											<ol class="unstyled">
 											<#list value as item>
 												<li>
@@ -204,7 +204,7 @@
 													${action.getText(item?string)}
 												<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 													${item?string}
-												<#elseif item?is_sequence>
+												<#elseif item?is_indexable>
 														<ol class="unstyled" style="padding-bottom:10px;">
 														<#list item as it>
 															<li>${it}</li>
@@ -247,7 +247,7 @@
 							${action.getText(value?string)}
 						<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 							${value?string}
-						<#elseif value?is_sequence>
+						<#elseif value?is_indexable>
 							<ol class="unstyled">
 							<#list value as item>
 								<li>
@@ -255,7 +255,7 @@
 										${action.getText(item?string)}
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
-									<#elseif item?is_sequence>
+									<#elseif item?is_indexable>
 										<ol class="unstyled" style="padding-bottom:10px;">
 										<#list item as it>
 											<li>${it}</li>

@@ -141,6 +141,8 @@ ${formHeader!}
 		${value?datetime}<#t>
 		<#elseif value?is_date_like>
 		${value?datetime}<#t>
+		<#elseif value?is_indexable>
+		<#list value as var>${var?xhtml}<#sep> </#list><#t>
 		<#else>
 		${value?xhtml}<#t>
 		</#if>

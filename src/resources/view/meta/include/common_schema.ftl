@@ -2,7 +2,7 @@
 	<#local schemaManager=beans['schemaManager']/>
 	<#if schemaName?is_string>
 		<#local schema=schemaManager.findOne(true,[schemaName])!>
-	<#elseif schemaName?is_sequence && schemaName?size gt 0>
+	<#elseif schemaName?is_indexable && schemaName?size gt 0>
 		<#if schemaName?size == 1>
 			<#local schema=schemaManager.findOne(true,schemaName)!>
 		<#else>
@@ -192,7 +192,7 @@
 	<#local schemaManager=beans['schemaManager']/>
 	<#if schemaName?is_string>
 		<#local schema=schemaManager.findOne(true,[schemaName])!>
-	<#elseif schemaName?is_sequence && schemaName?size gt 0>
+	<#elseif schemaName?is_indexable && schemaName?size gt 0>
 		<#if schemaName?size == 1>
 			<#local schema=schemaManager.findOne(true,schemaName)!>
 		<#else>

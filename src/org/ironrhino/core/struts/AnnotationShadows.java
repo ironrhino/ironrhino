@@ -25,6 +25,7 @@ public class AnnotationShadows {
 		private String inputType = UiConfig.DEFAULT_INPUT_TYPE;
 		private boolean required;
 		private boolean unique;
+		private boolean multiple;
 		private int maxlength;
 		private String regex;
 		private boolean trim = true;
@@ -241,6 +242,14 @@ public class AnnotationShadows {
 
 		public void setUnique(boolean unique) {
 			this.unique = unique;
+		}
+
+		public boolean isMultiple() {
+			return multiple;
+		}
+
+		public void setMultiple(boolean multiple) {
+			this.multiple = multiple;
 		}
 
 		public String getAlias() {

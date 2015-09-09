@@ -65,7 +65,7 @@
 			<#assign label=key>
 			<#if richtableConfig.celleditable&&!(readonly.value||config.readonly.value) && !(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)>
 				<#assign cellEdit=config.cellEdit!/>
-				<#if cellEdit=='' && !(idAssigned && key=='id')>
+				<#if !config.multiple && cellEdit=='' && !(idAssigned && key=='id')>
 					<#if config.type=='input'>
 						<#assign cellEdit='click'/>
 					<#elseif config.type=='textarea'>
@@ -135,9 +135,17 @@
 		</#if>
 		<#assign value = entity[key]!>
 		<#if config.type=='dictionary' && selectDictionary??>
-			<#assign dynamicAttributes+={'data-cellvalue':value}/>
 			<#assign templateName><@config.templateName?interpret /></#assign>
+			<#if !config.multiple>
+			<#assign dynamicAttributes+={'data-cellvalue':value}/>
 			<#assign value=getDictionaryLabel(templateName,value)/>	
+			<#else>
+			<#assign tmp=[]/>
+			<#list value as var>
+				<#assign tmp+=[getDictionaryLabel(templateName,var)]/>
+			</#list>
+			<#assign value=tmp/>
+			</#if>
 		</#if>
 		<#assign template=config.template/>
 		<#if config.listTemplate?has_content>
@@ -154,7 +162,7 @@
 <#list uiConfigs.entrySet() as entry>
 	<#assign key=entry.key>
 	<#assign config=entry.value>
-	<#assign hidden=config.hiddenInList.value>
+	<#assign hidden=config.hiddenInList.value||config.multiple>
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval/>
 	</#if>
