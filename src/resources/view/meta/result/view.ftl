@@ -62,7 +62,7 @@
 						<#elseif value??>
 							<#if value?is_boolean>
 								${action.getText(value?string)}
-							<#elseif !value?is_sequence&&(value?is_string||value?is_number||value?is_date_like)>
+							<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 								${value?string}
 							<#elseif value?is_sequence>
 								<ol class="unstyled">
@@ -70,7 +70,7 @@
 									<li>
 									<#if item?is_boolean>
 										${action.getText(item?string)}
-									<#elseif !item?is_sequence&&(item?is_string||item?is_number||item?is_date_like)>
+									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
 									<#elseif item?is_sequence>
 											<ol class="unstyled" style="padding-bottom:10px;">
@@ -194,7 +194,7 @@
 								<#elseif value??>
 										<#if value?is_boolean>
 											${action.getText(value?string)}
-										<#elseif !value?is_sequence&&(value?is_string||value?is_number||value?is_date_like)>
+										<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 											${value?string}
 										<#elseif value?is_sequence>
 											<ol class="unstyled">
@@ -202,7 +202,7 @@
 												<li>
 												<#if item?is_boolean>
 													${action.getText(item?string)}
-												<#elseif !item?is_sequence&&(item?is_string||item?is_number||item?is_date_like)>
+												<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 													${item?string}
 												<#elseif item?is_sequence>
 														<ol class="unstyled" style="padding-bottom:10px;">
@@ -245,7 +245,7 @@
 				<#elseif value??>
 						<#if value?is_boolean>
 							${action.getText(value?string)}
-						<#elseif !value?is_sequence&&(value?is_string||value?is_number||value?is_date_like)>
+						<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 							${value?string}
 						<#elseif value?is_sequence>
 							<ol class="unstyled">
@@ -253,7 +253,7 @@
 								<li>
 									<#if item?is_boolean>
 										${action.getText(item?string)}
-									<#elseif !item?is_sequence&&(item?is_string||item?is_number||item?is_date_like)>
+									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
 									<#elseif item?is_sequence>
 										<ol class="unstyled" style="padding-bottom:10px;">
