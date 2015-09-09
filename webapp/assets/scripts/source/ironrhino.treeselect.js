@@ -152,7 +152,10 @@
 				}
 
 			};
-			current.css('cursor', 'pointer').click(func).keydown(
+			var handle = current.find('.treeselect-handle');
+			if (!handle.length)
+				handle = current;
+			handle.css('cursor', 'pointer').click(func).keydown(
 					function(event) {
 						if (event.keyCode == 13) {
 							func(event);

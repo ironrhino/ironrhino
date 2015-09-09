@@ -137,12 +137,17 @@
 			var t = $(this);
 			var p = t.closest('.text-core');
 			t.attr('name', $('input[type="hidden"]', p).attr('name')).attr(
-					'style', '').attr('value','').show();
+					'style', '').attr('value', '').show();
 			p.replaceWith(t[0].outerHTML);
 			setTimeout(function() {
 						r.find('input.tags').tags();
 					}, 100);
 		});
+		$('input.imagepick', r).each(function() {
+					$(this).removeData('popover').popover({
+								'html' : true
+							}).change();
+				});
 		$('.datagrided tr', r).each(function(i) {
 					if (i > 0)
 						$(this).remove();

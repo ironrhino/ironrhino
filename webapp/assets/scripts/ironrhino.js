@@ -36640,12 +36640,17 @@ Observation.sortableTable = function(container) {
 			var t = $(this);
 			var p = t.closest('.text-core');
 			t.attr('name', $('input[type="hidden"]', p).attr('name')).attr(
-					'style', '').attr('value','').show();
+					'style', '').attr('value', '').show();
 			p.replaceWith(t[0].outerHTML);
 			setTimeout(function() {
 						r.find('input.tags').tags();
 					}, 100);
 		});
+		$('input.imagepick', r).each(function() {
+					$(this).removeData('popover').popover({
+								'html' : true
+							}).change();
+				});
 		$('.datagrided tr', r).each(function(i) {
 					if (i > 0)
 						$(this).remove();
@@ -39088,7 +39093,10 @@ Observation.groupable = function(container) {
 				}
 
 			};
-			current.css('cursor', 'pointer').click(func).keydown(
+			var handle = current.find('.treeselect-handle');
+			if (!handle.length)
+				handle = current;
+			handle.css('cursor', 'pointer').click(func).keydown(
 					function(event) {
 						if (event.keyCode == 13) {
 							func(event);
@@ -39420,7 +39428,10 @@ Observation.treeselect = function(container) {
 						});
 
 			};
-			current.css('cursor', 'pointer').click(func).keydown(
+			var handle = current.find('.listpick-handle');
+			if (!handle.length)
+				handle = current;
+			handle.css('cursor', 'pointer').click(func).keydown(
 					function(event) {
 						if (event.keyCode == 13) {
 							func(event);
@@ -39443,14 +39454,13 @@ Observation.listpick = function(container) {
 		return this.each(function() {
 			var t = $(this);
 			t
+					.addClass('listpick-id')
 					.addClass('poped')
-					.wrap('<div class="input-append"/>')
-					.parent()
-					.append('<span class="add-on listpick" style="cursor:pointer;" data-options="{\'url\':\''
+					.wrap('<div class="input-append listpick" data-options="{\'url\':\''
 							+ CONTEXT_PATH
-							+ '/common/upload/pick\',\'id\':\'#'
-							+ t.attr('id')
-							+ '\',\'width\':400}"><i class="glyphicon glyphicon-th-list"></i></span>');
+							+ '/common/upload/pick\',\'width\':400}"/>')
+					.parent()
+					.append('<span class="add-on listpick-handle"><i class="glyphicon glyphicon-th-list"></i></span>');
 			if (t.val())
 				t.attr('data-content', '<img src="' + t.val() + '"/>');
 			t.change(function() {
