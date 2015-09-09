@@ -316,7 +316,8 @@ Form = {
 					.is(':visible,[type="hidden"],.sqleditor,.chzn-done'))
 					&& !$(target).prop('disabled')) {
 				var value = $(target).val();
-				if ($(target).hasClass('required') && !value) {
+				if ($(target).hasClass('required')
+						&& !$(target).hasClass('tags') && !value) {
 					if ($(target).prop('tagName') == 'SELECT'
 							|| $(target).is('[type="hidden"]'))
 						Message.showFieldError(target, null,
