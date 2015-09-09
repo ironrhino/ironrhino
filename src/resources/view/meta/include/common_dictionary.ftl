@@ -56,6 +56,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 </#macro>
 
 <#macro checkDictionary dictionaryName name="" value=[] disabled=false dynamicAttributes...>
+	<input type="hidden" id="__multiselect_${dictionaryName?html}" name="__multiselect_${dictionaryName?html}" value=""<#rt/><#if disabled> disabled</#if>/>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
@@ -71,8 +72,8 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
-				<label for="${dictionaryName}-${index}" class="checkbox inline"><#t>
-				<input id="${dictionaryName}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.value)||statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.label)> checked</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+				<label for="${name}-${index}" class="checkbox inline"><#t>
+				<input id="${name}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.value)||statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.label)> checked</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 				</label><#t>
 				<#local index++>
 				</#list>
@@ -90,12 +91,12 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 							</#if>
 							<#local group = label/>
 							<#if group?has_content>
-								<span class="checkboxgroup"><label for="${dictionaryName}-${group}" class="group"><input id="${dictionaryName}-${group}" type="checkbox" class="custom"/>${group}</label><#t>
+								<span class="checkboxgroup"><label for="${name}-${group}" class="group"><input id="${name}-${group}" type="checkbox" class="custom"/>${group}</label><#t>
 							</#if>
 						</#if>
 					<#else>
-						<label for="${dictionaryName}-${index}" class="checkbox inline"><#t>
-						<input id="${dictionaryName}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.value)||statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.label)> checked</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+						<label for="${name}-${index}" class="checkbox inline"><#t>
+						<input id="${name}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.value)||statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.label)> checked</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 						</label><#t>
 						<#if group?has_content && index==items?size-1>
 						</span><#lt>
@@ -107,8 +108,8 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 		</#if>
 		<#list value as v>
 		<#if !dictionary?? || !(dictionary.itemsAsMap!)?keys?seq_contains(v)>
-		<label for="${dictionaryName}-${index}" class="checkbox inline"><#t>
-		<input id="${dictionaryName}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${v}" checked<#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${v}<#t>
+		<label for="${name}-${index}" class="checkbox inline"><#t>
+		<input id="${name}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${v}" checked<#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${v}<#t>
 		</label><#t>
 		<#local index = index+1/>
 		</#if>
@@ -128,8 +129,8 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
-				<label for="${dictionaryName}-${index}" class="radio inline"><#t>
-				<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}"<#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}"<#if value==lv.value> checked</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+				<label for="${name}-${index}" class="radio inline"><#t>
+				<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}"<#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}"<#if value==lv.value> checked</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 				</label><#t>
 				<#local index++>
 				</#list>
@@ -147,12 +148,12 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 							</#if>
 							<#local group = label/>
 							<#if group?has_content>
-								<span class="checkgroup"><label for="${dictionaryName}-${group}" class="group">${group}</label><#t>
+								<span class="checkgroup"><label for="${name}-${group}" class="group">${group}</label><#t>
 							</#if>
 						</#if>
 					<#else>
-						<label for="${dictionaryName}-${index}" class="radio inline"><#t>
-						<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${lv.value}"<#if value==lv.value> checked</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+						<label for="${name}-${index}" class="radio inline"><#t>
+						<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${lv.value}"<#if value==lv.value> checked</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
 						</label><#t>
 						<#if group?has_content && index==items?size-1>
 						</span><#lt>
@@ -163,8 +164,8 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			</#if>
 		</#if>
 		<#if !dictionary?? || value?has_content && !(dictionary.itemsAsMap!)?keys?seq_contains(value)>
-		<label for="${dictionaryName}-${index}" class="radio inline"><#t>
-		<input id="${dictionaryName}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${value}"checked<#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${value}<#t>
+		<label for="${name}-${index}" class="radio inline"><#t>
+		<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${value}"checked<#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>/>${value}<#t>
 		</label><#t>
 		<#local index = index+1/>
 		</#if>
