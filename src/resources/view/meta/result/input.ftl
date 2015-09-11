@@ -80,7 +80,11 @@
 				<@s.select disabled=readonly id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 				<#else>
 				<#if readonly>
-					<@s.hidden name=entityName+"."+key value="${(entity[key+'AsString'])!}"/>
+				<#if entity[key]?has_content>
+				<#list entity[key] as en>
+				<@s.hidden id="" name=entityName+"."+key value=en.name()/>
+				</#list>
+				</#if>
 				</#if>
 				<@s.checkboxlist disabled=readonly id=id label="%{getText('${label}')}" name=entityName+"."+key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 				</#if>
@@ -123,7 +127,11 @@
 					<@selectDictionary disabled=readonly id=id dictionaryName=templateName name=entityName+"."+key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 					<#else>
 					<#if readonly>
-						<@s.hidden name=entityName+"."+key value=(entity[key+'AsString'])! />
+					<#if entity[key]?has_content>
+					<#list entity[key] as en>
+					<@s.hidden id="" name=entityName+"."+key value=en.name()/>
+					</#list>
+					</#if>
 					</#if>
 					<@checkDictionary disabled=readonly id=id dictionaryName=templateName name=entityName+"."+key class=config.cssClass dynamicAttributes=dynamicAttributes/>
 					</#if>
@@ -233,7 +241,11 @@
 						<@s.select disabled=readonly id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 						<#else>
 						<#if readonly>
-						<@s.hidden name=entityName+"."+key value="${(entity[key+'AsString'])!}"/>
+						<#if entity[key]?has_content>
+						<#list entity[key] as en>
+						<@s.hidden id="" name=entityName+"."+key value=en.name()/>
+						</#list>
+						</#if>
 						</#if>
 						<@s.checkboxlist disabled=readonly id=id label="%{getText('${label}')}" name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 						</#if>
@@ -258,7 +270,11 @@
 						<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 						<#else>
 						<#if readonly>
-							<@s.hidden name=entityName+"."+key value=(entity[key+'AsString'])!/>
+						<#if entity[key]?has_content>
+						<#list entity[key] as en>
+						<@s.hidden id="" name=entityName+"."+key value=en.name()/>
+						</#list>
+						</#if>
 						</#if>
 						<@checkDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 						</#if>
@@ -355,7 +371,11 @@
 									<@s.select disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 									<#else>
 									<#if readonly>
-										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key value="${(entity[key][index][entry.key+'AsString'])!}"/>
+									<#if (entity[key][index][entry.key])?has_content>
+									<#list entity[key][index][entry.key] as en>
+									<@s.hidden id="" name=entityName+"."+key+"["+index+"]."+entry.key value=en.name()/>
+									</#list>
+									</#if>
 									</#if>
 									<@s.checkboxlist disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 									</#if>
@@ -377,7 +397,11 @@
 									<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 									<#else>
 									<#if readonly>
-										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key value=(entity.key[index][entry.key+'AsString'])!/>
+									<#if (entity[key][index][entry.key])?has_content>
+									<#list entity[key][index][entry.key] as en>
+									<@s.hidden id="" name=entityName+"."+key+"["+index+"]."+entry.key value=en.name()/>
+									</#list>
+									</#if>
 									</#if>
 									<@checkDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 									</#if>
