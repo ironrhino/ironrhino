@@ -12,6 +12,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
 
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+
 class ServiceImplementationCondition implements Condition {
 
 	private static Properties services = new Properties();
@@ -33,19 +37,30 @@ class ServiceImplementationCondition implements Condition {
 			Map<String, Object> attrs = metadata
 					.getAnnotationAttributes(ServiceImplementationConditional.class.getName());
 			if (attrs != null) {
+				String serviceInterfaceName = null;
 				String className = ((AnnotationMetadataReadingVisitor) metadata).getClassName();
 				Class<?> serviceInterface = (Class<?>) attrs.get("serviceInterface");
-				if (serviceInterface == void.class) {
+				if (serviceInterface != void.class) {
+					serviceInterfaceName = serviceInterface.getName();
+				} else {
 					try {
-						Class<?> clazz = Class.forName(className);
-						Class<?>[] interfaces = clazz.getInterfaces();
-						if (interfaces.length > 0)
-							serviceInterface = interfaces[0];
+						ClassPool classPool = ClassPool.getDefault();
+						classPool.insertClassPath(new ClassClassPath(this.getClass()));
+						CtClass cc = classPool.get(className);
+						while (!cc.getName().equals(Object.class.getName())) {
+							CtClass[] interfaces = cc.getInterfaces();
+							if (interfaces.length > 0) {
+								serviceInterfaceName = interfaces[0].getName();
+								break;
+							}
+							cc = cc.getSuperclass();
+						}
 					} catch (Throwable e) {
+						e.printStackTrace();
 					}
 				}
-				if (serviceInterface != null && serviceInterface != void.class) {
-					String implementationClassName = services.getProperty(serviceInterface.getName());
+				if (serviceInterfaceName != null) {
+					String implementationClassName = services.getProperty(serviceInterfaceName);
 					if (implementationClassName != null)
 						return implementationClassName.equals(className);
 				}
