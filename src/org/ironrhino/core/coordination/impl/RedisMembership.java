@@ -16,19 +16,17 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.coordination.Membership;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 @Component("membership")
-@Profile({ DUAL, CLOUD })
-@ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
+@ServiceImplementationConditional(profiles = { DUAL, CLOUD })
 public class RedisMembership implements Membership {
 
 	private static final String NAMESPACE = "membership:";

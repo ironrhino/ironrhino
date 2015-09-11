@@ -12,6 +12,16 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.cache.CacheManager;
+import org.ironrhino.core.metadata.PostPropertiesReset;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+
 import net.rubyeye.xmemcached.MemcachedClient;
 import net.rubyeye.xmemcached.MemcachedClientBuilder;
 import net.rubyeye.xmemcached.XMemcachedClientBuilder;
@@ -19,20 +29,8 @@ import net.rubyeye.xmemcached.command.BinaryCommandFactory;
 import net.rubyeye.xmemcached.impl.KetamaMemcachedSessionLocator;
 import net.rubyeye.xmemcached.utils.AddrUtil;
 
-import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.cache.CacheManager;
-import org.ironrhino.core.metadata.PostPropertiesReset;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-
 @Component("cacheManager")
-@Profile(CLUSTER)
-@ResourcePresentConditional(value = "resources/spring/applicationContext-cache.xml", negated = true)
+@ServiceImplementationConditional(profiles = CLUSTER)
 public class MemcachedCacheManager implements CacheManager {
 
 	private Logger log = LoggerFactory.getLogger(getClass());

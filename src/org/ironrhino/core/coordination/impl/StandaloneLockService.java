@@ -8,13 +8,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.ironrhino.core.coordination.LockService;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
-import org.springframework.context.annotation.Profile;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.stereotype.Component;
 
 @Component("lockService")
-@Profile(DEFAULT)
-@ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
+@ServiceImplementationConditional(profiles = DEFAULT)
 public class StandaloneLockService implements LockService {
 
 	private ConcurrentHashMap<String, Lock> locks = new ConcurrentHashMap<>();

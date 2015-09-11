@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.ironrhino.core.coordination.Membership;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component("membership")
-@Profile(DEFAULT)
-@ResourcePresentConditional(value = "resources/spring/applicationContext-coordination.xml", negated = true)
+@ServiceImplementationConditional(profiles = DEFAULT)
 public class StandaloneMembership implements Membership {
 
 	private Map<String, List<String>> groups = new HashMap<>();

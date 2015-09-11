@@ -9,19 +9,17 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.cache.CacheManager;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.springframework.stereotype.Component;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.ObjectExistsException;
 
-import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.cache.CacheManager;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-
 @Component("cacheManager")
-@Profile(DEFAULT)
-@ResourcePresentConditional(value = "resources/spring/applicationContext-cache.xml", negated = true)
+@ServiceImplementationConditional(profiles = DEFAULT)
 public class EhCacheManager implements CacheManager {
 
 	private net.sf.ehcache.CacheManager ehCacheManager;

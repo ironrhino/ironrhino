@@ -21,16 +21,16 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FileStorage;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 @Component("fileStorage")
-@Profile({ DEFAULT, DUAL })
+@ServiceImplementationConditional(profiles = { DEFAULT, DUAL })
 public class LocalFileStorage implements FileStorage {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());

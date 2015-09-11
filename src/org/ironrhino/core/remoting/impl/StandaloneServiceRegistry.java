@@ -6,13 +6,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
-import org.springframework.context.annotation.Profile;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.stereotype.Component;
 
 @Component("serviceRegistry")
-@Profile(DEFAULT)
-@ResourcePresentConditional(value = "resources/spring/applicationContext-remoting.xml", negated = true)
+@ServiceImplementationConditional(profiles = DEFAULT)
 public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
