@@ -41,8 +41,7 @@ class ServiceImplementationCondition implements Condition {
 						Class<?>[] interfaces = clazz.getInterfaces();
 						if (interfaces.length > 0)
 							serviceInterface = interfaces[0];
-					} catch (ClassNotFoundException e) {
-						throw new RuntimeException(e.getMessage(), e);
+					} catch (Throwable e) {
 					}
 				}
 				if (serviceInterface != null && serviceInterface != void.class) {
