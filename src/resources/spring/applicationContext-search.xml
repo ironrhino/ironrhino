@@ -13,7 +13,7 @@
 			<property name="settings">
 				<map>
 					<entry key="name" value="ironrhino" />
-					<entry key="cluster.name" value="iornrhino" />
+					<entry key="cluster.name" value="ironrhino" />
 					<entry key="http.enabled" value="false" />
 					<entry key="node.local" value="true" />
 					<entry key="discovery.zen.ping.multicast.enabled" value="false" />
@@ -32,7 +32,7 @@
 			<property name="settings">
 				<map>
 					<entry key="name" value="ironrhino" />
-					<entry key="cluster.name" value="iornrhino" />
+					<entry key="cluster.name" value="ironrhino" />
 					<entry key="http.enabled" value="false" />
 					<entry key="node.local" value="false" />
 					<entry key="discovery.zen.ping.multicast.enabled" value="true" />
@@ -51,7 +51,7 @@
 			<property name="settings">
 				<map>
 					<entry key="name" value="ironrhino" />
-					<entry key="cluster.name" value="iornrhino" />
+					<entry key="cluster.name" value="ironrhino" />
 					<entry key="http.enabled" value="false" />
 					<entry key="node.local" value="true" />
 					<entry key="discovery.zen.ping.multicast.enabled" value="false" />
