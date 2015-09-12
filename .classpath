@@ -17,9 +17,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.4.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.8.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.8.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.8.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.9.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.9.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.9.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/disruptor-3.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dynamicreports-core-4.0.0.jar"/>
@@ -33,7 +33,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-5.0.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-validator-5.2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpclient-4.5.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.4.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpmime-4.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/itextpdf-5.5.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/itext-pdfa-5.5.5.jar"/>
@@ -75,7 +75,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.5.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.12.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.4.5.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aspects-4.2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.2.1.jar"/>
@@ -90,7 +90,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jms-4.2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-4.2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.4.5.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.1.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-4.0.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-4.0.2.jar"/>
