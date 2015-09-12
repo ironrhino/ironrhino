@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import ognl.MethodFailedException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExceptionUtils;
@@ -20,6 +18,8 @@ import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ValidationAware;
 import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
 import com.opensymphony.xwork2.util.LocalizedTextUtil;
+
+import ognl.MethodFailedException;
 
 public class ExceptionInterceptor extends AbstractInterceptor {
 

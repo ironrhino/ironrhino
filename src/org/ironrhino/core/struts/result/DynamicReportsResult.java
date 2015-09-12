@@ -7,14 +7,14 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.StrutsStatics;
 import org.apache.struts2.dispatcher.StrutsResultSupport;
 
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.util.ValueStack;
+
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 
 public class DynamicReportsResult extends StrutsResultSupport {
 

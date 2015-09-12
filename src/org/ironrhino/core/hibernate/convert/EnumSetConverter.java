@@ -38,7 +38,7 @@ public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeCo
 	public Set<T> convertToEntityAttribute(String string) {
 		if (string == null)
 			return null;
-		if(StringUtils.isBlank(string))
+		if (StringUtils.isBlank(string))
 			return Collections.emptySet();
 		String[] names = string.split(SEPARATOR);
 		Set<T> set = new LinkedHashSet<>();

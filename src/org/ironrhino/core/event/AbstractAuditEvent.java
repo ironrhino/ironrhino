@@ -1,7 +1,5 @@
 package org.ironrhino.core.event;
 
-import org.ironrhino.core.event.BaseEvent;
-
 public abstract class AbstractAuditEvent extends BaseEvent<String> {
 
 	private static final long serialVersionUID = 2656926225727363987L;

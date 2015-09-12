@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
-import org.ironrhino.core.sequence.Sequence;
 import org.ironrhino.core.sequence.CyclicSequence.CycleType;
+import org.ironrhino.core.sequence.Sequence;
 import org.ironrhino.core.sequence.cyclic.DatabaseCyclicSequenceDelegate;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;

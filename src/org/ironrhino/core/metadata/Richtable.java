@@ -64,9 +64,9 @@ public @interface Richtable {
 	String viewWindowOptions() default "";
 
 	int gridColumns() default 0;
-	
+
 	int inputGridColumns() default 0;
-	
+
 	int viewGridColumns() default 0;
 
 }
