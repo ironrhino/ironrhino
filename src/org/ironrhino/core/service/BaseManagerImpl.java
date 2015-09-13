@@ -1,6 +1,9 @@
 package org.ironrhino.core.service;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -68,6 +71,18 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Autowired
 	private DeleteChecker deleteChecker;
+
+	private static final MethodHandle CRITERIA_IMPL_GETTER;
+
+	static {
+		try {
+			Field f = DetachedCriteria.class.getDeclaredField("impl");
+			f.setAccessible(true);
+			CRITERIA_IMPL_GETTER = MethodHandles.lookup().unreflectGetter(f);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	};
 
 	public BaseManagerImpl() {
 		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
@@ -294,7 +309,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public long countByCriteria(DetachedCriteria dc) {
-		CriteriaImpl impl = ReflectionUtils.<CriteriaImpl> getFieldValue(dc, "impl");
+		CriteriaImpl impl;
+		try {
+			impl = (CriteriaImpl) CRITERIA_IMPL_GETTER.invokeExact(dc);
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
 		Iterator<OrderEntry> it = impl.iterateOrderings();
 		List<OrderEntry> orderEntries = null;
 		boolean notEmpty = it.hasNext();
