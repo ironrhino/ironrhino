@@ -174,7 +174,7 @@ public class EntityClassHelper {
 							index = Integer.MAX_VALUE;
 						uci.setDisplayOrder(index);
 					}
-					if (pd.getWriteMethod() == null) {
+					if (pd.getWriteMethod() == null && StringUtils.isBlank(uci.getInputTemplate())) {
 						HiddenImpl hi = new HiddenImpl();
 						hi.setValue(true);
 						uci.setHiddenInInput(hi);
