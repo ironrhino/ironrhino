@@ -194,7 +194,7 @@ public class PageAction extends EntityAction<Page> {
 
 	@Override
 	protected boolean makeEntityValid() {
-		String path = page.getPath().trim().toLowerCase();
+		String path = page.getPath().trim();
 		if (!path.startsWith("/"))
 			path = "/" + path;
 		page.setPath(path);

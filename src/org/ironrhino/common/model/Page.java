@@ -20,7 +20,6 @@ import javax.persistence.Version;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.AutoConfig;
-import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.Richtable;
@@ -49,7 +48,6 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 
 	@SearchableProperty(index = Index.NOT_ANALYZED)
 	@Column(nullable = false)
-	@CaseInsensitive
 	@NaturalId
 	@UiConfig(alias = "path")
 	private String path;

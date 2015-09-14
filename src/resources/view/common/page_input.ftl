@@ -41,8 +41,13 @@ $(function() {
 		$('#page_input').removeClass('dirty');
 			ed.isNotDirty = 1;
 			if($('#page_input').attr('action').indexOf('save')>0 && window.parent!=window){
-					$('.ui-dialog-titlebar-close',$('.window-richtable ',window.parent.document).closest('.ui-dialog')).click();
-					return;
+					var win = $('.window-pop:last',window.parent.document).closest('.ui-dialog');
+					if(!win.length)
+						win = $('.window-richtable:last',window.parent.document).closest('.ui-dialog');
+					if(win.length){
+						$('.ui-dialog-titlebar-close',win).click();
+						return;
+					}
 				}
 			var page = Ajax.jsonResult.page;
 			if(page){
@@ -92,7 +97,11 @@ $(function() {
 </script>
 </head>
 <body>
-<@s.form id="page_input" action="${actionBaseUrl}/draft" method="post" class="ajax form-horizontal" style="padding-top:13px;">
+	<#assign pageContentDynamicAttributes={}>
+	<@classPresentConditional value="org.ironrhino.common.action.UploadAction">
+	<#assign pageContentDynamicAttributes={'data-uploadurl':'/common/upload'}>
+	</@classPresentConditional>
+<@s.form id="page_input" action="${actionBaseUrl}/${view?has_content?string('save','draft')}" method="post" class="ajax form-horizontal" style="padding-top:13px;">
 	<@s.hidden name="page.id" />
 	<@s.hidden name="page.version" class="version" />
 	<#if view=='embedded'>
@@ -101,14 +110,14 @@ $(function() {
 	<@s.hidden name="page.tagsAsString"/>
 	<@s.hidden name="page.head"/>
 	<@s.hidden name="page.title"/>
-	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:100%;height:320px;"/>
+	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:100%;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
 	<#elseif view=='brief'>
 	<@s.hidden name="page.path"/>
 	<@s.hidden name="page.displayOrder"/>
 	<@s.hidden name="page.tagsAsString"/>
 	<@s.hidden name="page.head"/>
 	<@s.textfield label="%{getText('title')}" name="page.title" style="width:600px;"/>
-	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:600px;height:320px;"/>
+	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:600px;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
 	<#else>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#_page_base" data-toggle="tab">${action.getText('base')}</a></li>
@@ -123,11 +132,7 @@ $(function() {
 	<@s.textfield label="%{getText('title')}" name="page.title" style="width:600px;"/>
 	</div>
 	<div id="_page_content" class="tab-pane">
-	<#assign dynamicAttributes={}>
-	<@classPresentConditional value="org.ironrhino.common.action.UploadAction">
-	<#assign dynamicAttributes={'data-uploadurl':'/common/upload'}>
-	</@classPresentConditional>
-	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:800px;height:260px;" dynamicAttributes=dynamicAttributes/>
+	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:800px;height:260px;" dynamicAttributes=pageContentDynamicAttributes/>
 	</div>
 	<div id="_page_head" class="tab-pane">
 	<@s.textarea theme="simple" id="page_head" name="page.head" style="width:800px;height:300px;"/>
@@ -161,5 +166,3 @@ $(function() {
 </@s.form>
 </body>
 </html></#escape>
-
-
