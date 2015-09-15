@@ -36849,8 +36849,9 @@ Observation.datagridTable = function(container) {
 				}).on('click', '.portlet-header .btn-fold', function() {
 					$('i', this).toggleClass('glyphicon-chevron-up')
 							.toggleClass('glyphicon-chevron-down');
-					$(this).closest('.portlet').find('.portlet-content')
-							.toggle();
+					var pc = $(this).closest('.portlet')
+							.find('.portlet-content');
+					pc.is(':visible') ? pc.slideUp() : pc.slideDown();
 					var p = $(this).closest('.portlet');
 					var id = p.attr('id');
 					if (savable && window.localStorage && id) {
@@ -38015,11 +38016,16 @@ Initialization.richtable = function() {
 								.closest('form').submit();
 					}).on('click', '.richtable .action .filter', function() {
 						var f = $(this).closest('form').next('form.criteria');
-						f.toggle();
-						if (f.is(':visible'))
-							$('html,body').animate({
-										scrollTop : f.offset().top - 50
-									}, 100);
+						if (f.is(':visible')) {
+							f.slideUp();
+						} else {
+							f.slideDown(100, function() {
+										$('html,body').animate({
+													scrollTop : f.offset().top
+															- 50
+												}, 300);
+									});
+						}
 					}).on('click', '.richtable .more', function(event) {
 				var form = $(event.target).closest('form');
 				if (!$('li.nextPage', form).length)

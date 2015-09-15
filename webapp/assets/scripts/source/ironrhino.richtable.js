@@ -575,11 +575,16 @@ Initialization.richtable = function() {
 								.closest('form').submit();
 					}).on('click', '.richtable .action .filter', function() {
 						var f = $(this).closest('form').next('form.criteria');
-						f.toggle();
-						if (f.is(':visible'))
-							$('html,body').animate({
-										scrollTop : f.offset().top - 50
-									}, 100);
+						if (f.is(':visible')) {
+							f.slideUp();
+						} else {
+							f.slideDown(100, function() {
+										$('html,body').animate({
+													scrollTop : f.offset().top
+															- 50
+												}, 300);
+									});
+						}
 					}).on('click', '.richtable .more', function(event) {
 				var form = $(event.target).closest('form');
 				if (!$('li.nextPage', form).length)

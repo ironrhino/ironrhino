@@ -81,8 +81,9 @@
 				}).on('click', '.portlet-header .btn-fold', function() {
 					$('i', this).toggleClass('glyphicon-chevron-up')
 							.toggleClass('glyphicon-chevron-down');
-					$(this).closest('.portlet').find('.portlet-content')
-							.toggle();
+					var pc = $(this).closest('.portlet')
+							.find('.portlet-content');
+					pc.is(':visible') ? pc.slideUp() : pc.slideDown();
 					var p = $(this).closest('.portlet');
 					var id = p.attr('id');
 					if (savable && window.localStorage && id) {

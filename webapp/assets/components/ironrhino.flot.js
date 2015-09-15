@@ -14,8 +14,8 @@
 					.insertAfter(plot).click(function() {
 						$('.glyphicon', this).toggleClass('glyphicon-list')
 								.toggleClass('glyphicon-picture');
-						ul.toggle();
-						plot.toggle();
+						ul.is(':visible') ? ul.slideUp() : ul.slideDown();
+						plot.is(':visible') ? plot.slideUp() : plot.slideDown();
 					});
 			if (ul.hasClass('flotlinechart')) {
 				var istime = false, options = {
