@@ -52,6 +52,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.ValueThenKeyComparator;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -514,20 +515,17 @@ public class EntityClassHelper {
 		for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
 			if (!entry.getValue().isExcludedFromCriteria() && !entry.getKey().endsWith("AsString")
 					&& !CriterionOperator.getSupportedOperators(entry.getValue().getPropertyType()).isEmpty()) {
-				UiConfigImpl config = entry.getValue();
-				Set<String> cssClasses = config.getCssClasses();
-				if (cssClasses.contains("date")) {
-					config.getCssClasses().clear();
-					config.getCssClasses().add("date");
-				} else if (cssClasses.contains("datetime")) {
-					config.getCssClasses().clear();
-					config.getCssClasses().add("datetime");
-				} else if (cssClasses.contains("time")) {
-					config.getCssClasses().clear();
-					config.getCssClasses().add("time");
-				} else {
-					config.getCssClasses().clear();
+				UiConfigImpl config = new UiConfigImpl();
+				BeanUtils.copyProperties(entry.getValue(), config);
+				Set<String> cssClasses = new LinkedHashSet<>();
+				if (config.getCssClasses().contains("date")) {
+					cssClasses.add("date");
+				} else if (config.getCssClasses().contains("datetime")) {
+					cssClasses.add("datetime");
+				} else if (config.getCssClasses().contains("time")) {
+					cssClasses.add("time");
 				}
+				config.setCssClasses(cssClasses);
 				propertyNamesInCriterion.put(entry.getKey(), config);
 			}
 		}
