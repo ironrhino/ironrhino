@@ -8266,13 +8266,13 @@ input.integer,input.long,input.double,input.date,input.datetime,input.time {
 	font-family: Arial;
 }
 input.integer,input.long,input.double{
-	width: 100px !important;
+	width: 100px;
 }
 input.double.large {
-	width: 150px !important;
+	width: 150px;
 }
 input.long {
-	width: 150px !important;
+	width: 150px;
 }
 input.date {
 	width: 75px !important;
