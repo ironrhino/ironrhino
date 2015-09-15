@@ -8266,25 +8266,25 @@ input.integer,input.long,input.double,input.date,input.datetime,input.time {
 	font-family: Arial;
 }
 input.integer,input.long,input.double{
-	width: 100px;
+	width: 100px !important;
 }
 input.double.large {
-	width: 150px;
+	width: 150px !important;
 }
 input.long {
-	width: 150px;
+	width: 150px !important;
 }
 input.date {
-	width: 75px;
+	width: 75px !important;
 }
 input.datetime {
-	width: 125px;
+	width: 125px !important;
 }
 input.time {
-	width: 60px;
+	width: 60px !important;
 }
 input.latlng{
-	width: 180px;
+	width: 180px !important;
 }
 .error input.required:read-write, input.required:focus {
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAAUUlEQVR42mNgGHzgPwNDFxCr/mNg+AekVUB8fIp5/zIwTIYqngzi41QMVHQGqPgNkP4Ppc/gM1kDqKgCZDKIBvI1cSoGKtgJteEflL+DPqEFAKYgJItbm6p6AAAAAElFTkSuQmCC);
