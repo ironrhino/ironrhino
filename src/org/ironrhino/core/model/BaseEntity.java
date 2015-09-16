@@ -21,7 +21,7 @@ public class BaseEntity extends Entity<String> {
 	@Id
 	@GeneratedValue(generator = "stringId")
 	@GenericGenerator(name = "stringId", strategy = "org.ironrhino.core.hibernate.StringIdGenerator")
-	@Column(length = 32)
+	@Column(length = 22)
 	protected String id;
 
 	@Override
