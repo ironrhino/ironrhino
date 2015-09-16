@@ -42,7 +42,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-core-2.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-databind-2.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jasperreports-6.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javamail-1.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javamail-1.5.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.20.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.3.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-annotations-2.0.0.jar"/>
