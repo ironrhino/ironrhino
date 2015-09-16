@@ -13,9 +13,9 @@
 		</param-value>
 	</context-param>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>characterEncodingFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.CharacterEncodingFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
@@ -26,19 +26,19 @@
 		</init-param>
 	</filter>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>captchaFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>accessFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>httpSessionFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>targetFilterLifecycle</param-name>
 			<param-value>true</param-value>
@@ -49,18 +49,18 @@
 		</init-param>
 	</filter>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>excludePatterns</param-name>
 			<param-value>/remoting/*</param-value>
 		</init-param>
 	</filter>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>openSessionInViewFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>targetFilterLifecycle</param-name>
 			<param-value>true</param-value>
@@ -75,9 +75,9 @@
 		</init-param>
 	</filter>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>strutsPrepareFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>targetFilterLifecycle</param-name>
 			<param-value>true</param-value>
@@ -88,9 +88,9 @@
 		</init-param>
 	</filter>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>strutsExecuteFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>targetFilterLifecycle</param-name>
 			<param-value>true</param-value>
@@ -101,9 +101,9 @@
 		</init-param>
 	</filter>
 	<filter>
-		<async-supported>true</async-supported>
 		<filter-name>sitemeshFilter</filter-name>
 		<filter-class>org.ironrhino.core.servlet.DelegatingFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>  
 			<param-name>targetFilterLifecycle</param-name>  
 			<param-value>true</param-value>  
@@ -173,7 +173,7 @@
 	<listener>
 		<listener-class>
 			org.springframework.web.util.IntrospectorCleanupListener</listener-class>
-	</listener>	
+	</listener>
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
