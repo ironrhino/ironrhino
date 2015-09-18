@@ -35,7 +35,7 @@
 <#noescape>${head}</#noescape>
 </head>
 
-<body class="main ${request.locale.language} ${(page.properties["meta.body_class"])!}<#if modernBrowser> render-location-qrcode</#if>">
+<body class="main ${.lang} ${(page.properties["meta.body_class"])!}<#if modernBrowser> render-location-qrcode</#if>">
 <#if !modernBrowser>
 <div class="container">
 <div class="alert">

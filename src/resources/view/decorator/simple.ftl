@@ -29,7 +29,7 @@
 <#include "include/assets.ftl" ignore_missing=true/>
 <#noescape>${head}</#noescape>
 </head>
-<body class="simple ${request.locale.language}">
+<body class="simple ${.lang}">
 <div id="content" class="simple">
 <#if action.hasActionMessages() || action.hasActionErrors()>
 <div id="message">
