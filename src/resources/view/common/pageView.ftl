@@ -15,7 +15,7 @@ div.section{
     margin: 10px 4px;
     box-shadow: 0 0 10px rgba(189, 189, 189, 0.4);
 	padding: 10px;
-	margin-bottom: 20px;
+	margin: 20px 0;
 }
 div.section ul{
 	margin: 0;
