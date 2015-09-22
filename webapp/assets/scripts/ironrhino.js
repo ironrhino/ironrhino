@@ -32013,8 +32013,8 @@ Form = {
 					.is(':visible,[type="hidden"],.sqleditor,.chzn-done'))
 					&& !$(target).prop('disabled')) {
 				var value = $(target).val();
-				if ($(target).hasClass('required')
-						&& !$(target).hasClass('tags') && !value) {
+				if ($(target).hasClass('required') && $(target).attr('name')
+						&& !value) {
 					if ($(target).prop('tagName') == 'SELECT'
 							|| $(target).is('[type="hidden"]'))
 						Message.showFieldError(target, null,
@@ -37210,20 +37210,20 @@ Observation.combobox = function(container) {
 				options.plugins = 'tags prompt focus';
 			}
 			t.val('').textext(options).bind('isTagAllowed', function(e, data) {
-						var inputed = [];
-						$('.text-tags .text-label', this.container).each(
-								function() {
-									inputed.push($(this).text())
-								});
-						for (var i = 0; i < inputed.length; i++)
-							if (inputed[i] == data.tag) {
-								data.result = false;
-								break;
-							}
-					});
+				var inputed = [];
+				$('.text-tags .text-label',
+						$(this).data('textext').wrapElement()).each(function() {
+							inputed.push($(this).text())
+						});
+				for (var i = 0; i < inputed.length; i++)
+					if (inputed[i] == data.tag) {
+						data.result = false;
+						break;
+					}
+			});
 			t.blur(function() {
-						if (t.hasClass('required') || t.val())
-							$(this).trigger('enterKeyPress').val('');
+						if (t.val())
+							t.trigger('enterKeyPress').val('').blur();
 					});
 		})
 		return this;

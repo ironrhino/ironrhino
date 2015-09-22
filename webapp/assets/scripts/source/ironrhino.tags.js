@@ -118,20 +118,20 @@
 				options.plugins = 'tags prompt focus';
 			}
 			t.val('').textext(options).bind('isTagAllowed', function(e, data) {
-						var inputed = [];
-						$('.text-tags .text-label', this.container).each(
-								function() {
-									inputed.push($(this).text())
-								});
-						for (var i = 0; i < inputed.length; i++)
-							if (inputed[i] == data.tag) {
-								data.result = false;
-								break;
-							}
-					});
+				var inputed = [];
+				$('.text-tags .text-label',
+						$(this).data('textext').wrapElement()).each(function() {
+							inputed.push($(this).text())
+						});
+				for (var i = 0; i < inputed.length; i++)
+					if (inputed[i] == data.tag) {
+						data.result = false;
+						break;
+					}
+			});
 			t.blur(function() {
-						if (t.hasClass('required') || t.val())
-							$(this).trigger('enterKeyPress').val('');
+						if (t.val())
+							t.trigger('enterKeyPress').val('').blur();
 					});
 		})
 		return this;
