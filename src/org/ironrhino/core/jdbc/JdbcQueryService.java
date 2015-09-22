@@ -416,7 +416,7 @@ public class JdbcQueryService {
 		}
 
 		final ColumnMapRowMapper crm = new ColumnMapRowMapper();
-		return namedParameterJdbcTemplate.execute(sql, paramMap, (preparedStatement) -> {
+		return namedParameterJdbcTemplate.execute(sql, paramMap, preparedStatement -> {
 			preparedStatement.setMaxRows(offset + limit);
 			ResultSet rs = preparedStatement.executeQuery();
 			List<Map<String, Object>> result = new ArrayList<>(limit);

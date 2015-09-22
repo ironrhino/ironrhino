@@ -82,7 +82,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 		for (List<TreeNode> topTreeNodes : result.values()) {
 			// sort children,set and cumulate to parent
 			for (TreeNode topNode : topTreeNodes) {
-				TreeWalker.walk(topNode, (node) -> {
+				TreeWalker.walk(topNode, node -> {
 					if (!node.isLeaf()) {
 						Value v = node.getValue();
 						if (v == null) {
@@ -101,7 +101,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 			}
 			// set Id and caculate percent
 			final CumulativeAnalyzer ca = this;
-			TreeWalker.Visitor vistor = (node) -> {
+			TreeWalker.Visitor vistor = node -> {
 				node.setId(ca.generateId());
 				if (node.isLeaf())
 					return;

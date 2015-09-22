@@ -105,13 +105,13 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 			if (masterName != null)
 				writeSlaves.put(masterName, master);
 			writeRoundRobin = new RoundRobin<>(writeSlaveNames,
-					(target) -> !deadDataSources.contains(writeSlaves.get(target)));
+					target -> !deadDataSources.contains(writeSlaves.get(target)));
 		}
 		if (readSlaveNames != null && readSlaveNames.size() > 0) {
 			for (String name : readSlaveNames.keySet())
 				readSlaves.put(name, (DataSource) beanFactory.getBean(name));
 			readRoundRobin = new RoundRobin<>(readSlaveNames,
-					(target) -> !deadDataSources.contains(readSlaves.get(target)));
+					target -> !deadDataSources.contains(readSlaves.get(target)));
 		}
 	}
 

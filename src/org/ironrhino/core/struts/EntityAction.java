@@ -420,7 +420,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPaginating(richtableConfig.paginating());
 			prepare(criteria);
 			resultPage.setCriteria(criteria);
-			resultPage = elasticSearchService.search(resultPage, (source) -> (EN) entityManager.get(source.getId()));
+			resultPage = elasticSearchService.search(resultPage, source -> (EN) entityManager.get(source.getId()));
 		}
 		return LIST;
 	}
@@ -1501,7 +1501,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (uic == null
 				|| !uic.isUnique() && !(getNaturalIds().size() == 1 && getNaturalIds().containsKey(propertyName)))
 			return NONE;
-		suggestions = getEntityManager(getEntityClass()).executeFind((session) -> {
+		suggestions = getEntityManager(getEntityClass()).executeFind(session -> {
 			StringBuilder hql = new StringBuilder("select ").append(propertyName).append(" from ")
 					.append(getEntityClass().getSimpleName()).append(" where ").append(propertyName)
 					.append(" like :keyword");

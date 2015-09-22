@@ -116,7 +116,7 @@ public class LocalFileStorage implements FileStorage {
 	@Override
 	public List<String> listFiles(String path) {
 		final List<String> list = new ArrayList<>();
-		new File(directory, path).listFiles((f) -> {
+		new File(directory, path).listFiles(f -> {
 			if (f.isFile()) {
 				list.add(f.getName());
 			}
@@ -128,7 +128,7 @@ public class LocalFileStorage implements FileStorage {
 	@Override
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
 		final Map<String, Boolean> map = new HashMap<>();
-		new File(directory, path).listFiles((f) -> {
+		new File(directory, path).listFiles(f -> {
 			map.put(f.getName(), f.isFile());
 			return false;
 		});

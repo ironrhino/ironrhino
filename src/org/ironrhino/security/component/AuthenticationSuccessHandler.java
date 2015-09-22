@@ -54,6 +54,6 @@ public class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHa
 	}
 
 	private void save(final LoginRecord loginRecord) {
-		userManager.execute((session) -> session.save(loginRecord));
+		userManager.execute(session -> session.save(loginRecord));
 	}
 }
