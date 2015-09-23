@@ -154,6 +154,9 @@ public class MonitorAction extends BaseAction {
 	}
 
 	public String chart() {
+		String id = getUid();
+		if (StringUtils.isBlank(id))
+			return NOTFOUND;
 		Date today = new Date();
 		if (date == null || date.after(today))
 			date = today;
@@ -162,7 +165,10 @@ public class MonitorAction extends BaseAction {
 
 	@JsonConfig(root = "chart")
 	public String data() {
-		chart = statControl.getChart(Key.fromString(getUid()), date, vtype, ctype, localhost);
+		String id = getUid();
+		if (StringUtils.isBlank(id))
+			return NOTFOUND;
+		chart = statControl.getChart(Key.fromString(id), date, vtype, ctype, localhost);
 		return JSON;
 	}
 }
