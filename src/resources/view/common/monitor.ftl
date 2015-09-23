@@ -38,13 +38,13 @@
 </div>
 <div id="result"<#if Parameters.live??> class="ajaxpanel" data-interval="${Parameters.interval?default('60000')}" data-quiet="true"</#if>>
 <#list result.entrySet() as entry>
-<table class="treeTable expanded table table-hover table-bordered" style="width:100%;">
+<table class="treeTable expanded table table-hover table-bordered sortable" style="width:100%;">
   <#if entry.key??>
   <caption><h3>${entry.key}</h3></caption>
   </#if>
   <thead>
     <tr>
-      <th>${action.getText('key')}</th>
+      <th class="nosort">${action.getText('key')}</th>
       <th style="width:20%;"></th>
       <th style="width:20%;"></th>
     </tr>
