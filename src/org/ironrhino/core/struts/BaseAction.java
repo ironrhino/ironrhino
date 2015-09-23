@@ -249,7 +249,7 @@ public class BaseAction extends ActionSupport {
 				return inputConfig.resultName();
 			}
 		}
-		if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)) {
+		if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "PATCH".equalsIgnoreCase(method)) {
 			try {
 				BufferedReader reader = ServletActionContext.getRequest().getReader();
 				StringBuilder sb = new StringBuilder();
