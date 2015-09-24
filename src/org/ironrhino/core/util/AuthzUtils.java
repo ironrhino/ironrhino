@@ -92,6 +92,10 @@ public class AuthzUtils {
 		return roleNames;
 	}
 
+	public static boolean hasRole(String role) {
+		return getRoleNames().contains(role);
+	}
+
 	public static boolean hasPermission(Secured entity) {
 		return hasPermission(entity, false);
 	}
