@@ -1,8 +1,8 @@
 <#macro renderTR node>
 <tr id="node-${node.id}"<#if node.parent??&&node.parent.id gt 0> class="child-of-node-${node.parent.id}"</#if>>
         <td>${node.name}</td>
-        <td <#if node.level gt 1>style="padding-left:${(node.level-1)*19}px"</#if>><#if node.value.longValue gt 0><a href="monitor/chart/${node.key?string}?vtype=l<#if request.queryString??>&${request.queryString}</#if>">${node.value.longValue}</a><span class="pull-right">${node.longPercent!}</span></#if></td>
-        <td <#if node.level gt 1>style="padding-left:${(node.level-1)*19}px"</#if>><#if node.value.doubleValue gt 0><a href="monitor/chart/${node.key?string}?vtype=d<#if request.queryString??>&${request.queryString}</#if>">${node.value.doubleValue}</a><span class="pull-right">${node.doublePercent!}</span></#if></td>
+        <td <#if node.level gt 1>style="padding-left:${(node.level-1)*19}px"</#if>><#if node.value.longValue gt 0><a href="monitor/chart/${node.key?string}?vtype=l<#if request.queryString??>&${request.queryString}</#if>" target="_blank">${node.value.longValue}</a><span class="pull-right">${node.longPercent!}<#if node.value.longValue?? && !node.leaf && node.children.size() lte 10> <a href="monitor/pie/${node.key?string}?vtype=l<#if request.queryString??>&${request.queryString}</#if>" target="_blank"><span class="glyphicon glyphicon-picture clickable"></span></a></#if></span></#if></td>
+        <td <#if node.level gt 1>style="padding-left:${(node.level-1)*19}px"</#if>><#if node.value.doubleValue gt 0><a href="monitor/chart/${node.key?string}?vtype=d<#if request.queryString??>&${request.queryString}</#if>" target="_blank">${node.value.doubleValue}</a><span class="pull-right">${node.doublePercent!}<#if node.value.doubleValue?? && !node.leaf && node.children.size() lte 10> <a href="monitor/pie/${node.key?string}?vtype=d<#if request.queryString??>&${request.queryString}</#if>" target="_blank"><span class="glyphicon glyphicon-picture clickable"></span></a></#if></span></#if></td>
 </tr>
 <#if node.leaf>
 	<#return>

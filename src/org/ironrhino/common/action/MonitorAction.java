@@ -40,6 +40,8 @@ public class MonitorAction extends BaseAction {
 
 	private Map<String, List<TreeNode>> result;
 
+	private TreeNode treeNode;
+
 	private Chart chart;
 
 	@Autowired
@@ -117,6 +119,10 @@ public class MonitorAction extends BaseAction {
 		return result;
 	}
 
+	public TreeNode getTreeNode() {
+		return treeNode;
+	}
+
 	@Override
 	public String execute() {
 		try {
@@ -170,5 +176,31 @@ public class MonitorAction extends BaseAction {
 			return NOTFOUND;
 		chart = statControl.getChart(Key.fromString(id), date, vtype, ctype, localhost);
 		return JSON;
+	}
+
+	public String pie() {
+		String id = getUid();
+		if (StringUtils.isBlank(id))
+			return NOTFOUND;
+		Key key = Key.fromString(id);
+		try {
+			if (from != null && to != null) {
+				result = statControl.getResult(from, to, localhost);
+			} else {
+				Date today = new Date();
+				if (date == null || date.after(today))
+					date = today;
+				result = statControl.getResult(date, localhost);
+			}
+			label: for (List<TreeNode> list : result.values()) {
+				for (TreeNode t : list) {
+					treeNode = t.getDescendantOrSelfByKey(key);
+					if (treeNode != null)
+						break label;
+				}
+			}
+		} catch (Exception e) {
+		}
+		return treeNode != null ? "pie" : NOTFOUND;
 	}
 }
