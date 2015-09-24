@@ -114,6 +114,17 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 						n.setDoublePercent(NumberUtils
 								.formatPercent(n.getValue().getDoubleValue() / node.getValue().getDoubleValue(), 2));
 				}
+				Collections.sort(node.getChildren(), (t1, t2) -> {
+					long v1 = t1.getValue().getLongValue();
+					long v2 = t2.getValue().getLongValue();
+					if (v1 > 0 && v2 > 0)
+						return (int) (v2 - v1);
+					double d1 = t1.getValue().getDoubleValue();
+					double d2 = t2.getValue().getDoubleValue();
+					if (d1 > 0 && d2 > 0)
+						return (int) ((d2 - d1) * 100);
+					return 0;
+				});
 			};
 			for (TreeNode topNode : topTreeNodes) {
 				TreeWalker.walk(topNode, vistor);
