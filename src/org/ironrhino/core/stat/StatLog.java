@@ -1,9 +1,7 @@
 package org.ironrhino.core.stat;
 
-import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +23,6 @@ public class StatLog {
 
 	private static Thread writeThread;
 
-	private static Date lastDate;
-
-	private static FileOutputStream fileOutputStream;
-
-	private static BufferedWriter bufferedWriter;
-
 	static {
 		startNewThread();
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -38,14 +30,6 @@ public class StatLog {
 			@Override
 			public void run() {
 				write(false);
-				try {
-					if (bufferedWriter != null)
-						bufferedWriter.close();
-					if (fileOutputStream != null)
-						fileOutputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
 		});
 	}
@@ -110,21 +94,13 @@ public class StatLog {
 		sb.append(value);
 		sb.append(StatLogSettings.TOKEN);
 		sb.append(sysdate());
+		sb.append('\n');
 		try {
-			if (lastDate == null || !DateUtils.isSameDay(new Date(), lastDate)) {
-				lastDate = new Date();
-				if (bufferedWriter != null)
-					bufferedWriter.close();
-				if (fileOutputStream != null)
-					fileOutputStream.close();
-				fileOutputStream = new FileOutputStream(StatLogSettings.getLogFile(
-						StatLogSettings.STAT_LOG_FILE_NAME + DateUtils.format(lastDate, StatLogSettings.DATE_STYLE)),
-						true);
-				bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream, StatLogSettings.ENCODING));
-			}
-			bufferedWriter.write(sb.toString());
-			bufferedWriter.write('\n');
-			bufferedWriter.flush();
+			FileOutputStream fileOutputStream = new FileOutputStream(StatLogSettings.getLogFile(
+					StatLogSettings.STAT_LOG_FILE_NAME + DateUtils.format(new Date(), StatLogSettings.DATE_STYLE)),
+					true);
+			fileOutputStream.write(sb.toString().getBytes(StatLogSettings.ENCODING));
+			fileOutputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
