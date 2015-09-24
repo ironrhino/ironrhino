@@ -73,6 +73,8 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 			@Override
 			protected KeyValuePair transform(String line, File f) {
 				String[] array = line.split("\\|");
+				if (array.length != 3)
+					return KeyValuePair.EMPTY;
 				Key key = Key.fromString(array[0]);
 				Value value = Value.fromString(array[1]);
 				Date date = null;
@@ -95,8 +97,11 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 		preAnalyze();
 		try {
 			Iterator<? extends KeyValuePair> it = iterate();
-			while (it.hasNext())
-				process(it.next());
+			while (it.hasNext()) {
+				KeyValuePair pair = it.next();
+				if (pair != KeyValuePair.EMPTY)
+					process(pair);
+			}
 			postAnalyze();
 		} catch (Exception e) {
 			throw new RuntimeException(e);

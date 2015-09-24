@@ -12,6 +12,8 @@ public class KeyValuePair implements Serializable {
 
 	private static final long serialVersionUID = 1939944128282158865L;
 
+	public static final KeyValuePair EMPTY = new KeyValuePair();
+
 	@Transient
 	protected Key key;
 
