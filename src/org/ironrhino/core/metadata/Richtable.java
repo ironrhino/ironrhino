@@ -40,6 +40,8 @@ public @interface Richtable {
 
 	boolean filterable() default true;
 
+	boolean downloadable() default true;
+
 	boolean celleditable() default true;
 
 	String actionColumnButtons() default "";
