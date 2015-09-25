@@ -31,6 +31,8 @@ public @interface CheckCache {
 
 	boolean cacheNull() default false;
 
+	int throughPermits() default 5;
+
 	// mvel expression
 	String onHit() default "";
 

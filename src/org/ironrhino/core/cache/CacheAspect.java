@@ -60,8 +60,9 @@ public class CacheAspect extends BaseAspect {
 				return value instanceof NullObject ? null : value;
 			} else {
 				if (mutex) {
-					if (cacheManager.putIfAbsent(keyMutex, "", Math.max(10000, mutexWait), TimeUnit.MILLISECONDS,
-							namespace)) {
+					int throughPermits = checkCache.throughPermits();
+					if (cacheManager.increment(keyMutex, 1, Math.max(10000, mutexWait), TimeUnit.MILLISECONDS,
+							namespace) <= throughPermits) {
 						mutexed = true;
 					} else {
 						Thread.sleep(mutexWait);
