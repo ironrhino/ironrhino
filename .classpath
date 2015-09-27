@@ -105,7 +105,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-spring-plugin-2.3.24.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/validation-api-1.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xmemcached-2.0.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xwork-core-2.3.24.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xwork-core-2.3.24.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zookeeper-3.4.6.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zxing-core-3.2.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zxing-javase-3.2.0.jar"/>
