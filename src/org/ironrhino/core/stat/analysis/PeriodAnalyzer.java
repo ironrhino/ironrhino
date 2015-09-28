@@ -92,10 +92,10 @@ public class PeriodAnalyzer extends AbstractAnalyzer<List<Value>> {
 			return;
 		calendar.setTime(pair.getDate());
 		int hour = calendar.get(Calendar.HOUR_OF_DAY);
-		result.get(hour).cumulate(pair.getValue());
+		result.get(hour).accumulate(pair.getValue());
 		if (cumulative)
 			for (int i = hour + 1; i < 24; i++)
-				result.get(i).cumulate(pair.getValue());
+				result.get(i).accumulate(pair.getValue());
 		if (perHostEnabled) {
 			List<Value> list = perHostResult.get(pair.getHost());
 			if (list == null) {
@@ -104,10 +104,10 @@ public class PeriodAnalyzer extends AbstractAnalyzer<List<Value>> {
 					list.add(new Value());
 				perHostResult.put(pair.getHost(), list);
 			}
-			list.get(hour).cumulate(pair.getValue());
+			list.get(hour).accumulate(pair.getValue());
 			if (cumulative)
 				for (int i = hour + 1; i < 24; i++)
-					list.get(i).cumulate(pair.getValue());
+					list.get(i).accumulate(pair.getValue());
 		}
 	}
 

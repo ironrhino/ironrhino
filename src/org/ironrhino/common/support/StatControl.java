@@ -125,7 +125,7 @@ public class StatControl {
 						} else {
 							if (calendar.get(Calendar.HOUR_OF_DAY) == currentHour) {
 								lastKey.setLastWriteTime(pair.getDate().getTime());
-								lastValue.cumulate(pair.getValue());
+								lastValue.accumulate(pair.getValue());
 							} else {
 								save();
 								lastKey = pair.getKey();

@@ -60,7 +60,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 				node = list.get(j);
 				if (cur.equals(node.getKey())) {
 					if (i == level)
-						node.getValue().cumulate(pair.getValue());
+						node.getValue().accumulate(pair.getValue());
 					contains = true;
 					break;
 				}
@@ -80,7 +80,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 	protected void postAnalyze() {
 
 		for (List<TreeNode> topTreeNodes : result.values()) {
-			// sort children,set and cumulate to parent
+			// sort children,set and accumulate to parent
 			for (TreeNode topNode : topTreeNodes) {
 				TreeWalker.walk(topNode, node -> {
 					if (!node.isLeaf()) {
@@ -93,7 +93,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 						Collections.sort(children, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
 						for (TreeNode n : children) {
 							n.setParent(node);
-							v.cumulate(n.getValue());
+							v.accumulate(n.getValue());
 						}
 					}
 				} , true);
