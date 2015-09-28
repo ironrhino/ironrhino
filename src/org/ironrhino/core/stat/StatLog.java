@@ -120,27 +120,27 @@ public class StatLog {
 		return value;
 	}
 
-	public static Number[] add(Key key, long c, double d) {
+	public static void add(Key key, long c, double d) {
 		if (!writeThread.isAlive())
 			runWriteThread();
 		Value value = getValue(key);
-		return value.add(c, d);
+		value.add(c, d);
 	}
 
-	public static long add(Key key, long c) {
-		return (Long) add(key, c, 0)[0];
+	public static void add(Key key, long c) {
+		add(key, c, 0);
 	}
 
-	public static double add(Key key, double d) {
-		return (Double) add(key, 0, d)[1];
+	public static void add(Key key, double d) {
+		add(key, 0, d);
 	}
 
-	public static long add(String... names) {
-		return add(new Key(names), 1);
+	public static void add(String... names) {
+		add(new Key(names), 1);
 	}
 
-	public static long add(Key key) {
-		return add(key, 1);
+	public static void add(Key key) {
+		add(key, 1);
 	}
 
 }

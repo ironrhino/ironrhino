@@ -1,7 +1,7 @@
 package org.ironrhino.core.stat;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,54 +9,57 @@ public class Value implements Serializable {
 
 	private static final long serialVersionUID = 3432914727431442150L;
 
-	private final AtomicLong longValue;
+	private final LongAdder longValue;
 
-	private final AtomicLong doubleValue;
+	private final LongAdder doubleValue;
 
 	public static final int PRECISION = 1000;
 
 	// private double doubleValue;
 
 	public Value() {
-		longValue = new AtomicLong(0);
-		doubleValue = new AtomicLong(0);
+		longValue = new LongAdder();
+		doubleValue = new LongAdder();
 	}
 
 	public Value(long c) {
-		longValue = new AtomicLong(c);
-		doubleValue = new AtomicLong(0);
+		longValue = new LongAdder();
+		longValue.add(c);
+		doubleValue = new LongAdder();
 	}
 
 	public Value(double d) {
-		longValue = new AtomicLong(0);
-		doubleValue = new AtomicLong((long) (d * PRECISION));
+		longValue = new LongAdder();
+		doubleValue = new LongAdder();
+		doubleValue.add((long) (d * PRECISION));
 	}
 
 	public Value(long c, double d) {
-		longValue = new AtomicLong(c);
-		doubleValue = new AtomicLong((long) (d * PRECISION));
+		longValue = new LongAdder();
+		longValue.add(c);
+		doubleValue = new LongAdder();
+		doubleValue.add((long) (d * PRECISION));
 	}
 
-	public Number[] add(long c, double d) {
-		c = addLongValue(c);
-		d = addDoubleValue(d);
-		return new Number[] { c, d };
+	public void add(long c, double d) {
+		addLongValue(c);
+		addDoubleValue(d);
 	}
 
-	public long addLongValue(long value) {
-		return longValue.addAndGet(value);
+	public void addLongValue(long value) {
+		longValue.add(value);
 	}
 
 	public long getLongValue() {
-		return longValue.get();
+		return longValue.longValue();
 	}
 
-	public double addDoubleValue(double value) {
-		return ((double) doubleValue.getAndAdd((long) (value * PRECISION))) / PRECISION;
+	public void addDoubleValue(double value) {
+		doubleValue.add((long) (value * PRECISION));
 	}
 
 	public double getDoubleValue() {
-		return ((double) doubleValue.get()) / PRECISION;
+		return ((double) doubleValue.longValue()) / PRECISION;
 	}
 
 	@Override
