@@ -61,6 +61,10 @@ public @interface Richtable {
 	Readonly readonly() default @Readonly
 	;
 
+	String inputFormCssClass() default "";
+
+	String listFormCssClass() default "";
+
 	String inputWindowOptions() default "";
 
 	String viewWindowOptions() default "";

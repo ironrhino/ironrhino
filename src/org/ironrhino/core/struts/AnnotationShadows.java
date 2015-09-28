@@ -597,6 +597,8 @@ public class AnnotationShadows {
 		private String formHeader = "";
 		private String formFooter = "";
 		private String rowDynamicAttributes = "";
+		private String inputFormCssClass = "";
+		private String listFormCssClass = "";
 		private String inputWindowOptions = "";
 		private String viewWindowOptions = "";
 		private int inputGridColumns = 0;
@@ -626,6 +628,8 @@ public class AnnotationShadows {
 			this.listFooter = config.listFooter();
 			this.formHeader = config.formHeader();
 			this.formFooter = config.formFooter();
+			this.inputFormCssClass = config.inputFormCssClass();
+			this.listFormCssClass = config.listFormCssClass();
 			this.inputWindowOptions = config.inputWindowOptions();
 			this.viewWindowOptions = config.viewWindowOptions();
 			if (config.inputGridColumns() < 5)
@@ -790,6 +794,22 @@ public class AnnotationShadows {
 
 		public void setRowDynamicAttributes(String rowDynamicAttributes) {
 			this.rowDynamicAttributes = rowDynamicAttributes;
+		}
+
+		public String getInputFormCssClass() {
+			return inputFormCssClass;
+		}
+
+		public void setInputFormCssClass(String inputFormCssClass) {
+			this.inputFormCssClass = inputFormCssClass;
+		}
+
+		public String getListFormCssClass() {
+			return listFormCssClass;
+		}
+
+		public void setListFormCssClass(String listFormCssClass) {
+			this.listFormCssClass = listFormCssClass;
 		}
 
 		public String getInputWindowOptions() {

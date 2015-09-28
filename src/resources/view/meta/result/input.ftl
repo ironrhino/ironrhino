@@ -11,7 +11,7 @@
 <#if richtableConfig.inputGridColumns gt 0>
 <#assign formDynamicAttributes+={'data-columns':richtableConfig.inputGridColumns}/>
 </#if>
-<@s.form id="${entityName}_input" action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${richtableConfig.importable?then(' importable','')}${attachmentable?then(' attachmentable','')} groupable" dynamicAttributes=formDynamicAttributes>
+<@s.form id="${entityName}_input" action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${richtableConfig.importable?then(' importable','')}${attachmentable?then(' attachmentable','')} groupable ${richtableConfig.inputFormCssClass}" dynamicAttributes=formDynamicAttributes>
 	<#if !isnew>
 	<#if !idAssigned>
 	<@s.hidden name="${entityName}.id" />

@@ -35,7 +35,7 @@
 <#if richtableConfig.celleditable&&versionPropertyName??>
 <#assign dynamicAttributes={"data-versionproperty":versionPropertyName}>
 </#if>
-<@rtstart formid=formid! entityName=entityName formHeader=formHeader! showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=dynamicAttributes!/>
+<@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=dynamicAttributes!/>
 <#assign size=0>
 <#list uiConfigs.entrySet() as entry>
 	<#assign hidden=entry.value.hiddenInList.value>
