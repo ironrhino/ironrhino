@@ -47,6 +47,10 @@ public class DelegatingFilter extends DelegatingFilterProxy {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws ServletException, IOException {
+		if (req.getAttribute(getTargetBeanName() + ".EXCLUDED") != null) {
+			chain.doFilter(req, res);
+			return;
+		}
 		String uri = RequestUtils.getRequestUri((HttpServletRequest) req);
 		if (excludePatternsList != null)
 			for (String pattern : excludePatternsList)
