@@ -123,8 +123,46 @@
 	        				}
 	        			}
 	        		}
-	        		if(!file.exists())
+	        		if(!file.exists()){
 	        			file = new File(basedir+'/extralib',filename);
+						var parent = file.getParentFile();
+						if(!file.exists() && parent.exists()){
+					        var files = parent.listFiles();
+							for(var i=0;i<files.length;i++){
+								var f = files[i];
+								var filename2 = f.getName();
+								var jarname2 = filename2.substring(0,filename2.lastIndexOf(filename2.lastIndexOf('-')>0?'-':'.'));
+								var version2 = filename2.substring(jarname2.length()+1);
+								if(f.isFile() && filename != filename2 && jarname == jarname2 && version2.length()>0){
+									if(version.length()>4)
+										version = version.substring(0,version.length()-4);
+									if(version2.length()>4)
+										version2 = version2.substring(0,version2.length()-4);
+									var verarr1 = version.split("\\.");
+									var verarr2 = version2.split("\\.");
+			        				var upgrade = false;
+									for(var j=0;j<verarr2.length;j++){
+										if(j==verarr1.length || verarr2[j]>verarr1[j] || verarr2[j].length() > verarr1[j].length()){
+											upgrade = true;
+											break;
+										}
+									}
+									if(!upgrade)
+											continue;
+									print('upgrade jar from '+filename+' to '+f.getName()+'\n');
+		        					file = f;
+		        					if(tofile.exists()){
+			        					var del = project.createTask("delete");
+			        					del.setFile(tofile);
+			        					del.perform();
+		        					}
+		        					tofile = new File(basedir,path.replaceAll(filename,f.getName()));
+		        					replacement.push(filename);
+		        					replacement.push(f.getName());
+								}
+							}
+						}
+					}
 	        		copy.setFile(file);
 	        		copy.setTofile(tofile);
 					copy.setPreserveLastModified(true);
