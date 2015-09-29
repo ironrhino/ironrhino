@@ -131,6 +131,20 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
   	text-align: center;
   }
 }
+@media (min-width: 961px) and (max-width: 1200px){
+	body.welcome .hero-unit button[type="submit"]:only-child {
+		width: 108px;
+	}
+	body.welcome .form-horizontal .control-label {
+    	width: 80px;
+	}
+	body.welcome .form-horizontal .controls {
+    	margin-left: 100px;
+	}
+	body.welcome .form-horizontal .form-actions {
+    	padding-left: 100px;
+	}
+}
 #indicator {
 	position: fixed;
 	z-index: 10000;
