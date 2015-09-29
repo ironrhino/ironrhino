@@ -131,7 +131,7 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
   	text-align: center;
   }
 }
-@media (min-width: 961px) and (max-width: 1200px){
+@media (min-width: 961px) and (max-width: 979px){
 	body.welcome .hero-unit button[type="submit"]:only-child {
 		width: 108px;
 	}
@@ -143,6 +143,20 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	}
 	body.welcome .form-horizontal .form-actions {
     	padding-left: 100px;
+	}
+}
+@media (min-width: 980px) and (max-width: 1200px){
+	body.welcome .hero-unit button[type="submit"]:only-child {
+		width: 140px;
+	}
+	body.welcome .form-horizontal .control-label {
+    	width: 70px;
+	}
+	body.welcome .form-horizontal .controls {
+    	margin-left: 90px;
+	}
+	body.welcome .form-horizontal .form-actions {
+    	padding-left: 90px;
 	}
 }
 #indicator {
