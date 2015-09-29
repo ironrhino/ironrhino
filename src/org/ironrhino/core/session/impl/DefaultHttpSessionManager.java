@@ -134,6 +134,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 				.getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 		if (sessionMap != null) {
 			session.setAttrMap(sessionMap);
+			session.getRequest().removeAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 			return;
 		}
 
