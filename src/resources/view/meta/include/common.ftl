@@ -26,6 +26,10 @@
   <#return statics['org.ironrhino.core.util.AuthzUtils'].authentication(property)>
 </#function>
 
+<#function hasPermission secured>
+  <#return statics['org.ironrhino.core.util.AuthzUtils'].hasPermission(secured)>
+</#function>
+
 <#function hasRole role>
   <#return statics['org.ironrhino.core.util.AuthzUtils'].hasRole(role)>
 </#function>

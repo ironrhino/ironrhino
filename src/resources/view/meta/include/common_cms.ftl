@@ -1,6 +1,6 @@
 <#macro includePage path abbr=0>
 <#local pageManager=beans['pageManager']>
-<#if (Parameters.preview!)=='true' && (getSetting("cms.preview.open","false")=='true' || statics['org.ironrhino.core.util.AuthzUtils'].authorize("ROLE_ADMINISTRATOR","",""))>
+<#if (Parameters.preview!)=='true' && (getSetting("cms.preview.open","false")=='true' || hasRole("ROLE_ADMINISTRATOR"))>
 <#local page=pageManager.getDraftByPath(path)!>
 <#if !page.content?has_content>
 <#local page=pageManager.getByPath(path)!>
@@ -14,7 +14,7 @@
 <#else>
 <#local _content=page.content>
 </#if>
-<#local designMode=(Parameters.designMode!)=='true'&&abbr==0&&statics['org.ironrhino.core.util.AuthzUtils'].authorize("ROLE_ADMINISTRATOR","","")>
+<#local designMode=(Parameters.designMode!)=='true'&&abbr==0&&hasRole("ROLE_ADMINISTRATOR")>
 <#if designMode>
 <div class="editme" data-url="<@url value="/common/page/editme?id=${page.id}"/>" name="page.content">
 </#if>
