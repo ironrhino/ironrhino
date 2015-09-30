@@ -26,6 +26,10 @@
   <#return statics['org.ironrhino.core.util.AuthzUtils'].authentication(property)>
 </#function>
 
+<#function hasRole role>
+  <#return statics['org.ironrhino.core.util.AuthzUtils'].hasRole(role)>
+</#function>
+
 <#macro authorize ifAllGranted="" ifAnyGranted="" ifNotGranted="" authorizer="" resource="">
 	<#if !ifAllGranted?is_indexable>
 		<#if ifAllGranted?has_content>
