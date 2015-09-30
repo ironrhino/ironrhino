@@ -7,8 +7,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -83,9 +85,16 @@ public class ApiDoc implements Serializable {
 		if (authorize == null)
 			authorize = clazz.getAnnotation(Authorize.class);
 		if (authorize != null) {
-			String ifAnyGranted = authorize.ifAnyGranted();
-			if (StringUtils.isNotBlank(ifAnyGranted))
-				requiredAuthorities = ifAnyGranted.split("\\s*,\\s*");
+			String[] ifAnyGranted = authorize.ifAnyGranted();
+			if (ifAnyGranted != null && ifAnyGranted.length > 0) {
+				Set<String> set = new LinkedHashSet<>();
+				for (String s : ifAnyGranted) {
+					String[] arr = s.split("\\s*,\\s*");
+					for (String ss : arr)
+						set.add(ss);
+				}
+				requiredAuthorities = set.toArray(new String[0]);
+			}
 		}
 
 		RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);

@@ -331,27 +331,31 @@ public class BaseAction extends ActionSupport {
 		return authorize;
 	}
 
-	private static String evalExpression(String str) {
-		if (StringUtils.isBlank(str))
-			return str;
+	private static String[] evalExpression(String[] arr) {
+		if (arr == null || arr.length == 0)
+			return arr;
 		ValueStack vs = ActionContext.getContext().getValueStack();
-		while (true) {
-			int start = str.indexOf("${");
-			if (start > -1) {
-				int end = str.indexOf('}', start + 2);
-				if (end > 0) {
-					String prefix = str.substring(0, start);
-					String exp = str.substring(start + 2, end);
-					String suffix = str.substring(end + 1);
-					str = prefix + vs.findString(exp) + suffix;
+		for (int i = 0; i < arr.length; i++) {
+			String str = arr[i];
+			while (true) {
+				int start = str.indexOf("${");
+				if (start > -1) {
+					int end = str.indexOf('}', start + 2);
+					if (end > 0) {
+						String prefix = str.substring(0, start);
+						String exp = str.substring(start + 2, end);
+						String suffix = str.substring(end + 1);
+						str = prefix + vs.findString(exp) + suffix;
+					} else {
+						break;
+					}
 				} else {
 					break;
 				}
-			} else {
-				break;
 			}
+			arr[i] = str;
 		}
-		return str;
+		return arr;
 	}
 
 }

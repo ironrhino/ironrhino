@@ -27,7 +27,28 @@
 </#function>
 
 <#macro authorize ifAllGranted="" ifAnyGranted="" ifNotGranted="" authorizer="" resource="">
-	<#if statics['org.ironrhino.core.util.AuthzUtils'].authorize(ifAllGranted,ifAnyGranted,ifNotGranted) || (authorizer!="" &&  beans['dynamicAuthorizerManager'].authorize(authorizer,authentication("principal"),resource))>
+	<#if !ifAllGranted?is_indexable>
+		<#if ifAllGranted?has_content>
+			<#local ifAllGranted=[ifAllGranted]/>
+		<#else>
+			<#local ifAllGranted=[]/>
+		</#if>
+	</#if>
+	<#if !ifAnyGranted?is_indexable>
+		<#if ifAnyGranted?has_content>
+			<#local ifAnyGranted=[ifAnyGranted]/>
+		<#else>
+			<#local ifAnyGranted=[]/>
+		</#if>
+	</#if>
+	<#if !ifNotGranted?is_indexable>
+		<#if ifNotGranted?has_content>
+			<#local ifNotGranted=[ifNotGranted]/>
+		<#else>
+			<#local ifNotGranted=[]/>
+		</#if>
+	</#if>
+	<#if statics['org.ironrhino.core.util.AuthzUtils'].authorizeArray(ifAllGranted,ifAnyGranted,ifNotGranted) || (authorizer!="" &&  beans['dynamicAuthorizerManager'].authorize(authorizer,authentication("principal"),resource))>
 		<#nested>
 	</#if>
 </#macro>

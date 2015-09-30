@@ -13,11 +13,11 @@ import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
 @Retention(RUNTIME)
 public @interface Authorize {
 	// equals to tag security:authorize
-	String ifAllGranted() default "";
+	String[] ifAllGranted() default {};
 
-	String ifAnyGranted() default "";
+	String[] ifAnyGranted() default {};
 
-	String ifNotGranted() default "";
+	String[] ifNotGranted() default {};
 
 	Class<? extends DynamicAuthorizer>authorizer() default DynamicAuthorizer.class;
 

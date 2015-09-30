@@ -37,6 +37,15 @@ public class AuthzUtils {
 		return authorizeRoles(getRoleNames(), ifAllGranted, ifAnyGranted, ifNotGranted);
 	}
 
+	public static boolean authorize(String[] ifAllGranted, String[] ifAnyGranted, String[] ifNotGranted) {
+		return authorizeRoles(getRoleNames(), ifAllGranted, ifAnyGranted, ifNotGranted);
+	}
+
+	// equals to authorize, for ftl call
+	public static boolean authorizeArray(String[] ifAllGranted, String[] ifAnyGranted, String[] ifNotGranted) {
+		return authorizeRoles(getRoleNames(), ifAllGranted, ifAnyGranted, ifNotGranted);
+	}
+
 	public static boolean authorizeUserDetails(UserDetails user, String ifAllGranted, String ifAnyGranted,
 			String ifNotGranted) {
 		return authorizeRoles(getRoleNamesFromUserDetails(user), ifAllGranted, ifAnyGranted, ifNotGranted);
@@ -64,6 +73,39 @@ public class AuthzUtils {
 					b = false;
 					break;
 				}
+			return b;
+		}
+		return false;
+	}
+
+	public static boolean authorizeRoles(List<String> roles, String[] ifAllGranted, String[] ifAnyGranted,
+			String[] ifNotGranted) {
+		if (ifAllGranted != null && ifAllGranted.length > 0) {
+			for (String s : ifAllGranted) {
+				String[] arr = s.split("\\s*,\\s*");
+				for (String ss : arr)
+					if (!roles.contains(ss.trim()))
+						return false;
+			}
+			return true;
+		} else if (ifAnyGranted != null && ifAnyGranted.length > 0) {
+			for (String s : ifAnyGranted) {
+				String[] arr = s.split("\\s*,\\s*");
+				for (String ss : arr)
+					if (roles.contains(ss.trim()))
+						return true;
+			}
+			return false;
+		} else if (ifNotGranted != null && ifNotGranted.length > 0) {
+			boolean b = true;
+			label: for (String s : ifNotGranted) {
+				String[] arr = s.split("\\s*,\\s*");
+				for (String ss : arr)
+					if (roles.contains(ss.trim())) {
+						b = false;
+						break label;
+					}
+			}
 			return b;
 		}
 		return false;
