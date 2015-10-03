@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.persistence.Lob;
 
@@ -74,6 +75,7 @@ public class JsonUtils {
 		});
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		objectMapper.setTimeZone(TimeZone.getDefault());
 		objectMapper.registerModule(new SimpleModule().addDeserializer(Date.class, new JsonDeserializer<Date>() {
 			@Override
 			public Date deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
