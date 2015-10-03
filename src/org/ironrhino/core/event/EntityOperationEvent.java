@@ -4,7 +4,7 @@ import org.ironrhino.core.model.Persistable;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
 
-public class EntityOperationEvent<T extends Persistable<?>> extends BaseEvent<T>implements ResolvableTypeProvider {
+public class EntityOperationEvent<T extends Persistable<?>> extends BaseEvent<T> implements ResolvableTypeProvider {
 
 	private static final long serialVersionUID = -3336231774669978161L;
 

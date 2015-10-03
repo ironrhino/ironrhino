@@ -15,6 +15,6 @@ public @interface Menu {
 
 	int displayOrder() default 0;
 
-	String[]parents() default {};
+	String[] parents() default {};
 
 }

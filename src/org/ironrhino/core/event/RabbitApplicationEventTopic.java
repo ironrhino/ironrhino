@@ -5,7 +5,7 @@ import org.ironrhino.core.rabbitmq.RabbitTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 
-public class RabbitApplicationEventTopic extends RabbitTopic<ApplicationEvent>implements ApplicationEventTopic {
+public class RabbitApplicationEventTopic extends RabbitTopic<ApplicationEvent> implements ApplicationEventTopic {
 
 	@Autowired
 	private EventPublisher eventPublisher;

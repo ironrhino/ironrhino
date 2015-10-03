@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
-public class AuthorizationManagerImpl extends BaseManagerImpl<Authorization>implements AuthorizationManager {
+public class AuthorizationManagerImpl extends BaseManagerImpl<Authorization> implements AuthorizationManager {
 
 	@Override
 	@Transactional(readOnly = true)

@@ -404,8 +404,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							criteria.addSort(propertyName, false);
 					}
 				}
-			} else
-				if (Ordered.class.isAssignableFrom(getEntityClass()) && searchableProperties.contains("displayOrder"))
+			} else if (Ordered.class.isAssignableFrom(getEntityClass())
+					&& searchableProperties.contains("displayOrder"))
 				criteria.addSort("displayOrder", false);
 			boolean resetPageSize;
 			if (resultPage == null) {

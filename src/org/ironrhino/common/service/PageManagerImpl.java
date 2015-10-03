@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class PageManagerImpl extends BaseManagerImpl<Page>implements PageManager {
+public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManager {
 
 	@Autowired(required = false)
 	private transient ElasticSearchService<Page> elasticSearchService;

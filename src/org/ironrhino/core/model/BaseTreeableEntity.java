@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @MappedSuperclass
-public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends Entity<Long>implements Treeable<T>, Ordered {
+public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends Entity<Long> implements Treeable<T>, Ordered {
 
 	private static final long serialVersionUID = 2462271646391940930L;
 

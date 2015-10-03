@@ -5,7 +5,7 @@ import org.ironrhino.core.redis.RedisTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 
-public class RedisApplicationEventTopic extends RedisTopic<ApplicationEvent>implements ApplicationEventTopic {
+public class RedisApplicationEventTopic extends RedisTopic<ApplicationEvent> implements ApplicationEventTopic {
 
 	@Autowired
 	private EventPublisher eventPublisher;

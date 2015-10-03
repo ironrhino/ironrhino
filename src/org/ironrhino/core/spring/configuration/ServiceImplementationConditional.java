@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Conditional;
 @Conditional(ServiceImplementationCondition.class)
 public @interface ServiceImplementationConditional {
 
-	String[]profiles() default {};
+	String[] profiles() default {};
 
-	Class<?>serviceInterface() default void.class;
+	Class<?> serviceInterface() default void.class;
 
 }

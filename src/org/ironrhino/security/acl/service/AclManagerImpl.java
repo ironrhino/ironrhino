@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class AclManagerImpl extends BaseManagerImpl<Acl>implements AclManager {
+public class AclManagerImpl extends BaseManagerImpl<Acl> implements AclManager {
 
 	@Override
 	@Transactional

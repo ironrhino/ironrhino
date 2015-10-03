@@ -24,7 +24,7 @@ import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 @Entity
 @Table(name = "common_treenode")
 @Searchable
-public class TreeNode extends BaseTreeableEntity<TreeNode>implements Attributable {
+public class TreeNode extends BaseTreeableEntity<TreeNode> implements Attributable {
 
 	private static final long serialVersionUID = 8878337541387688086L;
 

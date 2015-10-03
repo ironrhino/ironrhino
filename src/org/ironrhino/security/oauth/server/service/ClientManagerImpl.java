@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class ClientManagerImpl extends BaseManagerImpl<Client>implements ClientManager {
+public class ClientManagerImpl extends BaseManagerImpl<Client> implements ClientManager {
 
 	@Override
 	@Transactional(readOnly = true)
