@@ -195,10 +195,15 @@ public class RequestUtils {
 		} catch (UnsupportedEncodingException e) {
 		}
 		Cookie cookie = new Cookie(cookieName, cookieValue);
-		cookie.setHttpOnly(httpOnly);
+		String ua = request.getHeader("User-Agent");
+		// lower version android webview was buggy
+		boolean downgrade = (ua != null && ua.toLowerCase().contains("android"));
+		if (!downgrade) {
+			cookie.setHttpOnly(httpOnly);
+			cookie.setMaxAge(maxAge);
+		}
 		if (StringUtils.isNotBlank(domain))
 			cookie.setDomain(domain);
-		cookie.setMaxAge(maxAge);
 		cookie.setPath(path);
 		response.addCookie(cookie);
 	}
