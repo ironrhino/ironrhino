@@ -100,7 +100,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 		Object value = session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
 		if (value != null) {
 			Authentication auth = ((SecurityContext) value).getAuthentication();
-			if (auth.isAuthenticated()) {
+			if (auth != null && auth.isAuthenticated()) {
 				Object principal = auth.getPrincipal();
 				if (principal instanceof UserDetails)
 					username = ((UserDetails) principal).getUsername();
