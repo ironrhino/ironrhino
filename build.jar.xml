@@ -784,6 +784,7 @@
 				<zipgroupfileset file="${lib.dir}/websocket-api-*.jar" />
 				<zipgroupfileset file="${lib.dir}/asm-*.jar" />
 			</zip>
+			<delete file="${target.dir}/temp.jar" />
 		</target>
 
 	</project>
