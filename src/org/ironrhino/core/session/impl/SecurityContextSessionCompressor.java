@@ -44,12 +44,10 @@ public class SecurityContextSessionCompressor implements SessionCompressor<Secur
 					Object principal = auth.getPrincipal();
 					if (principal instanceof UserDetails) {
 						UserDetails ud = (UserDetails) principal;
+						String username = ud.getUsername();
 						String password = ud.getPassword();
-						StringBuilder sb = new StringBuilder();
-						if (password != null)
-							sb.append(CodecUtils.md5Hex(ud.getPassword()));
-						sb.append(",").append(ud.getUsername());
-						return sb.toString();
+						return password != null ? new StringBuilder(CodecUtils.md5Hex(ud.getPassword())).append(",")
+								.append(username).toString() : username;
 					}
 				}
 			}
@@ -63,14 +61,21 @@ public class SecurityContextSessionCompressor implements SessionCompressor<Secur
 		if (StringUtils.isNotBlank(string))
 			try {
 				String[] arr = string.split(",", 2);
-				String username = arr[1];
-				String password = arr[0];
+				String username, password;
+				if (arr.length == 2) {
+					username = arr[1];
+					password = arr[0];
+				} else {
+					username = arr[0];
+					password = null;
+				}
 				UserDetails ud = userDetailsService.loadUserByUsername(username);
-				if (ud.getPassword() == null && StringUtils.isBlank(password)
-						|| ud.getPassword() != null && CodecUtils.md5Hex(ud.getPassword()).equals(password)) {
+				if (ud.getPassword() == null && password == null
+						|| ud.getPassword() != null && CodecUtils.md5Hex(ud.getPassword()).equals(password))
 					sc.setAuthentication(
 							new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities()));
-				}
+				else
+					logger.info("invalidate SecurityContext of \"{}\" because password changed", username);
 			} catch (UsernameNotFoundException e) {
 				logger.warn(e.getMessage());
 			}
