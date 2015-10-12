@@ -1,6 +1,7 @@
 package org.ironrhino.core.util;
 
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -190,6 +191,8 @@ public class BeanUtils {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void normalizeCollectionFields(Object bean) {
+		if (!(bean instanceof Serializable))
+			return;
 		try {
 			Class<?> clazz = bean.getClass();
 			while (clazz != Object.class) {
@@ -199,18 +202,18 @@ public class BeanUtils {
 					Object value = f.get(bean);
 					if (value == null)
 						continue;
-					Class<?> type = value.getClass();
 					if (value.getClass().getName().startsWith("java."))
 						continue;
-					if (List.class.isAssignableFrom(type)) {
+					Class<?> declaredType = f.getType();
+					if (declaredType == List.class) {
 						List newValue = new ArrayList();
 						newValue.addAll((List) value);
 						f.set(bean, newValue);
-					} else if (Set.class.isAssignableFrom(type)) {
+					} else if (declaredType == Set.class) {
 						Set newValue = new LinkedHashSet();
 						newValue.addAll((Set) value);
 						f.set(bean, newValue);
-					} else if (Map.class.isAssignableFrom(type)) {
+					} else if (declaredType == Map.class) {
 						Map newValue = new LinkedHashMap();
 						newValue.putAll((Map) value);
 						f.set(bean, newValue);
