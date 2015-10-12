@@ -4,8 +4,8 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -190,32 +190,36 @@ public class BeanUtils {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void normalizeCollectionFields(Object bean) {
-		Class<?> clazz = bean.getClass();
-		while (clazz != Object.class) {
-			Field[] fields = clazz.getDeclaredFields();
-			for (Field f : fields) {
-				Class<?> type = f.getType();
-				if (!List.class.isAssignableFrom(type) && !Set.class.isAssignableFrom(type))
-					continue;
-				f.setAccessible(true);
-				try {
-					Collection value = (Collection) f.get(bean);
-					if (value == null || value.getClass().getName().startsWith("java."))
+		try {
+			Class<?> clazz = bean.getClass();
+			while (clazz != Object.class) {
+				Field[] fields = clazz.getDeclaredFields();
+				for (Field f : fields) {
+					f.setAccessible(true);
+					Object value = f.get(bean);
+					if (value == null)
 						continue;
-					Collection newValue = null;
+					Class<?> type = value.getClass();
+					if (value.getClass().getName().startsWith("java."))
+						continue;
 					if (List.class.isAssignableFrom(type)) {
-						newValue = new ArrayList();
+						List newValue = new ArrayList();
+						newValue.addAll((List) value);
+						f.set(bean, newValue);
 					} else if (Set.class.isAssignableFrom(type)) {
-						newValue = new LinkedHashSet();
+						Set newValue = new LinkedHashSet();
+						newValue.addAll((Set) value);
+						f.set(bean, newValue);
+					} else if (Map.class.isAssignableFrom(type)) {
+						Map newValue = new LinkedHashMap();
+						newValue.putAll((Map) value);
+						f.set(bean, newValue);
 					}
-					newValue.addAll(value);
-					f.set(bean, newValue);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
 				}
-
+				clazz = clazz.getSuperclass();
 			}
-			clazz = clazz.getSuperclass();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 

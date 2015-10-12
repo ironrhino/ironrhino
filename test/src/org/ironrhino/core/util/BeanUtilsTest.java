@@ -9,8 +9,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.ironrhino.core.metadata.NotInCopy;
@@ -24,6 +26,7 @@ public class BeanUtilsTest {
 		protected String id;
 		private List<String> names;
 		private Set<String> tags;
+		private Map<String, String> attributes;
 
 		public String getId() {
 			return id;
@@ -47,6 +50,14 @@ public class BeanUtilsTest {
 
 		public void setTags(Set<String> tags) {
 			this.tags = tags;
+		}
+
+		public Map<String, String> getAttributes() {
+			return attributes;
+		}
+
+		public void setAttributes(Map<String, String> attributes) {
+			this.attributes = attributes;
 		}
 
 	}
@@ -240,15 +251,15 @@ public class BeanUtilsTest {
 	}
 
 	private static class MyList<E> extends ArrayList<E> {
-
 		private static final long serialVersionUID = 1L;
-
 	}
 
 	private static class MySet<E> extends HashSet<E> {
-
 		private static final long serialVersionUID = 1L;
+	}
 
+	private static class MyMap<K, V> extends HashMap<K, V> {
+		private static final long serialVersionUID = 1L;
 	}
 
 	@Test
@@ -368,29 +379,40 @@ public class BeanUtilsTest {
 		BeanUtils.normalizeCollectionFields(user);
 		assertNull(user.getNames());
 		assertNull(user.getTags());
+		assertNull(user.getAttributes());
 		List<String> names = new ArrayList<>();
 		names.add("abc");
 		Set<String> tags = new HashSet<>();
 		tags.add("test");
+		Map<String, String> attributes = new HashMap<>();
+		attributes.put("test", "test");
 		user.setNames(names);
 		user.setTags(tags);
+		user.setAttributes(attributes);
 		BeanUtils.normalizeCollectionFields(user);
 		assertTrue(user.getNames() == names);
 		assertTrue(user.getTags() == tags);
+		assertTrue(user.getAttributes() == attributes);
 
 		List<String> names2 = new MyList<>();
 		names2.addAll(names);
 		Set<String> tags2 = new MySet<>();
 		tags2.addAll(tags);
+		Map<String, String> attributes2 = new MyMap<>();
+		attributes2.putAll(attributes);
 		user.setNames(names2);
 		user.setTags(tags2);
+		user.setAttributes(attributes2);
 		assertTrue(user.getNames() == names2);
 		assertTrue(user.getTags() == tags2);
+		assertTrue(user.getAttributes() == attributes2);
 		BeanUtils.normalizeCollectionFields(user);
 		assertFalse(user.getNames() == names2);
 		assertFalse(user.getTags() == tags2);
+		assertFalse(user.getAttributes() == attributes2);
 		assertEquals(user.getNames(), names);
 		assertEquals(user.getTags(), tags);
+		assertEquals(user.getAttributes(), attributes);
 	}
 
 }
