@@ -1,13 +1,17 @@
 package org.ironrhino.core.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.junit.Test;
@@ -18,6 +22,8 @@ public class BeanUtilsTest {
 
 		private static final long serialVersionUID = 1616212908678942555L;
 		protected String id;
+		private List<String> names;
+		private Set<String> tags;
 
 		public String getId() {
 			return id;
@@ -25,6 +31,22 @@ public class BeanUtilsTest {
 
 		public void setId(String id) {
 			this.id = id;
+		}
+
+		public List<String> getNames() {
+			return names;
+		}
+
+		public void setNames(List<String> names) {
+			this.names = names;
+		}
+
+		public Set<String> getTags() {
+			return tags;
+		}
+
+		public void setTags(Set<String> tags) {
+			this.tags = tags;
 		}
 
 	}
@@ -217,6 +239,18 @@ public class BeanUtilsTest {
 
 	}
 
+	private static class MyList<E> extends ArrayList<E> {
+
+		private static final long serialVersionUID = 1L;
+
+	}
+
+	private static class MySet<E> extends HashSet<E> {
+
+		private static final long serialVersionUID = 1L;
+
+	}
+
 	@Test
 	public void hasProperty() {
 		assertTrue(BeanUtils.hasProperty(User.class, "id"));
@@ -324,6 +358,39 @@ public class BeanUtilsTest {
 		assertEquals(1, team2.getUsers().size());
 		assertEquals("username", team2.getUsers().get(0).getUsername());
 		assertEquals("A", team2.getUsers().get(0).getType().name());
+	}
+
+	@Test
+	public void testNormalizeCollectionFields() {
+		User user = new User();
+		user.setId("id");
+		user.setUsername("username");
+		BeanUtils.normalizeCollectionFields(user);
+		assertNull(user.getNames());
+		assertNull(user.getTags());
+		List<String> names = new ArrayList<>();
+		names.add("abc");
+		Set<String> tags = new HashSet<>();
+		tags.add("test");
+		user.setNames(names);
+		user.setTags(tags);
+		BeanUtils.normalizeCollectionFields(user);
+		assertTrue(user.getNames() == names);
+		assertTrue(user.getTags() == tags);
+
+		List<String> names2 = new MyList<>();
+		names2.addAll(names);
+		Set<String> tags2 = new MySet<>();
+		tags2.addAll(tags);
+		user.setNames(names2);
+		user.setTags(tags2);
+		assertTrue(user.getNames() == names2);
+		assertTrue(user.getTags() == tags2);
+		BeanUtils.normalizeCollectionFields(user);
+		assertFalse(user.getNames() == names2);
+		assertFalse(user.getTags() == tags2);
+		assertEquals(user.getNames(), names);
+		assertEquals(user.getTags(), tags);
 	}
 
 }

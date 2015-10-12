@@ -1,9 +1,12 @@
 package org.ironrhino.core.util;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +63,7 @@ public class BeanUtils {
 		Set<String> ignores = new HashSet<>();
 		ignores.addAll(AnnotationUtils.getAnnotatedPropertyNames(source.getClass(), NotInCopy.class));
 		ignores.addAll(Arrays.asList(ignoreProperties));
+		normalizeCollectionFields(source);
 		BeanWrapperImpl bws = new BeanWrapperImpl(source);
 		bws.setConversionService(conversionService);
 		PropertyDescriptor[] sourcePds = bws.getPropertyDescriptors();
@@ -183,4 +187,36 @@ public class BeanUtils {
 		}
 		bw.setPropertyValue(propertyName, propertyValue);
 	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void normalizeCollectionFields(Object bean) {
+		Class<?> clazz = bean.getClass();
+		while (clazz != Object.class) {
+			Field[] fields = clazz.getDeclaredFields();
+			for (Field f : fields) {
+				Class<?> type = f.getType();
+				if (!List.class.isAssignableFrom(type) && !Set.class.isAssignableFrom(type))
+					continue;
+				f.setAccessible(true);
+				try {
+					Collection value = (Collection) f.get(bean);
+					if (value == null || value.getClass().getName().startsWith("java."))
+						continue;
+					Collection newValue = null;
+					if (List.class.isAssignableFrom(type)) {
+						newValue = new ArrayList();
+					} else if (Set.class.isAssignableFrom(type)) {
+						newValue = new LinkedHashSet();
+					}
+					newValue.addAll(value);
+					f.set(bean, newValue);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+			clazz = clazz.getSuperclass();
+		}
+	}
+
 }
