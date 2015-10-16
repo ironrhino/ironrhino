@@ -77,29 +77,29 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.12.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.5.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aspects-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-core-4.2.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aspects-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-core-4.2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-commons-1.11.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-mongodb-1.8.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-redis-1.6.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-expression-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jdbc-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jms-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.2.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-expression-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jdbc-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jms-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.1.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-4.0.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-4.0.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-web-4.0.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-tx-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-web-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webmvc-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-websocket-4.2.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-tx-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-web-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webmvc-4.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-websocket-4.2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-core-2.3.24.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-jasperreports-plugin-2.3.24.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-sitemesh-plugin-2.3.24.jar"/>
@@ -118,7 +118,7 @@
 	<classpathentry kind="lib" path="lib/jetty-all-9.3.5.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.12.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/spring-test-4.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/spring-test-4.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/websocket-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/yuicompressor.jar"/>
 	<classpathentry kind="output" path="webapp/WEB-INF/classes"/>
