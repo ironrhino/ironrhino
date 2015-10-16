@@ -122,7 +122,7 @@
 								}
 								if(!upgrade)
 										continue;
-	        					print('	upgrade jar from '+filename+' to '+f.getName());
+	        					print('	[sync] Upgrading '+filename+' to '+f.getName());
 	        					file = f;
 	        					if(tofile.exists()){
 		        					var del = project.createTask("delete");
@@ -162,7 +162,7 @@
 									}
 									if(!upgrade)
 											continue;
-									print('	upgrade jar from '+filename+' to '+f.getName());
+									print('	[sync] Upgrading '+filename+' to '+f.getName());
 		        					file = f;
 		        					if(tofile.exists()){
 			        					var del = project.createTask("delete");
@@ -231,7 +231,7 @@
 						var copy = project.createTask('copy');
 						var replace = project.createTask('replace');
 						if(filename.match(new RegExp(increment[i]+'-[\\d.]+\\.jar')) && !new File(basedir+'/webapp/WEB-INF/lib/'+filename).exists()){
-							print('	add jar '+filename);
+							print('	[sync] Adding '+filename);
 							copy.setFile(f);
 				        	copy.setTofile(new File(basedir+'/webapp/WEB-INF/lib/'+filename));
 							copy.setPreserveLastModified(true);
@@ -252,7 +252,7 @@
 						var del = project.createTask('delete');
 						var replace = project.createTask('replace');
 						if(filename.match(new RegExp(decrement[i]+'-[\\d.]+\\.jar'))){
-							print('	remove jar '+filename);
+							print('	[sync] Removing '+filename);
 							del.setFile(f);
 							del.perform();
 							var line = '	<classpathentry kind="lib" path="webapp/WEB-INF/lib/'+filename+'"/>\n';

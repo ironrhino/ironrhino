@@ -78,7 +78,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.12.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aspects-4.2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-4.2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-4.2.2.jar"/>
