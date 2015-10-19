@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.io.ClassPathResource;
@@ -17,6 +19,8 @@ import javassist.ClassPool;
 import javassist.CtClass;
 
 class ServiceImplementationCondition implements Condition {
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static Properties services = new Properties();
 
@@ -61,8 +65,13 @@ class ServiceImplementationCondition implements Condition {
 				}
 				if (serviceInterfaceName != null) {
 					String implementationClassName = services.getProperty(serviceInterfaceName);
-					if (implementationClassName != null)
-						return implementationClassName.equals(className);
+					if (implementationClassName != null) {
+						boolean matched = implementationClassName.equals(className);
+						if (matched)
+							logger.info("Select implementation {} for service {}", implementationClassName,
+									serviceInterfaceName);
+						return matched;
+					}
 				}
 				String[] profiles = (String[]) attrs.get("profiles");
 				if (profiles.length == 0 || context.getEnvironment().acceptsProfiles(profiles)) {
