@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.google.common.io.Files;
+
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = { DEFAULT, DUAL })
 public class LocalFileStorage implements FileStorage {
@@ -63,6 +65,7 @@ public class LocalFileStorage implements FileStorage {
 
 	@Override
 	public void write(InputStream is, String path) throws IOException {
+		path = Files.simplifyPath(path);
 		File dest = new File(directory, path);
 		dest.getParentFile().mkdirs();
 		FileOutputStream os = new FileOutputStream(dest);
@@ -76,31 +79,38 @@ public class LocalFileStorage implements FileStorage {
 
 	@Override
 	public InputStream open(String path) throws IOException {
+		path = Files.simplifyPath(path);
 		return new FileInputStream(new File(directory, path));
 	}
 
 	@Override
 	public boolean mkdir(String path) {
+		path = Files.simplifyPath(path);
 		return new File(directory, path).mkdirs();
 	}
 
 	@Override
 	public boolean delete(String path) {
+		path = Files.simplifyPath(path);
 		return new File(directory, path).delete();
 	}
 
 	@Override
 	public long getLastModified(String path) {
+		path = Files.simplifyPath(path);
 		return new File(directory, path).lastModified();
 	}
 
 	@Override
 	public boolean exists(String path) {
+		path = Files.simplifyPath(path);
 		return new File(directory, path).exists();
 	}
 
 	@Override
 	public boolean rename(String fromPath, String toPath) {
+		fromPath = Files.simplifyPath(fromPath);
+		toPath = Files.simplifyPath(toPath);
 		String s1 = fromPath.substring(0, fromPath.lastIndexOf('/'));
 		String s2 = toPath.substring(0, fromPath.lastIndexOf('/'));
 		if (!s1.equals(s2))
@@ -110,11 +120,13 @@ public class LocalFileStorage implements FileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
+		path = Files.simplifyPath(path);
 		return new File(directory, path).isDirectory();
 	}
 
 	@Override
 	public List<String> listFiles(String path) {
+		path = Files.simplifyPath(path);
 		final List<String> list = new ArrayList<>();
 		new File(directory, path).listFiles(f -> {
 			if (f.isFile()) {
@@ -127,6 +139,7 @@ public class LocalFileStorage implements FileStorage {
 
 	@Override
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
+		path = Files.simplifyPath(path);
 		final Map<String, Boolean> map = new HashMap<>();
 		new File(directory, path).listFiles(f -> {
 			map.put(f.getName(), f.isFile());
