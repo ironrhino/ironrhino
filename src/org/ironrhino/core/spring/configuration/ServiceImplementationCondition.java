@@ -2,8 +2,10 @@ package org.ironrhino.core.spring.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,8 @@ class ServiceImplementationCondition implements Condition {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static Properties services = new Properties();
+
+	private static Set<String> set = new HashSet<>();
 
 	static {
 		Resource resource = new ClassPathResource("services.properties");
@@ -67,9 +71,14 @@ class ServiceImplementationCondition implements Condition {
 					String implementationClassName = services.getProperty(serviceInterfaceName);
 					if (implementationClassName != null) {
 						boolean matched = implementationClassName.equals(className);
-						if (matched)
-							logger.info("Select implementation {} for service {}", implementationClassName,
-									serviceInterfaceName);
+						if (matched) {
+							String key = serviceInterfaceName + "=" + implementationClassName;
+							if (!set.contains(key)) {
+								logger.info("Select implementation {} for service {}", implementationClassName,
+										serviceInterfaceName);
+								set.add(key);
+							}
+						}
 						return matched;
 					}
 				}
