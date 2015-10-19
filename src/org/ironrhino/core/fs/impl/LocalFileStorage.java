@@ -40,6 +40,9 @@ public class LocalFileStorage implements FileStorage {
 	@Value("${fileStorage.uri:file:///${app.context}/assets/}")
 	protected String uri;
 
+	@Value("${fileStorage.path:/assets}")
+	protected String fileStoragePath;
+
 	private File directory;
 
 	public void setUri(String uri) {
@@ -151,6 +154,12 @@ public class LocalFileStorage implements FileStorage {
 		for (Map.Entry<String, Boolean> entry : list)
 			sortedMap.put(entry.getKey(), entry.getValue());
 		return sortedMap;
+	}
+
+	@Override
+	public String getFileUrl(String path) {
+		path = Files.simplifyPath(path);
+		return fileStoragePath + path;
 	}
 
 	private ValueThenKeyComparator<String, Boolean> comparator = new ValueThenKeyComparator<String, Boolean>() {

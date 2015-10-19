@@ -38,6 +38,9 @@ public class MongoFileStorage implements FileStorage {
 	@Value("${fileStorage.uri:file}")
 	protected String uri;
 
+	@Value("${fileStorage.path:/assets}")
+	protected String fileStoragePath;
+
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
@@ -246,6 +249,12 @@ public class MongoFileStorage implements FileStorage {
 		for (Map.Entry<String, Boolean> entry : list)
 			sortedMap.put(entry.getKey(), entry.getValue());
 		return sortedMap;
+	}
+
+	@Override
+	public String getFileUrl(String path) {
+		path = Files.simplifyPath(path);
+		return fileStoragePath + path;
 	}
 
 	private ValueThenKeyComparator<String, Boolean> comparator = new ValueThenKeyComparator<String, Boolean>() {

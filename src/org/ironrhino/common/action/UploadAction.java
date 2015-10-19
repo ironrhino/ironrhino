@@ -55,9 +55,6 @@ public class UploadAction extends BaseAction {
 	@Value("${upload.excludeSuffix:jsp,jspx,php,asp,rb,py,sh}")
 	private String excludeSuffix;
 
-	@Value("${fileStorage.path:/assets}")
-	private String fileStoragePath;
-
 	@Autowired
 	private transient FileStorage fileStorage;
 
@@ -146,10 +143,6 @@ public class UploadAction extends BaseAction {
 		return filename;
 	}
 
-	public String getFileStoragePath() {
-		return fileStoragePath;
-	}
-
 	@Override
 	public String input() {
 		return INPUT;
@@ -172,8 +165,10 @@ public class UploadAction extends BaseAction {
 				if (!excludes.contains(suffix))
 					try {
 						String path = createPath(fn, autorename);
-						array[i] = new StringBuilder(templateProvider.getAssetsBase()).append(getFileStoragePath())
-								.append(path).toString();
+						String url = fileStorage.getFileUrl(path);
+						if (url.startsWith("/"))
+							url = templateProvider.getAssetsBase() + url;
+						array[i] = url;
 						fileStorage.write(new FileInputStream(f), path);
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -296,11 +291,18 @@ public class UploadAction extends BaseAction {
 					if (!matches)
 						continue;
 				}
-				files.put(new StringBuilder(templateProvider.getAssetsBase()).append(getFileStoragePath()).append(path)
-						.append("/").append(s).toString(), true);
+				String url = fileStorage.getFileUrl(path);
+				if (url.startsWith("/"))
+					url = templateProvider.getAssetsBase() + url;
+				files.put(new StringBuilder(url).append("/").append(s).toString(), true);
 			}
 		}
 		return JSON;
+	}
+
+	public String getFileUrl(String filename) {
+		String path = getUploadRootDir() + getFolderEncoded() + "/" + filename;
+		return fileStorage.getFileUrl(path);
 	}
 
 	private String createPath(String filename, boolean autorename) {

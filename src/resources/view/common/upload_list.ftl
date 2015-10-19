@@ -38,9 +38,9 @@
 		<#list files.entrySet() as entry>
 		<tr>
 			<td class="checkbox"><#if entry.key!='..'><input type="checkbox" name="id" value="${entry.key}" class="custom"/></#if></td>
-			<td><#if entry.value><span class="uploaditem filename" style="cursor:pointer;">${entry.key}</span> <a href="<@url value="${fileStoragePath+uploadRootDir+folderEncoded}/${entry.key?url}"/>" target="_blank" download="${entry.key}"><i class="glyphicon glyphicon-download-alt"></i></a><#else><a style="color:blue;" class="ajax view history" data-replacement="files" href="<#if entry.key!='..'>${actionBaseUrl}/list${folderEncoded}/${entry.key?url}<#else>${actionBaseUrl}/list${folderEncoded?keep_before_last('/')}</#if>">${entry.key}</a></#if></td>
-			<td><#if entry.value && ['jpg','gif','png','bmp']?seq_contains(entry.key?lower_case?split('.')?last)><a href="<@url value="${fileStoragePath+uploadRootDir+folderEncoded}/${entry.key?url}"/>" target="_blank"><img class="uploaditem" src="<@url value="${fileStoragePath+uploadRootDir+folderEncoded}/${entry.key?url}"/>" style="height:50px;"/></a></#if></td>
-			<td><#if entry.value><span><@url value="${fileStoragePath+uploadRootDir+folderEncoded}/${entry.key?url}"/></span></#if></td>
+			<td><#if entry.value><span class="uploaditem filename" style="cursor:pointer;">${entry.key}</span> <a href="<@url value="${action.getFileUrl(entry.key?url)}"/>" target="_blank" download="${entry.key}"><i class="glyphicon glyphicon-download-alt"></i></a><#else><a style="color:blue;" class="ajax view history" data-replacement="files" href="<#if entry.key!='..'>${actionBaseUrl}/list${folderEncoded}/${entry.key?url}<#else>${actionBaseUrl}/list${folderEncoded?keep_before_last('/')}</#if>">${entry.key}</a></#if></td>
+			<td><#if entry.value && ['jpg','gif','png','bmp']?seq_contains(entry.key?lower_case?split('.')?last)><a href="<@url value="${action.getFileUrl(entry.key?url)}"/>" target="_blank"><img class="uploaditem" src="<@url value="${action.getFileUrl(entry.key?url)}"/>" style="height:50px;"/></a></#if></td>
+			<td><#if entry.value><span style="word-break: break-all;"><@url value="${action.getFileUrl(entry.key?url)}"/></span></#if></td>
 		</tr>
 		</#list>
 		</tbody>
