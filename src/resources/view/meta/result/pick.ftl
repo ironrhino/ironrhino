@@ -123,7 +123,7 @@
 </#if>
 <#assign bottomButtons+=r'
 <#if treeable&&Parameters.parent??>
-<a href="${href}<#if _parent?? && _parent gt 0>${href?contains("?")?string("&","?")+"parent="+_parent}</#if>" class="btn ajax view" data-replacement="${entityName}_pick">${action.getText("upward")}</a>
+<a href="${href}<#if parentEntity.parent?? && (!tree??||parent!=tree)>${href?contains("?")?string("&","?")+"parent="+_parent}</#if>" class="btn ajax view" data-replacement="${entityName}_pick">${action.getText("upward")}</a>
 </#if>
 <#if filterable><button type="button" class="btn filter">${action.getText("filter")}</button></#if>
 '>
@@ -134,11 +134,17 @@
     	<a href="${href}" class="ajax view" data-replacement="${entityName}_pick">${action.getText(entityName)}</a> <span class="divider">/</span>
 	</li>
 	<#if parentEntity.level gt 1>
+	<#assign renderItem=(!tree??||tree<1)/>
 	<#list 1..parentEntity.level-1 as level>
 	<#assign ancestor=parentEntity.getAncestor(level)>
+	<#if !renderItem>
+		<#assign renderItem=(ancestor.id==tree!)/>
+	</#if>
+	<#if renderItem>
 	<li>
     	<a href="${href}<#if _parent?? && _parent gt 0>${href?contains("?")?string("&","?")+"parent="+ancestor.id}</#if>" class="ajax view" data-replacement="${entityName}_pick">${ancestor.name}</a> <span class="divider">/</span>
 	</li>
+	</#if>
 	</#list>
 	</#if>
 	<li class="active">${parentEntity.name}</li>

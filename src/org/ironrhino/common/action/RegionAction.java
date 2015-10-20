@@ -38,6 +38,8 @@ public class RegionAction extends BaseAction {
 
 	private Region region;
 
+	private Long tree;
+
 	private Long parent;
 
 	private transient EntityManager<Region> entityManager;
@@ -83,6 +85,14 @@ public class RegionAction extends BaseAction {
 		return list;
 	}
 
+	public Long getTree() {
+		return tree;
+	}
+
+	public void setTree(Long tree) {
+		this.tree = tree;
+	}
+
 	public Long getParent() {
 		return parent;
 	}
@@ -112,11 +122,15 @@ public class RegionAction extends BaseAction {
 			} else {
 				region = new Region();
 				DetachedCriteria dc = entityManager.detachedCriteria();
-				dc.add(Restrictions.isNull("parent"));
-				dc.addOrder(Order.asc("displayOrder"));
-				dc.addOrder(Order.asc("name"));
-				if (StringUtils.isNotBlank(keyword))
-					dc.add(CriterionUtils.like(keyword, "name", "areacode", "postcode"));
+				if (tree != null && tree > 0) {
+					dc.add(Restrictions.eq("id", tree));
+				} else {
+					dc.add(Restrictions.isNull("parent"));
+					dc.addOrder(Order.asc("displayOrder"));
+					dc.addOrder(Order.asc("name"));
+					if (StringUtils.isNotBlank(keyword))
+						dc.add(CriterionUtils.like(keyword, "name", "areacode", "postcode"));
+				}
 				region.setChildren(entityManager.findListByCriteria(dc));
 			}
 			list = region.getChildren();

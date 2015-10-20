@@ -167,7 +167,7 @@ ${formHeader!}
 </#if>
 <#if treeable??&&treeable>
 <@btn view="move"/>
-<a class="btn ajax view" href="${actionBaseUrl}?parent=${entity.id}">${action.getText("enter")}</a>
+<a class="btn ajax view" href="${actionBaseUrl}?parent=${entity.id}<#if tree??>&tree=${tree}</#if>">${action.getText("enter")}</a>
 </#if>
 </#if>
 </td>
@@ -244,10 +244,10 @@ ${formHeader!}
 </#if>
 <#if !readonly||deletable><button type="button" class="btn confirm" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${action.getText("delete")}</button></#if>
 <#if treeable??&&treeable&&parentEntity??>
-<#if parentEntity.parent??>
-<a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}">${action.getText("upward")}</a>
+<#if parentEntity.parent?? && (!tree??||parent!=tree)>
+<a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}<#if tree??>&tree=${tree}</#if>">${action.getText("upward")}</a>
 <#else>
-<a class="btn ajax view" href="${actionBaseUrl}">${action.getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>">${action.getText("upward")}</a>
 </#if>
 </#if>
 <@btn class="reload"/>

@@ -7,7 +7,7 @@
 <#assign columns={"name":{"cellEdit":"click"},"areacode":{"cellEdit":"click","width":"100px"},"postcode":{"cellEdit":"click","width":"100px"},"rank":{"cellEdit":"click","width":"100px"},"displayOrder":{"cellEdit":"click","width":"100px"}}>
 <#assign actionColumnButtons=r'
 <@btn view="input" label="edit"/>
-<a class="btn ajax view" href="${actionBaseUrl+"?parent="+entity.id}">${action.getText("enter")}</a>
+<a class="btn ajax view" href="${actionBaseUrl+"?parent="+entity.id}<#if tree??>&tree=${tree}</#if>">${action.getText("enter")}</a>
 '>
 <#assign bottomButtons='
 <@btn view="input" label="create"/>
@@ -15,10 +15,10 @@
 <@btn action="delete" confirm=true/>
 '+r'
 <#if region?? && parent??>
-<#if region.parent??>
-<a class="btn ajax view" href="${actionBaseUrl+"?parent="+region.parent.id}">${action.getText("upward")}</a>
+<#if region.parent?? && (!tree??||parent!=tree)>
+<a class="btn ajax view" href="${actionBaseUrl+"?parent="+region.parent.id}<#if tree??>&tree=${tree}</#if>">${action.getText("upward")}</a>
 <#else>
-<a class="btn ajax view" href="${actionBaseUrl}">${action.getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>">${action.getText("upward")}</a>
 </#if>
 </#if>
 '+'
@@ -28,14 +28,20 @@
 <#if region?? && region.id?? && region.id gt 0>
 <ul class="breadcrumb">
 	<li>
-    	<a href="${actionBaseUrl}" class="ajax view">${action.getText('region')}</a> <span class="divider">/</span>
+    	<a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${action.getText('region')}</a> <span class="divider">/</span>
 	</li>
 	<#if region.level gt 1>
+	<#assign renderItem=(!tree??||tree<1)/>
 	<#list 1..region.level-1 as level>
 	<#assign ancestor=region.getAncestor(level)>
+	<#if !renderItem>
+		<#assign renderItem=(ancestor.id==tree!)/>
+	</#if>
+	<#if renderItem>
 	<li>
-    	<a href="${actionBaseUrl}?parent=${ancestor.id?string}" class="ajax view">${ancestor.name}</a> <span class="divider">/</span>
+    	<a href="${actionBaseUrl}?parent=${ancestor.id?string}<#if tree??>&tree=${tree}</#if>" class="ajax view">${ancestor.name}</a> <span class="divider">/</span>
 	</li>
+	</#if>
 	</#list>
 	</#if>
 	<li class="active">${region.name}</li>
