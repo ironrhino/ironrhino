@@ -128,7 +128,8 @@
 	<#if !hidden>
 		<#assign dynamicAttributes={}>
 		<#if config.type=='listpick'&&richtableConfig.celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
-			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":(value.id?string)!,"data-options":"{'url':'"+config.pickUrl+"','name':'this','id':'this@data-cellvalue'}"}>
+			<#assign pickUrl><@config.pickUrl?interpret/></#assign>
+			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":(value.id?string)!,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue'}"}>
 		</#if>
 		<#if config.readonly.expression?has_content && config.readonly.expression?eval>
 		<#assign dynamicAttributes+={'data-readonly':'true'}/>
