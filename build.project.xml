@@ -74,6 +74,25 @@
 				br.close();
 				is.close();	
 				var classpathfile = new File(basedir+'/.classpath');
+				for(var i=0;i<decrement.length;i++){
+					var files = new File(basedir+'/webapp/WEB-INF/lib').listFiles();
+					for(var j=0;j<files.length;j++){
+						var f = files[j];
+						var filename = f.getName();
+						var del = project.createTask('delete');
+						var replace = project.createTask('replace');
+						if(filename.match(new RegExp(decrement[i]+'-[\\d.]+\\.jar'))){
+							print('	[sync] Removing '+filename);
+							del.setFile(f);
+							del.perform();
+							var line = '	<classpathentry kind="lib" path="webapp/WEB-INF/lib/'+filename+'"/>';
+							replace.setFile(classpathfile);
+							replace.setToken(line);
+							replace.setValue('');
+							replace.perform();
+						}
+					}
+				}			
 				is = new FileInputStream(classpathfile);
 				br = new BufferedReader(new InputStreamReader(is,'utf-8'));
 				var lines = [];
@@ -237,28 +256,9 @@
 							copy.setPreserveLastModified(true);
 				        	copy.perform();
 							var line = '	<classpathentry kind="lib" path="webapp/WEB-INF/lib/'+filename+'"/>\n';
-							replace.setFile(new File(basedir+'/.classpath'));
+							replace.setFile(classpathfile);
 							replace.setToken(token);
 							replace.setValue(line+token);
-							replace.perform();
-						}
-					}
-				}
-				for(var i=0;i<decrement.length;i++){
-					var files = new File(basedir+'/webapp/WEB-INF/lib').listFiles();
-					for(var j=0;j<files.length;j++){
-						var f = files[j];
-						var filename = f.getName();
-						var del = project.createTask('delete');
-						var replace = project.createTask('replace');
-						if(filename.match(new RegExp(decrement[i]+'-[\\d.]+\\.jar'))){
-							print('	[sync] Removing '+filename);
-							del.setFile(f);
-							del.perform();
-							var line = '	<classpathentry kind="lib" path="webapp/WEB-INF/lib/'+filename+'"/>\n';
-							replace.setFile(new File(basedir+'/.classpath'));
-							replace.setToken(line);
-							replace.setValue('');
 							replace.perform();
 						}
 					}
