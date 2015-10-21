@@ -235,7 +235,8 @@ public class BaseAction extends ActionSupport {
 
 	@Before(priority = 10)
 	public String returnInputOrExtractRequestBody() throws Exception {
-		String method = ServletActionContext.getRequest().getMethod();
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String method = request.getMethod();
 		InputConfig inputConfig = getAnnotation(InputConfig.class);
 		if (inputConfig != null && "GET".equalsIgnoreCase(method)) {
 			returnInput = true;
@@ -250,19 +251,26 @@ public class BaseAction extends ActionSupport {
 			}
 		}
 		if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "PATCH".equalsIgnoreCase(method)) {
-			try {
-				BufferedReader reader = ServletActionContext.getRequest().getReader();
-				StringBuilder sb = new StringBuilder();
-				String line;
-				while ((line = reader.readLine()) != null)
-					sb.append(line).append("\n");
-				reader.close();
-				if (sb.length() > 0) {
-					sb.deleteCharAt(sb.length() - 1);
-					requestBody = sb.toString();
-				}
-			} catch (IllegalStateException e) {
+			String contentType = request.getHeader("Content-Type");
+			if (contentType != null) {
+				if (contentType.indexOf(';') > 0)
+					contentType = contentType.substring(0, contentType.indexOf(';')).trim();
+				if ((contentType.contains("text") || contentType.contains("xml") || contentType.contains("json")
+						|| contentType.contains("javascript")))
+					try {
+						BufferedReader reader = request.getReader();
+						StringBuilder sb = new StringBuilder();
+						String line;
+						while ((line = reader.readLine()) != null)
+							sb.append(line).append("\n");
+						reader.close();
+						if (sb.length() > 0) {
+							sb.deleteCharAt(sb.length() - 1);
+							requestBody = sb.toString();
+						}
+					} catch (IllegalStateException e) {
 
+					}
 			}
 		}
 		return null;
