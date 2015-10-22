@@ -48,7 +48,7 @@
 
 	<target name="sync">
 		<copy tofile="build.xml" file="${basedir}/../ironrhino/build.project.xml"
-			failonerror="false" />
+			failonerror="false" overwrite="true" />
 		<script language="javascript">
 			<![CDATA[
 			try{
@@ -188,6 +188,7 @@
 	        		copy.setFile(file);
 	        		copy.setTofile(tofile);
 					copy.setPreserveLastModified(true);
+					copy.setOverwrite(true);
 	        		if(file.exists())
 	        			copy.perform();
 				}
@@ -249,6 +250,7 @@
 							copy.setFile(f);
 				        	copy.setTofile(new File(basedir+'/webapp/WEB-INF/lib/'+filename));
 							copy.setPreserveLastModified(true);
+							copy.setOverwrite(true);
 				        	copy.perform();
 							var line = '	<classpathentry kind="lib" path="webapp/WEB-INF/lib/'+filename+'"/>\n';
 							replace.setFile(classpathfile);
