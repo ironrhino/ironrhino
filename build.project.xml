@@ -47,8 +47,7 @@
 	</target>
 
 	<target name="sync">
-		<copy tofile="build.xml" file="${basedir}/../ironrhino/build.project.xml"
-			failonerror="false" overwrite="true" />
+		<copy tofile="build.xml" file="${basedir}/../ironrhino/build.project.xml" failonerror="false" />
 		<script language="javascript">
 			<![CDATA[
 			try{
@@ -82,17 +81,25 @@
 					replaceregexp.setReplace('');
 					replaceregexp.setByLine(true);
 					replaceregexp.perform();
-				}			
+				}
 				is = new FileInputStream(classpathfile);
 				br = new BufferedReader(new InputStreamReader(is,'utf-8'));
+				var hasBlankLines = false;
 				var lines = [];
 				while((line=br.readLine()) != null){
+					if(!hasBlankLines)
+						hasBlankLines = !line;
 					if(line.indexOf('kind="lib"') < 0)
 						continue;
 					lines.push(line);	
 				}
 				br.close();
 				is.close();
+				if(hasBlankLines){
+					var antcall = project.createTask('antcall');
+					antcall.setTarget('refineclasspathfile');
+					antcall.perform();
+				}
 				var replacement = [];
 				for(var n=0;n<lines.length;n++){
 					var line = lines[n];
@@ -189,7 +196,7 @@
 	        		copy.setTofile(tofile);
 					copy.setPreserveLastModified(true);
 					copy.setOverwrite(true);
-	        		if(file.exists())
+	        		if(file.exists() && (!tofile.exists() || file.length() != tofile.length()))
 	        			copy.perform();
 				}
 				for(var i=0;i<replacement.length;i+=2){
@@ -203,7 +210,7 @@
 				is = new FileInputStream(new File(basedir+'/.classpath'));
 				br = new BufferedReader(new InputStreamReader(is,'utf-8'));
 				var jarnames = [];
-				while(line=br.readLine()){
+				while((line=br.readLine()) != null){
 					if(line.indexOf('kind="lib"') < 0)
 						continue;
 					var index = line.indexOf('path="')+6;
@@ -250,7 +257,6 @@
 							copy.setFile(f);
 				        	copy.setTofile(new File(basedir+'/webapp/WEB-INF/lib/'+filename));
 							copy.setPreserveLastModified(true);
-							copy.setOverwrite(true);
 				        	copy.perform();
 							var line = '	<classpathentry kind="lib" path="webapp/WEB-INF/lib/'+filename+'"/>\n';
 							replace.setFile(classpathfile);
@@ -263,6 +269,9 @@
 			}
 			]]>
 		</script>
+	</target>
+	
+	<target name="refineclasspathfile">
 		<copy file=".classpath" toFile=".temp">
 		  <filterchain>
 		    <ignoreblank/>
