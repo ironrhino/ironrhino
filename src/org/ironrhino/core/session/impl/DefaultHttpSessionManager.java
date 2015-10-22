@@ -13,6 +13,8 @@ import org.ironrhino.core.session.WrappedHttpSession;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.util.RequestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	private static final String SESSION_KEY_REMOTE_ADDR = "_REMOTE_ADDR";
 
 	private static final String SESSION_TRACKER_SEPERATOR = "-";
+
+	protected Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Value("${httpSessionManager.sessionTrackerName:" + DEFAULT_SESSION_TRACKER_NAME + "}")
 	private String sessionTrackerName = DEFAULT_SESSION_TRACKER_NAME;
@@ -190,8 +194,11 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			doInitialize(session);
 			if (checkRemoteAddr) {
 				String addr = (String) session.getAttribute(SESSION_KEY_REMOTE_ADDR);
-				if (addr != null && !session.getRequest().getRemoteAddr().equals(addr))
+				if (addr != null && !session.getRequest().getRemoteAddr().equals(addr)) {
+					log.warn("Invalidate session[{}] that created from {} but hijacked from {}", session.getId(), addr,
+							session.getRequest().getRemoteAddr());
 					invalidate(session);
+				}
 			}
 		}
 	}
