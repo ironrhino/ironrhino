@@ -51,7 +51,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			if (method != null && params != null && params.containsKey(ID))
 				sb.append("/" + URLEncoder.encode((String) params.get(ID), getEncoding()));
 		} catch (UnsupportedEncodingException e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return sb.toString();
 	}

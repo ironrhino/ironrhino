@@ -20,7 +20,7 @@ public class ZooKeeperLockService implements LockService {
 
 	public static final String DEFAULT_ZOOKEEPER_PATH = "/lock";
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private CuratorFramework curatorFramework;
 
@@ -53,7 +53,7 @@ public class ZooKeeperLockService implements LockService {
 		try {
 			success = lock.acquire(timeout, unit);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return success;
 	}
@@ -75,7 +75,7 @@ public class ZooKeeperLockService implements LockService {
 			try {
 				lock.release();
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 	}
 

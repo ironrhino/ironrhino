@@ -24,7 +24,7 @@ import org.springframework.jdbc.datasource.AbstractDataSource;
 
 public class GroupedDataSource extends AbstractDataSource implements BeanNameAware {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private int maxAttempts = 3;
 
@@ -147,7 +147,7 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 			StatLog.add(new Key("dataroute", true, groupName, dbname, "success"));
 			return conn;
 		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			if (--attempts < 1)
 				throw e;
 			Integer failureTimes = failureCount.get(ds);
@@ -158,7 +158,7 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 			if (failureTimes == deadFailureThreshold) {
 				failureCount.remove(ds);
 				deadDataSources.add(ds);
-				log.error("datasource [" + groupName + ":" + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				logger.error("datasource [" + groupName + ":" + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				StatLog.add(new Key("dataroute", false, groupName, dbname, "down"));
 			} else {
 				failureCount.put(ds, failureTimes);
@@ -195,9 +195,9 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 							break;
 						}
 					}
-				log.warn("datasource[" + groupName + ":" + dbname + "] recovered");
+				logger.warn("datasource[" + groupName + ":" + dbname + "] recovered");
 			} catch (Exception e) {
-				log.debug(e.getMessage(), e);
+				logger.debug(e.getMessage(), e);
 			}
 		}
 	}

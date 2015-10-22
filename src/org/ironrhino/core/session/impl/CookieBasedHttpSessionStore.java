@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component("cookieBased")
 public class CookieBasedHttpSessionStore implements HttpSessionStore {
 
-	protected Logger log = LoggerFactory.getLogger(this.getClass());
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String DEFAULT_SESSION_COOKIE_NAME = "s";
 
@@ -91,7 +91,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 					try {
 						cookieMap.put(cookie.getName(), URLDecoder.decode(cookie.getValue(), "UTF-8"));
 					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+						logger.error(e.getMessage(), e);
 					}
 				}
 		}

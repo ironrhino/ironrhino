@@ -33,7 +33,7 @@ import net.rubyeye.xmemcached.utils.AddrUtil;
 @ServiceImplementationConditional(profiles = CLUSTER)
 public class MemcachedCacheManager implements CacheManager {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Value("${memcached.serverAddress:localhost:11211}")
 	private String serverAddress;
@@ -53,7 +53,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			memcached = build(serverAddress);
 		} catch (IOException e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -74,7 +74,7 @@ public class MemcachedCacheManager implements CacheManager {
 			try {
 				memcached.shutdown();
 			} catch (IOException e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 	}
 
@@ -98,7 +98,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			memcached.setWithNoReply(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive), value);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return memcached.get(generateKey(key, namespace)) != null;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -121,7 +121,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return memcached.get(generateKey(key, namespace));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -135,7 +135,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return memcached.getAndTouch(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToIdle));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -147,7 +147,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			memcached.deleteWithNoReply(generateKey(key, namespace));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -169,7 +169,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return memcached.get(list);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -190,7 +190,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return (memcached.get(generateKey(key, namespace)) != null);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -200,7 +200,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return memcached.add(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive), value);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -211,7 +211,7 @@ public class MemcachedCacheManager implements CacheManager {
 			return memcached.incr(generateKey(key, namespace), delta, delta, 2000,
 					(int) timeUnit.toSeconds(timeToLive));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return -1;
 		}
 	}

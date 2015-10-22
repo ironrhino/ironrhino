@@ -34,7 +34,7 @@ public class ApplicationContextConsole {
 
 	private static final String SIMPLE_METHOD_INVOCATION_EXPRESSION_PATTERN = "^\\s*[a-zA-Z][a-zA-Z0-9_\\-]*\\.[a-zA-Z][a-zA-Z0-9_]*\\(\\s*\\)\\s*$";
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private ConfigurableListableBeanFactory ctx;
@@ -152,7 +152,7 @@ public class ApplicationContextConsole {
 		try {
 			execute(expression, Scope.LOCAL);
 		} catch (Throwable e) {
-			log.error("execute '" + expression + "' error", e);
+			logger.error("execute '" + expression + "' error", e);
 		}
 	}
 

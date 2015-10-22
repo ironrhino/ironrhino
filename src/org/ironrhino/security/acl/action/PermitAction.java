@@ -44,7 +44,7 @@ public class PermitAction extends BaseAction {
 
 	private static final long serialVersionUID = 8175406812208878896L;
 
-	protected static Logger log = LoggerFactory.getLogger(PermitAction.class);
+	protected static Logger logger = LoggerFactory.getLogger(PermitAction.class);
 
 	private static volatile Map<String, Collection<String>> resources;
 

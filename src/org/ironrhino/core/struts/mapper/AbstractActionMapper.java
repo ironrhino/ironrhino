@@ -12,7 +12,7 @@ public abstract class AbstractActionMapper implements ActionMapper {
 
 	public static final String ID = "id";
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	public static String getUri(HttpServletRequest request) {
 		String uri = RequestUtils.getRequestUri(request);

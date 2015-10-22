@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class RecordAspect implements Ordered {
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -79,7 +79,7 @@ public class RecordAspect implements Ordered {
 			record.setRecordDate(new Date());
 			sessionFactory.getCurrentSession().save(record);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 

@@ -26,7 +26,7 @@ import freemarker.template.Template;
 @Component
 public class TemplateProvider {
 
-	private Logger log = LoggerFactory.getLogger(this.getClass());
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Value("${ironrhino.view.ftl.location:" + AutoConfigResult.DEFAULT_FTL_LOCATION + "}")
 	private String ftlLocation;
@@ -94,7 +94,7 @@ public class TemplateProvider {
 						.getInstance(org.apache.struts2.views.freemarker.FreemarkerManager.class);
 				configuration = freemarkerManager.getConfiguration(ServletActionContext.getServletContext());
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 		return configuration;

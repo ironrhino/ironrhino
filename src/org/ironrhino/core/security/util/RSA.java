@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RSA {
-	private static Logger log = LoggerFactory.getLogger(RSA.class);
+	private static Logger logger = LoggerFactory.getLogger(RSA.class);
 
 	public static final String DEFAULT_KEY_LOCATION = "/resources/key/rsa";
 	public static final String KEY_DIRECTORY = "/key/";
@@ -54,46 +54,46 @@ public class RSA {
 		File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rsa");
 		if (file.exists()) {
 			defaultKeystoreURI = file.toURI();
-			log.info("using file " + file.getAbsolutePath());
+			logger.info("using file " + file.getAbsolutePath());
 		} else {
 			if (AppInfo.getStage() == Stage.PRODUCTION)
-				log.warn("file " + file.getAbsolutePath()
+				logger.warn("file " + file.getAbsolutePath()
 						+ " doesn't exists, please use your own keystore in production!");
 			if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 				try {
 					defaultKeystoreURI = RSA.class.getResource(DEFAULT_KEY_LOCATION).toURI();
-					log.info("using classpath resource " + RSA.class.getResource(DEFAULT_KEY_LOCATION).toString()
+					logger.info("using classpath resource " + RSA.class.getResource(DEFAULT_KEY_LOCATION).toString()
 							+ " as default keystore");
 				} catch (URISyntaxException e) {
-					log.error(e.getMessage(), e);
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
 		String s = System.getProperty(AppInfo.getAppName() + ".rsa.password");
 		if (StringUtils.isNotBlank(s)) {
 			defaultPassword = s;
-			log.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
+			logger.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
 		} else {
 			try {
 				file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rsa.password");
 				if (file.exists()) {
 					defaultPassword = FileUtils.readFileToString(file, "UTF-8");
-					log.info("using file " + file.getAbsolutePath());
+					logger.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						log.warn("file " + file.getAbsolutePath()
+						logger.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream pis = RSA.class.getResourceAsStream(DEFAULT_KEY_LOCATION + ".password")) {
 							defaultPassword = IOUtils.toString(pis, "UTF-8");
-							log.info("using classpath resource "
+							logger.info("using classpath resource "
 									+ RSA.class.getResource(DEFAULT_KEY_LOCATION + ".password").toString()
 									+ " as default key");
 						}
 					}
 				}
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 
@@ -160,7 +160,7 @@ public class RSA {
 		try {
 			return new String(Base64.encodeBase64(encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
-			log.error("encrypt exception!", ex);
+			logger.error("encrypt exception!", ex);
 			return "";
 		}
 	}
@@ -171,7 +171,7 @@ public class RSA {
 		try {
 			return new String(decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
-			log.error("decrypt exception!", ex);
+			logger.error("decrypt exception!", ex);
 			return "";
 		}
 	}
@@ -182,7 +182,7 @@ public class RSA {
 		try {
 			return new String(Base64.encodeBase64(sign(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
-			log.error("encrypt exception!", ex);
+			logger.error("encrypt exception!", ex);
 			return "";
 		}
 	}
@@ -193,7 +193,7 @@ public class RSA {
 		try {
 			return verify(str.getBytes("UTF-8"), signature.getBytes("UTF-8"));
 		} catch (Exception ex) {
-			log.error("encrypt exception!", ex);
+			logger.error("encrypt exception!", ex);
 			return false;
 		}
 	}

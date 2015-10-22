@@ -29,7 +29,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	private static final String SESSION_TRACKER_SEPERATOR = "-";
 
-	protected Logger log = LoggerFactory.getLogger(this.getClass());
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Value("${httpSessionManager.sessionTrackerName:" + DEFAULT_SESSION_TRACKER_NAME + "}")
 	private String sessionTrackerName = DEFAULT_SESSION_TRACKER_NAME;
@@ -195,7 +195,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			if (checkRemoteAddr) {
 				String addr = (String) session.getAttribute(SESSION_KEY_REMOTE_ADDR);
 				if (addr != null && !session.getRequest().getRemoteAddr().equals(addr)) {
-					log.warn("Invalidate session[{}] that created from {} but hijacked from {}", session.getId(), addr,
+					logger.warn("Invalidate session[{}] that created from {} but hijacked from {}", session.getId(), addr,
 							session.getRequest().getRemoteAddr());
 					invalidate(session);
 				}

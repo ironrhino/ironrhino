@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Blowfish {
-	private static Logger log = LoggerFactory.getLogger(Blowfish.class);
+	private static Logger logger = LoggerFactory.getLogger(Blowfish.class);
 
 	public static final String DEFAULT_KEY_LOCATION = "/resources/key/blowfish";
 	public static final String KEY_DIRECTORY = "/key/";
@@ -46,27 +46,27 @@ public class Blowfish {
 		String s = System.getProperty(AppInfo.getAppName() + ".blowfish");
 		if (StringUtils.isNotBlank(s)) {
 			defaultKey = s;
-			log.info("using system property " + AppInfo.getAppName() + ".blowfish as default key");
+			logger.info("using system property " + AppInfo.getAppName() + ".blowfish as default key");
 		} else {
 			try {
 				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "blowfish");
 				if (file.exists()) {
 					defaultKey = FileUtils.readFileToString(file, "UTF-8");
-					log.info("using file " + file.getAbsolutePath());
+					logger.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						log.error("file " + file.getAbsolutePath()
+						logger.error("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (Blowfish.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream is = Blowfish.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
 							defaultKey = IOUtils.toString(is, "UTF-8");
-							log.info("using classpath resource "
+							logger.info("using classpath resource "
 									+ Blowfish.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
 					}
 				}
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 		if (defaultKey == null)
@@ -88,7 +88,7 @@ public class Blowfish {
 			enCipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
 			deCipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 		} catch (Exception e) {
-			log.error("[BlowfishEncrypter]", e);
+			logger.error("[BlowfishEncrypter]", e);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class Blowfish {
 		try {
 			return new String(Base64.encodeBase64(encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
-			log.error("encrypt exception!", ex);
+			logger.error("encrypt exception!", ex);
 			return "";
 		}
 	}
@@ -125,7 +125,7 @@ public class Blowfish {
 		try {
 			return new String(decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
-			log.error("decrypt exception!", ex);
+			logger.error("decrypt exception!", ex);
 			return "";
 		}
 	}
@@ -146,7 +146,7 @@ public class Blowfish {
 		try {
 			return new String(Base64.encodeBase64(blowfish.encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
-			log.error("encrypt exception!", ex);
+			logger.error("encrypt exception!", ex);
 			return "";
 		}
 	}
@@ -156,7 +156,7 @@ public class Blowfish {
 		try {
 			return new String(blowfish.decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
-			log.error("decrypt exception!", ex);
+			logger.error("decrypt exception!", ex);
 			return "";
 		}
 	}

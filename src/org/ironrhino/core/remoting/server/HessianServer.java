@@ -19,7 +19,7 @@ import com.caucho.hessian.server.HessianSkeleton;
 
 public class HessianServer extends HessianServiceExporter {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<>();
 
@@ -46,11 +46,11 @@ public class HessianServer extends HessianServiceExporter {
 				super.handleRequest(request, response);
 			} else {
 				String msg = "No Service:" + getServiceInterface().getName();
-				log.error("No Service:" + getServiceInterface());
+				logger.error("No Service:" + getServiceInterface());
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
 			}
 		} catch (Exception ex) {
-			log.error(ex.getMessage(), ex);
+			logger.error(ex.getMessage(), ex);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
 		} finally {
 			serviceInterface.remove();

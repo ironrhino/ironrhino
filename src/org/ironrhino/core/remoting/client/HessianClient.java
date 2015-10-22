@@ -25,7 +25,7 @@ import com.caucho.hessian.client.HessianURLConnectionFactory;
 
 public class HessianClient extends HessianProxyFactoryBean {
 
-	private static Logger log = LoggerFactory.getLogger(HessianClient.class);
+	private static Logger logger = LoggerFactory.getLogger(HessianClient.class);
 
 	private ServiceRegistry serviceRegistry;
 
@@ -146,7 +146,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 						try {
 							invoke(invocation, maxAttempts);
 						} catch (Throwable e) {
-							log.error(e.getMessage(), e);
+							logger.error(e.getMessage(), e);
 						}
 					}
 				};
@@ -171,7 +171,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 				String serviceUrl = discoverServiceUrl();
 				if (!serviceUrl.equals(getServiceUrl())) {
 					setServiceUrl(serviceUrl);
-					log.info("relocate service url:" + serviceUrl);
+					logger.info("relocate service url:" + serviceUrl);
 					reset();
 				}
 			}
@@ -203,7 +203,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 					}
 				} else {
 					sb.append("fakehost");
-					log.error("couldn't discover service:" + serviceName);
+					logger.error("couldn't discover service:" + serviceName);
 				}
 			} else {
 				sb.append("fakehost");

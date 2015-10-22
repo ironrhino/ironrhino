@@ -22,7 +22,7 @@ public class StatLogSettings {
 
 	public static final String STAT_LOG_FILE_NAME = "stat.log";
 
-	private static final Logger log = LoggerFactory.getLogger(StatLogSettings.class);
+	private static final Logger logger = LoggerFactory.getLogger(StatLogSettings.class);
 
 	private static int intervalUnit = 60; // senconds
 
@@ -38,7 +38,7 @@ public class StatLogSettings {
 	public static File getLogFileDirectory() {
 		File dir = new File(AppInfo.getAppHome() + FILE_DIRECTORY);
 		if (!dir.exists() && dir.mkdirs())
-			log.error("mkdir error:" + dir.getAbsolutePath());
+			logger.error("mkdir error:" + dir.getAbsolutePath());
 		return dir;
 	}
 

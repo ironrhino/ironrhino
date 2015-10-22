@@ -12,7 +12,7 @@ import org.springframework.core.Ordered;
 
 public class BaseAspect implements Ordered {
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected int order;
 
@@ -38,7 +38,7 @@ public class BaseAspect implements Ordered {
 		if (paramNames == null) {
 			if (!warnNoDebugSymbolInformation) {
 				warnNoDebugSymbolInformation = true;
-				log.warn("Unable to resolve method parameter names for method: " + jp.getStaticPart().getSignature()
+				logger.warn("Unable to resolve method parameter names for method: " + jp.getStaticPart().getSignature()
 						+ ". Debug symbol information is required if you are using parameter names in expressions.");
 			}
 		} else {

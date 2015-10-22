@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected Iterator<? extends KeyValuePair> iterator;
 

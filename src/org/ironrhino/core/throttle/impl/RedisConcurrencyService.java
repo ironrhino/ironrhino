@@ -21,7 +21,7 @@ public class RedisConcurrencyService implements ConcurrencyService {
 
 	private static final String NAMESPACE = "concurrency:";
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private RedisTemplate<String, String> stringRedisTemplate;
 

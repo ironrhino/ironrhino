@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RC4 {
-	private static Logger log = LoggerFactory.getLogger(RC4.class);
+	private static Logger logger = LoggerFactory.getLogger(RC4.class);
 
 	public static final String DEFAULT_KEY_LOCATION = "/resources/key/rc4";
 	public static final String KEY_DIRECTORY = "/key/";
@@ -35,27 +35,27 @@ public class RC4 {
 		String s = System.getProperty(AppInfo.getAppName() + ".rc4");
 		if (StringUtils.isNotBlank(s)) {
 			defaultKey = s;
-			log.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
+			logger.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
 		} else {
 			try {
 				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rc4");
 				if (file.exists()) {
 					defaultKey = FileUtils.readFileToString(file, "UTF-8");
-					log.info("using file " + file.getAbsolutePath());
+					logger.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						log.warn("file " + file.getAbsolutePath()
+						logger.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RC4.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream is = RC4.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
 							defaultKey = IOUtils.toString(is, "UTF-8");
-							log.info("using classpath resource "
+							logger.info("using classpath resource "
 									+ RC4.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
 					}
 				}
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 		if (defaultKey == null)

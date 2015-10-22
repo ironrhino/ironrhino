@@ -53,7 +53,7 @@ public class Oauth2Action extends BaseAction {
 
 	private static final long serialVersionUID = 8175470892708878896L;
 
-	protected static Logger log = LoggerFactory.getLogger(Oauth2Action.class);
+	protected static Logger logger = LoggerFactory.getLogger(Oauth2Action.class);
 
 	@Autowired
 	protected transient EventPublisher eventPublisher;
@@ -299,7 +299,7 @@ public class Oauth2Action extends BaseAction {
 				}
 				return INPUT;
 			} catch (InternalAuthenticationServiceException failed) {
-				log.error(failed.getMessage(), failed);
+				logger.error(failed.getMessage(), failed);
 				addActionError(ExceptionUtils.getRootMessage(failed));
 				return INPUT;
 			}
@@ -387,7 +387,7 @@ public class Oauth2Action extends BaseAction {
 					try {
 						authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 					} catch (InternalAuthenticationServiceException failed) {
-						log.error(failed.getMessage(), failed);
+						logger.error(failed.getMessage(), failed);
 						throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
 					} catch (AuthenticationException failed) {
 						throw new IllegalArgumentException(getText(failed.getClass().getName()));

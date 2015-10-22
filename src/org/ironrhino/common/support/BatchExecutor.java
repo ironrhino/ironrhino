@@ -14,7 +14,7 @@ import org.springframework.mail.SimpleMailMessage;
 
 public class BatchExecutor {
 
-	protected final Logger log = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private List<String> commands = Collections.emptyList();
 
@@ -37,7 +37,7 @@ public class BatchExecutor {
 			try {
 				applicationContextConsole.execute(cmd, Scope.LOCAL);
 			} catch (Throwable e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 				if (mailService != null) {
 					try {
 						SimpleMailMessage smm = new SimpleMailMessage();
@@ -45,7 +45,7 @@ public class BatchExecutor {
 						smm.setText(ExceptionUtils.getStackTraceAsString(e));
 						mailService.send(smm, false);
 					} catch (Exception ee) {
-						log.warn("send email failed", ee);
+						logger.warn("send email failed", ee);
 					}
 				}
 			}

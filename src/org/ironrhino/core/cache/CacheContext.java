@@ -18,7 +18,7 @@ import ognl.OgnlContext;
 
 public class CacheContext {
 
-	private static Logger log = LoggerFactory.getLogger(CacheContext.class);
+	private static Logger logger = LoggerFactory.getLogger(CacheContext.class);
 
 	public static final String FORCE_FLUSH_PARAM_NAME = "_ff_";
 
@@ -59,7 +59,7 @@ public class CacheContext {
 			}
 			return null;
 		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}

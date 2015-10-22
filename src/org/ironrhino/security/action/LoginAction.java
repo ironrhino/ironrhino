@@ -45,7 +45,7 @@ public class LoginAction extends BaseAction {
 
 	private static final long serialVersionUID = 2783386542815083811L;
 
-	protected static Logger log = LoggerFactory.getLogger(LoginAction.class);
+	protected static Logger logger = LoggerFactory.getLogger(LoginAction.class);
 
 	protected String password;
 
@@ -94,7 +94,7 @@ public class LoginAction extends BaseAction {
 			attempt.setDetails(wads.buildDetails(request));
 			authResult = authenticationManager.authenticate(attempt);
 		} catch (InternalAuthenticationServiceException failed) {
-			log.error(failed.getMessage(), failed);
+			logger.error(failed.getMessage(), failed);
 			addActionError(ExceptionUtils.getRootMessage(failed));
 		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 			addFieldError("username", getText(failed.getClass().getName()));
@@ -106,7 +106,7 @@ public class LoginAction extends BaseAction {
 			try {
 				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		} catch (CredentialsExpiredException failed) {
 			UserDetails ud = userDetailsService.loadUserByUsername(username);
@@ -118,7 +118,7 @@ public class LoginAction extends BaseAction {
 				try {
 					usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				} catch (Exception e) {
-					log.error(e.getMessage(), e);
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
@@ -131,7 +131,7 @@ public class LoginAction extends BaseAction {
 							new LoginEvent(((UserDetails) principal).getUsername(), request.getRemoteAddr()),
 							Scope.LOCAL);
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		return SUCCESS;
 	}

@@ -17,7 +17,7 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<>();
 
@@ -50,11 +50,11 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 				writeRemoteInvocationResult(request, response, result);
 			} else {
 				String msg = "No Service:" + getServiceInterface().getName();
-				log.error("No Service:" + getServiceInterface());
+				logger.error("No Service:" + getServiceInterface());
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
 			}
 		} catch (Exception ex) {
-			log.error(ex.getMessage(), ex);
+			logger.error(ex.getMessage(), ex);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
 		} finally {
 			serviceInterface.remove();

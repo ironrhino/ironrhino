@@ -25,7 +25,7 @@ import org.springframework.context.event.EventListener;
 
 public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private ConfigurableApplicationContext ctx;
@@ -61,7 +61,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			try {
 				clazz = Class.forName(beanClassName);
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 				continue;
 			}
 			if (beanClassName.startsWith("org.ironrhino.core.remoting.client.") && beanClassName.endsWith("Client")) {
@@ -90,19 +90,19 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 						classes = interfaces;
 				}
 				if (classes.length == 0) {
-					log.warn("@Remoting on concrete class [{}] must assign interfaces to export services",
+					logger.warn("@Remoting on concrete class [{}] must assign interfaces to export services",
 							clazz.getName());
 				} else {
 					for (Class<?> inte : classes) {
 						if (!inte.isInterface()) {
-							log.warn("class [{}] in @Remoting on class [{}] must be interface", inte.getName(),
+							logger.warn("class [{}] in @Remoting on class [{}] must be interface", inte.getName(),
 									clazz.getName());
 						} else if (!inte.isAssignableFrom(clazz)) {
-							log.warn(" class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
+							logger.warn(" class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
 									inte.getName());
 						} else {
 							exportServices.put(inte.getName(), ctx.getBean(beanName));
-							log.info(" exported service [{}] for bean [{}#{}]", inte.getName(), beanClassName,
+							logger.info(" exported service [{}] for bean [{}#{}]", inte.getName(), beanClassName,
 									beanName);
 						}
 					}
@@ -118,7 +118,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			Remoting remoting = clazz.getAnnotation(Remoting.class);
 			if (remoting != null) {
 				exportServices.put(clazz.getName(), ctx.getBean(beanName));
-				log.info(" exported service [{}] for bean [{}#{}]", clazz.getName(), beanClassName, beanName);
+				logger.info(" exported service [{}] for bean [{}#{}]", clazz.getName(), beanClassName, beanName);
 			}
 			for (Class<?> c : clazz.getInterfaces())
 				export(c, beanName, beanClassName);
@@ -158,15 +158,15 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	protected void onDiscover(String serviceName, String host) {
-		log.info("discovered " + serviceName + "@" + host);
+		logger.info("discovered " + serviceName + "@" + host);
 	}
 
 	protected void onRegister(String serviceName, String host) {
-		log.info("registered " + serviceName + "@" + host);
+		logger.info("registered " + serviceName + "@" + host);
 	}
 
 	protected void onUnregister(String serviceName, String host) {
-		log.info("unregistered " + serviceName + "@" + host);
+		logger.info("unregistered " + serviceName + "@" + host);
 	}
 
 	protected void prepare() {

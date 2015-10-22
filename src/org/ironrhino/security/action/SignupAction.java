@@ -44,7 +44,7 @@ public class SignupAction extends BaseAction {
 
 	private static final long serialVersionUID = 8175406892708878896L;
 
-	protected static Logger log = LoggerFactory.getLogger(SignupAction.class);
+	protected static Logger logger = LoggerFactory.getLogger(SignupAction.class);
 
 	private String email;
 
@@ -186,7 +186,7 @@ public class SignupAction extends BaseAction {
 						eventPublisher.publish(loginEvent, Scope.LOCAL);
 					}
 				} catch (RuntimeException e) {
-					log.warn(e.getMessage(), e);
+					logger.warn(e.getMessage(), e);
 				}
 				targetUrl = "/";
 				return REDIRECT;

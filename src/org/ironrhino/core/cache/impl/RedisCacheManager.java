@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @ServiceImplementationConditional(profiles = { DUAL, CLOUD })
 public class RedisCacheManager implements CacheManager {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private RedisTemplate redisTemplate;
 
@@ -50,7 +50,7 @@ public class RedisCacheManager implements CacheManager {
 			else
 				redisTemplate.opsForValue().set(generateKey(key, namespace), value);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class RedisCacheManager implements CacheManager {
 		try {
 			return redisTemplate.hasKey(generateKey(key, namespace));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -73,11 +73,11 @@ public class RedisCacheManager implements CacheManager {
 		try {
 			return redisTemplate.opsForValue().get(generateKey(key, namespace));
 		} catch (SerializationFailedException e) {
-			log.warn(e.getMessage(), e);
+			logger.warn(e.getMessage(), e);
 			delete(key, namespace);
 			return null;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -92,11 +92,11 @@ public class RedisCacheManager implements CacheManager {
 		try {
 			return redisTemplate.opsForValue().get(actualKey);
 		} catch (SerializationFailedException e) {
-			log.warn(e.getMessage(), e);
+			logger.warn(e.getMessage(), e);
 			delete(key, namespace);
 			return null;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -108,7 +108,7 @@ public class RedisCacheManager implements CacheManager {
 		try {
 			redisTemplate.delete(generateKey(key, namespace));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -130,14 +130,14 @@ public class RedisCacheManager implements CacheManager {
 							conn.expire(k, timeToLive);
 					conn.exec();
 				} catch (Exception e) {
-					log.error(e.getMessage(), e);
+					logger.error(e.getMessage(), e);
 					conn.discard();
 				}
 				return null;
 			});
 
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -159,7 +159,7 @@ public class RedisCacheManager implements CacheManager {
 			}
 			return map;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -177,13 +177,13 @@ public class RedisCacheManager implements CacheManager {
 							conn.del(redisTemplate.getKeySerializer().serialize(generateKey(key, namespace)));
 					conn.exec();
 				} catch (Exception e) {
-					log.error(e.getMessage(), e);
+					logger.error(e.getMessage(), e);
 					conn.discard();
 				}
 				return null;
 			});
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		for (String key : keys)
 			delete(key, namespace);
@@ -196,7 +196,7 @@ public class RedisCacheManager implements CacheManager {
 		try {
 			return redisTemplate.hasKey(generateKey(key, namespace));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 	}

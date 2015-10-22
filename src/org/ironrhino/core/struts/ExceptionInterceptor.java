@@ -24,7 +24,7 @@ import ognl.MethodFailedException;
 public class ExceptionInterceptor extends AbstractInterceptor {
 
 	private static final long serialVersionUID = 6419734583295725844L;
-	protected static final Logger log = LoggerFactory.getLogger(ExceptionInterceptor.class);
+	protected static final Logger logger = LoggerFactory.getLogger(ExceptionInterceptor.class);
 
 	@Override
 	public String intercept(ActionInvocation invocation) throws Exception {
@@ -77,7 +77,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 							if (msg == null)
 								msg = ExceptionUtils.getDetailMessage(e);
 							validationAwareAction.addActionError(msg);
-							log.error(e.getMessage(), e);
+							logger.error(e.getMessage(), e);
 						}
 					}
 				}

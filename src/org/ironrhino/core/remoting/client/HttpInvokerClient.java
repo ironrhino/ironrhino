@@ -17,7 +17,7 @@ import org.springframework.util.Assert;
 
 public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
-	private static Logger log = LoggerFactory.getLogger(HttpInvokerClient.class);
+	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
 
 	private HttpInvokerRequestExecutor httpInvokerRequestExecutor;
 
@@ -123,7 +123,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 					try {
 						invoke(invocation, maxAttempts);
 					} catch (Throwable e) {
-						log.error(e.getMessage(), e);
+						logger.error(e.getMessage(), e);
 					}
 				};
 				if (executorService != null)
@@ -147,7 +147,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 				String serviceUrl = discoverServiceUrl();
 				if (!serviceUrl.equals(getServiceUrl())) {
 					setServiceUrl(serviceUrl);
-					log.info("relocate service url:" + serviceUrl);
+					logger.info("relocate service url:" + serviceUrl);
 				}
 			}
 			return invoke(invocation, attempts);
@@ -178,7 +178,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 					}
 				} else {
 					sb.append("fakehost");
-					log.error("couldn't discover service:" + serviceName);
+					logger.error("couldn't discover service:" + serviceName);
 				}
 			} else {
 				sb.append("fakehost");

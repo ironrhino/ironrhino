@@ -38,7 +38,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 
 	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_23;
 
-	private Logger log = LoggerFactory.getLogger(this.getClass());
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private String base;
 
@@ -87,7 +87,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 			configuration.setSetting(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "5");
 		configuration.setCacheStorage(new StrongCacheStorage());
 		configuration.setTemplateExceptionHandler((ex, env, writer) -> {
-			log.error(ex.getMessage());
+			logger.error(ex.getMessage());
 		});
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 		ServletContextResourcePatternResolver servletContextResourcePatternResolver = new ServletContextResourcePatternResolver(
@@ -108,7 +108,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 				configuration.addAutoImport(namespace, location.substring(location.indexOf(ftlClasspath)));
 			}
 		} catch (IOException e) {
-			log.debug(e.getMessage());
+			logger.debug(e.getMessage());
 		}
 		try {
 			searchPath = ftlLocation + "/meta/import/*.ftl";
@@ -120,7 +120,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 				configuration.addAutoImport(namespace, location.substring(location.indexOf(ftlLocation)));
 			}
 		} catch (IOException e) {
-			log.debug(e.getMessage());
+			logger.debug(e.getMessage());
 		}
 		try {
 			searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ftlClasspath + "/meta/include/*.ftl";
@@ -130,7 +130,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 				configuration.addAutoInclude(location.substring(location.indexOf(ftlClasspath)));
 			}
 		} catch (IOException e) {
-			log.debug(e.getMessage());
+			logger.debug(e.getMessage());
 		}
 		try {
 			searchPath = ftlLocation + "/meta/include/*.ftl";
@@ -140,7 +140,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 				configuration.addAutoInclude(location.substring(location.indexOf(ftlLocation)));
 			}
 		} catch (IOException e) {
-			log.debug(e.getMessage());
+			logger.debug(e.getMessage());
 		}
 		return configuration;
 	}

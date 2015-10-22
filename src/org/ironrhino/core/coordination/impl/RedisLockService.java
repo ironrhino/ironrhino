@@ -25,7 +25,7 @@ public class RedisLockService implements LockService {
 
 	private static final String NAMESPACE = "lock:";
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private RedisTemplate<String, String> stringRedisTemplate;
 
@@ -97,7 +97,7 @@ public class RedisLockService implements LockService {
 		RedisScript<Long> script = new DefaultRedisScript<>(str, Long.class);
 		Long ret = stringRedisTemplate.execute(script, Collections.singletonList(key), value);
 		if (ret == 0)
-			log.error("Lock [{}] is not hold by instance [{}]", name, value);
+			logger.error("Lock [{}] is not hold by instance [{}]", name, value);
 	}
 
 }

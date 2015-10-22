@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings("rawtypes")
 public class StatControl {
 
-	protected Logger log = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Resource
 	private EntityManager<Stat> entityManager;
@@ -150,7 +150,7 @@ public class StatControl {
 				};
 				analyzer.analyze();
 			} catch (FileNotFoundException e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 				throw new RuntimeException(e);
 			}
 		}
@@ -185,7 +185,7 @@ public class StatControl {
 				analyzer = new CumulativeAnalyzer(from, to, localhost);
 			} catch (Exception e) {
 				e.printStackTrace();
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		} else {
 			Calendar cal = Calendar.getInstance();
@@ -227,7 +227,7 @@ public class StatControl {
 					}
 				}
 			} catch (FileNotFoundException e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 				throw new RuntimeException(e);
 			}
 		}

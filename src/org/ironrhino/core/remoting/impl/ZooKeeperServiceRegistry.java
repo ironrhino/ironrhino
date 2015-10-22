@@ -67,7 +67,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			if (children != null && children.size() > 0)
 				importServices.put(serviceName, children);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		try {
 			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).inBackground()
 					.forPath(path, data);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -112,7 +112,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			Collections.sort(services);
 			return services;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return Collections.emptyList();
 		}
 	}
@@ -127,7 +127,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			Collections.sort(hosts);
 			return hosts;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return Collections.emptyList();
 		}
 	}
@@ -145,7 +145,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			services.putAll(map);
 			return services;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return Collections.emptyMap();
 		}
 

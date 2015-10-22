@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class SessionCompressorManager {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired(required = false)
 	private List<SessionCompressor> compressors;
@@ -54,7 +54,7 @@ public class SessionCompressorManager {
 				if (s != null)
 					compressedMap.put(key, s);
 			} catch (Exception e) {
-				log.error("compress error for " + key + ",it won't be saved", e);
+				logger.error("compress error for " + key + ",it won't be saved", e);
 			}
 		}
 		return compressedMap.isEmpty() ? null : JsonUtils.toJson(compressedMap);
@@ -68,7 +68,7 @@ public class SessionCompressorManager {
 			try {
 				compressedMap = JsonUtils.fromJson(str, JsonUtils.STRING_MAP_TYPE);
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 				session.invalidate();
 				return;
 			}
@@ -115,7 +115,7 @@ public class SessionCompressorManager {
 					} catch (AccountStatusException e) {
 						throw e;
 					} catch (Exception e) {
-						log.error("uncompress error for " + key + ",it won't be restored", e);
+						logger.error("uncompress error for " + key + ",it won't be restored", e);
 					}
 				}
 		}

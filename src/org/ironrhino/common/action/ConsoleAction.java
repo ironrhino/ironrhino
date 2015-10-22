@@ -29,7 +29,7 @@ public class ConsoleAction extends BaseAction {
 
 	private static final long serialVersionUID = 8180265410790553918L;
 
-	private static Logger log = LoggerFactory.getLogger(ConsoleAction.class);
+	private static Logger logger = LoggerFactory.getLogger(ConsoleAction.class);
 
 	private String expression;
 
@@ -74,7 +74,7 @@ public class ConsoleAction extends BaseAction {
 				throwable = ((InvocationTargetException) throwable).getTargetException();
 			if (throwable.getCause() instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable.getCause()).getTargetException();
-			log.error(throwable.getMessage(), throwable);
+			logger.error(throwable.getMessage(), throwable);
 			String msg = throwable.getMessage();
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + throwable.getMessage()) : ""));
 			Map<String, Collection<String>> map = new HashMap<>();
@@ -94,7 +94,7 @@ public class ConsoleAction extends BaseAction {
 		} catch (Throwable throwable) {
 			if (throwable instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable).getTargetException();
-			log.error(throwable.getMessage(), throwable);
+			logger.error(throwable.getMessage(), throwable);
 			String msg = throwable.getMessage();
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + throwable.getMessage()) : ""));
 			Map<String, Collection<String>> map = new HashMap<>();

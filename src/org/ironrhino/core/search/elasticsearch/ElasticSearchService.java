@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @SuppressWarnings(value = { "unchecked", "rawtypes" })
 public class ElasticSearchService<T> implements SearchService<T> {
 
-	protected Logger log = LoggerFactory.getLogger(ElasticSearchService.class);
+	protected Logger logger = LoggerFactory.getLogger(ElasticSearchService.class);
 
 	@Autowired
 	private Client client;
@@ -80,7 +80,7 @@ public class ElasticSearchService<T> implements SearchService<T> {
 				}
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return resultPage;
 	}
@@ -118,7 +118,7 @@ public class ElasticSearchService<T> implements SearchService<T> {
 					list.add(data);
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return list;
 	}
@@ -143,7 +143,7 @@ public class ElasticSearchService<T> implements SearchService<T> {
 			}
 			return result;
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return Collections.emptyMap();
 	}

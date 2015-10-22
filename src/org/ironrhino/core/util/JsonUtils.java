@@ -46,7 +46,7 @@ public class JsonUtils {
 	public static final TypeReference<Map<String, String>> STRING_MAP_TYPE = new TypeReference<Map<String, String>>() {
 	};
 
-	private static Logger log = LoggerFactory.getLogger(JsonUtils.class);
+	private static Logger logger = LoggerFactory.getLogger(JsonUtils.class);
 
 	private static ObjectMapper objectMapper = createNewObjectMapper();
 
@@ -104,7 +104,7 @@ public class JsonUtils {
 		try {
 			return objectMapper.writeValueAsString(object);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}

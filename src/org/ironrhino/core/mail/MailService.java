@@ -14,7 +14,7 @@ import freemarker.template.Template;
 
 public class MailService {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired(required = false)
 	private TemplateProvider templateProvider;
@@ -64,7 +64,7 @@ public class MailService {
 			if (simpleMailMessageWrapperQueue != null)
 				simpleMailMessageWrapperQueue.produce(new SimpleMailMessageWrapper(smm, useHtmlFormat));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			_failureCount++;
 			if (_failureCount >= forceLocalAsyncFailureThreshold) {
 				_failureCount = 0;
