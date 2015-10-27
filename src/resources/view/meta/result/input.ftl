@@ -47,6 +47,9 @@
 		<#assign readonly=true/>
 		</#if>
 		<#if !(entity.new && readonly)>
+			<#if (Parameters[key]?has_content||Parameters[key+'.id']?has_content)>
+				<#assign readonly=true/>
+			</#if>
 			<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key)/>
 			<#assign dynamicAttributes=config.dynamicAttributes/>
 			<#if config.group?has_content>
