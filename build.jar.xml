@@ -223,9 +223,10 @@
 	      			fs.setDir(new File(project.getProperty('webapp.dir')+'/WEB-INF/classes/resources/view/decorator'));
 	      			fs.setIncludes('**/*.ftl');
 	      			replaceregexp.addFileset(fs);
-	      			var namearr = name.split('\\.');
-	      			var match = '/'+dir.getName()+'/'+namearr[0]+'(.*)\\.'+namearr[1];
-	      			var replace = '/'+dir.getName()+'/'+namearr[0]+'\\1\\.'+namearr[1]+'?'+revision;
+					var prefix = name.substring(0,name.lastIndexOf('.'));
+					var suffix = name.substring(name.lastIndexOf('.')+1);
+		  			var match = '/'+dir.getName()+'/'+prefix+'(.*)\\.'+suffix;
+		  			var replace = '/'+dir.getName()+'/'+prefix+'\\1\\.'+suffix+'?'+revision;
 	        		replaceregexp.setMatch(match);
 	        		replaceregexp.setReplace(replace);
 	        		replaceregexp.perform();
