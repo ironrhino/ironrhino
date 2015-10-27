@@ -838,17 +838,16 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 				bwp.setConversionService(conversionService);
 				Set<String> editedPropertyNames = new HashSet<>();
-				String propertyName = null;
-				for (String parameterName : ServletActionContext.getRequest().getParameterMap().keySet()) {
-					if (parameterName.startsWith(getEntityName() + '.')
-							|| parameterName.startsWith("__checkbox_" + getEntityName() + '.')
-							|| parameterName.startsWith("__datagrid_" + getEntityName() + '.')) {
-						propertyName = parameterName.substring(parameterName.indexOf('.') + 1);
-						if (propertyName.indexOf('.') > 0)
-							propertyName = propertyName.substring(0, propertyName.indexOf('.'));
-						if (propertyName.indexOf('[') > 0)
-							propertyName = propertyName.substring(0, propertyName.indexOf('['));
-					}
+				for (String propertyName : ServletActionContext.getRequest().getParameterMap().keySet()) {
+					if (propertyName.startsWith("__checkbox_" + getEntityName() + '.')
+							|| propertyName.startsWith("__datagrid_" + getEntityName() + '.'))
+						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
+					if (propertyName.startsWith(getEntityName() + '.'))
+						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
+					if (propertyName.indexOf('.') > 0)
+						propertyName = propertyName.substring(0, propertyName.indexOf('.'));
+					if (propertyName.indexOf('[') > 0)
+						propertyName = propertyName.substring(0, propertyName.indexOf('['));
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
 					if (uiConfig == null || uiConfig.getReadonly().isValue()
 							|| fromList && uiConfig.getHiddenInList().isValue()
@@ -945,17 +944,16 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 
 				Set<String> editedPropertyNames = new HashSet<>();
-				String propertyName = null;
-				for (String parameterName : ServletActionContext.getRequest().getParameterMap().keySet()) {
-					if (parameterName.startsWith(getEntityName() + '.')
-							|| parameterName.startsWith("__checkbox_" + getEntityName() + '.')
-							|| parameterName.startsWith("__datagrid_" + getEntityName() + '.')) {
-						propertyName = parameterName.substring(parameterName.indexOf('.') + 1);
-						if (propertyName.indexOf('.') > 0)
-							propertyName = propertyName.substring(0, propertyName.indexOf('.'));
-						if (propertyName.indexOf('[') > 0)
-							propertyName = propertyName.substring(0, propertyName.indexOf('['));
-					}
+				for (String propertyName : ServletActionContext.getRequest().getParameterMap().keySet()) {
+					if (propertyName.startsWith("__checkbox_" + getEntityName() + '.')
+							|| propertyName.startsWith("__datagrid_" + getEntityName() + '.'))
+						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
+					if (propertyName.startsWith(getEntityName() + '.'))
+						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
+					if (propertyName.indexOf('.') > 0)
+						propertyName = propertyName.substring(0, propertyName.indexOf('.'));
+					if (propertyName.indexOf('[') > 0)
+						propertyName = propertyName.substring(0, propertyName.indexOf('['));
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
 					if (uiConfig == null || uiConfig.getReadonly().isValue()
 							|| fromList && uiConfig.getHiddenInList().isValue()
@@ -1024,7 +1022,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						|| !naturalIdMutable && naturalIds.keySet().contains(propertyName) && !isnew
 						|| !Persistable.class.isAssignableFrom(type))
 					continue;
-				if (!isnew && StringUtils.isNotBlank(uiConfig.getReadonly().getExpression()) && evalBoolean(
+				if (StringUtils.isNotBlank(uiConfig.getReadonly().getExpression()) && evalBoolean(
 						uiConfig.getReadonly().getExpression(), _entity, bw.getPropertyValue(propertyName)))
 					continue;
 				String parameterValue = ServletActionContext.getRequest()

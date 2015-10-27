@@ -59,7 +59,6 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@NotInCopy
 	@UiConfig(width = "150px")
 	@ManyToOne(optional = false)
-
 	@JoinColumn(name = "owner")
 	private User owner;
 
