@@ -35,7 +35,7 @@ public class ReflectionUtils {
 	private static ClassPool classPool = ClassPool.getDefault();
 
 	public static List<String> getAllFields(Class<?> clazz) {
-		if (clazz == Object.class)
+		if (clazz == Object.class || clazz.isPrimitive())
 			return Collections.emptyList();
 		try {
 			classPool.insertClassPath(new ClassClassPath(clazz));
