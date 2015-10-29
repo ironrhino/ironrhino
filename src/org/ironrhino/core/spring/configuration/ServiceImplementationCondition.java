@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
@@ -30,6 +32,14 @@ class ServiceImplementationCondition implements Condition {
 
 	static {
 		Resource resource = new ClassPathResource("services.properties");
+		if (resource.exists()) {
+			try (InputStream is = resource.getInputStream()) {
+				services.load(is);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		resource = new ClassPathResource("services." + AppInfo.getStage().name() + ".properties");
 		if (resource.exists()) {
 			try (InputStream is = resource.getInputStream()) {
 				services.load(is);
@@ -69,7 +79,7 @@ class ServiceImplementationCondition implements Condition {
 				}
 				if (serviceInterfaceName != null) {
 					String implementationClassName = services.getProperty(serviceInterfaceName);
-					if (implementationClassName != null) {
+					if (StringUtils.isNotBlank(implementationClassName)) {
 						boolean matched = implementationClassName.equals(className);
 						if (matched) {
 							String key = serviceInterfaceName + "=" + implementationClassName;
