@@ -1,6 +1,7 @@
 package org.ironrhino.core.hibernate.dialect;
 
 import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.MySQL57InnoDBDialect;
 import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 
@@ -14,7 +15,9 @@ public class MyDialectResolver extends StandardDialectResolver {
 		if ("MySQL".equals(databaseName)) {
 			final int majorVersion = info.getDatabaseMajorVersion();
 			final int minorVersion = info.getDatabaseMinorVersion();
-			if (majorVersion > 5 || majorVersion == 5 && minorVersion >= 6)
+			if (majorVersion > 5 || majorVersion == 5 && minorVersion >= 7)
+				return new MySQL57InnoDBDialect();
+			else if (majorVersion == 5 && minorVersion >= 6)
 				return new MySQL56Dialect();
 		}
 		return super.resolveDialect(info);
