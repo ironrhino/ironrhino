@@ -133,14 +133,14 @@ public class LoginAction extends BaseAction {
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
+		if (StringUtils.isBlank(targetUrl))
+			targetUrl = "/";
 		return SUCCESS;
 	}
 
 	@Override
 	public String input() {
 		HttpServletRequest request = ServletActionContext.getRequest();
-		if (StringUtils.isBlank(targetUrl))
-			targetUrl = "/";
 		username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 		return SUCCESS;
 	}

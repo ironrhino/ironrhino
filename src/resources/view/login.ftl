@@ -19,7 +19,7 @@
 	<h2 class="caption">${action.getText('login')}</h2>
 	<div class="hero-unit">
 	<@s.form id="login" action="${actionBaseUrl}" method="post" class="ajax focus form-horizontal well">
-		<@s.hidden id="targetUrl" name="targetUrl" />
+		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
 		<@s.textfield label="%{getText('username')}" name="username" class="required span2"/>
 		<@s.password label="%{getText('password')}" name="password" class="required span2 input-pattern submit"/>
 		<@s.checkbox label="%{getText('rememberme')}" name="rememberme" class="custom"/>
