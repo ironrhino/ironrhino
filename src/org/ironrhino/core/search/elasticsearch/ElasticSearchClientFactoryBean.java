@@ -41,7 +41,7 @@ public class ElasticSearchClientFactoryBean implements FactoryBean<Client>, Init
 	public void afterPropertiesSet() throws Exception {
 		if (StringUtils.isBlank(connectString)) {
 			Map<String, String> map = new HashMap<>();
-			map.put("path.home", AppInfo.getAppHome() + "/search");
+			map.put("path.home", AppInfo.getAppHome().replace('\\', '/') + "/search");
 			if (settings != null)
 				map.putAll(settings);
 			Settings settings = ImmutableSettings.settingsBuilder().put(map).build();
