@@ -46,7 +46,7 @@
 
 	<bean id="logoutSuccessHandler"
 		class="org.ironrhino.security.component.LogoutSuccessHandler"
-		p:defaultTargetUrl="/" />
+		p:defaultTargetUrl="${logout.defaultTargetUrl:/}" />
 
 	<bean id="rememberMeServices"
 		class="org.ironrhino.core.spring.security.DefaultTokenBasedRememberMeServices"
