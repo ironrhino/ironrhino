@@ -4,7 +4,7 @@
 	xmlns:mongo="http://www.springframework.org/schema/data/mongo" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 	<mongo:db-factory id="mongoDbFactory" host="${mongodb.host:localhost}" port="${mongodb.port:27017}" dbname="${mongodb.dbname:ironrhino}"/>
-	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate" primary="true">
 		<constructor-arg ref="mongoDbFactory" />
 	</bean>
 </beans>

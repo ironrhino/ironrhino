@@ -8,6 +8,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
@@ -23,6 +24,7 @@ public class ZooKeeperConfiguration {
 	@Value("${zooKeeper.sessionTimeout:60000}")
 	private int sessionTimeout;
 
+	@Primary
 	@Bean(initMethod = "start", destroyMethod = "close")
 	public CuratorFramework curatorFramework() {
 		CuratorFramework curatorFramework = CuratorFrameworkFactory.builder().connectString(connectString)

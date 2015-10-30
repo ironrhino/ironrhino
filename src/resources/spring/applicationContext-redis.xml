@@ -19,7 +19,7 @@
 		</property>
 	</bean>
 	<bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
-		p:connectionFactory-ref="redisConnectionFactory" />
+		p:connectionFactory-ref="redisConnectionFactory" primary="true"/>
 	<redis:listener-container connection-factory="redisConnectionFactory"
 		task-executor="executorService">
 	</redis:listener-container>
