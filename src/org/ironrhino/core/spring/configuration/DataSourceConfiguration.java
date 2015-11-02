@@ -30,7 +30,7 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.driverClassName:}")
 	private String driverClassName;
 
-	@Value("${jdbc.url:jdbc:mysql:///${app.name}?createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&tinyInt1isBit=false}")
+	@Value("${jdbc.url:jdbc:mysql:///#{systemProperties['app.name'].replaceAll('-','_')}?createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&tinyInt1isBit=false}")
 	private String jdbcUrl;
 
 	@Value("${jdbc.username:root}")

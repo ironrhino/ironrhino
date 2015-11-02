@@ -19,7 +19,7 @@
 						projectName = 'sample';
 					var projectPackage = project.getProperty('project.basePackage');
 					if(!projectPackage)
-						projectPackage = 'com.' + projectName;
+						projectPackage = 'com.' + projectName.replaceAll('-','.');
 					var features = project.getProperty('project.features')||'redis';
 					var basedir = project.getProperty('basedir');
 					var projectDir = basedir + '/../' + projectName;
@@ -51,7 +51,7 @@
 						echo.setMessage('@AutoConfig(namespace = "/")\npackage '+projectPackage+';\nimport org.ironrhino.core.metadata.AutoConfig;');
 						echo.perform();
 					}
-					file = new File(projectSrc+'/resources/i18n/'+projectName+'/messages_zh_CN.properties');
+					file = new File(projectSrc+'/resources/i18n/'+projectName.replaceAll('-','/')+'/messages_zh_CN.properties');
 					if(!file.exists()){
 						var echo = project.createTask("echo");
 						echo.setFile(file);

@@ -70,7 +70,7 @@ public class AppInfoListener implements ServletContextListener {
 
 		String appBasePackage = appProperties.getProperty(AppInfo.KEY_APP_BASEPACKAGE);
 		if (StringUtils.isBlank(appBasePackage))
-			appBasePackage = "com." + AppInfo.getAppName();
+			appBasePackage = "com." + AppInfo.getAppName().replaceAll("-", ".");
 		AppInfo.setAppBasePackage(appBasePackage);
 		System.setProperty(AppInfo.KEY_APP_BASEPACKAGE, appBasePackage);
 		String excludeFilterRegex = appProperties.getProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX);
