@@ -40,7 +40,12 @@
 					</#if>
 					<#if !template?has_content>
 						<#assign cssClass=config.cssClass?replace('input-[^ ]+', '', 'r')>
-						<#if config.type=='textarea'>
+						<#if config.multiple>
+							<#if value?has_content>
+							<#if config.type=='dictionary'&&displayDictionaryLabel??><#assign templateName><@config.templateName?interpret /></#assign></#if>
+							<#list value as var><span class="label"><#if config.type=='dictionary'&&displayDictionaryLabel??><@displayDictionaryLabel dictionaryName=templateName value=var!/><#else>${(var?string)!}</#if></span><#sep> </#list>
+							</#if>
+						<#elseif config.type=='textarea'>
 							<#if value?has_content>
 							<div style="white-space:pre-wrap;word-break:break-all;"<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</div>
 							</#if>
@@ -114,7 +119,12 @@
 			<#assign template=config.viewTemplate/>
 			</#if>
 			<#if !template?has_content>
-				<#if config.type=='textarea'>
+				<#if config.multiple>
+					<#if value?has_content>
+					<#if config.type=='dictionary'&&displayDictionaryLabel??><#assign templateName><@config.templateName?interpret /></#assign></#if>
+					<#list value as var><span class="label"><#if config.type=='dictionary'&&displayDictionaryLabel??><@displayDictionaryLabel dictionaryName=templateName value=var!/><#else>${(var?string)!}</#if></span><#sep> </#list>
+					</#if>
+				<#elseif config.type=='textarea'>
 					<#if value?has_content>
 					<div style="white-space:pre-wrap;word-break:break-all;"<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</div>
 					</#if>
@@ -176,7 +186,12 @@
 							<#assign template=config.viewTemplate/>
 							</#if>
 							<#if !template?has_content>
-								<#if config.type=='textarea'>
+								<#if config.multiple>
+									<#if value?has_content>
+									<#if config.type=='dictionary'&&displayDictionaryLabel??><#assign templateName><@config.templateName?interpret /></#assign></#if>
+									<#list value as var><span class="label"><#if config.type=='dictionary'&&displayDictionaryLabel??><@displayDictionaryLabel dictionaryName=templateName value=var!/><#else>${(var?string)!}</#if></span><#sep> </#list>
+									</#if>
+								<#elseif config.type=='textarea'>
 									<#if value?has_content>
 									<div style="white-space:pre-wrap;word-break:break-all;"<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</div>
 									</#if>
