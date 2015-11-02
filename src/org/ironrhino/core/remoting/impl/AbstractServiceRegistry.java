@@ -1,6 +1,6 @@
 package org.ironrhino.core.remoting.impl;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		return exportServices;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void init() {
 		host = AppInfo.getHostAddress() + ":" + (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_PORT);
 		prepare();
@@ -67,7 +66,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (beanClassName.startsWith("org.ironrhino.core.remoting.client.") && beanClassName.endsWith("Client")) {
 				// remoting_client
 				String serviceName = (String) bd.getPropertyValues().getPropertyValue("serviceInterface").getValue();
-				importServices.put(serviceName, Collections.EMPTY_LIST);
+				importServices.put(serviceName, new ArrayList<String>());
 			} else {
 				export(clazz, beanName, beanClassName);
 			}
