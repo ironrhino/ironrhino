@@ -72,7 +72,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	protected void lookup(String serviceName) {
 		List<String> list = stringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + serviceName, 0, -1);
 		if (list != null && list.size() > 0)
-			importServices.put(serviceName, list);
+			importServices.put(serviceName, new ArrayList<>(list));
 	}
 
 	@Override

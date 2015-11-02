@@ -10,6 +10,7 @@ import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 import org.springframework.remoting.httpinvoker.HttpInvokerRequestExecutor;
@@ -21,8 +22,10 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	private HttpInvokerRequestExecutor httpInvokerRequestExecutor;
 
+	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
+	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	private String host;
@@ -35,11 +38,13 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	private List<String> asyncMethods;
 
+	private boolean poll;
+
 	private boolean urlFromDiscovery;
 
 	private boolean discovered; // for lazy discover from serviceRegistry
 
-	private boolean poll;
+	private String discoveredHost;
 
 	public void setPoll(boolean poll) {
 		this.poll = poll;
@@ -143,7 +148,10 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 			if (--attempts < 1)
 				throw e;
 			if (urlFromDiscovery) {
-				serviceRegistry.evict(host);
+				if (discoveredHost != null) {
+					serviceRegistry.evict(discoveredHost);
+					discoveredHost = null;
+				}
 				String serviceUrl = discoverServiceUrl();
 				if (!serviceUrl.equals(getServiceUrl())) {
 					setServiceUrl(serviceUrl);
@@ -176,6 +184,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 						sb.append(':');
 						sb.append(port);
 					}
+					discoveredHost = ho;
 				} else {
 					sb.append("fakehost");
 					logger.error("couldn't discover service:" + serviceName);

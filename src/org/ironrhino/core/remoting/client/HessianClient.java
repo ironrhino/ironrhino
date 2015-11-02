@@ -15,6 +15,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.caucho.HessianProxyFactoryBean;
 import org.springframework.util.Assert;
@@ -27,8 +28,10 @@ public class HessianClient extends HessianProxyFactoryBean {
 
 	private static Logger logger = LoggerFactory.getLogger(HessianClient.class);
 
+	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
+	@Autowired(required = false)
 	private ExecutorService executorService;
 
 	private String host;
@@ -44,6 +47,8 @@ public class HessianClient extends HessianProxyFactoryBean {
 	private boolean urlFromDiscovery;
 
 	private boolean discovered; // for lazy discover from serviceRegistry
+
+	private String discoveredHost;
 
 	private boolean reset;
 
@@ -167,7 +172,10 @@ public class HessianClient extends HessianProxyFactoryBean {
 			if (--attempts < 1)
 				throw e;
 			if (urlFromDiscovery) {
-				serviceRegistry.evict(host);
+				if (discoveredHost != null) {
+					serviceRegistry.evict(discoveredHost);
+					discoveredHost = null;
+				}
 				String serviceUrl = discoverServiceUrl();
 				if (!serviceUrl.equals(getServiceUrl())) {
 					setServiceUrl(serviceUrl);
@@ -201,6 +209,7 @@ public class HessianClient extends HessianProxyFactoryBean {
 						sb.append(':');
 						sb.append(port);
 					}
+					discoveredHost = ho;
 				} else {
 					sb.append("fakehost");
 					logger.error("couldn't discover service:" + serviceName);

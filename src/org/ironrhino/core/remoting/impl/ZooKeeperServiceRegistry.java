@@ -65,7 +65,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		try {
 			List<String> children = curatorFramework.getChildren().watched().forPath(path);
 			if (children != null && children.size() > 0)
-				importServices.put(serviceName, children);
+				importServices.put(serviceName, new ArrayList<>(children));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -163,7 +163,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public void onNodeChildrenChanged(String path, List<String> children) {
 		String serviceName = path.substring(servicesParentPath.length() + 1);
-		importServices.put(serviceName, children);
+		importServices.put(serviceName, new ArrayList<>(children));
 	}
 
 	@Override
