@@ -8623,6 +8623,13 @@ form.attachmentable ul.thumbnails li .remove{
  right: 5px;
  font-size: 2em;
 }
+.form-horizontal .controls .unstyled{
+	padding-bottom:10px;
+}
+
+.form-horizontal .controls .unstyled em{
+	margin-right:10px;
+}
 .toolbar > [class*="span"]{
 	margin-top:0;
 	margin-bottom:0;

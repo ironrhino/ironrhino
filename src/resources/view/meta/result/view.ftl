@@ -4,7 +4,7 @@
 <title>${action.getText('view')}${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
 </head>
 <body>
-	<div id="${entityName}_view" class="form-horizontal groupable"<#if richtableConfig.viewGridColumns gt 0> data-columns="${richtableConfig.viewGridColumns}"</#if>>
+	<div id="${entityName}_view" class="view form-horizontal groupable"<#if richtableConfig.viewGridColumns gt 0> data-columns="${richtableConfig.viewGridColumns}"</#if>>
 	<#list uiConfigs.entrySet() as entry>
 		<#assign key=entry.key>
 		<#assign config=entry.value>
@@ -78,16 +78,16 @@
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
 									<#elseif item?is_indexable>
-											<ol class="unstyled" style="padding-bottom:10px;">
+											<ol class="unstyled">
 											<#list item as it>
 												<li>${it}</li>
 											</#list>
 											</ol>
 									<#elseif item?is_hash_ex>
-											<ul class="unstyled" style="padding-bottom:10px;">
+											<ul class="unstyled">
 											<#list item?keys as k>
 												<#if k!='class' && item[k]?? && !item[k]?is_method>
-												<li>${k}: ${item[k]?string}</li>
+												<li><em>${k}:</em> ${item[k]?string}</li>
 												</#if>
 											</#list>
 											</ul>
@@ -220,16 +220,16 @@
 												<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 													${item?string}
 												<#elseif item?is_indexable>
-														<ol class="unstyled" style="padding-bottom:10px;">
+														<ol class="unstyled">
 														<#list item as it>
 															<li>${it}</li>
 														</#list>
 														</ol>
 												<#elseif item?is_hash_ex>
-														<ul class="unstyled" style="padding-bottom:10px;">
+														<ul class="unstyled">
 														<#list item?keys as k>
 															<#if k!='class' && item[k]?? && !item[k]?is_method>
-															<li>${k}: ${item[k]?string}</li>
+															<li><em>${k}:</em> ${item[k]?string}</li>
 															</#if>
 														</#list>
 														</ul>
@@ -271,13 +271,13 @@
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
 									<#elseif item?is_indexable>
-										<ol class="unstyled" style="padding-bottom:10px;">
+										<ol class="unstyled">
 										<#list item as it>
 											<li>${it}</li>
 										</#list>
 										</ol>
 								<#elseif item?is_hash_ex>
-										<ul class="unstyled" style="padding-bottom:10px;">
+										<ul class="unstyled">
 										<#list item?keys as k>
 											<#if k!='class' && item[k]?? && !item[k]?is_method && item['set'+k?cap_first]??>
 											<li><em>${action.getText(k)}:</em> ${item[k]?string}</li>
