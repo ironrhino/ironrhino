@@ -126,7 +126,7 @@ ${formHeader!}
 <#local cellDynamicAttributes+={'class':dynamicAttributes['class']+' '+cellDynamicAttributes['class']}>
 </#if>
 <#local dynamicAttributes+=cellDynamicAttributes>
-<td<#if value??><#if !dynamicAttributes['data-cellvalue']??&&template?has_content||value?is_boolean> data-cellvalue="${value?string?html}"<#elseif value?is_hash&&value.displayName??> data-cellvalue="${value.name()?html}"</#if></#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>><#rt>
+<td<#if value??><#if !dynamicAttributes['data-cellvalue']??&&template?has_content&&value?has_content||value?is_boolean> data-cellvalue="${value?string?html}"<#elseif value?is_hash&&value.displayName??> data-cellvalue="${value.name()?html}"</#if></#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>><#rt>
 <#if !template?has_content>
 	<#if value??>
 		<#if value?is_boolean>

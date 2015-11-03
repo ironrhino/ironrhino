@@ -141,17 +141,24 @@
 		<#assign dynamicAttributes+={'data-readonly':'true'}/>
 		</#if>
 		<#assign value = entity[key]!>
-		<#if config.type=='dictionary' && selectDictionary??>
-			<#assign templateName><@config.templateName?interpret /></#assign>
-			<#if !config.multiple>
-			<#assign dynamicAttributes+={'data-cellvalue':value}/>
-			<#assign value=getDictionaryLabel(templateName,value)/>	
-			<#else>
-			<#assign tmp=[]/>
-			<#list value as var>
-				<#assign tmp+=[getDictionaryLabel(templateName,var)]/>
-			</#list>
-			<#assign value=tmp/>
+		<#if value?has_content>
+			<#if config.multiple>
+				<#assign temp = []>
+				<#if config.type=='dictionary' && selectDictionary??><#assign templateName><@config.templateName?interpret /></#assign></#if>
+				<#list value as var>
+				<#if config.type=='dictionary' && selectDictionary??>
+				<#assign temp+=[getDictionaryLabel(templateName,var)]/>
+				<#elseif config.type=='enum'>
+				<#assign temp+=[var.name()]/>
+				<#else>
+				<#assign temp+=[var]/>
+				</#if>
+				</#list>
+				<#assign dynamicAttributes+={'data-cellvalue':temp?join(',')}/>
+			<#elseif config.type=='dictionary' && selectDictionary??>
+				<#assign dynamicAttributes+={'data-cellvalue':value}/>
+				<#assign templateName><@config.templateName?interpret /></#assign>
+				<#assign value=getDictionaryLabel(templateName,value)/>
 			</#if>
 		</#if>
 		<#assign template=config.template/>
