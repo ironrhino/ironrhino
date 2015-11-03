@@ -1577,8 +1577,15 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				ReflectionContextState.setDenyMethodExecution(context, true);
 				for (Map.Entry<String, Object> entry : parameters.entrySet()) {
 					String name = entry.getKey();
-					if (name.startsWith(getEntityName() + "."))
-						temp.setParameter(name, entry.getValue());
+					String[] value = (String[]) entry.getValue();
+					if (name.startsWith(getEntityName() + ".")) {
+						if (name.split("\\.").length > 2) {
+							if (value.length == 1 && StringUtils.isEmpty(value[0])) {
+								value = null;
+							}
+						}
+						temp.setParameter(name, value);
+					}
 				}
 			} finally {
 				ReflectionContextState.setCreatingNullObjects(context, false);
