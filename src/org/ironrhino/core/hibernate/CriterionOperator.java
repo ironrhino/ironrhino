@@ -308,8 +308,12 @@ public enum CriterionOperator implements Displayable {
 		public Criterion operator(String name, Object... value) {
 			if (value == null || value.length == 0)
 				return null;
-			Object value1 = value[0];
-			return Restrictions.like(name, (String) value1, MatchMode.ANYWHERE);
+			String value1 = String.valueOf(value[0]);
+			if (name.endsWith("AsString")) {
+				return CriterionUtils.matchTag(name, value1);
+			} else {
+				return Restrictions.like(name, (String) value1, MatchMode.ANYWHERE);
+			}
 		}
 	},
 	NOTINCLUDE(1) {
@@ -323,8 +327,7 @@ public enum CriterionOperator implements Displayable {
 		public Criterion operator(String name, Object... value) {
 			if (value == null || value.length == 0)
 				return null;
-			Object value1 = value[0];
-			return Restrictions.not(Restrictions.like(name, (String) value1, MatchMode.ANYWHERE));
+			return Restrictions.or(Restrictions.isNull(name), Restrictions.not(INCLUDE.operator(name, value)));
 		}
 	},
 	ISTRUE(0) {

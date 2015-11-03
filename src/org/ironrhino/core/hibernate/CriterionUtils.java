@@ -191,7 +191,11 @@ public class CriterionUtils {
 				if (s.indexOf('.') > 0)
 					s = s.substring(0, s.indexOf('.'));
 				UiConfigImpl config = uiConfigs.get(s);
-				if (config == null || config.isExcludedFromCriteria())
+				boolean asString = s.endsWith("AsString");
+				String shadowPropertyName = asString ? s.substring(0, s.length() - 8) : null;
+				if (config == null && asString)
+					config = uiConfigs.get(shadowPropertyName);
+				if (config == null || config.isExcludedFromCriteria() && !asString)
 					continue;
 				CriterionOperator operator = null;
 				if (StringUtils.isNotBlank(operatorValue))
@@ -256,7 +260,7 @@ public class CriterionUtils {
 							}
 						}
 					}
-				} else if (propertyNames.contains(propertyName)) {
+				} else if (propertyNames.contains(propertyName) || propertyNames.contains(shadowPropertyName)) {
 					Class<?> type = entityBeanWrapper.getPropertyType(propertyName);
 					if (Persistable.class.isAssignableFrom(type)) {
 						@SuppressWarnings("unchecked")
