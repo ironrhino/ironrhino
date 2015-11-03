@@ -753,8 +753,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			Object value = bw.getPropertyValue(entry.getKey());
 			if (value instanceof String) {
 				String str = (String) value;
-				if (str != null && entry.getValue().isTrim() && "input".equals(entry.getValue().getType())) {
+				if (str != null && entry.getValue().isTrim() && ("input".equals(entry.getValue().getType())
+						|| "textarea".equals(entry.getValue().getType()))) {
 					str = str.trim();
+					if (str.isEmpty())
+						str = null;
 					if (bw.getPropertyDescriptor(entry.getKey()).getWriteMethod() != null)
 						bw.setPropertyValue(entry.getKey(), str);
 				}
