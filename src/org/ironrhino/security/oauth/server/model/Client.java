@@ -70,11 +70,6 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@Column(updatable = false)
 	private Date createDate = new Date();
 
-	@NotInCopy
-	@UiConfig(hiddenInInput = @Hidden(true) , hiddenInList = @Hidden(true) )
-	@Column(insertable = false)
-	private Date modifyDate;
-
 	@Convert(converter = StringListConverter.class)
 	private List<String> attachments = new ArrayList<>(0);
 
@@ -141,14 +136,6 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@Override
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
-	}
-
-	public Date getModifyDate() {
-		return modifyDate;
-	}
-
-	public void setModifyDate(Date modifyDate) {
-		this.modifyDate = modifyDate;
 	}
 
 	public Date getCreateDate() {
