@@ -9023,6 +9023,9 @@ table.richtable td {
 .richtable table td.action ul.dropdown-menu{
 	min-width: 100px;
 }
+.richtable table td.action ul.dropdown-menu li{
+	cursor: pointer;
+}
 .richtable tbody input.text,.richtable tbody textarea.text {
 	width: 90%;
 	width: calc(100% - 13px);
