@@ -628,6 +628,7 @@ public class AnnotationShadows {
 			this.listFooter = config.listFooter();
 			this.formHeader = config.formHeader();
 			this.formFooter = config.formFooter();
+			this.rowDynamicAttributes = config.rowDynamicAttributes();
 			this.inputFormCssClass = config.inputFormCssClass();
 			this.listFormCssClass = config.listFormCssClass();
 			this.inputWindowOptions = config.inputWindowOptions();
