@@ -845,6 +845,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				Set<String> editedPropertyNames = new HashSet<>();
 				for (String propertyName : ServletActionContext.getRequest().getParameterMap().keySet()) {
 					if (propertyName.startsWith("__checkbox_" + getEntityName() + '.')
+							|| propertyName.startsWith("__multiselect_" + getEntityName() + '.')
 							|| propertyName.startsWith("__datagrid_" + getEntityName() + '.'))
 						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
 					if (propertyName.startsWith(getEntityName() + '.'))
@@ -951,6 +952,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				Set<String> editedPropertyNames = new HashSet<>();
 				for (String propertyName : ServletActionContext.getRequest().getParameterMap().keySet()) {
 					if (propertyName.startsWith("__checkbox_" + getEntityName() + '.')
+							|| propertyName.startsWith("__multiselect_" + getEntityName() + '.')
 							|| propertyName.startsWith("__datagrid_" + getEntityName() + '.'))
 						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
 					if (propertyName.startsWith(getEntityName() + '.'))
