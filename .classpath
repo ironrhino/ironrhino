@@ -70,7 +70,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.13.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.6.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.37.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.0.12.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.0.13.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.12.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.5.4.jar"/>
