@@ -40,11 +40,11 @@ public class CustomAnnotationTypeFilter extends AnnotationTypeFilter {
 				&& !StageCondition.matches((Stage) attributes.get("value"), (Boolean) attributes.get("negated")))
 			return false;
 		attributes = metadata.getAnnotationAttributes(ClassPresentConditional.class.getName());
-		if (attributes != null && !ClassPresentCondition.matches((String) attributes.get("value"),
+		if (attributes != null && !ClassPresentCondition.matches((String[]) attributes.get("value"),
 				(Boolean) attributes.get("negated")))
 			return false;
 		attributes = metadata.getAnnotationAttributes(ResourcePresentConditional.class.getName());
-		if (attributes != null && !ResourcePresentCondition.matches((String) attributes.get("value"),
+		if (attributes != null && !ResourcePresentCondition.matches((String[]) attributes.get("value"),
 				(Boolean) attributes.get("negated")))
 			return false;
 		return true;

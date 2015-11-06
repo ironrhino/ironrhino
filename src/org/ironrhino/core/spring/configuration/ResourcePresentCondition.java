@@ -12,27 +12,34 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 public class ResourcePresentCondition implements Condition {
 
-	private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+	private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver(
+			ResourcePresentCondition.class.getClassLoader());
 
 	@Override
 	public boolean matches(ConditionContext ctx, AnnotatedTypeMetadata metadata) {
 		Map<String, Object> attributes = metadata.getAnnotationAttributes(ResourcePresentConditional.class.getName());
-		return matches((String) attributes.get("value"), (Boolean) attributes.get("negated"));
+		return matches((String[]) attributes.get("value"), (Boolean) attributes.get("negated"));
 	}
 
-	public static boolean matches(String value, boolean negated) {
-		boolean b = false;
+	public static boolean matches(String value[], boolean negated) {
+		boolean matches = true;
+		for (String val : value) {
+			if (!exists(val))
+				matches = false;
+		}
+		return matches && !negated || !matches && negated;
+	}
+
+	private static boolean exists(String resource) {
 		try {
-			Resource[] resources = resourcePatternResolver.getResources(value);
+			Resource[] resources = resourcePatternResolver.getResources(resource);
 			for (Resource r : resources)
 				if (r.exists()) {
-					b = true;
-					break;
+					return true;
 				}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return b && !negated || !b && negated;
+		return false;
 	}
-
 }

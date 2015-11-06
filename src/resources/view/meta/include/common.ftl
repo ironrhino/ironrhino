@@ -11,12 +11,18 @@
 </#macro>
 
 <#macro classPresentConditional value negated=false>
+	<#if !value?is_indexable>
+		<#local value=[value]/>
+	</#if>
 	<#if statics['org.ironrhino.core.spring.configuration.ClassPresentCondition'].matches(value,negated)>
 		<#nested>
 	</#if>
 </#macro>
 
 <#macro resourcePresentConditional value negated=false>
+	<#if !value?is_indexable>
+		<#local value=[value]/>
+	</#if>
 	<#if statics['org.ironrhino.core.spring.configuration.ResourcePresentCondition'].matches(value,negated)>
 		<#nested>
 	</#if>

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Conditional;
 @Conditional(ResourcePresentCondition.class)
 public @interface ResourcePresentConditional {
 
-	public String value();
+	public String[] value();
 
 	public boolean negated() default false;
 
