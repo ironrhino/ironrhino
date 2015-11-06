@@ -333,39 +333,42 @@ gzip_min_length  10240;
 gzip_types       text/plain text/xml text/css text/javascript application/javascript application/json application/x-javascript;
 limit_conn_zone  \$binary_remote_addr zone=addr:10m;
 upstream  backend  {
-    server   localhost:8080;
-    server   localhost:8081;
+	server   localhost:8080;
+	server   localhost:8081;
 }
 server {
-        listen   80 default_server;
-        proxy_pass_header Server;
-        client_max_body_size 4m;
-        location ~ ^/assets/ {
-                 root   /home/$USER/tomcat8080/webapps/ROOT;
-                 expires      max;
-                 add_header Cache-Control public;
-                 charset utf-8;
-        }
-        location ~ ^/websocket/ {
-                 proxy_pass http://backend;
-                 proxy_http_version 1.1;
-                 proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
-                 proxy_set_header  X-Real-IP  \$remote_addr;
-                 proxy_set_header  X-Url-Scheme \$scheme;
-                 proxy_set_header  Host \$http_host;
-                 proxy_set_header Upgrade \$http_upgrade;
-                 proxy_set_header Connection "upgrade";
-                 proxy_read_timeout 1h;
-        }
-        location  / {
-                 proxy_pass  http://backend;
-                 proxy_redirect    off;
-                 proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
-                 proxy_set_header  X-Real-IP  \$remote_addr;
-                 proxy_set_header  X-Url-Scheme \$scheme;
-                 proxy_set_header  Host \$http_host;
-                 limit_conn addr   8;
-        }
+	listen   80 default_server;
+	proxy_pass_header Server;
+	client_max_body_size 4m;
+	location ~ ^/assets/ {
+		root   /home/$USER/tomcat8080/webapps/ROOT;
+		expires      max;
+		add_header Cache-Control public;
+		charset utf-8;
+    }
+    location ~ ^/remoting/ {
+		return     403;
+	}
+    location ~ ^/websocket/ {
+		proxy_pass http://backend;
+		proxy_http_version 1.1;
+		proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
+		proxy_set_header  X-Real-IP  \$remote_addr;
+		proxy_set_header  X-Url-Scheme \$scheme;
+		proxy_set_header  Host \$http_host;
+		proxy_set_header Upgrade \$http_upgrade;
+		proxy_set_header Connection "upgrade";
+		proxy_read_timeout 1h;
+	}
+    location  / {
+		proxy_pass  http://backend;
+		proxy_redirect    off;
+		proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
+		proxy_set_header  X-Real-IP  \$remote_addr;
+		proxy_set_header  X-Url-Scheme \$scheme;
+		proxy_set_header  Host \$http_host;
+		limit_conn addr   8;
+    }
 }
 EOF
 setsebool -P httpd_can_network_connect=1 httpd_read_user_content=1
