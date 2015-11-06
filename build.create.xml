@@ -135,7 +135,7 @@
 					if(!file.exists()){
 						var echo = project.createTask("echo");
 						echo.setFile(file);
-						echo.setMessage('<ul class="nav">\n  <li><a href="<@url value="/"/>" class="ajax view">${action.getText("index")}</a></li>\n  <@authorize ifAnyGranted="ROLE_ADMINISTRATOR">\n  <li><a href="<@url value="/user"/>" class="ajax view">${action.getText("user")}</a></li>\n</@authorize>\n</ul>');
+						echo.setMessage('<ul class="nav">\n  <li><a href="<@url value="/"/>" class="ajax view">${action.getText("index")}</a></li>\n  <@authorize ifAnyGranted="ROLE_ADMINISTRATOR">\n  <li><a href="<@url value="/user"/>" class="ajax view">${action.getText("user")}</a></li>\n	</@authorize>\n</ul>');
 						echo.perform();
 					}
 					copy = project.createTask("copy");
