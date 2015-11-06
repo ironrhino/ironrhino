@@ -2,7 +2,6 @@ package org.ironrhino.core.spring.security;
 
 import java.util.List;
 
-import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 @Component("userDetailsService")
 @Primary
-@Remoting
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DelegatedUserDetailsService implements UserDetailsService {
 
