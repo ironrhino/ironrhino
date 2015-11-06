@@ -109,6 +109,15 @@ public class JsonUtils {
 		}
 	}
 
+	public static String toJsonWithView(Object object, Class<?> serializationView) {
+		try {
+			return objectMapper.writerWithView(serializationView).writeValueAsString(object);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
 	public static boolean isValidJson(String content) {
 		try {
 			getObjectMapper().readValue(content, JsonNode.class);

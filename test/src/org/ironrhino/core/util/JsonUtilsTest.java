@@ -2,7 +2,6 @@ package org.ironrhino.core.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,14 +10,15 @@ import java.util.List;
 
 import javax.persistence.Lob;
 
+import org.ironrhino.core.metadata.View;
 import org.ironrhino.core.model.ResultPage;
 import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class JsonUtilsTest {
 
@@ -31,13 +31,17 @@ public class JsonUtilsTest {
 	}
 
 	static class User {
+		@JsonView(View.Summary.class)
 		private String username;
 		private String password;
+		@JsonView(View.Detail.class)
 		private int age;
+		@JsonView(View.Detail.class)
 		private Status status;
 		@Lob
 		private String content;
 
+		@JsonView(View.Detail.class)
 		private Date date = DateUtils.beginOfDay(new Date());
 
 		public Date getDate() {
@@ -93,7 +97,7 @@ public class JsonUtilsTest {
 	}
 
 	@Test
-	public void testJson() {
+	public void testJson() throws IOException {
 		User u = new User();
 		u.setUsername("username");
 		u.setPassword("password");
@@ -101,51 +105,49 @@ public class JsonUtilsTest {
 		u.setAge(12);
 		u.setContent("this is a lob");
 		String json = JsonUtils.toJson(u);
-		try {
-			User u2 = JsonUtils.fromJson(json, User.class);
-			assertEquals(u.getUsername(), u2.getUsername());
-			assertEquals(u.getAge(), u2.getAge());
-			assertEquals(u.getStatus(), u2.getStatus());
-			assertEquals(u.getDate().getTime(), u2.getDate().getTime());
-			assertNull(u2.getPassword());
-			assertNull(u2.getContent());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		User u2 = JsonUtils.fromJson(json, User.class);
+		assertEquals(u.getUsername(), u2.getUsername());
+		assertEquals(u.getAge(), u2.getAge());
+		assertEquals(u.getStatus(), u2.getStatus());
+		assertEquals(u.getDate().getTime(), u2.getDate().getTime());
+		assertNull(u2.getPassword());
+		assertNull(u2.getContent());
+
 	}
 
 	@Test
-	public void testDate() {
+	public void testJsonWithView() throws IOException {
+		User u = new User();
+		u.setUsername("username");
+		u.setPassword("password");
+		u.setStatus(Status.ACTIVE);
+		u.setAge(12);
+		u.setContent("this is a lob");
+		String json = JsonUtils.toJsonWithView(u, View.Summary.class);
+		JsonNode jsonNode = JsonUtils.fromJson(json, JsonNode.class);
+		assertEquals(1, jsonNode.size());
+		jsonNode = jsonNode.get("username");
+		assertEquals(u.getUsername(), jsonNode.asText());
+	}
+
+	@Test
+	public void testDate() throws IOException {
 		Date d = new Date();
 		String json = "{\"date\":" + d.getTime() + "}";
-		try {
-			User u = JsonUtils.fromJson(json, User.class);
-			assertEquals(d, u.getDate());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		User u = JsonUtils.fromJson(json, User.class);
+		assertEquals(d, u.getDate());
+
 		json = "{\"date\":\"" + DateUtils.formatDate10(d) + "\"}";
-		try {
-			User u = JsonUtils.fromJson(json, User.class);
-			assertEquals(DateUtils.beginOfDay(d), u.getDate());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		u = JsonUtils.fromJson(json, User.class);
+		assertEquals(DateUtils.beginOfDay(d), u.getDate());
+
 		json = "{\"date\":\"" + DateUtils.formatDatetime(d) + "\"}";
-		try {
-			User u = JsonUtils.fromJson(json, User.class);
-			assertEquals(d.getTime() / 1000, u.getDate().getTime() / 1000);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		u = JsonUtils.fromJson(json, User.class);
+		assertEquals(d.getTime() / 1000, u.getDate().getTime() / 1000);
 	}
 
 	@Test
-	public void testFromJsonUsingTypeReference() {
+	public void testFromJsonUsingTypeReference() throws IOException {
 		List<User> users = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			User u = new User();
@@ -156,21 +158,17 @@ public class JsonUtilsTest {
 			users.add(u);
 		}
 		String json = JsonUtils.toJson(users);
-		try {
-			List<User> list = JsonUtils.fromJson(json, new TypeReference<List<User>>() {
-			});
-			assertEquals(users.size(), list.size());
-			assertEquals(users.get(0).getUsername(), list.get(0).getUsername());
-			assertEquals(users.get(0).getAge(), list.get(0).getAge());
-			assertEquals(users.get(0).getStatus(), list.get(0).getStatus());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		List<User> list = JsonUtils.fromJson(json, new TypeReference<List<User>>() {
+		});
+		assertEquals(users.size(), list.size());
+		assertEquals(users.get(0).getUsername(), list.get(0).getUsername());
+		assertEquals(users.get(0).getAge(), list.get(0).getAge());
+		assertEquals(users.get(0).getStatus(), list.get(0).getStatus());
+
 	}
 
 	@Test
-	public void testResultPage() throws JsonParseException, JsonMappingException, IOException {
+	public void testResultPage() throws IOException {
 		ResultPage<User> rp = new ResultPage<>();
 		List<User> users = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
