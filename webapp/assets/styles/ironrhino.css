@@ -8556,7 +8556,7 @@ select{
     text-overflow: '';
 	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAeCAYAAADZ7LXbAAAAeUlEQVR42mNgGAWjYBSMgiEMpk6d6jh9+vQ3QPwNiD9gwzNmzPgPpBdNnjxZihKLkkEG4cJAC4709fUJUeyjadOmFWCzACh+gSIfYLGoEc0Ht4G+VKF6HAENngy14DnQAgOaJIT6+no2oI9mArHnaLYYBaNgFIxEAAB30mu87oviJwAAAABJRU5ErkJggg==) no-repeat center right;
 }
-select:hover,select:focus{
+select:not([disabled]):hover,select:focus{
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAeCAYAAADZ7LXbAAAAg0lEQVR42u3Tqw6DIQwF4L4M4SZ4f0eCw2HwJDgEAoEhnCVzS7Y/2QW1iuovp6elvTdODzHCCCOMHEJqrZBSgoguxzmHMcbnSXLOEEK8BKy1mHN+v66U0lPIGPN2gstOYowPkNYavfffFx9CuENKKbTWzlzXWgvee5RS+E8YYYSRv0RuzedLGpb2fpgAAAAASUVORK5CYII=);
 }
 ::-ms-expand {
