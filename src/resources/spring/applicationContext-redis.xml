@@ -6,7 +6,7 @@
 	<bean id="redisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
 		p:usePool="true" p:hostName="${redis.host:localhost}" p:port="${redis.port:6379}"
-		p:database="${redis.database:0}">
+		p:password="${redis.password:}" p:database="${redis.database:0}">
 		<property name="poolConfig">
 			<bean class="redis.clients.jedis.JedisPoolConfig" p:maxTotal="${redis.maxTotal:100}" p:maxIdle="${redis.maxIdle:10}" p:minIdle="${redis.minIdle:1}" />
 		</property>
