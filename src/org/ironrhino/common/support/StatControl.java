@@ -48,7 +48,7 @@ public class StatControl {
 	@Resource
 	private EntityManager<Stat> entityManager;
 
-	@Scheduled(cron = "0 5 0 * * ?")
+	@Scheduled(cron = "${statControl.archive.cron:0 5 0 * * ?}")
 	public void archive() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_YEAR, -1);

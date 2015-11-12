@@ -245,7 +245,7 @@ public class PageViewServiceImpl implements PageViewService {
 	}
 
 	@Trigger
-	@Scheduled(cron = "0 5 0 * * ?")
+	@Scheduled(cron = "${pageViewService.archive.cron:0 5 0 * * ?}")
 	public void archive() {
 		if (stringRedisTemplate == null)
 			return;
