@@ -15,6 +15,8 @@ public interface HttpSessionManager extends HttpSessionStore {
 	String REQUEST_ATTRIBUTE_SESSION_TRACKER_IN_URL = "_session_tracker_in_url_";
 
 	String DEFAULT_SESSION_TRACKER_NAME = "T";
+	
+	String DEFAULT_SESSION_COOKIE_NAME = "s";
 
 	String DEFAULT_COOKIE_NAME_LOCALE = "locale";
 

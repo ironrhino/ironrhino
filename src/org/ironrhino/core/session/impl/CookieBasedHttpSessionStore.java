@@ -9,6 +9,7 @@ import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.security.util.Blowfish;
+import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.session.HttpSessionStore;
 import org.ironrhino.core.session.SessionCompressorManager;
 import org.ironrhino.core.session.WrappedHttpSession;
@@ -25,21 +26,16 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public static final String DEFAULT_SESSION_COOKIE_NAME = "s";
-
 	public static final int SINGLE_COOKIE_SIZE = 2 * 1024;
 
-	private String sessionCookieName = DEFAULT_SESSION_COOKIE_NAME;
+	@Value("${httpSessionManager.sessionCookieName:" + HttpSessionManager.DEFAULT_SESSION_COOKIE_NAME + "}")
+	private String sessionCookieName = HttpSessionManager.DEFAULT_SESSION_COOKIE_NAME;
 
 	@Value("${globalCookie:false}")
 	private boolean globalCookie;
 
 	@Autowired
 	private SessionCompressorManager sessionCompressorManager;
-
-	public void setSessionCookieName(String sessionCookieName) {
-		this.sessionCookieName = sessionCookieName;
-	}
 
 	@Override
 	public void initialize(WrappedHttpSession session) {
