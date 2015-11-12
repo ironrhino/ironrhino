@@ -31,9 +31,12 @@ public class UserController {
 	private ExecutorService executorService;
 
 	@RequestMapping(value = "/@self", method = RequestMethod.GET)
-	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
+	@Authorize(ifAnyGranted = { UserRole.ROLE_BUILTIN_USER, UserRole.ROLE_BUILTIN_ANONYMOUS })
 	public User self() {
-		return AuthzUtils.getUserDetails();
+		User user = AuthzUtils.getUserDetails(User.class);
+		if (user == null)
+			throw RestStatus.NOT_FOUND;
+		return user;
 	}
 
 	@RequestMapping(value = "/@self", method = RequestMethod.PUT)

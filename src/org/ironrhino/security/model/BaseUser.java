@@ -38,6 +38,7 @@ import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 @MappedSuperclass
 public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable<BaseUser>, Enableable {
@@ -101,11 +102,10 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	@JsonIgnore
 	@Transient
 	@UiConfig(hidden = true)
-	private Collection<GrantedAuthority> authorities;
+	private Collection<? extends GrantedAuthority> authorities;
 
 	@SearchableProperty
 	@Transient
-	@JsonIgnore
 	@UiConfig(displayOrder = 100, alias = "role", template = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next> </#if></#list>", csvTemplate = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next>,</#if></#list>")
 	private Set<String> roles = new LinkedHashSet<>(0);
 
@@ -186,6 +186,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	}
 
 	@Override
+	@JsonIgnore
 	public Set<String> getRoles() {
 		return roles;
 	}
@@ -201,6 +202,17 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 		return null;
 	}
 
+	@JsonProperty("roles")
+	public Set<String> getRolesForApi() {
+		if (authorities == null)
+			return null;
+		Set<String> roles = new LinkedHashSet<>();
+		for (GrantedAuthority ga : authorities)
+			roles.add(ga.getAuthority());
+		return roles;
+	}
+
+	@JsonSetter
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
 	}
@@ -295,11 +307,11 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	}
 
 	@Override
-	public Collection<GrantedAuthority> getAuthorities() {
+	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
 	}
 
-	public void setAuthorities(Collection<GrantedAuthority> authorities) {
+	public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
 		this.authorities = authorities;
 	}
 
