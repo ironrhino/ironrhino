@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.rest.RestStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ public class HttpErrorHandlerImpl implements HttpErrorHandler {
 	public boolean handle(HttpServletRequest request, HttpServletResponse response, int statusCode, String message) {
 		String requestURI = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 		if (requestURI == null)
-			requestURI = request.getRequestURI();
+			requestURI = RequestUtils.getRequestUri(request);
 		if (!(requestURI.startsWith("/api/") || requestURI.startsWith("/oauth/oauth2/")))
 			return false;
 		if (statusCode > 0)

@@ -30,9 +30,10 @@ public class PageViewHandler extends AccessHandler {
 
 	@Override
 	public boolean handle(final HttpServletRequest request, HttpServletResponse response) {
+		String uri = RequestUtils.getRequestUri(request);
 		if (pageViewService != null && request.getMethod().equalsIgnoreCase("GET")
-				&& !RequestUtils.isInternalTesting(request) && !request.getRequestURI().startsWith("/assets/")
-				&& !request.getRequestURI().endsWith("/favicon.ico")) {
+				&& !RequestUtils.isInternalTesting(request) && !uri.startsWith("/assets/")
+				&& !uri.endsWith("/favicon.ico")) {
 			final String remoteAddr = request.getRemoteAddr();
 			final String requestURL = request.getRequestURL().toString();
 			final String sessionId = httpSessionManager.getSessionId(request);

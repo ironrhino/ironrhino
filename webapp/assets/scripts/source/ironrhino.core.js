@@ -16,7 +16,7 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 	var $ajax = $.ajax;
 	if (MODERN_BROWSER)
 		$.ajax = function(options) {
-			// options.url = UrlUtils.makeSameOrigin(options.url);
+			options.url = UrlUtils.absolutize(options.url);
 			options.xhrFields = {
 				withCredentials : true
 			};
@@ -119,6 +119,8 @@ UrlUtils = {
 	isAbsolute : function(a) {
 		if (!a)
 			return false;
+		if (a.indexOf('//') == 0)
+			return true;
 		var index = a.indexOf('://');
 		return (index == 4 || index == 5);
 	},
@@ -128,8 +130,10 @@ UrlUtils = {
 		var a = document.location.href;
 		var index = a.indexOf('://');
 		if (url.length == 0 || url.indexOf('/') == 0) {
-			return a.substring(0, a.indexOf('/', index + 3)) + CONTEXT_PATH
-					+ url;
+			var host = a.substring(0, a.indexOf('/', index + 3));
+			if (CONTEXT_PATH && url.indexOf(CONTEXT_PATH + '/') != 0)
+				host += CONTEXT_PATH;
+			return host + url;
 		} else {
 			return a.substring(0, a.lastIndexOf('/') + 1) + url;
 		}

@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.ironrhino.common.action.UploadAction;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.servlet.AccessHandler;
+import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,7 @@ public class UploadFilesHandler extends AccessHandler {
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		long since = request.getDateHeader("If-Modified-Since");
-		String uri = request.getRequestURI();
+		String uri = RequestUtils.getRequestUri(request);
 		String path = uri.substring(uri.indexOf('/', 1));
 		try {
 			path = URLDecoder.decode(path, "UTF-8");
