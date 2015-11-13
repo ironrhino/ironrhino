@@ -1,6 +1,7 @@
 package org.ironrhino.rest.doc.action;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
@@ -19,10 +20,12 @@ public class DocsAction extends BaseAction {
 
 	private static final long serialVersionUID = -2983503425168586385L;
 
-	protected static List<ApiModuleObject> cache;
+	protected static Map<String, List<ApiModuleObject>> cache;
 
 	@Value("${apiBaseUrl:}")
 	protected String apiBaseUrl;
+
+	protected String category = "";
 
 	protected String module;
 
@@ -37,11 +40,19 @@ public class DocsAction extends BaseAction {
 		return apiBaseUrl;
 	}
 
-	public List<ApiModuleObject> getApiModules() {
+	public Map<String, List<ApiModuleObject>> getApiModules() {
 		if (cache == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			cache = ApiDocHelper.getApiModules();
 		}
 		return cache;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public String getModule() {
@@ -67,16 +78,18 @@ public class DocsAction extends BaseAction {
 	@Override
 	public String execute() {
 		if (StringUtils.isNotBlank(module) && StringUtils.isNotBlank(api)) {
-			loop: for (ApiModuleObject apiModule : getApiModules()) {
-				if (module.equals(apiModule.getName())) {
-					for (ApiDoc doc : apiModule.getApiDocs()) {
-						if (api.equals(doc.getName())) {
-							apiDoc = doc;
-							break loop;
+			List<ApiModuleObject> list = getApiModules().get(category);
+			if (list != null)
+				loop: for (ApiModuleObject apiModule : list) {
+					if (module.equals(apiModule.getName())) {
+						for (ApiDoc doc : apiModule.getApiDocs()) {
+							if (api.equals(doc.getName())) {
+								apiDoc = doc;
+								break loop;
+							}
 						}
 					}
 				}
-			}
 		}
 		return SUCCESS;
 	}

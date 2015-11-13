@@ -70,24 +70,40 @@
 		    </div>
 		  </div>
 		</@classPresentConditional>
-		<#list apiModules as apiModule>
+		<#list apiModules.entrySet() as entry>
+		  <#assign _category=entry.key>
+		  <#if _category?has_content>
+		  	<div class="accordion-group">
+		    <div class="accordion-heading">
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#category_${entry?index}">${_category}</a>
+		    </div>
+		    <div id="category_${entry?index}" class="accordion-body collapse<#if _category==category> in</#if>">
+		    <div class="accordion-inner">
+		    <div id="category_accordion_${entry?index}" class="accordion">
+		  </#if>
+		  <#list entry.value as apiModule>
 		  <div class="accordion-group">
 		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#module${apiModule?index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>
-		        ${apiModule.name}
-		      </a>
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#<#if _category?has_content>category_accordion_${entry?index}<#else>api-accordion</#if>" href="#module_${entry?index}_${apiModule?index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>${apiModule.name}</a>
 		    </div>
-		    <#assign currentModule = module?has_content && module==apiModule.name>
-		    <div id="module${apiModule?index}" class="accordion-body collapse<#if currentModule> in</#if>">
+		    <#assign currentModule = (!category?has_content||_category==category)&&module?has_content && module==apiModule.name>
+		    <div id="module_${entry?index}_${apiModule?index}" class="accordion-body collapse<#if currentModule> in</#if>">
 		      <div class="accordion-inner">
 		        <ul class="nav nav-list">
 					<#list apiModule.apiDocs as apiDoc>
-					<li<#if currentModule && api?has_content && api==apiDoc.name> class="active"</#if>><a href="<@url value="${actionBaseUrl}?module=${apiModule.name?url}&api=${apiDoc.name?url}"/><#if version?has_content>&version=${version}</#if>" class="ajax view">${apiDoc.name}</a></li>
+					<li<#if currentModule && api?has_content && api==apiDoc.name> class="active"</#if>><a href="${actionBaseUrl}?<#if _category?has_content>category=${_category?url}&</#if>module=${apiModule.name?url}&api=${apiDoc.name?url}<#if version?has_content>&version=${version}</#if>" class="ajax view">${apiDoc.name}</a></li>
 					</#list>
 				</ul>
 		      </div>
 		    </div>
 		  </div>
+		  </#list>
+		  <#if _category?has_content>
+		  </div>
+		  </div>
+		  </div>
+		  </div>
+		  </#if>
 		</#list>
 		</div>
     </div>

@@ -5,7 +5,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,17 +71,23 @@ public class ApiDocHelper {
 		return methods;
 	}
 
-	public static List<ApiModuleObject> getApiModules() {
+	public static Map<String, List<ApiModuleObject>> getApiModules() {
 		return getApiModules(ClassScanner.getAppPackages());
 	}
 
-	public static List<ApiModuleObject> getApiModules(String[] basePackages) {
+	public static Map<String, List<ApiModuleObject>> getApiModules(String[] basePackages) {
+		Map<String, List<ApiModuleObject>> map = new LinkedHashMap<>();
 		ObjectMapper objectMapper = ApiConfigBase.createObjectMapper();
 		Collection<Class<?>> classes = ClassScanner.scanAnnotated(basePackages, ApiModule.class);
-		List<ApiModuleObject> list = new ArrayList<>();
 		for (Class<?> clazz : classes) {
 			ApiModule apiModule = clazz.getAnnotation(ApiModule.class);
-			String name = apiModule.value();
+			String category = apiModule.category().trim();
+			List<ApiModuleObject> list = map.get(category);
+			if (list == null) {
+				list = new ArrayList<>();
+				map.put(category, list);
+			}
+			String name = apiModule.value().trim();
 			String description = apiModule.description();
 			ApiModuleObject apiModuleObject = null;
 			for (ApiModuleObject amo : list) {
@@ -102,7 +110,7 @@ public class ApiDocHelper {
 				e.printStackTrace();
 			}
 		}
-		return list;
+		return map;
 	}
 
 	public static Object generateSample(Object apiDocInstance, Method apiDocMethod, Fields fields) throws Exception {
