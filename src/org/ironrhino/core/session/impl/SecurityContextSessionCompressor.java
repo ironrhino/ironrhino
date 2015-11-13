@@ -9,6 +9,7 @@ import org.ironrhino.core.util.CodecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -27,6 +28,9 @@ public class SecurityContextSessionCompressor implements SessionCompressor<Secur
 
 	@Autowired
 	private UserDetailsService userDetailsService;
+
+	@Value("${httpSessionManager.checkDirtyPassword:true}")
+	private boolean checkDirtyPassword;
 
 	@Override
 	public boolean supportsKey(String key) {
@@ -70,12 +74,13 @@ public class SecurityContextSessionCompressor implements SessionCompressor<Secur
 					password = null;
 				}
 				UserDetails ud = userDetailsService.loadUserByUsername(username);
-				if (ud.getPassword() == null && password == null
-						|| ud.getPassword() != null && CodecUtils.md5Hex(ud.getPassword()).equals(password))
+				if (!checkDirtyPassword || (ud.getPassword() == null && password == null
+						|| ud.getPassword() != null && CodecUtils.md5Hex(ud.getPassword()).equals(password)))
 					sc.setAuthentication(
 							new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities()));
-				else
+				else {
 					logger.info("invalidate SecurityContext of \"{}\" because password changed", username);
+				}
 			} catch (UsernameNotFoundException e) {
 				logger.warn(e.getMessage());
 			}
