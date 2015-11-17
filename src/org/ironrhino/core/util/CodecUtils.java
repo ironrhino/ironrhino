@@ -5,10 +5,10 @@ import java.lang.ref.SoftReference;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 public class CodecUtils {
@@ -131,7 +131,7 @@ public class CodecUtils {
 
 	public static String fuzzify(String input) {
 		try {
-			byte[] bytes = Base64.encodeBase64(input.getBytes(DEFAULT_ENCODING));
+			byte[] bytes = Base64.getEncoder().encode(input.getBytes(DEFAULT_ENCODING));
 			swap(bytes);
 			return new String(bytes);
 		} catch (UnsupportedEncodingException e) {
@@ -143,7 +143,7 @@ public class CodecUtils {
 		try {
 			byte[] bytes = input.getBytes();
 			swap(bytes);
-			return new String(Base64.decodeBase64(bytes), DEFAULT_ENCODING);
+			return new String(Base64.getDecoder().decode(bytes), DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			return input;
 		}

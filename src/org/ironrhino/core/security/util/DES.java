@@ -3,6 +3,7 @@ package org.ironrhino.core.security.util;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
+import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -10,7 +11,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -112,7 +112,7 @@ public class DES {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.encodeBase64(encrypt(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.getEncoder().encode(encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -123,7 +123,7 @@ public class DES {
 		if (str == null)
 			return null;
 		try {
-			return new String(decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(decrypt(Base64.getDecoder().decode(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			logger.error("decrypt exception!", ex);
 			return "";
@@ -144,7 +144,7 @@ public class DES {
 	public static String encryptWithSalt(String str, String salt) {
 		DES des = new DES(defaultKey + salt);
 		try {
-			return new String(Base64.encodeBase64(des.encrypt(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.getEncoder().encode(des.encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -154,7 +154,7 @@ public class DES {
 	public static String decryptWithSalt(String str, String salt) {
 		DES des = new DES(defaultKey + salt);
 		try {
-			return new String(des.decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(des.decrypt(Base64.getDecoder().decode(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			logger.error("decrypt exception!", ex);
 			return "";

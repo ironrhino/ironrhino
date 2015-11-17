@@ -3,8 +3,8 @@ package org.ironrhino.common.action;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Base64;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -117,7 +117,7 @@ public class QrcodeAction extends BaseAction {
 					if (requestBody.startsWith("data:image"))
 						requestBody = requestBody.substring(requestBody.indexOf(',') + 1);
 					try {
-						content = BarcodeUtils.decode(new ByteArrayInputStream(Base64.decodeBase64(requestBody)),
+						content = BarcodeUtils.decode(new ByteArrayInputStream(Base64.getDecoder().decode(requestBody)),
 								encoding);
 					} catch (NotFoundException e) {
 						content = "";

@@ -8,11 +8,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.fs.FileStorage;
@@ -181,7 +181,7 @@ public class UploadAction extends BaseAction {
 		} else if (StringUtils.isNotBlank(requestBody) && filename != null && filename.length > 0) {
 			if (requestBody.startsWith("data:image"))
 				requestBody = requestBody.substring(requestBody.indexOf(',') + 1);
-			InputStream is = new ByteArrayInputStream(Base64.decodeBase64(requestBody));
+			InputStream is = new ByteArrayInputStream(Base64.getDecoder().decode(requestBody));
 			try {
 				fileStorage.write(is, createPath(filename[0], autorename));
 			} catch (IOException e) {

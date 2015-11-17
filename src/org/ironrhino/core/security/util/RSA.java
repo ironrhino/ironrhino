@@ -14,6 +14,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Enumeration;
 
 import javax.crypto.BadPaddingException;
@@ -21,7 +22,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -158,7 +158,7 @@ public class RSA {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.encodeBase64(encrypt(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.getEncoder().encode(encrypt(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -169,7 +169,7 @@ public class RSA {
 		if (str == null)
 			return null;
 		try {
-			return new String(decrypt(Base64.decodeBase64(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(decrypt(Base64.getDecoder().decode(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			logger.error("decrypt exception!", ex);
 			return "";
@@ -180,7 +180,7 @@ public class RSA {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.encodeBase64(sign(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.getEncoder().encode(sign(str.getBytes("UTF-8"))), "UTF-8");
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";

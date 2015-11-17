@@ -3,6 +3,7 @@ package org.ironrhino.security.oauth.client.service;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,7 +15,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.HttpClientUtils;
@@ -291,7 +291,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 			Mac mac = Mac.getInstance("HmacSHA1");
 			mac.init(key);
 			byte[] bytes = mac.doFinal(baseString.getBytes("UTF-8"));
-			return new String(Base64.encodeBase64(bytes)).replace("\r\n", "");
+			return new String(Base64.getEncoder().encode(bytes)).replace("\r\n", "");
 		}
 
 		public static String getBaseString(String method, String url, Map<String, String> params) throws Exception {
