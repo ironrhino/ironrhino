@@ -14,31 +14,25 @@ public class ErrorMessage extends RuntimeException {
 	private String submessage;
 
 	public ErrorMessage(String message) {
-		super(message);
+		super(I18N.getText(message));
 		this.message = message;
 	}
 
 	public ErrorMessage(String message, Object[] args) {
-		super(message);
+		super(I18N.getText(ErrorMessage.class, message, args));
 		this.message = message;
 		this.args = args;
 	}
 
 	public ErrorMessage(String message, Object[] args, String submessage) {
-		super(message);
+		super(I18N.getText(ErrorMessage.class, message, args));
 		this.message = message;
 		this.args = args;
 		this.submessage = submessage;
 	}
 
 	@Override
-	public String getMessage() {
-		return message;
-	}
-
-	@Override
 	public String getLocalizedMessage() {
-
 		try {
 			StringBuilder sb = new StringBuilder();
 			sb.append(I18N.getText(ErrorMessage.class, message, args));
@@ -48,28 +42,16 @@ public class ErrorMessage extends RuntimeException {
 			}
 			return sb.toString();
 		} catch (IllegalArgumentException e) {
-			return message;
+			return getMessage();
 		}
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 	public Object[] getArgs() {
 		return args;
 	}
 
-	public void setArgs(Object[] args) {
-		this.args = args;
-	}
-
 	public String getSubmessage() {
 		return submessage;
-	}
-
-	public void setSubmessage(String submessage) {
-		this.submessage = submessage;
 	}
 
 	@Override
