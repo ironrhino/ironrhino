@@ -18,9 +18,12 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	@Value("${restTemplate.readTimeout:5000}")
 	private int readTimeout;
 
+	@Value("${restTemplate.trustAllHosts:false}")
+	private boolean trustAllHosts;
+
 	public RestTemplate() {
 		super();
-		setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+		setRequestFactory(new HttpComponentsClientHttpRequestFactory(trustAllHosts));
 		MappingJackson2HttpMessageConverter jackson2 = null;
 		for (HttpMessageConverter<?> hmc : getMessageConverters()) {
 			if (hmc instanceof MappingJackson2HttpMessageConverter) {
