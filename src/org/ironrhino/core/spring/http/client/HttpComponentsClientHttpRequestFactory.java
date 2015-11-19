@@ -1,9 +1,19 @@
 package org.ironrhino.core.spring.http.client;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.slf4j.MDC;
 
@@ -16,8 +26,20 @@ public class HttpComponentsClientHttpRequestFactory
 
 	public HttpComponentsClientHttpRequestFactory(boolean trustAllHosts) {
 		HttpClientBuilder builder = builder();
-		if (trustAllHosts)
-			builder.setSSLHostnameVerifier((name, session) -> true);
+		if (trustAllHosts) {
+			try {
+				SSLContextBuilder sbuilder = SSLContexts.custom().loadTrustMaterial(null, new TrustStrategy() {
+					@Override
+					public boolean isTrusted(final X509Certificate[] chain, final String authType)
+							throws CertificateException {
+						return true;
+					}
+				});
+				builder.setSSLSocketFactory(new SSLConnectionSocketFactory(sbuilder.build()));
+			} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+				e.printStackTrace();
+			}
+		}
 		setHttpClient(builder.build());
 	}
 
