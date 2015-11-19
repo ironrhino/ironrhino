@@ -1,8 +1,10 @@
 (function($) {
-	var key = $('meta[name="autonavi-maps-key"]').attr('content');
-	if (!key)
-		key = 'ee95e52bf08006f63fd29bcfbcf21df0';
 	$.fn.latlng = function() {
+		var key = $('meta[name="autonavi-maps-key"]').attr('content');
+		if (typeof AMAP_KEY != 'undefined')
+			key = AMAP_KEY;
+		if (!key)
+			key = '9ef5c43ba470e46e355160c9fddc7086';
 		var t = $(this);
 		var anchor;
 		if (t.is('[type="hidden"]')) {

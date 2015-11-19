@@ -71,6 +71,8 @@ function latlng_loadMaps() {
 	if (typeof google != 'undefined' && typeof google.maps == 'undefined') {
 		var other_params = 'sensor=true&region=CN';
 		var key = $('meta[name="google-maps-key"]').attr('content');
+		if (typeof GMAP_KEY != 'undefined')
+			key = GMAP_KEY;
 		if (key)
 			other_params += '&key=' + key;
 		google.load("maps", "3", {
