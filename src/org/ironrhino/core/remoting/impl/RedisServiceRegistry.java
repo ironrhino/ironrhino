@@ -77,6 +77,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	protected void doRegister(String serviceName, String host) {
+		stringRedisTemplate.opsForList().remove(NAMESPACE_SERVICES + serviceName, 0, host);
 		stringRedisTemplate.opsForList().rightPush(NAMESPACE_SERVICES + serviceName, host);
 	}
 
