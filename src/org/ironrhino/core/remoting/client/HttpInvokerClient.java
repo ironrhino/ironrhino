@@ -11,6 +11,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 import org.springframework.remoting.httpinvoker.HttpInvokerRequestExecutor;
@@ -21,6 +22,9 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
 
 	private HttpInvokerRequestExecutor httpInvokerRequestExecutor;
+
+	@Value("${httpInvoker.useFstSerialization:false}")
+	private boolean useFstSerialization;
 
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
@@ -85,7 +89,8 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 	@Override
 	public HttpInvokerRequestExecutor getHttpInvokerRequestExecutor() {
 		if (this.httpInvokerRequestExecutor == null) {
-			SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor();
+			SimpleHttpInvokerRequestExecutor executor = useFstSerialization ? new FstSimpleHttpInvokerRequestExecutor()
+					: new SimpleHttpInvokerRequestExecutor();
 			executor.setBeanClassLoader(getBeanClassLoader());
 			this.httpInvokerRequestExecutor = executor;
 		}

@@ -1,6 +1,8 @@
 package org.ironrhino.core.remoting.server;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,9 +10,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.core.remoting.FstHttpInvokerSerializationHelper;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -23,8 +28,12 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private static ThreadLocal<Object> service = new ThreadLocal<>();
 
+	@Value("${httpInvoker.useFstSerialization:false}")
+	private boolean useFstSerialization;
+
 	private Map<Class<?>, Object> proxies = new HashMap<>();
 
+	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
 	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
@@ -42,11 +51,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			RemoteInvocation invocation = readRemoteInvocation(request);
 			Object proxy = getProxyForService();
 			if (proxy != null) {
-				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy); // getProxy
-																							// is
-																							// final
-																							// cannot
-																							// override
+				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
 				writeRemoteInvocationResult(request, response, result);
 			} else {
 				String msg = "No Service:" + getServiceInterface().getName();
@@ -92,6 +97,24 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	protected Object getProxyForService() {
 		return proxies.get(getServiceInterface());
+	}
+
+	@Override
+	protected RemoteInvocation readRemoteInvocation(HttpServletRequest request, InputStream is)
+			throws IOException, ClassNotFoundException {
+		if (useFstSerialization)
+			return FstHttpInvokerSerializationHelper.readRemoteInvocation(is);
+		else
+			return super.readRemoteInvocation(request, is);
+	}
+
+	@Override
+	protected void writeRemoteInvocationResult(HttpServletRequest request, HttpServletResponse response,
+			RemoteInvocationResult result, OutputStream os) throws IOException {
+		if (useFstSerialization)
+			FstHttpInvokerSerializationHelper.writeRemoteInvocationResult(result, os);
+		else
+			super.writeRemoteInvocationResult(request, response, result, os);
 	}
 
 }
