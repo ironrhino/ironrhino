@@ -1,2 +1,4 @@
-/bin
-/target
+target
+test/classes
+webapp/assets/upload
+webapp/WEB-INF/classes
