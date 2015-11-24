@@ -11,6 +11,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 public class AppInfo {
@@ -268,6 +269,50 @@ public class AppInfo {
 			if (!newer.getID().equals(older.getID()))
 				TimeZone.setDefault(newer);
 		}
+	}
+
+	private static Properties applicationContextProperties = null;
+
+	public static Properties getApplicationContextProperties() {
+		if (applicationContextProperties == null) {
+			Properties properties = new Properties();
+			Resource resource = new ClassPathResource("resources/spring/applicationContext.properties");
+			if (resource.exists()) {
+				try (InputStream is = resource.getInputStream()) {
+					properties.load(is);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			resource = new ClassPathResource(
+					"resources/spring/applicationContext." + AppInfo.getStage().name() + ".properties");
+			if (resource.exists()) {
+				try (InputStream is = resource.getInputStream()) {
+					properties.load(is);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			resource = new FileSystemResource(AppInfo.getAppHome() + "/conf/applicationContext.properties");
+			if (resource.exists()) {
+				try (InputStream is = resource.getInputStream()) {
+					properties.load(is);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			resource = new FileSystemResource(
+					AppInfo.getAppHome() + "/conf/applicationContext." + AppInfo.getStage().name() + ".properties");
+			if (resource.exists()) {
+				try (InputStream is = resource.getInputStream()) {
+					properties.load(is);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			applicationContextProperties = properties;
+		}
+		return applicationContextProperties;
 	}
 
 	private static String getEnv(String key) {
