@@ -1,11 +1,13 @@
 package org.ironrhino.sample.remoting;
 
+import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.sample.remoting.service.UserService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
 
 	public static void main(String[] args) {
+		AppInfo.initialize();
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"classpath*:org/ironrhino/sample/remoting/test_without_zk.xml");
 		UserService userServiceHessian = (UserService) ctx.getBean("userServiceHessian");
