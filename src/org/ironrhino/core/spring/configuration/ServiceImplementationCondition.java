@@ -78,7 +78,10 @@ class ServiceImplementationCondition implements Condition {
 					}
 				}
 				if (serviceInterfaceName != null) {
-					String implementationClassName = services.getProperty(serviceInterfaceName);
+					String implementationClassName = AppInfo.getApplicationContextProperties()
+							.getProperty(serviceInterfaceName);
+					if (StringUtils.isBlank(implementationClassName))
+						implementationClassName = services.getProperty(serviceInterfaceName);
 					if (StringUtils.isNotBlank(implementationClassName)) {
 						boolean matched = implementationClassName.equals(className);
 						if (matched) {
