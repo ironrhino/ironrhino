@@ -1,10 +1,17 @@
 package org.ironrhino.core.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Properties;
+import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 public class AppInfo {
 
@@ -194,6 +201,73 @@ public class AppInfo {
 
 	public static String getNodePath() {
 		return NODEPATH;
+	}
+
+	public static void initialize() {
+		Properties appProperties = new Properties();
+		Resource resource = new ClassPathResource("ironrhino.properties");
+		if (resource.exists()) {
+			try (InputStream is = resource.getInputStream()) {
+				appProperties.load(is);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		String name = appProperties.getProperty(AppInfo.KEY_APP_NAME);
+		if (StringUtils.isNotBlank(name))
+			AppInfo.setAppName(name);
+		String version = appProperties.getProperty(AppInfo.KEY_APP_VERSION);
+		if (StringUtils.isNotBlank(version))
+			AppInfo.setAppVersion(version);
+		String home = appProperties.getProperty(AppInfo.KEY_APP_HOME);
+		if (StringUtils.isNotBlank(home))
+			AppInfo.setAppHome(home);
+		System.setProperty(AppInfo.KEY_STAGE, AppInfo.getStage().name());
+		System.setProperty(AppInfo.KEY_APP_HOME, AppInfo.getAppHome());
+		System.setProperty(AppInfo.KEY_APP_NAME, AppInfo.getAppName());
+		String appBasePackage = appProperties.getProperty(AppInfo.KEY_APP_BASEPACKAGE);
+		if (StringUtils.isBlank(appBasePackage))
+			appBasePackage = "com." + AppInfo.getAppName().replaceAll("-", ".");
+		AppInfo.setAppBasePackage(appBasePackage);
+		System.setProperty(AppInfo.KEY_APP_BASEPACKAGE, appBasePackage);
+		String excludeFilterRegex = appProperties.getProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX);
+		if (StringUtils.isNotBlank(excludeFilterRegex)) {
+			AppInfo.setExcludeFilterRegex(excludeFilterRegex);
+			System.setProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX, excludeFilterRegex);
+		}
+
+		// configure spring profiles
+		if (StringUtils.isBlank(System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME))) {
+			String defaultProfiles = System
+					.getenv(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME.replaceAll("\\.", "_").toUpperCase());
+			if (StringUtils.isNotBlank(defaultProfiles)) {
+				System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
+			} else {
+				defaultProfiles = appProperties.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
+				if (StringUtils.isNotBlank(defaultProfiles)) {
+					System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
+				}
+			}
+		}
+
+		// configure log4j2
+		System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
+			System.setProperty("AsyncLogger.RingBufferSize", "16384");
+		System.setProperty("hibernate.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
+		System.setProperty("console.logger.level", AppInfo.getStage() == Stage.PRODUCTION
+				&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))
+						? "ERROR" : "INFO");
+
+		// configure timezone
+		String userTimezone = System.getProperty("user.timezone");
+		if (StringUtils.isBlank(userTimezone) || !TimeZone.getTimeZone(userTimezone).getID().equals(userTimezone)) {
+			userTimezone = "Asia/Shanghai";
+			TimeZone older = TimeZone.getDefault();
+			TimeZone newer = TimeZone.getTimeZone(userTimezone);
+			if (!newer.getID().equals(older.getID()))
+				TimeZone.setDefault(newer);
+		}
 	}
 
 	private static String getEnv(String key) {
