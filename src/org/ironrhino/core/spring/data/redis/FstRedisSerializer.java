@@ -38,6 +38,8 @@ public class FstRedisSerializer implements RedisSerializer<Serializable> {
 
 	@Override
 	public Serializable deserialize(byte[] bytes) throws SerializationException {
+		if (bytes == null || bytes.length == 0)
+			return null;
 		return (Serializable) conf.asObject(bytes);
 	}
 
