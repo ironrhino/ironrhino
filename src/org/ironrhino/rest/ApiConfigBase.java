@@ -35,9 +35,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class ApiConfigBase extends WebMvcConfigurationSupport {
 
-	public static ObjectMapper createObjectMapper() {
+	public ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
-		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
 	}

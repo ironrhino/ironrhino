@@ -77,7 +77,7 @@ public class ApiDocHelper {
 
 	public static Map<String, List<ApiModuleObject>> getApiModules(String[] basePackages) {
 		Map<String, List<ApiModuleObject>> map = new LinkedHashMap<>();
-		ObjectMapper objectMapper = ApiConfigBase.createObjectMapper();
+		ObjectMapper objectMapper = new ApiConfigBase().createObjectMapper();
 		Collection<Class<?>> classes = ClassScanner.scanAnnotated(basePackages, ApiModule.class);
 		for (Class<?> clazz : classes) {
 			ApiModule apiModule = clazz.getAnnotation(ApiModule.class);
