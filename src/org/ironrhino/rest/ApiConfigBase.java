@@ -2,7 +2,6 @@ package org.ironrhino.rest;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
 import org.ironrhino.rest.component.JsonpAdvice;
 import org.ironrhino.rest.component.RestExceptionHandler;
+import org.ironrhino.rest.doc.ApiDocHelper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.format.FormatterRegistry;
@@ -37,7 +37,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	public ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
-		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+		ApiDocHelper.objectMapper = objectMapper;
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
 	}
