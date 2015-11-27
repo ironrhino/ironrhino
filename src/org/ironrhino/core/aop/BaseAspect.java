@@ -45,16 +45,9 @@ public class BaseAspect implements Ordered {
 			for (int i = 0; i < args.length; i++)
 				context.put(paramNames[i], args[i]);
 		}
-		if (!context.containsKey("_this"))
-			context.put("_this", jp.getThis());
-		if (!context.containsKey("target"))
-			context.put("target", jp.getTarget());
-		if (!context.containsKey("aspect"))
-			context.put("aspect", this);
-		if (!context.containsKey("args"))
-			context.put("args", jp.getArgs());
-		if (!context.containsKey("user"))
-			context.put("user", AuthzUtils.getUserDetails());
+		context.put(AopContext.CONTEXT_KEY_THIS, jp.getThis());
+		context.put(AopContext.CONTEXT_KEY_ARGS, jp.getArgs());
+		context.put(AopContext.CONTEXT_KEY_USER, AuthzUtils.getUserDetails());
 		return context;
 	}
 

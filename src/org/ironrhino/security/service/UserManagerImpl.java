@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.criterion.DetachedCriteria;
+import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.hibernate.CriterionUtils;
@@ -48,21 +49,24 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "${target.cacheNamespace}", key = "${[user.username,user.email]}")
+	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
+			+ ".cacheNamespace}", key = "${[user.username,user.email]}")
 	public void delete(User user) {
 		super.delete(user);
 	}
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "${target.cacheNamespace}", key = "${[user.username,user.email]}")
+	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
+			+ ".cacheNamespace}", key = "${[user.username,user.email]}")
 	public void save(User user) {
 		super.save(user);
 	}
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "${target.cacheNamespace}", key = "${key = [];foreach (user : retval) { key.add(user.username); key.add(user.email);} return key;}")
+	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
+			+ ".cacheNamespace}", key = "${key = [];foreach (user : retval) { key.add(user.username); key.add(user.email);} return key;}")
 	public List<User> delete(Serializable... id) {
 		return super.delete(id);
 	}
@@ -74,7 +78,8 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 
 	@Override
 	@Transactional(readOnly = true)
-	@CheckCache(namespace = "${target.cacheNamespace}", key = "${username}", cacheNull = true)
+	@CheckCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
+			+ ".cacheNamespace}", key = "${username}", cacheNull = true)
 	public UserDetails loadUserByUsername(String username) {
 		if (StringUtils.isBlank(username))
 			return null;
