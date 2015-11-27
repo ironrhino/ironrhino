@@ -16,7 +16,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-lang3-3.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.4.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.9.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.9.0.jar"/>
