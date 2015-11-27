@@ -35,6 +35,7 @@ public class Stat extends KeyValuePair implements Persistable<String> {
 	@Id
 	@GeneratedValue(generator = "stringId")
 	@GenericGenerator(name = "stringId", strategy = "org.ironrhino.core.hibernate.StringIdGenerator")
+	@Column(length = 22)
 	private String id;
 
 	public Stat() {
@@ -51,7 +52,7 @@ public class Stat extends KeyValuePair implements Persistable<String> {
 
 	@Override
 	public boolean isNew() {
-		return StringUtils.isNotBlank(id);
+		return StringUtils.isBlank(id);
 	}
 
 	@Override
