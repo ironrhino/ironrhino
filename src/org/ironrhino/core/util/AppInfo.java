@@ -10,6 +10,10 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -43,6 +47,8 @@ public class AppInfo {
 	private static String basePackage;
 
 	private static String excludeFilterRegex;
+
+	private static String defaultProfiles;
 
 	private static String version = "1.0.0";
 
@@ -123,6 +129,35 @@ public class AppInfo {
 			sb.append("/");
 		sb.append(HOSTNAME);
 		NODEPATH = sb.toString();
+
+		Properties appProperties = new Properties();
+		Resource resource = new ClassPathResource("ironrhino.properties");
+		if (resource.exists()) {
+			try (InputStream is = resource.getInputStream()) {
+				appProperties.load(is);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		String appName = appProperties.getProperty(AppInfo.KEY_APP_NAME);
+		if (StringUtils.isNotBlank(appName))
+			AppInfo.setAppName(appName);
+		String version = appProperties.getProperty(AppInfo.KEY_APP_VERSION);
+		if (StringUtils.isNotBlank(version))
+			AppInfo.setAppVersion(version);
+		String home = appProperties.getProperty(AppInfo.KEY_APP_HOME);
+		if (StringUtils.isNotBlank(home))
+			AppInfo.setAppHome(home);
+		String appBasePackage = appProperties.getProperty(AppInfo.KEY_APP_BASEPACKAGE);
+		if (StringUtils.isBlank(appBasePackage))
+			appBasePackage = "com." + AppInfo.getAppName().replaceAll("-", ".");
+		AppInfo.setAppBasePackage(appBasePackage);
+		String excludeFilterRegex = appProperties.getProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX);
+		if (StringUtils.isNotBlank(excludeFilterRegex))
+			AppInfo.setExcludeFilterRegex(excludeFilterRegex);
+		String defaultProfiles = appProperties.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
+		if (StringUtils.isNotBlank(defaultProfiles))
+			AppInfo.setDefaultProfiles(defaultProfiles);
 	}
 
 	public static void setAppName(String name) {
@@ -139,6 +174,10 @@ public class AppInfo {
 
 	public static void setExcludeFilterRegex(String excludeFilterRegex) {
 		AppInfo.excludeFilterRegex = excludeFilterRegex;
+	}
+
+	public static void setDefaultProfiles(String defaultProfiles) {
+		AppInfo.defaultProfiles = defaultProfiles;
 	}
 
 	public static void setAppVersion(String version) {
@@ -188,6 +227,10 @@ public class AppInfo {
 		return excludeFilterRegex;
 	}
 
+	public static String getDefaultProfiles() {
+		return defaultProfiles;
+	}
+
 	public static String getHostName() {
 		return HOSTNAME;
 	}
@@ -205,37 +248,14 @@ public class AppInfo {
 	}
 
 	public static void initialize() {
-		Properties appProperties = new Properties();
-		Resource resource = new ClassPathResource("ironrhino.properties");
-		if (resource.exists()) {
-			try (InputStream is = resource.getInputStream()) {
-				appProperties.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		String name = appProperties.getProperty(AppInfo.KEY_APP_NAME);
-		if (StringUtils.isNotBlank(name))
-			AppInfo.setAppName(name);
-		String version = appProperties.getProperty(AppInfo.KEY_APP_VERSION);
-		if (StringUtils.isNotBlank(version))
-			AppInfo.setAppVersion(version);
-		String home = appProperties.getProperty(AppInfo.KEY_APP_HOME);
-		if (StringUtils.isNotBlank(home))
-			AppInfo.setAppHome(home);
+
 		System.setProperty(AppInfo.KEY_STAGE, AppInfo.getStage().name());
 		System.setProperty(AppInfo.KEY_APP_HOME, AppInfo.getAppHome());
 		System.setProperty(AppInfo.KEY_APP_NAME, AppInfo.getAppName());
-		String appBasePackage = appProperties.getProperty(AppInfo.KEY_APP_BASEPACKAGE);
-		if (StringUtils.isBlank(appBasePackage))
-			appBasePackage = "com." + AppInfo.getAppName().replaceAll("-", ".");
-		AppInfo.setAppBasePackage(appBasePackage);
-		System.setProperty(AppInfo.KEY_APP_BASEPACKAGE, appBasePackage);
-		String excludeFilterRegex = appProperties.getProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX);
-		if (StringUtils.isNotBlank(excludeFilterRegex)) {
-			AppInfo.setExcludeFilterRegex(excludeFilterRegex);
+		System.setProperty(AppInfo.KEY_APP_BASEPACKAGE, AppInfo.getAppBasePackage());
+		String excludeFilterRegex = AppInfo.getExcludeFilterRegex();
+		if (StringUtils.isNotBlank(excludeFilterRegex))
 			System.setProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX, excludeFilterRegex);
-		}
 
 		// configure spring profiles
 		if (StringUtils.isBlank(System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME))) {
@@ -244,7 +264,7 @@ public class AppInfo {
 			if (StringUtils.isNotBlank(defaultProfiles)) {
 				System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
 			} else {
-				defaultProfiles = appProperties.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
+				defaultProfiles = AppInfo.getDefaultProfiles();
 				if (StringUtils.isNotBlank(defaultProfiles)) {
 					System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
 				}
@@ -313,6 +333,15 @@ public class AppInfo {
 			applicationContextProperties = properties;
 		}
 		return applicationContextProperties;
+	}
+
+	public static String resolvePlaceholders(String text) {
+		MutablePropertySources propertySources = new MutablePropertySources();
+		PropertySource<?> localPropertySource = new PropertiesPropertySource("local",
+				getApplicationContextProperties());
+		propertySources.addFirst(localPropertySource);
+		PropertySourcesPropertyResolver propertyResolver = new PropertySourcesPropertyResolver(propertySources);
+		return propertyResolver.resolveRequiredPlaceholders(text);
 	}
 
 	private static String getEnv(String key) {
