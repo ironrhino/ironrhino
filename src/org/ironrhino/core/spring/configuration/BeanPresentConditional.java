@@ -14,6 +14,6 @@ public @interface BeanPresentConditional {
 
 	String value();
 
-	public boolean negated() default false;
+	boolean negated() default false;
 
 }

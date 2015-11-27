@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Conditional;
 @Conditional(RunLevelCondition.class)
 public @interface RunLevelConditional {
 
-	public RunLevel value() default RunLevel.NORMAL;
+	RunLevel value() default RunLevel.NORMAL;
 
-	public boolean negated() default false;
+	boolean negated() default false;
 
 }
