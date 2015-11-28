@@ -103,7 +103,7 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public void delete(String key, String namespace) {
-		if (key == null)
+		if (StringUtils.isBlank(key))
 			return;
 		try {
 			redisTemplate.delete(generateKey(key, namespace));
@@ -185,8 +185,6 @@ public class RedisCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		for (String key : keys)
-			delete(key, namespace);
 	}
 
 	@Override
