@@ -52,7 +52,7 @@ public class BaseAspect implements Ordered {
 	}
 
 	protected void putReturnValueIntoContext(Map<String, Object> context, Object value) {
-		context.put("retval", value);
+		context.put(AopContext.CONTEXT_KEY_RETVAL, value);
 	}
 
 }

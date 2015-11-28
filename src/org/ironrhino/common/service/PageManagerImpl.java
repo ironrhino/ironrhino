@@ -16,6 +16,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.common.model.Page;
+import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.hibernate.CriterionUtils;
@@ -53,7 +54,8 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 
 	@Override
 	@Transactional
-	@EvictCache(key = "${key = [];foreach (page : retval) { key.add(page.path); } return key;}", namespace = "page")
+	@EvictCache(key = "${key = [];foreach (page : " + AopContext.CONTEXT_KEY_RETVAL
+			+ ") { key.add(page.path); } return key;}", namespace = "page")
 	public List<Page> delete(Serializable... id) {
 		return super.delete(id);
 	}

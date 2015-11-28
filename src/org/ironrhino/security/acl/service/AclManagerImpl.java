@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
+import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.service.BaseManagerImpl;
@@ -24,7 +25,8 @@ public class AclManagerImpl extends BaseManagerImpl<Acl> implements AclManager {
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "acl", key = "${key = [];foreach (acl : retval) { key.add(acl.role+acl.resource);} return key;}")
+	@EvictCache(namespace = "acl", key = "${key = [];foreach (acl : " + AopContext.CONTEXT_KEY_RETVAL
+			+ ") { key.add(acl.role+acl.resource);} return key;}")
 	public List<Acl> delete(Serializable... id) {
 		return super.delete(id);
 	}

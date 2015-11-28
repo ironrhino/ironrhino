@@ -65,8 +65,8 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
-			+ ".cacheNamespace}", key = "${key = [];foreach (user : retval) { key.add(user.username); key.add(user.email);} return key;}")
+	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS + ".cacheNamespace}", key = "${key = [];foreach (user : "
+			+ AopContext.CONTEXT_KEY_RETVAL + ") { key.add(user.username); key.add(user.email);} return key;}")
 	public List<User> delete(Serializable... id) {
 		return super.delete(id);
 	}

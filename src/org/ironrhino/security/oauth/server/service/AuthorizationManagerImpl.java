@@ -3,6 +3,7 @@ package org.ironrhino.security.oauth.server.service;
 import java.io.Serializable;
 import java.util.List;
 
+import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.service.BaseManagerImpl;
@@ -38,7 +39,8 @@ public class AuthorizationManagerImpl extends BaseManagerImpl<Authorization> imp
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "oauth:authorization", key = "${key = [];foreach (authorization : retval) { key.add(authorization.accessToken);} return key;}")
+	@EvictCache(namespace = "oauth:authorization", key = "${key = [];foreach (authorization : "
+			+ AopContext.CONTEXT_KEY_RETVAL + ") { key.add(authorization.accessToken);} return key;}")
 	public List<Authorization> delete(Serializable... id) {
 		return super.delete(id);
 	}
