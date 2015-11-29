@@ -127,12 +127,19 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			params.put("resultPage.pageSize", ps);
 		if (StringUtils.isNotBlank(methodAndUid)) {
 			String uid = null;
-			String[] array = StringUtils.split(methodAndUid, "/", 2);
-			mapping.setMethod(array[0]);
-			if (array.length > 1) {
+			if (methodAndUid.indexOf('/') < 0) {
+				char ch = methodAndUid.charAt(0);
+				if ((ch >= '0' && ch <= '9') || StringUtils.isNumeric(methodAndUid)
+						|| !StringUtils.isAlphanumeric(methodAndUid) || methodAndUid.length() >= 20) {
+					uid = methodAndUid;
+				} else {
+					mapping.setMethod(methodAndUid);
+				}
+			} else {
+				String[] array = StringUtils.split(methodAndUid, "/", 2);
+				mapping.setMethod(array[0]);
 				uid = array[1];
 			}
-
 			if (StringUtils.isNotBlank(uid)) {
 				try {
 					params.put(ID, URLDecoder.decode(uid, getEncoding()));
