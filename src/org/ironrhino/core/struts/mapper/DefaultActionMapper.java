@@ -129,8 +129,8 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			String uid = null;
 			if (methodAndUid.indexOf('/') < 0) {
 				char ch = methodAndUid.charAt(0);
-				if ((ch >= '0' && ch <= '9') || StringUtils.isNumeric(methodAndUid)
-						|| !StringUtils.isAlphanumeric(methodAndUid) || methodAndUid.length() > 18) {
+				if ((ch >= '0' && ch <= '9') || !StringUtils.isAlphanumeric(methodAndUid.replaceAll("_", ""))
+						|| methodAndUid.length() > 18) {
 					uid = methodAndUid;
 				} else {
 					mapping.setMethod(methodAndUid);
