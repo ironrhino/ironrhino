@@ -354,9 +354,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		final BaseManager entityManager = getEntityManager(getEntityClass());
 		boolean searchable = isSearchable();
 		if (searchable && StringUtils.isNumeric(keyword) || StringUtils.isAlphanumeric(keyword)
-				&& (keyword.length() == 32 || keyword.length() >= 22 && keyword.length() <= 24)) // keyword
-																									// is
-																									// id
+				&& (keyword.length() == 32 || keyword.length() >= 19 && keyword.length() <= 22))
 			try {
 				bw.setPropertyValue("id", keyword);
 				Serializable idvalue = (Serializable) bw.getPropertyValue("id");

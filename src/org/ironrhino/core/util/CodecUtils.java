@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 
 public class CodecUtils {
 
@@ -213,7 +214,7 @@ public class CodecUtils {
 	public static String nextId() {
 		String id = UUID.randomUUID().toString().replace("-", "");
 		id = encodeBase62(id);
-		return id;
+		return StringUtils.leftPad(id, 22, '0');
 	}
 
 	public static String nextId(String salt) {
