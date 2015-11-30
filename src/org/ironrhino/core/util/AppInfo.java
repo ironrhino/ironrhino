@@ -330,7 +330,17 @@ public class AppInfo {
 					e.printStackTrace();
 				}
 			}
-			applicationContextProperties = properties;
+			Properties temp = new Properties();
+			MutablePropertySources propertySources = new MutablePropertySources();
+			PropertySource<?> localPropertySource = new PropertiesPropertySource("local", properties);
+			propertySources.addFirst(localPropertySource);
+			PropertySourcesPropertyResolver propertyResolver = new PropertySourcesPropertyResolver(propertySources);
+			for (String key : properties.stringPropertyNames()) {
+				String value = properties.getProperty(key);
+				value = propertyResolver.resolvePlaceholders(value);
+				temp.setProperty(key, value);
+			}
+			applicationContextProperties = temp;
 		}
 		return applicationContextProperties;
 	}
