@@ -1261,7 +1261,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
   padding: .3em 1.5em;
 }
 
-
 #popup_container {
 	font-family: Arial, sans-serif;
 	font-size: 12px;
@@ -1535,7 +1534,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	color: black;
 	cursor: default;
 }
-
 
 /*
  * add border-radius: 4px; to .chosen-container-multi .chosen-choices
@@ -8687,8 +8685,8 @@ form.attachmentable ul.thumbnails li .remove{
 .toolbar .pagination .inputPage {
 	width: 25px;
 	height: 20px;
-	padding-top: 6px;
-    padding-bottom: 2px;
+	padding-top: 5px;
+	padding-bottom: 3px;
 	line-height: 20px;
 	text-align:right;
 }
@@ -8697,6 +8695,9 @@ form.attachmentable ul.thumbnails li .remove{
 	height: 20px;
 	line-height: 20px;
 	text-align:left;
+	padding-top: 5px;
+	padding-bottom: 3px;
+	font-family: Arial;
 }
 .toolbar .pagination .pageSize {
 	border: 1px solid #ddd;
@@ -8781,7 +8782,6 @@ form.attachmentable ul.thumbnails li .remove{
 .editme:focus {
 	outline:1px solid #ffc000;
 }
-
 .portal-column { 
 	float: left;
 	}
@@ -10317,4 +10317,3 @@ border-radius: 20px;
     overflow: visible !important;
   }
 }
-

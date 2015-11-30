@@ -30,7 +30,7 @@
 						'.toolbar .pagination .lastPage:not(.disabled) a',
 						function(event) {
 							var form = $(this).closest('form');
-							$('.inputPage', form).val($('.totalPage strong',
+							$('.inputPage', form).val($('.totalPage',
 									form).text());
 							form.submit();
 							return false;
