@@ -60,7 +60,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Value("${httpSessionManager.minActiveInterval:" + DEFAULT_MINACTIVEINTERVAL + "}")
 	private int minActiveInterval;
 
-	@Value("${httpSessionManager.checkRemoteAddr:true}")
+	@Value("${httpSessionManager.checkRemoteAddr:false}")
 	private boolean checkRemoteAddr;
 
 	@Value("${httpSessionManager.alwaysUseCacheBased:false}")
