@@ -70,6 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -638,8 +639,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							bw2.setPropertyValue("id", parameterValue);
 							value = em.get((Serializable) bw2.getPropertyValue("id"));
 						} else {
-							bw2.setPropertyValue(subPropertyName, parameterValue);
-							value = em.findOne(subPropertyName, (Serializable) bw2.getPropertyValue(subPropertyName));
+							try {
+								bw2.setPropertyValue(subPropertyName, parameterValue);
+								value = em.findOne(subPropertyName,
+										(Serializable) bw2.getPropertyValue(subPropertyName));
+							} catch (InvalidPropertyException e) {
+								continue;
+							}
 						}
 						bw.setPropertyValue(propertyName, value);
 					}
