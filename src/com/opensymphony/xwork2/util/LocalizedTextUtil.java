@@ -22,16 +22,12 @@
 package com.opensymphony.xwork2.util;
 
 import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ModelDriven;
-import com.opensymphony.xwork2.conversion.impl.XWorkConverter;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
-import com.opensymphony.xwork2.util.reflection.ReflectionProviderFactory;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -85,7 +81,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author tm_jee
  * @version $Date$ $Id$
  */
-@SuppressWarnings({ "rawtypes" , "unchecked" , "unused" })
+@SuppressWarnings({ "rawtypes" , "unchecked" })
 public class LocalizedTextUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalizedTextUtil.class);
@@ -283,10 +279,13 @@ public class LocalizedTextUtil {
                         bundle = bundlesMap.get(key);
                     }
                 } catch (MissingResourceException e) {
+                	bundlesMap.putIfAbsent(key, new EmptyResourceBundle());
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Missing resource bundle [#0]!", aBundleName);
                     }
                 }
+            }else{
+            	bundlesMap.putIfAbsent(key, new EmptyResourceBundle());
             }
         }
         return bundle;
@@ -447,98 +446,6 @@ public class LocalizedTextUtil {
             return msg;
         }
 
-        if (ModelDriven.class.isAssignableFrom(aClass)) {
-            ActionContext context = ActionContext.getContext();
-            // search up model's class hierarchy
-            ActionInvocation actionInvocation = context.getActionInvocation();
-
-            // ActionInvocation may be null if we're being run from a Sitemesh filter, so we won't get model texts if this is null
-            if (actionInvocation != null) {
-                Object action = actionInvocation.getAction();
-                if (action instanceof ModelDriven) {
-                    Object model = ((ModelDriven) action).getModel();
-                    if (model != null) {
-                        msg = findMessage(model.getClass(), aTextName, indexedTextName, locale, args, null, valueStack);
-                        if (msg != null) {
-                            return msg;
-                        }
-                    }
-                }
-            }
-        }
-
-        // nothing still? alright, search the package hierarchy now
-        for (Class clazz = aClass;
-             (clazz != null) && !clazz.equals(Object.class);
-             clazz = clazz.getSuperclass()) {
-
-            String basePackageName = clazz.getName();
-            while (basePackageName.lastIndexOf('.') != -1) {
-                basePackageName = basePackageName.substring(0, basePackageName.lastIndexOf('.'));
-                String packageName = basePackageName + ".package";
-                msg = getMessage(packageName, locale, aTextName, valueStack, args);
-
-                if (msg != null) {
-                    return msg;
-                }
-
-                if (indexedTextName != null) {
-                    msg = getMessage(packageName, locale, indexedTextName, valueStack, args);
-
-                    if (msg != null) {
-                        return msg;
-                    }
-                }
-            }
-        }
-
-        // see if it's a child property
-        int idx = aTextName.indexOf(".");
-
-        if (idx != -1) {
-            String newKey = null;
-            String prop = null;
-
-            if (aTextName.startsWith(XWorkConverter.CONVERSION_ERROR_PROPERTY_PREFIX)) {
-                idx = aTextName.indexOf(".", XWorkConverter.CONVERSION_ERROR_PROPERTY_PREFIX.length());
-
-                if (idx != -1) {
-                    prop = aTextName.substring(XWorkConverter.CONVERSION_ERROR_PROPERTY_PREFIX.length(), idx);
-                    newKey = XWorkConverter.CONVERSION_ERROR_PROPERTY_PREFIX + aTextName.substring(idx + 1);
-                }
-            } else {
-                prop = aTextName.substring(0, idx);
-                newKey = aTextName.substring(idx + 1);
-            }
-
-            if (prop != null) {
-                Object obj = valueStack.findValue(prop);
-                try {
-                    Object actionObj = ReflectionProviderFactory.getInstance().getRealTarget(prop, valueStack.getContext(), valueStack.getRoot());
-                    if (actionObj != null) {
-                        PropertyDescriptor propertyDescriptor = ReflectionProviderFactory.getInstance().getPropertyDescriptor(actionObj.getClass(), prop);
-
-                        if (propertyDescriptor != null) {
-                            Class clazz = propertyDescriptor.getPropertyType();
-
-                            if (clazz != null) {
-                                if (obj != null)
-                                    valueStack.push(obj);
-                                msg = findText(clazz, newKey, locale, null, args);
-                                if (obj != null)
-                                    valueStack.pop();
-
-                                if (msg != null) {
-                                    return msg;
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    LOG.debug("unable to find property " + prop, e);
-                }
-            }
-        }
 
         // get default
         GetDefaultMessageReturnArg result;
@@ -639,7 +546,7 @@ public class LocalizedTextUtil {
         try {
             reloadBundles(valueStack.getContext());
 
-            String message = TextParseUtil.translateVariables(bundle.getString(aTextName), valueStack);
+            String message = bundle.getString(aTextName);
             MessageFormat mf = buildMessageFormat(message, locale);
 
             return formatWithNullDetection(mf, args);
@@ -676,7 +583,7 @@ public class LocalizedTextUtil {
 
             // defaultMessage may be null
             if (message != null) {
-                MessageFormat mf = buildMessageFormat(TextParseUtil.translateVariables(message, valueStack), locale);
+                MessageFormat mf = buildMessageFormat(message, locale);
 
                 String msg = formatWithNullDetection(mf, args);
                 result = new GetDefaultMessageReturnArg(msg, found);
@@ -698,8 +605,6 @@ public class LocalizedTextUtil {
             reloadBundles(valueStack.getContext());
         try {
         	String message = bundle.getString(key);
-        	if (valueStack != null) 
-        		message = TextParseUtil.translateVariables(message, valueStack);
             MessageFormat mf = buildMessageFormat(message, locale);
             return formatWithNullDetection(mf, args);
         } catch (MissingResourceException e) {
@@ -760,43 +665,6 @@ public class LocalizedTextUtil {
                 return msg;
             }
         }
-
-        // look in properties of implemented interfaces
-        Class[] interfaces = clazz.getInterfaces();
-
-        for (Class anInterface : interfaces) {
-            msg = getMessage(anInterface.getName(), locale, key, valueStack, args);
-
-            if (msg != null) {
-                return msg;
-            }
-
-            if (indexedKey != null) {
-                msg = getMessage(anInterface.getName(), locale, indexedKey, valueStack, args);
-
-                if (msg != null) {
-                    return msg;
-                }
-            }
-        }
-
-        // traverse up hierarchy
-        if (clazz.isInterface()) {
-            interfaces = clazz.getInterfaces();
-
-            for (Class anInterface : interfaces) {
-                msg = findMessage(anInterface, key, indexedKey, locale, args, checked, valueStack);
-
-                if (msg != null) {
-                    return msg;
-                }
-            }
-        } else {
-            if (!clazz.equals(Object.class) && !clazz.isPrimitive()) {
-                return findMessage(clazz.getSuperclass(), key, indexedKey, locale, args, checked, valueStack);
-            }
-        }
-
         return null;
     }
 
