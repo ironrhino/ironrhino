@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
@@ -27,6 +28,10 @@ import com.opensymphony.xwork2.util.ValueStack;
 import freemarker.cache.StrongCacheStorage;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.ext.beans.SimpleMapModel;
+import freemarker.ext.servlet.HttpRequestHashModel;
+import freemarker.ext.servlet.HttpRequestParametersHashModel;
+import freemarker.ext.servlet.HttpSessionHashModel;
+import freemarker.ext.servlet.ServletContextHashModel;
 import freemarker.template.Configuration;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateException;
@@ -37,6 +42,11 @@ import freemarker.template.Version;
 public class MyFreemarkerManager extends FreemarkerManager {
 
 	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_23;
+
+	private static final String ATTR_APPLICATION_MODEL = ".freemarker.Application";
+	private static final String ATTR_SESSION_MODEL = ".freemarker.Session";
+	private static final String ATTR_REQUEST_MODEL = ".freemarker.Request";
+	private static final String ATTR_REQUEST_PARAMETERS_MODEL = ".freemarker.RequestParameters";
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -151,6 +161,46 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		ScopesHashModel model = super.buildTemplateModel(stack, action, servletContext, request, response, wrapper);
 		if (StringUtils.isNotBlank(base))
 			model.put("base", base);
+		return model;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	protected ScopesHashModel buildScopesHashModel(ServletContext servletContext, HttpServletRequest request,
+			HttpServletResponse response, ObjectWrapper wrapper, ValueStack stack) {
+		ScopesHashModel model = new ScopesHashModel(wrapper, servletContext, request, stack);
+		ServletContextHashModel servletContextModel = (ServletContextHashModel) servletContext
+				.getAttribute(ATTR_APPLICATION_MODEL);
+		if (servletContextModel == null) {
+			servletContextModel = new ServletContextHashModel(servletContext, wrapper);
+			servletContext.setAttribute(ATTR_APPLICATION_MODEL, servletContextModel);
+		}
+		model.put(KEY_APPLICATION, servletContextModel);
+		// Create hash model wrapper for session
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			HttpSessionHashModel sessionModel = (HttpSessionHashModel) request.getAttribute(ATTR_SESSION_MODEL);
+			if (sessionModel == null) {
+				sessionModel = new HttpSessionHashModel(session, wrapper);
+				request.setAttribute(ATTR_SESSION_MODEL, sessionModel);
+			}
+			model.put(KEY_SESSION, sessionModel);
+		}
+		// Create hash model wrapper for the request attributes
+		HttpRequestHashModel requestModel = (HttpRequestHashModel) request.getAttribute(ATTR_REQUEST_MODEL);
+		if (requestModel == null) {
+			requestModel = new HttpRequestHashModel(request, response, wrapper);
+			request.setAttribute(ATTR_REQUEST_MODEL, requestModel);
+		}
+		model.put(KEY_REQUEST, requestModel);
+		// Create hash model wrapper for request parameters
+		HttpRequestParametersHashModel reqParametersModel = (HttpRequestParametersHashModel) request
+				.getAttribute(ATTR_REQUEST_PARAMETERS_MODEL);
+		if (reqParametersModel == null) {
+			reqParametersModel = new HttpRequestParametersHashModel(request);
+			request.setAttribute(ATTR_REQUEST_PARAMETERS_MODEL, reqParametersModel);
+		}
+		model.put(KEY_REQUEST_PARAMETERS_STRUTS, reqParametersModel);
 		return model;
 	}
 
