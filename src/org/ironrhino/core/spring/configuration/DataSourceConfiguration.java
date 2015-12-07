@@ -39,7 +39,7 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.password:}")
 	private String password;
 
-	@Value("${dataSource.maxActive:50}")
+	@Value("${dataSource.maxActive:1000}")
 	private int maxConnectionsPerPartition;
 
 	@Value("${dataSource.initialSize:5}")

@@ -8,7 +8,7 @@
 		p:usePool="true" p:hostName="${redis.host:localhost}" p:port="${redis.port:6379}"
 		p:password="${redis.password:}" p:database="${redis.database:0}">
 		<property name="poolConfig">
-			<bean class="redis.clients.jedis.JedisPoolConfig" p:maxTotal="${redis.maxTotal:100}" p:maxIdle="${redis.maxIdle:10}" p:minIdle="${redis.minIdle:1}" />
+			<bean class="redis.clients.jedis.JedisPoolConfig" p:maxTotal="${redis.maxTotal:1000}" p:maxIdle="${redis.maxIdle:10}" p:minIdle="${redis.minIdle:1}" />
 		</property>
 	</bean>
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
