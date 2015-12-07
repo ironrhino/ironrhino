@@ -2,7 +2,7 @@
 
 ANT_VERSION=1.9.6
 JDK_VERSION=8u66-b17
-TOMCAT_VERSION=8.0.28
+TOMCAT_VERSION=8.0.29
 REDIS_VERSION=3.0.5
 #JDK_VERSION=7u80-b15
 #TOMCAT_VERSION=7.0.65
@@ -152,7 +152,7 @@ cat>server.xml<<EOF
 <?xml version="1.0" encoding="utf-8"?>
 <Server port="\${port.shutdown}" shutdown="SHUTDOWN">
   <Service name="Catalina">
-    <Connector port="\${port.http}" connectionTimeout="20000" URIEncoding="UTF-8" useBodyEncodingForURI="true" bindOnInit="false" server="Ironrhino" maxPostSize="4194304" maxThreads="1000"/>
+    <Connector port="\${port.http}" connectionTimeout="20000" URIEncoding="UTF-8" useBodyEncodingForURI="true" bindOnInit="false" server="Ironrhino" maxPostSize="4194304"/>
     <Engine name="Catalina" defaultHost="localhost">
       <Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="false">
       </Host>
