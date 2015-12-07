@@ -140,11 +140,8 @@ public class SecurityMemberAccess extends DefaultMemberAccess {
     }
     
     protected boolean isPackageExcluded(String packageName) {
-    	if(packageName.startsWith("java.lang.") || packageName.startsWith("ognl."))
-    		return true;
-    	if(packageName.startsWith("javax.") && !packageName.startsWith("javax.servlet."))
-    		return true;
-    	return false;
+    	return packageName.startsWith("java.lang.") || packageName.startsWith("ognl.") 
+    			|| packageName.startsWith("javax.") && !packageName.startsWith("javax.servlet.");
     }
 
     protected boolean isClassExcluded(Class<?> clazz) {
