@@ -220,7 +220,7 @@ public class CodecUtils {
 	public static String nextId(String salt) {
 		String id = md5Hex(salt + UUID.randomUUID().toString());
 		id = encodeBase62(id);
-		return id;
+		return StringUtils.leftPad(id, 22, '0');
 	}
 
 	public static String encodeBase62(String hex) {

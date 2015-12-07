@@ -65,7 +65,8 @@ public class AppInfo {
 	private static final String NODEPATH;
 
 	static {
-		_instanceId = CodecUtils.nextId().substring(0, 10);
+		String temp = CodecUtils.nextId();
+		_instanceId = temp.substring(temp.length() - 10, temp.length());
 		String stage = getEnv(KEY_STAGE);
 		Stage s = null;
 		if (stage != null)
