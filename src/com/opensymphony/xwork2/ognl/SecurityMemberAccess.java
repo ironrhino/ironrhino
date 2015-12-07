@@ -139,10 +139,11 @@ public class SecurityMemberAccess extends DefaultMemberAccess {
         return isPackageExcluded(targetPackageName) || isPackageExcluded(memberPackageName);
     }
     
-    protected boolean isPackageExcluded(String packageName) {
-    	return packageName.startsWith("java.lang.") || packageName.startsWith("ognl.") 
-    			|| packageName.startsWith("javax.") && !packageName.startsWith("javax.servlet.");
-    }
+	protected static boolean isPackageExcluded(String packageName) {
+		return packageName.equals("java.lang") || packageName.startsWith("java.lang.") || packageName.equals("ognl")
+				|| packageName.startsWith("ognl.") || packageName.startsWith("javax.")
+						&& !(packageName.equals("javax.servlet") || packageName.startsWith("javax.servlet."));
+	}
 
     protected boolean isClassExcluded(Class<?> clazz) {
         if (clazz == Object.class) {
