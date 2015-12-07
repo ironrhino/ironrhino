@@ -26,6 +26,7 @@ import com.opensymphony.xwork2.util.LocalizedTextUtil;
 import com.opensymphony.xwork2.util.ValueStack;
 
 import freemarker.cache.StrongCacheStorage;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.ext.beans.SimpleMapModel;
 import freemarker.ext.servlet.HttpRequestHashModel;
@@ -42,6 +43,8 @@ import freemarker.template.Version;
 public class MyFreemarkerManager extends FreemarkerManager {
 
 	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_23;
+
+	public static final BeansWrapper DEFAULT_BEANS_WRAPPER = new BeansWrapperBuilder(DEFAULT_VERSION).build();
 
 	private static final String ATTR_APPLICATION_MODEL = ".freemarker.Application";
 	private static final String ATTR_SESSION_MODEL = ".freemarker.Session";
@@ -83,11 +86,10 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		base = templateProvider.getAllSharedVariables().get("base");
 		Map<String, Object> globalVariables = new HashMap<>(8);
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
-		globalVariables.put("statics", new BeansWrapperBuilder(DEFAULT_VERSION).build().getStaticModels());
+		globalVariables.put("statics", DEFAULT_BEANS_WRAPPER.getStaticModels());
 		globalVariables.put("beans", new BeansTemplateHashModel());
 		globalVariables.put("properties", new PropertiesTemplateHashModel());
-		TemplateHashModelEx hash = new SimpleMapModel(globalVariables,
-				new BeansWrapperBuilder(DEFAULT_VERSION).build());
+		TemplateHashModelEx hash = new SimpleMapModel(globalVariables, DEFAULT_BEANS_WRAPPER);
 		configuration.setAllSharedVariables(hash);
 		configuration.setDateFormat("yyyy-MM-dd");
 		configuration.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
