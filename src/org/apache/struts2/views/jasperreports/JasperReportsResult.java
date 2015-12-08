@@ -289,7 +289,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
 
         Connection conn = (Connection) stack.findValue(connection);
         if (conn == null)
-            stackDataSource = new ValueStackDataSource(stack, dataSource, wrapField);
+            stackDataSource = new ValueStackDataSource(stack, dataSource);
 
         // Determine the directory that the report file is in and set the reportDirectory parameter
         // For WW 2.1.7:
@@ -445,7 +445,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
     private void initializeProperties(ActionInvocation invocation) throws Exception {
         if (dataSource == null && connection == null) {
             String message = "No dataSource specified...";
-            LOG.error(message,new Object[0]);
+            LOG.error(message);
             throw new RuntimeException(message);
         }
         if (dataSource != null)

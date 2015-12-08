@@ -41,8 +41,9 @@ public class I18N {
 						LocalizedTextUtil.findText(
 								clazz, en.name(), ActionContext.getContext() != null
 										? ActionContext.getContext().getLocale() : Locale.getDefault(),
-								en.name(), null));
+								en.name(), null, null));
 			} catch (Exception e) {
+				e.printStackTrace();
 				map.put(en.name(), en.name());
 			}
 		}
