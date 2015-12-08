@@ -94,7 +94,6 @@ public class LocalizedTextUtil {
     private static boolean devMode;
 
     private static final ConcurrentMap<String, ResourceBundle> bundlesMap = new ConcurrentHashMap<String, ResourceBundle>();
-    private static final ConcurrentMap<MessageFormatKey, MessageFormat> messageFormats = new ConcurrentHashMap<MessageFormatKey, MessageFormat>();
     private static final ConcurrentMap<Integer, ClassLoader> delegatedClassLoaderMap = new ConcurrentHashMap<Integer, ClassLoader>();
 
     private static final String RELOADED = "com.opensymphony.xwork2.util.LocalizedTextUtil.reloaded";
@@ -627,15 +626,9 @@ public class LocalizedTextUtil {
     }
 
     private static MessageFormat buildMessageFormat(String pattern, Locale locale) {
-        MessageFormatKey key = new MessageFormatKey(pattern, locale);
-        MessageFormat format = messageFormats.get(key);
-        if (format == null) {
-            format = new MessageFormat(pattern);
-            format.setLocale(locale);
-            format.applyPattern(pattern);
-            messageFormats.put(key, format);
-        }
-
+    	MessageFormat format = new MessageFormat(pattern);
+        format.setLocale(locale);
+        format.applyPattern(pattern);
         return format;
     }
 
@@ -762,41 +755,8 @@ public class LocalizedTextUtil {
     public static void reset() {
         clearDefaultResourceBundles();
         bundlesMap.clear();
-        messageFormats.clear();
     }
 
-    static class MessageFormatKey {
-        String pattern;
-        Locale locale;
-
-        MessageFormatKey(String pattern, Locale locale) {
-            this.pattern = pattern;
-            this.locale = locale;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof MessageFormatKey)) return false;
-
-            final MessageFormatKey messageFormatKey = (MessageFormatKey) o;
-
-            if (locale != null ? !locale.equals(messageFormatKey.locale) : messageFormatKey.locale != null)
-                return false;
-            if (pattern != null ? !pattern.equals(messageFormatKey.pattern) : messageFormatKey.pattern != null)
-                return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int result;
-            result = (pattern != null ? pattern.hashCode() : 0);
-            result = 29 * result + (locale != null ? locale.hashCode() : 0);
-            return result;
-        }
-    }
 
     private static ClassLoader getCurrentThreadContextClassLoader() {
         return Thread.currentThread().getContextClassLoader();
