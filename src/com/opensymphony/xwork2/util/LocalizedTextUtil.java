@@ -279,13 +279,13 @@ public class LocalizedTextUtil {
                         bundle = bundlesMap.get(key);
                     }
                 } catch (MissingResourceException e) {
-                	bundlesMap.putIfAbsent(key, new EmptyResourceBundle());
+                	bundlesMap.putIfAbsent(key, EmptyResourceBundle.singleton);
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Missing resource bundle [#0]!", aBundleName);
                     }
                 }
             }else{
-            	bundlesMap.putIfAbsent(key, new EmptyResourceBundle());
+            	bundlesMap.putIfAbsent(key, EmptyResourceBundle.singleton);
             }
         }
         return bundle;
@@ -813,6 +813,9 @@ public class LocalizedTextUtil {
     }
 
     private static class EmptyResourceBundle extends ResourceBundle {
+    	
+    	private static EmptyResourceBundle singleton = new EmptyResourceBundle();
+    	
         @Override
         public Enumeration<String> getKeys() {
             return null; // dummy
