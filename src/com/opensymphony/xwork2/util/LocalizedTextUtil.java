@@ -89,6 +89,7 @@ public class LocalizedTextUtil {
 
     private static final List<String> DEFAULT_RESOURCE_BUNDLES = new CopyOnWriteArrayList<String>();
     private static final Logger LOG = LoggerFactory.getLogger(LocalizedTextUtil.class);
+    private static final String TOMCAT_RESOURCE_ENTRIES_FIELD = "resourceEntries";
     private static boolean reloadBundles = false;
     private static final ResourceBundle EMPTY_BUNDLE = new EmptyResourceBundle();
     private static final ConcurrentMap<String, ResourceBundle> bundlesMap = new ConcurrentHashMap<String, ResourceBundle>();
@@ -752,23 +753,28 @@ public class LocalizedTextUtil {
 
 
     private static void clearTomcatCache() {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        // no need for compilation here.
-        Class cl = loader.getClass();
-
-        try {
-            if ("org.apache.catalina.loader.WebappClassLoader".equals(cl.getName())) {
-                clearMap(cl, loader, "resourceEntries");
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("class loader " + cl.getName() + " is not tomcat loader.");
-                }
-            }
-        } catch (Exception e) {
-            if (LOG.isWarnEnabled()) {
-        	LOG.warn("couldn't clear tomcat cache", e);
-            }
-        }
+    	ClassLoader loader = Thread.currentThread().getContextClassLoader();
+	    // no need for compilation here.
+	    Class cl = loader.getClass();
+	
+	    try {
+	        if ("org.apache.catalina.loader.WebappClassLoader".equals(cl.getName())) {
+	            clearMap(cl, loader, TOMCAT_RESOURCE_ENTRIES_FIELD);
+	        } else {
+	            LOG.debug("Class loader {} is not tomcat loader.", cl.getName());
+	        }
+	    } catch (NoSuchFieldException nsfe) {
+	        if ("org.apache.catalina.loader.WebappClassLoaderBase".equals(cl.getSuperclass().getName())) {
+	            LOG.debug("Base class {} doesn't contain '{}' field, trying with parent!", cl.getName(), TOMCAT_RESOURCE_ENTRIES_FIELD, nsfe);
+	            try {
+	                clearMap(cl.getSuperclass(), loader, TOMCAT_RESOURCE_ENTRIES_FIELD);
+	            } catch (Exception e) {
+	                LOG.warn("Couldn't clear tomcat cache using {}", cl.getSuperclass().getName(), e);
+	            }
+	        }
+	    } catch (Exception e) {
+	  	    LOG.warn("Couldn't clear tomcat cache", cl.getName(), e);
+	    }
     }
 
 
