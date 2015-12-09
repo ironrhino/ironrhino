@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 
+import javax.annotation.PreDestroy;
+
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.ExportServicesEvent;
@@ -132,6 +134,13 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		for (Map.Entry<Object, Object> entry : map.entrySet())
 			services.put((String) entry.getKey(), (String) entry.getValue());
 		return services;
+	}
+
+	@PreDestroy
+	@Override
+	public void destroy() {
+		super.destroy();
+		stringRedisTemplate.delete(NAMESPACE_HOSTS + host);
 	}
 
 }
