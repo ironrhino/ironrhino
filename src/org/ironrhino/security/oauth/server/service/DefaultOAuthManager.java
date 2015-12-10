@@ -12,10 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
@@ -35,9 +35,6 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 
 	@Autowired
 	private AuthorizationManager authorizationManager;
-
-	@Autowired
-	private LockService lockService;
 
 	@Override
 	public Authorization grant(Client client) {
@@ -214,18 +211,12 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 
 	@Trigger
 	@Scheduled(cron = "0 30 23 * * ?")
+	@Mutex
 	public void removeExpired() {
-		String lockName = "oauthManager.removeExpired()";
-		if (lockService.tryLock(lockName)) {
-			try {
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.SECOND, (int) (-expireTime));
-				authorizationManager.executeUpdate(
-						"delete from Authorization a where lifetime >0 and a.modifyDate < ?1", cal.getTime());
-			} finally {
-				lockService.unlock(lockName);
-			}
-		}
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.SECOND, (int) (-expireTime));
+		authorizationManager.executeUpdate("delete from Authorization a where lifetime >0 and a.modifyDate < ?1",
+				cal.getTime());
 	}
 
 	@Override

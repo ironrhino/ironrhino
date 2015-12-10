@@ -22,7 +22,7 @@ import org.ironrhino.core.chart.openflashchart.axis.XAxis;
 import org.ironrhino.core.chart.openflashchart.axis.YAxis;
 import org.ironrhino.core.chart.openflashchart.elements.BarChart;
 import org.ironrhino.core.chart.openflashchart.elements.LineChart;
-import org.ironrhino.core.coordination.LockService;
+import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.stat.Key;
 import org.ironrhino.core.stat.KeyValuePair;
@@ -32,12 +32,12 @@ import org.ironrhino.core.stat.analysis.Analyzer;
 import org.ironrhino.core.stat.analysis.CumulativeAnalyzer;
 import org.ironrhino.core.stat.analysis.PeriodAnalyzer;
 import org.ironrhino.core.stat.analysis.TreeNode;
+import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CompositeIterator;
 import org.ironrhino.core.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -50,10 +50,8 @@ public class StatControl {
 	@Resource
 	private EntityManager<Stat> entityManager;
 
-	@Autowired
-	private LockService lockService;
-
 	@Scheduled(cron = "${statControl.archive.cron:0 5 0 * * ?}")
+	@Mutex(scope = Scope.LOCAL)
 	public void archive() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_YEAR, -1);
@@ -61,110 +59,104 @@ public class StatControl {
 		archive(yesterday);
 	}
 
+	@Mutex(scope = Scope.LOCAL)
 	public void archive(Date date) {
-		String lockName = "statControl.archive(" + DateUtils.formatDate8(date) + ")-" + AppInfo.getHostName();
-		if (lockService.tryLock(lockName)) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		Map<String, File> map = AbstractAnalyzer.getLogFile(date, true);
+		for (Map.Entry<String, File> entry : map.entrySet()) {
+			final String host = entry.getKey();
+			final File file = entry.getValue();
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			Date start = cal.getTime();
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 59);
+			Date end = cal.getTime();
+			entityManager.setEntityClass(Stat.class);
+			DetachedCriteria dc = entityManager.detachedCriteria();
+			dc.add(Restrictions.eq("host", host));
+			dc.add(Restrictions.between("date", start, end));
+			dc.addOrder(Order.desc("date"));
+			Stat stat = entityManager.findByCriteria(dc);
+			final Date lastStatDate;
+			if (stat != null)
+				lastStatDate = stat.getDate();
+			else
+				lastStatDate = null;
 			try {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(date);
-				Map<String, File> map = AbstractAnalyzer.getLogFile(date, true);
-				for (Map.Entry<String, File> entry : map.entrySet()) {
-					final String host = entry.getKey();
-					final File file = entry.getValue();
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					Date start = cal.getTime();
-					cal.set(Calendar.HOUR_OF_DAY, 23);
-					cal.set(Calendar.MINUTE, 59);
-					cal.set(Calendar.SECOND, 59);
-					Date end = cal.getTime();
-					entityManager.setEntityClass(Stat.class);
-					DetachedCriteria dc = entityManager.detachedCriteria();
-					dc.add(Restrictions.eq("host", host));
-					dc.add(Restrictions.between("date", start, end));
-					dc.addOrder(Order.desc("date"));
-					Stat stat = entityManager.findByCriteria(dc);
-					final Date lastStatDate;
-					if (stat != null)
-						lastStatDate = stat.getDate();
-					else
-						lastStatDate = null;
-					try {
-						Analyzer analyzer = new AbstractAnalyzer(file) {
-							Calendar calendar = Calendar.getInstance();
-							int currentHour = 0;
-							Map<Key, Value> map = new HashMap<>();
+				Analyzer analyzer = new AbstractAnalyzer(file) {
+					Calendar calendar = Calendar.getInstance();
+					int currentHour = 0;
+					Map<Key, Value> map = new HashMap<>();
 
-							private void save() {
-								Map<Key, Value> sortedMap = new TreeMap<>(map);
-								for (Map.Entry<Key, Value> entry : sortedMap.entrySet())
-									entityManager.save(new Stat(entry.getKey(), entry.getValue(),
-											new Date(entry.getKey().getLastWriteTime()), host));
-								map.clear();
-							}
-
-							@Override
-							protected void process(KeyValuePair pair) {
-								if (!pair.getKey().isCumulative())
-									return;
-								if (lastStatDate != null) {
-									long time = lastStatDate.getTime();
-									// hibernate doesn't handle mysql's
-									// timestamp
-									if (time % 1000 == 0)
-										time += 999;
-									if (pair.getDate().getTime() <= time)
-										return;
-								}
-								Key lastKey = null;
-								Value lastValue = null;
-								for (Map.Entry<Key, Value> entry : map.entrySet()) {
-									if (pair.getKey().equals(entry.getKey())) {
-										lastKey = entry.getKey();
-										lastValue = entry.getValue();
-										break;
-									}
-								}
-								if (lastValue == null) {
-									lastKey = pair.getKey();
-									lastValue = pair.getValue();
-									lastKey.setLastWriteTime(pair.getDate().getTime());
-									map.put(lastKey, lastValue);
-								} else {
-									if (calendar.get(Calendar.HOUR_OF_DAY) == currentHour) {
-										lastKey.setLastWriteTime(pair.getDate().getTime());
-										lastValue.accumulate(pair.getValue());
-									} else {
-										save();
-										lastKey = pair.getKey();
-										lastValue = pair.getValue();
-										lastKey.setLastWriteTime(pair.getDate().getTime());
-										map.put(lastKey, lastValue);
-									}
-								}
-								calendar.setTime(pair.getDate());
-								currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-							}
-
-							@Override
-							protected void postAnalyze() {
-								save();
-							}
-
-							@Override
-							public Object getResult() {
-								return null;
-							}
-						};
-						analyzer.analyze();
-					} catch (FileNotFoundException e) {
-						logger.error(e.getMessage(), e);
-						throw new RuntimeException(e);
+					private void save() {
+						Map<Key, Value> sortedMap = new TreeMap<>(map);
+						for (Map.Entry<Key, Value> entry : sortedMap.entrySet())
+							entityManager.save(new Stat(entry.getKey(), entry.getValue(),
+									new Date(entry.getKey().getLastWriteTime()), host));
+						map.clear();
 					}
-				}
-			} finally {
-				lockService.unlock(lockName);
+
+					@Override
+					protected void process(KeyValuePair pair) {
+						if (!pair.getKey().isCumulative())
+							return;
+						if (lastStatDate != null) {
+							long time = lastStatDate.getTime();
+							// hibernate doesn't handle mysql's
+							// timestamp
+							if (time % 1000 == 0)
+								time += 999;
+							if (pair.getDate().getTime() <= time)
+								return;
+						}
+						Key lastKey = null;
+						Value lastValue = null;
+						for (Map.Entry<Key, Value> entry : map.entrySet()) {
+							if (pair.getKey().equals(entry.getKey())) {
+								lastKey = entry.getKey();
+								lastValue = entry.getValue();
+								break;
+							}
+						}
+						if (lastValue == null) {
+							lastKey = pair.getKey();
+							lastValue = pair.getValue();
+							lastKey.setLastWriteTime(pair.getDate().getTime());
+							map.put(lastKey, lastValue);
+						} else {
+							if (calendar.get(Calendar.HOUR_OF_DAY) == currentHour) {
+								lastKey.setLastWriteTime(pair.getDate().getTime());
+								lastValue.accumulate(pair.getValue());
+							} else {
+								save();
+								lastKey = pair.getKey();
+								lastValue = pair.getValue();
+								lastKey.setLastWriteTime(pair.getDate().getTime());
+								map.put(lastKey, lastValue);
+							}
+						}
+						calendar.setTime(pair.getDate());
+						currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+					}
+
+					@Override
+					protected void postAnalyze() {
+						save();
+					}
+
+					@Override
+					public Object getResult() {
+						return null;
+					}
+				};
+				analyzer.analyze();
+			} catch (FileNotFoundException e) {
+				logger.error(e.getMessage(), e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

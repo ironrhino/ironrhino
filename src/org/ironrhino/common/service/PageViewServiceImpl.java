@@ -14,8 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.common.util.Location;
 import org.ironrhino.common.util.LocationUtils;
-import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +35,6 @@ public class PageViewServiceImpl implements PageViewService {
 	@Autowired(required = false)
 	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
-
-	@Autowired
-	private LockService lockService;
 
 	@Override
 	public void put(Date date, String ip, String url, String sessionId, String username, String referer) {
@@ -250,41 +247,35 @@ public class PageViewServiceImpl implements PageViewService {
 
 	@Trigger
 	@Scheduled(cron = "${pageViewService.archive.cron:0 5 0 * * ?}")
+	@Mutex
 	public void archive() {
 		if (stringRedisTemplate == null)
 			return;
-		String lockName = "pageViewService.archive()";
-		if (lockService.tryLock(lockName)) {
-			try {
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.DAY_OF_YEAR, -1);
-				Date yesterday = cal.getTime();
-				String day = DateUtils.formatDate8(yesterday);
-				stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("uip:").append(day)
-						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
-				stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("usid:").append(day)
-						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
-				stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("uu:").append(day)
-						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
-				updateMax(day, "pv", null);
-				updateMax(day, "uip", null);
-				updateMax(day, "usid", null);
-				updateMax(day, "uu", null);
-				for (String domain : getDomains()) {
-					stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":")
-							.append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-					stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":")
-							.append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-					stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uu:")
-							.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-					updateMax(day, "pv", domain);
-					updateMax(day, "uip", domain);
-					updateMax(day, "usid", domain);
-					updateMax(day, "uu", domain);
-				}
-			} finally {
-				lockService.unlock(lockName);
-			}
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DAY_OF_YEAR, -1);
+		Date yesterday = cal.getTime();
+		String day = DateUtils.formatDate8(yesterday);
+		stringRedisTemplate.delete(
+				new StringBuilder(KEY_PAGE_VIEW).append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+		stringRedisTemplate.delete(
+				new StringBuilder(KEY_PAGE_VIEW).append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+		stringRedisTemplate.delete(
+				new StringBuilder(KEY_PAGE_VIEW).append("uu:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+		updateMax(day, "pv", null);
+		updateMax(day, "uip", null);
+		updateMax(day, "usid", null);
+		updateMax(day, "uu", null);
+		for (String domain : getDomains()) {
+			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uip:")
+					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("usid:")
+					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uu:")
+					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+			updateMax(day, "pv", domain);
+			updateMax(day, "uip", domain);
+			updateMax(day, "usid", domain);
+			updateMax(day, "uu", domain);
 		}
 	}
 
