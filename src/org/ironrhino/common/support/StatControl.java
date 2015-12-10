@@ -62,7 +62,7 @@ public class StatControl {
 	}
 
 	public void archive(Date date) {
-		String lockName = "statControl.archive(" + DateUtils.formatDate8(date) + ")";
+		String lockName = "statControl.archive(" + DateUtils.formatDate8(date) + ")-" + AppInfo.getHostName();
 		if (lockService.tryLock(lockName)) {
 			try {
 				Calendar cal = Calendar.getInstance();
