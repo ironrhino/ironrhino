@@ -38,6 +38,9 @@ public class MemcachedCacheManager implements CacheManager {
 	@Value("${memcached.serverAddress:localhost:11211}")
 	private String serverAddress;
 
+	@Value("${memcached.useFstSerialization:false}")
+	private boolean useFstSerialization;
+
 	private MemcachedClient memcached;
 
 	private boolean rebuild; // reserve last set
@@ -83,6 +86,8 @@ public class MemcachedCacheManager implements CacheManager {
 		MemcachedClientBuilder builder = new XMemcachedClientBuilder(AddrUtil.getAddresses(serverAddress));
 		builder.setSessionLocator(new KetamaMemcachedSessionLocator());
 		builder.setCommandFactory(new BinaryCommandFactory());
+		if (useFstSerialization)
+			builder.setTranscoder(new FstTranscoder());
 		return builder.build();
 	}
 
