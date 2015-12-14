@@ -2,7 +2,7 @@ package org.ironrhino.core.remoting.client;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.util.ClassScanner;
@@ -33,7 +33,7 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		Collection<Class<?>> remotingServices = new HashSet<Class<?>>();
+		Collection<Class<?>> remotingServices = new LinkedHashSet<Class<?>>();
 		remotingServices.addAll(getIncludeClasses());
 		String[] basePackages = getBasePackages();
 		if (basePackages != null)
