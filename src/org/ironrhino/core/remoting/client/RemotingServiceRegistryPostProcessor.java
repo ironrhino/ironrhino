@@ -34,20 +34,19 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		Collection<Class<?>> remotingServices = new LinkedHashSet<Class<?>>();
-		remotingServices.addAll(getIncludeClasses());
+		Collection<Class<?>> includeClasses = getIncludeClasses();
+		if (includeClasses != null)
+			remotingServices.addAll(includeClasses);
 		String[] basePackages = getBasePackages();
 		if (basePackages != null)
 			remotingServices.addAll(ClassScanner.scanAnnotated(basePackages, Remoting.class));
-		Collection<Class<?>> excludeRemotingServices = getExcludeClasses();
+		Collection<Class<?>> excludeClasses = getExcludeClasses();
 		for (Class<?> remotingService : remotingServices) {
-			if (!remotingService.isInterface() || excludeRemotingServices.contains(remotingService))
+			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))
 				continue;
 			String beanName = StringUtils.uncapitalize(remotingService.getSimpleName());
-			if (registry.containsBeanDefinition(beanName)) {
-				logger.info("Skip bean {} which implemented by {}", beanName,
-						registry.getBeanDefinition(beanName).getBeanClassName());
-				continue;
-			}
+			if (registry.containsBeanDefinition(beanName))
+				beanName = remotingService.getName();
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(HttpInvokerClient.class);
 			beanDefinition.setTargetType(remotingService);
 			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
@@ -55,7 +54,8 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 			propertyValues.addPropertyValue("serviceInterface", remotingService.getName());
 			beanDefinition.setPropertyValues(propertyValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
-			logger.info("Registered bean {} for remoting service", beanName);
+			logger.info("imported service [{}] for bean [{}#{}]", remotingService.getName(),
+					beanDefinition.getBeanClassName(), beanName);
 		}
 	}
 
