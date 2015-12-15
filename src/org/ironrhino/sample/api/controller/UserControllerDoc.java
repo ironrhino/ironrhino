@@ -26,7 +26,7 @@ public class UserControllerDoc extends UserController {
 
 	@Override
 	@Api(value = "修改当前用户信息", description = "只传入需要修改的字段")
-	public RestStatus put(@Fields(value = { @Field(name = "password", required = false, description = "传入明文密码"),
+	public RestStatus patch(@Fields(value = { @Field(name = "password", required = false, description = "传入明文密码"),
 			@Field(name = "name", required = false), @Field(name = "email", required = false),
 			@Field(name = "phone", required = false) }, sampleMethodName = "createUserForPut") User user) {
 		return RestStatus.OK;
@@ -64,7 +64,7 @@ public class UserControllerDoc extends UserController {
 
 	@Override
 	@Api(value = "修改用户", description = "只传入需要修改的字段")
-	public RestStatus put(@Field(description = "字母和数字组合") String username,
+	public RestStatus patch(@Field(description = "字母和数字组合") String username,
 			@Fields(value = { @Field(name = "password", required = false, description = "传入明文密码"),
 					@Field(name = "name", required = false), @Field(name = "email", required = false),
 					@Field(name = "phone", required = false) }, sampleMethodName = "createUserForPut") User user) {

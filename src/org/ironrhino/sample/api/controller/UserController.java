@@ -39,10 +39,10 @@ public class UserController {
 		return user;
 	}
 
-	@RequestMapping(value = "/@self", method = RequestMethod.PUT)
+	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
-	public RestStatus put(@RequestBody User user) {
-		return put(AuthzUtils.getUsername(), user);
+	public RestStatus patch(@RequestBody User user) {
+		return patch(AuthzUtils.getUsername(), user);
 	}
 
 	@RequestMapping(value = "/@self/password", method = RequestMethod.PATCH)
@@ -91,8 +91,8 @@ public class UserController {
 		return RestStatus.OK;
 	}
 
-	@RequestMapping(value = "/{username}", method = RequestMethod.PUT)
-	public RestStatus put(@PathVariable String username, @RequestBody User user) {
+	@RequestMapping(value = "/{username}", method = RequestMethod.PATCH)
+	public RestStatus patch(@PathVariable String username, @RequestBody User user) {
 		User u = (User) userManager.loadUserByUsername(username);
 		if (u == null) {
 			// throw RestStatus.NOT_FOUND;
