@@ -47,6 +47,13 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 
 	@Override
 	@Transactional
+	@EvictCache(key = "${page.path}", namespace = "page", renew = "${page}")
+	public void update(Page page) {
+		super.update(page);
+	}
+
+	@Override
+	@Transactional
 	@EvictCache(key = "${page.path}", namespace = "page")
 	public void delete(Page page) {
 		super.delete(page);

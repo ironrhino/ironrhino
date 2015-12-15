@@ -36,6 +36,13 @@ public class AuthorizationManagerImpl extends BaseManagerImpl<Authorization> imp
 	public void save(Authorization authorization) {
 		super.save(authorization);
 	}
+	
+	@Override
+	@Transactional
+	@EvictCache(namespace = "oauth:authorization", key = "${authorization.accessToken}")
+	public void update(Authorization authorization) {
+		super.update(authorization);
+	}
 
 	@Override
 	@Transactional

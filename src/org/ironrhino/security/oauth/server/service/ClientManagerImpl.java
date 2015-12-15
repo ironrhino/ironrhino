@@ -34,6 +34,13 @@ public class ClientManagerImpl extends BaseManagerImpl<Client> implements Client
 	public void save(Client client) {
 		super.save(client);
 	}
+	
+	@Override
+	@Transactional
+	@EvictCache(namespace = "oauth:client", key = "${client.id}")
+	public void update(Client client) {
+		super.update(client);
+	}
 
 	@Override
 	@Transactional

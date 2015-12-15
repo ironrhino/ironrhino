@@ -39,6 +39,13 @@ public class AclManagerImpl extends BaseManagerImpl<Acl> implements AclManager {
 	}
 
 	@Override
+	@Transactional
+	@EvictCache(namespace = "acl", key = "${acl.role+acl.resource}")
+	public void update(Acl acl) {
+		super.update(acl);
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	@CheckCache(namespace = "acl", key = "${role+resource}")
 	public Acl findAcl(String role, String resource) {
