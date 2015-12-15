@@ -727,7 +727,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			String name = entry.getKey();
 			UiConfigImpl uiconfig = entry.getValue();
 			Object value = bwp.getPropertyValue(name);
-			if (uiconfig.isRequired() && !uiconfig.getHiddenInInput().isValue()
+			String expression = uiconfig.getHiddenInInput().getExpression();
+			if (uiconfig.isRequired()
+					&& !(uiconfig.getHiddenInInput().isValue()
+							|| StringUtils.isNotBlank(expression) && evalBoolean(expression, _entity, value))
 					&& (value == null || value instanceof String && StringUtils.isBlank(value.toString()))) {
 				addFieldError(getEntityName() + "." + name, getText("validation.required"));
 				return INPUT;
