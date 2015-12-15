@@ -15,21 +15,21 @@ import org.ironrhino.core.remoting.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
+	protected static final String CONTENT_TYPE_FST_SERIALIZED_OBJECT = "application/x-fst-serialized-object";
+
+	protected static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<>();
 
 	private static ThreadLocal<Object> service = new ThreadLocal<>();
-
-	@Value("${httpInvoker.useFstSerialization:false}")
-	private boolean useFstSerialization;
 
 	private Map<Class<?>, Object> proxies = new HashMap<>();
 
@@ -102,6 +102,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	protected RemoteInvocation readRemoteInvocation(HttpServletRequest request, InputStream is)
 			throws IOException, ClassNotFoundException {
+		boolean useFstSerialization = CONTENT_TYPE_FST_SERIALIZED_OBJECT
+				.equals(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
 		if (useFstSerialization)
 			return FstHttpInvokerSerializationHelper.readRemoteInvocation(is);
 		else
@@ -111,6 +113,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	protected void writeRemoteInvocationResult(HttpServletRequest request, HttpServletResponse response,
 			RemoteInvocationResult result, OutputStream os) throws IOException {
+		boolean useFstSerialization = CONTENT_TYPE_FST_SERIALIZED_OBJECT
+				.equals(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
 		if (useFstSerialization)
 			FstHttpInvokerSerializationHelper.writeRemoteInvocationResult(result, os);
 		else

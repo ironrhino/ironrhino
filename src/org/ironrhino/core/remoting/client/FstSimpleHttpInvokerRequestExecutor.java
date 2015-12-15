@@ -10,6 +10,12 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class FstSimpleHttpInvokerRequestExecutor extends SimpleHttpInvokerRequestExecutor {
 
+	protected static final String CONTENT_TYPE_FST_SERIALIZED_OBJECT = "application/x-fst-serialized-object";
+
+	public String getContentType() {
+		return CONTENT_TYPE_FST_SERIALIZED_OBJECT;
+	}
+
 	@Override
 	protected void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
 		FstHttpInvokerSerializationHelper.writeRemoteInvocation(invocation, os);
