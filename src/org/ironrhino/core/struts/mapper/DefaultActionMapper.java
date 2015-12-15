@@ -130,7 +130,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			if (methodAndUid.indexOf('/') < 0) {
 				char ch = methodAndUid.charAt(0);
 				if ((ch >= '0' && ch <= '9') || !StringUtils.isAlphanumeric(methodAndUid.replaceAll("_", ""))
-						|| methodAndUid.length() > 18) {
+						|| methodAndUid.length() == 22 || methodAndUid.length() == 32) {
 					uid = methodAndUid;
 				} else {
 					mapping.setMethod(methodAndUid);

@@ -354,8 +354,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
 		final BaseManager entityManager = getEntityManager(getEntityClass());
 		boolean searchable = isSearchable();
-		if (searchable && StringUtils.isNumeric(keyword) || StringUtils.isAlphanumeric(keyword)
-				&& (keyword.length() == 32 || keyword.length() >= 19 && keyword.length() <= 22))
+		if (searchable && StringUtils.isNumeric(keyword)
+				|| StringUtils.isAlphanumeric(keyword) && (keyword.length() == 32 || keyword.length() == 22))
 			try {
 				bw.setPropertyValue("id", keyword);
 				Serializable idvalue = (Serializable) bw.getPropertyValue("id");
