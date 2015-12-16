@@ -8,8 +8,10 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
@@ -23,6 +25,9 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	@Value("${httpInvoker.useFstSerialization:false}")
 	private boolean useFstSerialization;
+
+	@Value("${httpInvoker.loggingPayload:false}")
+	private boolean loggingPayload;
 
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
@@ -138,7 +143,22 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 				return null;
 			}
 		}
-		return invoke(invocation, maxAttempts);
+		if (loggingPayload) {
+			logger.info("invoking {}.{}() with:\n{}", getServiceInterface().getName(), invocation.getMethod().getName(),
+					JsonUtils.toJson(invocation.getArguments()));
+		}
+		long time = System.currentTimeMillis();
+		Object value = invoke(invocation, maxAttempts);
+		time = System.currentTimeMillis() - time;
+		if (loggingPayload) {
+			MDC.remove("url");
+			if (value != null) {
+				logger.info("returned in {}ms:\n{}", time, JsonUtils.toJson(value));
+			} else {
+				logger.info("returned in {}ms: null", time);
+			}
+		}
+		return value;
 	}
 
 	public Object invoke(MethodInvocation invocation, int attempts) throws Throwable {

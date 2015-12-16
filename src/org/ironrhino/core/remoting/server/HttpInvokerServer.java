@@ -12,9 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.remoting.FstHttpInvokerSerializationHelper;
 import org.ironrhino.core.remoting.ServiceRegistry;
+import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -34,6 +37,9 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private Map<Class<?>, Object> proxies = new HashMap<>();
 
+	@Value("${httpInvoker.loggingPayload:false}")
+	private boolean loggingPayload;
+
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
@@ -52,14 +58,37 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			RemoteInvocation invocation = readRemoteInvocation(request);
 			Object proxy = getProxyForService();
 			if (proxy != null) {
+				if (loggingPayload) {
+					logger.info("invoking {}.{}() with:\n{}", clazz.getName(), invocation.getMethodName(),
+							JsonUtils.toJson(invocation.getArguments()));
+				}
+				long time = System.currentTimeMillis();
 				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
+				time = System.currentTimeMillis() - time;
 				writeRemoteInvocationResult(request, response, result);
+				if (loggingPayload) {
+					MDC.remove("url");
+					if (!result.hasException()) {
+						Object value = result.getValue();
+						if (value != null) {
+							logger.info("returned in {}ms:\n{}", time, JsonUtils.toJson(value));
+						} else {
+							logger.info("returned in {}ms: null", time);
+						}
+					} else {
+						Throwable throwable = result.getException();
+						if (throwable.getCause() != null)
+							throwable = throwable.getCause();
+						logger.error(throwable.getMessage(), throwable);
+					}
+				}
 			} else {
 				String msg = "No Service:" + getServiceInterface().getName();
 				logger.error("No Service:" + getServiceInterface());
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
 			}
 		} catch (SerializationFailedException sfe) {
+			logger.error(sfe.getMessage(), sfe);
 			RemoteInvocationResult result = new RemoteInvocationResult();
 			result.setException(sfe);
 			writeRemoteInvocationResult(request, response, result);
