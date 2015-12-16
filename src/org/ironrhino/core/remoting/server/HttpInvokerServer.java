@@ -15,6 +15,7 @@ import org.ironrhino.core.remoting.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -58,6 +59,10 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 				logger.error("No Service:" + getServiceInterface());
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
 			}
+		} catch (SerializationFailedException sfe) {
+			RemoteInvocationResult result = new RemoteInvocationResult();
+			result.setException(sfe);
+			writeRemoteInvocationResult(request, response, result);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -104,10 +109,15 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			throws IOException, ClassNotFoundException {
 		boolean useFstSerialization = CONTENT_TYPE_FST_SERIALIZED_OBJECT
 				.equals(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
-		if (useFstSerialization)
-			return FstHttpInvokerSerializationHelper.readRemoteInvocation(is);
-		else
+		if (useFstSerialization) {
+			try {
+				return FstHttpInvokerSerializationHelper.readRemoteInvocation(is);
+			} catch (IOException e) {
+				throw new SerializationFailedException(e.getMessage(), e);
+			}
+		} else {
 			return super.readRemoteInvocation(request, is);
+		}
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 import org.springframework.remoting.httpinvoker.HttpInvokerRequestExecutor;
@@ -152,15 +153,23 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 		} catch (RemoteAccessException e) {
 			if (--attempts < 1)
 				throw e;
-			if (urlFromDiscovery) {
-				if (discoveredHost != null) {
-					serviceRegistry.evict(discoveredHost);
-					discoveredHost = null;
-				}
-				String serviceUrl = discoverServiceUrl();
-				if (!serviceUrl.equals(getServiceUrl())) {
-					setServiceUrl(serviceUrl);
-					logger.info("relocate service url:" + serviceUrl);
+			Throwable throwable = e.getCause();
+			if (throwable instanceof SerializationFailedException) {
+				this.useFstSerialization = false;
+				this.setHttpInvokerRequestExecutor(new SimpleHttpInvokerRequestExecutor());
+				logger.error("downgrade serialization from fst to java for service[{}]: {}",
+						getServiceInterface().getName(), throwable.getMessage());
+			} else {
+				if (urlFromDiscovery) {
+					if (discoveredHost != null) {
+						serviceRegistry.evict(discoveredHost);
+						discoveredHost = null;
+					}
+					String serviceUrl = discoverServiceUrl();
+					if (!serviceUrl.equals(getServiceUrl())) {
+						setServiceUrl(serviceUrl);
+						logger.info("relocate service url:" + serviceUrl);
+					}
 				}
 			}
 			return invoke(invocation, attempts);
