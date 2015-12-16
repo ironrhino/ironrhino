@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -92,20 +95,34 @@ public class AppInfo {
 		String name = null;
 		String address = "127.0.0.1";
 		try {
-			InetAddress[] addresses = InetAddress.getAllByName(InetAddress.getLocalHost().getHostName());
-			for (InetAddress addr : addresses) {
-				String ip = addr.getHostAddress();
-				if (ip.split("\\.").length != 4 || ip.startsWith("169.254."))
-					continue;
-				name = addr.getHostName();
-				address = ip;
-				break;
+			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+			while (e.hasMoreElements()) {
+				NetworkInterface n = (NetworkInterface) e.nextElement();
+				Enumeration<InetAddress> ee = n.getInetAddresses();
+				while (ee.hasMoreElements()) {
+					InetAddress addr = (InetAddress) ee.nextElement();
+					String ip = addr.getHostAddress();
+					if (ip.equals("127.0.0.1") || ip.split("\\.").length != 4 || ip.startsWith("169.254."))
+						continue;
+					address = ip;
+					break;
+				}
 			}
-			if (name == null) {
-				InetAddress addr = InetAddress.getLocalHost();
-				name = addr.getHostName();
+		} catch (SocketException e) {
+		}
+		try {
+			name = InetAddress.getLocalHost().getHostName();
+			if (address.equals("127.0.0.1")) {
+				InetAddress[] addresses = InetAddress.getAllByName(name);
+				for (InetAddress addr : addresses) {
+					String ip = addr.getHostAddress();
+					if (ip.equals("127.0.0.1") || ip.split("\\.").length != 4 || ip.startsWith("169.254."))
+						continue;
+					address = ip;
+					break;
+				}
 			}
-		} catch (UnknownHostException e) {
+		} catch (UnknownHostException ex) {
 			name = "unknown";
 		}
 		HOSTNAME = name;
