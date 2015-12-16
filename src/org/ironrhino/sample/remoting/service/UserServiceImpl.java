@@ -22,6 +22,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) {
+		if (username == null)
+			throw new IllegalArgumentException("username shouldn't be null");
 		UserDetails u = userManager.loadUserByUsername(username);
 		if (u == null)
 			return null;
