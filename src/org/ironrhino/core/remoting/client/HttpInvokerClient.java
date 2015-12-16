@@ -15,14 +15,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
-import org.springframework.remoting.httpinvoker.HttpInvokerRequestExecutor;
 import org.springframework.util.Assert;
 
 public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
-
-	private HttpInvokerRequestExecutor httpInvokerRequestExecutor;
 
 	@Value("${httpInvoker.useFstSerialization:false}")
 	private boolean useFstSerialization;
@@ -87,20 +84,16 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 		this.executorService = executorService;
 	}
 
-	@Override
-	public HttpInvokerRequestExecutor getHttpInvokerRequestExecutor() {
-		if (this.httpInvokerRequestExecutor == null) {
-			SimpleHttpInvokerRequestExecutor executor = useFstSerialization ? new FstSimpleHttpInvokerRequestExecutor()
-					: new SimpleHttpInvokerRequestExecutor();
-			executor.setBeanClassLoader(getBeanClassLoader());
-			this.httpInvokerRequestExecutor = executor;
-		}
-		return this.httpInvokerRequestExecutor;
+	public boolean isUseFstSerialization() {
+		return useFstSerialization;
 	}
 
-	@Override
-	public void setHttpInvokerRequestExecutor(HttpInvokerRequestExecutor httpInvokerRequestExecutor) {
-		this.httpInvokerRequestExecutor = httpInvokerRequestExecutor;
+	public void setUseFstSerialization(boolean useFstSerialization) {
+		this.useFstSerialization = useFstSerialization;
+		SimpleHttpInvokerRequestExecutor executor = useFstSerialization ? new FstSimpleHttpInvokerRequestExecutor()
+				: new SimpleHttpInvokerRequestExecutor();
+		executor.setBeanClassLoader(getBeanClassLoader());
+		super.setHttpInvokerRequestExecutor(executor);
 	}
 
 	@Override
@@ -116,6 +109,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 			discovered = false;
 			urlFromDiscovery = true;
 		}
+		setUseFstSerialization(this.useFstSerialization);
 		super.afterPropertiesSet();
 	}
 
@@ -155,8 +149,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 				throw e;
 			Throwable throwable = e.getCause();
 			if (throwable instanceof SerializationFailedException) {
-				this.useFstSerialization = false;
-				this.setHttpInvokerRequestExecutor(new SimpleHttpInvokerRequestExecutor());
+				setUseFstSerialization(false);
 				logger.error("downgrade serialization from fst to java for service[{}]: {}",
 						getServiceInterface().getName(), throwable.getMessage());
 			} else {
