@@ -92,27 +92,29 @@ public class AppInfo {
 			RUNLEVEL = r;
 		else
 			RUNLEVEL = RunLevel.NORMAL;
-		String name = null;
-		String address = "127.0.0.1";
-		try {
-			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-			while (e.hasMoreElements()) {
-				NetworkInterface n = (NetworkInterface) e.nextElement();
-				Enumeration<InetAddress> ee = n.getInetAddresses();
-				while (ee.hasMoreElements()) {
-					InetAddress addr = (InetAddress) ee.nextElement();
-					String ip = addr.getHostAddress();
-					if (ip.equals("127.0.0.1") || ip.split("\\.").length != 4 || ip.startsWith("169.254."))
-						continue;
-					address = ip;
-					break;
+		String name = System.getProperty("host.name");
+		String address = System.getProperty("host.address");
+		if (address == null)
+			try {
+				Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+				while (e.hasMoreElements()) {
+					NetworkInterface n = (NetworkInterface) e.nextElement();
+					Enumeration<InetAddress> ee = n.getInetAddresses();
+					while (ee.hasMoreElements()) {
+						InetAddress addr = (InetAddress) ee.nextElement();
+						String ip = addr.getHostAddress();
+						if (ip.equals("127.0.0.1") || ip.split("\\.").length != 4 || ip.startsWith("169.254."))
+							continue;
+						address = ip;
+						break;
+					}
 				}
+			} catch (SocketException e) {
 			}
-		} catch (SocketException e) {
-		}
 		try {
-			name = InetAddress.getLocalHost().getHostName();
-			if (address.equals("127.0.0.1")) {
+			if (name == null)
+				name = InetAddress.getLocalHost().getHostName();
+			if (address == null) {
 				InetAddress[] addresses = InetAddress.getAllByName(name);
 				for (InetAddress addr : addresses) {
 					String ip = addr.getHostAddress();
@@ -126,7 +128,7 @@ public class AppInfo {
 			name = "unknown";
 		}
 		HOSTNAME = name;
-		HOSTADDRESS = address;
+		HOSTADDRESS = address != null ? address : "127.0.0.1";
 
 		String p = System.getProperty("port.http");
 		if (StringUtils.isBlank(p))
