@@ -2,9 +2,6 @@ package org.ironrhino.core.remoting.client;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
@@ -31,9 +28,6 @@ public class HessianClient extends HessianProxyFactoryBean {
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
-	@Autowired(required = false)
-	private ExecutorService executorService;
-
 	private String host;
 
 	private int port;
@@ -41,8 +35,6 @@ public class HessianClient extends HessianProxyFactoryBean {
 	private String contextPath;
 
 	private int maxAttempts = 3;
-
-	private List<String> asyncMethods;
 
 	private boolean urlFromDiscovery;
 
@@ -68,20 +60,8 @@ public class HessianClient extends HessianProxyFactoryBean {
 		this.maxAttempts = maxAttempts;
 	}
 
-	public void setAsyncMethods(String asyncMethods) {
-		if (StringUtils.isNotBlank(asyncMethods)) {
-			asyncMethods = asyncMethods.trim();
-			String[] array = asyncMethods.split("\\s*,\\s*");
-			this.asyncMethods = Arrays.asList(array);
-		}
-	}
-
 	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
 		this.serviceRegistry = serviceRegistry;
-	}
-
-	public void setExecutorService(ExecutorService executorService) {
-		this.executorService = executorService;
 	}
 
 	@Override
@@ -141,26 +121,6 @@ public class HessianClient extends HessianProxyFactoryBean {
 			setServiceUrl(serviceUrl);
 			reset();
 			discovered = true;
-		}
-		if (asyncMethods != null) {
-			String name = invocation.getMethod().getName();
-			if (asyncMethods.contains(name)) {
-				Runnable task = new Runnable() {
-					@Override
-					public void run() {
-						try {
-							invoke(invocation, maxAttempts);
-						} catch (Throwable e) {
-							logger.error(e.getMessage(), e);
-						}
-					}
-				};
-				if (executorService != null)
-					executorService.execute(task);
-				else
-					new Thread(task).start();
-				return null;
-			}
 		}
 		return invoke(invocation, maxAttempts);
 	}
