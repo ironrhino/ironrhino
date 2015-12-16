@@ -139,11 +139,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		boolean useFstSerialization = CONTENT_TYPE_FST_SERIALIZED_OBJECT
 				.equals(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
 		if (useFstSerialization) {
-			try {
-				return FstHttpInvokerSerializationHelper.readRemoteInvocation(is);
-			} catch (IOException e) {
-				throw new SerializationFailedException(e.getMessage(), e);
-			}
+			return FstHttpInvokerSerializationHelper.readRemoteInvocation(is);
 		} else {
 			return super.readRemoteInvocation(request, is);
 		}

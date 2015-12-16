@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
+import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
@@ -21,6 +22,8 @@ public class FstHttpInvokerSerializationHelper {
 						+ RemoteInvocation.class.getName() + "]: " + obj);
 			}
 			return (RemoteInvocation) obj;
+		} catch (IOException e) {
+			throw new SerializationFailedException(e.getMessage(), e);
 		} finally {
 			in.close();
 		}
@@ -54,6 +57,8 @@ public class FstHttpInvokerSerializationHelper {
 						+ RemoteInvocationResult.class.getName() + "]: " + obj);
 			}
 			return (RemoteInvocationResult) obj;
+		} catch (IOException e) {
+			throw new SerializationFailedException(e.getMessage(), e);
 		} finally {
 			in.close();
 		}
