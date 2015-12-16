@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Configuration>
+<Configuration packages="org.ironrhino.core.log4j">
 	<Properties>
     	<Property name="app.home">/tmp/app</Property>
     	<Property name="port.http"></Property>
@@ -9,15 +9,15 @@
 	<Appenders>
 		<Console name="CONSOLE" target="SYSTEM_OUT">
 			<ThresholdFilter level="${sys:console.logger.level}"/>
-			<PatternLayout pattern="%d %c %p %m%n"/>
+			<PatternLayout pattern="%d %c %p %m%n%th{10}"/>
 		</Console>
 		<RollingFile name="APPLICATION" fileName="${sys:app.home}/logs/${sys:port.http}/application.log" filePattern="${sys:app.home}/logs/${sys:port.http}/application.log.%d{yyyy-MM-dd}">
-			<PatternLayout pattern="%d %c %t%X{session}%X{request}%X{url} %p %m%n" charset="UTF-8"/>
+			<PatternLayout pattern="%d %c %t%X{session}%X{request}%X{url} %p %m%n%th{10}" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="ERROR" fileName="${sys:app.home}/logs/${sys:port.http}/application-error.log" filePattern="${sys:app.home}/logs/${sys:port.http}/application-error.log.%d{yyyy-MM-dd}">
 			<ThresholdFilter level="ERROR"/>
-			<PatternLayout pattern="%d %c %t%X{session}%X{request}%X{url} %p %m%n" charset="UTF-8"/>
+			<PatternLayout pattern="%d %c %t%X{session}%X{request}%X{url} %p %m%n%th{10}" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="HIBERNATE" fileName="${sys:app.home}/logs/${sys:port.http}/hibernate.log" filePattern="${sys:app.home}/logs/${sys:port.http}/hibernate.log.%d{yyyy-MM-dd}">
@@ -26,7 +26,7 @@
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="REMOTING" fileName="${sys:app.home}/logs/${sys:port.http}/remoting.log" filePattern="${sys:app.home}/logs/${sys:port.http}/remoting.log.%d{yyyy-MM-dd}">
-			<PatternLayout pattern="%d %c %p %m%n" charset="UTF-8"/>
+			<PatternLayout pattern="%d %c %t%X{request} %p %m%n%th{10}" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="REST" fileName="${sys:app.home}/logs/${sys:port.http}/rest.log" filePattern="${sys:app.home}/logs/${sys:port.http}/rest.log.%d{yyyy-MM-dd}">
