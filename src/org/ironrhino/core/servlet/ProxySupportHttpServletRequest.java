@@ -1,5 +1,11 @@
 package org.ironrhino.core.servlet;
 
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -7,14 +13,34 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
+	// proxy_set_header X-Real-IP $remote_addr;
 	public static final String HEADER_NAME_X_REAL_IP = "X-Real-IP";
 
+	// proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 	public static final String HEADER_NAME_X_FORWARDED_FOR = "X-Forwarded-For";
 
+	// proxy_set_header X-Url-Scheme $scheme;
 	public static final String HEADER_NAME_X_URL_SCHEME = "X-Url-Scheme";
+
+	// proxy_set_header X-Client-Certificate $ssl_client_cert;
+	public static final String HEADER_NAME_X_CLIENT_CERTIFICATE = "X-Client-Certificate";
 
 	public ProxySupportHttpServletRequest(HttpServletRequest request) {
 		super(request);
+		String certificate = request.getHeader(HEADER_NAME_X_CLIENT_CERTIFICATE);
+		if (StringUtils.isNotBlank(certificate)) {
+			// nginx replaced line separator with whitespace and tab
+			String certificateContent = certificate.replaceAll("\\s{2,}", System.lineSeparator()).replaceAll("\\t+",
+					System.lineSeparator());
+			try {
+				X509Certificate x509Certificate = (X509Certificate) CertificateFactory.getInstance("X.509")
+						.generateCertificate(new ByteArrayInputStream(certificateContent.getBytes("ISO-8859-11")));
+				request.setAttribute("javax.servlet.request.X509Certificate",
+						new X509Certificate[] { x509Certificate });
+			} catch (CertificateException | UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
