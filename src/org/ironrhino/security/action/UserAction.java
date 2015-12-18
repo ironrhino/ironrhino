@@ -21,6 +21,7 @@ import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.security.role.UserRoleFilter;
 import org.ironrhino.core.security.role.UserRoleManager;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.AuthzUtils;
@@ -68,6 +69,9 @@ public class UserAction extends EntityAction<User> {
 
 	@Autowired
 	private transient UserRoleManager userRoleManager;
+
+	@Autowired(required = false)
+	private transient UserRoleFilter userRoleFilter;
 
 	@Autowired
 	protected transient EventPublisher eventPublisher;
@@ -121,12 +125,6 @@ public class UserAction extends EntityAction<User> {
 
 	@Override
 	public String input() {
-		Map<String, String> map = userRoleManager.getAllRoles(true);
-		roles = new ArrayList<>(map.size());
-		for (Map.Entry<String, String> entry : map.entrySet())
-			roles.add(new LabelValue(
-					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : getText(entry.getKey()),
-					entry.getKey()));
 		String id = getUid();
 		if (StringUtils.isNotBlank(id)) {
 			user = userManager.get(id);
@@ -135,7 +133,16 @@ public class UserAction extends EntityAction<User> {
 		}
 		if (user == null) {
 			user = new User();
-		} else {
+		}
+		Map<String, String> map = userRoleManager.getAllRoles(true);
+		roles = new ArrayList<>(map.size());
+		for (Map.Entry<String, String> entry : map.entrySet())
+			if (user == null || StringUtils.isBlank(user.getUsername()) || userRoleFilter == null
+					|| userRoleFilter.accepts(user.getUsername(), entry.getKey()))
+				roles.add(new LabelValue(
+						StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : getText(entry.getKey()),
+						entry.getKey()));
+		if (!user.isNew()) {
 			Set<String> userRoles = user.getRoles();
 			for (String r : userRoles) {
 				if (!map.containsKey(r)) {
