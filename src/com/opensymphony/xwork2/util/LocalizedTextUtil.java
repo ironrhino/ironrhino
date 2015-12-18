@@ -576,7 +576,7 @@ public class LocalizedTextUtil {
         try {
             reloadBundles(valueStack.getContext());
 
-            String message = TextParseUtil.translateVariables(bundle.getString(aTextName), valueStack);
+            String message = bundle.getString(aTextName);
             MessageFormat mf = buildMessageFormat(message, locale);
 
             return formatWithNullDetection(mf, args);
@@ -609,7 +609,7 @@ public class LocalizedTextUtil {
 
             // defaultMessage may be null
             if (message != null) {
-                MessageFormat mf = buildMessageFormat(TextParseUtil.translateVariables(message, valueStack), locale);
+                MessageFormat mf = buildMessageFormat(message, locale);
 
                 String msg = formatWithNullDetection(mf, args);
                 result = new GetDefaultMessageReturnArg(msg, found);

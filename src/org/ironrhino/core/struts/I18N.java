@@ -34,14 +34,13 @@ public class I18N {
 	}
 
 	public static String getTextForEnum(Class<? extends Enum<?>> clazz) {
+		ActionContext context = ActionContext.getContext();
+		Locale locale = context != null ? context.getLocale() : Locale.getDefault();
+		ValueStack vs = context != null ? context.getValueStack() : null;
 		Map<String, String> map = new LinkedHashMap<>();
 		for (Enum<?> en : clazz.getEnumConstants()) {
 			try {
-				map.put(en.name(),
-						LocalizedTextUtil.findText(
-								clazz, en.name(), ActionContext.getContext() != null
-										? ActionContext.getContext().getLocale() : Locale.getDefault(),
-								en.name(), null, null));
+				map.put(en.name(), LocalizedTextUtil.findText(clazz, en.name(), locale, en.name(), null, vs));
 			} catch (Exception e) {
 				e.printStackTrace();
 				map.put(en.name(), en.name());
