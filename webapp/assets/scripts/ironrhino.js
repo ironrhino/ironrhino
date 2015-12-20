@@ -32829,32 +32829,32 @@ Observation.common = function(container) {
 				});
 	});
 	$(':input.conjunct', container).bind('conjunct', function() {
-				var t = $(this);
-				var f = $(this).closest('form');
-				var data = {};
-				var url = f.prop('action');
-				if (url.indexOf('/') > -1) {
-					if (url.substring(url.lastIndexOf('/') + 1) == 'save')
-						url = url.substring(0, url.lastIndexOf('/')) + '/input';
-				} else if (url == 'save')
-					url = 'input';
-				var hid = $('input[type=hidden][name$=".id"]', f);
-				if (hid.val())
-					data['id'] = hid.val();
-				data[t.attr('name')] = t.val();
-				$('input[type=hidden]:not(.nocheck)', f).each(function() {
-							data[$(this).attr('name')] = $(this).val();
-						});
-				ajax({
-							global : false,
-							quiet : true,
-							type : t.data('method') || f.attr('method'),
-							url : url,
-							data : data,
-							target : f[0],
-							replacement : t.data('replacement')
-						});
-			});
+		var t = $(this);
+		var f = $(this).closest('form');
+		var data = {};
+		var url = f.prop('action');
+		if (url.indexOf('/') > -1) {
+			if (url.substring(url.lastIndexOf('/') + 1) == 'save')
+				url = url.substring(0, url.lastIndexOf('/')) + '/input';
+		} else if (url == 'save')
+			url = 'input';
+		var hid = $('input[type=hidden][name$=".id"]', f);
+		if (hid.val())
+			data['id'] = hid.val();
+		$(':input.conjunct,input[type=hidden]:not(.nocheck)', f).each(
+				function() {
+					data[$(this).attr('name')] = $(this).val();
+				});
+		ajax({
+					global : false,
+					quiet : true,
+					type : t.data('method') || f.attr('method'),
+					url : url,
+					data : data,
+					target : f[0],
+					replacement : t.data('replacement')
+				});
+	});
 	$(':input.conjunct', container).change(function() {
 				var t = $(this).trigger('conjunct');
 			});
@@ -33561,7 +33561,8 @@ DateUtils = {
 			if (since.getTime() <= leapDay.getTime())
 				return leapDay;
 		}
-		while (!DateUtils.isLeapYear(++year));
+		while (!DateUtils.isLeapYear(++year)) {
+		};
 		return new Date(year, 1, 29);
 	},
 
