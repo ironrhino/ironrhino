@@ -135,13 +135,16 @@ public class UserAction extends EntityAction<User> {
 			user = new User();
 		}
 		Map<String, String> map = userRoleManager.getAllRoles(true);
+		if (userRoleFilter != null) {
+			Map<String, String> temp = userRoleFilter.filter(user, map);
+			if (temp != null)
+				map = temp;
+		}
 		roles = new ArrayList<>(map.size());
 		for (Map.Entry<String, String> entry : map.entrySet())
-			if (user == null || StringUtils.isBlank(user.getUsername()) || userRoleFilter == null
-					|| userRoleFilter.accepts(user.getUsername(), entry.getKey()))
-				roles.add(new LabelValue(
-						StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : getText(entry.getKey()),
-						entry.getKey()));
+			roles.add(new LabelValue(
+					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : getText(entry.getKey()),
+					entry.getKey()));
 		if (!user.isNew()) {
 			Set<String> userRoles = user.getRoles();
 			for (String r : userRoles) {
