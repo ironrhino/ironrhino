@@ -26,10 +26,13 @@ import org.springframework.stereotype.Component;
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class UserRoleManager {
 
-	private Set<String> staticRoles;
+	@Autowired(required = false)
+	private List<UserRoleProvider> userRoleProviders;
 
 	@Value("${userRoleManager.rolesMutex:}")
 	private String rolesMutex;
+
+	private Set<String> staticRoles;
 
 	private List<List<String>> rolesMutexList = Collections.emptyList();
 
@@ -49,9 +52,6 @@ public class UserRoleManager {
 		}
 	}
 
-	@Autowired(required = false)
-	private List<UserRoleProvider> userRoleProviders;
-
 	public Set<String> getStaticRoles(boolean excludeBuiltin) {
 		Set<String> roles = getStaticRoles();
 		if (excludeBuiltin) {
@@ -59,7 +59,7 @@ public class UserRoleManager {
 			for (String s : roles)
 				if (!s.startsWith("ROLE_BUILTIN_"))
 					set.add(s);
-			roles = set;
+			roles = Collections.unmodifiableSet(set);
 		}
 		return roles;
 	}
@@ -93,7 +93,7 @@ public class UserRoleManager {
 				if (map != null)
 					customRoles.putAll(map);
 			}
-		return customRoles;
+		return Collections.unmodifiableMap(customRoles);
 	}
 
 	public Map<String, String> getAllRoles(boolean excludeBuiltin) {
@@ -106,7 +106,7 @@ public class UserRoleManager {
 			String value = StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : entry.getKey();
 			roles.put(entry.getKey(), I18N.getText(value));
 		}
-		return roles;
+		return Collections.unmodifiableMap(roles);
 	}
 
 	public List<String> displayRoles(Collection<String> roles) {
@@ -118,7 +118,7 @@ public class UserRoleManager {
 			String name = rolesMap.get(s);
 			result.add(StringUtils.isNotBlank(name) ? name : s);
 		}
-		return result;
+		return Collections.unmodifiableList(result);
 	}
 
 	public String displayRole(String role) {
