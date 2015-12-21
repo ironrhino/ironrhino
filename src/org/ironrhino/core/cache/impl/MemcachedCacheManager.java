@@ -244,4 +244,9 @@ public class MemcachedCacheManager implements CacheManager {
 		return true;
 	}
 
+	@Override
+	public void invalidate(String namespace) {
+		throw new UnsupportedOperationException("memcached doesn't support evict by namespace");
+	}
+
 }

@@ -183,6 +183,14 @@ public class EhCacheManager implements CacheManager {
 		return true;
 	}
 
+	@Override
+	public void invalidate(String namespace) {
+		Cache cache = ehCacheManager.getCache(namespace);
+		if (cache != null) {
+			cache.removeAll();
+		}
+	}
+
 	private Cache getCache(String namespace, boolean create) {
 		if (StringUtils.isBlank(namespace))
 			namespace = "_default";
