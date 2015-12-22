@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.aspectj.lang.JoinPoint;
+import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ public class BaseAspect implements Ordered {
 		}
 		context.put(AopContext.CONTEXT_KEY_THIS, jp.getThis());
 		context.put(AopContext.CONTEXT_KEY_ARGS, jp.getArgs());
+		context.put(AopContext.CONTEXT_KEY_REQUEST, RequestContext.getRequest());
 		context.put(AopContext.CONTEXT_KEY_USER, AuthzUtils.getUserDetails());
 		return context;
 	}

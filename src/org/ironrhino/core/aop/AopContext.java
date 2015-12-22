@@ -8,6 +8,8 @@ public class AopContext {
 	public static final String CONTEXT_KEY_THIS = "_this_";
 
 	public static final String CONTEXT_KEY_ARGS = "_args_";
+	
+	public static final String CONTEXT_KEY_REQUEST = "_request_";
 
 	public static final String CONTEXT_KEY_USER = "_user_";
 	
