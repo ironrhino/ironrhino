@@ -25,7 +25,12 @@ public class ConcurrencyAspect extends BaseAspect {
 	@Around("execution(public * *(..)) and @annotation(concurrency)")
 	public Object control(ProceedingJoinPoint jp, Concurrency concurrency) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
-		String key = jp.getSignature().toLongString();
+		String key = concurrency.key();
+		if (!key.isEmpty()) {
+			key = ExpressionUtils.evalString(key, context);
+		} else {
+			key = jp.getSignature().toLongString();
+		}
 		int permits = ExpressionUtils.evalInt(concurrency.permits(), context, 0);
 		if (!concurrency.block()) {
 			if (concurrencyService.tryAcquire(key, permits, concurrency.timeout(), concurrency.timeUnit())) {

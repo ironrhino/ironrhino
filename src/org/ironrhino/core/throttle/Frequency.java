@@ -11,12 +11,8 @@ import java.util.concurrent.TimeUnit;
 @Retention(RUNTIME)
 public @interface Frequency {
 
-	/**
-	 * 
-	 * this attribute support expression
-	 * 
-	 * @return
-	 */
+	String key() default "";
+
 	String limits();
 
 	int duration() default 1;

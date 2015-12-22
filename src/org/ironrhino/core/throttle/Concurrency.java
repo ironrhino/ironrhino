@@ -11,12 +11,8 @@ import java.util.concurrent.TimeUnit;
 @Retention(RUNTIME)
 public @interface Concurrency {
 
-	/**
-	 * 
-	 * this attribute support expression
-	 * 
-	 * @return
-	 */
+	String key() default "";
+
 	String permits();
 
 	boolean block() default false;
