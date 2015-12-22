@@ -81,6 +81,8 @@
 	<property name="security-oauth-client-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-sources-jar.name" value="ironrhino-security-oauth-server-${version}-sources.jar" />
 	<property name="security-oauth-server-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/oauth2**,resources/view/oauth/client**,resources/view/oauth/authorization**" />
+	<property name="security-oauth-server-remoting-sources-jar.name" value="ironrhino-security-oauth-server-remoting-${version}-sources.jar" />
+	<property name="security-oauth-server-remoting-sources-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*" />
 	<property name="rest-sources-jar.name" value="ironrhino-rest-${version}-sources.jar" />
 	<target name="set-revision">
 		<script language="javascript">
@@ -177,6 +179,7 @@
 			<delete file="${target.dir}/${security-acl-sources-jar.name}" />
 			<delete file="${target.dir}/${security-oauth-client-sources-jar.name}" />
 			<delete file="${target.dir}/${security-oauth-server-sources-jar.name}" />
+			<delete file="${target.dir}/${security-oauth-server-sources-remoting-jar.name}" />
 			<delete file="${target.dir}/${rest-sources-jar.name}" />
 			<jar jarfile="${target.dir}/${core-sources-jar.name}" basedir="${src.dir}" includes="META-INF/**,log4j*.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-sources-jar.includes},${zookeeper-sources-jar.includes},${remoting-common-sources-jar.includes},${common-setting-sources-jar.includes},${common-cms-sources-jar.includes},${common-dictionary-sources-jar.includes},${common-schema-sources-jar.includes},${common-treenode-sources-jar.includes},${common-region-sources-jar.includes},${common-stat-sources-jar.includes},${common-record-sources-jar.includes},${common-upload-sources-jar.includes},${common-install-sources-jar.includes},${common-qrcode-sources-jar.includes},${common-feedback-sources-jar.includes},${common-audit-sources-jar.includes}">
 				<manifest>
@@ -637,6 +640,18 @@
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
 				</manifest>
 			</jar>
+			<jar jarfile="${target.dir}/${security-oauth-server-remoting-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-server-remoting-sources-jar.includes}">
+				<manifest>
+					<attribute name="Implementation-Title" value="ironrhino-security-oauth-server-remoting" />
+					<attribute name="Implementation-Vendor" value="ironrhino" />
+					<attribute name="Implementation-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-server-remoting" />
+					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+					<attribute name="Ironrhino-Component-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+				</manifest>
+			</jar>			
 			<jar jarfile="${target.dir}/${rest-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/rest/**,resources/i18n/rest/**,resources/view/rest/*.ftl">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-rest" />

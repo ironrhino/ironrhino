@@ -81,6 +81,8 @@
 	<property name="security-oauth-client-jar.includes" value="org/ironrhino/security/oauth/package-info.class,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-jar.name" value="ironrhino-security-oauth-server-${version}.jar" />
 	<property name="security-oauth-server-jar.includes" value="org/ironrhino/security/oauth/package-info.class,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/oauth2**,resources/view/oauth/client**,resources/view/oauth/authorization**" />
+	<property name="security-oauth-server-remoting-jar.name" value="ironrhino-security-oauth-server-remoting-${version}.jar" />
+	<property name="security-oauth-server-remoting-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*" />
 	<property name="rest-jar.name" value="ironrhino-rest-${version}.jar" />
 	<target name="set-revision">
 		<script language="javascript">
@@ -281,6 +283,7 @@
 			<delete file="${target.dir}/${security-acl-jar.name}" />
 			<delete file="${target.dir}/${security-oauth-client-jar.name}" />
 			<delete file="${target.dir}/${security-oauth-server-jar.name}" />
+			<delete file="${target.dir}/${security-oauth-server-remoting-jar.name}" />
 			<delete file="${target.dir}/${rest-jar.name}" />
 			<delete file="${target.dir}/bootstrap.jar" />
 			<unzip dest="${webapp.dir}/assets/components">
@@ -763,6 +766,18 @@
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
 				</manifest>
 			</jar>
+			<jar jarfile="${target.dir}/${security-oauth-server-remoting-jar.name}" basedir="${classes.dir}" includes="${security-oauth-server-remoting-jar.includes}">
+				<manifest>
+					<attribute name="Implementation-Title" value="ironrhino-security-oauth-server-remoting" />
+					<attribute name="Implementation-Vendor" value="ironrhino" />
+					<attribute name="Implementation-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-server-remoting" />
+					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+					<attribute name="Ironrhino-Component-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+				</manifest>
+			</jar>			
 			<jar jarfile="${target.dir}/${rest-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/rest/**,resources/i18n/rest/**,resources/view/rest/*.ftl">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-rest" />

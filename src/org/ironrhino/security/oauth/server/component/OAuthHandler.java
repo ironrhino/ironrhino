@@ -13,9 +13,8 @@ import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.core.util.UserAgent;
-import org.ironrhino.security.oauth.server.model.Authorization;
-import org.ironrhino.security.oauth.server.model.Client;
-import org.ironrhino.security.oauth.server.service.OAuthManager;
+import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
+import org.ironrhino.security.oauth.server.service.OAuthAuthorizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,7 @@ public class OAuthHandler extends AccessHandler {
 	private boolean sessionFallback = true;
 
 	@Autowired
-	private OAuthManager oauthManager;
+	private OAuthAuthorizationService oauthAuthorizationService;
 
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -104,7 +103,7 @@ public class OAuthHandler extends AccessHandler {
 			}
 		}
 		if (StringUtils.isNotBlank(token)) {
-			Authorization authorization = oauthManager.retrieve(token);
+			OAuthAuthorization authorization = oauthAuthorizationService.get(token);
 			if (authorization != null) {
 				if (authorization.getExpiresIn() > 0) {
 					String[] scopes = null;
@@ -121,15 +120,16 @@ public class OAuthHandler extends AccessHandler {
 						}
 					}
 					if (authorizedScope) {
-						Client client = oauthManager.findClientById(authorization.getClient());
-						if (client != null) {
-							request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, client);
+						String clientId = authorization.getClientId();
+						String clientName = authorization.getClientName();
+						if (clientId != null) {
+							request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, clientId);
 							UserAgent ua = new UserAgent(request.getHeader("User-Agent"));
-							ua.setAppId(client.getId());
-							ua.setAppName(client.getName());
+							ua.setAppId(clientId);
+							ua.setAppName(authorization.getClientName());
 							request.setAttribute("userAgent", ua);
 						}
-						if (authorization.getClient() == null || client != null) {
+						if (!(clientId != null && clientName == null)) {
 							UserDetails ud = null;
 							if (authorization.getGrantor() != null) {
 								try {
@@ -138,9 +138,9 @@ public class OAuthHandler extends AccessHandler {
 									logger.error(unf.getMessage(), unf);
 								}
 
-							} else if (client != null) {
+							} else if (authorization.getClientOwner() != null) {
 								try {
-									ud = userDetailsService.loadUserByUsername(client.getOwner().getUsername());
+									ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
 								} catch (UsernameNotFoundException unf) {
 									logger.error(unf.getMessage(), unf);
 								}
