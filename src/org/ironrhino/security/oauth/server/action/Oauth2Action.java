@@ -25,11 +25,11 @@ import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationF
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExceptionUtils;
+import org.ironrhino.security.oauth.server.enums.GrantType;
+import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
-import org.ironrhino.security.oauth.server.model.GrantType;
-import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

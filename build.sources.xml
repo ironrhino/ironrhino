@@ -82,7 +82,7 @@
 	<property name="security-oauth-server-sources-jar.name" value="ironrhino-security-oauth-server-${version}-sources.jar" />
 	<property name="security-oauth-server-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/oauth2**,resources/view/oauth/client**,resources/view/oauth/authorization**" />
 	<property name="security-oauth-server-remoting-sources-jar.name" value="ironrhino-security-oauth-server-remoting-${version}-sources.jar" />
-	<property name="security-oauth-server-remoting-sources-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*" />
+	<property name="security-oauth-server-remoting-sources-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*,org/ironrhino/security/oauth/server/enums/**" />
 	<property name="rest-sources-jar.name" value="ironrhino-rest-${version}-sources.jar" />
 	<target name="set-revision">
 		<script language="javascript">

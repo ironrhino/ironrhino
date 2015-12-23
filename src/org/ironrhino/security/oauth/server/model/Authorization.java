@@ -21,6 +21,8 @@ import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
+import org.ironrhino.security.oauth.server.enums.GrantType;
+import org.ironrhino.security.oauth.server.enums.ResponseType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

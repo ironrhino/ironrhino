@@ -3,6 +3,7 @@ package org.ironrhino.security.oauth.server.service;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
+import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,8 @@ public class OAuthAuthorizationServiceImpl implements OAuthAuthorizationService 
 			Client client = oauthManager.findClientById(auth.getClient());
 			if (client != null && client.isEnabled()) {
 				authorization.setClientName(client.getName());
-				authorization.setClientOwner(client.getOwner().getUsername());
+				if (auth.getGrantType() == GrantType.client_credential)
+					authorization.setClientOwner(client.getOwner().getUsername());
 			}
 		}
 		return authorization;

@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.CodecUtils;
+import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.model.Authorization;
-import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 

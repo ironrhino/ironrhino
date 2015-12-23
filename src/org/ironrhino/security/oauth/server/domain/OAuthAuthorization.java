@@ -2,6 +2,8 @@ package org.ironrhino.security.oauth.server.domain;
 
 import java.io.Serializable;
 
+import org.ironrhino.security.oauth.server.enums.GrantType;
+
 public class OAuthAuthorization implements Serializable {
 
 	private static final long serialVersionUID = 8659734973845517719L;
@@ -17,6 +19,8 @@ public class OAuthAuthorization implements Serializable {
 	private int lifetime;
 
 	private String refreshToken;
+
+	private GrantType grantType;
 
 	private String address;
 
@@ -74,6 +78,14 @@ public class OAuthAuthorization implements Serializable {
 
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
+	}
+
+	public GrantType getGrantType() {
+		return grantType;
+	}
+
+	public void setGrantType(GrantType grantType) {
+		this.grantType = grantType;
 	}
 
 	public String getAddress() {

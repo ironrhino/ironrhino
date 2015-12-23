@@ -2,10 +2,10 @@ package org.ironrhino.security.oauth.server.service;
 
 import java.util.List;
 
+import org.ironrhino.security.oauth.server.enums.GrantType;
+import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
-import org.ironrhino.security.oauth.server.model.GrantType;
-import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface OAuthManager {

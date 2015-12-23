@@ -14,6 +14,7 @@ import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.core.util.UserAgent;
 import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
+import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.service.OAuthAuthorizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,7 +139,7 @@ public class OAuthHandler extends AccessHandler {
 									logger.error(unf.getMessage(), unf);
 								}
 
-							} else if (authorization.getClientOwner() != null) {
+							} else if (authorization.getGrantType() == GrantType.client_credential) {
 								try {
 									ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
 								} catch (UsernameNotFoundException unf) {

@@ -82,7 +82,7 @@
 	<property name="security-oauth-server-jar.name" value="ironrhino-security-oauth-server-${version}.jar" />
 	<property name="security-oauth-server-jar.includes" value="org/ironrhino/security/oauth/package-info.class,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/oauth2**,resources/view/oauth/client**,resources/view/oauth/authorization**" />
 	<property name="security-oauth-server-remoting-jar.name" value="ironrhino-security-oauth-server-remoting-${version}.jar" />
-	<property name="security-oauth-server-remoting-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*" />
+	<property name="security-oauth-server-remoting-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*,org/ironrhino/security/oauth/server/enums/**" />
 	<property name="rest-jar.name" value="ironrhino-rest-${version}.jar" />
 	<target name="set-revision">
 		<script language="javascript">
