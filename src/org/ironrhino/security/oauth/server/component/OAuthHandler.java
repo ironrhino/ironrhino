@@ -75,7 +75,6 @@ public class OAuthHandler extends AccessHandler {
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
-		String errorMessage = null;
 		Map<String, String> map = RequestUtils.parseParametersFromQueryString(request.getQueryString());
 		String token = map.get("oauth_token");
 		if (token == null)
@@ -99,88 +98,86 @@ public class OAuthHandler extends AccessHandler {
 						token = header.substring(0, header.indexOf("\""));
 					}
 				} else {
-					errorMessage = "invalid Authorization header,must starts with OAuth or Bearer";
+					return handleError(request, response,
+							"invalid Authorization header, must starts with OAuth or Bearer");
 				}
 			}
 		}
-		if (StringUtils.isNotBlank(token)) {
-			OAuthAuthorization authorization = oauthAuthorizationService.get(token);
-			if (authorization != null) {
-				if (authorization.getExpiresIn() > 0) {
-					String[] scopes = null;
-					if (StringUtils.isNotBlank(authorization.getScope()))
-						scopes = authorization.getScope().split("\\s");
-					boolean authorizedScope = (scopes == null);
-					if (!authorizedScope && scopes != null) {
-						for (String s : scopes) {
-							String requestURL = request.getRequestURL().toString();
-							if (requestURL.startsWith(s)) {
-								authorizedScope = true;
-								break;
-							}
-						}
-					}
-					if (authorizedScope) {
-						String clientId = authorization.getClientId();
-						String clientName = authorization.getClientName();
-						if (clientId != null) {
-							request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, clientId);
-							UserAgent ua = new UserAgent(request.getHeader("User-Agent"));
-							ua.setAppId(clientId);
-							ua.setAppName(authorization.getClientName());
-							request.setAttribute("userAgent", ua);
-						}
-						if (!(clientId != null && clientName == null)) {
-							UserDetails ud = null;
-							if (authorization.getGrantor() != null) {
-								try {
-									ud = userDetailsService.loadUserByUsername(authorization.getGrantor());
-								} catch (UsernameNotFoundException unf) {
-									logger.error(unf.getMessage(), unf);
-								}
-
-							} else if (authorization.getGrantType() == GrantType.client_credential) {
-								try {
-									ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
-								} catch (UsernameNotFoundException unf) {
-									logger.error(unf.getMessage(), unf);
-								}
-							}
-							if (ud != null && ud.isEnabled() && ud.isAccountNonExpired() && ud.isAccountNonLocked()) {
-								SecurityContext sc = SecurityContextHolder.getContext();
-								Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(),
-										ud.getAuthorities());
-								sc.setAuthentication(auth);
-								Map<String, Object> sessionMap = new HashMap<>(2, 1);
-								sessionMap.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
-								request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API,
-										sessionMap);
-								request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
-								request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API,
-										SESSION_ID_PREFIX + token);
-							}
-							return false;
-						} else {
-							errorMessage = "invalid_client";
-						}
-					} else {
-						errorMessage = "unauthorized_scope";
-					}
-				} else {
-					errorMessage = "expired_token";
-				}
-			} else {
-				errorMessage = "invalid_token";
-			}
-		} else {
+		if (StringUtils.isBlank(token)) {
 			if (sessionFallback) {
 				String sessionTracker = RequestUtils.getCookieValue(request,
 						httpSessionManager.getSessionTrackerName());
 				if (StringUtils.isNotBlank(sessionTracker))
 					return false;
 			}
-			errorMessage = "missing_token";
+			return handleError(request, response, "missing_token");
 		}
+
+		OAuthAuthorization authorization = oauthAuthorizationService.get(token);
+		if (authorization == null)
+			return handleError(request, response, "invalid_token");
+
+		if (authorization.getExpiresIn() <= 0)
+			return handleError(request, response, "expired_token");
+
+		String[] scopes = null;
+		if (StringUtils.isNotBlank(authorization.getScope()))
+			scopes = authorization.getScope().split("\\s");
+		boolean scopeAuthorized = (scopes == null);
+		if (!scopeAuthorized && scopes != null) {
+			for (String s : scopes) {
+				String requestURL = request.getRequestURL().toString();
+				if (requestURL.startsWith(s)) {
+					scopeAuthorized = true;
+					break;
+				}
+			}
+		}
+		if (!scopeAuthorized)
+			return handleError(request, response, "unauthorized_scope");
+
+		String clientId = authorization.getClientId();
+		if (clientId != null) {
+			String clientName = authorization.getClientName();
+			if (clientName == null)
+				return handleError(request, response, "invalid_client");
+			request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, clientId);
+			UserAgent ua = new UserAgent(request.getHeader("User-Agent"));
+			ua.setAppId(clientId);
+			ua.setAppName(clientName);
+			request.setAttribute("userAgent", ua);
+		}
+
+		UserDetails ud = null;
+		if (authorization.getGrantType() == GrantType.client_credential) {
+			try {
+				ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
+			} catch (UsernameNotFoundException unf) {
+				logger.error(unf.getMessage(), unf);
+			}
+		} else if (authorization.getGrantor() != null) {
+			try {
+				ud = userDetailsService.loadUserByUsername(authorization.getGrantor());
+			} catch (UsernameNotFoundException unf) {
+				logger.error(unf.getMessage(), unf);
+			}
+		}
+		if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked())
+			return handleError(request, response, "invalid_user");
+
+		SecurityContext sc = SecurityContextHolder.getContext();
+		Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
+		sc.setAuthentication(auth);
+		Map<String, Object> sessionMap = new HashMap<>(2, 1);
+		sessionMap.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
+		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API, sessionMap);
+		request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
+		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API, SESSION_ID_PREFIX + token);
+		return false;
+
+	}
+
+	protected boolean handleError(HttpServletRequest request, HttpServletResponse response, String errorMessage) {
 		if (httpErrorHandler != null
 				&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_UNAUTHORIZED, errorMessage))
 			return true;
