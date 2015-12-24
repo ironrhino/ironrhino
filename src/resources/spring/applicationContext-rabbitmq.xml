@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans profile="cloud,cluster" default-autowire="byName"
 	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:rabbit="http://www.springframework.org/schema/rabbit" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
-	<rabbit:connection-factory id="rabbitConnectionFactory"
-		host="${rabbitmq.host:localhost}" port="${rabbitmq.port:5672}"
-		username="${rabbitmq.username:guest}" password="${rabbitmq.password:guest}"
-		virtual-host="${rabbitmq.virtualHost:/}" />
-	<rabbit:template id="amqpTemplate" connection-factory="rabbitConnectionFactory" />
-	<rabbit:admin id="rabbitAdmin" connection-factory="rabbitConnectionFactory" />
-	<rabbit:listener-container
-		connection-factory="rabbitConnectionFactory">
-		<rabbit:listener queue-names="#{rabbitApplicationEventTopic.queueName}"
-			ref="rabbitApplicationEventTopic" method="subscribe" />
-	</rabbit:listener-container>
-	<bean id="rabbitApplicationEventTopic" class="org.ironrhino.core.event.RabbitApplicationEventTopic"
-		primary="true" />
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<import resource="classpath:org/ironrhino/core/spring/configuration/xml/applicationContext-rabbitmq.xml"/>
 </beans>

@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans profile="cloud,cluster" default-autowire="byName"
 	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:mongo="http://www.springframework.org/schema/data/mongo" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
-	<mongo:db-factory id="mongoDbFactory" host="${mongodb.host:localhost}" port="${mongodb.port:27017}" dbname="${mongodb.dbname:ironrhino}"/>
-	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate" primary="true">
-		<constructor-arg ref="mongoDbFactory" />
-	</bean>
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<import resource="classpath:org/ironrhino/core/spring/configuration/xml/applicationContext-mongodb.xml"/>
 </beans>
