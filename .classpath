@@ -75,10 +75,10 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.0.13.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.12.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.5.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.6.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.12.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.5.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.5.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-4.2.4.jar"/>
@@ -92,7 +92,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jms-4.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-4.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.2.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.5.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.5.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.1.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-4.0.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-4.0.3.jar"/>
