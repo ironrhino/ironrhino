@@ -12,6 +12,7 @@ import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component("lockService")
@@ -24,6 +25,7 @@ public class ZooKeeperLockService implements LockService {
 
 	private CuratorFramework curatorFramework;
 
+	@Value("${lockService.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
 	private ConcurrentHashMap<String, InterProcessMutex> locks = new ConcurrentHashMap<>();

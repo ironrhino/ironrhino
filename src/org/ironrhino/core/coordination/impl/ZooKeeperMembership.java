@@ -16,6 +16,7 @@ import org.ironrhino.core.coordination.Membership;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component("membership")
@@ -29,6 +30,7 @@ public class ZooKeeperMembership implements Membership {
 	@Autowired(required = false)
 	private List<LeaderChangeListener> leaderChangeListeners;
 
+	@Value("${membership.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
 	private ConcurrentHashMap<String, LeaderLatch> latchs = new ConcurrentHashMap<>();
