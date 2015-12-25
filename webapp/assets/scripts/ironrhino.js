@@ -32307,7 +32307,7 @@ Ajax = {
 				}
 			}
 		}
-		if (target && target.tagName == 'FORM') {
+		if (options.submitForm) {
 			if (!hasError && $(target).hasClass('disposable'))
 				setTimeout(function() {
 							$(':input', target).prop('disabled', true)
@@ -33239,7 +33239,7 @@ Observation.common = function(container) {
 				},
 				error : function() {
 					Form.focus(target);
-					if (target && target.tagName == 'FORM')
+					if (_opt.submitForm)
 						setTimeout(function() {
 									$('button[type="submit"]', target).prop(
 											'disabled', false);
@@ -33256,6 +33256,7 @@ Observation.common = function(container) {
 							'X-Data-Type' : 'json'
 						});
 			$(this).bind('submit', function(e) {
+						_opt.submitForm = true;
 						var form = $(this);
 						var btn = $('.clicked', form);
 						if (!btn.length)
