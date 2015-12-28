@@ -15,14 +15,14 @@ public interface HttpSessionManager extends HttpSessionStore {
 	String REQUEST_ATTRIBUTE_SESSION_TRACKER_IN_URL = "_session_tracker_in_url_";
 
 	String DEFAULT_SESSION_TRACKER_NAME = "T";
-	
+
 	String DEFAULT_SESSION_COOKIE_NAME = "s";
 
 	String DEFAULT_COOKIE_NAME_LOCALE = "locale";
 
 	int DEFAULT_LIFETIME = -1; // in seconds
 
-	int DEFAULT_MAXINACTIVEINTERVAL = 43200; // in seconds
+	int DEFAULT_MAXINACTIVEINTERVAL = 1800; // in seconds
 
 	int DEFAULT_MINACTIVEINTERVAL = 60;// in seconds
 
