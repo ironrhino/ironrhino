@@ -8,11 +8,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(Integer.MIN_VALUE)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class FirewallHandler extends AccessHandler {
 
 	public static final String KEY_ALLOWEDADDRPATTERN = "firewallHandler.allowedAddrPattern";

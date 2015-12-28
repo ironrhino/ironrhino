@@ -7,11 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(Integer.MIN_VALUE + 1)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class CorsHandler extends AccessHandler {
 
 	@Value("${cors.openForAllOrigin:false}")

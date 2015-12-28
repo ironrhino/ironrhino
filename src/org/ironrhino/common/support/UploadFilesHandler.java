@@ -20,7 +20,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(Integer.MIN_VALUE)
+@Order(2)
 public class UploadFilesHandler extends AccessHandler {
 
 	@Autowired

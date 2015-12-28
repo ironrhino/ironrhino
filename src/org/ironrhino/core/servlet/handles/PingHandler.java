@@ -7,11 +7,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.util.AppInfo;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(Integer.MIN_VALUE + 2)
+@Order(Ordered.HIGHEST_PRECEDENCE + 2)
 public class PingHandler extends AccessHandler {
 
 	@Override
