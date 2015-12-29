@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 public abstract class AbstractOAuthManager implements OAuthManager {
 
-	@Value("${oauth.authorization.lifetime:3600}")
+	@Value("${oauth.authorization.lifetime:" + DEFAULT_LIFE_TIME + "}")
 	protected int authorizationLifetime;
 
 	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")

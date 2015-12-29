@@ -10,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface OAuthManager {
 
-	long DEFAULT_EXPIRE_TIME = 14 * 24 * 3600;
+	int DEFAULT_LIFE_TIME = 3600;
+
+	int DEFAULT_EXPIRE_TIME = 14 * 24 * 3600;
 
 	public Authorization grant(Client client);
 
