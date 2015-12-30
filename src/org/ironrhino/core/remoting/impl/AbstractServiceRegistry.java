@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
+import org.springframework.web.context.ConfigurableWebApplicationContext;
 
 public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
@@ -47,6 +48,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	public void init() {
 		host = AppInfo.getHostAddress() + ":" + (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_PORT);
+		if (ctx instanceof ConfigurableWebApplicationContext) {
+			String ctxPath = ((ConfigurableWebApplicationContext) ctx).getServletContext().getContextPath();
+			if (!ctxPath.isEmpty())
+				host += ctxPath;
+		}
 		prepare();
 		String[] beanNames = ctx.getBeanDefinitionNames();
 		for (String beanName : beanNames) {

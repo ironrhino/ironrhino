@@ -64,8 +64,12 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		String path = new StringBuilder(servicesParentPath).append("/").append(serviceName).toString();
 		try {
 			List<String> children = curatorFramework.getChildren().watched().forPath(path);
-			if (children != null && children.size() > 0)
-				importServices.put(serviceName, new ArrayList<>(children));
+			if (children != null && children.size() > 0) {
+				List<String> hosts = new ArrayList<>(children.size());
+				for (String host : children)
+					hosts.add(unescapeSlash(host));
+				importServices.put(serviceName, hosts);
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -74,7 +78,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public void doRegister(String serviceName, String host) {
 		String path = new StringBuilder().append(servicesParentPath).append("/").append(serviceName).append("/")
-				.append(host).toString();
+				.append(escapeSlash(host)).toString();
 		try {
 			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path);
 		} catch (Exception e) {
@@ -93,7 +97,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	protected void writeDiscoveredServices() {
 		if (discoveredServices.size() == 0)
 			return;
-		String path = new StringBuilder().append(hostsParentPath).append("/").append(host).toString();
+		String path = new StringBuilder().append(hostsParentPath).append("/").append(escapeSlash(host)).toString();
 		byte[] data = JsonUtils.toJson(discoveredServices).getBytes();
 		try {
 			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).inBackground()
@@ -120,10 +124,11 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public Collection<String> getHostsForService(String service) {
 		try {
-			List<String> list = curatorFramework.getChildren().watched()
+			List<String> children = curatorFramework.getChildren().watched()
 					.forPath(new StringBuilder().append(servicesParentPath).append("/").append(service).toString());
-			List<String> hosts = new ArrayList<>(list.size());
-			hosts.addAll(list);
+			List<String> hosts = new ArrayList<>(children.size());
+			for (String host : children)
+				hosts.add(unescapeSlash(host));
 			Collections.sort(hosts);
 			return hosts;
 		} catch (Exception e) {
@@ -134,10 +139,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	@Override
 	public Map<String, String> getDiscoveredServices(String host) {
-		if (host.indexOf(':') < 0)
-			host += ":" + DEFAULT_PORT;
 		try {
-			String path = new StringBuilder().append(hostsParentPath).append("/").append(host).toString();
+			String path = new StringBuilder().append(hostsParentPath).append("/").append(escapeSlash(host)).toString();
 			byte[] data = curatorFramework.getData().forPath(path);
 			String sdata = new String(data);
 			Map<String, String> map = JsonUtils.fromJson(sdata, JsonUtils.STRING_MAP_TYPE);
@@ -163,7 +166,10 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public void onNodeChildrenChanged(String path, List<String> children) {
 		String serviceName = path.substring(servicesParentPath.length() + 1);
-		importServices.put(serviceName, new ArrayList<>(children));
+		List<String> hosts = new ArrayList<>(children.size());
+		for (String host : children)
+			hosts.add(unescapeSlash(host));
+		importServices.put(serviceName, hosts);
 	}
 
 	@Override
@@ -185,6 +191,14 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	protected boolean handle(InstanceLifecycleEvent event) {
 		return event instanceof ExportServicesEvent || event instanceof InstanceShutdownEvent;
 		// zookeeper has onNodeChildrenChanged
+	}
+
+	private static String escapeSlash(String host) {
+		return host.replaceAll("/", "\\$");
+	}
+
+	private static String unescapeSlash(String host) {
+		return host.replaceAll("\\$", "/");
 	}
 
 }

@@ -165,10 +165,6 @@ public class HessianClient extends HessianProxyFactoryBean {
 				String ho = serviceRegistry.discover(serviceName);
 				if (ho != null) {
 					sb.append(ho);
-					if (ho.indexOf(':') < 0 && port != 80) {
-						sb.append(':');
-						sb.append(port);
-					}
 					discoveredHost = ho;
 				} else {
 					sb.append("fakehost");
@@ -177,17 +173,15 @@ public class HessianClient extends HessianProxyFactoryBean {
 			} else {
 				sb.append("fakehost");
 			}
-
 		} else {
 			sb.append(host);
 			if (port != 80) {
 				sb.append(':');
 				sb.append(port);
 			}
+			if (StringUtils.isNotBlank(contextPath))
+				sb.append(contextPath);
 		}
-
-		if (StringUtils.isNotBlank(contextPath))
-			sb.append(contextPath);
 		sb.append("/remoting/hessian/");
 		sb.append(serviceName);
 		return sb.toString();
