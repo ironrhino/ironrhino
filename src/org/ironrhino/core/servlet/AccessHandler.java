@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class AccessHandler {
+public abstract class AccessHandler {
 
 	public String getPattern() {
 		return null;
@@ -15,8 +15,6 @@ public class AccessHandler {
 		return null;
 	}
 
-	public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		return false;
-	}
+	public abstract boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
 }
