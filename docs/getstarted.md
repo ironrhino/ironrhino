@@ -19,7 +19,7 @@ collation-server = utf8_general_ci
 3. 删除tomcat的webapps目录下所有文件, 修改bin/catalina.bat设置JVM参数, 修改bin/startup.bat , 在最后一行的 start 前面增加 jpda  ,这样以开启远程调试方式启动, 为了性能请不要在生产环境开启远程调试功能
 4. 设置环境变量 **STAGE=DEVELOPMENT** 此设置可以让很多情况不需重启即可看到效果, 为了性能请不要在生产环境设置
 
-## 运行演示工程
+##运行演示工程
 1. 在eclipse的workspace目录里面执行 `git clone --depth 1 https://github.com/ironrhino/ironrhino.git`
 2. 将ironrhino工程导入eclipse刷新工程确保无编译错误
 3. 在tomcat的conf目录下增加一个xml文件, 路径为conf/Catalina/localhost/ROOT.xml  ```
@@ -27,8 +27,14 @@ collation-server = utf8_general_ci
 ```路径请根据自己的真实情况修改, 然后运行bin/startup.bat 启动tomcat
 4. 浏览器访问 http://localhost:8080/setup , 设置系统管理员用户名和密码
 
-## 创建自有工程
+##创建自有工程
 1. 在ironrhino工程目录下运行 `ant create -Dproject.name=demo` , 这样会在同一个workspace下面创建一个demo工程,将新创建的工程导入到eclipse
 2. 进入到demo工程目录下执行 `ant sync`, 刷新eclipse里面的工程确保无编译错误
 3. 修改tomcat的ROOT.xml, 将docBase指向demo工程后启动tomcat
 4. 浏览器访问 http://localhost:8080/setup , 设置系统管理员用户名和密码
+
+##构建部署WAR包
+使用ant构建, 提供三种方式打包, 执行之后会在工程的target目录下生成`ROOT.war`
+1. `ant war`  会将*ironrhino-assets.jar*里面的静态资源文件释放出来放到工程里面的*assets*, 方便将*assets*直接通过web服务器比如nginx访问或者放到专门的CDN, 这种方式适用面最广 
+2. `ant war2` 会有一部分*assets*下面的静态资源文件在jar包里面, 相比第一种方式会紧凑一些
+3. `ant war-standalone` 在第二种方式基础上内嵌了*jetty*做为服务器, 可以通过 `java -jar ROOT.war` 方式直接运行不需要额外的应用服务器,默认用8080端口访问,可以指定系统属性以其他端口启动,比如 `java -jar -Dport.http=80 ROOT.war` , 这种方式适合做demo演示
