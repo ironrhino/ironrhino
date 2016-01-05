@@ -1,0 +1,47 @@
+= 参数配置
+
+:toc:
+
+== 目标
+**一份代码到处运行**, 从版本库里面的获取的代码, 不经任何修改构建出来的部署包, 在不同的环境下通用, 可以预防生产环境误用开发测试的配置, 降低上线的风险.
+
+== 实现方式
+. **约定优于配置**
+使用约定好的类名和路径和文件名等, 跟随直观感觉即可得知映射结果, 去除中间配置环节, 这样既可以减少工作量, 更可以杜绝中间配置里的乌龙, 这种问题通常是一个坑.
+. **提供默认行为**
+每一个配置项都给定一个适用面最广的默认值, 应用系统如需个性化配置, 在自己的配置文件里面指定新的值来覆盖配置项. 让应用系统在全新的环境可以快速搭建并启动起来.
+. **将与环境相关的配置外化到本地配置文件**
+比如 `jdbc.username` `jdbc.password` ,这两个是连接数据库的用户名和密码, 通常情况下生产环境跟开发测试环境使用不一样的值, 每个开发人员本地的环境可能也是不一样的值, 这就需要把这两个配置参数在本地配置文件里面指定自己的值来覆盖默认值.
+
+== 配置文件说明
+. 应用启动需要用到的配置文件 `classpath:ironrhino.properties`, 在里面指定应用的名称和应用的基础包名, 这些参数在应用启动之前就需要用到并且是跟环境无关, 示例如下:
+[source,properties]
+app.name=demo
+app.basePackage=com.demo
+
+. 可在不同环境下覆盖配置项的配置文件, 主要是给spring容器用, 所以命名也是 `applicationContext.properties`, 一共有四个配置文件, 都是可选的, 后面文件的配置项覆盖前面文件里面的配置项.
+* classpath:resources/spring/applicationContext.properties
+* classpath:resources/spring/applicationContext.${STAGE}.properties
+* file:${app.home}/conf/applicationContext.properties
+* file:\${app.home}/conf/applicationContext.${STAGE}.properties
+
+`app.home` 是用户目录 `user.home` 下面的子目录 `app.name`, 比如 `/home/app/demo`, 请注意不同操作系统下 `user.home` 路径不一样
+`STAGE` 有四个可选值 `DEVELOPMENT` `TEST` `PREPARATION` `PRODUCTION` , 有环境变量决定, 默认是 `PRODUCTION`
+
+前面两个文件是在工程源码里面, 可以放一些比较通用跟环境弱相关的配置项并且用来提交到版本库, 后面两个文件是用来放跟环境强相关的配置项,  这样将配置项划分成两部分用来实现一份代码到处运行的目标.
+这几个文件最终合并成的Properties给spring作为placeholder用:
+[source,java]
+.java方式
+----
+@Value("${jdbc.username:root}")
+private String username;
+
+@Value("${jdbc.password:}")
+private String password;
+----
+[source,xml]
+.xml方式
+----
+<property name="username" value="${jdbc.username:root}" />
+<property name="password" value="${jdbc.password:}" />
+----

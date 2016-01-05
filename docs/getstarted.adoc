@@ -1,0 +1,44 @@
+= 新手入门
+
+:toc:
+
+== 准备所需软件
+- **JDK** : 最低版本要求1.7推荐使用1.8, 如使用1.7请使用 https://github.com/ironrhino/ironrhino/tree/1.x[1.x] 分支
+- **Tomcat** : 最低版本要求7.0推荐使用8.0, 其他实现了Servlet3.0规范的应用服务器也可以
+- **MySQL** : 最低版本要求5.0推荐使用5.7, 若使用其他数据库则需自行引入相应的数据库JDBC驱动
+- **Ant** :  ironhino用ant作为构建工具, 并未采用maven或gradle
+- **Git** : 需要从github上拉取 https://github.com/ironrhino/ironrhino.git[ironrhino]
+-  **Eclipse** :  不用IDE或者用其他IDE的请略过, 不推荐 for Java EE 版本, for Java 版本即可, 推荐安装插件 Properties Editor 和 FreeMarker IDE
+-  **Chrome** : 或其他非IE浏览器, IE需要9.0+
+
+== 设置环境参数
+. 设置环境变量 **JAVA_HOME** **ANT_HOME** **PATH**等
+. 确保MySQL的root用户密码为空,否则需要在自己的applicationContext.properties文件里面指定用户名和密码, 修改配置文件增加两行修改默认字符集为UTF8以支持中文
+[source]
+character-set-server = utf8
+collation-server = utf8_general_ci
+
+. 删除tomcat的webapps目录下所有文件, 修改bin/catalina.bat设置JVM参数, 修改bin/startup.bat , 在最后一行的 start 前面增加 jpda  ,这样以开启远程调试方式启动, 为了性能请不要在生产环境开启远程调试功能
+. 设置环境变量 **STAGE=DEVELOPMENT** 此设置可以让很多情况不需重启即可看到效果, 为了性能请不要在生产环境设置
+
+== 运行演示工程
+. 在eclipse的workspace目录里面执行 `git clone --depth 1 https://github.com/ironrhino/ironrhino.git`
+. 将ironrhino工程导入eclipse刷新工程确保无编译错误
+. 在tomcat的conf目录下增加一个文件 `conf/Catalina/localhost/ROOT.xml`
+[source,xml]
+<Context docBase="D:/workspace/ironrhino/webapp" reloadable="false"/>
+
+. 浏览器访问 http://localhost:8080/setup , 设置系统管理员用户名和密码
+
+== 创建自有工程
+. 在ironrhino工程目录下运行 `ant create -Dproject.name=demo` , 这样会在同一个workspace下面创建一个demo工程,将新创建的工程导入到eclipse
+. 进入到demo工程目录下执行 `ant sync`, 刷新eclipse里面的工程确保无编译错误
+. 修改tomcat的ROOT.xml, 将docBase指向demo工程后启动tomcat
+. 浏览器访问 http://localhost:8080/setup , 设置系统管理员用户名和密码
+
+== 构建部署WAR包
+使用ant构建, 提供三种方式打包, 执行之后会在工程的target目录下生成 `ROOT.war`
+
+. `ant war`  会将*ironrhino-assets.jar*里面的静态资源文件释放出来放到工程里面的*assets*, 方便将*assets*直接通过web服务器比如nginx访问或者放到专门的CDN, 这种方式适用面最广
+. `ant war2` 会有一部分*assets*下面的静态资源文件在jar包里面, 相比第一种方式会紧凑一些
+. `ant war-standalone` 在第二种方式基础上内嵌了*jetty*做为服务器, 可以通过 `java -jar ROOT.war` 方式直接运行不需要额外的应用服务器,默认用8080端口访问,可以指定系统属性以其他端口启动,比如 `java -jar -Dport.http=80 ROOT.war` , 这种方式适合做demo演示
