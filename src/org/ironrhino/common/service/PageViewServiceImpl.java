@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -81,12 +82,6 @@ public class PageViewServiceImpl implements PageViewService {
 		sb.append(":");
 		String prefix = sb.toString();
 		String key = DateUtils.format(date, "yyyyMMddHH");
-		stringRedisTemplate.opsForValue().increment(prefix + key, 1);
-		key = DateUtils.formatDate8(date);
-		stringRedisTemplate.opsForValue().increment(prefix + key, 1);
-		key = DateUtils.format(date, "yyyyMM");
-		stringRedisTemplate.opsForValue().increment(prefix + key, 1);
-		key = DateUtils.format(date, "yyyy");
 		stringRedisTemplate.opsForValue().increment(prefix + key, 1);
 	}
 
@@ -305,12 +300,26 @@ public class PageViewServiceImpl implements PageViewService {
 		if (StringUtils.isNotBlank(domain))
 			sb.append(domain).append(":");
 		sb.append(type);
-		if (key != null)
+		if (key != null) {
 			sb.append(":").append(key);
-		String value = stringRedisTemplate.opsForValue().get(sb.toString());
-		if (value != null)
-			return Long.valueOf(value);
-		return 0;
+			String prefix = sb.toString();
+			String value = stringRedisTemplate.opsForValue().get(prefix);
+			if (value != null) {
+				return Long.valueOf(value);
+			} else {
+				Set<String> keys = stringRedisTemplate.keys(prefix + "*");
+				List<String> results = stringRedisTemplate.opsForValue().multiGet(keys);
+				long count = 0;
+				for (String str : results)
+					count += Long.valueOf(str);
+				return count;
+			}
+		} else {
+			String value = stringRedisTemplate.opsForValue().get(sb.toString());
+			if (value != null)
+				return Long.valueOf(value);
+			return 0;
+		}
 	}
 
 	private Pair<String, Long> getMax(String type, String domain) {
