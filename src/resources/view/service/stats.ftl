@@ -28,7 +28,7 @@ div.section ul{
 <script src="<@url value="/assets/components/flot/jquery.flot.time.js"/>" type="text/javascript"></script>
 <script src="<@url value="/assets/components/flot/ironrhino.flot.js"/>" type="text/javascript"></script>
 <script>
-function toggleUrl(url,clientSide){
+function toggleUrl(url,type){
 	if (url.indexOf('?') > 0) {
 		var uri = url.substring(0, url.indexOf('?'));
 		var query = url.substring(url.indexOf('?') + 1);
@@ -36,31 +36,31 @@ function toggleUrl(url,clientSide){
 		var arr = [];
 		for (var i = 0; i < params.length; i++) {
 			var arr2 = params[i].split('=', 2);
-			if (arr2[0] == 'clientSide') {
+			if (arr2[0] == 'type') {
 				continue;
 			} else {
 				arr.push(params[i]);
 			}
 		}
-		arr.push('clientSide=' + clientSide);
+		arr.push('type=' + type);
 		url = uri + '?' + arr.join('&');
 	} else {
-		url += '?clientSide=' + clientSide;
+		url += '?type=' + type;
 	}
 	return url;
 }
 Initialization.stats = function() {
 	$('#side button').click(function() {
-				var clientSide = $(this).data('side')=='client';
+				var type = $(this).data('type');
 				$('a.ajax.view').each(function(){
-					this.href = toggleUrl(this.href,clientSide);
+					this.href = toggleUrl(this.href,type);
 				});
 				$('form.ajax.view').each(function(){
-					this.action = toggleUrl(this.action,clientSide);
+					this.action = toggleUrl(this.action,type);
 				});
 				$('.ajaxpanel').each(function() {
 					var t = $(this);
-					t.data('url', toggleUrl(t.data('url'),clientSide));
+					t.data('url', toggleUrl(t.data('url'),type));
 					t.trigger('load');
 				});
 			});
@@ -71,8 +71,9 @@ Initialization.stats = function() {
 
 <div class="row">
 	<div id="side" class="btn-group btn-switch span2 offset5" style="margin-bottom:10px;">
-	  <button class="btn<#if !clientSide> active</#if>" data-side="server">Server Side</button>
-	  <button class="btn<#if clientSide> active</#if>" data-side="client">Client Side</button>
+	<#list statics['org.ironrhino.core.remoting.StatsType'].values() as var>
+	  <button class="btn<#if !type??||type.name()==var.name()> active</#if>" data-type="${var.name()}">${var}</button>
+	</#list>  
 	</div>
 </div>
 

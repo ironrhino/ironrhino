@@ -11,6 +11,7 @@ import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.remoting.ServiceStats;
+import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.DateUtils;
@@ -38,7 +39,7 @@ public class StatsAction extends BaseAction {
 
 	private String method;
 
-	private boolean clientSide;
+	private StatsType type = StatsType.SERVER_SIDE;
 
 	private Map<String, Set<String>> services;
 
@@ -61,12 +62,12 @@ public class StatsAction extends BaseAction {
 		this.method = method;
 	}
 
-	public boolean isClientSide() {
-		return clientSide;
+	public StatsType getType() {
+		return type;
 	}
 
-	public void setClientSide(boolean clientSide) {
-		this.clientSide = clientSide;
+	public void setType(StatsType type) {
+		this.type = type;
 	}
 
 	public Map<String, Set<String>> getServices() {
@@ -121,14 +122,14 @@ public class StatsAction extends BaseAction {
 			Date date = from;
 			while (!date.after(to)) {
 				String key = DateUtils.formatDate8(date);
-				Long value = serviceStats.getCount(serviceName, method, key, clientSide);
+				Long value = serviceStats.getCount(serviceName, method, key, type);
 				dataList.add(new Pair<>(date, value));
 				date = DateUtils.addDays(date, 1);
 			}
-			Pair<String, Long> p = serviceStats.getMaxCount(serviceName, method, clientSide);
+			Pair<String, Long> p = serviceStats.getMaxCount(serviceName, method, type);
 			if (p != null)
 				max = new Pair<>(DateUtils.parseDate8(p.getA()), p.getB());
-			long value = serviceStats.getCount(serviceName, method, null, clientSide);
+			long value = serviceStats.getCount(serviceName, method, null, type);
 			if (value > 0)
 				total = value;
 			return "linechart";
@@ -143,7 +144,7 @@ public class StatsAction extends BaseAction {
 				if (cal.getTime().before(new Date())) {
 					Date d = cal.getTime();
 					String key = DateUtils.format(d, "yyyyMMddHH");
-					Long value = serviceStats.getCount(serviceName, method, key, clientSide);
+					Long value = serviceStats.getCount(serviceName, method, key, type);
 					Calendar c = Calendar.getInstance();
 					c.setTime(d);
 					c.set(Calendar.MINUTE, 30);

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.remoting.ServiceStats;
+import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class StandaloneServiceStats implements ServiceStats {
 
 	@Override
-	public void emit(String serviceName, String method, long time, boolean failed, boolean clientSide) {
+	public void emit(String serviceName, String method, long time, StatsType type) {
 
 	}
 
@@ -26,12 +27,12 @@ public class StandaloneServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public long getCount(String serviceName, String method, String key, boolean clientSide) {
+	public long getCount(String serviceName, String method, String key, StatsType type) {
 		return 0;
 	}
-	
+
 	@Override
-	public Pair<String, Long> getMaxCount(String serviceName, String method, boolean clientSide){
+	public Pair<String, Long> getMaxCount(String serviceName, String method, StatsType type) {
 		return null;
 	}
 

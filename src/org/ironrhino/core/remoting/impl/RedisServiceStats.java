@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.remoting.ServiceStats;
+import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
@@ -39,18 +40,12 @@ public class RedisServiceStats implements ServiceStats {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static final String NAMESPACE = "remoting:stats:";
-	private static final String NAMESPACE_SERVICES = "remoting:stats:services:";
-	private static final String NAMESPACE_SERVER_SIDE = NAMESPACE + "server:";
-	private static final String NAMESPACE_CLIENT_SIDE = NAMESPACE + "client:";
+	private static final String NAMESPACE_SERVICES = NAMESPACE + "services:";
 
 	@Value("${serviceStats.archive.days:7}")
 	private int days = 7;
 
 	private RedisTemplate<String, String> stringRedisTemplate;
-
-	private ConcurrentHashMap<String, Map<String, AtomicInteger>> serverSideBuffer = new ConcurrentHashMap<>();
-
-	private ConcurrentHashMap<String, Map<String, AtomicInteger>> clientSideBuffer = new ConcurrentHashMap<>();
 
 	@Autowired
 	public RedisServiceStats(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
@@ -58,8 +53,10 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public void emit(String serviceName, String method, long time, boolean failed, boolean clientSide) {
-		emit(serviceName, method, clientSide);
+	public void emit(String serviceName, String method, long time, StatsType type) {
+		emit(serviceName, method, type.getBuffer());
+		if (type == StatsType.CLIENT_FAILED)
+			emit(serviceName, method, StatsType.CLIENT_SIDE.getBuffer());
 	}
 
 	@Override
@@ -75,8 +72,8 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public long getCount(String serviceName, String method, String key, boolean clientSide) {
-		StringBuilder sb = new StringBuilder(clientSide ? NAMESPACE_CLIENT_SIDE : NAMESPACE_SERVER_SIDE);
+	public long getCount(String serviceName, String method, String key, StatsType type) {
+		StringBuilder sb = new StringBuilder(getNameSpace(type));
 		sb.append(serviceName).append(".").append(method);
 		if (key != null) {
 			sb.append(":").append(key);
@@ -101,8 +98,8 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public Pair<String, Long> getMaxCount(String serviceName, String method, boolean clientSide) {
-		String key = (clientSide ? NAMESPACE_CLIENT_SIDE : NAMESPACE_SERVER_SIDE) + "max";
+	public Pair<String, Long> getMaxCount(String serviceName, String method, StatsType type) {
+		String key = getNameSpace(type) + "max";
 		String service = serviceName + "." + method;
 		String str = (String) stringRedisTemplate.opsForHash().get(key, service);
 		if (StringUtils.isNotBlank(str)) {
@@ -110,15 +107,14 @@ public class RedisServiceStats implements ServiceStats {
 			return new Pair<>(arr[0], Long.valueOf(arr[1]));
 		} else {
 			String today = DateUtils.formatDate8(new Date());
-			long count = getCount(serviceName, method, today, clientSide);
+			long count = getCount(serviceName, method, today, type);
 			if (count > 0)
 				return new Pair<>(today, count);
 		}
 		return null;
 	}
 
-	private void emit(String serviceName, String method, boolean clientSide) {
-		ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer = clientSide ? clientSideBuffer : serverSideBuffer;
+	private void emit(String serviceName, String method, ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer) {
 		Map<String, AtomicInteger> map = buffer.get(serviceName);
 		if (map == null) {
 			Map<String, AtomicInteger> temp = new ConcurrentHashMap<>();
@@ -135,18 +131,17 @@ public class RedisServiceStats implements ServiceStats {
 				ai = ai2;
 		}
 		ai.incrementAndGet();
-
 	}
 
 	@Scheduled(initialDelayString = "${serviceStats.flush.fixedRate:60000}", fixedRateString = "${serviceStats.flush.fixedRate:60000}")
 	@PreDestroy
 	public void flush() {
-		flush(false);
-		flush(true);
+		for (StatsType type : StatsType.values())
+			flush(type);
 	}
 
-	private void flush(boolean clientSide) {
-		ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer = clientSide ? clientSideBuffer : serverSideBuffer;
+	private void flush(StatsType type) {
+		ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer = type.getBuffer();
 		for (Map.Entry<String, Map<String, AtomicInteger>> entry : buffer.entrySet()) {
 			stringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + entry.getKey(),
 					entry.getValue().keySet().toArray(new String[0]));
@@ -154,16 +149,16 @@ public class RedisServiceStats implements ServiceStats {
 				AtomicInteger ai = entry2.getValue();
 				int count = ai.get();
 				if (count > 0) {
-					increment(entry.getKey(), entry2.getKey(), count, clientSide);
+					increment(entry.getKey(), entry2.getKey(), count, type);
 					ai.addAndGet(-count);
 				}
 			}
 		}
 	}
 
-	private void increment(String serviceName, String method, int count, boolean clientSide) {
+	private void increment(String serviceName, String method, int count, StatsType type) {
 		Date date = new Date();
-		StringBuilder sb = new StringBuilder(clientSide ? NAMESPACE_CLIENT_SIDE : NAMESPACE_SERVER_SIDE);
+		StringBuilder sb = new StringBuilder(getNameSpace(type));
 		sb.append(serviceName).append(".").append(method);
 		stringRedisTemplate.opsForValue().increment(sb.toString(), count);
 		sb.append(":");
@@ -182,16 +177,16 @@ public class RedisServiceStats implements ServiceStats {
 		for (Map.Entry<String, Set<String>> entry : getServices().entrySet()) {
 			String serviceName = entry.getKey();
 			for (String method : entry.getValue()) {
-				updateMax(serviceName, method, false);
-				updateMax(serviceName, method, true);
-				archive(serviceName, method, day, false);
-				archive(serviceName, method, day, true);
+				for (StatsType type : StatsType.values()) {
+					updateMax(serviceName, method, type);
+					archive(serviceName, method, day, type);
+				}
 			}
 		}
 	}
 
-	private void archive(String serviceName, String method, String day, boolean clientSide) {
-		StringBuilder sb = new StringBuilder(clientSide ? NAMESPACE_CLIENT_SIDE : NAMESPACE_SERVER_SIDE);
+	private void archive(String serviceName, String method, String day, StatsType type) {
+		StringBuilder sb = new StringBuilder(getNameSpace(type));
 		sb.append(serviceName).append(".").append(method);
 		sb.append(":").append(day);
 		String prefix = sb.toString();
@@ -207,11 +202,11 @@ public class RedisServiceStats implements ServiceStats {
 		}
 	}
 
-	private void updateMax(String serviceName, String method, boolean clientSide) {
+	private void updateMax(String serviceName, String method, StatsType type) {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_YEAR, -1);
 		String yesterday = DateUtils.formatDate8(cal.getTime());
-		StringBuilder sb = new StringBuilder(clientSide ? NAMESPACE_CLIENT_SIDE : NAMESPACE_SERVER_SIDE);
+		StringBuilder sb = new StringBuilder(getNameSpace(type));
 		sb.append(serviceName).append(".").append(method);
 		sb.append(":").append(yesterday);
 		String prefix = sb.toString();
@@ -221,7 +216,7 @@ public class RedisServiceStats implements ServiceStats {
 		for (String str : results)
 			count += Long.valueOf(str);
 		if (count > 0) {
-			String key = (clientSide ? NAMESPACE_CLIENT_SIDE : NAMESPACE_SERVER_SIDE) + "max";
+			String key = getNameSpace(type) + "max";
 			String service = serviceName + "." + method;
 			String str = (String) stringRedisTemplate.opsForHash().get(key, service);
 			if (StringUtils.isNotBlank(str)) {
@@ -232,6 +227,10 @@ public class RedisServiceStats implements ServiceStats {
 				stringRedisTemplate.opsForHash().put(key, service, yesterday + "," + count);
 			}
 		}
+	}
+
+	private static String getNameSpace(StatsType type) {
+		return NAMESPACE + type.getNamespace() + ":";
 	}
 
 }

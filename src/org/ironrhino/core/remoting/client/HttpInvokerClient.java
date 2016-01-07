@@ -4,6 +4,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
+import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
@@ -149,13 +150,13 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 			Object result = super.invoke(invocation);
 			if (serviceStats != null) {
 				serviceStats.emit(getServiceInterface().getName(), method.toString(), System.currentTimeMillis() - time,
-						false, true);
+						StatsType.CLIENT_SIDE);
 			}
 			return result;
 		} catch (RemoteAccessException e) {
 			if (serviceStats != null) {
 				serviceStats.emit(getServiceInterface().getName(), method.toString(), System.currentTimeMillis() - time,
-						true, true);
+						StatsType.CLIENT_FAILED);
 			}
 			if (--attempts < 1)
 				throw e;
