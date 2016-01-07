@@ -3,6 +3,7 @@ package org.ironrhino.core.remoting.impl;
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,13 +28,18 @@ public class StandaloneServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public long getCount(String serviceName, String method, String key, StatsType type) {
+	public long getCount(String service, String key, StatsType type) {
 		return 0;
 	}
 
 	@Override
-	public Pair<String, Long> getMaxCount(String serviceName, String method, StatsType type) {
+	public Pair<String, Long> getMaxCount(String service, StatsType type) {
 		return null;
+	}
+
+	@Override
+	public List<String> findHotspots(int limit) {
+		return Collections.emptyList();
 	}
 
 }

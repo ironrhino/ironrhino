@@ -82,11 +82,27 @@ Initialization.stats = function() {
 <#if request.queryString?has_content>
 <#list request.queryString?split('&') as pair>
 	<#assign name=pair?keep_before('=')>
-	<#if name!='_'&&name!='serviceName'&&name!='method'>
+	<#if name!='_'&&name!='service'>
 		<#assign baseurl+=baseurl?contains('?')?then('&','?')+pair>
 	</#if>
 </#list>
 </#if>
+ <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#services-accordion" href="#service-hotspots">
+     	<h4>${action.getText('hotspots')}</h4>
+      </a>
+    </div>
+    <div id="service-hotspots" class="accordion-body collapse<#if !service??> in</#if>">
+      <div class="accordion-inner">
+        <ul class="nav nav-list">
+        	<#list hotspots as var>
+			<li><#assign href=baseurl+baseurl?contains('?')?then('&','?')+'service='+var?url/><a href="<@url value="${href}"/>" class="ajax view" data-replacement="count">${var}</a></li>
+			</#list>
+		</ul>
+      </div>
+    </div>
+  </div>
 <#list services.entrySet() as entry>	
   <div class="accordion-group">
     <div class="accordion-heading">
@@ -94,11 +110,11 @@ Initialization.stats = function() {
      	<h4>${entry.key}</h4>
       </a>
     </div>
-    <div id="service-${entry?index}" class="accordion-body collapse<#if serviceName?? && serviceName==entry.key> in</#if>">
+    <div id="service-${entry?index}" class="accordion-body collapse<#if service?? && service?keep_before_last('(')?keep_before_last('.')==entry.key> in</#if>">
       <div class="accordion-inner">
         <ul class="nav nav-list">
         	<#list entry.value as var>
-			<li<#if serviceName?? && serviceName==entry.key && method?? && method==var> class="active"</#if>><#assign href=baseurl+baseurl?contains('?')?then('&','?')+'serviceName='+entry.key?url+'&method='+var?url/><a href="<@url value="${href}"/>" class="ajax view" data-replacement="count">${var}</a></li>
+			<li><#assign href=baseurl+baseurl?contains('?')?then('&','?')+'service='+(entry.key+'.'+var)?url/><a href="<@url value="${href}"/>" class="ajax view" data-replacement="count">${var}</a></li>
 			</#list>
 		</ul>
       </div>
@@ -108,10 +124,10 @@ Initialization.stats = function() {
  </div> 
 		  
 
-<div id="count" class="section count"><#if serviceName?has_content && method?has_content>
+<div id="count" class="section count"><#if service?has_content>
 <div class="row-fluid">
 <div class="span12">
-<strong>${serviceName}.${method}</strong>
+<strong>${service}</strong>
 </div>
 </div>
 <div class="row-fluid">

@@ -4,6 +4,7 @@ import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +42,7 @@ public class RedisServiceStats implements ServiceStats {
 
 	private static final String NAMESPACE = "remoting:stats:";
 	private static final String NAMESPACE_SERVICES = NAMESPACE + "services:";
+	private static final String KEY_HOTSPOTS = NAMESPACE + "hotspots";
 
 	@Value("${serviceStats.archive.days:7}")
 	private int days = 7;
@@ -72,9 +74,9 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public long getCount(String serviceName, String method, String key, StatsType type) {
+	public long getCount(String service, String key, StatsType type) {
 		StringBuilder sb = new StringBuilder(getNameSpace(type));
-		sb.append(serviceName).append(".").append(method);
+		sb.append(service);
 		if (key != null) {
 			sb.append(":").append(key);
 			String prefix = sb.toString();
@@ -98,20 +100,24 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public Pair<String, Long> getMaxCount(String serviceName, String method, StatsType type) {
+	public Pair<String, Long> getMaxCount(String service, StatsType type) {
 		String key = getNameSpace(type) + "max";
-		String service = serviceName + "." + method;
 		String str = (String) stringRedisTemplate.opsForHash().get(key, service);
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split(",");
 			return new Pair<>(arr[0], Long.valueOf(arr[1]));
 		} else {
 			String today = DateUtils.formatDate8(new Date());
-			long count = getCount(serviceName, method, today, type);
+			long count = getCount(service, today, type);
 			if (count > 0)
 				return new Pair<>(today, count);
 		}
 		return null;
+	}
+
+	@Override
+	public List<String> findHotspots(int limit) {
+		return new ArrayList<>(stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS).reverseRange(0, limit - 1));
 	}
 
 	private void emit(String serviceName, String method, ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer) {
@@ -164,12 +170,15 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(":");
 		sb.append(DateUtils.format(date, "yyyyMMddHH"));
 		stringRedisTemplate.opsForValue().increment(sb.toString(), count);
+		if (type == StatsType.SERVER_SIDE)
+			stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS).incrementScore(serviceName + "." + method, count);
 	}
 
 	@Trigger
 	@Scheduled(cron = "${serviceStats.archive.cron:0 1 0 * * ?}")
 	@Mutex
 	public void archive() {
+		stringRedisTemplate.delete(KEY_HOTSPOTS);
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DAY_OF_YEAR, -days);
 		Date date = cal.getTime();

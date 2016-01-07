@@ -29,37 +29,31 @@ public class StatsAction extends BaseAction {
 
 	private Date to;
 
+	private int limit = 10;
+
 	private List<Pair<Date, Long>> dataList;
 
 	private Pair<Date, Long> max;
 
 	private Long total;
 
-	private String serviceName;
-
-	private String method;
+	private String service;
 
 	private StatsType type = StatsType.SERVER_SIDE;
 
 	private Map<String, Set<String>> services;
 
+	private List<String> hotspots;
+
 	@Autowired
 	private transient ServiceStats serviceStats;
 
-	public String getServiceName() {
-		return serviceName;
+	public String getService() {
+		return service;
 	}
 
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-	}
-
-	public String getMethod() {
-		return method;
-	}
-
-	public void setMethod(String method) {
-		this.method = method;
+	public void setService(String service) {
+		this.service = service;
 	}
 
 	public StatsType getType() {
@@ -72,6 +66,10 @@ public class StatsAction extends BaseAction {
 
 	public Map<String, Set<String>> getServices() {
 		return services;
+	}
+
+	public List<String> getHotspots() {
+		return hotspots;
 	}
 
 	public Date getDate() {
@@ -98,6 +96,14 @@ public class StatsAction extends BaseAction {
 		this.to = to;
 	}
 
+	public int getLimit() {
+		return limit;
+	}
+
+	public void setLimit(int limit) {
+		this.limit = limit;
+	}
+
 	public List<Pair<Date, Long>> getDataList() {
 		return dataList;
 	}
@@ -113,6 +119,7 @@ public class StatsAction extends BaseAction {
 	@Override
 	public String execute() {
 		services = serviceStats.getServices();
+		hotspots = serviceStats.findHotspots(limit);
 		return SUCCESS;
 	}
 
@@ -122,14 +129,14 @@ public class StatsAction extends BaseAction {
 			Date date = from;
 			while (!date.after(to)) {
 				String key = DateUtils.formatDate8(date);
-				Long value = serviceStats.getCount(serviceName, method, key, type);
+				Long value = serviceStats.getCount(service, key, type);
 				dataList.add(new Pair<>(date, value));
 				date = DateUtils.addDays(date, 1);
 			}
-			Pair<String, Long> p = serviceStats.getMaxCount(serviceName, method, type);
+			Pair<String, Long> p = serviceStats.getMaxCount(service, type);
 			if (p != null)
 				max = new Pair<>(DateUtils.parseDate8(p.getA()), p.getB());
-			long value = serviceStats.getCount(serviceName, method, null, type);
+			long value = serviceStats.getCount(service, null, type);
 			if (value > 0)
 				total = value;
 			return "linechart";
@@ -144,7 +151,7 @@ public class StatsAction extends BaseAction {
 				if (cal.getTime().before(new Date())) {
 					Date d = cal.getTime();
 					String key = DateUtils.format(d, "yyyyMMddHH");
-					Long value = serviceStats.getCount(serviceName, method, key, type);
+					Long value = serviceStats.getCount(service, key, type);
 					Calendar c = Calendar.getInstance();
 					c.setTime(d);
 					c.set(Calendar.MINUTE, 30);

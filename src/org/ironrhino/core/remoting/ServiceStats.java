@@ -1,5 +1,6 @@
 package org.ironrhino.core.remoting;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,8 +12,10 @@ public interface ServiceStats {
 
 	public Map<String, Set<String>> getServices();
 
-	public Pair<String, Long> getMaxCount(String serviceName, String method, StatsType type);
+	public Pair<String, Long> getMaxCount(String service, StatsType type);
 
-	public long getCount(String serviceName, String method, String key, StatsType type);
+	public long getCount(String service, String key, StatsType type);
+
+	public List<String> findHotspots(int limit);
 
 }
