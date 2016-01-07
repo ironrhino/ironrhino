@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.remoting.FstHttpInvokerSerializationHelper;
 import org.ironrhino.core.remoting.ServiceRegistry;
+import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +44,15 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
+	@Autowired(required = false)
+	private ServiceStats serviceStats;
+
 	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
 		this.serviceRegistry = serviceRegistry;
+	}
+
+	public void setServiceStats(ServiceStats serviceStat) {
+		this.serviceStats = serviceStat;
 	}
 
 	@Override
@@ -66,6 +74,17 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
 				time = System.currentTimeMillis() - time;
 				writeRemoteInvocationResult(request, response, result);
+				if (serviceStats != null) {
+					StringBuilder method = new StringBuilder(invocation.getMethodName()).append("(");
+					Class<?>[] parameterTypes = invocation.getParameterTypes();
+					for (int i = 0; i < parameterTypes.length; i++) {
+						method.append(parameterTypes[i].getName());
+						if (i < parameterTypes.length - 1)
+							method.append(',');
+					}
+					method.append(")");
+					serviceStats.emit(interfaceName, method.toString(), time, false, false);
+				}
 				if (loggingPayload) {
 					MDC.remove("url");
 					if (!result.hasException()) {

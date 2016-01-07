@@ -3,6 +3,7 @@ package org.ironrhino.core.remoting.client;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
+import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
@@ -27,6 +28,9 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
+
+	@Autowired(required = false)
+	private ServiceStats serviceStats;
 
 	private String host;
 
@@ -66,6 +70,10 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 
 	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
 		this.serviceRegistry = serviceRegistry;
+	}
+
+	public void setServiceStats(ServiceStats serviceStat) {
+		this.serviceStats = serviceStat;
 	}
 
 	public boolean isUseFstSerialization() {
@@ -124,9 +132,31 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 	}
 
 	public Object invoke(MethodInvocation invocation, int attempts) throws Throwable {
+		String method = null;
+		if (serviceStats != null) {
+			StringBuilder sb = new StringBuilder(invocation.getMethod().getName()).append("(");
+			Class<?>[] parameterTypes = invocation.getMethod().getParameterTypes();
+			for (int i = 0; i < parameterTypes.length; i++) {
+				sb.append(parameterTypes[i].getName());
+				if (i < parameterTypes.length - 1)
+					sb.append(',');
+			}
+			sb.append(")");
+			method = sb.toString();
+		}
+		long time = System.currentTimeMillis();
 		try {
-			return super.invoke(invocation);
+			Object result = super.invoke(invocation);
+			if (serviceStats != null) {
+				serviceStats.emit(getServiceInterface().getName(), method.toString(), System.currentTimeMillis() - time,
+						false, true);
+			}
+			return result;
 		} catch (RemoteAccessException e) {
+			if (serviceStats != null) {
+				serviceStats.emit(getServiceInterface().getName(), method.toString(), System.currentTimeMillis() - time,
+						true, true);
+			}
 			if (--attempts < 1)
 				throw e;
 			Throwable throwable = e.getCause();

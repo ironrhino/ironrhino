@@ -79,14 +79,15 @@ public class PageViewServiceImpl implements PageViewService {
 		sb.append("pv");
 		stringRedisTemplate.opsForValue().increment(sb.toString(), 1);
 		sb.append(":");
+		String prefix = sb.toString();
 		String key = DateUtils.format(date, "yyyyMMddHH");
-		stringRedisTemplate.opsForValue().increment(sb.toString() + key, 1);
+		stringRedisTemplate.opsForValue().increment(prefix + key, 1);
 		key = DateUtils.formatDate8(date);
-		stringRedisTemplate.opsForValue().increment(sb.toString() + key, 1);
+		stringRedisTemplate.opsForValue().increment(prefix + key, 1);
 		key = DateUtils.format(date, "yyyyMM");
-		stringRedisTemplate.opsForValue().increment(sb.toString() + key, 1);
+		stringRedisTemplate.opsForValue().increment(prefix + key, 1);
 		key = DateUtils.format(date, "yyyy");
-		stringRedisTemplate.opsForValue().increment(sb.toString() + key, 1);
+		stringRedisTemplate.opsForValue().increment(prefix + key, 1);
 	}
 
 	private void addUrlVisit(String day, String url, String domain) {
