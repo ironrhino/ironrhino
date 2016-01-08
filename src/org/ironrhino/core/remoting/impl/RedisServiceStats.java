@@ -7,30 +7,38 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.remoting.InvocationWarning;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
+import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.BoundListOperations;
+import org.springframework.data.redis.core.BoundZSetOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -43,15 +51,33 @@ public class RedisServiceStats implements ServiceStats {
 	private static final String NAMESPACE = "remoting:stats:";
 	private static final String NAMESPACE_SERVICES = NAMESPACE + "services:";
 	private static final String KEY_HOTSPOTS = NAMESPACE + "hotspots";
+	private static final String KEY_WARNINGS = NAMESPACE + "warnings";
+
+	private CopyOnWriteArrayList<String> warningBuffer = new CopyOnWriteArrayList<String>();
 
 	@Value("${serviceStats.archive.days:7}")
 	private int days = 7;
 
+	@Value("${serviceStats.responseTimeThreshold:5000}")
+	public long responseTimeThreshold = 5000;
+
+	@Value("${serviceStats.maxWarningSize:100}")
+	public long maxWarningSize = 100;
+
 	private RedisTemplate<String, String> stringRedisTemplate;
+
+	private BoundZSetOperations<String, String> hotspotsOperations;
+	private BoundListOperations<String, String> warningsOperations;
 
 	@Autowired
 	public RedisServiceStats(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
 		this.stringRedisTemplate = stringRedisTemplate;
+	}
+
+	@PostConstruct
+	public void init() {
+		hotspotsOperations = stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
+		warningsOperations = stringRedisTemplate.boundListOps(KEY_WARNINGS);
 	}
 
 	@Override
@@ -69,6 +95,11 @@ public class RedisServiceStats implements ServiceStats {
 		doEmit(serviceName, method, type.getBuffer());
 		if (type == StatsType.CLIENT_FAILED)
 			doEmit(serviceName, method, StatsType.CLIENT_SIDE.getBuffer());
+		if (type == StatsType.CLIENT_FAILED || type == StatsType.CLIENT_SIDE && time > responseTimeThreshold) {
+			InvocationWarning warning = new InvocationWarning(source, target, serviceName + "." + method, time,
+					type == StatsType.CLIENT_FAILED);
+			warningBuffer.add(JsonUtils.toJson(warning));
+		}
 	}
 
 	@Override
@@ -126,8 +157,12 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public List<String> findHotspots(int limit) {
-		return new ArrayList<>(stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS).reverseRange(0, limit - 1));
+	public Map<String, Long> findHotspots(int limit) {
+		Set<TypedTuple<String>> result = hotspotsOperations.reverseRangeWithScores(0, limit - 1);
+		Map<String, Long> map = new LinkedHashMap<>();
+		for (TypedTuple<String> tt : result)
+			map.put(tt.getValue(), tt.getScore().longValue());
+		return map;
 	}
 
 	private void doEmit(String serviceName, String method,
@@ -150,9 +185,28 @@ public class RedisServiceStats implements ServiceStats {
 		ai.incrementAndGet();
 	}
 
+	public List<InvocationWarning> getWarnings() {
+		List<String> list = warningsOperations.range(0, -1);
+		List<InvocationWarning> results = new ArrayList<>(list.size());
+		try {
+			for (String str : list)
+				results.add(JsonUtils.fromJson(str, InvocationWarning.class));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+
 	@Scheduled(initialDelayString = "${serviceStats.flush.fixedRate:60000}", fixedRateString = "${serviceStats.flush.fixedRate:60000}")
 	@PreDestroy
 	public void flush() {
+		if (!warningBuffer.isEmpty()) {
+			warningsOperations.leftPushAll(warningBuffer.toArray(new String[0]));
+			warningBuffer.clear();
+			long size = warningsOperations.size();
+			if (size > maxWarningSize)
+				warningsOperations.trim(0, maxWarningSize - 1);
+		}
 		for (StatsType type : StatsType.values())
 			flush(type);
 	}
@@ -182,7 +236,7 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(DateUtils.format(date, "yyyyMMddHH"));
 		stringRedisTemplate.opsForValue().increment(sb.toString(), count);
 		if (type == StatsType.SERVER_SIDE)
-			stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS).incrementScore(serviceName + "." + method, count);
+			hotspotsOperations.incrementScore(serviceName + "." + method, count);
 	}
 
 	@Trigger

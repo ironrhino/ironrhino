@@ -87,22 +87,6 @@ Initialization.stats = function() {
 	</#if>
 </#list>
 </#if>
- <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#services-accordion" href="#service-hotspots">
-     	<h4>${action.getText('hotspots')}</h4>
-      </a>
-    </div>
-    <div id="service-hotspots" class="accordion-body collapse<#if !service??> in</#if>">
-      <div class="accordion-inner">
-        <ul class="nav nav-list">
-        	<#list hotspots as var>
-			<li><#assign href=baseurl+baseurl?contains('?')?then('&','?')+'service='+var?url/><a href="<@url value="${href}"/>" class="ajax view" data-replacement="count">${var}</a></li>
-			</#list>
-		</ul>
-      </div>
-    </div>
-  </div>
 <#list services.entrySet() as entry>	
   <div class="accordion-group">
     <div class="accordion-heading">
@@ -114,7 +98,7 @@ Initialization.stats = function() {
       <div class="accordion-inner">
         <ul class="nav nav-list">
         	<#list entry.value as var>
-			<li><#assign href=baseurl+baseurl?contains('?')?then('&','?')+'service='+(entry.key+'.'+var)?url/><a href="<@url value="${href}"/>" class="ajax view" data-replacement="count">${var}</a></li>
+			<li><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(entry.key+'.'+var)?url}"/>" class="ajax view" data-replacement="count">${var}</a></li>
 			</#list>
 		</ul>
       </div>
@@ -166,7 +150,17 @@ Initialization.stats = function() {
 </div>
 </#if></div>
 
+<#assign dataurl=actionBaseUrl+"/hotspots"/>
+<#if request.queryString?has_content>
+<#assign dataurl+='?'+request.queryString/>
+</#if>
+<div class="ajaxpanel" data-url="${dataurl}" data-interval="60000"></div>
 
+<#assign dataurl=actionBaseUrl+"/warnings"/>
+<#if request.queryString?has_content>
+<#assign dataurl+='?'+request.queryString/>
+</#if>
+<div class="ajaxpanel" data-url="${dataurl}" data-interval="60000"></div>
 
 </body>
 </html></#escape>

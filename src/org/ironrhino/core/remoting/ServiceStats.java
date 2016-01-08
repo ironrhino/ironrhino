@@ -18,6 +18,8 @@ public interface ServiceStats {
 
 	public long getCount(String service, String key, StatsType type);
 
-	public List<String> findHotspots(int limit);
+	public Map<String,Long> findHotspots(int limit);
+	
+	public List<InvocationWarning> getWarnings();
 
 }

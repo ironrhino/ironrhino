@@ -10,6 +10,7 @@ import java.util.Set;
 import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.remoting.InvocationWarning;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.security.role.UserRole;
@@ -43,7 +44,9 @@ public class StatsAction extends BaseAction {
 
 	private Map<String, Set<String>> services;
 
-	private List<String> hotspots;
+	private Map<String,Long> hotspots;
+
+	private List<InvocationWarning> warnings;
 
 	@Autowired
 	private transient ServiceStats serviceStats;
@@ -68,8 +71,12 @@ public class StatsAction extends BaseAction {
 		return services;
 	}
 
-	public List<String> getHotspots() {
+	public Map<String,Long> getHotspots() {
 		return hotspots;
+	}
+
+	public List<InvocationWarning> getWarnings() {
+		return warnings;
 	}
 
 	public Date getDate() {
@@ -119,8 +126,17 @@ public class StatsAction extends BaseAction {
 	@Override
 	public String execute() {
 		services = serviceStats.getServices();
-		hotspots = serviceStats.findHotspots(limit);
 		return SUCCESS;
+	}
+	
+	public String hotspots() {
+		hotspots = serviceStats.findHotspots(limit);
+		return "hotspots";
+	}
+	
+	public String warnings() {
+		warnings = serviceStats.getWarnings();
+		return "warnings";
 	}
 
 	public String count() {
