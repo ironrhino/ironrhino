@@ -20,7 +20,7 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	public Collection<String> getHostsForService(String service) {
-		return Collections.singleton(host);
+		return Collections.singleton(getLocalHost());
 	}
 
 	@Override

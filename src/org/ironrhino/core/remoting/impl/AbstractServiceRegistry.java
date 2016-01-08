@@ -35,7 +35,12 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	protected Map<String, Object> exportServices = new HashMap<>();
 
-	protected String host;
+	private String localHost;
+
+	@Override
+	public String getLocalHost() {
+		return localHost;
+	}
 
 	public Map<String, List<String>> getImportServices() {
 		return importServices;
@@ -47,11 +52,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	public void init() {
-		host = AppInfo.getHostAddress() + ":" + (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_PORT);
+		localHost = AppInfo.getHostAddress() + ":" + (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_PORT);
 		if (ctx instanceof ConfigurableWebApplicationContext) {
 			String ctxPath = ((ConfigurableWebApplicationContext) ctx).getServletContext().getContextPath();
 			if (!ctxPath.isEmpty())
-				host += ctxPath;
+				localHost += ctxPath;
 		}
 		prepare();
 		String[] beanNames = ctx.getBeanDefinitionNames();
@@ -154,12 +159,12 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Override
 	public void register(String serviceName) {
-		doRegister(serviceName, host);
+		doRegister(serviceName, localHost);
 	}
 
 	@Override
 	public void unregister(String serviceName) {
-		doUnregister(serviceName, host);
+		doUnregister(serviceName, localHost);
 	}
 
 	protected void onDiscover(String serviceName, String host) {

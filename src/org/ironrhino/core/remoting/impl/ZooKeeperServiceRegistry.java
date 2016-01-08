@@ -97,7 +97,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	protected void writeDiscoveredServices() {
 		if (discoveredServices.size() == 0)
 			return;
-		String path = new StringBuilder().append(hostsParentPath).append("/").append(escapeSlash(host)).toString();
+		String path = new StringBuilder().append(hostsParentPath).append("/").append(escapeSlash(getLocalHost()))
+				.toString();
 		byte[] data = JsonUtils.toJson(discoveredServices).getBytes();
 		try {
 			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).inBackground()
