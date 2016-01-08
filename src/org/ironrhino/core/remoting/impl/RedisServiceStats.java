@@ -55,10 +55,20 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public void emit(String serviceName, String method, long time, StatsType type) {
-		emit(serviceName, method, type.getBuffer());
+	public void serverSideEmit(String serviceName, String method, long time) {
+		emit(null, null, serviceName, method, time, StatsType.SERVER_SIDE);
+	}
+
+	@Override
+	public void clientSideEmit(String source, String target, String serviceName, String method, long time,
+			boolean failed) {
+		emit(source, target, serviceName, method, time, failed ? StatsType.CLIENT_FAILED : StatsType.CLIENT_SIDE);
+	}
+
+	protected void emit(String source, String target, String serviceName, String method, long time, StatsType type) {
+		doEmit(serviceName, method, type.getBuffer());
 		if (type == StatsType.CLIENT_FAILED)
-			emit(serviceName, method, StatsType.CLIENT_SIDE.getBuffer());
+			doEmit(serviceName, method, StatsType.CLIENT_SIDE.getBuffer());
 	}
 
 	@Override
@@ -120,7 +130,8 @@ public class RedisServiceStats implements ServiceStats {
 		return new ArrayList<>(stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS).reverseRange(0, limit - 1));
 	}
 
-	private void emit(String serviceName, String method, ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer) {
+	private void doEmit(String serviceName, String method,
+			ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer) {
 		Map<String, AtomicInteger> map = buffer.get(serviceName);
 		if (map == null) {
 			Map<String, AtomicInteger> temp = new ConcurrentHashMap<>();

@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.ironrhino.core.remoting.FstHttpInvokerSerializationHelper;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
-import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +83,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 							method.append(',');
 					}
 					method.append(")");
-					serviceStats.emit(interfaceName, method.toString(), time, StatsType.SERVER_SIDE);
+					serviceStats.serverSideEmit(interfaceName, method.toString(), time);
 				}
 				if (loggingPayload) {
 					MDC.remove("url");
