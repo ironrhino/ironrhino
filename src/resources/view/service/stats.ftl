@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <#escape x as x?html><html>
 <head>
-<title>${action.getText('stats')}</title>
+<title>${action.getText('service')}${action.getText('stats')}</title>
 <style>
 form.form-inline{
 	margin-bottom: 0;

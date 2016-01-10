@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <#escape x as x?html><html>
 <head>
-<title>${action.getText('stats')}</title>
+<title>${action.getText('service')}${action.getText('stats')}</title>
 </head>
 <body>
 <#assign baseurl=actionBaseUrl>
@@ -14,7 +14,7 @@
 </#list>
 </#if>
 <#if warnings?size gt 0>
-	<table class="table table-hover table-striped table-bordered sortable resizable" style="white-space: nowrap;">
+	<table class="table table-hover table-bordered sortable resizable" style="white-space: nowrap;">
 		<caption><h3>${action.getText('warnings')}</h3></caption>
 		<thead>
 		<tr>
@@ -27,11 +27,11 @@
 		</thead>
 		<tbody>
 		<#list warnings as var>
-		<tr>
+		<tr<#if var.failed> class="error"<#else> class="warning"</#if>>
 			<td>${var.source!}</td>
 			<td>${var.target!}</td>
 			<td><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(var.service)?url}"/>" class="ajax view" data-replacement="count">${var.service!}</a></td>
-			<td>${var.time?string}ms<#if var.failed> failed</#if></td>
+			<td>${var.time?string}ms</td>
 			<td>${var.date?datetime}</td>
 		</tr>
 		</#list>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <#escape x as x?html><html>
 <head>
-<title>${action.getText('stats')}</title>
+<title>${action.getText('service')}${action.getText('stats')}</title>
 </head>
 <body>
 <#assign baseurl=actionBaseUrl>
@@ -19,12 +19,12 @@
 		<thead>
 		<tr>
 			<th>${action.getText('service')}</th>
-			<th>${action.getText('times')}</th>
+			<th style="width:120px;">${action.getText('times')}</th>
 		</tr>
 		</thead>
 		<tbody>
 		<#list hotspots.entrySet() as entry>
-		<tr>
+		<tr class="warning">
 			<td><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(entry.key)?url}"/>" class="ajax view" data-replacement="count">${entry.key}</a></td>
 			<td>${entry.value?string}</td>
 		</tr>
