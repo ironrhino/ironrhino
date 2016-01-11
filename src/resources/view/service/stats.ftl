@@ -149,20 +149,20 @@ Initialization.stats = function() {
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
 </#if><#if service?has_content>
-<div class="ajaxpanel" data-url="${actionBaseUrl+"/samples?service="+service?url}" data-interval="60000"></div>
+<div class="ajaxpanel" data-url="${actionBaseUrl+"/samples?service="+service?url}" data-interval="60000" data-quiet="true"></div>
 </#if></div>
 
 <#assign dataurl=actionBaseUrl+"/hotspots"/>
 <#if request.queryString?has_content>
 <#assign dataurl+='?'+request.queryString/>
 </#if>
-<div class="ajaxpanel" data-url="${dataurl}" data-interval="60000"></div>
+<div class="ajaxpanel" data-url="${dataurl}" data-interval="60000" data-quiet="true"></div>
 
 <#assign dataurl=actionBaseUrl+"/warnings"/>
 <#if request.queryString?has_content>
 <#assign dataurl+='?'+request.queryString/>
 </#if>
-<div class="ajaxpanel" data-url="${dataurl}" data-interval="60000"></div>
+<div class="ajaxpanel" data-url="${dataurl}" data-interval="60000" data-quiet="true"></div>
 
 </body>
 </html></#escape>
