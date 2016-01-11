@@ -18,6 +18,25 @@ public enum StatsType implements Displayable {
 		this.namespace = namespace;
 	}
 
+	public void emit(String serviceName, String method) {
+		Map<String, AtomicInteger> map = buffer.get(serviceName);
+		if (map == null) {
+			Map<String, AtomicInteger> temp = new ConcurrentHashMap<>();
+			temp.put(method, new AtomicInteger());
+			map = buffer.putIfAbsent(serviceName, temp);
+			if (map == null)
+				map = temp;
+		}
+		AtomicInteger ai = map.get(method);
+		if (ai == null) {
+			AtomicInteger ai2 = new AtomicInteger();
+			ai = map.putIfAbsent(method, ai2);
+			if (ai == null)
+				ai = ai2;
+		}
+		ai.incrementAndGet();
+	}
+
 	public ConcurrentHashMap<String, Map<String, AtomicInteger>> getBuffer() {
 		return buffer;
 	}

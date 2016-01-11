@@ -92,9 +92,9 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	protected void emit(String source, String target, String serviceName, String method, long time, StatsType type) {
-		doEmit(serviceName, method, type.getBuffer());
+		type.emit(serviceName, method);
 		if (type == StatsType.CLIENT_FAILED)
-			doEmit(serviceName, method, StatsType.CLIENT_SIDE.getBuffer());
+			StatsType.CLIENT_SIDE.emit(serviceName, method);
 		if (type == StatsType.CLIENT_FAILED || type == StatsType.CLIENT_SIDE && time > responseTimeThreshold) {
 			InvocationWarning warning = new InvocationWarning(source, target, serviceName + "." + method, time,
 					type == StatsType.CLIENT_FAILED);
@@ -163,26 +163,6 @@ public class RedisServiceStats implements ServiceStats {
 		for (TypedTuple<String> tt : result)
 			map.put(tt.getValue(), tt.getScore().longValue());
 		return map;
-	}
-
-	private void doEmit(String serviceName, String method,
-			ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer) {
-		Map<String, AtomicInteger> map = buffer.get(serviceName);
-		if (map == null) {
-			Map<String, AtomicInteger> temp = new ConcurrentHashMap<>();
-			temp.put(method, new AtomicInteger());
-			map = buffer.putIfAbsent(serviceName, temp);
-			if (map == null)
-				map = temp;
-		}
-		AtomicInteger ai = map.get(method);
-		if (ai == null) {
-			AtomicInteger ai2 = new AtomicInteger();
-			ai = map.putIfAbsent(method, ai2);
-			if (ai == null)
-				ai = ai2;
-		}
-		ai.incrementAndGet();
 	}
 
 	public List<InvocationWarning> getWarnings() {
