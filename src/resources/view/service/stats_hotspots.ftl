@@ -15,7 +15,7 @@
 </#if>
 <#if hotspots?size gt 0>
 	<table class="table table-hover table-striped table-bordered sortable resizable" style="white-space: nowrap;">
-		<caption><h3>${action.getText('hotspots')}</h3></caption>
+		<caption><h4>${action.getText('hotspots')}</h4></caption>
 		<thead>
 		<tr>
 			<th>${action.getText('service')}</th>

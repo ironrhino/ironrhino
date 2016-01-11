@@ -6,9 +6,6 @@
 form.form-inline{
 	margin-bottom: 0;
 }
-strong{
-	font-size: 18px;
-}
 div.section{
 	border: 1px solid #DEDEDE;
     border-radius: 5px;
@@ -111,7 +108,7 @@ Initialization.stats = function() {
 <div id="count" class="section"><#if service?has_content>
 <div class="row-fluid">
 <div class="span12">
-<strong>${service}</strong>
+<h4>${service}</h4>
 </div>
 </div>
 <div class="row-fluid">

@@ -15,7 +15,7 @@
 </#if>
 <#if warnings?size gt 0>
 	<table class="table table-hover table-bordered sortable resizable" style="white-space: nowrap;">
-		<caption><h3>${action.getText('warnings')}</h3></caption>
+		<caption><h4>${action.getText('warnings')}</h4></caption>
 		<thead>
 		<tr>
 			<th style="width:120px;">${action.getText('source')}</th>

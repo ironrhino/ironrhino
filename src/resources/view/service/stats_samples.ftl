@@ -6,7 +6,7 @@
 <body>
 <#if samples?has_content>
 	<table class="table table-hover table-bordered sortable resizable" style="white-space: nowrap;">
-		<caption><strong>${action.getText('samples')}</strong></caption>
+		<caption><h4>${action.getText('samples')}</h4></caption>
 		<thead>
 		<tr>
 			<th>${action.getText('host')}</th>
