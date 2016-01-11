@@ -6,6 +6,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,7 +24,10 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.remoting.InvocationSample;
+import org.ironrhino.core.remoting.InvocationSampler;
 import org.ironrhino.core.remoting.InvocationWarning;
+import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
@@ -50,10 +54,14 @@ public class RedisServiceStats implements ServiceStats {
 
 	private static final String NAMESPACE = "remoting:stats:";
 	private static final String NAMESPACE_SERVICES = NAMESPACE + "services:";
+	private static final String NAMESPACE_SAMPLES = NAMESPACE + "samples:";
 	private static final String KEY_HOTSPOTS = NAMESPACE + "hotspots";
 	private static final String KEY_WARNINGS = NAMESPACE + "warnings";
 
 	private CopyOnWriteArrayList<String> warningBuffer = new CopyOnWriteArrayList<String>();
+
+	@Autowired(required = false)
+	private ServiceRegistry serviceRegistry;
 
 	@Value("${serviceStats.archive.days:7}")
 	private int days = 7;
@@ -61,8 +69,11 @@ public class RedisServiceStats implements ServiceStats {
 	@Value("${serviceStats.responseTimeThreshold:5000}")
 	public long responseTimeThreshold = 5000;
 
-	@Value("${serviceStats.maxWarningSize:100}")
-	public long maxWarningSize = 100;
+	@Value("${serviceStats.maxWarningsSize:100}")
+	public long maxWarningsSize = 100;
+
+	@Value("${serviceStats.maxSamplesSize:20}")
+	public long maxSamplesSize = 20;
 
 	private RedisTemplate<String, String> stringRedisTemplate;
 
@@ -86,15 +97,16 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public void clientSideEmit(String source, String target, String serviceName, String method, long time,
-			boolean failed) {
-		emit(source, target, serviceName, method, time, failed ? StatsType.CLIENT_FAILED : StatsType.CLIENT_SIDE);
+	public void clientSideEmit(String target, String serviceName, String method, long time, boolean failed) {
+		emit(serviceRegistry != null ? serviceRegistry.getLocalHost() : null, target, serviceName, method, time,
+				failed ? StatsType.CLIENT_FAILED : StatsType.CLIENT_SIDE);
 	}
 
 	protected void emit(String source, String target, String serviceName, String method, long time, StatsType type) {
-		type.emit(serviceName, method);
+		type.increaseCount(serviceName, method);
 		if (type == StatsType.CLIENT_FAILED)
-			StatsType.CLIENT_SIDE.emit(serviceName, method);
+			StatsType.CLIENT_SIDE.increaseCount(serviceName, method);
+		type.collectSample(serviceRegistry != null ? serviceRegistry.getLocalHost() : null, serviceName, method, time);
 		if (type == StatsType.CLIENT_FAILED || type == StatsType.CLIENT_SIDE && time > responseTimeThreshold) {
 			InvocationWarning warning = new InvocationWarning(source, target, serviceName + "." + method, time,
 					type == StatsType.CLIENT_FAILED);
@@ -165,6 +177,7 @@ public class RedisServiceStats implements ServiceStats {
 		return map;
 	}
 
+	@Override
 	public List<InvocationWarning> getWarnings() {
 		List<String> list = warningsOperations.range(0, -1);
 		List<InvocationWarning> results = new ArrayList<>(list.size());
@@ -177,6 +190,28 @@ public class RedisServiceStats implements ServiceStats {
 		return results;
 	}
 
+	@Override
+	public List<InvocationSample> getSamples(String service, StatsType type) {
+		switch (type) {
+		case SERVER_SIDE:
+		case CLIENT_SIDE:
+			List<String> list = stringRedisTemplate.opsForList()
+					.range(NAMESPACE_SAMPLES + type.getNamespace() + ":" + service, 0, -1);
+			List<InvocationSample> results = new ArrayList<>(list.size());
+			try {
+				for (String str : list)
+					results.add(JsonUtils.fromJson(str, InvocationSample.class));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return results;
+
+		default:
+			return Collections.emptyList();
+		}
+
+	}
+
 	@Scheduled(initialDelayString = "${serviceStats.flush.fixedRate:60000}", fixedRateString = "${serviceStats.flush.fixedRate:60000}")
 	@PreDestroy
 	public void flush() {
@@ -184,15 +219,27 @@ public class RedisServiceStats implements ServiceStats {
 			warningsOperations.leftPushAll(warningBuffer.toArray(new String[0]));
 			warningBuffer.clear();
 			long size = warningsOperations.size();
-			if (size > maxWarningSize)
-				warningsOperations.trim(0, maxWarningSize - 1);
+			if (size > maxWarningsSize)
+				warningsOperations.trim(0, maxWarningsSize - 1);
+		}
+		for (StatsType type : StatsType.values()) {
+			for (Map.Entry<String, InvocationSampler> entry : type.getSampleBuffer().entrySet()) {
+				InvocationSample sample = entry.getValue().peekAndReset();
+				if (sample.getCount() > 0) {
+					String key = NAMESPACE_SAMPLES + type.getNamespace() + ":" + entry.getKey();
+					stringRedisTemplate.opsForList().leftPush(key, JsonUtils.toJson(sample));
+					long size = stringRedisTemplate.opsForList().size(key);
+					if (size > maxSamplesSize)
+						stringRedisTemplate.opsForList().trim(key, 0, maxSamplesSize - 1);
+				}
+			}
 		}
 		for (StatsType type : StatsType.values())
 			flush(type);
 	}
 
 	private void flush(StatsType type) {
-		ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer = type.getBuffer();
+		ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer = type.getCountBuffer();
 		for (Map.Entry<String, Map<String, AtomicInteger>> entry : buffer.entrySet()) {
 			stringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + entry.getKey(),
 					entry.getValue().keySet().toArray(new String[0]));

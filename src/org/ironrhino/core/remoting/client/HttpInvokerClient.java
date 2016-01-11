@@ -148,15 +148,13 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 		try {
 			Object result = super.invoke(invocation);
 			if (serviceStats != null) {
-				serviceStats.clientSideEmit(serviceRegistry != null ? serviceRegistry.getLocalHost() : null,
-						discoveredHost, getServiceInterface().getName(), method.toString(),
+				serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method.toString(),
 						System.currentTimeMillis() - time, false);
 			}
 			return result;
 		} catch (RemoteAccessException e) {
 			if (serviceStats != null) {
-				serviceStats.clientSideEmit(serviceRegistry != null ? serviceRegistry.getLocalHost() : null,
-						discoveredHost, getServiceInterface().getName(), method.toString(),
+				serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method.toString(),
 						System.currentTimeMillis() - time, true);
 			}
 			if (--attempts < 1)

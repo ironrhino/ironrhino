@@ -10,7 +10,7 @@ public interface ServiceStats {
 
 	public void serverSideEmit(String serviceName, String method, long time);
 
-	public void clientSideEmit(String source, String target, String serviceName, String method, long time, boolean failed);
+	public void clientSideEmit(String target, String serviceName, String method, long time, boolean failed);
 
 	public Map<String, Set<String>> getServices();
 
@@ -18,8 +18,10 @@ public interface ServiceStats {
 
 	public long getCount(String service, String key, StatsType type);
 
-	public Map<String,Long> findHotspots(int limit);
-	
+	public Map<String, Long> findHotspots(int limit);
+
 	public List<InvocationWarning> getWarnings();
+
+	public List<InvocationSample> getSamples(String service, StatsType type);
 
 }

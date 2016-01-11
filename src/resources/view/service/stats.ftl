@@ -6,7 +6,7 @@
 form.form-inline{
 	margin-bottom: 0;
 }
-.row-fluid strong{
+strong{
 	font-size: 18px;
 }
 div.section{
@@ -108,7 +108,7 @@ Initialization.stats = function() {
  </div> 
 		  
 
-<div id="count" class="section count"><#if service?has_content>
+<div id="count" class="section"><#if service?has_content>
 <div class="row-fluid">
 <div class="span12">
 <strong>${service}</strong>
@@ -148,6 +148,8 @@ Initialization.stats = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</#if><#if service?has_content>
+<div class="ajaxpanel" data-url="${actionBaseUrl+"/samples?service="+service?url}" data-interval="60000"></div>
 </#if></div>
 
 <#assign dataurl=actionBaseUrl+"/hotspots"/>

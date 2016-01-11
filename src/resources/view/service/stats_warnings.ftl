@@ -21,7 +21,7 @@
 			<th style="width:120px;">${action.getText('source')}</th>
 			<th style="width:120px;">${action.getText('target')}</th>
 			<th>${action.getText('service')}</th>
-			<th style="width:50px;">${action.getText('time')}</th>
+			<th style="width:50px;">${action.getText('time')} (ms)</th>
 			<th style="width:120px;">${action.getText('date')}</th>
 		</tr>
 		</thead>
@@ -31,7 +31,7 @@
 			<td>${var.source!}</td>
 			<td>${var.target!}</td>
 			<td><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(var.service)?url}"/>" class="ajax view" data-replacement="count">${var.service!}</a></td>
-			<td>${var.time?string}ms</td>
+			<td>${var.time?string}</td>
 			<td>${var.date?datetime}</td>
 		</tr>
 		</#list>

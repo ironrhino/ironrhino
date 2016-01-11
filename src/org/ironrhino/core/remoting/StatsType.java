@@ -10,7 +10,8 @@ public enum StatsType implements Displayable {
 
 	SERVER_SIDE("server"), CLIENT_SIDE("client"), CLIENT_FAILED("cfailed");
 
-	private ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, Map<String, AtomicInteger>> countBuffer = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, InvocationSampler> sampleBuffer = new ConcurrentHashMap<>();
 
 	private String namespace;
 
@@ -18,12 +19,24 @@ public enum StatsType implements Displayable {
 		this.namespace = namespace;
 	}
 
-	public void emit(String serviceName, String method) {
-		Map<String, AtomicInteger> map = buffer.get(serviceName);
+	public ConcurrentHashMap<String, Map<String, AtomicInteger>> getCountBuffer() {
+		return countBuffer;
+	}
+
+	public ConcurrentHashMap<String, InvocationSampler> getSampleBuffer() {
+		return sampleBuffer;
+	}
+
+	public String getNamespace() {
+		return namespace;
+	}
+
+	public void increaseCount(String serviceName, String method) {
+		Map<String, AtomicInteger> map = countBuffer.get(serviceName);
 		if (map == null) {
 			Map<String, AtomicInteger> temp = new ConcurrentHashMap<>();
 			temp.put(method, new AtomicInteger());
-			map = buffer.putIfAbsent(serviceName, temp);
+			map = countBuffer.putIfAbsent(serviceName, temp);
 			if (map == null)
 				map = temp;
 		}
@@ -37,12 +50,16 @@ public enum StatsType implements Displayable {
 		ai.incrementAndGet();
 	}
 
-	public ConcurrentHashMap<String, Map<String, AtomicInteger>> getBuffer() {
-		return buffer;
-	}
-
-	public String getNamespace() {
-		return namespace;
+	public void collectSample(String host, String serviceName, String method, long time) {
+		String service = serviceName + "." + method;
+		InvocationSampler sampler = sampleBuffer.get(service);
+		if (sampler == null) {
+			InvocationSampler temp = new InvocationSampler(host);
+			sampler = sampleBuffer.putIfAbsent(service, temp);
+			if (sampler == null)
+				sampler = temp;
+		}
+		sampler.add(time);
 	}
 
 	@Override

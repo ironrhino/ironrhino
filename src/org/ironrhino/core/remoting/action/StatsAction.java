@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.remoting.InvocationSample;
 import org.ironrhino.core.remoting.InvocationWarning;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.remoting.StatsType;
@@ -44,9 +46,11 @@ public class StatsAction extends BaseAction {
 
 	private Map<String, Set<String>> services;
 
-	private Map<String,Long> hotspots;
+	private Map<String, Long> hotspots;
 
 	private List<InvocationWarning> warnings;
+
+	private List<InvocationSample> samples;
 
 	@Autowired
 	private transient ServiceStats serviceStats;
@@ -71,12 +75,16 @@ public class StatsAction extends BaseAction {
 		return services;
 	}
 
-	public Map<String,Long> getHotspots() {
+	public Map<String, Long> getHotspots() {
 		return hotspots;
 	}
 
 	public List<InvocationWarning> getWarnings() {
 		return warnings;
+	}
+
+	public List<InvocationSample> getSamples() {
+		return samples;
 	}
 
 	public Date getDate() {
@@ -128,15 +136,21 @@ public class StatsAction extends BaseAction {
 		services = serviceStats.getServices();
 		return SUCCESS;
 	}
-	
+
 	public String hotspots() {
 		hotspots = serviceStats.findHotspots(limit);
 		return "hotspots";
 	}
-	
+
 	public String warnings() {
 		warnings = serviceStats.getWarnings();
 		return "warnings";
+	}
+
+	public String samples() {
+		if (StringUtils.isNotBlank(service))
+			samples = serviceStats.getSamples(service, type);
+		return "samples";
 	}
 
 	public String count() {
