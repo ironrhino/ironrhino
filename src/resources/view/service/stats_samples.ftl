@@ -12,12 +12,22 @@
 			<th>${action.getText('host')}</th>
 			<th style="width:120px;">${action.getText('count')}</th>
 			<th style="width:120px;">${action.getText('meanTime')} (ms)</th>
-			<th style="width:150px;">${action.getText('start')}</th>
-			<th style="width:150px;">${action.getText('end')}</th>
+			<th style="width:120px;">${action.getText('start')}</th>
+			<th style="width:120px;">${action.getText('end')}</th>
 		</tr>
 		</thead>
 		<tbody>
+		<#assign count=0>
+		<#assign totalTime=0>
 		<#list samples as var>
+		<#assign count+=var.count>
+		<#assign totalTime+=var.totalTime>
+		<#if !start??||start.after(var.start)>
+		<#assign start=var.start>
+		</#if>
+		<#if !end??||end.before(var.end)>
+		<#assign end=var.end>
+		</#if>
 		<tr>
 			<td>${var.host!}</td>
 			<td>${var.count?string}</td>
@@ -27,6 +37,17 @@
 		</tr>
 		</#list>
 		</tbody>
+		<#if samples?size gt 1>
+		<tfoot>
+		<tr>
+			<td></td>
+			<td>${count}</td>
+			<td>${(totalTime/count)?string}</td>
+			<td>${start?datetime}</td>
+			<td>${end?datetime}</td>
+		</tr>
+		</tfoot>
+		</#if>
 	</table>
 </#if>
 </body>
