@@ -137,7 +137,7 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 			StringBuilder sb = new StringBuilder(invocation.getMethod().getName()).append("(");
 			Class<?>[] parameterTypes = invocation.getMethod().getParameterTypes();
 			for (int i = 0; i < parameterTypes.length; i++) {
-				sb.append(parameterTypes[i].getName());
+				sb.append(parameterTypes[i].getSimpleName());
 				if (i < parameterTypes.length - 1)
 					sb.append(',');
 			}

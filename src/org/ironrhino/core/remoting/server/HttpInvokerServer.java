@@ -78,7 +78,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 					StringBuilder method = new StringBuilder(invocation.getMethodName()).append("(");
 					Class<?>[] parameterTypes = invocation.getParameterTypes();
 					for (int i = 0; i < parameterTypes.length; i++) {
-						method.append(parameterTypes[i].getName());
+						method.append(parameterTypes[i].getSimpleName());
 						if (i < parameterTypes.length - 1)
 							method.append(',');
 					}
