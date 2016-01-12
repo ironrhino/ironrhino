@@ -52,7 +52,7 @@ public class StatsAction extends BaseAction {
 
 	private List<InvocationSample> samples;
 
-	@Autowired
+	@Autowired(required = false)
 	private transient ServiceStats serviceStats;
 
 	public String getService() {
@@ -133,6 +133,10 @@ public class StatsAction extends BaseAction {
 
 	@Override
 	public String execute() {
+		if(serviceStats == null){
+			addActionError("Require bean serviceStats");
+			return ERROR;
+		}
 		services = serviceStats.getServices();
 		return SUCCESS;
 	}

@@ -42,7 +42,7 @@
 		<tr>
 			<td></td>
 			<td>${count}</td>
-			<td>${(totalTime/count)?string}</td>
+			<td>${(totalTime/count)?string('0')}</td>
 			<td>${start?datetime}</td>
 			<td>${end?datetime}</td>
 		</tr>
