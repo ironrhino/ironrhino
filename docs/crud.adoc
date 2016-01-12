@@ -1,0 +1,389 @@
+= 增删改查
+
+首先根据前面的新手入门的指引, 生成了一个叫demo的演示工程, 现在在这个演示工程里面从浅到深一步一步展示基于注解式的实现自动增删改查功能
+
+== 最简单的增删改查
+[source,java]
+.Product.java
+----
+package com.demo.model;
+
+import java.math.BigDecimal;
+import javax.persistence.Entity;
+import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.model.BaseEntity;
+
+@AutoConfig
+@Entity
+public class Product extends BaseEntity {
+
+	private String name;
+
+	private int quantity;
+
+	private BigDecimal price;
+
+	private boolean featured;
+
+	private String description;
+
+  // getter and setter
+
+}
+----
+只需要继承 `BaseEntity` , 并标注 `@Entity` , 其实就是一个普通的JPA实体类, 再加上一个 `@AutoConfig` , 功能完整的增删改查就有了.
+启动应用, 浏览器里面打开 http://localhost:8080/product ,接下来就是见证奇迹的时候.
+
+`@AutoConfig` 默认的namespace是 `/` ,默认的actionName是首字母小写后的实体类名, 可以自己覆盖, 比如 `@AutoConfig(namespace="/myapp",actionName="prdt")` ,这样访问入口变成了 http://localhost:8080/myapp/prdt
+
+== 美化界面
+首先我们需要将界面上的英文显示成中文, 这就需要写自己的国际化资源文件, 资源文件的修改在开发环境下不需重启即可生效.
+[source,properties]
+.src/resources/i18n/demo/messages_zh_CN.properties
+----
+product=产品
+price=价格
+featured=精选
+----
+然后需要设置列表页面的每一列的宽度, 推荐方案是预留一个列自适应然后为其他所有列设置一个宽度值, 为多行文本设置正确的输入框类型, 只需要在字段上增加 `@UiConfig`
+[source,java]
+.Product.java
+----
+package com.demo.model;
+
+import java.math.BigDecimal;
+import javax.persistence.Entity;
+import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.model.BaseEntity;
+
+@AutoConfig
+@Entity
+public class Product extends BaseEntity {
+
+	@UiConfig(width = "150px")
+	private String name;
+
+	@UiConfig(width = "80px")
+	private int quantity;
+
+	@UiConfig(width = "100px")
+	private BigDecimal price;
+
+	@UiConfig(width = "80px")
+	private boolean featured;
+
+	@UiConfig(type = "textarea")
+	private String description;
+
+  // getter and setter
+
+}
+----
+类和字段上的注解, 在开启debug的情况下修改不需重启即可生效.
+
+== 设置业务主键
+通常情况下, 每一种实体都会有一个业务主键, 比如产品名字可以当业务主键, 只需要在字段上标注 `@NaturalId`
+[source,java]
+.Product.java
+----
+import org.hibernate.annotations.NaturalId;
+
+@NaturalId
+@UiConfig(width = "150px")
+private String name;
+
+----
+应用重启后, 数据库会在 `name` 字段上建立一个唯一索引.
+在创建页面上也会检查输入值是否已经存在避免冲突发生, 修改页面上此字段变为不可编辑.
+
+如果允许编辑业务主键, 只需要设置 `@NaturalId(mutable = true)` .
+
+
+== 控制是否隐藏
+对于一些不需要在界面上展示的字段, 可以在 `@UiConfig` 上设置 `hidden = true`.
+比如增加一个创建时间的字段:
+[source,java]
+.Product.java
+----
+
+@UiConfig(hidden = true)
+private Date createDate = new Date();
+
+// getter and setter
+
+----
+增加字段需要应用重启才能生效.
+创建时间在界面上不会体现, 但是数据库里面会有数据, 通过java代码也可以获取到这个字段.
+
+
+当一个实体字段很多情况下, 列表页面会很拥挤.
+这时我们需要将一些非重要信息的字段从列表里面隐藏, 可以在 `@UiConfig` 上设置 `hiddenInList = @Hidden(true)`
+[source,java]
+.Product.java
+----
+import org.ironrhino.core.metadata.Hidden;
+
+@UiConfig(type = "textarea", hiddenInList = @Hidden(true) )
+private String description;
+
+----
+有些情况下, 需要根据条件动态来隐藏, 这时可以设置表达式
+[source,java]
+.Product.java
+----
+import org.ironrhino.core.metadata.Hidden;
+
+@UiConfig(type = "textarea", hiddenInList = @Hidden(expression = "Parameters['hide']??") )
+private String description;
+
+----
+`expression` 的语法是freemarker, `Parameters['hide']??` 意思是存在 `hide` 请求参数情况下隐藏, 可以在url里面加 `hide` 参数看到效果.
+
+
+与 `hiddenInList` 类似的还有 `hiddenInInput` 和 `hiddenInView` , 分别控制输入界面和查看界面.
+后两者内置变量多了两个内置变量 `entity` (当前实体对象)和 `value` (当前实体对象的当前字段值), 例如:
+[source,java]
+.Product.java
+----
+
+@UiConfig(width = "80px", hiddenInView = @Hidden(expression = "value == 0") )
+private int quantity;
+
+@UiConfig(type = "textarea", hiddenInList = @Hidden(true) , hiddenInView = @Hidden(expression = "entity.quantity == 0") )
+private String description;
+
+----
+当数量为零的情况下, 数量和描述都不显示.
+
+== 控制是否只读
+只读控制可以在实体级别, 只需要为实体类上的 `@Richtable`设置 `readonly` 属性.
+也可以在字段级别, 只需要为字段的 `@UiConfig` 设置 `readonly` 属性.
+`@Readonly` 和 `@Hidden` 支持静态和动态表达式两种, 例如:
+[source,java]
+.Product.java
+----
+import org.ironrhino.core.metadata.Readonly;
+
+@Richtable(readonly = @Readonly(expression = "entity.quantity == 0") )
+public class Product extends BaseEntity {
+
+  @UiConfig(readonly = @Readonly(expression = "value") )
+  private boolean featured;
+
+}
+----
+数量为零的实体整体只读, 数量大于零的实体可以修改,但是"精选"字段在已经勾选的情况下不可取消勾选.
+
+== 自定义字段显示模板
+每个字段可以设置自己的模板来精确控制显示, 只需要在 `@UiConfig` 里面设置 `template` `listTemplate` `viewTemplate` `inputTemplate`,
+`template` 在`listTemplate` `viewTemplate`没有设置的情况下代替它们两个,例如:
+[source,java]
+.Product.java
+----
+
+@UiConfig(width = "80px", template="${value}个" )
+private int quantity;
+
+@UiConfig(width = "100px", inputTemplate = "<span class='input-append'><@s.textfield theme='simple' type='number' name='product.price'/><span class='add-on'>元</span></span>")
+private BigDecimal price;
+
+@UiConfig(type = "textarea", viewTemplate="<#if entity.quantity==0>缺货<#else>${value}</#if>" )
+private String description;
+
+----
+数量在列表页和查看页都会带上单位"个", 价格在输入界面后面带上了单位"元", 描述在列表页原样输出, 在查看页如果数量为零的话会显示"缺货".
+
+== 增加排序和搜索功能
+默认情况下列表的顺序是数据库记录的存储顺序, 一般需要指定自己的排序, 需要在实体类上增加一个 `@Richtable`
+[source,java]
+.Product.java
+----
+import org.ironrhino.core.metadata.Richtable;
+
+@Richtable(order = "quantity desc,name asc")
+public class Product extends BaseEntity {
+ ...
+}
+
+----
+如果需要增加搜索功能, 需要设置在实体类的`@Richtable`和字段的`@UiConfig` 上设置 `searchable = true`, 在列表界面会多出一个搜索框可以输入关键词.
+[source,java]
+.Product.java
+----
+
+@Richtable(order = "quantity desc,name asc", searchable = true)
+public class Product extends BaseEntity {
+
+ 	@UiConfig(width = "150px", searchable = true)
+	private String name;
+
+}
+----
+这种搜索利用的是数据库SQL查询的like功能, 为了性能考虑, 尽量不要用在大字段上, 并且搜索字段数越少越好.
+
+如果引入了elasticsearch, 则支持全文搜索, 需要在实体类上设置 `@Searchable`, 在字段上设置 `@SearchableProperty`
+[source,java]
+.Product.java
+----
+import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
+import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
+
+@Searchable
+public class Product extends BaseEntity {
+
+ 	@SearchableProperty
+	private String name;
+
+}
+----
+这种方式在没有elasticsearch的情况下会自动降级到第一种方式利用数据库的like查询.
+
+== 支持单选和多选字段
+对于单选或多选的字段, 有两种方式支持, 第一种也是推荐的方式, 就是采用枚举类型.
+例如增加一个状态字段:
+[source,java]
+.Status.java
+----
+package com.demo.model;
+
+public enum Status {
+
+	NORMAL, LOW_INVENTORY, SOLDOUT
+
+}
+----
+[source,java]
+.Product.java
+----
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
+@Enumerated(EnumType.ORDINAL)
+private Status status;
+
+//getter and setter
+
+----
+`@Enumerated` 可以省略, 默认是存枚举顺序, 如需要存枚举名, 则设置为 `EnumType.STRING`.
+
+枚举的显示也可以国际化, 需要让枚举继承`Displayable`然后增加国际化资源文件:
+[source,java]
+.Status.java
+----
+package com.demo.model;
+
+import org.ironrhino.core.model.Displayable;
+
+public enum Status implements Displayable {
+
+	NORMAL, LOW_INVENTORY, SOLDOUT;
+
+	@Override
+	public String getName() {
+		return name();
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Displayable.super.getDisplayName();
+	}
+
+	@Override
+	public String toString() {
+		return getDisplayName();
+	}
+
+}
+----
+[source,properties]
+.src/com/demo/model/Status_zh_CN.properties
+----
+NORMAL=正常
+LOW_INVENTORY=低库存
+SOLDOUT=售罄
+----
+
+
+第二种方式, 适用于选项在运行期可调整, 这就是字典类型, 需要引入ironrhino-common-dictionary模块,
+例如增加一个type字段:
+[source,java]
+.Product.java
+----
+
+@UiConfig(type = "dictionary", templateName = "product_type")
+private String type;
+
+//getter and setter
+
+----
+templateName是可选, 默认值是字段名, 选项在 http://localhost:8080/common/dictionary 里面维护.
+
+对于多选, 只需要将字段类型设置为数组或者集合类型, 和数据库映射还需要技巧:
+[source,java]
+.Product.java
+----
+
+@Transient
+@UiConfig(width = "80px", type = "dictionary", templateName = "product_tag")
+private Set<String> tags = new LinkedHashSet<>();
+
+public Set<String> getTags() {
+  return tags;
+}
+
+public void setTags(Set<String> tags) {
+  this.tags = tags;
+}
+
+@UiConfig(hidden = true)
+@NotInCopy
+@JsonIgnore
+@Column(name = "tags", length = 1024)
+@Access(AccessType.PROPERTY)
+public String getTagsAsString() {
+  if (tags.size() > 0)
+    return StringUtils.join(tags.iterator(), ',');
+  return null;
+}
+
+public void setTagsAsString(String tagsAsString) {
+  tags.clear();
+  if (StringUtils.isNotBlank(tagsAsString))
+    tags.addAll(
+        Arrays.asList(org.ironrhino.core.util.StringUtils.trimTail(tagsAsString, ",").split("\\s*,\\s*")));
+}
+
+----
+在字段上增加 `@Transient` , 另外增加一对 `getTagsAsString/setTagsAsString` 方法, 在`getTagsAsString`增加一些注解.
+多选同样也可以用枚举类型实现.
+
+有单选的情况下, 可以以多tab方式展示列表,
+比如 http://localhost:8080/product/tabs ,
+也可以指定一个字段(必须是枚举或字段或布尔类型)用来分tab http://localhost:8080/product/tabs?tab=featured
+
+
+== 防止并发修改
+同一个实体的修改, 如果同时有多个并发, 最后一个提交的会覆盖前面所有的提交.
+一般来说重要的数据我们希望每次修改都是在最新版本基础上做, 这时我们就需要引入乐观锁机制, 只需要增加一个版本字段.
+[source,java]
+.Product.java
+----
+import javax.persistence.Version;
+
+@Version
+private int verison = -1;
+
+// getter and setter
+
+----
+可以试试同时打开两个浏览器tab页, 都进入到同一个实体的编辑界面, 第一个保存会成功, 第二个保存会提示数据已经被修改过, 用户可以选择放弃修改或者强行覆盖.
+
+== 过滤列表结果
+可以在url后面带上请求参数来过滤列表结果,`{field}={value}&{field}-op={operator}&{field}-od=[asc|desc]`, 操作符可省略默认是等于, 排序也是可选.
+也可以直接使用列表页面的过滤功能.
+
+*  http://localhost:8080/product?name=test&name-op=INCLUDE  名字包含test
+*  http://localhost:8080/product?quantity=12&quantity-op=GT  数量大于12
+*  http://localhost:8080/product?status=LOW_INVENTORY  状态为低库存
+*  http://localhost:8080/product?status=LOW_INVENTORY&quantity=12&quantity-op=LT&quantity-od=desc  状态为低库存并且数量小于12并且按数量倒序
