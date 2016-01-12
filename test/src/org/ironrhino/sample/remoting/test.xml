@@ -9,7 +9,7 @@
 	<bean id="executorService" class="org.ironrhino.core.spring.ExecutorServiceFactoryBean"/>
 	<bean id="eventPublisher" class="org.ironrhino.core.event.EventPublisher"/>
 	<bean id="serviceStats" class="org.ironrhino.core.remoting.impl.RedisServiceStats" />
-	<bean id="zookeeperConfiguration" class="org.ironrhino.core.zookeeper.ZooKeeperConfiguration2" />
+	<bean id="zooKeeperConfiguration" class="org.ironrhino.sample.remoting.ZooKeeperConfiguration" />
 	<bean id="serviceRegistry" class="org.ironrhino.core.remoting.impl.ZooKeeperServiceRegistry" />
 	<bean id="userServiceHessian" class="org.ironrhino.core.remoting.client.HessianClient"
 		p:serviceInterface="org.ironrhino.sample.remoting.service.UserService" />

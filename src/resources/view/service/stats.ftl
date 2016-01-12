@@ -112,7 +112,7 @@ Initialization.stats = function() {
 </div>
 </div>
 <div class="row-fluid">
-<div class="span6">
+<div class="span5 offset1">
 <#assign baseaction=actionBaseUrl>
 <#if request.queryString?has_content>
 <#list request.queryString?split('&') as pair>
@@ -128,7 +128,7 @@ Initialization.stats = function() {
 <@s.submit value="%{getText('query')}" theme="simple"/>
 </form>
 </div>
-<div class="span6">
+<div class="span5 offset1">
 <form action="${baseaction}" class="ajax view form-inline" data-replacement="count_result">
 <span>${action.getText('date')}${action.getText('range')}</span>
 <@s.textfield label="%{getText('from')}" theme="simple" id="" name="from" class="date"/>

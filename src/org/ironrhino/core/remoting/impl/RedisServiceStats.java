@@ -6,7 +6,6 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -104,8 +103,6 @@ public class RedisServiceStats implements ServiceStats {
 
 	protected void emit(String source, String target, String serviceName, String method, long time, StatsType type) {
 		type.increaseCount(serviceName, method);
-		if (type == StatsType.CLIENT_FAILED)
-			StatsType.CLIENT_SIDE.increaseCount(serviceName, method);
 		type.collectSample(serviceRegistry != null ? serviceRegistry.getLocalHost() : null, serviceName, method, time);
 		if (type == StatsType.CLIENT_FAILED || type == StatsType.CLIENT_SIDE && time > responseTimeThreshold) {
 			InvocationWarning warning = new InvocationWarning(source, target, serviceName + "." + method, time,
@@ -192,24 +189,16 @@ public class RedisServiceStats implements ServiceStats {
 
 	@Override
 	public List<InvocationSample> getSamples(String service, StatsType type) {
-		switch (type) {
-		case SERVER_SIDE:
-		case CLIENT_SIDE:
-			List<String> list = stringRedisTemplate.opsForList()
-					.range(NAMESPACE_SAMPLES + type.getNamespace() + ":" + service, 0, -1);
-			List<InvocationSample> results = new ArrayList<>(list.size());
-			try {
-				for (String str : list)
-					results.add(JsonUtils.fromJson(str, InvocationSample.class));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return results;
-
-		default:
-			return Collections.emptyList();
+		List<String> list = stringRedisTemplate.opsForList()
+				.range(NAMESPACE_SAMPLES + type.getNamespace() + ":" + service, 0, -1);
+		List<InvocationSample> results = new ArrayList<>(list.size());
+		try {
+			for (String str : list)
+				results.add(JsonUtils.fromJson(str, InvocationSample.class));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
+		return results;
 	}
 
 	@Scheduled(initialDelayString = "${serviceStats.flush.fixedRate:60000}", fixedRateString = "${serviceStats.flush.fixedRate:60000}")
