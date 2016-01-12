@@ -528,6 +528,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			if (propertyNamesInLike.size() > 0)
 				dc.add(CriterionUtils.like(keyword, propertyNamesInLike));
+			else
+				dc.add(Restrictions.like("id", keyword, MatchMode.ANYWHERE));
 		}
 		if (criteriaState.getOrderings().isEmpty()) {
 			if (richtableConfig != null && StringUtils.isNotBlank(richtableConfig.order())) {
