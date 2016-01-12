@@ -360,7 +360,9 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		String actionClass = null;
 		AutoConfig ac = cls.getAnnotation(AutoConfig.class);
 		if (Persistable.class.isAssignableFrom(cls)) {
-			actionName = StringUtils.uncapitalize(cls.getSimpleName());
+			actionName = ac.actionName();
+			if (StringUtils.isBlank(actionName))
+				actionName = StringUtils.uncapitalize(cls.getSimpleName());
 			namespace = ac.namespace();
 			if (StringUtils.isBlank(namespace))
 				namespace = defaultNamespace;
