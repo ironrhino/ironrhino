@@ -9,7 +9,7 @@
 	<Appenders>
 		<Console name="CONSOLE" target="SYSTEM_OUT">
 			<ThresholdFilter level="${sys:console.logger.level}"/>
-			<PatternLayout pattern="%d %c %p %m%n%th{10}"/>
+			<PatternLayout pattern="%d %c %p %m%n"/>
 		</Console>
 		<RollingFile name="APPLICATION" fileName="${sys:app.home}/logs/${sys:port.http}/application.log" filePattern="${sys:app.home}/logs/${sys:port.http}/application.log.%d{yyyy-MM-dd}">
 			<PatternLayout pattern="%d %c %t%X{session}%X{request}%X{url} %p %m%n%th{10}" charset="UTF-8"/>
@@ -17,7 +17,7 @@
 		</RollingFile>
 		<RollingFile name="ERROR" fileName="${sys:app.home}/logs/${sys:port.http}/application-error.log" filePattern="${sys:app.home}/logs/${sys:port.http}/application-error.log.%d{yyyy-MM-dd}">
 			<ThresholdFilter level="ERROR"/>
-			<PatternLayout pattern="%d %c %t%X{session}%X{request}%X{url} %p %m%n%th{10}" charset="UTF-8"/>
+			<PatternLayout pattern="%d %c %t%X{session}%X{request}%X{url} %p %m%n" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="HIBERNATE" fileName="${sys:app.home}/logs/${sys:port.http}/hibernate.log" filePattern="${sys:app.home}/logs/${sys:port.http}/hibernate.log.%d{yyyy-MM-dd}">
