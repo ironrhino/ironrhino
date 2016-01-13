@@ -29,8 +29,8 @@ public class RedisLockService implements LockService {
 
 	private RedisTemplate<String, String> stringRedisTemplate;
 
-	@Value("${lockService.timeout:300}")
-	private int timeout = 300;
+	@Value("${lockService.maxHoldTime:300}")
+	private int maxHoldTime = 300;
 
 	@Autowired
 	public RedisLockService(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
@@ -43,7 +43,7 @@ public class RedisLockService implements LockService {
 		String value = AppInfo.getInstanceId();
 		boolean success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 		if (success)
-			stringRedisTemplate.expire(key, this.timeout, TimeUnit.SECONDS);
+			stringRedisTemplate.expire(key, this.maxHoldTime, TimeUnit.SECONDS);
 		return success;
 	}
 
@@ -67,7 +67,7 @@ public class RedisLockService implements LockService {
 			success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 		}
 		if (success)
-			stringRedisTemplate.expire(key, this.timeout, TimeUnit.SECONDS);
+			stringRedisTemplate.expire(key, this.maxHoldTime, TimeUnit.SECONDS);
 		return success;
 	}
 
@@ -84,7 +84,7 @@ public class RedisLockService implements LockService {
 			}
 			success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 			if (success)
-				stringRedisTemplate.expire(key, this.timeout, TimeUnit.SECONDS);
+				stringRedisTemplate.expire(key, this.maxHoldTime, TimeUnit.SECONDS);
 		}
 
 	}
