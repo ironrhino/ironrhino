@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile(CLUSTER)
+@Profile({ CLUSTER, "zookeeper" })
 public class ZooKeeperConfiguration {
 
 	@Value("${zooKeeper.connectString:localhost:2181}")
