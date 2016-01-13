@@ -471,6 +471,7 @@ package com.demo.service;
 import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.core.struts.ValidationException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.demo.model.Product;
 
@@ -478,6 +479,7 @@ import com.demo.model.Product;
 public class ProductManagerImpl extends BaseManagerImpl<Product> implements ProductManager {
 
 	@Override
+	@Transactional
 	public void save(Product product) {
 		if (product.isNew() && product.isFeatured()) {
 			// 纯演示用, 这个规则本应该放在实体类里面
@@ -491,6 +493,7 @@ public class ProductManagerImpl extends BaseManagerImpl<Product> implements Prod
 }
 
 ----
+请注意一定要记得加上 `@Transactional` ,否则修改不会提交到数据库.
 
 == 防止并发修改
 同一个实体的修改, 如果同时有多个并发, 最后一个提交的会覆盖前面所有的提交.
@@ -516,3 +519,166 @@ private int verison = -1;
 *  http://localhost:8080/product?quantity=12&quantity-op=GT  数量大于12
 *  http://localhost:8080/product?status=LOW_INVENTORY  状态为低库存
 *  http://localhost:8080/product?status=LOW_INVENTORY&quantity=12&quantity-op=LT&quantity-od=desc  状态为低库存并且数量小于12并且按数量倒序
+
+
+也可以在java代码里面增加内置的过滤条件
+[source,java]
+.ProductAction.java
+----
+package com.demo.action;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.struts2.ServletActionContext;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
+import org.ironrhino.core.hibernate.CriteriaState;
+import org.ironrhino.core.struts.EntityAction;
+
+import com.demo.model.Product;
+
+public class ProductAction extends EntityAction<Product> {
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {
+		String maxQuantity = ServletActionContext.getRequest().getParameter("maxQuantity");
+		if (StringUtils.isNumeric(maxQuantity))
+			dc.add(Restrictions.le("quantity", Integer.valueOf(maxQuantity)));
+	}
+
+}
+
+----
+如果带了请求参数 `maxQuantity` , 则增加内置条件 `quantity <= maxQuantity` , 更多规则使用请自行学习hibernate的 `DetachedCriteria` 的用法.
+
+== 关联其他对象
+实体之间关联, 有 `@ManyToMany` `@OneToMany` `@ManyToOne` `@OneToOne` .
+不推荐使用, 前两者, 第一是如果另一方数据量很大的话会存在性能问题, 第二是不好在UI上体现, 多对多的关系可以引入中间实体变成两段多对一关系.
+平台的自动增删改查功能只支持后两者, 也就是单向的多对一或者一对一.
+示例我们为Product(产品)增加一个关联对象Category(类目) :
+[source,java]
+.Category.java
+----
+package com.demo.model;
+
+import javax.persistence.Entity;
+
+import org.hibernate.annotations.NaturalId;
+import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.model.BaseEntity;
+import org.ironrhino.core.model.Ordered;
+import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
+import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
+
+@AutoConfig
+@Entity
+@Searchable
+public class Category extends BaseEntity implements Ordered<Category> {
+
+	private static final long serialVersionUID = 1L;
+
+	@NaturalId(mutable = true)
+	@UiConfig(width = "150px", searchable = true)
+	@SearchableProperty
+	private String name;
+
+	@UiConfig(width = "80px")
+	private int displayOrder;
+
+	@UiConfig(type = "textarea")
+	private String description;
+
+	// getter and setter
+
+	@Override
+	public int compareTo(Category other) {
+		int i = this.displayOrder - other.displayOrder;
+		return i != 0 ? i : this.name.compareTo(other.name);
+	}
+
+}
+
+----
+仿Product增加了一个Category, Category 实现了 `Ordered`, 这样不需要额外执行排序默认是用 `displayOrder` 来排序
+
+
+[source,java]
+.Product.java
+----
+import javax.persistence.ManyToOne;
+
+@UiConfig(width = "150px")
+@ManyToOne
+private Category category;
+
+//getter and setter
+
+----
+Product只需要增加一个字段 `category` 并且标注 `@ManyToOne` , 如果 `category` 是必选的话, 则标注 `@ManyToOne(optional = false)`
+
+== 内嵌对象集合
+有些情况下, 需要为实体增加内嵌对象集合, 比如收货地址是一个内嵌对象, 客户可能有多个收货地址.
+下面的示例我们为Product增加内嵌对象Photo:
+[source,java]
+.Photo.java
+----
+package com.demo.model;
+
+import java.io.Serializable;
+
+import javax.persistence.Embeddable;
+
+import org.ironrhino.core.metadata.UiConfig;
+
+@Embeddable
+public class Photo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@UiConfig(width = "200px", cssClass = "input-medium")
+	private String title;
+
+	@UiConfig(cssClass = "input-medium")
+	private String url;
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+}
+
+----
+请注意Photo标注的是 `@Embeddable` 而不是 `@Entity` ,这样它可以被其他实体内嵌.
+`cssClass = "input-medium"`是设置输入框的大小不让它溢出, 这不是必要的.
+
+
+[source,java]
+.Product.java
+----
+import javax.persistence.ElementCollection;
+import javax.persistence.OrderColumn;
+
+@ElementCollection
+@OrderColumn
+private List<Photo> photos;
+
+//getter and setter
+
+----
+Product只需要增加一个字段 `photos` 并且标注 `@ElementCollection` , 这是最简化的注解.
+另外可以增加一个 `@OrderColumn` , 这能够保证顺序跟界面上的一致.
+更多定制化配置请参考JPA.
