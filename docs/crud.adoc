@@ -400,6 +400,98 @@ public class Product extends BaseEntity implements Recordable<UserDetails> {
 示例里面用到的都是默认值, 可以直接省略成 `@Owner` .加了这个注解之后, 每个用户只能看见和操作自己创建的实体.
 设置 `isolate = false` 之后, 可以查看其他用户创建的实体但是不能修改.
 
+== 校验数据是否合法
+如果数据需要做合法性检查, 为了用户体验客户端可以尽可能的多做校验, 但是在服务器端一定要全部校验一遍, 防止恶意提交篡改数据.
+服务器端的校验有很多种方式, 这里只演示两种直接在实体类里面的校验, 第一种方式就是利用标准的 Bean Validation 写注解来声明规则, 例如:
+[source,java]
+.Product.java
+----
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
+@Max(100)
+@Min(0)
+private int quantity;
+
+----
+这里对数量做了限制, 最小是0, 最大是100, 其他更多规则请自行查阅 http://docs.oracle.com/javaee/6/tutorial/doc/gircz.html[官方教程]
+
+如果用注解不好实现的校验, 还可以写java代码来灵活校验:
+[source,java]
+.Product.java
+----
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import org.ironrhino.core.struts.ValidationException;
+
+@PreUpdate
+@PrePersist
+public void validate() {
+	if (price == null) {
+		ValidationException ve = new ValidationException();
+		ve.addActionError("请输入价格");
+		throw ve;
+	}
+	if (price.doubleValue() <= 0) {
+		ValidationException ve = new ValidationException();
+		ve.addFieldError("product.price", "价格必须大于0");
+		throw ve;
+	}
+	if (price.doubleValue() > 1000) {
+		ValidationException ve = new ValidationException();
+		ve.addFieldError("product.price", "价格最高不能超过1000");
+		throw ve;
+	}
+}
+
+----
+在任意的 `public void` 方法之上加上 `@PrePersist` 和 `@PreUpdate` ,这样在新建和修改的时候就会调用此方法.
+示例里面演示了抛出两种校验异常, 分别是 `actionError` 和 `fieldError` , 如果是针对具体字段的错误最好用后者.
+
+
+如果校验规则需要借助外部检查规则, 可以将校验放在Service层, 比如:
+[source,java]
+.ProductManager.java
+----
+package com.demo.service;
+
+import org.ironrhino.core.service.BaseManager;
+
+import com.demo.model.Product;
+
+public interface ProductManager extends BaseManager<Product> {
+
+}
+----
+[source,java]
+.ProductManagerImpl.java
+----
+package com.demo.service;
+
+import org.ironrhino.core.service.BaseManagerImpl;
+import org.ironrhino.core.struts.ValidationException;
+import org.springframework.stereotype.Component;
+
+import com.demo.model.Product;
+
+@Component
+public class ProductManagerImpl extends BaseManagerImpl<Product> implements ProductManager {
+
+	@Override
+	public void save(Product product) {
+		if (product.isNew() && product.isFeatured()) {
+			// 纯演示用, 这个规则本应该放在实体类里面
+			ValidationException ve = new ValidationException();
+			ve.addFieldError("product.featured", "新品不能设置为精选");
+			throw ve;
+		}
+		super.save(product);
+	}
+
+}
+
+----
+
 == 防止并发修改
 同一个实体的修改, 如果同时有多个并发, 最后一个提交的会覆盖前面所有的提交.
 一般来说重要的数据我们希望每次修改都是在最新版本基础上做, 这时我们就需要引入乐观锁机制, 只需要增加一个版本字段.
