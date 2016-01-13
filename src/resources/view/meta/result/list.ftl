@@ -124,6 +124,7 @@
 <#list uiConfigs.entrySet() as entry>
 	<#assign key=entry.key>
 	<#assign config=entry.value>
+	<#assign value=entity[key]!>
 	<#assign hidden=config.hiddenInList.value>
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval>
