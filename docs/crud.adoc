@@ -319,49 +319,86 @@ private String type;
 ----
 templateName是可选, 默认值是字段名, 选项在 http://localhost:8080/common/dictionary 里面维护.
 
-对于多选, 只需要将字段类型设置为数组或者集合类型, 和数据库映射还需要技巧:
+对于多选, 只需要将字段类型设置为集合类型(推荐)或数组:
 [source,java]
 .Product.java
 ----
+import javax.persistence.Convert;
+import org.ironrhino.core.hibernate.convert.StringSetConverter;
 
-@Transient
+@Convert(converter = StringSetConverter.class)
 @UiConfig(width = "80px", type = "dictionary", templateName = "product_tag")
 private Set<String> tags = new LinkedHashSet<>();
 
-public Set<String> getTags() {
-  return tags;
-}
+//getter and setter
 
-public void setTags(Set<String> tags) {
-  this.tags = tags;
-}
+----
+在字段上增加了 `@Convert` , 并且使用平台内置的JPA属性转换器 `StringSetConverter` .
+多选同样也可以用枚举类型实现, 如果没有合适的属性转换器, 需要实现自己的 `Converter`, 或使用其他高级技巧.
 
-@UiConfig(hidden = true)
-@NotInCopy
-@JsonIgnore
-@Column(name = "tags", length = 1024)
-@Access(AccessType.PROPERTY)
-public String getTagsAsString() {
-  if (tags.size() > 0)
-    return StringUtils.join(tags.iterator(), ',');
-  return null;
-}
+有单选的情况下, 可以以多tab方式展示列表,比如 http://localhost:8080/product/tabs ,
+也可以指定一个字段(必须是枚举或字段或布尔类型)用来分tab http://localhost:8080/product/tabs?tab=featured
 
-public void setTagsAsString(String tagsAsString) {
-  tags.clear();
-  if (StringUtils.isNotBlank(tagsAsString))
-    tags.addAll(
-        Arrays.asList(org.ironrhino.core.util.StringUtils.trimTail(tagsAsString, ",").split("\\s*,\\s*")));
+== 记录操作痕迹
+对于重要的实体, 可能想要记录是由哪个用户什么时候创建或修改, 实体类只需要实现 `Recordable` 接口
+[source,java]
+.Product.java
+----
+import org.ironrhino.core.model.Recordable;
+import org.springframework.security.core.userdetails.UserDetails;
+
+public class Product extends BaseEntity implements Recordable<UserDetails>{
+
+	@UiConfig(hidden = true)
+	@Column(updatable = false)
+	private Date createDate = new Date();
+
+	@UiConfig(hidden = true)
+	@Column(insertable = false)
+	private Date modifyDate;
+
+	@UiConfig(hidden = true)
+	@Column(updatable = false)
+	private String createUser;
+
+	@UiConfig(hidden = true)
+	@Column(insertable = false)
+	private String modifyUser;
+
+	// getter and setter
+
+	@Override
+	public void setCreateUserDetails(UserDetails user) {
+		if (user != null)
+			createUser = user.getUsername();
+	}
+
+	@Override
+	public void setModifyUserDetails(UserDetails user) {
+		if (user != null)
+			modifyUser = user.getUsername();
+	}
+
 }
 
 ----
-在字段上增加 `@Transient` , 另外增加一对 `getTagsAsString/setTagsAsString` 方法, 在`getTagsAsString`增加一些注解.
-多选同样也可以用枚举类型实现.
+增加了四个字段, 分别记录创建时间和最后修改时间和创建用户和最后修改用户.
+示例里面是关联用户名, 也可以用多对一直接关联用户对象, 这样需要将 `UserDetails` 替换成真正的实现类比如平台内置的 `User` .
 
-有单选的情况下, 可以以多tab方式展示列表,
-比如 http://localhost:8080/product/tabs ,
-也可以指定一个字段(必须是枚举或字段或布尔类型)用来分tab http://localhost:8080/product/tabs?tab=featured
+== 声明归属用户
+可以为实体增加一个 `@Owner` 注解来声明当前实体归属用户
+[source,java]
+.Product.java
+----
+import org.ironrhino.core.metadata.Owner;
 
+@Owner(propertyName = "createUser", isolate = true)
+public class Product extends BaseEntity implements Recordable<UserDetails> {
+
+}
+----
+示例里面用到的都是默认值, 可以直接省略成 `@Owner` .加了这个注解之后, 每个用户只能看见和操作自己创建的实体.
+设置 `isolate = false` 之后, 可以查看其他用户创建的实体但是不能修改.
 
 == 防止并发修改
 同一个实体的修改, 如果同时有多个并发, 最后一个提交的会覆盖前面所有的提交.
