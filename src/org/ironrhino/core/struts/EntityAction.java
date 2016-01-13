@@ -61,8 +61,6 @@ import org.ironrhino.core.struts.AnnotationShadows.ReadonlyImpl;
 import org.ironrhino.core.struts.AnnotationShadows.RichtableImpl;
 import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AnnotationUtils;
-import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.DateUtils;
@@ -100,6 +98,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	private ReadonlyImpl _readonly;
 
 	private RichtableImpl _richtableConfig;
+
+	private Map<String, UiConfigImpl> _uiConfigs;
 
 	private Persistable _entity;
 
@@ -197,7 +197,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public RichtableImpl getRichtableConfig() {
-		if (_richtableConfig == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
+		if (_richtableConfig == null) {
 			Richtable rc = getClass().getAnnotation(Richtable.class);
 			if (rc == null)
 				rc = getEntityClass().getAnnotation(Richtable.class);
@@ -207,7 +207,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public ReadonlyImpl getReadonly() {
-		if (_readonly == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
+		if (_readonly == null ) {
 			Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
 			if (immutable != null) {
 				_readonly = new ReadonlyImpl();
@@ -260,7 +260,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public Map<String, NaturalId> getNaturalIds() {
-		if (_naturalIds == null || AppInfo.getStage() == Stage.DEVELOPMENT)
+		if (_naturalIds == null)
 			_naturalIds = AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), NaturalId.class);
 		return _naturalIds;
 	}
@@ -275,7 +275,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public Map<String, UiConfigImpl> getUiConfigs() {
-		return EntityClassHelper.getUiConfigs(getEntityClass());
+		if (_uiConfigs == null)
+			_uiConfigs = EntityClassHelper.getUiConfigs(getEntityClass());
+		return _uiConfigs;
 	}
 
 	protected <T extends Persistable<?>> BaseManager<T> getEntityManager(Class<T> entityClass) {
