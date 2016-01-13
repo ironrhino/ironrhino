@@ -13,7 +13,7 @@
 		</#if>
 <#else>
 <#list uiConfigs.entrySet() as entry>
-	<#if entry.value.type=='enum'||selectDictionary??&&entry.value.type=='dictionary'>
+	<#if (entry.value.type=='enum'||selectDictionary??&&entry.value.type=='dictionary')&&!entry.value.multiple>
 		<#assign propertyName=entry.key>
 		<#assign config=entry.value>
 		<#break/>
