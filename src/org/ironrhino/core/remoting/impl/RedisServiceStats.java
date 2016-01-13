@@ -228,8 +228,8 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	private void flush(StatsType type) {
-		ConcurrentHashMap<String, Map<String, AtomicInteger>> buffer = type.getCountBuffer();
-		for (Map.Entry<String, Map<String, AtomicInteger>> entry : buffer.entrySet()) {
+		ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> buffer = type.getCountBuffer();
+		for (Map.Entry<String, ConcurrentHashMap<String, AtomicInteger>> entry : buffer.entrySet()) {
 			stringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + entry.getKey(),
 					entry.getValue().keySet().toArray(new String[0]));
 			for (Map.Entry<String, AtomicInteger> entry2 : entry.getValue().entrySet()) {
