@@ -61,6 +61,8 @@ import org.ironrhino.core.struts.AnnotationShadows.ReadonlyImpl;
 import org.ironrhino.core.struts.AnnotationShadows.RichtableImpl;
 import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AnnotationUtils;
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.DateUtils;
@@ -98,8 +100,6 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	private ReadonlyImpl _readonly;
 
 	private RichtableImpl _richtableConfig;
-
-	private Map<String, UiConfigImpl> _uiConfigs;
 
 	private Persistable _entity;
 
@@ -197,7 +197,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public RichtableImpl getRichtableConfig() {
-		if (_richtableConfig == null) {
+		if (_richtableConfig == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			Richtable rc = getClass().getAnnotation(Richtable.class);
 			if (rc == null)
 				rc = getEntityClass().getAnnotation(Richtable.class);
@@ -207,30 +207,29 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public ReadonlyImpl getReadonly() {
-		if (_readonly == null) {
-
-			Richtable rconfig = getClass().getAnnotation(Richtable.class);
-			if (rconfig == null)
-				rconfig = getEntityClass().getAnnotation(Richtable.class);
+		if (_readonly == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
-			if (immutable != null && rconfig == null) {
+			if (immutable != null) {
 				_readonly = new ReadonlyImpl();
 				_readonly.setValue(true);
 				return _readonly;
 			}
 			AppendOnly appendOnly = getEntityClass().getAnnotation(AppendOnly.class);
-			if (appendOnly != null && rconfig == null) {
+			if (appendOnly != null) {
 				_readonly = new ReadonlyImpl();
 				_readonly.setValue(false);
 				_readonly.setExpression("!entity.new");
 				_readonly.setDeletable(false);
 				return _readonly;
 			}
+			Richtable rconfig = getClass().getAnnotation(Richtable.class);
+			if (rconfig == null)
+				rconfig = getEntityClass().getAnnotation(Richtable.class);
 			Readonly rc = null;
 			if (rconfig != null)
 				rc = rconfig.readonly();
-			Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
-			if (rc == null && ownerProperty != null) {
+			Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
+			if (ownerProperty != null) {
 				Owner owner = ownerProperty.getKey();
 				if (!owner.isolate() && owner.readonlyForOther() && !(StringUtils.isNotBlank(owner.supervisorRole())
 						&& AuthzUtils.authorize(null, owner.supervisorRole(), null))) {
@@ -239,6 +238,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					StringBuilder sb = new StringBuilder("!entity.");
 					sb.append(ownerProperty.getKey().propertyName()).append("?? || entity.")
 							.append(ownerProperty.getKey().propertyName()).append("!=authentication('principal')");
+					if (ownerProperty.getValue() == String.class)
+						sb.append(".username");
+					if (rc != null && !rc.value() && StringUtils.isNotBlank(rc.expression()))
+						sb.append(" || ").append(rc.expression());
 					String expression = sb.toString();
 					_readonly.setExpression(expression);
 					_readonly.setDeletable(false);
@@ -257,7 +260,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public Map<String, NaturalId> getNaturalIds() {
-		if (_naturalIds == null)
+		if (_naturalIds == null || AppInfo.getStage() == Stage.DEVELOPMENT)
 			_naturalIds = AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), NaturalId.class);
 		return _naturalIds;
 	}
@@ -272,9 +275,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public Map<String, UiConfigImpl> getUiConfigs() {
-		if (_uiConfigs == null)
-			_uiConfigs = EntityClassHelper.getUiConfigs(getEntityClass());
-		return _uiConfigs;
+		return EntityClassHelper.getUiConfigs(getEntityClass());
 	}
 
 	protected <T extends Persistable<?>> BaseManager<T> getEntityManager(Class<T> entityClass) {
@@ -373,7 +374,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 			}
 
-		Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
+		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 		if (ownerProperty != null && ownerProperty.getKey().isolate()
 				|| (!searchable || StringUtils.isBlank(keyword) || (searchable && elasticSearchService == null))) {
 			boolean resetPageSize;
@@ -446,20 +447,23 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (richtableConfig == null)
 			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
 		boolean searchable = isSearchable();
-		Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
+		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 		return doPrepareCriteria(entityManager, bw, richtableConfig, searchable, ownerProperty);
 	}
 
 	private DetachedCriteria doPrepareCriteria(BaseManager entityManager, BeanWrapperImpl bw, Richtable richtableConfig,
-			boolean searchable, Tuple<Owner, Class<? extends UserDetails>> ownerProperty) {
-
+			boolean searchable, Tuple<Owner, Class<?>> ownerProperty) {
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		if (ownerProperty != null) {
 			Owner owner = ownerProperty.getKey();
 			if (!(StringUtils.isNotBlank(owner.supervisorRole())
 					&& AuthzUtils.authorize(null, owner.supervisorRole(), null)) && owner.isolate()) {
-				UserDetails ud = AuthzUtils.getUserDetails(ownerProperty.getValue());
-				dc.add(Restrictions.eq(owner.propertyName(), ud));
+				if (ownerProperty.getValue() == String.class) {
+					dc.add(Restrictions.eq(owner.propertyName(), AuthzUtils.getUsername()));
+				} else {
+					UserDetails ud = AuthzUtils.getUserDetails((Class<? extends UserDetails>) ownerProperty.getValue());
+					dc.add(Restrictions.eq(owner.propertyName(), ud));
+				}
 			}
 		}
 		CriteriaState criteriaState = CriterionUtils.filter(dc, getEntityClass(), getUiConfigs());
@@ -564,6 +568,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				dc.addOrder(Order.asc("displayOrder"));
 		}
 		return dc;
+
 	}
 
 	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {
@@ -586,17 +591,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected String doInput() {
 		tryFindEntity();
 		if (_entity != null && !_entity.isNew()) {
-			Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
+			Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 			if (ownerProperty != null) {
 				Owner owner = ownerProperty.getKey();
 				if (!(StringUtils.isNotBlank(owner.supervisorRole())
 						&& AuthzUtils.authorize(null, owner.supervisorRole(), null))
 						&& (owner.isolate() || owner.readonlyForOther())) {
-					UserDetails ud = AuthzUtils.getUserDetails(ownerProperty.getValue());
-					BeanWrapperImpl bwi = new BeanWrapperImpl(_entity);
-					bwi.setConversionService(conversionService);
-					Object value = bwi.getPropertyValue(owner.propertyName());
-					if (ud == null || value == null || !ud.equals(value)) {
+					if (!hasOwnership(_entity)) {
 						addActionError(getText("access.denied"));
 						return ACCESSDENIED;
 					}
@@ -692,16 +693,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			return INPUT;
 		BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 		bwp.setConversionService(conversionService);
-		Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
+		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 		if (!_entity.isNew()) {
 			if (ownerProperty != null) {
 				Owner owner = ownerProperty.getKey();
 				if (!(StringUtils.isNotBlank(owner.supervisorRole())
 						&& AuthzUtils.authorize(null, owner.supervisorRole(), null))
 						&& (ownerProperty.getKey().isolate() || ownerProperty.getKey().readonlyForOther())) {
-					UserDetails ud = AuthzUtils.getUserDetails(ownerProperty.getValue());
-					Object value = bwp.getPropertyValue(owner.propertyName());
-					if (ud == null || value == null || !ud.equals(value)) {
+					if (!hasOwnership(_entity)) {
 						addActionError(getText("access.denied"));
 						return ACCESSDENIED;
 					}
@@ -713,12 +712,21 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		} else {
 			if (ownerProperty != null) {
-				UserDetails ud = AuthzUtils.getUserDetails(ownerProperty.getValue());
-				if (ud == null) {
-					addActionError(getText("access.denied"));
-					return ACCESSDENIED;
+				if (ownerProperty.getValue() == String.class) {
+					String username = AuthzUtils.getUsername();
+					if (username == null) {
+						addActionError(getText("access.denied"));
+						return ACCESSDENIED;
+					}
+					bwp.setPropertyValue(ownerProperty.getKey().propertyName(), username);
+				} else {
+					UserDetails ud = AuthzUtils.getUserDetails((Class<? extends UserDetails>) ownerProperty.getValue());
+					if (ud == null) {
+						addActionError(getText("access.denied"));
+						return ACCESSDENIED;
+					}
+					bwp.setPropertyValue(ownerProperty.getKey().propertyName(), ud);
 				}
-				bwp.setPropertyValue(ownerProperty.getKey().propertyName(), ud);
 			}
 			if (isTreeable())
 				((BaseTreeableEntity) _entity)
@@ -1117,7 +1125,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return false;
 	}
 
-	private Tuple<Owner, Class<? extends UserDetails>> getOwnerProperty() {
+	private Tuple<Owner, Class<?>> getOwnerProperty() {
 		Owner owner = getEntityClass().getAnnotation(Owner.class);
 		if (owner == null)
 			return null;
@@ -1128,10 +1136,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		bw.setConversionService(conversionService);
 		Class type = bw.getPropertyType(propertyName);
 		if (type == null)
-			throw new IllegalArgumentException("No Such property " + propertyName + " of bean " + getEntityClass());
-		if (!UserDetails.class.isAssignableFrom(type))
-			throw new IllegalArgumentException("property " + propertyName + " of bean " + getEntityClass()
-					+ " is not instanceof " + UserDetails.class);
+			throw new IllegalArgumentException("No Such property " + propertyName + " of " + getEntityClass());
+		if (!UserDetails.class.isAssignableFrom(type) && String.class != type)
+			throw new IllegalArgumentException("property " + propertyName + " of " + getEntityClass()
+					+ " is not String or instanceof " + UserDetails.class);
 		return new Tuple<>(owner, type);
 	}
 
@@ -1140,16 +1148,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		tryFindEntity();
 		if (_entity == null)
 			return isAjax() ? NONE : NOTFOUND;
-		Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
+		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 		if (ownerProperty != null) {
 			Owner owner = ownerProperty.getKey();
 			if (!(StringUtils.isNotBlank(owner.supervisorRole())
 					&& AuthzUtils.authorize(null, owner.supervisorRole(), null)) && owner.isolate()) {
-				UserDetails ud = AuthzUtils.getUserDetails(ownerProperty.getValue());
-				BeanWrapperImpl bwi = new BeanWrapperImpl(_entity);
-				bwi.setConversionService(conversionService);
-				Object value = bwi.getPropertyValue(owner.propertyName());
-				if (ud == null || value == null || !ud.equals(value)) {
+				if (!hasOwnership(_entity)) {
 					addActionError(getText("access.denied"));
 					return ACCESSDENIED;
 				}
@@ -1166,15 +1170,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (_entity == null)
 			return NOTFOUND;
 		BeanWrapperImpl bwi = new BeanWrapperImpl(_entity);
-		Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
+		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 		if (ownerProperty != null) {
 			Owner owner = ownerProperty.getKey();
 			if (!(StringUtils.isNotBlank(owner.supervisorRole())
 					&& AuthzUtils.authorize(null, owner.supervisorRole(), null)) && owner.isolate()) {
-				UserDetails ud = AuthzUtils.getUserDetails(ownerProperty.getValue());
-				bwi.setConversionService(conversionService);
-				Object value = bwi.getPropertyValue(owner.propertyName());
-				if (ud == null || value == null || !ud.equals(value)) {
+				if (!hasOwnership(_entity)) {
 					addActionError(getText("access.denied"));
 					return ACCESSDENIED;
 				}
@@ -1235,15 +1236,15 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			logger.error(e.getMessage(), e);
 		}
 		if (id.length > 0) {
-			Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
+			Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 
-			UserDetails ud = null;
 			if (ownerProperty != null) {
 				Owner owner = ownerProperty.getKey();
 				if (!(StringUtils.isNotBlank(owner.supervisorRole())
 						&& AuthzUtils.authorize(null, owner.supervisorRole(), null))) {
-					ud = AuthzUtils.getUserDetails(ownerProperty.getValue());
-					if (ud == null) {
+					if (ownerProperty.getValue() == String.class && AuthzUtils.getUsername() == null
+							|| ownerProperty.getValue() != String.class && AuthzUtils
+									.getUserDetails((Class<? extends UserDetails>) ownerProperty.getValue()) == null) {
 						addActionError(getText("access.denied"));
 						return ACCESSDENIED;
 					}
@@ -1264,10 +1265,20 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							BeanWrapperImpl bwi = new BeanWrapperImpl(en);
 							bwi.setConversionService(conversionService);
 							Object value = bwi.getPropertyValue(owner.propertyName());
-							if (value == null || !ud.equals(value)) {
-								addActionError(getText("delete.forbidden", new String[] { en.toString() }));
-								deletable = false;
-								break;
+							if (ownerProperty.getValue() == String.class) {
+								if (value == null || !AuthzUtils.getUsername().equals(value)) {
+									addActionError(getText("delete.forbidden", new String[] { en.toString() }));
+									deletable = false;
+									break;
+								}
+							} else {
+								if (value == null || !AuthzUtils
+										.getUserDetails((Class<? extends UserDetails>) ownerProperty.getValue())
+										.equals(value)) {
+									addActionError(getText("delete.forbidden", new String[] { en.toString() }));
+									deletable = false;
+									break;
+								}
 							}
 						}
 					}
@@ -1416,14 +1427,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			logger.error(e.getMessage(), e);
 		}
 		if (id.length > 0) {
-			Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
-			UserDetails ud = null;
+			Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 			if (ownerProperty != null) {
 				Owner owner = ownerProperty.getKey();
 				if (!(StringUtils.isNotBlank(owner.supervisorRole())
 						&& AuthzUtils.authorize(null, owner.supervisorRole(), null))) {
-					ud = AuthzUtils.getUserDetails(ownerProperty.getValue());
-					if (ud == null) {
+					if (ownerProperty.getValue() == String.class && AuthzUtils.getUsername() == null
+							|| ownerProperty.getValue() != String.class && AuthzUtils
+									.getUserDetails((Class<? extends UserDetails>) ownerProperty.getValue()) == null) {
 						addActionError(getText("access.denied"));
 						return ACCESSDENIED;
 					}
@@ -1441,8 +1452,15 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						BeanWrapperImpl bwi = new BeanWrapperImpl(en);
 						bwi.setConversionService(conversionService);
 						Object value = bwi.getPropertyValue(owner.propertyName());
-						if (value == null || !ud.equals(value))
-							continue;
+						if (ownerProperty.getValue() == String.class) {
+							if (value == null || !AuthzUtils.getUsername().equals(value))
+								continue;
+						} else {
+							if (value == null || !AuthzUtils
+									.getUserDetails((Class<? extends UserDetails>) ownerProperty.getValue())
+									.equals(value))
+								continue;
+						}
 					}
 				}
 				String expression = getReadonly().getExpression();
@@ -1616,6 +1634,27 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			logger.error(e.getMessage(), e);
 		}
 		return entity;
+	}
+
+	private boolean hasOwnership(Persistable<?> entity) {
+		BeanWrapperImpl bw = new BeanWrapperImpl(entity);
+		bw.setConversionService(conversionService);
+		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
+		if (ownerProperty != null) {
+			Object value = bw.getPropertyValue(ownerProperty.getKey().propertyName());
+			if (ownerProperty.getValue() == String.class) {
+				String username = AuthzUtils.getUsername();
+				if (username == null || value == null || !username.equals(value)) {
+					return false;
+				}
+			} else {
+				UserDetails ud = AuthzUtils.getUserDetails((Class<? extends UserDetails>) ownerProperty.getValue());
+				if (ud == null || value == null || !ud.equals(value)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	@Inject
