@@ -43,7 +43,7 @@ public class RedisLockService implements LockService {
 		String value = AppInfo.getInstanceId();
 		boolean success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 		if (success)
-			stringRedisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+			stringRedisTemplate.expire(key, this.timeout, TimeUnit.SECONDS);
 		return success;
 	}
 
@@ -67,7 +67,7 @@ public class RedisLockService implements LockService {
 			success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 		}
 		if (success)
-			stringRedisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+			stringRedisTemplate.expire(key, this.timeout, TimeUnit.SECONDS);
 		return success;
 	}
 
@@ -84,7 +84,7 @@ public class RedisLockService implements LockService {
 			}
 			success = stringRedisTemplate.opsForValue().setIfAbsent(key, value);
 			if (success)
-				stringRedisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+				stringRedisTemplate.expire(key, this.timeout, TimeUnit.SECONDS);
 		}
 
 	}
