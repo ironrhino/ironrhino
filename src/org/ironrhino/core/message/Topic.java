@@ -10,4 +10,8 @@ public interface Topic<T extends Serializable> {
 
 	public void publish(T message, Scope scope);
 
+	public default void publish(T message) {
+		publish(message, null);
+	}
+
 }
