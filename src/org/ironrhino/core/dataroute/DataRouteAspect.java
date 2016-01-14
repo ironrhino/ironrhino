@@ -42,7 +42,7 @@ public class DataRouteAspect extends BaseAspect {
 		}
 	}
 
-	@Around("execution(public * *(..)) and @annotation(dataRoute))")
+	@Around("execution(public * *(..)) and @annotation(dataRoute)")
 	public Object determineGroup(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
 		String groupName = ExpressionUtils.evalString(dataRoute.value(), context);
