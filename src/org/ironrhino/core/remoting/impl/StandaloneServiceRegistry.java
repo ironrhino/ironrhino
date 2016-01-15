@@ -14,6 +14,26 @@ import org.springframework.stereotype.Component;
 public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
+	protected void register(String serviceName) {
+
+	}
+
+	@Override
+	protected void unregister(String serviceName) {
+
+	}
+
+	@Override
+	protected void onReady() {
+
+	}
+
+	@Override
+	protected void lookup(String serviceName) {
+
+	}
+
+	@Override
 	public Collection<String> getAllServices() {
 		return exportServices.keySet();
 	}

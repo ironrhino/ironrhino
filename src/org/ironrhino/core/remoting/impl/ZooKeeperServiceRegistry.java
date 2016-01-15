@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
@@ -47,8 +49,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		this.curatorFramework = curatorFramework;
 	}
 
-	@Override
-	public void prepare() {
+	@PostConstruct
+	public void afterPropertiesSet() {
 		servicesParentPath = zooKeeperPath + "/services";
 		hostsParentPath = zooKeeperPath + "/hosts";
 	}
@@ -76,7 +78,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public void doRegister(String serviceName, String host) {
+	public void register(String serviceName) {
+		String host = getLocalHost();
 		String path = new StringBuilder().append(servicesParentPath).append("/").append(serviceName).append("/")
 				.append(escapeSlash(host)).toString();
 		try {
@@ -84,6 +87,11 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	protected void unregister(String serviceName) {
+
 	}
 
 	@Override

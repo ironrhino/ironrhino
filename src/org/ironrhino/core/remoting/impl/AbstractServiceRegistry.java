@@ -66,7 +66,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (!ctxPath.isEmpty())
 				localHost += ctxPath;
 		}
-		prepare();
 		String[] beanNames = ctx.getBeanDefinitionNames();
 		for (String beanName : beanNames) {
 			BeanDefinition bd = ctx.getBeanFactory().getBeanDefinition(beanName);
@@ -130,8 +129,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 									inte.getName());
 						} else {
 							exportServices.put(inte.getName(), ctx.getBean(beanName));
-							logger.info(" exported service [{}] for bean [{}#{}]", inte.getName(), beanClassName,
-									beanName);
+							logger.info(" exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
+									beanName, localHost);
 						}
 					}
 				}
@@ -146,7 +145,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			Remoting remoting = clazz.getAnnotation(Remoting.class);
 			if (remoting != null) {
 				exportServices.put(clazz.getName(), ctx.getBean(beanName));
-				logger.info(" exported service [{}] for bean [{}#{}]", clazz.getName(), beanClassName, beanName);
+				logger.info(" exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
+						localHost);
 			}
 			for (Class<?> c : clazz.getInterfaces())
 				export(c, beanName, beanClassName);
@@ -175,47 +175,17 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	}
 
-	@Override
-	public void register(String serviceName) {
-		doRegister(serviceName, localHost);
-	}
-
-	@Override
-	public void unregister(String serviceName) {
-		doUnregister(serviceName, localHost);
-	}
-
 	protected void onDiscover(String serviceName, String host) {
 		logger.info("discovered " + serviceName + "@" + host);
 	}
 
-	protected void onRegister(String serviceName, String host) {
-		logger.info("registered " + serviceName + "@" + host);
-	}
+	protected abstract void register(String serviceName);
 
-	protected void onUnregister(String serviceName, String host) {
-		logger.info("unregistered " + serviceName + "@" + host);
-	}
+	protected abstract void unregister(String serviceName);
 
-	protected void prepare() {
+	protected abstract void onReady();
 
-	}
-
-	protected void onReady() {
-
-	}
-
-	protected void lookup(String serviceName) {
-
-	}
-
-	protected void doRegister(String serviceName, String host) {
-
-	}
-
-	protected void doUnregister(String serviceName, String host) {
-
-	}
+	protected abstract void lookup(String serviceName);
 
 	@PreDestroy
 	public void destroy() {
