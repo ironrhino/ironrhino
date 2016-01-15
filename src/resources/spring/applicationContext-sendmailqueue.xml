@@ -10,11 +10,10 @@
 				ref="rabbitSimpleMailMessageWrapperQueue" method="consume" />
 		</rabbit:listener-container>
 		<bean id="rabbitSimpleMailMessageWrapperQueue"
-			class="org.ironrhino.core.mail.RabbitSimpleMailMessageWrapperQueue"
-			primary="true" />
+			class="org.ironrhino.core.mail.RabbitSimpleMailMessageWrapperQueue" primary="true" />
 	</beans>
 	<beans profile="dual,cloud,cluster">
 		<bean id="redisSimpleMailMessageWrapperQueue"
-			class="org.ironrhino.core.mail.RedisSimpleMailMessageWrapperQueue" />
+			class="org.ironrhino.core.mail.RedisSimpleMailMessageWrapperQueue" p:consuming="true" />
 	</beans>
 </beans>
