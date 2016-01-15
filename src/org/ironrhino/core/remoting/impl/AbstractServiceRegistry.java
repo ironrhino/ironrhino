@@ -22,9 +22,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 
 public abstract class AbstractServiceRegistry implements ServiceRegistry {
+
+	private static final String CLASS_NAME_SERVER = "org.ironrhino.core.remoting.server.HttpInvokerServer";
+	private static final String CLASS_NAME_CLIENT = "org.ironrhino.core.remoting.client.HttpInvokerClient";
+	private static final boolean IS_SERVER_PRESENT = ClassUtils.isPresent(CLASS_NAME_SERVER,
+			AbstractServiceRegistry.class.getClassLoader());
+	private static final boolean IS_CLIENT_PRESENT = ClassUtils.isPresent(CLASS_NAME_CLIENT,
+			AbstractServiceRegistry.class.getClassLoader());
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -77,15 +85,25 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (beanClassName.startsWith("org.ironrhino.core.remoting.client.") && beanClassName.endsWith("Client")) {
 				// remoting_client
 				String serviceName = (String) bd.getPropertyValues().getPropertyValue("serviceInterface").getValue();
-				importServices.put(serviceName, new ArrayList<String>());
+				if (IS_CLIENT_PRESENT)
+					importServices.put(serviceName, new ArrayList<String>());
 			} else {
-				export(clazz, beanName, beanClassName);
+				if (IS_SERVER_PRESENT)
+					export(clazz, beanName, beanClassName);
 			}
 		}
-		for (String serviceName : exportServices.keySet())
-			register(serviceName);
-		for (String serviceName : importServices.keySet())
-			lookup(serviceName);
+		if (IS_SERVER_PRESENT) {
+			for (String serviceName : exportServices.keySet())
+				register(serviceName);
+		} else {
+			logger.warn("No class [" + CLASS_NAME_SERVER + "] found, skip register services");
+		}
+		if (IS_CLIENT_PRESENT) {
+			for (String serviceName : importServices.keySet())
+				lookup(serviceName);
+		} else {
+			logger.warn("No class [" + CLASS_NAME_CLIENT + "] found, skip lookup services");
+		}
 		onReady();
 	}
 
