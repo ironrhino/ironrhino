@@ -2,20 +2,31 @@ package org.ironrhino.core.coordination.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
+import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.google.common.util.concurrent.Striped;
 
 @Component("lockService")
 @ServiceImplementationConditional(profiles = DEFAULT)
 public class StandaloneLockService implements LockService {
 
-	private ConcurrentHashMap<String, Lock> locks = new ConcurrentHashMap<>();
+	@Value("${lockService.lockStripes:4}")
+	private int lockStripes = 4;
+
+	private Striped<Lock> stripedLocks;
+
+	@PostConstruct
+	public void init() {
+		stripedLocks = Striped.lazyWeakLock(lockStripes);
+	}
 
 	@Override
 	public boolean tryLock(String name) {
@@ -43,13 +54,6 @@ public class StandaloneLockService implements LockService {
 	}
 
 	private Lock getLock(String name) {
-		Lock lock = locks.get(name);
-		if (lock == null) {
-			Lock newLock = new ReentrantLock();
-			lock = locks.putIfAbsent(name, newLock);
-			if (lock == null)
-				lock = newLock;
-		}
-		return lock;
+		return stripedLocks.get(name);
 	}
 }
