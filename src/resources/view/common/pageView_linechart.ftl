@@ -8,8 +8,8 @@
 	<span style="margin-right:10px;">${from?string('yyyy-MM-dd')} -> ${to?string('yyyy-MM-dd')}</span>
 	<#if max??>
 	<span class="pull-right" style="margin:0 10px;">${action.getText('max')}:
-	<strong>${max.b?string}</strong>
-	${max.a?string('yyyy-MM-dd')}
+	<strong>${max.value?string}</strong>
+	${max.key?string('yyyy-MM-dd')}
 	</span>
 	</#if>
 	<#if total??>
@@ -20,8 +20,8 @@
 	<#if dataList??>
 	<#list dataList as var>
 	<li style="float:left;width:200px;padding:10px;">
-	<span data-time="${var.a.time}">${var.a?string('yyyy-MM-dd')}</span>
-	<strong class="pull-right" style="margin-right:10px;">${var.b?string}</strong>
+	<span data-time="${var.key.time}">${var.key?string('yyyy-MM-dd')}</span>
+	<strong class="pull-right" style="margin-right:10px;">${var.value?string}</strong>
 	</li>
 	</#list>
 	</#if>

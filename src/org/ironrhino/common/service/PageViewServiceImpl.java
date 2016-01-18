@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.common.util.Location;
 import org.ironrhino.common.util.LocationUtils;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.RequestUtils;
@@ -192,22 +192,22 @@ public class PageViewServiceImpl implements PageViewService {
 	}
 
 	@Override
-	public Pair<String, Long> getMaxPageView(String domain) {
+	public Tuple<String, Long> getMaxPageView(String domain) {
 		return getMax("pv", domain);
 	}
 
 	@Override
-	public Pair<String, Long> getMaxUniqueIp(String domain) {
+	public Tuple<String, Long> getMaxUniqueIp(String domain) {
 		return getMax("uip", domain);
 	}
 
 	@Override
-	public Pair<String, Long> getMaxUniqueSessionId(String domain) {
+	public Tuple<String, Long> getMaxUniqueSessionId(String domain) {
 		return getMax("usid", domain);
 	}
 
 	@Override
-	public Pair<String, Long> getMaxUniqueUsername(String domain) {
+	public Tuple<String, Long> getMaxUniqueUsername(String domain) {
 		return getMax("uu", domain);
 	}
 
@@ -322,7 +322,7 @@ public class PageViewServiceImpl implements PageViewService {
 		}
 	}
 
-	private Pair<String, Long> getMax(String type, String domain) {
+	private Tuple<String, Long> getMax(String type, String domain) {
 		if (stringRedisTemplate == null)
 			return null;
 		StringBuilder sb = new StringBuilder(KEY_PAGE_VIEW);
@@ -332,7 +332,7 @@ public class PageViewServiceImpl implements PageViewService {
 		String str = (String) stringRedisTemplate.opsForHash().get(sb.toString(), type);
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split(",");
-			return new Pair<>(arr[0], Long.valueOf(arr[1]));
+			return new Tuple<>(arr[0], Long.valueOf(arr[1]));
 		}
 		return null;
 	}

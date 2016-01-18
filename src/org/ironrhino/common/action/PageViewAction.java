@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.struts2.ServletActionContext;
-import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.common.service.PageViewService;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +26,9 @@ public class PageViewAction extends BaseAction {
 
 	private Date to;
 
-	private List<Pair<Date, Long>> dataList;
+	private List<Tuple<Date, Long>> dataList;
 
-	private Pair<Date, Long> max;
+	private Tuple<Date, Long> max;
 
 	private Long total;
 
@@ -79,11 +79,11 @@ public class PageViewAction extends BaseAction {
 		this.to = to;
 	}
 
-	public List<Pair<Date, Long>> getDataList() {
+	public List<Tuple<Date, Long>> getDataList() {
 		return dataList;
 	}
 
-	public Pair<Date, Long> getMax() {
+	public Tuple<Date, Long> getMax() {
 		return max;
 	}
 
@@ -112,12 +112,12 @@ public class PageViewAction extends BaseAction {
 			while (!date.after(to)) {
 				String key = DateUtils.formatDate8(date);
 				Long value = pageViewService.getPageView(key, domain);
-				dataList.add(new Pair<>(date, value));
+				dataList.add(new Tuple<>(date, value));
 				date = DateUtils.addDays(date, 1);
 			}
-			Pair<String, Long> p = pageViewService.getMaxPageView(domain);
+			Tuple<String, Long> p = pageViewService.getMaxPageView(domain);
 			if (p != null)
-				max = new Pair<>(DateUtils.parseDate8(p.getA()), p.getB());
+				max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
 			long value = pageViewService.getPageView(null, domain);
 			if (value > 0)
 				total = value;
@@ -138,9 +138,9 @@ public class PageViewAction extends BaseAction {
 					c.setTime(d);
 					c.set(Calendar.MINUTE, 30);
 					c.set(Calendar.SECOND, 30);
-					dataList.add(new Pair<>(c.getTime(), value));
+					dataList.add(new Tuple<>(c.getTime(), value));
 				} else {
-					dataList.add(new Pair<>(cal.getTime(), 0L));
+					dataList.add(new Tuple<>(cal.getTime(), 0L));
 				}
 			}
 			return "barchart";
@@ -157,12 +157,12 @@ public class PageViewAction extends BaseAction {
 		while (!date.after(to)) {
 			String key = DateUtils.formatDate8(date);
 			Long value = pageViewService.getUniqueIp(key, domain);
-			dataList.add(new Pair<>(date, value));
+			dataList.add(new Tuple<>(date, value));
 			date = DateUtils.addDays(date, 1);
 		}
-		Pair<String, Long> p = pageViewService.getMaxUniqueIp(domain);
+		Tuple<String, Long> p = pageViewService.getMaxUniqueIp(domain);
 		if (p != null)
-			max = new Pair<>(DateUtils.parseDate8(p.getA()), p.getB());
+			max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
 		return "linechart";
 	}
 
@@ -176,12 +176,12 @@ public class PageViewAction extends BaseAction {
 		while (!date.after(to)) {
 			String key = DateUtils.formatDate8(date);
 			Long value = pageViewService.getUniqueSessionId(key, domain);
-			dataList.add(new Pair<>(date, value));
+			dataList.add(new Tuple<>(date, value));
 			date = DateUtils.addDays(date, 1);
 		}
-		Pair<String, Long> p = pageViewService.getMaxUniqueSessionId(domain);
+		Tuple<String, Long> p = pageViewService.getMaxUniqueSessionId(domain);
 		if (p != null)
-			max = new Pair<>(DateUtils.parseDate8(p.getA()), p.getB());
+			max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
 		return "linechart";
 	}
 
@@ -195,12 +195,12 @@ public class PageViewAction extends BaseAction {
 		while (!date.after(to)) {
 			String key = DateUtils.formatDate8(date);
 			Long value = pageViewService.getUniqueUsername(key, domain);
-			dataList.add(new Pair<>(date, value));
+			dataList.add(new Tuple<>(date, value));
 			date = DateUtils.addDays(date, 1);
 		}
-		Pair<String, Long> p = pageViewService.getMaxUniqueUsername(domain);
+		Tuple<String, Long> p = pageViewService.getMaxUniqueUsername(domain);
 		if (p != null)
-			max = new Pair<>(DateUtils.parseDate8(p.getA()), p.getB());
+			max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
 		return "linechart";
 	}
 

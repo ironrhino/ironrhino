@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
-import org.ironrhino.common.model.tuples.Pair;
+import org.ironrhino.core.model.Tuple;
 
 public interface PageViewService {
 
@@ -20,13 +20,13 @@ public interface PageViewService {
 
 	public long getUniqueUsername(String day, String domain);
 
-	public Pair<String, Long> getMaxPageView(String domain);
+	public Tuple<String, Long> getMaxPageView(String domain);
 
-	public Pair<String, Long> getMaxUniqueIp(String domain);
+	public Tuple<String, Long> getMaxUniqueIp(String domain);
 
-	public Pair<String, Long> getMaxUniqueSessionId(String domain);
+	public Tuple<String, Long> getMaxUniqueSessionId(String domain);
 
-	public Pair<String, Long> getMaxUniqueUsername(String domain);
+	public Tuple<String, Long> getMaxUniqueUsername(String domain);
 
 	public Map<String, Long> getTopPageViewUrls(String day, int top, String domain);
 

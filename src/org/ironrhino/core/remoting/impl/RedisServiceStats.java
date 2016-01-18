@@ -21,8 +21,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.remoting.InvocationSample;
 import org.ironrhino.core.remoting.InvocationSampler;
 import org.ironrhino.core.remoting.InvocationWarning;
@@ -150,17 +150,17 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	@Override
-	public Pair<String, Long> getMaxCount(String service, StatsType type) {
+	public Tuple<String, Long> getMaxCount(String service, StatsType type) {
 		String key = getNameSpace(type) + "max";
 		String str = (String) stringRedisTemplate.opsForHash().get(key, service);
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split(",");
-			return new Pair<>(arr[0], Long.valueOf(arr[1]));
+			return new Tuple<>(arr[0], Long.valueOf(arr[1]));
 		} else {
 			String today = DateUtils.formatDate8(new Date());
 			long count = getCount(service, today, type);
 			if (count > 0)
-				return new Pair<>(today, count);
+				return new Tuple<>(today, count);
 		}
 		return null;
 	}

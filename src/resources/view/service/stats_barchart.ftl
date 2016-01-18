@@ -11,8 +11,8 @@
 	<#if dataList??>
 	<#list dataList as var>
 	<li style="float:left;width:200px;padding:10px;">
-	<span>${var.a?string('HH')}</span>
-	<strong class="pull-right" style="margin-right:10px;">${var.b?string}</strong>
+	<span>${var.key?string('HH')}</span>
+	<strong class="pull-right" style="margin-right:10px;">${var.value?string}</strong>
 	</li>
 	</#list>
 	</#if>

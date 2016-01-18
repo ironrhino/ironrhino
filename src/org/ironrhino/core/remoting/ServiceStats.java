@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.ironrhino.common.model.tuples.Pair;
+import org.ironrhino.core.model.Tuple;
 
 public interface ServiceStats {
 
@@ -14,7 +14,7 @@ public interface ServiceStats {
 
 	public Map<String, Set<String>> getServices();
 
-	public Pair<String, Long> getMaxCount(String service, StatsType type);
+	public Tuple<String, Long> getMaxCount(String service, StatsType type);
 
 	public long getCount(String service, String key, StatsType type);
 

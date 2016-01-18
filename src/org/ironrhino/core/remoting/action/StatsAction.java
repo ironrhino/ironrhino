@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.remoting.InvocationSample;
 import org.ironrhino.core.remoting.InvocationWarning;
 import org.ironrhino.core.remoting.ServiceStats;
@@ -34,9 +34,9 @@ public class StatsAction extends BaseAction {
 
 	private int limit = 10;
 
-	private List<Pair<Date, Long>> dataList;
+	private List<Tuple<Date, Long>> dataList;
 
-	private Pair<Date, Long> max;
+	private Tuple<Date, Long> max;
 
 	private Long total;
 
@@ -119,11 +119,11 @@ public class StatsAction extends BaseAction {
 		this.limit = limit;
 	}
 
-	public List<Pair<Date, Long>> getDataList() {
+	public List<Tuple<Date, Long>> getDataList() {
 		return dataList;
 	}
 
-	public Pair<Date, Long> getMax() {
+	public Tuple<Date, Long> getMax() {
 		return max;
 	}
 
@@ -164,12 +164,12 @@ public class StatsAction extends BaseAction {
 			while (!date.after(to)) {
 				String key = DateUtils.formatDate8(date);
 				Long value = serviceStats.getCount(service, key, type);
-				dataList.add(new Pair<>(date, value));
+				dataList.add(new Tuple<>(date, value));
 				date = DateUtils.addDays(date, 1);
 			}
-			Pair<String, Long> p = serviceStats.getMaxCount(service, type);
+			Tuple<String, Long> p = serviceStats.getMaxCount(service, type);
 			if (p != null)
-				max = new Pair<>(DateUtils.parseDate8(p.getA()), p.getB());
+				max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
 			long value = serviceStats.getCount(service, null, type);
 			if (value > 0)
 				total = value;
@@ -190,9 +190,9 @@ public class StatsAction extends BaseAction {
 					c.setTime(d);
 					c.set(Calendar.MINUTE, 30);
 					c.set(Calendar.SECOND, 30);
-					dataList.add(new Pair<>(c.getTime(), value));
+					dataList.add(new Tuple<>(c.getTime(), value));
 				} else {
-					dataList.add(new Pair<>(cal.getTime(), 0L));
+					dataList.add(new Tuple<>(cal.getTime(), 0L));
 				}
 			}
 			return "barchart";
