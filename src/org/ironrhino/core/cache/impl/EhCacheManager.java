@@ -2,6 +2,7 @@ package org.ironrhino.core.cache.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -12,9 +13,12 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.ObjectExistsException;
 
@@ -24,9 +28,12 @@ public class EhCacheManager implements CacheManager {
 
 	private net.sf.ehcache.CacheManager ehCacheManager;
 
+	@Value("${ehcache.configLocation:classpath:ehcache.xml}")
+	private Resource configLocation;
+
 	@PostConstruct
-	public void init() {
-		this.ehCacheManager = new net.sf.ehcache.CacheManager();
+	public void init() throws CacheException, IOException {
+		this.ehCacheManager = net.sf.ehcache.CacheManager.create(configLocation.getInputStream());
 	}
 
 	@PreDestroy
