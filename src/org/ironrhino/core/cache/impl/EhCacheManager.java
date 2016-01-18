@@ -2,10 +2,10 @@ package org.ironrhino.core.cache.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -17,8 +17,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import com.google.common.util.concurrent.Striped;
+
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.ObjectExistsException;
 
@@ -31,9 +32,15 @@ public class EhCacheManager implements CacheManager {
 	@Value("${ehcache.configLocation:classpath:ehcache.xml}")
 	private Resource configLocation;
 
+	@Value("${ehcache.lockStripes:4}")
+	private int lockStripes = 4;
+
+	private Striped<Lock> stripedLocks;
+
 	@PostConstruct
-	public void init() throws CacheException, IOException {
+	public void init() throws Exception {
 		this.ehCacheManager = net.sf.ehcache.CacheManager.create(configLocation.getInputStream());
+		this.stripedLocks = Striped.lazyWeakLock(lockStripes);
 	}
 
 	@PreDestroy
@@ -171,10 +178,24 @@ public class EhCacheManager implements CacheManager {
 			if (element == null) {
 				return delta;
 			} else {
-				long value = ((long) element.getObjectValue()) + delta;
-				cache.put(new Element(key, new Long(value), timeToLive <= 0 ? true : null, null,
-						(int) timeUnit.toSeconds(timeToLive)));
-				return value;
+				Lock lock = stripedLocks.get(namespace + ":" + key);
+				System.out.println("size:" + stripedLocks.size());
+				lock.lock();
+				try {
+					element = cache.get(key);
+					if (element == null) {
+						cache.put(new Element(key, new Long(delta), timeToLive <= 0 ? true : null, null,
+								(int) timeUnit.toSeconds(timeToLive)));
+						return delta;
+					} else {
+						long value = ((long) element.getObjectValue()) + delta;
+						cache.put(new Element(key, new Long(value), timeToLive <= 0 ? true : null, null,
+								(int) timeUnit.toSeconds(timeToLive)));
+						return value;
+					}
+				} finally {
+					lock.unlock();
+				}
 			}
 		} else
 			return -1;
