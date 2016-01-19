@@ -1,0 +1,156 @@
+= 自动配置Struts2
+
+前面的增删改查章节已经初步介绍了 `@AutoConfig` 的用法, 它的目的是取代struts2繁琐的xml配置文件, 遵循约定俗成使用注解的方式配置映射关系.
+
+== 映射规则
+=== URL到Action的映射
+
+URL由下面几部分组成
+
+. `namespace` 可选, 默认是 `/`, 用来划分命名空间防止不同模块间的 `actionName` 同名冲突, 匹配规则会优先选择深度最大的, 比如 `/a/b/c` 会比 `/a/b` 优先级高
+. `actionName` 必选, 用来对应具体的action类, 对于相同 `namespace` 下面有多个相同 `actionName` 的类, 可以用spring的 `@Order` 注解来标注取优先级最高的
+. `methodName` 可选, 如果不包含则调用的是action的 `execute` 方法
+. `id` 可选, 为了美化url, 等同于在url后面带上 `id` 请求参数
+
+
+可能的组合如下:
+
+. `{actionName}/{methodName}/{id}` 匹配 `/product/view/1`, 则 `actionName=product` `methodName=view`  `id=1`, 等同于 `/product/view?id=1`
+. `{actionName}/{methodName}` 匹配 `/product/view`, 则 `actionName=product` `methodName=view`
+. `{actionName}/${id}` 匹配 `/product/1`, 则 `actionName=product` `methodName=execute` `id=1`, 等同于 `/product?id=1` , 请注意这种情况下为了跟第二种组合区分, `id` 要满足以下几个条件之一
+- 长度为32, 对应UUID的长度, 一般不会用这么长的方法名
+- 长度为22, BASE62压缩UUID后并前面补零的长度, 这是平台默认生成的ID的长度, 一般不会用这么长的方法名
+- 纯数字, 自增长类型的ID符合这个规则, 数字开头不能作为方法名
+- 包含不能作为方法名的字符, 比如包含百分号等
+. `{actionName}` 匹配 `/product`, 则 `actionName=product` `methodName=execute`
+. 以上每种组合前面带上 `{namespace}` 覆盖默认的 `namespace=/`, 比如 `{namespace}/{actionName}/{methodName}/{id}` 匹配 `/my/app/product/view/1`, 则在第一种组合下多了 `namespace=/my/app`
+
+=== Result到Freemarker模板文件的映射
+Action的方法返回一个String类型的result, 框架需要将result转换成response返回给前端浏览器.
+一般情况下都是渲染FTL模板成HTML, result跟FTL模板按一定的规则和顺序匹配,
+从头开始搜索FTL模板, 哪个先匹配就用哪一个模板,
+也可以利用这种规则在各自的应用工程里面去覆盖底层提供好的模板.
+
+当result不为 `success`:
+
+. /WEB-INF/view/ftl/{namespace}/{actionName}_{result}.ftl
+. classpath:resources/view/{namespace}/{actionName}_{result}.ftl
+. /WEB-INF/view/ftl/meta/result/{result}.ftl
+. classpath:resources/view/meta/result/{result}.ftl
+
+当result为 `success` 并且methodName为 `execute`:
+
+. /WEB-INF/view/ftl/{namespace}/{actionName}.ftl
+. classpath:resources/view/{namespace}/{actionName}.ftl
+. /WEB-INF/view/ftl/meta/result/{result}.ftl
+. classpath:resources/view/meta/result/{result}.ftl
+
+当result为 `success` 并且methodName不为 `execute`,
+这种情况会重定向到 `/{namespace}/{actionName}` 也就是会调转到 `execute` ,
+比如对于一个典型的模块, `execute` 方法返回 `success` 作为主入口返回一个主页面, 其他方法执行某些操作后返回 `success` 重定向会主页面.
+增删改查尤其适用, `execute` 返回列表页面, 增删改之后还是回到列表页面.
+
+
+
+另外还有几种特殊的result:
+
+- `none` 返回空白
+- `redirect` 重定向到 `${targetUrl}`
+- `referer` 重定向到header里面的 referer
+- `error` 返回一个错误页面
+- `accessDenied` 返回权限不足的提示页面
+- `json` 渲染json返回, 需要配合 `@JsonConfig` 使用
+
+
+== 最简单的演示
+[source,java]
+.DemoAction.java
+----
+package com.demo.action;
+
+import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.struts.BaseAction;
+
+@AutoConfig(namespace = "/app")
+public class DemoAction extends BaseAction {
+
+	@Override
+	public String execute() {
+		return SUCCESS;
+	}
+
+}
+----
+这里直接在Action类上的 `@AutoConfig` 指明了 `namespace`,
+如果未指明则会从Action类所在的包开始往上搜寻 `package-info.java` 里面的 `@AutoConfig`, 使用第一个找到的里面的 `namespace` .
+`@AutoConfig` 里面没有指明 `actionName`, 则用Action类名小写首字母之后去掉结尾的Action作为 `actionName`.
+
+[source,html]
+.resources/view/app/demo.ftl
+----
+<!DOCTYPE html>
+<html>
+<head>
+<title>演示</title>
+</head>
+<body>
+这是一个演示而已
+</body>
+</html>
+----
+
+访问 http://localhost:8080/app/demo 就能看到效果.
+
+== 增加非 `execute` 方法
+[source,java]
+.DemoAction.java
+----
+
+public String test() {
+	return "test";
+}
+
+----
+
+[source,html]
+.resources/view/app/demo_test.ftl
+----
+<html>
+<head>
+<title>演示</title>
+</head>
+<body>
+这是用来演示 test 的
+</body>
+</html>
+----
+
+访问 http://localhost:8080/app/demo/test 就能看到效果.
+
+== URL里面带上 `id`
+[source,java]
+.DemoAction.java
+----
+
+public String test() {
+	System.out.println("获取到ID: "+ getUid());
+	return "test";
+}
+
+----
+
+[source,html]
+.resources/view/app/demo_test.ftl
+----
+<html>
+<head>
+<title>演示</title>
+</head>
+<body>
+这是用来演示 test 的 <#if uid??>, id=${uid}</#if>
+</body>
+</html>
+----
+
+访问 http://localhost:8080/app/demo/test/123 就能看到效果.
+访问 http://localhost:8080/app/demo/test?id=123 也能看到效果.
