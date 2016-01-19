@@ -1,10 +1,7 @@
 package org.ironrhino.core.spring.configuration;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
 
@@ -26,28 +21,7 @@ class ServiceImplementationCondition implements Condition {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private static Properties services = new Properties();
-
 	private static Set<String> set = new HashSet<>();
-
-	static {
-		Resource resource = new ClassPathResource("services.properties");
-		if (resource.exists()) {
-			try (InputStream is = resource.getInputStream()) {
-				services.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		resource = new ClassPathResource("services." + AppInfo.getStage().name() + ".properties");
-		if (resource.exists()) {
-			try (InputStream is = resource.getInputStream()) {
-				services.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -80,8 +54,6 @@ class ServiceImplementationCondition implements Condition {
 				if (serviceInterfaceName != null) {
 					String implementationClassName = AppInfo.getApplicationContextProperties()
 							.getProperty(serviceInterfaceName);
-					if (StringUtils.isBlank(implementationClassName))
-						implementationClassName = services.getProperty(serviceInterfaceName);
 					if (StringUtils.isNotBlank(implementationClassName)) {
 						boolean matched = implementationClassName.equals(className);
 						if (matched) {
