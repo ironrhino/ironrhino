@@ -8,3 +8,4 @@
 +classmate
 +validation-api
 -spring-aspects
++spring-retry

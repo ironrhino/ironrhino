@@ -1,4 +1,4 @@
-package org.ironrhino.sample.retry;
+package org.ironrhino.core.spring.configuration;
 
 import org.springframework.context.annotation.Configuration;
 
