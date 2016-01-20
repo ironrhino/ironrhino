@@ -46,32 +46,30 @@ public class ZooKeeperMembership implements Membership {
 
 	@Override
 	public void join(final String group) throws Exception {
-		LeaderLatch latch = latchs.get(group);
-		if (latch == null) {
-			latch = new LeaderLatch(curatorFramework, zooKeeperPath + "/" + group, AppInfo.getInstanceId());
-			LeaderLatch old = latchs.putIfAbsent(group, latch);
-			if (old == null) {
-				latch.start();
-				if (leaderChangeListeners != null)
-					latch.addListener(new LeaderLatchListener() {
+		LeaderLatch latch = latchs.computeIfAbsent(group, (key) -> {
+			LeaderLatch newLatch = new LeaderLatch(curatorFramework, zooKeeperPath + "/" + key,
+					AppInfo.getInstanceId());
+			if (leaderChangeListeners != null)
+				newLatch.addListener(new LeaderLatchListener() {
 
-						@Override
-						public void notLeader() {
-							for (LeaderChangeListener leaderChangeListener : leaderChangeListeners)
-								if (leaderChangeListener.supports(group))
-									leaderChangeListener.notLeader();
-						}
+					@Override
+					public void notLeader() {
+						for (LeaderChangeListener leaderChangeListener : leaderChangeListeners)
+							if (leaderChangeListener.supports(key))
+								leaderChangeListener.notLeader();
+					}
 
-						@Override
-						public void isLeader() {
-							for (LeaderChangeListener leaderChangeListener : leaderChangeListeners)
-								if (leaderChangeListener.supports(group))
-									leaderChangeListener.isLeader();
-						}
+					@Override
+					public void isLeader() {
+						for (LeaderChangeListener leaderChangeListener : leaderChangeListeners)
+							if (leaderChangeListener.supports(key))
+								leaderChangeListener.isLeader();
+					}
 
-					});
-			}
-		}
+				});
+			return newLatch;
+		});
+		latch.start();
 	}
 
 	@Override

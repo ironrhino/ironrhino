@@ -112,12 +112,7 @@ public class StatLog {
 	}
 
 	private static Value getValue(Key key) {
-		Value value = data.get(key);
-		if (value == null) {
-			data.putIfAbsent(key, new Value(0));
-			value = data.get(key);
-		}
-		return value;
+		return data.computeIfAbsent(key, (k) -> new Value(0));
 	}
 
 	public static void add(Key key, long c, double d) {

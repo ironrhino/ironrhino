@@ -31,33 +31,18 @@ public enum StatsType implements Displayable {
 	}
 
 	public void increaseCount(String serviceName, String method) {
-		ConcurrentHashMap<String, AtomicInteger> map = countBuffer.get(serviceName);
-		if (map == null) {
-			ConcurrentHashMap<String, AtomicInteger> temp = new ConcurrentHashMap<>();
-			temp.put(method, new AtomicInteger());
-			map = countBuffer.putIfAbsent(serviceName, temp);
-			if (map == null)
-				map = temp;
-		}
-		AtomicInteger ai = map.get(method);
-		if (ai == null) {
-			AtomicInteger ai2 = new AtomicInteger();
-			ai = map.putIfAbsent(method, ai2);
-			if (ai == null)
-				ai = ai2;
-		}
+		ConcurrentHashMap<String, AtomicInteger> serviceMap = countBuffer.computeIfAbsent(serviceName, (key) -> {
+			ConcurrentHashMap<String, AtomicInteger> methodMap = new ConcurrentHashMap<>();
+			methodMap.put(method, new AtomicInteger());
+			return methodMap;
+		});
+		AtomicInteger ai = serviceMap.computeIfAbsent(method, (key) -> new AtomicInteger());
 		ai.incrementAndGet();
 	}
 
 	public void collectSample(String host, String serviceName, String method, long time) {
 		String service = serviceName + "." + method;
-		InvocationSampler sampler = sampleBuffer.get(service);
-		if (sampler == null) {
-			InvocationSampler temp = new InvocationSampler(host);
-			sampler = sampleBuffer.putIfAbsent(service, temp);
-			if (sampler == null)
-				sampler = temp;
-		}
+		InvocationSampler sampler = sampleBuffer.computeIfAbsent(service, (key) -> new InvocationSampler(host));
 		sampler.add(time);
 	}
 

@@ -46,13 +46,8 @@ public class ZooKeeperLockService implements LockService {
 
 	@Override
 	public boolean tryLock(String name, long timeout, TimeUnit unit) {
-		InterProcessMutex lock = locks.get(name);
-		if (lock == null) {
-			InterProcessMutex newLock = new InterProcessMutex(curatorFramework, zooKeeperPath + "/" + name);
-			lock = locks.putIfAbsent(name, newLock);
-			if (lock == null)
-				lock = newLock;
-		}
+		InterProcessMutex lock = locks.computeIfAbsent(name,
+				(key) -> new InterProcessMutex(curatorFramework, zooKeeperPath + "/" + key));
 		boolean success = false;
 		try {
 			success = lock.acquire(timeout, unit);
@@ -64,13 +59,8 @@ public class ZooKeeperLockService implements LockService {
 
 	@Override
 	public void lock(String name) throws Exception {
-		InterProcessMutex lock = locks.get(name);
-		if (lock == null) {
-			InterProcessMutex newLock = new InterProcessMutex(curatorFramework, zooKeeperPath + "/" + name);
-			lock = locks.putIfAbsent(name, newLock);
-			if (lock == null)
-				lock = newLock;
-		}
+		InterProcessMutex lock = locks.computeIfAbsent(name,
+				(key) -> new InterProcessMutex(curatorFramework, zooKeeperPath + "/" + key));
 		lock.acquire();
 	}
 
