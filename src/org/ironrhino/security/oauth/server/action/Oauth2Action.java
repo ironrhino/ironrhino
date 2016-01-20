@@ -282,10 +282,16 @@ public class Oauth2Action extends BaseAction {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		UserDetails grantor = AuthzUtils.getUserDetails();
 		if (grantor == null) {
-			Authentication authResult = null;
 			try {
-				authResult = authenticationManager
+				Authentication authResult = authenticationManager
 						.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+				if (authResult != null)
+					try {
+						usernamePasswordAuthenticationFilter.success(request, response, authResult);
+						grantor = (UserDetails) authResult.getPrincipal();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 				addFieldError("username", getText(failed.getClass().getName()));
 				return INPUT;
@@ -303,14 +309,6 @@ public class Oauth2Action extends BaseAction {
 				addActionError(ExceptionUtils.getRootMessage(failed));
 				return INPUT;
 			}
-			if (authResult != null)
-				try {
-					usernamePasswordAuthenticationFilter.success(request, response, authResult);
-					grantor = (UserDetails) authResult.getPrincipal();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
 		}
 		try {
 			if (authorization == null)
@@ -385,11 +383,23 @@ public class Oauth2Action extends BaseAction {
 					throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
 				try {
 					try {
-						authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+						Authentication authResult = authenticationManager
+								.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+						if (authResult != null)
+							try {
+								usernamePasswordAuthenticationFilter.success(request, response, authResult);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 					} catch (InternalAuthenticationServiceException failed) {
-						logger.error(failed.getMessage(), failed);
 						throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
 					} catch (AuthenticationException failed) {
+						logger.error(failed.getMessage(), failed);
+						try {
+							usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						throw new IllegalArgumentException(getText(failed.getClass().getName()));
 					}
 					UserDetails u = userDetailsService.loadUserByUsername(username);
