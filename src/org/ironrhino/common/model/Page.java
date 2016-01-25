@@ -313,6 +313,6 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 
 	@Override
 	public String toString() {
-		return this.path;
+		return StringUtils.defaultString(this.path);
 	}
 }
