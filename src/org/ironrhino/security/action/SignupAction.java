@@ -15,13 +15,13 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.core.security.event.LoginEvent;
 import org.ironrhino.core.security.util.Blowfish;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.Constants;
-import org.ironrhino.security.event.LoginEvent;
 import org.ironrhino.security.event.SignupEvent;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
@@ -38,7 +38,7 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
-@AutoConfig(namespace = "/")
+@AutoConfig
 @ClassPresentConditional("org.ironrhino.security.service.UserManagerImpl")
 public class SignupAction extends BaseAction {
 

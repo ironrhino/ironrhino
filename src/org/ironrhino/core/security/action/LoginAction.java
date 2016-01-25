@@ -1,4 +1,4 @@
-package org.ironrhino.security.action;
+package org.ironrhino.core.security.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +11,8 @@ import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.security.event.LoginEvent;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
@@ -18,7 +20,6 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.RequestUtils;
-import org.ironrhino.security.event.LoginEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
-@AutoConfig(namespace = "/")
+@AutoConfig
+@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class LoginAction extends BaseAction {
 
 	public final static String COOKIE_NAME_LOGIN_USER = "U";

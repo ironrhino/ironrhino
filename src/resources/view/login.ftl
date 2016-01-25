@@ -26,7 +26,9 @@
 		<@captcha/>
 		<@s.submit value="%{getText('login')}" class="btn-primary">
 		<#if getSetting??&&'true'==getSetting('signup.enabled')>
+		<@resourcePresentConditional value="resources/view/signup.ftl">
 		<@s.param name="after"> <a class="btn" href="${getUrl('/signup')}">${action.getText('signup')}</a></@s.param>
+		</@resourcePresentConditional>
 		</#if>
 		</@s.submit>
 	</@s.form>
@@ -34,9 +36,12 @@
 	</div>
 </div>
 <#if getSetting??&&'true'==getSetting('signup.enabled')&&'true'==getSetting('oauth.enabled')>
+<@resourcePresentConditional value="resources/view/oauth/connect.ftl">
 <div class="ajaxpanel" data-url="<@url value="/oauth/connect"/>">
 </div>
+</@resourcePresentConditional>
 </#if>
+
 <#else>
 <div class="modal">
 	<div class="modal-body">

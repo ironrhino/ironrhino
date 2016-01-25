@@ -44,10 +44,6 @@
 		<constructor-arg value="${rememberMe.key:youcannotguessme}"/>
 	</bean>	
 
-	<bean id="logoutSuccessHandler"
-		class="org.ironrhino.security.component.LogoutSuccessHandler"
-		p:defaultTargetUrl="${logout.defaultTargetUrl:/}" />
-
 	<bean id="rememberMeServices"
 		class="org.ironrhino.core.spring.security.DefaultTokenBasedRememberMeServices"
 		p:parameter="rememberme" p:cookieName="rm">

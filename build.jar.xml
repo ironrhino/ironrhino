@@ -306,7 +306,7 @@
 			</jar>
 			<delete dir="${target.dir}/assets" />
 			<antcall target="append-revision-for-assets" />
-			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="META-INF/**,log4j*.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-jar.includes},${zookeeper-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-stat-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-install-jar.includes},${common-qrcode-jar.includes},${common-feedback-jar.includes},${common-audit-jar.includes}">
+			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="META-INF/**,log4j*.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-jar.includes},${zookeeper-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-stat-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-install-jar.includes},${common-qrcode-jar.includes},${common-feedback-jar.includes},${common-audit-jar.includes}">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-core" />
 					<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -646,7 +646,7 @@
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 				</manifest>
 			</jar>
-			<jar jarfile="${target.dir}/${security-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/security/**,resources/i18n/security/**,resources/view/login.ftl,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-jar.includes},${security-signup-jar.includes},${security-loginrecord-jar.includes},${security-acl-jar.includes},${security-oauth-client-jar.includes},${security-oauth-server-jar.includes}">
+			<jar jarfile="${target.dir}/${security-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/security/**,resources/i18n/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-jar.includes},${security-signup-jar.includes},${security-loginrecord-jar.includes},${security-acl-jar.includes},${security-oauth-client-jar.includes},${security-oauth-server-jar.includes}">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-security" />
 					<attribute name="Implementation-Vendor" value="ironrhino" />
