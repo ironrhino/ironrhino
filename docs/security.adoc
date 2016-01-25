@@ -1,0 +1,243 @@
+= 用户角色和权限
+
+== 概述
+Ironrhino采用的是基于角色权限控制方案(Role-Based Access Control), 就像物理机械装置一样, 角色可以看做是连接用户和权限的轴点.
+用户和角色之间在运行期是灵活变动的, 但是角色和权限之间在运行期是固定的, 如果需要变动可以很快的修改源码重新打包部署一个新版本.
+角色和权限在运行期可以配置, 很多号称提供此功能的系统实际上仅仅停留在界面展现层, 这就有点像鸵鸟遇到危险就把头埋到沙里一样, 稍微专业点的人就可以绕过它, 真正的安全控制必须在服务端做, 有一句开发名言叫永远不要相信客户端传过来的数据, 要实现展现层和服务器端控制的运行期配置, 会大大提高系统的复杂度, 不仅影响开发效率, 而且还会影响运行效率, 得了芝麻丢了西瓜.
+应用系统好比一个企业, 用户就是员工, 角色是岗位, 员工和岗位之间是灵活调配的, 但是每个岗位的职责和权限早已在企业规章制度中规定好了不会朝令夕改, 如果确实需要变动一个岗位的权限, 则需要走相关的程序去通过新的企业规章制度.
+角色可以看做是一个或者多个权限的集合, 颗粒度是由开发者去把控, 颗粒度最小的情况下是为每一个权限定义一个角色, 这样可以精准的控制每个用户的权限, 但是不推荐这样做, 最好还是按照现实中的规则去制定角色, 并且合理的分配它们应有的权限.
+
+
+== 定制角色
+=== 显式角色
+显示角色是在用户管理界面上可以勾选的角色, 它有两个来源:
+
+- `org.ironrhino.core.security.role.UserRole` 本身和它的子类里面的字段名
+
+[source,java]
+.UserRole.java
+----
+package com.demo.model;
+
+import org.ironrhino.core.security.role.UserRole;
+
+public interface MyUserRole extends UserRole{
+
+	String HR = "HR";
+
+	String MANAGER = "MANAGER";
+
+}
+----
+这样会在界面上多出两个角色名供勾选, 记得在i18n的属性文件里面加上它们.
+
+- 实现了 `org.ironrhino.core.security.role.UserRoleProvider` 的bean, 比如:
+
+[source,java]
+.MyUserRoleProvider.java
+----
+package com.demo.component;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.ironrhino.core.security.role.UserRoleProvider;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyUserRoleProvider implements UserRoleProvider {
+
+	@Override
+	public Map<String, String> getRoles() {
+		Map<String, String> roles = new LinkedHashMap<String, String>();
+		roles.put("HR", "人力专员");
+		roles.put("MANAGER", "经理");
+		return roles;
+	}
+
+}
+----
+平台内置了一个基于字典模块的 `org.ironrhino.common.support.DictionaryUserRoleProvider`
+
+=== 隐含角色
+隐含角色不在界面上勾选, 而是根据用户属性映射出来的角色, 需要写自己的实现 `UserRoleMapper`
+
+[source,java]
+.MyUserRoleMapper.java
+----
+package com.demo.component;
+
+import org.ironrhino.core.security.role.UserRoleMapper;
+import org.ironrhino.security.model.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyUserRoleMapper implements UserRoleMapper {
+
+	@Override
+	public String[] map(UserDetails user) {
+		if (user instanceof User) {
+			User u = (User) user;
+			if (u.getDepartment() != null)
+				return new String[] { "ROLE_DEPARTMENT_" + u.getDepartment().getId() };
+		}
+		return null;
+	}
+
+}
+----
+`MyUserRoleMapper` 为设置了部门的用户增加一个用部门ID映射出来的角色.
+
+平台还内置了一个 `UsernameRoleMapper` , 为每一个用户增加一个独有的角色 `USERNAME(username)` , 比如admin用户的就是 `USERNAME(admin)` , 需要根据用户名授权访问的可以用此角色.
+
+== 权限控制
+权限主要是 `@Authorize` 注解和 `<@authorize/>` 宏来控制, 两者的用法一致, 它们都有几个属性, 全部接受单个或者多个角色, 从上到下哪一个先不为空就用哪个:
+
+. `ifAllGranted` 必须全部包含这些角色才满足
+. `ifAnyGranted` 只要包含其中一个角色就满足
+. `ifNotGranted` 必须所有角色都不包含才满足
+
+用法分别如下:
+
+- 服务器端web逻辑层:
+
+[source,java]
+.DemoAction.java
+----
+package com.demo.action;
+
+import org.ironrhino.core.metadata.Authorize;
+import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.struts.BaseAction;
+
+@AutoConfig(namespace = "/app")
+@Authorize(ifAnyGranted = { "MANAGER", "HR" })
+public class DemoAction extends BaseAction {
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public String execute() {
+		return SUCCESS;
+	}
+
+	@Authorize(ifAnyGranted = "MANAGER" )
+	public String test() {
+		return "test";
+	}
+
+}
+----
+方法级别的注解优先于类级别的注解, 对于自动增删改查的还可以在实体类上加 `@Authorize`
+
+- 界面展示层:
+[source,html]
+----
+<@authorize ifAnyGranted=["MANAGER","HR"]>
+我是经理或人力专员
+</@authorize>
+<@authorize ifNotGranted="MANAGER">
+我不是经理
+</@authorize>
+<@authorize ifAllGranted=["MANAGER","HR"]>
+我是经理兼人力专员
+</@authorize>
+<@authorize ifNotGranted=["MANAGER","HR"]>
+我既不是经理也不是人力专员
+</@authorize>
+----
+
+== 定制用户属性
+开发平台本身提供了 `org.ironrhino.security.model.User` 这一套用户体系, 应用系统通常可以重用它, 有些应用系统需要为 `User` 增加一些额外属性.
+下面示例为用户增加了一个部门属性.
+
+首先我们需要一个多层级目录的部门实体:
+[source,java]
+.Department.java
+----
+package com.demo.model;
+
+import javax.persistence.Entity;
+
+import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.model.BaseTreeableEntity;
+
+@AutoConfig
+@Entity
+public class Department extends BaseTreeableEntity<Department> {
+
+	private static final long serialVersionUID = 1L;
+
+}
+----
+访问 http://localhost:8080/department 来维护部门信息
+
+因为实体Bean不能方便的扩展继承, 因此选用了简单粗暴的覆盖User类, 请注意包名和类名不能变 :
+[source,java]
+.User.java
+----
+package org.ironrhino.security.model;
+
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.ironrhino.core.aop.PublishAware;
+import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.Richtable;
+import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
+
+import com.demo.model.Department;
+
+@PublishAware
+@AutoConfig
+@Searchable
+@Entity
+@Table(name = "user")
+@Richtable(order = "username asc")
+public class User extends BaseUser {
+
+	private static final long serialVersionUID = 1L;
+
+	@ManyToOne
+	private Department department;
+
+	//getter and setter
+
+}
+----
+
+因为平台没有使用基于注解的input页面, 而是定制了 `user_input.ftl`, 上面增加的 `department` 属性也需要加入到ftl里面去, 复制一份 `user_input.ftl` 并增加一段代码:
+[source,html]
+.resources/view/user_input.ftl
+----
+
+...
+
+<div class="control-group listpick" data-options="{'url':'/department/pick'}">
+<@s.hidden name="user.department.id" class="listpick-id" />
+<label class="control-label">${action.getText('department')}</label>
+<div class="controls">
+<span class="listpick-name">${(user.department)!}</span>
+</div>
+</div>
+
+...
+
+----
+
+接下来访问 http://localhost:8080/user 在用户创建/编辑界面就可以选择部门.
+
+
+== 增加一套用户体系
+整体用户体系是基于spring-security, Ironrhino内置提供了 `UserDetailsService` 的实现 `DelegatedUserDetailsService` ,
+用它来聚合单个或者多个 `ConcreteUserDetailsService` , 系统内置的 `UserManager` 就是继承了 `ConcreteUserDetailsService` .
+如果开发者需要在 `User` 之外另外提供一套用户体系比如 `Customer` , 需要做一下几步:
+
+. 仿 `User.java` 增加自己的 `Customer.java`
+. 仿 `UserManager.java` 增加自己的 `CustomerManager.java`
+. 仿 `UserManagerImpl.java` 增加自己的 `CustomerManagerImpl.java`
+
+在 `XXXManagerImpl` 里面用 `accepts` 方法来划分不同用户体系的命名空间.
+对于命名冲突比如同一个用户名在多套用户体系里面都存在的情况, 会根据 `ConcreteUserDetailsService` 的优先级取到第一个满足的用户对象, 具体方法就是在 `XXXManagerImpl` 上增加spring的 `@Order` 注解.
