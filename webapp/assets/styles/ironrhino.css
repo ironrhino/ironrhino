@@ -7905,6 +7905,9 @@ td.middle {
 .ui-widget{
 	font-size: 1em;
 }
+.ui-widget-content .breadcrumb a, .ui-widget-content td a  {  
+	color: #0088cc;  
+}
 .ui-icon.close{
 	opacity: 1;
 	filter: alpha(opacity=100);
