@@ -46,14 +46,21 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 		for (Class<?> remotingService : remotingServices) {
 			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))
 				continue;
-			if ("false".equals(
-					AppInfo.getApplicationContextProperties().getProperty(remotingService.getName() + ".remoting")))
+			String key = remotingService.getName() + ".imported";
+			if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
+				logger.info("skiped import service [{}] because {}=false", remotingService.getName(), key);
 				continue;
+			}
 			String beanName = NameGenerator.buildDefaultBeanName(remotingService.getName());
 			if (registry.containsBeanDefinition(beanName)) {
-				if (remotingService.getName().startsWith("org.ironrhino"))
-					continue;
-				beanName = remotingService.getName();
+				try {
+					Class<?> beanClass = Class.forName(registry.getBeanDefinition(beanName).getBeanClassName());
+					if (remotingService.isAssignableFrom(beanClass))
+						continue;
+				} catch (ClassNotFoundException e) {
+					logger.error(e.getMessage(), e);
+					e.printStackTrace();
+				}
 			}
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(HttpInvokerClient.class);
 			beanDefinition.setTargetType(remotingService);

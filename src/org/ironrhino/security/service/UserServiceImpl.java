@@ -2,7 +2,6 @@ package org.ironrhino.security.service;
 
 import java.util.List;
 
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.spring.security.ConcreteUserDetailsService;
 import org.ironrhino.core.util.BeanUtils;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @ClassPresentConditional("org.ironrhino.core.remoting.server.HttpInvokerServer")
-@ApplicationContextPropertiesConditional(key = "org.ironrhino.security.service.UserService.remoting", value = "false", negated = true)
 public class UserServiceImpl implements UserService {
 
 	@Autowired(required = false)

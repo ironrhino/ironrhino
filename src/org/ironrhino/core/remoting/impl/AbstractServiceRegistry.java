@@ -128,13 +128,13 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 							logger.warn(" class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
 									inte.getName());
 						} else {
-							String key = inte.getName() + ".remoting";
+							String key = inte.getName() + ".exported";
 							if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
 								logger.info("skiped export service [{}] for bean [{}#{}]@{} because {}=false",
 										inte.getName(), beanClassName, beanName, localHost, key);
 							} else {
 								exportServices.put(inte.getName(), ctx.getBean(beanName));
-								logger.info(" exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
+								logger.info("exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
 										beanName, localHost);
 							}
 						}
@@ -150,13 +150,13 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		} else {
 			Remoting remoting = clazz.getAnnotation(Remoting.class);
 			if (remoting != null) {
-				String key = clazz.getName() + ".remoting";
+				String key = clazz.getName() + ".exported";
 				if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
 					logger.info("skiped export service [{}] for bean [{}#{}]@{} because {}=false", clazz.getName(),
 							beanClassName, beanName, localHost, key);
 				} else {
 					exportServices.put(clazz.getName(), ctx.getBean(beanName));
-					logger.info(" exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
+					logger.info("exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
 							localHost);
 				}
 			}
