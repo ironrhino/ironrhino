@@ -81,6 +81,7 @@ public class ErrorAction extends BaseAction {
 			result = NOTFOUND;
 		}
 		response.setStatus(errorcode);
+		response.setCharacterEncoding("utf-8"); // fix for jetty
 		return result;
 	}
 }
