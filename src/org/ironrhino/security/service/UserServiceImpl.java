@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 						ud = uds.loadUserByUsername(username);
 						if (ud != null) {
 							User user = new User();
-							BeanUtils.copyProperties(ud, user);
+							BeanUtils.copyProperties(ud, user, false);
 							return user;
 						}
 					} catch (UsernameNotFoundException unfe) {

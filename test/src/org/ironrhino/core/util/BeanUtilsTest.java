@@ -294,6 +294,12 @@ public class BeanUtilsTest {
 		assertNull(user2.getUsername());
 		assertNull(user2.getPassword());
 
+		User user3 = new User();
+		BeanUtils.copyProperties(user1, user3, false);
+		assertNotNull(user3.getId());
+		assertNotNull(user3.getUsername());
+		assertNotNull(user3.getPassword());
+
 	}
 
 	@Test
