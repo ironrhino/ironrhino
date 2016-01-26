@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.spring.NameGenerator;
+import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 		Collection<Class<?>> excludeClasses = getExcludeClasses();
 		for (Class<?> remotingService : remotingServices) {
 			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))
+				continue;
+			if ("false".equals(
+					AppInfo.getApplicationContextProperties().getProperty(remotingService.getName() + ".remoting")))
 				continue;
 			String beanName = NameGenerator.buildDefaultBeanName(remotingService.getName());
 			if (registry.containsBeanDefinition(beanName)) {
