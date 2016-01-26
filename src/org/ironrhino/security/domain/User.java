@@ -1,14 +1,10 @@
-package org.ironrhino.sample.remoting.domain;
+package org.ironrhino.security.domain;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -82,13 +78,6 @@ public class User implements UserDetails {
 	}
 
 	public void setEmail(String email) {
-		if (email != null && email.endsWith("@gmail.com")) {
-			String name = email.substring(0, email.indexOf('@'));
-			if (name.indexOf('+') > 0)
-				name = name.substring(0, name.indexOf('+'));
-			name = name.replaceAll("\\.", "");
-			email = name + "@gmail.com";
-		}
 		this.email = email;
 	}
 
@@ -217,18 +206,7 @@ public class User implements UserDetails {
 
 	@Override
 	public String toString() {
-		return StringUtils.isNotBlank(this.name) ? this.name : this.username;
-	}
-
-	@PrePersist
-	@PreUpdate
-	public void replaceBlankWithNull() {
-		if (StringUtils.isBlank(name))
-			name = null;
-		if (StringUtils.isBlank(email))
-			email = null;
-		if (StringUtils.isBlank(phone))
-			phone = null;
+		return this.name != null && !this.name.isEmpty() ? this.name : this.username;
 	}
 
 }

@@ -12,7 +12,7 @@
 	<bean id="zooKeeperConfiguration" class="org.ironrhino.sample.remoting.ZooKeeperConfiguration" />
 	<bean id="serviceRegistry" class="org.ironrhino.core.remoting.impl.ZooKeeperServiceRegistry" />
 	<bean id="userServiceHessian" class="org.ironrhino.core.remoting.client.HessianClient"
-		p:serviceInterface="org.ironrhino.sample.remoting.service.UserService" />
+		p:serviceInterface="org.ironrhino.security.service.UserService" />
 	<bean id="userServiceHttpInvoker" class="org.ironrhino.core.remoting.client.HttpInvokerClient"
-		p:serviceInterface="org.ironrhino.sample.remoting.service.UserService" />
+		p:serviceInterface="org.ironrhino.security.service.UserService" />
 </beans>

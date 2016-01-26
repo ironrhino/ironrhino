@@ -81,6 +81,8 @@
 	<property name="security-oauth-client-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-sources-jar.name" value="ironrhino-security-oauth-server-${version}-sources.jar" />
 	<property name="security-oauth-server-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/oauth2**,resources/view/oauth/client**,resources/view/oauth/authorization**" />
+	<property name="security-remoting-sources-jar.name" value="ironrhino-security-remoting-${version}-sources.jar" />
+	<property name="security-remoting-sources-jar.includes" value="org/ironrhino/security/domain/**,org/ironrhino/security/enums/**,org/ironrhino/security/exception/**,org/ironrhino/security/service/*Service.*" />
 	<property name="security-oauth-server-remoting-sources-jar.name" value="ironrhino-security-oauth-server-remoting-${version}-sources.jar" />
 	<property name="security-oauth-server-remoting-sources-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*,org/ironrhino/security/oauth/server/enums/**" />
 	<property name="rest-sources-jar.name" value="ironrhino-rest-${version}-sources.jar" />
@@ -140,530 +142,543 @@
 			]]>
 		</script>
 	</target>
-		<target name="jar-sources" depends="set-revision">
-			<mkdir dir="${target.dir}" />
-			<delete file="${target.dir}/${assets-sources-jar.name}" />
-			<delete file="${target.dir}/${core-sources-jar.name}" />
-			<delete file="${target.dir}/${fs-sources-jar.name}" />
-			<delete file="${target.dir}/${zookeeper-sources-jar.name}" />
-			<delete file="${target.dir}/${remoting-common-sources-jar.name}" />
-			<delete file="${target.dir}/${remoting-server-sources-jar.name}" />
-			<delete file="${target.dir}/${remoting-client-sources-jar.name}" />
-			<delete file="${target.dir}/${hibernate-config-sources-jar.name}" />
-			<delete file="${target.dir}/${mail-config-sources-jar.name}" />
-			<delete file="${target.dir}/${sendmailqueue-config-sources-jar.name}" />
-			<delete file="${target.dir}/${search-config-sources-jar.name}" />
-			<delete file="${target.dir}/${redis-config-sources-jar.name}" />
-			<delete file="${target.dir}/${mongodb-config-sources-jar.name}" />
-			<delete file="${target.dir}/${rabbitmq-config-sources-jar.name}" />
-			<delete file="${target.dir}/${sitemesh-config-sources-jar.name}" />
-			<delete file="${target.dir}/${common-setting-sources-jar.name}" />
-			<delete file="${target.dir}/${common-pageview-sources-jar.name}" />
-			<delete file="${target.dir}/${common-cms-sources-jar.name}" />
-			<delete file="${target.dir}/${common-dictionary-sources-jar.name}" />
-			<delete file="${target.dir}/${common-treenode-sources-jar.name}" />
-			<delete file="${target.dir}/${common-region-sources-jar.name}" />
-			<delete file="${target.dir}/${common-stat-sources-jar.name}" />
-			<delete file="${target.dir}/${common-record-sources-jar.name}" />
-			<delete file="${target.dir}/${common-upload-sources-jar.name}" />
-			<delete file="${target.dir}/${common-install-sources-jar.name}" />
-			<delete file="${target.dir}/${common-qrcode-sources-jar.name}" />
-			<delete file="${target.dir}/${common-feedback-sources-jar.name}" />
-			<delete file="${target.dir}/${common-audit-sources-jar.name}" />
-			<delete file="${target.dir}/${security-sources-jar.name}" />
-			<delete file="${target.dir}/${userdetailsservice-sources-jar.name}" />
-			<delete file="${target.dir}/${security-config-sources-jar.name}" />
-			<delete file="${target.dir}/${security-config-base-sources-jar.name}" />
-			<delete file="${target.dir}/${security-config-http-sources-jar.name}" />
-			<delete file="${target.dir}/${security-loginrecord-sources-jar.name}" />
-			<delete file="${target.dir}/${security-acl-sources-jar.name}" />
-			<delete file="${target.dir}/${security-oauth-client-sources-jar.name}" />
-			<delete file="${target.dir}/${security-oauth-server-sources-jar.name}" />
-			<delete file="${target.dir}/${security-oauth-server-sources-remoting-jar.name}" />
-			<delete file="${target.dir}/${rest-sources-jar.name}" />
-			<jar jarfile="${target.dir}/${core-sources-jar.name}" basedir="${src.dir}" includes="META-INF/**,log4j*.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-sources-jar.includes},${zookeeper-sources-jar.includes},${remoting-common-sources-jar.includes},${common-setting-sources-jar.includes},${common-cms-sources-jar.includes},${common-dictionary-sources-jar.includes},${common-schema-sources-jar.includes},${common-treenode-sources-jar.includes},${common-region-sources-jar.includes},${common-stat-sources-jar.includes},${common-record-sources-jar.includes},${common-upload-sources-jar.includes},${common-install-sources-jar.includes},${common-qrcode-sources-jar.includes},${common-feedback-sources-jar.includes},${common-audit-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-core" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-core" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${fs-sources-jar.name}" basedir="${src.dir}" includes="${fs-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-fs" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-fs" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${zookeeper-sources-jar.name}" basedir="${src.dir}" includes="${zookeeper-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-zookeeper" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-zookeeper" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${remoting-common-sources-jar.name}" basedir="${src.dir}" includes="${remoting-common-sources-jar.includes}" excludes="${remoting-server-sources-jar.includes},${remoting-client-sources-jar.includes},**/ZooKeeper*">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-remoting-common" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-common" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<move file="${classes.dir}/META-INF/web-fragment.xml" todir="${classes.dir}" />
-			<move file="${classes.dir}/org/ironrhino/core/remoting/server/web-fragment.xml" todir="${classes.dir}/META-INF" />
-			<jar jarfile="${target.dir}/${remoting-server-sources-jar.name}" basedir="${src.dir}" includes="${remoting-server-sources-jar.includes},META-INF/**">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-remoting-server" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-server" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<move file="${classes.dir}/META-INF/web-fragment.xml" todir="${classes.dir}/org/ironrhino/core/remoting/server" />
-			<move file="${classes.dir}/web-fragment.xml" todir="${classes.dir}/META-INF" />
-			<jar jarfile="${target.dir}/${remoting-client-sources-jar.name}" basedir="${src.dir}" includes="${remoting-client-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-client" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-client" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${hibernate-config-sources-jar.name}" basedir="${src.dir}" includes="${hibernate-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-hibernate-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-hibernate-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${mail-config-sources-jar.name}" basedir="${src.dir}" includes="${mail-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-mail-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-mail-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${sendmailqueue-config-sources-jar.name}" basedir="${src.dir}" includes="${sendmailqueue-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-sendmailqueue-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-sendmailqueue-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${search-config-sources-jar.name}" basedir="${src.dir}" includes="${search-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-search-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-search-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${redis-config-sources-jar.name}" basedir="${src.dir}" includes="${redis-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-redis-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-redis-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${mongodb-config-sources-jar.name}" basedir="${src.dir}" includes="${mongodb-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-mongodb-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-mongodb-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${rabbitmq-config-sources-jar.name}" basedir="${src.dir}" includes="${rabbitmq-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-rabbitmq-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-rabbitmq-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${sitemesh-config-sources-jar.name}" basedir="${src.dir}" includes="${sitemesh-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-sitemesh-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-sitemesh-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-setting-sources-jar.name}" basedir="${src.dir}" includes="${common-setting-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-setting" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-setting" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-pageview-sources-jar.name}" basedir="${src.dir}" includes="${common-pageview-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-pageview" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-pageview" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-cms-sources-jar.name}" basedir="${src.dir}" includes="${common-cms-sources-jar.includes}" excludes="${common-pageview-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-cms" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-cms" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-common-upload" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-dictionary-sources-jar.name}" basedir="${src.dir}" includes="${common-dictionary-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-dictionary" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-dictionary" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-schema-sources-jar.name}" basedir="${src.dir}" includes="${common-schema-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-schema" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-schema" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-treenode-sources-jar.name}" basedir="${src.dir}" includes="${common-treenode-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-treenode" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-treenode" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-region-sources-jar.name}" basedir="${src.dir}" includes="${common-region-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-region" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-region" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-stat-sources-jar.name}" basedir="${src.dir}" includes="${common-stat-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-stat" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-stat" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-record-sources-jar.name}" basedir="${src.dir}" includes="${common-record-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-record" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-record" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-upload-sources-jar.name}" basedir="${src.dir}" includes="${common-upload-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-upload" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-upload" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-fs" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-install-sources-jar.name}" basedir="${src.dir}" includes="${common-install-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-install" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-install" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-qrcode-sources-jar.name}" basedir="${src.dir}" includes="${common-qrcode-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-qrcode" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-qrcode" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-feedback-sources-jar.name}" basedir="${src.dir}" includes="${common-feedback-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-feedback" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-feedback" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-audit-sources-jar.name}" basedir="${src.dir}" includes="${common-audit-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-audit" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-audit" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/i18n/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-sources-jar.includes},${security-signup-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-acl-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${userdetailsservice-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/model/User.java,org/ironrhino/security/model/BaseUser.java,org/ironrhino/security/service/UserManager.java">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-userdetailsservice" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-userdetailsservice" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-config-sources-jar.name}" basedir="${src.dir}" includes="${security-config-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-config" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-config-base-sources-jar.name}" basedir="${src.dir}" includes="${security-config-base-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-config-base" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-base" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-config-http-sources-jar.name}" basedir="${src.dir}" includes="${security-config-http-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-config-http" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-http" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-signup-sources-jar.name}" basedir="${src.dir}" includes="${security-signup-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-signup" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-signup" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-security" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-loginrecord-sources-jar.name}" basedir="${src.dir}" includes="${security-loginrecord-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-loginrecord" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-loginrecord" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-acl-sources-jar.name}" basedir="${src.dir}" includes="${security-acl-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-acl" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-acl" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security,ironrhino-common-dictionary" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-oauth-client-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-client-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-oauth-client" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-client" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-security" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-oauth-server-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-server-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-oauth-server" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-server" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${security-oauth-server-remoting-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-server-remoting-sources-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-security-oauth-server-remoting" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-server-remoting" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-				</manifest>
-			</jar>			
-			<jar jarfile="${target.dir}/${rest-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/rest/**,resources/i18n/rest/**,resources/view/rest/*.ftl">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-rest" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-rest" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				</manifest>
-			</jar>
-		</target>
+	<target name="jar-sources" depends="set-revision">
+		<mkdir dir="${target.dir}" />
+		<delete file="${target.dir}/${assets-sources-jar.name}" />
+		<delete file="${target.dir}/${core-sources-jar.name}" />
+		<delete file="${target.dir}/${fs-sources-jar.name}" />
+		<delete file="${target.dir}/${zookeeper-sources-jar.name}" />
+		<delete file="${target.dir}/${remoting-common-sources-jar.name}" />
+		<delete file="${target.dir}/${remoting-server-sources-jar.name}" />
+		<delete file="${target.dir}/${remoting-client-sources-jar.name}" />
+		<delete file="${target.dir}/${hibernate-config-sources-jar.name}" />
+		<delete file="${target.dir}/${mail-config-sources-jar.name}" />
+		<delete file="${target.dir}/${sendmailqueue-config-sources-jar.name}" />
+		<delete file="${target.dir}/${search-config-sources-jar.name}" />
+		<delete file="${target.dir}/${redis-config-sources-jar.name}" />
+		<delete file="${target.dir}/${mongodb-config-sources-jar.name}" />
+		<delete file="${target.dir}/${rabbitmq-config-sources-jar.name}" />
+		<delete file="${target.dir}/${sitemesh-config-sources-jar.name}" />
+		<delete file="${target.dir}/${common-setting-sources-jar.name}" />
+		<delete file="${target.dir}/${common-pageview-sources-jar.name}" />
+		<delete file="${target.dir}/${common-cms-sources-jar.name}" />
+		<delete file="${target.dir}/${common-dictionary-sources-jar.name}" />
+		<delete file="${target.dir}/${common-treenode-sources-jar.name}" />
+		<delete file="${target.dir}/${common-region-sources-jar.name}" />
+		<delete file="${target.dir}/${common-stat-sources-jar.name}" />
+		<delete file="${target.dir}/${common-record-sources-jar.name}" />
+		<delete file="${target.dir}/${common-upload-sources-jar.name}" />
+		<delete file="${target.dir}/${common-install-sources-jar.name}" />
+		<delete file="${target.dir}/${common-qrcode-sources-jar.name}" />
+		<delete file="${target.dir}/${common-feedback-sources-jar.name}" />
+		<delete file="${target.dir}/${common-audit-sources-jar.name}" />
+		<delete file="${target.dir}/${security-sources-jar.name}" />
+		<delete file="${target.dir}/${userdetailsservice-sources-jar.name}" />
+		<delete file="${target.dir}/${security-config-sources-jar.name}" />
+		<delete file="${target.dir}/${security-config-base-sources-jar.name}" />
+		<delete file="${target.dir}/${security-config-http-sources-jar.name}" />
+		<delete file="${target.dir}/${security-loginrecord-sources-jar.name}" />
+		<delete file="${target.dir}/${security-acl-sources-jar.name}" />
+		<delete file="${target.dir}/${security-oauth-client-sources-jar.name}" />
+		<delete file="${target.dir}/${security-oauth-server-sources-jar.name}" />
+		<delete file="${target.dir}/${security-remoting-sources-jar.name}" />
+		<delete file="${target.dir}/${security-oauth-server-remoting-sources-jar.name}" />
+		<delete file="${target.dir}/${rest-sources-jar.name}" />
+		<jar jarfile="${target.dir}/${core-sources-jar.name}" basedir="${src.dir}" includes="META-INF/**,log4j*.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-sources-jar.includes},${zookeeper-sources-jar.includes},${remoting-common-sources-jar.includes},${common-setting-sources-jar.includes},${common-cms-sources-jar.includes},${common-dictionary-sources-jar.includes},${common-schema-sources-jar.includes},${common-treenode-sources-jar.includes},${common-region-sources-jar.includes},${common-stat-sources-jar.includes},${common-record-sources-jar.includes},${common-upload-sources-jar.includes},${common-install-sources-jar.includes},${common-qrcode-sources-jar.includes},${common-feedback-sources-jar.includes},${common-audit-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-core" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-core" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${fs-sources-jar.name}" basedir="${src.dir}" includes="${fs-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-fs" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-fs" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${zookeeper-sources-jar.name}" basedir="${src.dir}" includes="${zookeeper-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-zookeeper" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-zookeeper" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${remoting-common-sources-jar.name}" basedir="${src.dir}" includes="${remoting-common-sources-jar.includes}" excludes="${remoting-server-sources-jar.includes},${remoting-client-sources-jar.includes},**/ZooKeeper*">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-remoting-common" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-common" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<move file="${classes.dir}/META-INF/web-fragment.xml" todir="${classes.dir}" />
+		<move file="${classes.dir}/org/ironrhino/core/remoting/server/web-fragment.xml" todir="${classes.dir}/META-INF" />
+		<jar jarfile="${target.dir}/${remoting-server-sources-jar.name}" basedir="${src.dir}" includes="${remoting-server-sources-jar.includes},META-INF/**">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-remoting-server" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-server" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<move file="${classes.dir}/META-INF/web-fragment.xml" todir="${classes.dir}/org/ironrhino/core/remoting/server" />
+		<move file="${classes.dir}/web-fragment.xml" todir="${classes.dir}/META-INF" />
+		<jar jarfile="${target.dir}/${remoting-client-sources-jar.name}" basedir="${src.dir}" includes="${remoting-client-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-client" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-client" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${hibernate-config-sources-jar.name}" basedir="${src.dir}" includes="${hibernate-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-hibernate-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-hibernate-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${mail-config-sources-jar.name}" basedir="${src.dir}" includes="${mail-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-mail-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-mail-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${sendmailqueue-config-sources-jar.name}" basedir="${src.dir}" includes="${sendmailqueue-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-sendmailqueue-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-sendmailqueue-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${search-config-sources-jar.name}" basedir="${src.dir}" includes="${search-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-search-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-search-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${redis-config-sources-jar.name}" basedir="${src.dir}" includes="${redis-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-redis-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-redis-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${mongodb-config-sources-jar.name}" basedir="${src.dir}" includes="${mongodb-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-mongodb-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-mongodb-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${rabbitmq-config-sources-jar.name}" basedir="${src.dir}" includes="${rabbitmq-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-rabbitmq-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-rabbitmq-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${sitemesh-config-sources-jar.name}" basedir="${src.dir}" includes="${sitemesh-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-sitemesh-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-sitemesh-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-setting-sources-jar.name}" basedir="${src.dir}" includes="${common-setting-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-setting" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-setting" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-pageview-sources-jar.name}" basedir="${src.dir}" includes="${common-pageview-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-pageview" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-pageview" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-cms-sources-jar.name}" basedir="${src.dir}" includes="${common-cms-sources-jar.includes}" excludes="${common-pageview-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-cms" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-cms" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-common-upload" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-dictionary-sources-jar.name}" basedir="${src.dir}" includes="${common-dictionary-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-dictionary" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-dictionary" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-schema-sources-jar.name}" basedir="${src.dir}" includes="${common-schema-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-schema" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-schema" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-treenode-sources-jar.name}" basedir="${src.dir}" includes="${common-treenode-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-treenode" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-treenode" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-region-sources-jar.name}" basedir="${src.dir}" includes="${common-region-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-region" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-region" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-stat-sources-jar.name}" basedir="${src.dir}" includes="${common-stat-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-stat" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-stat" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-record-sources-jar.name}" basedir="${src.dir}" includes="${common-record-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-record" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-record" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-upload-sources-jar.name}" basedir="${src.dir}" includes="${common-upload-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-upload" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-upload" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-fs" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-install-sources-jar.name}" basedir="${src.dir}" includes="${common-install-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-install" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-install" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-qrcode-sources-jar.name}" basedir="${src.dir}" includes="${common-qrcode-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-qrcode" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-qrcode" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-feedback-sources-jar.name}" basedir="${src.dir}" includes="${common-feedback-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-feedback" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-feedback" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${common-audit-sources-jar.name}" basedir="${src.dir}" includes="${common-audit-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-common-audit" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-audit" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/i18n/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-sources-jar.includes},${security-signup-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-acl-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${userdetailsservice-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/model/User.java,org/ironrhino/security/model/BaseUser.java,org/ironrhino/security/service/UserManager.java">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-userdetailsservice" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-userdetailsservice" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-config-sources-jar.name}" basedir="${src.dir}" includes="${security-config-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-config" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-config-base-sources-jar.name}" basedir="${src.dir}" includes="${security-config-base-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-config-base" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-base" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-config-http-sources-jar.name}" basedir="${src.dir}" includes="${security-config-http-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-config-http" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-http" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-signup-sources-jar.name}" basedir="${src.dir}" includes="${security-signup-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-signup" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-signup" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-security" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-loginrecord-sources-jar.name}" basedir="${src.dir}" includes="${security-loginrecord-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-loginrecord" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-loginrecord" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-acl-sources-jar.name}" basedir="${src.dir}" includes="${security-acl-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-acl" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-acl" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security,ironrhino-common-dictionary" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-oauth-client-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-client-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-oauth-client" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-client" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-security" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-oauth-server-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-server-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-oauth-server" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-server" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-remoting-sources-jar.name}" basedir="${src.dir}" includes="${security-remoting-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-remoting" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-remoting" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${security-oauth-server-remoting-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-server-remoting-sources-jar.includes}">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-security-oauth-server-remoting" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-server-remoting" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${rest-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/rest/**,resources/i18n/rest/**,resources/view/rest/*.ftl">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-rest" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-rest" />
+				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
+				<attribute name="Ironrhino-Component-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+			</manifest>
+		</jar>
+	</target>
 
-	</project>
+</project>

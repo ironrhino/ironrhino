@@ -1,4 +1,4 @@
-package org.ironrhino.sample.remoting.service;
+package org.ironrhino.security.service;
 
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.spring.security.ConcreteUserDetailsService;

@@ -1,7 +1,7 @@
 package org.ironrhino.sample.remoting;
 
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.sample.remoting.service.UserService;
+import org.ironrhino.security.service.UserService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
