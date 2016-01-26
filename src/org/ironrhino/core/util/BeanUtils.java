@@ -62,7 +62,8 @@ public class BeanUtils {
 	public static void copyProperties(Object source, Object target, boolean ignoreNullValue,
 			String... ignoreProperties) {
 		Set<String> ignores = new HashSet<>();
-		ignores.addAll(AnnotationUtils.getAnnotatedPropertyNames(source.getClass(), NotInCopy.class));
+		if (source.getClass() == target.getClass())
+			ignores.addAll(AnnotationUtils.getAnnotatedPropertyNames(source.getClass(), NotInCopy.class));
 		ignores.addAll(Arrays.asList(ignoreProperties));
 		normalizeCollectionFields(source);
 		BeanWrapperImpl bws = new BeanWrapperImpl(source);
