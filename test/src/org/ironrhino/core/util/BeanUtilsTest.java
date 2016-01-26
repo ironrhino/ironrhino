@@ -297,19 +297,6 @@ public class BeanUtilsTest {
 	}
 
 	@Test
-	public void testCopyPropertiesBetweenDifferentTypes() {
-		User user1 = new User();
-		user1.setId("test");
-		user1.setUsername("username");
-		user1.setPassword("password");
-		User2 user2 = new User2();
-		BeanUtils.copyProperties(user1, user2);
-		assertEquals(user2.getId(), "test");
-		assertEquals(user2.getUsername(), "username");
-		assertEquals(user2.getPassword(), "password");
-	}
-
-	@Test
 	public void copyPropertiesIfNotNull() {
 		User user1 = new User();
 		user1.setId("test");
