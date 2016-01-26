@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import org.ironrhino.core.remoting.Remoting;
+import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.util.StringUtils;
 
 public abstract class RemotingServiceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
@@ -40,13 +40,17 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 		String[] basePackages = getBasePackages();
 		if (basePackages != null)
 			remotingServices.addAll(ClassScanner.scanAnnotated(basePackages, Remoting.class));
+		remotingServices.addAll(ClassScanner.scanAnnotated("org.ironrhino", Remoting.class));
 		Collection<Class<?>> excludeClasses = getExcludeClasses();
 		for (Class<?> remotingService : remotingServices) {
 			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))
 				continue;
-			String beanName = StringUtils.uncapitalize(remotingService.getSimpleName());
-			if (registry.containsBeanDefinition(beanName))
+			String beanName = NameGenerator.buildDefaultBeanName(remotingService.getName());
+			if (registry.containsBeanDefinition(beanName)) {
+				if (remotingService.getName().startsWith("org.ironrhino"))
+					continue;
 				beanName = remotingService.getName();
+			}
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(HttpInvokerClient.class);
 			beanDefinition.setTargetType(remotingService);
 			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
