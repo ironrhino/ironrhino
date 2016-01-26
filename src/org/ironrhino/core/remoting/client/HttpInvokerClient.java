@@ -4,19 +4,22 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
+import org.ironrhino.core.spring.RemotingClientProxy;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
+import org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor;
 import org.springframework.util.Assert;
 
-public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
+public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
 
 	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
 
@@ -47,6 +50,23 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 	private boolean discovered; // for lazy discover from serviceRegistry
 
 	private String discoveredHost;
+
+	private Object serviceProxy;
+
+	@Override
+	public Object getObject() {
+		return this.serviceProxy;
+	}
+
+	@Override
+	public Class<?> getObjectType() {
+		return getServiceInterface();
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
 
 	public void setPoll(boolean poll) {
 		this.poll = poll;
@@ -103,6 +123,9 @@ public class HttpInvokerClient extends HttpInvokerProxyFactoryBean {
 		}
 		setUseFstSerialization(this.useFstSerialization);
 		super.afterPropertiesSet();
+		ProxyFactory pf = new ProxyFactory(getServiceInterface(), this);
+		pf.addInterface(RemotingClientProxy.class);
+		this.serviceProxy = pf.getProxy(getBeanClassLoader());
 	}
 
 	@Override

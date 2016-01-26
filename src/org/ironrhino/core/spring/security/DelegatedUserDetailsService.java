@@ -2,6 +2,7 @@ package org.ironrhino.core.spring.security;
 
 import java.util.List;
 
+import org.ironrhino.core.spring.RemotingClientProxy;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -16,12 +17,23 @@ import org.springframework.stereotype.Component;
 public class DelegatedUserDetailsService implements UserDetailsService {
 
 	@Autowired(required = false)
+	private RemotingUserDetailsService remotingUserDetailsService;
+
+	@Autowired(required = false)
 	private List<ConcreteUserDetailsService> userDetailsServices;
 
 	public UserDetails loadUserByUsername(String username, boolean nullInsteadException)
 			throws UsernameNotFoundException {
 		UserDetails ud = null;
-		if (userDetailsServices != null)
+		if (remotingUserDetailsService instanceof RemotingClientProxy) {
+			try {
+				ud = remotingUserDetailsService.loadUserByUsername(username);
+				if (ud != null)
+					return ud;
+			} catch (UsernameNotFoundException unfe) {
+
+			}
+		} else if (userDetailsServices != null)
 			for (ConcreteUserDetailsService uds : userDetailsServices)
 				if (uds.accepts(username))
 					try {

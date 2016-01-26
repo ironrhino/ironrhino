@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @ClassPresentConditional("org.ironrhino.core.remoting.server.HttpInvokerServer")
@@ -20,19 +21,13 @@ public class UserServiceImpl implements UserService {
 	@Autowired(required = false)
 	private List<ConcreteUserDetailsService> userDetailsServices;
 
-	@Override
-	public boolean accepts(String username) {
-		return true;
-	}
-
+	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
 		UserDetails ud = null;
 		if (userDetailsServices != null)
 			for (ConcreteUserDetailsService uds : userDetailsServices) {
-				if (uds instanceof UserService)
-					continue;
 				if (uds.accepts(username))
 					try {
 						ud = uds.loadUserByUsername(username);
