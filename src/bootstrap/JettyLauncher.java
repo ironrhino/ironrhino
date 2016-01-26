@@ -29,7 +29,7 @@ public class JettyLauncher {
 		WebAppContext context = new WebAppContext();
 		context.setContextPath("/");
 		context.setWar(warUrl.toExternalForm());
-		File tempDir = new File(new File(System.getProperty("user.home")), ".jetty");
+		File tempDir = new File(new File(System.getProperty("user.home")), ".jetty" + port);
 		tempDir.mkdirs();
 		context.setTempDirectory(tempDir);
 		context.setServer(server);
