@@ -6,8 +6,8 @@
 $(function(){
 $('.service').click(function(){
 	var t = $(this);
-	if(t.next('ul').length){
-		t.next('ul').remove();
+	if(t.siblings().length){
+		t.siblings().remove();
 	}else{
 		var url = '${actionBaseUrl}/hosts/'+t.text();
 		$.getJSON(url,function(data){
@@ -19,19 +19,20 @@ $('.service').click(function(){
 			$.each(data,function(i,v){
 				$('<li class="span2"/>').appendTo(ul).html('<a class="host" href="#">'+v+'</a>');
 			});
+			$('<h5 style="text-align:center;">Exported By:</h5>').insertAfter(t);
 		});
 	}
 });
 $(document).on('click','a.host',function(e){
 	$('#discovered-services').remove();
 	var t = $(this);
-	var url = '${actionBaseUrl}/services/'+t.text();
+	var host = t.text();
+	var url = '${actionBaseUrl}/services/'+host;
 	$.getJSON(url,function(data){
-		if(!$('#discovered-services').length)
-			$('<div id="discovered-services"/>').insertAfter($('hr'));
-		var ul = $('<ul class="unstyled"/>').appendTo($('#discovered-services'));
+		$('<div id="discovered-services"/>').insertAfter($('hr')).prepend('<h4 style="text-align:center;">Imported By: '+host+'</h4>');
+		var ul = $('<ul class="thumbnails"/>').appendTo($('#discovered-services'));
 		$.each(data,function(k,v){
-			$('<li/>').appendTo(ul).html(k+'<a class="host" href="#" style="margin-left:20px;">'+v+'</a>');
+			$('<li/>').addClass('span6').appendTo(ul).html(k+'<a class="host pull-right" href="#">'+v+'</a>');
 		});	
 		if(!$('#discovered-services li').length){
 			$('#discovered-services').remove();
@@ -45,7 +46,11 @@ $(document).on('click','a.host',function(e){
 </head>
 <body>
 
-
+<div class="row" style="margin-bottom: 20px;">
+<div class="span4 offset4">
+<a class="host btn btn-block" href="#"><strong>${serviceRegistry.localHost}</strong></a>
+</div>
+</div>
 <#assign services = serviceRegistry.getAllServices()>
 <#if services?size gt 0>
 <div id="services">
