@@ -61,6 +61,7 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 					logger.error(e.getMessage(), e);
 					e.printStackTrace();
 				}
+				beanName = remotingService.getName();
 			}
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(HttpInvokerClient.class);
 			beanDefinition.setTargetType(remotingService);
