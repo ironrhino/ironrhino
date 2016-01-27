@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
@@ -31,15 +33,27 @@ public class RedisCacheManager implements CacheManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private RedisTemplate redisTemplate;
-
-	private RedisTemplate stringRedisTemplate;
+	@Autowired(required = false)
+	@Qualifier("cacheRedisTemplate")
+	private RedisTemplate cacheRedisTemplate;
 
 	@Autowired
-	public RedisCacheManager(RedisTemplate redisTemplate,
-			@Qualifier("stringRedisTemplate") RedisTemplate stringRedisTemplate) {
-		this.redisTemplate = redisTemplate;
-		this.stringRedisTemplate = stringRedisTemplate;
+	private RedisTemplate redisTemplate;
+
+	@Autowired(required = false)
+	@Qualifier("cacheStringRedisTemplate")
+	private RedisTemplate<String, String> cacheStringRedisTemplate;
+
+	@Autowired
+	@Qualifier("stringRedisTemplate")
+	private RedisTemplate<String, String> stringRedisTemplate;
+
+	@PostConstruct
+	public void afterPropertiesSet() {
+		if (cacheRedisTemplate != null)
+			redisTemplate = cacheRedisTemplate;
+		if (cacheStringRedisTemplate != null)
+			stringRedisTemplate = cacheStringRedisTemplate;
 	}
 
 	@Override

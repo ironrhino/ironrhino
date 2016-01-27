@@ -6,6 +6,8 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
@@ -27,14 +29,21 @@ public class RedisLockService implements LockService {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	private RedisTemplate<String, String> stringRedisTemplate;
-
 	@Value("${lockService.maxHoldTime:300}")
 	private int maxHoldTime = 300;
 
+	@Autowired(required = false)
+	@Qualifier("coordinationStringRedisTemplate")
+	private RedisTemplate<String, String> coordinationStringRedisTemplate;
+
 	@Autowired
-	public RedisLockService(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
-		this.stringRedisTemplate = stringRedisTemplate;
+	@Qualifier("stringRedisTemplate")
+	private RedisTemplate<String, String> stringRedisTemplate;
+
+	@PostConstruct
+	public void afterPropertiesSet() {
+		if (coordinationStringRedisTemplate != null)
+			stringRedisTemplate = coordinationStringRedisTemplate;
 	}
 
 	@Override

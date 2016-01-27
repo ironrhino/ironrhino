@@ -17,19 +17,22 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	public static final String KEY_SEQUENCE = "seq:";
 
+	@Autowired(required = false)
+	@Qualifier("sequenceStringRedisTemplate")
+	private RedisTemplate<String, String> sequenceStringRedisTemplate;
+
+	@Autowired
+	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundValueOperations<String, String> boundValueOperations;
-
-	@Autowired
-	public RedisCyclicSequence(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
-		this.stringRedisTemplate = stringRedisTemplate;
-	}
 
 	@Override
 	public void afterPropertiesSet() {
 		Assert.hasText(getSequenceName());
 		Assert.isTrue(getPaddingLength() > 0);
+		if (sequenceStringRedisTemplate != null)
+			stringRedisTemplate = sequenceStringRedisTemplate;
 		boundValueOperations = stringRedisTemplate.boundValueOps(KEY_SEQUENCE + getSequenceName());
 		boundValueOperations.setIfAbsent(getStringValue(now(), getPaddingLength(), 0));
 	}

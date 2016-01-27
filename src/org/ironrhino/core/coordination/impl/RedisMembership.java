@@ -31,8 +31,6 @@ public class RedisMembership implements Membership {
 
 	private static final String NAMESPACE = "membership:";
 
-	private RedisTemplate<String, String> stringRedisTemplate;
-
 	private Set<String> groups = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
 	@Autowired
@@ -41,13 +39,18 @@ public class RedisMembership implements Membership {
 	@Value("${redis.membership.heartbeat:60000}")
 	private int heartbeat = 60000;
 
+	@Autowired(required = false)
+	@Qualifier("coordinationStringRedisTemplate")
+	private RedisTemplate<String, String> coordinationStringRedisTemplate;
+
 	@Autowired
-	public RedisMembership(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
-		this.stringRedisTemplate = stringRedisTemplate;
-	}
+	@Qualifier("stringRedisTemplate")
+	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@PostConstruct
 	public void afterPropertiesSet() {
+		if (coordinationStringRedisTemplate != null)
+			stringRedisTemplate = coordinationStringRedisTemplate;
 		taskScheduler.scheduleAtFixedRate(() -> {
 			for (String group : groups) {
 				List<String> members = getMembers(group);

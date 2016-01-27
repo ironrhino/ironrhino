@@ -74,18 +74,21 @@ public class RedisServiceStats implements ServiceStats {
 	@Value("${serviceStats.maxSamplesSize:20}")
 	public long maxSamplesSize = 20;
 
+	@Autowired(required = false)
+	@Qualifier("remotingStringRedisTemplate")
+	private RedisTemplate<String, String> remotingStringRedisTemplate;
+
+	@Autowired
+	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundZSetOperations<String, String> hotspotsOperations;
 	private BoundListOperations<String, String> warningsOperations;
 
-	@Autowired
-	public RedisServiceStats(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
-		this.stringRedisTemplate = stringRedisTemplate;
-	}
-
 	@PostConstruct
-	public void init() {
+	public void afterPropertiesSet() {
+		if (remotingStringRedisTemplate != null)
+			stringRedisTemplate = remotingStringRedisTemplate;
 		hotspotsOperations = stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
 		warningsOperations = stringRedisTemplate.boundListOps(KEY_WARNINGS);
 	}

@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.event.EventPublisher;
@@ -34,6 +35,12 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	private static final String NAMESPACE_HOSTS = NAMESPACE + "hosts:";
 
+	@Autowired(required = false)
+	@Qualifier("remotingStringRedisTemplate")
+	private RedisTemplate<String, String> remotingStringRedisTemplate;
+
+	@Autowired
+	@Qualifier("stringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Autowired
@@ -46,9 +53,10 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	private boolean ready;
 
-	@Autowired
-	public RedisServiceRegistry(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
-		this.stringRedisTemplate = stringRedisTemplate;
+	@PostConstruct
+	public void afterPropertiesSet() {
+		if (remotingStringRedisTemplate != null)
+			stringRedisTemplate = remotingStringRedisTemplate;
 	}
 
 	@Override
