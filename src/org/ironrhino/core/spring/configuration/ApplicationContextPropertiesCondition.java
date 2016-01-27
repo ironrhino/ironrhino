@@ -21,13 +21,18 @@ class ApplicationContextPropertiesCondition implements Condition {
 		String key = (String) attributes.get("key");
 		String value = (String) attributes.get("value");
 		boolean negated = (Boolean) attributes.get("negated");
-		boolean matched = value.equals(AppInfo.getApplicationContextProperties().getProperty(key));
-		if (negated)
-			matched = !matched;
+		boolean matched = matches(key, value, negated);
 		if (!matched && (metadata instanceof ClassMetadata)) {
 			ClassMetadata cm = (ClassMetadata) metadata;
 			logger.info("Bean[" + cm.getClassName() + "] is skipped registry");
 		}
+		return matched;
+	}
+
+	public static boolean matches(String key, String value, boolean negated) {
+		boolean matched = value.equals(AppInfo.getApplicationContextProperties().getProperty(key));
+		if (negated)
+			matched = !matched;
 		return matched;
 	}
 

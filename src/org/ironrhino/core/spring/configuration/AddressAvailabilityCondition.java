@@ -27,13 +27,18 @@ public class AddressAvailabilityCondition implements Condition {
 		address = AppInfo.resolvePlaceholders(address);
 		int timeout = (Integer) attributes.get("timeout");
 		boolean negated = (Boolean) attributes.get("negated");
-		boolean matched = check(address, timeout);
-		if (negated)
-			matched = !matched;
+		boolean matched = matches(address, timeout, negated);
 		if (!matched && (metadata instanceof ClassMetadata)) {
 			ClassMetadata cm = (ClassMetadata) metadata;
 			logger.info("Bean[" + cm.getClassName() + "] is skipped registry");
 		}
+		return matched;
+	}
+
+	public static boolean matches(String address, int timeout, boolean negated) {
+		boolean matched = check(address, timeout);
+		if (negated)
+			matched = !matched;
 		return matched;
 	}
 

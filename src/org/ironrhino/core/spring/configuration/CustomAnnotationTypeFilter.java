@@ -47,6 +47,14 @@ public class CustomAnnotationTypeFilter extends AnnotationTypeFilter {
 		if (attributes != null && !ResourcePresentCondition.matches((String[]) attributes.get("value"),
 				(Boolean) attributes.get("negated")))
 			return false;
+		attributes = metadata.getAnnotationAttributes(ApplicationContextPropertiesConditional.class.getName());
+		if (attributes != null && !ApplicationContextPropertiesCondition.matches((String) attributes.get("key"),
+				(String) attributes.get("value"), (Boolean) attributes.get("negated")))
+			return false;
+		attributes = metadata.getAnnotationAttributes(AddressAvailabilityConditional.class.getName());
+		if (attributes != null && !AddressAvailabilityCondition.matches((String) attributes.get("address"),
+				(Integer) attributes.get("timeout"), (Boolean) attributes.get("negated")))
+			return false;
 		return true;
 	}
 
