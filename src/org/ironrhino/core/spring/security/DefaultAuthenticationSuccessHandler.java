@@ -28,7 +28,8 @@ public class DefaultAuthenticationSuccessHandler implements AuthenticationSucces
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws ServletException, IOException {
-		if (usernameInCookie && request.isRequestedSessionIdFromCookie()) {
+		if (usernameInCookie && request.isRequestedSessionIdFromCookie()
+				&& request.getAttribute("_OAUTH_REQUEST") == null) {
 			RequestUtils.saveCookie(request, response, COOKIE_NAME_LOGIN_USER, authentication.getName(),
 					usernameInCookieMaxAge, false, false);
 		}

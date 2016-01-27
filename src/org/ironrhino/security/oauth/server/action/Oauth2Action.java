@@ -25,6 +25,7 @@ import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationF
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExceptionUtils;
+import org.ironrhino.security.oauth.server.component.OAuthHandler;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
@@ -47,6 +48,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @AutoConfig
 public class Oauth2Action extends BaseAction {
@@ -69,6 +72,12 @@ public class Oauth2Action extends BaseAction {
 
 	@Autowired
 	private transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
+
+	@Autowired
+	protected AuthenticationFailureHandler authenticationFailureHandler;
+
+	@Autowired
+	protected AuthenticationSuccessHandler authenticationSuccessHandler;
 
 	@Autowired
 	private transient AuthenticationManager authenticationManager;
@@ -372,6 +381,7 @@ public class Oauth2Action extends BaseAction {
 	public String token() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
+		request.setAttribute(OAuthHandler.REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
 		if (grant_type == GrantType.password) {
 			client = oauthManager.findClientById(client_id);
 			try {
@@ -387,7 +397,7 @@ public class Oauth2Action extends BaseAction {
 								.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 						if (authResult != null)
 							try {
-								usernamePasswordAuthenticationFilter.success(request, response, authResult);
+								authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -396,7 +406,7 @@ public class Oauth2Action extends BaseAction {
 					} catch (AuthenticationException failed) {
 						logger.error(failed.getMessage(), failed);
 						try {
-							usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
+							authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
