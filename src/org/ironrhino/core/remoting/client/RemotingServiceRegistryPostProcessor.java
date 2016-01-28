@@ -41,7 +41,6 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 		String[] basePackages = getBasePackages();
 		if (basePackages != null)
 			remotingServices.addAll(ClassScanner.scanAnnotated(basePackages, Remoting.class));
-		remotingServices.addAll(ClassScanner.scanAnnotated("org.ironrhino", Remoting.class));
 		Collection<Class<?>> excludeClasses = getExcludeClasses();
 		for (Class<?> remotingService : remotingServices) {
 			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))
