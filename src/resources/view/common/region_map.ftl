@@ -19,7 +19,7 @@ function init(){
 }
 
 function loadMaps(){
-	var other_params = 'sensor=true&region=CN';
+	var other_params = 'region=CN';
 	var key = $('meta[name="google-maps-key"]').attr('content');
 	if(key)
 		other_params+='&key='+key;
@@ -48,8 +48,7 @@ function initMaps() {
 </#if>
 	google.maps.event.addListener(map, 'click', placeNewMarker);
 	google.maps.event.addListener(map, 'bounds_changed', closeSuccessInfoWindow);
-	google.maps.event.addListener(map, 'idle', getMarkers);
-	setTimeout(getMarkers,1000);
+	google.maps.event.addListener(map, 'bounds_changed', getMarkers);
 }
 function getMarkers(){
 	var bounds = map.getBounds();
