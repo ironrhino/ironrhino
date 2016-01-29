@@ -2,8 +2,11 @@ package org.ironrhino.core.remoting.client;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.AppInfo;
@@ -38,9 +41,18 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 		Collection<Class<?>> includeClasses = getIncludeClasses();
 		if (includeClasses != null)
 			remotingServices.addAll(includeClasses);
+		Set<String> packageSet = new HashSet<>();
+		packageSet.add("org.ironrhino");
+		String appBasePackage = AppInfo.getAppBasePackage();
+		if (StringUtils.isNotBlank(appBasePackage))
+			for (String p : appBasePackage.split(","))
+				packageSet.add(p);
 		String[] basePackages = getBasePackages();
-		if (basePackages != null)
-			remotingServices.addAll(ClassScanner.scanAnnotated(basePackages, Remoting.class));
+		if (basePackages != null) {
+			for (String p : basePackages)
+				packageSet.add(p);
+		}
+		remotingServices.addAll(ClassScanner.scanAnnotated(packageSet.toArray(new String[0]), Remoting.class));
 		Collection<Class<?>> excludeClasses = getExcludeClasses();
 		for (Class<?> remotingService : remotingServices) {
 			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))

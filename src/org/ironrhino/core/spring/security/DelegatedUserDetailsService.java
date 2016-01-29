@@ -25,15 +25,7 @@ public class DelegatedUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username, boolean nullInsteadException)
 			throws UsernameNotFoundException {
 		UserDetails ud = null;
-		if (remotingUserDetailsService instanceof RemotingClientProxy) {
-			try {
-				ud = remotingUserDetailsService.loadUserByUsername(username);
-				if (ud != null)
-					return ud;
-			} catch (UsernameNotFoundException unfe) {
-
-			}
-		} else if (userDetailsServices != null)
+		if (userDetailsServices != null) {
 			for (ConcreteUserDetailsService uds : userDetailsServices)
 				if (uds.accepts(username))
 					try {
@@ -43,6 +35,16 @@ public class DelegatedUserDetailsService implements UserDetailsService {
 					} catch (UsernameNotFoundException unfe) {
 						continue;
 					}
+		}
+		if (remotingUserDetailsService instanceof RemotingClientProxy) {
+			try {
+				ud = remotingUserDetailsService.loadUserByUsername(username);
+				if (ud != null)
+					return ud;
+			} catch (UsernameNotFoundException unfe) {
+
+			}
+		}
 		if (nullInsteadException)
 			return null;
 		throw new UsernameNotFoundException("No such Username : " + username);
