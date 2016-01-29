@@ -24137,10 +24137,11 @@ function log() {
 						var parentTreenode = $(parent).parent('li')
 								.data('treenode');
 						this.parent = parentTreenode;
-						if(!this.fullname)
+						if (!this.fullname)
 							if (parentTreenode)
 								this.fullname = (parentTreenode.fullname || parentTreenode.name)
-										+ (settings.separator || '') + this.name;
+										+ (settings.separator || '')
+										+ this.name;
 							else
 								this.fullname = this.name;
 						var current = $("<li/>")
@@ -24168,11 +24169,15 @@ function log() {
 										}, branch);
 							}
 							if (this.children && this.children.length) {
-								$.each(this.children, createNode, [branch])
+								$.each(this.children, function() {
+											createNode.apply(this, branch)
+										})
 							}
 						}
 					}
-					$.each(response, createNode, [child]);
+					$.each(response, function() {
+								createNode.apply(this, child)
+							});
 					$(container).treeview({
 								add : child
 							});
