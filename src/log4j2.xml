@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Configuration packages="org.ironrhino.core.log4j">
+<Configuration shutdownHook="disable" packages="org.ironrhino.core.log4j">
 	<Properties>
     	<Property name="app.home">/tmp/app</Property>
     	<Property name="port.http"></Property>
