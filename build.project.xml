@@ -563,15 +563,11 @@
 		<move todir="${target.dir}/classes" preservelastmodified="true">
 			<fileset dir="${webapp.dir}/WEB-INF/classes" />
 		</move>
-		<path id="ironrhino-core.jar.id">
-		  <fileset dir="${webapp.dir}/WEB-INF/lib">
-		      <include name="ironrhino-core-*.jar" />
-		  </fileset>
-		</path>
-		<property name="ironrhino-core.jar" refid="ironrhino-core.jar.id" />
 		<mkdir dir="${classes.dir}"/>
-		<unzip src="${ironrhino-core.jar}"
-		       dest="${classes.dir}">
+		<unzip dest="${classes.dir}">
+			<fileset dir="${webapp.dir}/WEB-INF/lib">
+		      	<include name="ironrhino-*.jar" />
+		  	</fileset>
 		    <patternset>
 		        <include name="com/**"/>
 		        <include name="org/**"/>
