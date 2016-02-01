@@ -3,6 +3,8 @@ package org.ironrhino.core.remoting.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +39,15 @@ public class HessianServer extends HessianServiceExporter {
 	@Override
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		Enumeration<String> en = request.getHeaderNames();
+		while (en.hasMoreElements()) {
+			String name = en.nextElement();
+			if (name.startsWith(RemotingContext.HTTP_HEADER_PREFIX)) {
+				String key = URLDecoder.decode(name.substring(RemotingContext.HTTP_HEADER_PREFIX.length()), "UTF-8");
+				String value = URLDecoder.decode(request.getHeader(name), "UTF-8");
+				RemotingContext.put(key, value);
+			}
+		}
 		String uri = request.getRequestURI();
 		try {
 			String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
@@ -54,6 +66,7 @@ public class HessianServer extends HessianServiceExporter {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
 		} finally {
 			serviceInterface.remove();
+			RemotingContext.clear();
 		}
 	}
 

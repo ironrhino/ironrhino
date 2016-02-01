@@ -2,10 +2,13 @@ package org.ironrhino.core.remoting.client;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Map;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.PostPropertiesReset;
+import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.spring.RemotingClientProxy;
@@ -118,6 +121,12 @@ public class HessianClient extends HessianClientInterceptor implements FactoryBe
 				String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 				if (requestId != null)
 					conn.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
+				Map<String, String> map = RemotingContext.getContext();
+				if (map != null) {
+					for (Map.Entry<String, String> entry : map.entrySet())
+						conn.addHeader(RemotingContext.HTTP_HEADER_PREFIX + URLEncoder.encode(entry.getKey(), "UTF-8"),
+								URLEncoder.encode(entry.getValue(), "UTF-8"));
+				}
 				return conn;
 			}
 
@@ -145,7 +154,12 @@ public class HessianClient extends HessianClientInterceptor implements FactoryBe
 			reset();
 			discovered = true;
 		}
-		return invoke(invocation, maxAttempts);
+		try {
+			return invoke(invocation, maxAttempts);
+		} finally {
+			RemotingContext.clear();
+		}
+
 	}
 
 	public Object invoke(MethodInvocation invocation, int attempts) throws Throwable {

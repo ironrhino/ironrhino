@@ -3,7 +3,9 @@ package org.ironrhino.core.remoting.client;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -16,6 +18,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
@@ -88,6 +91,12 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
+		Map<String, String> ctx = RemotingContext.getContext();
+		if (ctx != null) {
+			for (Map.Entry<String, String> entry : ctx.entrySet())
+				postMethod.addHeader(RemotingContext.HTTP_HEADER_PREFIX + URLEncoder.encode(entry.getKey(), "UTF-8"),
+						URLEncoder.encode(entry.getValue(), "UTF-8"));
+		}
 		postMethod.setEntity(new ByteArrayEntity(baos.toByteArray()));
 		CloseableHttpResponse rsp = httpClient.execute(postMethod);
 		try {

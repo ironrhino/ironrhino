@@ -2,6 +2,7 @@ package org.ironrhino.core.remoting.client;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.spring.RemotingClientProxy;
@@ -141,7 +142,12 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 					JsonUtils.toJson(invocation.getArguments()));
 		}
 		long time = System.currentTimeMillis();
-		Object value = invoke(invocation, maxAttempts);
+		Object value;
+		try {
+			value = invoke(invocation, maxAttempts);
+		} finally {
+			RemotingContext.clear();
+		}
 		time = System.currentTimeMillis() - time;
 		if (loggingPayload) {
 			MDC.remove("url");
