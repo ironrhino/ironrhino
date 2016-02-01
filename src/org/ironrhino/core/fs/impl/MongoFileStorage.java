@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.ValueThenKeyComparator;
@@ -38,8 +39,8 @@ public class MongoFileStorage implements FileStorage {
 	@Value("${fileStorage.uri:file}")
 	protected String uri;
 
-	@Value("${fileStorage.path:/assets}")
-	protected String fileStoragePath;
+	@Value("${fileStorage.baseUrl:}")
+	protected String baseUrl;
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -254,7 +255,9 @@ public class MongoFileStorage implements FileStorage {
 	@Override
 	public String getFileUrl(String path) {
 		path = Files.simplifyPath(path);
-		return fileStoragePath + path;
+		if (!path.startsWith("/"))
+			path = "/" + path;
+		return StringUtils.isNotBlank(baseUrl) ? baseUrl + path : path;
 	}
 
 	private ValueThenKeyComparator<String, Boolean> comparator = new ValueThenKeyComparator<String, Boolean>() {
