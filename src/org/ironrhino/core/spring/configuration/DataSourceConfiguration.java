@@ -15,15 +15,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.ClassUtils;
 
 import com.jolbox.bonecp.BoneCPDataSource;
 import com.jolbox.bonecp.ConnectionHandle;
 import com.jolbox.bonecp.hooks.AbstractConnectionHook;
-import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class DataSourceConfiguration {
+
+	private Logger logger = LoggerFactory.getLogger(DataSourceConfiguration.class);
 
 	@Value("${jdbc.dataSourceClassName:}")
 	private String dataSourceClassName;
@@ -70,7 +72,15 @@ public class DataSourceConfiguration {
 	@Bean(destroyMethod = "close")
 	@Primary
 	public DataSource dataSource() {
-		return HikariDataSource.class.getName().equals(dataSourceClassName) ? hikariDataSource() : boneCPDataSource();
+		String hikariClassName = "com.zaxxer.hikari.HikariDataSource";
+		if (hikariClassName.equals(dataSourceClassName)) {
+			if (ClassUtils.isPresent(hikariClassName, getClass().getClassLoader())) {
+				return hikariDataSource();
+			} else {
+				logger.warn("class [{}] not found, please add HikariCP.jar", hikariClassName);
+			}
+		}
+		return boneCPDataSource();
 	}
 
 	private DataSource boneCPDataSource() {
@@ -102,7 +112,7 @@ public class DataSourceConfiguration {
 
 	private DataSource hikariDataSource() {
 		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
-		HikariDataSource ds = new HikariDataSource();
+		com.zaxxer.hikari.HikariDataSource ds = new com.zaxxer.hikari.HikariDataSource();
 		if (StringUtils.isNotBlank(driverClass))
 			driverClassName = driverClass;
 		if (StringUtils.isNotBlank(driverClassName))
