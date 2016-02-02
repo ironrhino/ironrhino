@@ -19,10 +19,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import com.jolbox.bonecp.BoneCPDataSource;
 import com.jolbox.bonecp.ConnectionHandle;
 import com.jolbox.bonecp.hooks.AbstractConnectionHook;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class DataSourceConfiguration {
+
+	@Value("${jdbc.dataSourceClassName:}")
+	private String dataSourceClassName;
 
 	@Value("${jdbc.driverClass:}")
 	private String driverClass;
@@ -45,16 +49,13 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.initialSize:5}")
 	private int minConnectionsPerPartition;
 
-	@Value("${dataSource.statementsCacheSize:10}")
-	private int statementsCacheSize;
-
 	@Value("${dataSource.idleConnectionTestPeriodInMinutes:10}")
 	private int idleConnectionTestPeriodInMinutes;
 
 	@Value("${dataSource.idleMaxAgeInMinutes:30}")
 	private int idleMaxAgeInMinutes;
 
-	@Value("${dataSource.maxConnectionAgeInSeconds:14400}")
+	@Value("${dataSource.maxConnectionAgeInSeconds:14000}")
 	private int maxConnectionAgeInSeconds;
 
 	@Value("${dataSource.connectionTestStatement:}")
@@ -66,15 +67,16 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.disableJMX:true}")
 	private boolean disableJMX = true;
 
-	@Value("${dataSource.disableConnectionTracking:true}")
-	private boolean disableConnectionTracking = true;
-
 	@Bean(destroyMethod = "close")
 	@Primary
 	public DataSource dataSource() {
+		return HikariDataSource.class.getName().equals(dataSourceClassName) ? hikariDataSource() : boneCPDataSource();
+	}
+
+	private DataSource boneCPDataSource() {
 		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
 		BoneCPDataSource ds = new BoneCPDataSource();
-		if (StringUtils.isBlank(driverClass) && StringUtils.isNotBlank(driverClassName))
+		if (StringUtils.isNotBlank(driverClassName))
 			driverClass = driverClassName;
 		if (StringUtils.isNotBlank(driverClass))
 			ds.setDriverClass(driverClass);
@@ -85,17 +87,36 @@ public class DataSourceConfiguration {
 		ds.setPassword(password);
 		ds.setMaxConnectionsPerPartition(maxConnectionsPerPartition);
 		ds.setMinConnectionsPerPartition(minConnectionsPerPartition);
-		ds.setStatementsCacheSize(statementsCacheSize);
 		ds.setIdleConnectionTestPeriodInMinutes(idleConnectionTestPeriodInMinutes);
 		ds.setIdleMaxAgeInMinutes(idleMaxAgeInMinutes);
 		ds.setMaxConnectionAgeInSeconds(maxConnectionAgeInSeconds);
 		ds.setDisableJMX(disableJMX);
-		ds.setDisableConnectionTracking(disableConnectionTracking);
 		ds.setQueryExecuteTimeLimitInMs(queryExecuteTimeLimitInMs);
 		ds.setConnectionHook(new MyConnectionHook());
 		if (StringUtils.isBlank(connectionTestStatement) && databaseProduct != null)
 			connectionTestStatement = databaseProduct.getValidationQuery();
 		ds.setConnectionTestStatement(connectionTestStatement);
+		ds.setDisableConnectionTracking(true);
+		return ds;
+	}
+
+	private DataSource hikariDataSource() {
+		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
+		HikariDataSource ds = new HikariDataSource();
+		if (StringUtils.isNotBlank(driverClass))
+			driverClassName = driverClass;
+		if (StringUtils.isNotBlank(driverClassName))
+			ds.setDriverClassName(driverClassName);
+		else if (databaseProduct != null)
+			ds.setDriverClassName(databaseProduct.getDefaultDriverClass());
+		ds.setJdbcUrl(jdbcUrl);
+		ds.setUsername(username);
+		ds.setPassword(password);
+		ds.setMaximumPoolSize(maxConnectionsPerPartition);
+		ds.setMinimumIdle(minConnectionsPerPartition);
+		ds.setIdleTimeout(idleMaxAgeInMinutes * 60 * 1000);
+		ds.setMaxLifetime(maxConnectionAgeInSeconds * 1000);
+		ds.setRegisterMbeans(!disableJMX);
 		return ds;
 	}
 
