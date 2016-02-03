@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.ironrhino.core.util.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.InvalidPropertyException;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 
@@ -21,19 +22,23 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
 		Class<?> sourceClass = sourceType.getType();
 		Class<?> targetClass = targetType.getType();
-		if (sourceClass.equals(targetClass))
+		if (sourceClass == targetClass)
 			return false;
 		try {
 			sourceClass.getConstructor();
 		} catch (NoSuchMethodException | SecurityException e) {
 			return false;
 		}
-		if (targetClass.equals(String.class) || targetClass.equals(Long.class) || targetClass.equals(Long.TYPE)
-				|| targetClass.equals(Integer.class) || targetClass.equals(Integer.TYPE)) {
+		if (targetClass == String.class || targetClass == Long.class || targetClass == Long.TYPE
+				|| targetClass == Integer.class || targetClass == Integer.TYPE) {
 			BeanWrapperImpl bw = new BeanWrapperImpl(sourceClass);
-			PropertyDescriptor pd = bw.getPropertyDescriptor("id");
-			if (pd != null && pd.getPropertyType().equals(targetClass))
-				return true;
+			try {
+				PropertyDescriptor pd = bw.getPropertyDescriptor("id");
+				if (pd != null && pd.getPropertyType() == targetClass)
+					return true;
+			} catch (InvalidPropertyException e) {
+				return false;
+			}
 		}
 		try {
 			targetClass.getConstructor();
@@ -48,8 +53,8 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 		if (source == null)
 			return null;
 		Class<?> targetClass = targetType.getType();
-		if (targetClass.equals(String.class) || targetClass.equals(Long.class) || targetClass.equals(Long.TYPE)
-				|| targetClass.equals(Integer.class) || targetClass.equals(Integer.TYPE)) {
+		if (targetClass == String.class || targetClass == Long.class || targetClass == Long.TYPE
+				|| targetClass == Integer.class || targetClass == Integer.TYPE) {
 			BeanWrapperImpl bw = new BeanWrapperImpl(source);
 			return bw.getPropertyValue("id");
 		}

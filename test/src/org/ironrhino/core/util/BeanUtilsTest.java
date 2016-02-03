@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,17 +17,22 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ironrhino.core.metadata.NotInCopy;
+import org.ironrhino.core.model.Persistable;
 import org.junit.Test;
 
 public class BeanUtilsTest {
 
-	public static class Base implements Serializable {
+	public static class Base implements Serializable, Persistable<String> {
 
 		private static final long serialVersionUID = 1616212908678942555L;
 		protected String id;
 		private List<String> names;
 		private Set<String> tags;
 		private Map<String, String> attributes;
+
+		public boolean isNew() {
+			return id == null;
+		}
 
 		public String getId() {
 			return id;
@@ -166,6 +172,8 @@ public class BeanUtilsTest {
 
 		private List<User> users;
 
+		private Date createDate = new Date();
+
 		public String getName() {
 			return name;
 		}
@@ -196,6 +204,14 @@ public class BeanUtilsTest {
 
 		public void setUsers(List<User> users) {
 			this.users = users;
+		}
+
+		public Date getCreateDate() {
+			return createDate;
+		}
+
+		public void setCreateDate(Date createDate) {
+			this.createDate = createDate;
 		}
 
 	}
@@ -258,6 +274,8 @@ public class BeanUtilsTest {
 
 		private String owner;
 
+		private String createDate;
+
 		public String getName() {
 			return name;
 		}
@@ -272,6 +290,14 @@ public class BeanUtilsTest {
 
 		public void setOwner(String owner) {
 			this.owner = owner;
+		}
+
+		public String getCreateDate() {
+			return createDate;
+		}
+
+		public void setCreateDate(String createDate) {
+			this.createDate = createDate;
 		}
 
 	}
@@ -388,7 +414,7 @@ public class BeanUtilsTest {
 		team.setName("name");
 		team.setOwner(user);
 		team.setUsers(Collections.singletonList(user));
-		
+
 		Team team1 = new Team();
 		BeanUtils.copyProperties(team, team1);
 		assertNotNull(team1.getOwner());
@@ -403,10 +429,12 @@ public class BeanUtilsTest {
 		assertEquals("username", team2.getUsers().get(0).getUsername());
 		assertEquals("A", team2.getUsers().get(0).getType().name());
 		assertEquals(User2.class, team2.getUsers().get(0).getClass());
-		
+
 		Team3 team3 = new Team3();
 		BeanUtils.copyProperties(team, team3);
-		assertEquals(team.getOwner().getId(),team3.getOwner());
+		assertEquals(team.getOwner().getId(), team3.getOwner());
+		assertNotNull(team3.getName());
+		assertNotNull(team3.getCreateDate());
 	}
 
 	@Test
