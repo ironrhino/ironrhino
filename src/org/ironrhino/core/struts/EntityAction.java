@@ -207,7 +207,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public ReadonlyImpl getReadonly() {
-		if (_readonly == null ) {
+		if (_readonly == null) {
 			Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
 			if (immutable != null) {
 				_readonly = new ReadonlyImpl();
@@ -437,7 +437,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return LIST;
 	}
 
-	private DetachedCriteria doPrepareCriteria() {
+	protected DetachedCriteria detachedCriteria() {
 		BaseManager entityManager = getEntityManager(getEntityClass());
 		BeanWrapperImpl bw;
 		try {
@@ -1323,7 +1323,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				csvTemplates.put(name, new Template(null, uc.getCsvTemplate(), freemarkerManager.getConfig()));
 		}
 
-		DetachedCriteria dc = doPrepareCriteria();
+		DetachedCriteria dc = detachedCriteria();
 		BaseManager entityManager = getEntityManager(getEntityClass());
 		long count = entityManager.countByCriteria(dc);
 		int maxRows = getCsvMaxRows();
