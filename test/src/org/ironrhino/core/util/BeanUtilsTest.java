@@ -250,6 +250,32 @@ public class BeanUtilsTest {
 
 	}
 
+	public static class Team3 extends Base {
+
+		private static final long serialVersionUID = 1709649066766563947L;
+
+		private String name;
+
+		private String owner;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getOwner() {
+			return owner;
+		}
+
+		public void setOwner(String owner) {
+			this.owner = owner;
+		}
+
+	}
+
 	private static class MyList<E> extends ArrayList<E> {
 		private static final long serialVersionUID = 1L;
 	}
@@ -362,6 +388,7 @@ public class BeanUtilsTest {
 		team.setName("name");
 		team.setOwner(user);
 		team.setUsers(Collections.singletonList(user));
+		
 		Team team1 = new Team();
 		BeanUtils.copyProperties(team, team1);
 		assertNotNull(team1.getOwner());
@@ -375,6 +402,11 @@ public class BeanUtilsTest {
 		assertEquals(1, team2.getUsers().size());
 		assertEquals("username", team2.getUsers().get(0).getUsername());
 		assertEquals("A", team2.getUsers().get(0).getType().name());
+		assertEquals(User2.class, team2.getUsers().get(0).getClass());
+		
+		Team3 team3 = new Team3();
+		BeanUtils.copyProperties(team, team3);
+		assertEquals(team.getOwner().getId(),team3.getOwner());
 	}
 
 	@Test
