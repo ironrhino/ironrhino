@@ -252,8 +252,8 @@ public class RegionAction extends BaseAction {
 		array = northEast.split(",");
 		Double top = new Double(array[0]);
 		Double right = new Double(array[1]);
-		Integer[] levels = zoom2level(zoom);
-		Integer[] ranks = zoom2rank(zoom);
+		Object[] levels = zoom2level(zoom);
+		Object[] ranks = zoom2rank(zoom);
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		if (levels != null && ranks != null)
 			dc.add(Restrictions.or(Restrictions.in("level", levels), Restrictions.in("rank", ranks)));
