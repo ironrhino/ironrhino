@@ -18,9 +18,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.4.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.9.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.9.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.9.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.10.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.10.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-2.10.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/disruptor-3.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dynamicreports-core-4.0.2.jar"/>
@@ -78,7 +78,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.12.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.6.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.12.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.16.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.5.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-4.2.4.jar"/>
