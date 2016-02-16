@@ -22,6 +22,8 @@ import org.springframework.util.Assert;
 
 public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
 
+	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
+
 	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
 
 	@Value("${httpInvoker.useFstSerialization:false}")
@@ -35,6 +37,9 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
+
+	@Value("${remoting.channel.secure:false}")
+	private boolean secure;
 
 	private String host;
 
@@ -71,6 +76,10 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	public void setPoll(boolean poll) {
 		this.poll = poll;
+	}
+
+	public void setSecure(boolean secure) {
+		this.secure = secure;
 	}
 
 	public void setHost(String host) {
@@ -111,6 +120,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	@Override
 	public void afterPropertiesSet() {
+		if (StringUtils.isBlank(host))
+			Assert.notNull(serviceRegistry, "ServiceRegistry is missing");
 		if (port <= 0)
 			port = AppInfo.getHttpPort();
 		if (port <= 0)
@@ -118,7 +129,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		String serviceUrl = getServiceUrl();
 		if (serviceUrl == null) {
 			Assert.notNull(serviceRegistry);
-			setServiceUrl("http://fakehost/");
+			setServiceUrl((secure ? "https" : "http") + "://fakehost/");
 			discovered = false;
 			urlFromDiscovery = true;
 		}
@@ -222,19 +233,16 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	protected String discoverServiceUrl() {
 		String serviceName = getServiceInterface().getName();
-		StringBuilder sb = new StringBuilder("http://");
+		StringBuilder sb = new StringBuilder(secure ? "https" : "http");
+		sb.append("://");
 		if (StringUtils.isBlank(host)) {
-			if (serviceRegistry != null) {
-				String ho = serviceRegistry.discover(serviceName);
-				if (ho != null) {
-					sb.append(ho);
-					discoveredHost = ho;
-				} else {
-					sb.append("fakehost");
-					logger.error("couldn't discover service:" + serviceName);
-				}
+			String ho = serviceRegistry.discover(serviceName);
+			if (ho != null) {
+				sb.append(ho);
+				discoveredHost = ho;
 			} else {
-				sb.append("fakehost");
+				logger.error("couldn't discover service:" + serviceName);
+				throw new ServiceNotFoundException(serviceName + " not found");
 			}
 		} else {
 			sb.append(host);
@@ -245,7 +253,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			if (StringUtils.isNotBlank(contextPath))
 				sb.append(contextPath);
 		}
-		sb.append("/remoting/httpinvoker/");
+		sb.append(SERVLET_PATH_PREFIX);
 		sb.append(serviceName);
 		return sb.toString();
 	}

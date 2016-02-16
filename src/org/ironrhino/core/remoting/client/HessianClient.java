@@ -19,6 +19,7 @@ import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.caucho.HessianClientInterceptor;
 import org.springframework.util.Assert;
@@ -29,10 +30,15 @@ import com.caucho.hessian.client.HessianURLConnectionFactory;
 
 public class HessianClient extends HessianClientInterceptor implements FactoryBean<Object> {
 
+	private static final String SERVLET_PATH_PREFIX = "/remoting/hessian/";
+
 	private static Logger logger = LoggerFactory.getLogger(HessianClient.class);
 
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
+
+	@Value("${remoting.channel.secure:false}")
+	private boolean secure;
 
 	private String host;
 
@@ -67,6 +73,10 @@ public class HessianClient extends HessianClientInterceptor implements FactoryBe
 		return true;
 	}
 
+	public void setSecure(boolean secure) {
+		this.secure = secure;
+	}
+
 	public void setHost(String host) {
 		this.host = host;
 	}
@@ -95,6 +105,8 @@ public class HessianClient extends HessianClientInterceptor implements FactoryBe
 
 	@Override
 	public void afterPropertiesSet() {
+		if (StringUtils.isBlank(host))
+			Assert.notNull(serviceRegistry, "ServiceRegistry is missing");
 		if (port <= 0)
 			port = AppInfo.getHttpPort();
 		if (port <= 0)
@@ -102,7 +114,7 @@ public class HessianClient extends HessianClientInterceptor implements FactoryBe
 		String serviceUrl = getServiceUrl();
 		if (serviceUrl == null) {
 			Assert.notNull(serviceRegistry);
-			setServiceUrl("http://fakehost/");
+			setServiceUrl((secure ? "https" : "http") + "://fakehost/");
 			reset = false;
 			discovered = false;
 			urlFromDiscovery = true;
@@ -196,19 +208,16 @@ public class HessianClient extends HessianClientInterceptor implements FactoryBe
 
 	protected String discoverServiceUrl() {
 		String serviceName = getServiceInterface().getName();
-		StringBuilder sb = new StringBuilder("http://");
+		StringBuilder sb = new StringBuilder(secure ? "https" : "http");
+		sb.append("://");
 		if (StringUtils.isBlank(host)) {
-			if (serviceRegistry != null) {
-				String ho = serviceRegistry.discover(serviceName);
-				if (ho != null) {
-					sb.append(ho);
-					discoveredHost = ho;
-				} else {
-					sb.append("fakehost");
-					logger.error("couldn't discover service:" + serviceName);
-				}
+			String ho = serviceRegistry.discover(serviceName);
+			if (ho != null) {
+				sb.append(ho);
+				discoveredHost = ho;
 			} else {
-				sb.append("fakehost");
+				logger.error("couldn't discover service:" + serviceName);
+				throw new ServiceNotFoundException(serviceName + " not found");
 			}
 		} else {
 			sb.append(host);
@@ -219,7 +228,7 @@ public class HessianClient extends HessianClientInterceptor implements FactoryBe
 			if (StringUtils.isNotBlank(contextPath))
 				sb.append(contextPath);
 		}
-		sb.append("/remoting/hessian/");
+		sb.append(SERVLET_PATH_PREFIX);
 		sb.append(serviceName);
 		return sb.toString();
 	}
