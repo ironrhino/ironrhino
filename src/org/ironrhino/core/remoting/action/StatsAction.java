@@ -133,7 +133,7 @@ public class StatsAction extends BaseAction {
 
 	@Override
 	public String execute() {
-		if(serviceStats == null){
+		if (serviceStats == null) {
 			addActionError("Require bean serviceStats");
 			return ERROR;
 		}

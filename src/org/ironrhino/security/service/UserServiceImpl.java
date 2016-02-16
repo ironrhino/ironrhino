@@ -19,6 +19,7 @@ public class UserServiceImpl implements UserService {
 	@Autowired(required = false)
 	private List<ConcreteUserDetailsService> userDetailsServices;
 
+	@Override
 	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) {
 		if (username == null)

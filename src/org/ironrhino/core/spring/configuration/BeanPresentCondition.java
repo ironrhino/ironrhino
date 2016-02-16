@@ -14,7 +14,7 @@ import org.springframework.core.type.ClassMetadata;
 
 @Order(Ordered.LOWEST_PRECEDENCE)
 class BeanPresentCondition implements ConfigurationCondition {
-	
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override

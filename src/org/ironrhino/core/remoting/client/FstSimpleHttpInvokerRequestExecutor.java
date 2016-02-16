@@ -12,6 +12,7 @@ public class FstSimpleHttpInvokerRequestExecutor extends SimpleHttpInvokerReques
 
 	protected static final String CONTENT_TYPE_FST_SERIALIZED_OBJECT = "application/x-fst-serialized-object";
 
+	@Override
 	public String getContentType() {
 		return CONTENT_TYPE_FST_SERIALIZED_OBJECT;
 	}

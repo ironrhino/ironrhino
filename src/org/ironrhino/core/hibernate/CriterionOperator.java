@@ -312,7 +312,7 @@ public enum CriterionOperator implements Displayable {
 			if (name.endsWith("AsString")) {
 				return CriterionUtils.matchTag(name, value1);
 			} else {
-				return Restrictions.like(name, (String) value1, MatchMode.ANYWHERE);
+				return Restrictions.like(name, value1, MatchMode.ANYWHERE);
 			}
 		}
 	},

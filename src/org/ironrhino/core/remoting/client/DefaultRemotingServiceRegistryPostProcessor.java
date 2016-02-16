@@ -17,11 +17,13 @@ public class DefaultRemotingServiceRegistryPostProcessor extends RemotingService
 
 	public static final String KEY_IMPORT_EXCLUDE_CLASSES = "remoting.import.excludeClasses";
 
+	@Override
 	public String[] getBasePackages() {
 		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_IMPORT_BASE_PACKAGES);
 		return StringUtils.isNotBlank(str) ? str.trim().split(",") : null;
 	}
 
+	@Override
 	public Collection<Class<?>> getIncludeClasses() {
 		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_IMPORT_INCLUDE_CLASSES);
 		if (StringUtils.isNotBlank(str)) {
@@ -39,6 +41,7 @@ public class DefaultRemotingServiceRegistryPostProcessor extends RemotingService
 		return Collections.emptySet();
 	}
 
+	@Override
 	public Collection<Class<?>> getExcludeClasses() {
 		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_IMPORT_EXCLUDE_CLASSES);
 		if (StringUtils.isNotBlank(str)) {

@@ -158,7 +158,8 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 			if (failureTimes == deadFailureThreshold) {
 				failureCount.remove(ds);
 				deadDataSources.add(ds);
-				logger.error("datasource [" + groupName + ":" + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				logger.error(
+						"datasource [" + groupName + ":" + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				StatLog.add(new Key("dataroute", false, groupName, dbname, "down"));
 			} else {
 				failureCount.put(ds, failureTimes);

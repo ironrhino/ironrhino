@@ -26,7 +26,7 @@ public interface FileStorage {
 	public List<String> listFiles(String path);
 
 	public Map<String, Boolean> listFilesAndDirectory(String path);
-	
+
 	public String getFileUrl(String path);
 
 }

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 public @interface ApiModule {
 
 	String value();
-	
+
 	String category() default "";
 
 	String description() default "";

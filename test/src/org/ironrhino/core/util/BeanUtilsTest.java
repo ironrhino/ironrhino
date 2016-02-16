@@ -30,10 +30,12 @@ public class BeanUtilsTest {
 		private Set<String> tags;
 		private Map<String, String> attributes;
 
+		@Override
 		public boolean isNew() {
 			return id == null;
 		}
 
+		@Override
 		public String getId() {
 			return id;
 		}

@@ -195,8 +195,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			if (checkRemoteAddr) {
 				String addr = (String) session.getAttribute(SESSION_KEY_REMOTE_ADDR);
 				if (addr != null && !session.getRequest().getRemoteAddr().equals(addr)) {
-					logger.warn("Invalidate session[{}] that created from {} but hijacked from {}", session.getId(), addr,
-							session.getRequest().getRemoteAddr());
+					logger.warn("Invalidate session[{}] that created from {} but hijacked from {}", session.getId(),
+							addr, session.getRequest().getRemoteAddr());
 					invalidate(session);
 				}
 			}

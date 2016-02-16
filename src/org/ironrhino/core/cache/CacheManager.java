@@ -37,7 +37,7 @@ public interface CacheManager {
 	public boolean supportsTimeToIdle();
 
 	public boolean supportsUpdateTimeToLive();
-	
+
 	public void invalidate(String namespace);
 
 }

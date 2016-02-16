@@ -40,7 +40,7 @@ public class StandaloneConcurrencyService implements ConcurrencyService {
 	}
 
 	private Semaphore getSemaphore(String name, int permits) {
-		return semaphores.computeIfAbsent(name,(key)->new Semaphore(permits));
+		return semaphores.computeIfAbsent(name, key -> new Semaphore(permits));
 	}
-	
+
 }
