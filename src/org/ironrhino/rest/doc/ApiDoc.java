@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.StringUtils;
@@ -163,6 +164,8 @@ public class ApiDoc implements Serializable {
 			Class<?> view = null;
 			if (responseSample instanceof DeferredResult)
 				responseSample = ((DeferredResult<?>) responseSample).getResult();
+			else if (responseSample instanceof CompletableFuture)
+				responseSample = ((CompletableFuture<?>) responseSample).get();
 			else if (responseSample instanceof Callable)
 				responseSample = ((Callable<?>) responseSample).call();
 			else if (responseSample instanceof Future)
