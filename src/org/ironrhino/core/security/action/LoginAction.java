@@ -85,7 +85,7 @@ public class LoginAction extends BaseAction {
 	@Redirect
 	@InputConfig(methodName = INPUT)
 	@Captcha(threshold = 3)
-	public String execute() {
+	public String execute() throws Exception {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		Authentication authResult = null;
@@ -96,8 +96,13 @@ public class LoginAction extends BaseAction {
 			attempt.setDetails(wads.buildDetails(request));
 			authResult = authenticationManager.authenticate(attempt);
 		} catch (InternalAuthenticationServiceException failed) {
-			logger.error(failed.getMessage(), failed);
-			addActionError(ExceptionUtils.getRootMessage(failed));
+			Throwable cause = failed.getCause();
+			if (cause instanceof Exception) {
+				throw (Exception) cause;
+			} else {
+				logger.error(failed.getMessage(), failed);
+				addActionError(ExceptionUtils.getRootMessage(failed));
+			}
 		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 			addFieldError("username", getText(failed.getClass().getName()));
 		} catch (CredentialsNeedResetException failed) {

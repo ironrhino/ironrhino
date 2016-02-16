@@ -9,6 +9,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExceptionUtils;
+import org.ironrhino.core.util.LocalizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -28,63 +29,60 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 
 	@Override
 	public String intercept(ActionInvocation invocation) throws Exception {
-		String result;
 		try {
-			result = invocation.invoke();
+			return invocation.invoke();
 		} catch (Throwable e) {
+			logger.error(e.getMessage(), e);
 			if (e instanceof MethodFailedException)
 				e = e.getCause();
-			if (e instanceof NoSuchMethodException) {
-				result = BaseAction.NOTFOUND;
-			} else {
-				Object action = invocation.getAction();
-				if (action instanceof ValidationAware) {
-					ValidationAware validationAwareAction = (ValidationAware) action;
-					Throwable cause = e.getCause();
-					if (e instanceof ConstraintViolationException) {
-						ConstraintViolationException cve = (ConstraintViolationException) e;
-						for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
-							validationAwareAction
-									.addFieldError(StringUtils.uncapitalize(cv.getRootBeanClass().getSimpleName()) + "."
-											+ cv.getPropertyPath(), cv.getMessage());
+			if (e instanceof NoSuchMethodException)
+				return BaseAction.NOTFOUND;
+			Object action = invocation.getAction();
+			if (action instanceof ValidationAware) {
+				ValidationAware validationAwareAction = (ValidationAware) action;
+				Throwable cause = e.getCause();
+				if (e instanceof ConstraintViolationException) {
+					ConstraintViolationException cve = (ConstraintViolationException) e;
+					for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
+						validationAwareAction
+								.addFieldError(StringUtils.uncapitalize(cv.getRootBeanClass().getSimpleName()) + "."
+										+ cv.getPropertyPath(), cv.getMessage());
+					}
+				} else if (e instanceof OptimisticLockingFailureException
+						|| cause instanceof OptimisticLockingFailureException) {
+					validationAwareAction.addActionError(findText("try.again.later", null));
+				} else {
+					if (cause != null)
+						while (cause.getCause() != null)
+							cause = cause.getCause();
+					if (e instanceof ValidationException || cause instanceof ValidationException) {
+						ValidationException ve = (ValidationException) ((e instanceof ValidationException) ? e : cause);
+						for (String s : ve.getActionMessages())
+							validationAwareAction.addActionMessage(findText(s, null));
+						for (String s : ve.getActionErrors())
+							validationAwareAction.addActionError(findText(s, null));
+						for (Map.Entry<String, List<String>> entry : ve.getFieldErrors().entrySet()) {
+							for (String s : entry.getValue())
+								validationAwareAction.addFieldError(entry.getKey(), findText(s, null));
 						}
-					} else if (e instanceof OptimisticLockingFailureException
-							|| cause instanceof OptimisticLockingFailureException) {
-						validationAwareAction.addActionError(findText("try.again.later", null));
+					} else if (e instanceof ErrorMessage || cause instanceof ErrorMessage) {
+						ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e : cause);
+						validationAwareAction.addActionError(em.getLocalizedMessage());
+					} else if (e instanceof LocalizedException || cause instanceof LocalizedException) {
+						LocalizedException le = (LocalizedException) ((e instanceof LocalizedException) ? e : cause);
+						validationAwareAction.addActionError(le.getLocalizedMessage());
 					} else {
+						String msg = e.getMessage();
 						if (cause != null)
-							while (cause.getCause() != null)
-								cause = cause.getCause();
-						if (e instanceof ValidationException || cause instanceof ValidationException) {
-							ValidationException ve = (ValidationException) ((e instanceof ValidationException) ? e
-									: cause);
-							for (String s : ve.getActionMessages())
-								validationAwareAction.addActionMessage(findText(s, null));
-							for (String s : ve.getActionErrors())
-								validationAwareAction.addActionError(findText(s, null));
-							for (Map.Entry<String, List<String>> entry : ve.getFieldErrors().entrySet()) {
-								for (String s : entry.getValue())
-									validationAwareAction.addFieldError(entry.getKey(), findText(s, null));
-							}
-						} else if (e instanceof ErrorMessage || cause instanceof ErrorMessage) {
-							ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e : cause);
-							validationAwareAction.addActionError(em.getLocalizedMessage());
-						} else {
-
-							String msg = e.getMessage();
-							if (cause != null)
-								msg = cause.getMessage();
-							if (msg == null)
-								msg = ExceptionUtils.getDetailMessage(e);
-							validationAwareAction.addActionError(msg);
-							logger.error(e.getMessage(), e);
-						}
+							msg = cause.getMessage();
+						if (msg == null)
+							msg = ExceptionUtils.getDetailMessage(e);
+						validationAwareAction.addActionError(msg);
 					}
 				}
-				result = BaseAction.ERROR;
 			}
+			return BaseAction.ERROR;
 		}
-		return result;
 	}
 
 	private static String findText(String text, Object[] args) {

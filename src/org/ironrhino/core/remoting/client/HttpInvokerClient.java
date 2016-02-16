@@ -242,7 +242,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				discoveredHost = ho;
 			} else {
 				logger.error("couldn't discover service:" + serviceName);
-				throw new ServiceNotFoundException(serviceName + " not found");
+				throw new ServiceNotFoundException(serviceName);
 			}
 		} else {
 			sb.append(host);

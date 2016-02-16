@@ -217,7 +217,7 @@ public class HessianClient extends HessianClientInterceptor implements FactoryBe
 				discoveredHost = ho;
 			} else {
 				logger.error("couldn't discover service:" + serviceName);
-				throw new ServiceNotFoundException(serviceName + " not found");
+				throw new ServiceNotFoundException(serviceName);
 			}
 		} else {
 			sb.append(host);
