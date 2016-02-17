@@ -62,7 +62,7 @@
 			<#local ifNotGranted=[]/>
 		</#if>
 	</#if>
-	<#if statics['org.ironrhino.core.util.AuthzUtils'].authorizeArray(ifAllGranted,ifAnyGranted,ifNotGranted) || (authorizer!="" &&  beans['dynamicAuthorizerManager'].authorize(authorizer,authentication("principal"),resource))>
+	<#if statics['org.ironrhino.core.util.AuthzUtils'].authorizeArray(ifAllGranted,ifAnyGranted,ifNotGranted) || (authorizer?has_content && resource?has_content && beans['dynamicAuthorizerManager'].authorize(authorizer,authentication("principal"),resource))>
 		<#nested>
 	</#if>
 </#macro>

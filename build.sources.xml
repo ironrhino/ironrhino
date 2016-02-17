@@ -55,16 +55,11 @@
 	<property name="common-record-sources-jar.includes" value="org/ironrhino/common/record/*" />
 	<property name="common-upload-sources-jar.name" value="ironrhino-common-upload-${version}-sources.jar" />
 	<property name="common-upload-sources-jar.includes" value="org/ironrhino/common/**/Upload*,resources/view/common/upload*" />
-	<property name="common-install-sources-jar.name" value="ironrhino-common-install-${version}-sources.jar" />
-	<property name="common-install-sources-jar.includes" value="org/ironrhino/common/**/Install*,resources/view/common/install*" />
 	<property name="common-qrcode-sources-jar.name" value="ironrhino-common-qrcode-${version}-sources.jar" />
 	<property name="common-qrcode-sources-jar.includes" value="org/ironrhino/common/action/Qrcode*,resources/view/common/qrcode*" />
-	<property name="common-feedback-sources-jar.name" value="ironrhino-common-feedback-${version}-sources.jar" />
-	<property name="common-feedback-sources-jar.includes" value="org/ironrhino/common/**/*Feedback*,resources/view/*Feedback*" />
 	<property name="common-audit-sources-jar.name" value="ironrhino-common-audit-${version}-sources.jar" />
 	<property name="common-audit-sources-jar.includes" value="org/ironrhino/common/**/Audit*,resources/view/audit.ftl" />
 	<property name="security-sources-jar.name" value="ironrhino-security-${version}-sources.jar" />
-	<property name="userdetailsservice-sources-jar.name" value="ironrhino-userdetailsservice-${version}-sources.jar" />
 	<property name="security-config-sources-jar.name" value="ironrhino-security-config-${version}-sources.jar" />
 	<property name="security-config-sources-jar.includes" value="resources/spring/applicationContext-security*.xml" />
 	<property name="security-config-base-sources-jar.name" value="ironrhino-security-config-base-${version}-sources.jar" />
@@ -75,8 +70,6 @@
 	<property name="security-signup-sources-jar.includes" value="org/ironrhino/security/action/SignupAction*,resources/view/signup*.ftl" />
 	<property name="security-loginrecord-sources-jar.name" value="ironrhino-security-loginrecord-${version}-sources.jar" />
 	<property name="security-loginrecord-sources-jar.includes" value="org/ironrhino/security/model/LoginRecord.java,org/ironrhino/security/component/Authentication**" />
-	<property name="security-acl-sources-jar.name" value="ironrhino-security-acl-${version}-sources.jar" />
-	<property name="security-acl-sources-jar.includes" value="org/ironrhino/security/acl/**,resources/view/acl/**" />
 	<property name="security-oauth-client-sources-jar.name" value="ironrhino-security-oauth-client-${version}-sources.jar" />
 	<property name="security-oauth-client-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-sources-jar.name" value="ironrhino-security-oauth-server-${version}-sources.jar" />
@@ -168,23 +161,19 @@
 		<delete file="${target.dir}/${common-stat-sources-jar.name}" />
 		<delete file="${target.dir}/${common-record-sources-jar.name}" />
 		<delete file="${target.dir}/${common-upload-sources-jar.name}" />
-		<delete file="${target.dir}/${common-install-sources-jar.name}" />
 		<delete file="${target.dir}/${common-qrcode-sources-jar.name}" />
-		<delete file="${target.dir}/${common-feedback-sources-jar.name}" />
 		<delete file="${target.dir}/${common-audit-sources-jar.name}" />
 		<delete file="${target.dir}/${security-sources-jar.name}" />
-		<delete file="${target.dir}/${userdetailsservice-sources-jar.name}" />
 		<delete file="${target.dir}/${security-config-sources-jar.name}" />
 		<delete file="${target.dir}/${security-config-base-sources-jar.name}" />
 		<delete file="${target.dir}/${security-config-http-sources-jar.name}" />
 		<delete file="${target.dir}/${security-loginrecord-sources-jar.name}" />
-		<delete file="${target.dir}/${security-acl-sources-jar.name}" />
 		<delete file="${target.dir}/${security-oauth-client-sources-jar.name}" />
 		<delete file="${target.dir}/${security-oauth-server-sources-jar.name}" />
 		<delete file="${target.dir}/${security-remoting-sources-jar.name}" />
 		<delete file="${target.dir}/${security-oauth-server-remoting-sources-jar.name}" />
 		<delete file="${target.dir}/${rest-sources-jar.name}" />
-		<jar jarfile="${target.dir}/${core-sources-jar.name}" basedir="${src.dir}" includes="META-INF/**,log4j*.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-sources-jar.includes},${zookeeper-sources-jar.includes},${remoting-common-sources-jar.includes},${common-setting-sources-jar.includes},${common-cms-sources-jar.includes},${common-dictionary-sources-jar.includes},${common-schema-sources-jar.includes},${common-treenode-sources-jar.includes},${common-region-sources-jar.includes},${common-stat-sources-jar.includes},${common-record-sources-jar.includes},${common-upload-sources-jar.includes},${common-install-sources-jar.includes},${common-qrcode-sources-jar.includes},${common-feedback-sources-jar.includes},${common-audit-sources-jar.includes}">
+		<jar jarfile="${target.dir}/${core-sources-jar.name}" basedir="${src.dir}" includes="META-INF/**,log4j*.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,jasperreports_extension.properties,zhfonts.xml,META-INF/**,org/springframework/**,org/apache/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-sources-jar.includes},${zookeeper-sources-jar.includes},${remoting-common-sources-jar.includes},${common-setting-sources-jar.includes},${common-cms-sources-jar.includes},${common-dictionary-sources-jar.includes},${common-schema-sources-jar.includes},${common-treenode-sources-jar.includes},${common-region-sources-jar.includes},${common-stat-sources-jar.includes},${common-record-sources-jar.includes},${common-upload-sources-jar.includes},${common-qrcode-sources-jar.includes},${common-audit-sources-jar.includes}">
 			<manifest>
 				<attribute name="Implementation-Title" value="ironrhino-core" />
 				<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -475,36 +464,12 @@
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-fs" />
 			</manifest>
 		</jar>
-		<jar jarfile="${target.dir}/${common-install-sources-jar.name}" basedir="${src.dir}" includes="${common-install-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-common-install" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-install" />
-				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-				<attribute name="Ironrhino-Component-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-			</manifest>
-		</jar>
 		<jar jarfile="${target.dir}/${common-qrcode-sources-jar.name}" basedir="${src.dir}" includes="${common-qrcode-sources-jar.includes}">
 			<manifest>
 				<attribute name="Implementation-Title" value="ironrhino-common-qrcode" />
 				<attribute name="Implementation-Vendor" value="ironrhino" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-qrcode" />
-				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-				<attribute name="Ironrhino-Component-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${common-feedback-sources-jar.name}" basedir="${src.dir}" includes="${common-feedback-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-common-feedback" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-common-feedback" />
 				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
 				<attribute name="Ironrhino-Component-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
@@ -523,24 +488,12 @@
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 			</manifest>
 		</jar>
-		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/i18n/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-sources-jar.includes},${security-signup-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-acl-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
+		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/i18n/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-sources-jar.includes},${security-signup-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
 			<manifest>
 				<attribute name="Implementation-Title" value="ironrhino-security" />
 				<attribute name="Implementation-Vendor" value="ironrhino" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Id" value="ironrhino-security" />
-				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-				<attribute name="Ironrhino-Component-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${userdetailsservice-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/model/User.java,org/ironrhino/security/model/BaseUser.java,org/ironrhino/security/service/UserManager.java">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-userdetailsservice" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-userdetailsservice" />
 				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
 				<attribute name="Ironrhino-Component-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
@@ -605,18 +558,6 @@
 				<attribute name="Ironrhino-Component-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${security-acl-sources-jar.name}" basedir="${src.dir}" includes="${security-acl-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-security-acl" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-acl" />
-				<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-				<attribute name="Ironrhino-Component-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security,ironrhino-common-dictionary" />
 			</manifest>
 		</jar>
 		<jar jarfile="${target.dir}/${security-oauth-client-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-client-sources-jar.includes}">

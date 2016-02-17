@@ -209,12 +209,15 @@ public class BaseAction extends ActionSupport {
 					evalExpression(authorize.ifAnyGranted()), evalExpression(authorize.ifNotGranted()));
 			if (!authorized && dynamicAuthorizerManager != null
 					&& !authorize.authorizer().equals(DynamicAuthorizer.class)) {
-				ActionProxy ap = ActionContext.getContext().getActionInvocation().getProxy();
-				StringBuilder sb = new StringBuilder(ap.getNamespace());
-				sb.append(ap.getNamespace().endsWith("/") ? "" : "/");
-				sb.append(ap.getActionName());
-				sb.append(ap.getMethod().equals("execute") ? "" : "/" + ap.getMethod());
-				String resource = sb.toString();
+				String resource = authorize.resource();
+				if (StringUtils.isBlank(resource)) {
+					ActionProxy ap = ActionContext.getContext().getActionInvocation().getProxy();
+					StringBuilder sb = new StringBuilder(ap.getNamespace());
+					sb.append(ap.getNamespace().endsWith("/") ? "" : "/");
+					sb.append(ap.getActionName());
+					sb.append(ap.getMethod().equals("execute") ? "" : "/" + ap.getMethod());
+					resource = sb.toString();
+				}
 				UserDetails user = AuthzUtils.getUserDetails();
 				authorized = dynamicAuthorizerManager.authorize(authorize.authorizer(), user, resource);
 			}

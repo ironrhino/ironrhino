@@ -21,6 +21,6 @@ public @interface Authorize {
 
 	Class<? extends DynamicAuthorizer> authorizer() default DynamicAuthorizer.class;
 
-	String resourceGroup() default "";
+	String resource() default "";
 
 }
