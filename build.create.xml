@@ -175,14 +175,14 @@
 					if(!file.exists()){
 						var echo = project.createTask("echo");
 						echo.setFile(file);
-						echo.setMessage('lib\ntarget\ntest/classes\nwebapp/WEB-INF/classes\nwebapp/WEB-INF/lib\n.svnignore');
+						echo.setMessage('lib\ntarget\ntest/classes\nwebapp/WEB-INF/classes\nwebapp/WEB-INF/lib\n.svnignore\n.DS_Store');
 						echo.perform();
 					}
 					file = new File(projectDir+'/.svnignore');
 					if(!file.exists()){
 						var echo = project.createTask("echo");
 						echo.setFile(file);
-						echo.setMessage('lib/* target/* test/classes/* webapp/WEB-INF/classes/* webapp/WEB-INF/lib/* .gitignore');
+						echo.setMessage('target/* test/classes/* webapp/WEB-INF/classes/* .gitignore .DS_Store');
 						echo.perform();
 					}			
 					print('*********************************\n');
