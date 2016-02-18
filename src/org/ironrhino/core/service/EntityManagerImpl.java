@@ -16,7 +16,7 @@ public class EntityManagerImpl<T extends Persistable<?>> extends BaseManagerImpl
 	}
 
 	@Override
-	public Class<? extends Persistable<?>> getEntityClass() {
+	public Class<T> getEntityClass() {
 		return entityClassHolder.get();
 	}
 

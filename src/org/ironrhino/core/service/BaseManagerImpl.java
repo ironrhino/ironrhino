@@ -95,7 +95,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	@Override
-	public Class<? extends Persistable<?>> getEntityClass() {
+	public Class<T> getEntityClass() {
 		return entityClass;
 	}
 
@@ -293,6 +293,18 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		if (id == null)
 			return null;
 		return (T) sessionFactory.getCurrentSession().get(getEntityClass(), id, lockOptions);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<T> get(List<? extends Serializable> ids) {
+		if (ids == null)
+			return null;
+		if (ids.isEmpty())
+			return Collections.emptyList();
+		if (ids.size() > ResultPage.DEFAULT_MAX_PAGESIZE)
+			throw new IllegalArgumentException("ids size shouldn't large than " + ResultPage.DEFAULT_MAX_PAGESIZE);
+		return sessionFactory.getCurrentSession().byMultipleIds(getEntityClass()).multiLoad(ids);
 	}
 
 	@Override

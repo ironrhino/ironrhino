@@ -23,6 +23,8 @@ public interface BaseManager<T extends Persistable<?>> {
 	public T get(Serializable id);
 
 	public T get(Serializable id, LockOptions lockOptions);
+	
+	public List<T> get(List<? extends Serializable> ids);
 
 	public void evict(T obj);
 
