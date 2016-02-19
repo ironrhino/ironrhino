@@ -67,6 +67,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.groupable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treearea.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treeselect.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treeview.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.listpick.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.imagepick.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.latlng.js" />
