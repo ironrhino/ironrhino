@@ -2,18 +2,18 @@ package org.ironrhino.security.service;
 
 import java.util.List;
 
-import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.spring.security.ConcreteUserDetailsService;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.security.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@ClassPresentConditional("org.ironrhino.core.remoting.server.HttpInvokerServer")
+@Primary
 public class UserServiceImpl implements UserService {
 
 	@Autowired(required = false)
