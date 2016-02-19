@@ -42,7 +42,6 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 		if (includeClasses != null)
 			remotingServices.addAll(includeClasses);
 		Set<String> packageSet = new HashSet<>();
-		packageSet.add("org.ironrhino");
 		String appBasePackage = AppInfo.getAppBasePackage();
 		if (StringUtils.isNotBlank(appBasePackage))
 			for (String p : appBasePackage.split(","))

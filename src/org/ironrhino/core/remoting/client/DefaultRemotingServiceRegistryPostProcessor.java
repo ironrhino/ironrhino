@@ -20,7 +20,11 @@ public class DefaultRemotingServiceRegistryPostProcessor extends RemotingService
 	@Override
 	public String[] getBasePackages() {
 		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_IMPORT_BASE_PACKAGES);
-		return StringUtils.isNotBlank(str) ? str.trim().split(",") : null;
+		if (StringUtils.isBlank(str))
+			str = "org.ironrhino";
+		else
+			str = "org.ironrhino," + str.trim();
+		return str.split(",");
 	}
 
 	@Override
