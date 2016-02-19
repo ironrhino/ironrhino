@@ -334,11 +334,12 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
             LOG.error("Error building report for uri " + systemId, e);
             throw new ServletException(e.getMessage(), e);
         } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                LOG.warn("Could not close db connection properly", e);
-            }
+        	if (conn != null)
+	            try {
+	                conn.close();
+	            } catch (Exception e) {
+	                LOG.warn("Could not close db connection properly", e);
+	            }
         }
 
         // Export the print object to the desired output format
