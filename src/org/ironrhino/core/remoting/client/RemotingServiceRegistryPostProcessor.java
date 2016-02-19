@@ -2,11 +2,8 @@ package org.ironrhino.core.remoting.client;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.AppInfo;
@@ -15,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -41,17 +39,7 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 		Collection<Class<?>> includeClasses = getIncludeClasses();
 		if (includeClasses != null)
 			remotingServices.addAll(includeClasses);
-		Set<String> packageSet = new HashSet<>();
-		String appBasePackage = AppInfo.getAppBasePackage();
-		if (StringUtils.isNotBlank(appBasePackage))
-			for (String p : appBasePackage.split(","))
-				packageSet.add(p);
-		String[] basePackages = getBasePackages();
-		if (basePackages != null) {
-			for (String p : basePackages)
-				packageSet.add(p);
-		}
-		remotingServices.addAll(ClassScanner.scanAnnotated(packageSet.toArray(new String[0]), Remoting.class));
+		remotingServices.addAll(ClassScanner.scanAnnotated(getBasePackages(), Remoting.class));
 		Collection<Class<?>> excludeClasses = getExcludeClasses();
 		for (Class<?> remotingService : remotingServices) {
 			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))
@@ -63,8 +51,13 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 			}
 			String beanName = NameGenerator.buildDefaultBeanName(remotingService.getName());
 			if (registry.containsBeanDefinition(beanName)) {
+				BeanDefinition bd = registry.getBeanDefinition(beanName);
+				String beanClassName = bd.getBeanClassName();
+				if (beanClassName.startsWith("org.ironrhino.core.remoting.client.") && beanClassName.endsWith("Client")
+						&& remotingService.getName().equals(bd.getPropertyValues().get("serviceInterface")))
+					continue;
 				try {
-					Class<?> beanClass = Class.forName(registry.getBeanDefinition(beanName).getBeanClassName());
+					Class<?> beanClass = Class.forName(beanClassName);
 					if (remotingService.isAssignableFrom(beanClass))
 						continue;
 				} catch (ClassNotFoundException e) {
