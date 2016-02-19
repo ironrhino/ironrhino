@@ -1,0 +1,40 @@
+= Jar包依赖
+
+对于新创建的工程, 包含了的jar包是ironrhino自带的子集, 是一些必要和常用的jar包.
+如果需要增加依赖的jar包, 有两种情况.
+
+== ironrhino包含但是工程里面没有引用
+只需要从ironrhino里面复制依赖的jar包放到工程里面的 `webapp/WEB-INF/lib` 文件夹里面,
+并且将它们加入到eclipse的 `.classpath` 文件里面.
+
+.常用功能的依赖关系
+|===
+|功能 |依赖包
+
+|全文索引
+|elasticsearch-\*.jar lucene-*.jar mmseg4j-*.jar
+
+|redis
+|jedis-\*.jar commons-pool2-*.jar spring-data-redis-*.jar
+
+|rabbitmq
+|rabbitmq-client-\*.jar spring-rabbit-*.jar spring-amqp-*.jar
+
+|mongodb
+|mongo-java-driver-\*.jar	spring-data-mongodb-*.jar spring-data-commons-*.jar
+
+|zookeeper
+|zookeeper-\*.jar curator-*.jar
+
+|报表
+|jasperreports-\*.jar commons-digester-*.jar commons-collections-\*.jar dynamicreports-core-*.jar poi-\*.jar itext*.jar struts2-jasperreports-plugin-*.jar
+
+|二维码
+|zxing-*.jar
+|===
+
+== ironrhino没有包含
+在自己的工程里面建立一个叫 `extralib` 的文件夹, 将jar包放入进去并且复制到 `webapp/WEB-INF/lib` 文件夹里面,
+将 `webapp/WEB-INF/lib` 而不是 `extralib` 里面的加入到eclipse的 `.classpath` 文件里面
+
+`extralib` 可以放一些比较常用的第三方包比如 `mybatis-*.jar` `joda-time-*.jar` , 还有其他工程里面构建出来的依赖包等.

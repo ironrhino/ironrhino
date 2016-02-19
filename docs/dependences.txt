@@ -1,7 +1,0 @@
-search			elasticsearch-*.jar lucene-*.jar mmseg4j-*.jar
-redis			jedis-*.jar commons-pool2-*.jar spring-data-redis-*.jar
-rabbitmq		rabbitmq-client-*.jar spring-rabbit-*.jar spring-amqp-*.jar
-mongodb			mongo-java-driver-*.jar	spring-data-mongodb-*.jar spring-data-commons-*.jar
-zookeeper		zookeeper-*.jar curator-*.jar
-jasperreports   jasperreports-*.jar commons-digester-*.jar commons-collections-*.jar dynamicreports-core-*.jar poi-*.jar itext*.jar struts2-jasperreports-plugin-*.jar
-zxing			zxing-*.jar

@@ -1,0 +1,131 @@
+= 服务实现选择
+
+应用程序可能会在不同的部署规模下运行, 很难让一种服务实现满足所有场景需要,
+ironrhino通常对内置服务提供多种实现, 并且会在具体的部署规模下指定一个默认的实现, 同时也可以指定使用哪一个实现.
+
+部署规模由spring的profile决定, 默认是 `default` ,
+可以设置环境变量 `SPRING_PROFILES_DEFAULT` 或者jvm系统属性 `spring.profiles.default` 来指定.
+[cols="1,5"]
+|===
+|profile | 说明
+
+|default
+|适用于单实例部署
+
+|dual
+|适用于小规模的多实例部署, 通常是双实例
+
+|cluster
+|适用于大规模的多实例集群环境
+
+|cloud
+|适用于部署在云端比如cloudfoundry
+|===
+
+* org.ironrhino.core.cache.CacheManager
+[cols="1,5,5"]
+|===
+|profile | 实现 | 说明
+
+|default
+|org.ironrhino.core.cache.impl.EhCacheManager
+|使用ehcache当缓存, 只能单实例使用
+
+|dual cloud
+|org.ironrhino.core.cache.impl.RedisCacheManager
+|需要redis服务
+
+|cluster
+|org.ironrhino.core.cache.impl.MemcachedCacheManager
+|需要memcached集群
+|===
+
+* org.ironrhino.core.coordination.LockService
+[cols="2,5,5"]
+|===
+|profile | 实现 | 说明
+
+|default
+|org.ironrhino.core.coordination.impl.StandaloneLockService
+|使用jdk自带的Lock, 只能单实例使用
+
+|dual cloud
+|org.ironrhino.core.coordination.impl.RedisLockService
+|需要redis服务
+
+|cluster
+|org.ironrhino.core.coordination.impl.ZooKeeperLockService
+|需要zookeeper集群
+|===
+
+* org.ironrhino.core.throttle.ConcurrencyService
+[cols="2,5,5"]
+|===
+|profile | 实现 | 说明
+
+|default
+|org.ironrhino.core.throttle.impl.StandaloneConcurrencyService
+|使用jdk自带的Semaphore, 只能单实例使用
+
+|dual cluster cloud
+|org.ironrhino.core.throttle.impl.RedisConcurrencyService
+|需要redis服务
+|===
+
+* org.ironrhino.core.coordination.Membership
+[cols="2,5,5"]
+|===
+|profile | 实现 | 说明
+
+|default
+|org.ironrhino.core.coordination.impl.StandaloneMembership
+|只能单实例使用
+
+|dual cloud
+|org.ironrhino.core.coordination.impl.RedisMembership
+|需要redis服务
+
+|cluster
+|org.ironrhino.core.coordination.impl.ZooKeeperMembership
+|需要zookeeper集群
+|===
+
+* org.ironrhino.core.fs.FileStorage
+[cols="2,5,5"]
+|===
+|profile | 实现 | 说明
+
+|default dual
+|org.ironrhino.core.fs.impl.LocalFileStorage
+|使用本地磁盘当做文件存储
+
+|cluster cloud
+|org.ironrhino.core.fs.impl.MongoFileStorage
+|需要mongodb服务
+|===
+
+* org.ironrhino.core.remoting.ServiceRegistry
+[cols="2,5,5"]
+|===
+|profile | 实现 | 说明
+
+|default
+|org.ironrhino.core.remoting.impl.StandaloneServiceRegistry
+|空实现
+
+|dual cloud
+|org.ironrhino.core.remoting.impl.RedisServiceRegistry
+|需要redis服务
+
+|cluster
+|org.ironrhino.core.remoting.impl.ZooKeeperServiceRegistry
+|需要zookeeper集群
+|===
+
+
+还可以在 `applicationContext.properties` 里面指定使用某一个服务实现, key是服务接口类的全限名, value是服务实现类的全限名, 比如: 
+[source,properties]
+.applicationContext.properties
+----
+org.ironrhino.core.cache.CacheManager=org.ironrhino.core.cache.impl.MemcachedCacheManager
+----
