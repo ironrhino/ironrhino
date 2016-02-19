@@ -212,15 +212,15 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		if (event instanceof InstanceStartupEvent && event.isLocal())
 			init();
 		else if (event instanceof InstanceShutdownEvent && !event.isLocal()) {
-			String host = event.getHost();
-			if (event.getHttpPort() > 0)
-				host += ":" + event.getHttpPort();
+			String instanceId = event.getInstanceId();
+			String host = instanceId.substring(instanceId.lastIndexOf('@') + 1);
 			evict(host);
 		} else if (event instanceof ExportServicesEvent) {
 			if (event.isLocal())
 				return;
 			ExportServicesEvent ev = (ExportServicesEvent) event;
-			String host = ev.getHost();
+			String instanceId = event.getInstanceId();
+			String host = instanceId.substring(instanceId.lastIndexOf('@') + 1);
 			for (String serviceName : ev.getExportServices()) {
 				List<String> hosts = importServices.get(serviceName);
 				if (hosts != null && !hosts.contains(host))

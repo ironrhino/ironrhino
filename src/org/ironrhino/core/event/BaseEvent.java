@@ -9,10 +9,6 @@ public class BaseEvent<T> extends ApplicationEvent {
 
 	private String instanceId = AppInfo.getInstanceId();
 
-	private String host = AppInfo.getHostAddress();
-
-	private int httpPort = AppInfo.getHttpPort();
-
 	protected T source;
 
 	public BaseEvent(T source) {
@@ -31,14 +27,6 @@ public class BaseEvent<T> extends ApplicationEvent {
 
 	public boolean isLocal() {
 		return getInstanceId().equals(AppInfo.getInstanceId());
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public int getHttpPort() {
-		return httpPort;
 	}
 
 }
