@@ -59,7 +59,10 @@ fi
 #install ant
 if [ ! -d ant ];then
 if ! $(ls -l apache-ant-*.tar.gz >/dev/null 2>&1) ; then
-wget http://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
+wget http://mirrors.aliyun.com/apache/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
+if [ $? -ne 0 ]; then
+   http://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
+fi
 fi
 tar xf apache-ant-*.tar.gz
 rm apache-ant-*.tar.gz
@@ -72,7 +75,10 @@ fi
 #install tomcat
 if [ ! -d tomcat8080 ];then
 if ! $(ls -l apache-tomcat-*.tar.gz >/dev/null 2>&1) ; then
-wget "http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION:0:1}/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz"
+wget http://mirrors.aliyun.com/apache/tomcat/tomcat-${TOMCAT_VERSION:0:1}/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+if [ $? -ne 0 ]; then
+   http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION:0:1}/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+fi
 fi
 tar xf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
 mv apache-tomcat-* tomcat
@@ -258,7 +264,10 @@ fi
 version="\$1"
 if [ ! -d apache-tomcat-\$version ];then
 if [ ! -f apache-tomcat-\$version.tar.gz ];then
-wget http://archive.apache.org/dist/tomcat/tomcat-\${version:0:1}/v\$version/bin/apache-tomcat-\$version.tar.gz
+wget http://mirrors.aliyun.com/apache/tomcat/tomcat-\${version:0:1}/v\$version/bin/apache-tomcat-\$version.tar.gz
+if [ $? -ne 0 ]; then
+   wget http://archive.apache.org/dist/tomcat/tomcat-\${version:0:1}/v\$version/bin/apache-tomcat-\$version.tar.gz
+fi
 fi
 tar xf apache-tomcat-\$version.tar.gz && rm -rf apache-tomcat-\$version.tar.gz
 cd apache-tomcat-\$version && rm -rf bin/*.bat && rm -rf webapps/* && cd ..
