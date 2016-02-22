@@ -1,9 +1,3 @@
-/*add by zhouyanming start*/
-.treeview a:hover {
-	color: red;
-}
-
-/*add by zhouyanming end*/
 .treeview a span {
 	cursor: pointer;
 }
@@ -12,11 +6,6 @@
 	padding: 0;
 	margin: 0;
 	list-style: none;
-}
-
-.treeview ul {
-	background-color: white;
-	margin-top: 4px;
 }
 
 .treeview .hitarea {
@@ -46,11 +35,6 @@
 #treecontrol {
 	margin: 1em 0;
 	display: none;
-}
-
-.treeview .hover {
-	color: red;
-	cursor: pointer;
 }
 
 .treeview li {

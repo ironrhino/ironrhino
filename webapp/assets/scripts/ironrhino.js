@@ -24144,10 +24144,17 @@ function log() {
 										+ this.name;
 							else
 								this.fullname = this.name;
-						var current = $("<li/>")
-								.data('treenode', this)
-								.html("<a><span>" + (this.name) + "</span></a>")
+						var template = settings.template;
+						var current = $("<li/>").data('treenode', this)
 								.appendTo(parent);
+						if (template) {
+							current.html($.tmpl(template, this));
+							_observe(current);
+						} else {
+							current.html("<a><span>" + (this.name)
+									+ "</span></a>");
+						}
+
 						if (settings.click)
 							$("span", current).click(settings.click);
 						if (this.classes) {
@@ -32367,6 +32374,37 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		}
 	}
 
+	/* http://ejohn.org/blog/javascript-micro-templating/ */
+	var cache = {};
+	$.tmpl = function(str, data) {
+		// Figure out if we're getting a template, or if we need to
+		// load the template - and be sure to cache the result.
+		var fn = !/\W/.test(str) ? cache[str] = cache[str]
+				|| tmpl(document.getElementById(str).innerHTML) :
+
+				// Generate a reusable function that will serve as a template
+				// generator (and which will be cached).
+				new Function("obj",
+						"var p=[],print=function(){p.push.apply(p,arguments);};"
+								+
+
+								// Introduce the data as local variables using
+								// with(){}
+								"with(obj){p.push('" +
+
+								// Convert the template into pure JavaScript
+								str.replace(/[\r\t\n]/g, " ").split("{{")
+										.join("\t").replace(/((^|%>)[^\t]*)'/g,
+												"$1\r").replace(/\t(.*?)}}/g,
+												"',$1,'").split("\t")
+										.join("');").split("}}")
+										.join("p.push('").split("\r")
+										.join("\\'") + "');}return p.join('');");
+
+		// Provide some basic currying to the user
+		return data ? fn(data) : fn;
+	};
+
 })();
 
 Indicator = {
@@ -39793,8 +39831,9 @@ Observation.treeview = function(container) {
 								}
 							},
 							collapsed : t.data('collapsed'),
-							unique : t.data('unique')
-						});
+							unique : t.data('unique'),
+							template : $.trim(t.html())
+						}).html('');
 			});
 };
 (function($) {

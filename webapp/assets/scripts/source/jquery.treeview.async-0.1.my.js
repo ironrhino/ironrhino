@@ -39,10 +39,17 @@
 										+ this.name;
 							else
 								this.fullname = this.name;
-						var current = $("<li/>")
-								.data('treenode', this)
-								.html("<a><span>" + (this.name) + "</span></a>")
+						var template = settings.template;
+						var current = $("<li/>").data('treenode', this)
 								.appendTo(parent);
+						if (template) {
+							current.html($.tmpl(template, this));
+							_observe(current);
+						} else {
+							current.html("<a><span>" + (this.name)
+									+ "</span></a>");
+						}
+
 						if (settings.click)
 							$("span", current).click(settings.click);
 						if (this.classes) {

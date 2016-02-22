@@ -1116,12 +1116,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .masked-hidden {
     visibility: hidden !important;
 }
-/*add by zhouyanming start*/
-.treeview a:hover {
-	color: red;
-}
-
-/*add by zhouyanming end*/
 .treeview a span {
 	cursor: pointer;
 }
@@ -1130,11 +1124,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	padding: 0;
 	margin: 0;
 	list-style: none;
-}
-
-.treeview ul {
-	background-color: white;
-	margin-top: 4px;
 }
 
 .treeview .hitarea {
@@ -1167,7 +1156,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 }
 
 .treeview .hover {
-	color: red;
 	cursor: pointer;
 }
 

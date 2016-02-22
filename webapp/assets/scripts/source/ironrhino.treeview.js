@@ -17,7 +17,8 @@ Observation.treeview = function(container) {
 								}
 							},
 							collapsed : t.data('collapsed'),
-							unique : t.data('unique')
-						});
+							unique : t.data('unique'),
+							template : $.trim(t.html())
+						}).html('');
 			});
 };
