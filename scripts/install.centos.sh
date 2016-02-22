@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ANT_VERSION=1.9.6
-JDK_VERSION=8u66-b17
-TOMCAT_VERSION=8.0.30
-REDIS_VERSION=3.0.5
+JDK_VERSION=8u74-b02
+TOMCAT_VERSION=8.0.32
+REDIS_VERSION=3.0.7
 #JDK_VERSION=7u80-b15
-#TOMCAT_VERSION=7.0.65
+#TOMCAT_VERSION=7.0.68
 
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
@@ -167,7 +167,7 @@ sed -i '99i export SPRING_PROFILES_DEFAULT=dual' tomcat/bin/catalina.sh
 if [ "${JDK_VERSION:0:1}" = "7" ];then
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:+UseParNewGC -XX:CMSMaxAbortablePrecleanTime=5 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
 else
-sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+DisableExplicitGC -XX:+UseG1GC -XX:SurvivorRatio=6 -XX:MaxGCPauseMillis=400 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=40 -XX:ConcGCThreads=2 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
+sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+DisableExplicitGC -XX:+UseG1GC -XX:SurvivorRatio=6 -XX:MaxGCPauseMillis=400 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=40 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
 fi
 mv tomcat tomcat8080
 cp -R tomcat8080 tomcat8081
