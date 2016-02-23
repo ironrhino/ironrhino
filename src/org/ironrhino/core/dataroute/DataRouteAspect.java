@@ -39,7 +39,7 @@ public class DataRouteAspect extends BaseAspect {
 	}
 
 	@Around("execution(public * *(..)) and @annotation(dataRoute)")
-	public Object route(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
+	public Object routeOnMethod(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
 		String routingKey = ExpressionUtils.evalString(dataRoute.routingKey(), context);
 		if (StringUtils.isNotBlank(routingKey)) {
@@ -53,8 +53,9 @@ public class DataRouteAspect extends BaseAspect {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Around("execution(public * *(..)) and target(baseManager)")
-	public Object route(ProceedingJoinPoint jp, BaseManager baseManager) throws Throwable {
+	@Around("execution(public * *(..)) and target(baseManager) and @annotation(transactional)")
+	public Object routeOnClass(ProceedingJoinPoint jp, BaseManager baseManager, Transactional transactional)
+			throws Throwable {
 		DataRoute dataRoute = null;
 		Object target = jp.getTarget();
 		if (target != null)
