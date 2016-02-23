@@ -19,6 +19,6 @@ Observation.treeview = function(container) {
 							collapsed : t.data('collapsed'),
 							unique : t.data('unique'),
 							template : $.trim(t.html())
-						}).html('');
+						}).html(t.data('head') || '');
 			});
 };
