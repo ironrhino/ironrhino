@@ -13,7 +13,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
-import org.ironrhino.core.dataroute.DataRoute;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
@@ -23,7 +22,6 @@ import org.ironrhino.core.stat.Key;
 import org.ironrhino.core.stat.KeyValuePair;
 import org.ironrhino.core.stat.Value;
 
-@DataRoute("miscGroup")
 @AutoConfig
 @Entity
 @Table(name = "common_stat")

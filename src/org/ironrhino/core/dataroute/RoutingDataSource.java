@@ -1,5 +1,6 @@
 package org.ironrhino.core.dataroute;
 
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
@@ -8,49 +9,54 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.datasource.AbstractDataSource;
+import org.springframework.util.Assert;
 
-public class RoutingDataSource extends AbstractDataSource {
+import com.google.common.hash.Hashing;
 
-	private DataSource mainGroup;
+public class RoutingDataSource extends AbstractDataSource implements InitializingBean {
+
+	private DataSource defaultDataSource;
 
 	private Map<String, DataSource> routingMap;
 
-	public DataSource getMainGroup() {
-		if (mainGroup == null) {
-			mainGroup = routingMap.values().iterator().next();
-		}
-		return mainGroup;
+	private String[] nodeNames;
+
+	public void setDefaultDataSource(DataSource defaultDataSource) {
+		this.defaultDataSource = defaultDataSource;
 	}
 
-	// inject DataSource with groupName
-	public void setRoutingMap(Map<String, DataSource> map) {
-		if (routingMap != null)
-			throw new IllegalArgumentException("already injected by groupList");
-		this.routingMap = map;
-	}
-
-	// inject GroupedDataSource included groupName
-	public void setGroups(List<GroupedDataSource> list) {
-		if (routingMap != null)
-			throw new IllegalArgumentException("already injected by routingMap");
+	public void setNodes(List<GroupedDataSource> nodes) {
 		routingMap = new LinkedHashMap<>();
-		for (GroupedDataSource gds : list)
+		for (GroupedDataSource gds : nodes)
 			routingMap.put(gds.getGroupName(), gds);
-		mainGroup = list.get(0);
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(routingMap);
+		Assert.notEmpty(routingMap);
+		nodeNames = routingMap.keySet().toArray(new String[0]);
+		if (defaultDataSource == null)
+			defaultDataSource = routingMap.values().iterator().next();
+		Assert.notNull(defaultDataSource);
 	}
 
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
 		DataSource ds = null;
-		String groupName = DataRouteContext.getName();
-		if (groupName != null) {
-			ds = routingMap.get(groupName);
+		String routingKey = DataRouteContext.getRoutingKey();
+		String nodeName = DataRouteContext.getNodeName();
+		if (routingKey != null) {
+			ds = routingMap.get(route(routingKey));
+		} else if (nodeName != null) {
+			ds = routingMap.get(nodeName);
+			if (ds == null)
+				throw new IllegalArgumentException("dataSource '" + nodeName + "' not found");
 		} else {
-			ds = getMainGroup();
+			ds = defaultDataSource;
 		}
-		if (ds == null)
-			throw new IllegalArgumentException("group name '" + groupName + "' not found");
 		return ds.getConnection(username, password);
 	}
 
@@ -60,11 +66,17 @@ public class RoutingDataSource extends AbstractDataSource {
 	}
 
 	public void check() {
-		if (mainGroup instanceof GroupedDataSource)
-			((GroupedDataSource) mainGroup).checkDeadDataSources();
+		if (defaultDataSource instanceof GroupedDataSource)
+			((GroupedDataSource) defaultDataSource).checkDeadDataSources();
 		for (DataSource ds : routingMap.values())
 			if (ds instanceof GroupedDataSource)
 				((GroupedDataSource) ds).checkDeadDataSources();
+	}
+
+	protected String route(String routingKey) {
+		int i = Hashing.consistentHash(Hashing.murmur3_32().hashString(routingKey, Charset.defaultCharset()),
+				nodeNames.length);
+		return nodeNames[i];
 	}
 
 }

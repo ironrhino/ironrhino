@@ -1,7 +1,5 @@
 package org.ironrhino.core.dataroute;
 
-import static org.ironrhino.core.metadata.Profiles.CLUSTER;
-
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +10,6 @@ import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.util.ExpressionUtils;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Aspect
 @Component
-@Profile(CLUSTER)
 public class DataRouteAspect extends BaseAspect {
 
 	public DataRouteAspect() {
@@ -43,17 +39,22 @@ public class DataRouteAspect extends BaseAspect {
 	}
 
 	@Around("execution(public * *(..)) and @annotation(dataRoute)")
-	public Object determineGroup(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
+	public Object route(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
-		String groupName = ExpressionUtils.evalString(dataRoute.value(), context);
-		if (StringUtils.isNotBlank(groupName))
-			DataRouteContext.setName(groupName);
+		String routingKey = ExpressionUtils.evalString(dataRoute.routingKey(), context);
+		if (StringUtils.isNotBlank(routingKey)) {
+			DataRouteContext.setRoutingKey(routingKey);
+		} else {
+			String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
+			if (StringUtils.isNotBlank(nodeName))
+				DataRouteContext.setNodeName(nodeName);
+		}
 		return jp.proceed();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Around("execution(public * *(..)) and target(baseManager)")
-	public Object determineGroup(ProceedingJoinPoint jp, BaseManager baseManager) throws Throwable {
+	public Object route(ProceedingJoinPoint jp, BaseManager baseManager) throws Throwable {
 		DataRoute dataRoute = null;
 		Object target = jp.getTarget();
 		if (target != null)
@@ -65,9 +66,9 @@ public class DataRouteAspect extends BaseAspect {
 		}
 		if (dataRoute != null) {
 			Map<String, Object> context = buildContext(jp);
-			String groupName = ExpressionUtils.evalString(dataRoute.value(), context);
-			if (StringUtils.isNotBlank(groupName))
-				DataRouteContext.setName(groupName);
+			String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
+			if (StringUtils.isNotBlank(nodeName))
+				DataRouteContext.setNodeName(nodeName);
 		}
 		return jp.proceed();
 	}

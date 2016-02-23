@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface DataRoute {
 
-	String value();
+	String routingKey() default "";
 
+	String nodeName() default "";
 }

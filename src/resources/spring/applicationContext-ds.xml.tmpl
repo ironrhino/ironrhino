@@ -5,23 +5,14 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="dataSource"
-		class="org.ironrhino.core.dataroute.RoutingDataSource">
+		class="org.ironrhino.core.dataroute.RoutingDataSource" primary="true">
 		<!-- for GroupedDataSource-->
-		<property name="groups">
+		<property name="nodes">
 			<list>
-				<ref local="mainGroup"/>
-				<ref local="miscGroup"/>
+				<ref bean="mainGroup"/>
+				<ref bean="miscGroup"/>
 			</list>
 		</property>
-		<!-- for general DataSource-->
-		<!--
-				<property name="routingMap">
-					<map>
-						<entry key="mainGroup" value-ref="mainGroup"/>
-						<entry key="miscGroup" value-ref="miscGroup"/>
-					</map>
-				</property>
-			-->
 	</bean>
 	
 	<bean id="mainGroup"
@@ -65,7 +56,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -81,7 +72,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -97,7 +88,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -113,7 +104,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -129,7 +120,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -145,7 +136,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -161,7 +152,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -177,7 +168,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -193,7 +184,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -209,7 +200,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -225,7 +216,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -241,7 +232,7 @@
 		<property name="driverClass"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true}" />
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
 		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
@@ -251,155 +242,6 @@
 		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
 		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
 		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>	
-	
-	<!--
-		<bean id="mainGroupMaster"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="mainGroupRead1"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="mainGroupRead2"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="mainGroupRead3"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="mainGroupWrite1"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="mainGroupWrite2"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-
-
-		<bean id="miscGroupMaster"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="miscGroupRead1"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="miscGroupRead2"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="miscGroupRead3"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="miscGroupWrite1"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
-		<bean id="miscGroupWrite2"
-			class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-			p:url="${jdbc.url}" p:username="${jdbc.username}"
-			p:password="${jdbc.password}"
-			p:driverClassName="${jdbc.driverClassName}"
-			p:poolPreparedStatements="true" 
-			p:removeAbandoned="true"
-			p:initialSize="${dataSource.initialSize}" 
-			p:maxActive="${dataSource.maxActive}"
-			p:maxIdle="${dataSource.maxIdle}" 
-			p:minIdle="${dataSource.minIdle}"
-			p:maxWait="${dataSource.maxWait}" />
--->
+	</bean>
 
 </beans>
