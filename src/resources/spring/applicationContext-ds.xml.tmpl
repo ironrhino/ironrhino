@@ -6,66 +6,62 @@
 
 	<bean id="dataSource"
 		class="org.ironrhino.core.dataroute.RoutingDataSource" primary="true">
-		<!-- for GroupedDataSource-->
-		<property name="nodes">
+		<property name="shardingNames">
 			<list>
-				<ref bean="mainGroup"/>
-				<ref bean="miscGroup"/>
+				<idref bean="mainGroup"/>
+				<idref bean="miscGroup"/>
 			</list>
 		</property>
 	</bean>
 	
 	<bean id="mainGroup"
 		class="org.ironrhino.core.dataroute.GroupedDataSource">
-		<property name="masterName" value="mainGroupMaster"/>
+		<property name="masterName"><idref bean="mainGroupMaster"/></property>
 		<property name="readSlaveNames">
 			<map>
-				<entry  key="mainGroupRead1" value="1"/>
-				<entry  key="mainGroupRead2" value="2"/>
-				<entry  key="mainGroupRead3" value="3"/>
+				<entry value="1"><key><idref bean="mainGroupRead1"/></key></entry>
+				<entry value="2"><key><idref bean="mainGroupRead2"/></key></entry>
+				<entry value="3"><key><idref bean="mainGroupRead3"/></key></entry>
 			</map>
 		</property>
 		<property name="writeSlaveNames">
 			<map>
-				<entry  key="mainGroupWrite1" value="1"/>
-				<entry  key="mainGroupWrite2" value="1"/>
+				<entry value="1"><key><idref bean="mainGroupWrite1"/></key></entry>
+				<entry value="1"><key><idref bean="mainGroupWrite2"/></key></entry>
 			</map>
 		</property>
 	</bean>
 	
 	<bean id="miscGroup"
 		class="org.ironrhino.core.dataroute.GroupedDataSource">
-		<property name="masterName" value="miscGroupMaster"/>
+		<property name="masterName"><idref bean="miscGroupMaster"/></property>
 		<property name="readSlaveNames">
 			<map>
-				<entry  key="miscGroupRead1" value="1"/>
-				<entry  key="miscGroupRead2" value="2"/>
-				<entry  key="miscGroupRead3" value="3"/>
+				<entry value="1"><key><idref bean="miscGroupRead1"/></key></entry>
+				<entry value="2"><key><idref bean="miscGroupRead2"/></key></entry>
+				<entry value="3"><key><idref bean="miscGroupRead3"/></key></entry>
 			</map>
 		</property>
 		<property name="writeSlaveNames">
 			<map>
-				<entry  key="miscGroupWrite1" value="1"/>
-				<entry  key="miscGroupWrite2" value="1"/>
+				<entry value="1"><key><idref bean="miscGroupWrite1"/></key></entry>
+				<entry value="1"><key><idref bean="miscGroupWrite2"/></key></entry>
 			</map>
 		</property>
 	</bean>
 	
-	<bean id="mainGroupMaster" class="com.jolbox.bonecp.BoneCPDataSource"
+	<bean id="mainGroupMaster" class="com.zaxxer.hikari.HikariDataSource"
 		destroy-method="close">
-		<property name="driverClass"
+		<property name="driverClassName"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
 			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
+		<property name="maximumPoolSize" value="${dataSource.maxActive:50}" />
+		<property name="minimumIdle" value="${dataSource.initialSize:5}" />
+		<property name="idleTimeout" value="${dataSource.idleMaxAgeInMinutes:3600000}" />
+		<property name="maxLifetime" value="${dataSource.maxConnectionAgeInSeconds:14000000}"/>
 	</bean>
 	<bean id="mainGroupRead1" class="com.jolbox.bonecp.BoneCPDataSource"
 		destroy-method="close">

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.ironrhino.core.stat.Key;
@@ -17,14 +16,19 @@ import org.ironrhino.core.stat.StatLog;
 import org.ironrhino.core.util.RoundRobin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.datasource.AbstractDataSource;
+import org.springframework.scheduling.annotation.Scheduled;
 
-public class GroupedDataSource extends AbstractDataSource implements BeanNameAware {
+public class GroupedDataSource extends AbstractDataSource implements InitializingBean, BeanFactoryAware, BeanNameAware {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
+
+	private BeanFactory beanFactory;
 
 	private int maxAttempts = 3;
 
@@ -55,16 +59,8 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 
 	private int deadFailureThreshold = 3;
 
-	@Autowired
-	private BeanFactory beanFactory;
-
 	public void setDeadFailureThreshold(int deadFailureThreshold) {
 		this.deadFailureThreshold = deadFailureThreshold;
-	}
-
-	@Override
-	public void setBeanName(String beanName) {
-		this.groupName = beanName;
 	}
 
 	public void setMasterName(String masterName) {
@@ -79,10 +75,6 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 		this.writeSlaveNames = writeSlaveNames;
 	}
 
-	public String getGroupName() {
-		return groupName;
-	}
-
 	public void setMaxAttempts(int maxAttempts) {
 		this.maxAttempts = maxAttempts;
 	}
@@ -95,8 +87,22 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 		return writeRoundRobin;
 	}
 
-	@PostConstruct
-	public void init() {
+	public String getGroupName() {
+		return groupName;
+	}
+
+	@Override
+	public void setBeanName(String beanName) {
+		this.groupName = beanName;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
+	}
+
+	@Override
+	public void afterPropertiesSet() {
 		if (masterName != null)
 			master = (DataSource) beanFactory.getBean(masterName);
 		if (writeSlaveNames != null && writeSlaveNames.size() > 0) {
@@ -159,7 +165,7 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 				failureCount.remove(ds);
 				deadDataSources.add(ds);
 				logger.error(
-						"datasource [" + groupName + ":" + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						"dataSource[" + groupName + ":" + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				StatLog.add(new Key("dataroute", false, groupName, dbname, "down"));
 			} else {
 				failureCount.put(ds, failureTimes);
@@ -174,12 +180,14 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 		return getConnection(null, null);
 	}
 
-	public void checkDeadDataSources() {
+	@Scheduled(initialDelayString = "${dataSource.tryRecover.initialDelay:300000}", fixedDelayString = "${dataSource.tryRecover.fixedDelay:300000}")
+	public void tryRecover() {
 		Iterator<DataSource> it = deadDataSources.iterator();
 		while (it.hasNext()) {
 			DataSource ds = it.next();
 			try {
 				Connection conn = ds.getConnection();
+				conn.isValid(5);
 				conn.close();
 				it.remove();
 				String dbname = null;
@@ -196,7 +204,7 @@ public class GroupedDataSource extends AbstractDataSource implements BeanNameAwa
 							break;
 						}
 					}
-				logger.warn("datasource[" + groupName + ":" + dbname + "] recovered");
+				logger.warn("dataSource[" + groupName + ":" + dbname + "] recovered");
 			} catch (Exception e) {
 				logger.debug(e.getMessage(), e);
 			}
