@@ -69,3 +69,8 @@
 	{
 	background-position: 0;
 }
+
+.treeview li.active > a 
+	{
+	background-color: #ccc;
+}

@@ -49,7 +49,12 @@
 							current.html("<a><span>" + (this.name)
 									+ "</span></a>");
 						}
-
+						$("a", current).click(function(e) {
+							var li = $(e.target).closest('li');
+							$('li', li.closest('.treeview'))
+									.removeClass('active');
+							li.addClass('active');
+						});
 						if (settings.click)
 							$("span", current).click(settings.click);
 						if (this.classes) {

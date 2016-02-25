@@ -1155,10 +1155,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	display: none;
 }
 
-.treeview .hover {
-	cursor: pointer;
-}
-
 .treeview li {
 	background: url(../images/treeview-default-line.gif) 0 0 no-repeat;
 }
@@ -1190,6 +1186,11 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .treeview div.lastCollapsable-hitarea,.treeview div.lastExpandable-hitarea
 	{
 	background-position: 0;
+}
+
+.treeview li.active > a 
+	{
+	background-color: #ccc;
 }
 /* modify by zhouyanming
 1.sprite css
