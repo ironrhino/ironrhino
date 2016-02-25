@@ -71,7 +71,7 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 		} else {
 			ds = defaultNode;
 		}
-		return ds.getConnection(username, password);
+		return (username == null) ? ds.getConnection() : ds.getConnection(username, password);
 	}
 
 	@Override
