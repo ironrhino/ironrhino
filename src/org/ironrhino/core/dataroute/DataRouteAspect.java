@@ -10,6 +10,7 @@ import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.util.ExpressionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +25,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class DataRouteAspect extends BaseAspect {
 
+	@Autowired(required = false)
+	private RoutingDataSource routingDataSource;
+
 	public DataRouteAspect() {
 		order = -2;
 	}
 
 	@Around("execution(public * *(..)) and @annotation(transactional)")
 	public Object determineReadonly(ProceedingJoinPoint jp, Transactional transactional) throws Throwable {
+		if (routingDataSource == null)
+			return jp.proceed();
 		DataRouteContext.setReadonly(transactional.readOnly());
 		try {
 			return jp.proceed();
@@ -40,6 +46,8 @@ public class DataRouteAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(dataRoute)")
 	public Object routeOnMethod(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
+		if (routingDataSource == null)
+			return jp.proceed();
 		Map<String, Object> context = buildContext(jp);
 		String routingKey = ExpressionUtils.evalString(dataRoute.routingKey(), context);
 		if (StringUtils.isNotBlank(routingKey)) {
@@ -56,6 +64,8 @@ public class DataRouteAspect extends BaseAspect {
 	@Around("execution(public * *(..)) and target(baseManager) and @annotation(transactional)")
 	public Object routeOnClass(ProceedingJoinPoint jp, BaseManager baseManager, Transactional transactional)
 			throws Throwable {
+		if (routingDataSource == null)
+			return jp.proceed();
 		DataRoute dataRoute = null;
 		Object target = jp.getTarget();
 		if (target != null)
