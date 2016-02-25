@@ -41,6 +41,9 @@ public class QueryAction extends BaseAction {
 
 	protected ResultPage<Map<String, Object>> resultPage;
 
+	@Value("${query.result.maxSize:100000}")
+	private int resultMaxSize = 100000;
+
 	@Value("${csv.defaultEncoding:GBK}")
 	private String csvDefaultEncoding = "GBK";
 
@@ -115,9 +118,8 @@ public class QueryAction extends BaseAction {
 				}
 			}
 			long count = jdbcQueryService.count(sql, paramMap);
-			if (count > 10 * ResultPage.DEFAULT_MAX_PAGESIZE)
-				throw new ErrorMessage("query.result.number.exceed",
-						new Object[] { 10 * ResultPage.DEFAULT_MAX_PAGESIZE });
+			if (count > resultMaxSize)
+				throw new ErrorMessage("query.result.size.exceed", new Object[] { resultMaxSize });
 			HttpServletResponse response = ServletActionContext.getResponse();
 			response.setCharacterEncoding(csvDefaultEncoding);
 			response.setHeader("Content-type", "text/csv");
