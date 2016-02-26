@@ -24217,6 +24217,28 @@ function log() {
 			return proxied.apply(this, arguments);
 		}
 		var container = this;
+		this.on('refresh', 'li', function() {
+					var t = $(this);
+					if (t.hasClass('hasChildren'))
+						return false;
+					if (t.hasClass('expandable')) {
+						t.addClass("hasChildren").find("ul").empty();
+					} else {
+						t.find('.hitarea').click();
+						t.addClass("hasChildren").find("ul").empty();
+						t.find('.hitarea').click();
+					}
+					return false;
+				}).on('refresh', function() {
+					var t = $(this);
+					if (t.find('li.active').length) {
+						t.find('li.active').trigger('refresh');
+						return false;
+					}
+					t.children('li').remove();
+					load(settings, settings.root || "0", t, container);
+					return false;
+				});
 		load(settings, settings.root || "0", this, container);
 		var userToggle = settings.toggle;
 		return proxied.call(this, $.extend({}, settings, {
@@ -33961,11 +33983,12 @@ Observation.common = function(container) {
 			$(this).click(function() {
 				if (!Ajax.fire(target, 'onprepare'))
 					return false;
-				if (HISTORY_ENABLED
+				var addHistory = HISTORY_ENABLED
 						&& $(this).hasClass('view')
 						&& !$(this).hasClass('nohistory')
 						&& ($(this).hasClass('history') || !($(this)
-								.data('replacement')))) {
+								.data('replacement')));
+				if (addHistory) {
 					$('.ui-dialog:visible').children().remove();
 					var hash = this.href;
 					if (UrlUtils.isSameDomain(hash)) {
@@ -34011,9 +34034,10 @@ Observation.common = function(container) {
 							});
 				else if (!$(this).data('replacement'))
 					options.replaceTitle = true;
-				options.onsuccess = function() {
-					Nav.activate(options.url);
-				};
+				if (addHistory)
+					options.onsuccess = function() {
+						Nav.activate(options.url);
+					};
 				ajax(options);
 				return false;
 			});

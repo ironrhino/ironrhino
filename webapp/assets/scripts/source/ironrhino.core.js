@@ -1629,11 +1629,12 @@ Observation.common = function(container) {
 			$(this).click(function() {
 				if (!Ajax.fire(target, 'onprepare'))
 					return false;
-				if (HISTORY_ENABLED
+				var addHistory = HISTORY_ENABLED
 						&& $(this).hasClass('view')
 						&& !$(this).hasClass('nohistory')
 						&& ($(this).hasClass('history') || !($(this)
-								.data('replacement')))) {
+								.data('replacement')));
+				if (addHistory) {
 					$('.ui-dialog:visible').children().remove();
 					var hash = this.href;
 					if (UrlUtils.isSameDomain(hash)) {
@@ -1679,9 +1680,10 @@ Observation.common = function(container) {
 							});
 				else if (!$(this).data('replacement'))
 					options.replaceTitle = true;
-				options.onsuccess = function() {
-					Nav.activate(options.url);
-				};
+				if (addHistory)
+					options.onsuccess = function() {
+						Nav.activate(options.url);
+					};
 				ajax(options);
 				return false;
 			});
