@@ -112,6 +112,28 @@
 			return proxied.apply(this, arguments);
 		}
 		var container = this;
+		this.on('refresh', 'li', function() {
+					var t = $(this);
+					if (t.hasClass('hasChildren'))
+						return false;
+					if (t.hasClass('expandable')) {
+						t.addClass("hasChildren").find("ul").empty();
+					} else {
+						t.find('.hitarea').click();
+						t.addClass("hasChildren").find("ul").empty();
+						t.find('.hitarea').click();
+					}
+					return false;
+				}).on('refresh', function() {
+					var t = $(this);
+					if (t.find('li.active').length) {
+						t.find('li.active').trigger('refresh');
+						return false;
+					}
+					t.children('li').remove();
+					load(settings, settings.root || "0", t, container);
+					return false;
+				});
 		load(settings, settings.root || "0", this, container);
 		var userToggle = settings.toggle;
 		return proxied.call(this, $.extend({}, settings, {
