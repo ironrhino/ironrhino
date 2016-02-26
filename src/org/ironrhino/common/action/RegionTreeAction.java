@@ -2,7 +2,6 @@ package org.ironrhino.common.action;
 
 import java.util.Collection;
 
-import org.apache.struts2.ServletActionContext;
 import org.ironrhino.common.model.Region;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
@@ -54,7 +53,6 @@ public class RegionTreeAction extends BaseAction {
 			region = regionTreeControl.getTree().getDescendantOrSelfById(parent);
 		if (region != null)
 			children = region.getChildren();
-		ServletActionContext.getResponse().setHeader("Cache-Control", "max-age=86400");
 		return JSON;
 	}
 

@@ -56,7 +56,7 @@
 <#if treeview>
 <#assign formCssClass="nohistory">
 </#if>
-<@richtable entityName="region" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons formCssClass=formCssClass/>
+<@richtable entityName="region" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons formCssClass=formCssClass celleditable=!treeview/>
 <form id="move" action="${actionBaseUrl}/move" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${action.getText('confirm')}?');" onsuccess="$('#region_form').submit()">
 	<div style="padding-top:10px;text-align:center;">
 	<input id="regionId1" type="hidden" name="id"/>
