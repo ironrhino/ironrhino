@@ -230,6 +230,10 @@ public class RegionAction extends BaseAction {
 	public String map() {
 		return "map";
 	}
+	
+	public String treeview() {
+		return "treeview";
+	}
 
 	@Validations(requiredFields = {
 			@RequiredFieldValidator(type = ValidatorType.FIELD, fieldName = "region.id", key = "validation.required"),
