@@ -1,4 +1,4 @@
-<#macro richtable columns entityName formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression="" createable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass="">
+<#macro richtable columns entityName formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' createable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
 <@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
 <#nested/>
 </@rtstart>
@@ -47,7 +47,7 @@
 <@rtend showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly createable=createable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
 </#macro>
 
-<#macro rtstart formid='',action='',entityName='',resizable=true,sortable=true,includeParameters=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass="" dynamicAttributes...>
+<#macro rtstart formid='',action='',entityName='',resizable=true,sortable=true,includeParameters=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' dynamicAttributes...>
 <#local parameterNamesInQueryString=[]>
 <#if !action?has_content>
 <#local action=request.requestURI>
@@ -64,7 +64,7 @@
 <#if dynamicAttributes['dynamicAttributes']??>
 <#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
-<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view history ${formCssClass!}"<#if actionBaseUrl!=action> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName!=action&&entityName?has_content> data-entity="${entityName}"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
+<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view<#if formCssClass?index_of('nohistory') lt 0> history</#if> ${formCssClass}"<#if actionBaseUrl!=action> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName!=action&&entityName?has_content> data-entity="${entityName}"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
 ${formHeader!}
 <#nested/>
 <#if includeParameters>
@@ -153,7 +153,7 @@ ${formHeader!}
 </td>
 </#macro>
 
-<#macro rttbodytrend entity showActionColumn=true buttons='' editable=true viewable=false entityReadonly=false inputWindowOptions="" viewWindowOptions="">
+<#macro rttbodytrend entity showActionColumn=true buttons='' editable=true viewable=false entityReadonly=false inputWindowOptions='' viewWindowOptions=''>
 <#if showActionColumn && (buttons?has_content || editable || viewable)>
 <td class="action">
 <#if buttons?has_content>
@@ -175,7 +175,7 @@ ${formHeader!}
 </tr>
 </#macro>
 
-<#macro rtend showBottomButtons=true buttons='' readonly=false createable=true celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' showPageSize=true formFooter='' inputWindowOptions="">
+<#macro rtend showBottomButtons=true buttons='' readonly=false createable=true celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' showPageSize=true formFooter='' inputWindowOptions=''>
 <#if filterable>
 <#if !propertyNamesInCriteria?? && uiConfigs??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].filterPropertyNamesInCriteria(uiConfigs)>
@@ -368,6 +368,6 @@ ${formFooter!}
 </#if>
 </#macro>
 
-<#macro btn view="" action="" class="" label="" confirm=false windowoptions="">
+<#macro btn view='' action='' class='' label='' confirm=false windowoptions=''>
 <#if class?has_content && !(view?has_content||action?has_content)><button type="button" class="btn ${class}">${statics['org.ironrhino.core.struts.I18N'].getText(label?has_content?string(label,class))}</button><#else><button type="button" class="btn ${class}<#if confirm&&action?has_content> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if><#if action='delete'> data-shown="selected" data-filterselector=":not([data-deletable='false'])"<#elseif action='enable'> data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])"<#elseif action='disable'> data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])"</#if><#if view?has_content&&windowoptions?has_content><#assign single=windowoptions?contains('"')/> data-windowoptions=${single?string("'",'"')+windowoptions+single?string("'",'"')}</#if>>${statics['org.ironrhino.core.struts.I18N'].getText(label?has_content?string(label,view?has_content?string(view,action)))}</button></#if>
 </#macro>
