@@ -24221,24 +24221,44 @@ function log() {
 					var t = $(this);
 					if (t.hasClass('hasChildren'))
 						return false;
-					if (t.hasClass('expandable')) {
-						t.addClass("hasChildren").find("ul").empty();
+					var hitarea = t.find('.hitarea');
+					if (hitarea.length) {
+						if (t.hasClass('expandable')) {
+							t.addClass("hasChildren").find("ul").empty();
+						} else {
+							hitarea.click();
+							t.addClass("hasChildren").find("ul").empty();
+							hitarea.click();
+						}
 					} else {
-						t.find('.hitarea').click();
-						t.addClass("hasChildren").find("ul").empty();
-						t.find('.hitarea').click();
+						var parent = t.closest('li.collapsable');
+						if (parent.length) {
+							parent.trigger('reload');
+						} else {
+							t.closest('.treeview').trigger('reload');;
+						}
 					}
 					return false;
 				}).on('reload', function() {
-					var t = $(this);
-					if (t.find('li.active').length) {
-						t.find('li.active').trigger('reload');
+			var t = $(this);
+			var active = t.find('li.active');
+			if (active.length) {
+				if (active.hasClass('collapsable')
+						|| active.hasClass('expandable')) {
+					active.trigger('reload');
+					return false;
+				} else {
+					var parent = active.closest('li.collapsable');
+					if (parent.length) {
+						parent.trigger('reload');
 						return false;
 					}
-					t.children('li').remove();
-					load(settings, settings.root || "0", t, container);
-					return false;
-				});
+				}
+			}
+			t.children('li').remove();
+			load(settings, settings.root || "0", t, container);
+			return false;
+		});
 		load(settings, settings.root || "0", this, container);
 		var userToggle = settings.toggle;
 		return proxied.call(this, $.extend({}, settings, {
