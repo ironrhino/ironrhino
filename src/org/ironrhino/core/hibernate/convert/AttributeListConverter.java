@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Attribute;
 import org.ironrhino.core.util.JsonUtils;
 
@@ -20,7 +21,8 @@ public class AttributeListConverter implements AttributeConverter<List<Attribute
 			return null;
 		Map<String, String> map = new LinkedHashMap<>();
 		for (Attribute attr : list)
-			map.put(attr.getName(), attr.getValue());
+			if (StringUtils.isNotBlank(attr.getName()))
+				map.put(attr.getName(), attr.getValue());
 		return JsonUtils.toJson(map);
 	}
 
