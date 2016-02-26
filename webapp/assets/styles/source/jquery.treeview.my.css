@@ -70,7 +70,7 @@
 	background-position: 0;
 }
 
-.treeview li.active > a 
+.treeview li.active > a , .treeview div.head.active > a 
 	{
 	background-color: #ccc;
 }

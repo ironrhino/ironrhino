@@ -673,6 +673,17 @@ Initialization.richtable = function() {
 			});
 }
 Observation._richtable = function(container) {
+	$$('form.richtable', container).each(function() {
+				var t = $(this);
+				if (!t.data('reloadcallback')) {
+					t.data('reloadcallback', true);
+					t.on('submit', function() {
+								setTimeout(function() {
+											$('.reloadable').trigger('reload');
+										}, 500);
+							});
+				}
+			})
 	$('form.criteria', container).each(function() {
 		var t = $(this);
 		var f = t.prev('form.richtable');

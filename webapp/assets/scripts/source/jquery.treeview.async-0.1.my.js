@@ -51,7 +51,7 @@
 						}
 						$("a", current).click(function(e) {
 							var li = $(e.target).closest('li');
-							$('li', li.closest('.treeview'))
+							$('li,div.head', li.closest('.treeview'))
 									.removeClass('active');
 							li.addClass('active');
 						});
@@ -112,7 +112,7 @@
 			return proxied.apply(this, arguments);
 		}
 		var container = this;
-		this.on('refresh', 'li', function() {
+		this.addClass('reloadable').on('reload', 'li', function() {
 					var t = $(this);
 					if (t.hasClass('hasChildren'))
 						return false;
@@ -124,10 +124,10 @@
 						t.find('.hitarea').click();
 					}
 					return false;
-				}).on('refresh', function() {
+				}).on('reload', function() {
 					var t = $(this);
 					if (t.find('li.active').length) {
-						t.find('li.active').trigger('refresh');
+						t.find('li.active').trigger('reload');
 						return false;
 					}
 					t.children('li').remove();
