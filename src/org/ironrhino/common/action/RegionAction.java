@@ -162,7 +162,7 @@ public class RegionAction extends BaseAction {
 	public String save() {
 		Collection<Region> siblings = null;
 		if (region.isNew()) {
-			if (parent != null) {
+			if (parent != null && parent > 0) {
 				Region parentRegion = entityManager.get(parent);
 				region.setParent(parentRegion);
 				siblings = parentRegion.getChildren();
