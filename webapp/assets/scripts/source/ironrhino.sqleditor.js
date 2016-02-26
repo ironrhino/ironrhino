@@ -63,7 +63,5 @@
 })(jQuery);
 
 Observation.sqleditor = function(container) {
-	var c = $(container);
-	var selector = '.sqleditor';
-	c.is(selector) ? c.sqleditor() : $(selector, c).sqleditor();
+	$$('.sqleditor', container).sqleditor();
 };

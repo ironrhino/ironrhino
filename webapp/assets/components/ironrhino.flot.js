@@ -185,7 +185,6 @@
 })(jQuery);
 
 Observation.flot = function(container) {
-	var c = $(container);
-	var selector = 'ul.flotlinechart,ul.flotbarchart,ul.flotpiechart';
-	c.is(selector) ? c.flotchart() : $(selector, c).flotchart();
+	$$('ul.flotlinechart,ul.flotbarchart,ul.flotpiechart', container)
+			.flotchart();
 }

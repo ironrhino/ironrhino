@@ -138,10 +138,5 @@
 	};
 })(jQuery);
 Observation.tags = function(container) {
-	var c = $(container);
-	var selector = 'input.tags';
-	if (c.is(selector))
-		c.tags();
-	else
-		$(selector, c).tags();
+	$$('input.tags', container).tags();
 };

@@ -35,7 +35,5 @@
 })(jQuery);
 
 Observation.filtercolumn = function(container) {
-	var c = $(container);
-	var selector = 'table.filtercolumn';
-	c.is(selector) ? c.filtercolumn() : $(selector, c).filtercolumn();
+	$$('table.filtercolumn', container).filtercolumn();
 };

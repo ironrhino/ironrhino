@@ -262,7 +262,5 @@
 })(jQuery);
 
 Observation.sortableTable = function(container) {
-	var c = $(container);
-	var selector = 'table.sortable';
-	c.is(selector) ? c.sortableTable() : $(selector, c).sortableTable();
+	$$('table.sortable', container).sortableTable();
 };

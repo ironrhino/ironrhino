@@ -1,9 +1,8 @@
 Observation.treeview = function(container) {
-	var selector = '.treeview';
-	var c = $(container);
-	c = c.is(selector) ? c : $(selector, c);
-	c.each(function() {
+	$$('.treeview', container).each(function() {
 				var t = $(this);
+				var head = t.data('head');
+				var template = $.trim(t.find('template').html());
 				t.treeview({
 							url : t.data('url'),
 							click : function() {
@@ -18,7 +17,20 @@ Observation.treeview = function(container) {
 							},
 							collapsed : t.data('collapsed'),
 							unique : t.data('unique'),
-							template : $.trim(t.html())
-						}).html(t.data('head') || '');
+							template : template
+						}).html('');
+				if (head) {
+					if (template && !t.data('head-plain')) {
+						head = $.tmpl(template, {
+									id : 0,
+									name : head
+								});
+						t.html(head).children().each(function() {
+									_observe(this);
+								});
+					} else {
+						t.text(head);
+					}
+				}
 			});
 };

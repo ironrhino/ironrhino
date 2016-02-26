@@ -51,7 +51,5 @@
 })(jQuery);
 
 Observation._patterninput = function(container) {
-	var c = $(container);
-	var selector = 'input.input-pattern';
-	c.is(selector) ? c.patterninput() : $(selector, c).patterninput();
+	$$('input.input-pattern', container).patterninput();
 };

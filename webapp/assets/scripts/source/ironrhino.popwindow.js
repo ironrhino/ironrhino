@@ -5,7 +5,7 @@
 					var options = (new Function("return "
 							+ (t.data('windowoptions') || '{}')))();
 					var url = t.attr('href');
-					var winid = open(url, options.iframe);
+					var winid = window.open(url, options.iframe);
 					delete options.iframe;
 					for (var key in options)
 						$('#' + winid).dialog('option', key, options[key]);
@@ -15,7 +15,7 @@
 		return this;
 	};
 
-	open = function(url, useiframe) {
+	window.open = function(url, useiframe) {
 		useiframe = useiframe || false;
 		var winindex = $(document).data('winindex') || 0;
 		winindex++;
@@ -74,7 +74,5 @@
 })(jQuery);
 
 Observation.popwindow = function(container) {
-	var c = $(container);
-	var selector = '.popwindow';
-	c.is(selector) ? c.popwindow() : $(selector, c).popwindow();
+	$$('.popwindow', container).popwindow();
 };

@@ -30,7 +30,5 @@
 })(jQuery);
 
 Observation.editme = function(container) {
-	var c = $(container);
-	var selector = '.editme';
-	c.is(selector) ? c.editme() : $(selector, c).editme();
+	$$('.editme', container).editme();
 };

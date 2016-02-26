@@ -142,7 +142,5 @@
 })(jQuery);
 
 Observation.concatimage = function(container) {
-	var c = $(container);
-	var selector = '.concatimage';
-	c.is(selector) ? c.concatimage() : $(selector, c).concatimage();
+	$$('.concatimage', container).concatimage();
 };

@@ -190,7 +190,5 @@
 })(jQuery);
 
 Observation.treeselect = function(container) {
-	var c = $(container);
-	var selector = '.treeselect';
-	c.is(selector) ? c.treeselect() : $(selector, c).treeselect();
+	$$('.treeselect', container).treeselect();
 };

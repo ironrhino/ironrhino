@@ -178,7 +178,5 @@ function latlng_getLatLng() {
 
 }
 Observation.latlng = function(container) {
-	var c = $(container);
-	var selector = 'input.latlng';
-	c.is(selector) ? c.latlng() : $(selector, c).latlng();
+	$$('input.latlng', container).latlng();
 };

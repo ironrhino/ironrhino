@@ -90,7 +90,5 @@
 })(jQuery);
 
 Observation.combobox = function(container) {
-	var c = $(container);
-	var selector = '.combobox';
-	c.is(selector) ? c.combobox() : $(selector, c).combobox();
+	$$('.combobox', container).combobox();
 };

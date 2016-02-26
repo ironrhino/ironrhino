@@ -162,7 +162,5 @@
 
 if (window.FileReader)
 	Observation.importableform = function(container) {
-		var c = $(container);
-		var selector = 'form.importable';
-		c.is(selector) ? c.importableform() : $(selector, c).importableform();
+		$$('form.importable', container).importableform();
 	};

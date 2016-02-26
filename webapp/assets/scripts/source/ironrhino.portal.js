@@ -222,7 +222,5 @@
 })(jQuery);
 
 Observation._portal = function(container) {
-	var c = $(container);
-	var selector = '.portal';
-	c.is(selector) ? c.portal() : $(selector, c).portal();
+	$$('.portal', container).portal();
 };

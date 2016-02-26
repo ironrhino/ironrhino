@@ -102,9 +102,6 @@
 })(jQuery);
 
 Observation.groupable = function(container) {
-	var c = $(container);
-	var selector = '.groupable';
-	c.is(selector) ? c.groupable() : $(selector, c).groupable();
-	selector = '[data-columns]';
-	c.is(selector) ? c.groupColumns() : $(selector, c).groupColumns();
+	$$('.groupable', container).groupable();
+	$$('[data-columns]', container).groupColumns();
 };
