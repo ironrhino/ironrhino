@@ -13,6 +13,7 @@ import org.ironrhino.core.hibernate.convert.AttributeListConverter;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Attributable;
 import org.ironrhino.core.model.Attribute;
@@ -24,6 +25,7 @@ import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 @Entity
 @Table(name = "common_treenode")
 @Searchable
+@Richtable(order = "displayOrder,name")
 public class TreeNode extends BaseTreeableEntity<TreeNode> implements Attributable {
 
 	private static final long serialVersionUID = 8878337541387688086L;
@@ -67,11 +69,6 @@ public class TreeNode extends BaseTreeableEntity<TreeNode> implements Attributab
 	@Override
 	public void setAttributes(List<Attribute> attributes) {
 		this.attributes = attributes;
-	}
-
-	@Override
-	public String toString() {
-		return getDescription();
 	}
 
 }
