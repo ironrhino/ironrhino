@@ -64,7 +64,7 @@
 <#if dynamicAttributes['dynamicAttributes']??>
 <#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
-<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view<#if formCssClass?index_of('nohistory') lt 0> history</#if> ${formCssClass}"<#if actionBaseUrl!=action> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName!=action&&entityName?has_content> data-entity="${entityName}"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
+<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName!=action&&entityName?has_content> data-entity="${entityName}"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
 ${formHeader!}
 <#nested/>
 <#if includeParameters>
@@ -165,7 +165,7 @@ ${formHeader!}
 <#if editable && !entityReadonly>
 <@btn view="input" label="edit" windowoptions="${inputWindowOptions}"/>
 </#if>
-<#if treeable??&&treeable>
+<#if 'treeview'!=Parameters.view!&&treeable??&&treeable>
 <@btn view="move"/>
 <a class="btn ajax view" href="${actionBaseUrl}?parent=${entity.id}<#if tree??>&tree=${tree}</#if>">${action.getText("enter")}</a>
 </#if>
@@ -243,7 +243,7 @@ ${formHeader!}
 </#if>
 </#if>
 <#if !readonly||deletable><button type="button" class="btn confirm" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${action.getText("delete")}</button></#if>
-<#if treeable??&&treeable&&parentEntity??>
+<#if 'treeview'!=Parameters.view!&&treeable??&&treeable&&parentEntity??>
 <#if parentEntity.parent?? && (!tree??||parent!=tree)>
 <a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}<#if tree??>&tree=${tree}</#if>">${action.getText("upward")}</a>
 <#else>

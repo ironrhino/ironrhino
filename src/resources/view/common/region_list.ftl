@@ -1,10 +1,10 @@
-<#assign treeview='treeview'==Parameters.view!/>
 <!DOCTYPE html>
 <#escape x as x?html><html>
 <head>
 <title><#if region.name??>${region.name}-</#if>${action.getText('region')}${action.getText('list')}</title>
 </head>
 <body>
+<#assign treeview='treeview'==Parameters.view!/>
 <#assign columns={"name":{"cellEdit":"click"},"areacode":{"cellEdit":"click","width":"100px"},"postcode":{"cellEdit":"click","width":"100px"},"rank":{"cellEdit":"click","width":"100px"},"displayOrder":{"cellEdit":"click","width":"100px"}}>
 <#assign actionColumnButtons='
 <@btn view="input" label="edit"/>
@@ -31,10 +31,10 @@
 <button type="button" class="btn" onclick="$(\'#merge\').toggle()">${action.getText("merge")}</button>
 '>
 </#if>
-<#if !treeview && region?? && region.id?? && region.id gt 0>
+<#if region?? && region.id?? && region.id gt 0>
 <ul class="breadcrumb">
 	<li>
-    	<a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${action.getText('region')}</a> <span class="divider">/</span>
+    	<#if !treeview><a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${action.getText('region')}</a><#else>${action.getText('region')}</#if> <span class="divider">/</span>
 	</li>
 	<#if region.level gt 1>
 	<#assign renderItem=(!tree??||tree<1)/>
@@ -45,7 +45,7 @@
 	</#if>
 	<#if renderItem>
 	<li>
-    	<a href="${actionBaseUrl}?parent=${ancestor.id?string}<#if tree??>&tree=${tree}</#if>" class="ajax view">${ancestor.name}</a> <span class="divider">/</span>
+    	<#if !treeview><a href="${actionBaseUrl}?parent=${ancestor.id?string}<#if tree??>&tree=${tree}</#if>" class="ajax view">${ancestor.name}</a><#else>${ancestor.name}</#if> <span class="divider">/</span>
 	</li>
 	</#if>
 	</#list>
@@ -53,10 +53,7 @@
 	<li class="active">${region.name}</li>
 </ul>
 </#if>
-<#if treeview>
-<#assign formCssClass="nohistory">
-</#if>
-<@richtable entityName="region" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons formCssClass=formCssClass celleditable=!treeview/>
+<@richtable entityName="region" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons celleditable=!treeview/>
 <form id="move" action="${actionBaseUrl}/move" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${action.getText('confirm')}?');" onsuccess="$('#region_form').submit()">
 	<div style="padding-top:10px;text-align:center;">
 	<input id="regionId1" type="hidden" name="id"/>

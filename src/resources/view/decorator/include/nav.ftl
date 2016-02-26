@@ -8,7 +8,7 @@
   <li><a href="<@url value="/common/schema"/>" class="ajax view">${action.getText('schema')}</a></li>
   <li><a href="<@url value="/common/page"/>" class="ajax view">${action.getText('page')}</a></li>
   <li><a href="<@url value="/common/region/treeview"/>" class="ajax view">${action.getText('region')}</a></li>
-  <li><a href="<@url value="/common/treeNode"/>" class="ajax view">${action.getText('treeNode')}</a></li>
+  <li><a href="<@url value="/common/treeNode/treeview"/>" class="ajax view">${action.getText('treeNode')}</a></li>
   <li><a href="<@url value="/common/upload"/>" class="ajax view">${action.getText('upload')}</a></li>
   <li class="dropdown">
  	<a href="#" class="dropdown-toggle" data-toggle="dropdown">

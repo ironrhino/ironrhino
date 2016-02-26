@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <#escape x as x?html><html>
 <head>
-<title>${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}${action.getText('list')}</title>
+<#assign entityDisplayName=action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))/>
+<title>${entityDisplayName}${action.getText('list')}</title>
 </head>
 <body>
+<#assign treeview='treeview'==Parameters.view!/>
 <#if treeable?? && treeable && parentEntity?? && parentEntity.id?? && parentEntity.id gt 0>
 <ul class="breadcrumb">
 	<li>
-    	<a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${action.getText(entityName)}</a> <span class="divider">/</span>
+    	<#if !treeview><a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${entityDisplayName}</a><#else>${entityDisplayName}</#if> <span class="divider">/</span>
 	</li>
 	<#if parentEntity.level gt 1>
 	<#assign renderItem=(!tree??||tree<1)/>
@@ -18,7 +20,7 @@
 	</#if>
 	<#if renderItem>
 	<li>
-    	<a href="${actionBaseUrl}?parent=${ancestor.id?string}<#if tree??>&tree=${tree}</#if>" class="ajax view">${ancestor.name}</a> <span class="divider">/</span>
+    	<#if !treeview><a href="${actionBaseUrl}?parent=${ancestor.id?string}<#if tree??>&tree=${tree}</#if>" class="ajax view">${ancestor.name}</a><#else>${ancestor.name}</#if> <span class="divider">/</span>
 	</li>
 	</#if>
 	</#list>
@@ -26,6 +28,7 @@
 	<li class="active">${parentEntity.name}</li>
 </ul>
 </#if>
+<#assign celleditable=richtableConfig.celleditable && !treeview/>
 <#if richtableConfig.listHeader?has_content>
 <@richtableConfig.listHeader?interpret/>
 </#if>
@@ -38,7 +41,7 @@
 <#if richtableConfig.formFooter?has_content>
 <#assign formFooter><@richtableConfig.formFooter?interpret/></#assign>
 </#if>
-<#if richtableConfig.celleditable&&versionPropertyName??>
+<#if celleditable&&versionPropertyName??>
 <#assign dynamicAttributes={"data-versionproperty":versionPropertyName}>
 </#if>
 <@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=dynamicAttributes!/>
@@ -69,7 +72,7 @@
 		</#if>
 		<#if !hidden>
 			<#assign label=key>
-			<#if richtableConfig.celleditable&&!(readonly.value||config.readonly.value) && !(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)>
+			<#if celleditable&&!(readonly.value||config.readonly.value) && !(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)>
 				<#assign cellEdit=config.cellEdit!/>
 				<#if !config.multiple && cellEdit=='' && !(idAssigned && key=='id')>
 					<#if config.type=='input'>
@@ -117,7 +120,7 @@
 <#assign rowDynamicAttributes+={"data-deletable":"false"}>
 </#if>
 </#if>
-<#if richtableConfig.celleditable&&versionPropertyName??>
+<#if celleditable&&versionPropertyName??>
 <#assign rowDynamicAttributes+={"data-version":entity[versionPropertyName]}>
 </#if>
 <@rttbodytrstart entity=entity showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=rowDynamicAttributes/>
@@ -134,7 +137,7 @@
 	</#if>
 	<#if !hidden>
 		<#assign dynamicAttributes={}>
-		<#if config.type=='listpick'&&richtableConfig.celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
+		<#if config.type=='listpick'&&celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
 			<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":(value.id?string)!,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue'}"}>
 		</#if>
@@ -166,7 +169,7 @@
 		<#if config.listTemplate?has_content>
 		<#assign template=config.listTemplate/>
 		</#if>
-		<@rttbodytd entity=entity value=value celleditable=richtableConfig.celleditable template=template cellDynamicAttributes=config.cellDynamicAttributes dynamicAttributes=dynamicAttributes/>
+		<@rttbodytd entity=entity value=value celleditable=celleditable template=template cellDynamicAttributes=config.cellDynamicAttributes dynamicAttributes=dynamicAttributes/>
 	</#if>
 </#list>
 <@rttbodytrend entity=entity showActionColumn=richtableConfig.showActionColumn buttons=richtableConfig.actionColumnButtons editable=!readonly.value viewable=viewable entityReadonly=entityReadonly inputWindowOptions=richtableConfig.inputWindowOptions! viewWindowOptions=richtableConfig.viewWindowOptions!/>
