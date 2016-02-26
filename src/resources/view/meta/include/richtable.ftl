@@ -6,7 +6,7 @@
 <#list columns?keys as name>
 <#local config = columns[name]>
 <#local cellname=((config['trimPrefix']??)?then('',entityName+'.'))+name>
-<@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=config['cellEdit'] readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
+<@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit'],'') readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
 </#list>
 <@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
 <#if resultPage??><#local list=resultPage.result></#if>
@@ -40,7 +40,7 @@
 	<#if config['readonlyExpression']?has_content && config['readonlyExpression']?eval>
 		<#local dynamicAttributes+={'data-readonly':'true'}/>
 	</#if>
-	<@rttbodytd entity=entity value=value celleditable=config['cellEdit']?? template=config['template']! cellDynamicAttributes=config['dynamicAttributes'] dynamicAttributes=dynamicAttributes/>
+	<@rttbodytd entity=entity value=value celleditable=celleditable&&config['cellEdit']?? template=config['template']! cellDynamicAttributes=config['dynamicAttributes'] dynamicAttributes=dynamicAttributes/>
 </#list>
 <@rttbodytrend entity=entity showActionColumn=showActionColumn buttons=actionColumnButtons editable=!readonly viewable=viewable entityReadonly=entityReadonly/>
 </#list>
