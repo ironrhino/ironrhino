@@ -24140,6 +24140,11 @@ function log() {
 						if (!lastactive)
 							li.addClass('active');
 						if (response.length == 0) {
+							if (li.hasClass('lastExpandable')
+									|| li.hasClass('lastCollapsable'))
+								li.removeClass('lastExpandable')
+										.removeClass('lastCollapsable')
+										.addClass('last');
 							li.removeClass('collapsable')
 									.removeClass('expandable').find('.hitarea')
 									.remove();
