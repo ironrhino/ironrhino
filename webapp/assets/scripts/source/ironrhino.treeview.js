@@ -32,7 +32,7 @@ Observation.treeview = function(container) {
 							$('li', div.closest('.treeview'))
 									.removeClass('active');
 							div.addClass('active');
-						});
+						}).click();
 			} else {
 				t.text(head);
 			}

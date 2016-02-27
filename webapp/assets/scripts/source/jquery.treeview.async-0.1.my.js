@@ -28,7 +28,21 @@
 		$.getJSON(settings.url, {
 					parent : root
 				}, function(response) {
-					function createNode(parent) {
+					var lastactive = container.data('lastactive');
+					container.removeData('lastactive');
+					var li = child.parent('li');
+					if (li.length) {
+						if (!lastactive)
+							li.addClass('active');
+						if (response.length == 0) {
+							li.removeClass('collapsable')
+									.removeClass('expandable').find('.hitarea')
+									.remove();
+							child.remove();
+							return;
+						}
+					}
+					function createNode(parent, lastactive) {
 						var parentTreenode = $(parent).parent('li')
 								.data('treenode');
 						this.parent = parentTreenode;
@@ -42,6 +56,8 @@
 						var template = settings.template;
 						var current = $("<li/>").data('treenode', this)
 								.appendTo(parent);
+						if (lastactive == this.id)
+							current.addClass('active');
 						if (template) {
 							current.html($.tmpl(template, this));
 							_observe(current);
@@ -83,7 +99,7 @@
 						}
 					}
 					$.each(response, function() {
-								createNode.apply(this, child)
+								createNode.apply(this, [child, lastactive])
 							});
 					$(container).treeview({
 								add : child
@@ -112,25 +128,18 @@
 			return proxied.apply(this, arguments);
 		}
 		var container = this;
-		this.addClass('reloadable').on('reload', 'li', function() {
+		this.on('reload', 'li', function() {
 					var t = $(this);
-					if (t.hasClass('hasChildren'))
-						return false;
 					var hitarea = t.find('.hitarea');
 					if (hitarea.length) {
 						if (t.hasClass('expandable')) {
 							t.addClass("hasChildren").find("ul").empty();
+							hitarea.click();
+							hitarea.click();
 						} else {
 							hitarea.click();
 							t.addClass("hasChildren").find("ul").empty();
 							hitarea.click();
-						}
-					} else {
-						var parent = t.closest('li.collapsable');
-						if (parent.length) {
-							parent.trigger('reload');
-						} else {
-							t.closest('.treeview').trigger('reload');;
 						}
 					}
 					return false;
@@ -138,6 +147,7 @@
 			var t = $(this);
 			var active = t.find('li.active');
 			if (active.length) {
+				t.data('lastactive', active.data('treenode').id);
 				if (active.hasClass('collapsable')
 						|| active.hasClass('expandable')) {
 					active.trigger('reload');

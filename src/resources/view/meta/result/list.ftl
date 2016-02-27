@@ -28,7 +28,7 @@
 	<li class="active">${parentEntity.name}</li>
 </ul>
 </#if>
-<#assign celleditable=richtableConfig.celleditable && !treeview/>
+<#assign celleditable=richtableConfig.celleditable>
 <#if richtableConfig.listHeader?has_content>
 <@richtableConfig.listHeader?interpret/>
 </#if>

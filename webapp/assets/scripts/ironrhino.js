@@ -24133,7 +24133,21 @@ function log() {
 		$.getJSON(settings.url, {
 					parent : root
 				}, function(response) {
-					function createNode(parent) {
+					var lastactive = container.data('lastactive');
+					container.removeData('lastactive');
+					var li = child.parent('li');
+					if (li.length) {
+						if (!lastactive)
+							li.addClass('active');
+						if (response.length == 0) {
+							li.removeClass('collapsable')
+									.removeClass('expandable').find('.hitarea')
+									.remove();
+							child.remove();
+							return;
+						}
+					}
+					function createNode(parent, lastactive) {
 						var parentTreenode = $(parent).parent('li')
 								.data('treenode');
 						this.parent = parentTreenode;
@@ -24147,6 +24161,8 @@ function log() {
 						var template = settings.template;
 						var current = $("<li/>").data('treenode', this)
 								.appendTo(parent);
+						if (lastactive == this.id)
+							current.addClass('active');
 						if (template) {
 							current.html($.tmpl(template, this));
 							_observe(current);
@@ -24188,7 +24204,7 @@ function log() {
 						}
 					}
 					$.each(response, function() {
-								createNode.apply(this, child)
+								createNode.apply(this, [child, lastactive])
 							});
 					$(container).treeview({
 								add : child
@@ -24217,25 +24233,18 @@ function log() {
 			return proxied.apply(this, arguments);
 		}
 		var container = this;
-		this.addClass('reloadable').on('reload', 'li', function() {
+		this.on('reload', 'li', function() {
 					var t = $(this);
-					if (t.hasClass('hasChildren'))
-						return false;
 					var hitarea = t.find('.hitarea');
 					if (hitarea.length) {
 						if (t.hasClass('expandable')) {
 							t.addClass("hasChildren").find("ul").empty();
+							hitarea.click();
+							hitarea.click();
 						} else {
 							hitarea.click();
 							t.addClass("hasChildren").find("ul").empty();
 							hitarea.click();
-						}
-					} else {
-						var parent = t.closest('li.collapsable');
-						if (parent.length) {
-							parent.trigger('reload');
-						} else {
-							t.closest('.treeview').trigger('reload');;
 						}
 					}
 					return false;
@@ -24243,6 +24252,7 @@ function log() {
 			var t = $(this);
 			var active = t.find('li.active');
 			if (active.length) {
+				t.data('lastactive', active.data('treenode').id);
 				if (active.hasClass('collapsable')
 						|| active.hasClass('expandable')) {
 					active.trigger('reload');
@@ -38291,6 +38301,11 @@ Richtable = {
 									$('#' + winid).dialog('close');
 									// }, 1000);
 								}
+								setTimeout(function() {
+											form.closest('.reload-container')
+													.find('.reloadable')
+													.trigger('reload');
+										}, 500);
 							};
 						});
 					}
@@ -38423,13 +38438,19 @@ Richtable = {
 								url += (url.indexOf('?') > 0 ? '&' : '?')
 										+ idparams;
 								ajax({
-											url : url,
-											type : 'POST',
-											dataType : 'json',
-											success : function() {
-												$(form).submit();
-											}
-										});
+									url : url,
+									type : 'POST',
+									dataType : 'json',
+									success : function() {
+										$(form).submit();
+										setTimeout(function() {
+													form
+															.closest('.reload-container')
+															.find('.reloadable')
+															.trigger('reload');
+												}, 500);
+									}
+								});
 							}
 						});
 			} else {
@@ -38536,6 +38557,12 @@ Richtable = {
 										$(row).data('version', version + 1);
 									$('[data-action="save"]', form)
 											.removeClass('btn-primary').hide();
+									setTimeout(function() {
+												form
+														.closest('.reload-container')
+														.find('.reloadable')
+														.trigger('reload');
+											}, 500);
 								}
 							});
 				}
@@ -38705,8 +38732,14 @@ Initialization.richtable = function() {
 					'.richtable .action [data-view],.richtable .action [data-action],form.richtable a[rel="richtable"]',
 					Richtable.click).on('click', '.richtable .action .reload',
 					function() {
-						$(this).closest('.reload').addClass('clicked')
-								.closest('form').submit();
+						var form = $(this).closest('.reload')
+								.addClass('clicked').closest('form');
+						form.submit();
+						setTimeout(function() {
+									form.closest('.reload-container')
+											.find('.reloadable')
+											.trigger('reload');
+								}, 500);
 					}).on('click', '.richtable .action .filter', function() {
 						var f = $(this).closest('form').next('form.criteria');
 						if (f.is(':visible')) {
@@ -38807,17 +38840,6 @@ Initialization.richtable = function() {
 			});
 }
 Observation._richtable = function(container) {
-	$$('form.richtable', container).each(function() {
-				var t = $(this);
-				if (!t.data('reloadcallback')) {
-					t.data('reloadcallback', true);
-					t.on('submit', function() {
-								setTimeout(function() {
-											$('.reloadable').trigger('reload');
-										}, 500);
-							});
-				}
-			})
 	$('form.criteria', container).each(function() {
 		var t = $(this);
 		var f = t.prev('form.richtable');
@@ -39870,7 +39892,7 @@ Observation.treeview = function(container) {
 							$('li', div.closest('.treeview'))
 									.removeClass('active');
 							div.addClass('active');
-						});
+						}).click();
 			} else {
 				t.text(head);
 			}
