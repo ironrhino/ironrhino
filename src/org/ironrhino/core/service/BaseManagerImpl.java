@@ -267,7 +267,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			list.add(get(id[0]));
 		} else {
 			DetachedCriteria dc = detachedCriteria();
-			dc.add(Restrictions.in("id", (Object) id));
+			dc.add(Restrictions.in("id", (Object[]) id));
 			list = findListByCriteria(dc);
 		}
 		if (list.size() > 0) {

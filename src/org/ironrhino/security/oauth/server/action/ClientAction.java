@@ -82,7 +82,7 @@ public class ClientAction extends EntityAction<Client> {
 				list.add(clientManager.get(id[0]));
 			} else {
 				DetachedCriteria dc = clientManager.detachedCriteria();
-				dc.add(Restrictions.in("id", (Object) id));
+				dc.add(Restrictions.in("id", (Object[]) id));
 				list = clientManager.findListByCriteria(dc);
 			}
 			if (list.size() > 0) {
