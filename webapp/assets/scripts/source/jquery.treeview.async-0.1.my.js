@@ -12,14 +12,6 @@
  * Revision: $Id$
  * 
  */
-/*
- * changes by zhouyanming 1.change "source" to "0"; 2.change attr('id',this.id)
- * to data('treenode',this), change this.text to (this.name) 3.add <a> out of
- * <span> 4.add setting.onclick to <span> 5.if settings.unique=true will call
- * toggle on siblings,if not add $this.hasClass('collapsable') will load
- * siblings's data,change parameter name from root to parent
- */
-;
 (function($) {
 	var fullname;
 	function load(settings, root, child, container) {
@@ -28,13 +20,9 @@
 		$.getJSON(settings.url, {
 					parent : root
 				}, function(response) {
-					var lastactive = container.data('lastactive');
-					container.removeData('lastactive');
-					var li = child.parent('li');
-					if (li.length) {
-						if (!lastactive)
-							li.addClass('active');
-						if (response.length == 0) {
+					if (response.length == 0) {
+						var li = child.parent('li');
+						if (li.length) {
 							if (li.hasClass('lastExpandable')
 									|| li.hasClass('lastCollapsable'))
 								li.removeClass('lastExpandable')
@@ -44,10 +32,10 @@
 									.removeClass('expandable').find('.hitarea')
 									.remove();
 							child.remove();
-							return;
 						}
+						return;
 					}
-					function createNode(parent, lastactive) {
+					function createNode(parent, activeid) {
 						var parentTreenode = $(parent).parent('li')
 								.data('treenode');
 						this.parent = parentTreenode;
@@ -61,7 +49,7 @@
 						var template = settings.template;
 						var current = $("<li/>").data('treenode', this)
 								.appendTo(parent);
-						if (lastactive == this.id)
+						if (activeid == this.id)
 							current.addClass('active');
 						if (template) {
 							current.html($.tmpl(template, this));
@@ -103,8 +91,10 @@
 							}
 						}
 					}
+					var activeid = container.data('activeid');
+					container.removeData('activeid');
 					$.each(response, function() {
-								createNode.apply(this, [child, lastactive])
+								createNode.apply(this, [child, activeid])
 							});
 					$(container).treeview({
 								add : child
@@ -152,7 +142,7 @@
 			var t = $(this);
 			var active = t.find('li.active');
 			if (active.length) {
-				t.data('lastactive', active.data('treenode').id);
+				t.data('activeid', active.data('treenode').id);
 				if (active.hasClass('collapsable')
 						|| active.hasClass('expandable')) {
 					active.trigger('reload');
