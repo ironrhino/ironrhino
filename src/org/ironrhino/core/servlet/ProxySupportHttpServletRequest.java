@@ -19,6 +19,12 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	// proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 	public static final String HEADER_NAME_X_FORWARDED_FOR = "X-Forwarded-For";
 
+	// proxy_set_header X-Forwarded-For $scheme;
+	public static final String HEADER_NAME_X_FORWARDED_PROTO = "X-Forwarded-Proto";
+
+	// proxy_set_header X-Forwarded-For $server_port;
+	public static final String HEADER_NAME_X_FORWARDED_PORT = "X-Forwarded-Port";
+
 	// proxy_set_header X-Url-Scheme $scheme;
 	public static final String HEADER_NAME_X_URL_SCHEME = "X-Url-Scheme";
 
@@ -60,6 +66,8 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	public String getScheme() {
 		String scheme = getHeader(HEADER_NAME_X_URL_SCHEME);
 		if (StringUtils.isBlank(scheme))
+			scheme = getHeader(HEADER_NAME_X_FORWARDED_PROTO);
+		if (StringUtils.isBlank(scheme))
 			scheme = super.getScheme();
 		return scheme;
 	}
@@ -84,13 +92,16 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public int getServerPort() {
+		String port = getHeader(HEADER_NAME_X_FORWARDED_PORT);
+		if (StringUtils.isNumeric(port))
+			return Integer.valueOf(port);
 		String host = getHeader("Host");
 		if (StringUtils.isNotBlank(host)) {
 			int index = host.lastIndexOf(':');
 			if (index > 0) {
-				String p = host.substring(index + 1);
-				if (StringUtils.isNumeric(p))
-					return Integer.valueOf(p);
+				port = host.substring(index + 1);
+				if (StringUtils.isNumeric(port))
+					return Integer.valueOf(port);
 				else
 					return isSecure() ? 443 : 80;
 			} else {
