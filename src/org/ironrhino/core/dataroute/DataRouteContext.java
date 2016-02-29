@@ -13,14 +13,6 @@ public class DataRouteContext {
 
 	private static ThreadLocal<String> nodeName = new ThreadLocal<>();
 
-	public static void reset() {
-		Deque<Boolean> readonlyDeque = readonly.get();
-		if (readonlyDeque != null && readonlyDeque.size() > 0)
-			readonlyDeque.clear();
-		nodeName.remove();
-		routingKey.remove();
-	}
-
 	public static void setReadonly(Boolean bl) {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null) {

@@ -26,16 +26,30 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 
 	protected Map<String, DataSource> shardings;
 
+	protected Router router;
+
 	protected String defaultName;
 
 	protected List<String> shardingNames;
+
+	public Router getRouter() {
+		return router;
+	}
+
+	public void setRouter(Router router) {
+		this.router = router;
+	}
+
+	public Map<String, DataSource> getShardings() {
+		return shardings;
+	}
 
 	public void setDefaultName(String defaultName) {
 		this.defaultName = defaultName;
 	}
 
-	public void setShardingNames(List<String> shardings) {
-		this.shardingNames = shardings;
+	public void setShardingNames(List<String> shardingNames) {
+		this.shardingNames = shardingNames;
 	}
 
 	@Override
@@ -46,6 +60,7 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(shardingNames);
+		Assert.isTrue(shardingNames.size() > 1, "shardings should more than 1");
 		shardings = new LinkedHashMap<>();
 		for (String sharding : shardingNames)
 			shardings.put(sharding, beanFactory.getBean(sharding, DataSource.class));
@@ -53,6 +68,8 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 			defaultNode = beanFactory.getBean(defaultName, DataSource.class);
 		else
 			defaultNode = beanFactory.getBean(shardingNames.get(0), DataSource.class);
+		if (router == null)
+			router = new DefaultRouter();
 	}
 
 	@Override
@@ -61,7 +78,7 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 		String routingKey = DataRouteContext.getRoutingKey();
 		String nodeName = DataRouteContext.getNodeName();
 		if (routingKey != null) {
-			ds = shardings.get(route(routingKey));
+			ds = shardings.get(router.route(shardingNames, routingKey));
 		} else if (nodeName != null) {
 			ds = shardings.get(nodeName);
 			if (ds == null)
@@ -79,10 +96,15 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 		return getConnection(null, null);
 	}
 
-	public String route(String routingKey) {
-		int i = Hashing.consistentHash(Hashing.murmur3_32().hashString(routingKey, Charset.defaultCharset()),
-				shardingNames.size());
-		return shardingNames.get(i);
+	private static class DefaultRouter implements Router {
+
+		@Override
+		public String route(List<String> nodes, String routingKey) {
+			int i = Hashing.consistentHash(Hashing.murmur3_32().hashString(routingKey, Charset.defaultCharset()),
+					nodes.size());
+			return nodes.get(i);
+		}
+
 	}
 
 }
