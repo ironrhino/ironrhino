@@ -15,6 +15,11 @@ else
 USER="$SUDO_USER"
 fi
 
+#using aliyun as apt mirror
+cp /etc/apt/sources.list /etc/apt/sources.list.bak
+sed -i "s/us\.archive\.ubuntu\.com/mirrors.aliyun.com/g" /etc/apt/sources.list
+
+#add nginx
 cat>>/etc/apt/sources.list<<EOF
 deb http://nginx.org/packages/ubuntu/ trusty nginx
 deb-src http://nginx.org/packages/ubuntu/ trusty nginx

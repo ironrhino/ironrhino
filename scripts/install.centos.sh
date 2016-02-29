@@ -17,6 +17,11 @@ fi
 
 chmod +x /home/$USER
 
+#using aliyun as yum mirror
+mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+yum makecache
+
 cat>/etc/yum.repos.d/mysql-community.repo<<EOF
 [mysql56-community]
 name=MySQL 5.6 Community Server
@@ -36,9 +41,6 @@ EOF
 
 #install packages
 yum -y install mysql-server subversion git nginx chkconfig zip unzip wget make gcc telnet
-if [ ! -f "/sbin/insserv" ] ; then
-ln -s /usr/lib/insserv/insserv /sbin/insserv
-fi
 
 #install oracle jdk
 if [ ! -d jdk ];then
