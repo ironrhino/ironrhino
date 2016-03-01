@@ -2,6 +2,8 @@ package org.ironrhino.core.dataroute;
 
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -28,7 +30,7 @@ public class DataRouteAspect extends BaseAspect {
 
 	@Autowired(required = false)
 	@Qualifier("dataSource")
-	private RoutingDataSource routingDataSource;
+	private DataSource dataSource;
 
 	public DataRouteAspect() {
 		order = -2;
@@ -36,28 +38,30 @@ public class DataRouteAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(transactional)")
 	public Object determineReadonly(ProceedingJoinPoint jp, Transactional transactional) throws Throwable {
-		if (routingDataSource == null)
+		if (dataSource instanceof RoutingDataSource || dataSource instanceof GroupedDataSource) {
+			DataRouteContext.setReadonly(transactional.readOnly());
+			try {
+				return jp.proceed();
+			} finally {
+				DataRouteContext.removeReadonly();
+			}
+		} else {
 			return jp.proceed();
-		DataRouteContext.setReadonly(transactional.readOnly());
-		try {
-			return jp.proceed();
-		} finally {
-			DataRouteContext.removeReadonly();
 		}
 	}
 
 	@Around("execution(public * *(..)) and @annotation(dataRoute)")
 	public Object routeOnMethod(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
-		if (routingDataSource == null)
-			return jp.proceed();
-		Map<String, Object> context = buildContext(jp);
-		String routingKey = ExpressionUtils.evalString(dataRoute.routingKey(), context);
-		if (StringUtils.isNotBlank(routingKey)) {
-			DataRouteContext.setRoutingKey(routingKey);
-		} else {
-			String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
-			if (StringUtils.isNotBlank(nodeName))
-				DataRouteContext.setNodeName(nodeName);
+		if (dataSource instanceof RoutingDataSource) {
+			Map<String, Object> context = buildContext(jp);
+			String routingKey = ExpressionUtils.evalString(dataRoute.routingKey(), context);
+			if (StringUtils.isNotBlank(routingKey)) {
+				DataRouteContext.setRoutingKey(routingKey);
+			} else {
+				String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
+				if (StringUtils.isNotBlank(nodeName))
+					DataRouteContext.setNodeName(nodeName);
+			}
 		}
 		return jp.proceed();
 	}
@@ -66,22 +70,22 @@ public class DataRouteAspect extends BaseAspect {
 	@Around("execution(public * *(..)) and target(baseManager) and @annotation(transactional)")
 	public Object routeOnClass(ProceedingJoinPoint jp, BaseManager baseManager, Transactional transactional)
 			throws Throwable {
-		if (routingDataSource == null)
-			return jp.proceed();
-		DataRoute dataRoute = null;
-		Object target = jp.getTarget();
-		if (target != null)
-			dataRoute = target.getClass().getAnnotation(DataRoute.class);
-		if (dataRoute == null) {
-			Class<Persistable<?>> entityClass = baseManager.getEntityClass();
-			if (entityClass != null)
-				dataRoute = entityClass.getAnnotation(DataRoute.class);
-		}
-		if (dataRoute != null) {
-			Map<String, Object> context = buildContext(jp);
-			String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
-			if (StringUtils.isNotBlank(nodeName))
-				DataRouteContext.setNodeName(nodeName);
+		if (dataSource instanceof RoutingDataSource) {
+			DataRoute dataRoute = null;
+			Object target = jp.getTarget();
+			if (target != null)
+				dataRoute = target.getClass().getAnnotation(DataRoute.class);
+			if (dataRoute == null) {
+				Class<Persistable<?>> entityClass = baseManager.getEntityClass();
+				if (entityClass != null)
+					dataRoute = entityClass.getAnnotation(DataRoute.class);
+			}
+			if (dataRoute != null) {
+				Map<String, Object> context = buildContext(jp);
+				String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
+				if (StringUtils.isNotBlank(nodeName))
+					DataRouteContext.setNodeName(nodeName);
+			}
 		}
 		return jp.proceed();
 	}
