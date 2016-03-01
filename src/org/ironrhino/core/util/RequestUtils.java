@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.net.InternetDomainName;
+
 public class RequestUtils {
 
 	public static boolean isInternalTesting(HttpServletRequest request) {
@@ -65,26 +67,6 @@ public class RequestUtils {
 				map.put(arr[0], arr.length == 2 ? arr[1] : "");
 		}
 		return map;
-	}
-
-	@Deprecated
-	/**
-	 * use request.getRemoteAddr() instead
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public static String getRemoteAddr(HttpServletRequest request) {
-		String addr = request.getHeader("X-Real-IP");
-		if (StringUtils.isBlank(addr)) {
-			addr = request.getHeader("X-Forwarded-For");
-			int index = 0;
-			if (StringUtils.isNotBlank(addr) && (index = addr.indexOf(',')) > 0)
-				addr = addr.substring(0, index);
-		}
-		addr = StringUtils.isNotBlank(addr) ? addr : request.getRemoteAddr();
-		addr = addr != null ? addr : "";
-		return addr;
 	}
 
 	public static String trimPathParameter(String url) {
@@ -250,8 +232,7 @@ public class RequestUtils {
 			String host2 = new URL(b).getHost();
 			if (host2 == null)
 				host2 = "localhost";
-			return host1.equalsIgnoreCase(host2)
-					|| parseGlobalDomain(host1, host1).equalsIgnoreCase(parseGlobalDomain(host2, host2));
+			return host1.equalsIgnoreCase(host2) || parseGlobalDomain(host1).equalsIgnoreCase(parseGlobalDomain(host2));
 		} catch (MalformedURLException e) {
 			return false;
 		}
@@ -276,42 +257,18 @@ public class RequestUtils {
 	}
 
 	private static String parseGlobalDomain(String host) {
-		if (host.matches("^(\\d+\\.){3}\\d+$"))
+		if (host.matches("^(\\d+\\.){3}\\d+$") || host.indexOf('.') < 0)
 			return host;
-		boolean topDouble = false;
-		for (String s : topDoubleDomains) {
-			if (host.endsWith(s)) {
-				topDouble = true;
-				break;
-			}
-		}
+		InternetDomainName domainName = InternetDomainName.from(host);
+		if (domainName.isUnderPublicSuffix())
+			return "." + domainName.topPrivateDomain().toString();
 		String[] array = host.split("\\.");
-		if (!topDouble && array.length >= 2) {
-			StringBuilder sb = new StringBuilder();
-			sb.append('.');
-			sb.append(array[array.length - 2]);
-			sb.append('.');
-			sb.append(array[array.length - 1]);
-			return sb.toString();
-		} else if (topDouble && array.length >= 3) {
-			StringBuilder sb = new StringBuilder();
-			sb.append('.');
-			sb.append(array[array.length - 3]);
-			sb.append('.');
-			sb.append(array[array.length - 2]);
-			sb.append('.');
-			sb.append(array[array.length - 1]);
-			return sb.toString();
-		}
-		return null;
+		StringBuilder sb = new StringBuilder();
+		sb.append('.');
+		sb.append(array[array.length - 2]);
+		sb.append('.');
+		sb.append(array[array.length - 1]);
+		return sb.toString();
 	}
-
-	private static String parseGlobalDomain(String host, String _default) {
-		host = parseGlobalDomain(host);
-		return host != null ? host : _default;
-	}
-
-	private static String[] topDoubleDomains = new String[] { ".com.cn", ".edu.cn", ".org.cn", ".net.cn", ".co.uk",
-			"co.kr", "co.jp" };
 
 }
