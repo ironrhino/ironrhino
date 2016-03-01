@@ -11,6 +11,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataRouteAspect extends BaseAspect {
 
 	@Autowired(required = false)
+	@Qualifier("dataSource")
 	private RoutingDataSource routingDataSource;
 
 	public DataRouteAspect() {
