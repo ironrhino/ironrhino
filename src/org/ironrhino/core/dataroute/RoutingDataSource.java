@@ -13,6 +13,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.util.Assert;
 
@@ -26,18 +27,21 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 
 	protected Map<String, DataSource> shardings;
 
-	protected Router router;
-
 	protected String defaultName;
 
 	protected List<String> shardingNames;
 
-	public Router getRouter() {
-		return router;
+	protected Router defaultRouter;
+
+	@Autowired(required = false)
+	protected Map<String, Router> routers;
+
+	public Router getDefaultRouter() {
+		return defaultRouter;
 	}
 
-	public void setRouter(Router router) {
-		this.router = router;
+	public void setDefaultRouter(Router defaultRouter) {
+		this.defaultRouter = defaultRouter;
 	}
 
 	public Map<String, DataSource> getShardings() {
@@ -68,8 +72,8 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 			defaultNode = beanFactory.getBean(defaultName, DataSource.class);
 		else
 			defaultNode = beanFactory.getBean(shardingNames.get(0), DataSource.class);
-		if (router == null)
-			router = new DefaultRouter();
+		if (defaultRouter == null)
+			defaultRouter = new DefaultRouter();
 	}
 
 	@Override
@@ -78,6 +82,15 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 		String routingKey = DataRouteContext.getRoutingKey();
 		String nodeName = DataRouteContext.getNodeName();
 		if (routingKey != null) {
+			Router router = defaultRouter;
+			String routerName = DataRouteContext.getRouterName();
+			if (routerName != null) {
+				if (routers == null)
+					throw new IllegalArgumentException("no routers found");
+				router = routers.get(routerName);
+				if (router == null)
+					throw new IllegalArgumentException("router '" + routerName + "' not found");
+			}
 			ds = shardings.get(router.route(shardingNames, routingKey));
 		} else if (nodeName != null) {
 			ds = shardings.get(nodeName);

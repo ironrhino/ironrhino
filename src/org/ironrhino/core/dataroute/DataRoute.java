@@ -14,4 +14,6 @@ public @interface DataRoute {
 	String routingKey() default "";
 
 	String nodeName() default "";
+	
+	String routerName() default "";
 }

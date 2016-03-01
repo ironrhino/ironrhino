@@ -11,6 +11,8 @@ public class DataRouteContext {
 
 	private static ThreadLocal<String> routingKey = new ThreadLocal<>();
 
+	private static ThreadLocal<String> routerName = new ThreadLocal<>();
+
 	private static ThreadLocal<String> nodeName = new ThreadLocal<>();
 
 	public static void setReadonly(Boolean bl) {
@@ -54,6 +56,16 @@ public class DataRouteContext {
 	static String getRoutingKey() {
 		String s = routingKey.get();
 		routingKey.remove();
+		return s;
+	}
+
+	public static void setRouterName(String s) {
+		routerName.set(s);
+	}
+
+	static String getRouterName() {
+		String s = routerName.get();
+		routerName.remove();
 		return s;
 	}
 

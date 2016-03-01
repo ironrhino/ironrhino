@@ -57,6 +57,8 @@ public class DataRouteAspect extends BaseAspect {
 			String routingKey = ExpressionUtils.evalString(dataRoute.routingKey(), context);
 			if (StringUtils.isNotBlank(routingKey)) {
 				DataRouteContext.setRoutingKey(routingKey);
+				if (StringUtils.isNotBlank(dataRoute.routerName()))
+					DataRouteContext.setRouterName(dataRoute.routerName());
 			} else {
 				String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
 				if (StringUtils.isNotBlank(nodeName))
