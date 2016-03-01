@@ -30,19 +30,29 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 				httpSessionManager);
 		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(request, session);
 		final WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(response, session);
-		if (httpSessionFilterHooks != null)
+		if (httpSessionFilterHooks != null) {
+			int appliedHooks = 0;
 			try {
-				for (HttpSessionFilterHook httpSessionFilterHook : httpSessionFilterHooks)
-					httpSessionFilterHook.beforeDoFilter();
-				chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
+				boolean skipFilter = false;
+				for (HttpSessionFilterHook httpSessionFilterHook : httpSessionFilterHooks) {
+					if (httpSessionFilterHook.beforeFilterChain(wrappedHttpRequest, wrappedHttpResponse)) {
+						skipFilter = true;
+						break;
+					} else {
+						appliedHooks++;
+					}
+				}
+				if (!skipFilter)
+					chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
 			} finally {
-				for (int i = httpSessionFilterHooks.size() - 1; i > -1; i--) {
+				for (int i = 0; i < appliedHooks; i++) {
 					HttpSessionFilterHook httpSessionFilterHook = httpSessionFilterHooks.get(i);
-					httpSessionFilterHook.afterDoFilter();
+					httpSessionFilterHook.afterFilterChain(wrappedHttpRequest, wrappedHttpResponse);
 				}
 			}
-		else
+		} else {
 			chain.doFilter(wrappedHttpRequest, wrappedHttpResponse);
+		}
 		if (!wrappedHttpRequest.isAsyncStarted()) {
 			try {
 				session.save();
