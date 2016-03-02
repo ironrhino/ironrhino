@@ -24,8 +24,8 @@ yum makecache
 
 cat>/etc/yum.repos.d/mysql-community.repo<<EOF
 [mysql56-community]
-name=MySQL 5.6 Community Server
-baseurl=http://repo.mysql.com/yum/mysql-5.6-community/el/5/\$basearch/
+name=MySQL 5.7 Community Server
+baseurl=http://repo.mysql.com/yum/mysql-5.7-community/el/6/\$basearch/
 gpgcheck=0
 enabled=1
 EOF
@@ -326,6 +326,11 @@ sed -i '22i collation-server = utf8_general_ci' /etc/my.cnf
 sed -i '22i character-set-server = utf8' /etc/my.cnf
 service mysqld restart
 fi
+
+#reset mysql password
+#grep 'temporary password' /var/log/mysqld.log
+#mysql -u root -p
+#alter user 'root'@'localhost' identified by 'newpassword';
 
 
 #config nginx
