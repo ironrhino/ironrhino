@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.NamespaceContext;
 
 import org.apache.commons.io.IOUtils;
@@ -27,6 +26,7 @@ import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.util.XmlUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -43,7 +43,7 @@ public class RegionSetup {
 
 	private ListMultimap<String, String> regionCoordinateMap;
 
-	@Resource
+	@Autowired
 	private EntityManager<Region> entityManager;
 
 	@Setup

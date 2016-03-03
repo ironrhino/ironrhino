@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.annotation.Resource;
-
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -38,6 +36,7 @@ import org.ironrhino.core.util.CompositeIterator;
 import org.ironrhino.core.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +46,7 @@ public class StatControl {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Resource
+	@Autowired
 	private EntityManager<Stat> entityManager;
 
 	@Scheduled(cron = "${statControl.archive.cron:0 5 0 * * ?}")

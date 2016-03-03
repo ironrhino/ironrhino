@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 
 public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
@@ -19,7 +18,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 
 	private Class<T> entityClass;
 
-	@Resource
+	@Autowired
 	private EntityManager<T> entityManager;
 
 	public BaseTreeControl() {

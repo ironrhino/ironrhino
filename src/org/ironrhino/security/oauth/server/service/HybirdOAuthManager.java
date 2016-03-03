@@ -8,13 +8,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.CodecUtils;
@@ -33,16 +30,12 @@ import org.springframework.stereotype.Component;
 
 @Component("oauthManager")
 @ServiceImplementationConditional(profiles = CLUSTER)
-@SuppressWarnings({ "rawtypes" })
 public class HybirdOAuthManager extends AbstractOAuthManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private ClientManager clientManager;
-
-	@Resource
-	private EntityManager entityManager;
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
