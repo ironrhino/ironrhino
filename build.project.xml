@@ -371,6 +371,7 @@
 			}catch(e){
 			}
 			importPackage(java.io);
+			project.setProperty('timestamp',new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').format(new java.util.Date()));
 			if(new File(basedir+'/.svn').isDirectory()){
 				var exec = project.createTask('exec');
 				exec.setExecutable('svn');
@@ -587,7 +588,7 @@
 		</move>
 	</target>
 
-	<target name="jar" depends="compile">
+	<target name="jar" depends="compile,set-revision">
 		<script language="javascript">
 			<![CDATA[
 			if(project.getTargets().containsKey('pre-jar'))
@@ -618,8 +619,9 @@
 		</script>
 		<jar jarfile="${target.dir}/${jar.name}" basedir="${classes.dir}">
 			<manifest>
-				<attribute name="Ironrhino-Component-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+				<attribute name="Artifact-Version" value="${version}" />
+				<attribute name="Build-Timestamp" value="${timestamp}" />
+				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
 		</jar>
 		<antcall target="reset-append-revision-for-assets" />
@@ -643,7 +645,13 @@
 		<antcall target="append-revision-for-assets" />
 		<antcall target="unzip-overrides" />
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
-			needxmlfile="false" excludes="**/upload/**,assetsbak/**,**/ironrhino-assets-*.jar" />
+			needxmlfile="false" excludes="**/upload/**,assetsbak/**,**/ironrhino-assets-*.jar">
+			<manifest>
+				<attribute name="Artifact-Version" value="${version}" />
+				<attribute name="Build-Timestamp" value="${timestamp}" />
+				<attribute name="Build-Revision" value="${revision}" />
+			</manifest>
+		</war>
 		<antcall target="reset-overrides" />
 		<antcall target="reset-append-revision-for-assets" />
 		<antcall target="reset-assets" />
@@ -668,7 +676,13 @@
 		<antcall target="reset-assets" />
 		<antcall target="unzip-overrides" />
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
-			needxmlfile="false" />
+			needxmlfile="false">
+			<manifest>
+				<attribute name="Artifact-Version" value="${version}" />
+				<attribute name="Build-Timestamp" value="${timestamp}" />
+				<attribute name="Build-Revision" value="${revision}" />
+			</manifest>
+		</war>
 		<antcall target="reset-overrides" />
 		<antcall target="reset-append-revision-for-assets" />
 		<script language="javascript">
@@ -729,6 +743,9 @@
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
 			needxmlfile="false">
 			<manifest>
+				<attribute name="Artifact-Version" value="${version}" />
+				<attribute name="Build-Timestamp" value="${timestamp}" />				
+				<attribute name="Build-Revision" value="${revision}" />
 				<attribute name="Main-Class" value="bootstrap.Main" />
 			</manifest>
 		</war>

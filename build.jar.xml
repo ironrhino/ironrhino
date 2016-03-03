@@ -89,6 +89,7 @@
 			}catch(e){
 			}
 			importPackage(java.io);
+			project.setProperty('timestamp',new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').format(new java.util.Date()));
 			if(new File(basedir+'/.svn').isDirectory()){
 				var exec = project.createTask('exec');
 				exec.setExecutable('svn');
@@ -294,9 +295,8 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-assets" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<delete dir="${target.dir}/assets" />
@@ -307,9 +307,8 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-core" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<antcall target="reset-append-revision-for-assets" />
@@ -319,10 +318,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-fs" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${zookeeper-jar.name}" basedir="${classes.dir}" includes="${zookeeper-jar.includes}">
@@ -331,10 +329,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-zookeeper" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${remoting-common-jar.name}" basedir="${classes.dir}" includes="${remoting-common-jar.includes}" excludes="${remoting-server-jar.includes},${remoting-client-jar.includes},**/ZooKeeper*">
@@ -343,10 +340,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-common" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<move file="${classes.dir}/META-INF/web-fragment.xml" todir="${classes.dir}" />
@@ -357,10 +353,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-server" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<move file="${classes.dir}/META-INF/web-fragment.xml" todir="${classes.dir}/org/ironrhino/core/remoting/server" />
@@ -371,10 +366,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-remoting-client" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${hibernate-config-jar.name}" basedir="${classes.dir}" includes="${hibernate-config-jar.includes}">
@@ -383,10 +377,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-hibernate-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${mail-config-jar.name}" basedir="${classes.dir}" includes="${mail-config-jar.includes}">
@@ -395,10 +388,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-mail-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${sendmailqueue-config-jar.name}" basedir="${classes.dir}" includes="${sendmailqueue-config-jar.includes}">
@@ -407,10 +399,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-sendmailqueue-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${search-config-jar.name}" basedir="${classes.dir}" includes="${search-config-jar.includes}">
@@ -419,10 +410,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-search-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${redis-config-jar.name}" basedir="${classes.dir}" includes="${redis-config-jar.includes}">
@@ -431,10 +421,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-redis-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${mongodb-config-jar.name}" basedir="${classes.dir}" includes="${mongodb-config-jar.includes}">
@@ -443,10 +432,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-mongodb-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${rabbitmq-config-jar.name}" basedir="${classes.dir}" includes="${rabbitmq-config-jar.includes}">
@@ -455,10 +443,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-rabbitmq-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${sitemesh-config-jar.name}" basedir="${classes.dir}" includes="${sitemesh-config-jar.includes}">
@@ -467,10 +454,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-sitemesh-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-setting-jar.name}" basedir="${classes.dir}" includes="${common-setting-jar.includes}">
@@ -479,10 +465,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-setting" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-pageview-jar.name}" basedir="${classes.dir}" includes="${common-pageview-jar.includes}">
@@ -491,10 +476,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-pageview" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-cms-jar.name}" basedir="${classes.dir}" includes="${common-cms-jar.includes}" excludes="${common-pageview-jar.includes}">
@@ -503,10 +487,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-cms" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-common-upload" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-dictionary-jar.name}" basedir="${classes.dir}" includes="${common-dictionary-jar.includes}">
@@ -515,10 +498,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-dictionary" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-schema-jar.name}" basedir="${classes.dir}" includes="${common-schema-jar.includes}">
@@ -527,10 +509,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-schema" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-treenode-jar.name}" basedir="${classes.dir}" includes="${common-treenode-jar.includes}">
@@ -539,10 +520,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-treenode" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-region-jar.name}" basedir="${classes.dir}" includes="${common-region-jar.includes}">
@@ -551,10 +531,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-region" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-stat-jar.name}" basedir="${classes.dir}" includes="${common-stat-jar.includes}">
@@ -563,10 +542,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-stat" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />					
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-record-jar.name}" basedir="${classes.dir}" includes="${common-record-jar.includes}">
@@ -575,10 +553,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-record" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-upload-jar.name}" basedir="${classes.dir}" includes="${common-upload-jar.includes}">
@@ -587,10 +564,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-upload" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-fs" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-qrcode-jar.name}" basedir="${classes.dir}" includes="${common-qrcode-jar.includes}">
@@ -599,10 +575,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-qrcode" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${common-audit-jar.name}" basedir="${classes.dir}" includes="${common-audit-jar.includes}">
@@ -611,10 +586,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-audit" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/security/**,resources/i18n/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-jar.includes},${security-signup-jar.includes},${security-loginrecord-jar.includes},${security-remoting-provider-jar.includes},${security-oauth-client-jar.includes},${security-oauth-server-jar.includes}">
@@ -623,10 +597,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-config-jar.name}" basedir="${classes.dir}" includes="${security-config-jar.includes}">
@@ -635,10 +608,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-config-base-jar.name}" basedir="${classes.dir}" includes="${security-config-base-jar.includes}">
@@ -647,10 +619,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-base" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-config-http-jar.name}" basedir="${classes.dir}" includes="${security-config-http-jar.includes}">
@@ -659,10 +630,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-http" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-signup-jar.name}" basedir="${classes.dir}" includes="${security-signup-jar.includes}">
@@ -671,10 +641,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-signup" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-security" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-loginrecord-jar.name}" basedir="${classes.dir}" includes="${security-loginrecord-jar.includes}">
@@ -683,10 +652,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-loginrecord" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-oauth-client-jar.name}" basedir="${classes.dir}" includes="${security-oauth-client-jar.includes}">
@@ -695,10 +663,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-client" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-security" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-oauth-server-jar.name}" basedir="${classes.dir}" includes="${security-oauth-server-jar.includes}">
@@ -707,10 +674,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-server" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-remoting-provider-jar.name}" basedir="${classes.dir}" includes="${security-remoting-provider-jar.includes}">
@@ -719,10 +685,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-remoting-provider" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-remoting-jar.name}" basedir="${classes.dir}" includes="${security-remoting-jar.includes}">
@@ -731,10 +696,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-remoting" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${security-oauth-server-remoting-jar.name}" basedir="${classes.dir}" includes="${security-oauth-server-remoting-jar.includes}">
@@ -743,10 +707,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-server-remoting" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/${rest-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/rest/**,resources/i18n/rest/**,resources/view/rest/*.ftl">
@@ -755,10 +718,9 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-rest" />
-					<attribute name="Ironrhino-Component-Vendor" value="ironrhino" />
-					<attribute name="Ironrhino-Component-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Revision" value="${revision}" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/temp.jar" basedir="${classes.dir}" includes="bootstrap/**" />
