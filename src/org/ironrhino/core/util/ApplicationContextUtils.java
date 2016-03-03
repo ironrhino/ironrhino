@@ -48,7 +48,7 @@ public class ApplicationContextUtils {
 		try {
 			return (BaseManager<T>) getApplicationContext().getBean(entityManagerName);
 		} catch (NoSuchBeanDefinitionException e) {
-			EntityManager<T> entityManager = ApplicationContextUtils.getBean(EntityManager.class);
+			EntityManager<T> entityManager = getApplicationContext().getBean("entityManager", EntityManager.class);
 			entityManager.setEntityClass(entityClass);
 			return entityManager;
 		}
