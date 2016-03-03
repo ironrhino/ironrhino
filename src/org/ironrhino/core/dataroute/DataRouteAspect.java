@@ -15,6 +15,7 @@ import org.ironrhino.core.util.ExpressionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -39,11 +40,17 @@ public class DataRouteAspect extends BaseAspect {
 	@Around("execution(public * *(..)) and @annotation(transactional)")
 	public Object determineReadonly(ProceedingJoinPoint jp, Transactional transactional) throws Throwable {
 		if (dataSource instanceof RoutingDataSource || dataSource instanceof GroupedDataSource) {
-			DataRouteContext.setReadonly(transactional.readOnly());
-			try {
+			boolean participate = DataRouteContext.hasReadonly()
+					&& transactional.propagation() != Propagation.REQUIRES_NEW;
+			if (participate) {
 				return jp.proceed();
-			} finally {
-				DataRouteContext.removeReadonly();
+			} else {
+				DataRouteContext.pushReadonly(transactional.readOnly());
+				try {
+					return jp.proceed();
+				} finally {
+					DataRouteContext.popReadonly();
+				}
 			}
 		} else {
 			return jp.proceed();

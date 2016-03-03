@@ -1,7 +1,7 @@
 package org.ironrhino.core.dataroute;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 
 public class DataRouteContext {
 
@@ -15,16 +15,16 @@ public class DataRouteContext {
 
 	private static ThreadLocal<String> nodeName = new ThreadLocal<>();
 
-	public static void setReadonly(Boolean bl) {
+	static void pushReadonly(Boolean bl) {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null) {
-			deque = new LinkedList<>();
+			deque = new ArrayDeque<>();
 			readonly.set(deque);
 		}
 		deque.push(bl);
 	}
 
-	static Boolean removeReadonly() {
+	static Boolean popReadonly() {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null) {
 			throw new IllegalStateException("readonly should be present");
@@ -32,11 +32,16 @@ public class DataRouteContext {
 		return deque.pop();
 	}
 
+	static boolean hasReadonly() {
+		Deque<Boolean> deque = readonly.get();
+		return deque != null && deque.size() > 0;
+	}
+
 	static boolean isReadonly() {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null || deque.size() == 0)
 			return false;
-		return deque.getLast(); // outside scope win.
+		return deque.peek();
 	}
 
 	public static void setNodeName(String s) {
