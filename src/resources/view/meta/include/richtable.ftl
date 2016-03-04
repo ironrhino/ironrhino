@@ -6,7 +6,7 @@
 <#list columns?keys as name>
 <#local config = columns[name]>
 <#local cellname=((config['trimPrefix']??)?then('',entityName+'.'))+name>
-<@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit'],'') readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
+<@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit']!,'') readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
 </#list>
 <@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
 <#if resultPage??><#local list=resultPage.result></#if>
