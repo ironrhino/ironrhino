@@ -18,13 +18,15 @@ import com.google.common.util.concurrent.Striped;
 @ServiceImplementationConditional(profiles = DEFAULT)
 public class StandaloneLockService implements LockService {
 
-	@Value("${lockService.lockStripes:4}")
-	private int lockStripes = 4;
+	@Value("${lockService.lockStripes:0}")
+	private int lockStripes = 0;
 
 	private Striped<Lock> stripedLocks;
 
 	@PostConstruct
 	public void init() {
+		if (lockStripes <= 0)
+			lockStripes = Runtime.getRuntime().availableProcessors() * 4;
 		stripedLocks = Striped.lazyWeakLock(lockStripes);
 	}
 

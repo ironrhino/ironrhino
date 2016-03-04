@@ -32,15 +32,17 @@ public class EhCacheManager implements CacheManager {
 	@Value("${ehcache.configLocation:classpath:ehcache.xml}")
 	private Resource configLocation;
 
-	@Value("${ehcache.lockStripes:4}")
-	private int lockStripes = 4;
+	@Value("${ehcache.lockStripes:0}")
+	private int lockStripes = 0;
 
 	private Striped<Lock> stripedLocks;
 
 	@PostConstruct
 	public void init() throws Exception {
-		this.ehCacheManager = net.sf.ehcache.CacheManager.create(configLocation.getInputStream());
-		this.stripedLocks = Striped.lazyWeakLock(lockStripes);
+		ehCacheManager = net.sf.ehcache.CacheManager.create(configLocation.getInputStream());
+		if (lockStripes <= 0)
+			lockStripes = Runtime.getRuntime().availableProcessors() * 4;
+		stripedLocks = Striped.lazyWeakLock(lockStripes);
 	}
 
 	@PreDestroy
