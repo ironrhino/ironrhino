@@ -9,4 +9,3 @@
 +validation-api
 -spring-aspects
 +spring-retry
-+HikariCP
