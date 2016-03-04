@@ -25,12 +25,12 @@ public class ErrorAction extends BaseAction {
 
 	private static Logger logger = LoggerFactory.getLogger(ErrorAction.class);
 
-	private Exception exception;
+	private Throwable exception;
 
 	@Autowired(required = false)
 	private HttpErrorHandler httpErrorHandler;
 
-	public Exception getException() {
+	public Throwable getException() {
 		return exception;
 	}
 
@@ -38,7 +38,7 @@ public class ErrorAction extends BaseAction {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		int errorcode = 404;
-		exception = (Exception) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+		exception = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 		if (exception instanceof ErrorMessage) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			addActionError(((ErrorMessage) exception).getLocalizedMessage());
