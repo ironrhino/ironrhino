@@ -179,7 +179,6 @@ public class EhCacheManager implements CacheManager {
 				return delta;
 			} else {
 				Lock lock = stripedLocks.get(namespace + ":" + key);
-				System.out.println("size:" + stripedLocks.size());
 				lock.lock();
 				try {
 					element = cache.get(key);
