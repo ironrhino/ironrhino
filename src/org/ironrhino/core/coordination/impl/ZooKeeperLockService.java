@@ -67,12 +67,27 @@ public class ZooKeeperLockService implements LockService {
 	@Override
 	public void unlock(String name) {
 		InterProcessMutex lock = locks.get(name);
-		if (lock != null && lock.isAcquiredInThisProcess())
+		if (lock == null)
+			throw new IllegalArgumentException("Lock " + name + " is not held");
+		if (lock.isAcquiredInThisProcess()) {
 			try {
 				lock.release();
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
+			try {
+				Thread.sleep(5);
+				if (lock.acquire(0, TimeUnit.MILLISECONDS)) {
+					try {
+						locks.remove(name, lock);
+					} finally {
+						lock.release();
+					}
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
 	}
 
 }

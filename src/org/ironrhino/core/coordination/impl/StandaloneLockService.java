@@ -43,6 +43,18 @@ public class StandaloneLockService implements LockService {
 		if (lock == null)
 			throw new IllegalArgumentException("Lock " + name + " is not held");
 		lock.unlock();
+		try {
+			Thread.sleep(5);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if (lock.tryLock()) {
+			try {
+				locks.remove(name, lock);
+			} finally {
+				lock.unlock();
+			}
+		}
 	}
 
 	private Lock getLock(String name) {
