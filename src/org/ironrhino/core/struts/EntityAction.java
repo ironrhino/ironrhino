@@ -809,6 +809,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			isnew = "true".equals(ServletActionContext.getRequest().getParameter("_isnew"));
 		if (isnew) {
 			if (idAssigned) {
+				UiConfigImpl uci = uiConfigs.get("id");
+				if (uci != null && uci.getReadonly().isValue()) {
+					if (_entity.getId() != null) {
+						addActionError(getText("try.again.later"));
+						return false;
+					}
+				}
 				persisted = entityManager.get(_entity.getId());
 				if (persisted != null) {
 					addFieldError(getEntityName() + ".id", getText("validation.already.exists"));
@@ -954,6 +961,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			try {
 				if (persisted == null) {
 					persisted = entityManager.get((Serializable) bw.getPropertyValue("id"));
+					if (persisted == null) {
+						addActionError(getText("try.again.later"));
+						return false;
+					}
 					entityManager.evict(persisted);
 				}
 				BeanWrapperImpl bwp = new BeanWrapperImpl(persisted);
@@ -1398,7 +1409,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 			}
 			writer.flush();
-		} , dc);
+		}, dc);
 		return NONE;
 	}
 
