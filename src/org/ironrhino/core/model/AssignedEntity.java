@@ -1,28 +1,23 @@
 package org.ironrhino.core.model;
 
-import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
-import org.ironrhino.core.search.elasticsearch.annotations.Index;
-import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @MappedSuperclass
-public abstract class BaseEntity extends Entity<String> {
+public abstract class AssignedEntity extends Entity<String> {
 
-	private static final long serialVersionUID = 5290168777920037800L;
+	private static final long serialVersionUID = -6924908012178703499L;
 
-	@SearchableId(type = "string", index = Index.NOT_ANALYZED)
 	@Id
-	@GeneratedValue(generator = "stringId")
-	@GenericGenerator(name = "stringId", strategy = "org.ironrhino.core.hibernate.StringIdGenerator")
-	@Column(length = 22)
-	protected String id;
+	@GeneratedValue(generator = "assigned")
+	@GenericGenerator(name = "assigned", strategy = "assigned")
+	private String id;
 
 	@Override
 	public String getId() {
