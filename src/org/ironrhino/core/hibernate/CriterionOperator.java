@@ -57,6 +57,36 @@ public enum CriterionOperator implements Displayable {
 				return Restrictions.or(Restrictions.isNull(name), Restrictions.not(Restrictions.eq(name, value1)));
 		}
 	},
+	START(1) {
+
+		@Override
+		public boolean supports(Class<?> clazz) {
+			return clazz.equals(String.class);
+		}
+
+		@Override
+		public Criterion operator(String name, Object... value) {
+			if (value == null || value.length == 0)
+				return null;
+			String value1 = String.valueOf(value[0]);
+			return Restrictions.like(name, value1, MatchMode.START);
+		}
+	},
+	END(1) {
+
+		@Override
+		public boolean supports(Class<?> clazz) {
+			return clazz.equals(String.class);
+		}
+
+		@Override
+		public Criterion operator(String name, Object... value) {
+			if (value == null || value.length == 0)
+				return null;
+			String value1 = String.valueOf(value[0]);
+			return Restrictions.like(name, value1, MatchMode.END);
+		}
+	},
 	LT(1) {
 		@Override
 		public boolean supports(Class<?> clazz) {
