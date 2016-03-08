@@ -52,6 +52,10 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 		this.defaultName = defaultName;
 	}
 
+	public List<String> getShardingNames() {
+		return shardingNames;
+	}
+
 	public void setShardingNames(List<String> shardingNames) {
 		this.shardingNames = shardingNames;
 	}
