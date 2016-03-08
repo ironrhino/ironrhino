@@ -29,7 +29,7 @@ public class RestExceptionHandler {
 	@ResponseBody
 	public RestStatus handleException(HttpServletRequest req, HttpServletResponse response, Throwable ex) {
 		Integer oldStatus = response.getStatus();
-		if(ex instanceof CompletionException){
+		if (ex instanceof CompletionException) {
 			ex = ex.getCause();
 		}
 		if (ex instanceof HttpMediaTypeNotAcceptableException) {
@@ -64,6 +64,9 @@ public class RestExceptionHandler {
 				sb.append(cv.getPropertyPath()).append(": ").append(cv.getMessage()).append("; ");
 			}
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
+		}
+		if (ex instanceof IllegalArgumentException) {
+			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, ex.getMessage());
 		}
 		if (ex.getCause() instanceof RestStatus)
 			ex = ex.getCause();
