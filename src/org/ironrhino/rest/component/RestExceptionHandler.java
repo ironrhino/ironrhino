@@ -1,6 +1,7 @@
 package org.ironrhino.rest.component;
 
 import java.io.IOException;
+import java.util.concurrent.CompletionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +29,9 @@ public class RestExceptionHandler {
 	@ResponseBody
 	public RestStatus handleException(HttpServletRequest req, HttpServletResponse response, Throwable ex) {
 		Integer oldStatus = response.getStatus();
+		if(ex instanceof CompletionException){
+			ex = ex.getCause();
+		}
 		if (ex instanceof HttpMediaTypeNotAcceptableException) {
 			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);

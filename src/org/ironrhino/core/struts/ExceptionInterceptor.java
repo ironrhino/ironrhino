@@ -2,6 +2,7 @@ package org.ironrhino.core.struts;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -33,7 +34,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 			return invocation.invoke();
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
-			if (e instanceof MethodFailedException)
+			if (e instanceof MethodFailedException || e instanceof CompletionException)
 				e = e.getCause();
 			if (e instanceof NoSuchMethodException)
 				return BaseAction.NOTFOUND;
