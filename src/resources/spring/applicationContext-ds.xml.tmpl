@@ -14,6 +14,8 @@
 		</property>
 	</bean>
 	
+	<bean id="shardingsTemplateHolder" class="org.ironrhino.core.dataroute.ShardingsTemplateHolder" c:dataSource-ref="dataSource"/>
+	
 	<bean id="mainGroup"
 		class="org.ironrhino.core.dataroute.GroupedDataSource">
 		<property name="masterName"><idref bean="mainGroupMaster"/></property>
