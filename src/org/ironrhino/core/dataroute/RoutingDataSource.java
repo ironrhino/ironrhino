@@ -3,9 +3,11 @@ package org.ironrhino.core.dataroute;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -25,7 +27,7 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 
 	protected DataSource defaultNode;
 
-	protected Map<String, DataSource> shardings;
+	protected List<DataSource> shardings;
 
 	protected String defaultName;
 
@@ -44,7 +46,11 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 		this.defaultRouter = defaultRouter;
 	}
 
-	public Map<String, DataSource> getShardings() {
+	public Map<String, Router> getRouters() {
+		return routers;
+	}
+
+	public List<DataSource> getShardings() {
 		return shardings;
 	}
 
@@ -69,9 +75,12 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 	public void afterPropertiesSet() {
 		Assert.notNull(shardingNames);
 		Assert.isTrue(shardingNames.size() > 1, "shardings should more than 1");
-		shardings = new LinkedHashMap<>();
+		Set<String> set = new HashSet<>();
+		set.addAll(shardingNames);
+		Assert.isTrue(set.size() == shardingNames.size(), "sharding should not be duplicated");
+		shardings = new ArrayList<>(shardingNames.size());
 		for (String sharding : shardingNames)
-			shardings.put(sharding, beanFactory.getBean(sharding, DataSource.class));
+			shardings.add(beanFactory.getBean(sharding, DataSource.class));
 		if (defaultName != null)
 			defaultNode = beanFactory.getBean(defaultName, DataSource.class);
 		else
@@ -97,8 +106,10 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 			}
 			ds = shardings.get(router.route(shardingNames, routingKey));
 		} else if (nodeName != null) {
-			ds = shardings.get(nodeName);
-			if (ds == null)
+			int index = shardingNames.indexOf(nodeName);
+			if (index > -1)
+				ds = shardings.get(index);
+			else
 				ds = beanFactory.getBean(nodeName, DataSource.class);
 			if (ds == null)
 				throw new IllegalArgumentException("dataSource '" + nodeName + "' not found");
@@ -116,10 +127,10 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 	private static class DefaultRouter implements Router {
 
 		@Override
-		public String route(List<String> nodes, String routingKey) {
+		public int route(List<String> nodes, String routingKey) {
 			int i = Hashing.consistentHash(Hashing.murmur3_32().hashString(routingKey, Charset.defaultCharset()),
 					nodes.size());
-			return nodes.get(i);
+			return i;
 		}
 
 	}
