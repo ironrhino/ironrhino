@@ -43,6 +43,24 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 	public String nextStringValue() {
 		long value = boundValueOperations.increment(1);
 		final String stringValue = String.valueOf(value);
+		if (stringValue.length() < getPaddingLength() + getCycleType().getPattern().length()) {
+			final String restart = getStringValue(now(), getPaddingLength(), 1);
+			boolean success = stringRedisTemplate.execute(new SessionCallback<Boolean>() {
+				@Override
+				@SuppressWarnings({ "unchecked", "rawtypes" })
+				public Boolean execute(RedisOperations operations) {
+					operations.watch(Collections.singleton(boundValueOperations.getKey()));
+					if (stringValue.equals(boundValueOperations.get())) {
+						operations.multi();
+						boundValueOperations.set(restart);
+						return operations.exec() != null;
+					} else {
+						return false;
+					}
+				}
+			});
+			return success ? restart : nextStringValue();
+		}
 		Calendar cal = Calendar.getInstance();
 		CycleType cycleType = getCycleType();
 		if (cycleType.ordinal() <= CycleType.MINUTE.ordinal())
