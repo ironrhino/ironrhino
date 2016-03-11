@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.BeanUtils;
 
 public class SqlUtils {
 
@@ -25,8 +25,7 @@ public class SqlUtils {
 		Set<String> set = new HashSet<>();
 		if (ignoreProperties.length > 0)
 			set.addAll(Arrays.asList(ignoreProperties));
-		BeanWrapperImpl bw = new BeanWrapperImpl(beanClass);
-		for (PropertyDescriptor pd : bw.getPropertyDescriptors()) {
+		for (PropertyDescriptor pd : BeanUtils.getPropertyDescriptors(beanClass)) {
 			if (pd.getReadMethod() != null && pd.getWriteMethod() != null) {
 				String name = pd.getName();
 				if (!set.contains(name))

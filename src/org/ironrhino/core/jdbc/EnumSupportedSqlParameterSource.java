@@ -6,6 +6,10 @@ public class EnumSupportedSqlParameterSource extends BeanPropertySqlParameterSou
 
 	private boolean useNamed;
 
+	public EnumSupportedSqlParameterSource(Object object) {
+		super(object);
+	}
+
 	public EnumSupportedSqlParameterSource(Object object, boolean useNamed) {
 		super(object);
 		this.useNamed = useNamed;
