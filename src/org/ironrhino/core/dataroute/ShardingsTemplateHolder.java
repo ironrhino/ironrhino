@@ -43,12 +43,12 @@ public class ShardingsTemplateHolder implements InitializingBean {
 		return templateHolders;
 	}
 
-	public TemplateHolder get(String routingKey) {
+	public TemplateHolder route(String routingKey) {
 		return templateHolders
 				.get(routingDataSource.getDefaultRouter().route(routingDataSource.getShardingNames(), routingKey));
 	}
 
-	public TemplateHolder get(String routingKey, String routerName) {
+	public TemplateHolder route(String routingKey, String routerName) {
 		Router router = routingDataSource.getRouters().get(routerName);
 		if (router == null)
 			throw new IllegalArgumentException("router '" + routerName + "' not found");
