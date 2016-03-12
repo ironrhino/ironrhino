@@ -321,9 +321,10 @@ fi
 
 #config mysql
 if [ -f "/etc/my.cnf" ] && ! $(more /etc/my.cnf|grep collation-server >/dev/null 2>&1) ; then
-sed -i '22i innodb_stats_on_metadata = off' /etc/my.cnf
-sed -i '22i collation-server = utf8_general_ci' /etc/my.cnf
-sed -i '22i character-set-server = utf8' /etc/my.cnf
+sed -i '/\[mysqld\]/a\lower_case_table_names = 1' /etc/my.cnf
+sed -i '/\[mysqld\]/a\innodb_stats_on_metadata = off' /etc/my.cnf
+sed -i '/\[mysqld\]/a\collation-server = utf8_general_ci' /etc/my.cnf
+sed -i '/\[mysqld\]/a\character-set-server = utf8' /etc/my.cnf
 service mysqld restart
 fi
 
