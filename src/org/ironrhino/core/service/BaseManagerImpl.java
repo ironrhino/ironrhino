@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
+import org.hibernate.Hibernate;
 import org.hibernate.LockOptions;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
@@ -309,8 +310,11 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Override
 	public void evict(T obj) {
-		if (obj != null)
+		if (obj != null) {
+			if (obj instanceof BaseTreeableEntity)
+				Hibernate.initialize(((BaseTreeableEntity<?>) obj).getChildren());
 			sessionFactory.getCurrentSession().evict(obj);
+		}
 	}
 
 	@Override
