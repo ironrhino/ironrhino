@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.ironrhino.core.metadata.NotInCopy;
@@ -234,6 +235,46 @@ public class BeanUtils {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static <S, T> Function<S, T> forCopy(Class<T> targetClass) {
+		Function<S, T> func = new Function<S, T>() {
+			@Override
+			public T apply(S t) {
+				if (t == null)
+					return null;
+				try {
+					T target = targetClass.newInstance();
+					copyProperties(t, target, false);
+					return target;
+				} catch (InstantiationException | IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		return func;
+	}
+
+	public static <S, T> Function<List<S>, List<T>> forCopyList(Class<S> sourceClass, Class<T> targetClass) {
+		Function<List<S>, List<T>> func = new Function<List<S>, List<T>>() {
+			@Override
+			public List<T> apply(List<S> t) {
+				if (t == null)
+					return null;
+				List<T> list = new ArrayList<>(t.size());
+				t.forEach(e -> {
+					try {
+						T target = targetClass.newInstance();
+						copyProperties(e, target, false);
+						list.add(target);
+					} catch (InstantiationException | IllegalAccessException ex) {
+						throw new RuntimeException(ex);
+					}
+				});
+				return list;
+			}
+		};
+		return func;
 	}
 
 }
