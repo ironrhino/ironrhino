@@ -41,7 +41,7 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	@SequenceGenerator(name = "treeable_entity_seq", sequenceName = "treeable_entity_seq", allocationSize = 1)
 	protected Long id;
 
-	@Column(unique = false)
+	@Column(unique = true)
 	@UiConfig(hidden = true)
 	protected String fullId;
 
