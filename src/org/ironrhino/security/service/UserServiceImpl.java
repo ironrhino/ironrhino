@@ -24,17 +24,13 @@ public class UserServiceImpl implements UserService {
 	public UserDetails loadUserByUsername(String username) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
-		UserDetails ud = null;
 		if (userDetailsServices != null)
 			for (ConcreteUserDetailsService uds : userDetailsServices) {
 				if (uds.accepts(username))
 					try {
-						ud = uds.loadUserByUsername(username);
-						if (ud != null) {
-							User user = new User();
-							BeanUtils.copyProperties(ud, user, false);
+						User user = BeanUtils.forCopy(User.class).apply(uds.loadUserByUsername(username));
+						if (user != null)
 							return user;
-						}
 					} catch (UsernameNotFoundException unfe) {
 						continue;
 					}

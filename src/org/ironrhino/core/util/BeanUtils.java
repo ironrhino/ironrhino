@@ -237,10 +237,10 @@ public class BeanUtils {
 		}
 	}
 
-	public static <S, T> Function<S, T> forCopy(Class<T> targetClass) {
-		Function<S, T> func = new Function<S, T>() {
+	public static <T> Function<Object, T> forCopy(Class<T> targetClass) {
+		Function<Object, T> func = new Function<Object, T>() {
 			@Override
-			public T apply(S t) {
+			public T apply(Object t) {
 				if (t == null)
 					return null;
 				try {
@@ -255,10 +255,10 @@ public class BeanUtils {
 		return func;
 	}
 
-	public static <S, T> Function<List<S>, List<T>> forCopyList(Class<S> sourceClass, Class<T> targetClass) {
-		Function<List<S>, List<T>> func = new Function<List<S>, List<T>>() {
+	public static <T> Function<List<?>, List<T>> forCopyList(Class<T> targetClass) {
+		Function<List<?>, List<T>> func = new Function<List<?>, List<T>>() {
 			@Override
-			public List<T> apply(List<S> t) {
+			public List<T> apply(List<?> t) {
 				if (t == null)
 					return null;
 				List<T> list = new ArrayList<>(t.size());
