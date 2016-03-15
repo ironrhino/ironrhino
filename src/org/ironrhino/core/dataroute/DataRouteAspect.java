@@ -45,16 +45,28 @@ public class DataRouteAspect extends BaseAspect {
 	public Object routeOnMethod(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
 		String routingKey = ExpressionUtils.evalString(dataRoute.routingKey(), context);
+		String routerName = dataRoute.routerName();
+		String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
 		if (StringUtils.isNotBlank(routingKey)) {
 			DataRouteContext.setRoutingKey(routingKey);
-			if (StringUtils.isNotBlank(dataRoute.routerName()))
-				DataRouteContext.setRouterName(dataRoute.routerName());
+			if (StringUtils.isNotBlank(routerName))
+				DataRouteContext.setRouterName(routerName);
 		} else {
-			String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
 			if (StringUtils.isNotBlank(nodeName))
 				DataRouteContext.setNodeName(nodeName);
 		}
-		return jp.proceed();
+		try {
+			return jp.proceed();
+		} finally {
+			if (StringUtils.isNotBlank(routingKey)) {
+				DataRouteContext.removeRoutingKey(routingKey);
+				if (StringUtils.isNotBlank(routerName))
+					DataRouteContext.removeRouterName(routerName);
+			} else {
+				if (StringUtils.isNotBlank(nodeName))
+					DataRouteContext.removeNodeName(nodeName);
+			}
+		}
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -70,13 +82,19 @@ public class DataRouteAspect extends BaseAspect {
 			if (entityClass != null)
 				dataRoute = entityClass.getAnnotation(DataRoute.class);
 		}
+		String nodeName = null;
 		if (dataRoute != null) {
 			Map<String, Object> context = buildContext(jp);
-			String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
+			nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
 			if (StringUtils.isNotBlank(nodeName))
 				DataRouteContext.setNodeName(nodeName);
 		}
-		return jp.proceed();
+		try {
+			return jp.proceed();
+		} finally {
+			if (StringUtils.isNotBlank(nodeName))
+				DataRouteContext.removeNodeName(nodeName);
+		}
 	}
 
 }

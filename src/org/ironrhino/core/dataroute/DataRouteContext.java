@@ -48,6 +48,12 @@ public class DataRouteContext {
 		nodeName.set(s);
 	}
 
+	public static void removeNodeName(String s) {
+		String exists = nodeName.get();
+		if (s.equals(exists))
+			nodeName.remove();
+	}
+
 	static String getNodeName() {
 		String s = nodeName.get();
 		nodeName.remove();
@@ -58,6 +64,12 @@ public class DataRouteContext {
 		routingKey.set(s);
 	}
 
+	public static void removeRoutingKey(String s) {
+		String exists = routingKey.get();
+		if (s.equals(exists))
+			routingKey.remove();
+	}
+
 	static String getRoutingKey() {
 		String s = routingKey.get();
 		routingKey.remove();
@@ -66,6 +78,12 @@ public class DataRouteContext {
 
 	public static void setRouterName(String s) {
 		routerName.set(s);
+	}
+
+	public static void removeRouterName(String s) {
+		String exists = routerName.get();
+		if (s.equals(exists))
+			routerName.remove();
 	}
 
 	static String getRouterName() {
