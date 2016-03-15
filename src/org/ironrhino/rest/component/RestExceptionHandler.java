@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -65,7 +66,7 @@ public class RestExceptionHandler {
 			}
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
 		}
-		if (ex instanceof IllegalArgumentException) {
+		if (ex instanceof MethodArgumentTypeMismatchException || ex instanceof IllegalArgumentException) {
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, ex.getMessage());
 		}
 		if (ex.getCause() instanceof RestStatus)
