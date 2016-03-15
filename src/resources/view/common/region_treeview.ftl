@@ -6,8 +6,8 @@
 <body>
 <div class="row reload-container">
 	<div class="span2">
-		<div class="treeview reloadable" data-url="/region/children" data-head="${action.getText('region')}">
-		<template><a href="<@url value="/common/region?view=treeview&parent={{id}}"/>" class="ajax view" data-replacement="region_list"><span>{{name}}</span></a></template>
+		<div class="treeview reloadable" data-url="/region/children<#if tree??>?tree=${tree}</#if>" data-head="${action.getText('region')}">
+		<template><a href="<@url value="/common/region?view=treeview&parent={{id}}"/><#if tree??>&tree=${tree}</#if>" class="ajax view" data-replacement="region_list"><span>{{name}}</span></a></template>
 		</div>
 	</div>
 	<div class="span10">

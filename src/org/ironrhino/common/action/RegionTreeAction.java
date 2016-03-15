@@ -1,5 +1,6 @@
 package org.ironrhino.common.action;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.ironrhino.common.model.Region;
@@ -19,16 +20,26 @@ public class RegionTreeAction extends BaseAction {
 
 	private boolean async = true;
 
-	private long parent;
+	private Long tree;
+
+	private Long parent;
 
 	@Autowired
 	private transient BaseTreeControl<Region> regionTreeControl;
 
-	public long getParent() {
+	public Long getTree() {
+		return tree;
+	}
+
+	public void setTree(Long tree) {
+		this.tree = tree;
+	}
+
+	public Long getParent() {
 		return parent;
 	}
 
-	public void setParent(long parent) {
+	public void setParent(Long parent) {
 		this.parent = parent;
 	}
 
@@ -47,10 +58,17 @@ public class RegionTreeAction extends BaseAction {
 	@JsonConfig(root = "children")
 	public String children() {
 		Region region;
-		if (parent < 1)
-			region = regionTreeControl.getTree();
-		else
+		if (parent == null || parent < 1) {
+			if (tree != null && tree > 0) {
+				children = new ArrayList<>();
+				children.add(regionTreeControl.getTree().getDescendantOrSelfById(tree));
+				return JSON;
+			} else{
+				region = regionTreeControl.getTree();
+			}
+		} else {
 			region = regionTreeControl.getTree().getDescendantOrSelfById(parent);
+		}
 		if (region != null)
 			children = region.getChildren();
 		return JSON;
@@ -60,7 +78,7 @@ public class RegionTreeAction extends BaseAction {
 	public String execute() {
 		if (!async) {
 			Region region;
-			if (parent < 1)
+			if (parent == null || parent < 1)
 				region = regionTreeControl.getTree();
 			else
 				region = regionTreeControl.getTree().getDescendantOrSelfById(parent);

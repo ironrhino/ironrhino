@@ -1530,18 +1530,31 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				break;
 			}
 		if (baseTreeControl != null) {
-			if (parent == null || parent < 1)
-				parentEntity = baseTreeControl.getTree();
-			else
+			if (parent == null || parent < 1) {
+				if (tree != null && tree > 0) {
+					children = new ArrayList<>();
+					children.add(baseTreeControl.getTree().getDescendantOrSelfById(tree));
+					return JSON;
+				} else {
+					parentEntity = baseTreeControl.getTree();
+				}
+			} else {
 				parentEntity = baseTreeControl.getTree().getDescendantOrSelfById(parent);
+			}
 			if (parentEntity != null)
 				children = parentEntity.getChildren();
 		} else {
 			BaseManager entityManager = getEntityManager(getEntityClass());
 			if (parent == null || parent < 1) {
-				DetachedCriteria dc = entityManager.detachedCriteria();
-				dc.add(Restrictions.isNull("parent")).addOrder(Order.asc("displayOrder")).addOrder(Order.asc("name"));
-				children = entityManager.findListByCriteria(dc);
+				if (tree != null && tree > 0) {
+					children = new ArrayList<>();
+					children.add(entityManager.get(tree));
+				} else {
+					DetachedCriteria dc = entityManager.detachedCriteria();
+					dc.add(Restrictions.isNull("parent")).addOrder(Order.asc("displayOrder"))
+							.addOrder(Order.asc("name"));
+					children = entityManager.findListByCriteria(dc);
+				}
 			} else {
 				parentEntity = (BaseTreeableEntity) entityManager.get(parent);
 				if (parentEntity != null)

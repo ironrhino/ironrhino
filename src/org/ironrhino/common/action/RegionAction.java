@@ -21,7 +21,6 @@ import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ClassScanner;
-import org.ironrhino.core.util.HtmlUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -221,10 +220,6 @@ public class RegionAction extends BaseAction {
 			addActionMessage(getText("delete.success"));
 		}
 		return SUCCESS;
-	}
-
-	public String getTreeViewHtml() {
-		return HtmlUtils.getTreeViewHtml(list, async);
 	}
 
 	public String map() {

@@ -235,7 +235,9 @@ ${formHeader!}
 <@buttons?interpret/>
 <#else>
 <#if !readonly>
+<#if !(treeable?? && treeable && tree?? && tree gt 0 && (!parent??||parent lt 1))>
 <#if createable><@btn view="input" label="create" windowoptions="${inputWindowOptions}"/></#if>
+</#if>
 <#if celleditable><@btn action="save" confirm=true/></#if>
 <#if enableable>
 <@btn action="enable" confirm=true/>

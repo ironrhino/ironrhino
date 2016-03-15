@@ -9,8 +9,10 @@
 <#assign actionColumnButtons='
 <@btn view="input" label="edit"/>
 '>
-<#assign bottomButtons='
+<#assign bottomButtons=r'
+<#if !(tree?? && tree gt 0 && (!parent??||parent lt 1))>
 <@btn view="input" label="create"/>
+</#if>
 <@btn action="save" confirm=true/>
 <@btn action="delete" confirm=true/>
 '>

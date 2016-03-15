@@ -7,8 +7,8 @@
 <body>
 <div class="row reload-container">
 	<div class="span2">
-		<div class="treeview reloadable" data-url="${actionBaseUrl}/children" data-head="${entityDisplayName}">
-		<template><a href="${actionBaseUrl}?view=treeview&parent={{id}}" class="ajax view" data-replacement="${entityName}_list"><span>{{name}}</span></a></template>
+		<div class="treeview reloadable" data-url="${actionBaseUrl}/children<#if tree??>?tree=${tree}</#if>" data-head="${entityDisplayName}">
+		<template><a href="${actionBaseUrl}?view=treeview&parent={{id}}<#if tree??>&tree=${tree}</#if>" class="ajax view" data-replacement="${entityName}_list"><span>{{name}}</span></a></template>
 		</div>
 	</div>
 	<div class="span10">
