@@ -39880,10 +39880,12 @@ Observation.treeview = function(container) {
 					},
 					collapsed : t.data('collapsed'),
 					unique : t.data('unique'),
-					value: t.data('value'),
-					separator: t.data('separator'),
+					value : t.data('value'),
+					separator : t.data('separator'),
 					template : template
-				}).html('');
+				});
+		if (template)
+			t.html('');
 		if (head) {
 			if (template && !t.data('head-plain')) {
 				head = $.tmpl(template, {
