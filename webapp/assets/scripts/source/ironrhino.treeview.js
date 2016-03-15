@@ -17,6 +17,7 @@ Observation.treeview = function(container) {
 					collapsed : t.data('collapsed'),
 					unique : t.data('unique'),
 					value: t.data('value'),
+					separator: t.data('separator'),
 					template : template
 				}).html('');
 		if (head) {

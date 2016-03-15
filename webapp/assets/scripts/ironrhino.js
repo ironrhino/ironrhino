@@ -24209,18 +24209,21 @@ function log() {
 							var t = $(list.get(i));
 							var name = t.data('treenode').name;
 							if (name == fullname) {
-								t.children('a').click();
-								break;
+								setTimeout(function() {
+											t.children('a').click()
+										}, 200);
+								return;
 							} else if (name
 									&& fullname.indexOf(name
 											+ settings.separator) == 0) {
 								fullname = fullname.substring(name.length
 										+ settings.separator.length);
 								$('.hitarea', t).click();
-								break;
+								return;
 							}
 						}
-					} else if (child.hasClass('treeview') && list.length == 1) {
+					}
+					if (child.hasClass('treeview') && list.length == 1) {
 						var t = $(list.get(0));
 						$('.hitarea', t).click();
 					}
@@ -24229,9 +24232,9 @@ function log() {
 
 	var proxied = $.fn.treeview;
 	$.fn.treeview = function(settings) {
-		if (settings.separator == undefined) 
+		if (settings.separator == undefined)
 			settings.separator = '';
-		if (!settings.url) 
+		if (!settings.url)
 			return proxied.apply(this, arguments);
 		var container = this;
 		this.on('reload', 'li', function() {
@@ -39878,6 +39881,7 @@ Observation.treeview = function(container) {
 					collapsed : t.data('collapsed'),
 					unique : t.data('unique'),
 					value: t.data('value'),
+					separator: t.data('separator'),
 					template : template
 				}).html('');
 		if (head) {

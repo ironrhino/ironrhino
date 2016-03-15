@@ -225,8 +225,12 @@ public class RegionAction extends BaseAction {
 	public String map() {
 		return "map";
 	}
-	
+
 	public String treeview() {
+		if (parent != null && parent > 0) {
+			entityManager.setEntityClass(Region.class);
+			region = entityManager.get(parent);
+		}
 		return "treeview";
 	}
 

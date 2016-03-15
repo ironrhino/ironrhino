@@ -1567,6 +1567,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	public String treeview() throws Exception {
 		if (!isTreeable())
 			return NOTFOUND;
+		if (parent != null && parent > 0) {
+			_entity = getEntityManager(getEntityClass()).get(parent);
+			putEntityToValueStack(_entity);
+		}
 		return "treeview";
 	}
 

@@ -119,10 +119,18 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	}
 
 	public String getFullname() {
-		return getFullname(getFullnameSeperator());
+		return getFullname(getFullnameSeperator(), null);
+	}
+
+	public String getFullname(Long tree) {
+		return getFullname(getFullnameSeperator(), tree);
 	}
 
 	public String getFullname(String seperator) {
+		return getFullname(seperator, null);
+	}
+
+	public String getFullname(String seperator, Long tree) {
 		if (name == null)
 			return null;
 		StringBuilder fullname = new StringBuilder(name);
@@ -130,6 +138,8 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		while ((e = e.getParent()) != null) {
 			if (!(e.isRoot() && StringUtils.isBlank(e.getName())))
 				fullname.insert(0, e.getName() + seperator);
+			if (tree != null && tree.equals(e.getId()))
+				break;
 		}
 		return fullname.toString();
 	}

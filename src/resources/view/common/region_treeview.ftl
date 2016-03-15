@@ -6,7 +6,7 @@
 <body>
 <div class="row reload-container">
 	<div class="span2">
-		<div class="treeview reloadable" data-url="/region/children<#if tree??>?tree=${tree}</#if>" data-head="${action.getText('region')}">
+		<div class="treeview reloadable" data-url="/region/children<#if tree?? && tree gt 0>?tree=${tree}</#if>" data-head="${action.getText('region')}"<#if region?has_content>data-value="<#if tree?? && tree gt 0>${region.getFullname(tree)}<#else>${region.fullname}</#if>" data-separator="${region.fullnameSeperator}"</#if>>
 		<template><a href="<@url value="/common/region?view=treeview&parent={{id}}"/><#if tree??>&tree=${tree}</#if>" class="ajax view" data-replacement="region_list"><span>{{name}}</span></a></template>
 		</div>
 	</div>
