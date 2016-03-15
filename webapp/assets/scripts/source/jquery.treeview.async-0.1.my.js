@@ -42,8 +42,7 @@
 						if (!this.fullname)
 							if (parentTreenode)
 								this.fullname = (parentTreenode.fullname || parentTreenode.name)
-										+ (settings.separator || '')
-										+ this.name;
+										+ (settings.separator) + this.name;
 							else
 								this.fullname = this.name;
 						var template = settings.template;
@@ -99,12 +98,15 @@
 					$(container).treeview({
 								add : child
 							});
+					var list = child.children('li');
 					if (fullname) {
-						var list = $('li', child);
 						for (var i = 0; i < list.length; i++) {
 							var t = $(list.get(i));
 							var name = t.data('treenode').name;
-							if (name
+							if (name == fullname) {
+								t.children('a').click();
+								break;
+							} else if (name
 									&& fullname.indexOf(name
 											+ settings.separator) == 0) {
 								fullname = fullname.substring(name.length
@@ -113,15 +115,19 @@
 								break;
 							}
 						}
+					} else if (child.hasClass('treeview') && list.length == 1) {
+						var t = $(list.get(0));
+						$('.hitarea', t).click();
 					}
 				});
 	}
 
 	var proxied = $.fn.treeview;
 	$.fn.treeview = function(settings) {
-		if (!settings.url) {
+		if (settings.separator == undefined) 
+			settings.separator = '';
+		if (!settings.url) 
 			return proxied.apply(this, arguments);
-		}
 		var container = this;
 		this.on('reload', 'li', function() {
 					var t = $(this);
