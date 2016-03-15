@@ -230,6 +230,8 @@ public class RegionAction extends BaseAction {
 		if (parent != null && parent > 0) {
 			entityManager.setEntityClass(Region.class);
 			region = entityManager.get(parent);
+			if(region == null)
+				return NOTFOUND;
 		}
 		return "treeview";
 	}
