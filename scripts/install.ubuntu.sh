@@ -332,6 +332,9 @@ fi
 
 
 #config nginx
+if ! $(more /etc/nginx/nginx.conf |grep worker_rlimit_nofile >/dev/null 2>&1); then
+        sed -i '3i worker_rlimit_nofile 65535;' /etc/nginx/nginx.conf
+fi
 if [ -d /etc/nginx/sites-enabled ]  ; then
 ngigxfile="/etc/nginx/sites-enabled/default"
 else
