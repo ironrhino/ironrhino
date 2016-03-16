@@ -466,7 +466,7 @@
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
 		</jar>
-		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/i18n/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-sources-jar.includes},${security-signup-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-remoting-provider-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
+		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-sources-jar.includes},${security-signup-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-remoting-provider-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
 			<manifest>
 				<attribute name="Implementation-Title" value="ironrhino-security" />
 				<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -587,7 +587,7 @@
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
 		</jar>
-		<jar jarfile="${target.dir}/${rest-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/rest/**,resources/i18n/rest/**,resources/view/rest/*.ftl">
+		<jar jarfile="${target.dir}/${rest-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/rest/**,resources/view/rest/*.ftl">
 			<manifest>
 				<attribute name="Implementation-Title" value="ironrhino-rest" />
 				<attribute name="Implementation-Vendor" value="ironrhino" />
