@@ -325,6 +325,13 @@ sed -i '/\[mysqld\]/a\lower_case_table_names = 1' /etc/my.cnf
 sed -i '/\[mysqld\]/a\innodb_stats_on_metadata = off' /etc/my.cnf
 sed -i '/\[mysqld\]/a\collation-server = utf8_general_ci' /etc/my.cnf
 sed -i '/\[mysqld\]/a\character-set-server = utf8' /etc/my.cnf
+sed -i '/\[mysqld\]/a\open_files_limit = 8192' /etc/my.cnf
+sed -i '/\[mysqld\]/a\max_connections = 1000' /etc/my.cnf
+sed -i '/\[mysqld\]/a\innodb_buffer_pool_size = 1G' /etc/my.cnf
+sed -i '/\[mysqld\]/a\key_buffer_size = 384M' /etc/my.cnf
+sed -i '/\[mysqld\]/a\sort_buffer_size = 4M' /etc/my.cnf
+sed -i '/\[mysqld\]/a\read_buffer_size = 1M' /etc/my.cnf
+sed -i '/\[mysqld\]/a\table_open_cache = 2000' /etc/my.cnf
 service mysqld restart
 fi
 
