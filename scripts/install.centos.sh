@@ -360,6 +360,9 @@ server {
 	listen   80 default_server;
 	proxy_pass_header Server;
 	client_max_body_size 4m;
+	location /stub_status {
+		stub_status;
+	}
 	location ~ ^/assets/ {
 		root   /home/$USER/tomcat8080/webapps/ROOT;
 		expires      max;
