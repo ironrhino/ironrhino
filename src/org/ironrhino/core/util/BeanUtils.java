@@ -16,24 +16,13 @@ import java.util.function.Predicate;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.BaseTreeableEntity;
-import org.ironrhino.core.spring.converter.EnumToEnumConverter;
-import org.ironrhino.core.spring.converter.EnumToIntegerConverter;
-import org.ironrhino.core.spring.converter.IntegerToEnumConverterFactory;
-import org.ironrhino.core.spring.converter.SerializableToSerializableConverter;
+import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 public class BeanUtils {
 
-	static DefaultConversionService conversionService = new DefaultConversionService();
-
-	static {
-		conversionService.addConverterFactory(new IntegerToEnumConverterFactory());
-		conversionService.addConverter(Enum.class, Integer.class, new EnumToIntegerConverter((conversionService)));
-		conversionService.addConverter(new EnumToEnumConverter());
-		conversionService.addConverter(new SerializableToSerializableConverter());
-	}
+	static ConversionService conversionService = new CustomConversionService();
 
 	public static boolean hasProperty(Class<?> clazz, String name) {
 		if (org.springframework.beans.BeanUtils.getPropertyDescriptor(clazz, name) != null)
