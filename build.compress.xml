@@ -15,7 +15,7 @@
 	<target name="compressScripts">
 		<concat destfile="${webapp.dir}/assets/scripts/ironrhino.js" encoding="utf-8" fixlastline="yes">
 			<filelist>
-				<file name="${webapp.dir}/assets/scripts/source/jquery-2.2.1.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery-2.2.2.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.browser-1.0.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.cookie-1.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.ui-1.11.3.js" />
