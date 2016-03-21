@@ -558,6 +558,11 @@ public class Oauth2Action extends BaseAction {
 		if (access_token == null && token != null)
 			access_token = token;
 		oauthManager.revoke(access_token);
+		if (httpErrorHandler != null) {
+			HttpServletRequest request = ServletActionContext.getRequest();
+			HttpServletResponse response = ServletActionContext.getResponse();
+			httpErrorHandler.handle(request, response, HttpServletResponse.SC_OK, null);
+		}
 		return NONE;
 	}
 

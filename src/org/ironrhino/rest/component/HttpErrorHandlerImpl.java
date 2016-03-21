@@ -27,6 +27,9 @@ public class HttpErrorHandlerImpl implements HttpErrorHandler {
 			response.setStatus(statusCode);
 		RestStatus rs = null;
 		switch (statusCode) {
+		case HttpServletResponse.SC_OK:
+			rs = RestStatus.OK;
+			break;
 		case HttpServletResponse.SC_UNAUTHORIZED:
 			rs = RestStatus.valueOf(RestStatus.CODE_UNAUTHORIZED, message);
 			break;
