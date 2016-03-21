@@ -33,7 +33,7 @@ public interface OAuthManager {
 
 	public Authorization refresh(Client client, String refreshToken);
 
-	public void revoke(String accessToken);
+	public boolean revoke(String accessToken);
 
 	public void create(Authorization authorization);
 

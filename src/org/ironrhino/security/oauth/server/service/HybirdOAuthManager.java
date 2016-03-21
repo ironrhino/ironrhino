@@ -268,11 +268,11 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public void revoke(String accessToken) {
+	public boolean revoke(String accessToken) {
 		String key = NAMESPACE_AUTHORIZATION + accessToken;
 		String id = stringRedisTemplate.opsForValue().get(key);
 		if (id == null)
-			return;
+			return false;
 		Authorization auth = null;
 		try {
 			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
@@ -286,6 +286,9 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + auth.getRefreshToken());
 			stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), 0,
 					auth.getId());
+			return true;
+		} else {
+			return false;
 		}
 	}
 

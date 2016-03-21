@@ -177,10 +177,13 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public void revoke(String accessToken) {
+	public boolean revoke(String accessToken) {
 		Authorization auth = authorizationManager.findByNaturalId(accessToken);
-		if (auth != null)
+		if (auth != null) {
 			authorizationManager.delete(auth);
+			return true;
+		}
+		return false;
 	}
 
 	@Override

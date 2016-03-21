@@ -557,11 +557,12 @@ public class Oauth2Action extends BaseAction {
 	public String revoke() {
 		if (access_token == null && token != null)
 			access_token = token;
-		oauthManager.revoke(access_token);
+		boolean revoked = oauthManager.revoke(access_token);
 		if (httpErrorHandler != null) {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			HttpServletResponse response = ServletActionContext.getResponse();
-			httpErrorHandler.handle(request, response, HttpServletResponse.SC_OK, null);
+			httpErrorHandler.handle(request, response,
+					revoked ? HttpServletResponse.SC_OK : HttpServletResponse.SC_NOT_FOUND, null);
 		}
 		return NONE;
 	}
