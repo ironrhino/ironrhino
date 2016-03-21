@@ -42,6 +42,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
+import org.hibernate.transform.ResultTransformer;
 import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Ordered;
@@ -331,6 +332,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		} catch (Throwable e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
+		ResultTransformer rt = impl.getResultTransformer();
 		Iterator<OrderEntry> it = impl.iterateOrderings();
 		List<OrderEntry> orderEntries = null;
 		boolean notEmpty = it.hasNext();
@@ -351,7 +353,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				impl.addOrder(oe.getOrder());
 		}
 		dc.setProjection(null);
-		dc.setResultTransformer(CriteriaSpecification.ROOT_ENTITY);
+		dc.setResultTransformer(rt);
 		return count;
 	}
 
