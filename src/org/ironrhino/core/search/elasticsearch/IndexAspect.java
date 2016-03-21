@@ -36,7 +36,7 @@ public class IndexAspect implements Ordered {
 	public void deleteBatch(List list) throws Throwable {
 		if (!AopContext.isBypass(this.getClass()) && list != null)
 			for (Object entity : list) {
-				Searchable searchable = ReflectionUtils.getActualClass(entity.getClass())
+				Searchable searchable = ReflectionUtils.getActualClass(entity)
 						.getAnnotation(Searchable.class);
 				if (searchable != null) {
 					ListenableActionFuture<DeleteResponse> laf = indexManager.delete((Persistable) entity);

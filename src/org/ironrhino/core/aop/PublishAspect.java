@@ -30,8 +30,7 @@ public class PublishAspect extends BaseAspect {
 	public void deleteBatch(List list) throws Throwable {
 		if (!isBypass() && eventPublisher != null && list != null)
 			for (Object entity : list) {
-				PublishAware publishAware = ReflectionUtils.getActualClass(entity.getClass())
-						.getAnnotation(PublishAware.class);
+				PublishAware publishAware = ReflectionUtils.getActualClass(entity).getAnnotation(PublishAware.class);
 				if (publishAware != null)
 					eventPublisher.publish(new EntityOperationEvent<>((Persistable) entity, EntityOperationType.DELETE),
 							publishAware.scope());

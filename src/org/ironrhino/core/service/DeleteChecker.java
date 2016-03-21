@@ -165,7 +165,7 @@ public class DeleteChecker {
 			if (enableable.isEnabled())
 				throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.notdisabled");
 		}
-		List<Tuple<Class<?>, String>> references = mapping.get(ReflectionUtils.getActualClass(entity.getClass()));
+		List<Tuple<Class<?>, String>> references = mapping.get(ReflectionUtils.getActualClass(entity));
 		if (references != null && references.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, String> tuple : references) {
@@ -178,7 +178,7 @@ public class DeleteChecker {
 			}
 		}
 		List<Tuple<Class<?>, Tuple<String, String>>> componentReferences = componentMapping
-				.get(ReflectionUtils.getActualClass(entity.getClass()));
+				.get(ReflectionUtils.getActualClass(entity));
 		if (componentReferences != null && componentReferences.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, Tuple<String, String>> tuple : componentReferences) {
@@ -192,7 +192,7 @@ public class DeleteChecker {
 			}
 		}
 		List<Tuple<Class<?>, Tuple<String, String>>> collectionReferences = collectionMapping
-				.get(ReflectionUtils.getActualClass(entity.getClass()));
+				.get(ReflectionUtils.getActualClass(entity));
 		if (collectionReferences != null && collectionReferences.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, Tuple<String, String>> tuple : collectionReferences) {

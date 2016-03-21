@@ -105,7 +105,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void save(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj.getClass());
+		Class<?> clazz = ReflectionUtils.getActualClass(obj);
 		Immutable immutable = clazz.getAnnotation(Immutable.class);
 		if (immutable != null)
 			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
@@ -194,7 +194,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void update(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj.getClass());
+		Class<?> clazz = ReflectionUtils.getActualClass(obj);
 		Immutable immutable = clazz.getAnnotation(Immutable.class);
 		if (immutable != null)
 			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
@@ -211,7 +211,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void delete(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj.getClass());
+		Class<?> clazz = ReflectionUtils.getActualClass(obj);
 		Immutable immutable = clazz.getAnnotation(Immutable.class);
 		if (immutable != null)
 			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
@@ -225,7 +225,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	protected void checkDelete(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj.getClass());
+		Class<?> clazz = ReflectionUtils.getActualClass(obj);
 		Immutable immutable = clazz.getAnnotation(Immutable.class);
 		if (immutable != null)
 			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());

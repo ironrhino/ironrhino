@@ -462,13 +462,13 @@ public class IndexManagerImpl implements IndexManager {
 
 	@Override
 	public ListenableActionFuture<IndexResponse> index(Persistable entity) {
-		return client.prepareIndex(getIndexName(), classToType(ReflectionUtils.getActualClass(entity.getClass())),
+		return client.prepareIndex(getIndexName(), classToType(ReflectionUtils.getActualClass(entity)),
 				String.valueOf(entity.getId())).setSource(entityToDocument(entity)).execute();
 	}
 
 	@Override
 	public ListenableActionFuture<DeleteResponse> delete(Persistable entity) {
-		return client.prepareDelete(getIndexName(), classToType(ReflectionUtils.getActualClass(entity.getClass())),
+		return client.prepareDelete(getIndexName(), classToType(ReflectionUtils.getActualClass(entity)),
 				String.valueOf(entity.getId())).execute();
 	}
 
