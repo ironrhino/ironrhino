@@ -43,6 +43,7 @@ import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -461,14 +462,14 @@ public class IndexManagerImpl implements IndexManager {
 
 	@Override
 	public ListenableActionFuture<IndexResponse> index(Persistable entity) {
-		return client.prepareIndex(getIndexName(), classToType(entity.getClass()), String.valueOf(entity.getId()))
-				.setSource(entityToDocument(entity)).execute();
+		return client.prepareIndex(getIndexName(), classToType(ReflectionUtils.getActualClass(entity.getClass())),
+				String.valueOf(entity.getId())).setSource(entityToDocument(entity)).execute();
 	}
 
 	@Override
 	public ListenableActionFuture<DeleteResponse> delete(Persistable entity) {
-		return client.prepareDelete(getIndexName(), classToType(entity.getClass()), String.valueOf(entity.getId()))
-				.execute();
+		return client.prepareDelete(getIndexName(), classToType(ReflectionUtils.getActualClass(entity.getClass())),
+				String.valueOf(entity.getId())).execute();
 	}
 
 	private void initialize() {

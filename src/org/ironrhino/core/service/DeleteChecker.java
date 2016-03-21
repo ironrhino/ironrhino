@@ -31,6 +31,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.ErrorMessage;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -164,7 +165,7 @@ public class DeleteChecker {
 			if (enableable.isEnabled())
 				throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.notdisabled");
 		}
-		List<Tuple<Class<?>, String>> references = mapping.get(entity.getClass());
+		List<Tuple<Class<?>, String>> references = mapping.get(ReflectionUtils.getActualClass(entity.getClass()));
 		if (references != null && references.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, String> tuple : references) {
@@ -176,7 +177,8 @@ public class DeleteChecker {
 					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.referrer");
 			}
 		}
-		List<Tuple<Class<?>, Tuple<String, String>>> componentReferences = componentMapping.get(entity.getClass());
+		List<Tuple<Class<?>, Tuple<String, String>>> componentReferences = componentMapping
+				.get(ReflectionUtils.getActualClass(entity.getClass()));
 		if (componentReferences != null && componentReferences.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, Tuple<String, String>> tuple : componentReferences) {
@@ -189,7 +191,8 @@ public class DeleteChecker {
 					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.referrer");
 			}
 		}
-		List<Tuple<Class<?>, Tuple<String, String>>> collectionReferences = collectionMapping.get(entity.getClass());
+		List<Tuple<Class<?>, Tuple<String, String>>> collectionReferences = collectionMapping
+				.get(ReflectionUtils.getActualClass(entity.getClass()));
 		if (collectionReferences != null && collectionReferences.size() > 0) {
 			Session session = sessionFactory.getCurrentSession();
 			for (Tuple<Class<?>, Tuple<String, String>> tuple : collectionReferences) {

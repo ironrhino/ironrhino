@@ -105,15 +105,16 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void save(T obj) {
-		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
+		Class<?> clazz = ReflectionUtils.getActualClass(obj.getClass());
+		Immutable immutable = clazz.getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(obj.getClass() + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
+			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
+		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
 		boolean isnew = obj.isNew();
 		GeneratedValue generatedValue = AnnotationUtils
-				.getAnnotatedPropertyNameAndAnnotations(obj.getClass(), GeneratedValue.class).get("id");
+				.getAnnotatedPropertyNameAndAnnotations(clazz, GeneratedValue.class).get("id");
 		GenericGenerator genericGenerator = AnnotationUtils
-				.getAnnotatedPropertyNameAndAnnotations(obj.getClass(), GenericGenerator.class).get("id");
+				.getAnnotatedPropertyNameAndAnnotations(clazz, GenericGenerator.class).get("id");
 		boolean idAssigned = generatedValue == null
 				|| genericGenerator != null && "assigned".equals(genericGenerator.strategy());
 		if (idAssigned) {
@@ -129,7 +130,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			}
 		} else {
 			if (appendOnly != null && !isnew)
-				throw new IllegalArgumentException(obj.getClass() + " is @" + AppendOnly.class.getSimpleName());
+				throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		}
 		ReflectionUtils.processCallback(obj, isnew ? PrePersist.class : PreUpdate.class);
 		if (obj instanceof Recordable) {
@@ -193,12 +194,13 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void update(T obj) {
-		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
+		Class<?> clazz = ReflectionUtils.getActualClass(obj.getClass());
+		Immutable immutable = clazz.getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(obj.getClass() + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
+			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
+		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
 		if (appendOnly != null)
-			throw new IllegalArgumentException(obj.getClass() + " is @" + AppendOnly.class.getSimpleName());
+			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		if (obj.isNew())
 			throw new IllegalArgumentException(obj + " must be persisted before update");
 		ReflectionUtils.processCallback(obj, PreUpdate.class);
@@ -209,12 +211,13 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void delete(T obj) {
-		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
+		Class<?> clazz = ReflectionUtils.getActualClass(obj.getClass());
+		Immutable immutable = clazz.getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(obj.getClass() + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
+			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
+		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
 		if (appendOnly != null)
-			throw new IllegalArgumentException(obj.getClass() + " is @" + AppendOnly.class.getSimpleName());
+			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		checkDelete(obj);
 		ReflectionUtils.processCallback(obj, PreRemove.class);
 		sessionFactory.getCurrentSession().delete(obj);
@@ -222,12 +225,13 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	protected void checkDelete(T obj) {
-		Immutable immutable = obj.getClass().getAnnotation(Immutable.class);
+		Class<?> clazz = ReflectionUtils.getActualClass(obj.getClass());
+		Immutable immutable = clazz.getAnnotation(Immutable.class);
 		if (immutable != null)
-			throw new IllegalArgumentException(obj.getClass() + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
+			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
+		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
 		if (appendOnly != null)
-			throw new IllegalArgumentException(obj.getClass() + " is @" + AppendOnly.class.getSimpleName());
+			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		deleteChecker.check(obj);
 	}
 

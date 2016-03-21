@@ -10,6 +10,7 @@ import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,8 @@ public class PublishAspect extends BaseAspect {
 	public void deleteBatch(List list) throws Throwable {
 		if (!isBypass() && eventPublisher != null && list != null)
 			for (Object entity : list) {
-				PublishAware publishAware = entity.getClass().getAnnotation(PublishAware.class);
+				PublishAware publishAware = ReflectionUtils.getActualClass(entity.getClass())
+						.getAnnotation(PublishAware.class);
 				if (publishAware != null)
 					eventPublisher.publish(new EntityOperationEvent<>((Persistable) entity, EntityOperationType.DELETE),
 							publishAware.scope());

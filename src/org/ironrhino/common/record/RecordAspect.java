@@ -41,7 +41,8 @@ public class RecordAspect implements Ordered {
 	public void deleteBatch(List list) throws Throwable {
 		if (!AopContext.isBypass(this.getClass()) && list != null)
 			for (Object entity : list) {
-				RecordAware recordAware = entity.getClass().getAnnotation(RecordAware.class);
+				RecordAware recordAware = ReflectionUtils.getActualClass(entity.getClass())
+						.getAnnotation(RecordAware.class);
 				if (recordAware != null)
 					record((Persistable) entity, EntityOperationType.DELETE);
 			}

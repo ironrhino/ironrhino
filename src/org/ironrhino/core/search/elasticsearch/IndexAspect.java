@@ -11,6 +11,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,8 @@ public class IndexAspect implements Ordered {
 	public void deleteBatch(List list) throws Throwable {
 		if (!AopContext.isBypass(this.getClass()) && list != null)
 			for (Object entity : list) {
-				Searchable searchable = entity.getClass().getAnnotation(Searchable.class);
+				Searchable searchable = ReflectionUtils.getActualClass(entity.getClass())
+						.getAnnotation(Searchable.class);
 				if (searchable != null) {
 					ListenableActionFuture<DeleteResponse> laf = indexManager.delete((Persistable) entity);
 					laf.addListener(deleteResponseActionListener);
