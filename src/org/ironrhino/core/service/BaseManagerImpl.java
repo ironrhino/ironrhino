@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.GeneratedValue;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
@@ -109,9 +110,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			throw new IllegalArgumentException(obj.getClass() + " is @" + Immutable.class.getSimpleName());
 		AppendOnly appendOnly = obj.getClass().getAnnotation(AppendOnly.class);
 		boolean isnew = obj.isNew();
+		GeneratedValue generatedValue = AnnotationUtils
+				.getAnnotatedPropertyNameAndAnnotations(obj.getClass(), GeneratedValue.class).get("id");
 		GenericGenerator genericGenerator = AnnotationUtils
 				.getAnnotatedPropertyNameAndAnnotations(obj.getClass(), GenericGenerator.class).get("id");
-		boolean idAssigned = genericGenerator != null && "assigned".equals(genericGenerator.strategy());
+		boolean idAssigned = generatedValue == null
+				|| genericGenerator != null && "assigned".equals(genericGenerator.strategy());
 		if (idAssigned) {
 			Serializable id = obj.getId();
 			if (id == null)

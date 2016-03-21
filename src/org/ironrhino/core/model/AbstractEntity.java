@@ -8,7 +8,7 @@ import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 
-public abstract class Entity<PK extends Serializable> implements Persistable<PK> {
+public abstract class AbstractEntity<PK extends Serializable> implements Persistable<PK> {
 
 	private static final long serialVersionUID = 5366738895214161098L;
 
@@ -32,7 +32,7 @@ public abstract class Entity<PK extends Serializable> implements Persistable<PK>
 		if (!this.getClass().isAssignableFrom(object.getClass())
 				&& !object.getClass().isAssignableFrom(this.getClass()))
 			return false;
-		Entity that = (Entity) object;
+		AbstractEntity that = (AbstractEntity) object;
 		return this.toIdentifiedString() != null && this.toIdentifiedString().equals(that.toIdentifiedString());
 	}
 

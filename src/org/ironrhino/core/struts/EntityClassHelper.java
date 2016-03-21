@@ -23,6 +23,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
+import javax.persistence.GeneratedValue;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -64,9 +65,12 @@ public class EntityClassHelper {
 		Map<String, UiConfigImpl> map = cache.get(entityClass);
 		if (map == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			synchronized (entityClass) {
+				GeneratedValue generatedValue = org.ironrhino.core.util.AnnotationUtils
+						.getAnnotatedPropertyNameAndAnnotations(entityClass, GeneratedValue.class).get("id");
 				GenericGenerator genericGenerator = org.ironrhino.core.util.AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(entityClass, GenericGenerator.class).get("id");
-				boolean idAssigned = genericGenerator != null && "assigned".equals(genericGenerator.strategy());
+				boolean idAssigned = generatedValue == null
+						|| genericGenerator != null && "assigned".equals(genericGenerator.strategy());
 				Map<String, NaturalId> naturalIds = org.ironrhino.core.util.AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(entityClass, NaturalId.class);
 				Set<String> hides = new HashSet<>();

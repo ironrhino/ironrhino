@@ -13,7 +13,7 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @MappedSuperclass
-public abstract class BaseEntity extends Entity<String> {
+public abstract class BaseEntity extends AbstractEntity<String> {
 
 	private static final long serialVersionUID = 5290168777920037800L;
 
