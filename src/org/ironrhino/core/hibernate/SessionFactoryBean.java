@@ -12,11 +12,14 @@ import java.util.Properties;
 import javax.persistence.Entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.cfg.AvailableSettings;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
@@ -25,6 +28,12 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 	private Class<?>[] annotatedClasses;
 
 	private String excludeFilter;
+
+	@Autowired(required = false)
+	private ImplicitNamingStrategy implicitNamingStrategy;
+
+	@Autowired(required = false)
+	private PhysicalNamingStrategy physicalNamingStrategy;
 
 	public void setExcludeFilter(String excludeFilter) {
 		this.excludeFilter = excludeFilter;
@@ -76,6 +85,10 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		for (Class<?> clz : annotatedClasses)
 			logger.info(clz.getName());
 		super.setAnnotatedClasses(annotatedClasses);
+		if (implicitNamingStrategy != null)
+			super.setImplicitNamingStrategy(implicitNamingStrategy);
+		if (physicalNamingStrategy != null)
+			super.setPhysicalNamingStrategy(physicalNamingStrategy);
 		super.afterPropertiesSet();
 	}
 }
