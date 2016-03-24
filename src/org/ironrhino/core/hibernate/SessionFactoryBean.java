@@ -12,14 +12,17 @@ import java.util.Properties;
 import javax.persistence.Entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
+import org.hibernate.boot.registry.StandardServiceInitiator;
 import org.hibernate.cfg.AvailableSettings;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
@@ -28,6 +31,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 	private Class<?>[] annotatedClasses;
 
 	private String excludeFilter;
+
+	@Autowired(required = false)
+	private List<StandardServiceInitiator<?>> standardServiceInitiators;
 
 	@Autowired(required = false)
 	private ImplicitNamingStrategy implicitNamingStrategy;
@@ -90,5 +96,13 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		if (physicalNamingStrategy != null)
 			super.setPhysicalNamingStrategy(physicalNamingStrategy);
 		super.afterPropertiesSet();
+	}
+
+	@Override
+	protected SessionFactory buildSessionFactory(LocalSessionFactoryBuilder sfb) {
+		if (standardServiceInitiators != null)
+			for (StandardServiceInitiator<?> s : standardServiceInitiators)
+				sfb.getStandardServiceRegistryBuilder().addInitiator(s);
+		return sfb.buildSessionFactory();
 	}
 }

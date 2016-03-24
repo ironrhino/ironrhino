@@ -20,7 +20,7 @@ public abstract class BaseEntity extends AbstractEntity<String> {
 	@SearchableId(type = "string", index = Index.NOT_ANALYZED)
 	@Id
 	@GeneratedValue(generator = "stringId")
-	@GenericGenerator(name = "stringId", strategy = "org.ironrhino.core.hibernate.StringIdGenerator")
+	@GenericGenerator(name = "stringId", strategy = "stringId")
 	@Column(length = 22)
 	protected String id;
 

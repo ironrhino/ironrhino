@@ -32,7 +32,7 @@ public class Stat extends KeyValuePair implements Persistable<String> {
 
 	@Id
 	@GeneratedValue(generator = "stringId")
-	@GenericGenerator(name = "stringId", strategy = "org.ironrhino.core.hibernate.StringIdGenerator")
+	@GenericGenerator(name = "stringId", strategy = "stringId")
 	@Column(length = 22)
 	private String id;
 
