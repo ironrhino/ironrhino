@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.CreationTimestamp;
 import org.ironrhino.core.event.AbstractAuditEvent;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -39,8 +40,9 @@ public class AuditEvent extends BaseEntity {
 	private String username;
 
 	@UiConfig(width = "130px")
+	@CreationTimestamp
 	@Column(name = "date")
-	private Date date = new Date();
+	private Date date;
 
 	@UiConfig(width = "150px")
 	@SearchableProperty

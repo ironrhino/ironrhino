@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Readonly;
@@ -43,7 +44,8 @@ public class LoginRecord extends BaseEntity {
 
 	@UiConfig(width = "130px")
 	@Column(name = "date")
-	private Date date = new Date();
+	@CreationTimestamp
+	private Date date;
 
 	public String getUsername() {
 		return username;

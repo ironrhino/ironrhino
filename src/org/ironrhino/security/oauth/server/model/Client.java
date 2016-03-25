@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.hibernate.convert.StringListConverter;
 import org.ironrhino.core.metadata.Authorize;
@@ -68,7 +69,8 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@NotInCopy
 	@UiConfig(hiddenInInput = @Hidden(true) , hiddenInList = @Hidden(true) )
 	@Column(updatable = false)
-	private Date createDate = new Date();
+	@CreationTimestamp
+	private Date createDate;
 
 	@Convert(converter = StringListConverter.class)
 	private List<String> attachments = new ArrayList<>(0);
