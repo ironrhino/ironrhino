@@ -112,7 +112,7 @@ public class EntityClassHelper {
 
 					if (uiConfig != null && uiConfig.hidden())
 						continue;
-					if ("new".equals(propertyName) || !idAssigned && "id".equals(propertyName)
+					if ("new".equals(propertyName) || !idAssigned && "id".equals(propertyName) && uiConfig == null
 							|| "class".equals(propertyName) || "fieldHandler".equals(propertyName)
 							|| pd.getReadMethod() == null || hides.contains(propertyName))
 						continue;
