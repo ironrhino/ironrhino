@@ -22,12 +22,12 @@ public class ParamsInterceptor extends ParametersInterceptor {
 	protected boolean acceptableName(String name) {
 		boolean b = super.acceptableName(name);
 		if (b) {
-			int i = name.indexOf('[');
-			while (i > 0) {
-				int end = name.indexOf(']', i);
+			int start = name.indexOf('[');
+			while (start > 0) {
+				int end = name.indexOf(']', start);
 				if (end < 0)
 					break;
-				String s = name.substring(i + 1, end);
+				String s = name.substring(start + 1, end);
 				if (StringUtils.isNumeric(s)) {
 					int index = Integer.valueOf(s);
 					if (index > autoGrowCollectionLimit) {
@@ -35,7 +35,7 @@ public class ParamsInterceptor extends ParametersInterceptor {
 						return false;
 					}
 				}
-				i = name.indexOf('[', end);
+				start = name.indexOf('[', end);
 			}
 		}
 		return b;
