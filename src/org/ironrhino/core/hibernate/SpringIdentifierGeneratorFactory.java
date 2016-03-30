@@ -19,6 +19,21 @@ public class SpringIdentifierGeneratorFactory extends DefaultIdentifierGenerator
 
 	@Override
 	public IdentifierGenerator createIdentifierGenerator(String strategy, Type type, Properties config) {
+		IdentifierGenerator generator = tryFindIdentifierGenerator(strategy);
+		if (generator != null)
+			return generator;
+		return super.createIdentifierGenerator(strategy, type, config);
+	}
+
+	@Override
+	public Class<?> getIdentifierGeneratorClass(String strategy) {
+		IdentifierGenerator generator = tryFindIdentifierGenerator(strategy);
+		if (generator != null)
+			return generator.getClass();
+		return super.getIdentifierGeneratorClass(strategy);
+	}
+
+	protected IdentifierGenerator tryFindIdentifierGenerator(String strategy) {
 		if (identifierGenerators != null) {
 			for (Map.Entry<String, IdentifierGenerator> entry : identifierGenerators.entrySet()) {
 				String name = entry.getKey();
@@ -28,7 +43,7 @@ public class SpringIdentifierGeneratorFactory extends DefaultIdentifierGenerator
 					return generator;
 			}
 		}
-		return super.createIdentifierGenerator(strategy, type, config);
+		return null;
 	}
 
 }
