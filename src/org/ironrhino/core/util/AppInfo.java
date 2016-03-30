@@ -283,6 +283,7 @@ public class AppInfo {
 					.getenv(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME.replaceAll("\\.", "_").toUpperCase());
 			if (StringUtils.isNotBlank(defaultProfiles)) {
 				System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
+				AppInfo.setDefaultProfiles(defaultProfiles);
 			} else {
 				defaultProfiles = AppInfo.getDefaultProfiles();
 				if (StringUtils.isNotBlank(defaultProfiles)) {
