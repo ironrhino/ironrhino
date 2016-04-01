@@ -562,12 +562,14 @@ Ajax = {
 				&& (data.indexOf('{') == 0 || data.indexOf('[') == 0))
 			data = $.parseJSON(data);
 		if (typeof data == 'string') {
-			if (data.indexOf('<title>') >= 0 && data.indexOf('</title>') > 0) {
+			var i = data.indexOf('<title>');
+			if (i >= 0 && data.indexOf('</title>') > 0) {
 				Ajax.title = data.substring(data.indexOf('<title>') + 7, data
 								.indexOf('</title>'));
 				if (options.replaceTitle)
 					document.title = Ajax.title;
-				data = data.substring(data.indexOf('</title>') + 8);
+				if (i == 0)
+					data = data.substring(data.indexOf('</title>') + 8);
 			}
 			var html = data.replace(/<script(.|\s)*?\/script>/g, '');
 			var div = $('<div/>').html(html);
@@ -1141,19 +1143,19 @@ Observation.common = function(container) {
 				}
 			});
 	if (MODERN_BROWSER)
-		$('input[type="checkbox"].custom,input[type="radio"].custom',
-				container).each(function(i) {
-			$(this).hide();
-			if (!this.id)
-				this.id = ('a' + (i + Math.random())).replace('.', '')
-						.substring(0, 9);
-			var label = $(this).next('label.custom');
-			if (!label.length)
-				$(this).after($('<label class="custom" for="' + this.id
-						+ '"></label>'));
-			else
-				label.attr('for', this.id);
-		});
+		$('input[type="checkbox"].custom,input[type="radio"].custom', container)
+				.each(function(i) {
+					$(this).hide();
+					if (!this.id)
+						this.id = ('a' + (i + Math.random())).replace('.', '')
+								.substring(0, 9);
+					var label = $(this).next('label.custom');
+					if (!label.length)
+						$(this).after($('<label class="custom" for="' + this.id
+								+ '"></label>'));
+					else
+						label.attr('for', this.id);
+				});
 	$('.linkage', container).each(function() {
 		var c = $(this);
 		c.data('originalclass', c.attr('class'));
