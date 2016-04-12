@@ -44,10 +44,12 @@ public class DataRouteAspect extends BaseAspect {
 	@Around("execution(public * *(..)) and @annotation(dataRoute)")
 	public Object routeOnMethod(ProceedingJoinPoint jp, DataRoute dataRoute) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
-		String routingKey = ExpressionUtils.evalString(dataRoute.routingKey(), context);
+		Object routingKey = ExpressionUtils.eval(dataRoute.routingKey(), context);
 		String routerName = dataRoute.routerName();
 		String nodeName = ExpressionUtils.evalString(dataRoute.nodeName(), context);
-		if (StringUtils.isNotBlank(routingKey)) {
+		boolean routingKeyPresent = !(routingKey == null
+				|| routingKey instanceof String && StringUtils.isBlank((String) routingKey));
+		if (routingKeyPresent) {
 			DataRouteContext.setRoutingKey(routingKey);
 			if (StringUtils.isNotBlank(routerName))
 				DataRouteContext.setRouterName(routerName);
@@ -58,7 +60,7 @@ public class DataRouteAspect extends BaseAspect {
 		try {
 			return jp.proceed();
 		} finally {
-			if (StringUtils.isNotBlank(routingKey)) {
+			if (routingKeyPresent) {
 				DataRouteContext.removeRoutingKey(routingKey);
 				if (StringUtils.isNotBlank(routerName))
 					DataRouteContext.removeRouterName(routerName);

@@ -92,7 +92,7 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
 		DataSource ds = null;
-		String routingKey = DataRouteContext.getRoutingKey();
+		Object routingKey = DataRouteContext.getRoutingKey();
 		String nodeName = DataRouteContext.getNodeName();
 		if (routingKey != null) {
 			Router router = defaultRouter;
@@ -127,9 +127,9 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 	private static class DefaultRouter implements Router {
 
 		@Override
-		public int route(List<String> nodes, String routingKey) {
-			int i = Hashing.consistentHash(Hashing.murmur3_32().hashString(routingKey, Charset.defaultCharset()),
-					nodes.size());
+		public int route(List<String> nodes, Object routingKey) {
+			int i = Hashing.consistentHash(
+					Hashing.murmur3_32().hashString(routingKey.toString(), Charset.defaultCharset()), nodes.size());
 			return i;
 		}
 

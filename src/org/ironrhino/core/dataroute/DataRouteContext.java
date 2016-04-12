@@ -9,7 +9,7 @@ public class DataRouteContext {
 
 	private static ThreadLocal<Deque<Boolean>> readonly = new ThreadLocal<>();
 
-	private static ThreadLocal<String> routingKey = new ThreadLocal<>();
+	private static ThreadLocal<Object> routingKey = new ThreadLocal<>();
 
 	private static ThreadLocal<String> routerName = new ThreadLocal<>();
 
@@ -60,20 +60,20 @@ public class DataRouteContext {
 		return s;
 	}
 
-	public static void setRoutingKey(String s) {
-		routingKey.set(s);
+	public static void setRoutingKey(Object obj) {
+		routingKey.set(obj);
 	}
 
-	public static void removeRoutingKey(String s) {
-		String exists = routingKey.get();
-		if (s.equals(exists))
+	public static void removeRoutingKey(Object obj) {
+		Object exists = routingKey.get();
+		if (obj.equals(exists))
 			routingKey.remove();
 	}
 
-	static String getRoutingKey() {
-		String s = routingKey.get();
+	static Object getRoutingKey() {
+		Object obj = routingKey.get();
 		routingKey.remove();
-		return s;
+		return obj;
 	}
 
 	public static void setRouterName(String s) {

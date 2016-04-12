@@ -5,6 +5,6 @@ import java.util.List;
 @FunctionalInterface
 public interface Router {
 
-	public int route(List<String> nodes, String routingKey);
+	public int route(List<String> nodes, Object routingKey);
 
 }
