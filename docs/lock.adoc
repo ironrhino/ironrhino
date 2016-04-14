@@ -1,0 +1,80 @@
+= 锁
+
+== 概述
+通常会有一些操作不能并发执行, 比如定时任务.
+多实例部署的情况下, 用JDK自带的锁和同步机制并不能解决问题,
+这就需要利用外部服务来协调, Ironrhino 提供了 redis 和 zookeeper 的锁实现,
+并且统一抽象成接口 `org.ironrhino.core.coordination.LockService` , 开发者可以注入它调用相关API完成锁功能.
+
+
+== 示例
+下面的示例是一个定时关闭超期的订单例子
+
+[source,java]
+.OrderManager.java
+----
+
+
+import org.ironrhino.core.coordination.LockService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class OrderManager {
+
+	@Autowired
+	private LockService lockService;
+
+	@Scheduled(cron = "0 30 23 * * ?")
+	public void closeExpired() {
+		String lockName = "orderManager.closeExpired()"; // unique lockName
+		if (lockService.tryLock(lockName)) {
+			try {
+				doCloseExpired();
+			} finally {
+				lockService.unlock(lockName);
+			}
+		} else {
+			// log try lock failed
+		}
+	}
+
+	private void doCloseExpired() {
+		// update order status to CLOSED if expired
+	}
+
+}
+
+
+----
+
+== 使用注解的示例
+Ironrhino提供了 `@Mutex` 的注解, 上面的示例可以简化成下面的代码
+
+[source,java]
+.OrderManager.java
+----
+
+import org.ironrhino.core.throttle.Mutex;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class OrderManager {
+
+	@Scheduled(cron = "0 30 23 * * ?")
+	@Mutex
+	public void closeExpired() {
+		doCloseExpired();
+	}
+
+	private void doCloseExpired() {
+		// update order status to CLOSED if expired
+	}
+
+}
+
+----
+
+`@Mutex` 还支持自定义 `scope` , 默认是全局锁, 也可以是应用级别和本地级别, 本地级别是指同一个操作系统实例里面不是JVM实例级别.
