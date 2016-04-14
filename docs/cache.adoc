@@ -1,0 +1,110 @@
+= 缓存
+
+== 概述
+Ironrhino利用Spring的AOP功能提供了声明式的缓存控制, 只需要在bean的方法上标注相应的注解.
+也可以直接注入 `org.ironrhino.core.cache.CacheManager` 调用相关的API.
+
+
+== 检查缓存
+
+需要用到的注解是 `@CheckCache` :
+
+|===
+|参数 |说明 |默认值
+
+|key
+|cache的键值, 支持mvel
+|
+
+|namespace
+|cache的命名空间, 支持mvel
+|
+
+|when
+|mvel表达式求值为true的情况下才缓存
+|true
+
+|timeToLive
+|缓存的存活时间, 支持mvel表达式
+|3600
+
+|timeToIdle
+|缓存的闲置时间,支持mvel表达式, 值大于0的时候生效
+|-1
+
+|timeUnit
+|时间单位
+|秒
+
+|eternal
+|值为true的时候永不失效
+|false
+
+|cacheNull
+|值为true的时候null也会缓存, 这样不会穿透到下层服务, 可以防DOS攻击
+|false
+
+|throughPermits
+|缓存不存在的时候最大并发穿透数, 用来防止雪崩效应
+|5
+
+|===
+
+
+
+
+== 清除缓存
+需要用到的注解是 `@EvictCache` :
+
+|===
+|参数 |说明 |默认值
+
+|key
+|cache的键值, 支持mvel
+|
+
+|namespace
+|cache的命名空间, 支持mvel
+|
+
+|renew
+|mvel表达式求值为true的情况下续上缓存
+|false
+
+|===
+
+== 示例
+[source,java]
+.UserService.java
+----
+
+import org.ironrhino.core.cache.CheckCache;
+import org.ironrhino.core.cache.EvictCache;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Component
+public class UserService {
+
+	@Transactional
+	@EvictCache(namespace = "user", key = "${[user.username,user.email]}")
+	public void delete(User user) {
+		// TODO
+	}
+
+	@Transactional
+	@EvictCache(namespace = "user", key = "${[user.username,user.email]}")
+	public void save(User user) {
+		// TODO
+	}
+
+	@Transactional(readOnly = true)
+	@CheckCache(namespace = "user", key = "${username}")
+	public User loadUserByUsername(String username) {
+		// TODO
+		return null;
+	}
+
+}
+
+----
