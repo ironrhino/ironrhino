@@ -1,0 +1,99 @@
+= 节流器
+
+== 概述
+在后端服务的处理能力有限的情况下, 需要前端来做节流控制, Ironrhino 提供两种方式, 并发量控制和频度控制
+
+
+== 并发量控制
+需要用到的注解是 `@Concurrency`
+
+|===
+|参数 |说明 |默认值
+
+|key
+|键值, 支持mvel
+|
+
+|permits
+|并发数, 支持mvel
+|
+
+|block
+|在超过并发的情况下是否阻塞, true就阻塞false就抛出异常
+|false
+
+|timeout
+|阻塞的timeout, 0是一直阻塞等待
+|0
+
+|timeUnit
+|时间单位
+|毫秒
+
+|===
+
+示例
+
+[source,java]
+.OrderManager.java
+----
+
+import org.ironrhino.core.throttle.Concurrency;
+import org.springframework.stereotype.Component;
+
+@Component
+public class OrderManager {
+
+	@Concurrency(permits = "100", block = true, timeout = 5000) //并发数最大100
+	public void placeOrder() {
+		// TODO
+	}
+
+}
+
+
+----
+
+== 频度控制
+需要用到的注解是 `@Frequency`
+
+|===
+|参数 |说明 |默认值
+
+|key
+|键值, 支持mvel
+|
+
+|limits
+|最大通过数, 支持mvel
+|
+
+|duration
+|时长
+|1
+
+|timeUnit
+|时间单位
+|小时
+
+|===
+
+示例
+
+[source,java]
+.OrderManager.java
+----
+
+import org.ironrhino.core.throttle.Frequency;
+import org.springframework.stereotype.Component;
+
+@Component
+public class OrderManager {
+
+	@Frequency(limits = "10000") //一小时内最大10000次调用
+	public void placeOrder() {
+		// TODO
+	}
+
+}
+----
