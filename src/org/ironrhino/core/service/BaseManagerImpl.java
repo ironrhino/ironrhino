@@ -320,8 +320,14 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	public void evict(T obj) {
 		if (obj != null) {
-			if (obj instanceof BaseTreeableEntity)
-				Hibernate.initialize(((BaseTreeableEntity<?>) obj).getChildren());
+			if (obj instanceof BaseTreeableEntity) {
+				BaseTreeableEntity te = (BaseTreeableEntity) obj;
+				Hibernate.initialize(te.getChildren());
+				if (te.getChildren() != null) {
+					for (Object child : te.getChildren())
+						sessionFactory.getCurrentSession().evict(child);
+				}
+			}
 			sessionFactory.getCurrentSession().evict(obj);
 		}
 	}
