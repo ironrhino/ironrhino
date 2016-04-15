@@ -38088,7 +38088,7 @@ $(function() {
 					var options = (new Function("return "
 							+ (t.data('windowoptions') || '{}')))();
 					var url = t.attr('href');
-					var winid = window.open(url, options.iframe);
+					var winid = window.open(url, options);
 					delete options.iframe;
 					for (var key in options)
 						$('#' + winid).dialog('option', key, options[key]);
@@ -38098,8 +38098,18 @@ $(function() {
 		return this;
 	};
 
-	window.open = function(url, useiframe) {
-		useiframe = useiframe || false;
+	window.open = function(url, options) {
+		if (typeof options == 'undefined' || typeof options == 'string') {
+			options = {
+				iframe : false
+			};
+		} else if (typeof options == 'boolean') {
+			options = {
+				iframe : options
+			};
+		}
+		var useiframe = options.iframe;
+		delete options.iframe;
 		var winindex = $(document).data('winindex') || 0;
 		winindex++;
 		$(document).data('winindex', winindex);
@@ -38148,6 +38158,8 @@ $(function() {
 			}
 		};
 		win.dialog(opt);
+		for (var key in options)
+			win.dialog('option', key, options[key]);
 		win.dialog('open');
 		win.closest('.ui-dialog').css('z-index', 2000);
 		$('.ui-dialog-titlebar-close', win.closest('.ui-dialog')).blur();
