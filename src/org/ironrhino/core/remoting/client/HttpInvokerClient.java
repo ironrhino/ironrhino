@@ -49,6 +49,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private int maxAttempts = 3;
 
+	@Value("${httpInvoker.poll:false}")
 	private boolean poll;
 
 	private boolean urlFromDiscovery;
