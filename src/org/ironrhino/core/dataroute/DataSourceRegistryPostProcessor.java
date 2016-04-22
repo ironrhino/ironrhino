@@ -1,11 +1,15 @@
 package org.ironrhino.core.dataroute;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -22,15 +26,27 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 
 	public static final String KEY_SHARDINGS_PER_HOST = "routingDataSource.shardingsPerHost";
 
+	public static final String KEY_SHARDING_VERSION = "routingDataSource.shardingGeneration";
+
 	public static final String KEY_JDBC_URL_FORMAT = "routingDataSource.jdbcUrlFormat";
 
-	private String routingDataSourceName = "dataSource";
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	private String defaultRouterName;
+	protected String routingDataSourceName = "dataSource";
 
-	private String shardingParentName = "abstractDataSource";
+	protected String defaultRouterName;
 
-	private String shardingNamePrefix;
+	protected String shardingParentName = "abstractDataSource";
+
+	protected String shardingNamePrefix;
+
+	protected List<String> shardingHosts;
+
+	protected int shardingsPerHost;
+
+	protected int shardingGeneration;
+
+	protected String jdbcUrlFormat;
 
 	public void setRoutingDataSourceName(String routingDataSourceName) {
 		this.routingDataSourceName = routingDataSourceName;
@@ -48,43 +64,70 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 		this.shardingNamePrefix = shardingNamePrefix;
 	}
 
+	public void setShardingHosts(List<String> shardingHosts) {
+		this.shardingHosts = shardingHosts;
+	}
+
+	public void setShardingsPerHost(int shardingsPerHost) {
+		this.shardingsPerHost = shardingsPerHost;
+	}
+
+	public void setShardingGeneration(int shardingGeneration) {
+		this.shardingGeneration = shardingGeneration;
+	}
+
+	public void setJdbcUrlFormat(String jdbcUrlFormat) {
+		this.jdbcUrlFormat = jdbcUrlFormat;
+	}
+
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		Assert.hasText(routingDataSourceName);
 		Assert.hasText(shardingParentName);
 		Assert.hasText(shardingNamePrefix);
-		List<String> shardingHosts = getShardingHosts();
-		int index = 1;
-		List<String> shardingNames = new ArrayList<>();
-		int shardingsPerHost = getShardingsPerHost();
-		String jdbcUrlFormat = getJdbcUrlFormat();
-		for (String host : shardingHosts) {
-			for (int i = 0; i < shardingsPerHost; i++) {
-				String beanName = shardingNamePrefix + (index);
-				shardingNames.add(beanName);
-				String databaseName = shardingNamePrefix;
-				if (shardingsPerHost > 1)
-					databaseName += (i + 1);
-				ChildBeanDefinition beanDefinition = new ChildBeanDefinition(shardingParentName);
-				MutablePropertyValues propertyValues = new MutablePropertyValues();
-				propertyValues.addPropertyValue("jdbcUrl",
-						"${" + beanName + ".jdbc.url:" + String.format(jdbcUrlFormat, host, databaseName) + "}");
-				String username = AppInfo.getApplicationContextProperties().getProperty(beanName + ".jdbc.username");
-				if (username != null)
-					propertyValues.addPropertyValue("username", username);
-				String password = AppInfo.getApplicationContextProperties().getProperty(beanName + ".jdbc.password");
-				if (password != null)
-					propertyValues.addPropertyValue("password", password);
-				beanDefinition.setPropertyValues(propertyValues);
-				registry.registerBeanDefinition(beanName, beanDefinition);
-				index++;
-			}
+		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDING_HOSTS);
+		if (str != null)
+			shardingHosts = parseHosts(str);
+		Assert.notEmpty(shardingHosts);
+		str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDINGS_PER_HOST);
+		if (str != null)
+			shardingsPerHost = Integer.valueOf(str);
+		if (shardingsPerHost <= 0)
+			shardingsPerHost = 1;
+		str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDING_VERSION);
+		if (str != null)
+			shardingGeneration = Integer.valueOf(str);
+		str = AppInfo.getApplicationContextProperties().getProperty(KEY_JDBC_URL_FORMAT);
+		if (str != null)
+			jdbcUrlFormat = str;
+		Assert.hasText(jdbcUrlFormat);
+		Map<String, String> jdbcUrls = buildJdbcUrls();
+		StringBuilder dataSourceMapping = new StringBuilder();
+		for (Map.Entry<String, String> entry : jdbcUrls.entrySet()) {
+			String beanName = entry.getKey();
+			String jdbcUrl = entry.getValue();
+			ChildBeanDefinition beanDefinition = new ChildBeanDefinition(shardingParentName);
+			MutablePropertyValues propertyValues = new MutablePropertyValues();
+			String url = AppInfo.getApplicationContextProperties().getProperty(beanName + ".jdbc.url");
+			if (url != null)
+				jdbcUrl = url;
+			propertyValues.addPropertyValue("jdbcUrl", jdbcUrl);
+			dataSourceMapping.append(beanName).append("\t= ").append(jdbcUrl).append("\n");
+			String username = AppInfo.getApplicationContextProperties().getProperty(beanName + ".jdbc.username");
+			if (username != null)
+				propertyValues.addPropertyValue("username", username);
+			String password = AppInfo.getApplicationContextProperties().getProperty(beanName + ".jdbc.password");
+			if (password != null)
+				propertyValues.addPropertyValue("password", password);
+			beanDefinition.setPropertyValues(propertyValues);
+			registry.registerBeanDefinition(beanName, beanDefinition);
 		}
+		logger.info("Register dataSources:\n\n{}", dataSourceMapping.toString());
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(RoutingDataSource.class);
 		MutablePropertyValues propertyValues = new MutablePropertyValues();
 		if (StringUtils.isNotBlank(defaultRouterName))
 			propertyValues.addPropertyValue("defaultRouter", new RuntimeBeanReference(defaultRouterName));
-		propertyValues.addPropertyValue("shardingNames", shardingNames);
+		propertyValues.addPropertyValue("shardingNames", jdbcUrls.keySet());
 		beanDefinition.setPropertyValues(propertyValues);
 		registry.registerBeanDefinition(routingDataSourceName, beanDefinition);
 	}
@@ -94,19 +137,26 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 
 	}
 
-	public List<String> getShardingHosts() {
-		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDING_HOSTS, "localhost");
-		return parseHosts(str);
+	protected Map<String, String> buildJdbcUrls() {
+		Map<String, String> map = new LinkedHashMap<>();
+		List<Integer> seq = seq(shardingHosts.size(), shardingsPerHost, shardingGeneration);
+		for (int hostIndex = 0; hostIndex < shardingHosts.size(); hostIndex++) {
+			for (int databaseIndex = 0; databaseIndex < shardingsPerHost; databaseIndex++) {
+				int instanceIndex = hostIndex * shardingsPerHost + databaseIndex;
+				String beanName = shardingNamePrefix + (instanceIndex + 1);
+				String databaseName = beanName;
+				if (shardingsPerHost == 1 && shardingGeneration <= 1)
+					databaseName = shardingNamePrefix;
+				String host = shardingHosts.get(seq.indexOf(instanceIndex) / shardingsPerHost);
+				String jdbcUrl = buildJdbcUrl(host, databaseName, databaseIndex);
+				map.put(beanName, jdbcUrl);
+			}
+		}
+		return map;
 	}
 
-	public int getShardingsPerHost() {
-		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDINGS_PER_HOST, "4");
-		return Integer.valueOf(str);
-	}
-
-	public String getJdbcUrlFormat() {
-		return AppInfo.getApplicationContextProperties().getProperty(KEY_JDBC_URL_FORMAT,
-				"jdbc:mysql://%s/%s?autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&useSSL=false");
+	protected String buildJdbcUrl(String host, String databaseName, int databaseIndex) {
+		return String.format(jdbcUrlFormat, host, databaseName);
 	}
 
 	protected static List<String> parseHosts(String hosts) {
@@ -132,8 +182,32 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 		return new ArrayList<>(set);
 	}
 
-	public static void main(String[] args) {
-		System.out.println(String.format("this is a %s %s test", "A", "B"));
+	protected static List<Integer> seq(int shardingHosts, int shardingsPerHost, int shardingGeneration) {
+		if (shardingGeneration <= 1) {
+			List<Integer> seq = new ArrayList<>();
+			for (int i = 0; i < shardingHosts * shardingsPerHost; i++)
+				seq.add(i);
+			return seq;
+		} else {
+			if (shardingHosts % 2 != 0)
+				throw new IllegalArgumentException("hosts should be even number but is " + shardingHosts);
+			int lastShardingHosts = shardingHosts / 2;
+			int lastShardingsPerHost = shardingsPerHost * 2;
+			int lastShardingGeneration = shardingGeneration - 1;
+			List<Integer> lastSeq = seq(lastShardingHosts, lastShardingsPerHost, lastShardingGeneration);
+			List<Integer> seq = new ArrayList<>(lastSeq.size());
+			for (int i = 0; i < lastShardingHosts; i++) {
+				for (int j = 0; j < shardingsPerHost; j++) {
+					seq.add(lastSeq.get(i * lastShardingsPerHost) + j);
+				}
+			}
+			for (int i = 0; i < lastShardingHosts; i++) {
+				for (int j = shardingsPerHost; j < shardingsPerHost * 2; j++) {
+					seq.add(lastSeq.get(i * lastShardingsPerHost) + j);
+				}
+			}
+			return seq;
+		}
 	}
 
 }
