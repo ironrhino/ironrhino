@@ -3,7 +3,6 @@ package org.ironrhino.core.coordination.support;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.coordination.Membership;
 import org.ironrhino.core.util.AppInfo;
@@ -37,11 +36,6 @@ public class AppMembership {
 	@PostConstruct
 	public void init() throws Exception {
 		membership.join(group);
-	}
-
-	@PreDestroy
-	public void destroy() throws Exception {
-		membership.leave(group);
 	}
 
 }

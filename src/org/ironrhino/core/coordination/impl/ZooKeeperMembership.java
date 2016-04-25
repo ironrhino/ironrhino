@@ -2,13 +2,18 @@ package org.ironrhino.core.coordination.impl;
 
 import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PreDestroy;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
+import org.apache.curator.framework.recipes.leader.LeaderLatch.State;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.recipes.leader.Participant;
 import org.ironrhino.core.coordination.LeaderChangeListener;
@@ -69,7 +74,8 @@ public class ZooKeeperMembership implements Membership {
 				});
 			return newLatch;
 		});
-		latch.start();
+		if (latch.getState() != State.STARTED)
+			latch.start();
 	}
 
 	@Override
@@ -77,7 +83,8 @@ public class ZooKeeperMembership implements Membership {
 		LeaderLatch latch = latchs.remove(group);
 		if (latch == null)
 			throw new IllegalStateException("Please join group " + group + " first");
-		latch.close();
+		if (latch.getState() == State.STARTED)
+			latch.close();
 	}
 
 	@Override
@@ -106,6 +113,18 @@ public class ZooKeeperMembership implements Membership {
 		for (Participant p : participants)
 			list.add(p.getId());
 		return list;
+	}
+
+	@PreDestroy
+	public void destroy() {
+		for (Map.Entry<String, LeaderLatch> entry : latchs.entrySet()) {
+			if (entry.getValue().getState() == State.STARTED)
+				try {
+					entry.getValue().close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
 	}
 
 }
