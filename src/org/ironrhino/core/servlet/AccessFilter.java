@@ -149,11 +149,13 @@ public class AccessFilter implements Filter {
 				url.append('?').append(request.getQueryString());
 			MDC.put("url", " " + url.toString());
 			String s = request.getHeader("User-Agent");
-			if (s != null)
-				MDC.put("userAgent", " UserAgent:" + s);
+			if (s == null)
+				s = "";
+			MDC.put("userAgent", " UserAgent:" + s);
 			s = request.getHeader("Referer");
-			if (s != null)
-				MDC.put("referer", " Referer:" + s);
+			if (s == null)
+				s = "";
+			MDC.put("referer", " Referer:" + s);
 			s = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 			MDC.put("username", s != null ? " " + s : " ");
 			String sessionId = null;
