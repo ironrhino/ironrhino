@@ -1,0 +1,126 @@
+= 微服务
+
+== 概述
+在微服务架构的系统集群中, 包含了三方, 服务注册中心, 服务发布方, 服务消费方.
+服务注册中心有 `Redis` 和 `ZooKeeper` 两种实现, 作为bean注册在应用的spring容器里面.
+一个应用只能是某一个具体的服务发布方或者消费方, 但它可以同时是A服务的发布方和B服务的消费方.
+服务发布方只需要在服务接口类上标注一个注解, 容器会自动将服务发布到注册中心.
+服务消费方只需要引入服务的接口类和相关的领域模型类, 容器会自动从注册中心查找该服务并且注册Bean, 使用方法跟本地Bean没有两样.
+
+
+== 序列化
+Ironrhino的微服务采用的是RPC方式, 使用Spring自带的 `HttpInvoker`,它的序列化用的是JDK的序列化,
+Ironrhino扩展它增加了FST序列化支持, 可以在服务消费方的 `applicationContext.properties` 里面配置 `httpInvoker.useFstSerialization=true` 开启这个功能.
+采用FST序列化可以大大提升性能, 但是有一个比较大的弱点就是不支持不同版本的类的反序列化,
+在渐进式演化过程中, 通常会存在发布方和消费方的包版本不一致的情况, 这种情况下Ironrhino会检测到反序列化失败的自动切回JDK的序列化.
+*不管是用JDK序列化还是FST序列化, 领域模型类都需要实现 `java.io.Serializable` 并且带上 `serialVersionUID`.*
+
+== 依赖
+
+- 服务发布方需要添加 `ironrhino-remoting-common.jar` 和 `ironrhino-remoting-server.jar`
+- 服务消费方需要添加 `ironrhino-remoting-common.jar` 和 `ironrhino-remoting-client.jar`
+- 既是服务发布方也是消费方就都需要添加
+
+另外根据注册中心采用 `Redis` 还是 `ZooKeeper` 添加各自的依赖包, 另外有 `Jar包依赖` 文档里面有说明.
+注册中心采用哪种实现在 `服务实现选择` 文档里面有说明.
+
+== 发布服务示例
+下面的示例是一个定时关闭超期的订单例子
+
+[source,java]
+.EchoService.java
+----
+package com.demo.service;
+
+import org.ironrhino.core.remoting.Remoting;
+
+@Remoting
+public interface EchoService {
+
+	public String echo(String message);
+
+}
+
+----
+
+[source,java]
+.EchoServiceImpl.java
+----
+package com.demo.service;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class EchoServiceImpl implements EchoService {
+
+
+	@Override
+	public String echo(String message){
+		return "echo: "+message;
+	}
+
+}
+
+----
+将服务接口类和接口类依赖的相关领域模型类(本示例没有)打包给服务消费方使用,
+可以在服务发布方所在应用增加ant打包脚本
+
+[source,xml]
+.build.include.xml
+----
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+
+	<property name="dist.jar.name" value="demo-remoting-${version}.jar" />
+	<property name="dist.jar-sources.name" value="demo-remoting-${version}-sources.jar" />
+	<property name="dist.jar.includes" value="com/demo/domain/**,com/demo/enums/**,com/demo/service/*Service.*" />
+
+	<target name="pre-jar">
+		<delete file="${target.dir}/${dist.jar.name}" />
+		<delete file="${target.dir}/${dist.jar-sources.name}" />
+	</target>
+
+	<target name="post-jar">
+		<jar jarfile="${target.dir}/${dist.jar.name}" basedir="${classes.dir}" includes="${dist.jar.includes}">
+			<manifest>
+				<attribute name="Artifact-Version" value="${version}" />
+				<attribute name="Build-Timestamp" value="${timestamp}" />
+				<attribute name="Build-Revision" value="${revision}" />
+			</manifest>
+		</jar>
+		<jar jarfile="${target.dir}/${dist.jar-sources.name}" basedir="${src.dir}" includes="${dist.jar.includes}">
+			<manifest>
+				<attribute name="Artifact-Version" value="${version}" />
+				<attribute name="Build-Timestamp" value="${timestamp}" />
+				<attribute name="Build-Revision" value="${revision}" />
+			</manifest>
+		</jar>
+	</target>
+
+</project>
+----
+
+这样可以打一个叫 `demo-remoting.jar` 的包分发给服务消费方所在的应用.
+
+== 消费方示例
+引入服务发布方给的 `demo-remoting.jar`,
+如果消费方应用的 `app.basePackage` 包含了远程服务接口所在的包, 那么这个远程服务会自动注册,
+否则需要在 `applicationContext.properties` 增加 `remoting.import.basePackages=com.demo` .
+消费方对远程服务的使用跟本地服务使用没有两样, 可以从spring容器获取也可以使用注解依赖注入.
+
+[source,java]
+----
+
+@Autowired
+private EchoService echoService;
+
+public void test(){
+	System.out.println(echoService.echo("test"));
+}
+
+}
+----
+
+== 注意事项
+远程服务是在Servlet容器里面发布的, 端口默认使用的是8080, 因为没有办法自动发现容器的http端口, 如果不是用默认8080端口则需要指明系统属性 `port.http`
+比如 `java -Dport.http=8081 -jar target/ROOT.war` ( `war-standalone` 方式构建出来内嵌jetty的war包), 其他方式可以在jvm启动参数里面带上 `-Dport.http=8081`
