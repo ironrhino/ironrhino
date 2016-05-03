@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.UnhandledErrorListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class ZooKeeperConfiguration {
 	@Autowired(required = false)
 	private List<ConnectionStateListener> connectionStateListeners;
 
+	@Autowired(required = false)
+	private List<UnhandledErrorListener> unhandledErrorListeners;
+
 	@Primary
 	@Bean(initMethod = "start", destroyMethod = "close")
 	public CuratorFramework curatorFramework() {
@@ -47,6 +51,9 @@ public class ZooKeeperConfiguration {
 		if (connectionStateListeners != null)
 			for (ConnectionStateListener listener : connectionStateListeners)
 				curatorFramework.getConnectionStateListenable().addListener(listener);
+		if (unhandledErrorListeners != null)
+			for (UnhandledErrorListener listener : unhandledErrorListeners)
+				curatorFramework.getUnhandledErrorListenable().addListener(listener);
 		return defaultWatcher;
 	}
 
