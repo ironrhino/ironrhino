@@ -2,9 +2,13 @@ package org.ironrhino.core.zookeeper;
 
 import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 
+import java.util.List;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +28,9 @@ public class ZooKeeperConfiguration {
 	@Value("${zooKeeper.sessionTimeout:60000}")
 	private int sessionTimeout;
 
+	@Autowired(required = false)
+	private List<ConnectionStateListener> connectionStateListeners;
+
 	@Primary
 	@Bean(initMethod = "start", destroyMethod = "close")
 	public CuratorFramework curatorFramework() {
@@ -37,6 +44,9 @@ public class ZooKeeperConfiguration {
 	public DefaultWatcher defaultWatcher(CuratorFramework curatorFramework) {
 		DefaultWatcher defaultWatcher = new DefaultWatcher();
 		curatorFramework.getCuratorListenable().addListener(defaultWatcher);
+		if (connectionStateListeners != null)
+			for (ConnectionStateListener listener : connectionStateListeners)
+				curatorFramework.getConnectionStateListenable().addListener(listener);
 		return defaultWatcher;
 	}
 
