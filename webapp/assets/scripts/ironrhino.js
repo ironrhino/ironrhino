@@ -38097,7 +38097,7 @@ $(function() {
 				});
 		return this;
 	};
-
+	window._open = window.open;
 	window.open = function(url, options) {
 		if (typeof options == 'undefined' || typeof options == 'string') {
 			options = {
