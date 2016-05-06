@@ -16,7 +16,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-lang3-3.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.4.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-2.10.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-2.10.0.jar"/>
@@ -96,9 +96,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.5.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.1.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-4.0.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-web-4.0.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-4.1.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-4.1.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-web-4.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-tx-4.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-web-4.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webmvc-4.2.4.jar"/>
