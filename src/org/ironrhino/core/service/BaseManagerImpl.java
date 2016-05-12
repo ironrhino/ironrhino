@@ -389,7 +389,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			return c.list();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return new ArrayList<>();
+			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 
@@ -410,7 +410,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			return c.list();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return new ArrayList<>();
+			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 
@@ -604,7 +604,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			return root;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return null;
+			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 
@@ -670,7 +670,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			return callback.doInHibernate(sessionFactory.getCurrentSession());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return null;
+			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 
