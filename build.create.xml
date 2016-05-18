@@ -184,10 +184,9 @@
 						echo.setFile(file);
 						echo.setMessage('target/* test/classes/* webapp/WEB-INF/classes/* .gitignore .DS_Store');
 						echo.perform();
-					}			
-					print('*********************************\n');
-					print('created project ['+projectName+'] at '+new File(projectDir).getCanonicalPath()+' ,you can import this project into eclipse .\n');
-					print('*********************************\n');
+					}
+					print('\n');
+					print('created project ['+projectName+'] at ['+new File(projectDir).getCanonicalPath()+'], you can import this project into eclipse.\n');
 					]]>
 				</script>
 	</target>
