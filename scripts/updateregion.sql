@@ -39,3 +39,9 @@ drop table common_region_new;
 
 --rebuild search index;
 
+
+-- update fullId and level
+update common_region set fullId=concat(id,"."),level=1 where parentId is null;
+update common_region t join (select a.id,concat(b.fullId,a.id,".") as fullId,b.level+1 as level from common_region a join common_region b on a.parentId=b.id where b.level=1) c on t.id=c.id set t.fullId=c.fullId,t.level=c.level;
+update common_region t join (select a.id,concat(b.fullId,a.id,".") as fullId,b.level+1 as level from common_region a join common_region b on a.parentId=b.id where b.level=2) c on t.id=c.id set t.fullId=c.fullId,t.level=c.level;
+
