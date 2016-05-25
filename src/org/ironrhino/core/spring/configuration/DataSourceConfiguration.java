@@ -51,6 +51,9 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.initialSize:5}")
 	private int minConnectionsPerPartition;
 
+	@Value("${dataSource.connectionTimeoutInMs:30000}")
+	private int connectionTimeoutInMs;
+
 	@Value("${dataSource.idleConnectionTestPeriodInMinutes:10}")
 	private int idleConnectionTestPeriodInMinutes;
 
@@ -97,6 +100,7 @@ public class DataSourceConfiguration {
 		ds.setPassword(password);
 		ds.setMaxConnectionsPerPartition(maxConnectionsPerPartition);
 		ds.setMinConnectionsPerPartition(minConnectionsPerPartition);
+		ds.setConnectionTimeoutInMs(connectionTimeoutInMs);
 		ds.setIdleConnectionTestPeriodInMinutes(idleConnectionTestPeriodInMinutes);
 		ds.setIdleMaxAgeInMinutes(idleMaxAgeInMinutes);
 		ds.setMaxConnectionAgeInSeconds(maxConnectionAgeInSeconds);
@@ -124,6 +128,7 @@ public class DataSourceConfiguration {
 		ds.setPassword(password);
 		ds.setMaximumPoolSize(maxConnectionsPerPartition);
 		ds.setMinimumIdle(minConnectionsPerPartition);
+		ds.setConnectionTimeout(connectionTimeoutInMs);
 		ds.setIdleTimeout(idleMaxAgeInMinutes * 60 * 1000);
 		ds.setMaxLifetime(maxConnectionAgeInSeconds * 1000);
 		ds.setRegisterMbeans(!disableJMX);
