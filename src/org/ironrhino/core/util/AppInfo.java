@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.log4j.SimpleMergeStrategy;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -293,6 +294,12 @@ public class AppInfo {
 		}
 
 		// configure log4j2
+		StringBuilder configurationFiles = new StringBuilder("classpath:log4j2.xml");
+		if (AppInfo.class.getClassLoader().getResource("log4j2-app.xml") != null) {
+			configurationFiles.append(",classpath:log4j2-app.xml");
+			System.setProperty("log4j.mergeStrategy", SimpleMergeStrategy.class.getName());
+		}
+		System.setProperty("log4j.configurationFile", configurationFiles.toString());
 		System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
 		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
 			System.setProperty("AsyncLogger.RingBufferSize", "16384");

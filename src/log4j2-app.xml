@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<Configuration>
+
+	<Loggers>
+		<Logger name="org.springframework.core.io.support.PathMatchingResourcePatternResolver" level="WARN"/>
+		<Logger name="org.springframework.core.type.classreading.AnnotationAttributesReadingVisitor" level="WARN"/>
+		<Logger name="org.springframework.security" level="INFO"/>
+		<Logger name="org.hibernate.tool.hbm2ddl.TableMetadata" level="INFO"/>
+	</Loggers>
+
+</Configuration>
