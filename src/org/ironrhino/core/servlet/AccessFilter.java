@@ -35,7 +35,6 @@ import org.springframework.stereotype.Component;
 public class AccessFilter implements Filter {
 
 	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-Id";
-	public static final String MDC_KEY_SESSION_ID = "sessionId";
 	public static final String MDC_KEY_REQUEST_ID = "requestId";
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
@@ -161,10 +160,6 @@ public class AccessFilter implements Filter {
 			String sessionId = null;
 			if (httpSessionManager != null) {
 				sessionId = httpSessionManager.getSessionId(request);
-				if (sessionId != null) {
-					MDC.put("session", " session:" + sessionId);
-					MDC.put(MDC_KEY_SESSION_ID, sessionId);
-				}
 			}
 			String requestId = (String) request.getAttribute(MDC_KEY_REQUEST_ID);
 			if (requestId == null) {
