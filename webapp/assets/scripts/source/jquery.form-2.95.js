@@ -596,7 +596,7 @@ $.fn.ajaxSubmit = function(options) {
 			}
 			return (doc && doc.documentElement && doc.documentElement.nodeName != 'parsererror') ? doc : null;
 		};
-		var parseJSON = $.parseJSON || function(s) {
+		var parseJSON = JSON.parse || function(s) {
 			return window['eval']('(' + s + ')');
 		};
 
