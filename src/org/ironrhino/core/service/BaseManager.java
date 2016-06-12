@@ -10,7 +10,7 @@ import org.hibernate.criterion.Order;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.ResultPage;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateCallback;
 
 public interface BaseManager<T extends Persistable<?>> {
 
