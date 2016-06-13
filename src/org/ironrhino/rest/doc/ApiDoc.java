@@ -98,26 +98,40 @@ public class ApiDoc implements Serializable {
 			}
 		}
 
-		RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-		if (requestMapping != null) {
-			String murl = "";
-			String curl = "";
-			String[] values = requestMapping.value();
-			if (values.length > 0)
-				murl = values[0];
-			RequestMapping requestMappingWithClass = clazz.getAnnotation(RequestMapping.class);
-			if (requestMappingWithClass != null) {
-				values = requestMappingWithClass.value();
+		// process @RequestMapping @GetMapping ...
+		for (Annotation annotation : method.getAnnotations()) {
+			Class<?> clz = annotation.annotationType();
+			String simpleName = clz.getSimpleName();
+			if (clz.getPackage() == RequestMapping.class.getPackage() && simpleName.endsWith("Mapping")) {
+				String murl = "";
+				String curl = "";
+				String[] values = (String[]) clz.getDeclaredMethod("value").invoke(annotation);
+				if (values.length == 0)
+					values = (String[]) clz.getDeclaredMethod("path").invoke(annotation);
 				if (values.length > 0)
-					curl = values[0];
-			}
-			if (StringUtils.isNotBlank(murl) || StringUtils.isNotBlank(curl))
-				url = curl + murl;
-			RequestMethod[] rms = requestMapping.method();
-			if (rms.length > 0) {
-				methods = new String[rms.length];
-				for (int i = 0; i < rms.length; i++)
-					methods[i] = rms[i].name();
+					murl = values[0];
+				RequestMapping requestMappingWithClass = clazz.getAnnotation(RequestMapping.class);
+				if (requestMappingWithClass != null) {
+					values = requestMappingWithClass.value();
+					if (values.length > 0)
+						curl = values[0];
+				}
+				if (StringUtils.isNotBlank(murl) || StringUtils.isNotBlank(curl))
+					url = curl + murl;
+				String str = simpleName.substring(0, simpleName.length() - 7).toUpperCase();
+				if (str.equals("REQUEST")) {
+					RequestMethod[] rms = (RequestMethod[]) clz.getDeclaredMethod("method").invoke(annotation);
+					if (rms.length > 0) {
+						methods = new String[rms.length];
+						for (int i = 0; i < rms.length; i++)
+							methods[i] = rms[i].name();
+					}
+				} else {
+					methods = new String[] { str };
+				}
+				if (StringUtils.isBlank(this.name))
+					this.name = (String) clz.getDeclaredMethod("name").invoke(annotation);
+				break;
 			}
 		}
 
