@@ -173,7 +173,7 @@
 							+ '_portal-folded'];
 					document.location.reload();
 				} else if (arguments[1] == 'render') {
-					var layout = JSON.parse(arguments[2] || '[]');
+					var layout = $.parseJSON(arguments[2] || '[]');
 					var hidden = arguments[3];
 					hidden = hidden ? hidden.split(',') : [];
 					var folded = arguments[4];

@@ -560,7 +560,7 @@ Ajax = {
 			options.quiet = true;
 		if ((typeof data == 'string')
 				&& (data.indexOf('{') == 0 || data.indexOf('[') == 0))
-			data = JSON.parse(data);
+			data = $.parseJSON(data);
 		if (typeof data == 'string') {
 			var i = data.indexOf('<title>');
 			if (i >= 0 && data.indexOf('</title>') > 0) {

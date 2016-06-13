@@ -67,7 +67,7 @@
 			var value = t.val();
 			if (value) {
 				if (value.indexOf("[\"") == 0)
-					options.tagsItems = JSON.parse(value);
+					options.tagsItems = $.parseJSON(value);
 				else
 					options.tagsItems = value.split(',');
 			}
