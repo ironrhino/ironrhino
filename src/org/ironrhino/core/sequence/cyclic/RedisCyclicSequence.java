@@ -3,6 +3,7 @@ package org.ironrhino.core.sequence.cyclic;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,13 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	@Override
 	public String nextStringValue() {
-		long value = boundValueOperations.increment(1);
-		Date now = now();
+		List<Object> results = (List<Object>) stringRedisTemplate.executePipelined(connection -> {
+			connection.incr(boundValueOperations.getKey().getBytes());
+			connection.time();
+			return null;
+		});
+		long value = (Long) results.get(0);
+		Date now = new Date((Long) results.get(1));
 		final String stringValue = String.valueOf(value);
 		if (stringValue.length() == getPaddingLength() + getCycleType().getPattern().length()) {
 			Calendar cal = Calendar.getInstance();
