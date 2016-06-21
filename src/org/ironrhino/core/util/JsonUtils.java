@@ -139,8 +139,7 @@ public class JsonUtils {
 	}
 
 	public static <T> T fromJson(String json, Type type) throws JsonParseException, JsonMappingException, IOException {
-		return objectMapper.readValue(json,
-				objectMapper.getDeserializationConfig().getTypeFactory().constructType(type));
+		return objectMapper.readValue(json, objectMapper.getTypeFactory().constructType(type));
 	}
 
 	public static <T extends Enum<T>> String enumToJson(Class<T> clazz) {
