@@ -23,7 +23,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 
 	public BaseTreeControl() {
 		@SuppressWarnings("unchecked")
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
+		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass(), BaseTreeControl.class);
 		if (clazz == null)
 			throw new RuntimeException("generic class is required here");
 		entityClass = clazz;

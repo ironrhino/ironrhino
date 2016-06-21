@@ -1626,7 +1626,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	// need call once before view
 	protected Class<Persistable<?>> getEntityClass() {
 		if (entityClass == null)
-			entityClass = (Class<Persistable<?>>) ReflectionUtils.getGenericClass(getClass());
+			entityClass = (Class<Persistable<?>>) ReflectionUtils.getGenericClass(getClass(), EntityAction.class);
 		if (entityClass == null) {
 			ActionProxy proxy = ActionContext.getContext().getActionInvocation().getProxy();
 			String actionName = getEntityName();

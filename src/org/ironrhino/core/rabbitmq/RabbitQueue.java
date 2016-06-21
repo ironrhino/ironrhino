@@ -39,7 +39,7 @@ public abstract class RabbitQueue<T extends Serializable> implements Queue<T> {
 	}
 
 	public RabbitQueue() {
-		Class<?> clazz = ReflectionUtils.getGenericClass(getClass());
+		Class<?> clazz = ReflectionUtils.getGenericClass(getClass(), RabbitQueue.class);
 		if (clazz != null)
 			queueName = clazz.getName();
 	}

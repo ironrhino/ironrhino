@@ -61,11 +61,32 @@ public class ReflectionUtils {
 	}
 
 	public static Class<?> getGenericClass(Class<?> clazz) {
-		return getGenericClass(clazz, 0);
+		return getGenericClass(clazz, null, 0);
 	}
 
 	public static Class<?> getGenericClass(Class<?> clazz, int index) {
-		return getGenericClass(clazz.getGenericSuperclass(), index);
+		return getGenericClass(clazz, null, index);
+	}
+
+	public static Class<?> getGenericClass(Class<?> clazz, Class<?> genericContainerClass) {
+		return getGenericClass(clazz, genericContainerClass, 0);
+	}
+
+	public static Class<?> getGenericClass(Class<?> clazz, Class<?> genericContainerClass, int index) {
+		Type t = clazz.getGenericSuperclass();
+		while (t != null) {
+			if (t instanceof ParameterizedType) {
+				ParameterizedType paramType = (ParameterizedType) t;
+				if (genericContainerClass == null || genericContainerClass == paramType.getRawType()) {
+					return getGenericClass(paramType, index);
+				} else {
+					t = paramType.getRawType();
+				}
+			} else if (t instanceof Class) {
+				t = ((Class<?>) t).getGenericSuperclass();
+			}
+		}
+		return null;
 	}
 
 	public static Class<?> getGenericClass(Type genType, int index) {

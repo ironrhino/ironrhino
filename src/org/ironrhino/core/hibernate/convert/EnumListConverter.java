@@ -17,7 +17,7 @@ public abstract class EnumListConverter<T extends Enum<T>> implements AttributeC
 
 	@SuppressWarnings("unchecked")
 	public EnumListConverter() {
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
+		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass(), EnumListConverter.class);
 		if (clazz != null)
 			enumType = clazz;
 	}

@@ -48,7 +48,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	}
 
 	public RedisTopic() {
-		Class<?> clazz = ReflectionUtils.getGenericClass(getClass());
+		Class<?> clazz = ReflectionUtils.getGenericClass(getClass(), RedisTopic.class);
 		channelName = clazz.getName();
 	}
 
@@ -69,7 +69,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 				if (!(e.getCause() instanceof ClassNotFoundException))
 					throw e;
 			}
-		} , Arrays.asList(globalTopic, applicationTopic));
+		}, Arrays.asList(globalTopic, applicationTopic));
 	}
 
 	protected String getChannelName(Scope scope) {

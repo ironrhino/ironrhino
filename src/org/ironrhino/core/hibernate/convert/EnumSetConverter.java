@@ -19,7 +19,7 @@ public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeCo
 
 	@SuppressWarnings("unchecked")
 	public EnumSetConverter() {
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
+		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass(), EnumSetConverter.class);
 		if (clazz != null)
 			enumType = clazz;
 	}

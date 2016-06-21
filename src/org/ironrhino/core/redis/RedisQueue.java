@@ -50,7 +50,7 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 	protected BlockingDeque<T> queue;
 
 	public RedisQueue() {
-		Class<?> clazz = ReflectionUtils.getGenericClass(getClass());
+		Class<?> clazz = ReflectionUtils.getGenericClass(getClass(), RedisQueue.class);
 		queueName = clazz.getName();
 	}
 

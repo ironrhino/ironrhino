@@ -42,7 +42,7 @@ public abstract class RabbitTopic<T extends Serializable> implements Topic<T> {
 	}
 
 	public RabbitTopic() {
-		Class<?> clazz = ReflectionUtils.getGenericClass(getClass());
+		Class<?> clazz = ReflectionUtils.getGenericClass(getClass(), RabbitTopic.class);
 		if (clazz != null)
 			routingKey = clazz.getName();
 	}
