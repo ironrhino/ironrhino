@@ -17,12 +17,10 @@ import org.ironrhino.core.util.JsonUtils;
 
 public abstract class JsonConverter<T> implements AttributeConverter<T, String> {
 
-	private ParameterizedType type;
+	private Type type;
 
 	public JsonConverter() {
-		ParameterizedType pramType = (ParameterizedType) getClass().getGenericSuperclass();
-		Type[] params = pramType.getActualTypeArguments();
-		type = (ParameterizedType) params[0];
+		type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
 	@Override
@@ -41,13 +39,17 @@ public abstract class JsonConverter<T> implements AttributeConverter<T, String> 
 		if (string == null)
 			return null;
 		if (StringUtils.isEmpty(string)) {
-			if (List.class.isAssignableFrom((Class<?>) type.getRawType())) {
-				return (T) new ArrayList<>();
-			} else if (Set.class.isAssignableFrom((Class<?>) type.getRawType())) {
-				return (T) new LinkedHashSet<>();
-			} else if (Map.class.isAssignableFrom((Class<?>) type.getRawType())) {
-				return (T) new LinkedHashMap<>();
+			if (type instanceof ParameterizedType) {
+				ParameterizedType pt = (ParameterizedType) type;
+				if (List.class.isAssignableFrom((Class<?>) pt.getRawType())) {
+					return (T) new ArrayList<>();
+				} else if (Set.class.isAssignableFrom((Class<?>) pt.getRawType())) {
+					return (T) new LinkedHashSet<>();
+				} else if (Map.class.isAssignableFrom((Class<?>) pt.getRawType())) {
+					return (T) new LinkedHashMap<>();
+				}
 			}
+			return null;
 		}
 		try {
 			return (T) JsonUtils.fromJson(string, type);
