@@ -66,8 +66,8 @@
 					</table>
 				</td>
 				<td><@s.select theme="simple" name="schema.fields[${index}].type" class="linkage_switch" style="width:80px;" list="@org.ironrhino.common.model.SchemaFieldType@values()" listKey="name" listValue="displayName"/></td>
-				<td><span class="showonadd linkage_component SELECT INPUT"><@s.checkbox theme="simple" name="schema.fields[${index}].required" class="custom"/></span></td>
-				<td><span class="showonadd linkage_component SELECT"><@s.checkbox theme="simple" name="schema.fields[${index}].strict" class="custom"/></span></td>
+				<td><span class="showonadd linkage_component SELECT INPUT"><@s.checkbox theme="simple" name="schema.fields[${index}].required"/></span></td>
+				<td><span class="showonadd linkage_component SELECT"><@s.checkbox theme="simple" name="schema.fields[${index}].strict"/></span></td>
 				<td class="manipulate"></td>
 			</tr>
 			</#list>
