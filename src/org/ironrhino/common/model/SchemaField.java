@@ -68,18 +68,4 @@ public class SchemaField implements Serializable {
 		this.strict = strict;
 	}
 
-	@Override
-	public int hashCode() {
-		return name != null ? name.hashCode() : 0;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof SchemaField) {
-			SchemaField that = (SchemaField) o;
-			return that.getName() != null && that.getName().equals(this.getName());
-		}
-		return false;
-	}
-
 }
