@@ -117,7 +117,7 @@
 				var image = false;
 				var index = uri.lastIndexOf('.');
 				if (index > 0) {
-					var suffix = uri.substring(index + 1);
+					var suffix = uri.substring(index + 1).toLowerCase();
 					image = suffix == 'jpg' || suffix == 'png'
 							|| suffix == 'gif' || suffix == 'bmp'
 							|| suffix == 'webp';

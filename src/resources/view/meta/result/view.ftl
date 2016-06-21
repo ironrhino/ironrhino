@@ -293,8 +293,9 @@
 	<#list entity.attachments as attachment>
 		<#assign filename=attachment?keep_after_last('/') />
 		<#assign url=attachment?keep_before_last('/')+'/'+filename?url />
+		<#assign att=attachment?lower_case />
 		<a href="${url}" target="_blank">
-		<#if attachment?ends_with('jpg')||attachment?ends_with('png')||attachment?ends_with('gif')||attachment?ends_with('bmp')||attachment?ends_with('webp')>
+		<#if att?ends_with('jpg')||att?ends_with('png')||att?ends_with('gif')||att?ends_with('bmp')||att?ends_with('webp')>
 		<img style="display:block;" src="${url}"/>
 		<#else>
 		<div>${filename}</div>
