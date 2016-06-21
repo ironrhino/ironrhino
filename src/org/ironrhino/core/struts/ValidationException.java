@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.elasticsearch.common.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.opensymphony.xwork2.ValidationAwareSupport;
 
