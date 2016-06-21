@@ -1,7 +1,6 @@
 package org.ironrhino.core.hibernate.convert;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.AttributeConverter;
@@ -26,6 +25,8 @@ public abstract class EnumListConverter<T extends Enum<T>> implements AttributeC
 	public String convertToDatabaseColumn(List<T> list) {
 		if (list == null)
 			return null;
+		if (list.isEmpty())
+			return "";
 		List<String> names = new ArrayList<>();
 		for (Enum<?> en : list)
 			names.add(en.name());
@@ -37,7 +38,7 @@ public abstract class EnumListConverter<T extends Enum<T>> implements AttributeC
 		if (string == null)
 			return null;
 		if (StringUtils.isBlank(string))
-			return Collections.emptyList();
+			return new ArrayList<>();
 		String[] names = string.split(SEPARATOR);
 		List<T> list = new ArrayList<>();
 		for (String name : names)

@@ -1,7 +1,6 @@
 package org.ironrhino.core.hibernate.convert;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +27,8 @@ public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeCo
 	public String convertToDatabaseColumn(Set<T> set) {
 		if (set == null)
 			return null;
+		if (set.isEmpty())
+			return "";
 		List<String> names = new ArrayList<>();
 		for (Enum<?> en : set)
 			names.add(en.name());
@@ -39,7 +40,7 @@ public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeCo
 		if (string == null)
 			return null;
 		if (StringUtils.isBlank(string))
-			return Collections.emptySet();
+			return new LinkedHashSet<>();
 		String[] names = string.split(SEPARATOR);
 		Set<T> set = new LinkedHashSet<>();
 		for (String name : names)

@@ -18,6 +18,8 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
 	public String convertToDatabaseColumn(List<String> list) {
 		if (list == null)
 			return null;
+		if (list.isEmpty())
+			return "";
 		return StringUtils.join(list.iterator(), SEPARATOR);
 	}
 

@@ -18,6 +18,8 @@ public class StringSetConverter implements AttributeConverter<Set<String>, Strin
 	public String convertToDatabaseColumn(Set<String> set) {
 		if (set == null)
 			return null;
+		if(set.isEmpty())
+			return "";
 		return StringUtils.join(set.iterator(), SEPARATOR);
 	}
 
