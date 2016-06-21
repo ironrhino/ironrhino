@@ -9,7 +9,7 @@ import javax.persistence.Converter;
 
 import org.apache.commons.lang3.StringUtils;
 
-@Converter
+@Converter(autoApply = true)
 public class StringListConverter implements AttributeConverter<List<String>, String> {
 
 	public static final String SEPARATOR = ",";

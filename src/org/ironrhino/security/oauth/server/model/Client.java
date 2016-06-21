@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -14,7 +13,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
-import org.ironrhino.core.hibernate.convert.StringListConverter;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
@@ -72,7 +70,6 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@CreationTimestamp
 	private Date createDate;
 
-	@Convert(converter = StringListConverter.class)
 	private List<String> attachments = new ArrayList<>(0);
 
 	@Override

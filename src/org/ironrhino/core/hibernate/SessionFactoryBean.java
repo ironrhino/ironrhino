@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import javax.persistence.Entity;
 
 import org.apache.commons.lang3.StringUtils;
@@ -98,11 +100,23 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		super.afterPropertiesSet();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected SessionFactory buildSessionFactory(LocalSessionFactoryBuilder sfb) {
 		if (standardServiceInitiators != null)
 			for (StandardServiceInitiator<?> s : standardServiceInitiators)
 				sfb.getStandardServiceRegistryBuilder().addInitiator(s);
+		Collection<Class<?>> converters = ClassScanner.scanAssignable(ClassScanner.getAppPackages(),
+				AttributeConverter.class);
+		logger.info("annotatedConverters: ");
+		for (Class<?> clz : converters) {
+			Converter c = clz.getAnnotation(Converter.class);
+			if (c != null && c.autoApply()) {
+				sfb.addAttributeConverter((Class<AttributeConverter<?, ?>>) clz);
+				logger.info(clz.getName());
+			}
+
+		}
 		return sfb.buildSessionFactory();
 	}
 }

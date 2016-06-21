@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.ironrhino.core.aop.PublishAware;
-import org.ironrhino.core.hibernate.convert.AttributeListConverter;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
@@ -36,7 +34,6 @@ public class TreeNode extends BaseTreeableEntity<TreeNode> implements Attributab
 
 	@NotInCopy
 	@Column(length = 4000)
-	@Convert(converter = AttributeListConverter.class)
 	@UiConfig(hiddenInList = @Hidden(true) )
 	private List<Attribute> attributes = new ArrayList<>();
 

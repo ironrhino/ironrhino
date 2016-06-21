@@ -11,7 +11,6 @@ import java.util.Set;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -19,7 +18,6 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
-import org.ironrhino.core.hibernate.convert.StringMapConverter;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
@@ -112,7 +110,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	@NotInCopy
 	@JsonIgnore
 	@Column(length = 4000)
-	@Convert(converter = StringMapConverter.class)
 	@UiConfig(hidden = true)
 	private Map<String, String> attributes;
 

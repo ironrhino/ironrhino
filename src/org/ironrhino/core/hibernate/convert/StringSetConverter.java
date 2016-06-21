@@ -9,7 +9,7 @@ import javax.persistence.Converter;
 
 import org.apache.commons.lang3.StringUtils;
 
-@Converter
+@Converter(autoApply = true)
 public class StringSetConverter implements AttributeConverter<Set<String>, String> {
 
 	public static final String SEPARATOR = ",";
@@ -18,7 +18,7 @@ public class StringSetConverter implements AttributeConverter<Set<String>, Strin
 	public String convertToDatabaseColumn(Set<String> set) {
 		if (set == null)
 			return null;
-		if(set.isEmpty())
+		if (set.isEmpty())
 			return "";
 		return StringUtils.join(set.iterator(), SEPARATOR);
 	}

@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Attribute;
 import org.ironrhino.core.util.JsonUtils;
 
-@Converter
+@Converter(autoApply = true)
 public class AttributeListConverter implements AttributeConverter<List<Attribute>, String> {
 
 	@Override
