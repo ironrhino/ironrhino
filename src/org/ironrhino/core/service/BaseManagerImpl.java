@@ -655,12 +655,20 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Transactional
 	public int executeUpdate(String queryString, Object... values) {
 		Query queryObject = sessionFactory.getCurrentSession().createQuery(queryString);
-		if (values != null) {
-			for (int i = 0; i < values.length; i++) {
-				queryObject.setParameter(String.valueOf(i + 1), values[i]);
-			}
+		for (int i = 0; i < values.length; i++) {
+			queryObject.setParameter(String.valueOf(i + 1), values[i]);
 		}
 		return queryObject.executeUpdate();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<T> executeQuery(String queryString, Object... values) {
+		Query queryObject = sessionFactory.getCurrentSession().createQuery(queryString);
+		for (int i = 0; i < values.length; i++) {
+			queryObject.setParameter(String.valueOf(i + 1), values[i]);
+		}
+		return queryObject.list();
 	}
 
 	@Override
