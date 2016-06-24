@@ -43,7 +43,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	@Override
 	public String nextStringValue() {
-		List<Object> results = (List<Object>) stringRedisTemplate.executePipelined(connection -> {
+		List<Object> results = (List<Object>) stringRedisTemplate.executePipelined((RedisConnection connection) -> {
 			connection.incr(boundValueOperations.getKey().getBytes());
 			connection.time();
 			return null;
