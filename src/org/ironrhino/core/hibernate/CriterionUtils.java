@@ -90,15 +90,29 @@ public class CriterionUtils {
 	public static Criterion matchTag(String tagFieldName, String tag) {
 		tag = tag.trim();
 		if (DATABASE_PRODUCT == DatabaseProduct.MYSQL) {
-			if (tagFieldName.endsWith("AsString"))
-				tagFieldName = tagFieldName.substring(0, tagFieldName.length() - 8);
-			return Restrictions.sqlRestriction("find_in_set(?," + tagFieldName + ")>0", tag, StringType.INSTANCE);
+			return Restrictions.sqlRestriction("find_in_set(?," + getActualColumnName(tagFieldName) + ")", tag,
+					StringType.INSTANCE);
+		} else if (DATABASE_PRODUCT == DatabaseProduct.POSTGRESQL) {
+			return Restrictions.sqlRestriction("?=any(string_to_array(" + getActualColumnName(tagFieldName) + ",','))",
+					tag, StringType.INSTANCE);
+		} else if (DATABASE_PRODUCT == DatabaseProduct.ORACLE) {
+			return Restrictions.sqlRestriction("','||" + getActualColumnName(tagFieldName) + "||',' like ?",
+					"%," + tag + ",%", StringType.INSTANCE);
+		} else if (DATABASE_PRODUCT == DatabaseProduct.SQLSERVER || DATABASE_PRODUCT == DatabaseProduct.SYBASE) {
+			return Restrictions.sqlRestriction("(','+" + getActualColumnName(tagFieldName) + "+',') like ?",
+					"%," + tag + ",%", StringType.INSTANCE);
 		}
 		return Restrictions.or(Restrictions.eq(tagFieldName, tag),
 				Restrictions.or(Restrictions.like(tagFieldName, tag + ",", MatchMode.START),
 						Restrictions.or(Restrictions.like(tagFieldName, "," + tag, MatchMode.END),
 								Restrictions.like(tagFieldName, "," + tag + ",", MatchMode.ANYWHERE))));
 
+	}
+
+	private static String getActualColumnName(String propertyName) {
+		if (propertyName.endsWith("AsString"))
+			return propertyName.substring(0, propertyName.length() - 8);
+		return propertyName;
 	}
 
 	public static CriteriaState filter(DetachedCriteria dc, Class<? extends Persistable<?>> entityClass) {
