@@ -22,7 +22,7 @@
 		</RollingFile>
 		<RollingFile name="HIBERNATE" fileName="${sys:app.home}/logs/${sys:port.http}/hibernate.log" filePattern="${sys:app.home}/logs/${sys:port.http}/hibernate.log.%d{yyyy-MM-dd}">
 			<ThresholdFilter level="ALL"/>
-			<PatternLayout pattern="%d %c %p %m%n" charset="UTF-8"/>
+			<PatternLayout pattern="%d %c %t%X{request}%X{url} %p %m%n" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="REMOTING" fileName="${sys:app.home}/logs/${sys:port.http}/remoting.log" filePattern="${sys:app.home}/logs/${sys:port.http}/remoting.log.%d{yyyy-MM-dd}">
