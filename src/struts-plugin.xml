@@ -36,8 +36,6 @@
 				class="org.ironrhino.core.struts.result.QRCodeResult" />
 		</result-types>
 		<interceptors>
-			<interceptor name="params"
-				class="org.ironrhino.core.struts.ParamsInterceptor" />
 			<interceptor name="exception"
 				class="org.ironrhino.core.struts.ExceptionInterceptor" />
 			<interceptor name="annotationWorkflow"
