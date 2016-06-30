@@ -19,44 +19,49 @@
  * under the License.
  */
 
-package org.apache.struts2.views.jasperreports;
+package org.ironrhino.core.struts.result;
 
-import com.opensymphony.xwork2.ActionInvocation;
-import com.opensymphony.xwork2.util.ValueStack;
-import com.opensymphony.xwork2.util.logging.Logger;
-import com.opensymphony.xwork2.util.logging.LoggerFactory;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRExporter;
-import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JRParameter;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.export.JRCsvExporter;
-import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
-import net.sf.jasperreports.engine.export.JRRtfExporter;
-import net.sf.jasperreports.engine.export.JRXlsExporter;
-import net.sf.jasperreports.engine.export.JRXmlExporter;
-import net.sf.jasperreports.engine.util.JRLoader;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.ServletActionContext;
-import org.apache.struts2.dispatcher.StrutsResultSupport;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.Map;
+import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.dispatcher.StrutsResultSupport;
+import org.apache.struts2.views.jasperreports.JasperReportConstants;
+import org.apache.struts2.views.jasperreports.ValueStackDataSource;
+import org.apache.struts2.views.jasperreports.ValueStackShadowMap;
+
+import com.opensymphony.xwork2.ActionInvocation;
+import com.opensymphony.xwork2.util.ValueStack;
+import com.opensymphony.xwork2.util.logging.Logger;
+import com.opensymphony.xwork2.util.logging.LoggerFactory;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.export.HtmlExporter;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.JRRtfExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXmlExporter;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.export.Exporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 
 /**
  * <!-- START SNIPPET: description -->
@@ -142,7 +147,7 @@ import java.util.TimeZone;
  * &lt;/result&gt;
  * <!-- END SNIPPET: example2 --></pre>
  */
-@SuppressWarnings({"rawtypes","unchecked","deprecation"})
+@SuppressWarnings({"rawtypes","unchecked"})
 public class JasperReportsResult extends StrutsResultSupport implements JasperReportConstants {
 
     private static final long serialVersionUID = -2523174799621182907L;
@@ -153,8 +158,6 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
     protected String format;
     protected String documentName;
     protected String contentDisposition;
-    protected String delimiter;
-    protected String imageServletUrl = "/images/";
     protected String timeZone;
     protected boolean wrapField = true;
 
@@ -192,13 +195,6 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
         super(location);
     }
 
-    public String getImageServletUrl() {
-        return imageServletUrl;
-    }
-
-    public void setImageServletUrl(final String imageServletUrl) {
-        this.imageServletUrl = imageServletUrl;
-    }
 
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
@@ -214,10 +210,6 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
 
     public void setContentDisposition(String contentDisposition) {
         this.contentDisposition = contentDisposition;
-    }
-
-    public void setDelimiter(String delimiter) {
-        this.delimiter = delimiter;
     }
 
     /**
@@ -358,7 +350,7 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
                 response.setHeader("Content-disposition", tmp.toString());
             }
 
-            JRExporter exporter;
+            Exporter exporter;
 
             if (format.equals(FORMAT_PDF)) {
                 response.setContentType("application/pdf");
@@ -367,20 +359,8 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
                 response.setContentType("text/csv");
                 exporter = new JRCsvExporter();
             } else if (format.equals(FORMAT_HTML)) {
-                response.setContentType("text/html");
-
-                // IMAGES_MAPS seems to be only supported as "backward compatible" from JasperReports 1.1.0
-
-                Map imagesMap = new HashMap();
-                request.getSession(true).setAttribute("IMAGES_MAP", imagesMap);
-
-                exporter = new JRHtmlExporter();
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, imagesMap);
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, request.getContextPath() + imageServletUrl);
-
-                // Needed to support chart images:
-                exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-                request.getSession().setAttribute("net.sf.jasperreports.j2ee.jasper_print", jasperPrint);
+            	//response.setContentType("text/html");
+                exporter = new HtmlExporter();
             } else if (format.equals(FORMAT_XLS)) {
                 response.setContentType("application/vnd.ms-excel");
                 exporter = new JRXlsExporter();
@@ -394,12 +374,13 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
                 throw new ServletException("Unknown report format: " + format);
             }
 
-            Map exportParams = (Map) stack.findValue(exportParameters);
+            Map<String,Object> exportParams = (Map) stack.findValue(exportParameters);
             if (exportParams != null) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Found export parameters; adding to exporter parameters...", new Object[0]);
                 }
-                exporter.getParameters().putAll(exportParams);
+                for(Map.Entry<String,Object> entry : exportParams.entrySet())
+                exporter.getReportContext().setParameterValue(entry.getKey(), entry.getValue());
             }
 
             output = exportReportToBytes(jasperPrint, exporter);
@@ -484,15 +465,16 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
      * @throws net.sf.jasperreports.engine.JRException
      *          If there is a problem running the report
      */
-    private byte[] exportReportToBytes(JasperPrint jasperPrint, JRExporter exporter) throws JRException {
+    private byte[] exportReportToBytes(JasperPrint jasperPrint, Exporter exporter) throws JRException {
         byte[] output;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-        exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
-        if (delimiter != null) {
-            exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, delimiter);
-        }
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        if(exporter instanceof HtmlExporter)
+        	exporter.setExporterOutput(new SimpleHtmlExporterOutput(baos));
+        else
+        	exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
+        
 
         exporter.exportReport();
 

@@ -29,7 +29,7 @@
 			<result-type name="referer"
 				class="org.ironrhino.core.struts.result.RefererResult" />
 			<result-type name="jasperreports"
-				class="org.apache.struts2.views.jasperreports.JasperReportsResult" />
+				class="org.ironrhino.core.struts.result.JasperReportsResult" />
 			<result-type name="dynamicreports"
 				class="org.ironrhino.core.struts.result.DynamicReportsResult" />
 			<result-type name="qrcode"
