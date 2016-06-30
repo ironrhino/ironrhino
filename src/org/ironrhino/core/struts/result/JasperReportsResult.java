@@ -21,7 +21,6 @@
 
 package org.ironrhino.core.struts.result;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -62,6 +61,7 @@ import net.sf.jasperreports.export.Exporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimpleWriterExporterOutput;
 
 /**
  * <!-- START SNIPPET: description -->
@@ -312,7 +312,6 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
             parameters.putAll(reportParams);
         }
 
-        byte[] output;
         JasperPrint jasperPrint;
 
         // Fill the report and produce a print object
@@ -351,25 +350,30 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
             }
 
             Exporter exporter;
-
-            if (format.equals(FORMAT_PDF)) {
+            if (format.equalsIgnoreCase(FORMAT_PDF)) {
                 response.setContentType("application/pdf");
                 exporter = new JRPdfExporter();
-            } else if (format.equals(FORMAT_CSV)) {
-                response.setContentType("text/csv");
-                exporter = new JRCsvExporter();
-            } else if (format.equals(FORMAT_HTML)) {
-            	//response.setContentType("text/html");
-                exporter = new HtmlExporter();
-            } else if (format.equals(FORMAT_XLS)) {
+                exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
+            } else if (format.equalsIgnoreCase(FORMAT_XLS)) {
                 response.setContentType("application/vnd.ms-excel");
                 exporter = new JRXlsExporter();
-            } else if (format.equals(FORMAT_XML)) {
+                exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
+            } else if (format.equalsIgnoreCase(FORMAT_HTML)) {
+            	response.setContentType("text/html");
+                exporter = new HtmlExporter();
+                exporter.setExporterOutput(new SimpleHtmlExporterOutput(response.getWriter()));
+            } else if (format.equalsIgnoreCase(FORMAT_CSV)) {
+                response.setContentType("text/csv");
+                exporter = new JRCsvExporter();
+                exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getWriter()));
+            } else if (format.equalsIgnoreCase(FORMAT_XML)) {
                 response.setContentType("text/xml");
                 exporter = new JRXmlExporter();
-            } else if (format.equals(FORMAT_RTF)) {
+                exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getWriter()));
+            } else if (format.equalsIgnoreCase(FORMAT_RTF)) {
                 response.setContentType("application/rtf");
                 exporter = new JRRtfExporter();
+                exporter.setExporterOutput(new SimpleWriterExporterOutput(response.getWriter()));
             } else {
                 throw new ServletException("Unknown report format: " + format);
             }
@@ -382,47 +386,19 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
                 for(Map.Entry<String,Object> entry : exportParams.entrySet())
                 exporter.getReportContext().setParameterValue(entry.getKey(), entry.getValue());
             }
-
-            output = exportReportToBytes(jasperPrint, exporter);
+            exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+            exporter.exportReport();
         } catch (JRException e) {
             String message = "Error producing " + format + " report for uri " + systemId;
             LOG.error(message, e);
             throw new ServletException(e.getMessage(), e);
         }
 
-        response.setContentLength(output.length);
 
-        // Will throw ServletException on IOException.
-        writeReport(response, output);
+       
     }
 
-    /**
-     * Writes report bytes to response output stream.
-     *
-     * @param response Current response.
-     * @param output   Report bytes to write.
-     * @throws ServletException on stream IOException.
-     */
-    private void writeReport(HttpServletResponse response, byte[] output) throws ServletException {
-        ServletOutputStream outputStream = null;
-        try {
-            outputStream = response.getOutputStream();
-            outputStream.write(output);
-            outputStream.flush();
-        } catch (IOException e) {
-            LOG.error("Error writing report output", e);
-            throw new ServletException(e.getMessage(), e);
-        } finally {
-            try {
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            } catch (IOException e) {
-                LOG.error("Error closing report output stream", e);
-                throw new ServletException(e.getMessage(), e);
-            }
-        }
-    }
+    
 
     /**
      * Sets up result properties, parsing etc.
@@ -456,31 +432,5 @@ public class JasperReportsResult extends StrutsResultSupport implements JasperRe
         exportParameters = conditionalParse(exportParameters, invocation);
     }
 
-    /**
-     * Run a Jasper report to CSV format and put the results in a byte array
-     *
-     * @param jasperPrint The Print object to render as CSV
-     * @param exporter    The exporter to use to export the report
-     * @return A CSV formatted report
-     * @throws net.sf.jasperreports.engine.JRException
-     *          If there is a problem running the report
-     */
-    private byte[] exportReportToBytes(JasperPrint jasperPrint, Exporter exporter) throws JRException {
-        byte[] output;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-        if(exporter instanceof HtmlExporter)
-        	exporter.setExporterOutput(new SimpleHtmlExporterOutput(baos));
-        else
-        	exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
-        
-
-        exporter.exportReport();
-
-        output = baos.toByteArray();
-
-        return output;
-    }
-
+   
 }
