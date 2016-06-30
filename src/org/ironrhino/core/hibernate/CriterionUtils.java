@@ -89,10 +89,12 @@ public class CriterionUtils {
 
 	public static Criterion matchTag(String tagFieldName, String tag) {
 		tag = tag.trim();
-		if (DATABASE_PRODUCT == DatabaseProduct.MYSQL) {
-			if (tagFieldName.endsWith("AsString"))
-				tagFieldName = tagFieldName.substring(0, tagFieldName.length() - 8);
-			return Restrictions.sqlRestriction("find_in_set(?," + tagFieldName + ")>0", tag, StringType.INSTANCE);
+		if (tagFieldName.indexOf('.') < 0) {
+			if (DATABASE_PRODUCT == DatabaseProduct.MYSQL) {
+				if (tagFieldName.endsWith("AsString"))
+					tagFieldName = tagFieldName.substring(0, tagFieldName.length() - 8);
+				return Restrictions.sqlRestriction("find_in_set(?," + tagFieldName + ")>0", tag, StringType.INSTANCE);
+			}
 		}
 		return Restrictions.or(Restrictions.eq(tagFieldName, tag),
 				Restrictions.or(Restrictions.like(tagFieldName, tag + ",", MatchMode.START),
