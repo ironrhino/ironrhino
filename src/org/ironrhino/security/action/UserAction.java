@@ -120,7 +120,7 @@ public class UserAction extends EntityAction<User> {
 	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {
 		String role = ServletActionContext.getRequest().getParameter("role");
 		if (StringUtils.isNotBlank(role))
-			dc.add(CriterionUtils.matchTag("rolesAsString", role));
+			dc.add(CriterionUtils.matchTag("roles", role));
 	}
 
 	@Override

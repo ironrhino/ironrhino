@@ -173,7 +173,7 @@ public class EntityClassHelper {
 						uci.setExcludedFromOrdering(true);
 						if (StringUtils.isBlank(uci.getTemplate()))
 							uci.setTemplate(
-									"<#list value as var><span class=\"label\">${var}</span><#if var_has_next> </#if></#list>");
+									"<#if value?has_content><#list value as var><span class=\"label\">${var}</span><#if var_has_next> </#if></#list></#if>");
 					}
 					if (pd.getWriteMethod() == null)
 						uci.setExcludedFromCriteria(true);
