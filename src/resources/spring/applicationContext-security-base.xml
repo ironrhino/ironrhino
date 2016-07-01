@@ -34,7 +34,6 @@
 
 	<bean id="authenticationFilter"
 		class="org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter"
-		p:usernameParameter="username" p:passwordParameter="password"
 		p:filterProcessesUrl="/check" p:authenticationManager-ref="authenticationManager"
 		p:rememberMeServices-ref="rememberMeServices">
 	</bean>

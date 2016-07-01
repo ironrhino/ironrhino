@@ -23,6 +23,7 @@ import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -52,6 +53,9 @@ public class LoginAction extends BaseAction {
 	protected String password;
 
 	protected String username;
+	
+	@Value("${login.defaultTargetUrl:/}")
+	protected String defaultTargetUrl;
 
 	@Autowired
 	protected transient UserDetailsService userDetailsService;
@@ -141,7 +145,7 @@ public class LoginAction extends BaseAction {
 				logger.error(e.getMessage(), e);
 			}
 		if (StringUtils.isBlank(targetUrl))
-			targetUrl = "/";
+			targetUrl = defaultTargetUrl;
 		return SUCCESS;
 	}
 
