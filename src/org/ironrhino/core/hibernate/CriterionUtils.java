@@ -90,28 +90,19 @@ public class CriterionUtils {
 	public static Criterion matchTag(String tagFieldName, String tag) {
 		tag = tag.trim();
 		if (tagFieldName.indexOf('.') < 0) {
-			if (DATABASE_PRODUCT == DatabaseProduct.MYSQL) {
-				if (tagFieldName.endsWith("AsString"))
-					tagFieldName = tagFieldName.substring(0, tagFieldName.length() - 8);
+			if (DATABASE_PRODUCT == DatabaseProduct.MYSQL)
 				return Restrictions.sqlRestriction("find_in_set(?," + getActualColumnName(tagFieldName) + ")", tag,
 						StringType.INSTANCE);
-			} else if (DATABASE_PRODUCT == DatabaseProduct.POSTGRESQL) {
-				if (tagFieldName.endsWith("AsString"))
-					tagFieldName = tagFieldName.substring(0, tagFieldName.length() - 8);
+			else if (DATABASE_PRODUCT == DatabaseProduct.POSTGRESQL)
 				return Restrictions.sqlRestriction(
 						"?=any(string_to_array(" + getActualColumnName(tagFieldName) + ",','))", tag,
 						StringType.INSTANCE);
-			} else if (DATABASE_PRODUCT == DatabaseProduct.ORACLE) {
-				if (tagFieldName.endsWith("AsString"))
-					tagFieldName = tagFieldName.substring(0, tagFieldName.length() - 8);
+			else if (DATABASE_PRODUCT == DatabaseProduct.ORACLE)
 				return Restrictions.sqlRestriction("','||" + getActualColumnName(tagFieldName) + "||',' like ?",
 						"%," + tag + ",%", StringType.INSTANCE);
-			} else if (DATABASE_PRODUCT == DatabaseProduct.SQLSERVER || DATABASE_PRODUCT == DatabaseProduct.SYBASE) {
-				if (tagFieldName.endsWith("AsString"))
-					tagFieldName = tagFieldName.substring(0, tagFieldName.length() - 8);
+			else if (DATABASE_PRODUCT == DatabaseProduct.SQLSERVER || DATABASE_PRODUCT == DatabaseProduct.SYBASE)
 				return Restrictions.sqlRestriction("(','+" + getActualColumnName(tagFieldName) + "+',') like ?",
 						"%," + tag + ",%", StringType.INSTANCE);
-			}
 		}
 		return Restrictions.or(Restrictions.eq(tagFieldName, tag),
 				Restrictions.or(Restrictions.like(tagFieldName, tag + ",", MatchMode.START),
