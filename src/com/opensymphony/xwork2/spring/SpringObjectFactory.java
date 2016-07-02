@@ -174,6 +174,8 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
      */
     @Override
     public Object buildBean(Class clazz, Map<String, Object> extraContext) throws Exception {
+    	if(clazz.isArray())
+    		return null;
         Object bean;
 
         try {

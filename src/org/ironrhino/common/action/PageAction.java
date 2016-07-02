@@ -2,6 +2,8 @@ package org.ironrhino.common.action;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +71,7 @@ public class PageAction extends EntityAction<Page> {
 					String tags = keyword.replace("tags:", "");
 					tags = tags.replace(" AND ", ",");
 					for (String tag : tags.split("\\s*,\\s*"))
-						dc.add(CriterionUtils.matchTag("tagsAsString", tag));
+						dc.add(CriterionUtils.matchTag("tags", tag));
 				} else {
 					dc.add(CriterionUtils.like(keyword, "path", "title"));
 				}
@@ -127,7 +129,8 @@ public class PageAction extends EntityAction<Page> {
 			if (StringUtils.isNotBlank(keyword) && keyword.startsWith("tags:")) {
 				String tags = keyword.replace("tags:", "");
 				tags = tags.replace(" AND ", ",");
-				String tag = tags.split("\\s*,\\s*")[0];
+				String[] tagsArray = tags.split("\\s*,\\s*");
+				String tag = tagsArray[0];
 				int count = pageManager.findListByTag(tag).size();
 				String path = null;
 				while (true) {
@@ -136,7 +139,7 @@ public class PageAction extends EntityAction<Page> {
 						break;
 				}
 				page.setPath(path);
-				page.setTagsAsString(tags);
+				page.setTags(new HashSet<>(Arrays.asList(tagsArray)));
 			}
 		} else {
 			if (StringUtils.isNotBlank(page.getDraft())) {

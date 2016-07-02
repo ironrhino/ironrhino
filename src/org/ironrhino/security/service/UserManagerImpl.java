@@ -175,7 +175,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 	@Override
 	public DetachedCriteria detachedCriteria(String role) {
 		DetachedCriteria dc = detachedCriteria();
-		return dc.add(CriterionUtils.matchTag("rolesAsString", role));
+		return dc.add(CriterionUtils.matchTag("roles", role));
 	}
 
 }

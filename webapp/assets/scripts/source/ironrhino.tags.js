@@ -66,10 +66,13 @@
 			};
 			var value = t.val();
 			if (value) {
-				if (value.indexOf("[\"") == 0)
+				if (value.indexOf('["') == 0)
 					options.tagsItems = $.parseJSON(value);
-				else
-					options.tagsItems = value.split(',');
+				else {
+					if (value.indexOf('[') == 0)
+						value = value.substring(1, value.length - 1);
+					options.tagsItems = value.split(/,\s*/);
+				}
 			}
 			if (t.data('source')) {
 				if (t.data('source').indexOf('[') != 0) {

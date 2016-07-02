@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
@@ -422,6 +423,21 @@ public enum CriterionOperator implements Displayable {
 		@Override
 		public Criterion operator(String name, Object... value) {
 			return Restrictions.not(Restrictions.in(name, value));
+		}
+	},
+	CONTAINS(1) {
+		@Override
+		public boolean supports(Class<?> clazz) {
+			return Set.class.isAssignableFrom(clazz);
+		}
+
+		@Override
+		public Criterion operator(String name, Object... value) {
+			Object v = value[0];
+			if (v instanceof Set) {
+				v = ((Set<?>) v).iterator().next();
+			}
+			return CriterionUtils.matchTag(name, String.valueOf(v));
 		}
 	};
 

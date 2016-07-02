@@ -154,7 +154,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 		DetachedCriteria dc = detachedCriteria();
 		for (String tag : tags)
 			if (StringUtils.isNotBlank(tag))
-				dc.add(CriterionUtils.matchTag("tagsAsString", tag));
+				dc.add(CriterionUtils.matchTag("tags", tag));
 		dc.add(Restrictions.gt("createDate", page.getCreateDate()));
 		dc.add(Restrictions.le("displayOrder", page.getDisplayOrder()));
 		dc.addOrder(Order.desc("displayOrder"));
@@ -163,7 +163,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 		dc = detachedCriteria();
 		for (String tag : tags)
 			if (StringUtils.isNotBlank(tag))
-				dc.add(CriterionUtils.matchTag("tagsAsString", tag));
+				dc.add(CriterionUtils.matchTag("tags", tag));
 		dc.add(Restrictions.lt("createDate", page.getCreateDate()));
 		dc.add(Restrictions.ge("displayOrder", page.getDisplayOrder()));
 		dc.addOrder(Order.asc("displayOrder"));
@@ -205,7 +205,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 			dc.addOrder(Order.desc("createDate"));
 			for (int i = 0; i < tag.length; i++) {
 				if (StringUtils.isNotBlank(tag[i]))
-					dc.add(CriterionUtils.matchTag("tagsAsString", tag[i]));
+					dc.add(CriterionUtils.matchTag("tags", tag[i]));
 			}
 			if (limit > 0)
 				list = findListByCriteria(dc, 1, limit);
@@ -258,7 +258,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 			DetachedCriteria dc = detachedCriteria();
 			for (int i = 0; i < tag.length; i++)
 				if (StringUtils.isNotBlank(tag[i]))
-					dc.add(CriterionUtils.matchTag("tagsAsString", tag[i]));
+					dc.add(CriterionUtils.matchTag("tags", tag[i]));
 			for (Map.Entry<String, Boolean> entry : criteria.getSorts().entrySet())
 				dc.addOrder(entry.getValue() ? Order.desc(entry.getKey()) : Order.asc(entry.getKey()));
 			resultPage.setCriteria(dc);
@@ -288,7 +288,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 		} else {
 			final Map<String, Integer> map = new HashMap<>();
 			DetachedCriteria dc = detachedCriteria();
-			dc.add(Restrictions.like("tagsAsString", keyword, MatchMode.ANYWHERE));
+			dc.add(Restrictions.like("tags", keyword, MatchMode.ANYWHERE));
 			List<Page> list = findListByCriteria(dc);
 			for (Page p : list) {
 				for (String tag : p.getTags()) {

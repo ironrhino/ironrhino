@@ -1,7 +1,9 @@
 package org.ironrhino.core.struts;
 
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -82,96 +84,38 @@ public class EntityClassHelper {
 					if (pd.getReadMethod() == null || pd.getWriteMethod() == null
 							&& AnnotationUtils.findAnnotation(pd.getReadMethod(), UiConfig.class) == null)
 						continue;
-					Class<?> declaredClass = pd.getReadMethod().getDeclaringClass();
-					Version version = AnnotationUtils.findAnnotation(pd.getReadMethod(), Version.class);
-					if (version == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								version = f.getAnnotation(Version.class);
-						} catch (Exception e) {
-						}
-					if (version != null)
+					Method readMethod = pd.getReadMethod();
+					Field declaredField;
+					try {
+						declaredField = readMethod.getDeclaringClass().getDeclaredField(propertyName);
+					} catch (NoSuchFieldException e) {
+						declaredField = null;
+					} catch (SecurityException e) {
+						throw new RuntimeException(e);
+					}
+					if (findAnnotation(readMethod, declaredField, Version.class) != null)
 						continue;
-					Transient trans = AnnotationUtils.findAnnotation(pd.getReadMethod(), Transient.class);
-					if (trans == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								trans = f.getAnnotation(Transient.class);
-						} catch (Exception e) {
-						}
-					UiConfig uiConfig = AnnotationUtils.findAnnotation(pd.getReadMethod(), UiConfig.class);
-					if (uiConfig == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								uiConfig = f.getAnnotation(UiConfig.class);
-						} catch (Exception e) {
-						}
-
+					UiConfig uiConfig = findAnnotation(readMethod, declaredField, UiConfig.class);
 					if (uiConfig != null && uiConfig.hidden())
 						continue;
 					if ("new".equals(propertyName) || !idAssigned && "id".equals(propertyName) && uiConfig == null
 							|| "class".equals(propertyName) || "fieldHandler".equals(propertyName)
-							|| pd.getReadMethod() == null || hides.contains(propertyName))
+							|| hides.contains(propertyName))
 						continue;
-					Column columnannotation = AnnotationUtils.findAnnotation(pd.getReadMethod(), Column.class);
-					if (columnannotation == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								columnannotation = f.getAnnotation(Column.class);
-						} catch (Exception e) {
+					Class<?> collectionClass = null;
+					Class<?> elementClass = null;
+					if (readMethod.getGenericReturnType() instanceof ParameterizedType) {
+						ParameterizedType pt = (ParameterizedType) readMethod.getGenericReturnType();
+						Type[] args = pt.getActualTypeArguments();
+						if (pt.getRawType() instanceof Class) {
+							collectionClass = (Class<?>) pt.getRawType();
+							if (!Collection.class.isAssignableFrom(collectionClass))
+								collectionClass = null;
 						}
-					Basic basic = AnnotationUtils.findAnnotation(pd.getReadMethod(), Basic.class);
-					if (basic == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								basic = f.getAnnotation(Basic.class);
-						} catch (Exception e) {
-						}
-					Lob lob = AnnotationUtils.findAnnotation(pd.getReadMethod(), Lob.class);
-					if (lob == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								lob = f.getAnnotation(Lob.class);
-						} catch (Exception e) {
-						}
-					OneToOne oneToOne = AnnotationUtils.findAnnotation(pd.getReadMethod(), OneToOne.class);
-					if (oneToOne == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								oneToOne = f.getAnnotation(OneToOne.class);
-						} catch (Exception e) {
-						}
-					Embedded embedded = AnnotationUtils.findAnnotation(pd.getReadMethod(), Embedded.class);
-					Class<?> embeddedClass = null;
-					if (embedded == null) {
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								embedded = f.getAnnotation(Embedded.class);
-							embeddedClass = f.getType();
-						} catch (Exception e) {
-						}
-					} else {
-						embeddedClass = pd.getReadMethod().getReturnType();
-					}
-					if (uiConfig != null && uiConfig.embeddedAsSingle()) {
-						embedded = null;
-						embeddedClass = null;
+						if (collectionClass != null && args.length == 1 && args[0] instanceof Class)
+							elementClass = (Class<?>) args[0];
 					}
 
-					Class<?> elementClass = null;
-					if (Collection.class.isAssignableFrom(pd.getReadMethod().getReturnType())) {
-						elementClass = ReflectionUtils.getGenericClass(pd.getReadMethod().getGenericReturnType(), 0);
-						if (elementClass != null && elementClass.getAnnotation(Embeddable.class) == null)
-							elementClass = null;
-					}
 					UiConfigImpl uci = new UiConfigImpl(pd.getName(), pd.getPropertyType(), uiConfig);
 					if (uiConfig == null || uiConfig.displayOrder() == Integer.MAX_VALUE) {
 						int index = fields.indexOf(pd.getName());
@@ -187,53 +131,76 @@ public class EntityClassHelper {
 						ri.setValue(true);
 						uci.setReadonly(ri);
 					}
+
+					OneToOne oneToOne = findAnnotation(readMethod, declaredField, OneToOne.class);
 					if (oneToOne != null && StringUtils.isNotBlank(oneToOne.mappedBy())) {
 						ReadonlyImpl ri = new ReadonlyImpl();
 						ri.setValue(true);
 						uci.setReadonly(ri);
 					}
-					if (embedded != null) {
+
+					if (findAnnotation(readMethod, declaredField, Embedded.class) != null
+							&& (uiConfig == null || !uiConfig.embeddedAsSingle())) {
 						HiddenImpl hi = new HiddenImpl();
 						hi.setValue(true);
 						uci.setHiddenInList(hi);
 						uci.setType("embedded");
-						Map<String, UiConfigImpl> map2 = getUiConfigs(embeddedClass);
+						Map<String, UiConfigImpl> map2 = getUiConfigs(readMethod.getReturnType());
 						for (UiConfigImpl ui : map2.values()) {
 							if (StringUtils.isBlank(ui.getGroup()) && StringUtils.isNotBlank(uci.getGroup()))
 								ui.setGroup(uci.getGroup());
 						}
 						uci.setEmbeddedUiConfigs(map2);
 					}
-					if (elementClass != null) {
+
+					if (collectionClass != null && elementClass != null
+							&& elementClass.getAnnotation(Embeddable.class) != null) {
 						HiddenImpl hi = new HiddenImpl();
 						hi.setValue(true);
 						uci.setHiddenInList(hi);
 						uci.setType("collection");
 						uci.setEmbeddedUiConfigs(getUiConfigs(elementClass));
 					}
+
 					if (idAssigned && propertyName.equals("id"))
 						uci.addCssClass("required checkavailable");
 					if (Attributable.class.isAssignableFrom(entityClass) && pd.getName().equals("attributes")) {
 						uci.setType("attributes");
 					}
+					if (!uci.getType().equals("dictionary") && collectionClass != null
+							&& elementClass == String.class) {
+						uci.addCssClass("tags");
+						uci.setExcludedFromOrdering(true);
+						if (StringUtils.isBlank(uci.getTemplate()))
+							uci.setTemplate(
+									"<#if value?has_content><#list value as var><span class=\"label\">${var}</span><#if var_has_next> </#if></#list></#if>");
+					}
 					if (pd.getWriteMethod() == null)
 						uci.setExcludedFromCriteria(true);
-					if (trans != null) {
+					if (findAnnotation(readMethod, declaredField, Transient.class) != null) {
 						uci.setExcludedFromCriteria(true);
 						uci.setExcludedFromLike(true);
 						uci.setExcludedFromOrdering(true);
 					}
+					Lob lob = findAnnotation(readMethod, declaredField, Lob.class);
 					if (lob != null) {
 						uci.setExcludedFromCriteria(true);
 						if (uci.getMaxlength() == 0)
 							uci.setMaxlength(2 * 1024 * 1024);
 					}
-					if (columnannotation != null && !columnannotation.nullable() || basic != null && !basic.optional())
+					if (lob != null || uci.getMaxlength() > 255)
+						uci.setExcludedFromOrdering(true);
+
+					Column column = findAnnotation(readMethod, declaredField, Column.class);
+					Basic basic = findAnnotation(readMethod, declaredField, Basic.class);
+					if (column != null && !column.nullable() || basic != null && !basic.optional())
 						uci.setRequired(true);
-					if (columnannotation != null && columnannotation.length() != 255 && uci.getMaxlength() == 0)
-						uci.setMaxlength(columnannotation.length());
-					if (columnannotation != null) {
-						if (!columnannotation.updatable() && !columnannotation.insertable()) {
+					if (column != null) {
+						if (column.length() != 255 && uci.getMaxlength() == 0)
+							uci.setMaxlength(column.length());
+						if (column.unique())
+							uci.setUnique(true);
+						if (!column.updatable() && !column.insertable()) {
 							HiddenImpl hi = uci.getHiddenInInput();
 							if (hi == null || hi.isDefaultOptions()) {
 								hi = new HiddenImpl();
@@ -246,14 +213,14 @@ public class EntityClassHelper {
 								ri.setValue(true);
 								uci.setReadonly(ri);
 							}
-						} else if (columnannotation.updatable() && !columnannotation.insertable()) {
+						} else if (column.updatable() && !column.insertable()) {
 							ReadonlyImpl ri = uci.getReadonly();
 							if (ri == null || ri.isDefaultOptions()) {
 								ri = new ReadonlyImpl();
 								ri.setExpression("entity.new");
 								uci.setReadonly(ri);
 							}
-						} else if (!columnannotation.updatable() && columnannotation.insertable()) {
+						} else if (!column.updatable() && column.insertable()) {
 							ReadonlyImpl ri = uci.getReadonly();
 							if (ri == null || ri.isDefaultOptions()) {
 								ri = new ReadonlyImpl();
@@ -262,8 +229,7 @@ public class EntityClassHelper {
 							}
 						}
 					}
-					if (lob != null || uci.getMaxlength() > 255)
-						uci.setExcludedFromOrdering(true);
+
 					Class<?> returnType = pd.getPropertyType();
 					if (returnType.isArray()) {
 						Class<?> clazz = returnType.getComponentType();
@@ -275,21 +241,13 @@ public class EntityClassHelper {
 							uci.setThCssClass("excludeIfNotEdited");
 						}
 					}
-					if (Collection.class.isAssignableFrom(returnType)) {
-						Type type = pd.getReadMethod().getGenericReturnType();
-						if (type instanceof ParameterizedType) {
-							type = ((ParameterizedType) type).getActualTypeArguments()[0];
-							if (type instanceof Class) {
-								Class<?> clazz = (Class<?>) type;
-								if (clazz.isEnum() || clazz == String.class) {
-									uci.setMultiple(true);
-									returnType = clazz;
-									uci.setPropertyType(returnType);
-									uci.addCssClass("custom");
-									uci.setThCssClass("excludeIfNotEdited");
-								}
-							}
-						}
+					if (collectionClass != null && elementClass != null && (elementClass.isEnum()
+							|| elementClass == String.class && uci.getType().equals("dictionary"))) {
+						uci.setMultiple(true);
+						returnType = elementClass;
+						uci.setPropertyType(returnType);
+						uci.addCssClass("custom");
+						uci.setThCssClass("excludeIfNotEdited");
 					}
 					if (uci.isMultiple()) {
 						if (uci.getType().equals("dictionary")) {
@@ -300,6 +258,7 @@ public class EntityClassHelper {
 									"<#if value?has_content><#list value as var><span class=\"label\">${(var?string)!}</span><#sep> </#list></#if>");
 						}
 					}
+
 					if (returnType.isEnum()) {
 						uci.setType("enum");
 						try {
@@ -315,19 +274,11 @@ public class EntityClassHelper {
 							uci.setListValue(uci.getListKey());
 						}
 					} else if (Persistable.class.isAssignableFrom(returnType)) {
-						JoinColumn joincolumnannotation = AnnotationUtils.findAnnotation(pd.getReadMethod(),
-								JoinColumn.class);
-						if (joincolumnannotation == null)
-							try {
-								Field f = declaredClass.getDeclaredField(propertyName);
-								if (f != null)
-									joincolumnannotation = f.getAnnotation(JoinColumn.class);
-							} catch (Exception e) {
-							}
-						if (joincolumnannotation != null && !joincolumnannotation.nullable())
+						JoinColumn joinColumn = findAnnotation(readMethod, declaredField, JoinColumn.class);
+						if (joinColumn != null && !joinColumn.nullable())
 							uci.setRequired(true);
-						if (joincolumnannotation != null) {
-							if (!joincolumnannotation.updatable() && !joincolumnannotation.insertable()) {
+						if (joinColumn != null) {
+							if (!joinColumn.updatable() && !joinColumn.insertable()) {
 								HiddenImpl hi = uci.getHiddenInInput();
 								if (hi == null || hi.isDefaultOptions()) {
 									hi = new HiddenImpl();
@@ -340,14 +291,14 @@ public class EntityClassHelper {
 									ri.setValue(true);
 									uci.setReadonly(ri);
 								}
-							} else if (joincolumnannotation.updatable() && !joincolumnannotation.insertable()) {
+							} else if (joinColumn.updatable() && !joinColumn.insertable()) {
 								ReadonlyImpl ri = uci.getReadonly();
 								if (ri == null || ri.isDefaultOptions()) {
 									ri = new ReadonlyImpl();
 									ri.setExpression("entity.new");
 									uci.setReadonly(ri);
 								}
-							} else if (!joincolumnannotation.updatable() && joincolumnannotation.insertable()) {
+							} else if (!joinColumn.updatable() && joinColumn.insertable()) {
 								ReadonlyImpl ri = uci.getReadonly();
 								if (ri == null || ri.isDefaultOptions()) {
 									ri = new ReadonlyImpl();
@@ -356,14 +307,7 @@ public class EntityClassHelper {
 								}
 							}
 						}
-						ManyToOne manyToOne = AnnotationUtils.findAnnotation(pd.getReadMethod(), ManyToOne.class);
-						if (manyToOne == null)
-							try {
-								Field f = declaredClass.getDeclaredField(propertyName);
-								if (f != null)
-									manyToOne = f.getAnnotation(ManyToOne.class);
-							} catch (Exception e) {
-							}
+						ManyToOne manyToOne = findAnnotation(readMethod, declaredField, ManyToOne.class);
 						if (manyToOne != null && !manyToOne.optional())
 							uci.setRequired(true);
 						if (uci.getType().equals(UiConfig.DEFAULT_TYPE))
@@ -396,7 +340,7 @@ public class EntityClassHelper {
 							uci.setInputType("number");
 							uci.addCssClass("double");
 							if (returnType == BigDecimal.class) {
-								int scale = columnannotation != null ? columnannotation.scale() : 2;
+								int scale = column != null ? column.scale() : 2;
 								if (scale == 0)
 									scale = 2;
 								StringBuilder step = new StringBuilder(scale + 2);
@@ -427,14 +371,7 @@ public class EntityClassHelper {
 								uci.getDynamicAttributes().put("min", "0");
 						}
 					} else if (Date.class.isAssignableFrom(returnType)) {
-						Temporal temporal = AnnotationUtils.findAnnotation(pd.getReadMethod(), Temporal.class);
-						if (temporal == null)
-							try {
-								Field f = declaredClass.getDeclaredField(propertyName);
-								if (f != null)
-									temporal = f.getAnnotation(Temporal.class);
-							} catch (Exception e) {
-							}
+						Temporal temporal = findAnnotation(readMethod, declaredField, Temporal.class);
 						String temporalType = "date";
 						if (temporal != null)
 							if (temporal.value() == TemporalType.TIMESTAMP)
@@ -452,34 +389,12 @@ public class EntityClassHelper {
 					} else if (returnType == Boolean.TYPE || returnType == Boolean.class) {
 						uci.setType("checkbox");
 					}
-					if (columnannotation != null && columnannotation.unique())
-						uci.setUnique(true);
-					SearchableProperty searchableProperty = AnnotationUtils.findAnnotation(pd.getReadMethod(),
+
+					SearchableProperty searchableProperty = findAnnotation(readMethod, declaredField,
 							SearchableProperty.class);
-					if (searchableProperty == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								searchableProperty = f.getAnnotation(SearchableProperty.class);
-						} catch (Exception e) {
-						}
-					SearchableId searchableId = AnnotationUtils.findAnnotation(pd.getReadMethod(), SearchableId.class);
-					if (searchableId == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								searchableId = f.getAnnotation(SearchableId.class);
-						} catch (Exception e) {
-						}
-					SearchableComponent searchableComponent = AnnotationUtils.findAnnotation(pd.getReadMethod(),
+					SearchableId searchableId = findAnnotation(readMethod, declaredField, SearchableId.class);
+					SearchableComponent searchableComponent = findAnnotation(readMethod, declaredField,
 							SearchableComponent.class);
-					if (searchableComponent == null)
-						try {
-							Field f = declaredClass.getDeclaredField(propertyName);
-							if (f != null)
-								searchableComponent = f.getAnnotation(SearchableComponent.class);
-						} catch (Exception e) {
-						}
 					if (searchableProperty != null || searchableId != null || searchableComponent != null) {
 						uci.setSearchable(true);
 						if (searchableId != null
@@ -590,6 +505,14 @@ public class EntityClassHelper {
 			sb.append("?columns=" + StringUtils.join(columns, ','));
 		}
 		return sb.toString();
+	}
+
+	private static <T extends Annotation> T findAnnotation(Method readMethod, Field declaredField,
+			Class<T> annotationClass) {
+		T annotation = AnnotationUtils.findAnnotation(readMethod, annotationClass);
+		if (annotation == null && declaredField != null)
+			annotation = declaredField.getAnnotation(annotationClass);
+		return annotation;
 	}
 
 	private static ValueThenKeyComparator<String, UiConfigImpl> comparator = new ValueThenKeyComparator<String, UiConfigImpl>() {
