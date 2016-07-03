@@ -14,7 +14,7 @@ import org.ironrhino.core.model.BaseEntity;
 @AutoConfig
 @Entity
 @Table(name = "common_record")
-@Richtable(order = "recordDate desc", readonly = @Readonly(value = true, deletable = true) )
+@Richtable(order = "recordDate desc", readonly = @Readonly(value = true, deletable = true))
 public class Record extends BaseEntity {
 
 	private static final long serialVersionUID = -8287907984213799302L;

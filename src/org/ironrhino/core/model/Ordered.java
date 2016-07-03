@@ -4,6 +4,7 @@ public interface Ordered<T extends Ordered<T>> extends Comparable<T> {
 
 	public int getDisplayOrder();
 
+	@Override
 	public default int compareTo(T o) {
 		if (o == null)
 			return 1;

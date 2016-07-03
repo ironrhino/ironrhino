@@ -28,7 +28,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Searchable
 @Entity
 @Table(name = "common_setting")
-@Richtable(searchable = true, readonly = @Readonly(expression = "entity.readonly") , order = "key asc", exportable = true, importable = true)
+@Richtable(searchable = true, readonly = @Readonly(expression = "entity.readonly"), order = "key asc", exportable = true, importable = true)
 public class Setting extends BaseEntity implements Recordable<UserDetails> {
 
 	private static final long serialVersionUID = -8352037603261222984L;

@@ -45,7 +45,7 @@ public class MyConfiguration extends Configuration {
 	@Override
 	public Template getTemplate(String name, Locale locale, Object customLookupCondition, String encoding,
 			boolean parseAsFTL, boolean ignoreMissing)
-					throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
+			throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
 		Template result;
 		if (overridableTemplateProviders != null) {
 			for (OverridableTemplateProvider overridableTemplateProvider : overridableTemplateProviders) {

@@ -29,7 +29,7 @@ import org.ironrhino.core.util.JsonUtils;
 @Entity
 @Table(indexes = { @javax.persistence.Index(columnList = "username,date desc") })
 @Searchable
-@Richtable(searchable = true, order = "date desc", readonly = @Readonly(true) )
+@Richtable(searchable = true, order = "date desc", readonly = @Readonly(true))
 public class AuditEvent extends BaseEntity {
 
 	private static final long serialVersionUID = -7691080078972338500L;

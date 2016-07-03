@@ -58,7 +58,7 @@ public class StatLog {
 				}
 				StatLog.write();
 			}
-		} , StatLogSettings.WRITETHREAD_NAME);
+		}, StatLogSettings.WRITETHREAD_NAME);
 		writeThread.setDaemon(true);
 		writeThread.start();
 	}

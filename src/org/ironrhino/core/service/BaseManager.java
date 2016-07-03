@@ -23,7 +23,7 @@ public interface BaseManager<T extends Persistable<?>> {
 	public T get(Serializable id);
 
 	public T get(Serializable id, LockOptions lockOptions);
-	
+
 	public List<T> get(List<? extends Serializable> ids);
 
 	public void evict(T obj);
@@ -61,7 +61,7 @@ public interface BaseManager<T extends Persistable<?>> {
 	public <TE extends BaseTreeableEntity<TE>> TE loadTree();
 
 	public int executeUpdate(String queryString, Object... args);
-	
+
 	public List<T> executeQuery(String queryString, Object... args);
 
 	public <K> K execute(HibernateCallback<K> callback);

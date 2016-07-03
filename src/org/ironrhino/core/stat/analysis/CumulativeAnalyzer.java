@@ -96,7 +96,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 							v.accumulate(n.getValue());
 						}
 					}
-				} , true);
+				}, true);
 
 			}
 			// set Id and caculate percent

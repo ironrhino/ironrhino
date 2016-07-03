@@ -294,7 +294,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public T get(Serializable id) {
 		if (id == null)
 			return null;
-		return (T) sessionFactory.getCurrentSession().get(getEntityClass(), id);
+		return sessionFactory.getCurrentSession().get(getEntityClass(), id);
 	}
 
 	@Override
@@ -302,7 +302,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public T get(Serializable id, LockOptions lockOptions) {
 		if (id == null)
 			return null;
-		return (T) sessionFactory.getCurrentSession().get(getEntityClass(), id, lockOptions);
+		return sessionFactory.getCurrentSession().get(getEntityClass(), id, lockOptions);
 	}
 
 	@Override

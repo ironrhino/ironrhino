@@ -53,7 +53,7 @@ public class LoginAction extends BaseAction {
 	protected String password;
 
 	protected String username;
-	
+
 	@Value("${login.defaultTargetUrl:/}")
 	protected String defaultTargetUrl;
 

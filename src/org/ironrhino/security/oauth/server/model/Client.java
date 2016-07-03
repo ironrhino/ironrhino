@@ -48,10 +48,10 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@Column(nullable = false)
 	private String secret = CodecUtils.nextId();
 
-	@UiConfig(cssClass = "input-xxlarge", hiddenInList = @Hidden(true) )
+	@UiConfig(cssClass = "input-xxlarge", hiddenInList = @Hidden(true))
 	private String redirectUri;
 
-	@UiConfig(cssClass = "input-xxlarge", type = "textarea", hiddenInList = @Hidden(true) )
+	@UiConfig(cssClass = "input-xxlarge", type = "textarea", hiddenInList = @Hidden(true))
 	@Column(length = 4000)
 	private String description;
 
@@ -65,7 +65,7 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	private boolean enabled = true;
 
 	@NotInCopy
-	@UiConfig(hiddenInInput = @Hidden(true) , hiddenInList = @Hidden(true) )
+	@UiConfig(hiddenInInput = @Hidden(true), hiddenInList = @Hidden(true))
 	@Column(updatable = false)
 	@CreationTimestamp
 	private Date createDate;

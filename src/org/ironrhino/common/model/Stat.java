@@ -25,7 +25,7 @@ import org.ironrhino.core.stat.Value;
 @AutoConfig
 @Entity
 @Table(name = "common_stat")
-@Richtable(readonly = @Readonly(true) , order = "date desc")
+@Richtable(readonly = @Readonly(true), order = "date desc")
 public class Stat extends KeyValuePair implements Persistable<String> {
 
 	private static final long serialVersionUID = -1795832273603877285L;

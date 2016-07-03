@@ -63,7 +63,7 @@ public class RegionTreeAction extends BaseAction {
 				children = new ArrayList<>();
 				children.add(regionTreeControl.getTree().getDescendantOrSelfById(tree));
 				return JSON;
-			} else{
+			} else {
 				region = regionTreeControl.getTree();
 			}
 		} else {

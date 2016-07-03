@@ -15,7 +15,7 @@ public class TransferService {
 
 	private AtomicInteger count = new AtomicInteger(0);
 
-	@Retryable(include = ConcurrencyFailureException.class, maxAttempts = 5, backoff = @Backoff(delay = 1000, maxDelay = 5000, multiplier = 2) )
+	@Retryable(include = ConcurrencyFailureException.class, maxAttempts = 5, backoff = @Backoff(delay = 1000, maxDelay = 5000, multiplier = 2))
 	@Transactional
 	public void transfer(String fromAccountNo, String toAccountNo, BigDecimal amount) {
 		int i = count.addAndGet(1);

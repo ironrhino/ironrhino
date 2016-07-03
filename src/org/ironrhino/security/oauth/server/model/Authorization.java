@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(name = "oauth_authorization")
-@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true) , bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
+@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
 @ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
 public class Authorization extends BaseEntity {
 
@@ -49,21 +49,21 @@ public class Authorization extends BaseEntity {
 
 	private String grantor;
 
-	@UiConfig(hiddenInList = @Hidden(true) )
+	@UiConfig(hiddenInList = @Hidden(true))
 	private String scope;
 
-	@UiConfig(hiddenInList = @Hidden(true) )
+	@UiConfig(hiddenInList = @Hidden(true))
 	@Column(unique = true)
 	private String code;
 
 	@UiConfig(width = "60px")
 	private int lifetime = DEFAULT_LIFETIME;
 
-	@UiConfig(hiddenInList = @Hidden(true) , alias = "refresh_token")
+	@UiConfig(hiddenInList = @Hidden(true), alias = "refresh_token")
 	@Column(unique = true)
 	private String refreshToken;
 
-	@UiConfig(hiddenInList = @Hidden(true) , alias = "response_type")
+	@UiConfig(hiddenInList = @Hidden(true), alias = "response_type")
 	@Column(nullable = false, length = 10)
 	@Enumerated(EnumType.STRING)
 	private ResponseType responseType = ResponseType.code;
