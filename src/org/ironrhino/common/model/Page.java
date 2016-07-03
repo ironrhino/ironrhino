@@ -279,15 +279,6 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 	}
 
 	@Override
-	public int compareTo(Page page) {
-		if (page == null)
-			return 1;
-		if (this.getDisplayOrder() != page.getDisplayOrder())
-			return this.getDisplayOrder() - page.getDisplayOrder();
-		return this.toString().compareTo(page.toString());
-	}
-
-	@Override
 	public String toString() {
 		return StringUtils.defaultString(this.path);
 	}

@@ -370,15 +370,6 @@ public class SetupAction extends BaseAction {
 		}
 
 		@Override
-		public int compareTo(SetupParameterImpl sp) {
-			if (sp == null)
-				return 1;
-			if (this.getDisplayOrder() != sp.getDisplayOrder())
-				return this.getDisplayOrder() - sp.getDisplayOrder();
-			return this.toString().compareTo(sp.toString());
-		}
-
-		@Override
 		public String toString() {
 			return this.name;
 		}
