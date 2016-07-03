@@ -7,15 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,9 +31,6 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.ValidationException;
-import org.ironrhino.core.util.JsonUtils;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 @PublishAware
 @AutoConfig
@@ -49,9 +42,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class Dictionary extends BaseEntity {
 
 	private static final long serialVersionUID = -8352037604261222984L;
-
-	private static final TypeReference<List<LabelValue>> TYPE_LIST = new TypeReference<List<LabelValue>>() {
-	};
 
 	@SearchableProperty(boost = 3)
 	@UiConfig(width = "300px")
@@ -65,9 +55,10 @@ public class Dictionary extends BaseEntity {
 	@Column(length = 4000)
 	private String description;
 
+	// @Lob
+	@Column(length = 4000)
 	@SearchableComponent
-	@UiConfig(hiddenInList = @Hidden(true) )
-	@Transient
+	@UiConfig(hiddenInList = @Hidden(true))
 	private List<LabelValue> items = new ArrayList<>();
 
 	@Version
@@ -95,26 +86,6 @@ public class Dictionary extends BaseEntity {
 
 	public void setItems(List<LabelValue> items) {
 		this.items = items;
-	}
-
-	@NotInCopy
-	@UiConfig(hidden = true)
-	@Column(name = "items")
-	@Lob
-	@Access(AccessType.PROPERTY)
-	public String getItemsAsString() {
-		if (items == null || items.isEmpty())
-			return null;
-		return JsonUtils.toJson(items);
-	}
-
-	public void setItemsAsString(String str) {
-		if (StringUtils.isNotBlank(str))
-			try {
-				items = JsonUtils.fromJson(str, TYPE_LIST);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 	}
 
 	public int getVersion() {

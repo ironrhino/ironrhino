@@ -6,24 +6,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.Converter;
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
+import org.ironrhino.core.hibernate.convert.JsonConverter;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.Hidden;
-import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
@@ -32,9 +29,6 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.ValidationException;
-import org.ironrhino.core.util.JsonUtils;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 @AutoConfig
 @Searchable
@@ -45,9 +39,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class Schema extends BaseEntity {
 
 	private static final long serialVersionUID = -8352037604269012984L;
-
-	private static final TypeReference<List<SchemaField>> TYPE_LIST = new TypeReference<List<SchemaField>>() {
-	};
 
 	@SearchableProperty(boost = 3)
 	@UiConfig(width = "300px")
@@ -64,9 +55,10 @@ public class Schema extends BaseEntity {
 	@UiConfig(width = "100px")
 	private boolean strict;
 
+	// @Lob
+	@Column(length = 4000)
 	@SearchableComponent
-	@UiConfig(hiddenInList = @Hidden(true) )
-	@Transient
+	@UiConfig(hiddenInList = @Hidden(true))
 	private List<SchemaField> fields = new ArrayList<>();
 
 	@Version
@@ -106,24 +98,6 @@ public class Schema extends BaseEntity {
 
 	public void setFields(List<SchemaField> fields) {
 		this.fields = fields;
-	}
-
-	@NotInCopy
-	@UiConfig(hidden = true)
-	@Column(name = "fields")
-	@Lob
-	@Access(AccessType.PROPERTY)
-	public String getFieldsAsString() {
-		return JsonUtils.toJson(fields);
-	}
-
-	public void setFieldsAsString(String str) {
-		if (StringUtils.isNotBlank(str))
-			try {
-				fields = JsonUtils.fromJson(str, TYPE_LIST);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 	}
 
 	public int getVersion() {
@@ -216,6 +190,11 @@ public class Schema extends BaseEntity {
 				fields.add(f);
 			}
 		}
+	}
+
+	@Converter(autoApply = true)
+	public static class FieldsConverter extends JsonConverter<List<SchemaField>> {
+
 	}
 
 }
