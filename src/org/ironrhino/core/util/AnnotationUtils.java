@@ -62,7 +62,7 @@ public class AnnotationUtils {
 			}
 			List<Map.Entry<Method, Integer>> list = new ArrayList<Map.Entry<Method, Integer>>(map.entrySet());
 			Collections.sort(list, comparator);
-			methods = new LinkedHashSet<Method>();
+			methods = new LinkedHashSet<>();
 			for (Map.Entry<Method, Integer> entry : list)
 				methods.add(entry.getKey());
 			cache.put(key, Collections.unmodifiableSet(methods));
@@ -79,7 +79,7 @@ public class AnnotationUtils {
 		String key = sb.toString();
 		Set<String> set = (Set<String>) cache.get(key);
 		if (set == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
-			set = new HashSet<String>();
+			set = new HashSet<>();
 			try {
 				Class<?> cls = clazz;
 				while (!cls.equals(Object.class)) {
@@ -107,7 +107,7 @@ public class AnnotationUtils {
 		if (annotaionClass.length == 0)
 			return Collections.emptyMap();
 		Map<String, Object> map = new HashMap<String, Object>();
-		Set<String> propertyNames = new HashSet<String>();
+		Set<String> propertyNames = new HashSet<>();
 		for (Class<? extends Annotation> clz : annotaionClass)
 			propertyNames.addAll(getAnnotatedPropertyNames(object.getClass(), clz));
 		BeanWrapperImpl bw = new BeanWrapperImpl(object);

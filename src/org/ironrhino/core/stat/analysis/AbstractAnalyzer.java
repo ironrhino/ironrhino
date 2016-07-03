@@ -40,14 +40,14 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 	}
 
 	public AbstractAnalyzer(Date[] dates, boolean localhost) throws FileNotFoundException {
-		List<File> list = new ArrayList<File>();
+		List<File> list = new ArrayList<>();
 		for (int i = 0; i < dates.length; i++)
 			list.addAll(getLogFile(dates[i], localhost).values());
 		this.iterator = newIterator(list.toArray(new File[0]));
 	}
 
 	public AbstractAnalyzer(Date start, Date end, boolean localhost) throws FileNotFoundException {
-		List<File> list = new ArrayList<File>();
+		List<File> list = new ArrayList<>();
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(end);
 		int endDay = cal.get(Calendar.DAY_OF_YEAR);

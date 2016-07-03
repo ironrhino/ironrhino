@@ -57,7 +57,7 @@ public class RedisServiceStats implements ServiceStats {
 	private static final String KEY_HOTSPOTS = NAMESPACE + "hotspots";
 	private static final String KEY_WARNINGS = NAMESPACE + "warnings";
 
-	private CopyOnWriteArrayList<String> warningBuffer = new CopyOnWriteArrayList<String>();
+	private CopyOnWriteArrayList<String> warningBuffer = new CopyOnWriteArrayList<>();
 
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
