@@ -44,11 +44,16 @@ public class AuthzUtils {
 
 	// equals to authorize, for ftl call
 	public static boolean authorizeArray(String[] ifAllGranted, String[] ifAnyGranted, String[] ifNotGranted) {
-		return authorizeRoles(getRoleNames(), ifAllGranted, ifAnyGranted, ifNotGranted);
+		return authorize(ifAllGranted, ifAnyGranted, ifNotGranted);
 	}
 
 	public static boolean authorizeUserDetails(UserDetails user, String ifAllGranted, String ifAnyGranted,
 			String ifNotGranted) {
+		return authorizeRoles(getRoleNamesFromUserDetails(user), ifAllGranted, ifAnyGranted, ifNotGranted);
+	}
+
+	public static boolean authorizeUserDetails(UserDetails user, String[] ifAllGranted, String[] ifAnyGranted,
+			String[] ifNotGranted) {
 		return authorizeRoles(getRoleNamesFromUserDetails(user), ifAllGranted, ifAnyGranted, ifNotGranted);
 	}
 
