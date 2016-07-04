@@ -15,7 +15,6 @@ import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +24,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class RecordAspect implements Ordered {
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	
+	@Autowired
+	private Logger logger;
 
 	@Autowired
 	private SessionFactory sessionFactory;

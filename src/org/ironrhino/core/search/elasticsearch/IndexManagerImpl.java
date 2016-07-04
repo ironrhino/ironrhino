@@ -45,7 +45,6 @@ import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +56,8 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 @SuppressWarnings(value = { "unchecked", "rawtypes" })
 public class IndexManagerImpl implements IndexManager {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Value("${indexManager.indexName:ironrhino}")
 	private String indexName;

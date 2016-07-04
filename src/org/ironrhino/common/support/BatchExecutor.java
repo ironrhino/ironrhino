@@ -8,21 +8,21 @@ import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.spring.ApplicationContextConsole;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 
 public class BatchExecutor {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-	private List<String> commands = Collections.emptyList();
+	@Autowired
+	private Logger logger;
 
 	@Autowired
 	private ApplicationContextConsole applicationContextConsole;
 
 	@Autowired(required = false)
 	MailService mailService;
+
+	private List<String> commands = Collections.emptyList();
 
 	public List<String> getCommands() {
 		return commands;

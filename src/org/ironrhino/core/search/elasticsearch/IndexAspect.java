@@ -13,7 +13,6 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 
@@ -21,7 +20,8 @@ import org.springframework.core.Ordered;
 @SuppressWarnings("rawtypes")
 public class IndexAspect implements Ordered {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Autowired
 	private IndexManager indexManager;

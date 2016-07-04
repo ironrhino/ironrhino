@@ -24,7 +24,6 @@ import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
@@ -42,7 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class JdbcQueryService {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;

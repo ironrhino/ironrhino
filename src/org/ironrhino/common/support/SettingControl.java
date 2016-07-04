@@ -24,7 +24,6 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.DateUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -34,12 +33,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class SettingControl {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
-
-	private Map<String, Setting> settings;
+	@Autowired
+	private Logger logger;
 
 	@Autowired
 	private EntityManager<Setting> entityManager;
+
+	private Map<String, Setting> settings;
 
 	@PostConstruct
 	public void afterPropertiesSet() {

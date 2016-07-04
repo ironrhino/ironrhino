@@ -22,17 +22,13 @@ import org.hibernate.cfg.AvailableSettings;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
-
-	private Class<?>[] annotatedClasses;
-
-	private String excludeFilter;
+	@Autowired
+	private Logger logger;
 
 	@Autowired(required = false)
 	private List<StandardServiceInitiator<?>> standardServiceInitiators;
@@ -42,6 +38,10 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 
 	@Autowired(required = false)
 	private PhysicalNamingStrategy physicalNamingStrategy;
+
+	private Class<?>[] annotatedClasses;
+
+	private String excludeFilter;
 
 	public void setExcludeFilter(String excludeFilter) {
 		this.excludeFilter = excludeFilter;

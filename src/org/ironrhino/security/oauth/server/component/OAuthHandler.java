@@ -17,7 +17,6 @@ import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.service.OAuthAuthorizationService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
@@ -39,7 +38,8 @@ public class OAuthHandler extends AccessHandler {
 	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT = "_OAUTH_CLIENT";
 	public static final String SESSION_ID_PREFIX = "tk_";
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Value("${oauth.api.pattern:/user/self,/oauth2/tokeninfo,/oauth2/revoketoken,/api/*}")
 	private String apiPattern;

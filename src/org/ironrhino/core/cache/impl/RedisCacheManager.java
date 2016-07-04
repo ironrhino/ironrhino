@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.serializer.support.SerializationFailedException;
@@ -31,7 +30,8 @@ import org.springframework.stereotype.Component;
 @ServiceImplementationConditional(profiles = { DUAL, CLOUD })
 public class RedisCacheManager implements CacheManager {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Autowired(required = false)
 	@Qualifier("cacheRedisTemplate")

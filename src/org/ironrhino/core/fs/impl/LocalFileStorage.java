@@ -25,7 +25,7 @@ import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -36,7 +36,8 @@ import com.google.common.io.Files;
 @ServiceImplementationConditional(profiles = { DEFAULT, DUAL })
 public class LocalFileStorage implements FileStorage {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Value("${fileStorage.uri:file:///${app.context}/assets/}")
 	protected String uri;

@@ -12,7 +12,6 @@ import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,8 @@ public class RedisLockService implements LockService {
 
 	private static final String NAMESPACE = "lock:";
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Value("${lockService.maxHoldTime:300}")
 	private int maxHoldTime = 300;

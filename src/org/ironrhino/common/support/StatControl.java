@@ -35,7 +35,6 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CompositeIterator;
 import org.ironrhino.core.util.DateUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -44,7 +43,8 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings("rawtypes")
 public class StatControl {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Autowired
 	private EntityManager<Stat> entityManager;

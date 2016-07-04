@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,8 @@ import org.springframework.stereotype.Component;
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DynamicAuthorizerManager {
 
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	private Logger logger;
 
 	@Autowired(required = false)
 	private List<DynamicAuthorizer> authorizers;

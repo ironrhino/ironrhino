@@ -28,13 +28,13 @@ import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.search.SearchCriteria;
 import org.ironrhino.core.search.SearchService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @SuppressWarnings(value = { "unchecked", "rawtypes" })
 public class ElasticSearchService<T> implements SearchService<T> {
 
-	protected Logger logger = LoggerFactory.getLogger(ElasticSearchService.class);
+	@Autowired
+	private Logger logger;
 
 	@Autowired
 	private Client client;

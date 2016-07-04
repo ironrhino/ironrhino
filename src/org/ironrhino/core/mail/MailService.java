@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutorService;
 
 import org.ironrhino.core.struts.TemplateProvider;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 
@@ -14,7 +13,8 @@ import freemarker.template.Template;
 
 public class MailService {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	@Autowired(required = false)
 	private TemplateProvider templateProvider;
