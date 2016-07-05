@@ -25,6 +25,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.persistence.GeneratedValue;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
@@ -139,7 +140,9 @@ public class EntityClassHelper {
 						uci.setReadonly(ri);
 					}
 
-					if (findAnnotation(readMethod, declaredField, Embedded.class) != null
+					Embedded embedded = findAnnotation(readMethod, declaredField, Embedded.class);
+					EmbeddedId embeddedId = findAnnotation(readMethod, declaredField, EmbeddedId.class);
+					if ((embedded != null || embeddedId != null)
 							&& (uiConfig == null || !uiConfig.embeddedAsSingle())) {
 						HiddenImpl hi = new HiddenImpl();
 						hi.setValue(true);
@@ -149,6 +152,12 @@ public class EntityClassHelper {
 						for (UiConfigImpl ui : map2.values()) {
 							if (StringUtils.isBlank(ui.getGroup()) && StringUtils.isNotBlank(uci.getGroup()))
 								ui.setGroup(uci.getGroup());
+							if (embeddedId != null) {
+								ui.addCssClass("required");
+								ReadonlyImpl ri = new ReadonlyImpl();
+								ri.setExpression("!entity.new");
+								ui.setReadonly(ri);
+							}
 						}
 						uci.setEmbeddedUiConfigs(map2);
 					}
