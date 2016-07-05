@@ -3,17 +3,17 @@
 <head>
 <title>${action.getText('login')}</title>
 <meta name="body_class" content="welcome" />
-<#assign notlogin = false>
+<#assign anonymous = false>
 <@authorize ifAllGranted="ROLE_BUILTIN_ANONYMOUS">
-<#assign notlogin = true>
+<#assign anonymous = true>
 </@authorize>
-<#if !notlogin>
+<#if !anonymous>
 <meta name="decorator" content="simple" />
-<meta http-equiv="refresh" content="0; url=<@url value=targetUrl!'/'/>" />
+<meta http-equiv="refresh" content="0; url=<@url value=targetUrl!(properties['login.defaultTargetUrl']!'/')/>" />
 </#if>
 </head>
 <body>
-<#if notlogin>
+<#if anonymous>
 <div class="row">
 	<div class="span6 offset3">
 	<h2 class="caption">${action.getText('login')}</h2>
