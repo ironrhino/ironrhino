@@ -2,6 +2,7 @@ package org.ironrhino.core.spring.converter;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.Set;
 
@@ -24,6 +25,11 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 		Class<?> targetClass = targetType.getType();
 		if (sourceClass == targetClass)
 			return false;
+		try {
+			targetClass.getConstructor(sourceClass);
+			return true;
+		} catch (NoSuchMethodException | SecurityException e) {
+		}
 		try {
 			sourceClass.getConstructor();
 		} catch (NoSuchMethodException | SecurityException e) {
@@ -52,7 +58,13 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
 		if (source == null)
 			return null;
+		Class<?> sourceClass = sourceType.getType();
 		Class<?> targetClass = targetType.getType();
+		try {
+			Constructor<?> ctor = targetClass.getConstructor(sourceClass);
+			return ctor.newInstance(source);
+		} catch (Exception e) {
+		}
 		if (targetClass == String.class || targetClass == Long.class || targetClass == Long.TYPE
 				|| targetClass == Integer.class || targetClass == Integer.TYPE) {
 			BeanWrapperImpl bw = new BeanWrapperImpl(source);

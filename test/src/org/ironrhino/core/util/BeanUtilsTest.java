@@ -304,6 +304,49 @@ public class BeanUtilsTest {
 
 	}
 
+	public static class Team4 extends Base {
+
+		private static final long serialVersionUID = 4712258219610091729L;
+
+		private String name;
+
+		private User owner;
+
+		private Date createDate;
+
+		public Team4(Team team) {
+			this.id = team.getId();
+			this.name = team.getName();
+			this.owner = team.getOwner();
+			this.createDate = team.getCreateDate();
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public User getOwner() {
+			return owner;
+		}
+
+		public void setOwner(User owner) {
+			this.owner = owner;
+		}
+
+		public Date getCreateDate() {
+			return createDate;
+		}
+
+		public void setCreateDate(Date createDate) {
+			this.createDate = createDate;
+		}
+
+	}
+
 	private static class MyList<E> extends ArrayList<E> {
 		private static final long serialVersionUID = 1L;
 	}
@@ -437,6 +480,10 @@ public class BeanUtilsTest {
 		assertEquals(team.getOwner().getId(), team3.getOwner());
 		assertNotNull(team3.getName());
 		assertNotNull(team3.getCreateDate());
+
+		Team4 team4 = BeanUtils.conversionService.convert(team, Team4.class);
+		assertEquals(team1.getOwner(), team4.getOwner());
+		assertEquals(team1.getCreateDate(), team4.getCreateDate());
 	}
 
 	@Test
