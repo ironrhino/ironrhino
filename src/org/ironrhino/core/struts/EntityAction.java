@@ -699,7 +699,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 		bwp.setConversionService(conversionService);
 		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
-		if (!_entity.isNew()) {
+		boolean isnew = _entity.isNew();
+		if (isIdAssigned())
+			isnew = "true".equals(ServletActionContext.getRequest().getParameter("_isnew"));
+		if (!isnew) {
 			if (ownerProperty != null) {
 				Owner owner = ownerProperty.getKey();
 				if (!(StringUtils.isNotBlank(owner.supervisorRole())
