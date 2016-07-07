@@ -9,7 +9,7 @@ import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.rest.RestStatus;
 import org.springframework.core.Ordered;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Aspect
 @ControllerAdvice
@@ -19,13 +19,13 @@ public class AuthorizeAspect extends BaseAspect {
 		order = Ordered.HIGHEST_PRECEDENCE + 1;
 	}
 
-	@Before("execution(public * *(..)) and @annotation(requestMapping) and not @annotation(org.ironrhino.core.metadata.Authorize)")
-	public void authorizeClass(JoinPoint jp, RequestMapping requestMapping) throws Throwable {
+	@Before("execution(public * *(..)) and @within(restController) and not @annotation(org.ironrhino.core.metadata.Authorize)")
+	public void authorizeClass(JoinPoint jp, RestController restController) throws Throwable {
 		authorize(jp.getTarget().getClass().getAnnotation(Authorize.class));
 	}
 
-	@Before("execution(public * *(..)) and @annotation(requestMapping) and @annotation(authorize)")
-	public void authorizeMethod(JoinPoint jp, RequestMapping requestMapping, Authorize authorize) throws Throwable {
+	@Before("execution(public * *(..)) and @within(restController) and @annotation(authorize)")
+	public void authorizeMethod(JoinPoint jp, RestController restController, Authorize authorize) throws Throwable {
 		authorize(authorize);
 	}
 
