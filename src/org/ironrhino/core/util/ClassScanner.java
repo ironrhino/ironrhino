@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.configuration.CustomAnnotationTypeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -205,7 +206,7 @@ public class ClassScanner {
 			Set<String> packages = new TreeSet<>();
 			Collection<Class<?>> componentScans = scanAnnotated(arr, ComponentScan.class);
 			for (Class<?> c : componentScans) {
-				ComponentScan cs = c.getAnnotation(ComponentScan.class);
+				ComponentScan cs = AnnotatedElementUtils.getMergedAnnotation(c, ComponentScan.class);
 				packages.addAll(Arrays.asList(cs.value()));
 			}
 			packages.addAll(Arrays.asList(arr));

@@ -3,6 +3,7 @@ package org.ironrhino.core.util;
 import java.util.Comparator;
 
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.Order;
 
 public class ClassComparator implements Comparator<Class<?>> {
@@ -12,10 +13,10 @@ public class ClassComparator implements Comparator<Class<?>> {
 	@Override
 	public int compare(Class<?> a, Class<?> b) {
 		int order1 = Ordered.LOWEST_PRECEDENCE, order2 = Ordered.LOWEST_PRECEDENCE;
-		Order o = a.getAnnotation(Order.class);
+		Order o = AnnotatedElementUtils.getMergedAnnotation(a, Order.class);
 		if (o != null)
 			order1 = o.value();
-		o = b.getAnnotation(Order.class);
+		o = AnnotatedElementUtils.getMergedAnnotation(b, Order.class);
 		if (o != null)
 			order2 = o.value();
 		int v = order1 == order2 ? 0 : order1 < order2 ? -1 : 1;
