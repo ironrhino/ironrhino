@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,8 @@ import com.jolbox.bonecp.hooks.AbstractConnectionHook;
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class DataSourceConfiguration {
 
-	private Logger logger = LoggerFactory.getLogger(DataSourceConfiguration.class);
+	@Autowired
+	private Logger logger;
 
 	@Value("${jdbc.dataSourceClassName:}")
 	private String dataSourceClassName;
@@ -75,12 +77,13 @@ public class DataSourceConfiguration {
 	@Bean(destroyMethod = "close")
 	@Primary
 	public DataSource dataSource() {
+		logger.info("Connecting {}", jdbcUrl);
 		String hikariClassName = "com.zaxxer.hikari.HikariDataSource";
 		if (hikariClassName.equals(dataSourceClassName)) {
 			if (ClassUtils.isPresent(hikariClassName, getClass().getClassLoader())) {
 				return hikariDataSource();
 			} else {
-				logger.warn("class [{}] not found, please add HikariCP.jar", hikariClassName);
+				logger.warn("Class [{}] not found, please add HikariCP.jar", hikariClassName);
 			}
 		}
 		return boneCPDataSource();
