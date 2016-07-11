@@ -21,6 +21,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
@@ -125,6 +127,12 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Bean
 	protected RestExceptionHandler restExceptionHandler() {
 		return new RestExceptionHandler();
+	}
+
+	@Override
+	protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		argumentResolvers.add(new AuthenticationPrincipalArgumentResolver());
+		super.addArgumentResolvers(argumentResolvers);
 	}
 
 	@Bean

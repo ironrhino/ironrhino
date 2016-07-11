@@ -9,6 +9,7 @@ import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.rest.Asserts;
 import org.ironrhino.rest.RestStatus;
+import org.ironrhino.security.LoggedInUser;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +33,16 @@ public class UserController {
 
 	@RequestMapping(value = "/@self", method = RequestMethod.GET)
 	@Authorize(ifAnyGranted = { UserRole.ROLE_BUILTIN_USER, UserRole.ROLE_BUILTIN_ANONYMOUS })
-	public User self() {
-		User user = AuthzUtils.getUserDetails(User.class);
-		if (user == null)
+	public User self(@LoggedInUser User loggedInUser) {
+		if (loggedInUser == null)
 			throw RestStatus.NOT_FOUND;
-		return user;
+		return loggedInUser;
 	}
 
 	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
-	public RestStatus patch(@RequestBody User user) {
-		return patch(AuthzUtils.getUsername(), user);
+	public RestStatus patch(@LoggedInUser User loggedInUser, @RequestBody User user) {
+		return patch(loggedInUser.getUsername(), user);
 	}
 
 	@RequestMapping(value = "/@self/password", method = RequestMethod.PATCH)

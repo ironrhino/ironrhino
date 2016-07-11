@@ -20,15 +20,16 @@ public class UserControllerDoc extends UserController {
 
 	@Override
 	@Api("获取当前用户信息")
-	public User self() {
+	public User self(User loggedInUser) {
 		return createUserForGet();
 	}
 
 	@Override
 	@Api(value = "修改当前用户信息", description = "只传入需要修改的字段")
-	public RestStatus patch(@Fields(value = { @Field(name = "password", required = false, description = "传入明文密码"),
-			@Field(name = "name", required = false), @Field(name = "email", required = false),
-			@Field(name = "phone", required = false) }, sampleMethodName = "createUserForPut") User user) {
+	public RestStatus patch(User loggedInUser,
+			@Fields(value = { @Field(name = "password", required = false, description = "传入明文密码"),
+					@Field(name = "name", required = false), @Field(name = "email", required = false),
+					@Field(name = "phone", required = false) }, sampleMethodName = "createUserForPut") User user) {
 		return RestStatus.OK;
 	}
 
