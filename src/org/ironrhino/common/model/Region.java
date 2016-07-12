@@ -12,6 +12,7 @@ import org.ironrhino.core.aop.PublishAware;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.NotInCopy;
+import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
@@ -30,6 +31,11 @@ public class Region extends BaseTreeableEntity<Region> {
 
 	private static final long serialVersionUID = 8878381261391688086L;
 
+	@Embedded
+	@UiConfig(cssClass = "latlng", embeddedAsSingle = true, dynamicAttributes = "{\"data-address\":\"${region.fullname!}\"}")
+	private Coordinate coordinate;
+
+	@UiConfig(hidden = true)
 	private String fullname;
 
 	@Column(length = 6)
@@ -38,10 +44,8 @@ public class Region extends BaseTreeableEntity<Region> {
 	@Column(length = 6)
 	private String postcode;
 
+	@UiConfig(cssClass = "positive", dynamicAttributes = "{\"min\":\"1\"}")
 	private Integer rank;
-
-	@Embedded
-	private Coordinate coordinate;
 
 	public Region() {
 
@@ -54,6 +58,14 @@ public class Region extends BaseTreeableEntity<Region> {
 	public Region(String name, int displayOrder) {
 		this.name = name;
 		this.displayOrder = displayOrder;
+	}
+
+	public Coordinate getCoordinate() {
+		return coordinate;
+	}
+
+	public void setCoordinate(Coordinate coordinate) {
+		this.coordinate = coordinate;
 	}
 
 	public String getAreacode() {
@@ -99,14 +111,6 @@ public class Region extends BaseTreeableEntity<Region> {
 
 	public void setRank(Integer rank) {
 		this.rank = rank;
-	}
-
-	public Coordinate getCoordinate() {
-		return coordinate;
-	}
-
-	public void setCoordinate(Coordinate coordinate) {
-		this.coordinate = coordinate;
 	}
 
 	@JsonIgnore

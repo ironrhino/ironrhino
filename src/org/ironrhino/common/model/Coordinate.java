@@ -4,11 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Embeddable
 public class Coordinate implements Serializable {
 
@@ -30,7 +25,14 @@ public class Coordinate implements Serializable {
 	}
 
 	public Coordinate(String latLng) {
-		setLatLngAsString(latLng);
+		if (latLng == null || latLng.trim().length() == 0) {
+			this.latitude = null;
+			this.longitude = null;
+		} else {
+			String[] arr = latLng.split(",");
+			this.latitude = parseLatOrLong(arr[0]);
+			this.longitude = parseLatOrLong(arr[1]);
+		}
 	}
 
 	public Coordinate(String latitude, String longitude) {
@@ -54,38 +56,24 @@ public class Coordinate implements Serializable {
 		this.longitude = longitude;
 	}
 
-	@JsonIgnore
-	public void setLatLngAsString(String latLng) {
-		if (latLng == null || latLng.trim().length() == 0) {
-			this.latitude = null;
-			this.longitude = null;
-		} else {
-			String[] arr = latLng.split(",");
-			this.latitude = parseLatOrLong(arr[0]);
-			this.longitude = parseLatOrLong(arr[1]);
-		}
-	}
-
-	public String getLatLngAsString() {
-		if (latitude != null && longitude != null)
-			return latitude + "," + longitude;
-		else
-			return null;
-	}
-
 	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
+		return toString().hashCode();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+	public boolean equals(Object that) {
+		if(that == null)
+			return false;
+		return this.toString().equals(that.toString());
 	}
 
 	@Override
 	public String toString() {
-		return getLatLngAsString();
+		if (latitude != null && longitude != null)
+			return latitude + "," + longitude;
+		else
+			return "";
 	}
 
 	public static Double parseLatOrLong(String input) {

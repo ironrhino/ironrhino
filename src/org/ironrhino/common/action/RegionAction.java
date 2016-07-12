@@ -19,7 +19,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.ElasticSearchCriteria;
 import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
 import org.ironrhino.core.service.EntityManager;
-import org.ironrhino.core.struts.BaseAction;
+import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.ClassScanner;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
-public class RegionAction extends BaseAction {
+public class RegionAction extends EntityAction<Region> {
 
 	private static final long serialVersionUID = -4643055307938016102L;
 
