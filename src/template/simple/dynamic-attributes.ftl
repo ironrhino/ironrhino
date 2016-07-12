@@ -26,9 +26,7 @@
 <#if aKey!='data-group'>
   <#assign keyValue = parameters.dynamicAttributes.get(aKey)/>
   <#if keyValue?is_string>
-      <#assign keyValue>
-      <@keyValue?interpret/>
-      </#assign>
+      <#assign keyValue><@keyValue?interpret/></#assign>
       <#assign value = struts.translateVariables(keyValue)!keyValue/>
   <#else>
       <#assign value = keyValue?string/>
