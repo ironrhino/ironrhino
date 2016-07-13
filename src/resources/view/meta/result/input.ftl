@@ -1,3 +1,15 @@
+<#function dynAttrs config>
+	<#local dynamicAttributes={}/>
+	<#if config.internalDynamicAttributes?has_content>
+		<#local dynamicAttributes+=config.internalDynamicAttributes/>
+	</#if>
+	<#if config.dynamicAttributes?has_content>
+		<#local da><@config.dynamicAttributes?interpret/></#local>
+		<#local da=da?eval>
+		<#local dynamicAttributes+=da/>
+	</#if>
+	<#return dynamicAttributes>
+</#function>
 <!DOCTYPE html>
 <#escape x as x?html><html>
 <head>
@@ -51,11 +63,7 @@
 				<#assign readonly=true/>
 			</#if>
 			<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key)/>
-			<#assign dynamicAttributes=config.dynamicAttributes/>
-			<#if config.group?has_content>
-				<#assign group=action.getText(config.group)/>
-				<#assign dynamicAttributes+={'data-group':group}/>
-			</#if>
+			<#assign dynamicAttributes=dynAttrs(config)/>
 			<#if config.inputTemplate?has_content>
 				<#if config.inputTemplate?index_of('<div class="control-group') gt -1>
 				<@config.inputTemplate?interpret/>
@@ -68,9 +76,6 @@
 				</div>
 				</#if>
 			<#elseif config.type=='textarea'>
-				<#if config.maxlength gt 0>
-				<#assign dynamicAttributes+={"maxlength":config.maxlength}>
-				</#if>
 				<@s.textarea id=id label=label name=entityName+"."+key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='checkbox'>
 				<#if readonly>
@@ -226,17 +231,10 @@
 					<#assign label=action.getText(label)>
 					<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 					<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
-					<#assign dynamicAttributes=config.dynamicAttributes/>	
-					<#if config.group?has_content>
-						<#assign group=action.getText(config.group)/>
-						<#assign dynamicAttributes+={'data-group':group}/>
-					</#if>			
+					<#assign dynamicAttributes=dynAttrs(config)/>
 					<#if config.inputTemplate?has_content>
 						<@config.inputTemplate?interpret/>
 					<#elseif config.type=='textarea'>
-						<#if config.maxlength gt 0>
-						<#assign dynamicAttributes+={"maxlength":config.maxlength}>
-						</#if>
 						<@s.textarea id=id label=label name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 					<#elseif config.type=='checkbox'>
 						<@s.checkbox readonly=readonly id=id label=label name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
@@ -361,13 +359,10 @@
 								<td>
 								<#assign value=(entity[key][index][entry.key])!>
 								<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
-								<#assign dynamicAttributes=config.dynamicAttributes/>
+								<#assign dynamicAttributes=dynAttrs(config)/>
 								<#if config.inputTemplate?has_content>
 									<@config.inputTemplate?interpret/>
 								<#elseif config.type=='textarea'>
-									<#if config.maxlength gt 0>
-									<#assign dynamicAttributes+={"maxlength":config.maxlength}>
-									</#if>
 									<@s.textarea readonly=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 								<#elseif config.type=='checkbox'>
 									<@s.checkbox readonly=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
@@ -445,10 +440,6 @@
 					</div>
 				</div>
 			<#else>
-				<#assign dynamicAttributes=config.dynamicAttributes/>
-				<#if config.group?has_content>
-				<#assign dynamicAttributes+={'data-group':action.getText(config.group)}/>
-				</#if>
 				<#if config.cssClass?contains('datetime')>
 					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType value=(entity[key]?string('yyyy-MM-dd HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 				<#elseif config.cssClass?contains('time')>

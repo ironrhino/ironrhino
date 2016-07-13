@@ -2,17 +2,16 @@ package org.ironrhino.core.struts;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.util.JsonUtils;
 
 public class AnnotationShadows {
 
@@ -44,7 +43,8 @@ public class AnnotationShadows {
 		private String inputTemplate = "";
 		private String csvTemplate = "";
 		private String width;
-		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<>(0);
+		private Map<String, String> internalDynamicAttributes = new HashMap<>(0);
+		private String dynamicAttributes = "";
 		private String cellDynamicAttributes = "";
 		private boolean excludeIfNotEdited;
 		private String listKey = UiConfig.DEFAULT_LIST_KEY;
@@ -95,12 +95,7 @@ public class AnnotationShadows {
 			this.inputTemplate = config.inputTemplate();
 			this.csvTemplate = config.csvTemplate();
 			this.width = config.width();
-			if (StringUtils.isNotBlank(config.dynamicAttributes()))
-				try {
-					this.dynamicAttributes = JsonUtils.fromJson(config.dynamicAttributes(), JsonUtils.STRING_MAP_TYPE);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			this.dynamicAttributes = config.dynamicAttributes();
 			this.cellDynamicAttributes = config.cellDynamicAttributes();
 			this.cellEdit = config.cellEdit();
 			this.excludeIfNotEdited = config.excludeIfNotEdited();
@@ -114,7 +109,7 @@ public class AnnotationShadows {
 				this.templateName = propertyName;
 			if (StringUtils.isNotBlank(this.regex)) {
 				cssClasses.add("regex");
-				dynamicAttributes.put("data-regex", this.regex);
+				internalDynamicAttributes.put("data-regex", this.regex);
 			}
 			this.excludedFromLike = config.excludedFromLike();
 			this.excludedFromCriteria = config.excludedFromCriteria();
@@ -212,11 +207,16 @@ public class AnnotationShadows {
 			this.templateName = templateName;
 		}
 
-		public Map<String, String> getDynamicAttributes() {
+		public Map<String, String> getInternalDynamicAttributes() {
+			return internalDynamicAttributes;
+		}
+
+		
+		public String getDynamicAttributes() {
 			return dynamicAttributes;
 		}
 
-		public void setDynamicAttributes(Map<String, String> dynamicAttributes) {
+		public void setDynamicAttributes(String dynamicAttributes) {
 			this.dynamicAttributes = dynamicAttributes;
 		}
 

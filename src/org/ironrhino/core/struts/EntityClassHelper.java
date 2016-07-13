@@ -357,8 +357,8 @@ public class EntityClassHelper {
 								for (int i = 0; i < scale - 1; i++)
 									step.append("0");
 								step.append("1");
-								uci.getDynamicAttributes().put("step", step.toString());
-								uci.getDynamicAttributes().put("data-scale", String.valueOf(scale));
+								uci.getInternalDynamicAttributes().put("step", step.toString());
+								uci.getInternalDynamicAttributes().put("data-scale", String.valueOf(scale));
 								if (StringUtils.isBlank(uci.getTemplate()) && returnType == BigDecimal.class) {
 									StringBuilder template = new StringBuilder(scale + 40);
 									template.append("<#if value?is_number>${value?string('#,##0.");
@@ -370,14 +370,14 @@ public class EntityClassHelper {
 							}
 						}
 						Set<String> cssClasses = uci.getCssClasses();
-						if (cssClasses.contains("double") && !uci.getDynamicAttributes().containsKey("step"))
-							uci.getDynamicAttributes().put("step", "0.01");
-						if (cssClasses.contains("positive") && !uci.getDynamicAttributes().containsKey("min")) {
-							uci.getDynamicAttributes().put("min", "1");
+						if (cssClasses.contains("double") && !uci.getInternalDynamicAttributes().containsKey("step"))
+							uci.getInternalDynamicAttributes().put("step", "0.01");
+						if (cssClasses.contains("positive") && !uci.getInternalDynamicAttributes().containsKey("min")) {
+							uci.getInternalDynamicAttributes().put("min", "1");
 							if (cssClasses.contains("double"))
-								uci.getDynamicAttributes().put("min", "0.01");
+								uci.getInternalDynamicAttributes().put("min", "0.01");
 							if (cssClasses.contains("zero"))
-								uci.getDynamicAttributes().put("min", "0");
+								uci.getInternalDynamicAttributes().put("min", "0");
 						}
 					} else if (Date.class.isAssignableFrom(returnType)) {
 						Temporal temporal = findAnnotation(readMethod, declaredField, Temporal.class);
@@ -429,9 +429,14 @@ public class EntityClassHelper {
 								for (String name : naturalIds.keySet())
 									if (!name.equals(pd.getName()))
 										list.add(StringUtils.uncapitalize(entityClass.getSimpleName()) + "." + name);
-								uci.getDynamicAttributes().put("data-checkwith", StringUtils.join(list, ","));
+								uci.getInternalDynamicAttributes().put("data-checkwith", StringUtils.join(list, ","));
 							}
 						}
+					}
+					if (uci.getType().equals("textarea") && uci.getMaxlength() > 0)
+						uci.getInternalDynamicAttributes().put("maxlength", String.valueOf(uci.getMaxlength()));
+					if (StringUtils.isNotBlank(uci.getGroup())) {
+						uci.getInternalDynamicAttributes().put("data-group", I18N.getText(uci.getGroup()));
 					}
 					map.put(propertyName, uci);
 				}
