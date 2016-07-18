@@ -19,11 +19,15 @@ import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.boot.registry.StandardServiceInitiator;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
+import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
+import org.springframework.stereotype.Component;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
@@ -34,10 +38,19 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 	private List<StandardServiceInitiator<?>> standardServiceInitiators;
 
 	@Autowired(required = false)
+	private List<AttributeConverter<?, ?>> attributeConverters;
+
+	@Autowired(required = false)
 	private ImplicitNamingStrategy implicitNamingStrategy;
 
 	@Autowired(required = false)
 	private PhysicalNamingStrategy physicalNamingStrategy;
+
+	@Autowired(required = false)
+	private MultiTenantConnectionProvider multiTenantConnectionProvider;
+
+	@Autowired(required = false)
+	private CurrentTenantIdentifierResolver currentTenantIdentifierResolver;
 
 	private Class<?>[] annotatedClasses;
 
@@ -94,9 +107,13 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			logger.info(clz.getName());
 		super.setAnnotatedClasses(annotatedClasses);
 		if (implicitNamingStrategy != null)
-			super.setImplicitNamingStrategy(implicitNamingStrategy);
+			setImplicitNamingStrategy(implicitNamingStrategy);
 		if (physicalNamingStrategy != null)
-			super.setPhysicalNamingStrategy(physicalNamingStrategy);
+			setPhysicalNamingStrategy(physicalNamingStrategy);
+		if (multiTenantConnectionProvider != null)
+			setMultiTenantConnectionProvider(multiTenantConnectionProvider);
+		if (currentTenantIdentifierResolver != null)
+			setCurrentTenantIdentifierResolver(currentTenantIdentifierResolver);
 		super.afterPropertiesSet();
 	}
 
@@ -110,12 +127,19 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 				AttributeConverter.class);
 		logger.info("annotatedConverters: ");
 		for (Class<?> clz : converters) {
+			if (AnnotationUtils.getAnnotation(clz, Component.class) != null)
+				continue;
 			Converter c = clz.getAnnotation(Converter.class);
 			if (c != null && c.autoApply()) {
 				sfb.addAttributeConverter((Class<AttributeConverter<?, ?>>) clz);
 				logger.info(clz.getName());
 			}
-
+		}
+		if (attributeConverters != null) {
+			for (AttributeConverter<?, ?> ac : attributeConverters) {
+				sfb.addAttributeConverter(ac);
+				logger.info(ac.getClass().getName());
+			}
 		}
 		return sfb.buildSessionFactory();
 	}
