@@ -87,7 +87,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	};
 
 	public BaseManagerImpl() {
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass(), BaseManagerImpl.class);
+		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
 		if (clazz != null)
 			entityClass = clazz;
 	}
