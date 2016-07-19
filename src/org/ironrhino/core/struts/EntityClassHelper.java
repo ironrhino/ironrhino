@@ -2,6 +2,7 @@ package org.ironrhino.core.struts;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -27,6 +28,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -62,18 +64,14 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 public class EntityClassHelper {
 
-	private static Map<Class<?>, Map<String, UiConfigImpl>> cache = new ConcurrentHashMap<>(64);
+	private static Map<Class<?>, Map<String, UiConfigImpl>> uiConfigCache = new ConcurrentHashMap<>(64);
+	private static Map<Class<?>, Boolean> idAssignedCache = new ConcurrentHashMap<>(64);
 
 	public static Map<String, UiConfigImpl> getUiConfigs(Class<?> entityClass) {
-		Map<String, UiConfigImpl> map = cache.get(entityClass);
+		Map<String, UiConfigImpl> map = uiConfigCache.get(entityClass);
 		if (map == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			synchronized (entityClass) {
-				GeneratedValue generatedValue = org.ironrhino.core.util.AnnotationUtils
-						.getAnnotatedPropertyNameAndAnnotations(entityClass, GeneratedValue.class).get("id");
-				GenericGenerator genericGenerator = org.ironrhino.core.util.AnnotationUtils
-						.getAnnotatedPropertyNameAndAnnotations(entityClass, GenericGenerator.class).get("id");
-				boolean idAssigned = generatedValue == null
-						|| genericGenerator != null && "assigned".equals(genericGenerator.strategy());
+				boolean idAssigned = isIdAssigned(entityClass);
 				Map<String, NaturalId> naturalIds = org.ironrhino.core.util.AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(entityClass, NaturalId.class);
 				Set<String> hides = new HashSet<>();
@@ -446,7 +444,7 @@ public class EntityClassHelper {
 				for (Map.Entry<String, UiConfigImpl> entry : list)
 					sortedMap.put(entry.getKey(), entry.getValue());
 				map = sortedMap;
-				cache.put(entityClass, Collections.unmodifiableMap(map));
+				uiConfigCache.put(entityClass, Collections.unmodifiableMap(map));
 			}
 		}
 		return map;
@@ -519,6 +517,48 @@ public class EntityClassHelper {
 			sb.append("?columns=" + StringUtils.join(columns, ','));
 		}
 		return sb.toString();
+	}
+
+	public static boolean isIdAssigned(Class<?> entityClass) {
+		Boolean b = idAssignedCache.get(entityClass);
+		if (b != null) {
+			return b;
+		} else {
+			b = _isIdAssigned(entityClass);
+			idAssignedCache.put(entityClass, b);
+			return b;
+		}
+	}
+
+	private static boolean _isIdAssigned(Class<?> entityClass) {
+		if (entityClass.isInterface())
+			return false;
+		AnnotatedElement ae = null;
+		try {
+			Method m = entityClass.getMethod("getId");
+			if (AnnotationUtils.findAnnotation(m, Id.class) != null) {
+				ae = m;
+			} else {
+				Class<?> clz = entityClass;
+				loop: while (clz != Object.class) {
+					Field[] fields = clz.getDeclaredFields();
+					for (Field f : fields) {
+						if (f.getAnnotation(Id.class) != null) {
+							ae = f;
+							break loop;
+						}
+					}
+					clz = clz.getSuperclass();
+				}
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		if (ae == null)
+			return false;
+		GeneratedValue generatedValue = AnnotationUtils.findAnnotation(ae, GeneratedValue.class);
+		GenericGenerator genericGenerator = AnnotationUtils.findAnnotation(ae, GenericGenerator.class);
+		return generatedValue == null || genericGenerator != null && "assigned".equals(genericGenerator.strategy());
 	}
 
 	private static <T extends Annotation> T findAnnotation(Method readMethod, Field declaredField,

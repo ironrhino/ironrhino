@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.GeneratedValue;
 import javax.persistence.Version;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.hibernate.Query;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.DetachedCriteria;
@@ -160,11 +158,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public boolean isIdAssigned() {
-		GeneratedValue generatedValue = AnnotationUtils
-				.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), GeneratedValue.class).get("id");
-		GenericGenerator genericGenerator = AnnotationUtils
-				.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), GenericGenerator.class).get("id");
-		return generatedValue == null || genericGenerator != null && "assigned".equals(genericGenerator.strategy());
+		return EntityClassHelper.isIdAssigned(getEntityClass());
 	}
 
 	public Persistable getEntity() {

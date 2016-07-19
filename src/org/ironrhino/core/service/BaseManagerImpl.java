@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.GeneratedValue;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
@@ -33,7 +32,6 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -50,6 +48,7 @@ import org.ironrhino.core.model.Ordered;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.Recordable;
 import org.ironrhino.core.model.ResultPage;
+import org.ironrhino.core.struts.EntityClassHelper;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
@@ -111,13 +110,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
 		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
 		boolean isnew = obj.isNew();
-		GeneratedValue generatedValue = AnnotationUtils
-				.getAnnotatedPropertyNameAndAnnotations(clazz, GeneratedValue.class).get("id");
-		GenericGenerator genericGenerator = AnnotationUtils
-				.getAnnotatedPropertyNameAndAnnotations(clazz, GenericGenerator.class).get("id");
-		boolean idAssigned = generatedValue == null
-				|| genericGenerator != null && "assigned".equals(genericGenerator.strategy());
-		if (idAssigned) {
+		if (EntityClassHelper.isIdAssigned(clazz)) {
 			Serializable id = obj.getId();
 			if (id == null)
 				throw new IllegalArgumentException(obj + " must have an ID");
