@@ -2,6 +2,7 @@ package org.ironrhino.rest.doc;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -125,7 +126,7 @@ public class ApiDocHelper {
 						throw new ErrorMessage(
 								sampleFileName + " with " + apiDocInstance.getClass().getName() + " is not found!");
 					}
-					return StringUtils.join(IOUtils.readLines(is, "UTF-8"), "\n");
+					return StringUtils.join(IOUtils.readLines(is, StandardCharsets.UTF_8), "\n");
 				}
 			}
 			String sampleMethodName = fields.sampleMethodName();

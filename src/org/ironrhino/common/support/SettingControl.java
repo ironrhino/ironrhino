@@ -2,6 +2,7 @@ package org.ironrhino.common.support;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -203,7 +204,7 @@ public class SettingControl {
 			if (is == null)
 				return;
 			Setting temp;
-			for (String s : IOUtils.readLines(is, "UTF-8")) {
+			for (String s : IOUtils.readLines(is, StandardCharsets.UTF_8)) {
 				if (StringUtils.isBlank(s) || s.trim().startsWith("#"))
 					continue;
 				String arr[] = s.trim().split("#", 2);

@@ -2,6 +2,7 @@ package org.ironrhino.core.jdbc;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -327,7 +328,7 @@ public enum DatabaseProduct {
 
 	public List<String> getKeywords() {
 		try (InputStream is = getClass().getResourceAsStream("keywords.txt")) {
-			List<String> lines = IOUtils.readLines(is, "UTF-8");
+			List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
 			for (String line : lines) {
 				if (line.startsWith(name() + "=")) {
 					String s = line.substring(line.indexOf("=") + 1);

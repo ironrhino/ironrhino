@@ -3,7 +3,8 @@ package org.ironrhino.core.cache.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
@@ -25,10 +26,10 @@ class FstTranscoder implements Transcoder<Object> {
 
 	public static final int DEFAULT_COMPRESSION_THRESHOLD = 16384;
 
-	public static final String DEFAULT_CHARSET = "UTF-8";
+	public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
 	protected int compressionThreshold = DEFAULT_COMPRESSION_THRESHOLD;
-	protected String charset = DEFAULT_CHARSET;
+	protected Charset charset = DEFAULT_CHARSET;
 	protected CompressionMode compressMode = CompressionMode.GZIP;
 	protected static final Logger log = LoggerFactory.getLogger(FstTranscoder.class);
 
@@ -46,13 +47,7 @@ class FstTranscoder implements Transcoder<Object> {
 		this.compressMode = compressMode;
 	}
 
-	public void setCharset(String to) {
-		// Validate the character set.
-		try {
-			new String(new byte[97], to);
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+	public void setCharset(Charset to) {
 		this.charset = to;
 	}
 
@@ -228,23 +223,15 @@ class FstTranscoder implements Transcoder<Object> {
 
 	protected String decodeString(byte[] data) {
 		String rv = null;
-		try {
-			if (data != null) {
-				rv = new String(data, this.charset);
-			}
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+		if (data != null) {
+			rv = new String(data, this.charset);
 		}
 		return rv;
 	}
 
 	protected byte[] encodeString(String in) {
 		byte[] rv = null;
-		try {
-			rv = in.getBytes(this.charset);
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		rv = in.getBytes(this.charset);
 		return rv;
 	}
 

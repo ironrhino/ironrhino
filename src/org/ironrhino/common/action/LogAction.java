@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,7 +99,7 @@ public class LogAction extends BaseAction {
 				while ((line = raf.readLine()) != null) {
 					position = raf.getFilePointer();
 					w.write("data: ");
-					w.write(new String(line.getBytes("ISO-8859-1"), "UTF-8") + "\n");
+					w.write(new String(line.getBytes("ISO-8859-1"), StandardCharsets.UTF_8) + "\n");
 				}
 				raf.close();
 				w.write("id: " + position + "\n\n");

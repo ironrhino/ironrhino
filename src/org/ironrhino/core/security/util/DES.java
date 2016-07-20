@@ -3,6 +3,7 @@ package org.ironrhino.core.security.util;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -51,7 +52,7 @@ public class DES {
 			try {
 				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "des");
 				if (file.exists()) {
-					defaultKey = FileUtils.readFileToString(file, "UTF-8");
+					defaultKey = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 					logger.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
@@ -59,7 +60,7 @@ public class DES {
 								+ " doesn't exists, please use your own default key in production!");
 					if (DES.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream is = DES.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
-							defaultKey = IOUtils.toString(is, "UTF-8");
+							defaultKey = IOUtils.toString(is, StandardCharsets.UTF_8);
 							logger.info("using classpath resource "
 									+ DES.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
@@ -112,7 +113,7 @@ public class DES {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.getEncoder().encode(encrypt(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.getEncoder().encode(encrypt(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -123,7 +124,7 @@ public class DES {
 		if (str == null)
 			return null;
 		try {
-			return new String(decrypt(Base64.getDecoder().decode(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("decrypt exception!", ex);
 			return "";
@@ -144,7 +145,7 @@ public class DES {
 	public static String encryptWithSalt(String str, String salt) {
 		DES des = new DES(defaultKey + salt);
 		try {
-			return new String(Base64.getEncoder().encode(des.encrypt(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.getEncoder().encode(des.encrypt(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -154,7 +155,7 @@ public class DES {
 	public static String decryptWithSalt(String str, String salt) {
 		DES des = new DES(defaultKey + salt);
 		try {
-			return new String(des.decrypt(Base64.getDecoder().decode(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(des.decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("decrypt exception!", ex);
 			return "";

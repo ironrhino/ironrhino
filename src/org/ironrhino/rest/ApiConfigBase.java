@@ -1,7 +1,7 @@
 package org.ironrhino.rest;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +69,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 		};
 		jackson2.setObjectMapper(createObjectMapper());
 		converters.add(jackson2);
-		StringHttpMessageConverter string = new StringHttpMessageConverter(Charset.forName("UTF-8")) {
+		StringHttpMessageConverter string = new StringHttpMessageConverter(StandardCharsets.UTF_8) {
 
 			@Override
 			protected void writeInternal(String str, HttpOutputMessage outputMessage) throws IOException {

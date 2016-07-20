@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
@@ -40,7 +41,7 @@ public class RC4 {
 			try {
 				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rc4");
 				if (file.exists()) {
-					defaultKey = FileUtils.readFileToString(file, "UTF-8");
+					defaultKey = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 					logger.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
@@ -48,7 +49,7 @@ public class RC4 {
 								+ " doesn't exists, please use your own default key in production!");
 					if (RC4.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream is = RC4.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
-							defaultKey = IOUtils.toString(is, "UTF-8");
+							defaultKey = IOUtils.toString(is, StandardCharsets.UTF_8);
 							logger.info("using classpath resource "
 									+ RC4.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
@@ -128,7 +129,7 @@ public class RC4 {
 		if (input == null)
 			return null;
 		try {
-			return Hex.encodeHexString(rc4(URLEncoder.encode(input, "UTF-8").getBytes("UTF-8")));
+			return Hex.encodeHexString(rc4(URLEncoder.encode(input, "UTF-8").getBytes(StandardCharsets.UTF_8)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return input;
@@ -139,7 +140,8 @@ public class RC4 {
 		if (input == null)
 			return null;
 		try {
-			return URLDecoder.decode(new String(rc4(Hex.decodeHex(input.toCharArray())), "UTF-8"), "UTF-8");
+			return URLDecoder.decode(new String(rc4(Hex.decodeHex(input.toCharArray())), StandardCharsets.UTF_8),
+					"UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return input;

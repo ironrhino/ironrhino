@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -77,7 +78,7 @@ public class RSA {
 			try {
 				file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rsa.password");
 				if (file.exists()) {
-					defaultPassword = FileUtils.readFileToString(file, "UTF-8");
+					defaultPassword = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 					logger.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
@@ -85,7 +86,7 @@ public class RSA {
 								+ " doesn't exists, please use your own default key in production!");
 					if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream pis = RSA.class.getResourceAsStream(DEFAULT_KEY_LOCATION + ".password")) {
-							defaultPassword = IOUtils.toString(pis, "UTF-8");
+							defaultPassword = IOUtils.toString(pis, StandardCharsets.UTF_8);
 							logger.info("using classpath resource "
 									+ RSA.class.getResource(DEFAULT_KEY_LOCATION + ".password").toString()
 									+ " as default key");
@@ -158,7 +159,7 @@ public class RSA {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.getEncoder().encode(encrypt(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.getEncoder().encode(encrypt(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -169,7 +170,7 @@ public class RSA {
 		if (str == null)
 			return null;
 		try {
-			return new String(decrypt(Base64.getDecoder().decode(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("decrypt exception!", ex);
 			return "";
@@ -180,7 +181,7 @@ public class RSA {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.getEncoder().encode(sign(str.getBytes("UTF-8"))), "UTF-8");
+			return new String(Base64.getEncoder().encode(sign(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -191,7 +192,7 @@ public class RSA {
 		if (str == null)
 			return false;
 		try {
-			return verify(str.getBytes("UTF-8"), signature.getBytes("UTF-8"));
+			return verify(str.getBytes(StandardCharsets.UTF_8), signature.getBytes(StandardCharsets.UTF_8));
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return false;

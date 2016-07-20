@@ -3,7 +3,7 @@ package org.ironrhino.common.support;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -115,7 +115,7 @@ public class RegionSetup {
 		List<String> lines = new ArrayList<>();
 		try (InputStream is = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("resources/data/region_code.txt")) {
-			lines = IOUtils.readLines(is, "utf-8");
+			lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -163,13 +163,11 @@ public class RegionSetup {
 				return prefix.iterator();
 			}
 		};
-		try {
-			nodeList = XmlUtils.evalNodeList("//kml:Placemark", new InputStreamReader(
-					Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/data/region.kml"),
-					"utf-8"), nsContext);
-		} catch (UnsupportedEncodingException e) {
-			return null;
-		}
+		nodeList = XmlUtils.evalNodeList("//kml:Placemark",
+				new InputStreamReader(
+						Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/data/region.kml"),
+						StandardCharsets.UTF_8),
+				nsContext);
 		ListMultimap<String, String> map = LinkedListMultimap.create();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Element element = (Element) nodeList.item(i);
