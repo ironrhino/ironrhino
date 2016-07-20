@@ -977,6 +977,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						propertyName = propertyName.substring(0, propertyName.indexOf('.'));
 					if (propertyName.indexOf('[') > 0)
 						propertyName = propertyName.substring(0, propertyName.indexOf('['));
+					if (propertyName.equals(versionPropertyName)) {
+						editedPropertyNames.add(propertyName);
+						continue;
+					}
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
 					if (uiConfig == null || uiConfig.getReadonly().isValue()
 							|| fromList && uiConfig.getHiddenInList().isValue()
@@ -999,9 +1003,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							continue;
 					}
 					editedPropertyNames.add(propertyName);
-					if (isAttachmentable())
-						editedPropertyNames.add("attachments");
 				}
+				if (isAttachmentable())
+					editedPropertyNames.add("attachments");
 				for (String name : editedPropertyNames)
 					bwp.setPropertyValue(name, bw.getPropertyValue(name));
 				bw = bwp;
