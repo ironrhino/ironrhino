@@ -100,7 +100,7 @@ public class MongoFileStorage implements FileStorage {
 			throw new IOException("cannot direct access path /");
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null)
-			throw new IOException("path " + path + " doesn't exists");
+			throw new IOException("path " + path + " doesn't exist");
 		if (file.isDirectory())
 			throw new IOException("path " + path + " is directory");
 		return new ByteArrayInputStream(file.getData());

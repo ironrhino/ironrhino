@@ -35,7 +35,7 @@ public class StandaloneConcurrencyService implements ConcurrencyService {
 	public void release(String name) {
 		Semaphore semaphore = semaphores.get(name);
 		if (semaphore == null)
-			throw new IllegalArgumentException("Semaphore '" + name + " ' doesn't exists");
+			throw new IllegalArgumentException("Semaphore '" + name + " ' doesn't exist");
 		semaphore.release();
 	}
 

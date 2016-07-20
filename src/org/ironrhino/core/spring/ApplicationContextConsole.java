@@ -115,7 +115,7 @@ public class ApplicationContextConsole {
 			methodName = methodName.substring(0, methodName.indexOf('('));
 			Object bean = getBeans().get(beanName);
 			if (bean == null)
-				throw new IllegalArgumentException("bean[" + beanName + "] doesn't exists");
+				throw new IllegalArgumentException("bean[" + beanName + "] doesn't exist");
 			try {
 				Method m = bean.getClass().getMethod(methodName, new Class[0]);
 				return m.invoke(bean, new Object[0]);

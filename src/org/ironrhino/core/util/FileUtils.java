@@ -24,7 +24,7 @@ public class FileUtils {
 		if (zipFile == null)
 			zipFile = defaultZipFileName(file);
 		if (!file.exists() || !file.canRead())
-			throw new RuntimeException(file + "doesn't exists or cannot read");
+			throw new RuntimeException(file + "doesn't exist or cannot read");
 		if (file.isDirectory()) {
 			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
 			zipDirctory(out, file, "");
