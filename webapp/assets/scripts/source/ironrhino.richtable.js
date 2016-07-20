@@ -69,7 +69,8 @@ Richtable = {
 		}
 		return url;
 	},
-	open : function(url, reloadonclose, useiframe, form) {
+	open : function(url, reloadonclose, useiframe, form, btn) {
+		btn.prop('disabled', true).addClass('disabled');
 		form = form || $('form.richtable');
 		reloadonclose = reloadonclose || false;
 		useiframe = useiframe || false;
@@ -184,7 +185,10 @@ Richtable = {
 						cache : false,
 						target : target,
 						replacement : winid + ':content',
-						quiet : true
+						quiet : true,
+						complete : function() {
+							btn.prop('disabled', false).removeClass('disabled');
+						}
 					});
 		} else {
 			// embed iframe
@@ -194,6 +198,7 @@ Richtable = {
 			var iframe = $('#' + winid + ' > iframe')[0];
 			iframe.src = url;
 			iframe.onload = function() {
+				btn.prop('disabled', false).removeClass('disabled');
 				Dialog.adapt(win, iframe);
 			}
 		}
@@ -215,7 +220,7 @@ Richtable = {
 										.hasClass('forcereload') || !$('#'
 								+ winid + ' form.ajax').hasClass('dontreload'))) {
 					$('.action .reload', form).addClass('clicked');
-					$(form).submit();
+					form.submit();
 				}
 				win.html('').dialog('destroy').remove();
 			},
@@ -250,14 +255,12 @@ Richtable = {
 		return winid;
 	},
 	click : function(event) {
-		var btn = event.target;
-		var form = $(btn).closest('form');
-		if ($(btn).prop('tagName') != 'BUTTON' || $(btn).prop('tagName') != 'A')
-			btn = $(btn).closest('button,a');
+		var btn = $(event.target).closest('button,a');
+		var form = btn.closest('form');
 		if (btn.attr('onclick') || btn.hasClass('raw'))
 			return;
 		var idparams;
-		var tr = $(btn).closest('tr');
+		var tr = btn.closest('tr');
 		var id = tr.data('rowid')
 				|| $('input[type="checkbox"],input[type="radio"]',
 						$('td:eq(0)', tr)).val();
@@ -273,10 +276,10 @@ Richtable = {
 			});
 			idparams = arr.join('&');
 		}
-		var action = $(btn).data('action');
+		var action = btn.data('action');
 		if (action)
 			btn.addClass('clicked');
-		var view = $(btn).data('view');
+		var view = btn.data('view');
 		if (action == 'save')
 			Richtable.save(event);
 		else if (action) {
@@ -284,8 +287,9 @@ Richtable = {
 				Message.showMessage('no.selection');
 				return false;
 			}
+			btn.prop('disabled', true).addClass('disabled');
 			if (action == 'delete') {
-				$.alerts.confirm($(btn).data('confirm')
+				$.alerts.confirm(btn.data('confirm')
 								|| MessageBundle.get('confirm.delete'),
 						MessageBundle.get('select'), function(b) {
 							if (b) {
@@ -298,15 +302,22 @@ Richtable = {
 									type : 'POST',
 									dataType : 'json',
 									success : function() {
-										$(form).submit();
+										form.submit();
 										setTimeout(function() {
 													form
 															.closest('.reload-container')
 															.find('.reloadable')
 															.trigger('reload');
 												}, 500);
+									},
+									complete : function() {
+										btn.prop('disabled', false)
+												.removeClass('disabled');
 									}
 								});
+							} else {
+								btn.prop('disabled', false)
+										.removeClass('disabled');
 							}
 						});
 			} else {
@@ -315,20 +326,26 @@ Richtable = {
 				url += (url.indexOf('?') > 0 ? '&' : '?') + idparams;
 				var action = function() {
 					ajax({
-								url : url,
-								type : 'POST',
-								dataType : 'json',
-								success : function() {
-									$(form).submit();
-								}
-							});
+						url : url,
+						type : 'POST',
+						dataType : 'json',
+						success : function() {
+							form.submit();
+						},
+						complete : function() {
+							btn.prop('disabled', false).removeClass('disabled');
+						}
+					});
 				}
-				if ($(btn).hasClass('confirm')) {
-					$.alerts.confirm($(btn).data('confirm')
+				if (btn.hasClass('confirm')) {
+					$.alerts.confirm(btn.data('confirm')
 									|| MessageBundle.get('confirm.action'),
 							MessageBundle.get('select'), function(b) {
 								if (b) {
 									action();
+								} else {
+									btn.prop('disabled', false)
+											.removeClass('disabled');
 								}
 							});
 				} else {
@@ -338,13 +355,13 @@ Richtable = {
 			}
 		} else {
 			var options = (new Function("return "
-					+ ($(btn).data('windowoptions') || '{}')))();
-			var url = $(btn).attr('href');
+					+ (btn.data('windowoptions') || '{}')))();
+			var url = btn.attr('href');
 			if (view) {
 				url = Richtable.getUrl(view, id, !id || options.includeParams,
 						form);
 			} else {
-				if (!$(btn).hasClass('noid')) {
+				if (!btn.hasClass('noid')) {
 					if (!id) {
 						// from bottom
 						if (!idparams) {
@@ -358,10 +375,10 @@ Richtable = {
 				}
 			}
 			var reloadonclose = typeof(options.reloadonclose) == 'undefined'
-					? (view != 'view' && !$(btn).hasClass('view'))
+					? (view != 'view' && !btn.hasClass('view'))
 					: options.reloadonclose;
-			var winid = Richtable
-					.open(url, reloadonclose, options.iframe, form);
+			var winid = Richtable.open(url, reloadonclose, options.iframe,
+					form, btn);
 			delete options.iframe;
 			delete options.reloadonclose;
 			for (var key in options)
@@ -371,6 +388,8 @@ Richtable = {
 		}
 	},
 	save : function(event) {
+		var btn = $(event.target).closest('button,a');
+		btn.prop('disabled', true).addClass('disabled');
 		var action = function() {
 			var form = $(event.target).closest('form');
 			var versionproperty = form.data('versionproperty');
@@ -399,45 +418,48 @@ Richtable = {
 					var url = Richtable.getBaseUrl(form) + '/save'
 							+ Richtable.getPathParams();
 					ajax({
-								url : url,
-								type : 'POST',
-								data : params,
-								dataType : 'json',
-								headers : {
-									'X-Edit' : 'cell'
-								},
-								onsuccess : function() {
-									$('td', row).removeClass('edited')
-											.removeData('oldvalue');
-									if (version != undefined)
-										$(row).data('version', version + 1);
-									$('[data-action="save"]', form)
-											.removeClass('btn-primary').hide();
-									setTimeout(function() {
-												form
-														.closest('.reload-container')
-														.find('.reloadable')
-														.trigger('reload');
-											}, 500);
-								}
-							});
+						url : url,
+						type : 'POST',
+						data : params,
+						dataType : 'json',
+						headers : {
+							'X-Edit' : 'cell'
+						},
+						onsuccess : function() {
+							$('td', row).removeClass('edited')
+									.removeData('oldvalue');
+							if (version != undefined)
+								$(row).data('version', version + 1);
+							$('[data-action="save"]', form)
+									.removeClass('btn-primary').hide();
+							setTimeout(function() {
+										form.closest('.reload-container')
+												.find('.reloadable')
+												.trigger('reload');
+									}, 500);
+						},
+						complete : function() {
+							btn.prop('disabled', false).removeClass('disabled');
+						}
+					});
 				}
 			});
 			if (!modified) {
+				btn.prop('disabled', false).removeClass('disabled');
 				Message.showMessage('no.modification');
 				return false;
 			}
 		}
 
-		var btn = event.target;
-		if ($(btn).prop('tagName') != 'BUTTON' || $(btn).prop('tagName') != 'A')
-			btn = $(btn).closest('button,a');
-		if ($(btn).hasClass('confirm')) {
-			$.alerts.confirm($(btn).data('confirm')
+		if (btn.hasClass('confirm')) {
+			$.alerts.confirm(btn.data('confirm')
 							|| MessageBundle.get('confirm.save'), MessageBundle
 							.get('select'), function(b) {
 						if (b) {
 							action();
+						} else {
+							console.log(b);
+							btn.prop('disabled', false).removeClass('disabled');
 						}
 					});
 		} else {
@@ -587,9 +609,11 @@ Initialization.richtable = function() {
 					'click',
 					'.richtable .action [data-view],.richtable .action [data-action],form.richtable a[rel="richtable"]',
 					Richtable.click).on('click', '.richtable .action .reload',
-					function() {
-						var form = $(this).closest('.reload')
-								.addClass('clicked').closest('form');
+					function(event) {
+						var btn = $(event.target).closest('button,a')
+								.addClass('clicked');
+						var form = btn.closest('form');
+						btn.prop('disabled', true);
 						form.submit();
 						setTimeout(function() {
 									form.closest('.reload-container')
@@ -616,8 +640,8 @@ Initialization.richtable = function() {
 							return parseInt(v) + 1
 						});
 				$.ajax({
-					url : $(form).prop('action'),
-					type : $(form).attr('method'),
+					url : form.prop('action'),
+					type : form.attr('method'),
 					data : form.serialize(),
 					success : function(data) {
 						var html = data

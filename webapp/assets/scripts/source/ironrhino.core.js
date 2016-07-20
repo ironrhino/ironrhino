@@ -659,8 +659,7 @@ Ajax = {
 						}, 100);
 			else
 				setTimeout(function() {
-							$('button[type="submit"]', target).prop('disabled',
-									false);
+							$(':submit', target).prop('disabled', false);
 							Captcha.refresh()
 						}, 100);
 			if (!hasError && $(target).hasClass('reset') && target.reset) {
@@ -1526,7 +1525,7 @@ Observation.common = function(container) {
 				},
 				beforeSubmit : function() {
 					Indicator.text = $(target).data('indicator');
-					$('button[type="submit"]', target).prop('disabled', true);
+					$(':submit', target).prop('disabled', true);
 					Ajax.fire(target, 'onloading');
 					var form = $(target);
 					var pushstate = false;
@@ -1662,6 +1661,7 @@ Observation.common = function(container) {
 					}
 
 				}
+				var t = $(this).addClass('disabled');
 				var options = {
 					target : this,
 					url : this.href,
@@ -1674,6 +1674,9 @@ Observation.common = function(container) {
 					},
 					error : function() {
 						Ajax.fire(target, 'onerror');
+					},
+					complete : function() {
+						t.removeClass('disabled');
 					}
 				};
 				if (!$(this).hasClass('view'))

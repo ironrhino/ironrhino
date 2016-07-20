@@ -8091,6 +8091,9 @@ a.remove:hover {
   opacity: 0.4;
   filter: alpha(opacity=40);
 }
+button.disabled,a.disabled {
+  pointer-events: none;
+}
 
 .glyphicon-download-alt,.glyphicon-download{
  opacity: 0.2;
