@@ -259,10 +259,12 @@ a.remove:hover {
   opacity: 0.4;
   filter: alpha(opacity=40);
 }
-button.disabled,a.disabled {
+.disabled {
   pointer-events: none;
 }
-
+input[type="checkbox"].disabled + label.custom,input[type="radio"].disabled + label.custom{
+  pointer-events: none;
+}
 .glyphicon-download-alt,.glyphicon-download{
  opacity: 0.2;
 }

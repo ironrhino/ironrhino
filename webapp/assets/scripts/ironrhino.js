@@ -33895,6 +33895,7 @@ Observation.common = function(container) {
 					Ajax.fire(target, 'onbeforeserialize');
 				},
 				beforeSubmit : function() {
+					$(target).addClass('disabled');
 					Indicator.text = $(target).data('indicator');
 					$(':submit', target).prop('disabled', true);
 					Ajax.fire(target, 'onloading');
@@ -33963,6 +33964,9 @@ Observation.common = function(container) {
 				},
 				success : function(data) {
 					Ajax.handleResponse(data, _opt);
+				},
+				complete : function() {
+					$(target).removeClass('disabled');
 				},
 				headers : _opt.headers
 			};
