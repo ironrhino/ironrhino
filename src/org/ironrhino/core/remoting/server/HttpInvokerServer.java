@@ -2,7 +2,6 @@ package org.ironrhino.core.remoting.server;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -85,7 +84,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 				long time = System.currentTimeMillis();
 				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
 				time = System.currentTimeMillis() - time;
-				writeRemoteInvocationResult(request, response, result);
+				writeRemoteInvocationResult(request, response, invocation, result);
 				if (serviceStats != null) {
 					StringBuilder method = new StringBuilder(invocation.getMethodName()).append("(");
 					Class<?>[] parameterTypes = invocation.getParameterTypes();
@@ -177,15 +176,17 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		}
 	}
 
-	@Override
 	protected void writeRemoteInvocationResult(HttpServletRequest request, HttpServletResponse response,
-			RemoteInvocationResult result, OutputStream os) throws IOException {
+			RemoteInvocation invocation, RemoteInvocationResult result) throws IOException {
 		boolean useFstSerialization = CONTENT_TYPE_FST_SERIALIZED_OBJECT
 				.equals(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
-		if (useFstSerialization)
-			FstHttpInvokerSerializationHelper.writeRemoteInvocationResult(result, os);
-		else
-			super.writeRemoteInvocationResult(request, response, result, os);
+		if (useFstSerialization) {
+			response.setContentType(getContentType());
+			FstHttpInvokerSerializationHelper.writeRemoteInvocationResult(result,
+					decorateOutputStream(request, response, response.getOutputStream()));
+		} else {
+			super.writeRemoteInvocationResult(request, response, result);
+		}
 	}
 
 }
