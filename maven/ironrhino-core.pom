@@ -10,7 +10,7 @@
 	<description>Core</description>
 	<properties>
 		<aspectj.version>1.8.9</aspectj.version>
-        <spring.version>4.3.1.RELEASE</spring.version>
+        <spring.version>4.3.2.RELEASE</spring.version>
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <struts.version>2.3.16.3</struts.version>
         <jackson.version>2.7.5</jackson.version>

@@ -148,11 +148,4 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		return sfb.buildSessionFactory();
 	}
 
-	@Override
-	public void setCurrentTenantIdentifierResolver(CurrentTenantIdentifierResolver currentTenantIdentifierResolver) {
-		getHibernateProperties().put(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER,
-				currentTenantIdentifierResolver);
-		super.setCurrentTenantIdentifierResolver(currentTenantIdentifierResolver);
-	}
-
 }
