@@ -2,7 +2,9 @@ package org.ironrhino.core.remoting.client;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.remoting.GenericRemoteInvocation;
 import org.ironrhino.core.remoting.RemotingContext;
+import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.spring.RemotingClientProxy;
@@ -18,7 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor;
+import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.util.Assert;
+
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
 
@@ -26,8 +31,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
 
-	@Value("${httpInvoker.useFstSerialization:false}")
-	private boolean useFstSerialization;
+	@Value("${httpInvoker.serialization.type:JAVA}")
+	private volatile SerializationType serializationType = SerializationType.JAVA;
 
 	@Value("${httpInvoker.loggingPayload:false}")
 	private boolean loggingPayload;
@@ -107,14 +112,13 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		this.serviceStats = serviceStat;
 	}
 
-	public boolean isUseFstSerialization() {
-		return useFstSerialization;
+	public SerializationType getSerializationType() {
+		return serializationType;
 	}
 
-	public void setUseFstSerialization(boolean useFstSerialization) {
-		this.useFstSerialization = useFstSerialization;
-		SimpleHttpInvokerRequestExecutor executor = useFstSerialization ? new FstSimpleHttpInvokerRequestExecutor()
-				: new SimpleHttpInvokerRequestExecutor();
+	public void setSerializationType(SerializationType serializationType) {
+		this.serializationType = serializationType;
+		SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor(serializationType);
 		executor.setBeanClassLoader(getBeanClassLoader());
 		super.setHttpInvokerRequestExecutor(executor);
 	}
@@ -134,11 +138,18 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			discovered = false;
 			urlFromDiscovery = true;
 		}
-		setUseFstSerialization(this.useFstSerialization);
+		setSerializationType(getSerializationType());
 		super.afterPropertiesSet();
 		ProxyFactory pf = new ProxyFactory(getServiceInterface(), this);
 		pf.addInterface(RemotingClientProxy.class);
 		this.serviceProxy = pf.getProxy(getBeanClassLoader());
+	}
+
+	@Override
+	protected RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
+		if (getSerializationType() == SerializationType.JSON)
+			return new GenericRemoteInvocation(methodInvocation);
+		return super.createRemoteInvocation(methodInvocation);
 	}
 
 	@Override
@@ -201,9 +212,13 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			if (--attempts < 1)
 				throw e;
 			Throwable throwable = e.getCause();
-			if (throwable instanceof SerializationFailedException) {
-				setUseFstSerialization(false);
-				logger.error("downgrade serialization from fst to java for service[{}]: {}",
+			if (throwable instanceof SerializationFailedException && getSerializationType() == SerializationType.FST) {
+				setSerializationType(SerializationType.JAVA);
+				logger.error("downgrade serialization from FST to JAVA for service[{}]: {}",
+						getServiceInterface().getName(), throwable.getMessage());
+			} else if (throwable instanceof JsonMappingException && getSerializationType() == SerializationType.JSON) {
+				setSerializationType(SerializationType.JAVA);
+				logger.error("downgrade serialization from JSON to JAVA for service[{}]: {}",
 						getServiceInterface().getName(), throwable.getMessage());
 			} else {
 				if (urlFromDiscovery) {

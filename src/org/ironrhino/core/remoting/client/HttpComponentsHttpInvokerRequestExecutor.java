@@ -3,6 +3,7 @@ package org.ironrhino.core.remoting.client;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.Locale;
 import java.util.Map;
@@ -19,12 +20,14 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.ironrhino.core.remoting.RemotingContext;
+import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.remoting.httpinvoker.AbstractHttpInvokerRequestExecutor;
 import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
+import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.StringUtils;
 
@@ -32,11 +35,21 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 
 	private CloseableHttpClient httpClient;
 
+	private SerializationType serializationType = SerializationType.JAVA;
+
 	private long timeToLive = 60;
 
 	private int maxConnPerRoute = 1000;
 
 	private int maxConnTotal = 1000;
+
+	public SerializationType getSerializationType() {
+		return serializationType;
+	}
+
+	public void setSerializationType(SerializationType serializationType) {
+		this.serializationType = serializationType;
+	}
 
 	public long getTimeToLive() {
 		return timeToLive;
@@ -122,6 +135,28 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String getContentType() {
+		return serializationType.getContentType();
+	}
+
+	@Override
+	protected void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
+		if (serializationType != SerializationType.JAVA)
+			serializationType.writeRemoteInvocation(invocation, decorateOutputStream(os));
+		else
+			super.writeRemoteInvocation(invocation, os);
+	}
+
+	@Override
+	protected RemoteInvocationResult readRemoteInvocationResult(InputStream is, String codebaseUrl)
+			throws IOException, ClassNotFoundException {
+		if (serializationType != SerializationType.JAVA)
+			return serializationType.readRemoteInvocationResult(decorateInputStream(is));
+		else
+			return super.readRemoteInvocationResult(is, codebaseUrl);
 	}
 
 }

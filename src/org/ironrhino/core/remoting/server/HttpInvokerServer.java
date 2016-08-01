@@ -11,8 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ironrhino.core.remoting.FstHttpInvokerSerializationHelper;
 import org.ironrhino.core.remoting.RemotingContext;
+import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.util.JsonUtils;
@@ -27,8 +27,6 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class HttpInvokerServer extends HttpInvokerServiceExporter {
-
-	protected static final String CONTENT_TYPE_FST_SERIALIZED_OBJECT = "application/x-fst-serialized-object";
 
 	protected static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
 
@@ -167,22 +165,19 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	protected RemoteInvocation readRemoteInvocation(HttpServletRequest request, InputStream is)
 			throws IOException, ClassNotFoundException {
-		boolean useFstSerialization = CONTENT_TYPE_FST_SERIALIZED_OBJECT
-				.equals(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
-		if (useFstSerialization) {
-			return FstHttpInvokerSerializationHelper.readRemoteInvocation(is);
-		} else {
+		SerializationType serializationType = SerializationType.parse(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
+		if (serializationType != SerializationType.JAVA)
+			return serializationType.readRemoteInvocation(decorateInputStream(request, is));
+		else
 			return super.readRemoteInvocation(request, is);
-		}
 	}
 
 	protected void writeRemoteInvocationResult(HttpServletRequest request, HttpServletResponse response,
 			RemoteInvocation invocation, RemoteInvocationResult result) throws IOException {
-		boolean useFstSerialization = CONTENT_TYPE_FST_SERIALIZED_OBJECT
-				.equals(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
-		if (useFstSerialization) {
-			response.setContentType(getContentType());
-			FstHttpInvokerSerializationHelper.writeRemoteInvocationResult(result,
+		SerializationType serializationType = SerializationType.parse(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
+		if (serializationType != SerializationType.JAVA) {
+			response.setContentType(serializationType.getContentType());
+			serializationType.writeRemoteInvocationResult(invocation, result,
 					decorateOutputStream(request, response, response.getOutputStream()));
 		} else {
 			super.writeRemoteInvocationResult(request, response, result);

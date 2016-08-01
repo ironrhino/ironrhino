@@ -13,6 +13,15 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class FstHttpInvokerSerializationHelper {
 
+	public static void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
+		FSTObjectOutput out = new FSTObjectOutput(os);
+		try {
+			out.writeObject(invocation);
+		} finally {
+			out.close();
+		}
+	}
+
 	public static RemoteInvocation readRemoteInvocation(InputStream is) throws IOException, ClassNotFoundException {
 		FSTObjectInput in = new FSTObjectInput(is);
 		try {
@@ -29,19 +38,11 @@ public class FstHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static void writeRemoteInvocationResult(RemoteInvocationResult result, OutputStream os) throws IOException {
+	public static void writeRemoteInvocationResult(RemoteInvocation invocation, RemoteInvocationResult result,
+			OutputStream os) throws IOException {
 		FSTObjectOutput out = new FSTObjectOutput(os);
 		try {
 			out.writeObject(result);
-		} finally {
-			out.close();
-		}
-	}
-
-	public static void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
-		FSTObjectOutput out = new FSTObjectOutput(os);
-		try {
-			out.writeObject(invocation);
 		} finally {
 			out.close();
 		}
