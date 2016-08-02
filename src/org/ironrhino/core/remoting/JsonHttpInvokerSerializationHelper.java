@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,12 +17,20 @@ import java.util.Map;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonHttpInvokerSerializationHelper {
@@ -29,8 +38,18 @@ public class JsonHttpInvokerSerializationHelper {
 	private static final String SEPARATOR = "|";
 
 	private static ObjectMapper objectMapper = new ObjectMapper()
+			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).registerModule(new SimpleModule()
+					.addDeserializer(GrantedAuthority.class, new JsonDeserializer<SimpleGrantedAuthority>() {
+						@Override
+						public SimpleGrantedAuthority deserialize(JsonParser jsonParser,
+								DeserializationContext deserializationContext)
+								throws IOException, JsonProcessingException {
+							JsonNode node = jsonParser.readValueAsTree();
+							return new SimpleGrantedAuthority(node.get("authority").textValue());
+						}
+					}));
 
 	public static void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
 		GenericRemoteInvocation invocation = (GenericRemoteInvocation) remoteInvocation;
@@ -42,10 +61,8 @@ public class JsonHttpInvokerSerializationHelper {
 		for (int i = 0; i < types.length; i++) {
 			String type = types[i];
 			Object argument = arguments[i];
-			JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
-			if (!jt.isContainerType() && !jt.isConcrete() && argument != null)
-				type += SEPARATOR + objectMapper.getTypeFactory().constructType(argument.getClass()).toCanonical();
-			on.putPOJO(type, argument);
+			String concreteType = toConcrete(type, argument);
+			on.putPOJO(concreteType.equals(type) ? type : type + SEPARATOR + concreteType, argument);
 		}
 		byte[] bytes = methodName.getBytes(StandardCharsets.UTF_8);
 		os.write(bytes.length);
@@ -66,7 +83,7 @@ public class JsonHttpInvokerSerializationHelper {
 		bytes = new byte[length];
 		is.read(bytes);
 		invocation.setGenericReturnType(new String(bytes, StandardCharsets.UTF_8));
-		JsonNode node = objectMapper.readValue(is, JsonNode.class);
+		JsonNode node = objectMapper.readTree(is);
 		if (node instanceof ObjectNode) {
 			ObjectNode on = (ObjectNode) node;
 			List<String> genericParameterTypes = new ArrayList<>();
@@ -102,10 +119,7 @@ public class JsonHttpInvokerSerializationHelper {
 		if (exception == null) {
 			os.write(0);
 			String returnType = invocation.getGenericReturnType();
-			JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(returnType);
-			if (!jt.isContainerType() && !jt.isConcrete() && result.getValue() != null)
-				returnType += SEPARATOR
-						+ objectMapper.getTypeFactory().constructType(result.getValue().getClass()).toCanonical();
+			returnType = toConcrete(returnType, result.getValue());
 			byte[] bytes = returnType.getBytes(StandardCharsets.UTF_8);
 			os.write(bytes.length);
 			os.write(bytes);
@@ -128,14 +142,13 @@ public class JsonHttpInvokerSerializationHelper {
 			int length = is.read();
 			byte[] bytes = new byte[length];
 			is.read(bytes);
-			String name = new String(bytes, StandardCharsets.UTF_8);
-			int index = name.indexOf(SEPARATOR);
-			String type = index > 0 ? name.substring(index + SEPARATOR.length()) : name;
-			JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
-			Object value = jt.toCanonical().equals("void") ? null : objectMapper.readValue(is, jt);
-			result.setValue(value);
+			String type = new String(bytes, StandardCharsets.UTF_8);
+			if (!type.equals("void")) {
+				JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
+				result.setValue(objectMapper.readValue(is, jt));
+			}
 			return result;
-		} else if (i == 1) {
+		} else {
 			Map<String, String> map = objectMapper.readValue(is, JsonUtils.STRING_MAP_TYPE);
 			Class<?> clz = Class.forName(map.get("type"));
 			Throwable throwable;
@@ -148,11 +161,28 @@ public class JsonHttpInvokerSerializationHelper {
 			result.setException(exception);
 			return result;
 		}
-		throw new RemoteException("Illegal stream");
 	}
 
 	public static String toCanonical(Type type) {
 		return objectMapper.getTypeFactory().constructType(type).toCanonical();
+	}
+
+	private static String toConcrete(String type, Object argument) {
+		JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
+		if (argument != null) {
+			if (!jt.isContainerType() && !jt.isConcrete()) {
+				return objectMapper.getTypeFactory().constructType(argument.getClass()).toCanonical();
+			} else if (jt.isCollectionLikeType() && !jt.getContentType().isConcrete()
+					&& argument instanceof Collection) {
+				Collection<?> coll = (Collection<?>) argument;
+				if (!coll.isEmpty()) {
+					JavaType newJt = objectMapper.getTypeFactory().constructParametricType(jt.getRawClass(),
+							objectMapper.getTypeFactory().constructType(coll.iterator().next().getClass()));
+					return newJt.toCanonical();
+				}
+			}
+		}
+		return type;
 	}
 
 }

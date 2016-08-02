@@ -8,9 +8,6 @@ import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class User implements UserDetails {
 
 	private static final long serialVersionUID = -6135434863820342822L;
@@ -55,12 +52,10 @@ public class User implements UserDetails {
 	}
 
 	@Override
-	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
-	@JsonProperty
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -164,19 +159,16 @@ public class User implements UserDetails {
 	}
 
 	@Override
-	@JsonIgnore
 	public boolean isAccountNonExpired() {
 		return accountExpireDate == null || accountExpireDate.after(new Date());
 	}
 
 	@Override
-	@JsonIgnore
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
 	@Override
-	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
 		return !isPasswordExpired();
 	}

@@ -16,6 +16,8 @@ import org.ironrhino.core.model.Displayable;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -94,6 +96,13 @@ public class JsonUtils {
 					throw new RuntimeException(date + " is not valid date");
 				return d;
 			}
+		}).addDeserializer(GrantedAuthority.class, new JsonDeserializer<SimpleGrantedAuthority>() {
+			@Override
+			public SimpleGrantedAuthority deserialize(JsonParser jsonParser,
+					DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+				JsonNode node = jsonParser.readValueAsTree();
+				return new SimpleGrantedAuthority(node.get("authority").textValue());
+			}
 		}));
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -120,7 +129,7 @@ public class JsonUtils {
 
 	public static boolean isValidJson(String content) {
 		try {
-			getObjectMapper().readValue(content, JsonNode.class);
+			getObjectMapper().readTree(content);
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -153,7 +162,7 @@ public class JsonUtils {
 	public static String unprettify(String json) {
 		ObjectMapper objectMapper = getObjectMapper();
 		try {
-			JsonNode node = objectMapper.readValue(json, JsonNode.class);
+			JsonNode node = objectMapper.readTree(json);
 			return objectMapper.writeValueAsString(node);
 		} catch (Exception e) {
 			return json;
@@ -163,7 +172,7 @@ public class JsonUtils {
 	public static String prettify(String json) {
 		ObjectMapper objectMapper = getObjectMapper();
 		try {
-			JsonNode node = objectMapper.readValue(json, JsonNode.class);
+			JsonNode node = objectMapper.readTree(json);
 			ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
 			return writer.writeValueAsString(node);
 		} catch (Exception e) {

@@ -1,8 +1,13 @@
 package org.ironrhino.sample.remoting;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.security.domain.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -42,9 +47,24 @@ public class TestServiceImpl implements TestService {
 	}
 
 	public UserDetails loadUserByUsername(String username) {
+		if (username == null)
+			return null;
 		User user = new User();
 		user.setUsername(username);
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority("test"));
+		user.setAuthorities(authorities);
 		return user;
+	}
+
+	public List<UserDetails> search(String keyword) {
+		if (keyword == null)
+			return null;
+		if (StringUtils.isBlank(keyword))
+			return Collections.emptyList();
+		List<UserDetails> list = new ArrayList<>();
+		list.add(loadUserByUsername(keyword));
+		return list;
 	}
 
 }

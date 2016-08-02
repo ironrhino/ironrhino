@@ -21,7 +21,11 @@ public class TestServiceMain {
 				.echoListWithArray(Collections.singletonList(new String[] { "echoWithArrayList" })).get(0)[0]);
 		System.out.println(testService.countAndAdd(Collections.singletonList("test"), 2));
 		System.out.println(testService.echoArray(new String[] { "array" })[0]);
+		System.out.println(testService.loadUserByUsername(null));
 		System.out.println(testService.loadUserByUsername("username").getUsername());
+		System.out.println(testService.search(null));
+		System.out.println(testService.search(""));
+		System.out.println(testService.search("username").get(0).getUsername());
 		try {
 			testService.throwException("this is a message");
 		} catch (IllegalArgumentException e) {
