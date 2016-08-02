@@ -521,13 +521,11 @@ public class EntityClassHelper {
 
 	public static boolean isIdAssigned(Class<?> entityClass) {
 		Boolean b = idAssignedCache.get(entityClass);
-		if (b != null) {
-			return b;
-		} else {
+		if (b == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			b = _isIdAssigned(entityClass);
 			idAssignedCache.put(entityClass, b);
-			return b;
 		}
+		return b;
 	}
 
 	private static boolean _isIdAssigned(Class<?> entityClass) {
@@ -536,14 +534,15 @@ public class EntityClassHelper {
 		AnnotatedElement ae = null;
 		try {
 			Method m = entityClass.getMethod("getId");
-			if (AnnotationUtils.findAnnotation(m, Id.class) != null) {
+			if (AnnotationUtils.findAnnotation(m, Id.class) != null
+					|| AnnotationUtils.findAnnotation(m, EmbeddedId.class) != null) {
 				ae = m;
 			} else {
 				Class<?> clz = entityClass;
 				loop: while (clz != Object.class) {
 					Field[] fields = clz.getDeclaredFields();
 					for (Field f : fields) {
-						if (f.getAnnotation(Id.class) != null) {
+						if (f.getAnnotation(Id.class) != null || f.getAnnotation(EmbeddedId.class) != null) {
 							ae = f;
 							break loop;
 						}
