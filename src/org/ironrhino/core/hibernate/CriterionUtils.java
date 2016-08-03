@@ -12,8 +12,6 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.StringType;
-import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.servlet.RequestContext;
@@ -30,8 +28,6 @@ public class CriterionUtils {
 	public static final String CRITERION_OPERATOR_SUFFIX = "-op";
 
 	public static final String CRITERION_ORDER_SUFFIX = "-od";
-
-	public static DatabaseProduct DATABASE_PRODUCT;
 
 	public static Criterion like(String value, String... names) {
 		Criterion criterion = null;
@@ -88,32 +84,7 @@ public class CriterionUtils {
 	}
 
 	public static Criterion matchTag(String tagFieldName, String tag) {
-		tag = tag.trim();
-		if (tagFieldName.indexOf('.') < 0) {
-			if (DATABASE_PRODUCT == DatabaseProduct.MYSQL)
-				return Restrictions.sqlRestriction("find_in_set(?," + getActualColumnName(tagFieldName) + ")", tag,
-						StringType.INSTANCE);
-			else if (DATABASE_PRODUCT == DatabaseProduct.POSTGRESQL)
-				return Restrictions.sqlRestriction(
-						"?=any(string_to_array(" + getActualColumnName(tagFieldName) + ",','))", tag,
-						StringType.INSTANCE);
-			else if (DATABASE_PRODUCT == DatabaseProduct.ORACLE)
-				return Restrictions.sqlRestriction("','||" + getActualColumnName(tagFieldName) + "||',' like ?",
-						"%," + tag + ",%", StringType.INSTANCE);
-			else if (DATABASE_PRODUCT == DatabaseProduct.SQLSERVER || DATABASE_PRODUCT == DatabaseProduct.SYBASE)
-				return Restrictions.sqlRestriction("(','+" + getActualColumnName(tagFieldName) + "+',') like ?",
-						"%," + tag + ",%", StringType.INSTANCE);
-		}
-		return Restrictions.or(Restrictions.eq(tagFieldName, tag),
-				Restrictions.or(Restrictions.like(tagFieldName, tag + ",", MatchMode.START),
-						Restrictions.or(Restrictions.like(tagFieldName, "," + tag, MatchMode.END),
-								Restrictions.like(tagFieldName, "," + tag + ",", MatchMode.ANYWHERE))));
-	}
-
-	private static String getActualColumnName(String propertyName) {
-		if (propertyName.endsWith("AsString"))
-			return propertyName.substring(0, propertyName.length() - 8);
-		return propertyName;
+		return new FindInSetCriterion(tagFieldName, tag.trim());
 	}
 
 	public static CriteriaState filter(DetachedCriteria dc, Class<? extends Persistable<?>> entityClass) {

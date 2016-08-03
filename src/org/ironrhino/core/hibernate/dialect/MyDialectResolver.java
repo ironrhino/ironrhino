@@ -4,7 +4,6 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQL57InnoDBDialect;
 import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
-import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 
 public class MyDialectResolver extends StandardDialectResolver {
@@ -15,7 +14,6 @@ public class MyDialectResolver extends StandardDialectResolver {
 	public Dialect resolveDialect(DialectResolutionInfo info) {
 		String databaseName = info.getDatabaseName();
 		DatabaseProduct database = DatabaseProduct.parse(databaseName);
-		CriterionUtils.DATABASE_PRODUCT = database;
 		if (database == DatabaseProduct.MYSQL) {
 			int majorVersion = info.getDatabaseMajorVersion();
 			int minorVersion = info.getDatabaseMinorVersion();
