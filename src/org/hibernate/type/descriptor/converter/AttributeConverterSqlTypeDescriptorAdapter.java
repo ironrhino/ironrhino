@@ -73,40 +73,38 @@ public class AttributeConverterSqlTypeDescriptorAdapter implements SqlTypeDescri
 		return new ValueBinder<X>() {
 			@Override
 			public void bind(PreparedStatement st, X value, int index, WrapperOptions options) throws SQLException {
-				final Object convertedValue;
-				if( intermediateJavaTypeDescriptor.getJavaTypeClass().isInstance(value) ){
-					convertedValue = value;
-				}else{
-					try {
-						convertedValue = converter.convertToDatabaseColumn( value );
-					}
-					catch (PersistenceException pe) {
-						throw pe;
-					}
-					catch (RuntimeException re) {
-						throw new PersistenceException( "Error attempting to apply AttributeConverter", re );
-					}
+				Object convertedValue;
+				try {
+					convertedValue = converter.convertToDatabaseColumn( value );
 				}
-
+				catch (ClassCastException ce) {
+					convertedValue = value;
+				}
+				catch (PersistenceException pe) {
+					throw pe;
+				}
+				catch (RuntimeException re) {
+					throw new PersistenceException( "Error attempting to apply AttributeConverter", re );
+				}
+				
 				log.debugf( "Converted value on binding : %s -> %s", value, convertedValue );
 				realBinder.bind( st, convertedValue, index, options );
 			}
 
 			@Override
 			public void bind(CallableStatement st, X value, String name, WrapperOptions options) throws SQLException {
-				final Object convertedValue;
-				if( intermediateJavaTypeDescriptor.getJavaTypeClass().isInstance(value) ){
+				Object convertedValue;
+				try {
+					convertedValue = converter.convertToDatabaseColumn( value );
+				}
+				catch (ClassCastException ce) {
 					convertedValue = value;
-				}else{
-					try {
-						convertedValue = converter.convertToDatabaseColumn( value );
-					}
-					catch (PersistenceException pe) {
-						throw pe;
-					}
-					catch (RuntimeException re) {
-						throw new PersistenceException( "Error attempting to apply AttributeConverter", re );
-					}
+				}
+				catch (PersistenceException pe) {
+					throw pe;
+				}
+				catch (RuntimeException re) {
+					throw new PersistenceException( "Error attempting to apply AttributeConverter", re );
 				}
 
 				log.debugf( "Converted value on binding : %s -> %s", value, convertedValue );
