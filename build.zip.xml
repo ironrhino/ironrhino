@@ -9,7 +9,7 @@
 		<antcall target="jar-sources" />
 		<move file="build.xml" tofile="build.xml.bak" />
 		<move file="build.create.xml" tofile="build.xml" />
-		<zip destfile="${target.dir}/${project.name}-${version}.zip" basedir="${basedir}/.." includes="${project.name}/build.xml,${project.name}/build.project.xml,${project.name}/.settings/**,${project.name}/.project,${project.name}/.dependence,${project.name}/webapp/WEB-INF/lib/*.jar,${project.name}/lib/*.jar,${project.name}/target/*.jar" />
+		<zip destfile="${target.dir}/${project.name}-${version}.zip" basedir="${basedir}/.." includes="${project.name}/build.xml,${project.name}/build.project.xml,${project.name}/**/*.java,${project.name}/.settings/**,${project.name}/.project,${project.name}/.classpath,${project.name}/.dependence,${project.name}/webapp/WEB-INF/lib/*.jar,${project.name}/lib/*.jar,${project.name}/target/*.jar" />
 		<move file="build.xml" tofile="build.create.xml" />
 		<move file="build.xml.bak" tofile="build.xml" />
 	</target>
