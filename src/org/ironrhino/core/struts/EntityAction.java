@@ -8,7 +8,6 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -349,25 +348,6 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
 		final BaseManager entityManager = getEntityManager(getEntityClass());
 		boolean searchable = isSearchable();
-		if (searchable && StringUtils.isNumeric(keyword)
-				|| StringUtils.isAlphanumeric(keyword) && (keyword.length() == 32 || keyword.length() == 22))
-			try {
-				bw.setPropertyValue("id", keyword);
-				Serializable idvalue = (Serializable) bw.getPropertyValue("id");
-				if (idvalue != null) {
-					EN p = (EN) getEntityManager(getEntityClass()).get(idvalue);
-					if (p != null) {
-						resultPage = new ResultPage<>();
-						resultPage.setPageNo(1);
-						resultPage.setTotalResults(1);
-						resultPage.setResult(Collections.singletonList(p));
-						return LIST;
-					}
-				}
-			} catch (Exception e) {
-
-			}
-
 		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 		if (ownerProperty != null && ownerProperty.getKey().isolate()
 				|| (!searchable || StringUtils.isBlank(keyword) || (searchable && elasticSearchService == null))) {
@@ -477,6 +457,22 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		if (searchable && StringUtils.isNotBlank(keyword)) {
+			if (StringUtils.isNumeric(keyword)) {
+				try {
+					bw.setPropertyValue("id", keyword);
+					Serializable idvalue = (Serializable) bw.getPropertyValue("id");
+					if (idvalue instanceof Number) {
+						dc.add(Restrictions.idEq(idvalue));
+						return dc;
+					}
+				} catch (Exception e) {
+
+				}
+			}
+			if (StringUtils.isAlphanumeric(keyword) && (keyword.length() == 32 || keyword.length() == 22)) {
+				dc.add(Restrictions.idEq(keyword));
+				return dc;
+			}
 			Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<>();
 			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 				if (entry.getValue().isSearchable() && !entry.getValue().isExcludedFromLike()) {
@@ -522,7 +518,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (propertyNamesInLike.size() > 0)
 				dc.add(CriterionUtils.like(keyword, propertyNamesInLike));
 			else
-				dc.add(Restrictions.like("id", keyword, MatchMode.ANYWHERE));
+				dc.add(Restrictions.like("id", keyword, MatchMode.EXACT));
 		}
 		if (criteriaState.getOrderings().isEmpty()) {
 			if (richtableConfig != null && StringUtils.isNotBlank(richtableConfig.order())) {
