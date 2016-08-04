@@ -32,6 +32,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -530,6 +531,10 @@ public class EntityClassHelper {
 
 	private static boolean _isIdAssigned(Class<?> entityClass) {
 		if (entityClass.isInterface())
+			return false;
+		Map<String, MapsId> map = org.ironrhino.core.util.AnnotationUtils
+				.getAnnotatedPropertyNameAndAnnotations(entityClass, MapsId.class);
+		if (!map.isEmpty())
 			return false;
 		AnnotatedElement ae = null;
 		try {
