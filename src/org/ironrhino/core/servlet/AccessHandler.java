@@ -2,6 +2,7 @@ package org.ironrhino.core.servlet;
 
 import java.io.IOException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +16,7 @@ public abstract class AccessHandler {
 		return null;
 	}
 
-	public abstract boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException;
+	public abstract boolean handle(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException;
 
 }
