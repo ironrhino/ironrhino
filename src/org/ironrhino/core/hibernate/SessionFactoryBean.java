@@ -14,6 +14,7 @@ import javax.persistence.Converter;
 import javax.persistence.Entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Interceptor;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
@@ -22,6 +23,12 @@ import org.hibernate.boot.registry.StandardServiceInitiator;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.event.spi.PostDeleteEventListener;
+import org.hibernate.event.spi.PostInsertEventListener;
+import org.hibernate.event.spi.PostUpdateEventListener;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
@@ -52,6 +59,18 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 
 	@Autowired(required = false)
 	private CurrentTenantIdentifierResolver currentTenantIdentifierResolver;
+
+	@Autowired(required = false)
+	private Interceptor entityInterceptor;
+
+	@Autowired(required = false)
+	private List<PostInsertEventListener> postInsertEventListeners;
+
+	@Autowired(required = false)
+	private List<PostUpdateEventListener> postUpdateEventListeners;
+
+	@Autowired(required = false)
+	private List<PostDeleteEventListener> postDeleteEventListeners;
 
 	private Class<?>[] annotatedClasses;
 
@@ -118,6 +137,8 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 				setCurrentTenantIdentifierResolver(currentTenantIdentifierResolver);
 			}
 		}
+		if (entityInterceptor != null)
+			setEntityInterceptor(entityInterceptor);
 		super.afterPropertiesSet();
 	}
 
@@ -145,7 +166,22 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 				logger.info(ac.getClass().getName());
 			}
 		}
-		return sfb.buildSessionFactory();
+		SessionFactory sessionFactory = sfb.buildSessionFactory();
+		if (postInsertEventListeners != null || postUpdateEventListeners != null || postDeleteEventListeners != null) {
+			SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
+			EventListenerRegistry registry = sf.getServiceRegistry().getService(EventListenerRegistry.class);
+			if (postInsertEventListeners != null)
+				registry.getEventListenerGroup(EventType.POST_INSERT)
+						.appendListeners(postInsertEventListeners.toArray(new PostInsertEventListener[0]));
+			if (postUpdateEventListeners != null)
+				registry.getEventListenerGroup(EventType.POST_UPDATE)
+						.appendListeners(postUpdateEventListeners.toArray(new PostUpdateEventListener[0]));
+			if (postDeleteEventListeners != null)
+				registry.getEventListenerGroup(EventType.POST_DELETE)
+						.appendListeners(postDeleteEventListeners.toArray(new PostDeleteEventListener[0]));
+		}
+		return sessionFactory;
+
 	}
 
 }
