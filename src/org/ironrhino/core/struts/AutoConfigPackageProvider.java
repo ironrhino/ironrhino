@@ -199,7 +199,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 					// add package
 					configuration.addPackageConfig(packageConfig.getName(), packageConfig);
 					for (ActionConfig ac : packageConfig.getActionConfigs().values())
-						logger.info("mapping " + ac.getClassName() + " to " + packageConfig.getNamespace()
+						logger.info("Mapping " + ac.getClassName() + " to " + packageConfig.getNamespace()
 								+ (packageConfig.getNamespace().endsWith("/") ? "" : "/") + ac.getName());
 				} else {
 					Map<String, ActionConfig> actionConfigs = new LinkedHashMap<>(pc.getActionConfigs());
@@ -208,13 +208,13 @@ public class AutoConfigPackageProvider implements PackageProvider {
 							// ignore if action already exists
 							logger.warn(actionConfigs.get(actionName) + " exists for action class '"
 									+ actionConfigs.get(actionName).getClassName()
-									+ "',ignore autoconfig on action class '"
+									+ "', ignore autoconfig on action class '"
 									+ packageConfig.getActionConfigs().get(actionName).getClassName() + "'");
 							continue;
 						}
 						ActionConfig ac = packageConfig.getActionConfigs().get(actionName);
 						actionConfigs.put(actionName, ac);
-						logger.info("mapping " + ac.getClassName() + " to " + pc.getNamespace()
+						logger.info("Mapping " + ac.getClassName() + " to " + pc.getNamespace()
 								+ (pc.getNamespace().endsWith("/") ? "" : "/") + ac.getName());
 					}
 					// this is a trick
@@ -250,9 +250,8 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			PackageConfig packageConfig = ReflectionUtils.getFieldValue(pkgConfig, "target");
 			ActionConfig existsConfig = packageConfig.getActionConfigs().get(actionName);
 			if (existsConfig != null) {
-				logger.warn("{} already mapped with {},skip {}",
-						(namespace.endsWith("/") ? namespace : namespace + "/") + actionName,
-						existsConfig.getClassName(), cls);
+				logger.info("Replace {} with {} for {}", cls.getName(), existsConfig.getClassName(),
+						(namespace.endsWith("/") ? namespace : namespace + "/") + actionName);
 				return;
 			}
 		} catch (Exception e) {
