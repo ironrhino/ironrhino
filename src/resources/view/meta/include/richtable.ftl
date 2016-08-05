@@ -277,7 +277,7 @@ ${formHeader!}
 </#if>
 ${totalResults}<span class="recordLabel"> ${action.getText('record')}</span>
 <#if downloadable && request.requestURI?ends_with(actionBaseUrl) && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
-<button type="submit" class="noajax plain" formaction="${actionBaseUrl}/csv">
+<button type="submit" class="noajax plain" formaction="${actionBaseUrl}/csv" style="padding-top:2px;">
 <span class="glyphicon glyphicon-download-alt clickable">
 </span>
 </button>
