@@ -277,7 +277,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Object... value) {
-			return Restrictions.eq(name, "");
+			return Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, ""));
 		}
 	},
 	ISNOTEMPTY(0) {
@@ -293,41 +293,10 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Object... value) {
-			return Restrictions.not(Restrictions.eq(name, ""));
-		}
-	},
-	ISBLANK(0) {
-		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz);
-		}
-
-		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			return Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, ""));
-		}
-	},
-	ISNOTBLANK(0) {
-		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz);
-		}
-
-		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
 			return Restrictions.not(Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, "")));
 		}
 	},
+
 	INCLUDE(1) {
 
 		@Override
