@@ -9050,6 +9050,12 @@ table.richtable a .glyphicon {
 table.richtable a:hover .glyphicon ,table.richtable a:focus .glyphicon  {
 	color: #005580;
 }
+table.criteria{
+	margin-bottom: 0;
+}
+table.ordering tfoot{
+	background-color: transparent;
+}
 .toolbar .btn[data-shown],.toolbar .btn[data-action="save"]{
 	display: none;
 }
