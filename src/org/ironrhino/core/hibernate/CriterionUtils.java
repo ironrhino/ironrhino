@@ -284,8 +284,7 @@ public class CriterionUtils {
 							e.printStackTrace();
 						}
 					} else {
-						if (!operator.isEffective(type, parameterValues.length > 0 ? parameterValues[0] : null,
-								parameterValues.length > 1 ? parameterValues[1] : null))
+						if (!operator.isEffective(type, parameterValues))
 							continue;
 						values = new Object[parameterValues.length];
 						for (int n = 0; n < values.length; n++) {

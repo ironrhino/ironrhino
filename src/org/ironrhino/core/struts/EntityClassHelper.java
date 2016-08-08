@@ -467,6 +467,8 @@ public class EntityClassHelper {
 					cssClasses.add("time");
 				}
 				config.setCssClasses(cssClasses);
+				if ("email".equals(config.getInputType()))
+					config.setInputType("text");
 				propertyNamesInCriterion.put(entry.getKey(), config);
 			}
 		}

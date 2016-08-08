@@ -18,170 +18,217 @@ public enum CriterionOperator implements Displayable {
 
 	EQ(1) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			if (clazz == null)
-				return false;
+		boolean supports(Class<?> clazz) {
 			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz == boolean.class || clazz == Boolean.class
-					|| Number.class.isAssignableFrom(clazz) || clazz.equals(String.class) || clazz.equals(Date.class)
+					|| clazz == double.class || clazz == Boolean.class || clazz == String.class
+					|| Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz)
 					|| Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			Object value1 = value[0];
-			if (value1 instanceof Date && DateUtils.isBeginOfDay((Date) value1))
-				return Restrictions.between(name, value1, DateUtils.endOfDay((Date) value1));
+		public boolean isEffective(Class<?> clazz, String... values) {
+			return values != null && values.length == 1;
+		}
+
+		@Override
+		public Criterion operator(String name, Object... values) {
+			Object value = values[0];
+			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
+				return Restrictions.between(name, value, DateUtils.endOfDay((Date) value));
 			else
-				return Restrictions.eq(name, value1);
+				return Restrictions.eq(name, value);
 		}
 	},
 	NEQ(1) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class) || Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
+		boolean supports(Class<?> clazz) {
+			return EQ.supports(clazz);
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			Object value1 = value[0];
-			if (value1 instanceof Date && DateUtils.isBeginOfDay((Date) value1))
-				return Restrictions.or(Restrictions.isNull(name), Restrictions.or(Restrictions.lt(name, value1),
-						Restrictions.gt(name, DateUtils.endOfDay((Date) value1))));
+		public boolean isEffective(Class<?> clazz, String... values) {
+			return values != null && values.length == 1;
+		}
+
+		@Override
+		public Criterion operator(String name, Object... values) {
+			Object value = values[0];
+			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
+				return Restrictions.or(Restrictions.isNull(name), Restrictions.or(Restrictions.lt(name, value),
+						Restrictions.gt(name, DateUtils.endOfDay((Date) value))));
 			else
-				return Restrictions.or(Restrictions.isNull(name), Restrictions.not(Restrictions.eq(name, value1)));
+				return Restrictions.ne(name, value);
 		}
 	},
 	START(1) {
 
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class);
+		boolean supports(Class<?> clazz) {
+			return clazz == String.class;
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			String value1 = String.valueOf(value[0]);
-			return Restrictions.like(name, value1, MatchMode.START);
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.like(name, (String) values[0], MatchMode.START);
+		}
+	},
+	NOTSTART(1) {
+
+		@Override
+		boolean supports(Class<?> clazz) {
+			return clazz == String.class;
+		}
+
+		@Override
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.not(START.operator(name, values));
 		}
 	},
 	END(1) {
 
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class);
+		boolean supports(Class<?> clazz) {
+			return START.supports(clazz);
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			String value1 = String.valueOf(value[0]);
-			return Restrictions.like(name, value1, MatchMode.END);
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.like(name, (String) values[0], MatchMode.END);
+		}
+	},
+	NOTEND(1) {
+
+		@Override
+		boolean supports(Class<?> clazz) {
+			return START.supports(clazz);
+		}
+
+		@Override
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.not(END.operator(name, values));
+		}
+	},
+	INCLUDE(1) {
+
+		@Override
+		boolean supports(Class<?> clazz) {
+			return clazz == String.class;
+		}
+
+		@Override
+		public Criterion operator(String name, Object... values) {
+			String value = String.valueOf(values[0]);
+			if (name.endsWith("AsString")) {
+				return CriterionUtils.matchTag(name, value);
+			} else {
+				return Restrictions.like(name, value, MatchMode.ANYWHERE);
+			}
+		}
+	},
+	NOTINCLUDE(1) {
+
+		@Override
+		boolean supports(Class<?> clazz) {
+			return INCLUDE.supports(clazz);
+		}
+
+		@Override
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.or(Restrictions.isNull(name), Restrictions.not(INCLUDE.operator(name, values)));
+		}
+	},
+	CONTAINS(1) {
+		@Override
+		boolean supports(Class<?> clazz) {
+			return Set.class.isAssignableFrom(clazz);
+		}
+
+		@Override
+		public Criterion operator(String name, Object... values) {
+			Object value = values[0];
+			if (value instanceof Set) {
+				value = ((Set<?>) value).iterator().next();
+			}
+			return CriterionUtils.matchTag(name, String.valueOf(value));
+		}
+	},
+	NOTCONTAINS(1) {
+		@Override
+		boolean supports(Class<?> clazz) {
+			return CONTAINS.supports(clazz);
+		}
+
+		@Override
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.not(CONTAINS.operator(name, values));
 		}
 	},
 	LT(1) {
 		@Override
-		public boolean supports(Class<?> clazz) {
+		boolean supports(Class<?> clazz) {
 			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class);
+					|| clazz == double.class || clazz == String.class || Number.class.isAssignableFrom(clazz)
+					|| Date.class.isAssignableFrom(clazz);
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			Object value1 = value[0];
-			return Restrictions.lt(name, value1);
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.lt(name, values[0]);
 		}
 	},
 	LE(1) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class);
+		boolean supports(Class<?> clazz) {
+			return LT.supports(clazz);
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			Object value1 = value[0];
-			if (value1 instanceof Date && DateUtils.isBeginOfDay((Date) value1))
-				return Restrictions.le(name, DateUtils.endOfDay((Date) value1));
+		public Criterion operator(String name, Object... values) {
+			Object value = values[0];
+			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
+				return Restrictions.le(name, DateUtils.endOfDay((Date) value));
 			else
-				return Restrictions.le(name, value1);
+				return Restrictions.le(name, value);
 		}
 	},
 	GT(1) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class);
+		boolean supports(Class<?> clazz) {
+			return LT.supports(clazz);
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			Object value1 = value[0];
-			if (value1 instanceof Date && DateUtils.isBeginOfDay((Date) value1))
-				return Restrictions.gt(name, DateUtils.endOfDay((Date) value1));
+		public Criterion operator(String name, Object... values) {
+			Object value = values[0];
+			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
+				return Restrictions.gt(name, DateUtils.endOfDay((Date) value));
 			else
-				return Restrictions.gt(name, value1);
+				return Restrictions.gt(name, value);
 		}
 	},
 	GE(1) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class);
+		boolean supports(Class<?> clazz) {
+			return LT.supports(clazz);
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			Object value1 = value[0];
-			return Restrictions.ge(name, value1);
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.ge(name, values[0]);
 		}
 	},
 	BETWEEN(2) {
 		@Override
-		public boolean supports(Class<?> clazz) {
+		boolean supports(Class<?> clazz) {
 			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class);
+					|| clazz == double.class || clazz == String.class || Number.class.isAssignableFrom(clazz)
+					|| Date.class.isAssignableFrom(clazz);
 		}
 
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return (value != null && value.length == 2)
-					&& (StringUtils.isNotBlank(value[0]) || StringUtils.isNotBlank(value[1]));
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			Object value1 = null;
-			Object value2 = null;
-			if (value != null) {
-				if (value.length > 0)
-					value1 = value[0];
-				if (value.length > 1)
-					value2 = value[1];
-			}
+		public Criterion operator(String name, Object... values) {
+			Object value1 = values[0];
+			Object value2 = values[1];
 			if (value2 instanceof Date && DateUtils.isBeginOfDay((Date) value2))
 				value2 = DateUtils.endOfDay((Date) value2);
 			if (value1 != null && value2 != null)
@@ -196,28 +243,14 @@ public enum CriterionOperator implements Displayable {
 	},
 	NOTBETWEEN(2) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class);
+		boolean supports(Class<?> clazz) {
+			return BETWEEN.supports(clazz);
 		}
 
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return (value != null && value.length == 2)
-					&& (StringUtils.isNotBlank(value[0]) || StringUtils.isNotBlank(value[1]));
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			Object value1 = null;
-			Object value2 = null;
-			if (value != null) {
-				if (value.length > 0)
-					value1 = value[0];
-				if (value.length > 1)
-					value2 = value[1];
-			}
+		public Criterion operator(String name, Object... values) {
+			Object value1 = values[0];
+			Object value2 = values[1];
 			if (value2 instanceof Date && DateUtils.isBeginOfDay((Date) value2))
 				value2 = DateUtils.endOfDay((Date) value2);
 			if (value1 != null && value2 != null)
@@ -230,183 +263,94 @@ public enum CriterionOperator implements Displayable {
 				return null;
 		}
 	},
-	ISNULL(0) {
-		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class) || clazz.equals(Boolean.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class) || Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
-		}
-
-		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			return Restrictions.isNull(name);
-		}
-	},
 	ISNOTNULL(0) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class) || clazz.equals(Boolean.class) || Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class) || Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
+		boolean supports(Class<?> clazz) {
+			return !clazz.isPrimitive();
+
 		}
 
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
+		public Criterion operator(String name, Object... values) {
 			return Restrictions.isNotNull(name);
 		}
 	},
-	ISEMPTY(0) {
+	ISNULL(0) {
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz);
+		boolean supports(Class<?> clazz) {
+			return ISNOTNULL.supports(clazz);
 		}
 
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			return Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, ""));
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.isNull(name);
 		}
 	},
 	ISNOTEMPTY(0) {
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz);
+		boolean supports(Class<?> clazz) {
+			return clazz == String.class;
 		}
 
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
+		public Criterion operator(String name, Object... values) {
 			return Restrictions.not(Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, "")));
 		}
 	},
-
-	INCLUDE(1) {
+	ISEMPTY(0) {
 
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class);
+		boolean supports(Class<?> clazz) {
+			return ISNOTEMPTY.supports(clazz);
 		}
 
 		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			String value1 = String.valueOf(value[0]);
-			if (name.endsWith("AsString")) {
-				return CriterionUtils.matchTag(name, value1);
-			} else {
-				return Restrictions.like(name, value1, MatchMode.ANYWHERE);
-			}
-		}
-	},
-	NOTINCLUDE(1) {
-
-		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			if (value == null || value.length == 0)
-				return null;
-			return Restrictions.or(Restrictions.isNull(name), Restrictions.not(INCLUDE.operator(name, value)));
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, ""));
 		}
 	},
 	ISTRUE(0) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz == boolean.class || clazz.equals(Boolean.class);
+		boolean supports(Class<?> clazz) {
+			return clazz == boolean.class || clazz == Boolean.class;
 		}
 
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
+		public Criterion operator(String name, Object... values) {
 			return Restrictions.eq(name, true);
 		}
 	},
 	ISFALSE(0) {
 		@Override
-		public boolean supports(Class<?> clazz) {
-			return clazz == boolean.class || clazz.equals(Boolean.class);
+		boolean supports(Class<?> clazz) {
+			return ISTRUE.supports(clazz);
 		}
 
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
+		public Criterion operator(String name, Object... values) {
 			return Restrictions.eq(name, false);
 		}
 	},
 	IN(-1) {
 		@Override
-		public boolean supports(Class<?> clazz) {
+		boolean supports(Class<?> clazz) {
 			return clazz.isEnum();
 		}
 
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz) && value != null && value.length > 0;
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			return Restrictions.in(name, value);
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.in(name, values);
 		}
 	},
 	NOTIN(-1) {
 		@Override
-		public boolean supports(Class<?> clazz) {
+		boolean supports(Class<?> clazz) {
 			return clazz.isEnum();
 		}
 
 		@Override
-		public boolean isEffective(Class<?> clazz, String... value) {
-			return supports(clazz) && value != null && value.length > 0;
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			return Restrictions.not(Restrictions.in(name, value));
-		}
-	},
-	CONTAINS(1) {
-		@Override
-		public boolean supports(Class<?> clazz) {
-			return Set.class.isAssignableFrom(clazz);
-		}
-
-		@Override
-		public Criterion operator(String name, Object... value) {
-			Object v = value[0];
-			if (v instanceof Set) {
-				v = ((Set<?>) v).iterator().next();
-			}
-			return CriterionUtils.matchTag(name, String.valueOf(v));
+		public Criterion operator(String name, Object... values) {
+			return Restrictions.not(Restrictions.in(name, values));
 		}
 	};
 
@@ -434,28 +378,36 @@ public enum CriterionOperator implements Displayable {
 		return null;
 	}
 
-	public abstract Criterion operator(String name, Object... value);
+	public abstract Criterion operator(String name, Object... values);
 
 	public int getParametersSize() {
 		return parametersSize;
 	}
 
-	public boolean isEffective(Class<?> clazz, String... value) {
+	public boolean isEffective(Class<?> clazz, String... values) {
 		if (!supports(clazz))
 			return false;
-		if (value == null || value.length == 0 || StringUtils.isBlank(value[0]))
-			return false;
-		return true;
+		int size = getParametersSize();
+		if (size == 0) {
+			return values.length == 0;
+		} else {
+			if (size > 0 && values.length != size)
+				return false;
+			for (String s : values)
+				if (StringUtils.isBlank(s))
+					return false;
+			return true;
+		}
 	}
 
-	public abstract boolean supports(Class<?> clazz);
+	abstract boolean supports(Class<?> clazz);
 
 	public static List<String> getSupportedOperators(Class<?> clazz) {
 		if (clazz == null)
 			return Collections.emptyList();
 		List<String> list = new ArrayList<>();
 		for (CriterionOperator op : values())
-			if (op.supports(clazz) && !(op == EQ && (clazz == Boolean.class || clazz == boolean.class)))
+			if (op.supports(clazz))
 				list.add(op.name());
 		return list;
 	}
@@ -464,8 +416,8 @@ public enum CriterionOperator implements Displayable {
 		Class<?> clazz = null;
 		try {
 			clazz = Class.forName(className);
-		} catch (Exception e) {
-
+		} catch (ClassNotFoundException e) {
+			return Collections.emptyList();
 		}
 		return getSupportedOperators(clazz);
 	}
