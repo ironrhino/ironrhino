@@ -714,10 +714,7 @@ Initialization.richtable = function() {
 								next.focus();
 							}
 						}
-					}).on('click', '.ui-dialog .dialog-close', function(evt) {
-				$(evt.target).closest('.ui-dialog')
-						.find('.ui-dialog-titlebar-close').click();
-			});
+					});
 }
 Observation._richtable = function(container) {
 	$('form.criteria', container).each(function() {

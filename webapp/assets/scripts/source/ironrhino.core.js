@@ -829,6 +829,10 @@ Initialization.common = function() {
 			}).on('dblclick', '.ui-dialog-titlebar', function() {
 		Dialog.toggleMaximization($('.ui-dialog-content', $(this)
 						.closest('.ui-dialog')));
+	}).on('click', '.ui-dialog .dialog-close', function(evt) {
+		evt.preventDefault();
+		$(evt.target).closest('.ui-dialog').find('.ui-dialog-titlebar-close')
+				.click();
 	}).on('mouseenter', '.popover,.tooltip', function() {
 				$(this).remove()
 			}).on('click', '.action-error strong.force-override', function(e) {
@@ -1743,9 +1747,11 @@ var Dialog = {
 	adapt : function(d, iframe) {
 		var useiframe = iframe != null;
 		var hasRow = false;
+		var hideCloseButton = false;
 		if (!iframe) {
 			$(d).dialog('option', 'title', Ajax.title);
 			hasRow = $('div.row', d).length > 0;
+			hideCloseButton = d.find('.custom-dialog-close').length;
 		} else {
 			var doc = iframe.document;
 			if (iframe.contentDocument) {
@@ -1758,6 +1764,7 @@ var Dialog = {
 			var height = $(doc).height() + 20;
 			$(iframe).height(height);
 			hasRow = $('div.row', doc).length > 0;
+			hideCloseButton = $(doc).find('.custom-dialog-close').length;
 		}
 		d.dialog('moveToTop');
 		if (hasRow) {
@@ -1765,6 +1772,8 @@ var Dialog = {
 							? '90%'
 							: ($(window).width() > 1210 ? '95%' : '100%'));
 		}
+		if (hideCloseButton)
+			$('.ui-dialog-titlebar-close', d.closest('.ui-dialog')).hide();
 		var height = d.outerHeight();
 		if (height >= $(window).height()) {
 			d.dialog('option', 'position', {
