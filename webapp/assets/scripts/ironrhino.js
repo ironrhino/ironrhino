@@ -38089,8 +38089,10 @@ $(function() {
 		return this;
 	};
 	window._open = window.open;
-	window.open = function(url, options) {
-		if (typeof options == 'undefined' || typeof options == 'string') {
+	window.open = function(url, options, features, replace) {
+		if (typeof options == 'string')
+			return window._open(url, options, features, replace);
+		if (typeof options == 'undefined') {
 			options = {
 				iframe : false
 			};
