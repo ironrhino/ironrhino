@@ -325,7 +325,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Object... value) {
-			return Restrictions.not(Restrictions.eqOrIsNull(name, ""));
+			return Restrictions.not(Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, "")));
 		}
 	},
 	INCLUDE(1) {
