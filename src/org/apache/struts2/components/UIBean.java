@@ -1277,8 +1277,9 @@ public abstract class UIBean extends Component {
 	}
 
 	protected Set<String> getStandardAttributes() {
-        Class clz = getClass();
-        Set<String> standardAttributes = standardAttributesMap.get(clz);
+		Class clz = getClass();
+		Class key = clz;
+        Set<String> standardAttributes = standardAttributesMap.get(key);
         if (standardAttributes == null) {
             standardAttributes = new HashSet<String>();
             while (clz != null) {
@@ -1294,7 +1295,7 @@ public abstract class UIBean extends Component {
                     clz = clz.getSuperclass();
                 }
             }
-            Set<String> exists = standardAttributesMap.putIfAbsent(clz, standardAttributes);
+            Set<String> exists = standardAttributesMap.putIfAbsent(key, standardAttributes);
             if (exists != null)
             	standardAttributes = exists;
         }
