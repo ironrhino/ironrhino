@@ -26,6 +26,8 @@ import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.ValueStack;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.StrutsConstants;
 import org.apache.struts2.StrutsException;
 import org.apache.struts2.components.template.Template;
@@ -39,8 +41,7 @@ import org.apache.struts2.views.util.ContextUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -1277,25 +1278,15 @@ public abstract class UIBean extends Component {
 	}
 
 	protected Set<String> getStandardAttributes() {
-		Class clz = getClass();
-		Class key = clz;
-        Set<String> standardAttributes = standardAttributesMap.get(key);
+        Class clz = getClass();
+        Set<String> standardAttributes = standardAttributesMap.get(clz);
         if (standardAttributes == null) {
             standardAttributes = new HashSet<String>();
-            while (clz != null) {
-                for (Field f : clz.getDeclaredFields()) {
-                    if (Modifier.isProtected(f.getModifiers())
-                            && (f.getType().equals(String.class) || clz.equals(ListUIBean.class)
-                            && f.getName().equals("list")))
-                        standardAttributes.add(f.getName());
-                }
-                if (clz.equals(UIBean.class)) {
-                    break;
-                } else {
-                    clz = clz.getSuperclass();
-                }
-            }
-            Set<String> exists = standardAttributesMap.putIfAbsent(key, standardAttributes);
+            for (Method m : clz.getMethods()) {
+            	if(m.isAnnotationPresent(StrutsTagAttribute.class))
+            		standardAttributes.add(StringUtils.uncapitalize(m.getName().substring(3)));
+			}
+            Set<String> exists = standardAttributesMap.putIfAbsent(clz, standardAttributes);
             if (exists != null)
             	standardAttributes = exists;
         }
