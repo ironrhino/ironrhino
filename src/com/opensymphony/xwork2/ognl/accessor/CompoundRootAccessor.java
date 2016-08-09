@@ -324,6 +324,8 @@ public class CompoundRootAccessor implements PropertyAccessor, MethodAccessor, C
 
         @Override
         public boolean equals(Object obj) {
+        	if (obj == null)
+        		return false;
             MethodCall mc = (CompoundRootAccessor.MethodCall) obj;
 
             return (mc.clazz.equals(clazz) && mc.name.equals(name) && Arrays.equals(mc.args, args));

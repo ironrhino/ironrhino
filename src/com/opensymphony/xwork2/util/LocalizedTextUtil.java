@@ -111,10 +111,6 @@ public class LocalizedTextUtil {
                 DEFAULT_RESOURCE_BUNDLES.clear();
                 DEFAULT_RESOURCE_BUNDLES.add("com/opensymphony/xwork2/xwork-messages");
             }
-        } else {
-            synchronized (DEFAULT_RESOURCE_BUNDLES) {
-                DEFAULT_RESOURCE_BUNDLES.add("com/opensymphony/xwork2/xwork-messages");
-            }
         }
     }
 
@@ -251,20 +247,28 @@ public class LocalizedTextUtil {
         try {
             if (bundle == null) {
                 bundle = ResourceBundle.getBundle(aBundleName, locale, Thread.currentThread().getContextClassLoader());
-                bundlesMap.putIfAbsent(key, bundle);
+                ResourceBundle exists = bundlesMap.putIfAbsent(key, bundle);
+                if (exists != null)
+                	bundle = exists;
             }
         } catch (MissingResourceException ex) {
             if (delegatedClassLoader != null) {
                 try {
                     bundle = ResourceBundle.getBundle(aBundleName, locale, delegatedClassLoader);
-                    bundlesMap.putIfAbsent(key, bundle);
+                    ResourceBundle exists = bundlesMap.putIfAbsent(key, bundle);
+                    if (exists != null)
+                    	bundle = exists;
                 } catch (MissingResourceException e) {
                     bundle = EMPTY_BUNDLE;
-                    bundlesMap.putIfAbsent(key, bundle);
+                    ResourceBundle exists = bundlesMap.putIfAbsent(key, bundle);
+                    if (exists != null)
+                    	bundle = exists;
                 }
             } else {
                 bundle = EMPTY_BUNDLE;
-                bundlesMap.putIfAbsent(key, bundle);
+                ResourceBundle exists = bundlesMap.putIfAbsent(key, bundle);
+                if (exists != null)
+                	bundle = exists;
             }
         }
         return (bundle == EMPTY_BUNDLE) ? null : bundle;
@@ -276,9 +280,7 @@ public class LocalizedTextUtil {
      * @param classLoader
      */
     public static void setDelegatedClassLoader(final ClassLoader classLoader) {
-        synchronized (bundlesMap) {
-            delegatedClassLoader = classLoader;
-        }
+        delegatedClassLoader = classLoader;
     }
 
     /**

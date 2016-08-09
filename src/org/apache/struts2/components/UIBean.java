@@ -1294,7 +1294,9 @@ public abstract class UIBean extends Component {
                     clz = clz.getSuperclass();
                 }
             }
-            standardAttributesMap.putIfAbsent(clz, standardAttributes);
+            Set<String> exists = standardAttributesMap.putIfAbsent(clz, standardAttributes);
+            if (exists != null)
+            	standardAttributes = exists;
         }
 		return standardAttributes;
 	}

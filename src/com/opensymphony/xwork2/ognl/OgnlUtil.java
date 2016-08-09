@@ -496,15 +496,15 @@ public class OgnlUtil {
      * @throws IntrospectionException is thrown if an exception occurs during introspection.
      */
     public BeanInfo getBeanInfo(Class clazz) throws IntrospectionException {
-        synchronized (beanInfoCache) {
-            BeanInfo beanInfo;
-            beanInfo = beanInfoCache.get(clazz);
-            if (beanInfo == null) {
-                beanInfo = Introspector.getBeanInfo(clazz, Object.class);
-                beanInfoCache.putIfAbsent(clazz, beanInfo);
-            }
-            return beanInfo;
+        BeanInfo beanInfo;
+        beanInfo = beanInfoCache.get(clazz);
+        if (beanInfo == null) {
+            beanInfo = Introspector.getBeanInfo(clazz, Object.class);
+            BeanInfo exists = beanInfoCache.putIfAbsent(clazz, beanInfo);
+            if (exists != null)
+            	beanInfo = exists;
         }
+        return beanInfo;
     }
 
     void internalSetProperty(String name, Object value, Object o, Map<String, Object> context, boolean throwPropertyExceptions) throws ReflectionException{
