@@ -136,13 +136,13 @@
 						+ MessageBundle.get('select')
 						+ '" class="window-listpick"></div>')
 						.appendTo(document.body).dialog({
-							width : current.data('_options').width || 800,
-							minHeight : current.data('_options').minHeight
-									|| 500,
-							close : function() {
-								win.html('').dialog('destroy').remove();
-							}
-						});
+									width : options.width || 800,
+									minHeight : options.minHeight || 500,
+									close : function() {
+										win.html('').dialog('destroy').remove();
+									}
+								});
+				win.data('windowoptions', options);
 				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
 					win.mask(MessageBundle.get('ajax.loading'));

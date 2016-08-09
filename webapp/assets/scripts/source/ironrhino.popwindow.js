@@ -35,6 +35,7 @@
 		var winid = '_window_' + winindex;
 		var win = $('<div id="' + winid + '" class="window-pop"></div>')
 				.appendTo(document.body).dialog();
+		win.data('windowoptions', options);
 		if (!useiframe) {
 			// ajax replace
 			var target = win.get(0);

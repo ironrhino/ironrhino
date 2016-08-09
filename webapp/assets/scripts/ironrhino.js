@@ -34138,7 +34138,8 @@ var Dialog = {
 			hideCloseButton = $(doc).find('.custom-dialog-close').length;
 		}
 		d.dialog('moveToTop');
-		if (hasRow) {
+		if (hasRow
+				&& !(d.data('windowoptions') && d.data('windowoptions').width)) {
 			d.dialog('option', 'width', $(window).width() > 1345
 							? '90%'
 							: ($(window).width() > 1210 ? '95%' : '100%'));
@@ -38109,6 +38110,7 @@ $(function() {
 		var winid = '_window_' + winindex;
 		var win = $('<div id="' + winid + '" class="window-pop"></div>')
 				.appendTo(document.body).dialog();
+		win.data('windowoptions', options);
 		if (!useiframe) {
 			// ajax replace
 			var target = win.get(0);
@@ -38414,6 +38416,7 @@ Richtable = {
 		};
 		if ($.browser.msie && $.browser.version <= 8)
 			opt.height = 600;
+		win.data('windowoptions', opt);
 		win.dialog(opt);
 		win.dialog('open');
 		win.closest('.ui-dialog').css('z-index', 2000);
@@ -38549,6 +38552,7 @@ Richtable = {
 			delete options.reloadonclose;
 			for (var key in options)
 				$('#' + winid).dialog('option', key, options[key]);
+			$('#' + winid).data('windowoptions', options);
 			Dialog.adapt($('#' + winid));
 			return false;
 		}
@@ -40084,13 +40088,13 @@ Observation.treeview = function(container) {
 						+ MessageBundle.get('select')
 						+ '" class="window-listpick"></div>')
 						.appendTo(document.body).dialog({
-							width : current.data('_options').width || 800,
-							minHeight : current.data('_options').minHeight
-									|| 500,
-							close : function() {
-								win.html('').dialog('destroy').remove();
-							}
-						});
+									width : options.width || 800,
+									minHeight : options.minHeight || 500,
+									close : function() {
+										win.html('').dialog('destroy').remove();
+									}
+								});
+				win.data('windowoptions', options);
 				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
 					win.mask(MessageBundle.get('ajax.loading'));

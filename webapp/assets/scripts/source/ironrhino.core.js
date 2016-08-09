@@ -1767,7 +1767,8 @@ var Dialog = {
 			hideCloseButton = $(doc).find('.custom-dialog-close').length;
 		}
 		d.dialog('moveToTop');
-		if (hasRow) {
+		if (hasRow
+				&& !(d.data('windowoptions') && d.data('windowoptions').width)) {
 			d.dialog('option', 'width', $(window).width() > 1345
 							? '90%'
 							: ($(window).width() > 1210 ? '95%' : '100%'));

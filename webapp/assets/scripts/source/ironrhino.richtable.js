@@ -248,6 +248,7 @@ Richtable = {
 		};
 		if ($.browser.msie && $.browser.version <= 8)
 			opt.height = 600;
+		win.data('windowoptions', opt);
 		win.dialog(opt);
 		win.dialog('open');
 		win.closest('.ui-dialog').css('z-index', 2000);
@@ -383,6 +384,7 @@ Richtable = {
 			delete options.reloadonclose;
 			for (var key in options)
 				$('#' + winid).dialog('option', key, options[key]);
+			$('#' + winid).data('windowoptions', options);
 			Dialog.adapt($('#' + winid));
 			return false;
 		}
