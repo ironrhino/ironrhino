@@ -586,6 +586,34 @@
 		<move todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
 			<fileset dir="${target.dir}/classes" />
 		</move>
+	</target>	
+	
+	<target name="unzip-descriptors">
+		<unzip dest="${target.dir}">
+			<fileset dir="${webapp.dir}/WEB-INF/lib">
+		      	<include name="ironrhino-core-*.jar" />
+		  	</fileset>
+		    <patternset>
+		        <include name="META-INF/descriptors/*.xml"/>
+		    </patternset>
+		</unzip>
+		<copy todir="${target.dir}/META-INF" preservelastmodified="true">
+			<fileset dir="${webapp.dir}/WEB-INF" includes="*.xml"/>
+		</copy>
+		<copy todir="${target.dir}/META-INF/descriptors" preservelastmodified="true">
+			<fileset dir="${target.dir}/META-INF" includes="*.xml"/>
+		</copy>
+		<copy todir="${webapp.dir}/WEB-INF">
+			<fileset dir="${target.dir}/META-INF/descriptors" includes="*.xml"/>
+		</copy>
+	</target>
+
+	<target name="reset-descriptors">
+		<delete dir="${webapp.dir}/WEB-INF" includes="*.xml"/>
+		<move todir="${webapp.dir}/WEB-INF">
+			<fileset dir="${target.dir}/META-INF" includes="*.xml"/>
+		</move>
+		<delete dir="${target.dir}/META-INF"/>
 	</target>
 
 	<target name="jar" depends="compile,set-revision">
@@ -644,6 +672,7 @@
 		<antcall target="unzip-assets" />
 		<antcall target="append-revision-for-assets" />
 		<antcall target="unzip-overrides" />
+		<antcall target="unzip-descriptors" />
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
 			needxmlfile="false" excludes="**/upload/**,assetsbak/**,**/ironrhino-assets-*.jar">
 			<manifest>
@@ -652,6 +681,7 @@
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
 		</war>
+		<antcall target="reset-descriptors" />
 		<antcall target="reset-overrides" />
 		<antcall target="reset-append-revision-for-assets" />
 		<antcall target="reset-assets" />
@@ -675,6 +705,7 @@
 		<antcall target="append-revision-for-assets" />
 		<antcall target="reset-assets" />
 		<antcall target="unzip-overrides" />
+		<antcall target="unzip-descriptors" />
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
 			needxmlfile="false">
 			<manifest>
@@ -683,6 +714,7 @@
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
 		</war>
+		<antcall target="reset-descriptors" />
 		<antcall target="reset-overrides" />
 		<antcall target="reset-append-revision-for-assets" />
 		<script language="javascript">
@@ -740,6 +772,7 @@
 		<antcall target="append-revision-for-assets" />
 		<antcall target="reset-assets" />
 		<antcall target="unzip-overrides" />
+		<antcall target="unzip-descriptors" />
 		<war warfile="${target.dir}/${war.name}" basedir="${webapp.dir}"
 			needxmlfile="false">
 			<manifest>
@@ -749,6 +782,7 @@
 				<attribute name="Main-Class" value="bootstrap.Main" />
 			</manifest>
 		</war>
+		<antcall target="reset-descriptors" />
 		<antcall target="reset-overrides" />
 		<antcall target="reset-append-revision-for-assets" />
 		<delete dir="${webapp.dir}/bootstrap" />

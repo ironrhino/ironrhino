@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://caucho.com/ns/resin"
+	xmlns:resin="urn:java:com.caucho.resin">
+	<class-loader>
+		<servlet-hack>true</servlet-hack>
+	</class-loader>
+</web-app>
