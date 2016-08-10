@@ -37326,6 +37326,9 @@ Observation.sortableTable = function(container) {
 		$('*', r).removeAttr('id');
 		$('span.info', r).html('');
 		$(':input[type!=checkbox][type!=radio]', r).val('');
+		$('select', r).each(function() {
+					$('option:first', this).prop('selected', true);
+				});
 		$('input[type=checkbox],input[type=radio]', r).prop('checked', false);
 		$(':input', r).not('.readonly').prop('readonly', false)
 				.removeAttr('keyupValidate');
