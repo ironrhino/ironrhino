@@ -34,8 +34,12 @@ public class AppMembership {
 	}
 
 	@PostConstruct
-	public void init() throws Exception {
-		membership.join(group);
+	public void init() {
+		try {
+			membership.join(group);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

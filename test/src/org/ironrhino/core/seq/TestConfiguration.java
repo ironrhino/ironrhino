@@ -45,7 +45,7 @@ public class TestConfiguration {
 		private Sequence sequence;
 
 		@PostConstruct
-		public void init() throws InterruptedException {
+		public void init() {
 			final CountDownLatch cdl = new CountDownLatch(THREADS);
 			final AtomicInteger count = new AtomicInteger();
 			long time = System.currentTimeMillis();
@@ -68,7 +68,11 @@ public class TestConfiguration {
 				});
 			}
 			es.shutdown();
-			cdl.await();
+			try {
+				cdl.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			System.out
 					.println("completed " + count.get() + " requests in " + (System.currentTimeMillis() - time) + "ms");
 		}

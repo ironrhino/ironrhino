@@ -2,6 +2,7 @@ package org.ironrhino.core.cache.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -38,8 +39,12 @@ public class EhCacheManager implements CacheManager {
 	private Striped<Lock> stripedLocks;
 
 	@PostConstruct
-	public void init() throws Exception {
-		ehCacheManager = net.sf.ehcache.CacheManager.create(configLocation.getInputStream());
+	public void init() {
+		try {
+			ehCacheManager = net.sf.ehcache.CacheManager.create(configLocation.getInputStream());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		if (lockStripes <= 0)
 			lockStripes = Runtime.getRuntime().availableProcessors() * 4;
 		stripedLocks = Striped.lazyWeakLock(lockStripes);

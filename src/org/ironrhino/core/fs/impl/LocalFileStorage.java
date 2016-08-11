@@ -52,7 +52,7 @@ public class LocalFileStorage implements FileStorage {
 	}
 
 	@PostConstruct
-	public void afterPropertiesSet() throws IOException {
+	public void afterPropertiesSet() {
 		Assert.hasText(uri);
 		uri = uri.replace('\\', '/');
 		uri = uri.replace(" ", "%20");
@@ -62,7 +62,7 @@ public class LocalFileStorage implements FileStorage {
 			logger.error(e.getMessage(), e);
 		}
 		if (this.directory.isFile())
-			throw new IOException(directory + " is not directory");
+			throw new IllegalStateException(directory + " is not directory");
 		if (!this.directory.exists())
 			if (!this.directory.mkdirs())
 				logger.error("mkdirs error:" + directory.getAbsolutePath());
