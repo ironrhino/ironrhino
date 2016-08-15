@@ -42,9 +42,9 @@ public class MemcachedCacheManager implements CacheManager {
 	@Value("${memcached.useFstSerialization:false}")
 	private boolean useFstSerialization;
 
-	private MemcachedClient memcached;
+	private volatile MemcachedClient memcached;
 
-	private boolean rebuild; // reserve last set
+	private volatile boolean rebuild; // reserve last set
 
 	public void setServerAddress(String val) {
 		if (val != null && serverAddress != null && !val.equals(serverAddress))

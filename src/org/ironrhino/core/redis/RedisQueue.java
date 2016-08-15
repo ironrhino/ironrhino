@@ -23,7 +23,7 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 
 	protected boolean consuming;
 
-	private boolean stopConsuming;
+	private volatile boolean stopConsuming;
 
 	@Autowired(required = false)
 	private ExecutorService executorService;

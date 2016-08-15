@@ -38,7 +38,7 @@ public class DictionaryControl {
 	@Autowired
 	private EntityManager<Dictionary> entityManager;
 
-	private Map<String, Dictionary> map;
+	private volatile Map<String, Dictionary> map;
 
 	@PostConstruct
 	public void afterPropertiesSet() {
