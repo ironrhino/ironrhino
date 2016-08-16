@@ -175,12 +175,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 					save((T) c);
 				}
 			}
-			return;
+		} else {
+			if (isnew)
+				session.save(obj);
+			else
+				session.update(obj);
 		}
-		if (isnew)
-			session.save(obj);
-		else
-			session.update(obj);
 		ReflectionUtils.processCallback(obj, isnew ? PostPersist.class : PostUpdate.class);
 	}
 
