@@ -46,14 +46,14 @@ $(document).on('click','a.host',function(e){
 </head>
 <body>
 
-<div class="row" style="margin-bottom: 20px;">
+<div class="row<#if fluidLayout>-fluid</#if>" style="margin-bottom: 20px;">
 <div class="span4 offset4">
 <a class="host btn btn-block" href="#"><strong>${serviceRegistry.localHost}</strong></a>
 </div>
 </div>
 <#assign services = serviceRegistry.getAllServices()>
 <#if services?size gt 0>
-<div id="services">
+<div id="services"<#if fluidLayout> class="container"</#if>>
 	<ul class="thumbnails">
 	<#list services as service>
 	<li class="span6">

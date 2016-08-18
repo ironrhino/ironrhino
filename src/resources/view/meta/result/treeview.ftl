@@ -5,7 +5,7 @@
 <title>${entityDisplayName}</title>
 </head>
 <body>
-<div class="row reload-container">
+<div class="row<#if fluidLayout>-fluid</#if> reload-container">
 	<div class="span2">
 		<#assign parentNode=(entityName?eval)!/>
 		<div class="treeview reloadable" data-url="${actionBaseUrl}/children<#if tree?? && tree gt 0>?tree=${tree}</#if>" data-head="${entityDisplayName}"<#if parentNode?has_content>data-value="<#if tree?? && tree gt 0>${parentNode.getFullname(tree)}<#else>${parentNode.fullname}</#if>" data-separator="${parentNode.fullnameSeperator}"</#if>>

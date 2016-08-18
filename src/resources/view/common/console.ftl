@@ -69,11 +69,11 @@ $(function(){
 
 <#assign triggers = beans['applicationContextConsole'].getTriggers()>
 <#if triggers?keys?size gt 0>
-<div id="trigger">
+<div id="trigger"<#if fluidLayout> class="container"</#if>>
 	<ul class="thumbnails">
 	<#list triggers.entrySet() as entry>
 	<li class="span4">
-	<button type="button" class="btn btn-block" data-scope="${entry.value.name()}"  data-expression="${entry.key}">${action.getText(entry.key)}</button>
+	<button type="button" class="btn btn-block" data-scope="${entry.value.name()}" data-expression="${entry.key}">${action.getText(entry.key)}</button>
 	</li>
 	</#list>
 	</ul>
@@ -84,7 +84,7 @@ $(function(){
 <#if printSetting??>
 <#assign settings = beans['settingControl'].getAllBooleanSettings()>
 <#if settings?size gt 0>
-<div id="switch">
+<div id="switch"<#if fluidLayout> class="container"</#if>>
 	<style scoped>
 	div.key{
 		text-align: right;

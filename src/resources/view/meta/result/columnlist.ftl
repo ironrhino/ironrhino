@@ -18,7 +18,7 @@
 </#if>
 </ul>
 <div class="column ${name}">
-  <div class="row">
+  <div class="row<#if fluidLayout>-fluid</#if>">
     <div class="span2">
 		<ul class="nav nav-list">
 			<li class="nav-header<#if !column?has_content> active</#if>"><a href="<@url value="/${name}"/>" class="ajax view">${name}</a></li>

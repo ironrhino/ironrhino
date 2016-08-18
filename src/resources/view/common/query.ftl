@@ -122,7 +122,7 @@ $(function(){
 			</#list>
 			</tbody>
 		</table>
-		<div class="toolbar row">
+		<div class="toolbar row-fluid">
 			<div class="span5">
 				<#if resultPage.paginating>
 				<div class="pagination">

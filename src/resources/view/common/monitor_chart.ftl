@@ -4,7 +4,7 @@
 <title>${action.getText('monitor')}</title>
 </head>
 <body>
-<div class="row">
+<div class="row<#if fluidLayout>-fluid</#if>">
 <div class="span6">
 <form action="${actionBaseUrl}/chart/${uid}" class="ajax view form-inline" data-replacement="c">
 <@s.hidden name="vtype"/>

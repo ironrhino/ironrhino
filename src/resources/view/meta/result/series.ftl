@@ -18,7 +18,7 @@
 </#if>
 </ul>
 <div class="series ${name}">
-  <div class="row">
+  <div class="row<#if fluidLayout>-fluid</#if>">
     <div class="span2">
 		<ul class="nav nav-list">
 			<li class="nav-header">${name}</li>

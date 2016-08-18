@@ -264,7 +264,7 @@ $(function(){
 </script> 
 </head> 
 <body>
-<div class="row">
+<div class="row<#if fluidLayout>-fluid</#if>">
   <div class="span3" style="height: 600px;overflow-y:scroll;overflow-x:hidden;">
   	<div class="btn-toolbar" style="margin-bottom:10px;">
 		<div class="btn-group btn-switch">

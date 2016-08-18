@@ -18,7 +18,7 @@
 <title>${action.getText('monitor')}</title>
 </head>
 <body>
-<div class="row">
+<div class="row<#if fluidLayout>-fluid</#if>">
 <div class="span6">
 <form class="ajax view form-inline" data-replacement="result">
 <span>${action.getText('date')}</span>

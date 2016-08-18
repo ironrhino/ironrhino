@@ -4,10 +4,6 @@
 <#if ua?? && ua.name=='msie' && ua.majorVersion lt 9>
 <#assign modernBrowser = false/>
 </#if>
-<#assign devMode = false/>
-<@stageConditional value="DEVELOPMENT" negated=false>
-<#assign devMode = true/>
-</@stageConditional>
 <#if modernBrowser>
 <!DOCTYPE html>
 <html>

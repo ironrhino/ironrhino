@@ -5,6 +5,7 @@
 <meta name="body_class" content="welcome" />
 </head>
 <body>
+<#if fluidLayout><div class="container"></#if>
 <div class="row">
 	<div class="span6 offset3">
 	<h2 class="caption">${action.getText('setup')}</h2>
@@ -32,5 +33,6 @@
 	</div>
 	</div>
 </div>
+<#if fluidLayout></div></#if>
 </body>
 </html></#escape>

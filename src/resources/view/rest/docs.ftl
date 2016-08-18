@@ -47,7 +47,7 @@
 </head>
 <body>
 
-  <div class="row">
+  <div class="row<#if fluidLayout>-fluid</#if>">
     <div class="span3">
 		<div class="accordion" id="api-accordion">
 		<@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">

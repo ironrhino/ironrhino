@@ -5,10 +5,6 @@
 <#if ua?? && ua.name=='msie' && ua.majorVersion lt 9>
 <#assign modernBrowser = false/>
 </#if>
-<#assign devMode = false/>
-<@stageConditional value="DEVELOPMENT" negated=false>
-<#assign devMode = true/>
-</@stageConditional>
 <#if modernBrowser>
 <!DOCTYPE html>
 <html>
@@ -37,7 +33,7 @@
 
 <body class="main ${.lang} ${(page.properties["meta.body_class"])!}<#if modernBrowser> render-location-qrcode</#if>">
 <#if !modernBrowser>
-<div class="container">
+<div class="container<#if fluidLayout>-fluid</#if>">
 <div class="alert">
 <button type="button" class="close" data-dismiss="alert">&times;</button>
 <#noescape>
@@ -51,7 +47,7 @@ ${action.getText('browser.warning')}
 <@authorize ifNotGranted="ROLE_BUILTIN_ANONYMOUS">
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
-    <div class="container">
+    <div class="container<#if fluidLayout>-fluid</#if>">
     	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -73,7 +69,7 @@ ${action.getText('browser.warning')}
 </div>
 </@authorize>
 </#if>
-<div id="content" class="container">
+<div id="content" class="container<#if fluidLayout>-fluid</#if>">
 <#if action.hasActionMessages() || action.hasActionErrors()>
 <div id="message">
 <@s.actionerror />

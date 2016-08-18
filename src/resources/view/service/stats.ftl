@@ -66,7 +66,7 @@ Initialization.stats = function() {
 </head>
 <body>
 
-<div class="row">
+<div class="row<#if fluidLayout>-fluid</#if>">
 	<div id="side" class="btn-group btn-switch span2 offset5" style="margin-bottom:10px;">
 	<#list statics['org.ironrhino.core.remoting.StatsType'].values() as var>
 	  <button class="btn<#if !type??||type.name()==var.name()> active</#if>" data-type="${var.name()}">${var}</button>

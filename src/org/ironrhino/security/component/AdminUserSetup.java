@@ -19,9 +19,9 @@ public class AdminUserSetup {
 	@Setup
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public User setup(
-			@SetupParameter(defaultValue = "admin", displayOrder = Ordered.HIGHEST_PRECEDENCE, label = "admin.username") String username,
+			@SetupParameter(defaultValue = "admin", displayOrder = Ordered.HIGHEST_PRECEDENCE, label = "admin.username", cssClass = "span2") String username,
 			@SetupParameter(defaultValue = "password", displayOrder = Ordered.HIGHEST_PRECEDENCE
-					+ 1, label = "admin.password") String password)
+					+ 1, label = "admin.password", cssClass = "span2") String password)
 			throws Exception {
 		if (userManager.countAll() > 0)
 			return null;

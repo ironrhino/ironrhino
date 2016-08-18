@@ -51,6 +51,13 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	private static final String ATTR_REQUEST_MODEL = ".freemarker.Request";
 	private static final String ATTR_REQUEST_PARAMETERS_MODEL = ".freemarker.RequestParameters";
 
+	public static final String KEY_BASE = "base";
+	public static final String KEY_STATICS = "statics";
+	public static final String KEY_BEANS = "beans";
+	public static final String KEY_PROPERTIES = "properties";
+	public static final String KEY_DEV_MODE = "devMode";
+	public static final String KEY_FLUID_LAYOUT = "fluidLayout";
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private String base;
@@ -61,7 +68,8 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		// Configuration configuration =
 		// super.createConfiguration(servletContext);
 		/** super.createConfiguration(servletContext) start **/
-		if (AppInfo.getStage() == Stage.DEVELOPMENT)
+		boolean devMode = AppInfo.getStage() == Stage.DEVELOPMENT;
+		if (devMode)
 			LocalizedTextUtil.setReloadBundles(true);
 		MyConfiguration configuration = new MyConfiguration(DEFAULT_VERSION);
 		configuration.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION
@@ -83,12 +91,15 @@ public class MyFreemarkerManager extends FreemarkerManager {
 				.getBeansOfType(FallbackTemplateProvider.class).values());
 		TemplateProvider templateProvider = WebApplicationContextUtils.getWebApplicationContext(servletContext)
 				.getBean("templateProvider", TemplateProvider.class);
-		base = templateProvider.getAllSharedVariables().get("base");
+		base = templateProvider.getAllSharedVariables().get(KEY_BASE);
 		Map<String, Object> globalVariables = new HashMap<>(8);
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
-		globalVariables.put("statics", DEFAULT_BEANS_WRAPPER.getStaticModels());
-		globalVariables.put("beans", new BeansTemplateHashModel());
-		globalVariables.put("properties", new PropertiesTemplateHashModel());
+		globalVariables.put(KEY_STATICS, DEFAULT_BEANS_WRAPPER.getStaticModels());
+		globalVariables.put(KEY_BEANS, new BeansTemplateHashModel());
+		globalVariables.put(KEY_PROPERTIES, new PropertiesTemplateHashModel());
+		globalVariables.put(KEY_DEV_MODE, devMode);
+		globalVariables.put(KEY_FLUID_LAYOUT,
+				"true".equals(AppInfo.getApplicationContextProperties().get(KEY_FLUID_LAYOUT)));
 		TemplateHashModelEx hash = new SimpleMapModel(globalVariables, DEFAULT_BEANS_WRAPPER);
 		configuration.setAllSharedVariables(hash);
 		configuration.setDateFormat("yyyy-MM-dd");
@@ -162,7 +173,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 			HttpServletRequest request, HttpServletResponse response, ObjectWrapper wrapper) {
 		ScopesHashModel model = super.buildTemplateModel(stack, action, servletContext, request, response, wrapper);
 		if (StringUtils.isNotBlank(base))
-			model.put("base", base);
+			model.put(KEY_BASE, base);
 		return model;
 	}
 
@@ -171,6 +182,9 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	protected ScopesHashModel buildScopesHashModel(ServletContext servletContext, HttpServletRequest request,
 			HttpServletResponse response, ObjectWrapper wrapper, ValueStack stack) {
 		ScopesHashModel model = new ScopesHashModel(wrapper, servletContext, request, stack);
+		Boolean fluidLayout = (Boolean) request.getAttribute(KEY_FLUID_LAYOUT);
+		if (fluidLayout != null)
+			model.put(KEY_FLUID_LAYOUT, fluidLayout);
 		ServletContextHashModel servletContextModel = (ServletContextHashModel) servletContext
 				.getAttribute(ATTR_APPLICATION_MODEL);
 		if (servletContextModel == null) {
