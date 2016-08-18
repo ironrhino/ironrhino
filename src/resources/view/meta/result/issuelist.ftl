@@ -10,7 +10,7 @@
 	</li>
 	<li class="active">${action.getText(name)}</li>
 </ul>
-<div class="container-fluid issue ${name}">
+<div class="issue ${name}">
 <div id="list">
 <ul class="unstyled">
 <#list resultPage.result as page>

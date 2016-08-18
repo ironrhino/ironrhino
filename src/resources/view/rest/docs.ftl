@@ -47,7 +47,6 @@
 </head>
 <body>
 
-<div class="container">
   <div class="row">
     <div class="span3">
 		<div class="accordion" id="api-accordion">
@@ -137,6 +136,5 @@
 		</#if>
     </div>
   </div>
-</div>
 </body>
 </html></#escape>

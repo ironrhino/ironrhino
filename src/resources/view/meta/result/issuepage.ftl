@@ -10,7 +10,7 @@
 	</li>
 	<li class="active">${action.getText(name)}</li>
 </ul>
-<div class="container-fluid issue ${name}">
+<div class="issue ${name}">
 <#if page??>
 <div>
 	<h3 class="title" style="text-align:center;">${page.title!}</h3>

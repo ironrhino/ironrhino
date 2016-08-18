@@ -17,8 +17,8 @@
 	<li class="active">${column!}</li>
 </#if>
 </ul>
-<div class="container-fluid column ${name}">
-  <div class="row-fluid">
+<div class="column ${name}">
+  <div class="row">
     <div class="span2">
 		<ul class="nav nav-list">
 			<li class="nav-header"><a href="<@url value="/${name}"/>" class="ajax view">${name}</a></li>
