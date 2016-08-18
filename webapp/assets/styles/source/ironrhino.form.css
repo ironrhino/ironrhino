@@ -320,11 +320,14 @@ input[type="radio"].custom + label.custom:active, input[type="radio"].custom:che
 	margin-left: -20px;
 }
 .inline > label.custom {
-	margin-right: 5px;
 	margin-top: -3px;
 }
+.radio.inline:first-child, .checkbox.inline:first-child {
+	margin-right: 20px;
+}
 .radio.inline+.radio.inline, .checkbox.inline+.checkbox.inline{
-	margin-left: 20px;
+	margin-left: 0;
+	margin-right: 20px;
 }
 [class*="span"] .radio.inline,
 [class*="span"] .checkbox.inline {
@@ -411,7 +414,8 @@ form.attachmentable ul.thumbnails li .remove{
  font-size: 2em;
 }
 .form-horizontal .controls .unstyled{
-	padding-bottom:10px;
+	padding-bottom: 0;
+	margin-bottom: 0;
 }
 
 .form-horizontal .controls .unstyled em{
