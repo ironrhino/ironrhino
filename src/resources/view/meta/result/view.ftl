@@ -42,7 +42,7 @@
 						<#assign cssClass=config.cssClass?replace('input-[^ ]+', '', 'r')>
 						<#if config.type=='textarea'>
 							<#if value?has_content>
-							<div style="white-space:pre-wrap;word-break:break-all;"<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</div>
+							<p<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</p>
 							</#if>
 						<#elseif config.type=='dictionary'>
 							<#if displayDictionaryLabel??>
@@ -116,7 +116,7 @@
 			<#if !template?has_content>
 				<#if config.type=='textarea'>
 					<#if value?has_content>
-					<div style="white-space:pre-wrap;word-break:break-all;"<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</div>
+					<p<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</p>
 					</#if>
 				<#elseif config.type=='dictionary'>
 					<#if displayDictionaryLabel??>
@@ -178,7 +178,7 @@
 							<#if !template?has_content>
 								<#if config.type=='textarea'>
 									<#if value?has_content>
-									<div style="white-space:pre-wrap;word-break:break-all;"<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</div>
+									<p<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</p>
 									</#if>
 								<#elseif config.type=='dictionary'>
 									<#if displayDictionaryLabel??>

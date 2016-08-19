@@ -207,6 +207,10 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 .highlight {
 	background: #FF6;
 }
+p {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
 thead,tfoot {
 	background-color: #EEE;
 }

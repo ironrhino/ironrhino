@@ -15,7 +15,7 @@
 		<@s.hidden name="setting.description"/>
 	<#elseif view=='brief'>
 		<@s.hidden name="setting.key"/>
-		<@s.textarea label="%{getText('description')}" name="setting.description" tabindex="-1" readonly=true class="input-xxlarge" style="height:20px;border:none;resize:none;outline:none;"/>
+		<@s.textarea label="%{getText('description')}" name="setting.description" tabindex="-1" readonly=true class="input-xxlarge"/>
 	<#else>
 		<@s.textfield label="%{getText('key')}" name="setting.key" class="required checkavailable input-xxlarge"/>
 	</#if>

@@ -211,7 +211,6 @@ public class AnnotationShadows {
 			return internalDynamicAttributes;
 		}
 
-		
 		public String getDynamicAttributes() {
 			return dynamicAttributes;
 		}
@@ -633,11 +632,11 @@ public class AnnotationShadows {
 			this.listFormCssClass = config.listFormCssClass();
 			this.inputWindowOptions = config.inputWindowOptions();
 			this.viewWindowOptions = config.viewWindowOptions();
-			if (config.inputGridColumns() < 5)
+			if (config.inputGridColumns() > 1 && config.inputGridColumns() < 5 || config.inputGridColumns() == 6)
 				this.inputGridColumns = config.inputGridColumns();
-			if (config.viewGridColumns() < 5)
+			if (config.viewGridColumns() > 1 && config.viewGridColumns() < 5 || config.viewGridColumns() == 6)
 				this.viewGridColumns = config.viewGridColumns();
-			if (config.gridColumns() > 0 && config.gridColumns() < 5) {
+			if (config.gridColumns() > 1 && config.gridColumns() < 5 || config.gridColumns() == 6) {
 				if (this.inputGridColumns == 0)
 					this.inputGridColumns = config.gridColumns();
 				if (this.viewGridColumns == 0)

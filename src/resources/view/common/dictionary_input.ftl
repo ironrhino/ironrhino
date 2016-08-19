@@ -15,7 +15,7 @@
 		<@s.hidden name="dictionary.description" />
 	<#else>
 	<#if view=='brief'><@s.hidden name="dictionary.name"/><h4>${dictionary.name!}</h4><#else><@s.textfield label="%{getText('name')}" name="dictionary.name" class="required checkavailable"/></#if>
-	<#if view=='brief'><@s.hidden name="dictionary.description"/><p style="white-space:pre-wrap;word-break:break-all;">${dictionary.description!}</p><#else><@s.textarea label="%{getText('description')}" name="dictionary.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
+	<#if view=='brief'><@s.hidden name="dictionary.description"/><p>${dictionary.description!}</p><#else><@s.textarea label="%{getText('description')}" name="dictionary.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
 	</#if>
 	<table class="datagrid nullable table table-condensed">
 	<@s.hidden name="__datagrid_dictionary.items" />

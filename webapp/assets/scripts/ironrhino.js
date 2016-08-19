@@ -39556,37 +39556,32 @@ Observation.attachmentableform = function(container) {
 	}
 
 	transform = function(container, columns) {
+		var rowclass = container.parents('.container-fluid').length
+				? 'row-fluid'
+				: 'row';
 		var span = 'span' + (12 / columns);
+		var current = 0;
 		container.find('.control-group').filter(function(i) {
 					return !$(this).parent('[class*="span"]').length;
 				}).each(function(i, v) {
-					var t = $(v);
-					if (i % columns == 0) {
-						t.wrap('<div class="row"><div class="' + span
-								+ '"/></div>');
-					} else {
-						var prev = t.prev('.row');
-						t.wrap('<div class="' + span + '"/>').parent()
-								.appendTo(prev);
-					}
-				});
-		container.find('.controls')
-				.find('textarea,table,.input-xxlarge,.newline').each(
-						function(i, v) {
-							var sdiv = $(v).closest('.control-group')
-									.parent('.' + span);
-							if (!sdiv.length)
-								return;
-							var rdiv = $(sdiv).parent('.row');
-							sdiv.removeClass(span).addClass('span12');
-							if (sdiv.is(':first-child'))
-								sdiv.wrap('<div class="row"/>').parent()
-										.insertBefore(rdiv);
-							else
-								sdiv.wrap('<div class="row"/>').parent()
-										.insertAfter(rdiv);
-						});
-		container.find('.row:empty').remove();
+			var t = $(v);
+			if (t.find('.controls')
+					.find('textarea,table,p,.input-xxlarge,.newline').length) {
+				t.wrap('<div class="' + rowclass
+						+ '"><div class="span12"/></div>');
+				current = 0;
+			} else {
+				if (current % columns == 0) {
+					t.wrap('<div class="' + rowclass + '"><div class="' + span
+							+ '"/></div>');
+				} else {
+					var prev = t.prev('.' + rowclass);
+					t.wrap('<div class="' + span + '"/>').parent()
+							.appendTo(prev);
+				}
+				current++;
+			}
+		});
 	}
 
 })(jQuery);

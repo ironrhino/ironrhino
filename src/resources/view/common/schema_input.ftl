@@ -17,7 +17,7 @@
 	<#else>
 	<#if view=='brief'><@s.hidden name="schema.name"/><h4>${schema.name!}<#if schema.strict> <span class="label">${action.getText('strict')}</span></#if></h4><#else><@s.textfield label="%{getText('name')}" name="schema.name" class="required checkavailable"/></#if>
 	<#if view=='brief'><@s.hidden name="schema.strict"/><#else><@s.checkbox label="%{getText('strict')}" name="schema.strict" class="custom"/></#if>
-	<#if view=='brief'><@s.hidden name="schema.description"/><p style="white-space:pre-wrap;word-break:break-all;">${schema.description!}</p><#else><@s.textarea label="%{getText('description')}" name="schema.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
+	<#if view=='brief'><@s.hidden name="schema.description"/><p>${schema.description!}</p><#else><@s.textarea label="%{getText('description')}" name="schema.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
 	</#if>
 	<table class="datagrid nullable table table-condensed">
 	<@s.hidden name="__datagrid_schema.fields" />
