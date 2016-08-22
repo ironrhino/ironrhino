@@ -33899,7 +33899,6 @@ Observation.common = function(container) {
 					Ajax.fire(target, 'onbeforeserialize');
 				},
 				beforeSubmit : function() {
-					$(target).addClass('disabled');
 					Indicator.text = $(target).data('indicator');
 					$(':submit', target).prop('disabled', true);
 					Ajax.fire(target, 'onloading');
@@ -33957,6 +33956,9 @@ Observation.common = function(container) {
 					if (Ajax.fire(target, 'onbeforesubmit') === false)
 						return false;
 				},
+				beforeSend : function() {
+					$(target).addClass('loading');
+				},
 				error : function() {
 					Form.focus(target);
 					if (_opt.submitForm)
@@ -33970,7 +33972,7 @@ Observation.common = function(container) {
 					Ajax.handleResponse(data, _opt);
 				},
 				complete : function() {
-					$(target).removeClass('disabled');
+					$(target).removeClass('loading');
 				},
 				headers : _opt.headers
 			};
@@ -34040,13 +34042,14 @@ Observation.common = function(container) {
 					}
 
 				}
-				var t = $(this).addClass('disabled');
+				var t = $(this);
 				var options = {
 					target : this,
 					url : this.href,
 					type : $(this).data('method') || 'GET',
 					cache : $(this).hasClass('cache'),
 					beforeSend : function() {
+						t.addClass('loading');
 						$('.action-error').remove();
 						Indicator.text = $(target).data('indicator');
 						Ajax.fire(target, 'onloading');
@@ -34055,7 +34058,7 @@ Observation.common = function(container) {
 						Ajax.fire(target, 'onerror');
 					},
 					complete : function() {
-						t.removeClass('disabled');
+						t.removeClass('loading');
 					}
 				};
 				if (!$(this).hasClass('view'))
@@ -38241,7 +38244,6 @@ Richtable = {
 		return url;
 	},
 	open : function(url, reloadonclose, useiframe, form, btn) {
-		btn.prop('disabled', true).addClass('disabled');
 		form = form || $('form.richtable');
 		reloadonclose = reloadonclose || false;
 		useiframe = useiframe || false;
@@ -38357,19 +38359,23 @@ Richtable = {
 						target : target,
 						replacement : winid + ':content',
 						quiet : true,
+						beforeSend : function() {
+							btn.prop('disabled', true).addClass('loading');
+						},
 						complete : function() {
-							btn.prop('disabled', false).removeClass('disabled');
+							btn.prop('disabled', false).removeClass('loading');
 						}
 					});
 		} else {
 			// embed iframe
+			btn.prop('disabled', true).addClass('loading');
 			win.html('<iframe style="width:100%;height:550px;border:0;"/>');
 			url += (url.indexOf('?') > 0 ? '&' : '?') + 'decorator=simple&'
 					+ Math.random();
 			var iframe = $('#' + winid + ' > iframe')[0];
 			iframe.src = url;
 			iframe.onload = function() {
-				btn.prop('disabled', false).removeClass('disabled');
+				btn.prop('disabled', false).removeClass('loading');
 				Dialog.adapt(win, iframe);
 			}
 		}
@@ -38459,71 +38465,45 @@ Richtable = {
 				Message.showMessage('no.selection');
 				return false;
 			}
-			btn.prop('disabled', true).addClass('disabled');
-			if (action == 'delete') {
-				$.alerts.confirm(btn.data('confirm')
-								|| MessageBundle.get('confirm.delete'),
+			var url = Richtable.getBaseUrl(form) + '/' + action
+					+ Richtable.getPathParams();
+			url += (url.indexOf('?') > 0 ? '&' : '?') + idparams;
+			var action = function() {
+				ajax({
+							url : url,
+							type : 'POST',
+							dataType : 'json',
+							beforeSend : function() {
+								btn.prop('disabled', true).addClass('loading');
+								form.addClass('loading');
+							},
+							success : function() {
+								form.submit();
+								setTimeout(function() {
+											form.closest('.reload-container')
+													.find('.reloadable')
+													.trigger('reload');
+										}, 500);
+							},
+							complete : function() {
+								btn.prop('disabled', false)
+										.removeClass('loading');
+								form.removeClass('loading');
+							}
+						});
+
+			}
+			if (btn.hasClass('confirm') || action == 'delete') {
+				$.alerts.confirm((btn.data('confirm') || action == 'delete'
+								? MessageBundle.get('confirm.delete')
+								: MessageBundle.get('confirm.action')),
 						MessageBundle.get('select'), function(b) {
 							if (b) {
-								var url = Richtable.getBaseUrl(form) + '/'
-										+ action + Richtable.getPathParams();
-								url += (url.indexOf('?') > 0 ? '&' : '?')
-										+ idparams;
-								ajax({
-									url : url,
-									type : 'POST',
-									dataType : 'json',
-									success : function() {
-										form.submit();
-										setTimeout(function() {
-													form
-															.closest('.reload-container')
-															.find('.reloadable')
-															.trigger('reload');
-												}, 500);
-									},
-									complete : function() {
-										btn.prop('disabled', false)
-												.removeClass('disabled');
-									}
-								});
-							} else {
-								btn.prop('disabled', false)
-										.removeClass('disabled');
+								action();
 							}
 						});
 			} else {
-				var url = Richtable.getBaseUrl(form) + '/' + action
-						+ Richtable.getPathParams();
-				url += (url.indexOf('?') > 0 ? '&' : '?') + idparams;
-				var action = function() {
-					ajax({
-						url : url,
-						type : 'POST',
-						dataType : 'json',
-						success : function() {
-							form.submit();
-						},
-						complete : function() {
-							btn.prop('disabled', false).removeClass('disabled');
-						}
-					});
-				}
-				if (btn.hasClass('confirm')) {
-					$.alerts.confirm(btn.data('confirm')
-									|| MessageBundle.get('confirm.action'),
-							MessageBundle.get('select'), function(b) {
-								if (b) {
-									action();
-								} else {
-									btn.prop('disabled', false)
-											.removeClass('disabled');
-								}
-							});
-				} else {
-					action();
-				}
-
+				action();
 			}
 		} else {
 			var options = (new Function("return "
@@ -38562,9 +38542,8 @@ Richtable = {
 	},
 	save : function(event) {
 		var btn = $(event.target).closest('button,a');
-		btn.prop('disabled', true).addClass('disabled');
+		var form = $(event.target).closest('form');
 		var action = function() {
-			var form = $(event.target).closest('form');
 			var versionproperty = form.data('versionproperty');
 			var modified = false;
 			var theadCells = $('.richtable thead:eq(0) th');
@@ -38591,34 +38570,41 @@ Richtable = {
 					var url = Richtable.getBaseUrl(form) + '/save'
 							+ Richtable.getPathParams();
 					ajax({
-						url : url,
-						type : 'POST',
-						data : params,
-						dataType : 'json',
-						headers : {
-							'X-Edit' : 'cell'
-						},
-						onsuccess : function() {
-							$('td', row).removeClass('edited')
-									.removeData('oldvalue');
-							if (version != undefined)
-								$(row).data('version', version + 1);
-							$('[data-action="save"]', form)
-									.removeClass('btn-primary').hide();
-							setTimeout(function() {
-										form.closest('.reload-container')
-												.find('.reloadable')
-												.trigger('reload');
-									}, 500);
-						},
-						complete : function() {
-							btn.prop('disabled', false).removeClass('disabled');
-						}
-					});
+								url : url,
+								type : 'POST',
+								data : params,
+								dataType : 'json',
+								headers : {
+									'X-Edit' : 'cell'
+								},
+								beforeSend : function() {
+									btn.prop('disabled', true)
+											.addClass('loading');
+									form.addClass('loading');
+								},
+								onsuccess : function() {
+									$('td', row).removeClass('edited')
+											.removeData('oldvalue');
+									if (version != undefined)
+										$(row).data('version', version + 1);
+									$('[data-action="save"]', form)
+											.removeClass('btn-primary').hide();
+									setTimeout(function() {
+												form
+														.closest('.reload-container')
+														.find('.reloadable')
+														.trigger('reload');
+											}, 500);
+								},
+								complete : function() {
+									btn.prop('disabled', false)
+											.removeClass('loading');
+									form.removeClass('loading');
+								}
+							});
 				}
 			});
 			if (!modified) {
-				btn.prop('disabled', false).removeClass('disabled');
 				Message.showMessage('no.modification');
 				return false;
 			}
@@ -38630,9 +38616,6 @@ Richtable = {
 							.get('select'), function(b) {
 						if (b) {
 							action();
-						} else {
-							console.log(b);
-							btn.prop('disabled', false).removeClass('disabled');
 						}
 					});
 		} else {

@@ -8095,7 +8095,7 @@ a.remove:hover {
   opacity: 0.4;
   filter: alpha(opacity=40);
 }
-.disabled {
+.loading {
   pointer-events: none;
 }
 input[type="checkbox"].disabled + label.custom,input[type="radio"].disabled + label.custom{

@@ -1528,7 +1528,6 @@ Observation.common = function(container) {
 					Ajax.fire(target, 'onbeforeserialize');
 				},
 				beforeSubmit : function() {
-					$(target).addClass('disabled');
 					Indicator.text = $(target).data('indicator');
 					$(':submit', target).prop('disabled', true);
 					Ajax.fire(target, 'onloading');
@@ -1586,6 +1585,9 @@ Observation.common = function(container) {
 					if (Ajax.fire(target, 'onbeforesubmit') === false)
 						return false;
 				},
+				beforeSend : function() {
+					$(target).addClass('loading');
+				},
 				error : function() {
 					Form.focus(target);
 					if (_opt.submitForm)
@@ -1599,7 +1601,7 @@ Observation.common = function(container) {
 					Ajax.handleResponse(data, _opt);
 				},
 				complete : function() {
-					$(target).removeClass('disabled');
+					$(target).removeClass('loading');
 				},
 				headers : _opt.headers
 			};
@@ -1669,13 +1671,14 @@ Observation.common = function(container) {
 					}
 
 				}
-				var t = $(this).addClass('disabled');
+				var t = $(this);
 				var options = {
 					target : this,
 					url : this.href,
 					type : $(this).data('method') || 'GET',
 					cache : $(this).hasClass('cache'),
 					beforeSend : function() {
+						t.addClass('loading');
 						$('.action-error').remove();
 						Indicator.text = $(target).data('indicator');
 						Ajax.fire(target, 'onloading');
@@ -1684,7 +1687,7 @@ Observation.common = function(container) {
 						Ajax.fire(target, 'onerror');
 					},
 					complete : function() {
-						t.removeClass('disabled');
+						t.removeClass('loading');
 					}
 				};
 				if (!$(this).hasClass('view'))
