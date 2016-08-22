@@ -7889,6 +7889,32 @@ td.middle {
 .tab-content {
     overflow: visible;
 }
+.container-fluid .thumbnails .span6{
+	width: calc((100% - 40px) / 2);
+}
+.container-fluid .thumbnails .span4{
+	width: calc((100% - 60px) / 3);
+}
+.container-fluid .thumbnails .span3{
+	width: calc((100% - 80px) / 4);
+}
+.container-fluid .thumbnails .span2{
+	width: calc((100% - 120px) / 6);
+}
+@media (min-width: 1200px) {
+	.container-fluid .thumbnails .span6{
+		width: calc((100% - 60px) / 2);
+	}
+	.container-fluid .thumbnails .span4{
+		width: calc((100% - 90px) / 3);
+	}
+	.container-fluid .thumbnails .span3{
+		width: calc((100% - 120px) / 4);
+	}
+	.container-fluid .thumbnails .span2{
+		width: calc((100% - 180px) / 6);
+	}	
+}
 /*override bootstrap end*/
 /*override jqueryui start*/
 .ui-widget{

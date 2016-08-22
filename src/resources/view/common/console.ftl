@@ -69,7 +69,7 @@ $(function(){
 
 <#assign triggers = beans['applicationContextConsole'].getTriggers()>
 <#if triggers?keys?size gt 0>
-<div id="trigger"<#if fluidLayout> class="container"</#if>>
+<div id="trigger">
 	<ul class="thumbnails">
 	<#list triggers.entrySet() as entry>
 	<li class="span4">
@@ -84,7 +84,7 @@ $(function(){
 <#if printSetting??>
 <#assign settings = beans['settingControl'].getAllBooleanSettings()>
 <#if settings?size gt 0>
-<div id="switch"<#if fluidLayout> class="container"</#if>>
+<div id="switch">
 	<style scoped>
 	div.key{
 		text-align: right;

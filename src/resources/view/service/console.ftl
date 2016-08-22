@@ -17,7 +17,7 @@ $('.service').click(function(){
 			}
 			var ul = $('<ul class="thumbnails"/>').insertAfter(t);
 			$.each(data,function(i,v){
-				$('<li class="span2"/>').appendTo(ul).html('<a class="host" href="#">'+v+'</a>');
+				$('<li class="span3"/>').appendTo(ul).html('<a class="host" href="#">'+v+'</a>');
 			});
 			$('<h5 style="text-align:center;">Exported By:</h5>').insertAfter(t);
 		});
@@ -53,7 +53,7 @@ $(document).on('click','a.host',function(e){
 </div>
 <#assign services = serviceRegistry.getAllServices()>
 <#if services?size gt 0>
-<div id="services"<#if fluidLayout> class="container"</#if>>
+<div id="services">
 	<ul class="thumbnails">
 	<#list services as service>
 	<li class="span6">
