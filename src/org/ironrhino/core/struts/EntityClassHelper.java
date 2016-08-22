@@ -40,6 +40,7 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.hibernate.CriterionOperator;
@@ -236,6 +237,11 @@ public class EntityClassHelper {
 								uci.setReadonly(ri);
 							}
 						}
+					}
+					if (findAnnotation(readMethod, declaredField, Formula.class) != null) {
+						ReadonlyImpl ri = new ReadonlyImpl();
+						ri.setValue(true);
+						uci.setReadonly(ri);
 					}
 
 					Class<?> returnType = pd.getPropertyType();
