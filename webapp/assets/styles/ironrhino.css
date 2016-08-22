@@ -8448,6 +8448,7 @@ input[type="checkbox"].custom + label.custom {
 	display: inline-block;
 	vertical-align: middle;
 	margin-bottom: 0;
+	margin-right: 5px;
 	position: relative;
 }
 
@@ -8489,6 +8490,7 @@ input[type="radio"].custom + label.custom {
 	display: inline-block;
 	vertical-align: middle;
 	margin-bottom: 0;
+	margin-right: 5px;
 	position: relative;
 }
 

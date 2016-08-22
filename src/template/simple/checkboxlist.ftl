@@ -35,8 +35,8 @@
             <#assign itemValue = stack.findString('top')/>
     </#if>
     <#assign itemKeyStr=itemKey.toString() />
-    <label for="${parameters.name?html}-${itemCount}" class="checkbox inline">
-<input type="checkbox" name="${parameters.name?html}" value="${itemKeyStr?html}"
+    <label for="${parameters.name?html}-${itemCount}" class="checkbox inline"><#rt/>
+<input type="checkbox" name="${parameters.name?html}" value="${itemKeyStr?html}"<#rt/>
        id="${parameters.name?html}-${itemCount}"<#rt/>
     <#if tag.contains(parameters.nameValue, itemKey) || tag.contains(parameters.nameValue, itemValue)>
        checked="checked"<#rt/>
@@ -53,14 +53,13 @@
     <#include "/${parameters.templateDir}/simple/css.ftl" />
     <#include "/${parameters.templateDir}/simple/scripting-events.ftl" />
     <#include "/${parameters.templateDir}/simple/common-attributes.ftl" />
-        />
+        /><#rt/>
 ${itemValue?html}</label>
 </@s.iterator>
     <#else>
     &nbsp;
 </#if>
-<input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.name?html}"
-       value=""<#rt/>
+<input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.name?html}" value=""<#rt/>
 <#if parameters.disabled!false>
        disabled="disabled"<#rt/>
 </#if>
