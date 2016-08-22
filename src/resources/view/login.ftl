@@ -14,7 +14,6 @@
 </head>
 <body>
 <#if anonymous>
-<#if fluidLayout><div class="container"></#if>
 <div class="row">
 	<div class="span6 offset3">
 	<h2 class="caption">${action.getText('login')}</h2>
@@ -36,7 +35,6 @@
 	</div>
 	</div>
 </div>
-<#if fluidLayout></div></#if>
 <#if getSetting??&&'true'==getSetting('signup.enabled')&&'true'==getSetting('oauth.enabled')>
 <@resourcePresentConditional value="resources/view/oauth/connect.ftl">
 <div class="ajaxpanel" data-url="<@url value="/oauth/connect"/>">

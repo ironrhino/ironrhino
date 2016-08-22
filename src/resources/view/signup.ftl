@@ -14,7 +14,6 @@
 </head>
 <body>
 <#if anonymous>
-<#if fluidLayout><div class="container"></#if>
 <div class="row">
 	<div class="span6 offset3">
 	<h2 class="caption">${action.getText('signup')}</h2>
@@ -31,7 +30,6 @@
 	</div>
 	</div>
 </div>
-<#if fluidLayout></div></#if>
 <#else>
 <div class="modal">
 	<div class="modal-body">

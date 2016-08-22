@@ -5,6 +5,9 @@
 <#if ua?? && ua.name=='msie' && ua.majorVersion lt 9>
 <#assign modernBrowser = false/>
 </#if>
+<#if fluidLayout>
+	<#assign fluidLayout = 'welcome'!= (page.properties["meta.body_class"])!/>
+</#if>
 <#if modernBrowser>
 <!DOCTYPE html>
 <html>
