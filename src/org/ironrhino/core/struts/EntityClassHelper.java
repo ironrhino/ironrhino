@@ -40,10 +40,14 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.ironrhino.core.hibernate.CreationUser;
 import org.ironrhino.core.hibernate.CriterionOperator;
+import org.ironrhino.core.hibernate.UpdateUser;
 import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Attributable;
@@ -131,6 +135,24 @@ public class EntityClassHelper {
 						ReadonlyImpl ri = new ReadonlyImpl();
 						ri.setValue(true);
 						uci.setReadonly(ri);
+					}
+
+					if (findAnnotation(readMethod, declaredField, CreationTimestamp.class) != null
+							|| findAnnotation(readMethod, declaredField, UpdateTimestamp.class) != null
+							|| findAnnotation(readMethod, declaredField, CreationUser.class) != null
+							|| findAnnotation(readMethod, declaredField, UpdateUser.class) != null) {
+						HiddenImpl hi = uci.getHiddenInInput();
+						if (hi == null || hi.isDefaultOptions()) {
+							hi = new HiddenImpl();
+							hi.setValue(true);
+							uci.setHiddenInInput(hi);
+						}
+						ReadonlyImpl ri = uci.getReadonly();
+						if (ri == null || ri.isDefaultOptions()) {
+							ri = new ReadonlyImpl();
+							ri.setValue(true);
+							uci.setReadonly(ri);
+						}
 					}
 
 					OneToOne oneToOne = findAnnotation(readMethod, declaredField, OneToOne.class);
