@@ -26,6 +26,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 	@Autowired
 	private Logger logger;
 
+	@Autowired
 	private RedisTemplate<String, Client> clientRedisTemplate;
 
 	@Autowired
@@ -43,14 +44,6 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 	// oauth:authorization:{accessToken} -> id
 	// oauth:authorization:{refreshToken} -> id
 	// oauth:authorization:grantor:{username} -> [id]
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Autowired
-	public RedisOAuthManager(RedisTemplate redisTemplate,
-			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
-		this.clientRedisTemplate = redisTemplate;
-		this.stringRedisTemplate = stringRedisTemplate;
-	}
 
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;

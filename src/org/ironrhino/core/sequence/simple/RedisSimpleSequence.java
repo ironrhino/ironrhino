@@ -1,5 +1,6 @@
 package org.ironrhino.core.sequence.simple;
 
+import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.BoundValueOperations;
@@ -10,12 +11,9 @@ public class RedisSimpleSequence extends AbstractSimpleSequence {
 
 	public static final String KEY_SEQUENCE = "seq:";
 
-	@Autowired(required = false)
-	@Qualifier("sequenceStringRedisTemplate")
-	private RedisTemplate<String, String> sequenceStringRedisTemplate;
-
 	@Autowired
 	@Qualifier("stringRedisTemplate")
+	@PrioritizedQualifier("sequenceStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundValueOperations<String, String> boundValueOperations;
@@ -24,8 +22,6 @@ public class RedisSimpleSequence extends AbstractSimpleSequence {
 	public void afterPropertiesSet() {
 		Assert.hasText(getSequenceName());
 		Assert.isTrue(getPaddingLength() > 0);
-		if (sequenceStringRedisTemplate != null)
-			stringRedisTemplate = sequenceStringRedisTemplate;
 		boundValueOperations = stringRedisTemplate.boundValueOps(KEY_SEQUENCE + getSequenceName());
 		boundValueOperations.setIfAbsent("0");
 	}

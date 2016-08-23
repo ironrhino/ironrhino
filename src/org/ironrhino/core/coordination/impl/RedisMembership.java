@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.coordination.Membership;
+import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,18 +41,13 @@ public class RedisMembership implements Membership {
 	@Value("${redis.membership.heartbeat:60000}")
 	private int heartbeat = 60000;
 
-	@Autowired(required = false)
-	@Qualifier("coordinationStringRedisTemplate")
-	private RedisTemplate<String, String> coordinationStringRedisTemplate;
-
 	@Autowired
 	@Qualifier("stringRedisTemplate")
+	@PrioritizedQualifier("coordinationStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@PostConstruct
 	public void afterPropertiesSet() {
-		if (coordinationStringRedisTemplate != null)
-			stringRedisTemplate = coordinationStringRedisTemplate;
 		taskScheduler.scheduleAtFixedRate(() -> {
 			for (String group : groups) {
 				List<String> members = getMembers(group);

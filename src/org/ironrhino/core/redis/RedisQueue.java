@@ -7,11 +7,11 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.support.collections.DefaultRedisList;
 
@@ -28,11 +28,8 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
-	@Autowired(required = false)
-	@Qualifier("mqRedisTemplate")
-	private RedisTemplate<String, T> mqRedisTemplate;
-
 	@Autowired
+	@PrioritizedQualifier("mqRedisTemplate")
 	private RedisTemplate<String, T> redisTemplate;
 
 	public void setConsuming(boolean consuming) {
@@ -56,8 +53,6 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 
 	@PostConstruct
 	public void afterPropertiesSet() {
-		if (mqRedisTemplate != null)
-			redisTemplate = mqRedisTemplate;
 		queue = new DefaultRedisList<>(queueName, redisTemplate);
 		if (consuming) {
 			Runnable task = () -> {

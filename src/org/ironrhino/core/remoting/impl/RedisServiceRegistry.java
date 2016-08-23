@@ -13,12 +13,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.ExportServicesEvent;
+import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,12 +35,9 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	private static final String NAMESPACE_HOSTS = NAMESPACE + "hosts:";
 
-	@Autowired(required = false)
-	@Qualifier("remotingStringRedisTemplate")
-	private RedisTemplate<String, String> remotingStringRedisTemplate;
-
 	@Autowired
 	@Qualifier("stringRedisTemplate")
+	@PrioritizedQualifier("remotingStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Autowired
@@ -52,12 +49,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	private Map<String, String> discoveredServices = new HashMap<>();
 
 	private boolean ready;
-
-	@PostConstruct
-	public void afterPropertiesSet() {
-		if (remotingStringRedisTemplate != null)
-			stringRedisTemplate = remotingStringRedisTemplate;
-	}
 
 	@Override
 	protected void onReady() {

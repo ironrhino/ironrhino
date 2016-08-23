@@ -6,8 +6,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
+import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.throttle.ConcurrencyService;
 import org.slf4j.Logger;
@@ -25,19 +24,10 @@ public class RedisConcurrencyService implements ConcurrencyService {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Autowired(required = false)
-	@Qualifier("throttleStringRedisTemplate")
-	private RedisTemplate<String, String> throttleStringRedisTemplate;
-
 	@Autowired
 	@Qualifier("stringRedisTemplate")
+	@PrioritizedQualifier("throttleStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
-
-	@PostConstruct
-	public void afterPropertiesSet() {
-		if (throttleStringRedisTemplate != null)
-			stringRedisTemplate = throttleStringRedisTemplate;
-	}
 
 	@Override
 	public boolean tryAcquire(String name, int permits) {

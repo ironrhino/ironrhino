@@ -29,6 +29,7 @@ import org.ironrhino.core.remoting.InvocationWarning;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.remoting.StatsType;
+import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
@@ -74,12 +75,9 @@ public class RedisServiceStats implements ServiceStats {
 	@Value("${serviceStats.maxSamplesSize:20}")
 	public long maxSamplesSize = 20;
 
-	@Autowired(required = false)
-	@Qualifier("remotingStringRedisTemplate")
-	private RedisTemplate<String, String> remotingStringRedisTemplate;
-
 	@Autowired
 	@Qualifier("stringRedisTemplate")
+	@PrioritizedQualifier("remotingStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundZSetOperations<String, String> hotspotsOperations;
@@ -87,8 +85,6 @@ public class RedisServiceStats implements ServiceStats {
 
 	@PostConstruct
 	public void afterPropertiesSet() {
-		if (remotingStringRedisTemplate != null)
-			stringRedisTemplate = remotingStringRedisTemplate;
 		hotspotsOperations = stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
 		warningsOperations = stringRedisTemplate.boundListOps(KEY_WARNINGS);
 	}

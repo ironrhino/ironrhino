@@ -10,10 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
+import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,28 +32,14 @@ public class RedisCacheManager implements CacheManager {
 	@Autowired
 	private Logger logger;
 
-	@Autowired(required = false)
-	@Qualifier("cacheRedisTemplate")
-	private RedisTemplate cacheRedisTemplate;
-
 	@Autowired
+	@PrioritizedQualifier("cacheRedisTemplate")
 	private RedisTemplate redisTemplate;
-
-	@Autowired(required = false)
-	@Qualifier("cacheStringRedisTemplate")
-	private RedisTemplate<String, String> cacheStringRedisTemplate;
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
+	@PrioritizedQualifier("cacheStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
-
-	@PostConstruct
-	public void afterPropertiesSet() {
-		if (cacheRedisTemplate != null)
-			redisTemplate = cacheRedisTemplate;
-		if (cacheStringRedisTemplate != null)
-			stringRedisTemplate = cacheStringRedisTemplate;
-	}
 
 	@Override
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
