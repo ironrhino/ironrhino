@@ -14,15 +14,11 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.ironrhino.core.hibernate.CreationUser;
-import org.ironrhino.core.hibernate.UpdateUser;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.model.BaseEntity;
+import org.ironrhino.core.model.BaseRecordableEntity;
 import org.ironrhino.core.model.Enableable;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
@@ -39,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 @MappedSuperclass
-public class BaseUser extends BaseEntity implements RoledUserDetails, Enableable {
+public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, Enableable {
 
 	private static final long serialVersionUID = -6135434863820342822L;
 
@@ -106,34 +102,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Enableable
 	@Column(length = 4000)
 	@UiConfig(hidden = true)
 	private Map<String, String> attributes;
-
-	@NotInCopy
-	@JsonIgnore
-	@UiConfig(hidden = true)
-	@Column(updatable = false)
-	@CreationTimestamp
-	private Date createDate;
-
-	@NotInCopy
-	@JsonIgnore
-	@UiConfig(hidden = true)
-	@Column(insertable = false)
-	@UpdateTimestamp
-	private Date modifyDate;
-
-	@NotInCopy
-	@JsonIgnore
-	@UiConfig(hidden = true)
-	@Column(updatable = false)
-	@CreationUser
-	private String createUser;
-
-	@NotInCopy
-	@JsonIgnore
-	@UiConfig(hidden = true)
-	@Column(insertable = false)
-	@UpdateUser
-	private String modifyUser;
 
 	@Override
 	public String getUsername() {
@@ -239,38 +207,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Enableable
 
 	public void setPasswordExpired(boolean passwordExpired) {
 		this.passwordExpired = passwordExpired;
-	}
-
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	public String getCreateUser() {
-		return createUser;
-	}
-
-	public void setCreateUser(String createUser) {
-		this.createUser = createUser;
-	}
-
-	public Date getModifyDate() {
-		return modifyDate;
-	}
-
-	public void setModifyDate(Date modifyDate) {
-		this.modifyDate = modifyDate;
-	}
-
-	public String getModifyUser() {
-		return modifyUser;
-	}
-
-	public void setModifyUser(String modifyUser) {
-		this.modifyUser = modifyUser;
 	}
 
 	@Override
