@@ -15,6 +15,7 @@ import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Csrf;
 import org.ironrhino.core.metadata.CurrentPassword;
 import org.ironrhino.core.security.captcha.CaptchaManager;
+import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizerManager;
 import org.ironrhino.core.util.AnnotationUtils;
@@ -73,9 +74,7 @@ public class BaseAction extends ActionSupport {
 
 	protected String responseBody;
 
-	protected boolean captchaRequired;
-
-	private boolean firstReachCaptchaThreshold;
+	protected CaptchaStatus captchaStatus;
 
 	protected String csrf;
 
@@ -107,7 +106,7 @@ public class BaseAction extends ActionSupport {
 	}
 
 	public boolean isCaptchaRequired() {
-		return captchaRequired;
+		return captchaStatus != null && captchaStatus.isRequired();
 	}
 
 	public String getTargetUrl() {
@@ -230,11 +229,9 @@ public class BaseAction extends ActionSupport {
 		}
 		Captcha captcha = getAnnotation(Captcha.class);
 		if (captcha != null && captchaManager != null) {
-			boolean[] array = captchaManager.isCaptchaRequired(ServletActionContext.getRequest(), captcha);
-			captchaRequired = array[0];
-			firstReachCaptchaThreshold = array[1];
+			captchaStatus = captchaManager.getCaptchaStatus(ServletActionContext.getRequest(), captcha);
 		}
-		csrfRequired = !captchaRequired && getAnnotation(Csrf.class) != null;
+		csrfRequired = captchaStatus == null && getAnnotation(Csrf.class) != null;
 		return null;
 	}
 
@@ -283,7 +280,7 @@ public class BaseAction extends ActionSupport {
 
 	@Override
 	public void validate() {
-		if (captchaManager != null && captchaRequired && !firstReachCaptchaThreshold
+		if (captchaManager != null && isCaptchaRequired() && !captchaStatus.isFirstReachThreshold()
 				&& !captchaManager.verify(ServletActionContext.getRequest(),
 						ServletActionContext.getRequest().getSession().getId(), true))
 			addFieldError(CaptchaManager.KEY_CAPTCHA, getText("captcha.error"));
@@ -327,9 +324,15 @@ public class BaseAction extends ActionSupport {
 			targetUrl = ServletActionContext.getResponse().encodeRedirectURL(targetUrl);
 			ServletActionContext.getResponse().setHeader("X-Redirect-To", targetUrl);
 		}
-		if (!(returnInput || !isAjax() || (captchaRequired && firstReachCaptchaThreshold)
+		if (!(returnInput || !isAjax() || (isCaptchaRequired() && captchaStatus.isFirstReachThreshold())
 				|| !(isUseJson() || hasErrors()))) {
 			ActionContext.getContext().getActionInvocation().setResultCode(JSON);
+			if (csrfRequired) {
+				csrf = CodecUtils.nextId();
+				RequestUtils.saveCookie(ServletActionContext.getRequest(), ServletActionContext.getResponse(),
+						COOKIE_NAME_CSRF, csrf, false, true);
+				ServletActionContext.getResponse().addHeader("X-Csrf", csrf);
+			}
 		} else if (!isUseJson() && hasFieldErrors()) {
 			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<String, List<String>> entry : getFieldErrors().entrySet()) {

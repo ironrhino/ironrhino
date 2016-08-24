@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.security.captcha.CaptchaManager;
+import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +21,12 @@ public class DefaultCaptchaManager implements CaptchaManager {
 	private static final char[] CHINESE_NUMBERS = "零壹贰叁肆伍陆柒捌玖".toCharArray();
 
 	private static final String REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED = "CAPTACHA_THRESHOLD_ADDED";
-	private static final String REQUEST_ATTRIBUTE_KEY_CAPTACHA_REQUIRED = "CAPTACHA_REQUIRED";
+	private static final String REQUEST_ATTRIBUTE_KEY_CAPTACHA_STATUS = "CAPTACHA_STATUS";
 	private static final String REQUEST_ATTRIBUTE_KEY_CAPTACHA_VALIDATED = "CAPTACHA_VALIDATED";
 
 	private static final String CACHE_PREFIX_ANSWER = "answer_";
 
-	public static final String CACHE_PREFIX_THRESHOLD = "captchaThreshold_";
+	public static final String CACHE_PREFIX_COUNT = "captchaCount_";
 
 	public static final int CACHE_ANSWER_TIME_TO_LIVE = 60;
 
@@ -83,12 +84,12 @@ public class DefaultCaptchaManager implements CaptchaManager {
 	}
 
 	@Override
-	public void addCaptachaThreshold(HttpServletRequest request) {
+	public void addCaptachaCount(HttpServletRequest request) {
 		if (bypass)
 			return;
 		boolean added = request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED) != null;
 		if (!added) {
-			String key = getThresholdKey(request);
+			String key = getCountKey(request);
 			Integer threshold = (Integer) cacheManager.get(key, KEY_CAPTCHA);
 			if (threshold != null)
 				threshold += 1;
@@ -101,30 +102,28 @@ public class DefaultCaptchaManager implements CaptchaManager {
 	}
 
 	@Override
-	public boolean[] isCaptchaRequired(HttpServletRequest request, Captcha captcha) {
+	public CaptchaStatus getCaptchaStatus(HttpServletRequest request, Captcha captcha) {
 		if (bypass)
-			return new boolean[] { false, false };
-		boolean[] required = (boolean[]) request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_REQUIRED);
-		if (required == null) {
+			return CaptchaStatus.EMPTY;
+		CaptchaStatus status = (CaptchaStatus) request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_STATUS);
+		if (status == null) {
 			if (captcha != null) {
 				if (captcha.always()) {
-					required = new boolean[] { true, false };
+					status = new CaptchaStatus(true, captcha.threshold(), 0);
 				} else if (captcha.bypassLoggedInUser()) {
-					required = new boolean[] { AuthzUtils.getUserDetails() == null, false };
+					status = new CaptchaStatus(AuthzUtils.getUserDetails() == null, captcha.threshold(), 0);
 				} else {
-					Integer threshold = (Integer) cacheManager.get(getThresholdKey(request), KEY_CAPTCHA);
-					if (threshold != null && threshold >= captcha.threshold()) {
-						required = new boolean[] { true, (threshold > 0 && threshold == captcha.threshold()) };
-					} else {
-						required = new boolean[] { false, false };
-					}
+					Integer threshold = (Integer) cacheManager.get(getCountKey(request), KEY_CAPTCHA);
+					if (threshold == null)
+						threshold = 0;
+					status = new CaptchaStatus(threshold >= captcha.threshold(), captcha.threshold(), threshold);
 				}
 			} else {
-				required = new boolean[] { false, false };
+				status = CaptchaStatus.EMPTY;
 			}
-			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_REQUIRED, required);
+			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_STATUS, status);
 		}
-		return required;
+		return status;
 	}
 
 	@Override
@@ -138,13 +137,13 @@ public class DefaultCaptchaManager implements CaptchaManager {
 		if (!cleanup)
 			return pass;
 		if (pass)
-			cacheManager.delete(getThresholdKey(request), KEY_CAPTCHA);
+			cacheManager.delete(getCountKey(request), KEY_CAPTCHA);
 		else
-			addCaptachaThreshold(request);
+			addCaptachaCount(request);
 		return pass;
 	}
 
-	protected String getThresholdKey(HttpServletRequest request) {
-		return CACHE_PREFIX_THRESHOLD + request.getRemoteAddr();
+	protected String getCountKey(HttpServletRequest request) {
+		return CACHE_PREFIX_COUNT + request.getRemoteAddr();
 	}
 }

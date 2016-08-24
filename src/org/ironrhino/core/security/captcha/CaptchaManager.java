@@ -16,15 +16,8 @@ public interface CaptchaManager {
 
 	public boolean verify(HttpServletRequest request, String token, boolean cleanup);
 
-	/**
-	 * array[0] = isCaptchaRequired,array[1] = isFirstReachCaptchaThreshold
-	 * 
-	 * @param request
-	 * @param captcha
-	 * @return
-	 */
-	public boolean[] isCaptchaRequired(HttpServletRequest request, Captcha captcha);
+	public CaptchaStatus getCaptchaStatus(HttpServletRequest request, Captcha captcha);
 
-	public void addCaptachaThreshold(HttpServletRequest request);
+	public void addCaptachaCount(HttpServletRequest request);
 
 }

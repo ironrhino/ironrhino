@@ -783,6 +783,9 @@ Initialization.common = function() {
 			}
 			return;
 		}
+		var csrf = xhr.getResponseHeader('X-Csrf');
+		if (csrf)
+			$('input[type="hidden"][name="csrf"]').val(csrf);
 	}).keyup(function(e) {
 		if (e.keyCode == 27) {
 			if ($('.modal:visible').length)

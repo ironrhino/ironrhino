@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 public class SessionBasedCaptchaManager extends DefaultCaptchaManager {
 
 	@Override
-	protected String getThresholdKey(HttpServletRequest request) {
-		return CACHE_PREFIX_THRESHOLD + request.getSession().getId();
+	protected String getCountKey(HttpServletRequest request) {
+		return CACHE_PREFIX_COUNT + request.getSession().getId();
 	}
 
 }
