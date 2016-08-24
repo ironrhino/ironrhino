@@ -33565,13 +33565,19 @@ Observation.common = function(container) {
 					data[$(this).attr('name')] = $(this).val();
 				});
 		ajax({
-					global : false,
+					global : t.data('global'),
 					quiet : true,
 					type : t.data('method') || f.attr('method'),
 					url : url,
 					data : data,
 					target : f[0],
-					replacement : t.data('replacement')
+					replacement : t.data('replacement'),
+					beforeSend : function() {
+						f.addClass('loading');
+					},
+					complete : function() {
+						f.removeClass('loading');
+					}
 				});
 	});
 	$(':input.conjunct', container).change(function() {
