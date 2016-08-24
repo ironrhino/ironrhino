@@ -7,9 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.ironrhino.common.record.RecordAware;
 import org.ironrhino.core.aop.PublishAware;
+import org.ironrhino.core.hibernate.CreationUser;
+import org.ironrhino.core.hibernate.UpdateUser;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
@@ -17,10 +21,8 @@ import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
-import org.ironrhino.core.model.Recordable;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @RecordAware
 @PublishAware
@@ -29,7 +31,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(name = "common_setting")
 @Richtable(searchable = true, readonly = @Readonly(expression = "entity.readonly"), order = "key asc", exportable = true, importable = true)
-public class Setting extends BaseEntity implements Recordable<UserDetails> {
+public class Setting extends BaseEntity {
 
 	private static final long serialVersionUID = -8352037603261222984L;
 
@@ -59,21 +61,25 @@ public class Setting extends BaseEntity implements Recordable<UserDetails> {
 	@NotInCopy
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
-	private Date createDate = new Date();
+	@CreationTimestamp
+	private Date createDate;
 
 	@NotInCopy
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
+	@UpdateTimestamp
 	private Date modifyDate;
 
 	@NotInCopy
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
+	@CreationUser
 	private String createUser;
 
 	@NotInCopy
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
+	@UpdateUser
 	private String modifyUser;
 
 	@Version
@@ -128,22 +134,18 @@ public class Setting extends BaseEntity implements Recordable<UserDetails> {
 		this.hidden = hidden;
 	}
 
-	@Override
 	public Date getCreateDate() {
 		return createDate;
 	}
 
-	@Override
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
 
-	@Override
 	public Date getModifyDate() {
 		return modifyDate;
 	}
 
-	@Override
 	public void setModifyDate(Date modifyDate) {
 		this.modifyDate = modifyDate;
 	}
@@ -162,18 +164,6 @@ public class Setting extends BaseEntity implements Recordable<UserDetails> {
 
 	public void setModifyUser(String modifyUser) {
 		this.modifyUser = modifyUser;
-	}
-
-	@Override
-	public void setCreateUserDetails(UserDetails user) {
-		if (user != null)
-			createUser = user.getUsername();
-	}
-
-	@Override
-	public void setModifyUserDetails(UserDetails user) {
-		if (user != null)
-			modifyUser = user.getUsername();
 	}
 
 	public int getVersion() {

@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -46,11 +45,9 @@ import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Ordered;
 import org.ironrhino.core.model.Persistable;
-import org.ironrhino.core.model.Recordable;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.struts.EntityClassHelper;
 import org.ironrhino.core.util.AnnotationUtils;
-import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -58,7 +55,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateCallback;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -126,26 +122,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		}
 		ReflectionUtils.processCallback(obj, isnew ? PrePersist.class : PreUpdate.class);
-		if (obj instanceof Recordable) {
-			Recordable r = (Recordable) obj;
-			Date date = new Date();
-			UserDetails user = AuthzUtils.getUserDetails();
-			if (isnew) {
-				r.setCreateDate(date);
-				try {
-					r.setCreateUserDetails(user);
-				} catch (ClassCastException e) {
-					logger.warn(e.getMessage());
-				}
-			} else {
-				r.setModifyDate(date);
-				try {
-					r.setModifyUserDetails(user);
-				} catch (ClassCastException e) {
-					logger.warn(e.getMessage());
-				}
-			}
-		}
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
 			final BaseTreeableEntity entity = (BaseTreeableEntity) obj;

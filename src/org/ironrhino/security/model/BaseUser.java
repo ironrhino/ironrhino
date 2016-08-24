@@ -14,14 +14,17 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.ironrhino.core.hibernate.CreationUser;
+import org.ironrhino.core.hibernate.UpdateUser;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.model.Enableable;
 import org.ironrhino.core.model.Persistable;
-import org.ironrhino.core.model.Recordable;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.RoledUserDetails;
@@ -36,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 @MappedSuperclass
-public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable<BaseUser>, Enableable {
+public class BaseUser extends BaseEntity implements RoledUserDetails, Enableable {
 
 	private static final long serialVersionUID = -6135434863820342822L;
 
@@ -89,12 +92,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 
 	@NotInCopy
 	@JsonIgnore
-	@UiConfig(hidden = true)
-	@Column(updatable = false)
-	private Date createDate = new Date();
-
-	@NotInCopy
-	@JsonIgnore
 	@Transient
 	@UiConfig(hidden = true)
 	private Collection<? extends GrantedAuthority> authorities;
@@ -113,19 +110,29 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	@NotInCopy
 	@JsonIgnore
 	@UiConfig(hidden = true)
+	@Column(updatable = false)
+	@CreationTimestamp
+	private Date createDate;
+
+	@NotInCopy
+	@JsonIgnore
+	@UiConfig(hidden = true)
 	@Column(insertable = false)
+	@UpdateTimestamp
 	private Date modifyDate;
 
 	@NotInCopy
 	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
+	@CreationUser
 	private String createUser;
 
 	@NotInCopy
 	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
+	@UpdateUser
 	private String modifyUser;
 
 	@Override
@@ -234,12 +241,10 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 		this.passwordExpired = passwordExpired;
 	}
 
-	@Override
 	public Date getCreateDate() {
 		return createDate;
 	}
 
-	@Override
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
@@ -252,18 +257,10 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 		this.createUser = createUser;
 	}
 
-	@Override
-	public void setCreateUserDetails(BaseUser createUser) {
-		if (createUser != null)
-			this.createUser = createUser.getUsername();
-	}
-
-	@Override
 	public Date getModifyDate() {
 		return modifyDate;
 	}
 
-	@Override
 	public void setModifyDate(Date modifyDate) {
 		this.modifyDate = modifyDate;
 	}
@@ -274,12 +271,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 
 	public void setModifyUser(String modifyUser) {
 		this.modifyUser = modifyUser;
-	}
-
-	@Override
-	public void setModifyUserDetails(BaseUser modifyUser) {
-		if (modifyUser != null)
-			this.modifyUser = modifyUser.getUsername();
 	}
 
 	@Override

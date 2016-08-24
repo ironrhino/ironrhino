@@ -14,7 +14,11 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.ironrhino.core.hibernate.CreationUser;
+import org.ironrhino.core.hibernate.UpdateUser;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
@@ -22,14 +26,12 @@ import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.model.Ordered;
-import org.ironrhino.core.model.Recordable;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -38,7 +40,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "common_page")
 @Richtable(searchable = true)
-public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered<Page> {
+public class Page extends BaseEntity implements Ordered<Page> {
 
 	private static final long serialVersionUID = 4688382703803043164L;
 
@@ -81,23 +83,27 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 	@NotInCopy
 	@SearchableProperty
 	@Column(updatable = false)
+	@CreationTimestamp
 	private Date createDate;
 
 	@NotInCopy
 	@SearchableProperty
 	@Column(insertable = false)
+	@UpdateTimestamp
 	private Date modifyDate;
 
 	@NotInCopy
 	@SearchableProperty(include_in_all = false)
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
+	@CreationUser
 	private String createUser;
 
 	@NotInCopy
 	@SearchableProperty(include_in_all = false)
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
+	@UpdateUser
 	private String modifyUser;
 
 	@Version
@@ -160,22 +166,18 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 		this.draftDate = draftDate;
 	}
 
-	@Override
 	public Date getCreateDate() {
 		return createDate;
 	}
 
-	@Override
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
 
-	@Override
 	public Date getModifyDate() {
 		return modifyDate;
 	}
 
-	@Override
 	public void setModifyDate(Date modifyDate) {
 		this.modifyDate = modifyDate;
 	}
@@ -186,18 +188,6 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 
 	public void setTags(Set<String> tags) {
 		this.tags = tags;
-	}
-
-	@Override
-	public void setCreateUserDetails(UserDetails user) {
-		if (user != null)
-			createUser = user.getUsername();
-	}
-
-	@Override
-	public void setModifyUserDetails(UserDetails user) {
-		if (user != null)
-			modifyUser = user.getUsername();
 	}
 
 	public String getCreateUser() {
