@@ -340,50 +340,45 @@ private Set<String> tags = new LinkedHashSet<>();
 也可以指定一个字段(必须是枚举或字段或布尔类型)用来分tab http://localhost:8080/product/tabs?tab=featured
 
 == 记录操作痕迹
-对于重要的实体, 可能想要记录是由哪个用户什么时候创建或修改, 实体类只需要实现 `Recordable` 接口
+对于重要的实体, 可能想要记录是由哪个用户什么时候创建或修改, 实体类只需要标注相应的注解
 [source,java]
 .Product.java
 ----
-import org.ironrhino.core.model.Recordable;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.ironrhino.core.hibernate.CreationUser;
+import org.ironrhino.core.hibernate.UpdateUser;
 
-public class Product extends BaseEntity implements Recordable<UserDetails>{
+public class Product extends BaseEntity {
 
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
-	private Date createDate = new Date();
+	@CreationTimestamp
+	private Date createDate;
 
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
+	@UpdateTimestamp
 	private Date modifyDate;
 
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
+	@CreationUser
 	private String createUser;
 
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
+	@UpdateUser
 	private String modifyUser;
 
 	// getter and setter
-
-	@Override
-	public void setCreateUserDetails(UserDetails user) {
-		if (user != null)
-			createUser = user.getUsername();
-	}
-
-	@Override
-	public void setModifyUserDetails(UserDetails user) {
-		if (user != null)
-			modifyUser = user.getUsername();
-	}
 
 }
 
 ----
 增加了四个字段, 分别记录创建时间和最后修改时间和创建用户和最后修改用户.
-示例里面是关联用户名, 也可以用多对一直接关联用户对象, 这样需要将 `UserDetails` 替换成真正的实现类比如平台内置的 `User` .
+示例里面是记录用户名, 也可以用多对一直接关联用户对象.
+如果想要创建的时候也记录 `modifyDate` 和 `modifyUser` , 请将 `@Column` 里面的 `insertable = false` 去掉.
 
 == 声明归属用户
 可以为实体增加一个 `@Owner` 注解来声明当前实体归属用户
@@ -393,8 +388,14 @@ public class Product extends BaseEntity implements Recordable<UserDetails>{
 import org.ironrhino.core.metadata.Owner;
 
 @Owner(propertyName = "createUser", isolate = true)
-public class Product extends BaseEntity implements Recordable<UserDetails> {
+public class Product extends BaseEntity {
 
+	@UiConfig(hidden = true)
+	@Column(updatable = false)
+	@CreationUser
+	private String createUser;
+
+	// getter and setter
 }
 ----
 示例里面用到的都是默认值, 可以直接省略成 `@Owner` .加了这个注解之后, 每个用户只能看见和操作自己创建的实体.
