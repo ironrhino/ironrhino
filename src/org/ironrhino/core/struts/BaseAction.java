@@ -2,6 +2,8 @@ package org.ironrhino.core.struts;
 
 import java.io.BufferedReader;
 import java.lang.annotation.Annotation;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -326,8 +328,16 @@ public class BaseAction extends ActionSupport {
 			ServletActionContext.getResponse().setHeader("X-Redirect-To", targetUrl);
 		}
 		if (!(returnInput || !isAjax() || (captchaRequired && firstReachCaptchaThreshold)
-				|| !(isUseJson() || hasErrors())))
+				|| !(isUseJson() || hasErrors()))) {
 			ActionContext.getContext().getActionInvocation().setResultCode(JSON);
+		} else if (!isUseJson() && hasFieldErrors()) {
+			StringBuilder sb = new StringBuilder();
+			for (Map.Entry<String, List<String>> entry : getFieldErrors().entrySet()) {
+				sb.append(entry.getKey()).append(": ").append(StringUtils.join(entry.getValue(), "\t")).append("; ");
+			}
+			sb.delete(sb.length() - 2, sb.length() - 1);
+			ServletActionContext.getResponse().setHeader("X-Field-Errors", sb.toString());
+		}
 	}
 
 	protected <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
