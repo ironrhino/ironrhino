@@ -14,6 +14,7 @@ import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.apache.struts2.views.freemarker.ScopesHashModel;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -182,9 +183,12 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	protected ScopesHashModel buildScopesHashModel(ServletContext servletContext, HttpServletRequest request,
 			HttpServletResponse response, ObjectWrapper wrapper, ValueStack stack) {
 		ScopesHashModel model = new ScopesHashModel(wrapper, servletContext, request, stack);
-		Boolean fluidLayout = (Boolean) request.getAttribute(KEY_FLUID_LAYOUT);
-		if (fluidLayout != null)
-			model.put(KEY_FLUID_LAYOUT, fluidLayout);
+		String value = RequestUtils.getCookieValue(request, KEY_FLUID_LAYOUT);
+		if ("true".equals(value)) {
+			model.put(KEY_FLUID_LAYOUT, true);
+		} else if ("false".equals(value)) {
+			model.put(KEY_FLUID_LAYOUT, false);
+		}
 		ServletContextHashModel servletContextModel = (ServletContextHashModel) servletContext
 				.getAttribute(ATTR_APPLICATION_MODEL);
 		if (servletContextModel == null) {

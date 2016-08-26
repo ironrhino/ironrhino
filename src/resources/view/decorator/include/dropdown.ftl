@@ -17,4 +17,6 @@
   </#if>
   <li><a href="<@url value="${ssoServerBase!}/logout"/>">${action.getText('logout')}</a></li>
   </#if>
+  <li class="divider"></li>
+  <li><a href="#" class="layout-change">${action.getText('layout.change')}</a></li>
 </ul>

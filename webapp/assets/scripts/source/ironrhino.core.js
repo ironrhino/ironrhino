@@ -903,6 +903,12 @@ Initialization.common = function() {
 						}
 					});
 		}
+	}).on('click', '.layout-change', function() {
+		var fluidLayout = 'false' != $.cookie('fluidLayout')
+				&& $('#content').hasClass('container-fluid');
+		$.cookie('fluidLayout', !fluidLayout);
+		document.location.reload();
+		return false;
 	});
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
