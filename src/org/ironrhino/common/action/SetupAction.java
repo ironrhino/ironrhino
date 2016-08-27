@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +27,6 @@ import org.ironrhino.core.spring.ApplicationContextConsole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -116,6 +115,7 @@ public class SetupAction extends BaseAction {
 
 	public List<SetupParameterImpl> getSetupParameters() throws Exception {
 		if (setupParameters == null) {
+			Set<String> names = new HashSet<>();
 			setupParameters = new ArrayList<>();
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
@@ -148,6 +148,9 @@ public class SetupAction extends BaseAction {
 									_type = "integer";
 								else if (_type.equals("float") || _type.equals("bigdecimal"))
 									_type = "double";
+								if (names.contains(parameterNames[i]))
+									continue;
+								names.add(parameterNames[i]);
 								setupParameters.add(new SetupParameterImpl(type, parameterNames[i], _type, sp));
 							}
 						}
@@ -159,7 +162,6 @@ public class SetupAction extends BaseAction {
 		return setupParameters;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void doSetup() throws Exception {
 		logger.info("setup started");
 		String[] beanNames = ctx.getBeanDefinitionNames();
@@ -197,28 +199,8 @@ public class SetupAction extends BaseAction {
 				Object[] value = new Object[parameterNames.length];
 				for (int i = 0; i < parameterNames.length; i++) {
 					String pvalue = ServletActionContext.getRequest().getParameter(parameterNames[i]);
-					Object v = pvalue;
 					Class<?> type = parameterTypes[i];
-					if (!type.equals(String.class)) {
-						if (type.isEnum()) {
-							v = Enum.valueOf((Class<? extends Enum>) type, pvalue);
-						} else if (type.equals(Integer.class) || type.equals(Integer.TYPE)) {
-							v = Integer.valueOf(pvalue);
-						} else if (type.equals(Long.class) || type.equals(Long.TYPE)) {
-							v = Long.valueOf(pvalue);
-						} else if (type.equals(Float.class) || type.equals(Float.TYPE)) {
-							v = Float.valueOf(pvalue);
-						} else if (type.equals(Double.class) || type.equals(Double.TYPE)) {
-							v = Double.valueOf(pvalue);
-						} else if (type.equals(BigDecimal.class)) {
-							v = new BigDecimal(pvalue);
-						} else if (type.equals(Boolean.class) || type.equals(Boolean.TYPE)) {
-							v = "true".equals(pvalue);
-						} else if (type.equals(Date.class)) {
-							v = DateUtils.parse(pvalue);
-						}
-					}
-					value[i] = v;
+					value[i] = ctx.getBeanFactory().getConversionService().convert(pvalue, type);
 				}
 				Object o = m.invoke(entry.getValue(), value);
 				if (o instanceof UserDetails)
