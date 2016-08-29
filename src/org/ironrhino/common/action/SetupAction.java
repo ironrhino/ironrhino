@@ -27,7 +27,6 @@ import org.ironrhino.core.spring.ApplicationContextConsole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -57,7 +56,7 @@ public class SetupAction extends BaseAction {
 
 	@Override
 	@InputConfig(methodName = INPUT)
-	public String execute() {
+	public String execute() throws Exception {
 		if (!canSetup())
 			return NOTFOUND;
 		executeSetup();
@@ -97,17 +96,12 @@ public class SetupAction extends BaseAction {
 		return true;
 	}
 
-	private void executeSetup() {
-		try {
-			doSetup();
-			if (ctx.containsBean("settingControl")) {
-				ApplicationContextConsole console = ctx.getBean(ApplicationContextConsole.class);
-				String expression = "settingControl.setValue(\"" + SETUP_ENABLED_KEY + "\",\"false\",true,true)";
-				console.execute(expression, Scope.LOCAL);
-			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-			throw new ErrorMessage(e.getMessage());
+	private void executeSetup() throws Exception {
+		doSetup();
+		if (ctx.containsBean("settingControl")) {
+			ApplicationContextConsole console = ctx.getBean(ApplicationContextConsole.class);
+			String expression = "settingControl.setValue(\"" + SETUP_ENABLED_KEY + "\",\"false\",true,true)";
+			console.execute(expression, Scope.LOCAL);
 		}
 	}
 

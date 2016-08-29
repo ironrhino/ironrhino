@@ -27,7 +27,7 @@ public class PublishAspect extends BaseAspect {
 
 	@AfterReturning(pointcut = "execution(java.util.List org.ironrhino.core.service.BaseManager.delete(*)) ", returning = "list")
 	@SuppressWarnings("rawtypes")
-	public void deleteBatch(List list) throws Throwable {
+	public void deleteBatch(List list) {
 		if (!isBypass() && eventPublisher != null && list != null)
 			for (Object entity : list) {
 				PublishAware publishAware = ReflectionUtils.getActualClass(entity).getAnnotation(PublishAware.class);

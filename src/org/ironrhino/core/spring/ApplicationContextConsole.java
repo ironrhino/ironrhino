@@ -95,7 +95,7 @@ public class ApplicationContextConsole {
 		return triggers;
 	}
 
-	public Object execute(String expression, Scope scope) throws Throwable {
+	public Object execute(String expression, Scope scope) throws Exception {
 		Object value = null;
 		if (expression.matches(SET_PROPERTY_EXPRESSION_PATTERN)) {
 			executeSetProperty(expression);
@@ -107,7 +107,7 @@ public class ApplicationContextConsole {
 		return value;
 	}
 
-	private Object executeMethodInvocation(String expression) throws Throwable {
+	private Object executeMethodInvocation(String expression) throws Exception {
 		if (expression.matches(SIMPLE_METHOD_INVOCATION_EXPRESSION_PATTERN)) {
 			String[] arr = expression.split("\\.");
 			String beanName = arr[0].trim();
@@ -128,19 +128,15 @@ public class ApplicationContextConsole {
 	}
 
 	private void executeSetProperty(String expression) throws Exception {
-		try {
-			Object bean = null;
-			if (expression.indexOf('=') > 0) {
-				bean = getBeans().get(expression.substring(0, expression.indexOf('.')));
-			}
-			ExpressionUtils.evalExpression(expression, getBeans());
-			if (bean != null) {
-				Method m = AnnotationUtils.getAnnotatedMethod(bean.getClass(), PostPropertiesReset.class);
-				if (m != null)
-					m.invoke(bean, new Object[0]);
-			}
-		} catch (Exception e) {
-			throw e;
+		Object bean = null;
+		if (expression.indexOf('=') > 0) {
+			bean = getBeans().get(expression.substring(0, expression.indexOf('.')));
+		}
+		ExpressionUtils.evalExpression(expression, getBeans());
+		if (bean != null) {
+			Method m = AnnotationUtils.getAnnotatedMethod(bean.getClass(), PostPropertiesReset.class);
+			if (m != null)
+				m.invoke(bean, new Object[0]);
 		}
 	}
 
