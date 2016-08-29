@@ -1,4 +1,6 @@
 <ul class="dropdown-menu">
+ <li><a href="#" class="layout-change">${action.getText('layout.change')}</a></li>
+  <li class="divider"></li>
   <@resourcePresentConditional value="resources/view/audit.ftl">
   <li><a href="<@url value="/audit"/>" class="ajax view">${action.getText('auditEvent')}</a></li>
   <li class="divider"></li>
@@ -17,6 +19,4 @@
   </#if>
   <li><a href="<@url value="${ssoServerBase!}/logout"/>">${action.getText('logout')}</a></li>
   </#if>
-  <li class="divider"></li>
-  <li><a href="#" class="layout-change">${action.getText('layout.change')}</a></li>
 </ul>
