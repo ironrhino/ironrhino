@@ -31,6 +31,7 @@
 // 7.comment this.set(); in hide()
 // 8.add if ($(document).height() - offset.top < 300)
 // 9.rename icon- to glyphicon-
+// 10.remove dateFormatComponents['yy'] and '\\b' in patterns to support format 'yyyyMMdd'
 (function($) {
 
 	// Picker object
@@ -1214,61 +1215,55 @@
 		dd : {
 			property : 'UTCDate',
 			getPattern : function() {
-				return '(0?[1-9]|[1-2][0-9]|3[0-1])\\b';
+				return '(0?[1-9]|[1-2][0-9]|3[0-1])';
 			}
 		},
 		MM : {
 			property : 'UTCMonth',
 			getPattern : function() {
-				return '(0?[1-9]|1[0-2])\\b';
-			}
-		},
-		yy : {
-			property : 'UTCYear',
-			getPattern : function() {
-				return '(\\d{2})\\b'
+				return '(0?[1-9]|1[0-2])';
 			}
 		},
 		yyyy : {
 			property : 'UTCFullYear',
 			getPattern : function() {
-				return '(\\d{4})\\b';
+				return '(\\d{4})';
 			}
 		},
 		HH : {
 			property : 'UTCHours',
 			getPattern : function() {
-				return '(0?[0-9]|1[0-9]|2[0-3])\\b';
+				return '(0?[0-9]|1[0-9]|2[0-3])';
 			}
 		},
 		mm : {
 			property : 'UTCMinutes',
 			getPattern : function() {
-				return '(0?[0-9]|[1-5][0-9])\\b';
+				return '(0?[0-9]|[1-5][0-9])';
 			}
 		},
 		ss : {
 			property : 'UTCSeconds',
 			getPattern : function() {
-				return '(0?[0-9]|[1-5][0-9])\\b';
+				return '(0?[0-9]|[1-5][0-9])';
 			}
 		},
 		ms : {
 			property : 'UTCMilliseconds',
 			getPattern : function() {
-				return '([0-9]{1,3})\\b';
+				return '([0-9]{1,3})';
 			}
 		},
 		hh : {
 			property : 'Hours12',
 			getPattern : function() {
-				return '(0?[1-9]|1[0-2])\\b';
+				return '(0?[1-9]|1[0-2])';
 			}
 		},
 		PP : {
 			property : 'Period12',
 			getPattern : function() {
-				return '(AM|PM|am|pm|Am|aM|Pm|pM)\\b';
+				return '(AM|PM|am|pm|Am|aM|Pm|pM)';
 			}
 		}
 	};
@@ -1279,9 +1274,9 @@
 	keys[keys.length - 1] += '\\b';
 	keys.push('.');
 
-	var formatComponent = new RegExp(keys.join('\\b|'));
+	var formatComponent = new RegExp(keys.join('|'));
 	keys.pop();
-	var formatReplacer = new RegExp(keys.join('\\b|'), 'g');
+	var formatReplacer = new RegExp(keys.join('|'), 'g');
 
 	function escapeRegExp(str) {
 		// http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
