@@ -240,6 +240,10 @@ input[type="checkbox"].custom + label.custom {
 	position: relative;
 }
 
+td.checkbox input[type="checkbox"].custom + label.custom {
+	margin-right: 0;
+}
+
 input[type="checkbox"][disabled].custom + label.custom, input[type="checkbox"][readonly].custom + label.custom {
 	cursor: not-allowed !important;
 	background-color: #eee !important;
@@ -280,6 +284,10 @@ input[type="radio"].custom + label.custom {
 	margin-bottom: 0;
 	margin-right: 5px;
 	position: relative;
+}
+
+td.radio input[type="radio"].custom + label.custom {
+	margin-right: 0;
 }
 
 input[type="radio"][disabled].custom + label.custom, input[type="radio"][readonly].custom + label.custom {
