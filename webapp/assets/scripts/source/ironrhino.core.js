@@ -823,7 +823,7 @@ Initialization.common = function() {
 						}
 						return true;
 					})).on('change', 'input,textarea', function(ev) {
-				if (this.value != this.defaultValue)
+				if (!this.defaultValue || this.value != this.defaultValue)
 					Form.validate(this, 'change');
 				return true;
 			}).on('change', 'select', function() {
