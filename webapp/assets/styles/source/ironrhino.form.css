@@ -16,10 +16,10 @@
 .form-horizontal .span3 .controls {
 	margin-left: 90px;
 }
-.form-horizontal .span3 .controls input,.form-horizontal .span3 .controls .uneditable-input{
+.form-horizontal .row .span3 .controls input:not([class*="input-"]),.form-horizontal .row .span3 .controls .uneditable-input:not([class*="input-"]){
 	width: 180px;
 }
-.form-horizontal .span3 .controls select{
+.form-horizontal .row .span3 .controls select:not([class*="input-"]){
 	width: 194px;
 }
 .form-horizontal .span6 .control-label{

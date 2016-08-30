@@ -32337,7 +32337,7 @@ Message = {
 				prompt.css({
 							"top" : promptTopPosition + "px",
 							"left" : promptleftPosition + "px",
-							"opacity" : 0
+							"opacity" : 0.2
 						});
 				prompt.animate({
 							"opacity" : 0.8
@@ -32392,10 +32392,12 @@ Form = {
 		}
 	},
 	validate : function(target, evt) {
-		if ($(target).prop('tagName') != 'FORM') {
-			Form.clearError(target);
-			if ($(target).is('input[type="radio"]')) {
-				if ($(target).hasClass('required')) {
+		var t = $(target);
+		if (t.prop('tagName') != 'FORM') {
+			if (!t.is('[type="hidden"]') || !t.prevAll(':input').length)
+				Form.clearError(target);
+			if (t.is('input[type="radio"]')) {
+				if (t.hasClass('required')) {
 					var options = $('input[type="radio"][name="' + target.name
 									+ '"]', target.form);
 					var checked = false;
@@ -32410,53 +32412,47 @@ Form = {
 				}
 			}
 			var valid = true;
-			var tabpane = $(target).closest('.control-group')
-					.parent('.tab-pane');
-			var inhiddenpanel = tabpane.length
-					&& $(target).css('display') != 'none'
+			var tabpane = t.closest('.control-group').parent('.tab-pane');
+			var inhiddenpanel = tabpane.length && t.css('display') != 'none'
 					&& !tabpane.hasClass('active');
 			if (inhiddenpanel
 					&& $('.control-group.error', tabpane
 									.siblings('.tab-pane.active')).length)
 				return;
-			if ((inhiddenpanel || $(target)
+			if ((inhiddenpanel || t
 					.is(':visible,[type="hidden"],.sqleditor,.chzn-done'))
-					&& !$(target).prop('disabled')) {
-				var value = $(target).val();
-				if ($(target).hasClass('required') && $(target).attr('name')
-						&& !value) {
-					if ($(target).prop('tagName') == 'SELECT'
-							|| $(target).is('[type="hidden"]'))
+					&& !t.prop('disabled')) {
+				var value = t.val();
+				if (t.hasClass('required') && t.attr('name') && !value) {
+					if (t.prop('tagName') == 'SELECT'
+							|| t.is('[type="hidden"]'))
 						Message.showFieldError(target, null,
 								'selection.required');
 					else
 						Message.showFieldError(target, null, 'required');
 					if (inhiddenpanel)
-						$('a[href="#'
-								+ $(target).closest('.tab-pane').attr('id')
+						$('a[href="#' + t.closest('.tab-pane').attr('id')
 								+ '"]').tab('show');
 					valid = false;
 				} else if (evt != 'keyup'
-						&& $(target).hasClass('email')
+						&& t.hasClass('email')
 						&& value
 						&& !value
 								.match(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)) {
 					Message.showFieldError(target, null, 'email');
 					valid = false;
-				} else if (evt != 'keyup' && $(target).hasClass('regex')
-						&& value
-						&& !value.match(new RegExp($(target).data('regex')))) {
+				} else if (evt != 'keyup' && t.hasClass('regex') && value
+						&& !value.match(new RegExp(t.data('regex')))) {
 					Message.showFieldError(target, null, 'regex');
 					valid = false;
-				} else if (evt != 'keyup' && $(target).hasClass('phone')
-						&& value && !value.match(/^[\d-]+$/)) {
+				} else if (evt != 'keyup' && t.hasClass('phone') && value
+						&& !value.match(/^[\d-]+$/)) {
 					Message.showFieldError(target, null, 'phone');
 					valid = false;
-				} else if (($(target).hasClass('integer') || $(target)
-						.hasClass('long'))
+				} else if ((t.hasClass('integer') || t.hasClass('long'))
 						&& value) {
-					if ($(target).hasClass('positive')
-							&& (!value.match(/^[+]?\d*$/) || !$(target)
+					if (t.hasClass('positive')
+							&& (!value.match(/^[+]?\d*$/) || !t
 									.hasClass('zero')
 									&& parseInt(value) == 0)) {
 						Message
@@ -32464,20 +32460,19 @@ Form = {
 										'integer.positive');
 						valid = false;
 					}
-					if (!$(target).hasClass('positive')
-							&& !value.match(/^[-+]?\d*$/)) {
+					if (!t.hasClass('positive') && !value.match(/^[-+]?\d*$/)) {
 						Message.showFieldError(target, null, 'integer');
 						valid = false;
 					}
-				} else if ($(target).hasClass('double') && value) {
-					if ($(target).hasClass('positive')
-							&& (!value.match(/^[+]?\d+\.?(\d+)?$/) || !$(target)
+				} else if (t.hasClass('double') && value) {
+					if (t.hasClass('positive')
+							&& (!value.match(/^[+]?\d+\.?(\d+)?$/) || !t
 									.hasClass('zero')
 									&& parseFloat(value) == 0)) {
 						Message.showFieldError(target, null, 'double.positive');
 						valid = false;
 					}
-					if (!$(target).hasClass('positive')
+					if (!t.hasClass('positive')
 							&& !value.match(/^[-+]?\d+\.?(\d+)?$/)) {
 						Message.showFieldError(target, null, 'double');
 						valid = false;
@@ -32485,17 +32480,16 @@ Form = {
 					var i = value.indexOf('.');
 					if (i > -1) {
 						var decimal = value.substring(i + 1);
-						var scale = parseInt($(target).data('scale') || '2');
+						var scale = parseInt(t.data('scale') || '2');
 						if (decimal.length > scale) {
 							value = value.substring(0, i + 1)
 									+ decimal.substring(0, scale);
-							$(target).val(value);
+							t.val(value);
 						}
 					}
-				} else if (evt != 'keyup' && $(target).hasClass('repeat')) {
-					if (value != $(
-							'[name="' + $(target).data('repeatwith') + '"]',
-							$(target).closest('form')).val()) {
+				} else if (evt != 'keyup' && t.hasClass('repeat')) {
+					if (value != $('[name="' + t.data('repeatwith') + '"]',
+							t.closest('form')).val()) {
 						Message.showFieldError(target, null,
 								'repeat.not.matched');
 						valid = false;
@@ -33271,7 +33265,7 @@ Observation.common = function(container) {
 		ajax({
 					global : t.data('global'),
 					quiet : true,
-					type : t.data('method') || f.attr('method'),
+					type : t.data('method') || 'GET',
 					url : url,
 					data : data,
 					target : f[0],
