@@ -1,4 +1,4 @@
-<#macro selectDictionary dictionaryName name="" value="" required=false disabled=false headerKey="" headerValue="" strict=true dynamicAttributes...>
+<#macro selectDictionary dictionaryName name="" value="" required=false disabled=false showHeader=true headerKey="" headerValue="" strict=true dynamicAttributes...>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 	<#if dynamicAttributes['dynamicAttributes']??>
 		<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']/>
@@ -7,7 +7,7 @@
 	<#local value=stack.findValue(name)!/>
 	</#if>
 	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#list dynamicAttributes?keys as attr><#if attr!='class' && attr!='dynamicAttributes'&&attr!='class'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
-		<option value="${headerKey}">${headerValue}</option>
+		<#if showHeader><option value="${headerKey}">${headerValue}</option></#if>
 		<#local exists=false>
 		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
 			<#local items = dictionary.items/>
