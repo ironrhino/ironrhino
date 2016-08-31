@@ -178,14 +178,14 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
 			EventListenerRegistry registry = sf.getServiceRegistry().getService(EventListenerRegistry.class);
 			if (postInsertEventListeners != null)
-				registry.getEventListenerGroup(EventType.POST_INSERT)
-						.appendListeners(postInsertEventListeners.toArray(new PostInsertEventListener[0]));
+				registry.appendListeners(EventType.POST_INSERT,
+						postInsertEventListeners.toArray(new PostInsertEventListener[0]));
 			if (postUpdateEventListeners != null)
-				registry.getEventListenerGroup(EventType.POST_UPDATE)
-						.appendListeners(postUpdateEventListeners.toArray(new PostUpdateEventListener[0]));
+				registry.appendListeners(EventType.POST_UPDATE,
+						postUpdateEventListeners.toArray(new PostUpdateEventListener[0]));
 			if (postDeleteEventListeners != null)
-				registry.getEventListenerGroup(EventType.POST_DELETE)
-						.appendListeners(postDeleteEventListeners.toArray(new PostDeleteEventListener[0]));
+				registry.appendListeners(EventType.POST_DELETE,
+						postDeleteEventListeners.toArray(new PostDeleteEventListener[0]));
 		}
 		return sessionFactory;
 
