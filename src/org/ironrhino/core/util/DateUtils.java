@@ -256,6 +256,20 @@ public class DateUtils {
 		return formatDate10(date).endsWith("01-01");
 	}
 
+	public static String duration(Date start, Date end) {
+		if (start == null || end == null || start.after(end))
+			return null;
+		int delta = (int) (end.getTime() / 1000 - start.getTime() / 1000);
+		if (delta == 0)
+			return "00:00:00";
+		int hours = delta / 3600;
+		delta -= hours * 3600;
+		int minutes = delta / 60;
+		int seconds = delta - minutes * 60;
+		return new StringBuilder(NumberUtils.format(hours, 2)).append(":").append(NumberUtils.format(minutes, 2))
+				.append(":").append(NumberUtils.format(seconds, 2)).toString();
+	}
+
 	public static String humanRead(Date date) {
 		Date now = new Date();
 		long delta = now.getTime() - date.getTime();
