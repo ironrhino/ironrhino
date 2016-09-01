@@ -126,21 +126,15 @@ ${formHeader!}
 <#local cellDynamicAttributes+={'class':dynamicAttributes['class']+' '+cellDynamicAttributes['class']}>
 </#if>
 <#local dynamicAttributes+=cellDynamicAttributes>
-<td<#if value??><#if !dynamicAttributes['data-cellvalue']??&&template?has_content&&value?has_content||value?is_boolean> data-cellvalue="${value?string?html}"<#elseif value?is_hash&&value.displayName??> data-cellvalue="${value.name()?html}"</#if></#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>><#rt>
+<td<#if value??><#if !dynamicAttributes['data-cellvalue']??&&template?has_content&&value?has_content||value?is_boolean> data-cellvalue="<#if value?is_unknown_date_like>${value?datetime?html}<#else>${value?string?html}</#if>"<#elseif value?is_hash&&value.displayName??> data-cellvalue="${value.name()?html}"</#if></#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>><#rt>
 <#if !template?has_content>
 	<#if value??>
 		<#if value?is_boolean>
 		${action.getText(value?string)}<#t>
+		<#elseif value?is_unknown_date_like>
+		${value?datetime}<#t>
 		<#elseif value?is_hash&&value.displayName??>
 		${value.displayName}<#t>
-		<#elseif value?is_date_only>
-		${value?date}<#t>
-		<#elseif value?is_time>
-		${value?time}<#t>
-		<#elseif value?is_datetime>
-		${value?datetime}<#t>
-		<#elseif value?is_date_like>
-		${value?datetime}<#t>
 		<#elseif value?is_indexable>
 		<#list value as var>${var?xhtml}<#sep> </#list><#t>
 		<#else>

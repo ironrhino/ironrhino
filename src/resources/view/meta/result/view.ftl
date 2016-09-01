@@ -62,6 +62,8 @@
 						<#elseif value??>
 							<#if value?is_boolean>
 								${action.getText(value?string)}
+							<#elseif value?is_unknown_date_like>
+								${value?datetime}
 							<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 								${value?string}
 							<#elseif value?is_indexable>
@@ -70,6 +72,8 @@
 									<li>
 									<#if item?is_boolean>
 										${action.getText(item?string)}
+									<#elseif item?is_unknown_date_like>
+										${item?datetime}
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
 									<#elseif item?is_indexable>
@@ -194,6 +198,8 @@
 								<#elseif value??>
 										<#if value?is_boolean>
 											${action.getText(value?string)}
+										<#elseif value?is_unknown_date_like>
+											${value?datetime}
 										<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 											${value?string}
 										<#elseif value?is_indexable>
@@ -202,6 +208,8 @@
 												<li>
 												<#if item?is_boolean>
 													${action.getText(item?string)}
+												<#elseif item?is_unknown_date_like>
+													${item?datetime}
 												<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 													${item?string}
 												<#elseif item?is_indexable>
@@ -245,6 +253,8 @@
 				<#elseif value??>
 						<#if value?is_boolean>
 							${action.getText(value?string)}
+						<#elseif value?is_unknown_date_like>
+							${value?datetime}
 						<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 							${value?string}
 						<#elseif value?is_indexable>
@@ -253,6 +263,8 @@
 								<li>
 									<#if item?is_boolean>
 										${action.getText(item?string)}
+									<#elseif item?is_unknown_date_like>
+										${item?datetime}
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
 									<#elseif item?is_indexable>
