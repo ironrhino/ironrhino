@@ -8,6 +8,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.jdbc.DatabaseProduct;
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +79,15 @@ public class DataSourceConfiguration {
 	@Bean(destroyMethod = "close")
 	@Primary
 	public DataSource dataSource() {
+		if (AppInfo.getStage() == Stage.DEVELOPMENT
+				&& StringUtils.isBlank(AppInfo.getApplicationContextProperties().getProperty("jdbc.url"))) {
+			boolean available = AddressAvailabilityCondition.check(jdbcUrl, 5000);
+			if (!available && ClassUtils.isPresent("org.h2.Driver", getClass().getClassLoader())) {
+				String newJdbcUrl = "jdbc:h2:" + AppInfo.getAppHome() + "/db/h2";
+				logger.warn("Default jdbcUrl {} is not available, switch to {}", jdbcUrl, newJdbcUrl);
+				jdbcUrl = newJdbcUrl;
+			}
+		}
 		logger.info("Connecting {}", jdbcUrl);
 		String hikariClassName = "com.zaxxer.hikari.HikariDataSource";
 		if (hikariClassName.equals(dataSourceClassName)) {
