@@ -2,6 +2,17 @@
 <#escape x as x?html><html>
 <head>
 <title>${action.getText('query')}</title>
+<style>
+.form-horizontal .control-group {
+    margin-bottom: 0;
+}
+.form-horizontal .control-label {
+    width: 150px;
+}
+.form-horizontal .controls {
+    margin-left: 180px;
+}
+</style>
 <script>
 $(function(){
 	$(document).on('click','#result tbody .btn',function(){
@@ -17,9 +28,9 @@ $(function(){
 		for(var i=0;i<ths.length;i++){
 			arr.push('<div class="control-group"><label class="control-label">');
 			arr.push(ths.eq(i).text());
-			arr.push('</label><div class="controls">');
+			arr.push('</label><div class="controls"><p>');
 			arr.push(tds.eq(i).text());
-			arr.push('</div></div>');
+			arr.push('</p></div></div>');
 		}
 		arr.push('</div>');
 		$('#row-modal-body').html(arr.join(''));
