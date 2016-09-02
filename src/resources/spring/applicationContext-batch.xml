@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/batch
+	http://www.springframework.org/schema/batch/spring-batch.xsd">
+	<bean id="batchTaskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" c:threadNamePrefix="batch-"/>
+	<bean id="executionContextSerializer" class="org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer"/>
+	<batch:job-repository serializer="executionContextSerializer" isolation-level-for-create="${jobRepository.isolationLevelForCreate:REPEATABLE_READ}" table-prefix="${jobRepository.tablePrefix:BATCH_}" max-varchar-length="${jobRepository.maxVarcharLength:4000}"/>
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher" p:taskExecutor-ref="batchTaskExecutor"/>
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" p:tablePrefix="${jobRepository.tablePrefix:BATCH_}" p:serializer-ref="executionContextSerializer"/>
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+		<property name="jobParametersConverter">
+			<bean class="org.springframework.batch.core.converter.DefaultJobParametersConverter">
+				<property name="dateFormat">
+					<bean class="java.text.SimpleDateFormat">
+						<constructor-arg value="yyyy-MM-dd"/>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
+	<bean class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
+		<property name="applicationContextFactories">
+			<bean class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
+				<property name="resources" value="${jobRegistrar.resources:classpath*:resources/batch/*.xml}" />
+			</bean>
+		</property>
+		<property name="jobLoader">
+			<bean class="org.springframework.batch.core.configuration.support.DefaultJobLoader"/>
+		</property>
+	</bean>
+</beans>

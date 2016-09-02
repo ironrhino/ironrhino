@@ -10,6 +10,7 @@
   <li><a href="<@url value="/common/region/treeview"/>" class="ajax view">${action.getText('region')}</a></li>
   <li><a href="<@url value="/common/treeNode/treeview"/>" class="ajax view">${action.getText('treeNode')}</a></li>
   <li><a href="<@url value="/common/upload"/>" class="ajax view">${action.getText('upload')}</a></li>
+  <li><a href="<@url value="/batch/job"/>" class="ajax view">${action.getText('job')}</a></li>
   <li class="dropdown">
  	<a href="#" class="dropdown-toggle" data-toggle="dropdown">
       	${action.getText('open.platform')}

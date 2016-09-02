@@ -31,6 +31,9 @@
 
 |二维码
 |zxing-*.jar
+
+|批处理
+|javax.batch-api-\*.jar spring-batch-\*.jar
 |===
 
 == ironrhino没有包含

@@ -81,6 +81,7 @@
 	<property name="security-oauth-server-remoting-jar.name" value="ironrhino-security-oauth-server-remoting-${version}.jar" />
 	<property name="security-oauth-server-remoting-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*,org/ironrhino/security/oauth/server/enums/**" />
 	<property name="rest-jar.name" value="ironrhino-rest-${version}.jar" />
+	<property name="batch-jar.name" value="ironrhino-batch-${version}.jar" />
 	<target name="set-revision">
 		<script language="javascript">
 			<![CDATA[
@@ -281,6 +282,7 @@
 			<delete file="${target.dir}/${security-remoting-jar.name}" />
 			<delete file="${target.dir}/${security-oauth-server-remoting-jar.name}" />
 			<delete file="${target.dir}/${rest-jar.name}" />
+			<delete file="${target.dir}/${batch-jar.name}" />
 			<delete file="${target.dir}/bootstrap.jar" />
 			<unzip dest="${webapp.dir}/assets/components">
 				<fileset dir="${webapp.dir}/assets/components" includes="*.zip" />
@@ -726,6 +728,17 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-rest" />
+					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
+					<attribute name="Build-Timestamp" value="${timestamp}" />
+					<attribute name="Build-Revision" value="${revision}" />
+				</manifest>
+			</jar>
+			<jar jarfile="${target.dir}/${batch-jar.name}" basedir="${classes.dir}" includes="org/ironrhino/batch/**,META-INF/resources/**,resources/spring/applicationContext-batch.xml,resources/view/batch/*.ftl,resources/i18n/batch/**">
+				<manifest>
+					<attribute name="Implementation-Title" value="ironrhino-batch" />
+					<attribute name="Implementation-Vendor" value="ironrhino" />
+					<attribute name="Implementation-Version" value="${version}" />
+					<attribute name="Ironrhino-Component-Id" value="ironrhino-batch" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 					<attribute name="Build-Timestamp" value="${timestamp}" />
 					<attribute name="Build-Revision" value="${revision}" />

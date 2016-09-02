@@ -99,6 +99,8 @@
 						excludes+='jasperreports-*.jar,commons-digester-*.jar,commons-collections-*.jar,dynamicreports-core-*.jar,poi-*.jar,itext*.jar,struts2-jasperreports-plugin-*.jar,';
 					if(features.indexOf('zxing')<0)
 						excludes+='zxing-*.jar,';
+					if(features.indexOf('batch')<0)
+						excludes+='javax.batch-api-*.jar,spring-batch-*.jar,';
 					if(excludes)
 					fs.setExcludes(excludes);
 					copy.addFileset(fs);
@@ -120,6 +122,10 @@
 						includes += 'ironrhino-zookeeper-'+version+'.jar,';
 					if(features.indexOf('remoting')>=0)
 						includes += 'ironrhino-remoting-*-'+version+'.jar';
+					if(features.indexOf('rest')>=0)
+						includes += 'ironrhino-rest-*-'+version+'.jar';			
+					if(features.indexOf('batch')>=0)
+						includes += 'ironrhino-batch-*-'+version+'.jar';
 					fs.setIncludes(includes);
 					copy.addFileset(fs);
 					copy.setTodir(new File(webappLib));

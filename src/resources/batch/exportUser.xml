@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/batch
+	http://www.springframework.org/schema/batch/spring-batch.xsd">
+	
+	<bean id="userReader" scope="job" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="sql" value="select * from user where date(createDate)=?"/>
+		<property name="rowMapper">
+			<bean class="org.springframework.jdbc.core.BeanPropertyRowMapper" p:mappedClass="org.ironrhino.security.model.User"/>
+		</property>
+		<property name="preparedStatementSetter">
+			<bean class="org.springframework.jdbc.core.ArgumentPreparedStatementSetter">
+				<constructor-arg>
+					<array>
+						<value>#{jobParameters[workdate]}</value>
+					</array>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="userWriter" scope="job" class="org.springframework.batch.item.file.FlatFileItemWriter" p:resource="file:${app.home}/target/output.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}">
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="fieldExtractor">
+					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="username,name,phone"/>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="jobParemetersValidator" class="org.ironrhino.batch.job.SimpleJobParametersValidator">
+		<property name="requiredKeys">
+			<map>
+				<entry key="workdate" value="DATE"/>
+			</map>
+		</property>
+	</bean>	
+	
+	<job id="exportUserJob" xmlns="http://www.springframework.org/schema/batch">
+		<validator ref="jobParemetersValidator"/>
+		<step id="exportToFile">
+			<tasklet>
+				<chunk reader="userReader" writer="userWriter" commit-interval="${exportUserJob.exportToFile.commit.interval:2}"/>
+			</tasklet>
+		</step>
+	</job>
+	
+</beans>
