@@ -28,7 +28,12 @@ public class JettyLauncher {
 				"org.eclipse.jetty.annotations.AnnotationConfiguration");
 		WebAppContext context = new WebAppContext();
 		context.setContextPath("/");
-		context.setWar(warUrl.toExternalForm());
+		String webappDir = System.getProperty("webapp.dir");
+		if (webappDir != null) {
+			context.setWar(webappDir);
+		} else {
+			context.setWar(warUrl.toExternalForm());
+		}
 		File tempDir = new File(new File(System.getProperty("user.home")), ".jetty" + port);
 		tempDir.mkdirs();
 		context.setTempDirectory(tempDir);
