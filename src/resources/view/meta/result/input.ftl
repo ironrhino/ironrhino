@@ -304,10 +304,9 @@
 							</div>
 						</div>
 					<#else>
-						<#if config.cssClass?contains('datetime')>
-							<@s.textfield id=id label=label name=entityName+'.'+key+'.'+entry.key type=config.inputType value=(entity[key][entry.key]?string('yyyy-MM-dd HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
-						<#elseif config.cssClass?contains('time')>
-							<@s.textfield id=id label=label name=entityName+'.'+key+'.'+entry.key type=config.inputType value=(entity[key][entry.key]?string('HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+						<#if (entity[key][entry.key])!?is_date_like>
+							<#assign value=entity[key][entry.key]/><#if config.cssClass?contains('datetime')><#assign value=value?datetime/><#elseif config.cssClass?contains('time')><#assign value=value?time/><#else><#assign value=value?date/></#if>
+							<@s.textfield id=id label=label name=entityName+'.'+key+'.'+entry.key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 						<#else>
 							<@s.textfield id=id label=label name=entityName+'.'+key+'.'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 						</#if>
@@ -421,10 +420,9 @@
 										<span class="treeselect-name"><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></span>
 										</div>
 								<#else>
-									<#if config.cssClass?contains('datetime')>
-										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=(entity[key][index][entry.key]?string('yyyy-MM-dd HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
-									<#elseif config.cssClass?contains('time')>
-										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=(entity[key][index][entry.key]?string('HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+									<#if (entity[key][index][entry.key])!?is_date_like>
+										<#assign value=entity[key][index][entry.key]/><#if config.cssClass?contains('datetime')><#assign value=value?datetime/><#elseif config.cssClass?contains('time')><#assign value=value?time/><#else><#assign value=value?date/></#if>
+										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 									<#else>
 										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 									</#if>
@@ -440,10 +438,9 @@
 					</div>
 				</div>
 			<#else>
-				<#if config.cssClass?contains('datetime')>
-					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType value=(entity[key]?string('yyyy-MM-dd HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
-				<#elseif config.cssClass?contains('time')>
-					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType value=(entity[key]?string('HH:mm:ss'))! cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+				<#if (entity[key])!?is_date_like>
+					<#assign value=entity[key]/><#if config.cssClass?contains('datetime')><#assign value=value?datetime/><#elseif config.cssClass?contains('time')><#assign value=value?time/><#else><#assign value=value?date/></#if>
+					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 				<#else>
 					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 				</#if>

@@ -104,6 +104,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		TemplateHashModelEx hash = new SimpleMapModel(globalVariables, DEFAULT_BEANS_WRAPPER);
 		configuration.setAllSharedVariables(hash);
 		configuration.setDateFormat("yyyy-MM-dd");
+		configuration.setTimeFormat("HH:mm:ss");
 		configuration.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
 		configuration.setNumberFormat("0.##");
 		configuration.setURLEscapingCharset("UTF-8");
