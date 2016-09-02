@@ -1,7 +1,7 @@
 (function($) {
 
 	function check(group) {
-		var boxes = $('input[type=checkbox][name]', group);
+		var boxes = $('input[type=checkbox]:not(.normal):not(.checkall)', group);
 		var allchecked = boxes.length > 0;
 		if (allchecked)
 			for (var i = 0; i < boxes.length; i++)
@@ -9,7 +9,7 @@
 					allchecked = false;
 					break;
 				}
-		$('input[type=checkbox]:not(.normal):not([name])', group).prop(
+		$('input.checkall[type=checkbox]:not(.normal)', group).prop(
 				'checked', allchecked);
 	}
 
@@ -24,10 +24,10 @@
 			var group = $(this).closest('.checkboxgroup');
 			if (!group.length)
 				group = $(this).closest('form.richtable');
-			if (!this.name) {
+			if ($(this).hasClass('checkall')) {
 				var b = this.checked;
 				if (group.length)
-					$('input[type=checkbox][name]', group).each(function() {
+					$('input[type=checkbox]:not(.normal)', group).each(function() {
 								this.checked = b;
 								var tr = $(this).closest('tr');
 								if (tr.length) {
@@ -63,7 +63,7 @@
 										});
 					}
 				} else {
-					var boxes = $('input[type=checkbox][name]', group);
+					var boxes = $('input[type=checkbox]:not(.checkall):not(.normal)', group);
 					var start = -1, end = -1, checked = false;
 					for (var i = 0; i < boxes.length; i++) {
 						if ($(boxes[i]).hasClass('lastClicked')) {

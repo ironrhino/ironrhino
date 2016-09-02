@@ -36568,7 +36568,7 @@ Observation.ajaxpanel = function(container) {
 (function($) {
 
 	function check(group) {
-		var boxes = $('input[type=checkbox][name]', group);
+		var boxes = $('input[type=checkbox]:not(.normal):not(.checkall)', group);
 		var allchecked = boxes.length > 0;
 		if (allchecked)
 			for (var i = 0; i < boxes.length; i++)
@@ -36576,7 +36576,7 @@ Observation.ajaxpanel = function(container) {
 					allchecked = false;
 					break;
 				}
-		$('input[type=checkbox]:not(.normal):not([name])', group).prop(
+		$('input.checkall[type=checkbox]:not(.normal)', group).prop(
 				'checked', allchecked);
 	}
 
@@ -36591,10 +36591,10 @@ Observation.ajaxpanel = function(container) {
 			var group = $(this).closest('.checkboxgroup');
 			if (!group.length)
 				group = $(this).closest('form.richtable');
-			if (!this.name) {
+			if ($(this).hasClass('checkall')) {
 				var b = this.checked;
 				if (group.length)
-					$('input[type=checkbox][name]', group).each(function() {
+					$('input[type=checkbox]:not(.normal)', group).each(function() {
 								this.checked = b;
 								var tr = $(this).closest('tr');
 								if (tr.length) {
@@ -36630,7 +36630,7 @@ Observation.ajaxpanel = function(container) {
 										});
 					}
 				} else {
-					var boxes = $('input[type=checkbox][name]', group);
+					var boxes = $('input[type=checkbox]:not(.checkall):not(.normal)', group);
 					var start = -1, end = -1, checked = false;
 					for (var i = 0; i < boxes.length; i++) {
 						if ($(boxes[i]).hasClass('lastClicked')) {
@@ -37980,8 +37980,9 @@ Richtable = {
 										|| $(this).hasClass('time') || $(this)
 										.prop('tagName') == 'BUTTON');
 					}).eq(0).focus();
-					if (!inputform.hasClass('keepopen')) {
-						$(':input', inputform).change(function(e) {
+					if (!inputform.hasClass('keepopen')
+							&& !inputform.hasClass('richtable')) {
+						$(':input[name]', inputform).change(function(e) {
 									if (!inputform.hasClass('nodirty'))
 										inputform.addClass('dirty');
 								});

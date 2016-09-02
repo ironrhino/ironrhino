@@ -21,7 +21,7 @@
 <table class="treeTable checkboxgroup" style="width:100%;">
   <thead>
     <tr>
-      <th style="width:10%"><input type="checkbox" class="custom"/></th>
+      <th style="width:10%"><input type="checkbox" class="checkall custom"/></th>
       <th style="width:20%;">${action.getText('name')}</th>
       <th style="width:70%;">${action.getText('fullname')}</th>
     </tr>

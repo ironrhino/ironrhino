@@ -240,7 +240,7 @@ input[type="checkbox"].custom + label.custom {
 	position: relative;
 }
 
-td.checkbox input[type="checkbox"].custom + label.custom {
+.checkbox input[type="checkbox"].custom + label.custom {
 	margin-right: 0;
 }
 
@@ -286,7 +286,7 @@ input[type="radio"].custom + label.custom {
 	position: relative;
 }
 
-td.radio input[type="radio"].custom + label.custom {
+.radio input[type="radio"].custom + label.custom {
 	margin-right: 0;
 }
 

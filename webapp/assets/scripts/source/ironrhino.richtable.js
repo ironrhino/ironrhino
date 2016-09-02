@@ -102,8 +102,9 @@ Richtable = {
 										|| $(this).hasClass('time') || $(this)
 										.prop('tagName') == 'BUTTON');
 					}).eq(0).focus();
-					if (!inputform.hasClass('keepopen')) {
-						$(':input', inputform).change(function(e) {
+					if (!inputform.hasClass('keepopen')
+							&& !inputform.hasClass('richtable')) {
+						$(':input[name]', inputform).change(function(e) {
 									if (!inputform.hasClass('nodirty'))
 										inputform.addClass('dirty');
 								});

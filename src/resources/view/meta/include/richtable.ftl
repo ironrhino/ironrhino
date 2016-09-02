@@ -54,7 +54,7 @@
 <#if request.queryString?has_content>
 <#list request.queryString?split('&') as pair>
 	<#local name=pair?keep_before('=')>
-	<#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&name!='check'&&!formHeader?contains(' name="'+name+'" ')>
+	<#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
 		<#local action+=action?contains('?')?then('&','?')+pair>
 		<#local parameterNamesInQueryString+=[name]>
 	</#if>
@@ -69,7 +69,7 @@ ${formHeader!}
 <#nested/>
 <#if includeParameters>
 <#list Parameters?keys as name>
-<#if !parameterNamesInQueryString?seq_contains(name)&&name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&name!='check'&&!formHeader?contains(' name="'+name+'" ')>
+<#if !parameterNamesInQueryString?seq_contains(name)&&name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
 <input type="hidden" name="${name}" value="${Parameters[name]}" />
 </#if>
 </#list>
@@ -78,7 +78,7 @@ ${formHeader!}
 <thead>
 <tr>
 <#if showCheckColumn>
-<th class="nosort <#if multipleCheck>checkbox<#else>radio</#if>"><#if multipleCheck><input type="checkbox" class="checkbox custom"/></#if></th>
+<th class="nosort <#if multipleCheck>checkbox<#else>radio</#if>"><#if multipleCheck><input type="checkbox" class="checkall custom"/></#if></th>
 </#if>
 </#macro>
 
@@ -103,7 +103,7 @@ ${formHeader!}
 	<#local id><@rowid?interpret/></#local>
 </#if>
 <tr<#if entity.enabled??> data-enabled="${entity.enabled?string}"</#if><#if !showCheckColumn&&id?has_content> data-rowid="${id}"</#if><#list dynamicAttributes?keys as attr><#if attr=='dynamicAttributes'><#list dynamicAttributes['dynamicAttributes']?keys as attr> ${attr}="${dynamicAttributes['dynamicAttributes'][attr]?string}"</#list><#else> ${attr}="${dynamicAttributes[attr]?string}"</#if></#list>>
-<#if showCheckColumn><td class="<#if multipleCheck>checkbox<#else>radio</#if>"><input type="<#if multipleCheck>checkbox<#else>radio</#if>" name="check"<#if id?has_content> value="${id}"</#if> class="custom"/></td></#if>
+<#if showCheckColumn><td class="<#if multipleCheck>checkbox<#else>radio</#if>"><input type="<#if multipleCheck>checkbox<#else>radio</#if>"<#if id?has_content> value="${id}"</#if> class="custom"/></td></#if>
 </#macro>
 
 <#macro rttbodytd value,entity,celleditable=true,template='',cellDynamicAttributes='',dynamicAttributes...>

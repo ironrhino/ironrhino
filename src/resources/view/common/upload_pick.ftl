@@ -6,11 +6,11 @@
 <body>
 <@s.form id="upload_form" action="${actionBaseUrl}" method="post" class="ajax view form-inline" data\-replacement="files">
 	<input type="hidden" name="pick" value="true"/>
-	<table id="files" class="checkboxgroup table table-striped middle" style="margin-top:50px;">
+	<table id="files" class="table table-striped middle" style="margin-top:50px;">
 		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${action.getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>
 		<thead>
 		<tr style="font-weight:bold;height:43px;">
-			<td style="width:30px" class="radio;"></td>
+			<td style="width:30px" class="radio"></td>
 			<td style="width:220px;"><span style="line-height:28px;">${action.getText('name')}</span><input type="search" class="filter input-small pull-right"/></td>
 			<td class="center">${action.getText('preview')}</td>
 		</tr>

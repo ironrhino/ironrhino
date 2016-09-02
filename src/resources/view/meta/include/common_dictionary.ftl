@@ -91,7 +91,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 							</#if>
 							<#local group = label/>
 							<#if group?has_content>
-								<span class="checkboxgroup"><label for="${name}-${group}" class="group"><input id="${name}-${group}" type="checkbox" class="custom"/>${group}</label><#t>
+								<span class="checkboxgroup"><label for="${name}-${group}" class="group"><input id="${name}-${group}" type="checkbox" class="checkall custom"/>${group}</label><#t>
 							</#if>
 						</#if>
 					<#else>

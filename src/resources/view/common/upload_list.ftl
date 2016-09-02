@@ -18,7 +18,7 @@
 		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${action.getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>
 		<thead>
 		<tr style="font-weight:bold;height:43px;">
-			<td style="width:30px" class="checkbox"><input type="checkbox" class="checkbox custom"/></td>
+			<td style="width:30px" class="checkbox"><input type="checkbox" class="checkbox checkall custom"/></td>
 			<td style="width:300px;"><span style="line-height:28px;">${action.getText('name')}</span><input type="search" class="filter input-small pull-right"/></td>
 			<td style="width:150px" class="center;">${action.getText('preview')}</td>
 			<td >${action.getText('path')}</td>
