@@ -45,19 +45,30 @@ public class ApplicationContextConsole {
 	@Autowired
 	private EventPublisher eventPublisher;
 
-	private Map<String, Object> beans = new HashMap<>();
+	private volatile Map<String, Object> beans;
 
 	private Map<String, Scope> triggers;
 
 	public Map<String, Object> getBeans() {
-		if (beans.isEmpty()) {
-			if (servletContext != null)
-				beans.put("freemarkerConfiguration",
-						servletContext.getAttribute(FreemarkerManager.CONFIG_SERVLET_CONTEXT_KEY));
-			String[] beanNames = ctx.getBeanDefinitionNames();
-			for (String beanName : beanNames) {
-				if (StringUtils.isAlphanumeric(beanName.replaceAll("_", "")) && ctx.isSingleton(beanName))
-					beans.put(beanName, ctx.getBean(beanName));
+		if (beans == null) {
+			synchronized (this) {
+				if (beans == null) {
+					beans = new HashMap<>();
+					if (servletContext != null)
+						beans.put("freemarkerConfiguration",
+								servletContext.getAttribute(FreemarkerManager.CONFIG_SERVLET_CONTEXT_KEY));
+					String[] beanNames = ctx.getBeanDefinitionNames();
+					for (String beanName : beanNames) {
+						if (!ctx.isSingleton(beanName))
+							continue;
+						if (StringUtils.isAlphanumeric(beanName.replaceAll("_", "")))
+							beans.put(beanName, ctx.getBean(beanName));
+						String[] aliases = ctx.getAliases(beanName);
+						for (String alias : aliases)
+							if (StringUtils.isAlphanumeric(alias.replaceAll("_", "")))
+								beans.put(alias, ctx.getBean(beanName));
+					}
+				}
 			}
 		}
 		return beans;
@@ -65,7 +76,7 @@ public class ApplicationContextConsole {
 
 	public Map<String, Scope> getTriggers() {
 		if (triggers == null) {
-			triggers = new TreeMap<>();
+			Map<String, Scope> temp = new TreeMap<>();
 			// triggers.put("freemarkerConfiguration.clearTemplateCache()",
 			// Scope.APPLICATION);
 			String[] beanNames = ctx.getBeanDefinitionNames();
@@ -81,7 +92,7 @@ public class ApplicationContextConsole {
 							if (Modifier.isPublic(modifiers) && m.getParameterTypes().length == 0) {
 								StringBuilder expression = new StringBuilder(beanName);
 								expression.append(".").append(m.getName()).append("()");
-								triggers.put(expression.toString(), m.getAnnotation(Trigger.class).scope());
+								temp.put(expression.toString(), m.getAnnotation(Trigger.class).scope());
 							}
 						}
 					} catch (NoSuchBeanDefinitionException e) {
@@ -91,6 +102,7 @@ public class ApplicationContextConsole {
 					}
 				}
 			}
+			triggers = temp;
 		}
 		return triggers;
 	}
