@@ -193,18 +193,18 @@
 	</servlet-mapping>
 	<error-page>
 		<error-code>500</error-code>
-		<location>/error/handle/500</location>
+		<location>/error/500</location>
 	</error-page>
 	<error-page>
 		<error-code>404</error-code>
-		<location>/error/handle/404</location>
+		<location>/error/404</location>
 	</error-page>
 	<error-page>
 		<error-code>403</error-code>
-		<location>/error/handle/403</location>
+		<location>/error/403</location>
 	</error-page>
 	<error-page>
 		<error-code>401</error-code>
-		<location>/error/handle/401</location>
+		<location>/error/401</location>
 	</error-page>
 </web-app>

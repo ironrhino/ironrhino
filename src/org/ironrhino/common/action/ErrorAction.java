@@ -34,7 +34,7 @@ public class ErrorAction extends BaseAction {
 		return exception;
 	}
 
-	public String handle() {
+	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		int errorcode = 404;
@@ -84,4 +84,10 @@ public class ErrorAction extends BaseAction {
 		response.setCharacterEncoding("utf-8"); // fix for jetty
 		return result;
 	}
+	
+	@Deprecated
+	public String handle() {
+		return execute();
+	}
+	
 }

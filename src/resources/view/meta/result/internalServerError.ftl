@@ -68,7 +68,7 @@
 <div class="clear"></div>
 <div class="content">
 	<#if exception??>
-	<pre>	   ${statics['org.ironrhino.core.util.ExceptionUtils'].getStackTraceAsString(exception)!}</pre>
+	<pre>	${statics['org.ironrhino.core.util.ExceptionUtils'].getStackTraceAsString(exception)!}</pre>
 	</br>
 	</#if>
 	<a href="javascript:history.back();">${action.getText('back')}</a>

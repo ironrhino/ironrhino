@@ -7,7 +7,7 @@
 	<security:http pattern="/assets/**" security="none" />
 	<security:http pattern="/remoting/**" security="none" />
 	<security:http use-expressions="true" entry-point-ref="entryPoint" access-decision-manager-ref="accessDecisionManager">
-		<security:access-denied-handler error-page="/error/handle/401"/>
+		<security:access-denied-handler error-page="/error/401"/>
 		<security:headers disabled="true"/>
 		<security:csrf disabled="true"/>
 		<security:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService"/>

@@ -1,5 +1,8 @@
 package org.ironrhino.common.action;
 
+import javax.servlet.DispatcherType;
+
+import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
 
 import com.opensymphony.xwork2.ActionSupport;
@@ -14,7 +17,8 @@ public class DirectTemplateAction extends ActionSupport {
 
 	@Override
 	public String execute() {
-		return "directTemplate";
+		return (ServletActionContext.getRequest().getDispatcherType() == DispatcherType.ERROR) ? ERROR
+				: "directTemplate";
 	}
 
 }
