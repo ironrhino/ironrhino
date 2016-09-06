@@ -13,6 +13,7 @@ import org.hibernate.event.spi.AbstractEvent;
 import org.hibernate.event.spi.PostDeleteEvent;
 import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostUpdateEvent;
+import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
@@ -32,7 +33,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class RecordAspect extends TransactionSynchronizationAdapter implements Ordered {
 
-	private static final String HIBERNATE_EVENTS = "HIBERNATE_EVENTS";
+	private static final String HIBERNATE_EVENTS = "HIBERNATE_EVENTS_FOR_RECORD";
 
 	@Autowired
 	private Logger logger;
@@ -55,9 +56,13 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 		this.order = order;
 	}
 
+	protected boolean isBypass() {
+		return AopContext.isBypass(this.getClass());
+	}
+
 	@Before("execution(public * *(..)) and @annotation(transactional)")
 	public void registerTransactionSyncrhonization(JoinPoint jp, Transactional transactional) {
-		if (!transactional.readOnly())
+		if (!isBypass() && !transactional.readOnly())
 			TransactionSynchronizationManager.registerSynchronization(this);
 	}
 

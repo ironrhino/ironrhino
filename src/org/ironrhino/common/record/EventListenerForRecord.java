@@ -10,7 +10,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RecordEventListener implements PostInsertEventListener, PostUpdateEventListener, PostDeleteEventListener {
+public class EventListenerForRecord implements PostInsertEventListener, PostUpdateEventListener, PostDeleteEventListener {
 
 	private static final long serialVersionUID = 6292673725187749565L;
 
