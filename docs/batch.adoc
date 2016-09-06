@@ -1,0 +1,136 @@
+= 批量任务
+
+== 概述
+基于spring-batch, ironrhino 扩展和hack了一些功能, 并且提供了简介直观的web界面.
+更多信息请参考官方文档 http://docs.spring.io/spring-batch/reference/html/
+
+
+== 基本概念
+- **Job** 任务, 比如生成对账文件
+- **JobInstance**  任务实例, 等价于具体的任务参数+任务, 比如生成2016-09-06这一天的对账文件, 跟Job是N对1关系
+- **JobExecution** 任务执行, 跟JobInstance是N对1关系, 正常情况下N是1, 如果有失败重跑的情况那么N就会大于1
+- **Step** 步骤, 一个任务定义可以包含一个或者多个步骤, 步骤通常由Reader和Processor(非必须)和Writer组成, 类似ETL的概念
+- **StepExecution** 步骤执行, 跟JobExecution的关系等价于Step跟Job的关系
+
+== 使用方法
+秉承ironrhino一贯的风格, 只需要引入相关的依赖包即可
+
+- ironrhino-batch.jar
+- javax.batch-api.jar
+- spring-batch-core.jar
+- spring-batch-infrastructure.jar
+
+然后就需要定义自己的任务, 任务定义文件就是spring的xml配置文件, 任何在 resources/batch 路径下的配置文件都会自动注册.
+下面是一个从数据库导出数据成csv文件的示例
+[source,xml]
+.resources/batch/exportUser.xml
+
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/batch
+	http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<bean id="userReader" scope="job" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="sql" value="select * from user where date(createDate)=?"/>
+		<property name="rowMapper">
+			<bean class="org.springframework.jdbc.core.BeanPropertyRowMapper" p:mappedClass="org.ironrhino.security.model.User"/>
+		</property>
+		<property name="preparedStatementSetter">
+			<bean class="org.springframework.jdbc.core.ArgumentPreparedStatementSetter">
+				<constructor-arg>
+					<array>
+						<value>#{jobParameters[workdate]}</value>
+					</array>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="userWriter" scope="job" class="org.springframework.batch.item.file.FlatFileItemWriter" p:resource="file:${app.home}/target/output.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}">
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="fieldExtractor">
+					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="username,name,phone"/>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="jobParemetersValidator" class="org.ironrhino.batch.job.SimpleJobParametersValidator">
+		<property name="requiredKeys">
+			<map>
+				<entry key="workdate" value="DATE"/>
+			</map>
+		</property>
+	</bean>
+
+	<job id="exportUserJob" xmlns="http://www.springframework.org/schema/batch">
+		<validator ref="jobParemetersValidator"/>
+		<step id="exportToFile">
+			<tasklet>
+				<chunk reader="userReader" writer="userWriter" commit-interval="${exportUserJob.exportToFile.commit.interval:10}"/>
+			</tasklet>
+		</step>
+	</job>
+
+</beans>
+----
+上面的示例是接受一个类型为Date名字为workdate的参数, 只有一个步骤, 从数据库查询数据导出文件的任务, 10条记录一个批次提交, 因为不需要加工数据所以没有用到Processor
+部署成功后, 可以用管理员用户访问 http://localhost:8080/batch/job , 这里有发起任务执行的操作界面
+
+== 任务调度
+1. 管理界面人工方式
+2. 暴露接口供外部调度器比如crontab触发
+3. 应用里面使用定时器触发, 这是推荐的方法, 下面是示例代码
+
+[source,java]
+.JobScheduler.java
+----
+import java.util.Date;
+
+import org.ironrhino.core.throttle.Mutex;
+import org.ironrhino.core.util.DateUtils;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class JobScheduler {
+
+	@Autowired
+	private JobRegistry jobRegistry;
+
+	@Autowired
+	private JobLauncher jobLauncher;
+
+	@Scheduled(cron = "${jobScheduler.launchExportUserJob.cron:0 0 1,2,3 * * ?}") // 每天凌晨1点2点3点都执行一次,后面两次是为了确保前面失败的情况下重试
+	@Mutex // 多实例运行的情况下保证只在一个实例上执行
+	public void launchExportUserJob() throws JobExecutionException {
+		Job job = jobRegistry.getJob("exportUserJob");
+		JobParameters jobParameters = new JobParametersBuilder()
+				.addDate("workdate", DateUtils.beginOfDay(DateUtils.addDays(new Date(), -1))).toJobParameters();
+		try {
+			jobLauncher.run(job, jobParameters);
+		} catch (JobInstanceAlreadyCompleteException e) {
+			// 任务已经成功执行
+		}
+	}
+
+}
+
+----
