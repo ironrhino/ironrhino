@@ -10,7 +10,7 @@
 	<property name="test.dir" location="${basedir}/test" />
 	<property name="test.src.dir" location="${basedir}/test/src" />
 	<property name="test.classes.dir" location="${basedir}/test/classes" />
-	<property name="test.results.dir" location="${basedir}/test/results" />
+	<property name="test.results.dir" location="${target.dir}/test/results" />
 	<property name="war.name" value="ironrhino.war" />
 
 	<path id="lib.classpath">
