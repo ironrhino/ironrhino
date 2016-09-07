@@ -62,6 +62,7 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public int executeUpdate(String queryString, Object... args);
 
+	@Deprecated
 	public List<T> executeQuery(String queryString, Object... args);
 
 	public <K> K execute(HibernateCallback<K> callback);

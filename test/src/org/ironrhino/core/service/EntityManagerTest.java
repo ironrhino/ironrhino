@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -14,10 +16,10 @@ import org.hibernate.criterion.Restrictions;
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.service.BaseManager.IterateCallback;
-import org.ironrhino.core.service.EntityManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -71,18 +73,10 @@ public class EntityManagerTest {
 
 	@Test
 	public void testCriteriaWithList() {
-		entityManager.setEntityClass(Person.class);
-		int size = 9;
-		for (int i = 0; i < size; i++) {
-			Person person = new Person();
-			person.setName("test" + i);
-			person.setGender(i % 2 == 0 ? Gender.MALE : Gender.FEMALE);
-			person.setDateOfBirth(new Date());
-			entityManager.save(person);
-		}
+		prepareData();
 
 		List<Person> males = entityManager.findAll(Order.asc("name"));
-		assertEquals(size, males.size());
+		assertEquals(9, males.size());
 
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
@@ -121,23 +115,14 @@ public class EntityManagerTest {
 		assertEquals("test6", males.get(0).getName());
 		assertEquals("test8", males.get(1).getName());
 
-		for (int i = 0; i < size; i++) {
-			Person person = entityManager.findOne("test" + i);
-			entityManager.delete(person);
-		}
+		clearData();
+		assertEquals(0, entityManager.countAll());
 	}
 
 	@Test
 	public void testHql() {
-		entityManager.setEntityClass(Person.class);
-		int size = 9;
-		for (int i = 0; i < size; i++) {
-			Person person = new Person();
-			person.setName("test" + i);
-			person.setGender(i % 2 == 0 ? Gender.MALE : Gender.FEMALE);
-			person.setDateOfBirth(new Date());
-			entityManager.save(person);
-		}
+		prepareData();
+
 		List<Person> males = entityManager.find("from Person p where p.gender=?1", Gender.MALE);
 		assertEquals(5, males.size());
 		entityManager.executeUpdate("delete from Person p where p.gender=?1", Gender.MALE);
@@ -145,21 +130,30 @@ public class EntityManagerTest {
 		assertEquals(0, males.size());
 		List<Person> females = entityManager.find("from Person p where p.gender=?1", Gender.FEMALE);
 		assertEquals(4, females.size());
-		entityManager.executeUpdate("delete from Person p where p.gender=?1", Gender.FEMALE);
+
+		clearData();
 		assertEquals(0, entityManager.countAll());
 	}
 
 	@Test
+	public void testCallback() {
+		prepareData();
+		Person person = entityManager.executeFind(new HibernateCallback<Person>() {
+			@Override
+			public Person doInHibernate(Session session) throws HibernateException {
+				Query q = session.createQuery("from Person p where p.name=:name");
+				q.setString("name", "test0");
+				q.setMaxResults(1);
+				return (Person) q.uniqueResult();
+			}
+		});
+		assertEquals("test0", person.getName());
+		clearData();
+	}
+
+	@Test
 	public void testIterate() {
-		entityManager.setEntityClass(Person.class);
-		int size = 9;
-		for (int i = 0; i < size; i++) {
-			Person person = new Person();
-			person.setName("test" + i);
-			person.setGender(i % 2 == 0 ? Gender.MALE : Gender.FEMALE);
-			person.setDateOfBirth(new Date());
-			entityManager.save(person);
-		}
+		prepareData();
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
@@ -170,10 +164,25 @@ public class EntityManagerTest {
 				for (Object obj : entityArray)
 					males.add((Person) obj);
 			}
-		}, dc);
+		}, dc, false);
 		assertEquals(5, males.size());
+		clearData();
+	}
+
+	private void prepareData() {
+		entityManager.setEntityClass(Person.class);
+		int size = 9;
+		for (int i = 0; i < size; i++) {
+			Person person = new Person();
+			person.setName("test" + i);
+			person.setGender(i % 2 == 0 ? Gender.MALE : Gender.FEMALE);
+			person.setDateOfBirth(new Date());
+			entityManager.save(person);
+		}
+	}
+
+	private void clearData() {
 		entityManager.executeUpdate("delete from Person p");
-		assertEquals(0, entityManager.countAll());
 	}
 
 }
