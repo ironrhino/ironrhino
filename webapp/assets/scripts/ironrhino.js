@@ -38621,8 +38621,9 @@ Observation._richtable = function(container) {
 				operator.attr('name', t.val() + '-op');
 				$('td:eq(2) :input', t.closest('tr')).attr('name', t.val());
 				var ops = $('option:selected', t).data('operators');
-				ops = ops.substring(1, ops.length - 1);
-				ops = ops.split(', ');
+				if (ops.indexOf('[') == 0)
+					ops = ops.substring(1, ops.length - 1);
+				ops = ops.split(/,\s*/);
 				var val;
 				$('option', operator).each(function() {
 							var temp = $(this).attr('value');
@@ -38660,8 +38661,9 @@ Observation._richtable = function(container) {
 					if (!select.hasClass('required'))
 						$('<option value=""></option>').appendTo(select);
 					var map = option.data('map');
-					map = map.substring(1, map.length - 1);
-					map = map.split(', ');
+					if (map.indexOf('{') == 0)
+						map = map.substring(1, map.length - 1);
+					map = map.split(/,\s*/);
 					for (var i = 0; i < map.length; i++) {
 						var arr = map[i].split('=', 2);
 						$('<option value="' + arr[0] + '">'
@@ -38689,10 +38691,10 @@ Observation._richtable = function(container) {
 							'10px');
 				_observe(td);
 			} else if (size < 0 && 'select' == option.data('type')) {
-
 				var map = option.data('map');
-				map = map.substring(1, map.length - 1);
-				map = map.split(', ');
+				if (map.indexOf('{') == 0)
+					map = map.substring(1, map.length - 1);
+				map = map.split(/,\s*/);
 				for (var i = 0; i < map.length; i++) {
 					var arr = map[i].split('=', 2);
 					var cbid = '-filter-' + property.val() + '-' + i;
