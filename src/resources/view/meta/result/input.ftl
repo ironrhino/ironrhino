@@ -103,12 +103,12 @@
 				<#if readonly>
 					<@s.hidden name=entityName+"."+key />
 				</#if>
-				<@s.select disabled=readonly id=id label=label name=entityName+"."+key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+				<@s.select disabled=readonly id=id label=label name=entityName+"."+key cssClass=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='multiselect'>
 				<#if readonly>
 					<@s.hidden name=entityName+"."+key />
 				</#if>
-				<@s.select disabled=readonly id=id label=label name=entityName+"."+key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
+				<@s.select disabled=readonly id=id label=label name=entityName+"."+key cssClass=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='listpick'>
 				<div id="control-group-${entityName!}-${key}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
 					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
@@ -259,12 +259,12 @@
 						<#if readonly>
 						<@s.hidden name=entityName+"."+key/>
 						</#if>
-						<@s.select disabled=readonly id=id label=label name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+						<@s.select disabled=readonly id=id label=label name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 					<#elseif config.type=='multiselect'>
 						<#if readonly>
 						<@s.hidden name=entityName+"."+key/>
 						</#if>
-						<@s.select disabled=readonly id=id label=label name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
+						<@s.select disabled=readonly id=id label=label name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 					<#elseif config.type=='dictionary' && selectDictionary??>
 						<div id="control-group-${entityName!}-${key}-${entry.key}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
 						<label class="control-label">${label}</label>
@@ -386,12 +386,12 @@
 									<#if readonly>
 										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
 									</#if>
-									<@s.select disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+									<@s.select disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 								<#elseif config.type=='multiselect'>
 									<#if readonly>
 										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
 									</#if>
-									<@s.select disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
+									<@s.select disabled=readonly id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key cssClass=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 								<#elseif config.type=='dictionary' && selectDictionary??>
 									<#if !config.multiple>
 									<#if readonly>

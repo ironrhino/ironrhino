@@ -199,9 +199,9 @@
 		<#elseif config.type=='select'>
 		<textarea id="rt_select_template_${key}">
 		<#if config.required>
-		<@s.select theme="simple" name=entityName+"."+key list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue/>
+		<@s.select theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue/>
 		<#else>
-		<@s.select theme="simple" name=entityName+"."+key list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
+		<@s.select theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
 		</#if>
 		</textarea>
 		<#elseif config.type=='dictionary' && selectDictionary??>

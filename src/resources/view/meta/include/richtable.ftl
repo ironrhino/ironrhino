@@ -300,8 +300,8 @@ ${formFooter!}
 					<#assign templateName><@entry.value.templateName?interpret /></#assign>
 					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName).entrySet() as entry>${entry.key}=${entry.value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					<#elseif entry.value.type='select'>
-					<#local options=entry.value.optionsExpression?eval>
-					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#list options?keys as key>${key}=${options[key]}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<#local options=entry.value.listOptions?eval>
+					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#if entry.value.listOptions?starts_with('{')><#list options?keys as key>${key}=${options[key]}<#sep>,</#list><#elseif entry.value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					<#elseif entry.value.type='listpick'>
 					<#assign pickUrl><@entry.value.pickUrl?interpret/></#assign>
 					<option value="${entry.key}.id" data-type="listpick" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>

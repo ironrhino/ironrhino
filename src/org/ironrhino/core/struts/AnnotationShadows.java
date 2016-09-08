@@ -49,8 +49,8 @@ public class AnnotationShadows {
 		private boolean excludeIfNotEdited;
 		private String listKey = UiConfig.DEFAULT_LIST_KEY;
 		private String listValue = UiConfig.DEFAULT_LIST_VALUE;
+		private String listOptions = "";
 		private String cellEdit = "";
-		private String optionsExpression = "";
 		private String pickUrl = "";
 		private String templateName = "";
 		private boolean excludedFromLike = false;
@@ -102,7 +102,14 @@ public class AnnotationShadows {
 			if (StringUtils.isNotBlank(config.cssClass()))
 				this.cssClasses.addAll(Arrays.asList(config.cssClass().split("\\s")));
 			this.thCssClass = config.thCssClass();
-			this.optionsExpression = config.optionsExpression();
+			this.listOptions = config.listOptions().trim();
+			if (listOptions.indexOf('{') == 0) {
+				this.listKey = "key";
+				this.listValue = "value";
+			}else if (listOptions.indexOf('[') == 0) {
+				this.listKey = "top";
+				this.listValue = "top";
+			}
 			this.pickUrl = config.pickUrl();
 			this.templateName = config.templateName();
 			if (StringUtils.isBlank(templateName))
@@ -433,12 +440,12 @@ public class AnnotationShadows {
 			this.cellEdit = cellEdit;
 		}
 
-		public String getOptionsExpression() {
-			return optionsExpression;
+		public String getListOptions() {
+			return listOptions;
 		}
 
-		public void setOptionsExpression(String optionsExpression) {
-			this.optionsExpression = optionsExpression;
+		public void setListOptions(String listOptions) {
+			this.listOptions = listOptions;
 		}
 
 		public boolean isSearchable() {
