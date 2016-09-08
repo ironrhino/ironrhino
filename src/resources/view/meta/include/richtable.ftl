@@ -295,17 +295,18 @@ ${formFooter!}
 						</#if>
 					</#if>
 					<#if entry.value.propertyType.enum>
-					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="${statics['org.ironrhino.core.struts.I18N'].getTextForEnum(entry.value.propertyType)}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(entry.value.propertyType).entrySet() as entry>${entry.key}=${entry.value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					<#elseif entry.value.type='dictionary' && selectDictionary??>
 					<#assign templateName><@entry.value.templateName?interpret /></#assign>
-					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="${beans['dictionaryControl'].getItemsAsMap(templateName)}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators('org.ironrhino.core.hibernate.CriterionOperator')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName).entrySet() as entry>${entry.key}=${entry.value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					<#elseif entry.value.type='select'>
-					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="${entry.value.optionsExpression?eval}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators('org.ironrhino.core.hibernate.CriterionOperator')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<#local options=entry.value.optionsExpression?eval>
+					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#list options?keys as key>${key}=${options[key]}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					<#elseif entry.value.type='listpick'>
 					<#assign pickUrl><@entry.value.pickUrl?interpret/></#assign>
-					<option value="${entry.key}.id" data-type="listpick" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${entry.key}.id" data-type="listpick" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					<#else>
-					<option value="${entry.key}" data-class="${entry.value.cssClass?replace('checkavailable','')}" data-inputtype="${entry.value.inputType}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${entry.key}" data-class="${entry.value.cssClass?replace('checkavailable','')}" data-inputtype="${entry.value.inputType}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					</#if>
 					</#list>
 				</select>

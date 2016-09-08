@@ -1,8 +1,6 @@
 package org.ironrhino.core.struts;
 
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.util.LocalizedTextUtil;
@@ -31,22 +29,6 @@ public class I18N {
 		} catch (Exception e) {
 			return key;
 		}
-	}
-
-	public static String getTextForEnum(Class<? extends Enum<?>> clazz) {
-		ActionContext context = ActionContext.getContext();
-		Locale locale = context != null ? context.getLocale() : Locale.getDefault();
-		ValueStack vs = context != null ? context.getValueStack() : null;
-		Map<String, String> map = new LinkedHashMap<>();
-		for (Enum<?> en : clazz.getEnumConstants()) {
-			try {
-				map.put(en.name(), LocalizedTextUtil.findText(clazz, en.name(), locale, en.name(), null, vs));
-			} catch (Exception e) {
-				e.printStackTrace();
-				map.put(en.name(), en.name());
-			}
-		}
-		return map.toString();
 	}
 
 }
