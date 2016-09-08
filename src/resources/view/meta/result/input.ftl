@@ -42,7 +42,8 @@
 	<#list uiConfigs.entrySet() as entry>
 		<#assign key=entry.key>
 		<#assign config=entry.value>
-		<#assign templateName><@config.templateName?interpret /></#assign>
+		<#assign templateName><@config.templateName?interpret/></#assign>
+		<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 		<#assign value=entity[key]!>
 		<#assign hidden=config.hiddenInInput.value>
 		<#if !hidden && config.hiddenInInput.expression?has_content>
@@ -109,7 +110,6 @@
 				</#if>
 				<@s.select disabled=readonly id=id label=label name=entityName+"."+key cssClass=config.cssClass list=config.optionsExpression?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='listpick'>
-				<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 				<div id="control-group-${entityName!}-${key}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
 					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 					<label class="control-label">${label}</label>
@@ -118,7 +118,6 @@
 					</div>
 				</div>
 			<#elseif config.type=='treeselect'>
-				<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 				<div id="control-group-${entityName!}-${key}" class="control-group <#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
 					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="treeselect-id ${config.cssClass}"/>
 					<label class="control-label">${label}</label>
@@ -218,6 +217,8 @@
 			<#elseif config.type=='embedded'&&config.embeddedUiConfigs??>
 				<#list config.embeddedUiConfigs.entrySet() as entry>
 					<#assign config = entry.value>
+					<#assign templateName><@config.templateName?interpret/></#assign>
+					<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 					<#assign value=(entity[key][entry.key])!>
 					<#assign hidden=config.hiddenInInput.value>
 					<#if !hidden && config.hiddenInInput.expression?has_content>
@@ -272,7 +273,7 @@
 						<#if readonly>
 							<@s.hidden name=entityName+"."+key />
 						</#if>
-						<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
+						<@selectDictionary disabled=readonly id="" dictionaryName=templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 						<#else>
 						<#if readonly>
 						<#if entity[key]?has_content>
@@ -281,12 +282,11 @@
 						</#list>
 						</#if>
 						</#if>
-						<@checkDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
+						<@checkDictionary disabled=readonly id="" dictionaryName=templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 						</#if>
 						</div>
 						</div>
 					<#elseif config.type=='listpick'>
-						<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 						<div id="control-group-${entityName!}-${key}-${entry.key}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
 						<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 						<label class="control-label">${label}</label>
@@ -295,7 +295,6 @@
 							</div>
 						</div>
 					<#elseif config.type=='treeselect'>
-						<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 						<div id="control-group-${entityName!}-${key}-${entry.key}" class="control-group <#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
 							<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="treeselect-id ${config.cssClass}"/>
 							<label class="control-label">${label}</label>
@@ -357,6 +356,8 @@
 								<#if !hidden>
 								<td>
 								<#assign value=(entity[key][index][entry.key])!>
+								<#assign templateName><@config.templateName?interpret/></#assign>
+								<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 								<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 								<#assign dynamicAttributes=dynAttrs(config)/>
 								<#if config.inputTemplate?has_content>
@@ -396,7 +397,7 @@
 									<#if readonly>
 										<@s.hidden name=entityName+"."+key+"["+index+"]."+entry.key />
 									</#if>
-									<@selectDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
+									<@selectDictionary disabled=readonly id="" dictionaryName=templateName name=entityName+"."+key+'['+index+'].'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 									<#else>
 									<#if readonly>
 									<#if (entity[key][index][entry.key])?has_content>
@@ -405,16 +406,14 @@
 									</#list>
 									</#if>
 									</#if>
-									<@checkDictionary disabled=readonly id="" dictionaryName=config.templateName name=entityName+"."+key+'['+index+'].'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
+									<@checkDictionary disabled=readonly id="" dictionaryName=templateName name=entityName+"."+key+'['+index+'].'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 									</#if>
 								<#elseif config.type=='listpick'>
-										<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 										<div class="<#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'}">
 										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 										<span class="listpick-name"><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></span>
 										</div>
 								<#elseif config.type=='treeselect'>
-										<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 										<div class="<#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}">
 										<@s.hidden name=entityName+"."+key+'['+index+'].'+entry.key+".id" cssClass="treeselect-id ${config.cssClass}"/>
 										<span class="treeselect-name"><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></span>
