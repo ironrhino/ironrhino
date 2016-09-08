@@ -96,8 +96,6 @@
 									</li>
 								</#list>
 								</ol>
-							<#elseif value?is_hash_ex && value.displayName??>
-									${value.displayName!}
 							<#else>
 							${value?string!}
 							</#if>
@@ -232,8 +230,6 @@
 												</li>
 											</#list>
 											</ol>
-										<#elseif value?is_hash_ex && value.displayName??>
-												${value.displayName!}
 										<#else>
 										${value?string!}
 										</#if>
@@ -287,8 +283,6 @@
 								</li>
 							</#list>
 							</ol>
-						<#elseif value?is_hash_ex && value.displayName??>
-								${value.displayName!}
 						<#else>
 						${value?string!}
 						</#if>

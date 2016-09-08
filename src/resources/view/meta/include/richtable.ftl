@@ -133,12 +133,10 @@ ${formHeader!}
 		${action.getText(value?string)}<#t>
 		<#elseif value?is_unknown_date_like>
 		${value?datetime}<#t>
-		<#elseif value?is_hash&&value.displayName??>
-		${value.displayName}<#t>
 		<#elseif value?is_indexable>
-		<#list value as var>${var?xhtml}<#sep> </#list><#t>
+		<#list value as var>${var?html}<#sep> </#list><#t>
 		<#else>
-		${value?xhtml}<#t>
+		${value?html}<#t>
 		</#if>
 	</#if>
 <#else>
@@ -315,7 +313,7 @@ ${formFooter!}
 			<td style="width:30%;text-align:right;">
 			<select class="operator">
 			<#list statics['org.ironrhino.core.hibernate.CriterionOperator'].values() as op>
-			<option value="${op.name()}" data-parameters="${op.parametersSize}">${op.displayName}</option>
+			<option value="${op.name()}" data-parameters="${op.parametersSize}">${op}</option>
 			</#list>
 			</select>
 			</td>

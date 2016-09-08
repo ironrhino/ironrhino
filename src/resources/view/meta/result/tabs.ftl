@@ -31,7 +31,7 @@
 	<#if config.type=='enum'>
 	<#assign values=statics[config.propertyType.name].values()>
 	<#list values as value>
-	<li><a href="#${propertyName+'-'+value.name()}" data-toggle="tab">${value.displayName}</a></li>
+	<li><a href="#${propertyName+'-'+value.name()}" data-toggle="tab">${value}</a></li>
 	</#list>
 	<#elseif selectDictionary??&&config.type=='dictionary'>
 	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
