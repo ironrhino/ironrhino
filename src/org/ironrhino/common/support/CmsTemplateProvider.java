@@ -7,7 +7,7 @@ import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.Page;
 import org.ironrhino.common.service.PageManager;
-import org.ironrhino.core.struts.FallbackTemplateProvider;
+import org.ironrhino.core.freemarker.FallbackTemplateProvider;
 import org.ironrhino.core.struts.result.AutoConfigResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;

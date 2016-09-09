@@ -12,6 +12,13 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.apache.struts2.views.freemarker.ScopesHashModel;
+import org.ironrhino.core.freemarker.BeansTemplateHashModel;
+import org.ironrhino.core.freemarker.FallbackTemplateProvider;
+import org.ironrhino.core.freemarker.MyBeansWrapperBuilder;
+import org.ironrhino.core.freemarker.MyConfiguration;
+import org.ironrhino.core.freemarker.OverridableTemplateProvider;
+import org.ironrhino.core.freemarker.PropertiesTemplateHashModel;
+import org.ironrhino.core.freemarker.TemplateProvider;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.RequestUtils;
@@ -28,7 +35,6 @@ import com.opensymphony.xwork2.util.ValueStack;
 
 import freemarker.cache.StrongCacheStorage;
 import freemarker.ext.beans.BeansWrapper;
-import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.ext.beans.SimpleMapModel;
 import freemarker.ext.servlet.HttpRequestHashModel;
 import freemarker.ext.servlet.HttpRequestParametersHashModel;
@@ -45,7 +51,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 
 	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_23;
 
-	public static final BeansWrapper DEFAULT_BEANS_WRAPPER = new BeansWrapperBuilder(DEFAULT_VERSION).build();
+	public static final BeansWrapper DEFAULT_BEANS_WRAPPER = new MyBeansWrapperBuilder(DEFAULT_VERSION).build();
 
 	private static final String ATTR_APPLICATION_MODEL = ".freemarker.Application";
 	private static final String ATTR_SESSION_MODEL = ".freemarker.Session";

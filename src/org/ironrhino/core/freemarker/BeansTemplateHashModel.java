@@ -1,20 +1,20 @@
-package org.ironrhino.core.struts;
+package org.ironrhino.core.freemarker;
 
+import org.ironrhino.core.struts.MyFreemarkerManager;
 import org.ironrhino.core.util.ApplicationContextUtils;
 
-import freemarker.ext.beans.StringModel;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
-public class PropertiesTemplateHashModel implements TemplateHashModel {
+public class BeansTemplateHashModel implements TemplateHashModel {
 
 	@Override
 	public TemplateModel get(String name) throws TemplateModelException {
-		String str = ApplicationContextUtils.getApplicationContext().getEnvironment().getProperty(name);
-		if (str == null)
+		Object bean = ApplicationContextUtils.getBean(name);
+		if (bean == null)
 			return null;
-		return new StringModel(str, MyFreemarkerManager.DEFAULT_BEANS_WRAPPER);
+		return MyFreemarkerManager.DEFAULT_BEANS_WRAPPER.wrap(bean);
 	}
 
 	@Override

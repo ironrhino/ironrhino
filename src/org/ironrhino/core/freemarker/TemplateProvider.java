@@ -1,4 +1,4 @@
-package org.ironrhino.core.struts;
+package org.ironrhino.core.freemarker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

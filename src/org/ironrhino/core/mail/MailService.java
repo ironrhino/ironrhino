@@ -4,7 +4,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import org.ironrhino.core.struts.TemplateProvider;
+import org.ironrhino.core.freemarker.TemplateProvider;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;

@@ -15,13 +15,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
+import org.ironrhino.core.freemarker.TemplateProvider;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
-import org.ironrhino.core.struts.TemplateProvider;
 import org.ironrhino.core.util.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
