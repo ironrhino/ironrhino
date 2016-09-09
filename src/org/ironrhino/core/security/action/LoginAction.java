@@ -113,7 +113,7 @@ public class LoginAction extends BaseAction {
 			addFieldError("password", getText(failed.getClass().getName()));
 		} catch (BadCredentialsException failed) {
 			addFieldError("password", getText(failed.getClass().getName()));
-			captchaManager.addCaptachaCount(request);
+			captchaManager.addCaptchaCount(request);
 			try {
 				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			} catch (Exception e) {

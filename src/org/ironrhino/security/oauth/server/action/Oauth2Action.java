@@ -306,7 +306,7 @@ public class Oauth2Action extends BaseAction {
 				return INPUT;
 			} catch (BadCredentialsException | CredentialsExpiredException | CredentialsNeedResetException failed) {
 				addFieldError("password", getText(failed.getClass().getName()));
-				captchaManager.addCaptachaCount(request);
+				captchaManager.addCaptchaCount(request);
 				try {
 					usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				} catch (Exception e) {

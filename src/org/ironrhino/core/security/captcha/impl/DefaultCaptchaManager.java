@@ -84,7 +84,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
 	}
 
 	@Override
-	public void addCaptachaCount(HttpServletRequest request) {
+	public void addCaptchaCount(HttpServletRequest request) {
 		if (bypass)
 			return;
 		boolean added = request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED) != null;
@@ -139,7 +139,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
 		if (pass)
 			cacheManager.delete(getCountKey(request), KEY_CAPTCHA);
 		else
-			addCaptachaCount(request);
+			addCaptchaCount(request);
 		return pass;
 	}
 

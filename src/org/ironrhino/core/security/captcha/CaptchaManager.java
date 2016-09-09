@@ -18,6 +18,6 @@ public interface CaptchaManager {
 
 	public CaptchaStatus getCaptchaStatus(HttpServletRequest request, Captcha captcha);
 
-	public void addCaptachaCount(HttpServletRequest request);
+	public void addCaptchaCount(HttpServletRequest request);
 
 }
