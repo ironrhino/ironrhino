@@ -8666,6 +8666,10 @@ form.attachmentable ul.thumbnails li .remove{
 	margin-bottom: 0;
 }
 
+.form-horizontal .controls li .unstyled{
+	margin-bottom: 10px;
+}
+
 .form-horizontal .controls .unstyled em{
 	margin-right:10px;
 }
