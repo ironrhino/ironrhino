@@ -8478,7 +8478,7 @@ input[type="checkbox"].custom + label.custom {
 	position: relative;
 }
 
-.checkbox input[type="checkbox"].custom + label.custom {
+th.checkbox input[type="checkbox"].custom + label.custom, td.checkbox input[type="checkbox"].custom + label.custom {
 	margin-right: 0;
 }
 
@@ -8524,7 +8524,7 @@ input[type="radio"].custom + label.custom {
 	position: relative;
 }
 
-.radio input[type="radio"].custom + label.custom {
+td.radio input[type="radio"].custom + label.custom {
 	margin-right: 0;
 }
 
