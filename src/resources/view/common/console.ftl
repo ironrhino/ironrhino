@@ -68,7 +68,7 @@ $(function(){
 <hr/>
 
 <#assign triggers = beans['applicationContextConsole'].getTriggers()>
-<#if triggers?keys?size gt 0>
+<#if triggers.size() gt 0>
 <div id="trigger">
 	<ul class="thumbnails">
 	<#list triggers.entrySet() as entry>

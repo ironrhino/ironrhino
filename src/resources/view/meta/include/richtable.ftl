@@ -175,7 +175,7 @@ ${formHeader!}
 <#if !propertyNamesInCriteria?? && entityClass??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].getPropertyNamesInCriteria(entityClass)>
 </#if>
-<#local filterable=propertyNamesInCriteria??&&propertyNamesInCriteria?keys?size gt 0>
+<#local filterable=propertyNamesInCriteria??&&propertyNamesInCriteria.size() gt 0>
 </#if>
 </tbody>
 </table>
