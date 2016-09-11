@@ -58,11 +58,11 @@
 						echo.setMessage('#'+projectName+'='+projectName);
 						echo.perform();
 					}
-					file = new File(testSrc+'/package-info.java');
+					file = new File(testSrc+'/'+new java.lang.String(projectPackage).replaceAll('\\.','/')+'/test/package-info.java');
 					if(!file.exists()){
 						var echo = project.createTask("echo");
 						echo.setFile(file);
-						echo.setMessage('');
+						echo.setMessage('package '+projectPackage+".test;");
 						echo.perform();
 					}
 					var copy = project.createTask('copy');
@@ -141,7 +141,7 @@
 					if(!file.exists()){
 						var echo = project.createTask("echo");
 						echo.setFile(file);
-						echo.setMessage('<ul class="nav">\n  <li><a href="<@url value="/"/>" class="ajax view">${action.getText("index")}</a></li>\n  <@authorize ifAnyGranted="ROLE_ADMINISTRATOR">\n  <li><a href="<@url value="/user"/>" class="ajax view">${action.getText("user")}</a></li>\n	</@authorize>\n</ul>');
+						echo.setMessage('<ul class="nav">\n\t<li><a href="<@url value="/"/>" class="ajax view">${action.getText("index")}</a></li>\n\t<@authorize ifAnyGranted="ROLE_ADMINISTRATOR">\n\t<li><a href="<@url value="/user"/>" class="ajax view">${action.getText("user")}</a></li>\n\t</@authorize>\n</ul>');
 						echo.perform();
 					}
 					copy = project.createTask("copy");
