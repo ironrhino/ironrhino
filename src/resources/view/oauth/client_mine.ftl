@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('client')}${action.getText('list')}</title>
 </head>
@@ -9,4 +10,4 @@
 <#assign bottomButtons='<@btn view="apply" class="btn-primary"/> <@btn action="disable" confirm=true/> <@btn class="reload"/>'>
 <@richtable entityName="client" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons celleditable=false enableable=true/>
 </body>
-</html></#escape>
+</html>

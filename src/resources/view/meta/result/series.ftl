@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText(name)}</title>
 </head>
@@ -44,4 +45,4 @@
   </div>
 </div>
 </body>
-</html></#escape>
+</html>

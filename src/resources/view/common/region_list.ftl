@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title><#if region.name??>${region.name}-</#if>${action.getText('region')}${action.getText('list')}</title>
 </head>
@@ -77,4 +78,4 @@
 	</div>
 </form>
 </body>
-</html></#escape>
+</html>

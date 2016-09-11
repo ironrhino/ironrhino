@@ -1,3 +1,4 @@
+<#ftl output_format='HTML'>
 <#macro renderTR region>
 <tr id="node-${region.id}"<#if region.parent??&&region.parent.id gt 0> class="child-of-node-${region.parent.id}"</#if>>
         <td><input type="checkbox" class="custom" name="id" value="${region.id}"/></td>
@@ -13,7 +14,7 @@
 </#if>
 </#macro>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>region table</title>
 </head>
@@ -33,4 +34,4 @@
   </tbody>
 </table>
 </body>
-</html></#escape>
+</html>

@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('jobExecution')}${action.getText('steps')} - ${action.getText(jobInstance.jobName)!}</title>
 </head>
@@ -81,4 +82,4 @@
 </#list>
 </div>
 </body>
-</html></#escape>
+</html>

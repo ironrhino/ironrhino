@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('upload')}</title>
 </head>
@@ -25,17 +26,17 @@
 		</tr>
 		</tfoot>
 		<tbody>
-		<#list files.entrySet() as entry>
+		<#list files as key,value>
 		<tr>
-			<td class="radio"><#if entry.value><input type="radio" name="id" value="<@url value="${action.getFileUrl(entry.key?url)}"/>" class="custom"/></#if></td>
-			<td><#if entry.value><span class="uploaditem filename" style="cursor:pointer;">${entry.key}</span> <a href="<@url value="${action.getFileUrl(entry.key?url)}"/>" target="_blank" download="${entry.key}"><i class="glyphicon glyphicon-download-alt"></i></a><#else><a style="color:blue;" class="ajax view" data-replacement="files" href="${actionBaseUrl}/pick${folderEncoded}/${entry.key?replace('..','__')?url}">${entry.key}</a></#if></td>
-			<td class="center"><#if entry.value && ['jpg','gif','png','bmp']?seq_contains(entry.key?lower_case?split('.')?last)><a href="<@url value="${action.getFileUrl(entry.key?url)}"/>" target="_blank"><img class="uploaditem" src="<@url value="${action.getFileUrl(entry.key?url)}"/>" style="width:50px;height:50px;"/></a></#if></td>
+			<td class="radio"><#if value><input type="radio" name="id" value="<@url value="${action.getFileUrl(key?url)}"/>" class="custom"/></#if></td>
+			<td><#if value><span class="uploaditem filename" style="cursor:pointer;">${key}</span> <a href="<@url value="${action.getFileUrl(key?url)}"/>" target="_blank" download="${key}"><i class="glyphicon glyphicon-download-alt"></i></a><#else><a style="color:blue;" class="ajax view" data-replacement="files" href="${actionBaseUrl}/pick${folderEncoded}/${key?replace('..','__')?url}">${key}</a></#if></td>
+			<td class="center"><#if value && ['jpg','gif','png','bmp']?seq_contains(key?lower_case?split('.')?last)><a href="<@url value="${action.getFileUrl(key?url)}"/>" target="_blank"><img class="uploaditem" src="<@url value="${action.getFileUrl(key?url)}"/>" style="width:50px;height:50px;"/></a></#if></td>
 		</tr>
 		</#list>
 		</tbody>
 	</table>
 </@s.form>
 </body>
-</html></#escape>
+</html>
 
 

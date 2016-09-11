@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('service')}${action.getText('stats')}</title>
 </head>
@@ -18,4 +19,4 @@
 	</#if>
 </ul>
 </body>
-</html></#escape>
+</html>

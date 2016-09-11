@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('service')}${action.getText('console')}</title>
 <script>
@@ -65,4 +66,4 @@ $(document).on('click','a.host',function(e){
 <hr/>
 </#if>
 </body>
-</html></#escape>
+</html>

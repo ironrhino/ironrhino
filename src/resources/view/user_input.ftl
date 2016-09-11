@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title><#if user.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('user')}</title>
 </head>
@@ -31,6 +32,6 @@
 	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>
-</html></#escape>
+</html>
 
 

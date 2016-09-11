@@ -1,5 +1,6 @@
-﻿<!DOCTYPE html>
-<#escape x as x?html><html>
+<#ftl output_format='HTML'>
+<!DOCTYPE html>
+<html>
 <head>
 <title>${action.getText('auditEvent')}</title>
 </head>
@@ -15,4 +16,4 @@
 		<button style="margin-top:10px;" class="btn btn-block load-more"<#if !since?? && events?size==0 || events?size lt pageSize> disabled</#if>>${action.getText('more')}</button>
 	</div>
 </body>
-</html></#escape>
+</html>

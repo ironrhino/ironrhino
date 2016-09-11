@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('move')}${action.getText(entityName)}</title>
 </head>
@@ -16,4 +17,4 @@
 	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 	</@s.form>
 </body>
-</html></#escape>
+</html>

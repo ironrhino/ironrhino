@@ -1,6 +1,7 @@
+<#ftl output_format='HTML'>
 <#assign view=Parameters.view!/>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title><#if page.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('page')}</title>
 <meta name="cms_path" content="${cmsPath}" />
@@ -165,4 +166,4 @@ $(function() {
 	
 </@s.form>
 </body>
-</html></#escape>
+</html>

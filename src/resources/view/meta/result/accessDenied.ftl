@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('access.denied')}</title>
 <#assign redirectToLogin = false>
@@ -26,4 +27,4 @@ ${action.getText('access.denied')}
 </#if>
 </h3>
 </body>
-</html></#escape>
+</html>

@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('error.occur')}</title>
 <meta name="decorator" content="none"/>
@@ -75,6 +76,6 @@
 	<a href="<@url value="/"/>">${action.getText('index')}</a>
 </div>
 </body>
-</html></#escape>
+</html>
 
 

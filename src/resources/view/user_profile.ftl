@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('profile')}</title>
 </head>
@@ -11,6 +12,6 @@
 	<@s.submit value="%{getText('save')}" class="btn-primary" disabled=userProfileReadonly />
 </@s.form>
 </body>
-</html></#escape>
+</html>
 
 

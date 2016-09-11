@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <#assign entityDisplayName=action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))/>
 <title>${entityDisplayName}</title>
@@ -17,4 +18,4 @@
 	</div>
 </div>
 </body>
-</html></#escape>
+</html>

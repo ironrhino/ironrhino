@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('service')}${action.getText('stats')}</title>
 </head>
@@ -23,14 +24,14 @@
 		</tr>
 		</thead>
 		<tbody>
-		<#list hotspots.entrySet() as entry>
+		<#list hotspots as key,value>
 		<tr class="warning">
-			<td><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(entry.key)?url}"/>" class="ajax view" data-replacement="count">${entry.key}</a></td>
-			<td>${entry.value?string}</td>
+			<td><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(key)?url}"/>" class="ajax view" data-replacement="count">${key}</a></td>
+			<td>${value?string}</td>
 		</tr>
 		</#list>
 		</tbody>
 	</table>
 </#if>
 </body>
-</html></#escape>
+</html>

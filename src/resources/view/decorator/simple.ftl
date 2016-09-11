@@ -1,3 +1,4 @@
+<#ftl output_format='HTML'>
 <#assign requestURI=request.requestURI[request.contextPath?length..]/>
 <#assign modernBrowser = true/>
 <#assign ua = request.getAttribute('userAgent')!/>
@@ -11,9 +12,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 </#if>
-<#compress><#escape x as x?html>
+<#compress>
 <head>
-<title><#noescape>${title}</#noescape></title>
+<title>${title?no_esc}</title>
 <#if modernBrowser>
 <meta charset="utf-8">
 <#else>
@@ -27,7 +28,7 @@
 <link href="<@url value="/assets/styles/ironrhino${devMode?then('','-min')}.css"/>" media="all" rel="stylesheet" type="text/css" />
 <script src="<@url value="/assets/scripts/ironrhino${devMode?then('','-min')}.js"/>" type="text/javascript"<#if modernBrowser&&!head?contains('</script>')> defer</#if>></script>
 <#include "include/assets.ftl" ignore_missing=true/>
-<#noescape>${head}</#noescape>
+${head?no_esc}
 </head>
 <body class="simple ${.lang}">
 <div id="content" class="simple">
@@ -37,7 +38,7 @@
 <@s.actionmessage />
 </div>
 </#if>
-<#noescape>${body}</#noescape>
+${body?no_esc}
 </div>
 </body>
-</html></#escape></#compress>
+</html></#compress>

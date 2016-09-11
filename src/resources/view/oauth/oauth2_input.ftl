@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title><#if displayForNative && granted>Success code=${authorization.code}<#elseif displayForNative && denied>denied<#else>${action.getText('grant')}</#if></title>
 </head>
@@ -48,4 +49,4 @@
 		</@s.form>
 	</#if>
 </body>
-</html></#escape>
+</html>

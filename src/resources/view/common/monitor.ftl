@@ -1,3 +1,4 @@
+<#ftl output_format='HTML'>
 <#macro renderTR node>
 <tr id="node-${node.id}"<#if node.parent??&&node.parent.id gt 0> class="child-of-node-${node.parent.id}"</#if>>
         <td>${node.name}</td>
@@ -13,7 +14,7 @@
 </#if>
 </#macro>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('monitor')}</title>
 </head>
@@ -37,10 +38,10 @@
 </div>
 </div>
 <div id="result"<#if Parameters.live??> class="ajaxpanel" data-interval="${Parameters.interval?default('60000')}" data-quiet="true"</#if>>
-<#list result.entrySet() as entry>
+<#list result as key,value>
 <table class="treeTable expanded table table-hover table-bordered" style="width:100%;">
-  <#if entry.key??>
-  <caption><h3>${entry.key}</h3></caption>
+  <#if key??>
+  <caption><h3>${key}</h3></caption>
   </#if>
   <thead>
     <tr>
@@ -50,7 +51,7 @@
     </tr>
   </thead>
   <tbody>
-    <#list entry.value as var>
+    <#list value as var>
       <@renderTR var/>
     </#list>
   </tbody>
@@ -58,4 +59,4 @@
 </#list>
 </div>
 </body>
-</html></#escape>
+</html>

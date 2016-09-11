@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <#assign entityDisplayName=action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))/>
 <title>${entityDisplayName}${action.getText('list')}</title>
@@ -34,24 +35,27 @@
 </#if>
 <#if richtableConfig.formid?has_content>
 <#assign formid><@richtableConfig.formid?interpret/></#assign>
+<#assign formid=formid?markup_string>
 </#if>
 <#if richtableConfig.formHeader?has_content>
 <#assign formHeader><@richtableConfig.formHeader?interpret/></#assign>
+<#assign formHeader=formHeader?markup_string>
 </#if>
 <#if richtableConfig.formFooter?has_content>
 <#assign formFooter><@richtableConfig.formFooter?interpret/></#assign>
+<#assign formFooter=formFooter?markup_string>
 </#if>
 <#if celleditable&&versionPropertyName??>
 <#assign dynamicAttributes={"data-versionproperty":versionPropertyName}>
 </#if>
 <@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=dynamicAttributes!/>
 <#assign size=0>
-<#list uiConfigs.entrySet() as entry>
-	<#assign hidden=entry.value.hiddenInList.value>
-	<#if !hidden && entry.value.hiddenInList.expression?has_content>
-	<#assign hidden=entry.value.hiddenInList.expression?eval/>
+<#list uiConfigs as key,value>
+	<#assign hidden=value.hiddenInList.value>
+	<#if !hidden && value.hiddenInList.expression?has_content>
+	<#assign hidden=value.hiddenInList.expression?eval/>
 	</#if>
-	<#if !hidden && Parameters[entry.key]?has_content && !Parameters[entry.key+'-op']?has_content>
+	<#if !hidden && Parameters[key]?has_content && !Parameters[key+'-op']?has_content>
 	<#assign hidden=true/>
 	</#if>
 	<#if !hidden>
@@ -60,9 +64,7 @@
 </#list>
 <#assign viewable=richtableConfig.exportable>
 <#assign hasSelect=false>
-<#list uiConfigs.entrySet() as entry>
-		<#assign key=entry.key>
-		<#assign config=entry.value>
+<#list uiConfigs as key,config>
 		<#assign hidden=config.hiddenInList.value>
 		<#if !hidden && config.hiddenInList.expression?has_content>
 		<#assign hidden=config.hiddenInList.expression?eval>
@@ -96,7 +98,7 @@
 			<#else>
 				<#assign cellEdit=''/>
 			</#if>
-			<@rttheadtd name=label alias=config['alias']! width=config['width']! title=config['title']! class=config['thCssClass']! cellname=entityName+'.'+key cellEdit=cellEdit readonly=readonly.value excludeIfNotEdited=config.excludeIfNotEdited resizable=viewable||!(readonly.value&&!entry?has_next)/>
+			<@rttheadtd name=label alias=config['alias']! width=config['width']! title=config['title']! class=config['thCssClass']! cellname=entityName+'.'+key cellEdit=cellEdit readonly=readonly.value excludeIfNotEdited=config.excludeIfNotEdited resizable=viewable||!(readonly.value&&!key?has_next)/>
 		<#else>
 			<#assign viewable=true>
 		</#if>
@@ -108,6 +110,7 @@
 <#assign rowDynamicAttributes={}>
 <#if richtableConfig.rowDynamicAttributes?has_content>
 <#assign rowDynamicAttributes><@richtableConfig.rowDynamicAttributes?interpret /></#assign>
+<#assign rowDynamicAttributes=rowDynamicAttributes?markup_string>
 <#if rowDynamicAttributes?has_content>
 <#assign rowDynamicAttributes=rowDynamicAttributes?eval>
 <#else>
@@ -124,9 +127,7 @@
 <#assign rowDynamicAttributes+={"data-version":entity[versionPropertyName]}>
 </#if>
 <@rttbodytrstart entity=entity showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=rowDynamicAttributes/>
-<#list uiConfigs.entrySet() as entry>
-	<#assign key=entry.key>
-	<#assign config=entry.value>
+<#list uiConfigs as key,config>
 	<#assign value=entity[key]!>
 	<#assign hidden=config.hiddenInList.value>
 	<#if !hidden && config.hiddenInList.expression?has_content>
@@ -139,6 +140,7 @@
 		<#assign dynamicAttributes={}>
 		<#if config.type=='listpick'&&celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
 			<#assign pickUrl><@config.pickUrl?interpret/></#assign>
+			<#assign pickUrl=pickUrl?markup_string>
 			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":(value.id?string)!,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue'}"}>
 		</#if>
 		<#if config.readonly.expression?has_content && config.readonly.expression?eval>
@@ -148,7 +150,7 @@
 		<#if value?has_content>
 			<#if config.multiple>
 				<#assign temp = []>
-				<#if config.type=='dictionary' && selectDictionary??><#assign templateName><@config.templateName?interpret /></#assign></#if>
+				<#if config.type=='dictionary' && selectDictionary??><#assign templateName><@config.templateName?interpret /></#assign><#assign templateName=templateName?markup_string/></#if>
 				<#list value as var>
 				<#if config.type=='dictionary' && selectDictionary??>
 				<#assign temp+=[getDictionaryLabel(templateName,var)]/>
@@ -162,6 +164,7 @@
 			<#elseif config.type=='dictionary' && selectDictionary??>
 				<#assign dynamicAttributes+={'data-cellvalue':value}/>
 				<#assign templateName><@config.templateName?interpret /></#assign>
+				<#assign templateName=templateName?markup_string/>
 				<#assign value=getDictionaryLabel(templateName,value)/>
 			</#if>
 		</#if>
@@ -177,9 +180,7 @@
 <@rtend showBottomButtons=richtableConfig.showBottomButtons readonly=readonly.value deletable=!readonly.value||readonly.deletable searchable=searchable filterable=richtableConfig.filterable downloadable=richtableConfig.downloadable showPageSize=richtableConfig.showPageSize! buttons=richtableConfig.bottomButtons! enableable=enableable formFooter=formFooter! inputWindowOptions=richtableConfig.inputWindowOptions!/>
 <#if !readonly.value && hasSelect>
 <div style="display: none;">
-<#list uiConfigs.entrySet() as entry>
-	<#assign key=entry.key>
-	<#assign config=entry.value>
+<#list uiConfigs as key,config>
 	<#assign hidden=config.hiddenInList.value||config.multiple>
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval/>
@@ -207,6 +208,7 @@
 		<#elseif config.type=='dictionary' && selectDictionary??>
 		<textarea id="rt_select_template_${key}">
 		<#assign templateName><@config.templateName?interpret /></#assign>
+		<#assign templateName=templateName?markup_string/>
 		<@selectDictionary dictionaryName=templateName id=key name="${entityName}.${key}" required=config.required/>
 		</textarea>
 		</#if>
@@ -217,4 +219,4 @@
 <@richtableConfig.listFooter?interpret/>
 </#if>
 </body>
-</html></#escape>
+</html>

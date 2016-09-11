@@ -1,9 +1,10 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>
 <#if preview>[${action.getText('preview')}]</#if><#if page.title??><@page.title?interpret/></#if></title>
-<#noescape>${page.head!}</#noescape>
+${(page.head?no_esc)!}
 </head>
 <body>
 <div class="page content">
@@ -17,4 +18,4 @@
 	</#if>
 </div>
 </body>
-</html></#escape>
+</html>

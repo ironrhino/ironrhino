@@ -1,3 +1,4 @@
+<#ftl output_format='HTML'>
 <#macro listFields fields>
 <table class="table">
 <thead>
@@ -29,8 +30,8 @@
 			<#if field.values?has_content>
 			枚举值:
 			<ul class="unstyled">
-				<#list field.values.entrySet() as entry>
-				<li>${entry.key} <span class="label">${entry.value}</span></li>
+				<#list field.values as key,value>
+				<li>${key} <span class="label">${value}</span></li>
 				</#list>
 			</ul>
 			</#if>
@@ -41,7 +42,7 @@
 </table>
 </#macro>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('docs')}<#if version?has_content> ${version}</#if></title>
 </head>
@@ -69,24 +70,24 @@
 		    </div>
 		  </div>
 		</@classPresentConditional>
-		<#list apiModules.entrySet() as entry>
-		  <#assign _category=entry.key>
+		<#list apiModules as key,value>
+		  <#assign _category=key>
 		  <#if _category?has_content>
 		  	<div class="accordion-group">
 		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#category_${entry?index}">${_category}</a>
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#category_${key?index}">${_category}</a>
 		    </div>
-		    <div id="category_${entry?index}" class="accordion-body collapse<#if _category==category> in</#if>">
+		    <div id="category_${key?index}" class="accordion-body collapse<#if _category==category> in</#if>">
 		    <div class="accordion-inner">
-		    <div id="category_accordion_${entry?index}" class="accordion">
+		    <div id="category_accordion_${key?index}" class="accordion">
 		  </#if>
-		  <#list entry.value as apiModule>
+		  <#list value as apiModule>
 		  <div class="accordion-group">
 		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#<#if _category?has_content>category_accordion_${entry?index}<#else>api-accordion</#if>" href="#module_${entry?index}_${apiModule?index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>${apiModule.name}</a>
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#<#if _category?has_content>category_accordion_${key?index}<#else>api-accordion</#if>" href="#module_${key?index}_${apiModule?index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>${apiModule.name}</a>
 		    </div>
 		    <#assign currentModule = (!category?has_content||_category==category)&&module?has_content && module==apiModule.name>
-		    <div id="module_${entry?index}_${apiModule?index}" class="accordion-body collapse<#if currentModule> in</#if>">
+		    <div id="module_${key?index}_${apiModule?index}" class="accordion-body collapse<#if currentModule> in</#if>">
 		      <div class="accordion-inner">
 		        <ul class="nav nav-list">
 					<#list apiModule.apiDocs as apiDoc>
@@ -111,7 +112,7 @@
 			<h4 style="text-align:center;">${apiDoc.name}</h4>
 			<#if apiDoc.description?has_content>
 			<div class="alert alert-info">
-			  <#noescape>${apiDoc.description}</#noescape>
+			  ${apiDoc.description?no_esc}
 			</div>
 			</#if>
 			<table class="table">
@@ -126,9 +127,9 @@
 					<#if apiDoc.requestHeaders?has_content><tr><td>请求头</td><td><@listFields fields=apiDoc.requestHeaders/></td></tr></#if>
 					<#if apiDoc.cookieValues?has_content><tr><td>请求Cookie</td><td><@listFields fields=apiDoc.cookieValues/></td></tr></#if>
 					<#if apiDoc.requestBody?has_content><tr><td>请求消息体<#if !apiDoc.requestBodyRequired><br/><span class="label label-info">可选</span></#if><#if apiDoc.requestBodyType?has_content><br/><span class="label label-warning">${action.getText(apiDoc.requestBodyType)}</span></#if></td><td><@listFields fields=apiDoc.requestBody/></td></tr></#if>
-					<#if apiDoc.requestBodySample?has_content><tr><td>请求消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;"><#noescape>${apiDoc.requestBodySample}</#noescape></code></td></tr></#if>
+					<#if apiDoc.requestBodySample?has_content><tr><td>请求消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;">${apiDoc.requestBodySample?no_esc}</code></td></tr></#if>
 					<#if apiDoc.responseBody?has_content><tr><td>响应消息体<#if apiDoc.responseBodyType?has_content><br/><span class="label label-warning">${action.getText(apiDoc.responseBodyType)}</span></#if></td><td><@listFields fields=apiDoc.responseBody/></td></tr></#if>
-					<#if apiDoc.responseBodySample?has_content><tr><td>响应消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;"><#noescape>${apiDoc.responseBodySample}</#noescape></code></td></tr></#if>
+					<#if apiDoc.responseBodySample?has_content><tr><td>响应消息体示例</td><td><code style="word-break: break-all;word-wrap: break-word;white-space: pre;white-space: pre-wrap;">${apiDoc.responseBodySample?no_esc}</code></td></tr></#if>
 				</tbody>
 			</table>
 		<#elseif partial?has_content>
@@ -137,4 +138,4 @@
     </div>
   </div>
 </body>
-</html></#escape>
+</html>

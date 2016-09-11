@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('pageView')}</title>
 <style>
@@ -366,4 +367,4 @@ Initialization.pageView = function() {
 </div>
 
 </body>
-</html></#escape>
+</html>

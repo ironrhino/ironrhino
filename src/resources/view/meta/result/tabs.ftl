@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}${action.getText('list')}</title>
 </head>
@@ -12,10 +13,10 @@
 		</#if>
 		</#if>
 <#else>
-<#list uiConfigs.entrySet() as entry>
-	<#if (entry.value.type=='enum'||selectDictionary??&&entry.value.type=='dictionary')&&!entry.value.multiple>
-		<#assign propertyName=entry.key>
-		<#assign config=entry.value>
+<#list uiConfigs as key,value>
+	<#if (value.type=='enum'||selectDictionary??&&value.type=='dictionary')&&!value.multiple>
+		<#assign propertyName=key>
+		<#assign config=value>
 		<#break/>
 	</#if>
 </#list>
@@ -35,8 +36,8 @@
 	</#list>
 	<#elseif selectDictionary??&&config.type=='dictionary'>
 	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
-	<#list map.entrySet() as entry>
-	<li><a href="#${propertyName+'-'+entry.key}" data-toggle="tab">${entry.value}</a></li>
+	<#list map as key,value>
+	<li><a href="#${propertyName+'-'+key}" data-toggle="tab">${value}</a></li>
 	</#list>
 	<#elseif config.type=='checkbox'>
 	<li><a href="#${propertyName}-true" data-toggle="tab">${action.getText('true')}</a></li>
@@ -51,8 +52,8 @@
 	</#list>
 	<#elseif selectDictionary??&&config.type=='dictionary'>
 	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
-	<#list map.entrySet() as entry>
-	<div id="${propertyName+'-'+entry.key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=${entry.key?url}"></div>
+	<#list map as key,value>
+	<div id="${propertyName+'-'+key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=${key?url}"></div>
 	</#list>
 	<#elseif config.type=='checkbox'>
 	<div id="${propertyName}-true" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=true"></div>
@@ -61,4 +62,4 @@
 </div>
 </#if>
 </body>
-</html></#escape>
+</html>

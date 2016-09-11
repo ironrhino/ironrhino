@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('monitor')}</title>
 <script src="<@url value="/assets/components/flot/jquery.flot.js"/>" type="text/javascript"></script>
@@ -18,4 +19,4 @@
 	</#if>
 </ul>
 </body>
-</html></#escape>
+</html>

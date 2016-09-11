@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<#escape x as x?html><html>
+<#ftl output_format='HTML'>
+<html>
 <head>
 <title>${action.getText('view')}${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
 </head>
@@ -47,6 +47,7 @@
 						<#elseif config.type=='dictionary'>
 							<#if displayDictionaryLabel??>
 								<#assign templateName><@config.templateName?interpret /></#assign>
+								<#assign templateName=templateName?markup_string/>
 								<@displayDictionaryLabel dictionaryName=templateName value=value!/>
 							<#else>
 								${value!}
@@ -66,7 +67,7 @@
 								${value?datetime}
 							<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 								${value?string}
-							<#elseif value?is_indexable>
+							<#elseif value?is_enumerable>
 								<ol class="unstyled">
 								<#list value as item>
 									<li>
@@ -76,7 +77,7 @@
 										${item?datetime}
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
-									<#elseif item?is_indexable>
+									<#elseif item?is_enumerable>
 											<ol class="unstyled">
 											<#list item as it>
 												<li>${it}</li>
@@ -84,9 +85,9 @@
 											</ol>
 									<#elseif item?is_hash_ex>
 											<ul class="unstyled">
-											<#list item?keys as k>
-												<#if k!='class' && item[k]?? && !item[k]?is_method>
-												<li><em>${k}:</em> ${item[k]?string}</li>
+											<#list item as k,v>
+												<#if k!='class' && v?? && !v?is_method>
+												<li><em>${k}:</em> ${v?string}</li>
 												</#if>
 											</#list>
 											</ul>
@@ -123,6 +124,7 @@
 				<#elseif config.type=='dictionary'>
 					<#if displayDictionaryLabel??>
 						<#assign templateName><@config.templateName?interpret /></#assign>
+						<#assign templateName=templateName?markup_string/>
 						<@displayDictionaryLabel dictionaryName=templateName value=value!/>
 					<#else>
 						${value!}
@@ -160,7 +162,7 @@
 					<tbody>
 					<#assign size=0>
 					<#assign collections=entity[key]!>
-					<#if collections?is_collection && collections?size gt 0>
+					<#if collections?is_collection_ex && collections?size gt 0>
 					<#list collections as element>
 						<tr>
 							<#list embeddedUiConfigs.entrySet() as entry>
@@ -185,6 +187,7 @@
 								<#elseif config.type=='dictionary'>
 									<#if displayDictionaryLabel??>
 										<#assign templateName><@config.templateName?interpret /></#assign>
+										<#assign templateName=templateName?markup_string/>
 										<@displayDictionaryLabel dictionaryName=templateName value=value!/>
 									<#else>
 										${value!}
@@ -200,7 +203,7 @@
 											${value?datetime}
 										<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 											${value?string}
-										<#elseif value?is_indexable>
+										<#elseif value?is_enumerable>
 											<ol class="unstyled">
 											<#list value as item>
 												<li>
@@ -210,7 +213,7 @@
 													${item?datetime}
 												<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 													${item?string}
-												<#elseif item?is_indexable>
+												<#elseif item?is_enumerable>
 														<ol class="unstyled">
 														<#list item as it>
 															<li>${it}</li>
@@ -218,9 +221,9 @@
 														</ol>
 												<#elseif item?is_hash_ex>
 														<ul class="unstyled">
-														<#list item?keys as k>
-															<#if k!='class' && item[k]?? && !item[k]?is_method>
-															<li><em>${k}:</em> ${item[k]?string}</li>
+														<#list item as k,v>
+															<#if k!='class' && v?? && !v?is_method>
+															<li><em>${k}:</em> ${v?string}</li>
 															</#if>
 														</#list>
 														</ul>
@@ -253,7 +256,7 @@
 							${value?datetime}
 						<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
 							${value?string}
-						<#elseif value?is_indexable>
+						<#elseif value?is_enumerable>
 							<ol class="unstyled">
 							<#list value as item>
 								<li>
@@ -263,7 +266,7 @@
 										${item?datetime}
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
 										${item?string}
-									<#elseif item?is_indexable>
+									<#elseif item?is_enumerable>
 										<ol class="unstyled">
 										<#list item as it>
 											<li>${it}</li>
@@ -271,9 +274,9 @@
 										</ol>
 								<#elseif item?is_hash_ex>
 										<ul class="unstyled">
-										<#list item?keys as k>
-											<#if k!='class' && item[k]?? && !item[k]?is_method && item['set'+k?cap_first]??>
-											<li><em>${action.getText(k)}:</em> ${item[k]?string}</li>
+										<#list item as k,v>
+											<#if k!='class' && v?? && !v?is_method && item['set'+k?cap_first]??>
+											<li><em>${action.getText(k)}:</em> ${v?string}</li>
 											</#if>
 										</#list>
 										</ul>
@@ -316,4 +319,4 @@
 	</#if>
 	</div>
 </body>
-</html></#escape>
+</html>

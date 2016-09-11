@@ -123,3 +123,14 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 <#macro url value includeContextPath=true includeQueryString=false secure="">
 ${getUrl(value,includeContextPath,includeQueryString,secure)}<#t>
 </#macro>
+
+<#macro dynAttrs value exclude="">
+<#if !exclude?is_indexable>
+	<#if exclude?has_content>
+		<#local exclude=[exclude]/>
+	<#else>
+		<#local exclude=[]/>
+	</#if>
+</#if>
+<#list value as attr,val><#if attr=='dynamicAttributes'><#list val as attr2,val2><#if !exclude?seq_contains(attr2)> ${attr2}="${val2?html}"</#if></#list><#else><#if !exclude?seq_contains(attr)> ${attr}="${val?html}"</#if></#if></#list>
+</#macro>

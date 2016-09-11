@@ -1,17 +1,18 @@
-<#function dynAttrs config>
+<#ftl output_format='HTML'>
+<#function mergeDynAttrs config>
 	<#local dynamicAttributes={}/>
 	<#if config.internalDynamicAttributes?has_content>
 		<#local dynamicAttributes+=config.internalDynamicAttributes/>
 	</#if>
 	<#if config.dynamicAttributes?has_content>
 		<#local da><@config.dynamicAttributes?interpret/></#local>
-		<#local da=da?eval>
+		<#local da=da?markup_string?eval>
 		<#local dynamicAttributes+=da/>
 	</#if>
 	<#return dynamicAttributes>
 </#function>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title><#if !entity??><#assign entity=entityName?eval></#if><#assign isnew = !entity??||entity.new/><#assign isnew = !entity??||entity.new/><#if idAssigned><#assign isnew=!entity??||!entity.id?has_content/></#if><#if isnew>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
 </head>
@@ -43,7 +44,9 @@
 		<#assign key=entry.key>
 		<#assign config=entry.value>
 		<#assign templateName><@config.templateName?interpret/></#assign>
+		<#assign templateName=templateName?markup_string/>
 		<#assign pickUrl><@config.pickUrl?interpret/></#assign>
+		<#assign pickUrl=pickUrl?markup_string/>
 		<#assign value=entity[key]!>
 		<#assign hidden=config.hiddenInInput.value>
 		<#if !hidden && config.hiddenInInput.expression?has_content>
@@ -64,7 +67,7 @@
 				<#assign readonly=true/>
 			</#if>
 			<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key)/>
-			<#assign dynamicAttributes=dynAttrs(config)/>
+			<#assign dynamicAttributes=mergeDynAttrs(config)/>
 			<#if config.inputTemplate?has_content>
 				<#if config.inputTemplate?index_of('<div class="control-group') gt -1>
 				<@config.inputTemplate?interpret/>
@@ -218,7 +221,9 @@
 				<#list config.embeddedUiConfigs.entrySet() as entry>
 					<#assign config = entry.value>
 					<#assign templateName><@config.templateName?interpret/></#assign>
+					<#assign templateName=templateName?markup_string/>
 					<#assign pickUrl><@config.pickUrl?interpret/></#assign>
+					<#assign pickUrl=pickUrl?markup_string/>
 					<#assign value=(entity[key][entry.key])!>
 					<#assign hidden=config.hiddenInInput.value>
 					<#if !hidden && config.hiddenInInput.expression?has_content>
@@ -232,7 +237,7 @@
 					<#assign label=action.getText(label)>
 					<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 					<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
-					<#assign dynamicAttributes=dynAttrs(config)/>
+					<#assign dynamicAttributes=mergeDynAttrs(config)/>
 					<#if config.inputTemplate?has_content>
 						<@config.inputTemplate?interpret/>
 					<#elseif config.type=='textarea'>
@@ -342,7 +347,7 @@
 						<tbody>
 						<#assign size=0>
 						<#assign collections=entity[key]!>
-						<#if collections?is_collection && collections?size gt 0>
+						<#if collections?is_collection_ex && collections?size gt 0>
 							<#assign size = collections?size-1>
 						</#if>
 						<#list 0..size as index>
@@ -357,9 +362,11 @@
 								<td>
 								<#assign value=(entity[key][index][entry.key])!>
 								<#assign templateName><@config.templateName?interpret/></#assign>
+								<#assign templateName=templateName?markup_string/>
 								<#assign pickUrl><@config.pickUrl?interpret/></#assign>
+								<#assign pickUrl=pickUrl?markup_string/>
 								<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
-								<#assign dynamicAttributes=dynAttrs(config)/>
+								<#assign dynamicAttributes=mergeDynAttrs(config)/>
 								<#if config.inputTemplate?has_content>
 									<@config.inputTemplate?interpret/>
 								<#elseif config.type=='textarea'>
@@ -450,4 +457,4 @@
 	<@s.submit value=action.getText('save') class="btn-primary"/>
 </@s.form>
 </body>
-</html></#escape>
+</html>

@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('service')}${action.getText('stats')}</title>
 <style>
@@ -84,18 +85,18 @@ Initialization.stats = function() {
 	</#if>
 </#list>
 </#if>
-<#list services.entrySet() as entry>	
+<#list services as key,value>	
   <div class="accordion-group">
     <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#services-accordion" href="#service-${entry?index}">
-     	<h4>${entry.key}</h4>
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#services-accordion" href="#service-${key?index}">
+     	<h4>${key}</h4>
       </a>
     </div>
-    <div id="service-${entry?index}" class="accordion-body collapse<#if service?? && service?keep_before_last('(')?keep_before_last('.')==entry.key> in</#if>">
+    <div id="service-${key?index}" class="accordion-body collapse<#if service?? && service?keep_before_last('(')?keep_before_last('.')==key> in</#if>">
       <div class="accordion-inner">
         <ul class="nav nav-list">
-        	<#list entry.value as var>
-			<li><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(entry.key+'.'+var)?url}"/>" class="ajax view" data-replacement="count">${var}</a></li>
+        	<#list value as var>
+			<li><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(key+'.'+var)?url}"/>" class="ajax view" data-replacement="count">${var}</a></li>
 			</#list>
 		</ul>
       </div>
@@ -162,4 +163,4 @@ Initialization.stats = function() {
 <div class="ajaxpanel" data-url="${dataurl}" data-interval="60000" data-quiet="true"></div>
 
 </body>
-</html></#escape>
+</html>

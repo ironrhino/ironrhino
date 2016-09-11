@@ -2,9 +2,8 @@
 <@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
 <#nested/>
 </@rtstart>
-<#local size = columns?keys?size>
-<#list columns?keys as name>
-<#local config = columns[name]>
+<#local size = columns?size>
+<#list columns as name,config>
 <#local cellname=((config['trimPrefix']??)?then('',entityName+'.'))+name>
 <@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit']!,'') readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
 </#list>
@@ -25,8 +24,7 @@
 <#local _rowDynamicAttributes+={"data-readonly":"true"}>
 </#if>
 <@rttbodytrstart entity=entity showCheckColumn=showCheckColumn multipleCheck=multipleCheck rowid=rowid dynamicAttributes=_rowDynamicAttributes/>
-<#list columns?keys as name>
-	<#local config = columns[name]>
+<#list columns as name,config>
 	<#if config['value']??>
 	<#local value=config['value']>
 	<#else>
@@ -64,13 +62,13 @@
 <#if dynamicAttributes['dynamicAttributes']??>
 <#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
-<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName!=action&&entityName?has_content> data-entity="${entityName}"</#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>>
+<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName!=action&&entityName?has_content> data-entity="${entityName}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
 ${formHeader!}
 <#nested/>
 <#if includeParameters>
-<#list Parameters?keys as name>
+<#list Parameters as name,value>
 <#if !parameterNamesInQueryString?seq_contains(name)&&name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
-<input type="hidden" name="${name}" value="${Parameters[name]}" />
+<input type="hidden" name="${name}" value="${value}" />
 </#if>
 </#list>
 </#if>
@@ -102,7 +100,7 @@ ${formHeader!}
 <#else>
 	<#local id><@rowid?interpret/></#local>
 </#if>
-<tr<#if entity.enabled??> data-enabled="${entity.enabled?string}"</#if><#if !showCheckColumn&&id?has_content> data-rowid="${id}"</#if><#list dynamicAttributes?keys as attr><#if attr=='dynamicAttributes'><#list dynamicAttributes['dynamicAttributes']?keys as attr> ${attr}="${dynamicAttributes['dynamicAttributes'][attr]?string}"</#list><#else> ${attr}="${dynamicAttributes[attr]?string}"</#if></#list>>
+<tr<#if entity.enabled??> data-enabled="${entity.enabled?string}"</#if><#if !showCheckColumn&&id?has_content> data-rowid="${id}"</#if><@dynAttrs value=dynamicAttributes/>>
 <#if showCheckColumn><td class="<#if multipleCheck>checkbox<#else>radio</#if>"><input type="<#if multipleCheck>checkbox<#else>radio</#if>"<#if id?has_content> value="${id}"</#if> class="custom"/></td></#if>
 </#macro>
 
@@ -126,14 +124,14 @@ ${formHeader!}
 <#local cellDynamicAttributes+={'class':dynamicAttributes['class']+' '+cellDynamicAttributes['class']}>
 </#if>
 <#local dynamicAttributes+=cellDynamicAttributes>
-<td<#if value??><#if !dynamicAttributes['data-cellvalue']??&&template?has_content&&value?has_content||value?is_boolean> data-cellvalue="<#if value?is_unknown_date_like>${value?datetime?html}<#else>${value?string?html}</#if>"<#elseif value?is_hash&&value.displayName??> data-cellvalue="${value.name()?html}"</#if></#if><#list dynamicAttributes?keys as attr><#if attr!='dynamicAttributes'> ${attr}="${dynamicAttributes[attr]?html}"</#if></#list>><#rt>
+<td<#if value??><#if !dynamicAttributes['data-cellvalue']??&&template?has_content&&value?has_content||value?is_boolean> data-cellvalue="<#if value?is_unknown_date_like>${value?datetime?html}<#else>${value?string?html}</#if>"<#elseif value?is_hash&&value.displayName??> data-cellvalue="${value.name()?html}"</#if></#if><@dynAttrs value=dynamicAttributes/>><#rt>
 <#if !template?has_content>
 	<#if value??>
 		<#if value?is_boolean>
 		${action.getText(value?string)}<#t>
 		<#elseif value?is_unknown_date_like>
 		${value?datetime}<#t>
-		<#elseif value?is_indexable>
+		<#elseif value?is_enumerable>
 		<#list value as var>${var?html}<#sep> </#list><#t>
 		<#else>
 		${value?html}<#t>
@@ -175,7 +173,7 @@ ${formHeader!}
 <#if !propertyNamesInCriteria?? && entityClass??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].getPropertyNamesInCriteria(entityClass)>
 </#if>
-<#local filterable=propertyNamesInCriteria??&&propertyNamesInCriteria.size() gt 0>
+<#local filterable=propertyNamesInCriteria??&&propertyNamesInCriteria?size gt 0>
 </#if>
 </tbody>
 </table>
@@ -286,27 +284,27 @@ ${formFooter!}
 			<td style="width:30%;">
 				<select class="decrease property">
 					<option value=""></option>
-					<#list propertyNamesInCriteria.entrySet() as entry>
-					<#local label=entry.value.alias!/>
+					<#list propertyNamesInCriteria as key,value>
+					<#local label=value.alias!/>
 					<#if !label?has_content>
-						<#local label=entry.key/>
+						<#local label=key/>
 						<#if label?index_of('.') gt 0>
 							<#local label=label?keep_after_last('.')/>
 						</#if>
 					</#if>
-					<#if entry.value.propertyType.enum>
-					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(entry.value.propertyType).entrySet() as entry>${entry.key}=${entry.value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
-					<#elseif entry.value.type='dictionary' && selectDictionary??>
-					<#assign templateName><@entry.value.templateName?interpret /></#assign>
-					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName).entrySet() as entry>${entry.key}=${entry.value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
-					<#elseif entry.value.type='select'>
-					<#local options=entry.value.listOptions?eval>
-					<option value="${entry.key}" data-class="${entry.value.cssClass}" data-type="select" data-map="{<#if entry.value.listOptions?starts_with('{')><#list options?keys as key>${key}=${options[key]}<#sep>,</#list><#elseif entry.value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
-					<#elseif entry.value.type='listpick'>
-					<#assign pickUrl><@entry.value.pickUrl?interpret/></#assign>
-					<option value="${entry.key}.id" data-type="listpick" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<#if value.propertyType.enum>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(value.propertyType) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<#elseif value.type='dictionary' && selectDictionary??>
+					<#local templateName><@value.templateName?interpret /></#local>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<#elseif value.type='select'>
+					<#local options=value.listOptions?eval>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#if value.listOptions?starts_with('{')><#list options as key,value>${key}=${value}<#sep>,</#list><#elseif value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<#elseif value.type='listpick'>
+					<#local pickUrl><@value.pickUrl?interpret/></#local>
+					<option value="${key}.id" data-type="listpick" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					<#else>
-					<option value="${entry.key}" data-class="${entry.value.cssClass?replace('checkavailable','')}" data-inputtype="${entry.value.inputType}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(entry.value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass?replace('checkavailable','')}" data-inputtype="${value.inputType}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					</#if>
 					</#list>
 				</select>
@@ -329,16 +327,16 @@ ${formFooter!}
 			<td style="width:30%;">
 				<select class="decrease property">
 					<option value=""></option>
-					<#list propertyNamesInCriteria.entrySet() as entry>
-					<#if !entry.value.excludedFromOrdering>
-					<#local label=entry.value.alias!/>
+					<#list propertyNamesInCriteria as key,value>
+					<#if !value.excludedFromOrdering>
+					<#local label=value.alias!/>
 					<#if !label?has_content>
-						<#local label=entry.key/>
+						<#local label=key/>
 						<#if label?index_of('.') gt 0>
 							<#local label=label?keep_after_last('.')/>
 						</#if>
 					</#if>
-					<option value="${entry.key}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${key}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
 					</#if>
 					</#list>
 				</select>

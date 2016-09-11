@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('pageView')}</title>
 </head>
@@ -7,13 +8,13 @@
 <h4 style="text-align:center;"><#if date??>${date?string('yyyy-MM-dd')}<#else>${action.getText('total')}</#if></h4>
 <ul class="unstyled">
 	<#if dataMap??>
-	<#list dataMap?keys as key>
+	<#list dataMap as key,value>
 	<li>
 	<span style="margin-right:10px;word-break:break-all;">${key}</span>
-	<strong class="pull-right">${dataMap[key]?string}</strong>
+	<strong class="pull-right">${value?string}</strong>
 	</li>
 	</#list>
 	</#if>
 </ul>
 </body>
-</html></#escape>
+</html>

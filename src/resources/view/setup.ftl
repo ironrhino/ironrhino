@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('setup')}</title>
 <meta name="body_class" content="welcome" />
@@ -14,9 +15,10 @@
 		<#assign defaultValue = p.defaultValue!/>
 		<#if defaultValue?has_content>
 		<#assign defaultValue><@defaultValue?interpret/></#assign>
+		<#assign defaultValue=defaultValue?markup_string>
 		</#if>
 		<#if p.type=='enum'>
-		<@s.select label="%{getText('${p.label?has_content?string(p.label,p.name)}')}" name=p.name value="%{'${p.defaultValue!}'}" class="${p.cssClass}" list="@${p.parameterType.name}@values()" listKey="name" listValue="displayName" dynamicAttributes=p.dynamicAttributes/>
+		<@s.select label="%{getText('${p.label?has_content?string(p.label,p.name)}')}" name=p.name value=defaultValue! class="${p.cssClass}" list="@${p.parameterType.name}@values()" listKey="name" listValue="displayName" dynamicAttributes=p.dynamicAttributes/>
 		<#elseif p.type=='boolean'>
 		<@s.checkbox label="%{getText('${p.label?has_content?string(p.label,p.name)}')}" name=p.name class="${p.cssClass} custom" dynamicAttributes=p.dynamicAttributes/>
 		<#elseif p.type=='integer'>
@@ -33,4 +35,4 @@
 	</div>
 </div>
 </body>
-</html></#escape>
+</html>

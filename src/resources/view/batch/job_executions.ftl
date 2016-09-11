@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('jobExecution')}${action.getText('list')} - ${action.getText(jobInstance.jobName)!}</title>
 </head>
@@ -18,4 +19,4 @@
 <#assign rowDynamicAttributes=r'{"class":"${entity.status.name()?switch("COMPLETED","success","FAILED","error","STARTING","info","STARTED","info","warning")}"}'>
 <@richtable entityName="jobExecution" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons rowDynamicAttributes=rowDynamicAttributes/>
 </body>
-</html></#escape>
+</html>

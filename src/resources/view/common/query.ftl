@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('query')}</title>
 <style>
@@ -126,8 +127,8 @@ $(function(){
 			<#list resultPage.result as row>
 			<tr>
 				<td><button type="button" class="btn">${action.getText('view')}</button></td>
-				<#list row.entrySet() as entry>
-				<td>${(entry.value?string)!}</td>
+				<#list row as key,value>
+				<td>${(value?string)!}</td>
 				</#list>
 			</tr>
 			</#list>
@@ -189,6 +190,6 @@ $(function(){
 	</#if>
 </@s.form>
 </body>
-</html></#escape>
+</html>
 
 

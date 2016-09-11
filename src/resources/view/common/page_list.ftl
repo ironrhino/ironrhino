@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('page')}${action.getText('list')}</title>
 </head>
@@ -14,4 +15,4 @@
 '>
 <@richtable entityName="page" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons celleditable=false searchable=true/>
 </body>
-</html></#escape>
+</html>

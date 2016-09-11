@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('create')}${action.getText('authorization')}</title>
 </head>
@@ -24,4 +25,4 @@
 	<@s.submit value="%{getText('create')}" class="btn-primary"/>
 </@s.form>
 </body>
-</html></#escape>
+</html>

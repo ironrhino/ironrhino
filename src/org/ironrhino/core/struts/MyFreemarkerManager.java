@@ -49,7 +49,7 @@ import freemarker.template.Version;
 
 public class MyFreemarkerManager extends FreemarkerManager {
 
-	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_23;
+	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_25;
 
 	public static final BeansWrapper DEFAULT_BEANS_WRAPPER = new MyBeansWrapperBuilder(DEFAULT_VERSION).build();
 

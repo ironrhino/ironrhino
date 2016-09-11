@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('console')}</title>
 <script>
@@ -68,12 +69,12 @@ $(function(){
 <hr/>
 
 <#assign triggers = beans['applicationContextConsole'].getTriggers()>
-<#if triggers.size() gt 0>
+<#if triggers?size gt 0>
 <div id="trigger">
 	<ul class="thumbnails">
-	<#list triggers.entrySet() as entry>
+	<#list triggers as key,value>
 	<li class="span4">
-	<button type="button" class="btn btn-block" data-scope="${entry.value.name()}" data-expression="${entry.key}">${action.getText(entry.key)}</button>
+	<button type="button" class="btn btn-block" data-scope="${value.name()}" data-expression="${key}">${action.getText(key)}</button>
 	</li>
 	</#list>
 	</ul>
@@ -107,4 +108,4 @@ $(function(){
 </#if>
 </#if>
 </body>
-</html></#escape>
+</html>

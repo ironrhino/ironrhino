@@ -1,6 +1,7 @@
+<#ftl output_format='HTML'>
 <#assign view=Parameters.view!/>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title><#if schema.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('schema')}</title>
 </head>
@@ -76,6 +77,6 @@
 	<@s.submit value="%{getText('save')}" class="btn-primary"/>
 </@s.form>
 </body>
-</html></#escape>
+</html>
 
 

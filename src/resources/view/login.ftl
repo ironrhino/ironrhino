@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('login')}</title>
 <meta name="body_class" content="welcome" />
@@ -52,4 +53,4 @@
 </div>
 </#if>
 </body>
-</html></#escape>
+</html>

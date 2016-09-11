@@ -1,3 +1,4 @@
+<#ftl output_format='HTML'>
 <#if !entityName??>
 <#assign entityName=action.class.simpleName?uncap_first/>
 <#if entityName?ends_with('Action')>
@@ -6,7 +7,7 @@
 </#if>
 <#assign requestURI=request.requestURI>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('pick')}${action.getText(entityName)}</title>
 </head>
@@ -42,9 +43,8 @@
 <#elseif uiConfigs??>
 	<#assign propertyNames=uiConfigs?keys>
 	<#assign columnNames=[]>
-	<#list uiConfigs.entrySet() as entry>
-		<#assign column=entry.key>
-		<#if (column=='name' && !propertyNames?seq_contains('fullname') || column=='fullname' || column=='code' || entry.value.shownInPick || naturalIds?? && naturalIds?keys?seq_contains(column))>
+	<#list uiConfigs as column,config>
+		<#if (column=='name' && !propertyNames?seq_contains('fullname') || column=='fullname' || column=='code' || config.shownInPick || naturalIds?? && naturalIds?keys?seq_contains(column))>
 			<#assign columnNames+=[column]>
 		</#if>
 	</#list>
@@ -90,6 +90,7 @@
 				</#if>
 				<#if uiConfig.type=='dictionary'>
 					<#assign templateName><@uiConfig.templateName?interpret /></#assign>
+					<#assign templateName=templateName?markup_string/>
 					<#assign template = r'<#if displayDictionaryLabel??><@displayDictionaryLabel dictionaryName="'+templateName+r'" value=value!/><#else>${value!}</#if>'/>
 				</#if>
 			<#else>
@@ -153,4 +154,4 @@
 <@richtable entityName=entityName formid=entityName+'_pick_form' columns=columns bottomButtons=bottomButtons searchable=searchable!true readonly=true showCheckColumn=true multipleCheck=multiple columnfilterable=false resizable=false sortable=false showPageSize=false/>
 </div>
 </body>
-</html></#escape>
+</html>
