@@ -2,10 +2,12 @@ package org.ironrhino.core.service;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.model.BaseEntity;
@@ -22,6 +24,10 @@ public class Person extends BaseEntity {
 
 	@Temporal(TemporalType.DATE)
 	private Date dateOfBirth;
+
+	@Column(nullable = false)
+	@CreationTimestamp
+	private Date createDate;
 
 	public String getName() {
 		return name;
@@ -45,6 +51,14 @@ public class Person extends BaseEntity {
 
 	public void setDateOfBirth(Date dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 }

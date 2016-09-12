@@ -7,5 +7,6 @@
 -slf4j-log4j12
 +classmate
 +validation-api
++hibernate-validator
 -spring-aspects
 +spring-retry

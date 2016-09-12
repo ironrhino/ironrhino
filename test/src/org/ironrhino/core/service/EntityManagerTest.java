@@ -1,6 +1,7 @@
 package org.ironrhino.core.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class EntityManagerTest {
 		entityManager.save(person);
 		Person person2 = entityManager.get(person.getId());
 		assertEquals(Gender.MALE, person2.getGender());
+		assertNotNull(person2.getCreateDate());
 		person.setGender(Gender.FEMALE);
 		entityManager.update(person);
 		person2 = entityManager.findByNaturalId("test");
