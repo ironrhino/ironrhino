@@ -1,9 +1,18 @@
 package org.ironrhino.core.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -28,6 +37,8 @@ public class Person extends BaseEntity {
 	@Column(nullable = false)
 	@CreationTimestamp
 	private Date createDate;
+
+	transient List<String> lifyCycleEvents = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -59,6 +70,41 @@ public class Person extends BaseEntity {
 
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
+	}
+
+	@PostLoad
+	public void postLoad() {
+		lifyCycleEvents.add("PostLoad");
+	}
+
+	@PrePersist
+	public void prePersist() {
+		lifyCycleEvents.add(PrePersist.class.getSimpleName());
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		lifyCycleEvents.add(PreUpdate.class.getSimpleName());
+	}
+
+	@PreRemove
+	public void preRemove() {
+		lifyCycleEvents.add(PreRemove.class.getSimpleName());
+	}
+
+	@PostPersist
+	public void postPersist() {
+		lifyCycleEvents.add(PostPersist.class.getSimpleName());
+	}
+
+	@PostUpdate
+	public void postUpdate() {
+		lifyCycleEvents.add(PostUpdate.class.getSimpleName());
+	}
+
+	@PostRemove
+	public void postRemove() {
+		lifyCycleEvents.add(PostRemove.class.getSimpleName());
 	}
 
 }

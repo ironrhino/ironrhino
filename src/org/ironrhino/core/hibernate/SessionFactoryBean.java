@@ -28,7 +28,11 @@ import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.PostDeleteEventListener;
 import org.hibernate.event.spi.PostInsertEventListener;
+import org.hibernate.event.spi.PostLoadEventListener;
 import org.hibernate.event.spi.PostUpdateEventListener;
+import org.hibernate.event.spi.PreDeleteEventListener;
+import org.hibernate.event.spi.PreInsertEventListener;
+import org.hibernate.event.spi.PreUpdateEventListener;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.util.ClassScanner;
@@ -66,6 +70,15 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 	private Interceptor entityInterceptor;
 
 	@Autowired(required = false)
+	private List<PreInsertEventListener> preInsertEventListeners;
+
+	@Autowired(required = false)
+	private List<PreUpdateEventListener> preUpdateEventListeners;
+
+	@Autowired(required = false)
+	private List<PreDeleteEventListener> preDeleteEventListeners;
+
+	@Autowired(required = false)
 	private List<PostInsertEventListener> postInsertEventListeners;
 
 	@Autowired(required = false)
@@ -73,6 +86,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 
 	@Autowired(required = false)
 	private List<PostDeleteEventListener> postDeleteEventListeners;
+
+	@Autowired(required = false)
+	private List<PostLoadEventListener> postLoadEventListeners;
 
 	private Class<?>[] annotatedClasses;
 
@@ -174,19 +190,28 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			}
 		}
 		SessionFactory sessionFactory = sfb.buildSessionFactory();
-		if (postInsertEventListeners != null || postUpdateEventListeners != null || postDeleteEventListeners != null) {
-			SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
-			EventListenerRegistry registry = sf.getServiceRegistry().getService(EventListenerRegistry.class);
-			if (postInsertEventListeners != null)
-				registry.appendListeners(EventType.POST_INSERT,
-						postInsertEventListeners.toArray(new PostInsertEventListener[0]));
-			if (postUpdateEventListeners != null)
-				registry.appendListeners(EventType.POST_UPDATE,
-						postUpdateEventListeners.toArray(new PostUpdateEventListener[0]));
-			if (postDeleteEventListeners != null)
-				registry.appendListeners(EventType.POST_DELETE,
-						postDeleteEventListeners.toArray(new PostDeleteEventListener[0]));
-		}
+		SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
+		EventListenerRegistry registry = sf.getServiceRegistry().getService(EventListenerRegistry.class);
+		if (preInsertEventListeners != null)
+			registry.appendListeners(EventType.PRE_INSERT,
+					preInsertEventListeners.toArray(new PreInsertEventListener[0]));
+		if (preUpdateEventListeners != null)
+			registry.appendListeners(EventType.PRE_UPDATE,
+					preUpdateEventListeners.toArray(new PreUpdateEventListener[0]));
+		if (preDeleteEventListeners != null)
+			registry.appendListeners(EventType.PRE_DELETE,
+					preDeleteEventListeners.toArray(new PreDeleteEventListener[0]));
+		if (postInsertEventListeners != null)
+			registry.appendListeners(EventType.POST_INSERT,
+					postInsertEventListeners.toArray(new PostInsertEventListener[0]));
+		if (postUpdateEventListeners != null)
+			registry.appendListeners(EventType.POST_UPDATE,
+					postUpdateEventListeners.toArray(new PostUpdateEventListener[0]));
+		if (postDeleteEventListeners != null)
+			registry.appendListeners(EventType.POST_DELETE,
+					postDeleteEventListeners.toArray(new PostDeleteEventListener[0]));
+		if (postLoadEventListeners != null)
+			registry.appendListeners(EventType.POST_LOAD, postLoadEventListeners.toArray(new PostLoadEventListener[0]));
 		return sessionFactory;
 
 	}

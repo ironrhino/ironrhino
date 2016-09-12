@@ -8,6 +8,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -52,6 +60,31 @@ public class EntityManagerTest {
 		assertEquals(Gender.FEMALE, person2.getGender());
 		entityManager.delete(person2);
 		assertNull(entityManager.findByNaturalId("test"));
+	}
+	
+	@Test
+	public void testLifecyleEvents() {
+		entityManager.setEntityClass(Person.class);
+		Person person = new Person();
+		person.setName("test");
+		person.setGender(Gender.MALE);
+		person.setDateOfBirth(new Date());
+		entityManager.save(person);
+		assertEquals(2, person.lifyCycleEvents.size());
+		assertEquals(PrePersist.class.getSimpleName(), person.lifyCycleEvents.get(0));
+		assertEquals(PostPersist.class.getSimpleName(), person.lifyCycleEvents.get(1));
+		Person person2 = entityManager.get(person.getId());
+		assertEquals(1, person2.lifyCycleEvents.size());
+		assertEquals(PostLoad.class.getSimpleName(), person2.lifyCycleEvents.get(0));
+		person2.setDateOfBirth(new Date());
+		entityManager.save(person2);
+		assertEquals(3, person2.lifyCycleEvents.size());
+		assertEquals(PreUpdate.class.getSimpleName(), person2.lifyCycleEvents.get(1));
+		assertEquals(PostUpdate.class.getSimpleName(), person2.lifyCycleEvents.get(2));
+		entityManager.delete(person2);
+		assertEquals(5, person2.lifyCycleEvents.size());
+		assertEquals(PreRemove.class.getSimpleName(), person2.lifyCycleEvents.get(3));
+		assertEquals(PostRemove.class.getSimpleName(), person2.lifyCycleEvents.get(4));
 	}
 
 	@Test
