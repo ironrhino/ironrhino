@@ -1,7 +1,27 @@
 (function($) {
 	$.ajaxupload = function(files, options) {
-		if (!files)
-			return false;
+		if (!files.length) {
+			options = files;
+			files = null;
+			if (!options)
+				return false;
+			if (options.target && options.target.tagName == 'FORM') {
+				options.name = [];
+				files = [];
+				$('input[type="file"]', options.target).each(function() {
+							if (!this.name)
+								return;
+							var fs = this.files;
+							if (fs && fs.length > 0)
+								for (var i = 0; i < fs.length; i++) {
+									options.name.push(this.name);
+									files.push(fs[i]);
+								}
+						});
+			} else {
+				return false;
+			}
+		}
 		var _options = {
 			name : 'file'
 		};
@@ -11,6 +31,12 @@
 		if (typeof options.beforeSerialize == 'function') {
 			if (options.beforeSerialize() === false)
 				return false;
+		}
+		if (!(options.name instanceof Array)) {
+			var arr = [];
+			for (var i = 0; i < files.length; i++)
+				arr[i] = options.name;
+			options.name = arr;
 		}
 
 		var progress;
@@ -48,6 +74,8 @@
 				if (xhr.status == 200 || xhr.status == 304) {
 					if (!files.length)
 						Indicator.hide();
+					if (options.target && options.target.tagName == 'FORM')
+						$('input[type="file"]', options.target).val('');
 					var data = xhr.responseText;
 					if (data.indexOf('[') == 0 || data.indexOf('{') == 0)
 						data = $.parseJSON(data);
@@ -88,11 +116,12 @@
 		if (!!window.FormData) {
 			var formData = new FormData();
 			for (var i = 0; i < files.length; i++)
-				formData.append(options.name, files[i]);
+				formData.append(options.name[i], files[i]);
 			if (options.target && options.target.tagName == 'FORM') {
 				$(':input', options.target).each(function(i, v) {
-					if (!(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
-							&& !this.checked))
+					if (this.name
+							&& !(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
+									&& !this.checked))
 						formData.append(this.name, fieldValue(this));
 				});
 			} else if (options.data)
@@ -121,13 +150,15 @@
 					var f = files[i];
 					var reader = new FileReader();
 					reader.sourceFile = f;
+					reader.name = options.name[i];
 					var completed = 0;
 					var boundary = 'xxxxxxxxx';
 					var body = new BlobBuilder();
 					if (options.target && options.target.tagName == 'FORM') {
 						$(':input', options.target).each(function(i, v) {
-							if (!(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
-									&& !this.checked)) {
+							if (this.name
+									&& !(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
+											&& !this.checked)) {
 								var bb = new BlobBuilder();
 								bb.append('--');
 								bb.append(boundary);
@@ -162,7 +193,7 @@
 						bb.append(boundary);
 						bb.append('\r\n');
 						bb.append('Content-Disposition: form-data; name=');
-						bb.append(options.name);
+						bb.append(reader.name);
 						bb.append('; filename=');
 						bb.append(f.name);
 						bb.append('\r\n');
@@ -230,7 +261,7 @@
 				bb.append(boundary);
 				bb.append('\r\n');
 				bb.append('Content-Disposition: form-data; name=');
-				bb.append(name);
+				bb.append(name[i]);
 				bb.append('; filename=');
 				bb.append(files[i].name);
 				bb.append('\r\n');
