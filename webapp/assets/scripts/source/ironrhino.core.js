@@ -900,7 +900,10 @@ Initialization.common = function() {
 	}).on('click', '.layout-change', function() {
 		var fluidLayout = 'false' != $.cookie('fluidLayout')
 				&& $('#content').hasClass('container-fluid');
-		$.cookie('fluidLayout', !fluidLayout);
+		$.cookie('fluidLayout', !fluidLayout, {
+					path : CONTEXT_PATH || '/',
+					expires : 365
+				});
 		document.location.reload();
 		return false;
 	});
