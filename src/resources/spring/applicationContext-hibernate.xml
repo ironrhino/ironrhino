@@ -35,6 +35,9 @@
 				<prop key="hibernate.jdbc.batch_size">
 					${hibernate.jdbc.batch_size:50}
 				</prop>
+				<prop key="hibernate.jdbc.batch_versioned_data">
+					${hibernate.jdbc.batch_versioned_data:true}
+				</prop>
 				<prop key="hibernate.auto_quote_keyword">
 					${hibernate.auto_quote_keyword:true}
 				</prop>

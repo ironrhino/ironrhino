@@ -1,6 +1,9 @@
 package org.ironrhino.core.hibernate;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,6 +15,7 @@ import java.util.Properties;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import javax.persistence.Entity;
+import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.ConnectionReleaseMode;
@@ -35,6 +39,7 @@ import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
+import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +98,14 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 	private Class<?>[] annotatedClasses;
 
 	private String excludeFilter;
+
+	private DataSource dataSource;
+
+	@Override
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+		super.setDataSource(dataSource);
+	}
 
 	public void setExcludeFilter(String excludeFilter) {
 		this.excludeFilter = excludeFilter;
@@ -162,6 +175,22 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		}
 		if (entityInterceptor != null)
 			setEntityInterceptor(entityInterceptor);
+		Properties props = getHibernateProperties();
+		String value = props.getProperty(AvailableSettings.BATCH_VERSIONED_DATA);
+		if ("true".equals(value)) {
+			try (Connection conn = dataSource.getConnection()) {
+				DatabaseMetaData dbmd = conn.getMetaData();
+				DatabaseProduct dp = DatabaseProduct.parse(dbmd.getDatabaseProductName());
+				if (dp == DatabaseProduct.ORACLE) {
+					props.put(AvailableSettings.BATCH_VERSIONED_DATA, "false");
+					logger.warn(
+							"Override {} to false because this driver returns incorrect row counts from executeBatch()",
+							AvailableSettings.BATCH_VERSIONED_DATA);
+				}
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
 		super.afterPropertiesSet();
 	}
 
