@@ -27,10 +27,10 @@ import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManager {
 
 	@Autowired(required = false)

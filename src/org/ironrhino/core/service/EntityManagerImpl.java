@@ -3,10 +3,10 @@ package org.ironrhino.core.service;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 @Primary
-@Component
+@Service
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class EntityManagerImpl<T extends Persistable<?>> extends BaseManagerImpl<T> implements EntityManager<T> {
 

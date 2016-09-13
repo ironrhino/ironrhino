@@ -8,10 +8,10 @@ import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.security.oauth.server.model.Client;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 public class ClientManagerImpl extends BaseManagerImpl<Client> implements ClientManager {
 
 	@Override

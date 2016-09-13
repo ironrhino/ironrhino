@@ -8,10 +8,10 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.common.model.AuditEvent;
 import org.ironrhino.core.service.BaseManagerImpl;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 public class AuditEventManagerImpl extends BaseManagerImpl<AuditEvent> implements AuditEventManager {
 
 	@Override

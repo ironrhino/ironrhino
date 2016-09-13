@@ -2,9 +2,9 @@ package org.ironrhino.common.service;
 
 import org.ironrhino.common.model.Schema;
 import org.ironrhino.core.service.BaseManagerImpl;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class SchemaManagerImpl extends BaseManagerImpl<Schema> implements SchemaManager {
 
 }

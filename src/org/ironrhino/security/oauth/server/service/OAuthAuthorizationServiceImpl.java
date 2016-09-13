@@ -6,9 +6,9 @@ import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class OAuthAuthorizationServiceImpl implements OAuthAuthorizationService {
 
 	@Autowired
