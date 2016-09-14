@@ -68,6 +68,14 @@
 			<result name="dynamicreports" type="dynamicreports" />
 			<result name="qrcode" type="qrcode" />
 			<result name="error" type="autoconfig" />
+			<result name="jasper" type="jasperreports">
+				<param name="reportParameters">reportParameters</param>
+				<param name="contentDisposition">inline</param>
+				<param name="dataSource">list</param>
+				<param name="format">${format}</param>
+				<param name="location">${location}</param>
+				<param name="documentName">${documentName}</param>
+			</result>
 		</global-results>
 	</package>
 </struts>
