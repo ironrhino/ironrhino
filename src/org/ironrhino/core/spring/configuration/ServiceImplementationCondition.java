@@ -1,6 +1,8 @@
 package org.ironrhino.core.spring.configuration;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,21 +37,7 @@ class ServiceImplementationCondition implements Condition {
 				if (serviceInterface != void.class) {
 					serviceInterfaceName = serviceInterface.getName();
 				} else {
-					try {
-						ClassPool classPool = ClassPool.getDefault();
-						classPool.insertClassPath(new ClassClassPath(this.getClass()));
-						CtClass cc = classPool.get(className);
-						while (!cc.getName().equals(Object.class.getName())) {
-							CtClass[] interfaces = cc.getInterfaces();
-							if (interfaces.length > 0) {
-								serviceInterfaceName = interfaces[0].getName();
-								break;
-							}
-							cc = cc.getSuperclass();
-						}
-					} catch (Throwable e) {
-						e.printStackTrace();
-					}
+					serviceInterfaceName = findMostMatchedInterface(className);
 				}
 				if (serviceInterfaceName != null) {
 					String implementationClassName = AppInfo.getApplicationContextProperties()
@@ -75,6 +63,44 @@ class ServiceImplementationCondition implements Condition {
 			}
 		}
 		return true;
+	}
+
+	private String findMostMatchedInterface(String className) {
+		List<String> interfaceNames = new ArrayList<>();
+		try {
+			ClassPool classPool = ClassPool.getDefault();
+			classPool.insertClassPath(new ClassClassPath(getClass()));
+			CtClass cc = classPool.get(className);
+			while (!cc.getName().equals(Object.class.getName())) {
+				CtClass[] interfaces = cc.getInterfaces();
+				for (CtClass ct : interfaces)
+					interfaceNames.add(ct.getName());
+				cc = cc.getSuperclass();
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		for (String interfaceName : interfaceNames) {
+			String simpleInterfaceName = interfaceName.substring(interfaceName.lastIndexOf('.') + 1);
+			String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+			String interfacePackage = interfaceName.substring(0, interfaceName.lastIndexOf('.'));
+			String classPackage = className.substring(0, className.lastIndexOf('.'));
+			if (classPackage.startsWith(interfacePackage) && simpleClassName.contains(simpleInterfaceName))
+				return interfaceName;
+		}
+		for (String interfaceName : interfaceNames) {
+			String simpleInterfaceName = interfaceName.substring(interfaceName.lastIndexOf('.') + 1);
+			String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+			if (simpleClassName.contains(simpleInterfaceName))
+				return interfaceName;
+		}
+		for (String interfaceName : interfaceNames) {
+			String interfacePackage = interfaceName.substring(0, interfaceName.lastIndexOf('.'));
+			String classPackage = className.substring(0, className.lastIndexOf('.'));
+			if (classPackage.startsWith(interfacePackage))
+				return interfaceName;
+		}
+		return null;
 	}
 
 }
