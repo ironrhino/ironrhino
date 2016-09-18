@@ -1426,29 +1426,31 @@ Observation.common = function(container) {
 						var html = data
 								.replace(/<script(.|\s)*?\/script>/g, '');
 						var div = $('<div/>').html(html);
-						var title = $('title', div).html();
-						var body = $('#content', div).html();
-						var modalwidth = t.data('modalwidth');
-						$('<div id="'
-								+ id
-								+ '" class="modal pop hide fade in"'
-								+ (modalwidth ? ' style="width:' + modalwidth
-										+ ';"' : '')
-								+ '><div class="modal-header"><a class="close" data-dismiss="modal">&times;</a><h3 style="text-align:center;">'
-								+ title + '</h3></div><div class="modal-body">'
-								+ body + '</div></div>')
+						var modal = $('<div class="modal pop hide fade in"><div class="modal-header"><h3 style="text-align:center;"></h3></div><div class="modal-body"></div></div>')
 								.appendTo(document.body);
-						_observe($('#' + id));
-						$('form', $('#' + id)).each(function() {
+						modal.attr('id', id);
+						var modalwidth = t.data('modalwidth');
+						if (modalwidth)
+							modal.width(modalwidth);
+						modal.find('.modal-header h3').append($('title', div)
+								.html());
+						modal.find('.modal-body').append($('#content', div)
+								.html());
+						if (!modal.find('.custom-dialog-close').length)
+							modal
+									.find('.modal-header')
+									.prepend('<a class="close" data-dismiss="modal">&times;</a>');
+						_observe(modal);
+						$('form', modal).each(function() {
 									this.onsuccess = function() {
-										$('#' + id).modal('hide');
+										modal.modal('hide');
 									};
 								});
 						t.data('originalhref', t.attr('href')).attr('href',
 								'#' + id).attr('data-toggle', 'modal');
-						$('#' + id).modal('show');
+						modal.modal('show');
 						if (t.hasClass('nocache'))
-							$('#' + id).on('hidden', function() {
+							modal.on('hidden', function() {
 										t.attr('href', t.data('originalhref'));
 										$(this).remove();
 									})
