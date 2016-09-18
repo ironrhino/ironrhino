@@ -5,10 +5,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 	<context:property-placeholder ignore-resource-not-found="true" location="classpath:resources/spring/applicationContext.properties,classpath:resources/spring/applicationContext.${STAGE}.properties,file:///${app.home}/conf/applicationContext.properties,file:${app.home}/conf/applicationContext.${STAGE}.properties"/>
 	<context:annotation-config />
-	<bean id="userServiceHessian" class="org.ironrhino.core.remoting.client.HessianClient"
-		p:serviceInterface="org.ironrhino.security.service.UserService"
-		p:host="localhost" />
-	<bean id="userServiceHttpInvoker" class="org.ironrhino.core.remoting.client.HttpInvokerClient"
+	<bean id="userService" class="org.ironrhino.core.remoting.client.HttpInvokerClient"
 		p:serviceInterface="org.ironrhino.security.service.UserService"
 		p:host="localhost" />
 </beans>
