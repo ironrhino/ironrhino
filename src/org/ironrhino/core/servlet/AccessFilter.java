@@ -163,7 +163,7 @@ public class AccessFilter implements Filter {
 			if (httpSessionManager != null) {
 				sessionId = httpSessionManager.getSessionId(request);
 			}
-			String requestId = MDC.get(MDC_KEY_REQUEST_ID);
+			String requestId = (String) request.getAttribute(HTTP_HEADER_REQUEST_ID);
 			if (requestId == null) {
 				requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
 				if (StringUtils.isBlank(requestId)) {
@@ -172,6 +172,7 @@ public class AccessFilter implements Filter {
 						requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
 					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 				}
+				request.setAttribute(HTTP_HEADER_REQUEST_ID, requestId);
 				MDC.put(MDC_KEY_REQUEST_ID, requestId);
 				MDC.put(MDC_KEY_REQUEST, " " + MDC_KEY_REQUEST + ":" + requestId);
 			}
