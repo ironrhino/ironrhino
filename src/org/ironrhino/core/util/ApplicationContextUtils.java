@@ -9,6 +9,7 @@ import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.servlet.AppInfoListener;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.ResolvableType;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class ApplicationContextUtils {
@@ -44,7 +45,13 @@ public class ApplicationContextUtils {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Persistable<?>> BaseManager<T> getEntityManager(Class<T> entityClass) {
-		String entityManagerName = StringUtils.uncapitalize(entityClass.getSimpleName()) + "Manager";
+		String[] beanNames = getApplicationContext()
+				.getBeanNamesForType(ResolvableType.forClassWithGenerics(BaseManager.class, entityClass));
+		String entityManagerName;
+		if (beanNames.length == 1)
+			entityManagerName = beanNames[0];
+		else
+			entityManagerName = StringUtils.uncapitalize(entityClass.getSimpleName()) + "Manager";
 		try {
 			return (BaseManager<T>) getApplicationContext().getBean(entityManagerName);
 		} catch (NoSuchBeanDefinitionException e) {
