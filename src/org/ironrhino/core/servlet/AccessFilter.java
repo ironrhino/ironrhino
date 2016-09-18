@@ -34,8 +34,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccessFilter implements Filter {
 
+	public static final String HTTP_HEADER_INSTANCE_ID = "X-Instance-Id";
 	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-Id";
 	public static final String MDC_KEY_REQUEST_ID = "requestId";
+	public static final String MDC_KEY_REQUEST = "request";
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -100,7 +102,7 @@ public class AccessFilter implements Filter {
 		RequestContext.set(request, response);
 		try {
 			if (isRequestDispatcher && RequestUtils.isInternalTesting(request))
-				response.addHeader("X-Instance-Id", AppInfo.getInstanceId());
+				response.addHeader(HTTP_HEADER_INSTANCE_ID, AppInfo.getInstanceId());
 
 			String uri = request.getRequestURI();
 			uri = uri.substring(request.getContextPath().length());
@@ -161,20 +163,18 @@ public class AccessFilter implements Filter {
 			if (httpSessionManager != null) {
 				sessionId = httpSessionManager.getSessionId(request);
 			}
-			String requestId = (String) request.getAttribute(MDC_KEY_REQUEST_ID);
+			String requestId = MDC.get(MDC_KEY_REQUEST_ID);
 			if (requestId == null) {
 				requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
 				if (StringUtils.isBlank(requestId)) {
 					requestId = CodecUtils.nextId();
-					if (sessionId != null) {
+					if (sessionId != null)
 						requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
-					}
 					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 				}
-				request.setAttribute(MDC_KEY_REQUEST_ID, requestId);
+				MDC.put(MDC_KEY_REQUEST_ID, requestId);
+				MDC.put(MDC_KEY_REQUEST, " " + MDC_KEY_REQUEST + ":" + requestId);
 			}
-			MDC.put("request", " request:" + requestId);
-			MDC.put(MDC_KEY_REQUEST_ID, requestId);
 			try {
 				if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")
 						&& request.getHeader("Last-Event-Id") == null)
