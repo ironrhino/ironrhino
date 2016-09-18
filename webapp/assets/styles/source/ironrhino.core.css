@@ -388,6 +388,7 @@ div.text-core{
 
 .modal-close .close{
     width: 20px;
+    font-family: Tahoma, 'Microsoft Yahei', sans-serif;
 }
 .modal-close ~ .modal-body{
 	margin-top: 20px;
