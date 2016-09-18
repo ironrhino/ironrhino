@@ -259,9 +259,12 @@ public class DateUtils {
 	public static String duration(Date start, Date end) {
 		if (start == null || end == null || start.after(end))
 			return null;
-		int delta = (int) (end.getTime() / 1000 - start.getTime() / 1000);
-		if (delta == 0)
-			return "00:00:00";
+		int delta = (int) (end.getTime() - start.getTime());
+		if (delta < 1000)
+			return delta + " ms";
+		delta /= 1000;
+		if (delta < 60)
+			return delta + " s";
 		int hours = delta / 3600;
 		delta -= hours * 3600;
 		int minutes = delta / 60;
