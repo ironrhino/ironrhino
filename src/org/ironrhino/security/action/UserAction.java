@@ -15,7 +15,6 @@ import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.Authorize;
-import org.ironrhino.core.metadata.CurrentPassword;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.LabelValue;
@@ -64,6 +63,9 @@ public class UserAction extends EntityAction<User> {
 
 	@Value("${user.password.readonly:false}")
 	private boolean userPasswordReadonly;
+
+	@Value("${user.password.currentPasswordNeeded:true}")
+	private boolean userCurrentPasswordNeeded;
 
 	@Autowired
 	private transient UserManager userManager;
@@ -118,6 +120,10 @@ public class UserAction extends EntityAction<User> {
 
 	public boolean isUserPasswordReadonly() {
 		return userPasswordReadonly;
+	}
+
+	public boolean isUserCurrentPasswordNeeded() {
+		return userCurrentPasswordNeeded;
 	}
 
 	@Override
@@ -255,7 +261,6 @@ public class UserAction extends EntityAction<User> {
 
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	@InputConfig(resultName = "password")
-	@CurrentPassword
 	@Validations(requiredStrings = {
 			@RequiredStringValidator(type = ValidatorType.FIELD, trim = true, fieldName = "password", key = "validation.required") }, expressions = {
 					@ExpressionValidator(expression = "password == confirmPassword", key = "validation.repeat.not.matched") })
@@ -268,6 +273,13 @@ public class UserAction extends EntityAction<User> {
 		if (user != null) {
 			if (passwordStrengthChecker != null)
 				passwordStrengthChecker.check(user, password);
+			if (isUserCurrentPasswordNeeded()) {
+				boolean valid = currentPassword != null && AuthzUtils.isPasswordValid(currentPassword);
+				if (!valid) {
+					addFieldError("currentPassword", getText("currentPassword.error"));
+					return "password";
+				}
+			}
 			user.setLegiblePassword(password);
 			userManager.save(user);
 			addActionMessage(getText("save.success"));
