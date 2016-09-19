@@ -58,6 +58,9 @@ public class UserAction extends EntityAction<User> {
 
 	private String confirmPassword;
 
+	@Value("${login.defaultTargetUrl:/}")
+	private String defaultTargetUrl;
+
 	@Value("${user.profile.readonly:false}")
 	private boolean userProfileReadonly;
 
@@ -280,12 +283,17 @@ public class UserAction extends EntityAction<User> {
 					return "password";
 				}
 			}
+			boolean passwordExpired = !user.isCredentialsNonExpired();
 			user.setLegiblePassword(password);
 			userManager.save(user);
 			addActionMessage(getText("save.success"));
 			eventPublisher.publish(
 					new PasswordChangedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),
 					Scope.LOCAL);
+			if (passwordExpired) {
+				targetUrl = defaultTargetUrl;
+				return REDIRECT;
+			}
 		}
 		return "password";
 	}
