@@ -48,6 +48,7 @@ public class BaseAction extends ActionSupport {
 	public static final String REFERER = "referer";
 	public static final String JSON = "json";
 	public static final String DYNAMICREPORTS = "dynamicreports";
+	public static final String JASPER = "jasper";
 	public static final String QRCODE = "qrcode";
 	public static final String REDIRECT = "redirect";
 	public static final String SUGGEST = "suggest";
