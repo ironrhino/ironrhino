@@ -215,7 +215,7 @@ public class SignupAction extends BaseAction {
 			user.setPassword(password);
 			Map<String, Object> model = new HashMap<>(4);
 			model.put("user", user);
-			model.put("url", StringUtils.isNoneBlank(passwordEntryPoint) ? passwordEntryPoint : "/user/password");
+			model.put("url", StringUtils.isNotBlank(passwordEntryPoint) ? passwordEntryPoint : "/user/password");
 			SimpleMailMessage smm = new SimpleMailMessage();
 			smm.setTo(user + "<" + user.getEmail() + ">");
 			smm.setSubject(getText("mail.subject.user_forgot"));

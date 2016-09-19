@@ -62,7 +62,7 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 	@Override
 	public Connection getConnection(String tenantIdentifier) throws SQLException {
 		Connection connection = dataSource.getConnection();
-		if (StringUtils.isNoneBlank(tenantIdentifier)) {
+		if (StringUtils.isNotBlank(tenantIdentifier)) {
 			if (useCatalog) {
 				String catalog = connection.getCatalog();
 				connection.setClientInfo(CLIENT_INFO_KEY_IDENTIFIER, catalog);
