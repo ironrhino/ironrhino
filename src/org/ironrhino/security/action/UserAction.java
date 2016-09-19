@@ -23,6 +23,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleFilter;
 import org.ironrhino.core.security.role.UserRoleManager;
+import org.ironrhino.core.spring.security.password.PasswordStrengthChecker;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
@@ -72,6 +73,9 @@ public class UserAction extends EntityAction<User> {
 
 	@Autowired(required = false)
 	private transient UserRoleFilter userRoleFilter;
+
+	@Autowired(required = false)
+	private transient PasswordStrengthChecker passwordStrengthChecker;
 
 	@Autowired
 	protected transient EventPublisher eventPublisher;
@@ -262,6 +266,8 @@ public class UserAction extends EntityAction<User> {
 		}
 		User user = AuthzUtils.getUserDetails();
 		if (user != null) {
+			if (passwordStrengthChecker != null)
+				passwordStrengthChecker.check(user, password);
 			user.setLegiblePassword(password);
 			userManager.save(user);
 			addActionMessage(getText("save.success"));
