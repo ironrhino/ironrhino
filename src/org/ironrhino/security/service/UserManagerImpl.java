@@ -35,7 +35,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 	@Autowired(required = false)
 	private List<UserRoleMapper> userRoleMappers;
 
-	@Value("${userManager.passwordExpiresInDays:0}")
+	@Value("${user.password.expiresInDays:0}")
 	private int passwordExpiresInDays;
 
 	@Value("${userManager.cacheNamespace:" + DEFAULT_CACHE_NAMESPACE + "}")
