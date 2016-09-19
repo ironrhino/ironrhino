@@ -14,6 +14,7 @@ import org.ironrhino.core.util.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,9 @@ public class ErrorAction extends BaseAction {
 	private static Logger logger = LoggerFactory.getLogger(ErrorAction.class);
 
 	private Throwable exception;
+
+	@Value("${password.entryPoint:}")
+	private String passwordEntryPoint;
 
 	@Autowired(required = false)
 	private HttpErrorHandler httpErrorHandler;
@@ -47,7 +51,10 @@ public class ErrorAction extends BaseAction {
 			if (exception instanceof CredentialsExpiredException) {
 				UserDetails ud = AuthzUtils.getUserDetails();
 				if (ud != null) {
-					targetUrl = "/" + StringUtils.uncapitalize(ud.getClass().getSimpleName()) + "/password";
+					if (StringUtils.isNotBlank(passwordEntryPoint))
+						targetUrl = passwordEntryPoint;
+					else
+						targetUrl = "/" + StringUtils.uncapitalize(ud.getClass().getSimpleName()) + "/password";
 					return REDIRECT;
 				}
 			}
@@ -84,10 +91,10 @@ public class ErrorAction extends BaseAction {
 		response.setCharacterEncoding("utf-8"); // fix for jetty
 		return result;
 	}
-	
+
 	@Deprecated
 	public String handle() {
 		return execute();
 	}
-	
+
 }

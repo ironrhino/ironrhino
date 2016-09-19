@@ -11,6 +11,7 @@ import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
@@ -26,6 +27,9 @@ import org.springframework.stereotype.Component;
 public class SessionCompressorManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
+
+	@Value("${password.entryPoint:}")
+	private String passwordEntryPoint;
 
 	@Autowired(required = false)
 	private List<SessionCompressor> compressors;
@@ -104,7 +108,9 @@ public class SessionCompressorManager {
 									} else if (!ud.isAccountNonLocked()) {
 										throw new LockedException(username);
 									} else if (!ud.isCredentialsNonExpired()) {
-										if (!uri.endsWith("/password") && !uri.startsWith("/assets/"))
+										boolean isPasswordEntryPoint = StringUtils.isNotBlank(passwordEntryPoint)
+												? uri.equals(passwordEntryPoint) : uri.endsWith("/password");
+										if (!isPasswordEntryPoint && !uri.startsWith("/assets/"))
 											throw new CredentialsExpiredException(username);
 									}
 								}

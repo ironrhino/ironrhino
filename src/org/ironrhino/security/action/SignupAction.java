@@ -28,6 +28,7 @@ import org.ironrhino.security.service.UserManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -53,6 +54,9 @@ public class SignupAction extends BaseAction {
 	private String password;
 
 	private String confirmPassword;
+
+	@Value("${password.entryPoint:}")
+	private String passwordEntryPoint;
 
 	@Autowired
 	private transient UserManager userManager;
@@ -211,7 +215,7 @@ public class SignupAction extends BaseAction {
 			user.setPassword(password);
 			Map<String, Object> model = new HashMap<>(4);
 			model.put("user", user);
-			model.put("url", "/user/password");
+			model.put("url", StringUtils.isNoneBlank(passwordEntryPoint) ? passwordEntryPoint : "/user/password");
 			SimpleMailMessage smm = new SimpleMailMessage();
 			smm.setTo(user + "<" + user.getEmail() + ">");
 			smm.setSubject(getText("mail.subject.user_forgot"));
