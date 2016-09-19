@@ -50,7 +50,7 @@
 		<constructor-arg ref="userDetailsService" />
 	</bean>
 
-	<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.MixedPasswordEncoder" />
+	<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MixedPasswordEncoder" />
 
 	<!-- <bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MultiVersionPasswordEncoder" 
 		> <property name="versions"> <list> <bean class="org.ironrhino.core.spring.security.password.V1PasswordEncoder"/> 
