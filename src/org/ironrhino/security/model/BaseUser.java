@@ -14,6 +14,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
@@ -84,7 +85,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@JsonIgnore
 	@UiConfig(hidden = true)
 	@Transient
-	private boolean passwordExpired;
+	private int passwordExpiresInDays;
 
 	@NotInCopy
 	@JsonIgnore
@@ -201,12 +202,12 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 		this.passwordModifyDate = passwordModifyDate;
 	}
 
-	public boolean isPasswordExpired() {
-		return passwordExpired;
+	public int getPasswordExpiresInDays() {
+		return passwordExpiresInDays;
 	}
 
-	public void setPasswordExpired(boolean passwordExpired) {
-		this.passwordExpired = passwordExpired;
+	public void setPasswordExpiresInDays(int passwordExpiresInDays) {
+		this.passwordExpiresInDays = passwordExpiresInDays;
 	}
 
 	@Override
@@ -233,7 +234,8 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@Override
 	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
-		return !isPasswordExpired();
+		return passwordModifyDate == null || passwordExpiresInDays <= 0
+				|| DateUtils.addDays(passwordModifyDate, passwordExpiresInDays).after(new Date());
 	}
 
 	public boolean isPasswordValid(String legiblePassword) {

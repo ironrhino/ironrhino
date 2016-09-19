@@ -4,11 +4,9 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.cache.CheckCache;
@@ -104,10 +102,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 			return null; // for @CheckCache
 		}
 		if (passwordExpiresInDays > 0) {
-			Date passwordModifyDate = user.getPasswordModifyDate();
-			if (passwordModifyDate != null
-					&& DateUtils.addDays(passwordModifyDate, passwordExpiresInDays).before(new Date()))
-				user.setPasswordExpired(true);
+			user.setPasswordExpiresInDays(passwordExpiresInDays);
 		}
 		populateAuthorities(user);
 		return user;
