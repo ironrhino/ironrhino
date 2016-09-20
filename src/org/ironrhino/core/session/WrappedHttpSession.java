@@ -46,8 +46,6 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private int minActiveInterval;
 
-	private boolean dirty;
-
 	private boolean isnew;
 
 	private boolean fromCookie = true;
@@ -140,7 +138,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	public void setAttribute(String key, Object object) {
 		attrMap.put(key, object);
-		dirty = true;
+		setDirty(true);
 	}
 
 	@Override
@@ -151,7 +149,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	public void removeAttribute(String key) {
 		attrMap.remove(key);
-		dirty = true;
+		setDirty(true);
 	}
 
 	@Override
@@ -219,11 +217,14 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	}
 
 	public boolean isDirty() {
-		return dirty;
+		return Boolean.TRUE.equals(request.getAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY));
 	}
 
 	public void setDirty(boolean dirty) {
-		this.dirty = dirty;
+		if (dirty)
+			request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY, true);
+		else
+			request.removeAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY);
 	}
 
 	public String getSessionTracker() {

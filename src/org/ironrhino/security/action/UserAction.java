@@ -22,6 +22,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleFilter;
 import org.ironrhino.core.security.role.UserRoleManager;
+import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.security.password.PasswordStrengthChecker;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.AuthzUtils;
@@ -290,6 +291,8 @@ public class UserAction extends EntityAction<User> {
 			eventPublisher.publish(
 					new PasswordChangedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),
 					Scope.LOCAL);
+			ServletActionContext.getRequest().setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY,
+					true);
 			if (passwordExpired) {
 				targetUrl = defaultTargetUrl;
 				return REDIRECT;
