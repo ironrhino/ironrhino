@@ -104,6 +104,9 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
+		String requestChain = MDC.get(AccessFilter.MDC_KEY_REQUEST_CHAIN);
+		if (requestChain != null)
+			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		Map<String, String> ctx = RemotingContext.getContext();
 		if (ctx != null) {
 			for (Map.Entry<String, String> entry : ctx.entrySet())

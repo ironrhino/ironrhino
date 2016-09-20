@@ -37,7 +37,8 @@ public class AccessFilter implements Filter {
 	public static final String HTTP_HEADER_INSTANCE_ID = "X-Instance-Id";
 	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-Id";
 	public static final String MDC_KEY_REQUEST_ID = "requestId";
-	public static final String MDC_KEY_REQUEST = "request";
+	public static final String HTTP_HEADER_REQUEST_CHAIN = "X-Request-Chain";
+	public static final String MDC_KEY_REQUEST_CHAIN = "requestChain";
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -165,16 +166,29 @@ public class AccessFilter implements Filter {
 			}
 			String requestId = (String) request.getAttribute(HTTP_HEADER_REQUEST_ID);
 			if (requestId == null) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(" request:");
+				String requestChain = null;
 				requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
 				if (StringUtils.isBlank(requestId)) {
 					requestId = CodecUtils.nextId();
+					requestChain = requestId.substring(14);
 					if (sessionId != null)
 						requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
 					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 				}
 				request.setAttribute(HTTP_HEADER_REQUEST_ID, requestId);
 				MDC.put(MDC_KEY_REQUEST_ID, requestId);
-				MDC.put(MDC_KEY_REQUEST, " " + MDC_KEY_REQUEST + ":" + requestId);
+				sb.append(requestId);
+				String originalChain = request.getHeader(HTTP_HEADER_REQUEST_CHAIN);
+				if (originalChain != null) {
+					requestChain = new StringBuilder(originalChain).append('.')
+							.append(requestChain != null ? requestChain : CodecUtils.nextId().substring(14)).toString();
+					sb.append(" chain:");
+					sb.append(requestChain);
+				}
+				MDC.put(MDC_KEY_REQUEST_CHAIN, requestChain);
+				MDC.put("request", sb.toString());
 			}
 			try {
 				if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")

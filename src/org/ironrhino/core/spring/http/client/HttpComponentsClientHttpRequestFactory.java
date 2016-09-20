@@ -59,6 +59,9 @@ public class HttpComponentsClientHttpRequestFactory
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			request.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
+		String requestChain = MDC.get(AccessFilter.MDC_KEY_REQUEST_CHAIN);
+		if (requestChain != null)
+			request.addHeader(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 	}
 
 }

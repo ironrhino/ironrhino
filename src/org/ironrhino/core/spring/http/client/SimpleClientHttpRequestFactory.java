@@ -59,5 +59,8 @@ public class SimpleClientHttpRequestFactory extends org.springframework.http.cli
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			connection.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
+		String requestChain = MDC.get(AccessFilter.MDC_KEY_REQUEST_CHAIN);
+		if (requestChain != null)
+			connection.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 	}
 }

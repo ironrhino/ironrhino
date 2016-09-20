@@ -28,6 +28,9 @@ public class SimpleHttpInvokerRequestExecutor
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			con.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
+		String requestChain = MDC.get(AccessFilter.MDC_KEY_REQUEST_CHAIN);
+		if (requestChain != null)
+			con.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		Map<String, String> map = RemotingContext.getContext();
 		if (map != null) {
 			for (Map.Entry<String, String> entry : map.entrySet())
