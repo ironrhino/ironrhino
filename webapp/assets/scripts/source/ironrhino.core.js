@@ -606,8 +606,12 @@ Ajax = {
 						r.html(div.find('#content').html());
 					else if (div.find('body').length)
 						r.html(div.find('body').html());
-					else
+					else {
+						if (html.indexOf('<body>') > 0)
+							html = html.substring(html.indexOf('<body>') + 6,
+									html.indexOf('</body>'));
 						r.html(html);
+					}
 				}
 				if (!options.quiet && (typeof $.effects != 'undefined'))
 					r.effect('highlight');

@@ -190,6 +190,8 @@ Richtable = {
 							btn.prop('disabled', true).addClass('loading');
 						},
 						complete : function() {
+							if (!useiframe)
+								win.find('.loading-indicator').remove();
 							btn.prop('disabled', false).removeClass('loading');
 						}
 					});
@@ -210,8 +212,9 @@ Richtable = {
 			if (win.html() && typeof $.fn.mask != 'undefined')
 				win.mask(MessageBundle.get('ajax.loading'));
 			else
-				win.html('<div style="text-align:center;">'
-						+ MessageBundle.get('ajax.loading') + '</div>');
+				win
+						.html('<div class="loading-indicator" style="text-align:center;">'
+								+ MessageBundle.get('ajax.loading') + '</div>');
 		var opt = {
 			minHeight : 600,
 			width : 700,

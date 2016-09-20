@@ -3,6 +3,8 @@
 <html>
 <head>
 <title>${action.getText('error.occur')}</title>
+<#if !ajax?? || !ajax>
+<meta name="decorator" content="none"/>
 <style>
 			*{
 				margin:0;
@@ -60,13 +62,22 @@
 				color:white;
 			}
 </style>
+</#if>
 </head>
 <body>
 <#assign exception=request.getAttribute('javax.servlet.error.exception')!>
+<#if !ajax?? || !ajax>
 <p class="error-code">500</p>
 <p class="error-occur">${action.getText('error.occur')}</p>
 <div class="clear"></div>
 <div class="content">
+	<#if action.hasActionErrors()>
+	<#list action.actionErrors as error>
+		<#if error?has_content>
+           <p>${error}</p>
+        </#if>
+	</#list>
+	</#if>
 	<#if exception?has_content>
 	<pre>	${statics['org.ironrhino.core.util.ExceptionUtils'].getStackTraceAsString(exception)!}</pre>
 	</br>
@@ -74,6 +85,8 @@
 	<a href="javascript:history.back();">${action.getText('back')}</a>
 	<a href="<@url value="/"/>">${action.getText('index')}</a>
 </div>
+<#else>
+</#if>
 </body>
 </html>
 

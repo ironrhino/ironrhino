@@ -3,6 +3,7 @@
 <html>
 <head>
 <title>${action.getText('page.not.found')}</title>
+<#if !ajax?? || !ajax>
 <meta name="decorator" content="none"/>
 <style>
 			*{
@@ -58,9 +59,10 @@
 				color:white;
 			}
 </style>
+</#if>
 </head>
 <body>
-
+<#if !ajax?? || !ajax>
 <p class="error-code">404</p>
 <p class="not-found">${action.getText('page.not.found')}</p>
 <div class="clear"></div>
@@ -68,5 +70,6 @@
 	<a href="javascript:history.back();">${action.getText('back')}</a>
 	<a href="<@url value="/"/>">${action.getText('index')}</a>
 </div>
+</#if>
 </body>
 </html>
