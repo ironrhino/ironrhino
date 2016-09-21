@@ -2,6 +2,7 @@ package org.ironrhino.core.spring;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -53,21 +54,22 @@ public class ApplicationContextConsole {
 		if (beans == null) {
 			synchronized (this) {
 				if (beans == null) {
-					beans = new HashMap<>();
+					Map<String, Object> temp = new HashMap<>();
 					if (servletContext != null)
-						beans.put("freemarkerConfiguration",
+						temp.put("freemarkerConfiguration",
 								servletContext.getAttribute(FreemarkerManager.CONFIG_SERVLET_CONTEXT_KEY));
 					String[] beanNames = ctx.getBeanDefinitionNames();
 					for (String beanName : beanNames) {
 						if (!ctx.isSingleton(beanName))
 							continue;
 						if (StringUtils.isAlphanumeric(beanName.replaceAll("_", "")))
-							beans.put(beanName, ctx.getBean(beanName));
+							temp.put(beanName, ctx.getBean(beanName));
 						String[] aliases = ctx.getAliases(beanName);
 						for (String alias : aliases)
 							if (StringUtils.isAlphanumeric(alias.replaceAll("_", "")))
-								beans.put(alias, ctx.getBean(beanName));
+								temp.put(alias, ctx.getBean(beanName));
 					}
+					beans = Collections.unmodifiableMap(temp);
 				}
 			}
 		}
@@ -102,7 +104,7 @@ public class ApplicationContextConsole {
 					}
 				}
 			}
-			triggers = temp;
+			triggers = Collections.unmodifiableMap(temp);
 		}
 		return triggers;
 	}
