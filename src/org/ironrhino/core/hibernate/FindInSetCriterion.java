@@ -3,7 +3,6 @@ package org.ironrhino.core.hibernate;
 import java.util.Arrays;
 
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.dialect.Dialect;
@@ -25,7 +24,7 @@ public class FindInSetCriterion implements Criterion {
 	}
 
 	@Override
-	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
+	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) {
 		String column = criteriaQuery.findColumns(propertyName, criteria)[0];
 		Dialect dialect = criteriaQuery.getFactory().getDialect();
 		if (dialect instanceof MySQLDialect)
@@ -38,7 +37,7 @@ public class FindInSetCriterion implements Criterion {
 	}
 
 	@Override
-	public TypedValue[] getTypedValues(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
+	public TypedValue[] getTypedValues(Criteria criteria, CriteriaQuery criteriaQuery) {
 		Dialect dialect = criteriaQuery.getFactory().getDialect();
 		TypedValue typedValue;
 		if (dialect instanceof MySQLDialect || dialect instanceof PostgreSQL81Dialect)

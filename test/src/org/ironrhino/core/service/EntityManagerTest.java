@@ -16,7 +16,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
@@ -61,7 +60,7 @@ public class EntityManagerTest {
 		entityManager.delete(person2);
 		assertNull(entityManager.findByNaturalId("test"));
 	}
-	
+
 	@Test
 	public void testLifecyleEvents() {
 		entityManager.setEntityClass(Person.class);
@@ -175,7 +174,7 @@ public class EntityManagerTest {
 		prepareData();
 		Person person = entityManager.executeFind(new HibernateCallback<Person>() {
 			@Override
-			public Person doInHibernate(Session session) throws HibernateException {
+			public Person doInHibernate(Session session) {
 				Query q = session.createQuery("from Person p where p.name=:name");
 				q.setString("name", "test0");
 				q.setMaxResults(1);
