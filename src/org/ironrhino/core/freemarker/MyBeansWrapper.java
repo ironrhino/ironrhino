@@ -19,6 +19,7 @@ public class MyBeansWrapper extends BeansWrapper {
 		super(bwConf, writeProtected, true);
 	}
 
+	@Override
 	protected ModelFactory getModelFactory(Class clazz) {
 		if (Map.class.isAssignableFrom(clazz)) {
 			return MyMapModel.FACTORY;

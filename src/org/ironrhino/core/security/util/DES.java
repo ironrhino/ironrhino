@@ -113,7 +113,8 @@ public class DES {
 		if (str == null)
 			return null;
 		try {
-			return new String(Base64.getEncoder().encode(encrypt(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
+			return new String(Base64.getEncoder().encode(encrypt(str.getBytes(StandardCharsets.UTF_8))),
+					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -124,7 +125,8 @@ public class DES {
 		if (str == null)
 			return null;
 		try {
-			return new String(decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
+			return new String(decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))),
+					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("decrypt exception!", ex);
 			return "";
@@ -145,7 +147,8 @@ public class DES {
 	public static String encryptWithSalt(String str, String salt) {
 		DES des = new DES(defaultKey + salt);
 		try {
-			return new String(Base64.getEncoder().encode(des.encrypt(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
+			return new String(Base64.getEncoder().encode(des.encrypt(str.getBytes(StandardCharsets.UTF_8))),
+					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("encrypt exception!", ex);
 			return "";
@@ -155,7 +158,8 @@ public class DES {
 	public static String decryptWithSalt(String str, String salt) {
 		DES des = new DES(defaultKey + salt);
 		try {
-			return new String(des.decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
+			return new String(des.decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))),
+					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
 			logger.error("decrypt exception!", ex);
 			return "";

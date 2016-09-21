@@ -25,7 +25,7 @@ public interface TestService {
 	public String[] echoArray(String[] arr);
 
 	public UserDetails loadUserByUsername(String username);
-	
+
 	public List<UserDetails> search(String keyword);
 
 }

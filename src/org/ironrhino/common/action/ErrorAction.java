@@ -38,6 +38,7 @@ public class ErrorAction extends BaseAction {
 		return exception;
 	}
 
+	@Override
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();

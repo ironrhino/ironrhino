@@ -14,6 +14,7 @@ import freemarker.template.TemplateModel;
 public class MyMapModel extends MapModel {
 	static final ModelFactory FACTORY = new ModelFactory() {
 
+		@Override
 		public TemplateModel create(Object object, ObjectWrapper wrapper) {
 			return new MyMapModel((Map) object, (BeansWrapper) wrapper);
 		}

@@ -24,7 +24,8 @@ public class FaviconHandler extends AccessHandler {
 	public boolean handle(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		request.getRequestDispatcher("/assets/images/favicon.ico").forward(request, response);
-		//response.sendRedirect(request.getContextPath() + "/assets/images/favicon.ico");
+		// response.sendRedirect(request.getContextPath() +
+		// "/assets/images/favicon.ico");
 		return true;
 	}
 

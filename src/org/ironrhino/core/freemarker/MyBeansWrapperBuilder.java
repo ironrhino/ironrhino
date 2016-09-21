@@ -23,6 +23,7 @@ public class MyBeansWrapperBuilder extends BeansWrapperConfiguration {
 
 		private static final BeansWrapperFactory INSTANCE = new BeansWrapperFactory();
 
+		@Override
 		public BeansWrapper create(BeansWrapperConfiguration bwConf) {
 			return new MyBeansWrapper(bwConf, true);
 		}

@@ -106,7 +106,7 @@ public class AnnotationShadows {
 			if (listOptions.indexOf('{') == 0) {
 				this.listKey = "key";
 				this.listValue = "value";
-			}else if (listOptions.indexOf('[') == 0) {
+			} else if (listOptions.indexOf('[') == 0) {
 				this.listKey = "top";
 				this.listValue = "top";
 			}

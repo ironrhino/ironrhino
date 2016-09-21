@@ -34,10 +34,10 @@ public class CommonConfiguration {
 	public ConversionService conversionService() {
 		return new CustomConversionService();
 	}
-	
+
 	@Bean
-    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    public Logger createLogger(InjectionPoint injectionPoint) {
+	@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+	public Logger createLogger(InjectionPoint injectionPoint) {
 		return LoggerFactory.getLogger(injectionPoint.getMember().getDeclaringClass());
-    }
+	}
 }

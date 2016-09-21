@@ -29,6 +29,7 @@ public class PrioritizedQualifierPostProcessor implements BeanPostProcessor, Bea
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		ReflectionUtils.doWithFields(bean.getClass(), new FieldCallback() {
+			@Override
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 				ReflectionUtils.makeAccessible(field);
 				if (field.isAnnotationPresent(Autowired.class)) {

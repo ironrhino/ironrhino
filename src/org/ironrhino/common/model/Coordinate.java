@@ -63,7 +63,7 @@ public class Coordinate implements Serializable {
 
 	@Override
 	public boolean equals(Object that) {
-		if(that == null)
+		if (that == null)
 			return false;
 		return this.toString().equals(that.toString());
 	}

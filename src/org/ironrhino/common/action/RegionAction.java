@@ -84,18 +84,22 @@ public class RegionAction extends EntityAction<Region> {
 		return list;
 	}
 
+	@Override
 	public Long getTree() {
 		return tree;
 	}
 
+	@Override
 	public void setTree(Long tree) {
 		this.tree = tree;
 	}
 
+	@Override
 	public Long getParent() {
 		return parent;
 	}
 
+	@Override
 	public void setParent(Long parent) {
 		this.parent = parent;
 	}
@@ -226,6 +230,7 @@ public class RegionAction extends EntityAction<Region> {
 		return "map";
 	}
 
+	@Override
 	public String treeview() {
 		if (parent != null && parent > 0) {
 			entityManager.setEntityClass(Region.class);
@@ -292,6 +297,7 @@ public class RegionAction extends EntityAction<Region> {
 		}
 	}
 
+	@Override
 	public String move() {
 		String[] id = getId();
 		if (id != null && id.length == 2) {
