@@ -58,7 +58,7 @@ public class Dictionary extends BaseEntity {
 	// @Lob
 	@Column(length = 4000)
 	@SearchableComponent
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true), excludedFromCriteria = true)
 	private List<LabelValue> items = new ArrayList<>();
 
 	@Version
