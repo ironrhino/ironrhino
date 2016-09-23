@@ -7,9 +7,11 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.log4j.SimpleMergeStrategy;
@@ -36,6 +38,8 @@ public class AppInfo {
 
 	public static final String KEY_APP_EXCLUDEFILTERREGEX = "app.excludeFilterRegex";
 
+	public static final String KEY_APP_FEATUREPROFILES = "app.featureProfiles";
+
 	public static final String KEY_APP_VERSION = "app.version";
 
 	public static final String KEY_RACK = "RACK";
@@ -53,6 +57,8 @@ public class AppInfo {
 	private static String excludeFilterRegex;
 
 	private static String defaultProfiles;
+
+	private static String featureProfiles;
 
 	private static String version = "1.0.0";
 
@@ -160,25 +166,28 @@ public class AppInfo {
 				e.printStackTrace();
 			}
 		}
-		String appName = appProperties.getProperty(AppInfo.KEY_APP_NAME);
+		String appName = appProperties.getProperty(KEY_APP_NAME);
 		if (StringUtils.isNotBlank(appName))
-			AppInfo.setAppName(appName);
-		String version = appProperties.getProperty(AppInfo.KEY_APP_VERSION);
+			setAppName(appName);
+		String version = appProperties.getProperty(KEY_APP_VERSION);
 		if (StringUtils.isNotBlank(version))
-			AppInfo.setAppVersion(version);
-		String home = appProperties.getProperty(AppInfo.KEY_APP_HOME);
+			setAppVersion(version);
+		String home = appProperties.getProperty(KEY_APP_HOME);
 		if (StringUtils.isNotBlank(home))
-			AppInfo.setAppHome(home);
-		String appBasePackage = appProperties.getProperty(AppInfo.KEY_APP_BASEPACKAGE);
+			setAppHome(home);
+		String appBasePackage = appProperties.getProperty(KEY_APP_BASEPACKAGE);
 		if (StringUtils.isBlank(appBasePackage))
-			appBasePackage = "com." + AppInfo.getAppName().replaceAll("-", ".");
-		AppInfo.setAppBasePackage(appBasePackage);
-		String excludeFilterRegex = appProperties.getProperty(AppInfo.KEY_APP_EXCLUDEFILTERREGEX);
+			appBasePackage = "com." + getAppName().replaceAll("-", ".");
+		setAppBasePackage(appBasePackage);
+		String excludeFilterRegex = appProperties.getProperty(KEY_APP_EXCLUDEFILTERREGEX);
 		if (StringUtils.isNotBlank(excludeFilterRegex))
-			AppInfo.setExcludeFilterRegex(excludeFilterRegex);
+			setExcludeFilterRegex(excludeFilterRegex);
 		String defaultProfiles = appProperties.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 		if (StringUtils.isNotBlank(defaultProfiles))
-			AppInfo.setDefaultProfiles(defaultProfiles);
+			setDefaultProfiles(defaultProfiles);
+		String featureProfiles = appProperties.getProperty(KEY_APP_FEATUREPROFILES);
+		if (StringUtils.isNotBlank(featureProfiles))
+			setFeatureProfiles(featureProfiles);
 	}
 
 	public static void setAppName(String name) {
@@ -199,6 +208,10 @@ public class AppInfo {
 
 	public static void setDefaultProfiles(String defaultProfiles) {
 		AppInfo.defaultProfiles = defaultProfiles;
+	}
+
+	public static void setFeatureProfiles(String featureProfiles) {
+		AppInfo.featureProfiles = featureProfiles;
 	}
 
 	public static void setAppVersion(String version) {
@@ -252,6 +265,10 @@ public class AppInfo {
 		return defaultProfiles;
 	}
 
+	public static String getFeatureProfiles() {
+		return featureProfiles;
+	}
+
 	public static String getHostName() {
 		return HOSTNAME;
 	}
@@ -291,6 +308,14 @@ public class AppInfo {
 					System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
 				}
 			}
+		}
+		String featureProfiles = getFeatureProfiles();
+		if (StringUtils.isNotBlank(featureProfiles)) {
+			String defaultProfiles = System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
+			defaultProfiles = StringUtils.isNotBlank(defaultProfiles) ? defaultProfiles + "," + featureProfiles
+					: featureProfiles;
+			System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME,
+					StringUtils.join(new TreeSet<>(Arrays.asList(defaultProfiles.split("\\s*,\\s*"))), ","));
 		}
 
 		// configure log4j2

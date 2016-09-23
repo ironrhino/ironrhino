@@ -2,75 +2,77 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	<bean id="elasticSearchService"
-		class="org.ironrhino.core.search.elasticsearch.ElasticSearchService" />
-	<bean id="indexManager"
-		class="org.ironrhino.core.search.elasticsearch.IndexManagerImpl" />
-	<bean id="indexAspect" class="org.ironrhino.core.search.elasticsearch.IndexAspect" />
-	<beans profile="default">
-		<bean id="elasticSearchClient"
-			class="org.ironrhino.core.search.elasticsearch.ElasticSearchClientFactoryBean">
-			<property name="settings">
-				<map>
-					<entry key="name" value="ironrhino" />
-					<entry key="cluster.name" value="ironrhino" />
-					<entry key="http.enabled" value="false" />
-					<entry key="node.local" value="true" />
-					<entry key="discovery.zen.ping.multicast.enabled" value="false" />
-					<entry key="index.number_of_shards" value="1" />
-					<entry key="index.number_of_replicas" value="0" />
-					<entry key="threadpool.bulk.queue_size" value="${elasticSearch.threadpool.bulk.queue_size:1000}" />
-					<entry key="index.analysis.analyzer.default.type" value="mmseg" />
-				</map>
-			</property>
-		</bean>
-	</beans>
+	<beans profile="search">
+		<bean id="elasticSearchService"
+			class="org.ironrhino.core.search.elasticsearch.ElasticSearchService" />
+		<bean id="indexManager"
+			class="org.ironrhino.core.search.elasticsearch.IndexManagerImpl" />
+		<bean id="indexAspect" class="org.ironrhino.core.search.elasticsearch.IndexAspect" />
+		<beans profile="default">
+			<bean id="elasticSearchClient"
+				class="org.ironrhino.core.search.elasticsearch.ElasticSearchClientFactoryBean">
+				<property name="settings">
+					<map>
+						<entry key="name" value="ironrhino" />
+						<entry key="cluster.name" value="ironrhino" />
+						<entry key="http.enabled" value="false" />
+						<entry key="node.local" value="true" />
+						<entry key="discovery.zen.ping.multicast.enabled" value="false" />
+						<entry key="index.number_of_shards" value="1" />
+						<entry key="index.number_of_replicas" value="0" />
+						<entry key="threadpool.bulk.queue_size" value="${elasticSearch.threadpool.bulk.queue_size:1000}" />
+						<entry key="index.analysis.analyzer.default.type" value="mmseg" />
+					</map>
+				</property>
+			</bean>
+		</beans>
 
-	<beans profile="dual">
-		<bean id="elasticSearchClient"
-			class="org.ironrhino.core.search.elasticsearch.ElasticSearchClientFactoryBean">
-			<property name="settings">
-				<map>
-					<entry key="name" value="ironrhino" />
-					<entry key="cluster.name" value="ironrhino" />
-					<entry key="http.enabled" value="false" />
-					<entry key="node.local" value="false" />
-					<entry key="discovery.zen.ping.multicast.enabled" value="true" />
-					<entry key="index.number_of_shards" value="1" />
-					<entry key="index.number_of_replicas" value="0" />
-					<entry key="threadpool.bulk.queue_size" value="${elasticSearch.threadpool.bulk.queue_size:1000}" />
-					<entry key="index.analysis.analyzer.default.type" value="mmseg" />
-				</map>
-			</property>
-		</bean>
-	</beans>
+		<beans profile="dual">
+			<bean id="elasticSearchClient"
+				class="org.ironrhino.core.search.elasticsearch.ElasticSearchClientFactoryBean">
+				<property name="settings">
+					<map>
+						<entry key="name" value="ironrhino" />
+						<entry key="cluster.name" value="ironrhino" />
+						<entry key="http.enabled" value="false" />
+						<entry key="node.local" value="false" />
+						<entry key="discovery.zen.ping.multicast.enabled" value="true" />
+						<entry key="index.number_of_shards" value="1" />
+						<entry key="index.number_of_replicas" value="0" />
+						<entry key="threadpool.bulk.queue_size" value="${elasticSearch.threadpool.bulk.queue_size:1000}" />
+						<entry key="index.analysis.analyzer.default.type" value="mmseg" />
+					</map>
+				</property>
+			</bean>
+		</beans>
 
-	<beans profile="cloud">
-		<bean id="elasticSearchClient"
-			class="org.ironrhino.core.search.elasticsearch.ElasticSearchClientFactoryBean">
-			<property name="settings">
-				<map>
-					<entry key="name" value="ironrhino" />
-					<entry key="cluster.name" value="ironrhino" />
-					<entry key="http.enabled" value="false" />
-					<entry key="node.local" value="true" />
-					<entry key="discovery.zen.ping.multicast.enabled" value="false" />
-					<entry key="index.number_of_shards" value="1" />
-					<entry key="index.number_of_replicas" value="0" />
-					<entry key="threadpool.bulk.queue_size" value="${elasticSearch.threadpool.bulk.queue_size:1000}" />
-					<entry key="index.analysis.analyzer.default.type" value="mmseg" />
-					<entry key="gateway.type" value="none" />
-					<entry key="index.store.type" value="memory" />
-				</map>
-			</property>
-		</bean>
-	</beans>
+		<beans profile="cloud">
+			<bean id="elasticSearchClient"
+				class="org.ironrhino.core.search.elasticsearch.ElasticSearchClientFactoryBean">
+				<property name="settings">
+					<map>
+						<entry key="name" value="ironrhino" />
+						<entry key="cluster.name" value="ironrhino" />
+						<entry key="http.enabled" value="false" />
+						<entry key="node.local" value="true" />
+						<entry key="discovery.zen.ping.multicast.enabled" value="false" />
+						<entry key="index.number_of_shards" value="1" />
+						<entry key="index.number_of_replicas" value="0" />
+						<entry key="threadpool.bulk.queue_size" value="${elasticSearch.threadpool.bulk.queue_size:1000}" />
+						<entry key="index.analysis.analyzer.default.type" value="mmseg" />
+						<entry key="gateway.type" value="none" />
+						<entry key="index.store.type" value="memory" />
+					</map>
+				</property>
+			</bean>
+		</beans>
 
-	<beans profile="cluster">
-		<bean id="elasticSearchClient"
-			class="org.ironrhino.core.search.elasticsearch.ElasticSearchClientFactoryBean"
-			p:connectString="${elasticSearchClient.connectString:localhost}">
-		</bean>
+		<beans profile="cluster">
+			<bean id="elasticSearchClient"
+				class="org.ironrhino.core.search.elasticsearch.ElasticSearchClientFactoryBean"
+				p:connectString="${elasticSearchClient.connectString:localhost}">
+			</bean>
+		</beans>
 	</beans>
 
 </beans>
