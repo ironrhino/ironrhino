@@ -95,7 +95,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-expression-4.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jdbc-4.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jms-4.3.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-kafka-1.1.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-kafka-1.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-4.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.6.1.jar"/>
