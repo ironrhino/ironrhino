@@ -69,11 +69,11 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public <K> K executeFind(HibernateCallback<K> callback);
 
-	public void iterate(int fetchSize, IterateCallback callback);
+	public long iterate(int fetchSize, IterateCallback callback);
 
-	public void iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc);
+	public long iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc);
 
-	public void iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc, boolean commitPerFetch);
+	public long iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc, boolean commitPerFetch);
 
 	@FunctionalInterface
 	public static interface IterateCallback {

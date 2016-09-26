@@ -642,17 +642,17 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	@Override
-	public void iterate(int fetchSize, IterateCallback callback) {
-		iterate(fetchSize, callback, null);
+	public long iterate(int fetchSize, IterateCallback callback) {
+		return iterate(fetchSize, callback, null);
 	}
 
 	@Override
-	public void iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc) {
-		iterate(fetchSize, callback, dc, false);
+	public long iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc) {
+		return iterate(fetchSize, callback, dc, false);
 	}
 
 	@Override
-	public void iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc, boolean commitPerFetch) {
+	public long iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc, boolean commitPerFetch) {
 		Session hibernateSession = sessionFactory.openSession();
 		Criteria c;
 		if (dc != null) {
@@ -664,6 +664,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		hibernateSession.setCacheMode(CacheMode.IGNORE);
 		ScrollableResults cursor = null;
 		Transaction hibernateTransaction = null;
+		long count = 0;
 		try {
 			hibernateTransaction = hibernateSession.beginTransaction();
 			c.setFetchSize(fetchSize);
@@ -688,7 +689,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 					// session
 					// in the flush process
 					buffer.put(prev);
-					buffer.flush();
+					count += buffer.flush();
 					prev = null;
 					if (commitPerFetch) {
 						hibernateTransaction.commit();
@@ -699,10 +700,11 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			if (prev != null) {
 				buffer.put(prev);
 			}
-			buffer.close();
+			count += buffer.close();
 			cursor.close();
 			hibernateTransaction.commit();
-		} catch (Exception e) {
+			return count;
+		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
 			if (hibernateTransaction != null) {
 				try {
@@ -711,6 +713,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 					logger.warn("Failed to rollback Hibernate", e1);
 				}
 			}
+			throw e;
 		} finally {
 			hibernateSession.close();
 		}
