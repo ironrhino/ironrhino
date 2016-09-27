@@ -15,7 +15,7 @@ public class MyXWorkConverter extends XWorkConverter {
 	public Object convertValue(Map<String, Object> context, Object target, Member member, String property, Object value,
 			Class toClass) {
 		Object result = super.convertValue(context, target, member, property, value, toClass);
-		if (result == TypeConverter.NO_CONVERSION_POSSIBLE && value != null) {
+		if (TypeConverter.NO_CONVERSION_POSSIBLE.equals(result) && value != null) {
 			try {
 				Constructor ctor = toClass.getConstructor(value.getClass());
 				result = ctor.newInstance(value);
