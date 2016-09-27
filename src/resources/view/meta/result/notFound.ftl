@@ -1,8 +1,11 @@
 <#ftl output_format='HTML'>
+<#if action.hasActionErrors() && action.actionErrors?size == 1>
+<#assign message=action.actionErrors[0]/>
+</#if>
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('page.not.found')}</title>
+<title><#if message?has_content>${message}<#else>${action.getText('page.not.found')}</#if></title>
 <#if !ajax?? || !ajax>
 <meta name="decorator" content="none"/>
 <style>
@@ -58,15 +61,25 @@
 			a:hover{
 				color:white;
 			}
+			.alert-error {
+    			color: #b94a48;
+			}
 </style>
 </#if>
 </head>
 <body>
 <#if !ajax?? || !ajax>
 <p class="error-code">404</p>
-<p class="not-found">${action.getText('page.not.found')}</p>
+<p class="not-found"><#if message?has_content>${message}<#else>${action.getText('page.not.found')}</#if></p>
 <div class="clear"></div>
 <div class="content">
+	<#if !message?has_content && action.hasActionErrors()>
+	<#list action.actionErrors as error>
+		<#if error?has_content>
+           <h2 class="alert-error">${error}</h2>
+        </#if>
+	</#list>
+	</#if>
 	<a href="javascript:history.back();">${action.getText('back')}</a>
 	<a href="<@url value="/"/>">${action.getText('index')}</a>
 </div>

@@ -1,8 +1,11 @@
 <#ftl output_format='HTML'>
+<#if action.hasActionErrors() && action.actionErrors?size == 1>
+<#assign message=action.actionErrors[0]/>
+</#if>
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('error.occur')}</title>
+<title><#if message?has_content>${message}<#else>${action.getText('error.occur')}</#if></title>
 <#if !ajax?? || !ajax>
 <meta name="decorator" content="none"/>
 <style>
@@ -61,6 +64,9 @@
 			a:hover{
 				color:white;
 			}
+			.alert-error {
+    			color: #b94a48;
+			}
 </style>
 </#if>
 </head>
@@ -68,13 +74,13 @@
 <#assign exception=request.getAttribute('javax.servlet.error.exception')!>
 <#if !ajax?? || !ajax>
 <p class="error-code">500</p>
-<p class="error-occur">${action.getText('error.occur')}</p>
+<p class="error-occur"><#if message?has_content>${message}<#else>${action.getText('error.occur')}</#if></p>
 <div class="clear"></div>
 <div class="content">
-	<#if action.hasActionErrors()>
+	<#if !message?has_content && action.hasActionErrors()>
 	<#list action.actionErrors as error>
 		<#if error?has_content>
-           <p>${error}</p>
+           <h2 class="alert-error">${error}</h2>
         </#if>
 	</#list>
 	</#if>
@@ -85,9 +91,6 @@
 	<a href="javascript:history.back();">${action.getText('back')}</a>
 	<a href="<@url value="/"/>">${action.getText('index')}</a>
 </div>
-<#else>
 </#if>
 </body>
 </html>
-
-

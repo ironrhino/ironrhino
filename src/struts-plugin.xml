@@ -8,7 +8,7 @@
 	<bean type="org.apache.struts2.views.freemarker.FreemarkerManager"
 		class="org.ironrhino.core.struts.MyFreemarkerManager" />
 	<bean type="com.opensymphony.xwork2.conversion.impl.XWorkConverter"
-		  class="org.ironrhino.core.struts.converter.MyXWorkConverter" />
+		class="org.ironrhino.core.struts.converter.MyXWorkConverter" />
 	<constant name="struts.devMode" value="false" />
 	<constant name="struts.ognl.allowStaticMethodAccess" value="false" />
 	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
@@ -30,6 +30,8 @@
 			<result-type name="json" class="org.ironrhino.core.struts.result.JsonResult" />
 			<result-type name="referer"
 				class="org.ironrhino.core.struts.result.RefererResult" />
+			<result-type name="jasper"
+				class="org.ironrhino.core.struts.result.JasperReportsResult" />
 			<result-type name="jasperreports"
 				class="org.ironrhino.core.struts.result.JasperReportsResult" />
 			<result-type name="dynamicreports"
@@ -68,7 +70,7 @@
 			<result name="dynamicreports" type="dynamicreports" />
 			<result name="qrcode" type="qrcode" />
 			<result name="error" type="autoconfig" />
-			<result name="jasper" type="jasperreports">
+			<result name="jasper" type="jasper">
 				<param name="reportParameters">reportParameters</param>
 				<param name="contentDisposition">inline</param>
 				<param name="dataSource">list</param>

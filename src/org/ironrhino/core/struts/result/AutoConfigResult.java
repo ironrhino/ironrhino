@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsStatics;
 import org.apache.struts2.views.freemarker.FreemarkerResult;
+import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 
@@ -46,15 +47,21 @@ public class AutoConfigResult extends FreemarkerResult {
 	public void execute(ActionInvocation invocation) throws Exception {
 		if (invocation.getResultCode().equals(Action.NONE))
 			return;
+		ActionContext ctx = invocation.getInvocationContext();
+		HttpServletRequest request = (HttpServletRequest) ctx.get(StrutsStatics.HTTP_REQUEST);
+		HttpServletResponse response = (HttpServletResponse) ctx.get(StrutsStatics.HTTP_RESPONSE);
 		if (invocation.getResultCode().equals(Action.SUCCESS) && !invocation.getProxy().getMethod().equals("")
 				&& !invocation.getProxy().getMethod().equals("execute")) {
-			ActionContext ctx = invocation.getInvocationContext();
-			HttpServletRequest request = (HttpServletRequest) ctx.get(StrutsStatics.HTTP_REQUEST);
-			HttpServletResponse response = (HttpServletResponse) ctx.get(StrutsStatics.HTTP_RESPONSE);
 			String namespace = invocation.getProxy().getNamespace();
 			String url = namespace + (namespace.endsWith("/") ? "" : "/") + invocation.getProxy().getActionName();
 			response.sendRedirect(request.getContextPath() + url);
 			return;
+		}
+		if (!"XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"))) {
+			if (invocation.getResultCode().equals(Action.ERROR))
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			if (invocation.getResultCode().equals(BaseAction.NOTFOUND))
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 		String finalLocation = conditionalParse(location, invocation);
 		doExecute(finalLocation, invocation);
