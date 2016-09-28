@@ -10,11 +10,11 @@
 
 == 序列化
 Ironrhino的微服务采用的是RPC方式, 使用Spring自带的 `HttpInvoker`,它的序列化用的是JDK的序列化,
-Ironrhino扩展它增加了FST序列化支持, 可以在服务消费方的 `applicationContext.properties` 里面配置 `httpInvoker.useFstSerialization=true` 开启这个功能.
+Ironrhino扩展它增加了FST序列化和JSON序列化支持, 可以在服务消费方的 `applicationContext.properties` 里面配置 `httpInvoker.serialization.type` 为FST或者JSON开启这个功能.
 采用FST序列化可以大大提升性能, 但是有一个比较大的弱点就是不支持不同版本的类的反序列化,
 在渐进式演化过程中, 通常会存在发布方和消费方的包版本不一致的情况, 这种情况下Ironrhino会检测到反序列化失败的自动切回JDK的序列化.
 *不管是用JDK序列化还是FST序列化, 领域模型类都需要实现 `java.io.Serializable` 并且带上 `serialVersionUID`.*
-
+采用JSON序列化也可以大大提升性能, 但是对于一些复杂的对象或者泛型不一定支持, JSON序列化反序列化失败的情况下也会自动切回JDK的序列化.
 == 依赖
 
 - 服务发布方需要添加 `ironrhino-remoting-common.jar` 和 `ironrhino-remoting-server.jar`
