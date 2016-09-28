@@ -188,8 +188,10 @@ public class AnnotationUtils {
 		T annotation = null;
 		Class<?> c = clazz;
 		while (annotation == null && c != null) {
-			annotation = clazz.getAnnotation(annotationClass);
-			c = clazz.getSuperclass();
+			annotation = c.getAnnotation(annotationClass);
+			if (annotation != null)
+				break;
+			c = c.getSuperclass();
 			if (c == null || c.getClass().equals(Object.class))
 				break;
 		}
