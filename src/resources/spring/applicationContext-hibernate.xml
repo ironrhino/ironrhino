@@ -23,17 +23,17 @@
 				<prop key="hibernate.default_batch_fetch_size">
 					${hibernate.default_batch_fetch_size:10}
 				</prop>
-				<prop key="hibernate.order_inserts">
-					${hibernate.order_inserts:false}
-				</prop>
-				<prop key="hibernate.order_updates">
-					${hibernate.order_updates:false}
-				</prop>
 				<prop key="hibernate.jdbc.fetch_size">
 					${hibernate.jdbc.fetch_size:20}
 				</prop>
 				<prop key="hibernate.jdbc.batch_size">
 					${hibernate.jdbc.batch_size:50}
+				</prop>
+				<prop key="hibernate.order_inserts">
+					${hibernate.order_inserts:true}
+				</prop>
+				<prop key="hibernate.order_updates">
+					${hibernate.order_updates:true}
 				</prop>
 				<prop key="hibernate.jdbc.batch_versioned_data">
 					${hibernate.jdbc.batch_versioned_data:true}
