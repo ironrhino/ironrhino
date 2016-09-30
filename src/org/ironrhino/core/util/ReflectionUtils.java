@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.metadata.Param;
+import org.springframework.aop.SpringProxy;
 import org.springframework.aop.framework.Advised;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -101,7 +102,7 @@ public class ReflectionUtils {
 
 	public static Class<?> getActualClass(Object object) {
 		Class<?> c = object.getClass();
-		if (object instanceof ProxyObject)
+		if (object instanceof ProxyObject || object instanceof SpringProxy)
 			c = c.getSuperclass();
 		return c;
 	}
