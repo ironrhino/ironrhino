@@ -101,10 +101,13 @@ public class ReflectionUtils {
 	}
 
 	public static Class<?> getActualClass(Object object) {
-		Class<?> c = object.getClass();
-		if (object instanceof ProxyObject || object instanceof SpringProxy)
-			c = c.getSuperclass();
-		return c;
+		return getActualClass(object.getClass());
+	}
+
+	public static Class<?> getActualClass(Class<?> clazz) {
+		if (ProxyObject.class.isAssignableFrom(clazz) || SpringProxy.class.isAssignableFrom(clazz))
+			clazz = clazz.getSuperclass();
+		return clazz;
 	}
 
 	public static String[] getParameterNames(Constructor<?> ctor) {

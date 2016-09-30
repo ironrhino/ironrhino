@@ -35,6 +35,7 @@ public class AnnotationUtils {
 	};
 
 	public static Method getAnnotatedMethod(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
+		clazz = ReflectionUtils.getActualClass(clazz);
 		Iterator<Method> it = getAnnotatedMethods(clazz, annotaionClass).iterator();
 		if (it.hasNext())
 			return it.next();
@@ -42,6 +43,7 @@ public class AnnotationUtils {
 	}
 
 	public static Set<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
+		clazz = ReflectionUtils.getActualClass(clazz);
 		StringBuilder sb = new StringBuilder();
 		sb.append("getAnnotatedMethods:");
 		sb.append(clazz.getName());
@@ -72,6 +74,7 @@ public class AnnotationUtils {
 	}
 
 	public static Set<String> getAnnotatedPropertyNames(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
+		clazz = ReflectionUtils.getActualClass(clazz);
 		StringBuilder sb = new StringBuilder();
 		sb.append("getAnnotatedPropertyNames:");
 		sb.append(clazz.getName());
@@ -125,6 +128,7 @@ public class AnnotationUtils {
 
 	public static <T extends Annotation> Map<String, T> getAnnotatedPropertyNameAndAnnotations(Class<?> clazz,
 			Class<T> annotaionClass) {
+		clazz = ReflectionUtils.getActualClass(clazz);
 		StringBuilder sb = new StringBuilder();
 		sb.append("getAnnotatedPropertyNameAndAnnotations:");
 		sb.append(clazz.getName());
@@ -158,6 +162,7 @@ public class AnnotationUtils {
 
 	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationClass, String methodName,
 			Class<?>... paramTypes) {
+		clazz = ReflectionUtils.getActualClass(clazz);
 		StringBuilder sb = new StringBuilder();
 		sb.append("getAnnotation:");
 		sb.append(clazz.getName());
@@ -185,6 +190,7 @@ public class AnnotationUtils {
 	}
 
 	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationClass) {
+		clazz = ReflectionUtils.getActualClass(clazz);
 		T annotation = null;
 		Class<?> c = clazz;
 		while (annotation == null && c != null) {
