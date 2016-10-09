@@ -38,6 +38,7 @@ import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.export.Exporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleHtmlExporterConfiguration;
 import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleWriterExporterOutput;
@@ -231,8 +232,12 @@ public class JasperReportsResult extends StrutsResultSupport {
 				break;
 			case FORMAT_HTML:
 				response.setContentType("text/html");
-				exporter = new HtmlExporter();
-				exporter.setExporterOutput(new SimpleHtmlExporterOutput(response.getWriter()));
+				HtmlExporter hexporter = new HtmlExporter();
+				SimpleHtmlExporterConfiguration configuration = new SimpleHtmlExporterConfiguration();
+				configuration.setBetweenPagesHtml("<div style=\"page-break-after:always;\"></div>");
+				hexporter.setConfiguration(configuration);
+				hexporter.setExporterOutput(new SimpleHtmlExporterOutput(response.getWriter()));
+				exporter = hexporter;
 				break;
 			case FORMAT_XML:
 				response.setContentType("text/xml");
