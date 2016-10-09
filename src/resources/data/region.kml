@@ -10969,7 +10969,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>蓟县</name>
+        <name>蓟州区</name>
         <styleUrl>#khStyle2656</styleUrl>
         <Point>
           <coordinates>117.40182,40.043865,0</coordinates>
@@ -12352,7 +12352,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>冀州市</name>
+            <name>冀州区</name>
             <styleUrl>#khStyle914</styleUrl>
             <Point>
               <coordinates>115.56381,37.56598300000001,0</coordinates>
@@ -17424,7 +17424,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>大洼县</name>
+            <name>大洼区</name>
             <LookAt>
               <longitude>122.0613327026368</longitude>
               <latitude>40.99197769167507</latitude>
@@ -21839,7 +21839,7 @@
           </Point>
         </Placemark>
         <Placemark>
-          <name>崇明县</name>
+          <name>崇明区</name>
           <styleUrl>#khStyle2656</styleUrl>
           <Point>
             <coordinates>121.38989,31.627645,0</coordinates>
@@ -38847,7 +38847,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>星子县</name>
+            <name>庐山市</name>
             <styleUrl>#khStyle2656</styleUrl>
             <Point>
               <coordinates>116.04112,29.453485,0</coordinates>
@@ -40113,7 +40113,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>垦利县</name>
+            <name>垦利区</name>
             <LookAt>
               <longitude>118.5470236613604</longitude>
               <latitude>37.58758391019271</latitude>
@@ -51146,7 +51146,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>柳江县</name>
+            <name>柳江区</name>
             <styleUrl>#khStyle2656</styleUrl>
             <Point>
               <coordinates>109.32584,24.252417,0</coordinates>
@@ -58067,7 +58067,7 @@
         </Point>
       </Placemark>
       <Placemark>
-        <name>开县</name>
+        <name>开州区</name>
         <LookAt>
           <longitude>108.4216152317901</longitude>
           <latitude>31.18624259149351</latitude>
@@ -58630,7 +58630,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>安县</name>
+            <name>安州区</name>
             <styleUrl>#khStyle2656</styleUrl>
             <Point>
               <coordinates>104.42853,31.649504,0</coordinates>
@@ -61985,7 +61985,7 @@
         <Folder>
           <name>曲靖市</name>
           <Placemark>
-            <name>沾益县</name>
+            <name>沾益区</name>
             <LookAt>
               <longitude>103.891562517113</longitude>
               <latitude>25.75509540281196</latitude>
@@ -62956,7 +62956,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>泸水县</name>
+            <name>泸水市</name>
             <styleUrl>#khStyle265600</styleUrl>
             <Point>
               <coordinates>98.818764,25.982824,0</coordinates>
@@ -64367,7 +64367,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>遵义县</name>
+            <name>播州区</name>
             <styleUrl>#khStyle2656</styleUrl>
             <Point>
               <coordinates>106.82287,27.539255,0</coordinates>
@@ -66545,7 +66545,7 @@
             </Point>
           </Placemark>
           <Placemark>
-            <name>安塞县</name>
+            <name>安塞区</name>
             <LookAt>
               <longitude>109.3199569199329</longitude>
               <latitude>36.86403128397777</latitude>
