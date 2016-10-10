@@ -131,6 +131,8 @@ public class SettingControl {
 	public List<Setting> getAllBooleanSettings() {
 		List<Setting> list = new ArrayList<>();
 		for (Setting s : settings.values()) {
+			if (s.isReadonly() || s.isHidden())
+				continue;
 			String value = s.getValue();
 			if ("true".equals(value) || "false".equals(value))
 				list.add(s);
