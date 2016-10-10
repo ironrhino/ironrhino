@@ -7,6 +7,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.servlet.AppInfoListener;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.ResolvableType;
@@ -22,6 +23,17 @@ public class ApplicationContextUtils {
 	public static <T> T getBean(String name) {
 		try {
 			return (T) getApplicationContext().getBean(name);
+		} catch (NoSuchBeanDefinitionException e) {
+			if (name.indexOf('.') > 0) {
+				try {
+					Class<T> clazz = (Class<T>) Class.forName(name);
+					return getBean(clazz);
+				} catch (ClassNotFoundException e1) {
+					return null;
+				}
+			} else {
+				return null;
+			}
 		} catch (Exception e) {
 			return null;
 		}
