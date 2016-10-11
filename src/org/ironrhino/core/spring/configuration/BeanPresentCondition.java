@@ -24,6 +24,19 @@ class BeanPresentCondition implements ConfigurationCondition {
 		boolean negated = (Boolean) attributes.get("negated");
 		BeanDefinitionRegistry bdr = ctx.getRegistry();
 		boolean matched = bdr.containsBeanDefinition(name);
+		if (!matched && name.indexOf('.') > 0) {
+			for (String beanName : bdr.getBeanDefinitionNames()) {
+				try {
+					Class<?> beanclazz = Class.forName(bdr.getBeanDefinition(beanName).getBeanClassName());
+					if (Class.forName(name).isAssignableFrom(beanclazz)) {
+						matched = true;
+						break;
+					}
+				} catch (ClassNotFoundException e) {
+					continue;
+				}
+			}
+		}
 		if (negated)
 			matched = !matched;
 		if (!matched && (metadata instanceof ClassMetadata)) {
