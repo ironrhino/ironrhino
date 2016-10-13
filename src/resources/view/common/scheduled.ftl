@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('scheduled')}${action.getText('console')}</title>
+<title>${getText('scheduled')}${getText('console')}</title>
 <script>
 $(function(){
 		$('#scheduled input:checkbox').change(function(e){
@@ -37,8 +37,8 @@ $(function(){
 	<#list tasks as task>
 	<li class="span6">
 	<div class="row-fluid">
-	<div class="span7 task">${action.getText(task)}</div>
-	<div class="span5"><div class="switch" data-on-label="${action.getText('ON')}" data-off-label="${action.getText('OFF')}"><input type="checkbox" name="${task}"<#if !circuitBreaker??> disabled</#if><#if !circuitBreaker?? || !circuitBreaker.isShortCircuit(task)> checked="checked"</#if>></div></div>
+	<div class="span7 task">${getText(task)}</div>
+	<div class="span5"><div class="switch" data-on-label="${getText('ON')}" data-off-label="${getText('OFF')}"><input type="checkbox" name="${task}"<#if !circuitBreaker??> disabled</#if><#if !circuitBreaker?? || !circuitBreaker.isShortCircuit(task)> checked="checked"</#if>></div></div>
 	</div>
 	</li>
 	</#list>

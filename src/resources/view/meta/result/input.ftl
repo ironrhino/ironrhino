@@ -14,7 +14,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#if !entity??><#assign entity=entityName?eval></#if><#assign isnew = !entity??||entity.new/><#assign isnew = !entity??||entity.new/><#if idAssigned><#assign isnew=!entity??||!entity.id?has_content/></#if><#if isnew>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
+<title><#if !entity??><#assign entity=entityName?eval></#if><#assign isnew = !entity??||entity.new/><#assign isnew = !entity??||entity.new/><#if idAssigned><#assign isnew=!entity??||!entity.id?has_content/></#if><#if isnew>${getText('create')}<#else>${getText('edit')}</#if>${getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
 </head>
 <body>
 <#assign formDynamicAttributes={}/>
@@ -57,7 +57,7 @@
 		<#if config.alias??>
 			<#assign label=config.alias>
 		</#if>
-		<#assign label=action.getText(label)>
+		<#assign label=getText(label)>
 		<#assign readonly=naturalIds?keys?seq_contains(key)&&!naturalIdMutable&&!isnew||config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 		<#if !isnew&&idAssigned&&key=='id'>
 		<#assign readonly=true/>
@@ -156,8 +156,8 @@
 				<table class="datagrid table table-condensed nullable">
 					<thead>
 						<tr>
-							<td>${action.getText('name')}</td>
-							<td>${action.getText('value')}</td>
+							<td>${getText('name')}</td>
+							<td>${getText('value')}</td>
 							<td class="manipulate"></td>
 						</tr>
 					</thead>
@@ -190,16 +190,16 @@
 						<label class="control-label" for="${id}-upload-button">${label}</label>
 						<div class="controls">
 							<div style="margin-bottom:5px;">
-							<button id="${id}-upload-button" class="btn concatimage" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${action.getText('upload')}</button>
+							<button id="${id}-upload-button" class="btn concatimage" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${getText('upload')}</button>
 							<#if config.cssClasses?seq_contains('concatsnapshot')>
-							<button class="btn concatsnapshot" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${action.getText('snapshot')}</button>
+							<button class="btn concatsnapshot" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${getText('snapshot')}</button>
 							</#if>
 							</div>
 							<div id="${id}-image" style="text-align:center;min-height:100px;border:1px solid #ccc;">
 								<#if entity[key]?has_content>
-									<img src="${entity[key]}" title="${action.getText('drag.image.file')}"/>
+									<img src="${entity[key]}" title="${getText('drag.image.file')}"/>
 								<#else>
-									${action.getText('drag.image.file')}
+									${getText('drag.image.file')}
 								</#if>
 							</div>
 						</div>
@@ -211,7 +211,7 @@
 						<div class="controls">
 							<span>
 							<#if entity[key]?has_content>
-								<img src="${entity[key]}" title="${action.getText('drag.image.file')}"/>
+								<img src="${entity[key]}" title="${getText('drag.image.file')}"/>
 							</#if>
 							</span>
 						</div>
@@ -234,7 +234,7 @@
 					<#if config.alias??>
 						<#assign label=config.alias>
 					</#if>
-					<#assign label=action.getText(label)>
+					<#assign label=getText(label)>
 					<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 					<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
 					<#assign dynamicAttributes=mergeDynAttrs(config)/>
@@ -337,7 +337,7 @@
 								<#if config.alias??>
 									<#assign label2=config.alias>
 								</#if>
-								<#assign label2=action.getText(label2)>
+								<#assign label2=getText(label2)>
 								<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${label2}</th>
 								</#if>
 								</#list>
@@ -454,7 +454,7 @@
 		</#if>
 		</#if>
 	</#list>
-	<@s.submit value=action.getText('save') class="btn-primary"/>
+	<@s.submit value=getText('save') class="btn-primary"/>
 </@s.form>
 </body>
 </html>

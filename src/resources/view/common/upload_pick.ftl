@@ -2,26 +2,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('upload')}</title>
+<title>${getText('upload')}</title>
 </head>
 <body>
 <@s.form id="upload_form" action="${actionBaseUrl}" method="post" class="ajax view form-inline" data\-replacement="files">
 	<input type="hidden" name="pick" value="true"/>
 	<table id="files" class="table table-striped middle" style="margin-top:50px;">
-		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${action.getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>
+		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>
 		<thead>
 		<tr style="font-weight:bold;height:43px;">
 			<td style="width:30px" class="radio"></td>
-			<td style="width:220px;"><span style="line-height:28px;">${action.getText('name')}</span><input type="search" class="filter input-small pull-right"/></td>
-			<td class="center">${action.getText('preview')}</td>
+			<td style="width:220px;"><span style="line-height:28px;">${getText('name')}</span><input type="search" class="filter input-small pull-right"/></td>
+			<td class="center">${getText('preview')}</td>
 		</tr>
 		</thead>
 		<tfoot>
 		<tr>
 			<td colspan="3" class="center">
-			<button type="button" class="btn mkdir">${action.getText('create.subfolder')}</button>
-			<button type="button" class="btn snapshot">${action.getText('snapshot')}</button>
-			<button type="button" class="btn reload">${action.getText('reload')}</button>
+			<button type="button" class="btn mkdir">${getText('create.subfolder')}</button>
+			<button type="button" class="btn snapshot">${getText('snapshot')}</button>
+			<button type="button" class="btn reload">${getText('reload')}</button>
 			</td>
 		</tr>
 		</tfoot>

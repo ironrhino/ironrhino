@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#if page.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('page')}</title>
+<title><#if page.new>${getText('create')}<#else>${getText('edit')}</#if>${getText('page')}</title>
 <meta name="cms_path" content="${cmsPath}" />
 <script type="text/javascript" src="<@url value="/assets/components/tinymce/tinymce.min.js"/>"></script>
 <script type="text/javascript" src="<@url value="/assets/components/tinymce/ironrhino.tinymce.js"/>"></script>
@@ -111,29 +111,29 @@ $(function() {
 	<@s.hidden name="page.tags" value="${(page.tags?join(','))}"/>
 	<@s.hidden name="page.head"/>
 	<@s.hidden name="page.title"/>
-	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:100%;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
+	<@s.textarea theme="simple" id="page_content" label=getText('content') labelposition="top" name="page.content" style="width:100%;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
 	<#elseif view=='brief'>
 	<@s.hidden name="page.path"/>
 	<@s.hidden name="page.displayOrder"/>
 	<@s.hidden name="page.tags" value="${(page.tags?join(','))}"/>
 	<@s.hidden name="page.head"/>
-	<@s.textfield label="%{getText('title')}" name="page.title" style="width:600px;"/>
-	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:600px;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
+	<@s.textfield label=getText('title') name="page.title" style="width:600px;"/>
+	<@s.textarea theme="simple" id="page_content" label=getText('content') labelposition="top" name="page.content" style="width:600px;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
 	<#else>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="#_page_base" data-toggle="tab">${action.getText('base')}</a></li>
-		<li><a href="#_page_content" data-toggle="tab">${action.getText('content')}</a></li>
-		<li><a href="#_page_head" data-toggle="tab">${action.getText('head')}</a></li>
+		<li class="active"><a href="#_page_base" data-toggle="tab">${getText('base')}</a></li>
+		<li><a href="#_page_content" data-toggle="tab">${getText('content')}</a></li>
+		<li><a href="#_page_head" data-toggle="tab">${getText('head')}</a></li>
 	</ul>
 	<div class="tab-content">
 	<div id="_page_base" class="tab-pane active">
-	<@s.textfield id="page_path" label="%{getText('path')}" readonly=!page.new name="page.path" class="required checkavailable" style="width:600px;"/>
-	<@s.textfield label="%{getText('displayOrder')}" name="page.displayOrder" type="number" class="integer"/>
-	<@s.textfield label="%{getText('tags')}" name="page.tags"  class="tags" data\-source="${actionBaseUrl}/suggest" style="width:600px;"/>
-	<@s.textfield label="%{getText('title')}" name="page.title" style="width:600px;"/>
+	<@s.textfield id="page_path" label=getText('path') readonly=!page.new name="page.path" class="required checkavailable" style="width:600px;"/>
+	<@s.textfield label=getText('displayOrder') name="page.displayOrder" type="number" class="integer"/>
+	<@s.textfield label=getText('tags') name="page.tags"  class="tags" data\-source="${actionBaseUrl}/suggest" style="width:600px;"/>
+	<@s.textfield label=getText('title') name="page.title" style="width:600px;"/>
 	</div>
 	<div id="_page_content" class="tab-pane">
-	<@s.textarea theme="simple" id="page_content" label="%{getText('content')}" labelposition="top" name="page.content" style="width:800px;height:260px;" dynamicAttributes=pageContentDynamicAttributes/>
+	<@s.textarea theme="simple" id="page_content" label=getText('content') labelposition="top" name="page.content" style="width:800px;height:260px;" dynamicAttributes=pageContentDynamicAttributes/>
 	</div>
 	<div id="_page_head" class="tab-pane">
 	<@s.textarea theme="simple" id="page_head" name="page.head" style="width:800px;height:300px;"/>
@@ -141,25 +141,25 @@ $(function() {
 	</div>
 	</#if>
 	<div class="form-actions">
-	<@s.submit id="save" value="%{getText('save')}" theme="simple" class="btn-primary"/>
+	<@s.submit id="save" value=getText('save') theme="simple" class="btn-primary"/>
 	
 	<#if view!='embedded'>
 	<#if page?? && !page.new>
-	<@s.submit id="draft" value="%{getText('draft')}" theme="simple"/>
+	<@s.submit id="draft" value=getText('draft') theme="simple"/>
 	</#if>
 	<span class="draft" <#if !draft>style="display: none;"</#if>>
-	${action.getText('draftDate')}:<span class="draftDate"><#if page.draftDate??>${page.draftDate?datetime}</#if></span>
+	${getText('draftDate')}:<span class="draftDate"><#if page.draftDate??>${page.draftDate?datetime}</#if></span>
 	<#if page.id??>
-	<a class="btn" id="preview" href="${getUrl(cmsPath+page.path)}?preview=true" target="_blank">${action.getText('preview')}</a>
+	<a class="btn" id="preview" href="${getUrl(cmsPath+page.path)}?preview=true" target="_blank">${getText('preview')}</a>
 	<#else>
-	<a class="btn" id="preview" target="_blank">${action.getText('preview')}</a>
+	<a class="btn" id="preview" target="_blank">${getText('preview')}</a>
 	</#if>
-	<@s.submit id="drop" value="%{getText('drop')}" theme="simple"/>
+	<@s.submit id="drop" value=getText('drop') theme="simple"/>
 	</span>
 	<#if page.id??>
-	<a class="btn" id="view" href="${getUrl(cmsPath+page.path)}" target="_blank">${action.getText('view')}</a>
+	<a class="btn" id="view" href="${getUrl(cmsPath+page.path)}" target="_blank">${getText('view')}</a>
 	<#else>
-	<a class="btn" id="view" target="_blank">${action.getText('view')}</a>
+	<a class="btn" id="view" target="_blank">${getText('view')}</a>
 	</#if>
 	</#if>
 	</div>

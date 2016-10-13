@@ -40,7 +40,7 @@ ${head?no_esc}
 <div class="container<#if fluidLayout>-fluid</#if>">
 <div class="alert">
 <button type="button" class="close" data-dismiss="alert">&times;</button>
-${action.getText('browser.warning')?no_esc}
+${getText('browser.warning')?no_esc}
 </div>
 </div>
 </#if>

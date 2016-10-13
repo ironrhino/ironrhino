@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('locale')}</title>
+<title>${getText('locale')}</title>
 </head>
 <body>
 <form action="${actionBaseUrl}">

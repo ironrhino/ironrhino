@@ -2,8 +2,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<#assign entityDisplayName=action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))/>
-<title>${entityDisplayName}${action.getText('list')}</title>
+<#assign entityDisplayName=getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))/>
+<title>${entityDisplayName}${getText('list')}</title>
 </head>
 <body>
 <#assign treeview='treeview'==Parameters.view!/>

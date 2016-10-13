@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('user')}${action.getText('list')}</title>
+<title>${getText('user')}${getText('list')}</title>
 </head>
 <body>
 <#assign actionColumnButtons=r'<@btn view="view"/> <@btn view="input" label="edit"/>'>

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('service')}${action.getText('stats')}</title>
+<title>${getText('service')}${getText('stats')}</title>
 <style>
 form.form-inline{
 	margin-bottom: 0;
@@ -124,18 +124,18 @@ Initialization.stats = function() {
 </#list>
 </#if>
 <form action="${baseaction}" class="ajax view form-inline" data-replacement="count_result">
-<span>${action.getText('date')}</span>
-<@s.textfield label="%{getText('date')}" theme="simple" id="" name="date" class="date"/>
-<@s.submit value="%{getText('query')}" theme="simple"/>
+<span>${getText('date')}</span>
+<@s.textfield label=getText('date') theme="simple" id="" name="date" class="date"/>
+<@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span5 offset1">
 <form action="${baseaction}" class="ajax view form-inline" data-replacement="count_result">
-<span>${action.getText('date')}${action.getText('range')}</span>
-<@s.textfield label="%{getText('from')}" theme="simple" id="" name="from" class="date"/>
+<span>${getText('date')}${getText('range')}</span>
+<@s.textfield label=getText('from') theme="simple" id="" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
-<@s.textfield label="%{getText('to')}" theme="simple" id="" name="to" class="date"/>
-<@s.submit value="%{getText('query')}" theme="simple"/>
+<@s.textfield label=getText('to') theme="simple" id="" name="to" class="date"/>
+<@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 </div>

@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('pick')}${action.getText(entityName)}</title>
+<title>${getText('pick')}${getText(entityName)}</title>
 </head>
 <body>
 
@@ -118,21 +118,21 @@
 	</#if>
 </#if>
 <#if multiple>
-<#assign bottomButtons=r'<button type="button" class="btn pick" data-shown="selected">${action.getText("confirm")}</button> '/>
+<#assign bottomButtons=r'<button type="button" class="btn pick" data-shown="selected">${getText("confirm")}</button> '/>
 <#else>
 <#assign bottomButtons=''/>
 </#if>
 <#assign bottomButtons+=r'
 <#if treeable&&Parameters.parent??>
-<a href="${href}<#if parentEntity.parent?? && (!tree??||parent!=tree)>${href?contains("?")?string("&","?")+"parent="+_parent}</#if>" class="btn ajax view" data-replacement="${entityName}_pick">${action.getText("upward")}</a>
+<a href="${href}<#if parentEntity.parent?? && (!tree??||parent!=tree)>${href?contains("?")?string("&","?")+"parent="+_parent}</#if>" class="btn ajax view" data-replacement="${entityName}_pick">${getText("upward")}</a>
 </#if>
-<#if filterable><button type="button" class="btn filter">${action.getText("filter")}</button></#if>
+<#if filterable><button type="button" class="btn filter">${getText("filter")}</button></#if>
 '>
 <div id="${entityName}_pick">
 <#if _parent?? && parentEntity?? && parentEntity.id?? && parentEntity.id gt 0>
 <ul class="breadcrumb">
 	<li>
-    	<a href="${href}" class="ajax view" data-replacement="${entityName}_pick">${action.getText(entityName)}</a> <span class="divider">/</span>
+    	<a href="${href}" class="ajax view" data-replacement="${entityName}_pick">${getText(entityName)}</a> <span class="divider">/</span>
 	</li>
 	<#if parentEntity.level gt 1>
 	<#assign renderItem=(!tree??||tree<1)/>

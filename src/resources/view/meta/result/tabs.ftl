@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}${action.getText('list')}</title>
+<title>${getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}${getText('list')}</title>
 </head>
 <body>
 <#if Parameters.tab?has_content>
@@ -27,8 +27,8 @@
 <#assign dataurl+='?'+request.queryString>
 </#if>
 <ul class="nav nav-tabs">
-	<li><strong style="display:block;padding-top: 8px;padding-bottom: 8px;line-height: 20px;padding-right: 12px;padding-left: 12px;margin-right: 2px;">${action.getText(propertyName)}:</strong></li>
-	<li class="active"><a href="#all" data-toggle="tab">${action.getText('all')}</a></li>
+	<li><strong style="display:block;padding-top: 8px;padding-bottom: 8px;line-height: 20px;padding-right: 12px;padding-left: 12px;margin-right: 2px;">${getText(propertyName)}:</strong></li>
+	<li class="active"><a href="#all" data-toggle="tab">${getText('all')}</a></li>
 	<#if config.type=='enum'>
 	<#assign values=statics[config.propertyType.name].values()>
 	<#list values as value>
@@ -40,8 +40,8 @@
 	<li><a href="#${propertyName+'-'+key}" data-toggle="tab">${value}</a></li>
 	</#list>
 	<#elseif config.type=='checkbox'>
-	<li><a href="#${propertyName}-true" data-toggle="tab">${action.getText('true')}</a></li>
-	<li><a href="#${propertyName}-false" data-toggle="tab">${action.getText('false')}</a></li>
+	<li><a href="#${propertyName}-true" data-toggle="tab">${getText('true')}</a></li>
+	<li><a href="#${propertyName}-false" data-toggle="tab">${getText('false')}</a></li>
 	</#if>
 </ul>
 <div class="tab-content">

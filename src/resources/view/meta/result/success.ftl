@@ -2,9 +2,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('warnings')}</title>
+<title>${getText('warnings')}</title>
 </head>
 <body>
- <div class="alert alert-warning"><a class="close" data-dismiss="alert">&times;</a>${action.getText('template.not.found')}</div>
+ <div class="alert alert-warning"><a class="close" data-dismiss="alert">&times;</a>${getText('template.not.found')}</div>
 </body>
 </html>

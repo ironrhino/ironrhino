@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#if message?has_content>${message}<#else>${action.getText('error.occur')}</#if></title>
+<title><#if message?has_content>${message}<#else>${getText('error.occur')}</#if></title>
 <#if !ajax?? || !ajax>
 <meta name="decorator" content="none"/>
 <style>
@@ -74,7 +74,7 @@
 <#assign exception=request.getAttribute('javax.servlet.error.exception')!>
 <#if !ajax?? || !ajax>
 <p class="error-code">500</p>
-<p class="error-occur"><#if message?has_content>${message}<#else>${action.getText('error.occur')}</#if></p>
+<p class="error-occur"><#if message?has_content>${message}<#else>${getText('error.occur')}</#if></p>
 <div class="clear"></div>
 <div class="content">
 	<#if !message?has_content && action.hasActionErrors()>
@@ -88,8 +88,8 @@
 	<pre>	${statics['org.ironrhino.core.util.ExceptionUtils'].getStackTraceAsString(exception)!}</pre>
 	</br>
 	</#if>
-	<a href="javascript:history.back();">${action.getText('back')}</a>
-	<a href="<@url value="/"/>">${action.getText('index')}</a>
+	<a href="javascript:history.back();">${getText('back')}</a>
+	<a href="<@url value="/"/>">${getText('index')}</a>
 </div>
 </#if>
 </body>

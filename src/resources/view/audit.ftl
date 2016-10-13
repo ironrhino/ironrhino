@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('auditEvent')}</title>
+<title>${getText('auditEvent')}</title>
 </head>
 <body>
 	<div id="events" class="scroll-list" data-scrollurl="${actionBaseUrl}" data-pagesize="${pageSize}">
@@ -13,7 +13,7 @@
 			<div class="span2"><span class="label">${ev.address!}</span></div>
 		</div>
 		</#list>
-		<button style="margin-top:10px;" class="btn btn-block load-more"<#if !since?? && events?size==0 || events?size lt pageSize> disabled</#if>>${action.getText('more')}</button>
+		<button style="margin-top:10px;" class="btn btn-block load-more"<#if !since?? && events?size==0 || events?size lt pageSize> disabled</#if>>${getText('more')}</button>
 	</div>
 </body>
 </html>

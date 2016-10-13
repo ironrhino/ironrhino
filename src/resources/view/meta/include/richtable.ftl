@@ -81,8 +81,8 @@ ${formHeader!}
 </#macro>
 
 <#macro rttheadtd name,alias='',title='',cellname='',cellEdit='',class='',width='',readonly=false,resizable=true,excludeIfNotEdited=false>
-<th<#if title?has_content> title="${action.getText(title)}"</#if><#if excludeIfNotEdited||class?has_content> class="<#if excludeIfNotEdited> excludeIfNotEdited</#if><#if class?has_content> ${class}</#if>"</#if><#if width?has_content> style="width:${width};"</#if> data-cellname="${cellname}"<#if cellEdit?has_content> data-cellEdit="${cellEdit}"</#if>>
-<#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?keep_after_last('.')/></#if></#if>${action.getText(alias)}<#if resizable></span><span class="resizeBar visible-desktop"></span></#if>
+<th<#if title?has_content> title="${getText(title)}"</#if><#if excludeIfNotEdited||class?has_content> class="<#if excludeIfNotEdited> excludeIfNotEdited</#if><#if class?has_content> ${class}</#if>"</#if><#if width?has_content> style="width:${width};"</#if> data-cellname="${cellname}"<#if cellEdit?has_content> data-cellEdit="${cellEdit}"</#if>>
+<#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?keep_after_last('.')/></#if></#if>${getText(alias)}<#if resizable></span><span class="resizeBar visible-desktop"></span></#if>
 </th>
 </#macro>
 <#macro rtmiddle width='50px' showActionColumn=true>
@@ -128,7 +128,7 @@ ${formHeader!}
 <#if !template?has_content>
 	<#if value??>
 		<#if value?is_boolean>
-		${action.getText(value?string)}<#t>
+		${getText(value?string)}<#t>
 		<#elseif value?is_unknown_date_like>
 		${value?datetime}<#t>
 		<#elseif value?is_enumerable>
@@ -157,7 +157,7 @@ ${formHeader!}
 </#if>
 <#if 'treeview'!=Parameters.view!&&treeable??&&treeable>
 <@btn view="move"/>
-<a class="btn ajax view" href="${actionBaseUrl}?parent=${entity.id}<#if tree??>&tree=${tree}</#if>">${action.getText("enter")}</a>
+<a class="btn ajax view" href="${actionBaseUrl}?parent=${entity.id}<#if tree??>&tree=${tree}</#if>">${getText("enter")}</a>
 </#if>
 </#if>
 </td>
@@ -182,33 +182,33 @@ ${formHeader!}
 <#if resultPage?? && resultPage.paginating>
 <ul>
 <#if resultPage.first>
-<li class="disabled firstPage"><a title="${action.getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
-<li class="disabled"><a title="${action.getText('previouspage')}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
+<li class="disabled firstPage"><a title="${getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
+<li class="disabled"><a title="${getText('previouspage')}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
 <#else>
-<li class="firstPage"><a title="${action.getText('firstpage')}" href="${resultPage.renderUrl(1)}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
-<li class="prevPage"><a title="${action.getText('previouspage')}" href="${resultPage.renderUrl(resultPage.previousPage)}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
+<li class="firstPage"><a title="${getText('firstpage')}" href="${resultPage.renderUrl(1)}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
+<li class="prevPage"><a title="${getText('previouspage')}" href="${resultPage.renderUrl(resultPage.previousPage)}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
 </#if>
 <#if resultPage.last>
-<li class="disabled"><a title="${action.getText('nextpage')}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
-<li class="disabled lastPage"><a title="${action.getText('lastpage')}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
+<li class="disabled"><a title="${getText('nextpage')}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
+<li class="disabled lastPage"><a title="${getText('lastpage')}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
 <#else>
-<li class="nextPage"><a title="${action.getText('nextpage')}" href="${resultPage.renderUrl(resultPage.nextPage)}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
-<li class="lastPage"><a title="${action.getText('lastpage')}" href="${resultPage.renderUrl(resultPage.totalPage)}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
+<li class="nextPage"><a title="${getText('nextpage')}" href="${resultPage.renderUrl(resultPage.nextPage)}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
+<li class="lastPage"><a title="${getText('lastpage')}" href="${resultPage.renderUrl(resultPage.totalPage)}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
 </#if>
 <li class="pageNo">
 <span class="input-append">
-    <input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${action.getText('currentpage')}"/><span class="add-on totalPage" title="${action.getText('totalpage')}">${resultPage.totalPage}</span>
+    <input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${getText('currentpage')}"/><span class="add-on totalPage" title="${getText('totalpage')}">${resultPage.totalPage}</span>
 </span>
 <#if showPageSize>
 <li class="visible-desktop">
-<select name="resultPage.pageSize" class="pageSize" title="${action.getText('pagesize')}">
+<select name="resultPage.pageSize" class="pageSize" title="${getText('pagesize')}">
 <#local array=[5,10,20,50,100,500]>
 <#local selected=false>
 <#list array as ps>
 <option value="${ps}"<#if resultPage.pageSize==ps><#local selected=true> selected</#if>>${ps}</option>
 </#list>
 <#if resultPage.canListAll>
-<option value="${resultPage.totalResults}"<#if !selected && resultPage.pageSize==resultPage.totalResults><#local selected=true> selected</#if>>${action.getText('all')}</option>
+<option value="${resultPage.totalResults}"<#if !selected && resultPage.pageSize==resultPage.totalResults><#local selected=true> selected</#if>>${getText('all')}</option>
 </#if>
 <#if !selected !array?seq_contains(resultPage.pageSize)>
 <option value="${resultPage.pageSize}" selected>${resultPage.pageSize}</option>
@@ -234,12 +234,12 @@ ${formHeader!}
 <@btn action="disable" confirm=true/>
 </#if>
 </#if>
-<#if !readonly||deletable><button type="button" class="btn confirm" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${action.getText("delete")}</button></#if>
+<#if !readonly||deletable><button type="button" class="btn confirm" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${getText("delete")}</button></#if>
 <#if 'treeview'!=Parameters.view!&&treeable??&&treeable&&parentEntity??>
 <#if parentEntity.parent?? && (!tree??||parent!=tree)>
-<a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}<#if tree??>&tree=${tree}</#if>">${action.getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}<#if tree??>&tree=${tree}</#if>">${getText("upward")}</a>
 <#else>
-<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>">${action.getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>">${getText("upward")}</a>
 </#if>
 </#if>
 <@btn class="reload"/>
@@ -250,7 +250,7 @@ ${formHeader!}
 <div class="search span<#if showBottomButtons>2<#else>3</#if>">
 <#if searchable>
 <span class="input-append search">
-    <input type="text" name="keyword" value="${keyword!?html}" placeholder="${action.getText('search')}"/><span class="add-on"><i class="glyphicon glyphicon-search clickable"></i></span>
+    <input type="text" name="keyword" value="${keyword!?html}" placeholder="${getText('search')}"/><span class="add-on"><i class="glyphicon glyphicon-search clickable"></i></span>
 </span>
 </#if>
 <#if searchButtons?has_content>
@@ -265,7 +265,7 @@ ${formHeader!}
 <#elseif list?? && list?size gt 0>
 <#local totalResults=list?size/>
 </#if>
-${totalResults}<span class="recordLabel"> ${action.getText('record')}</span>
+${totalResults}<span class="recordLabel"> ${getText('record')}</span>
 <#if downloadable && request.requestURI?ends_with(actionBaseUrl) && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
 <button type="submit" class="noajax plain" formaction="${actionBaseUrl}/csv" style="padding-top:2px;">
 <span class="glyphicon glyphicon-download-alt clickable">
@@ -293,18 +293,18 @@ ${formFooter!}
 						</#if>
 					</#if>
 					<#if value.propertyType.enum>
-					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(value.propertyType) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(value.propertyType) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					<#elseif value.type='dictionary' && selectDictionary??>
 					<#local templateName><@value.templateName?interpret /></#local>
-					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					<#elseif value.type='select'>
 					<#local options=value.listOptions?eval>
-					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#if value.listOptions?starts_with('{')><#list options as key,value>${key}=${value}<#sep>,</#list><#elseif value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#if value.listOptions?starts_with('{')><#list options as key,value>${key}=${value}<#sep>,</#list><#elseif value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					<#elseif value.type='listpick'>
 					<#local pickUrl><@value.pickUrl?interpret/></#local>
-					<option value="${key}.id" data-type="listpick" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${key}.id" data-type="listpick" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					<#else>
-					<option value="${key}" data-class="${value.cssClass?replace('checkavailable','')}" data-inputtype="${value.inputType}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass?replace('checkavailable','')}" data-inputtype="${value.inputType}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					</#if>
 					</#list>
 				</select>
@@ -336,15 +336,15 @@ ${formFooter!}
 							<#local label=label?keep_after_last('.')/>
 						</#if>
 					</#if>
-					<option value="${key}">${statics['org.ironrhino.core.struts.I18N'].getText(label)}</option>
+					<option value="${key}">${getText(label)}</option>
 					</#if>
 					</#list>
 				</select>
 			</td>
 			<td style="width:30%;text-align:right;">
 			<select class="ordering">
-			<option value="asc">${statics['org.ironrhino.core.struts.I18N'].getText('ascending')}</option>
-			<option value="desc">${statics['org.ironrhino.core.struts.I18N'].getText('descending')}</option>
+			<option value="asc">${getText('ascending')}</option>
+			<option value="desc">${getText('descending')}</option>
 			</select>
 			</td>
 			<td style="text-align:center;"></td>
@@ -353,7 +353,7 @@ ${formFooter!}
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="4" style="text-align:center;"><button type="submit" class="btn btn-primary">${statics['org.ironrhino.core.struts.I18N'].getText('search')}</button> <button type="button" class="btn restore">${statics['org.ironrhino.core.struts.I18N'].getText('restore')}</button></td>
+			<td colspan="4" style="text-align:center;"><button type="submit" class="btn btn-primary">${getText('search')}</button> <button type="button" class="btn restore">${getText('restore')}</button></td>
 		</tr>
 	</tfoot>
 </table>
@@ -366,5 +366,5 @@ ${formFooter!}
 <#local windowoptions><@windowoptions?interpret/></#local>
 <#local windowoptions=windowoptions?replace('"',"'")/>
 </#if>
-<#if class?has_content && !(view?has_content||action?has_content)><button type="button" class="btn ${class}">${statics['org.ironrhino.core.struts.I18N'].getText(label?has_content?string(label,class))}</button><#else><button type="button" class="btn ${class}<#if confirm&&action?has_content> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if><#if action='delete'> data-shown="selected" data-filterselector=":not([data-deletable='false'])"<#elseif action='enable'> data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])"<#elseif action='disable'> data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])"</#if><#if view?has_content&&windowoptions?has_content> data-windowoptions="${windowoptions}"</#if>>${statics['org.ironrhino.core.struts.I18N'].getText(label?has_content?string(label,view?has_content?string(view,action)))}</button></#if>
+<#if class?has_content && !(view?has_content||action?has_content)><button type="button" class="btn ${class}">${getText(label?has_content?string(label,class))}</button><#else><button type="button" class="btn ${class}<#if confirm&&action?has_content> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if><#if action='delete'> data-shown="selected" data-filterselector=":not([data-deletable='false'])"<#elseif action='enable'> data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])"<#elseif action='disable'> data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])"</#if><#if view?has_content&&windowoptions?has_content> data-windowoptions="${windowoptions}"</#if>>${getText(label?has_content?string(label,view?has_content?string(view,action)))}</button></#if>
 </#macro>

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('query')}</title>
+<title>${getText('query')}</title>
 <style>
 .form-horizontal .control-group {
     margin-bottom: 0;
@@ -109,7 +109,7 @@ $(function(){
 	<@s.textfield label="${var}" name="paramMap['${var}']"/>
 	</#list>
 	</#if>
-	<@s.submit value="%{getText('submit')}" class="btn-primary"/>
+	<@s.submit value=getText('submit') class="btn-primary"/>
 	<#if resultPage??>
 	<#if resultPage.result?size gt 0>
 	<#assign map=resultPage.result[0]/>
@@ -126,7 +126,7 @@ $(function(){
 			<tbody>
 			<#list resultPage.result as row>
 			<tr>
-				<td><button type="button" class="btn">${action.getText('view')}</button></td>
+				<td><button type="button" class="btn">${getText('view')}</button></td>
 				<#list row as key,value>
 				<td>${(value?string)!}</td>
 				</#list>
@@ -140,32 +140,32 @@ $(function(){
 				<div class="pagination">
 				<ul>
 				<#if resultPage.first>
-				<li class="disabled firstPage"><a title="${action.getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
-				<li class="disabled"><a title="${action.getText('previouspage')}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
+				<li class="disabled firstPage"><a title="${getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
+				<li class="disabled"><a title="${getText('previouspage')}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
 				<#else>
-				<li class="firstPage"><a title="${action.getText('firstpage')}" href="${resultPage.renderUrl(1)}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
-				<li class="prevPage"><a title="${action.getText('previouspage')}" href="${resultPage.renderUrl(resultPage.previousPage)}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
+				<li class="firstPage"><a title="${getText('firstpage')}" href="${resultPage.renderUrl(1)}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
+				<li class="prevPage"><a title="${getText('previouspage')}" href="${resultPage.renderUrl(resultPage.previousPage)}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
 				</#if>
 				<#if resultPage.last>
-				<li class="disabled"><a title="${action.getText('nextpage')}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
-				<li class="disabled lastPage"><a title="${action.getText('lastpage')}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
+				<li class="disabled"><a title="${getText('nextpage')}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
+				<li class="disabled lastPage"><a title="${getText('lastpage')}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
 				<#else>
-				<li class="nextPage"><a title="${action.getText('nextpage')}" href="${resultPage.renderUrl(resultPage.nextPage)}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
-				<li class="lastPage"><a title="${action.getText('lastpage')}" href="${resultPage.renderUrl(resultPage.totalPage)}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
+				<li class="nextPage"><a title="${getText('nextpage')}" href="${resultPage.renderUrl(resultPage.nextPage)}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
+				<li class="lastPage"><a title="${getText('lastpage')}" href="${resultPage.renderUrl(resultPage.totalPage)}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
 				</#if>
 				<li>
 				<span class="input-append">
-				    <input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${action.getText('currentpage')}"/><span class="add-on totalPage"><span class="divider">/</span><strong title="${action.getText('totalpage')}">${resultPage.totalPage}</strong></span>
+				    <input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${getText('currentpage')}"/><span class="add-on totalPage"><span class="divider">/</span><strong title="${getText('totalpage')}">${resultPage.totalPage}</strong></span>
 				</span>
 				<li class="visible-desktop">
-				<select name="resultPage.pageSize" class="pageSize" title="${action.getText('pagesize')}">
+				<select name="resultPage.pageSize" class="pageSize" title="${getText('pagesize')}">
 				<#assign array=[5,10,20,50,100,500]>
 				<#assign selected=false>
 				<#list array as ps>
 				<option value="${ps}"<#if resultPage.pageSize==ps><#assign selected=true> selected</#if>>${ps}</option>
 				</#list>
 				<#if resultPage.canListAll>
-				<option value="${resultPage.totalResults}"<#if !selected && resultPage.pageSize==resultPage.totalResults> selected</#if>>${action.getText('all')}</option>
+				<option value="${resultPage.totalResults}"<#if !selected && resultPage.pageSize==resultPage.totalResults> selected</#if>>${getText('all')}</option>
 				</#if>
 				</select>
 				</li>
@@ -174,17 +174,17 @@ $(function(){
 				</#if>
 			</div>
 			<div class="action span2">
-				<input type="submit" class="btn noajax" value="${action.getText('export')}" formaction="${actionBaseUrl}/export"/>
+				<input type="submit" class="btn noajax" value="${getText('export')}" formaction="${actionBaseUrl}/export"/>
 			</div>
 			<div class="status span5">
-				${resultPage.totalResults} ${action.getText('record')} , ${action.getText('tookInMillis',[resultPage.tookInMillis])}
+				${resultPage.totalResults} ${getText('record')} , ${getText('tookInMillis',[resultPage.tookInMillis])}
 			</div>
 		</div>
 	</div>
 	<#elseif resultPage.executed>
 	<div class="alert">
 	  <button type="button" class="close" data-dismiss="alert">&times;</button>
-	  <strong>${action.getText('query.result.empty')}</strong>
+	  <strong>${getText('query.result.empty')}</strong>
 	</div>
 	</#if>
 	</#if>

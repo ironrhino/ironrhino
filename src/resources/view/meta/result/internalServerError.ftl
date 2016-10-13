@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('error.occur')}</title>
+<title>${getText('error.occur')}</title>
 <meta name="decorator" content="none"/>
 <style>
 			*{
@@ -65,15 +65,15 @@
 <body>
 
 <p class="error-code">500</p>
-<p class="error-occur">${action.getText('error.occur')}</p>
+<p class="error-occur">${getText('error.occur')}</p>
 <div class="clear"></div>
 <div class="content">
 	<#if exception??>
 	<pre>	${statics['org.ironrhino.core.util.ExceptionUtils'].getStackTraceAsString(exception)!}</pre>
 	</br>
 	</#if>
-	<a href="javascript:history.back();">${action.getText('back')}</a>
-	<a href="<@url value="/"/>">${action.getText('index')}</a>
+	<a href="javascript:history.back();">${getText('back')}</a>
+	<a href="<@url value="/"/>">${getText('index')}</a>
 </div>
 </body>
 </html>

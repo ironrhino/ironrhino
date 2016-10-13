@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('pageView')}</title>
+<title>${getText('pageView')}</title>
 </head>
 <body>
 <div style="padding:5px;">

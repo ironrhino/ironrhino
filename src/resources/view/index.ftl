@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('index')}</title>
+<title>${getText('index')}</title>
 </head>
 <body>
 <#if printSetting??>
 <div class="portal savable">
 	<ul class="portal-column">
 		<li id="announcement" class="portlet">
-			<div class="portlet-header">${action.getText('announcement')}</div>
+			<div class="portlet-header">${getText('announcement')}</div>
 			<div class="portlet-content">
 			<@authorize ifAnyGranted="ROLE_ADMINISTRATOR">
 				<div class="ajaxpanel" data-url="<@url value="/common/setting/input/announcement?view=embedded&class=htmlarea"/>"></div>

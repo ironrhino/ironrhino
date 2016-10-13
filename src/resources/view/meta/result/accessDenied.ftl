@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('access.denied')}</title>
+<title>${getText('access.denied')}</title>
 <#assign redirectToLogin = false>
 <@authorize ifAllGranted="ROLE_BUILTIN_ANONYMOUS">
 <#assign redirectToLogin = true>
@@ -21,9 +21,9 @@
 <body>
 <h3 style="text-align:center;">
 <#if redirectToLogin>
-<a href="<@url value="${ssoServerBase!}/login?targetUrl=${returnUrl?url}"/>">${action.getText('login.required')}</a>
+<a href="<@url value="${ssoServerBase!}/login?targetUrl=${returnUrl?url}"/>">${getText('login.required')}</a>
 <#else>
-${action.getText('access.denied')}
+${getText('access.denied')}
 </#if>
 </h3>
 </body>

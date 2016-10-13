@@ -3,7 +3,7 @@
 <html>
 <head>
 <title>
-<#if preview>[${action.getText('preview')}]</#if><#if page.title??><@page.title?interpret/></#if></title>
+<#if preview>[${getText('preview')}]</#if><#if page.title??><@page.title?interpret/></#if></title>
 ${(page.head?no_esc)!}
 </head>
 <body>

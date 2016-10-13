@@ -2,19 +2,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('pageView')}</title>
+<title>${getText('pageView')}</title>
 </head>
 <body>
 <div style="padding:5px;">
 	<span style="margin-right:10px;">${from?string('yyyy-MM-dd')} -> ${to?string('yyyy-MM-dd')}</span>
 	<#if max??>
-	<span class="pull-right" style="margin:0 10px;">${action.getText('max')}:
+	<span class="pull-right" style="margin:0 10px;">${getText('max')}:
 	<strong>${max.value?string}</strong>
 	${max.key?string('yyyy-MM-dd')}
 	</span>
 	</#if>
 	<#if total??>
-	<span class="pull-right" style="margin:0 10px;">${action.getText('total')}:<strong>${total?string}</strong></span>
+	<span class="pull-right" style="margin:0 10px;">${getText('total')}:<strong>${total?string}</strong></span>
 	</#if>
 </div>
 <ul class="unstyled flotlinechart" style="height:300px;" data-format="<#if date??>%H(%m-%d)<#else>%m-%d</#if>">

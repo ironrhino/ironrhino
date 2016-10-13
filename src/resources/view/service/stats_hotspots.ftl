@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('service')}${action.getText('stats')}</title>
+<title>${getText('service')}${getText('stats')}</title>
 </head>
 <body>
 <#assign baseurl=actionBaseUrl>
@@ -16,11 +16,11 @@
 </#if>
 <#if hotspots?size gt 0>
 	<table class="table table-hover table-striped table-bordered sortable resizable" style="white-space: nowrap;">
-		<caption><h4>${action.getText('hotspots')}</h4></caption>
+		<caption><h4>${getText('hotspots')}</h4></caption>
 		<thead>
 		<tr>
-			<th>${action.getText('service')}</th>
-			<th style="width:120px;">${action.getText('times')}</th>
+			<th>${getText('service')}</th>
+			<th style="width:120px;">${getText('times')}</th>
 		</tr>
 		</thead>
 		<tbody>

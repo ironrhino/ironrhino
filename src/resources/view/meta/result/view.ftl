@@ -1,7 +1,7 @@
 <#ftl output_format='HTML'>
 <html>
 <head>
-<title>${action.getText('view')}${action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
+<title>${getText('view')}${getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
 </head>
 <body>
 	<div id="${entityName}_view" class="view form-horizontal groupable"<#if richtableConfig.viewGridColumns gt 0> data-columns="${richtableConfig.viewGridColumns}"</#if>>
@@ -31,8 +31,8 @@
 				<#if config.alias??>
 					<#assign label=config.alias>
 				</#if>
-				<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
-					<label class="control-label">${action.getText(label)}</label>
+				<div class="control-group"<#if config.group?has_content> data-group="${getText(config.group)}"</#if>>
+					<label class="control-label">${getText(label)}</label>
 					<div class="controls">
 					<#assign template=config.template/>
 					<#if config.viewTemplate!=''>
@@ -62,7 +62,7 @@
 							</#if>
 						<#elseif value??>
 							<#if value?is_boolean>
-								${action.getText(value?string)}
+								${getText(value?string)}
 							<#elseif value?is_unknown_date_like>
 								${value?datetime}
 							<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
@@ -72,7 +72,7 @@
 								<#list value as item>
 									<li>
 									<#if item?is_boolean>
-										${action.getText(item?string)}
+										${getText(item?string)}
 									<#elseif item?is_unknown_date_like>
 										${item?datetime}
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
@@ -109,8 +109,8 @@
 				</#if>
 				</#list>
 		<#else>		
-		<div class="control-group"<#if config.group?has_content> data-group="${action.getText(config.group)}"</#if>>
-			<label class="control-label">${action.getText(label)}</label>
+		<div class="control-group"<#if config.group?has_content> data-group="${getText(config.group)}"</#if>>
+			<label class="control-label">${getText(label)}</label>
 			<div class="controls">
 			<#assign template=config.template/>
 			<#if config.viewTemplate!=''>
@@ -154,7 +154,7 @@
 							<#if config.alias??>
 								<#assign label2=config.alias>
 							</#if>
-							<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${action.getText(label2)}</th>
+							<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${getText(label2)}</th>
 							</#if>
 							</#list>
 						</tr>
@@ -198,7 +198,7 @@
 									</#if>
 								<#elseif value??>
 										<#if value?is_boolean>
-											${action.getText(value?string)}
+											${getText(value?string)}
 										<#elseif value?is_unknown_date_like>
 											${value?datetime}
 										<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
@@ -208,7 +208,7 @@
 											<#list value as item>
 												<li>
 												<#if item?is_boolean>
-													${action.getText(item?string)}
+													${getText(item?string)}
 												<#elseif item?is_unknown_date_like>
 													${item?datetime}
 												<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
@@ -251,7 +251,7 @@
 					</table>
 				<#elseif value??>
 						<#if value?is_boolean>
-							${action.getText(value?string)}
+							${getText(value?string)}
 						<#elseif value?is_unknown_date_like>
 							${value?datetime}
 						<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
@@ -261,7 +261,7 @@
 							<#list value as item>
 								<li>
 									<#if item?is_boolean>
-										${action.getText(item?string)}
+										${getText(item?string)}
 									<#elseif item?is_unknown_date_like>
 										${item?datetime}
 									<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
@@ -276,7 +276,7 @@
 										<ul class="unstyled">
 										<#list item as k,v>
 											<#if k!='class' && v?? && !v?is_method && item['set'+k?cap_first]??>
-											<li><em>${action.getText(k)}:</em> ${v?string}</li>
+											<li><em>${getText(k)}:</em> ${v?string}</li>
 											</#if>
 										</#list>
 										</ul>
@@ -314,7 +314,7 @@
 	</#if>
 	<#if richtableConfig.exportable>
 	<div class="form-actions">
-		<a href="${actionBaseUrl}/export/${entity.id}" class="btn">${action.getText('export')}</a>
+		<a href="${actionBaseUrl}/export/${entity.id}" class="btn">${getText('export')}</a>
 	</div>
 	</#if>
 	</div>

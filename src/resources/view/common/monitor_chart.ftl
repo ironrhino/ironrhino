@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('monitor')}</title>
+<title>${getText('monitor')}</title>
 </head>
 <body>
 <div class="row<#if fluidLayout>-fluid</#if>">
@@ -10,20 +10,20 @@
 <form action="${actionBaseUrl}/chart/${uid}" class="ajax view form-inline" data-replacement="c">
 <@s.hidden name="vtype"/>
 <@s.hidden name="ctype"/>
-<span>${action.getText('date')}</span>
-<@s.textfield label="%{getText('date')}" theme="simple" name="date" class="date"/>
-<@s.submit value="%{getText('query')}" theme="simple"/>
+<span>${getText('date')}</span>
+<@s.textfield label=getText('date') theme="simple" name="date" class="date"/>
+<@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span6">
 <form action="${actionBaseUrl}/chart/${uid}" class="ajax view form-inline" data-replacement="c">
 <@s.hidden name="vtype"/>
 <@s.hidden name="ctype"/>
-<span>${action.getText('date.range')}</span>
-<@s.textfield label="%{getText('from')}" theme="simple" name="from" class="date"/>
+<span>${getText('date.range')}</span>
+<@s.textfield label=getText('from') theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
-<@s.textfield label="%{getText('to')}" theme="simple" name="to" class="date"/>
-<@s.submit value="%{getText('query')}" theme="simple"/>
+<@s.textfield label=getText('to') theme="simple" name="to" class="date"/>
+<@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 </div>

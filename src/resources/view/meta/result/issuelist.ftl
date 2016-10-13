@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText(name)}</title>
+<title>${getText(name)}</title>
 </head>
 <body>
 <ul class="breadcrumb">
 	<li>
-    	<a class="ajax view" href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
+    	<a class="ajax view" href="<@url value="/"/>">${getText('index')}</a> <span class="divider">/</span>
 	</li>
-	<li class="active">${action.getText(name)}</li>
+	<li class="active">${getText(name)}</li>
 </ul>
 <div class="issue ${name}">
 <div id="list">

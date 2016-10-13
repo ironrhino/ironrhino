@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('login')}</title>
+<title>${getText('login')}</title>
 </head>
 <body>
 <#if providers??>
@@ -12,7 +12,7 @@
 <#list providers as var>
 <div class="span2" style="height:100px;">
 <a href="${request.requestURL}?id=${var.name}<#if targetUrl??>&targetUrl=${targetUrl?url}</#if>">
-	<img src="${var.logo}" alt="${action.getText(var.name)}" title="${action.getText(var.name)}"/>
+	<img src="${var.logo}" alt="${getText(var.name)}" title="${getText(var.name)}"/>
 </a>
 </div>
 </#list>

@@ -23,8 +23,8 @@
   <thead>
     <tr>
       <th style="width:10%"><input type="checkbox" class="checkall custom"/></th>
-      <th style="width:20%;">${action.getText('name')}</th>
-      <th style="width:70%;">${action.getText('fullname')}</th>
+      <th style="width:20%;">${getText('name')}</th>
+      <th style="width:70%;">${getText('fullname')}</th>
     </tr>
   </thead>
   <tbody>

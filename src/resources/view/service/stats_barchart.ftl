@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('service')}${action.getText('stats')}</title>
+<title>${getText('service')}${getText('stats')}</title>
 </head>
 <body>
 <div style="padding:5px;">

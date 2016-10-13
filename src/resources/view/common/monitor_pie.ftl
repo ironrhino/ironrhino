@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('monitor')}</title>
+<title>${getText('monitor')}</title>
 <script src="<@url value="/assets/components/flot/jquery.flot.js"/>" type="text/javascript"></script>
 <script src="<@url value="/assets/components/flot/jquery.flot.pie.js"/>" type="text/javascript"></script>
 <script src="<@url value="/assets/components/flot/ironrhino.flot.js"/>" type="text/javascript"></script>

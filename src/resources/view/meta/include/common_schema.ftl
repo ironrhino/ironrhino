@@ -37,8 +37,8 @@
 	<table class="datagrid table table-condensed nullable">
 		<thead>
 			<tr>
-				<td>${action.getText('name')}</td>
-				<td>${action.getText('value')}</td>
+				<td>${getText('name')}</td>
+				<td>${getText('value')}</td>
 				<#if !schema.strict?? || !schema.strict>
 				<td class="manipulate"></td>
 				</#if>

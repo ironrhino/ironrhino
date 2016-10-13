@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('log')}</title>
+<title>${getText('log')}</title>
 <style>
 	#result{
 		line-height:1.5em;
@@ -46,9 +46,9 @@
 	<div class="control-group">
 		<input id="filename" type="text" class="span6"/>
 		<input id="tail" type="text"  class="span1" value="4096"/>
-		<button type="button" class="btn" id="view">${action.getText('view')}</button>
-		<button type="button" class="btn" id="clear">${action.getText('clear')}</button>
-		<button type="button" class="btn" id="download">${action.getText('download')}</button>
+		<button type="button" class="btn" id="view">${getText('view')}</button>
+		<button type="button" class="btn" id="clear">${getText('clear')}</button>
+		<button type="button" class="btn" id="download">${getText('download')}</button>
 	</div>
 </form>
 <div id="result">

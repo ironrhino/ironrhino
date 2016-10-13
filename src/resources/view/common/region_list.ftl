@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#if region.name??>${region.name}-</#if>${action.getText('region')}${action.getText('list')}</title>
+<title><#if region.name??>${region.name}-</#if>${getText('region')}${getText('list')}</title>
 </head>
 <body>
 <#assign treeview='treeview'==Parameters.view!/>
@@ -19,25 +19,25 @@
 '>
 <#if !treeview>
 <#assign actionColumnButtons+=r'
-<a class="btn ajax view" href="${actionBaseUrl+"?parent="+entity.id}<#if tree??>&tree=${tree}</#if>">${action.getText("enter")}</a>
+<a class="btn ajax view" href="${actionBaseUrl+"?parent="+entity.id}<#if tree??>&tree=${tree}</#if>">${getText("enter")}</a>
 '>
 <#assign bottomButtons+=r'
 <#if region?? && parent??>
 <#if region.parent?? && (!tree??||parent!=tree)>
-<a class="btn ajax view" href="${actionBaseUrl+"?parent="+region.parent.id}<#if tree??>&tree=${tree}</#if>">${action.getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl+"?parent="+region.parent.id}<#if tree??>&tree=${tree}</#if>">${getText("upward")}</a>
 <#else>
-<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>">${action.getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>">${getText("upward")}</a>
 </#if>
 </#if>
 '+'
-<button type="button" class="btn" onclick="$(\'#move\').toggle()">${action.getText("move")}</button>
-<button type="button" class="btn" onclick="$(\'#merge\').toggle()">${action.getText("merge")}</button>
+<button type="button" class="btn" onclick="$(\'#move\').toggle()">${getText("move")}</button>
+<button type="button" class="btn" onclick="$(\'#merge\').toggle()">${getText("merge")}</button>
 '>
 </#if>
 <#if region?? && region.id?? && region.id gt 0>
 <ul class="breadcrumb">
 	<li>
-    	<#if !treeview><a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${action.getText('region')}</a><#else>${action.getText('region')}</#if> <span class="divider">/</span>
+    	<#if !treeview><a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${getText('region')}</a><#else>${getText('region')}</#if> <span class="divider">/</span>
 	</li>
 	<#if region.level gt 1>
 	<#assign renderItem=(!tree??||tree<1)/>
@@ -57,24 +57,24 @@
 </ul>
 </#if>
 <@richtable entityName="region" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons/>
-<form id="move" action="${actionBaseUrl}/move" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${action.getText('confirm')}?');" onsuccess="$('#region_form').submit()">
+<form id="move" action="${actionBaseUrl}/move" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${getText('confirm')}?');" onsuccess="$('#region_form').submit()">
 	<div style="padding-top:10px;text-align:center;">
 	<input id="regionId1" type="hidden" name="id"/>
 	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId1','cache':false}"></span>
 	--&gt;
 	<input id="regionId2" type="hidden" name="id"/>
 	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId2','cache':false}"></span>
-	<@s.submit theme="simple" value="%{getText('confirm')}" />
+	<@s.submit theme="simple" value=getText('confirm') />
 	</div>
 </form>
-<form id="merge" action="${actionBaseUrl}/merge" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${action.getText('confirm')}?');" onsuccess="$('#region_form').submit()">
+<form id="merge" action="${actionBaseUrl}/merge" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${getText('confirm')}?');" onsuccess="$('#region_form').submit()">
 	<div style="padding-top:10px;text-align:center;">
 	<input id="regionId3" type="hidden" name="id"/>
 	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId3','cache':false}"></span>
 	--&gt;
 	<input id="regionId4" type="hidden" name="id"/>
 	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId4','cache':false}"></span>
-	<@s.submit theme="simple" value="%{getText('confirm')}" />
+	<@s.submit theme="simple" value=getText('confirm') />
 	</div>
 </form>
 </body>

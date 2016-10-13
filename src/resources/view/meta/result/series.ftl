@@ -2,18 +2,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText(name)}</title>
+<title>${getText(name)}</title>
 </head>
 <body>
 <ul class="breadcrumb">
 	<li>
-    	<a class="ajax view" href="<@url value="/"/>">${action.getText('index')}</a> <span class="divider">/</span>
+    	<a class="ajax view" href="<@url value="/"/>">${getText('index')}</a> <span class="divider">/</span>
 	</li>
 <#if !page??>
-	<li class="active">${action.getText(name)}</li>
+	<li class="active">${getText(name)}</li>
 <#else>
 	<li>
-    	<a class="ajax view" href="<@url value="/${name}"/>">${action.getText(name)}</a> <span class="divider">/</span>
+    	<a class="ajax view" href="<@url value="/${name}"/>">${getText(name)}</a> <span class="divider">/</span>
 	</li>
 	<li class="active">${page.title!}</li>
 </#if>
@@ -36,8 +36,8 @@
 			</div>
 			<#if showPager>
 			<div class="pager">
-				<#if previousPage??><li><a href="<@url value="/${name}/p${previousPage.path}"/>" class="ajax view">${action.getText('previouspage')}:${previousPage.title!}</a></li></#if>
-				<#if nextPage??><li><a href="<@url value="/${name}/p${nextPage.path}"/>" class="ajax view">${action.getText('nextpage')}:${nextPage.title!}</a></li></#if>
+				<#if previousPage??><li><a href="<@url value="/${name}/p${previousPage.path}"/>" class="ajax view">${getText('previouspage')}:${previousPage.title!}</a></li></#if>
+				<#if nextPage??><li><a href="<@url value="/${name}/p${nextPage.path}"/>" class="ajax view">${getText('nextpage')}:${nextPage.title!}</a></li></#if>
 			</div>
 			</#if>
 		</#if>

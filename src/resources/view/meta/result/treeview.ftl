@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<#assign entityDisplayName=action.getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))/>
+<#assign entityDisplayName=getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))/>
 <title>${entityDisplayName}</title>
 </head>
 <body>

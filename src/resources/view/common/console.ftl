@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('console')}</title>
+<title>${getText('console')}</title>
 <script>
 $(function(){
 		$('#trigger .btn').click(function(){
@@ -57,13 +57,13 @@ $(function(){
 <@s.form id="form" action="${actionBaseUrl}" method="post" class="ajax focus form-inline well">
 	<div class="row-fluid">
 	<div class="span6">
-	<span>${action.getText('expression')}: </span><@s.textfield theme="simple" id="expression" name="expression" class="required" style="width:80%;"/>
+	<span>${getText('expression')}: </span><@s.textfield theme="simple" id="expression" name="expression" class="required" style="width:80%;"/>
 	</div>
 	<div class="span3">
-	<span>${action.getText('scope')}: </span><@s.select theme="simple" id="scope" name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/>
+	<span>${getText('scope')}: </span><@s.select theme="simple" id="scope" name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/>
 	</div>
 	<div class="span3">
-	<@s.submit id="submit" theme="simple" value="%{getText('confirm')}" />
+	<@s.submit id="submit" theme="simple" value=getText('confirm') />
 	</div>
 </@s.form>
 <hr/>
@@ -74,7 +74,7 @@ $(function(){
 	<ul class="thumbnails">
 	<#list triggers as key,value>
 	<li class="span4">
-	<button type="button" class="btn btn-block" data-scope="${value.name()}" data-expression="${key}">${action.getText(key)}</button>
+	<button type="button" class="btn btn-block" data-scope="${value.name()}" data-expression="${key}">${getText(key)}</button>
 	</li>
 	</#list>
 	</ul>
@@ -97,8 +97,8 @@ $(function(){
 	<#list settings as setting>
 	<li class="span4">
 	<div class="row-fluid">
-	<div class="span6 key"<#if setting.description?has_content> title="${setting.description}"</#if>>${action.getText(setting.key)}</div>
-	<div class="span6"><div class="switch" data-on-label="${action.getText('ON')}" data-off-label="${action.getText('OFF')}"><input type="checkbox" name="${setting.key}"<#if setting.value=='true'> checked="checked"</#if>></div></div>
+	<div class="span6 key"<#if setting.description?has_content> title="${setting.description}"</#if>>${getText(setting.key)}</div>
+	<div class="span6"><div class="switch" data-on-label="${getText('ON')}" data-off-label="${getText('OFF')}"><input type="checkbox" name="${setting.key}"<#if setting.value=='true'> checked="checked"</#if>></div></div>
 	</div>
 	</li>
 	</#list>

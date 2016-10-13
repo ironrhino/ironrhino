@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#if schema.new>${action.getText('create')}<#else>${action.getText('edit')}</#if>${action.getText('schema')}</title>
+<title><#if schema.new>${getText('create')}<#else>${getText('edit')}</#if>${getText('schema')}</title>
 </head>
 <body>
 <@s.form id="schema_input" action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?then('',' importable')}">
@@ -16,9 +16,9 @@
 	<@s.hidden name="schema.description"/>
 	<@s.hidden name="schema.strict"/>
 	<#else>
-	<#if view=='brief'><@s.hidden name="schema.name"/><h4>${schema.name!}<#if schema.strict> <span class="label">${action.getText('strict')}</span></#if></h4><#else><@s.textfield label="%{getText('name')}" name="schema.name" class="required checkavailable"/></#if>
-	<#if view=='brief'><@s.hidden name="schema.strict"/><#else><@s.checkbox label="%{getText('strict')}" name="schema.strict" class="custom"/></#if>
-	<#if view=='brief'><@s.hidden name="schema.description"/><p>${schema.description!}</p><#else><@s.textarea label="%{getText('description')}" name="schema.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
+	<#if view=='brief'><@s.hidden name="schema.name"/><h4>${schema.name!}<#if schema.strict> <span class="label">${getText('strict')}</span></#if></h4><#else><@s.textfield label=getText('name') name="schema.name" class="required checkavailable"/></#if>
+	<#if view=='brief'><@s.hidden name="schema.strict"/><#else><@s.checkbox label=getText('strict') name="schema.strict" class="custom"/></#if>
+	<#if view=='brief'><@s.hidden name="schema.description"/><p>${schema.description!}</p><#else><@s.textarea label=getText('description') name="schema.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
 	</#if>
 	<table class="datagrid nullable table table-condensed">
 	<@s.hidden name="__datagrid_schema.fields" />
@@ -32,11 +32,11 @@
 		</style>
 		<thead>
 			<tr>
-				<th>${action.getText('name')}</th>
-				<th style="width:36%;">${action.getText('value')}</th>
-				<th>${action.getText('type')}</th>
-				<th>${action.getText('required')}</th>
-				<th>${action.getText('strict')}</th>
+				<th>${getText('name')}</th>
+				<th style="width:36%;">${getText('value')}</th>
+				<th>${getText('type')}</th>
+				<th>${getText('required')}</th>
+				<th>${getText('strict')}</th>
 				<th class="manipulate"></th>
 			</tr>
 		</thead>
@@ -74,7 +74,7 @@
 			</#list>
 		</tbody>
 	</table>
-	<@s.submit value="%{getText('save')}" class="btn-primary"/>
+	<@s.submit value=getText('save') class="btn-primary"/>
 </@s.form>
 </body>
 </html>

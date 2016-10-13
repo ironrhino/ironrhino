@@ -79,9 +79,17 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 
 <#macro captcha theme="">
 <#if captchaRequired!>
-	<@s.textfield label="%{getText('captcha')}" name="captcha" class="required captcha" style="width:60px;" data\-captcha="${base}/captcha.jpg?token=${session.id}"/>
+	<@s.textfield label=getText('captcha') name="captcha" class="required captcha" style="width:60px;" data\-captcha="${base}/captcha.jpg?token=${session.id}"/>
 </#if>
 </#macro>
+
+<#function getText value>
+	<#if (action.getText)??>
+		<#return action.getText(value)/>
+	<#else>
+		<#return statics['org.ironrhino.core.struts.I18N'].getText(value)/>
+	</#if>
+</#function>
 
 <#function getUrl value includeContextPath=true includeQueryString=false secure="">
 <#if value?starts_with('/assets/') && includeContextPath>

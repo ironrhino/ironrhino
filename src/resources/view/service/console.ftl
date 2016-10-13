@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('service')}${action.getText('console')}</title>
+<title>${getText('service')}${getText('console')}</title>
 <script>
 $(function(){
 $('.service').click(function(){

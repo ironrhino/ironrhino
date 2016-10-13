@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('service')}${action.getText('stats')}</title>
+<title>${getText('service')}${getText('stats')}</title>
 </head>
 <body>
 <#assign baseurl=actionBaseUrl>
@@ -16,14 +16,14 @@
 </#if>
 <#if warnings?size gt 0>
 	<table class="table table-hover table-bordered sortable resizable" style="white-space: nowrap;">
-		<caption><h4>${action.getText('warnings')}</h4></caption>
+		<caption><h4>${getText('warnings')}</h4></caption>
 		<thead>
 		<tr>
-			<th style="width:120px;">${action.getText('source')}</th>
-			<th style="width:120px;">${action.getText('target')}</th>
-			<th>${action.getText('service')}</th>
-			<th style="width:50px;">${action.getText('time')} (ms)</th>
-			<th style="width:120px;">${action.getText('date')}</th>
+			<th style="width:120px;">${getText('source')}</th>
+			<th style="width:120px;">${getText('target')}</th>
+			<th>${getText('service')}</th>
+			<th style="width:50px;">${getText('time')} (ms)</th>
+			<th style="width:120px;">${getText('date')}</th>
 		</tr>
 		</thead>
 		<tbody>

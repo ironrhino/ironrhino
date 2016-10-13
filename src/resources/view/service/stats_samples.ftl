@@ -2,19 +2,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${action.getText('service')}${action.getText('stats')}</title>
+<title>${getText('service')}${getText('stats')}</title>
 </head>
 <body>
 <#if samples?has_content>
 	<table class="table table-hover table-bordered sortable resizable" style="white-space: nowrap;">
-		<caption><h4>${action.getText('samples')}</h4></caption>
+		<caption><h4>${getText('samples')}</h4></caption>
 		<thead>
 		<tr>
-			<th>${action.getText('host')}</th>
-			<th style="width:120px;">${action.getText('count')}</th>
-			<th style="width:120px;">${action.getText('meanTime')} (ms)</th>
-			<th style="width:120px;">${action.getText('start')}</th>
-			<th style="width:120px;">${action.getText('end')}</th>
+			<th>${getText('host')}</th>
+			<th style="width:120px;">${getText('count')}</th>
+			<th style="width:120px;">${getText('meanTime')} (ms)</th>
+			<th style="width:120px;">${getText('start')}</th>
+			<th style="width:120px;">${getText('end')}</th>
 		</tr>
 		</thead>
 		<tbody>
