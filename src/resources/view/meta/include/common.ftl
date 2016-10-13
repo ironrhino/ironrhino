@@ -83,11 +83,11 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 </#if>
 </#macro>
 
-<#function getText value>
+<#function getText value args...>
 	<#if (action.getText)??>
-		<#return action.getText(value)/>
+		<#return action.getText(value,args)/>
 	<#else>
-		<#return statics['org.ironrhino.core.struts.I18N'].getText(value)/>
+		<#return statics['org.ironrhino.core.struts.I18N'].getText(value,args)/>
 	</#if>
 </#function>
 
