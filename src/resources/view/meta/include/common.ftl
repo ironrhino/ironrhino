@@ -84,6 +84,9 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 </#macro>
 
 <#function getText value args...>
+	<#if args?size == 1 && args[0]?is_indexable>
+		<#local args=args[0]>
+	</#if>
 	<#if (action.getText)??>
 		<#return action.getText(value,args)/>
 	<#else>
