@@ -47,6 +47,12 @@
 				<prop key="hibernate.cache.use_second_level_cache">
 					${hibernate.cache.use_second_level_cache:false}
 				</prop>
+				<prop key="hibernate.connection.acquisition_mode">
+					${hibernate.connection.acquisition_mode:AS_NEEDED}
+				</prop>
+				<prop key="hibernate.connection.acquisition_mode">
+					${hibernate.connection.release_mode:ON_CLOSE}
+				</prop>
 				<prop key="hibernate.show_sql">
 					${hibernate.show_sql:false}
 				</prop>

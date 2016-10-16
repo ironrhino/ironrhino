@@ -38,6 +38,7 @@ import org.hibernate.event.spi.PreDeleteEventListener;
 import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.hibernate.internal.SessionFactoryImpl;
+import org.ironrhino.core.dataroute.RoutingDataSource;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.ClassScanner;
@@ -121,10 +122,12 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		Properties properties = getHibernateProperties();
 		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
 			properties.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
-		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.RELEASE_CONNECTIONS))
-				&& ClassUtils.isPresent("org.springframework.batch.core.Job", getClass().getClassLoader())) {
+		if (!ConnectionReleaseMode.ON_CLOSE.name().equals(properties.getProperty(AvailableSettings.RELEASE_CONNECTIONS))
+				&& (ClassUtils.isPresent("org.springframework.batch.core.Job", getClass().getClassLoader())
+						|| dataSource instanceof RoutingDataSource)) {
 			// spring-batch need custom isolation levels
 			properties.put(AvailableSettings.RELEASE_CONNECTIONS, ConnectionReleaseMode.ON_CLOSE.name());
+			logger.warn("Override {} to {}", AvailableSettings.RELEASE_CONNECTIONS, ConnectionReleaseMode.ON_CLOSE);
 		}
 		Map<String, Class<?>> added = new HashMap<>();
 		List<Class<?>> classes = new ArrayList<>();
