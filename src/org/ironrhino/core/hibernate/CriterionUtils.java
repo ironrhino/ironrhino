@@ -2,6 +2,7 @@ package org.ironrhino.core.hibernate;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -196,7 +197,7 @@ public class CriterionUtils {
 				CriterionOperator operator = null;
 				if (StringUtils.isNotBlank(operatorValue))
 					try {
-						operator = CriterionOperator.valueOf(operatorValue.toUpperCase());
+						operator = CriterionOperator.valueOf(operatorValue.toUpperCase(Locale.ROOT));
 					} catch (IllegalArgumentException e) {
 
 					}

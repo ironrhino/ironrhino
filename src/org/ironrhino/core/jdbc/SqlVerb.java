@@ -1,5 +1,7 @@
 package org.ironrhino.core.jdbc;
 
+import java.util.Locale;
+
 import org.ironrhino.core.model.Displayable;
 
 public enum SqlVerb implements Displayable {
@@ -28,7 +30,7 @@ public enum SqlVerb implements Displayable {
 		sql = SqlUtils.clearComments(sql).trim();
 		String[] arr = sql.split("\\s");
 		try {
-			return valueOf(arr[0].toUpperCase());
+			return valueOf(arr[0].toUpperCase(Locale.ROOT));
 		} catch (Exception e) {
 			return null;
 		}

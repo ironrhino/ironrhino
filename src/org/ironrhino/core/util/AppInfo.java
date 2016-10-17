@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -81,7 +82,7 @@ public class AppInfo {
 		Stage s = null;
 		if (stage != null)
 			try {
-				s = Stage.valueOf(stage.toUpperCase());
+				s = Stage.valueOf(stage.toUpperCase(Locale.ROOT));
 			} catch (Exception e) {
 			}
 		if (s != null)
@@ -92,7 +93,7 @@ public class AppInfo {
 		RunLevel r = null;
 		if (runlevel != null)
 			try {
-				r = RunLevel.valueOf(runlevel.toUpperCase());
+				r = RunLevel.valueOf(runlevel.toUpperCase(Locale.ROOT));
 			} catch (Exception e) {
 			}
 		if (r != null)
@@ -297,8 +298,8 @@ public class AppInfo {
 
 		// configure spring profiles
 		if (StringUtils.isBlank(System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME))) {
-			String defaultProfiles = System
-					.getenv(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME.replaceAll("\\.", "_").toUpperCase());
+			String defaultProfiles = System.getenv(
+					AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME.replaceAll("\\.", "_").toUpperCase(Locale.ROOT));
 			if (StringUtils.isNotBlank(defaultProfiles)) {
 				System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
 				AppInfo.setDefaultProfiles(defaultProfiles);

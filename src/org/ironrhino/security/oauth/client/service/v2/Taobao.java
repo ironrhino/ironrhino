@@ -6,6 +6,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -133,7 +134,7 @@ public class Taobao extends OAuth2Provider {
 		for (Map.Entry<String, String> entry : map.entrySet())
 			sb.append(entry.getKey()).append(entry.getValue());
 		sb.append(getClientSecret());
-		return CodecUtils.md5Hex(sb.toString()).toUpperCase();
+		return CodecUtils.md5Hex(sb.toString()).toUpperCase(Locale.ROOT);
 	}
 
 }

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -147,7 +148,7 @@ public class JdbcQueryService {
 			if (keywords.isEmpty()) {
 				str = dbmd.getSQLKeywords();
 				if (StringUtils.isNotBlank(str))
-					keywords.addAll(Arrays.asList(str.toUpperCase().split(",")));
+					keywords.addAll(Arrays.asList(str.toUpperCase(Locale.ROOT).split(",")));
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -165,7 +166,7 @@ public class JdbcQueryService {
 			ResultSet rs = dbmd.getTables(catalog, schema, "%", new String[] { "TABLE" });
 			while (rs.next()) {
 				String table = rs.getString(3);
-				if (keywords.contains(table.toUpperCase()))
+				if (keywords.contains(table.toUpperCase(Locale.ROOT)))
 					table = new StringBuilder(table.length() + 2).append(quoteString).append(table).append(quoteString)
 							.toString();
 				tables.add(table);

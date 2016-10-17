@@ -7,6 +7,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -296,7 +297,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 
 		public static String getBaseString(String method, String url, Map<String, String> params) throws Exception {
 			StringBuilder sb = new StringBuilder();
-			sb.append(method.toUpperCase()).append('&');
+			sb.append(method.toUpperCase(Locale.ROOT)).append('&');
 			URL u = new URL(url);
 			StringBuilder usb = new StringBuilder();
 			usb.append(u.getProtocol().toLowerCase()).append("://").append(u.getHost().toLowerCase());

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.FilterChain;
@@ -42,7 +43,7 @@ public class RestFilter extends OncePerRequestFilter {
 		if (StringUtils.isNotBlank(method)
 				|| request.getContentType() != null && request.getContentType().startsWith(MediaType.TEXT_PLAIN_VALUE))
 			request = new WrappedHttpServletRequest(request,
-					StringUtils.isNotBlank(method) ? method.toUpperCase().trim() : request.getMethod());
+					StringUtils.isNotBlank(method) ? method.toUpperCase(Locale.ROOT).trim() : request.getMethod());
 		if (loggingBody && (request.getContentType() == null
 				|| request.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE))) {
 			if (request.getMethod().equalsIgnoreCase("GET")) {

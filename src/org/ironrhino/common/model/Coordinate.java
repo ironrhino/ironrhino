@@ -1,6 +1,7 @@
 package org.ironrhino.common.model;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import javax.persistence.Embeddable;
 
@@ -90,7 +91,7 @@ public class Coordinate implements Serializable {
 				i = input.indexOf('"');
 				if (i > 0) {
 					d += Double.valueOf(input.substring(0, i)) / (60 * 60);
-					input = input.substring(i + 1).trim().toUpperCase();
+					input = input.substring(i + 1).trim().toUpperCase(Locale.ROOT);
 					if (input.equals("S") || input.equals("W"))
 						d = 0 - d;
 				}

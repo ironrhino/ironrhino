@@ -3,6 +3,7 @@ package org.ironrhino.core.struts.result;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -213,7 +214,7 @@ public class JasperReportsResult extends StrutsResultSupport {
 			}
 
 			Exporter exporter;
-			format = format.toUpperCase();
+			format = format.toUpperCase(Locale.ROOT);
 			switch (format) {
 			case FORMAT_PDF:
 				response.setContentType("application/pdf");

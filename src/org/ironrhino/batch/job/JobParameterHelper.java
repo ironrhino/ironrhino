@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +39,8 @@ public class JobParameterHelper {
 				key = key.substring(1);
 			ParameterType type = ParameterType.STRING;
 			if (key.indexOf('(') > 0 && key.indexOf(')') > 0) {
-				type = ParameterType.valueOf(key.substring(key.indexOf('(') + 1, key.indexOf(')')).toUpperCase());
+				type = ParameterType
+						.valueOf(key.substring(key.indexOf('(') + 1, key.indexOf(')')).toUpperCase(Locale.ROOT));
 				key = key.substring(0, key.indexOf('('));
 			}
 			SimpleJobParameter sjp = new SimpleJobParameter();
