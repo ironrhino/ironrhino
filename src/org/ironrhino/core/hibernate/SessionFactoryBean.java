@@ -18,7 +18,6 @@ import javax.persistence.Entity;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.Interceptor;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.SessionFactory;
@@ -38,7 +37,6 @@ import org.hibernate.event.spi.PreDeleteEventListener;
 import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.hibernate.internal.SessionFactoryImpl;
-import org.ironrhino.core.dataroute.RoutingDataSource;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.ClassScanner;
@@ -47,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ClassUtils;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
@@ -122,13 +119,6 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		Properties properties = getHibernateProperties();
 		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
 			properties.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
-		if (!ConnectionReleaseMode.ON_CLOSE.name().equals(properties.getProperty(AvailableSettings.RELEASE_CONNECTIONS))
-				&& (ClassUtils.isPresent("org.springframework.batch.core.Job", getClass().getClassLoader())
-						|| dataSource instanceof RoutingDataSource)) {
-			// spring-batch need custom isolation levels
-			properties.put(AvailableSettings.RELEASE_CONNECTIONS, ConnectionReleaseMode.ON_CLOSE.name());
-			logger.warn("Override {} to {}", AvailableSettings.RELEASE_CONNECTIONS, ConnectionReleaseMode.ON_CLOSE);
-		}
 		Map<String, Class<?>> added = new HashMap<>();
 		List<Class<?>> classes = new ArrayList<>();
 		Collection<Class<?>> scaned = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), Entity.class);
