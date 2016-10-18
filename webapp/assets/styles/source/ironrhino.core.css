@@ -269,13 +269,6 @@ ul.attributes span.group{
 ul.attributes li.group ul{
 	padding-left:10px;
 }
-.treeselect .control-label,.listpick .control-label{
-	cursor:pointer;
-}
-.treeselect .controls span,.listpick .controls span{
-	display:inline-block;
-	margin:5px 0;
-}
 a.remove {
   font-size: 16px;
   font-weight: bold;
@@ -284,13 +277,23 @@ a.remove {
   opacity: 0.2;
   filter: alpha(opacity=20);
 }
-
 a.remove:hover {
   color: #000000;
   text-decoration: none;
   cursor: pointer;
   opacity: 0.4;
   filter: alpha(opacity=40);
+}
+.treeselect .control-label,.listpick .control-label{
+	cursor:pointer;
+}
+.treeselect .controls span,.listpick .controls span{
+	display:inline-block;
+	margin:5px 0;
+}
+.treeselect .controls span a.remove,.listpick .controls span a.remove{
+	font-size: 13px;
+	margin-left: 5px;	
 }
 .loading {
   pointer-events: none;
