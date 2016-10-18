@@ -1,5 +1,6 @@
 package org.ironrhino.core.spring;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
@@ -18,22 +19,24 @@ import org.ironrhino.core.metadata.PostPropertiesReset;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.util.AnnotationUtils;
+import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.mvel2.PropertyAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.framework.Advised;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ApplicationContextConsole {
 
-	private static final String SET_PROPERTY_EXPRESSION_PATTERN = "^\\s*[a-zA-Z][a-zA-Z0-9_\\-]*\\.[a-zA-Z][a-zA-Z0-9_]*\\s*=\\s*.+\\s*$";
-
-	private static final String SIMPLE_METHOD_INVOCATION_EXPRESSION_PATTERN = "^\\s*[a-zA-Z][a-zA-Z0-9_\\-]*\\.[a-zA-Z][a-zA-Z0-9_]*\\(\\s*\\)\\s*$";
+	private static final String SET_PROPERTY_EXPRESSION_PATTERN = "^[a-zA-Z][a-zA-Z0-9_\\-]*\\.[a-zA-Z][a-zA-Z0-9_]*\\s*=\\s*.+$";
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -110,48 +113,70 @@ public class ApplicationContextConsole {
 	}
 
 	public Object execute(String expression, Scope scope) throws Exception {
+		expression = expression.trim();
 		Object value = null;
-		if (expression.matches(SET_PROPERTY_EXPRESSION_PATTERN)) {
-			executeSetProperty(expression);
-		} else {
-			value = executeMethodInvocation(expression);
-		}
-		if (scope != null && scope != Scope.LOCAL)
-			eventPublisher.publish(new ExpressionEvent(expression), Scope.GLOBAL);
-		return value;
-	}
-
-	private Object executeMethodInvocation(String expression) throws Exception {
-		if (expression.matches(SIMPLE_METHOD_INVOCATION_EXPRESSION_PATTERN)) {
-			String[] arr = expression.split("\\.");
-			String beanName = arr[0].trim();
-			String methodName = arr[1].trim();
-			methodName = methodName.substring(0, methodName.indexOf('('));
-			Object bean = getBeans().get(beanName);
-			if (bean == null)
-				throw new IllegalArgumentException("bean[" + beanName + "] doesn't exist");
-			try {
-				Method m = bean.getClass().getMethod(methodName, new Class[0]);
-				return m.invoke(bean, new Object[0]);
-			} catch (NoSuchMethodException e) {
-				throw new IllegalArgumentException("bean[" + beanName + "] has no such method: " + arr[1]);
+		try {
+			if (expression.matches(SET_PROPERTY_EXPRESSION_PATTERN)) {
+				executeSetProperty(expression);
+			} else {
+				try {
+					value = ExpressionUtils.evalExpression(expression, getBeans());
+				} catch (PropertyAccessException pe) {
+					if (!expression.endsWith(")"))
+						value = executeGetProperty(expression);
+					else
+						throw pe;
+				}
 			}
-		} else {
-			return ExpressionUtils.evalExpression(expression, getBeans());
+			if (scope != null && scope != Scope.LOCAL)
+				eventPublisher.publish(new ExpressionEvent(expression), Scope.GLOBAL);
+			return value;
+		} catch (NoSuchFieldException e) {
+			throw new IllegalArgumentException("NoSuchFieldException: " + e.getMessage());
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException("NoSuchMethodException: " + e.getMessage());
 		}
 	}
 
 	private void executeSetProperty(String expression) throws Exception {
 		Object bean = null;
-		if (expression.indexOf('=') > 0) {
-			bean = getBeans().get(expression.substring(0, expression.indexOf('.')));
+		String beanName = expression.substring(0, expression.indexOf('.'));
+		bean = getBeans().get(beanName);
+		if (bean == null)
+			throw new IllegalArgumentException("bean[" + beanName + "] doesn't exist");
+		try {
+			ExpressionUtils.evalExpression(expression, getBeans());
+		} catch (PropertyAccessException pe) {
+			if (bean instanceof Advised) {
+				bean = (((Advised) bean).getTargetSource()).getTarget();
+			}
+			String fieldName = expression.substring(expression.indexOf('.') + 1, expression.indexOf('=')).trim();
+			String value = expression.substring(expression.indexOf('=') + 1).trim();
+			Field f = ReflectionUtils.getField(bean.getClass(), fieldName);
+			if (f.getType() == String.class && (value.startsWith("\"") && value.endsWith("\"")
+					|| value.startsWith("'") && value.endsWith("'"))) {
+				value = value.substring(1, value.length() - 1);
+			}
+			Object v = ApplicationContextUtils.getBean(ConversionService.class).convert(value, f.getType());
+			f.setAccessible(true);
+			f.set(bean, v);
 		}
-		ExpressionUtils.evalExpression(expression, getBeans());
-		if (bean != null) {
-			Method m = AnnotationUtils.getAnnotatedMethod(bean.getClass(), PostPropertiesReset.class);
-			if (m != null)
-				m.invoke(bean, new Object[0]);
+		ReflectionUtils.processCallback(bean, PostPropertiesReset.class);
+	}
+
+	private Object executeGetProperty(String expression) throws Exception {
+		Object bean = null;
+		String beanName = expression.substring(0, expression.indexOf('.'));
+		bean = getBeans().get(beanName);
+		if (bean == null)
+			throw new IllegalArgumentException("bean[" + beanName + "] doesn't exist");
+		if (bean instanceof Advised) {
+			bean = (((Advised) bean).getTargetSource()).getTarget();
 		}
+		String fieldName = expression.substring(expression.indexOf('.') + 1).trim();
+		Field f = ReflectionUtils.getField(bean.getClass(), fieldName);
+		f.setAccessible(true);
+		return f.get(bean);
 	}
 
 	@EventListener
