@@ -37,15 +37,23 @@
 		$(this).each(function() {
 			var t = $(this);
 			if (t.prop('tagName') == 'SELECT') {
-				var div = $('<div class="input-append combobox"><ul class="dropdown-menu combobox-menu" role="menu"></ul><input type="text" name="'
-						+ t.attr('name')
-						+ '" value="'
-						+ t.val()
-						+ '"/><span class="add-on"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
-						.insertBefore(t);
-				$('input', div).width(t.width() - 27);
-				if (t.hasClass('required'))
-					$('input', div).addClass('required');
+				var update = false;
+				var div = t.next('div.combobox');
+				if (!div.length) {
+					var div = $('<div class="input-append combobox"><ul class="dropdown-menu combobox-menu" role="menu"></ul><input type="text" name="'
+							+ t.attr('name')
+							+ '" value="'
+							+ t.val()
+							+ '"/><span class="add-on"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
+							.insertAfter(t);
+					var input = $('input', div);
+					input.width(t.width() - 27);
+					if (t.hasClass('required'))
+						input.addClass('required');
+				} else {
+					$('.combobox-menu li', div).remove();
+					update = true;
+				}
 				var _menu = $('.combobox-menu', div);
 				t.children().each(function(i, v) {
 					if ($(v).prop('tagName') == 'OPTION' && $(v).attr('value')) {
@@ -62,7 +70,9 @@
 						});
 					}
 				});
-				t.remove();
+				if (update)
+					return this;
+				t.hide().prop('disabled', true);
 				t = div;
 			}
 			var arr = [];

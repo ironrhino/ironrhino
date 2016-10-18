@@ -40,18 +40,21 @@
 			});
 			if ($(this).parents('.datagrided').length)
 				return;
-			$('tbody input:last', this).keydown(function(event) {
-						if (event.keyCode == 13 && !$(this).hasClass('tags')) {
-							event.preventDefault();
-							addRow(event, options);
-						}
-					});
-			$('tbody input:first', this).keydown(function(event) {
-						if (event.keyCode == 8 && !$(event.target).val()) {
-							event.preventDefault();
-							removeRow(event, options);
-						}
-					});
+			if ($(this).hasClass('keydown')) {
+				$('tbody input:last', this).keydown(function(event) {
+							if (event.keyCode == 13
+									&& !$(this).hasClass('tags')) {
+								event.preventDefault();
+								addRow(event, options);
+							}
+						});
+				$('tbody input:first', this).keydown(function(event) {
+							if (event.keyCode == 8 && !$(event.target).val()) {
+								event.preventDefault();
+								removeRow(event, options);
+							}
+						});
+			}
 			$('thead .add', this).click(function(event) {
 				var row = $(event.target).closest('table.datagrided')
 						.children('tbody').children(':not(.nontemplate):eq(0)');

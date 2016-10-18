@@ -65,6 +65,7 @@ $(function(){
 	<div class="span3">
 	<@s.submit id="submit" theme="simple" value=getText('confirm') />
 	</div>
+	</div>
 </@s.form>
 <hr/>
 

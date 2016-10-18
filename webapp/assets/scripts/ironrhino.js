@@ -32304,7 +32304,7 @@ Message = {
 	showFieldError : function(field, msg, msgKey) {
 		var msg = msg || MessageBundle.get(msgKey);
 		if (field && $(field).length) {
-			field = $(field);
+			field = $(field).not(':disabled');
 			var tabpane = field.closest('.control-group').parent('.tab-pane');
 			if (tabpane.length && !tabpane.hasClass('active'))
 				$('a[href$="#' + tabpane.attr('id') + '"]').tab('show');
@@ -37010,18 +37010,21 @@ Observation.sortableTable = function(container) {
 			});
 			if ($(this).parents('.datagrided').length)
 				return;
-			$('tbody input:last', this).keydown(function(event) {
-						if (event.keyCode == 13 && !$(this).hasClass('tags')) {
-							event.preventDefault();
-							addRow(event, options);
-						}
-					});
-			$('tbody input:first', this).keydown(function(event) {
-						if (event.keyCode == 8 && !$(event.target).val()) {
-							event.preventDefault();
-							removeRow(event, options);
-						}
-					});
+			if ($(this).hasClass('keydown')) {
+				$('tbody input:last', this).keydown(function(event) {
+							if (event.keyCode == 13
+									&& !$(this).hasClass('tags')) {
+								event.preventDefault();
+								addRow(event, options);
+							}
+						});
+				$('tbody input:first', this).keydown(function(event) {
+							if (event.keyCode == 8 && !$(event.target).val()) {
+								event.preventDefault();
+								removeRow(event, options);
+							}
+						});
+			}
 			$('thead .add', this).click(function(event) {
 				var row = $(event.target).closest('table.datagrided')
 						.children('tbody').children(':not(.nontemplate):eq(0)');
@@ -37497,15 +37500,23 @@ Observation._portal = function(container) {
 		$(this).each(function() {
 			var t = $(this);
 			if (t.prop('tagName') == 'SELECT') {
-				var div = $('<div class="input-append combobox"><ul class="dropdown-menu combobox-menu" role="menu"></ul><input type="text" name="'
-						+ t.attr('name')
-						+ '" value="'
-						+ t.val()
-						+ '"/><span class="add-on"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
-						.insertBefore(t);
-				$('input', div).width(t.width() - 27);
-				if (t.hasClass('required'))
-					$('input', div).addClass('required');
+				var update = false;
+				var div = t.next('div.combobox');
+				if (!div.length) {
+					var div = $('<div class="input-append combobox"><ul class="dropdown-menu combobox-menu" role="menu"></ul><input type="text" name="'
+							+ t.attr('name')
+							+ '" value="'
+							+ t.val()
+							+ '"/><span class="add-on"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
+							.insertAfter(t);
+					var input = $('input', div);
+					input.width(t.width() - 27);
+					if (t.hasClass('required'))
+						input.addClass('required');
+				} else {
+					$('.combobox-menu li', div).remove();
+					update = true;
+				}
 				var _menu = $('.combobox-menu', div);
 				t.children().each(function(i, v) {
 					if ($(v).prop('tagName') == 'OPTION' && $(v).attr('value')) {
@@ -37522,7 +37533,9 @@ Observation._portal = function(container) {
 						});
 					}
 				});
-				t.remove();
+				if (update)
+					return this;
+				t.hide().prop('disabled', true);
 				t = div;
 			}
 			var arr = [];

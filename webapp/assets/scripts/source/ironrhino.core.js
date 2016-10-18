@@ -238,7 +238,7 @@ Message = {
 	showFieldError : function(field, msg, msgKey) {
 		var msg = msg || MessageBundle.get(msgKey);
 		if (field && $(field).length) {
-			field = $(field);
+			field = $(field).not(':disabled');
 			var tabpane = field.closest('.control-group').parent('.tab-pane');
 			if (tabpane.length && !tabpane.hasClass('active'))
 				$('a[href$="#' + tabpane.attr('id') + '"]').tab('show');
