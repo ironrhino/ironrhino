@@ -13,6 +13,10 @@ public class HttpComponentsClientHttpRequestFactory
 
 	public static final String MDC_KEY_REQUEST_ID = "requestId";
 
+	public static final String HTTP_HEADER_REQUEST_CHAIN = "X-Request-Chain";
+
+	public static final String MDC_KEY_REQUEST_CHAIN = "requestChain";
+
 	public static final int DEFAULT_CONNECTTIMEOUT = 5000;
 
 	public static final int DEFAULT_READTIMEOUT = 5000;
@@ -64,6 +68,9 @@ public class HttpComponentsClientHttpRequestFactory
 		String requestId = MDC.get(MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			request.addHeader(HTTP_HEADER_REQUEST_ID, requestId);
+		String requestChain = MDC.get(MDC_KEY_REQUEST_CHAIN);
+		if (requestChain != null)
+			request.addHeader(HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		if (client != null)
 			request.addHeader("Authorization", "Bearer " + client.fetchAccessToken());
 	}
