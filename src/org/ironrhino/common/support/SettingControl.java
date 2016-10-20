@@ -15,7 +15,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Order;
-import org.ironrhino.common.Constants;
 import org.ironrhino.common.model.Setting;
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
@@ -33,6 +32,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SettingControl {
+
+	public static final String SETTING_KEY_SETUP_DATETIME = "setup.datetime";
+	public static final String SETTING_KEY_SETUP_TIMESTAMP = "setup.timestamp";
 
 	@Autowired
 	private Logger logger;
@@ -188,15 +190,15 @@ public class SettingControl {
 	public void setup() {
 		entityManager.setEntityClass(Setting.class);
 		Date now = new Date();
-		Setting sd = entityManager.findOne(Constants.SETTING_KEY_SETUP_DATETIME);
+		Setting sd = entityManager.findOne(SETTING_KEY_SETUP_DATETIME);
 		if (sd == null) {
-			sd = new Setting(Constants.SETTING_KEY_SETUP_DATETIME, DateUtils.formatDatetime(now));
+			sd = new Setting(SETTING_KEY_SETUP_DATETIME, DateUtils.formatDatetime(now));
 			sd.setReadonly(true);
 			entityManager.save(sd);
 		}
-		sd = entityManager.findOne(Constants.SETTING_KEY_SETUP_TIMESTAMP);
+		sd = entityManager.findOne(SETTING_KEY_SETUP_TIMESTAMP);
 		if (sd == null) {
-			sd = new Setting(Constants.SETTING_KEY_SETUP_TIMESTAMP, String.valueOf(now.getTime()));
+			sd = new Setting(SETTING_KEY_SETUP_TIMESTAMP, String.valueOf(now.getTime()));
 			sd.setReadonly(true);
 			sd.setHidden(true);
 			entityManager.save(sd);

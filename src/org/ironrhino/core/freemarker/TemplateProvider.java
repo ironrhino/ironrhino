@@ -11,7 +11,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
-import org.ironrhino.core.struts.result.AutoConfigResult;
+import org.ironrhino.core.struts.MyFreemarkerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +28,11 @@ public class TemplateProvider {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Value("${ironrhino.view.ftl.location:" + AutoConfigResult.DEFAULT_FTL_LOCATION + "}")
-	private String ftlLocation;
+	@Value("${view.ftl.location:" + MyFreemarkerManager.DEFAULT_FTL_LOCATION + "}")
+	private String ftlLocation = MyFreemarkerManager.DEFAULT_FTL_LOCATION;
 
-	@Value("${ironrhino.view.ftl.classpath:" + AutoConfigResult.DEFAULT_FTL_CLASSPATH + "}")
-	private String ftlClasspath;
+	@Value("${view.ftl.classpath:" + MyFreemarkerManager.DEFAULT_FTL_CLASSPATH + "}")
+	private String ftlClasspath = MyFreemarkerManager.DEFAULT_FTL_CLASSPATH;
 
 	@Value("${base:}")
 	private String base;

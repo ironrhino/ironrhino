@@ -16,7 +16,7 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.RequestUtils;
-import org.ironrhino.security.Constants;
+import org.ironrhino.security.action.SignupAction;
 import org.ironrhino.security.event.SignupEvent;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.client.model.Profile;
@@ -30,6 +30,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 public class ConnectAction extends BaseAction {
 
 	private static final long serialVersionUID = 8175406892708878896L;
+
+	public static final String SETTING_KEY_OAUTH_ENABLED = "oauth.enabled";
 
 	private List<OAuthProvider> providers;
 
@@ -140,7 +142,7 @@ public class ConnectAction extends BaseAction {
 	}
 
 	private boolean isEnabled() {
-		return settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false)
-				&& settingControl.getBooleanValue(Constants.SETTING_KEY_OAUTH_ENABLED, false);
+		return settingControl.getBooleanValue(SignupAction.SETTING_KEY_SIGNUP_ENABLED, false)
+				&& settingControl.getBooleanValue(SETTING_KEY_OAUTH_ENABLED, false);
 	}
 }

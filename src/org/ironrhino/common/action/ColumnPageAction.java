@@ -1,9 +1,9 @@
 package org.ironrhino.common.action;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.common.Constants;
 import org.ironrhino.common.model.Page;
 import org.ironrhino.common.service.PageManager;
+import org.ironrhino.common.support.CmsActionMappingMatcher;
 import org.ironrhino.common.support.SettingControl;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.model.ResultPage;
@@ -91,8 +91,8 @@ public class ColumnPageAction extends BaseAction {
 	}
 
 	public String list() {
-		columns = settingControl
-				.getStringArray(Constants.SETTING_KEY_CMS_PREFIX + getName() + Constants.SETTING_KEY_CMS_COLUMN_SUFFIX);
+		columns = settingControl.getStringArray(CmsActionMappingMatcher.SETTING_KEY_CMS_PREFIX + getName()
+				+ CmsActionMappingMatcher.SETTING_KEY_CMS_COLUMN_SUFFIX);
 		column = getUid();
 		if (StringUtils.isBlank(column)) {
 			page = pageManager.getByPath("/" + getName() + "/preface");
@@ -111,8 +111,8 @@ public class ColumnPageAction extends BaseAction {
 	}
 
 	public String p() {
-		columns = settingControl
-				.getStringArray(Constants.SETTING_KEY_CMS_PREFIX + getName() + Constants.SETTING_KEY_CMS_COLUMN_SUFFIX);
+		columns = settingControl.getStringArray(CmsActionMappingMatcher.SETTING_KEY_CMS_PREFIX + getName()
+				+ CmsActionMappingMatcher.SETTING_KEY_CMS_COLUMN_SUFFIX);
 		String path = getUid();
 		if (StringUtils.isNotBlank(path)) {
 			path = "/" + path;

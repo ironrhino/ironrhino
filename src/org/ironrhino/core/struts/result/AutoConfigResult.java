@@ -14,6 +14,7 @@ import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsStatics;
 import org.apache.struts2.views.freemarker.FreemarkerResult;
 import org.ironrhino.core.struts.BaseAction;
+import org.ironrhino.core.struts.MyFreemarkerManager;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 
@@ -27,15 +28,11 @@ public class AutoConfigResult extends FreemarkerResult {
 
 	private static final long serialVersionUID = -2277156996891287055L;
 
-	public static final String DEFAULT_FTL_LOCATION = "/WEB-INF/view/ftl";
+	@Inject(value = "view.ftl.location", required = false)
+	private static String ftlLocation = MyFreemarkerManager.DEFAULT_FTL_LOCATION;
 
-	public static final String DEFAULT_FTL_CLASSPATH = "/resources/view";
-
-	@Inject(value = "ironrhino.view.ftl.location", required = false)
-	private static String ftlLocation = DEFAULT_FTL_LOCATION;
-
-	@Inject(value = "ironrhino.view.ftl.classpath", required = false)
-	private static String ftlClasspath = DEFAULT_FTL_CLASSPATH;
+	@Inject(value = "view.ftl.classpath", required = false)
+	private static String ftlClasspath = MyFreemarkerManager.DEFAULT_FTL_CLASSPATH;
 
 	private static ThreadLocal<String> styleHolder = new ThreadLocal<>();
 

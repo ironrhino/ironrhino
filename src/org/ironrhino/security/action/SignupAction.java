@@ -21,7 +21,6 @@ import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
-import org.ironrhino.security.Constants;
 import org.ironrhino.security.event.SignupEvent;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
@@ -44,6 +43,10 @@ import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 public class SignupAction extends BaseAction {
 
 	private static final long serialVersionUID = 8175406892708878896L;
+
+	public static final String SETTING_KEY_SIGNUP_ENABLED = "signup.enabled";
+
+	public static final String SETTING_KEY_SIGNUP_ACTIVATION_REQUIRED = "signup.activation.required";
 
 	protected static Logger logger = LoggerFactory.getLogger(SignupAction.class);
 
@@ -104,7 +107,7 @@ public class SignupAction extends BaseAction {
 
 	@Override
 	public String input() {
-		if (!settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false))
+		if (!settingControl.getBooleanValue(SETTING_KEY_SIGNUP_ENABLED, false))
 			return ACCESSDENIED;
 		return SUCCESS;
 	}
@@ -120,7 +123,7 @@ public class SignupAction extends BaseAction {
 									@FieldExpressionValidator(expression = "password == confirmPassword", fieldName = "confirmPassword", key = "validation.repeat.not.matched") })
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
-		if (!settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false))
+		if (!settingControl.getBooleanValue(SETTING_KEY_SIGNUP_ENABLED, false))
 			return ACCESSDENIED;
 		if (StringUtils.isBlank(username))
 			username = userManager.suggestUsername(email);
@@ -128,8 +131,7 @@ public class SignupAction extends BaseAction {
 			return INPUT;
 		if (StringUtils.isBlank(password))
 			password = CodecUtils.randomString(10);
-		boolean activationRequired = settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ACTIVATION_REQUIRED,
-				false);
+		boolean activationRequired = settingControl.getBooleanValue(SETTING_KEY_SIGNUP_ACTIVATION_REQUIRED, false);
 		User user = new User();
 		user.setEmail(email);
 		user.setUsername(username);
@@ -158,7 +160,7 @@ public class SignupAction extends BaseAction {
 
 	private boolean check() {
 		boolean valid = true;
-		if (settingControl.getBooleanValue(Constants.SETTING_KEY_SIGNUP_ENABLED, false)) {
+		if (settingControl.getBooleanValue(SETTING_KEY_SIGNUP_ENABLED, false)) {
 			if (StringUtils.isNotBlank(username) && userManager.findByNaturalId(username) != null) {
 				addFieldError("username", getText("validation.already.exists"));
 				valid = false;

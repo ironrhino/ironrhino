@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.dispatcher.mapper.ActionMapping;
-import org.ironrhino.common.Constants;
 import org.ironrhino.common.action.ColumnPageAction;
 import org.ironrhino.common.action.DisplayPageAction;
 import org.ironrhino.common.action.IssuePageAction;
@@ -34,17 +33,22 @@ import org.springframework.stereotype.Component;
 public class CmsActionMappingMatcher implements ActionMappingMatcher {
 
 	public static final String DEFAULT_PAGE_PATH_PREFIX = "/p/";
+	public static final String SETTING_KEY_CMS_PREFIX = "cms.";
+	public static final String SETTING_KEY_CMS_SERIESES = SETTING_KEY_CMS_PREFIX + "serieses";
+	public static final String SETTING_KEY_CMS_COLUMNS = SETTING_KEY_CMS_PREFIX + "columns";
+	public static final String SETTING_KEY_CMS_ISSUES = SETTING_KEY_CMS_PREFIX + "issues";
+	public static final String SETTING_KEY_CMS_COLUMN_SUFFIX = ".columns";
 
 	@Value("${cms.pagePathPrefix:" + DEFAULT_PAGE_PATH_PREFIX + "}")
 	private String pagePathPrefix = DEFAULT_PAGE_PATH_PREFIX;
 
-	@Value("${" + Constants.SETTING_KEY_CMS_SERIESES + ":}")
+	@Value("${" + SETTING_KEY_CMS_SERIESES + ":}")
 	private String serieses = "";
 
-	@Value("${" + Constants.SETTING_KEY_CMS_COLUMNS + ":}")
+	@Value("${" + SETTING_KEY_CMS_COLUMNS + ":}")
 	private String columns = "";
 
-	@Value("${" + Constants.SETTING_KEY_CMS_ISSUES + ":}")
+	@Value("${" + SETTING_KEY_CMS_ISSUES + ":}")
 	private String issues = "";
 
 	private List<String> seriesesList;
@@ -79,8 +83,8 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				return mapping;
 			}
 			for (String name : seriesesList) {
-				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding))
-						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
+				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append(pagePathPrefix)
+						.toString();
 				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();
 					mapping.setNamespace(SeriesPageAction.NAMESPACE);
@@ -103,8 +107,8 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 			for (String name : columnsList) {
 				String listurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append("/list/")
 						.toString();
-				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding))
-						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
+				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append(pagePathPrefix)
+						.toString();
 				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(listurl)
 						|| uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();
@@ -142,8 +146,8 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 			for (String name : issuesList) {
 				String listurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append("/list/")
 						.toString();
-				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding))
-						.append(DEFAULT_PAGE_PATH_PREFIX).toString();
+				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append(pagePathPrefix)
+						.toString();
 				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(listurl)
 						|| uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();
@@ -190,7 +194,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 			for (String s : serieses.split("\\s*,\\s*"))
 				list.add(s);
 		if (settingControl != null)
-			for (String s : settingControl.getStringArray(Constants.SETTING_KEY_CMS_SERIESES))
+			for (String s : settingControl.getStringArray(SETTING_KEY_CMS_SERIESES))
 				list.add(s);
 		seriesesList = list;
 	}
@@ -201,7 +205,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 			for (String s : columns.split("\\s*,\\s*"))
 				list.add(s);
 		if (settingControl != null)
-			for (String s : settingControl.getStringArray(Constants.SETTING_KEY_CMS_COLUMNS))
+			for (String s : settingControl.getStringArray(SETTING_KEY_CMS_COLUMNS))
 				list.add(s);
 		columnsList = list;
 	}
@@ -212,7 +216,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 			for (String s : issues.split("\\s*,\\s*"))
 				list.add(s);
 		if (settingControl != null)
-			for (String s : settingControl.getStringArray(Constants.SETTING_KEY_CMS_ISSUES))
+			for (String s : settingControl.getStringArray(SETTING_KEY_CMS_ISSUES))
 				list.add(s);
 		issuesList = list;
 	}
@@ -221,7 +225,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 	public void onApplicationEvent(EntityOperationEvent<Setting> event) {
 		Setting setting = event.getEntity();
 		String key = setting.getKey();
-		if (key.equals(Constants.SETTING_KEY_CMS_SERIESES)) {
+		if (key.equals(SETTING_KEY_CMS_SERIESES)) {
 			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(serieses))
 				for (String s : serieses.split("\\s*,\\s*"))
@@ -230,7 +234,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				for (String s : setting.getValue().split("\\s*,\\s*"))
 					list.add(s);
 			seriesesList = list;
-		} else if (key.equals(Constants.SETTING_KEY_CMS_COLUMNS)) {
+		} else if (key.equals(SETTING_KEY_CMS_COLUMNS)) {
 			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(columns))
 				for (String s : columns.split("\\s*,\\s*"))
@@ -239,7 +243,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				for (String s : setting.getValue().split("\\s*,\\s*"))
 					list.add(s);
 			columnsList = list;
-		} else if (key.equals(Constants.SETTING_KEY_CMS_ISSUES)) {
+		} else if (key.equals(SETTING_KEY_CMS_ISSUES)) {
 			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(issues))
 				for (String s : issues.split("\\s*,\\s*"))
