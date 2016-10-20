@@ -25,7 +25,6 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.mvel2.PropertyAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.framework.Advised;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -147,9 +146,7 @@ public class ApplicationContextConsole {
 		try {
 			ExpressionUtils.evalExpression(expression, getBeans());
 		} catch (PropertyAccessException pe) {
-			if (bean instanceof Advised) {
-				bean = (((Advised) bean).getTargetSource()).getTarget();
-			}
+			bean = ReflectionUtils.getTargetObject(bean);
 			String fieldName = expression.substring(expression.indexOf('.') + 1, expression.indexOf('=')).trim();
 			String value = expression.substring(expression.indexOf('=') + 1).trim();
 			Field f = ReflectionUtils.getField(bean.getClass(), fieldName);
@@ -170,9 +167,7 @@ public class ApplicationContextConsole {
 		bean = getBeans().get(beanName);
 		if (bean == null)
 			throw new IllegalArgumentException("bean[" + beanName + "] doesn't exist");
-		if (bean instanceof Advised) {
-			bean = (((Advised) bean).getTargetSource()).getTarget();
-		}
+		bean = ReflectionUtils.getTargetObject(bean);
 		String fieldName = expression.substring(expression.indexOf('.') + 1).trim();
 		Field f = ReflectionUtils.getField(bean.getClass(), fieldName);
 		f.setAccessible(true);
