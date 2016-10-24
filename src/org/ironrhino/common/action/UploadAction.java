@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -280,7 +281,7 @@ public class UploadAction extends BaseAction {
 		files = new LinkedHashMap<>();
 		String[] suffixes = null;
 		if (StringUtils.isNotBlank(suffix))
-			suffixes = suffix.toLowerCase().split("\\s*,\\s*");
+			suffixes = suffix.toLowerCase(Locale.ROOT).split("\\s*,\\s*");
 		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
 			String s = entry.getKey();
 			if (!entry.getValue()) {
@@ -289,7 +290,7 @@ public class UploadAction extends BaseAction {
 				if (suffixes != null) {
 					boolean matches = false;
 					for (String sf : suffixes)
-						if (s.toLowerCase().endsWith("." + sf))
+						if (s.toLowerCase(Locale.ROOT).endsWith("." + sf))
 							matches = true;
 					if (!matches)
 						continue;

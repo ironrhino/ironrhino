@@ -1,6 +1,7 @@
 package org.ironrhino.rest.client;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.ironrhino.rest.client.token.DefaultTokenStore;
@@ -92,7 +93,7 @@ public class RestClient {
 							Token.class, params);
 				} catch (HttpClientErrorException e) {
 					if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)
-							&& e.getResponseBodyAsString().toLowerCase().contains("invalid_token")) {
+							&& e.getResponseBodyAsString().toLowerCase(Locale.ROOT).contains("invalid_token")) {
 						token = null;
 						tokenStore.setToken(null);
 					} else {

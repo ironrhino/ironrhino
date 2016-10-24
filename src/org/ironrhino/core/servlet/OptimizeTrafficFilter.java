@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
@@ -71,7 +72,7 @@ public class OptimizeTrafficFilter implements Filter {
 				if (compress && brw.getContentType() != null && brw.getContentType().indexOf("text") >= 0) {
 					String acceptEncoding = request.getHeader("Accept-Encoding");
 					if (acceptEncoding != null) {
-						acceptEncoding = acceptEncoding.toLowerCase();
+						acceptEncoding = acceptEncoding.toLowerCase(Locale.ROOT);
 						if (acceptEncoding.indexOf("gzip") >= 0) {
 							ByteArrayOutputStream boas = new ByteArrayOutputStream(10 * 1024);
 							GZIPOutputStream gzos = new GZIPOutputStream(boas);

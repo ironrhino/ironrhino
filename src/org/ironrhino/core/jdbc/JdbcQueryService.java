@@ -219,7 +219,7 @@ public class JdbcQueryService {
 		} catch (BadSqlGrammarException bse) {
 			Throwable t = bse.getCause();
 			if (t.getClass().getSimpleName().equals("PSQLException")) {
-				String error = t.getMessage().toLowerCase();
+				String error = t.getMessage().toLowerCase(Locale.ROOT);
 				if ((error.indexOf("smallint") > 0 || error.indexOf("bigint") > 0 || error.indexOf("bigserial") > 0
 						|| error.indexOf("integer") > 0 || error.indexOf("serial") > 0 || error.indexOf("numeric") > 0
 						|| error.indexOf("decimal") > 0 || error.indexOf("real") > 0
@@ -304,7 +304,7 @@ public class JdbcQueryService {
 		}
 
 		if (databaseProduct == DatabaseProduct.SQLSERVER && databaseMajorVersion >= 11
-				&& sql.toLowerCase().matches(".+\\s+order\\s+by\\s+.+")) {
+				&& sql.toLowerCase(Locale.ROOT).matches(".+\\s+order\\s+by\\s+.+")) {
 			// https://technet.microsoft.com/en-us/library/gg699618(v=sql.110).aspx
 			// OFFSET-FETCH can be used only with the ORDER BY clause.
 			StringBuilder sb = new StringBuilder(sql.length() + 45);
@@ -393,8 +393,8 @@ public class JdbcQueryService {
 		}
 
 		if (databaseProduct == DatabaseProduct.SQLSERVER || databaseProduct == DatabaseProduct.SYBASE) {
-			int selectIndex = sql.toLowerCase().indexOf("select");
-			int selectDistinctIndex = sql.toLowerCase().indexOf("select distinct");
+			int selectIndex = sql.toLowerCase(Locale.ROOT).indexOf("select");
+			int selectDistinctIndex = sql.toLowerCase(Locale.ROOT).indexOf("select distinct");
 			int position = selectIndex + (selectDistinctIndex == selectIndex ? 15 : 6);
 			sql = new StringBuilder(sql.length() + 8).append(sql)
 					.insert(position, " top " + (offset > 0 ? offset + limit : limit)).toString();
@@ -402,8 +402,8 @@ public class JdbcQueryService {
 				return namedParameterJdbcTemplate.queryForList(sql, paramMap);
 		}
 		if (databaseProduct == DatabaseProduct.INFORMIX) {
-			int selectIndex = sql.toLowerCase().indexOf("select");
-			int selectDistinctIndex = sql.toLowerCase().indexOf("select distinct");
+			int selectIndex = sql.toLowerCase(Locale.ROOT).indexOf("select");
+			int selectDistinctIndex = sql.toLowerCase(Locale.ROOT).indexOf("select distinct");
 			int position = selectIndex + (selectDistinctIndex == selectIndex ? 15 : 6);
 			if (databaseMajorVersion >= 11) {
 				sql = new StringBuilder(sql.length() + 8).append(sql)

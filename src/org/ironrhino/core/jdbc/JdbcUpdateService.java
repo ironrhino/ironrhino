@@ -6,6 +6,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -169,7 +170,7 @@ public class JdbcUpdateService {
 		} catch (BadSqlGrammarException bse) {
 			Throwable t = bse.getCause();
 			if (t.getClass().getSimpleName().equals("PSQLException")) {
-				String error = t.getMessage().toLowerCase();
+				String error = t.getMessage().toLowerCase(Locale.ROOT);
 				if ((error.indexOf("smallint") > 0 || error.indexOf("bigint") > 0 || error.indexOf("bigserial") > 0
 						|| error.indexOf("integer") > 0 || error.indexOf("serial") > 0 || error.indexOf("numeric") > 0
 						|| error.indexOf("decimal") > 0 || error.indexOf("real") > 0
@@ -254,7 +255,7 @@ public class JdbcUpdateService {
 
 	private static String appendFalseClause(String sql) {
 		if (!sql.endsWith("1=0")) {
-			boolean where = sql.toLowerCase().contains(" where ");
+			boolean where = sql.toLowerCase(Locale.ROOT).contains(" where ");
 			if (where) {
 				StringBuilder sb = new StringBuilder(sql.length() + 9);
 				sb.append(sql).append("\n").append(" and 1=0");

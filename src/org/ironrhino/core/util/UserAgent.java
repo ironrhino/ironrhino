@@ -1,6 +1,7 @@
 package org.ironrhino.core.util;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 public class UserAgent implements Serializable {
 
@@ -71,7 +72,7 @@ public class UserAgent implements Serializable {
 					return;
 				}
 
-				String lower = userAgent.toLowerCase();
+				String lower = userAgent.toLowerCase(Locale.ROOT);
 				mobile = lower.contains("mobile") || lower.contains("mobi");
 				if (lower.contains("windows")) {
 					platform = "windows";

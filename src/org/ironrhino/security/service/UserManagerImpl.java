@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
@@ -90,7 +91,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 		if (StringUtils.isBlank(username))
 			return null;
 		// throw new UsernameNotFoundException("username is blank");
-		username = username.toLowerCase();
+		username = username.toLowerCase(Locale.ROOT);
 		User user;
 		if (username.indexOf('@') > 0)
 			user = findOne("email", username);

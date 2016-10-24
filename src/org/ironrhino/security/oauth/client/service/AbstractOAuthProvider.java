@@ -1,5 +1,7 @@
 package org.ironrhino.security.oauth.client.service;
 
+import java.util.Locale;
+
 import org.ironrhino.common.support.SettingControl;
 import org.ironrhino.security.oauth.client.model.Profile;
 import org.slf4j.Logger;
@@ -21,7 +23,7 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
 
 	@Override
 	public String getName() {
-		return getClass().getSimpleName().toLowerCase();
+		return getClass().getSimpleName().toLowerCase(Locale.ROOT);
 	}
 
 	@Override

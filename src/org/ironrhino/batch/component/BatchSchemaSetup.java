@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Locale;
 
 import javax.sql.DataSource;
 
@@ -49,7 +50,8 @@ public class BatchSchemaSetup {
 				throw new IllegalArgumentException("Max varchar length is 32704 for db2");
 			if ((dp == DatabaseProduct.SQLSERVER || dp == DatabaseProduct.SYBASE) && maxVarCharLength > 8000)
 				throw new IllegalArgumentException("Max varchar length is 8000 for sqlserver or sybase");
-			String file = "schema-" + (dp == DatabaseProduct.ORACLE ? "oracle10g" : dp.name().toLowerCase()) + ".sql";
+			String file = "schema-" + (dp == DatabaseProduct.ORACLE ? "oracle10g" : dp.name().toLowerCase(Locale.ROOT))
+					+ ".sql";
 			try (InputStream is = Job.class.getResourceAsStream(file)) {
 				if (is == null)
 					throw new UnsupportedOperationException("Database " + dp.name() + " is not supported");

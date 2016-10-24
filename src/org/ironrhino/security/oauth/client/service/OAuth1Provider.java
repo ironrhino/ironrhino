@@ -271,7 +271,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 		}
 
 		public static String getNonce() {
-			return CodecUtils.randomString(8).toLowerCase();
+			return CodecUtils.randomString(8).toLowerCase(Locale.ROOT);
 		}
 
 		public static String percentEncode(String string) {
@@ -300,7 +300,7 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 			sb.append(method.toUpperCase(Locale.ROOT)).append('&');
 			URL u = new URL(url);
 			StringBuilder usb = new StringBuilder();
-			usb.append(u.getProtocol().toLowerCase()).append("://").append(u.getHost().toLowerCase());
+			usb.append(u.getProtocol().toLowerCase(Locale.ROOT)).append("://").append(u.getHost().toLowerCase(Locale.ROOT));
 			if (u.getPort() > 0 && u.getPort() != u.getDefaultPort())
 				usb.append(":").append(u.getPort());
 			usb.append(u.getPath());

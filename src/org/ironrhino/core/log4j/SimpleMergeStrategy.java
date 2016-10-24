@@ -2,6 +2,7 @@
 package org.ironrhino.core.log4j;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.config.Node;
@@ -39,7 +40,7 @@ public class SimpleMergeStrategy extends DefaultMergeStrategy {
 					continue;
 				}
 
-				switch (targetChildNode.getName().toLowerCase()) {
+				switch (targetChildNode.getName().toLowerCase(Locale.ROOT)) {
 				case PROPERTIES:
 				case SCRIPTS:
 				case APPENDERS: {

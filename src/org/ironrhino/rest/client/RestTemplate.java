@@ -1,6 +1,7 @@
 package org.ironrhino.rest.client;
 
 import java.net.URI;
+import java.util.Locale;
 
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.client.token.Token;
@@ -89,7 +90,7 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 		} catch (HttpClientErrorException e) {
 			logger.error(e.getResponseBodyAsString(), e);
 			if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-				String response = e.getResponseBodyAsString().toLowerCase();
+				String response = e.getResponseBodyAsString().toLowerCase(Locale.ROOT);
 				Token token = client.getTokenStore().getToken();
 				if (response.contains("invalid_token")) {
 					client.getTokenStore().setToken(null);

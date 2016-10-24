@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -202,7 +203,7 @@ public class UserAction extends EntityAction<User> {
 		}
 		if (user.isNew()) {
 			if (StringUtils.isNotBlank(user.getUsername())) {
-				user.setUsername(user.getUsername().toLowerCase());
+				user.setUsername(user.getUsername().toLowerCase(Locale.ROOT));
 				if (userManager.findByNaturalId(user.getUsername()) != null) {
 					addFieldError("user.username", getText("validation.already.exists"));
 					return false;

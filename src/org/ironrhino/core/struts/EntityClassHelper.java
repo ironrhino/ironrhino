@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -418,7 +419,7 @@ public class EntityClassHelper {
 						// uci.setInputType(temporalType);
 						if (StringUtils.isBlank(uci.getCellEdit()))
 							uci.setCellEdit("click," + temporalType);
-					} else if (String.class == returnType && pd.getName().toLowerCase().contains("email")
+					} else if (String.class == returnType && pd.getName().toLowerCase(Locale.ROOT).contains("email")
 							&& !pd.getName().contains("Password")) {
 						uci.setInputType("email");
 						uci.addCssClass("email");

@@ -2,6 +2,7 @@ package org.ironrhino.core.sequence.cyclic;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.Locale;
 
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -16,7 +17,7 @@ public class DatabaseCyclicSequenceDelegate extends AbstractDatabaseCyclicSequen
 		DatabaseProduct databaseProduct = null;
 		try {
 			DatabaseMetaData dbmd = con.getMetaData();
-			databaseProduct = DatabaseProduct.parse(dbmd.getDatabaseProductName().toLowerCase());
+			databaseProduct = DatabaseProduct.parse(dbmd.getDatabaseProductName().toLowerCase(Locale.ROOT));
 		} finally {
 			DataSourceUtils.releaseConnection(con, getDataSource());
 		}

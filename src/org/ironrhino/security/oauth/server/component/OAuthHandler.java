@@ -2,6 +2,7 @@ package org.ironrhino.security.oauth.server.component;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -82,10 +83,10 @@ public class OAuthHandler extends AccessHandler {
 			String header = request.getHeader("Authorization");
 			if (header != null) {
 				header = header.trim();
-				if (header.toLowerCase().startsWith("bearer ")) {
+				if (header.toLowerCase(Locale.ROOT).startsWith("bearer ")) {
 					// oauth 2.0
 					token = header.substring("bearer ".length());
-				} else if (header.toLowerCase().startsWith("oauth ")) {
+				} else if (header.toLowerCase(Locale.ROOT).startsWith("oauth ")) {
 					header = header.substring("oauth ".length());
 					int i = header.indexOf("oauth_token=");
 					if (i < 0) {

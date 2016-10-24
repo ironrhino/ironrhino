@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -213,7 +214,7 @@ public class IndexManagerImpl implements IndexManager {
 				else if (propertyClass.isEnum())
 					this.type = "string";
 				else
-					this.type = propertyClass.getSimpleName().toLowerCase();
+					this.type = propertyClass.getSimpleName().toLowerCase(Locale.ROOT);
 			}
 			this.type = translateType(this.type);
 			if (StringUtils.isNotBlank(searchableProperty.index_name()))
@@ -222,14 +223,14 @@ public class IndexManagerImpl implements IndexManager {
 				this.format = searchableProperty.format();
 			Index index = searchableProperty.index();
 			if (index == Index.NO || index == Index.ANALYZED || index == Index.NOT_ANALYZED)
-				this.index = index.name().toLowerCase();
+				this.index = index.name().toLowerCase(Locale.ROOT);
 			if ("string".equals(this.type) && searchableProperty.index() != Index.NOT_ANALYZED
 					&& searchableProperty.index() != Index.NO && !searchableProperty.omit_norms()
 					&& searchableProperty.boost() != 1.0f)
 				this.boost = searchableProperty.boost();
 			Store store = searchableProperty.store();
 			if (store != Store.NA)
-				this.store = store.name().toLowerCase();
+				this.store = store.name().toLowerCase(Locale.ROOT);
 			if (StringUtils.isNotBlank(searchableProperty.analyzer()))
 				this.analyzer = searchableProperty.analyzer();
 			if (StringUtils.isNotBlank(searchableProperty.index_analyzer()))
@@ -257,7 +258,7 @@ public class IndexManagerImpl implements IndexManager {
 				else if (propertyClass.isEnum())
 					this.type = "string";
 				else
-					this.type = propertyClass.getSimpleName().toLowerCase();
+					this.type = propertyClass.getSimpleName().toLowerCase(Locale.ROOT);
 			}
 			this.type = translateType(this.type);
 			if (StringUtils.isNotBlank(searchableProperty.index_name()))
@@ -266,14 +267,14 @@ public class IndexManagerImpl implements IndexManager {
 				this.format = searchableProperty.format();
 			Index index = searchableProperty.index();
 			if (index == Index.NO || index == Index.ANALYZED || index == Index.NOT_ANALYZED)
-				this.index = index.name().toLowerCase();
+				this.index = index.name().toLowerCase(Locale.ROOT);
 			if ("string".equals(this.type) && searchableProperty.index() != Index.NOT_ANALYZED
 					&& searchableProperty.index() != Index.NO && !searchableProperty.omit_norms()
 					&& searchableProperty.boost() != 1.0f)
 				this.boost = searchableProperty.boost();
 			Store store = searchableProperty.store();
 			if (store != Store.NA)
-				this.store = store.name().toLowerCase();
+				this.store = store.name().toLowerCase(Locale.ROOT);
 			if (StringUtils.isNotBlank(searchableProperty.analyzer()))
 				this.analyzer = searchableProperty.analyzer();
 			if (StringUtils.isNotBlank(searchableProperty.index_analyzer()))

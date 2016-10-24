@@ -305,7 +305,7 @@ public class StringUtils {
 	public static String toLowerCaseWithUnderscores(String str) {
 		if (str == null)
 			return null;
-		return toUpperCaseWithUnderscores(str).toLowerCase();
+		return toUpperCaseWithUnderscores(str).toLowerCase(Locale.ROOT);
 	}
 
 	public static boolean matchesWildcard(String text, String pattern) {
@@ -365,8 +365,8 @@ public class StringUtils {
 	}
 
 	public static boolean matchesAutocomplete(String text, String pattern) {
-		text = text.toLowerCase();
-		pattern = pattern.toLowerCase();
+		text = text.toLowerCase(Locale.ROOT);
+		pattern = pattern.toLowerCase(Locale.ROOT);
 		if (text.startsWith(pattern))
 			return true;
 		char[] chars = pattern.toCharArray();
@@ -481,7 +481,7 @@ public class StringUtils {
 	}
 
 	private static boolean isUtf8Url(String urlCode) {
-		urlCode = urlCode.toLowerCase();
+		urlCode = urlCode.toLowerCase(Locale.ROOT);
 		int p = urlCode.indexOf("%");
 		if (p != -1 && urlCode.length() - p > 9) {
 			urlCode = urlCode.substring(p, p + 9);

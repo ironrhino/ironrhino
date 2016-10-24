@@ -8,6 +8,7 @@ import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
@@ -31,7 +32,7 @@ public class RequestUtils {
 			StringBuilder sb = new StringBuilder();
 			Map<String, String[]> map = request.getParameterMap();
 			for (Map.Entry<String, String[]> entry : map.entrySet()) {
-				if (entry.getKey().toLowerCase().contains("password"))
+				if (entry.getKey().toLowerCase(Locale.ROOT).contains("password"))
 					continue;
 				for (String value : entry.getValue()) {
 					sb.append(entry.getKey()).append('=').append(value.length() > 256 ? value.substring(0, 256) : value)
@@ -179,7 +180,7 @@ public class RequestUtils {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		String ua = request.getHeader("User-Agent");
 		// lower version android webview was buggy
-		boolean downgrade = (ua != null && ua.toLowerCase().contains("android"));
+		boolean downgrade = (ua != null && ua.toLowerCase(Locale.ROOT).contains("android"));
 		if (!downgrade) {
 			cookie.setHttpOnly(httpOnly);
 			cookie.setMaxAge(maxAge);

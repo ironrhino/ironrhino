@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -291,32 +292,32 @@ public enum DatabaseProduct {
 
 	public static DatabaseProduct parse(String nameOrUrl) {
 		nameOrUrl = nameOrUrl.trim();
-		if (nameOrUrl.toLowerCase().startsWith("jdbc:")) {
+		if (nameOrUrl.toLowerCase(Locale.ROOT).startsWith("jdbc:")) {
 			for (DatabaseProduct p : values())
 				if (nameOrUrl.startsWith(p.getJdbcUrlPrefix()))
 					return p;
 			return null;
 		} else {
-			if (nameOrUrl.toLowerCase().contains("mysql"))
+			if (nameOrUrl.toLowerCase(Locale.ROOT).contains("mysql"))
 				return MYSQL;
-			else if (nameOrUrl.toLowerCase().contains("postgres"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("postgres"))
 				return POSTGRESQL;
-			else if (nameOrUrl.toLowerCase().contains("oracle"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("oracle"))
 				return ORACLE;
-			else if (nameOrUrl.toLowerCase().startsWith("db2"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).startsWith("db2"))
 				return DB2;
-			else if (nameOrUrl.toLowerCase().contains("informix"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("informix"))
 				return INFORMIX;
-			else if (nameOrUrl.toLowerCase().contains("microsoft"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("microsoft"))
 				return SQLSERVER;
-			else if (nameOrUrl.toLowerCase().contains("sql server") || nameOrUrl.equals("Adaptive Server Enterprise")
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("sql server") || nameOrUrl.equals("Adaptive Server Enterprise")
 					|| nameOrUrl.equals("ASE"))
 				return SYBASE;
-			else if (nameOrUrl.toLowerCase().equals("h2"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).equals("h2"))
 				return H2;
-			else if (nameOrUrl.toLowerCase().contains("hsql"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("hsql"))
 				return HSQL;
-			else if (nameOrUrl.toLowerCase().contains("derby"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("derby"))
 				return DERBY;
 		}
 		return null;
@@ -346,7 +347,7 @@ public enum DatabaseProduct {
 	}
 
 	public String getJdbcUrlPrefix() {
-		return "jdbc:" + name().toLowerCase();
+		return "jdbc:" + name().toLowerCase(Locale.ROOT);
 	}
 
 	public String getJdbcUrl(String host, int port, String databaseName, String params) {

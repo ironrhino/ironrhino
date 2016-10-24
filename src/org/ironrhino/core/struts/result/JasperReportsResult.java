@@ -207,7 +207,7 @@ public class JasperReportsResult extends StrutsResultSupport {
 					tmp.append("; filename=");
 					tmp.append(documentName);
 					tmp.append(".");
-					tmp.append(format.toLowerCase());
+					tmp.append(format.toLowerCase(Locale.ROOT));
 				}
 
 				response.setHeader("Content-disposition", tmp.toString());

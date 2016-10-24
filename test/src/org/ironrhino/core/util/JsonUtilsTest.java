@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.Lob;
 
@@ -26,7 +27,7 @@ public class JsonUtilsTest {
 		ACTIVE, DISABLED;
 		@Override
 		public String toString() {
-			return name().toLowerCase();
+			return name().toLowerCase(Locale.ROOT);
 		}
 	}
 

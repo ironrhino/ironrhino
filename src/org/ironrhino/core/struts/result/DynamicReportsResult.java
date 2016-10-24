@@ -1,6 +1,7 @@
 package org.ironrhino.core.struts.result;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -81,7 +82,7 @@ public class DynamicReportsResult extends StrutsResultSupport {
 				tmp.append("; filename=");
 				tmp.append(documentName);
 				tmp.append(".");
-				tmp.append(format.toLowerCase());
+				tmp.append(format.toLowerCase(Locale.ROOT));
 			}
 
 			response.setHeader("Content-disposition", tmp.toString());
