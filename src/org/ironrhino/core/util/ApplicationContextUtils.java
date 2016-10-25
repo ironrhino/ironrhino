@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.service.EntityManager;
-import org.ironrhino.core.servlet.AppInfoListener;
+import org.ironrhino.core.servlet.AppInfoInitializer;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
@@ -16,7 +16,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ApplicationContextUtils {
 
 	public static ApplicationContext getApplicationContext() {
-		return WebApplicationContextUtils.getWebApplicationContext(AppInfoListener.SERVLET_CONTEXT);
+		return WebApplicationContextUtils.getWebApplicationContext(AppInfoInitializer.SERVLET_CONTEXT);
 	}
 
 	@SuppressWarnings("unchecked")

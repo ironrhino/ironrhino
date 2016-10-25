@@ -164,9 +164,6 @@
 		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
 	<listener>
-		<listener-class>org.ironrhino.core.servlet.AppInfoListener</listener-class>
-	</listener>
-	<listener>
 		<listener-class>
 			org.springframework.web.util.IntrospectorCleanupListener</listener-class>
 	</listener>
