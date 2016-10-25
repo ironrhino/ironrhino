@@ -19,20 +19,22 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "ctx.xml" })
-public class DatabaseSequenceTest {
+@ContextConfiguration(locations = { "db.xml" })
+public class SequenceTest {
 
-	public static final int THREADS = 20;
+	public static final int THREADS = 50;
 
 	public static final int LOOP = 10000;
-
-	private static ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<>(THREADS * LOOP * 2);
 
 	private static ExecutorService executorService;
 
 	@Autowired
-	@Qualifier("sampleSequence")
-	private Sequence sampleSequence;
+	@Qualifier("sample1Sequence")
+	private Sequence sample1Sequence;
+
+	@Autowired
+	@Qualifier("sample2Sequence")
+	private Sequence sample2Sequence;
 
 	@BeforeClass
 	public static void setup() {
@@ -45,15 +47,26 @@ public class DatabaseSequenceTest {
 	}
 
 	@Test
-	public void test() throws InterruptedException {
+	public void testSimple() throws InterruptedException {
+		test(false);
+	}
+
+	@Test
+	public void testCyclic() throws InterruptedException {
+		test(true);
+	}
+
+	private void test(boolean cyclic) throws InterruptedException {
+		final ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<>(THREADS * LOOP * 2);
 		final CountDownLatch cdl = new CountDownLatch(THREADS);
 		final AtomicInteger count = new AtomicInteger();
+		final Sequence seq = cyclic ? sample2Sequence : sample1Sequence;
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < THREADS; i++) {
 			executorService.execute(() -> {
 				for (int j = 0; j < LOOP; j++) {
 					try {
-						String id = sampleSequence.nextStringValue();
+						String id = seq.nextStringValue();
 						Long time2 = System.currentTimeMillis();
 						Long old = map.putIfAbsent(id, time2);
 						if (old != null)
@@ -68,7 +81,8 @@ public class DatabaseSequenceTest {
 			});
 		}
 		cdl.await();
-		System.out.println("completed " + count.get() + " requests in " + (System.currentTimeMillis() - time) + "ms");
+		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in "
+				+ (System.currentTimeMillis() - time) + "ms" + (cyclic ? " using CyclicSequence" : ""));
 		assertEquals(LOOP * THREADS, map.size());
 	}
 
