@@ -121,7 +121,7 @@ public class SetupAction extends BaseAction {
 					for (Method m : methods) {
 						int modifiers = m.getModifiers();
 						if (Modifier.isPublic(modifiers)) {
-							if (m.getParameterTypes().length == 0)
+							if (m.getParameterCount() == 0)
 								continue;
 							String[] parameterNames = ReflectionUtils.parameterNameDiscoverer.getParameterNames(m);
 							Class<?>[] parameterTypes = m.getParameterTypes();
@@ -185,7 +185,7 @@ public class SetupAction extends BaseAction {
 			if (!Modifier.isPublic(modifiers))
 				continue;
 			logger.info("executing {}", m);
-			if (m.getParameterTypes().length == 0) {
+			if (m.getParameterCount() == 0) {
 				m.invoke(entry.getValue(), new Object[0]);
 			} else {
 				String[] parameterNames = ReflectionUtils.parameterNameDiscoverer.getParameterNames(m);
