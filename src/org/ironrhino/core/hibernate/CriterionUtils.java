@@ -154,10 +154,10 @@ public class CriterionUtils {
 										state.getAliases().put(propertyName, alias);
 									}
 									if (desc)
-										dc.addOrder(Order.desc(alias + "." + subPropertyName));
+										dc.addOrder(Order.desc(alias + '.' + subPropertyName));
 									else
-										dc.addOrder(Order.asc(alias + "." + subPropertyName));
-									state.getOrderings().put(alias + "." + subPropertyName, desc);
+										dc.addOrder(Order.asc(alias + '.' + subPropertyName));
+									state.getOrderings().put(alias + '.' + subPropertyName, desc);
 								}
 							}
 						} else if (propertyNames.contains(propertyName)) {
@@ -232,27 +232,27 @@ public class CriterionUtils {
 								state.getAliases().put(propertyName, alias);
 							}
 							if (subPropertyName.indexOf('.') < 0 || subPropertyName.endsWith(".id")) {
-								Criterion criterion = operator.operator(alias + "." + subPropertyName, values);
+								Criterion criterion = operator.operator(alias + '.' + subPropertyName, values);
 								if (criterion != null) {
 									dc.add(criterion);
-									state.getCriteria().add(alias + "." + subPropertyName);
+									state.getCriteria().add(alias + '.' + subPropertyName);
 								}
 							} else {
 								String[] arr = subPropertyName.split("\\.", 2);
-								String subname = propertyName + "." + arr[0];
+								String subname = propertyName + '.' + arr[0];
 								String subalias = state.getAliases().get(subname);
 								if (subalias == null) {
-									subalias = propertyName + "_" + arr[0] + "_";
+									subalias = propertyName + '_' + arr[0] + "_";
 									while (state.getAliases().containsValue(subalias))
 										subalias += "_";
-									dc.createAlias(alias + "." + arr[0], subalias);
+									dc.createAlias(alias + '.' + arr[0], subalias);
 									state.getAliases().put(subname, subalias);
 								}
 
-								Criterion criterion = operator.operator(subalias + "." + arr[1], values);
+								Criterion criterion = operator.operator(subalias + '.' + arr[1], values);
 								if (criterion != null) {
 									dc.add(criterion);
-									state.getCriteria().add(subalias + "." + arr[1]);
+									state.getCriteria().add(subalias + '.' + arr[1]);
 								}
 							}
 						}

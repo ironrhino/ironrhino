@@ -104,7 +104,7 @@ public class RedisServiceStats implements ServiceStats {
 		type.increaseCount(serviceName, method);
 		type.collectSample(serviceRegistry != null ? serviceRegistry.getLocalHost() : null, serviceName, method, time);
 		if (type == StatsType.CLIENT_FAILED || type == StatsType.CLIENT_SIDE && time > responseTimeThreshold) {
-			InvocationWarning warning = new InvocationWarning(source, target, serviceName + "." + method, time,
+			InvocationWarning warning = new InvocationWarning(source, target, serviceName + '.' + method, time,
 					type == StatsType.CLIENT_FAILED);
 			warningBuffer.add(JsonUtils.toJson(warning));
 		}
@@ -189,7 +189,7 @@ public class RedisServiceStats implements ServiceStats {
 	@Override
 	public List<InvocationSample> getSamples(String service, StatsType type) {
 		List<String> list = stringRedisTemplate.opsForList()
-				.range(NAMESPACE_SAMPLES + type.getNamespace() + ":" + service, 0, -1);
+				.range(NAMESPACE_SAMPLES + type.getNamespace() + ':' + service, 0, -1);
 		List<InvocationSample> results = new ArrayList<>(list.size());
 		try {
 			for (String str : list)
@@ -214,7 +214,7 @@ public class RedisServiceStats implements ServiceStats {
 			for (Map.Entry<String, InvocationSampler> entry : type.getSampleBuffer().entrySet()) {
 				InvocationSample sample = entry.getValue().peekAndReset();
 				if (sample.getCount() > 0) {
-					String key = NAMESPACE_SAMPLES + type.getNamespace() + ":" + entry.getKey();
+					String key = NAMESPACE_SAMPLES + type.getNamespace() + ':' + entry.getKey();
 					stringRedisTemplate.opsForList().leftPush(key, JsonUtils.toJson(sample));
 					long size = stringRedisTemplate.opsForList().size(key);
 					if (size > maxSamplesSize)
@@ -251,7 +251,7 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(DateUtils.format(date, "yyyyMMddHH"));
 		stringRedisTemplate.opsForValue().increment(sb.toString(), count);
 		if (type == StatsType.SERVER_SIDE)
-			hotspotsOperations.incrementScore(serviceName + "." + method, count);
+			hotspotsOperations.incrementScore(serviceName + '.' + method, count);
 	}
 
 	@Trigger
@@ -306,14 +306,14 @@ public class RedisServiceStats implements ServiceStats {
 			count += Long.valueOf(str);
 		if (count > 0) {
 			String key = getNameSpace(type) + "max";
-			String service = serviceName + "." + method;
+			String service = serviceName + '.' + method;
 			String str = (String) stringRedisTemplate.opsForHash().get(key, service);
 			if (StringUtils.isNotBlank(str)) {
 				String[] arr = str.split(",");
 				if (Long.valueOf(arr[1]) < count)
-					stringRedisTemplate.opsForHash().put(key, service, yesterday + "," + count);
+					stringRedisTemplate.opsForHash().put(key, service, yesterday + ',' + count);
 			} else {
-				stringRedisTemplate.opsForHash().put(key, service, yesterday + "," + count);
+				stringRedisTemplate.opsForHash().put(key, service, yesterday + ',' + count);
 			}
 		}
 	}

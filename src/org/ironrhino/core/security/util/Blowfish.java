@@ -71,7 +71,7 @@ public class Blowfish {
 			}
 		}
 		if (defaultKey == null)
-			defaultKey = AppInfo.getAppName() + ":" + AppInfo.getAppBasePackage();
+			defaultKey = AppInfo.getAppName() + ':' + AppInfo.getAppBasePackage();
 		defaultKey = CodecUtils.fuzzify(defaultKey);
 	}
 

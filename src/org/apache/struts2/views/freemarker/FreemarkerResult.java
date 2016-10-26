@@ -170,11 +170,11 @@ public class FreemarkerResult extends StrutsResultSupport {
         } else { 
             String namespace = invocation.getProxy().getNamespace();
             if (namespace == null || namespace.length() == 0 || namespace.equals("/")) {
-                absoluteLocation = "/" + location;
+                absoluteLocation = '/' + location;
             } else if (namespace.startsWith("/")) {
-                absoluteLocation = namespace + "/" + location;
+                absoluteLocation = namespace + '/' + location;
             } else {
-                absoluteLocation = "/" + namespace + "/" + location;
+                absoluteLocation = '/' + namespace + '/' + location;
             }
         }
 

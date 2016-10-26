@@ -219,7 +219,7 @@ public class SignupAction extends BaseAction {
 			model.put("user", user);
 			model.put("url", StringUtils.isNotBlank(passwordEntryPoint) ? passwordEntryPoint : "/user/password");
 			SimpleMailMessage smm = new SimpleMailMessage();
-			smm.setTo(user + "<" + user.getEmail() + ">");
+			smm.setTo(user.toString() + '<' + user.getEmail() + '>');
 			smm.setSubject(getText("mail.subject.user_forgot"));
 			mailService.send(smm, "template/user_forgot.ftl", model);
 			addActionMessage(getText("operate.success"));
@@ -231,9 +231,9 @@ public class SignupAction extends BaseAction {
 		Map<String, Object> model = new HashMap<>(4);
 		model.put("user", user);
 		model.put("url",
-				"/signup/activate/" + Blowfish.getDefaultInstance().encrypt(user.getId() + "," + user.getEmail()));
+				"/signup/activate/" + Blowfish.getDefaultInstance().encrypt(user.getId() + ',' + user.getEmail()));
 		SimpleMailMessage smm = new SimpleMailMessage();
-		smm.setTo(user + "<" + user.getEmail() + ">");
+		smm.setTo(user.toString() + '<' + user.getEmail() + '>');
 		smm.setSubject(getText("mail.subject.user_activate"));
 		mailService.send(smm, "template/user_activate.ftl", model);
 	}

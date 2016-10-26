@@ -52,7 +52,7 @@ public class ZooKeeperMembership implements Membership {
 	@Override
 	public void join(final String group) throws Exception {
 		LeaderLatch latch = latchs.computeIfAbsent(group, key -> {
-			LeaderLatch newLatch = new LeaderLatch(curatorFramework, zooKeeperPath + "/" + key,
+			LeaderLatch newLatch = new LeaderLatch(curatorFramework, zooKeeperPath + '/' + key,
 					AppInfo.getInstanceId());
 			if (leaderChangeListeners != null)
 				newLatch.addListener(new LeaderLatchListener() {

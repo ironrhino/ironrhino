@@ -32,13 +32,13 @@ public class PropertiesAction extends BaseAction {
 		for (Map.Entry<String, String> entry : defaultProperties.entrySet()) {
 			String overridedValue = overridedProperties.get(entry.getKey());
 			if (overridedValue != null && !overridedValue.equals(entry.getValue()))
-				writer.write("#" + entry.getKey() + "=" + entry.getValue() + "\n");
-			writer.write(entry.getKey() + "=" + (overridedValue != null ? overridedValue : entry.getValue()) + "\n");
+				writer.write("#" + entry.getKey() + '=' + entry.getValue() + "\n");
+			writer.write(entry.getKey() + '=' + (overridedValue != null ? overridedValue : entry.getValue()) + "\n");
 		}
 		writer.write("######\n");
 		for (Map.Entry<String, String> entry : overridedProperties.entrySet())
 			if (!defaultProperties.containsKey(entry.getKey()))
-				writer.write(entry.getKey() + "=" + entry.getValue() + "\n");
+				writer.write(entry.getKey() + '=' + entry.getValue() + "\n");
 		return NONE;
 	}
 
@@ -48,7 +48,7 @@ public class PropertiesAction extends BaseAction {
 		Writer writer = response.getWriter();
 		Map<String, String> overridedProperties = applicationContextInspector.getOverridedProperties();
 		for (Map.Entry<String, String> entry : overridedProperties.entrySet())
-			writer.write(entry.getKey() + "=" + entry.getValue() + "\n");
+			writer.write(entry.getKey() + '=' + entry.getValue() + "\n");
 		return NONE;
 	}
 

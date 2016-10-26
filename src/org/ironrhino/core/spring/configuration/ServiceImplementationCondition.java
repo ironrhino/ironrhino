@@ -45,7 +45,7 @@ class ServiceImplementationCondition implements Condition {
 					if (StringUtils.isNotBlank(implementationClassName)) {
 						boolean matched = implementationClassName.equals(className);
 						if (matched) {
-							String key = serviceInterfaceName + "=" + implementationClassName;
+							String key = serviceInterfaceName + '=' + implementationClassName;
 							if (!set.contains(key)) {
 								logger.info("Select implementation {} for service {}", implementationClassName,
 										serviceInterfaceName);

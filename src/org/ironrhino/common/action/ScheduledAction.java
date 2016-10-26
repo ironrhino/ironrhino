@@ -70,7 +70,7 @@ public class ScheduledAction extends BaseAction {
 					}
 					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Scheduled.class);
 					for (Method m : methods)
-						temp.add(beanName + "." + m.getName() + "()");
+						temp.add(beanName + '.' + m.getName() + "()");
 				}
 			}
 			Collections.sort(temp);

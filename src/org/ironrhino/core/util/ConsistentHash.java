@@ -95,7 +95,7 @@ public class ConsistentHash<K, V> {
 				Object node = keys.next();
 				int n = nodes.get(node).intValue() * pointsPerWeight;
 				for (int i = 0; i < n; i++)
-					points[point++] = new Point(hash.hash(node.toString() + "/" + i), node);
+					points[point++] = new Point(hash.hash(node.toString() + '/' + i), node);
 			}
 			Arrays.sort(points);
 		} finally {
@@ -286,7 +286,7 @@ public class ConsistentHash<K, V> {
 
 		@Override
 		public String toString() {
-			return "{" + node + "," + start + "}";
+			return "{" + node + ',' + start + "}";
 		}
 
 	}

@@ -79,7 +79,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 				logger.info("Loading autoconfig from " + name);
 				String defaultNamespace = ac.namespace();
 				if (defaultNamespace.equals(""))
-					defaultNamespace = "/" + packageName.substring(packageName.lastIndexOf('.') + 1);
+					defaultNamespace = '/' + packageName.substring(packageName.lastIndexOf('.') + 1);
 				Set<String> set = packages.get(ac.namespace());
 				if (set == null) {
 					set = new HashSet<>();
@@ -279,7 +279,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		if (packageName.equals("default"))
 			namespace = "/";
 		else
-			namespace = "/" + packageName.replace('_', '/');
+			namespace = '/' + packageName.replace('_', '/');
 		PackageConfig.Builder pkgConfig = packageLoader.getPackage(packageName);
 		if (pkgConfig == null) {
 			pkgConfig = new PackageConfig.Builder(packageName);

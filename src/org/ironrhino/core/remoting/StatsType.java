@@ -41,7 +41,7 @@ public enum StatsType implements Displayable {
 	}
 
 	public void collectSample(String host, String serviceName, String method, long time) {
-		String service = serviceName + "." + method;
+		String service = serviceName + '.' + method;
 		InvocationSampler sampler = sampleBuffer.computeIfAbsent(service, key -> new InvocationSampler(host));
 		sampler.add(time);
 	}

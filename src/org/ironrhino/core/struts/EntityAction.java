@@ -539,7 +539,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 								dc.createAlias(p1, alias);
 								criteriaState.getAliases().put(p1, alias);
 							}
-							propertyName = alias + "." + p2;
+							propertyName = alias + '.' + p2;
 						}
 					}
 					if (arr.length == 2 && arr[1].equalsIgnoreCase("asc"))
@@ -726,7 +726,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					&& !(uiconfig.getHiddenInInput().isValue()
 							|| StringUtils.isNotBlank(expression) && evalBoolean(expression, _entity, value))
 					&& (value == null || value instanceof String && StringUtils.isBlank(value.toString()))) {
-				addFieldError(getEntityName() + "." + name, getText("validation.required"));
+				addFieldError(getEntityName() + '.' + name, getText("validation.required"));
 				return INPUT;
 			}
 		}
@@ -769,13 +769,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					if (maxlength == 0)
 						maxlength = 255;
 					if (maxlength > 0 && str.length() > maxlength) {
-						addFieldError(getEntityName() + "." + entry.getKey(),
+						addFieldError(getEntityName() + '.' + entry.getKey(),
 								getText("validation.maxlength.violation", new String[] { String.valueOf(maxlength) }));
 						return false;
 					}
 					String regex = entry.getValue().getRegex();
 					if (StringUtils.isNotBlank(regex) && !str.matches(regex)) {
-						addFieldError(getEntityName() + "." + entry.getKey(), getText("validation.invalid"));
+						addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.invalid"));
 						return false;
 					}
 				}
@@ -824,7 +824,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				if (persisted != null) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
-						String fieldName = getEntityName() + "." + it.next();
+						String fieldName = getEntityName() + '.' + it.next();
 						if (StringUtils.isBlank(targetField) || targetField.equals(fieldName)
 								|| targetField.equals(fieldName + ".id"))
 							addFieldError(targetField == null ? fieldName : targetField,
@@ -838,7 +838,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						persisted = entityManager.findOne(entry.getKey(),
 								(Serializable) bw.getPropertyValue(entry.getKey()));
 						if (persisted != null) {
-							addFieldError(getEntityName() + "." + entry.getKey(), getText("validation.already.exists"));
+							addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
 							return false;
 						}
 					}
@@ -915,7 +915,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				if (persisted != null && !persisted.getId().equals(_entity.getId())) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
-						String fieldName = getEntityName() + "." + it.next();
+						String fieldName = getEntityName() + '.' + it.next();
 						if (StringUtils.isBlank(targetField) || targetField.equals(fieldName)
 								|| targetField.equals(fieldName + ".id"))
 							addFieldError(targetField == null ? fieldName : targetField,
@@ -931,7 +931,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 								(Serializable) bw.getPropertyValue(entry.getKey()));
 						entityManager.evict(persisted);
 						if (persisted != null && !persisted.getId().equals(_entity.getId())) {
-							addFieldError(getEntityName() + "." + entry.getKey(), getText("validation.already.exists"));
+							addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
 							return false;
 						}
 					}
@@ -1049,10 +1049,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						uiConfig.getReadonly().getExpression(), _entity, bw.getPropertyValue(propertyName)))
 					continue;
 				String parameterValue = ServletActionContext.getRequest()
-						.getParameter(getEntityName() + "." + propertyName);
+						.getParameter(getEntityName() + '.' + propertyName);
 				if (parameterValue == null)
 					parameterValue = ServletActionContext.getRequest()
-							.getParameter(getEntityName() + "." + propertyName + ".id");
+							.getParameter(getEntityName() + '.' + propertyName + ".id");
 				if (parameterValue == null)
 					parameterValue = ServletActionContext.getRequest().getParameter(propertyName + "Id");
 				if (parameterValue == null) {

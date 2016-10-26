@@ -55,7 +55,7 @@ public class ErrorAction extends BaseAction {
 					if (StringUtils.isNotBlank(passwordEntryPoint))
 						targetUrl = passwordEntryPoint;
 					else
-						targetUrl = "/" + StringUtils.uncapitalize(ud.getClass().getSimpleName()) + "/password";
+						targetUrl = '/' + StringUtils.uncapitalize(ud.getClass().getSimpleName()) + "/password";
 					return REDIRECT;
 				}
 			}

@@ -353,7 +353,7 @@ public class PageViewServiceImpl implements PageViewService {
 		if (StringUtils.isNotBlank(str))
 			oldvalue = Long.valueOf(str.split(",")[1]);
 		if (value > oldvalue)
-			stringRedisTemplate.opsForHash().put(key, type, day + "," + value);
+			stringRedisTemplate.opsForHash().put(key, type, day + ',' + value);
 	}
 
 	public Map<String, Long> getTop(String day, String type, int top, String domain) {

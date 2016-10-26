@@ -60,7 +60,7 @@ public class RC4 {
 			}
 		}
 		if (defaultKey == null)
-			defaultKey = AppInfo.getAppName() + ":" + AppInfo.getAppBasePackage();
+			defaultKey = AppInfo.getAppName() + ':' + AppInfo.getAppBasePackage();
 		defaultKey = CodecUtils.fuzzify(defaultKey);
 	}
 

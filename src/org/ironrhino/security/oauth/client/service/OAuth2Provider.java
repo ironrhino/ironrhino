@@ -130,7 +130,7 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 			try {
 				content = HttpClientUtils.postResponseText(getAccessTokenEndpoint(), params);
 			} catch (Exception e) {
-				logger.error(getAccessTokenEndpoint() + "," + params.toString(), e);
+				logger.error(getAccessTokenEndpoint() + ',' + params.toString(), e);
 			}
 			accessToken = new OAuth2Token(content);
 			if (accessToken.getAccess_token() == null)
@@ -178,7 +178,7 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 		if (!isUseAuthorizationHeader())
 			map.put(getAccessTokenParameterName(), accessToken);
 		else
-			map.put(getAuthorizationHeaderName(), getAuthorizationHeaderType() + " " + accessToken);
+			map.put(getAuthorizationHeaderName(), getAuthorizationHeaderType() + ' ' + accessToken);
 		return invoke(protectedURL, isUseAuthorizationHeader() ? null : map, isUseAuthorizationHeader() ? map : null);
 	}
 

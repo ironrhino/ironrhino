@@ -44,7 +44,7 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
 	}
 
 	protected String generateUid(String uid) {
-		return "(" + getName() + ")" + uid;
+		return "(" + getName() + ')' + uid;
 	}
 
 	public abstract String getProfileUrl();

@@ -60,7 +60,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	public void init() {
-		localHost = AppInfo.getHostAddress() + ":" + (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_PORT);
+		localHost = AppInfo.getHostAddress() + ':' + (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_PORT);
 		if (ctx instanceof ConfigurableWebApplicationContext) {
 			String ctxPath = ((ConfigurableWebApplicationContext) ctx).getServletContext().getContextPath();
 			if (!ctxPath.isEmpty())
@@ -188,7 +188,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	protected void onDiscover(String serviceName, String host) {
-		logger.info("discovered " + serviceName + "@" + host);
+		logger.info("discovered " + serviceName + '@' + host);
 	}
 
 	protected abstract void register(String serviceName);

@@ -79,7 +79,7 @@ public class IssuePageAction extends BaseAction {
 	public String p() {
 		String path = getUid();
 		if (StringUtils.isNotBlank(path)) {
-			path = "/" + path;
+			path = '/' + path;
 			page = pageManager.getByPath(path);
 		}
 		if (page == null)

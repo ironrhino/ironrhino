@@ -174,7 +174,7 @@ public class BeanUtils {
 			if (name == null)
 				name = arr[i];
 			else
-				name += "." + arr[i];
+				name += '.' + arr[i];
 			Object value = bw.getPropertyValue(name);
 			if (value == null) {
 				try {

@@ -64,7 +64,7 @@ public class Value implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.valueOf(getLongValue()) + "," + String.valueOf(getDoubleValue());
+		return String.valueOf(getLongValue()) + ',' + String.valueOf(getDoubleValue());
 	}
 
 	public static Value fromString(String s) {

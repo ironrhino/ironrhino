@@ -204,7 +204,7 @@ public class RegionSetup {
 				}
 			}
 			if (name != null) {
-				map.put(name, coordinate + " " + parentName);
+				map.put(name, coordinate + ' ' + parentName);
 			}
 		}
 		return map;

@@ -495,13 +495,13 @@ public class StringUtils {
 		if (s.indexOf('_') < 0)
 			return s;
 		for (Locale locale : Locale.getAvailableLocales()) {
-			String suffix = "_" + locale.getLanguage();
+			String suffix = '_' + locale.getLanguage();
 			if (s.endsWith(suffix))
 				return s.substring(0, s.length() - suffix.length());
-			suffix += "_" + locale.getCountry();
+			suffix += '_' + locale.getCountry();
 			if (s.endsWith(suffix))
 				return s.substring(0, s.length() - suffix.length());
-			suffix += "_" + locale.getVariant();
+			suffix += '_' + locale.getVariant();
 			if (s.endsWith(suffix))
 				return s.substring(0, s.length() - suffix.length());
 		}

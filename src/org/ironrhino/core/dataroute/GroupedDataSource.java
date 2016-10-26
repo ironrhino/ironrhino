@@ -165,7 +165,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 				failureCount.remove(ds);
 				deadDataSources.add(ds);
 				logger.error(
-						"dataSource[" + groupName + ":" + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						"dataSource[" + groupName + ':' + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				StatLog.add(new Key("dataroute", false, groupName, dbname, "down"));
 			} else {
 				failureCount.put(ds, failureTimes);
@@ -204,7 +204,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 							break;
 						}
 					}
-				logger.warn("dataSource[" + groupName + ":" + dbname + "] recovered");
+				logger.warn("dataSource[" + groupName + ':' + dbname + "] recovered");
 			} catch (Exception e) {
 				logger.debug(e.getMessage(), e);
 			}

@@ -301,7 +301,7 @@ public class LocalizedTextUtil {
      * @return the key to use for lookup/storing in the bundle misses cache.
      */
     private static String createMissesKey(String aBundleName, Locale locale) {
-        return aBundleName + "_" + locale.toString();
+        return aBundleName + '_' + locale.toString();
     }
 
     /**

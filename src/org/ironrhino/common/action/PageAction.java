@@ -134,7 +134,7 @@ public class PageAction extends EntityAction<Page> {
 				int count = pageManager.findListByTag(tag).size();
 				String path = null;
 				while (true) {
-					path = "/" + tag + "/" + (++count);
+					path = '/' + tag + '/' + (++count);
 					if (pageManager.getByPath(path) == null)
 						break;
 				}
@@ -199,7 +199,7 @@ public class PageAction extends EntityAction<Page> {
 	protected boolean makeEntityValid() {
 		String path = page.getPath().trim();
 		if (!path.startsWith("/"))
-			path = "/" + path;
+			path = '/' + path;
 		page.setPath(path);
 		if (page.isNew()) {
 			if (pageManager.findByNaturalId(page.getPath()) != null) {

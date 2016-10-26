@@ -184,7 +184,7 @@ public class DeleteChecker {
 			for (Tuple<Class<?>, Tuple<String, String>> tuple : componentReferences) {
 				Criteria c = session.createCriteria(tuple.getKey());
 				Tuple<String, String> value = tuple.getValue();
-				c.add(Restrictions.eq(value.getKey() + "." + value.getValue(), entity));
+				c.add(Restrictions.eq(value.getKey() + '.' + value.getValue(), entity));
 				c.setProjection(Projections.projectionList().add(Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
 				if (count > 0)
@@ -199,7 +199,7 @@ public class DeleteChecker {
 				Criteria c = session.createCriteria(tuple.getKey());
 				Tuple<String, String> value = tuple.getValue();
 				c.createAlias(value.getKey(), value.getKey())
-						.add(Restrictions.eq(value.getKey() + "." + value.getValue(), entity));
+						.add(Restrictions.eq(value.getKey() + '.' + value.getValue(), entity));
 				c.setProjection(Projections.projectionList().add(Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
 				if (count > 0)

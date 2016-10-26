@@ -456,7 +456,7 @@ public class EntityClassHelper {
 								List<String> list = new ArrayList<>(naturalIds.size() - 1);
 								for (String name : naturalIds.keySet())
 									if (!name.equals(pd.getName()))
-										list.add(StringUtils.uncapitalize(entityClass.getSimpleName()) + "." + name);
+										list.add(StringUtils.uncapitalize(entityClass.getSimpleName()) + '.' + name);
 								uci.getInternalDynamicAttributes().put("data-checkwith", StringUtils.join(list, ","));
 							}
 						}

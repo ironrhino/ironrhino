@@ -315,7 +315,7 @@ public class AppInfo {
 			String defaultProfiles = System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 			if (StringUtils.isBlank(defaultProfiles))
 				defaultProfiles = "default";
-			defaultProfiles = defaultProfiles + "," + featureProfiles;
+			defaultProfiles = defaultProfiles + ',' + featureProfiles;
 			System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME,
 					StringUtils.join(new TreeSet<>(Arrays.asList(defaultProfiles.split("\\s*,\\s*"))), ","));
 		}

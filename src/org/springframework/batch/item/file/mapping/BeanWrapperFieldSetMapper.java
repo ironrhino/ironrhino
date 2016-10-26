@@ -318,7 +318,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 			Object nestedValue = getPropertyValue(bean, nestedName);
 			String nestedPropertyName = findPropertyName(nestedValue, suffix);
-			return nestedPropertyName == null ? null : nestedName + "." + nestedPropertyName;
+			return nestedPropertyName == null ? null : nestedName + '.' + nestedPropertyName;
 		}
 
 		String name = null;

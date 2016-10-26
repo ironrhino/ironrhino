@@ -28,7 +28,7 @@ public class DefaultRemotingServiceRegistryPostProcessor extends RemotingService
 		if (StringUtils.isBlank(str))
 			str = appBasePackage;
 		else
-			str = appBasePackage + "," + str.trim();
+			str = appBasePackage + ',' + str.trim();
 		return str.split(",");
 	}
 

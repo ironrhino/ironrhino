@@ -115,7 +115,7 @@ public class ColumnPageAction extends BaseAction {
 				+ CmsActionMappingMatcher.SETTING_KEY_CMS_COLUMN_SUFFIX);
 		String path = getUid();
 		if (StringUtils.isNotBlank(path)) {
-			path = "/" + path;
+			path = '/' + path;
 			page = pageManager.getByPath(path);
 		}
 		if (page == null)

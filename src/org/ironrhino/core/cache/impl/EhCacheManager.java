@@ -185,7 +185,7 @@ public class EhCacheManager implements CacheManager {
 			if (element == null) {
 				return delta;
 			} else {
-				Lock lock = stripedLocks.get(namespace + ":" + key);
+				Lock lock = stripedLocks.get(namespace + ':' + key);
 				lock.lock();
 				try {
 					element = cache.get(key);

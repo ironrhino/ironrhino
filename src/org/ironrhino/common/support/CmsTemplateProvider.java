@@ -41,7 +41,7 @@ public class CmsTemplateProvider implements FallbackTemplateProvider {
 	@Override
 	public Template getTemplate(String name, Locale locale, String encoding, boolean parse) throws IOException {
 		if (!name.startsWith("/"))
-			name = "/" + name;
+			name = '/' + name;
 		String path = null;
 		if (name.startsWith(ftlClasspath))
 			path = name.substring(ftlClasspath.length());

@@ -256,7 +256,7 @@ public class MongoFileStorage implements FileStorage {
 	public String getFileUrl(String path) {
 		path = Files.simplifyPath(path);
 		if (!path.startsWith("/"))
-			path = "/" + path;
+			path = '/' + path;
 		return StringUtils.isNotBlank(baseUrl) ? baseUrl + path : path;
 	}
 

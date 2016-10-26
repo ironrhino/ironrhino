@@ -70,7 +70,7 @@ public class SeriesPageAction extends BaseAction {
 		pages = pageManager.findListByTag(getName());
 		String path = getUid();
 		if (StringUtils.isNotBlank(path)) {
-			path = "/" + path;
+			path = '/' + path;
 			for (int i = 0; i < pages.size(); i++) {
 				Page p = pages.get(i);
 				if (p.getPath().equals(path)) {
