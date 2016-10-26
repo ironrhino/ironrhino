@@ -82,7 +82,7 @@ public class SequenceTest {
 		}
 		cdl.await();
 		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in "
-				+ (System.currentTimeMillis() - time) + "ms" + (cyclic ? " using CyclicSequence" : ""));
+				+ (System.currentTimeMillis() - time) + "ms using " + seq.getClass().getSimpleName());
 		assertEquals(LOOP * THREADS, map.size());
 	}
 
