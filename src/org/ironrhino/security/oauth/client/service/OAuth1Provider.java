@@ -11,7 +11,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.annotation.PostConstruct;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -55,14 +54,6 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 	@Override
 	public boolean isEnabled() {
 		return super.isEnabled() && StringUtils.isNotBlank(getConsumerKey());
-	}
-
-	@PostConstruct
-	public void afterPropertiesSet() {
-		String key = getConsumerKey();
-		String secret = getConsumerSecret();
-		if (StringUtils.isEmpty(key) || StringUtils.isEmpty(secret))
-			logger.warn(getName() + " key or secret is empty");
 	}
 
 	@Override
@@ -300,7 +291,8 @@ public abstract class OAuth1Provider extends AbstractOAuthProvider {
 			sb.append(method.toUpperCase(Locale.ROOT)).append('&');
 			URL u = new URL(url);
 			StringBuilder usb = new StringBuilder();
-			usb.append(u.getProtocol().toLowerCase(Locale.ROOT)).append("://").append(u.getHost().toLowerCase(Locale.ROOT));
+			usb.append(u.getProtocol().toLowerCase(Locale.ROOT)).append("://")
+					.append(u.getHost().toLowerCase(Locale.ROOT));
 			if (u.getPort() > 0 && u.getPort() != u.getDefaultPort())
 				usb.append(":").append(u.getPort());
 			usb.append(u.getPath());

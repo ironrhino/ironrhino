@@ -6,7 +6,6 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,15 +58,6 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 
 	protected String getAccessTokenParameterName() {
 		return "oauth_token";
-	}
-
-	@PostConstruct
-	public void afterPropertiesSet() {
-		String clientId = getClientId();
-		String clientSecret = getClientSecret();
-		if (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(clientSecret)) {
-			logger.warn(getName() + " clientId or clientSecret is empty");
-		}
 	}
 
 	@Override
