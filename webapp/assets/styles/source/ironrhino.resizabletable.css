@@ -2,6 +2,7 @@ table .resizeTitle {
 	width: 95%;
 	text-align: center;
 }
+
 table .resizeBar {
 	padding: 0px;
 	margin-right: 2px;
@@ -13,3 +14,4 @@ table .resizeBar {
 	background-color: #cccccc;
 	display: inline;
 }
+

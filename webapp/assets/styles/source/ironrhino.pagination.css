@@ -1,141 +1,169 @@
-.toolbar > [class*="span"]{
-	margin-top:0;
-	margin-bottom:0;
+.toolbar > [class *= "span"] {
+	margin-top: 0;
+	margin-bottom: 0;
 }
-.toolbar .action{
-	text-align:center;
+
+.toolbar .action {
+	text-align: center;
 }
-.toolbar .status{
+
+.toolbar .status {
 	line-height: 30px;
-	text-align:right;
+	text-align: right;
 }
+
 @media (min-width: 480px) and (max-width: 767px) {
-.toolbar .pagination .pageNo{
-	display: none;
+	.toolbar .pagination .pageNo {
+		display: none;
+	}
+
+	.toolbar .status .recordLabel {
+		display: none;
+	}
+
+	.toolbar .pagination[class *= "span"] {
+		width: 30%;
+		float: left;
+	}
+
+	.toolbar .action[class *= "span"] {
+		width: 40%;
+		float: left;
+	}
+
+	.toolbar .search[class *= "span"] {
+		width: 20%;
+		float: left;
+	}
+
+	.toolbar .status[class *= "span"] {
+		width: 10%;
+		float: left;
+	}
 }
-.toolbar .status .recordLabel{
-	display: none;
-}
-.toolbar .pagination[class*="span"]{
-	width:30%;
-	float: left;
-}
-.toolbar .action[class*="span"]{
-	width:40%;
-	float: left;
-}
-.toolbar .search[class*="span"]{
-	width:20%;
-	float: left;
-}
-.toolbar .status[class*="span"]{
-	width:10%;
-	float: left;
-}
-}
+
 @media (max-width: 479px) {
-.toolbar .action{
-	text-align:left;
+	.toolbar .action {
+		text-align: left;
+	}
+
+	.toolbar .search {
+		padding-top: 4px;
+	}
+
+	.toolbar .status {
+		text-align: left;
+	}
 }
-.toolbar .search{
-	padding-top: 4px;
-}
-.toolbar .status{
-	text-align:left;
-}
-}
-.toolbar .pagination{
+
+.toolbar .pagination {
 	margin: 0;
 }
-.toolbar .pagination ul{
+
+.toolbar .pagination ul {
 	-webkit-box-shadow: none;
 	-moz-box-shadow: none;
 	box-shadow: none;
 }
+
 .toolbar .pagination .inputPage {
 	width: 25px;
 	height: 20px;
 	padding-top: 5px;
 	padding-bottom: 3px;
 	line-height: 20px;
-	text-align:right;
+	text-align: right;
 }
+
 .toolbar .pagination .totalPage {
 	min-width: 25px;
 	height: 20px;
 	line-height: 20px;
-	text-align:left;
+	text-align: left;
 	padding-top: 5px;
 	padding-bottom: 3px;
 	font-family: Arial;
 }
+
 .toolbar .pagination .pageSize {
 	border: 1px solid #ddd;
 	-webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 	width: 60px;
 	height: 30px;
 	line-height: 20px;
 	margin: 0;
 }
-.toolbar .pagination a[href] .glyphicon{
+
+.toolbar .pagination a[href] .glyphicon {
 	color: #555;
 }
 
-.toolbar .input-append.search{
+.toolbar .input-append.search {
 	margin: 0;
 }
-.toolbar input[name="keyword"]{
+
+.toolbar input[name="keyword"] {
 	margin: 0;
-	width:100px;
+	width: 100px;
 	-moz-transition: width .2s ease-in .5s;
 	-webkit-transition: width .2s ease-in .5s;
 	transition: width .2s ease-in .5s;
 }
-.toolbar input[name="keyword"]:focus{
-	width:100%;
+
+.toolbar input[name="keyword"]:focus {
+	width: 100%;
 }
-.toolbar.pagination ul{
-  -webkit-border-radius: 0;
-     -moz-border-radius: 0;
-          border-radius: 0;
-  -webkit-box-shadow: none;
-     -moz-box-shadow: none;
-          box-shadow: none;
+
+.toolbar.pagination ul {
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
 }
-.toolbar .pagination a{
-	padding:0 8px;
+
+.toolbar .pagination a {
+	padding: 0 8px;
 	line-height: 28px;
 }
-.toolbar .pagination li.disabled a i{
-	filter: Alpha(Opacity=50); 
+
+.toolbar .pagination li.disabled a i {
+	filter: Alpha(Opacity=50);
 	opacity: 0.50;
 }
-.toolbar .pagination li.firstPage a{
-  -webkit-border-radius: 3px 0 0 3px;
-     -moz-border-radius: 3px 0 0 3px;
-          border-radius: 3px 0 0 3px;
+
+.toolbar .pagination li.firstPage a {
+	-webkit-border-radius: 3px 0 0 3px;
+	-moz-border-radius: 3px 0 0 3px;
+	border-radius: 3px 0 0 3px;
 }
-.toolbar .pagination li.lastPage a{
-  -webkit-border-radius: 0 3px 3px 0;
-     -moz-border-radius: 0 3px 3px 0;
-          border-radius: 0 3px 3px 0;
+
+.toolbar .pagination li.lastPage a {
+	-webkit-border-radius: 0 3px 3px 0;
+	-moz-border-radius: 0 3px 3px 0;
+	border-radius: 0 3px 3px 0;
 }
+
 .toolbar .pagination span.input-append {
-  padding: 0 4px;
-  line-height: 20px;
-  background-color: transparent;
-  border: 0;
-  margin: 0px;
+	padding: 0 4px;
+	line-height: 20px;
+	background-color: transparent;
+	border: 0;
+	margin: 0px;
 }
+
 .toolbar .pagination span.add-on {
-  float: none;
+	float: none;
 }
+
 .toolbar .pagination span.divider {
-  float: none;
-  padding: 0;
-  line-height: 20px;
-  background-color: transparent;
-  border: 0;
+	float: none;
+	padding: 0;
+	line-height: 20px;
+	background-color: transparent;
+	border: 0;
 }
+

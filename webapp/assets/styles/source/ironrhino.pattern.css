@@ -1,43 +1,52 @@
-div.pattern	div.cell{
-		float:left;
-		position: relative;
-	}
-div.pattern	div.cell:first-of-type:nth-last-of-type(2), div.pattern	div.cell:first-of-type:nth-last-of-type(2) ~ div.cell {
-		width: 50%;
-	}
-div.pattern	div.cell:first-of-type:nth-last-of-type(3), div.pattern	div.cell:first-of-type:nth-last-of-type(3) ~ div.cell {
-		width: 33.33%;
-	}
-div.pattern	div.cell:first-of-type:nth-last-of-type(4), div.pattern	div.cell:first-of-type:nth-last-of-type(4) ~ div.cell {
-		width: 25%;
-	}
-div.pattern	div.cell:first-of-type:nth-last-of-type(5), div.pattern	div.cell:first-of-type:nth-last-of-type(5) ~ div.cell {
-		width: 20%;
-	}	
-div.pattern	div.cell:before{
-		content: "";
-		display: block;
-		padding-top: 100%;
-	}
-div.pattern	div.circle{
-		height: 40%;
-		width: 40%;
-		border-radius: 100%;
-		border:2px solid blue;
-		position: absolute;
-		top: 30%;
-		left: 30%;
-	}
-div.pattern	div.dot{
-		height: 80%;
-		width: 80%;
-		border-radius: 100%;
-		background-color: black;
-		position: absolute;
-		top: 10%;
-		left: 10%;
-	}
-div.pattern	div.dot.active{
-		cursor: crosshair;
-		background-color: orange;
-	}
+div.pattern div.cell {
+	float: left;
+	position: relative;
+}
+
+div.pattern div.cell:first-of-type:nth-last-of-type(2) , div.pattern div.cell:first-of-type:nth-last-of-type(2) ~ div.cell {
+	width: 50%;
+}
+
+div.pattern div.cell:first-of-type:nth-last-of-type(3) , div.pattern div.cell:first-of-type:nth-last-of-type(3) ~ div.cell {
+	width: 33.33%;
+}
+
+div.pattern div.cell:first-of-type:nth-last-of-type(4) , div.pattern div.cell:first-of-type:nth-last-of-type(4) ~ div.cell {
+	width: 25%;
+}
+
+div.pattern div.cell:first-of-type:nth-last-of-type(5) , div.pattern div.cell:first-of-type:nth-last-of-type(5) ~ div.cell {
+	width: 20%;
+}
+
+div.pattern div.cell:before {
+	content: "";
+	display: block;
+	padding-top: 100%;
+}
+
+div.pattern div.circle {
+	height: 40%;
+	width: 40%;
+	border-radius: 100%;
+	border: 2px solid blue;
+	position: absolute;
+	top: 30%;
+	left: 30%;
+}
+
+div.pattern div.dot {
+	height: 80%;
+	width: 80%;
+	border-radius: 100%;
+	background-color: black;
+	position: absolute;
+	top: 10%;
+	left: 10%;
+}
+
+div.pattern div.dot.active {
+	cursor: crosshair;
+	background-color: orange;
+}
+

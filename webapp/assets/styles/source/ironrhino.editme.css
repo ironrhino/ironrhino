@@ -1,13 +1,17 @@
-.editme{
-	margin:0px;
-	padding:0px;
+.editme {
+	margin: 0px;
+	padding: 0px;
 }
+
 .editme.edited {
-	outline:1px solid red;
+	outline: 1px solid red;
 }
+
 .editme:hover {
-	outline:1px dotted #ffc000;
+	outline: 1px dotted #ffc000;
 }
+
 .editme:focus {
-	outline:1px solid #ffc000;
+	outline: 1px solid #ffc000;
 }
+

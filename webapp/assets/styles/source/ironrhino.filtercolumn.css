@@ -1,35 +1,35 @@
-th.filtercolumn li.selecton
-{
+th.filtercolumn li.selecton {
 	color: green;
 	font-weight: bold;
 }
-th.filtercolumn li.selectoff
-{
+
+th.filtercolumn li.selectoff {
 	color: red;
 	font-weight: bold;
 }
-th.filtercolumn div.cmDiv
-{
+
+th.filtercolumn div.cmDiv {
 	display: inline;
 	background: none;
 	border: 0;
 	float: left;
 	padding-left: 10px;
 }
-th.filtercolumn.sortcol div.cmDiv
-{
+
+th.filtercolumn.sortcol div.cmDiv {
 	padding-top: 3px;
 }
-th.filtercolumn li.main
-{
+
+th.filtercolumn li.main {
 	padding: 0;
 	background: none;
 	width: 100%;
 	text-align: left;
 	cursor: pointer;
 }
-th.filtercolumn li.main li
-{
+
+th.filtercolumn li.main li {
 	text-align: left;
 	padding-right: 2px;
 }
+

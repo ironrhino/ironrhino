@@ -1,166 +1,210 @@
-.form-horizontal .control-label{
+.form-horizontal .control-label {
 	width: 100px;
 }
+
 .form-horizontal .controls {
 	margin-left: 120px;
 }
-.form-horizontal .span2 .control-label,.form-horizontal .span1 .control-label{
+
+.form-horizontal .span2 .control-label , .form-horizontal .span1 .control-label {
 	width: 60px;
 }
-.form-horizontal .span2 .controls,.form-horizontal .span1 .controls {
+
+.form-horizontal .span2 .controls , .form-horizontal .span1 .controls {
 	margin-left: 80px;
 }
-.form-horizontal .span3 .control-label{
+
+.form-horizontal .span3 .control-label {
 	width: 80px;
 }
+
 .form-horizontal .span3 .controls {
 	margin-left: 90px;
 }
-.form-horizontal .row .span3 .controls input:not([class*="input-"]),.form-horizontal .row .span3 .controls .uneditable-input:not([class*="input-"]){
+
+.form-horizontal .row .span3 .controls input:not([class *= "input-"]) , .form-horizontal .row .span3 .controls .uneditable-input:not([class *= "input-"]) {
 	width: 180px;
 }
-.form-horizontal .row .span3 .controls select:not([class*="input-"]){
+
+.form-horizontal .row .span3 .controls select:not([class *= "input-"]) {
 	width: 194px;
 }
-.form-horizontal .span6 .control-label{
+
+.form-horizontal .span6 .control-label {
 	width: 180px;
 }
+
 .form-horizontal .span6 .controls {
 	margin-left: 200px;
 }
-.form-horizontal  .control-label{
+
+.form-horizontal .control-label {
 	font-weight: bold;
 	font-style: italic;
 }
-div.form-horizontal  .control-label{
+
+div.form-horizontal .control-label {
 	cursor: text;
 }
-div.form-horizontal .controls,.controls.text {
+
+div.form-horizontal .controls , .controls.text {
 	padding-top: 5px;
 	padding-bottom: 5px;
 }
+
 .form-horizontal .form-actions {
 	padding-left: 120px;
 }
+
 .form-horizontal .control-group {
 	margin-bottom: 10px;
 }
+
 .form-actions {
 	padding: 10px 20px 10px;
 }
+
 .hero-unit .form-horizontal {
 	font-size: 13px;
 	font-weight: normal;
 	line-height: 20px;
 }
+
 @media (max-width: 960px) {
-  .form-horizontal .control-label{
-	width: 60px;
+	.form-horizontal .control-label {
+		width: 60px;
 	}
+
 	.form-horizontal .controls {
 		margin-left: 80px;
 	}
+
 	.form-horizontal .form-actions {
 		padding-left: 40px;
 	}
 }
-td input,td textarea,td select,td .uneditable-input{
-	margin-bottom: 0px !important;
+
+td input , td textarea , td select , td .uneditable-input {
+	margin-bottom: 0px ! important;
 }
-th.radio,th.checkbox,td.radio,td.checkbox{
+
+th.radio , th.checkbox , td.radio , td.checkbox {
 	padding: 0;
 	text-align: center;
 	vertical-align: middle;
 }
-th.radio input[type="radio"],th.checkbox input[type="checkbox"],td.radio input[type="radio"],td.checkbox input[type="checkbox"]{
-	float: none !important;
+
+th.radio input[type="radio"] , th.checkbox input[type="checkbox"] , td.radio input[type="radio"] , td.checkbox input[type="checkbox"] {
+	float: none ! important;
 	margin: 0;
 }
 
-input.integer,input.long,input.double,input.date,input.datetime,input.time {
+input.integer , input.long , input.double , input.date , input.datetime , input.time {
 	font-family: Arial;
 }
-input.integer,input.long,input.double{
+
+input.integer , input.long , input.double {
 	width: 100px;
 }
+
 input.double.large {
 	width: 150px;
 }
+
 input.long {
 	width: 150px;
 }
+
 input.date {
-	width: 75px !important;
+	width: 75px ! important;
 }
+
 input.datetime {
-	width: 125px !important;
+	width: 125px ! important;
 }
+
 input.time {
-	width: 60px !important;
+	width: 60px ! important;
 }
-input.latlng{
-	width: 180px !important;
+
+input.latlng {
+	width: 180px ! important;
 }
-.error input.required:read-write, input.required:focus {
+
+.error input.required:read-write , input.required:focus {
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAAUUlEQVR42mNgGHzgPwNDFxCr/mNg+AekVUB8fIp5/zIwTIYqngzi41QMVHQGqPgNkP4Ppc/gM1kDqKgCZDKIBvI1cSoGKtgJteEflL+DPqEFAKYgJItbm6p6AAAAAElFTkSuQmCC);
 	background-repeat: no-repeat;
 	background-position: right;
 }
-textarea{
+
+textarea {
 	height: 150px;
 	resize: vertical;
 }
-textarea.container,input.container,select.container{
+
+textarea.container , input.container , select.container {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
-input.container,select.container{
+
+input.container , select.container {
 	height: 30px;
 }
-select.empty{
+
+select.empty {
 	color: #ccc;
 }
-select.empty option{
+
+select.empty option {
 	color: #000;
 }
-input::-ms-reveal,input::-ms-clear {
+
+input::-ms-reveal , input::-ms-clear {
 	display: none;
 }
-button.plain{
-	border:none;
-	background-color:transparent;
-	padding:0;
-	margin-top:-2px;
+
+button.plain {
+	border: none;
+	background-color: transparent;
+	padding: 0;
+	margin-top: -2px;
 }
-input[type="file"]::-webkit-file-upload-button{
-   float: right;
-   border: 1px solid #aaaaaa;
-   border-radius: 4px;
-   padding-top:4px;
-   padding-bottom:4px;
-   background: linear-gradient(to bottom, #EFEFEF, #DEDEDE, #EFEFEF);
+
+input[type="file"]::-webkit-file-upload-button {
+	float: right;
+	border: 1px solid #aaaaaa;
+	border-radius: 4px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background: linear-gradient(to bottom, #EFEFEF, #DEDEDE, #EFEFEF);
 }
-span.checkboxgroup{
+
+span.checkboxgroup {
 	display: inline-block;
-	margin:0 20px;
+	margin: 0 20px;
 }
-.checkboxgroup label.group{
+
+.checkboxgroup label.group {
 	display: inline;
-	font-weight:bold;
-	font-size:1.1em;
-	margin:0 10px 10px 0;
+	font-weight: bold;
+	font-size: 1.1em;
+	margin: 0 10px 10px 0;
 }
-.checkboxgroup label.group input[type="checkbox"]{
-	margin-right:5px;
-	height:10px;
+
+.checkboxgroup label.group input[type="checkbox"] {
+	margin-right: 5px;
+	height: 10px;
 }
-.control-group.error .glyphicon,span.field-error {
+
+.control-group.error .glyphicon , span.field-error {
 	color: #b94a48;
 }
-.action-error strong.force-override{
+
+.action-error strong.force-override {
 	cursor: pointer;
 }
+
 .field-error-popover {
 	position: absolute;
 	z-index: 100000;
@@ -170,7 +214,7 @@ span.checkboxgroup{
 	text-align: left;
 	width: 100%;
 	background: #fcf8e3;
-	position:relative;
+	position: relative;
 	color: #b94a48;
 	min-width: 100px;
 	max-width: 300px;
@@ -181,19 +225,21 @@ span.checkboxgroup{
 	border-radius: 6px;
 	white-space: pre-wrap;
 }
-.field-error-content:before{
-    content:'';
-    display:inline-block;
-    border-left:7px solid transparent;
-    border-right:7px solid transparent;
-    border-bottom:7px solid #b94a48;
-    position:absolute;
-    bottom: auto;
+
+.field-error-content:before {
+	content: '';
+	display: inline-block;
+	border-left: 7px solid transparent;
+	border-right: 7px solid transparent;
+	border-bottom: 7px solid #b94a48;
+	position: absolute;
+	bottom: auto;
 	top: -7px;
-	left:10px;
+	left: 10px;
 }
-.field-error-content:after{
-    content: '';
+
+.field-error-content:after {
+	content: '';
 	display: inline-block;
 	border-left: 6px solid transparent;
 	border-right: 6px solid transparent;
@@ -203,34 +249,38 @@ span.checkboxgroup{
 	top: -6px;
 	left: 11px;
 }
+
 .input-append .field-error-content {
 	font-size: 13px;
 }
+
 .hero-unit .field-error-content {
 	font-size: 13px;
 	line-height: 20px;
 }
-.input-error{
-	border-color: red !important;
+
+.input-error {
+	border-color: red ! important;
 }
+
 img.captcha {
 	height: 25px;
 	width: 100px;
 	cursor: pointer;
 	vertical-align: middle;
 }
+
 .combobox .dropdown-menu li.group > a:hover {
-	cursor:default;
+	cursor: default;
 	color: #333333;
-	background-color:transparent;
+	background-color: transparent;
 	background-image: none;
 }
-
 
 input[type="checkbox"].custom + label.custom {
 	background-color: #fafafa;
 	border: 1px solid #cacece;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05);
 	padding: 8px;
 	border-radius: 3px;
 	display: inline-block;
@@ -240,27 +290,27 @@ input[type="checkbox"].custom + label.custom {
 	position: relative;
 }
 
-th.checkbox input[type="checkbox"].custom + label.custom, td.checkbox input[type="checkbox"].custom + label.custom {
+th.checkbox input[type="checkbox"].custom + label.custom , td.checkbox input[type="checkbox"].custom + label.custom {
 	margin-right: 0;
 }
 
-input[type="checkbox"][disabled].custom + label.custom, input[type="checkbox"][readonly].custom + label.custom {
-	cursor: not-allowed !important;
-	background-color: #eee !important;
+input[type="checkbox"][disabled].custom + label.custom , input[type="checkbox"][readonly].custom + label.custom {
+	cursor: not-allowed ! important;
+	background-color: #eee ! important;
 }
 
 input[type="checkbox"].custom + label.custom:hover {
 	background-color: #eaeaea;
 }
 
-input[type="checkbox"].custom + label.custom:active, input[type="checkbox"].custom:checked + label.custom:active {
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+input[type="checkbox"].custom + label.custom:active , input[type="checkbox"].custom:checked + label.custom:active {
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 input[type="checkbox"].custom:checked + label.custom {
 	background-color: #e9ecee;
 	border: 1px solid #adb8c0;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05), inset 15px 10px -12px rgba(255, 255, 255, 0.1);
 	color: #99a1a7;
 }
 
@@ -276,7 +326,7 @@ input[type="radio"].custom + label.custom {
 	-webkit-appearance: none;
 	background-color: #fafafa;
 	border: 1px solid #cacece;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05);
 	padding: 9px;
 	border-radius: 50px;
 	display: inline-block;
@@ -290,9 +340,9 @@ td.radio input[type="radio"].custom + label.custom {
 	margin-right: 0;
 }
 
-input[type="radio"][disabled].custom + label.custom, input[type="radio"][readonly].custom + label.custom {
-	cursor: not-allowed !important;
-	background-color: #eee !important;
+input[type="radio"][disabled].custom + label.custom , input[type="radio"][readonly].custom + label.custom {
+	cursor: not-allowed ! important;
+	background-color: #eee ! important;
 }
 
 input[type="radio"].custom + label.custom:hover {
@@ -307,7 +357,7 @@ input[type="radio"].custom:checked + label.custom:after {
 	position: absolute;
 	top: 3px;
 	background: #99a1a7;
-	box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
+	box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3);
 	text-shadow: 0px;
 	left: 3px;
 	font-size: 32px;
@@ -317,121 +367,140 @@ input[type="radio"].custom:checked + label.custom {
 	background-color: #e9ecee;
 	color: #99a1a7;
 	border: 1px solid #adb8c0;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1), inset 0px 0px 10px rgba(0,0,0,0.1);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05), inset 15px 10px -12px rgba(255, 255, 255, 0.1), inset 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-input[type="radio"].custom + label.custom:active, input[type="radio"].custom:checked + label.custom:active {
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+input[type="radio"].custom + label.custom:active , input[type="radio"].custom:checked + label.custom:active {
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px 1px 3px rgba(0, 0, 0, 0.1);
 }
+
 .controls > label.custom {
 	margin: 6px 0;
 }
-.controls label.checkbox label.custom,.controls label.radio label.custom{
+
+.controls label.checkbox label.custom , .controls label.radio label.custom {
 	margin-left: -20px;
 }
+
 .inline > label.custom {
 	margin-top: -3px;
 }
-.radio.inline:first-child, .checkbox.inline:first-child {
+
+.radio.inline:first-child , .checkbox.inline:first-child {
 	margin-right: 20px;
 }
-.radio.inline+.radio.inline, .checkbox.inline+.checkbox.inline{
+
+.radio.inline + .radio.inline , .checkbox.inline + .checkbox.inline {
 	margin-left: 0;
 	margin-right: 20px;
 }
-[class*="span"] .radio.inline,
-[class*="span"] .checkbox.inline {
-  padding-top: 0;
+
+[class *= "span"] .radio.inline , [class *= "span"] .checkbox.inline {
+	padding-top: 0;
 }
-[class*="span"] .controls .radio.inline,
-[class*="span"] .controls .checkbox.inline {
-  padding-top: 5px;
+
+[class *= "span"] .controls .radio.inline , [class *= "span"] .controls .checkbox.inline {
+	padding-top: 5px;
 }
-select{
+
+select {
 	line-height: 18px;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
 	text-indent: 0.01px;
-    text-overflow: '';
+	text-overflow: '';
 	background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAeCAYAAADZ7LXbAAAAeUlEQVR42mNgGAWjYBSMgiEMpk6d6jh9+vQ3QPwNiD9gwzNmzPgPpBdNnjxZihKLkkEG4cJAC4709fUJUeyjadOmFWCzACh+gSIfYLGoEc0Ht4G+VKF6HAENngy14DnQAgOaJIT6+no2oI9mArHnaLYYBaNgFIxEAAB30mu87oviJwAAAABJRU5ErkJggg==) no-repeat center right;
 }
-select:not([disabled]):hover,select:focus{
+
+select:not([disabled]):hover , select:focus {
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAeCAYAAADZ7LXbAAAAg0lEQVR42u3Tqw6DIQwF4L4M4SZ4f0eCw2HwJDgEAoEhnCVzS7Y/2QW1iuovp6elvTdODzHCCCOMHEJqrZBSgoguxzmHMcbnSXLOEEK8BKy1mHN+v66U0lPIGPN2gstOYowPkNYavfffFx9CuENKKbTWzlzXWgvee5RS+E8YYYSRv0RuzedLGpb2fpgAAAAASUVORK5CYII=);
 }
+
 ::-ms-expand {
-	 display: none;
+	display: none;
 }
-.input-append.search input{
+
+.input-append.search input {
 	-webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    border-right: 0;
-    padding-left: 10px;
-    padding-right: 0;
-    -webkit-border-radius:  1rem 0 0 1rem;
-    -moz-border-radius:  1rem 0 0 1rem;
-    border-radius: 1rem 0 0 1rem;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	border-right: 0;
+	padding-left: 10px;
+	padding-right: 0;
+	-webkit-border-radius: 1rem 0 0 1rem;
+	-moz-border-radius: 1rem 0 0 1rem;
+	border-radius: 1rem 0 0 1rem;
 }
-.input-append.search .add-on{
+
+.input-append.search .add-on {
 	background-color: #fff;
-    border: 1px solid #ccc;
+	border: 1px solid #ccc;
 	border-left: 0;
 	margin-left: 0;
 	-webkit-border-radius: 0 1rem 1rem 0;
 	-moz-border-radius: 0 1rem 1rem 0;
 	border-radius: 0 1rem 1rem 0;
 }
-.input-append.search input[type="text"]:focus ~ .add-on{
+
+.input-append.search input[type="text"]:focus ~ .add-on {
 	border-color: rgba(82, 168, 236, 0.8);
 }
-div.preview{
+
+div.preview {
 	vertical-align: middle;
 	padding: 4px 6px;
-	display:inline-block;
+	display: inline-block;
 	overflow: auto;
-	white-space:pre-wrap;
-	word-break:break-all;
+	white-space: pre-wrap;
+	word-break: break-all;
 	border: 1px solid #ccc;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
-	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
-	-moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
-	box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
-}
-div.preview span.comment{
-	font-style: italic;
-	color:#999;
-}
-div.preview strong{
-	color: #0da4d3;
-}
-div.sqleditor.preview{
-	min-width:90%;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
-form.attachmentable ul.thumbnails{
- min-height: 50px;
+div.preview span.comment {
+	font-style: italic;
+	color: #999;
 }
-form.attachmentable ul.thumbnails li{
- position: relative;
+
+div.preview strong {
+	color: #0da4d3;
 }
-form.attachmentable ul.thumbnails li .remove{
- position: absolute;
- top: 5px;
- right: 5px;
- font-size: 2em;
+
+div.sqleditor.preview {
+	min-width: 90%;
 }
-.form-horizontal .controls .unstyled{
+
+form.attachmentable ul.thumbnails {
+	min-height: 50px;
+}
+
+form.attachmentable ul.thumbnails li {
+	position: relative;
+}
+
+form.attachmentable ul.thumbnails li .remove {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	font-size: 2em;
+}
+
+.form-horizontal .controls .unstyled {
 	padding-bottom: 0;
 	margin-bottom: 0;
 }
 
-.form-horizontal .controls li .unstyled{
+.form-horizontal .controls li .unstyled {
 	margin-bottom: 10px;
 }
 
-.form-horizontal .controls .unstyled em{
-	margin-right:10px;
+.form-horizontal .controls .unstyled em {
+	margin-right: 10px;
 }
+

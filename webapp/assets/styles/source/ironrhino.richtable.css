@@ -1,85 +1,106 @@
-.window-richtable form:first-child{
-	padding-top : 20px;
+.window-richtable form:first-child {
+	padding-top: 20px;
 }
-.window-richtable form:first-child textarea.input-xxlarge,.window-richtable form input.input-xxlarge {
+
+.window-richtable form:first-child textarea.input-xxlarge , .window-richtable form input.input-xxlarge {
 	width: 515px;
 }
-.window-listpick form.criteria select{
+
+.window-listpick form.criteria select {
 	width: 200px;
 }
+
 table.richtable thead {
 	background: #DEDEDE;
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EFEFEF), to(#EFEFEF), color-stop(.5,#DEDEDE));
-	background: -moz-linear-gradient(center top , #EFEFEF, #DEDEDE, #EFEFEF);
-	background: -o-linear-gradient(top,  #EFEFEF, #DEDEDE, #EFEFEF);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EFEFEF), to(#EFEFEF), color-stop(.5, #DEDEDE));
+	background: -moz-linear-gradient(center top, #EFEFEF, #DEDEDE, #EFEFEF);
+	background: -o-linear-gradient(top, #EFEFEF, #DEDEDE, #EFEFEF);
 	background: -ms-linear-gradient(top, #EFEFEF, #DEDEDE, #EFEFEF);
 	background: linear-gradient(to bottom, #EFEFEF, #DEDEDE, #EFEFEF);
 }
-table.richtable td,table.richtable th {
+
+table.richtable td , table.richtable th {
 	padding: 0.5em;
 	height: 30px;
 	vertical-align: middle;
 	word-break: break-all;
 }
+
 table.richtable th {
 	min-width: 50px;
 	padding: 0.5em 0;
 	line-height: 200%;
 }
-table.richtable th.checkbox,table.richtable th.radio {
+
+table.richtable th.checkbox , table.richtable th.radio {
 	max-width: 50px;
 	width: 50px;
 }
+
 table.richtable td {
 	word-wrap: break-all;
 	white-space: pre-wrap;
 }
+
 .richtable th {
 	text-align: center;
 }
-.richtable table td.action{
-	white-space:nowrap;
+
+.richtable table td.action {
+	white-space: nowrap;
 }
-.richtable table td.action ul.dropdown-menu{
+
+.richtable table td.action ul.dropdown-menu {
 	min-width: 100px;
 }
-.richtable table td.action ul.dropdown-menu li{
+
+.richtable table td.action ul.dropdown-menu li {
 	cursor: pointer;
 }
-.richtable tbody input.text,.richtable tbody textarea.text {
+
+.richtable tbody input.text , .richtable tbody textarea.text {
 	width: 90%;
 	width: calc(100% - 13px);
 	margin: 0;
 }
+
 .richtable tbody input.radio {
 	width: auto;
 	margin: 0;
 }
+
 .richtable tbody select {
 	width: 95%;
 	width: calc(100% - 13px);
 	margin: 0;
 	padding-left: 0;
 }
+
 .richtable tr.selected td {
-	background-color: #FFC !important;
+	background-color: #FFC ! important;
 }
-.richtable td.edited{
-	background-color: #fff3f0 !important;
+
+.richtable td.edited {
+	background-color: #fff3f0 ! important;
 }
+
 table.richtable a .glyphicon {
 	color: #404040;
 }
-table.richtable a:hover .glyphicon ,table.richtable a:focus .glyphicon  {
+
+table.richtable a:hover .glyphicon , table.richtable a:focus .glyphicon {
 	color: #005580;
 }
-table.criteria{
+
+table.criteria {
 	margin-bottom: 0;
 }
-table.ordering tfoot{
+
+table.ordering tfoot {
 	background-color: transparent;
 }
-.toolbar .btn[data-shown],.toolbar .btn[data-action="save"]{
+
+.toolbar .btn[data-shown] , .toolbar .btn[data-action="save"] {
 	display: none;
 }
-/*override bootstrap end*/
+
