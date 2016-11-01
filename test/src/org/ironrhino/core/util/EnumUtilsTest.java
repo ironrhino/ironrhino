@@ -12,11 +12,6 @@ public class EnumUtilsTest {
 
 	public static enum Enum1 implements Displayable {
 		TEST1, TEST2;
-
-		@Override
-		public String getName() {
-			return name();
-		}
 	}
 
 	public static enum Enum2 {

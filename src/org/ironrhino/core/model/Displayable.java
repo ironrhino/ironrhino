@@ -4,7 +4,11 @@ import org.ironrhino.core.struts.I18N;
 
 public interface Displayable {
 
-	String getName();
+	String name();
+
+	default String getName() {
+		return name();
+	}
 
 	default String getDisplayName() {
 		try {

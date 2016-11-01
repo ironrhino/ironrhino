@@ -366,7 +366,7 @@ public enum CriterionOperator implements Displayable {
 
 	@Override
 	public String getName() {
-		return name();
+		return Displayable.super.getName();
 	}
 
 	@Override
