@@ -11,6 +11,25 @@
 			<bean class="redis.clients.jedis.JedisPoolConfig" p:maxTotal="${redis.maxTotal:50}" p:maxIdle="${redis.maxIdle:10}" p:minIdle="${redis.minIdle:1}" />
 		</property>
 	</bean>
+	<!--
+	<bean id="redisConnectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+		p:usePool="true" p:password="${redis.password:}" p:database="${redis.database:0}">
+		<constructor-arg>
+			<bean class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
+				<constructor-arg>
+					<value>${redis.master:master}</value>
+				</constructor-arg>
+				<constructor-arg>
+					<value>${redis.connectString:localhost:26379,localhost:26380,localhost:26381}</value>
+				</constructor-arg>
+			</bean>
+		</constructor-arg>
+		<constructor-arg>
+			<bean class="redis.clients.jedis.JedisPoolConfig" p:maxTotal="${redis.maxTotal:50}" p:maxIdle="${redis.maxIdle:10}" p:minIdle="${redis.minIdle:1}" />
+		</constructor-arg>
+	</bean>
+	-->
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
 		p:connectionFactory-ref="redisConnectionFactory" primary="true">
 		<property name="keySerializer">
