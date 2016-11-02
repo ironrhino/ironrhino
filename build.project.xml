@@ -597,23 +597,23 @@
 		        <include name="META-INF/descriptors/*.xml"/>
 		    </patternset>
 		</unzip>
-		<copy todir="${target.dir}/META-INF" preservelastmodified="true">
+		<copy todir="${target.dir}/META-INF" preservelastmodified="true" failonerror="false">
 			<fileset dir="${webapp.dir}/WEB-INF" includes="*.xml"/>
 		</copy>
-		<copy todir="${target.dir}/META-INF/descriptors" preservelastmodified="true">
+		<copy todir="${target.dir}/META-INF/descriptors" preservelastmodified="true" failonerror="false">
 			<fileset dir="${target.dir}/META-INF" includes="*.xml"/>
 		</copy>
-		<copy todir="${webapp.dir}/WEB-INF">
+		<copy todir="${webapp.dir}/WEB-INF" failonerror="false">
 			<fileset dir="${target.dir}/META-INF/descriptors" includes="*.xml"/>
 		</copy>
 	</target>
 
 	<target name="reset-descriptors">
-		<delete dir="${webapp.dir}/WEB-INF" includes="*.xml"/>
-		<move todir="${webapp.dir}/WEB-INF">
+		<delete dir="${webapp.dir}/WEB-INF" includes="*.xml" failonerror="false"/>
+		<move todir="${webapp.dir}/WEB-INF" failonerror="false">
 			<fileset dir="${target.dir}/META-INF" includes="*.xml"/>
 		</move>
-		<delete dir="${target.dir}/META-INF"/>
+		<delete dir="${target.dir}/META-INF" failonerror="false"/>
 	</target>
 
 	<target name="jar" depends="compile,set-revision">
