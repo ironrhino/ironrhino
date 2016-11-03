@@ -11,7 +11,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Column;
+import javax.persistence.Table;
+
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanUtils;
 
 public class SqlUtils {
@@ -22,20 +26,36 @@ public class SqlUtils {
 
 	public static String buildInsertStatement(Class<?> beanClass, String tableName, String... ignoreProperties) {
 		List<String> properties = new ArrayList<>();
-		Set<String> set = new HashSet<>();
+		Set<String> ignorePropertiesSet = new HashSet<>();
 		if (ignoreProperties.length > 0)
-			set.addAll(Arrays.asList(ignoreProperties));
+			ignorePropertiesSet.addAll(Arrays.asList(ignoreProperties));
 		for (PropertyDescriptor pd : BeanUtils.getPropertyDescriptors(beanClass)) {
 			if (pd.getReadMethod() != null && pd.getWriteMethod() != null) {
 				String name = pd.getName();
-				if (!set.contains(name))
-					properties.add(name);
+				if (!ignorePropertiesSet.contains(name)) {
+					String columnName = name;
+					Column column = pd.getReadMethod().getAnnotation(Column.class);
+					if (column == null) {
+						try {
+							column = ReflectionUtils.getField(beanClass, name).getAnnotation(Column.class);
+						} catch (NoSuchFieldException e) {
+						}
+					}
+					if (column != null && StringUtils.isNotBlank(column.name()))
+						columnName = column.name();
+					properties.add(columnName);
+				}
 			}
 		}
 		if (properties.isEmpty())
 			throw new IllegalArgumentException(beanClass + " has no properties");
-		if (tableName == null)
-			tableName = beanClass.getSimpleName();
+		if (tableName == null) {
+			Table table = beanClass.getAnnotation(Table.class);
+			if (table != null)
+				tableName = table.name();
+			if (StringUtils.isBlank(tableName))
+				tableName = beanClass.getSimpleName();
+		}
 		StringBuilder sb = new StringBuilder("insert into ");
 		sb.append(tableName);
 		sb.append("(");
