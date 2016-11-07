@@ -53,7 +53,7 @@ public abstract class AbstractDatabaseCyclicSequence extends AbstractCyclicSeque
 		this.lockService = lockService;
 	}
 
-	public String getLockName() {
+	protected String getLockName() {
 		return "SEQLOCK:" + getSequenceName();
 	}
 

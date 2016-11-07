@@ -1,6 +1,7 @@
 package org.ironrhino.core.sequence.simple;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -28,91 +29,44 @@ public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSim
 
 	@Override
 	public void afterPropertiesSet() {
-		Connection con = null;
-		Statement stmt = null;
-		try {
-			con = getDataSource().getConnection();
+		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
-			stmt = con.createStatement();
-			stmt.execute(getCreateSequenceStatement());
+			DatabaseMetaData dbmd = con.getMetaData();
+			boolean sequenceExists = false;
+			try (ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "SEQUENCE" })) {
+				while (rs.next()) {
+					if (getActualSequenceName().equalsIgnoreCase(rs.getString(3))) {
+						sequenceExists = true;
+						break;
+					}
+				}
+			}
+			if (!sequenceExists)
+				stmt.execute(getCreateSequenceStatement());
 		} catch (SQLException ex) {
 			logger.warn(ex.getMessage());
-		} finally {
-			if (stmt != null)
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			if (con != null)
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 		}
 	}
 
 	@Override
 	public int nextIntValue() throws DataAccessException {
-		int nextId = 0;
-		Connection con = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		try {
-			con = getDataSource().getConnection();
-			con.setAutoCommit(true);
-			stmt = con.createStatement();
-			rs = stmt.executeQuery(getQuerySequenceStatement());
-			try {
-				rs.next();
-				nextId = rs.getInt(1);
-			} finally {
-				rs.close();
-			}
+		try (Connection con = getDataSource().getConnection();
+				Statement stmt = con.createStatement();
+				ResultSet rs = stmt.executeQuery(getQuerySequenceStatement())) {
+			rs.next();
+			return rs.getInt(1);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain next value of sequence", ex);
-		} finally {
-			if (stmt != null)
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			if (con != null)
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 		}
-		return nextId;
 	}
 
 	@Override
 	public void restart() {
-		Connection con = null;
-		Statement stmt = null;
-		try {
-			con = getDataSource().getConnection();
+		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
-			stmt = con.createStatement();
 			restartSequence(con, stmt);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
-		} finally {
-			if (stmt != null)
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			if (con != null)
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 		}
 	}
 

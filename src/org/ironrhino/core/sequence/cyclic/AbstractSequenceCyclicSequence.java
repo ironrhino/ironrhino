@@ -2,14 +2,19 @@ package org.ironrhino.core.sequence.cyclic;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.util.Assert;
 
 public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyclicSequence {
 
@@ -21,24 +26,22 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		return "TIMESTAMP";
 	}
 
+	protected String getNameColumnType() {
+		return "VARCHAR(50)";
+	}
+
 	protected String getCurrentTimestamp() {
 		return "CURRENT_TIMESTAMP";
 	}
 
 	protected String getCreateTableStatement() {
-		return new StringBuilder("CREATE TABLE ").append(getTableName()).append(" (").append(getSequenceName())
-				.append("_TIMESTAMP ").append(getTimestampColumnType()).append(")").toString();
-	}
-
-	protected String getAddColumnStatement() {
-		return new StringBuilder("ALTER TABLE ").append(getTableName()).append(" ADD ").append(getSequenceName())
-				.append("_TIMESTAMP ").append(getTimestampColumnType()).append(" DEFAULT ")
-				.append(getCurrentTimestamp()).toString();
+		return new StringBuilder("CREATE TABLE ").append(getTableName()).append(" (NAME ").append(getNameColumnType())
+				.append(" PRIMARY KEY, LAST_UPDATED ").append(getTimestampColumnType()).append(")").toString();
 	}
 
 	protected String getInsertStatement() {
-		return new StringBuilder("INSERT INTO ").append(getTableName()).append(" VALUES(").append(getCurrentTimestamp())
-				.append(")").toString();
+		return new StringBuilder("INSERT INTO ").append(getTableName()).append(" VALUES(").append("'")
+				.append(getSequenceName()).append("',").append(getCurrentTimestamp()).append(")").toString();
 	}
 
 	protected abstract String getQuerySequenceStatement();
@@ -57,38 +60,68 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 
 	@Override
 	public void afterPropertiesSet() {
+		Assert.notNull(getLockService());
 		querySequenceStatement = getQuerySequenceStatement();
-		queryTimestampStatement = new StringBuilder("SELECT  ").append(getCurrentTimestamp()).append(",")
-				.append(getSequenceName()).append("_TIMESTAMP").append(" FROM ").append(getTableName()).toString();
-		Connection con = null;
-		Statement stmt = null;
-		try {
-			con = getDataSource().getConnection();
+		queryTimestampStatement = new StringBuilder("SELECT ").append(getCurrentTimestamp()).append(",LAST_UPDATED")
+				.append(" FROM ").append(getTableName()).append(" WHERE NAME='").append(getSequenceName()).append("'")
+				.toString();
+		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
+			String tableName = getTableName();
+			boolean tableExists = false;
 			con.setAutoCommit(true);
 			DatabaseMetaData dbmd = con.getMetaData();
-			ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "TABLE" });
-			boolean tableExists = false;
-			while (rs.next()) {
-				if (getTableName().equalsIgnoreCase(rs.getString(3))) {
-					tableExists = true;
-					break;
-				}
-			}
-			stmt = con.createStatement();
-			String columnName = getSequenceName();
-			if (tableExists) {
-				rs = stmt.executeQuery("SELECT * FROM " + getTableName());
-				boolean columnExists = false;
-				ResultSetMetaData metadata = rs.getMetaData();
-				for (int i = 0; i < metadata.getColumnCount(); i++) {
-					if ((columnName + "_TIMESTAMP").equalsIgnoreCase(metadata.getColumnName(i + 1))) {
-						columnExists = true;
+			try (ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "TABLE" })) {
+				while (rs.next()) {
+					if (tableName.equalsIgnoreCase(rs.getString(3))) {
+						tableExists = true;
 						break;
 					}
 				}
-				rs.close();
-				if (!columnExists) {
-					stmt.execute(getAddColumnStatement());
+			}
+			if (tableExists) {
+				// upgrade legacy
+				Map<String, Object> map = null;
+				try (ResultSet rs = stmt.executeQuery("SELECT * FROM " + tableName)) {
+					ResultSetMetaData rsmd = rs.getMetaData();
+					boolean legacy = true;
+					for (int i = 0; i < rsmd.getColumnCount(); i++)
+						if ("LAST_UPDATED".equalsIgnoreCase(rsmd.getColumnName(i + 1))) {
+							legacy = false;
+							break;
+						}
+					if (legacy) {
+						map = new LinkedHashMap<>();
+						rs.next();
+						for (int i = 0; i < rsmd.getColumnCount(); i++)
+							map.put(rsmd.getColumnName(i + 1), rs.getObject(i + 1));
+					}
+				}
+				if (map != null) {
+					stmt.execute("DROP TABLE " + tableName);
+					stmt.execute(getCreateTableStatement());
+					try (PreparedStatement ps = con.prepareStatement("INSERT INTO " + tableName + " VALUES(?,?)")) {
+						for (Map.Entry<String, Object> entry : map.entrySet()) {
+							if (entry.getKey().toUpperCase().endsWith("_TIMESTAMP")) {
+								String sequenceName = entry.getKey();
+								sequenceName = sequenceName.substring(0, sequenceName.lastIndexOf('_'));
+								ps.setString(1, sequenceName);
+								ps.setTimestamp(2, ((Timestamp) entry.getValue()));
+								ps.addBatch();
+							}
+						}
+						ps.executeBatch();
+					}
+				}
+			}
+			String sequenceName = getSequenceName();
+			if (tableExists) {
+				boolean rowExists = false;
+				try (ResultSet rs = stmt
+						.executeQuery("SELECT NAME FROM " + tableName + " WHERE NAME='" + sequenceName + "'")) {
+					rowExists = rs.next();
+				}
+				if (!rowExists) {
+					stmt.execute(getInsertStatement());
 					stmt.execute(getCreateSequenceStatement());
 				}
 			} else {
@@ -98,19 +131,6 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			}
 		} catch (SQLException ex) {
 			logger.error(ex.getMessage(), ex);
-		} finally {
-			if (stmt != null)
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			if (con != null)
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 		}
 	}
 
@@ -158,9 +178,9 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 					try {
 						result = queryTimestampWithSequence(con, stmt);
 						if (!getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp)) {
-							stmt.executeUpdate("UPDATE " + getTableName() + " SET " + getSequenceName()
-									+ "_TIMESTAMP = " + getCurrentTimestamp());
 							restartSequence(con, stmt);
+							stmt.executeUpdate("UPDATE " + getTableName() + " SET LAST_UPDATED = "
+									+ getCurrentTimestamp() + " WHERE NAME='" + getSequenceName() + "'");
 							result = queryTimestampWithSequence(con, stmt);
 						}
 						return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
@@ -215,9 +235,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 
 	private Result queryTimestampWithSequence(Connection con, Statement stmt) throws SQLException {
 		Result result = new Result();
-		ResultSet rs = null;
-		try {
-			rs = stmt.executeQuery(querySequenceStatement);
+		try (ResultSet rs = stmt.executeQuery(querySequenceStatement)) {
 			rs.next();
 			result.nextId = rs.getInt(1);
 			if (rs.getMetaData().getColumnCount() > 1) {
@@ -235,22 +253,16 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 				return queryTimestampWithSequence(con, stmt);
 			}
 			throw ex;
-		} finally {
-			if (rs != null)
-				rs.close();
 		}
 	}
 
 	private Result queryTimestamp(Connection con, Statement stmt) throws SQLException {
 		Result result = new Result();
-		ResultSet rs = stmt.executeQuery(queryTimestampStatement);
-		try {
+		try (ResultSet rs = stmt.executeQuery(queryTimestampStatement)) {
 			rs.next();
 			result.currentTimestamp = rs.getTimestamp(1);
 			result.lastTimestamp = rs.getTimestamp(2);
 			return result;
-		} finally {
-			rs.close();
 		}
 	}
 

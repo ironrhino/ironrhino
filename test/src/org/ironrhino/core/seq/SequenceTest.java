@@ -2,6 +2,7 @@ package org.ironrhino.core.seq;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -9,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ironrhino.core.sequence.Sequence;
+import org.ironrhino.core.util.DateUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -63,21 +65,28 @@ public class SequenceTest {
 		final Sequence seq = cyclic ? sample2Sequence : sample1Sequence;
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < THREADS; i++) {
-			executorService.execute(() -> {
-				for (int j = 0; j < LOOP; j++) {
-					try {
-						String id = seq.nextStringValue();
-						Long time2 = System.currentTimeMillis();
-						Long old = map.putIfAbsent(id, time2);
-						if (old != null)
-							System.out.println(id + " , old=" + old + " , new=" + time2);
-						else
-							count.incrementAndGet();
-					} catch (Throwable e) {
-						e.printStackTrace();
+			executorService.execute(new Runnable() {
+
+				@Override
+				public void run() {
+
+					for (int j = 0; j < LOOP; j++) {
+						try {
+							String id = seq.nextStringValue();
+							Long time2 = System.currentTimeMillis();
+							Long old = map.putIfAbsent(id, time2);
+							if (old != null)
+								System.out.println(id + " , old=" + DateUtils.formatTimestamp(new Date(old)) + " , new="
+										+ DateUtils.formatTimestamp(new Date(time2)));
+							else
+								count.incrementAndGet();
+						} catch (Throwable e) {
+							e.printStackTrace();
+						}
+
 					}
+					cdl.countDown();
 				}
-				cdl.countDown();
 			});
 		}
 		cdl.await();

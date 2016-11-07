@@ -5,8 +5,8 @@ public class InformixCyclicSequence extends AbstractSequenceCyclicSequence {
 	@Override
 	protected String getQuerySequenceStatement() {
 		return new StringBuilder("SELECT ").append(getActualSequenceName()).append(".NEXTVAL,")
-				.append(getCurrentTimestamp()).append(",").append(getSequenceName()).append("_TIMESTAMP FROM ")
-				.append(getTableName()).toString();
+				.append(getCurrentTimestamp()).append(",LAST_UPDATED FROM ").append(getTableName())
+				.append(" WHERE NAME='").append(getSequenceName()).append("'").toString();
 	}
 
 	@Override
