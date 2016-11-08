@@ -31,9 +31,6 @@ public class DataSourceConfiguration {
 	@Autowired
 	private Logger logger;
 
-	@Value("${jdbc.dataSourceClassName:}")
-	private String dataSourceClassName;
-
 	@Value("${jdbc.driverClass:}")
 	private String driverClass;
 
@@ -88,16 +85,15 @@ public class DataSourceConfiguration {
 				jdbcUrl = newJdbcUrl;
 			}
 		}
-		logger.info("Connecting {}", jdbcUrl);
-		String hikariClassName = "com.zaxxer.hikari.HikariDataSource";
-		if (hikariClassName.equals(dataSourceClassName)) {
-			if (ClassUtils.isPresent(hikariClassName, getClass().getClassLoader())) {
-				return hikariDataSource();
-			} else {
-				logger.warn("Class [{}] not found, please add HikariCP.jar", hikariClassName);
-			}
+		DataSource ds;
+		if (ClassUtils.isPresent("com.zaxxer.hikari.HikariDataSource", getClass().getClassLoader())) {
+			ds = hikariDataSource();
+		} else {
+			logger.warn("Please add HikariCP.jar to use HikariDataSource instead of BoneCPDataSource");
+			ds = boneCPDataSource();
 		}
-		return boneCPDataSource();
+		logger.info("Using {} to connect {}", ds.getClass().getName(), jdbcUrl);
+		return ds;
 	}
 
 	private DataSource boneCPDataSource() {
