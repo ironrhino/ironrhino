@@ -73,7 +73,6 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			}
 			String sequenceName = getSequenceName();
 			if (tableExists) {
-
 				boolean rowExists = false;
 				try (ResultSet rs = stmt
 						.executeQuery("SELECT NAME FROM `" + tableName + "` WHERE NAME='" + sequenceName + "'")) {
@@ -150,8 +149,8 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			}
 			int next;
 			Date currentTimestamp;
-			try (ResultSet rs = stmt
-					.executeQuery("SELECT LAST_INSERT_ID(),UNIX_TIMESTAMP() FROM `" + getTableName() + "`")) {
+			try (ResultSet rs = stmt.executeQuery("SELECT LAST_INSERT_ID(),LAST_UPDATED FROM `" + getTableName()
+					+ "` WHERE NAME='" + sequenceName + "'")) {
 				if (!rs.next()) {
 					throw new DataAccessResourceFailureException("LAST_INSERT_ID() failed after executing an update");
 				}
@@ -184,7 +183,6 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 					e.printStackTrace();
 				}
 				return nextStringValue(--maxAttempts);
-
 			}
 			return getStringValue(currentTimestamp, getPaddingLength(), next);
 		} catch (SQLException ex) {
