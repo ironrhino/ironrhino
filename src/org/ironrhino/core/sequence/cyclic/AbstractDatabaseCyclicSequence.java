@@ -6,7 +6,9 @@ import org.ironrhino.core.coordination.LockService;
 
 public abstract class AbstractDatabaseCyclicSequence extends AbstractCyclicSequence {
 
-	static final long CRITICAL_THRESHOLD_TIME = 500;
+	static final int STATUS_CYCLE_CROSS = 0;
+	static final int STATUS_CYCLE_SAME_AND_SAFE = 1;
+	static final int STATUS_CYCLE_SAME_AND_CRITICAL = 2;
 
 	private DataSource dataSource;
 

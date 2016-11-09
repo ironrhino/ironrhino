@@ -18,6 +18,8 @@ import org.springframework.util.Assert;
 
 public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyclicSequence {
 
+	static final long CRITICAL_THRESHOLD_TIME = 500;
+
 	protected String querySequenceStatement;
 
 	protected String queryTimestampStatement;
@@ -149,38 +151,16 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			con.setAutoCommit(true);
 			stmt = con.createStatement();
 			Result result = queryTimestampWithSequence(con, stmt);
-			if (getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp)) {
-				if (result.isCriticalPoint(getCycleType())) {
-					// timestamp updated but sequence not restarted
-					if (stmt != null)
-						try {
-							stmt.close();
-							stmt = null;
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-					try {
-						con.close();
-						con = null;
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					return nextStringValue(--maxAttempts);
-				}
+			if (sameCycle(result) == STATUS_CYCLE_SAME_AND_SAFE) {
 				return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
 			} else {
 				if (getLockService().tryLock(getLockName())) {
 					try {
 						result = queryTimestampWithSequence(con, stmt);
-						if (!getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp)) {
-							restartSequence(con, stmt);
+						if (sameCycle(result) == STATUS_CYCLE_CROSS) {
 							stmt.executeUpdate("UPDATE " + getTableName() + " SET LAST_UPDATED = "
 									+ getCurrentTimestamp() + " WHERE NAME='" + getSequenceName() + "'");
+							restartSequence(con, stmt);
 							result = queryTimestampWithSequence(con, stmt);
 						}
 						return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
@@ -202,7 +182,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 						e.printStackTrace();
 					}
 					try {
-						Thread.sleep(500);
+						Thread.sleep(CRITICAL_THRESHOLD_TIME);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -231,6 +211,17 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 
 	protected void restartSequence(Connection con, Statement stmt) throws SQLException {
 		stmt.execute(getRestartSequenceStatement());
+	}
+
+	private int sameCycle(Result result) {
+		boolean sameCycle = getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp);
+		if (!sameCycle)
+			return STATUS_CYCLE_CROSS;
+		Date cycleStart = getCycleType().getCycleStart(result.currentTimestamp);
+		if (result.currentTimestamp.getTime() - cycleStart.getTime() <= CRITICAL_THRESHOLD_TIME) {
+			return STATUS_CYCLE_SAME_AND_CRITICAL;
+		}
+		return STATUS_CYCLE_SAME_AND_SAFE;
 	}
 
 	private Result queryTimestampWithSequence(Connection con, Statement stmt) throws SQLException {
@@ -267,17 +258,8 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 	}
 
 	private static class Result {
-
 		int nextId;
 		Date currentTimestamp;
 		Date lastTimestamp;
-
-		boolean isCriticalPoint(CycleType cycleType) {
-			return currentTimestamp.getTime()
-					- cycleType.getCycleStart(currentTimestamp).getTime() < CRITICAL_THRESHOLD_TIME && nextId > 100
-					|| cycleType.getCycleEnd(currentTimestamp).getTime()
-							- currentTimestamp.getTime() < CRITICAL_THRESHOLD_TIME && nextId < 5;
-		}
-
 	}
 }
