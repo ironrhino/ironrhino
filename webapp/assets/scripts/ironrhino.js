@@ -36797,7 +36797,7 @@ Observation.checkbox = function(container) {
 				// string, so you can use it to order a column of various srings
 				// containing numbers.
 				var calc = function(v) {
-					v = parseFloat(v.replace(
+					v = parseFloat(v.replace(/,/g,'').replace(
 							/^.*?([-+]?[\d]*\.?[\d]+(?:[eE][-+]?[\d]+)?).*$/,
 							"$1"));
 					return isNaN(v) ? 0 : v;
@@ -36872,7 +36872,7 @@ Observation.checkbox = function(container) {
 					re : /^[-+]?[\d]*\.?[\d]+(?:[eE][-+]?[\d]+)?\s?[k|m|g|t]b$/i,
 					type : "datasize"
 				}, {
-					re : /^[-+]?[\d]*\.?[\d]+(?:[eE][-+]?[\d]+)?$/,
+					re : /^[-+]?[\d,]*\.?[\d]+(?:[eE][-+]?[\d]+)?$/,
 					type : "number"
 				}, {
 					re : /^[A-Z]+$/,
