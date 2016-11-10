@@ -7,9 +7,23 @@
 <#local cellname=((config['trimPrefix']??)?then('',entityName+'.'))+name>
 <@rttheadtd name=name alias=config['alias']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit']!,'') readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
 </#list>
-<@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
+<#local showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
+<@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn/>
 <#if resultPage??><#local list=resultPage.result></#if>
+<#local sumColumns={}>
+<#list columns as name,config>
+	<#if config['showSum']?? && config['showSum']>
+		<#local sumColumns+={name:{"template":config['template']!}}>
+	</#if>
+</#list>
 <#list list as entity>
+<#list sumColumns as name,config>
+	<#if !name?contains('.')><#local val=entity[name]!><#else><#local val=('(entity.'+name+')!')?eval></#if>
+	<#if val?has_content>
+	<#if val?is_number><#if config.value??><#local val+=config.value/></#if><#else><#local val=''/></#if>
+	<#local sumColumns+={name:{"value":val,"template":config['template']!}}>
+	</#if>
+</#list>
 <#local entityReadonly = !readonly && readonlyExpression?has_content && readonlyExpression?eval />
 <#local _rowDynamicAttributes={}>
 <#if rowDynamicAttributes?has_content>
@@ -42,7 +56,7 @@
 </#list>
 <@rttbodytrend entity=entity showActionColumn=showActionColumn buttons=actionColumnButtons editable=!readonly viewable=viewable entityReadonly=entityReadonly/>
 </#list>
-<@rtend showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly createable=createable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
+<@rtend columns=columns?keys sumColumns=sumColumns showCheckColumn=showCheckColumn showActionColumn=showActionColumn showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly createable=createable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
 </#macro>
 
 <#macro rtstart formid='',action='',entityName='',resizable=true,sortable=true,includeParameters=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' dynamicAttributes...>
@@ -144,7 +158,7 @@ ${formHeader!}
 </#macro>
 
 <#macro rttbodytrend entity showActionColumn=true buttons='' editable=true viewable=false entityReadonly=false inputWindowOptions='' viewWindowOptions=''>
-<#if showActionColumn && (buttons?has_content || editable || viewable)>
+<#if showActionColumn>
 <td class="action">
 <#if buttons?has_content>
 <@buttons?interpret/>
@@ -165,7 +179,7 @@ ${formHeader!}
 </tr>
 </#macro>
 
-<#macro rtend showBottomButtons=true buttons='' readonly=false createable=true celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' showPageSize=true formFooter='' inputWindowOptions=''>
+<#macro rtend columns sumColumns={} showCheckColumn=true showActionColumn=true showBottomButtons=true buttons='' readonly=false createable=true celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' showPageSize=true formFooter='' inputWindowOptions=''>
 <#if filterable>
 <#if !propertyNamesInCriteria?? && uiConfigs??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].filterPropertyNamesInCriteria(uiConfigs)>
@@ -176,6 +190,17 @@ ${formHeader!}
 <#local filterable=propertyNamesInCriteria??&&propertyNamesInCriteria?size gt 0>
 </#if>
 </tbody>
+<#if sumColumns?keys?size gt 0>
+<tfoot>
+<tr>
+<#if showCheckColumn><td style="text-align:center;">∑</td></#if>
+<#list columns as name>
+<td><#if sumColumns[name]?? && sumColumns[name].value??><#if sumColumns[name].template?has_content><#local template=sumColumns[name].template><#else><#local template=r'${value}'></#if><#local value=sumColumns[name].value><@template?interpret/></#if></td>
+</#list>
+<#if showActionColumn><td></td></#if>
+</tr>
+</tfoot>
+</#if>
 </table>
 <div class="toolbar row-fluid">
 <div class="pagination span<#if showBottomButtons>4<#else>6</#if>">

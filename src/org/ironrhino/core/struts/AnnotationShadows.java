@@ -62,6 +62,7 @@ public class AnnotationShadows {
 		private Set<String> nestSearchableProperties;
 		private Map<String, UiConfigImpl> embeddedUiConfigs;
 		private boolean suppressViewLink;
+		private boolean showSum;
 
 		public UiConfigImpl() {
 		}
@@ -124,6 +125,10 @@ public class AnnotationShadows {
 			this.group = config.group();
 			this.searchable = config.searchable();
 			this.suppressViewLink = config.suppressViewLink();
+			if (config.showSum())
+				this.showSum = Number.class.isAssignableFrom(propertyType) || propertyType == short.class
+						|| propertyType == int.class || propertyType == long.class || propertyType == float.class
+						|| propertyType == double.class;
 		}
 
 		public String getGroup() {
@@ -478,6 +483,14 @@ public class AnnotationShadows {
 
 		public void setSuppressViewLink(boolean suppressViewLink) {
 			this.suppressViewLink = suppressViewLink;
+		}
+
+		public boolean isShowSum() {
+			return showSum;
+		}
+
+		public void setShowSum(boolean showSum) {
+			this.showSum = showSum;
 		}
 
 		public Map<String, UiConfigImpl> getEmbeddedUiConfigs() {

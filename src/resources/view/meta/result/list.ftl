@@ -64,6 +64,8 @@
 </#list>
 <#assign viewable=richtableConfig.exportable>
 <#assign hasSelect=false>
+<#assign columns=[]>
+<#assign sumColumns={}>
 <#list uiConfigs as key,config>
 		<#assign hidden=config.hiddenInList.value>
 		<#if !hidden && config.hiddenInList.expression?has_content>
@@ -73,6 +75,10 @@
 		<#assign hidden=true/>
 		</#if>
 		<#if !hidden>
+			<#assign columns+=[key]>
+			<#if config['showSum']>
+				<#assign sumColumns+={key:{"value":0,"template":config['template']!}}>
+			</#if>
 			<#assign label=key>
 			<#if celleditable&&!(readonly.value||config.readonly.value) && !(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)>
 				<#assign cellEdit=config.cellEdit!/>
@@ -103,7 +109,8 @@
 			<#assign viewable=true>
 		</#if>
 </#list>
-<@rtmiddle showActionColumn=richtableConfig.showActionColumn && (richtableConfig.actionColumnButtons?has_content||!readonly.value||viewable)/>
+<#assign showActionColumn=richtableConfig.showActionColumn && (richtableConfig.actionColumnButtons?has_content||!readonly.value||viewable)>
+<@rtmiddle showActionColumn=showActionColumn/>
 <#list resultPage.result as entity>
 <#assign entityReadonly = readonly.value/>
 <#if !entityReadonly && readonly.expression?has_content><#assign entityReadonly=readonly.expression?eval></#if>
@@ -172,12 +179,15 @@
 		<#if config.listTemplate?has_content>
 		<#assign template=config.listTemplate/>
 		</#if>
+		<#list sumColumns as name,config>
+			<#if key==name && value?has_content><#assign sumColumns+={name:{"value":config.value+value,"template":config['template']!}}></#if>
+		</#list>
 		<@rttbodytd entity=entity value=value celleditable=celleditable template=template cellDynamicAttributes=config.cellDynamicAttributes dynamicAttributes=dynamicAttributes/>
 	</#if>
 </#list>
-<@rttbodytrend entity=entity showActionColumn=richtableConfig.showActionColumn buttons=richtableConfig.actionColumnButtons editable=!readonly.value viewable=viewable entityReadonly=entityReadonly inputWindowOptions=richtableConfig.inputWindowOptions! viewWindowOptions=richtableConfig.viewWindowOptions!/>
+<@rttbodytrend entity=entity showActionColumn=showActionColumn buttons=richtableConfig.actionColumnButtons editable=!readonly.value viewable=viewable entityReadonly=entityReadonly inputWindowOptions=richtableConfig.inputWindowOptions! viewWindowOptions=richtableConfig.viewWindowOptions!/>
 </#list>
-<@rtend showBottomButtons=richtableConfig.showBottomButtons readonly=readonly.value deletable=!readonly.value||readonly.deletable searchable=searchable filterable=richtableConfig.filterable downloadable=richtableConfig.downloadable showPageSize=richtableConfig.showPageSize! buttons=richtableConfig.bottomButtons! enableable=enableable formFooter=formFooter! inputWindowOptions=richtableConfig.inputWindowOptions!/>
+<@rtend columns=columns sumColumns=sumColumns showCheckColumn=richtableConfig.showCheckColumn showActionColumn=showActionColumn showBottomButtons=richtableConfig.showBottomButtons readonly=readonly.value deletable=!readonly.value||readonly.deletable searchable=searchable filterable=richtableConfig.filterable downloadable=richtableConfig.downloadable showPageSize=richtableConfig.showPageSize! buttons=richtableConfig.bottomButtons! enableable=enableable formFooter=formFooter! inputWindowOptions=richtableConfig.inputWindowOptions!/>
 <#if !readonly.value && hasSelect>
 <div style="display: none;">
 <#list uiConfigs as key,config>

@@ -3,6 +3,7 @@ package org.ironrhino.core.struts;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -1299,6 +1300,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		String columns = request.getParameter("columns");
 		List<String> columnsList = null;
 		final List<String> exportColumnsList = new ArrayList<>();
+		final Map<String, Number> sumColumns = new HashMap<>();
 		final Map<String, Template> csvTemplates = new HashMap<>();
 		if (StringUtils.isNotBlank(columns))
 			columnsList = Arrays.asList(columns.split(","));
@@ -1311,6 +1313,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (hidden.isValue())
 				continue;
 			exportColumnsList.add(name);
+			if (uc.isShowSum())
+				sumColumns.put(name, null);
 			if (StringUtils.isNotBlank(uc.getCsvTemplate()))
 				csvTemplates.put(name, new Template(null, uc.getCsvTemplate(), freemarkerManager.getConfig()));
 		}
@@ -1344,9 +1348,48 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			for (Object en : entityArray) {
 				BeanWrapperImpl bw = new BeanWrapperImpl(en);
 				for (int i = 0; i < exportColumnsList.size(); i++) {
-					Object value = bw.getPropertyValue(exportColumnsList.get(i));
+					String name = exportColumnsList.get(i);
+					Object value = bw.getPropertyValue(name);
+					if (value != null && sumColumns.containsKey(name)) {
+						Class<?> clazz = value.getClass();
+						Object sum;
+						if (clazz == float.class || clazz == Float.class) {
+							BigDecimal old = (BigDecimal) sumColumns.get(name);
+							if (old == null)
+								old = new BigDecimal(0);
+							sum = old.add(new BigDecimal((Float) value));
+						} else if (clazz == double.class || clazz == Double.class) {
+							BigDecimal old = (BigDecimal) sumColumns.get(name);
+							if (old == null)
+								old = new BigDecimal(0);
+							sum = old.add(new BigDecimal((Double) value));
+						} else if (clazz == BigDecimal.class) {
+							BigDecimal old = (BigDecimal) sumColumns.get(name);
+							if (old == null)
+								old = new BigDecimal(0);
+							sum = old.add((BigDecimal) value);
+						} else if (clazz == short.class || clazz == Short.class) {
+							Long old = (Long) sumColumns.get(name);
+							if (old == null)
+								old = 0L;
+							sum = old + (Short) value;
+						} else if (clazz == int.class || clazz == Integer.class) {
+							Long old = (Long) sumColumns.get(name);
+							if (old == null)
+								old = 0L;
+							sum = old + (Integer) value;
+						} else if (clazz == long.class || clazz == Long.class) {
+							Long old = (Long) sumColumns.get(name);
+							if (old == null)
+								old = 0L;
+							sum = old + (Long) value;
+						} else {
+							throw new IllegalArgumentException("Unsupported type: " + clazz.getName());
+						}
+						sumColumns.put(name, (Number) sum);
+					}
 					String text;
-					Template csvTemplate = csvTemplates.get(exportColumnsList.get(i));
+					Template csvTemplate = csvTemplates.get(name);
 					if (csvTemplate != null) {
 						StringWriter sw = new StringWriter();
 						Map<String, Object> rootMap = new HashMap<>(4, 1);
@@ -1391,6 +1434,31 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			writer.flush();
 		}, dc);
+		if (!sumColumns.isEmpty()) {
+			for (int i = 0; i < exportColumnsList.size(); i++) {
+				String name = exportColumnsList.get(i);
+				if (sumColumns.containsKey(name)) {
+					Object value = sumColumns.get(name);
+					String text = value.toString();
+					Template csvTemplate = csvTemplates.get(name);
+					if (csvTemplate != null) {
+						StringWriter sw = new StringWriter();
+						Map<String, Object> rootMap = new HashMap<>(4, 1);
+						rootMap.put("value", value);
+						try {
+							csvTemplate.process(rootMap, sw);
+							text = sw.toString();
+						} catch (Exception e) {
+							text = e.getMessage();
+						}
+					}
+					if (text.contains(String.valueOf(columnSeperator)))
+						text = new StringBuilder(text.length() + 2).append("\"").append(text).append("\"").toString();
+					writer.print(text);
+				}
+				writer.print(i == exportColumnsList.size() - 1 ? lineSeperator : columnSeperator);
+			}
+		}
 		return NONE;
 	}
 
