@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@SuppressWarnings("unchecked")
 public class CacheAspect extends BaseAspect {
 
 	private final static String MUTEX = "_MUTEX_";
@@ -40,33 +41,38 @@ public class CacheAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(checkCache)")
 	public Object get(ProceedingJoinPoint jp, CheckCache checkCache) throws Throwable {
+		if (isBypass())
+			return jp.proceed();
 		Map<String, Object> context = buildContext(jp);
 		String namespace = ExpressionUtils.evalString(checkCache.namespace(), context);
-		String key = ExpressionUtils.evalString(checkCache.key(), context);
-		if (key == null || isBypass())
+		List<String> keys = ExpressionUtils.evalList(checkCache.key(), context);
+		if (keys == null || keys.isEmpty())
 			return jp.proceed();
-		String keyMutex = MUTEX + key;
+		String keyMutex = MUTEX + StringUtils.join(keys, "_");
 		boolean mutexed = false;
 		if (CacheContext.isForceFlush()) {
-			cacheManager.delete(key, namespace);
+			cacheManager.mdelete(keys, namespace);
 		} else {
 			int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
-			Object value = (timeToIdle > 0 && !cacheManager.supportsTimeToIdle())
-					? cacheManager.get(key, namespace, timeToIdle, checkCache.timeUnit())
-					: cacheManager.get(key, namespace);
-			if (value != null) {
-				putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
-				ExpressionUtils.eval(checkCache.onHit(), context);
-				return value instanceof NullObject ? null : value;
-			} else {
-				if (mutex) {
-					int throughPermits = checkCache.throughPermits();
-					if (cacheManager.increment(keyMutex, 1, Math.max(10000, mutexWait), TimeUnit.MILLISECONDS,
-							namespace) <= throughPermits) {
-						mutexed = true;
-					} else {
-						Thread.sleep(mutexWait);
-						value = cacheManager.get(key, namespace);
+			for (String key : keys) {
+				Object value = (timeToIdle > 0 && !cacheManager.supportsTimeToIdle())
+						? cacheManager.get(key, namespace, timeToIdle, checkCache.timeUnit())
+						: cacheManager.get(key, namespace);
+				if (value != null) {
+					putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
+					ExpressionUtils.eval(checkCache.onHit(), context);
+					return value instanceof NullObject ? null : value;
+				}
+			}
+			if (mutex) {
+				int throughPermits = checkCache.throughPermits();
+				if (cacheManager.increment(keyMutex, 1, Math.max(10000, mutexWait), TimeUnit.MILLISECONDS,
+						namespace) <= throughPermits) {
+					mutexed = true;
+				} else {
+					Thread.sleep(mutexWait);
+					for (String key : keys) {
+						Object value = cacheManager.get(key, namespace);
 						if (value != null) {
 							putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
 							ExpressionUtils.eval(checkCache.onHit(), context);
@@ -74,8 +80,8 @@ public class CacheAspect extends BaseAspect {
 						}
 					}
 				}
-				ExpressionUtils.eval(checkCache.onMiss(), context);
 			}
+			ExpressionUtils.eval(checkCache.onMiss(), context);
 		}
 		Object result = jp.proceed();
 		putReturnValueIntoContext(context, result);
@@ -83,11 +89,13 @@ public class CacheAspect extends BaseAspect {
 			Object cacheResult = (result == null && checkCache.cacheNull()) ? NullObject.get() : result;
 			if (cacheResult != null) {
 				if (checkCache.eternal()) {
-					cacheManager.put(key, cacheResult, 0, checkCache.timeUnit(), namespace);
+					for (String key : keys)
+						cacheManager.put(key, cacheResult, 0, checkCache.timeUnit(), namespace);
 				} else {
 					int timeToLive = ExpressionUtils.evalInt(checkCache.timeToLive(), context, 0);
 					int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
-					cacheManager.put(key, cacheResult, timeToIdle, timeToLive, checkCache.timeUnit(), namespace);
+					for (String key : keys)
+						cacheManager.put(key, cacheResult, timeToIdle, timeToLive, checkCache.timeUnit(), namespace);
 				}
 			}
 			if (result != null)
@@ -98,7 +106,6 @@ public class CacheAspect extends BaseAspect {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Around("execution(public * *(..)) and @annotation(evictCache)")
 	public Object remove(ProceedingJoinPoint jp, EvictCache evictCache) throws Throwable {
 		Map<String, Object> context = buildContext(jp);
