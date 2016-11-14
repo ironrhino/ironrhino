@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
-import org.ironrhino.common.support.SettingControl;
+import org.ironrhino.common.support.LocaleProvider;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.struts.BaseAction;
@@ -32,8 +32,8 @@ public class LocaleAction extends BaseAction {
 	@Value("${globalCookie:false}")
 	private boolean globalCookie;
 
-	@Autowired
-	private SettingControl settingControl;
+	@Autowired(required = false)
+	private LocaleProvider localeProvider;
 
 	@Autowired
 	private HttpSessionManager httpSessionManager;
@@ -80,7 +80,9 @@ public class LocaleAction extends BaseAction {
 				lang = locale.toString();
 		}
 		availableLocales = Locale.getAvailableLocales();
-		String[] locales = settingControl.getStringArray(SETTING_KEY_AVAILABLE_LOCALES);
+		String[] locales = null;
+		if (localeProvider != null)
+			locales = localeProvider.getAvailableLocales();
 		if (locales != null && locales.length > 0) {
 			List<String> _locales = Arrays.asList(locales);
 			List<Locale> list = new ArrayList<>(locales.length);

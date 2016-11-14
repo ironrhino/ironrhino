@@ -35,7 +35,7 @@ public class PropertiesAction extends BaseAction {
 				writer.write("#" + entry.getKey() + '=' + entry.getValue() + "\n");
 			writer.write(entry.getKey() + '=' + (overridedValue != null ? overridedValue : entry.getValue()) + "\n");
 		}
-		writer.write("######\n");
+		writer.write("\n");
 		for (Map.Entry<String, String> entry : overridedProperties.entrySet())
 			if (!defaultProperties.containsKey(entry.getKey()))
 				writer.write(entry.getKey() + '=' + entry.getValue() + "\n");

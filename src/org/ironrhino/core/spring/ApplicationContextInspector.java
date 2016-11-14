@@ -74,13 +74,18 @@ public class ApplicationContextInspector {
 						if (clz == null) {
 							continue;
 						}
-						ReflectionUtils.doWithFields(Class.forName(clz), new FieldCallback() {
-							@Override
-							public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-								if (field.isAnnotationPresent(Value.class))
-									list.add(field.getAnnotation(Value.class).value());
-							}
-						});
+						try {
+							ReflectionUtils.doWithFields(Class.forName(clz), new FieldCallback() {
+								@Override
+								public void doWith(Field field)
+										throws IllegalArgumentException, IllegalAccessException {
+									if (field.isAnnotationPresent(Value.class))
+										list.add(field.getAnnotation(Value.class).value());
+								}
+							});
+						} catch (NoClassDefFoundError e) {
+							e.printStackTrace();
+						}
 					}
 
 					for (Resource resource : resourcePatternResolver
