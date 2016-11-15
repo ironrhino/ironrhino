@@ -138,14 +138,6 @@ public class AppInfo {
 		HOSTNAME = name;
 		HOSTADDRESS = address != null ? address : "127.0.0.1";
 
-		String p = System.getProperty("port.http");
-		if (StringUtils.isBlank(p))
-			p = System.getProperty("port.http.nonssl");
-		if (StringUtils.isBlank(p))
-			p = System.getenv("VCAP_APP_PORT");
-		if (StringUtils.isNotBlank(p) && StringUtils.isNumeric(p))
-			httpPort = Integer.valueOf(p);
-
 		String rack = getEnv(KEY_RACK);
 		if (rack == null)
 			rack = DEFAULT_RACK;
@@ -219,6 +211,10 @@ public class AppInfo {
 		AppInfo.version = version;
 	}
 
+	public static void setHttpPort(int httpPort) {
+		AppInfo.httpPort = httpPort;
+	}
+
 	public static Stage getStage() {
 		return STAGE;
 	}
@@ -287,6 +283,14 @@ public class AppInfo {
 	}
 
 	public static void initialize() {
+
+		String p = System.getProperty("port.http");
+		if (StringUtils.isBlank(p))
+			p = System.getProperty("port.http.nonssl");
+		if (StringUtils.isBlank(p))
+			p = System.getenv("VCAP_APP_PORT");
+		if (StringUtils.isNotBlank(p) && StringUtils.isNumeric(p))
+			httpPort = Integer.valueOf(p);
 
 		System.setProperty(AppInfo.KEY_STAGE, AppInfo.getStage().name());
 		System.setProperty(AppInfo.KEY_APP_HOME, AppInfo.getAppHome());

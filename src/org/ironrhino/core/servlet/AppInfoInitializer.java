@@ -22,6 +22,9 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
+		int port = ContainerDetector.port(servletContext);
+		if (port > 0)
+			AppInfo.setHttpPort(port);
 		AppInfo.initialize();
 		SERVLET_CONTEXT = servletContext;
 		String context = SERVLET_CONTEXT.getRealPath("/");
@@ -30,7 +33,9 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 		System.setProperty("app.context", context);
 		String defaultProfiles = System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 		logger = LoggerFactory.getLogger(getClass());
-		logger.info("default timezone {}", TimeZone.getDefault().getID());
+		if (port > 0)
+			logger.info("Server port auto detected: {}", port);
+		logger.info("Default timezone {}", TimeZone.getDefault().getID());
 		logger.info(
 				"app.name={},app.version={},app.instanceid={},app.stage={},app.runlevel={},app.home={},hostname={},hostaddress={},profiles={}",
 				AppInfo.getAppName(), AppInfo.getAppVersion(), AppInfo.getInstanceId(), AppInfo.getStage().toString(),
