@@ -108,13 +108,10 @@ public class ContainerDetector {
 			// weblogic
 			try {
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-				Set<ObjectName> objs = mbs
-						.queryNames(new ObjectName("com.bea:Type=ServerChannelRuntime,Name=Default[http],*"), null);
+				Set<ObjectName> objs = mbs.queryNames(new ObjectName("com.bea:Type=ServerRuntime,*"), null);
 				for (ObjectName on : objs) {
 					try {
-						String publicURL = (String) mbs.getAttribute(on, "PublicURL");
-						String port = publicURL.substring(publicURL.lastIndexOf(':') + 1);
-						return Integer.valueOf(port);
+						return (Integer) mbs.getAttribute(on, "ListenPort");
 					} catch (AttributeNotFoundException e) {
 					}
 				}
