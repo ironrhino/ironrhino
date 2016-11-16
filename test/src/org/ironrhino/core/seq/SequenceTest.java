@@ -92,7 +92,7 @@ public class SequenceTest {
 		cdl.await();
 		time = System.currentTimeMillis() - time;
 		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time
-				+ "ms (tps = " + (count.get() * 1000 / time) + " ) using " + seq.getClass().getSimpleName());
+				+ "ms (tps = " + (count.get() * 1000 / time) + ") using " + seq.getClass().getSimpleName());
 		assertEquals(LOOP * THREADS, map.size());
 	}
 
