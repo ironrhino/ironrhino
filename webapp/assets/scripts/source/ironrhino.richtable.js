@@ -742,6 +742,18 @@ Observation._richtable = function(container) {
 		$('table.criteria select.property', t).change(function() {
 			var t = $(this);
 			var operator = $('select.operator', t.closest('tr'));
+			var allops = operator.data('operators');
+			if (!allops) {
+				allops = {};
+				$('option', operator).each(function() {
+							allops[$(this).attr('value')] = {
+								parameters : $(this).data('parameters'),
+								label : $(this).text()
+							};
+						});
+				operator.data('operators', allops);
+			}
+			operator.find('option').remove();
 			if (t.val()) {
 				operator.attr('name', t.val() + '-op');
 				$('td:eq(2) :input', t.closest('tr')).attr('name', t.val());
@@ -749,26 +761,21 @@ Observation._richtable = function(container) {
 				if (ops.indexOf('[') == 0)
 					ops = ops.substring(1, ops.length - 1);
 				ops = ops.split(/,\s*/);
-				var val;
-				$('option', operator).each(function() {
-							var temp = $(this).attr('value');
-							if (jQuery.inArray(temp, ops) < 0) {
-								$(this).prop('disabled', true).css('display',
-										'none');
-							} else {
-								if (!val)
-									val = temp;
-								$(this).prop('disabled', false).css('display',
-										'');
-							}
+				$.each(allops, function(k, v) {
+							if (jQuery.inArray(k, ops) >= 0)
+								operator.append('<option value="' + k
+										+ '" data-parameters="' + v.parameters
+										+ '">' + v.label + '</option>');
 						});
-				operator.val(val);
 				operator.change();
 			} else {
 				operator.removeAttr('name');
 				$('td:eq(2) :input', t.closest('tr')).removeAttr('name');
-				$('option', operator).prop('disabled', false)
-						.css('display', '');
+				$.each(allops, function(k, v) {
+							operator.append('<option value="' + k
+									+ '" data-parameters="' + v.parameters
+									+ '">' + v.label + '</option>');
+						});
 			}
 		});
 		$('table.criteria select.operator', t).change(function() {

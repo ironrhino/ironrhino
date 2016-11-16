@@ -30,6 +30,7 @@
 			url : url || document.location.href,
 			global : false,
 			quiet : true,
+			cache : false,
 			beforeSend : function() {
 				if (!ele.data('quiet')) {
 					if (typeof $.fn.mask != 'undefined') {

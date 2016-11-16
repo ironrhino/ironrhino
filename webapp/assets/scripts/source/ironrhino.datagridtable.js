@@ -138,7 +138,7 @@
 				if (selected)
 					t.prop('disabled', true).css('display', 'none');
 			});
-		});
+		}).change();
 		$('input.tags', r).each(function() {
 			var t = $(this);
 			var p = t.closest('.text-core');

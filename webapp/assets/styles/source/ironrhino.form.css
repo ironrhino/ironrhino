@@ -131,8 +131,8 @@ input.latlng {
 	width: 180px ! important;
 }
 
-.error input.required:read-write , input.required:focus {
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAAUUlEQVR42mNgGHzgPwNDFxCr/mNg+AekVUB8fIp5/zIwTIYqngzi41QMVHQGqPgNkP4Ppc/gM1kDqKgCZDKIBvI1cSoGKtgJteEflL+DPqEFAKYgJItbm6p6AAAAAElFTkSuQmCC);
+ .error input.required:not(:disabled), input.required:focus {
+	background-image: url('../images/required.png');
 	background-repeat: no-repeat;
 	background-position: right;
 }
