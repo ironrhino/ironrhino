@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.Query;
@@ -62,8 +63,7 @@ public class ContainerDetector {
 				}
 			} catch (Throwable e) {
 			}
-		}
-		if (className.startsWith("org.eclipse.jetty")) {
+		} else if (className.startsWith("org.eclipse.jetty")) {
 			// jetty
 			try {
 				Object webAppContext = ReflectionUtils.getFieldValue(servletContext, "this$0");
@@ -87,8 +87,7 @@ public class ContainerDetector {
 				}
 			} catch (Throwable e) {
 			}
-		}
-		if (className.startsWith("io.undertow.servlet")) {
+		} else if (className.startsWith("io.undertow.servlet")) {
 			// wildfly
 			try {
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -97,13 +96,41 @@ public class ContainerDetector {
 						"boundPort");
 			} catch (Throwable e) {
 			}
-		}
-		if (className.startsWith("com.caucho.server")) {
+		} else if (className.startsWith("com.caucho.server")) {
 			// resin
 			try {
 				Class<?> configClass = servletContext.getClassLoader().loadClass("com.caucho.config.Config");
 				Object server = configClass.getMethod("getProperty", String.class).invoke(null, "server");
 				return (Integer) server.getClass().getMethod("getHttpPort").invoke(server);
+			} catch (Throwable e) {
+			}
+		} else if (className.startsWith("weblogic.servlet")) {
+			// weblogic
+			try {
+				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+				Set<ObjectName> objs = mbs
+						.queryNames(new ObjectName("com.bea:Type=ServerChannelRuntime,Name=Default[http],*"), null);
+				for (ObjectName on : objs) {
+					try {
+						String publicURL = (String) mbs.getAttribute(on, "PublicURL");
+						String port = publicURL.substring(publicURL.lastIndexOf(':') + 1);
+						return Integer.valueOf(port);
+					} catch (AttributeNotFoundException e) {
+					}
+				}
+			} catch (Throwable e) {
+			}
+		} else if (className.startsWith("com.ibm.ws")) {
+			// websphere
+			try {
+				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+				Set<ObjectName> objs = mbs
+						.queryNames(new ObjectName("WebSphere:type=endpoint,name=defaultHttpEndpoint,*"), null);
+				for (ObjectName on : objs)
+					try {
+						return (Integer) mbs.getAttribute(on, "Port");
+					} catch (AttributeNotFoundException e) {
+					}
 			} catch (Throwable e) {
 			}
 		}
