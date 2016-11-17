@@ -98,7 +98,7 @@ public @interface UiConfig {
 	boolean suppressViewLink() default false;
 
 	boolean embeddedAsSingle() default false;
-	
+
 	boolean showSum() default false;
 
 }

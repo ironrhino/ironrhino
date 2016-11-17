@@ -31,6 +31,7 @@ public class EntityBeanPropertyRowMapper<T> extends BeanPropertyRowMapper<T> {
 		bw.setConversionService(conversionService);
 	}
 
+	@Override
 	protected String underscoreName(String name) {
 		if (beanWrapper != null) {
 			PropertyDescriptor pd = beanWrapper.getPropertyDescriptor(name);

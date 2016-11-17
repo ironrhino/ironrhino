@@ -310,8 +310,8 @@ public enum DatabaseProduct {
 				return INFORMIX;
 			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("microsoft"))
 				return SQLSERVER;
-			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("sql server") || nameOrUrl.equals("Adaptive Server Enterprise")
-					|| nameOrUrl.equals("ASE"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("sql server")
+					|| nameOrUrl.equals("Adaptive Server Enterprise") || nameOrUrl.equals("ASE"))
 				return SYBASE;
 			else if (nameOrUrl.toLowerCase(Locale.ROOT).equals("h2"))
 				return H2;

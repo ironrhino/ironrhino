@@ -213,8 +213,7 @@ public class ReflectionUtils {
 	public static void processCallback(Object obj, Class<? extends Annotation> callbackAnnotation) {
 		Set<Method> methods = AnnotationUtils.getAnnotatedMethods(obj.getClass(), callbackAnnotation);
 		for (Method m : methods) {
-			if (m.getParameterCount() == 0 && m.getReturnType() == void.class
-					&& Modifier.isPublic(m.getModifiers()))
+			if (m.getParameterCount() == 0 && m.getReturnType() == void.class && Modifier.isPublic(m.getModifiers()))
 				try {
 					m.invoke(obj, new Object[0]);
 				} catch (IllegalAccessException e) {

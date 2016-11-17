@@ -11,6 +11,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 
+	@Override
 	protected String getNameColumnType() {
 		return "VARCHAR2(50)";
 	}
