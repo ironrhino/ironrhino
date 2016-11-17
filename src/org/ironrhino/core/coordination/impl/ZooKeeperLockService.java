@@ -2,6 +2,8 @@ package org.ironrhino.core.coordination.impl;
 
 import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -24,6 +26,8 @@ public class ZooKeeperLockService implements LockService {
 	@Value("${lockService.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
+	private ConcurrentHashMap<String, InterProcessMutex> locks = new ConcurrentHashMap<>();
+
 	public void setZooKeeperPath(String zooKeeperPath) {
 		this.zooKeeperPath = zooKeeperPath;
 	}
@@ -35,29 +39,40 @@ public class ZooKeeperLockService implements LockService {
 
 	@Override
 	public boolean tryLock(String name, long timeout, TimeUnit unit) {
-		InterProcessMutex lock = new InterProcessMutex(curatorFramework, zooKeeperPath + '/' + name);
-		boolean success = false;
+		InterProcessMutex lock = locks.computeIfAbsent(name,
+				key -> new InterProcessMutex(curatorFramework, zooKeeperPath + '/' + key));
 		try {
-			success = lock.acquire(timeout, unit);
+			return lock.acquire(timeout, unit);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return success;
 	}
 
 	@Override
 	public void lock(String name) throws Exception {
-		InterProcessMutex lock = new InterProcessMutex(curatorFramework, zooKeeperPath + '/' + name);
+		InterProcessMutex lock = locks.computeIfAbsent(name,
+				key -> new InterProcessMutex(curatorFramework, zooKeeperPath + '/' + key));
 		lock.acquire();
 	}
 
 	@Override
 	public void unlock(String name) {
-		InterProcessMutex lock = new InterProcessMutex(curatorFramework, zooKeeperPath + '/' + name);
+		InterProcessMutex lock = locks.get(name);
+		if (lock == null)
+			throw new IllegalArgumentException("Lock " + name + " does not exist");
+		if (!lock.isAcquiredInThisProcess())
+			throw new IllegalStateException("Lock " + name + " is not held");
 		try {
 			lock.release();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public void clearExpired() {
+		for (Map.Entry<String, InterProcessMutex> entry : locks.entrySet()) {
+			if (!entry.getValue().isAcquiredInThisProcess())
+				locks.remove(entry.getKey());
 		}
 	}
 
