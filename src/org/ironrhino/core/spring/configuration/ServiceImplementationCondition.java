@@ -3,7 +3,6 @@ package org.ironrhino.core.spring.configuration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
 
@@ -28,12 +28,12 @@ class ServiceImplementationCondition implements Condition {
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		if (context.getEnvironment() != null) {
-			Map<String, Object> attrs = metadata
-					.getAnnotationAttributes(ServiceImplementationConditional.class.getName());
-			if (attrs != null) {
+			AnnotationAttributes attributes = AnnotationAttributes
+					.fromMap(metadata.getAnnotationAttributes(ServiceImplementationConditional.class.getName()));
+			if (attributes != null) {
 				String serviceInterfaceName = null;
 				String className = ((AnnotationMetadataReadingVisitor) metadata).getClassName();
-				Class<?> serviceInterface = (Class<?>) attrs.get("serviceInterface");
+				Class<?> serviceInterface = attributes.getClass("serviceInterface");
 				if (serviceInterface != void.class) {
 					serviceInterfaceName = serviceInterface.getName();
 				} else {
@@ -55,7 +55,7 @@ class ServiceImplementationCondition implements Condition {
 						return matched;
 					}
 				}
-				String[] profiles = (String[]) attrs.get("profiles");
+				String[] profiles = attributes.getStringArray("profiles");
 				if (profiles.length == 0 || context.getEnvironment().acceptsProfiles(profiles)) {
 					return true;
 				}
