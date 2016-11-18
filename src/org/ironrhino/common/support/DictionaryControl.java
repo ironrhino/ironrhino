@@ -82,6 +82,16 @@ public class DictionaryControl {
 		return value;
 	}
 
+	public String getDictionaryValue(String name, String label) {
+		if (label == null)
+			return null;
+		for (Map.Entry<String, String> entry : getItemsAsMap(name).entrySet()) {
+			if (label.equals(StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : entry.getKey()))
+				return entry.getKey();
+		}
+		return label;
+	}
+
 	@EventListener
 	public void onApplicationEvent(EntityOperationEvent<Dictionary> event) {
 		Dictionary dictInEvent = event.getEntity();
