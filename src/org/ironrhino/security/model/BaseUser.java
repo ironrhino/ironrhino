@@ -8,14 +8,15 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.annotations.NaturalId;
+import org.ironrhino.core.hibernate.convert.StringMapConverter;
+import org.ironrhino.core.hibernate.convert.StringSetConverter;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
@@ -95,12 +96,14 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	@SearchableProperty
 	@Column(length = 4000)
+	@Convert(converter = StringSetConverter.class)
 	@UiConfig(displayOrder = 100, alias = "role", template = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next> </#if></#list>", csvTemplate = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next>,</#if></#list>")
 	private Set<String> roles = new LinkedHashSet<>(0);
 
 	@NotInCopy
 	@JsonIgnore
 	@Column(length = 4000)
+	@Convert(converter = StringMapConverter.class)
 	@UiConfig(hidden = true)
 	private Map<String, String> attributes;
 
@@ -129,6 +132,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	}
 
 	public void setName(String name) {
+		name = StringUtils.isBlank(name) ? null : name;
 		this.name = name;
 	}
 
@@ -137,6 +141,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	}
 
 	public void setEmail(String email) {
+		email = StringUtils.isBlank(email) ? null : email;
 		if (email != null && email.endsWith("@gmail.com")) {
 			String name = email.substring(0, email.indexOf('@'));
 			if (name.indexOf('+') > 0)
@@ -152,6 +157,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	}
 
 	public void setPhone(String phone) {
+		phone = StringUtils.isBlank(phone) ? null : phone;
 		this.phone = phone;
 	}
 
@@ -255,7 +261,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	public void setAttribute(String key, String value) {
 		if (attributes == null)
-			attributes = new HashMap<>(4);
+			attributes = new HashMap<String, String>(4);
 		if (value == null)
 			attributes.remove(key);
 		else
@@ -294,17 +300,6 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@Override
 	public String toString() {
 		return StringUtils.isNotBlank(this.name) ? this.name : this.username;
-	}
-
-	@PrePersist
-	@PreUpdate
-	private void replaceBlankWithNull() {
-		if (StringUtils.isBlank(name))
-			name = null;
-		if (StringUtils.isBlank(email))
-			email = null;
-		if (StringUtils.isBlank(phone))
-			phone = null;
 	}
 
 }
