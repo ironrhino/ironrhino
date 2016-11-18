@@ -10,7 +10,7 @@
 			expr = expr.substring(0, i);
 		return (expr == 'this') ? current : $(expr, container);
 	}
-	function val(expr, container, val, html) {// expr #id #id@attr .class@attr
+	function val(expr, container, val) {// expr #id #id@attr .class@attr
 		// @attr
 		if (!container || expr.indexOf('#') > -1)
 			container = document;
@@ -20,14 +20,19 @@
 			var i = expr.indexOf('@');
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
-				if (ele.is(':input')) {
-					ele.val(val).trigger('change').trigger('validate');
-				} else {
-					if (html)
-						ele.html(val);
-					else
-						ele.text(val);
-				}
+				ele.each(function() {
+							var t = $(this);
+							if (t.is(':input')) {
+								t.val(val).trigger('change')
+										.trigger('validate');
+							} else {
+								if (val === null && !t.is('td'))
+									t
+											.html('<i class="glyphicon glyphicon-list"></i>');
+								else
+									t.text(val);
+							}
+						});
 			} else if (i == 0) {
 				current.attr(expr.substring(i + 1), val);
 			} else {
@@ -62,11 +67,8 @@
 	function removeAction(event) {
 		current = $(event.target).closest('.treeselect');
 		var options = current.data('_options');
-		var nametarget = find(options.name);
-		val(options.name, current, nametarget.is(':input,td')
-						? ''
-						: '<i class="glyphicon glyphicon-list"></i>', true);
-		val(options.id, current, '');
+		val(options.name, current, null);
+		val(options.id, current, null);
 		if (options.id) {
 			var idtarget = find(options.id);
 			idtarget.removeData('treenode');
@@ -101,10 +103,8 @@
 						if (text.indexOf('...') < 0)
 							$('<a class="remove" href="#">&times;</a>')
 									.appendTo(nametarget).click(removeAction);
-					} else if (!nametarget.is(':input,td')) {
-						val(options.name, current,
-								'<i class="glyphicon glyphicon-list"></i>',
-								true);
+					} else {
+						val(options.name, current, null);
 					}
 				}
 			}
@@ -171,9 +171,12 @@
 			var nametarget = find(options.name, current);
 			var name = options.full ? treenode.fullname : treenode.name;
 			val(options.name, current, name);
-			if (!nametarget.is(':input'))
-				$('<a class="remove" href="#">&times;</a>')
-						.appendTo(nametarget).click(removeAction);
+			nametarget.each(function() {
+						var t = $(this);
+						if (!t.is(':input'))
+							$('<a class="remove" href="#">&times;</a>')
+									.appendTo(t).click(removeAction);
+					});
 		}
 		if (options.id) {
 			var idtarget = find(options.id, current);

@@ -10,7 +10,7 @@
 			expr = expr.substring(0, i);
 		return (expr == 'this') ? current : $(expr, container);
 	}
-	function val(expr, container, val, html) {// expr #id #id@attr .class@attr
+	function val(expr, container, val) {// expr #id #id@attr .class@attr
 		// @attr
 		if (!container || expr.indexOf('#') > -1)
 			container = document;
@@ -20,14 +20,19 @@
 			var i = expr.indexOf('@');
 			if (i < 0) {
 				var ele = expr == 'this' ? current : $(expr, container);
-				if (ele.is(':input')) {
-					ele.val(val).trigger('change').trigger('validate');
-				} else {
-					if (html)
-						ele.html(val);
-					else
-						ele.text(val);
-				}
+				ele.each(function() {
+							var t = $(this);
+							if (t.is(':input')) {
+								t.val(val).trigger('change')
+										.trigger('validate');
+							} else {
+								if (val === null && !t.is('td'))
+									t
+											.html('<i class="glyphicon glyphicon-list"></i>');
+								else
+									t.text(val);
+							}
+						});
 			} else if (i == 0) {
 				current.attr(expr.substring(i + 1), val);
 			} else {
@@ -62,24 +67,19 @@
 	function removeAction(event) {
 		current = $(event.target).closest('.listpick');
 		var options = current.data('_options');
-		if (options.name)
-			var nametarget = find(options.name, current);
 		var viewlink = current.find('a.view[rel="richtable"]');
 		if (current.is('td') && viewlink.length)
-			viewlink.text('');
+			viewlink.text(null);
 		else
-			val(options.name, current, nametarget.is(':input,td')
-							? ''
-							: '<i class="glyphicon glyphicon-list"></i>', true);
-		val(options.id, current, '', false);
+			val(options.name, current, null);
+		val(options.id, current, null);
 		if (options.mapping) {
 			for (var k in options.mapping)
-				val(k, current, '', false);
+				val(k, current, null);
 		}
 		$(this).remove();
 		event.stopPropagation();
 		return false;
-
 	}
 	$.fn.listpick = function() {
 		$(this).each(function() {
@@ -95,9 +95,8 @@
 			$.extend(options, (new Function("return "
 							+ (current.data('options') || '{}')))());
 			current.data('_options', options);
-			var nametarget = null;
 			if (options.name) {
-				nametarget = find(options.name, current);
+				var nametarget = find(options.name, current);
 				var remove = nametarget.children('a.remove');
 				if (remove.length) {
 					remove.click(removeAction);
@@ -110,10 +109,8 @@
 						if (text.indexOf('...') < 0)
 							$('<a class="remove" href="#">&times;</a>')
 									.appendTo(nametarget).click(removeAction);
-					} else if (!nametarget.is(':input,td')) {
-						val(options.name, current,
-								'<i class="glyphicon glyphicon-list"></i>',
-								true);
+					} else {
+						val(options.name, current, null);
 					}
 				}
 			}
@@ -188,11 +185,14 @@
 											val(options.name, $(target)
 															.data('listpick'),
 													name);
-										if (!nametarget.is(':input')
-												&& !nametarget.find('a.remove').length)
-											$('<a class="remove" href="#">&times;</a>')
-													.appendTo(nametarget)
-													.click(removeAction);
+										nametarget.each(function() {
+											var t = $(this);
+											if (!t.is(':input')
+													&& !t.find('a.remove').length)
+												$('<a class="remove" href="#">&times;</a>')
+														.appendTo(t)
+														.click(removeAction);
+										});
 									}
 									if (options.id) {
 										val(options.id, $(target)
@@ -232,34 +232,36 @@
 								var nametarget = find(options.name, $(target)
 												.data('listpick'));
 								var name = names.join(separator);
-								if (nametarget.is(':input')) {
-									var _names = val(options.name, $(target)
-													.data('listpick'))
-											|| '';
-									val(
-											options.name,
-											$(target).data('listpick'),
-											ArrayUtils
-													.unique((_names
-															+ (_names
-																	? separator
-																	: '') + name)
-															.split(separator))
-													.join(separator));
-								} else {
-									var picked = nametarget.data('picked')
-											|| '';
-									picked = ArrayUtils.unique(((picked
-											? picked + separator
-											: '') + name).split(separator))
-											.join(separator);
-									nametarget.data('picked', picked);
-									val(options.name, $(target)
-													.data('listpick'), picked);
-									$('<a class="remove" href="#">&times;</a>')
-											.appendTo(nametarget)
-											.click(removeAction);
-								}
+								nametarget.each(function() {
+									var t = $(this);
+									if (t.is(':input')) {
+										var _names = val(options.name,
+												$(target).data('listpick'))
+												|| '';
+										val(options.name, $(target)
+														.data('listpick'),
+												ArrayUtils.unique((_names
+														+ (_names
+																? separator
+																: '') + name)
+														.split(separator))
+														.join(separator));
+									} else {
+										var picked = t.data('picked') || '';
+										picked = ArrayUtils.unique(((picked
+												? picked + separator
+												: '') + name).split(separator))
+												.join(separator);
+										t.data('picked', picked);
+										val(options.name, $(target)
+														.data('listpick'),
+												picked);
+										$('<a class="remove" href="#">&times;</a>')
+												.appendTo(t)
+												.click(removeAction);
+									}
+								});
+
 							}
 							if (options.id) {
 								var idtarget = find(options.id, $(target)
