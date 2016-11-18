@@ -5,6 +5,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,11 +55,30 @@ public class AnnotationUtils {
 		if (methods == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			final Map<Method, Integer> map = new HashMap<Method, Integer>();
 			try {
-				for (Method m : clazz.getMethods())
+				for (Method m : clazz.getMethods()) {
+					// public methods include default methods on interface or
+					// super class
 					if (m.getAnnotation(annotaionClass) != null) {
+						int mod = m.getModifiers();
+						if (Modifier.isStatic(mod) || Modifier.isAbstract(mod))
+							continue;
 						Order o = m.getAnnotation(Order.class);
 						map.put(m, o != null ? o.value() : 0);
 					}
+				}
+				for (Class<?> c = clazz; c != Object.class; c = c.getSuperclass()) {
+					for (Method m : c.getDeclaredMethods()) {
+						// protected and private methods on super class
+						if (m.getAnnotation(annotaionClass) != null) {
+							int mod = m.getModifiers();
+							if (Modifier.isStatic(mod) || Modifier.isAbstract(mod) || Modifier.isPublic(mod))
+								continue;
+							m.setAccessible(true);
+							Order o = m.getAnnotation(Order.class);
+							map.put(m, o != null ? o.value() : 0);
+						}
+					}
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

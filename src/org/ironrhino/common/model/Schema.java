@@ -126,7 +126,7 @@ public class Schema extends BaseEntity {
 
 	@PrePersist
 	@PreUpdate
-	public void validate() {
+	private void validate() {
 		if (fields != null && fields.size() > 0) {
 			boolean hasGroup = false;
 			boolean needApendBlankGroup = false;

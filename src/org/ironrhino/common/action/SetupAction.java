@@ -3,7 +3,6 @@ package org.ironrhino.common.action;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -119,34 +118,31 @@ public class SetupAction extends BaseAction {
 							: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
 					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Setup.class);
 					for (Method m : methods) {
-						int modifiers = m.getModifiers();
-						if (Modifier.isPublic(modifiers)) {
-							if (m.getParameterCount() == 0)
+						if (m.getParameterCount() == 0)
+							continue;
+						String[] parameterNames = ReflectionUtils.parameterNameDiscoverer.getParameterNames(m);
+						Class<?>[] parameterTypes = m.getParameterTypes();
+						Annotation[][] annotationArrays = m.getParameterAnnotations();
+						for (int i = 0; i < annotationArrays.length; i++) {
+							Annotation[] arr = annotationArrays[i];
+							SetupParameter sp = null;
+							for (Annotation ann : arr)
+								if (ann instanceof SetupParameter) {
+									sp = (SetupParameter) ann;
+									break;
+								}
+							Class<?> type = parameterTypes[i];
+							String _type = StringUtils.uncapitalize(type.getSimpleName());
+							if (type.isEnum())
+								_type = "enum";
+							else if (_type.equals("int") || _type.equals("long"))
+								_type = "integer";
+							else if (_type.equals("float") || _type.equals("bigdecimal"))
+								_type = "double";
+							if (names.contains(parameterNames[i]))
 								continue;
-							String[] parameterNames = ReflectionUtils.parameterNameDiscoverer.getParameterNames(m);
-							Class<?>[] parameterTypes = m.getParameterTypes();
-							Annotation[][] annotationArrays = m.getParameterAnnotations();
-							for (int i = 0; i < annotationArrays.length; i++) {
-								Annotation[] arr = annotationArrays[i];
-								SetupParameter sp = null;
-								for (Annotation ann : arr)
-									if (ann instanceof SetupParameter) {
-										sp = (SetupParameter) ann;
-										break;
-									}
-								Class<?> type = parameterTypes[i];
-								String _type = StringUtils.uncapitalize(type.getSimpleName());
-								if (type.isEnum())
-									_type = "enum";
-								else if (_type.equals("int") || _type.equals("long"))
-									_type = "integer";
-								else if (_type.equals("float") || _type.equals("bigdecimal"))
-									_type = "double";
-								if (names.contains(parameterNames[i]))
-									continue;
-								names.add(parameterNames[i]);
-								setupParameters.add(new SetupParameterImpl(type, parameterNames[i], _type, sp));
-							}
+							names.add(parameterNames[i]);
+							setupParameters.add(new SetupParameterImpl(type, parameterNames[i], _type, sp));
 						}
 					}
 				}
@@ -181,9 +177,6 @@ public class SetupAction extends BaseAction {
 			}
 		for (Map.Entry<Method, Object> entry : methods.entrySet()) {
 			Method m = entry.getKey();
-			int modifiers = m.getModifiers();
-			if (!Modifier.isPublic(modifiers))
-				continue;
 			logger.info("executing {}", m);
 			if (m.getParameterCount() == 0) {
 				m.invoke(entry.getValue(), new Object[0]);

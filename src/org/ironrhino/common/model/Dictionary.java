@@ -146,7 +146,7 @@ public class Dictionary extends BaseEntity {
 
 	@PrePersist
 	@PreUpdate
-	public void validate() {
+	private void validate() {
 		if (items != null && items.size() > 0) {
 			Set<String> values = new HashSet<>(items.size());
 			Set<String> labels = new HashSet<>(items.size());

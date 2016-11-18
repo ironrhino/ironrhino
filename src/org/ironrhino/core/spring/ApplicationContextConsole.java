@@ -2,7 +2,6 @@ package org.ironrhino.core.spring;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,8 +91,7 @@ public class ApplicationContextConsole {
 								: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
 						Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);
 						for (Method m : methods) {
-							int modifiers = m.getModifiers();
-							if (Modifier.isPublic(modifiers) && m.getParameterCount() == 0) {
+							if (m.getParameterCount() == 0) {
 								StringBuilder expression = new StringBuilder(beanName);
 								expression.append(".").append(m.getName()).append("()");
 								temp.put(expression.toString(), m.getAnnotation(Trigger.class).scope());

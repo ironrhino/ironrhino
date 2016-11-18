@@ -298,7 +298,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	@PrePersist
 	@PreUpdate
-	public void replaceBlankWithNull() {
+	private void replaceBlankWithNull() {
 		if (StringUtils.isBlank(name))
 			name = null;
 		if (StringUtils.isBlank(email))

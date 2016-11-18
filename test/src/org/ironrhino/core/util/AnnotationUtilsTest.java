@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.Trigger;
@@ -69,6 +71,16 @@ public class AnnotationUtilsTest {
 		public void setAttributes(Map<String, String> attributes) {
 			this.attributes = attributes;
 		}
+		
+		@PrePersist
+		private void validate(){
+			
+		}
+		
+		@PreUpdate
+		private void validateUpdate(){
+			
+		}
 
 	}
 
@@ -97,19 +109,34 @@ public class AnnotationUtilsTest {
 		public void setPassword(String password) {
 			this.password = password;
 		}
+		
+		@PrePersist
+		public void validate1(){
+			
+		}
+		
+		@PrePersist
+		protected void validate2(){
+			
+		}
+		
+		@PrePersist
+		private void validate3(){
+			
+		}
 
 	}
 
 	@Test
 	public void testGetAnnotatedMethod() {
-		assertEquals("getNames", AnnotationUtils.getAnnotatedMethod(User.class, UiConfig.class).getName());
+		assertEquals("validateUpdate", AnnotationUtils.getAnnotatedMethod(User.class, PreUpdate.class).getName());
 		assertNull(AnnotationUtils.getAnnotatedMethod(User.class, Trigger.class));
 	}
 
 	@Test
 	public void testGetAnnotatedMethods() {
-		assertEquals("getNames",
-				AnnotationUtils.getAnnotatedMethods(User.class, UiConfig.class).iterator().next().getName());
+		assertEquals(4,
+				AnnotationUtils.getAnnotatedMethods(User.class, PrePersist.class).size());
 		assertTrue(AnnotationUtils.getAnnotatedMethods(User.class, Trigger.class).isEmpty());
 	}
 
