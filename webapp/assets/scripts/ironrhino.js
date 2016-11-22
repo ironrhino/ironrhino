@@ -39248,12 +39248,9 @@ Observation.attachmentableform = function(container) {
 						}
 						cts.push(ct);
 					});
-			if ($('.form-actions', t).length)
-				$('<ul class="nav nav-tabs"></ul><div class="tab-content"></div>')
-						.insertBefore($('.form-actions', t));
-			else
-				$('<ul class="nav nav-tabs"></ul><div class="tab-content"></div>')
-						.appendTo(t);
+			$('<ul class="nav nav-tabs"></ul><div class="tab-content"></div>')
+					.prependTo($('.form-actions', t).length ? $(
+							'.form-actions', t).parent() : t);
 			var navtabs = $('.nav-tabs', t);
 			var tabcontent = $('.tab-content', t);
 			var index = 0;

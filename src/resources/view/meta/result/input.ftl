@@ -11,6 +11,12 @@
 	</#if>
 	<#return dynamicAttributes>
 </#function>
+<#macro controlGroup id="" group="">
+<div<#if id?has_content> id="control-group-${id}"</#if> class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+</#macro>
+<#macro controlLabel label description for="">
+<label class="control-label"<#if for?has_content> for="${for}"</#if>><#if description?has_content><span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span> </#if>${label}</label>
+</#macro>
 <!DOCTYPE html>
 <html>
 <head>
@@ -54,10 +60,12 @@
 		</#if>
 		<#if !hidden>
 		<#assign label=key>
-		<#if config.alias??>
+		<#if config.alias?has_content>
 			<#assign label=config.alias>
 		</#if>
 		<#assign label=getText(label)>
+		<#assign group=getText(config.group)>
+		<#assign description=getText(config.description)>
 		<#assign readonly=naturalIds?keys?seq_contains(key)&&!naturalIdMutable&&!isnew||config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 		<#if !isnew&&idAssigned&&key=='id'>
 		<#assign readonly=true/>
@@ -72,8 +80,8 @@
 				<#if config.inputTemplate?index_of('<div class="control-group') gt -1>
 				<@config.inputTemplate?interpret/>
 				<#else>
-				<div id="control-group-${entityName!}-${key}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
-					<label class="control-label">${label}</label>
+				<@controlGroup id=id group=group/>
+					<@controlLabel label=label description=description/>
 					<div class="controls">
 					<@config.inputTemplate?interpret/>
 					</div>
@@ -113,24 +121,24 @@
 				</#if>
 				<@s.select disabled=readonly id=id label=label name=entityName+"."+key cssClass=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='listpick'>
-				<div id="control-group-${entityName!}-${key}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
+				<div id="control-group-${id}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
 					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
-					<label class="control-label">${label}</label>
+					<@controlLabel label=label description=description/>
 					<div class="controls<#if readonly> text</#if>">
 					<span class="listpick-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
 					</div>
 				</div>
 			<#elseif config.type=='treeselect'>
-				<div id="control-group-${entityName!}-${key}" class="control-group <#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
+				<div id="control-group-${id}" class="control-group <#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
 					<@s.hidden id=id name=entityName+"."+key+".id" cssClass="treeselect-id ${config.cssClass}"/>
-					<label class="control-label">${label}</label>
+					<@controlLabel label=label description=description/>
 					<div class="controls<#if readonly> text</#if>">
 					<span class="treeselect-name"><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></span>
 					</div>
 				</div>
 			<#elseif config.type=='dictionary' && selectDictionary??>
-				<div id="control-group-${entityName!}-${key}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
-				<label class="control-label" for="${id}">${label}</label>
+				<@controlGroup id=id group=group/>
+				<@controlLabel label=label description=description for=id/>
 				<div class="controls">
 					<#if !config.multiple>
 					<#if readonly>
@@ -150,8 +158,8 @@
 				</div>
 				</div>
 			<#elseif config.type=='attributes'>
-				<div id="control-group-${entityName!}-${key}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
-				<label class="control-label" for="${id}">${label}</label>
+				<@controlGroup id=id group=group/>
+				<@controlLabel label=label description=description/>
 				<div class="controls">
 				<table class="datagrid table table-condensed nullable">
 					<thead>
@@ -185,9 +193,9 @@
 				</#if>
 			<#elseif config.type=='imageupload'>
 				<#if !readonly>
-					<div id="control-group-${entityName!}-${key}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+					<@controlGroup id=id group=group/>
 						<@s.hidden id=id name=entityName+"."+key cssClass=config.cssClass+" nocheck" maxlength=(config.maxlength gt 0)?string(config.maxlength,'') dynamicAttributes=dynamicAttributes/>
-						<label class="control-label" for="${id}-upload-button">${label}</label>
+						<@controlLabel label=label description=description for="${id}-upload-button"/>
 						<div class="controls">
 							<div style="margin-bottom:5px;">
 							<button id="${id}-upload-button" class="btn concatimage" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${getText('upload')}</button>
@@ -205,9 +213,9 @@
 						</div>
 					</div>
 				<#else>
-					<div id="control-group-${entityName!}-${key}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+					<@controlGroup id=id group=group/>
 						<@s.hidden id=id name=entityName+"."+key cssClass=config.cssClass+" nocheck" maxlength=(config.maxlength gt 0)?string(config.maxlength,'') dynamicAttributes=dynamicAttributes/>
-						<label class="control-label">${label}</label>
+						<@controlLabel label=label description=description/>
 						<div class="controls">
 							<span>
 							<#if entity[key]?has_content>
@@ -231,10 +239,11 @@
 					</#if>
 					<#if !hidden>
 					<#assign label=entry.key>
-					<#if config.alias??>
+					<#if config.alias?has_content>
 						<#assign label=config.alias>
 					</#if>
 					<#assign label=getText(label)>
+					<#assign description=getText(config.description)>
 					<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 					<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
 					<#assign dynamicAttributes=mergeDynAttrs(config)/>
@@ -271,8 +280,8 @@
 						</#if>
 						<@s.select disabled=readonly id=id label=label name=entityName+'.'+key+'.'+entry.key cssClass=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 					<#elseif config.type=='dictionary' && selectDictionary??>
-						<div id="control-group-${entityName!}-${key}-${entry.key}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
-						<label class="control-label">${label}</label>
+						<@controlGroup id=id group=group/>
+						<@controlLabel label=label description=description/>
 						<div class="controls">
 						<#if !config.multiple>
 						<#if readonly>
@@ -292,17 +301,17 @@
 						</div>
 						</div>
 					<#elseif config.type=='listpick'>
-						<div id="control-group-${entityName!}-${key}-${entry.key}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
+						<div id="control-group-${id}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
 						<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
-						<label class="control-label">${label}</label>
+						<@controlLabel label=label description=description/>
 							<div class="controls<#if readonly> text</#if>">
 							<span class=" listpick-name"><#if entity[key][entry.key]??><#if entity[key][entry.key].fullname??>${entity[key][entry.key].fullname!}<#else>${entity[key][entry.key]!}</#if></#if></span>
 							</div>
 						</div>
 					<#elseif config.type=='treeselect'>
-						<div id="control-group-${entityName!}-${key}-${entry.key}" class="control-group <#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
+						<div id="control-group-${id}" class="control-group <#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
 							<@s.hidden id=id name=entityName+'.'+key+'.'+entry.key+".id" cssClass="treeselect-id ${config.cssClass}"/>
-							<label class="control-label">${label}</label>
+							<@controlLabel label=label description=description/>
 							<div class="controls<#if readonly> text</#if>">
 							<span class="treeselect-name"><#if entity[key][entry.key]??><#if entity[key][entry.key].fullname??>${entity[key][entry.key].fullname!}<#else>${entity[key][entry.key]!}</#if></#if></span>
 							</div>
@@ -319,9 +328,9 @@
 				</#list>
 			<#elseif config.type=='collection'&&config.embeddedUiConfigs??>
 				<#assign embeddedUiConfigs=config.embeddedUiConfigs/>
-				<div id="control-group-${entityName!}-${key}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+				<@controlGroup id=id group=group/>
 					<input type="hidden" name="__datagrid_${entityName}.${key}"/>
-					<label class="control-label">${label}</label>
+					<@controlLabel label=label description=description/>
 					<div class="controls">
 						<table class="table table-bordered table-fixed middle datagrid ${config.cssClass}">
 						<thead>
@@ -334,11 +343,12 @@
 								</#if>
 								<#if !hidden>
 								<#assign label2=entry.key>
-								<#if config.alias??>
+								<#if config.alias?has_content>
 									<#assign label2=config.alias>
 								</#if>
 								<#assign label2=getText(label2)>
-								<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${label2}</th>
+								<#assign description2=getText(config.description)>
+								<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${label2}<#if description2?has_content> <span data-content="${description2}" class="poped glyphicon glyphicon-question-sign"></span></#if></th>
 								</#if>
 								</#list>
 								<th class="manipulate"></th>

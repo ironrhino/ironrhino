@@ -104,7 +104,7 @@
 			<#else>
 				<#assign cellEdit=''/>
 			</#if>
-			<@rttheadtd name=label alias=config['alias']! width=config['width']! title=config['title']! class=config['thCssClass']! cellname=entityName+'.'+key cellEdit=cellEdit readonly=readonly.value excludeIfNotEdited=config.excludeIfNotEdited resizable=viewable||!(readonly.value&&!key?has_next)/>
+			<@rttheadtd name=label alias=config['alias']! description=config['description']! width=config['width']! title=config['title']! class=config['thCssClass']! cellname=entityName+'.'+key cellEdit=cellEdit readonly=readonly.value excludeIfNotEdited=config.excludeIfNotEdited resizable=viewable||!(readonly.value&&!key?has_next)/>
 		<#else>
 			<#assign viewable=true>
 		</#if>

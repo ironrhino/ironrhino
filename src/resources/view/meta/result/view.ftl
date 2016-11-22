@@ -1,4 +1,10 @@
 <#ftl output_format='HTML'>
+<#macro controlGroup id="" group="">
+<div<#if id?has_content> id="control-group-${id}"</#if> class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+</#macro>
+<#macro controlLabel label description>
+<label class="control-label"><#if description?has_content><span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span> </#if>${label}</label>
+</#macro>
 <html>
 <head>
 <title>${getText('view')}${getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
@@ -15,9 +21,13 @@
 		</#if>
 		<#if !hidden>
 		<#assign label=key>
-		<#if config.alias??>
+		<#if config.alias?has_content>
 			<#assign label=config.alias>
 		</#if>
+		<#assign label=getText(label)>
+		<#assign group=getText(config.group)>
+		<#assign description=getText(config.description)>
+		<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key)/>
 		<#if config.type=='embedded'&&config.embeddedUiConfigs??>
 				<#list config.embeddedUiConfigs.entrySet() as entry>
 				<#assign config=entry.value>
@@ -28,11 +38,14 @@
 				</#if>
 				<#if !hidden>
 				<#assign label=entry.key>
-				<#if config.alias??>
+				<#if config.alias?has_content>
 					<#assign label=config.alias>
 				</#if>
-				<div class="control-group"<#if config.group?has_content> data-group="${getText(config.group)}"</#if>>
-					<label class="control-label">${getText(label)}</label>
+				<#assign label=getText(label)>
+				<#assign description=getText(config.description)>
+				<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
+				<@controlGroup id=id group=group/>
+					<@controlLabel label=label description=description/>
 					<div class="controls">
 					<#assign template=config.template/>
 					<#if config.viewTemplate!=''>
@@ -109,8 +122,8 @@
 				</#if>
 				</#list>
 		<#else>		
-		<div class="control-group"<#if config.group?has_content> data-group="${getText(config.group)}"</#if>>
-			<label class="control-label">${getText(label)}</label>
+		<@controlGroup id=id group=group/>
+			<@controlLabel label=label description=description/>
 			<div class="controls">
 			<#assign template=config.template/>
 			<#if config.viewTemplate!=''>
@@ -151,10 +164,12 @@
 							</#if>
 							<#if !hidden>
 							<#assign label2=entry.key>
-							<#if config.alias??>
+							<#if config.alias?has_content>
 								<#assign label2=config.alias>
 							</#if>
-							<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${getText(label2)}</th>
+							<#assign label2=getText(label2)>
+							<#assign description2=getText(config.description)>
+							<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${label2}<#if description2?has_content> <span data-content="${description2}" class="poped glyphicon glyphicon-question-sign"></span></#if></th>
 							</#if>
 							</#list>
 						</tr>

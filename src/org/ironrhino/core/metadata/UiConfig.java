@@ -21,6 +21,8 @@ public @interface UiConfig {
 
 	String alias() default "";
 
+	String description() default "";
+
 	String id() default "";
 
 	String type() default DEFAULT_TYPE; // input,textarea,enum,select,multiselect,checkbox,listpick,dictionary,schema...

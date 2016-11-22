@@ -1192,7 +1192,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	{
 	background-color: #ccc;
 }
-
 /* modify by zhouyanming
 1.sprite css
 2.fixed span position
@@ -1250,7 +1249,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .treeTable tbody tr td {
   padding: .3em 1.5em;
 }
-
 
 #popup_container {
 	font-family: Arial, sans-serif;
@@ -1525,7 +1523,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	color: black;
 	cursor: default;
 }
-
 
 /*
  * add border-radius: 4px; to .chosen-container-multi .chosen-choices
@@ -7892,6 +7889,10 @@ td.middle {
 	border-top: solid 2px #ccc;
 }
 
+.popover {
+  white-space: pre-wrap;
+}
+
 .modal {
 	z-index: 2050;
 }
@@ -8325,7 +8326,6 @@ div.text-core {
 		display: none ! important;
 	}
 }
-
 
 .form-horizontal .control-label {
 	width: 100px;
@@ -8833,7 +8833,6 @@ form.attachmentable ul.thumbnails li .remove {
 	margin-right: 10px;
 }
 
-
 .toolbar > [class *= "span"] {
 	margin-top: 0;
 	margin-bottom: 0;
@@ -9003,7 +9002,6 @@ form.attachmentable ul.thumbnails li .remove {
 	border: 0;
 }
 
-
 .editme {
 	margin: 0px;
 	padding: 0px;
@@ -9020,7 +9018,6 @@ form.attachmentable ul.thumbnails li .remove {
 .editme:focus {
 	outline: 1px solid #ffc000;
 }
-
 
 .portal-column {
 	float: left;
@@ -9199,7 +9196,6 @@ form.attachmentable ul.thumbnails li .remove {
 	border-radius: 0 6px 6px 0;
 }
 
-
 .sortcol {
 	padding-left: 10px ! important;
 	text-align: center ! important;
@@ -9234,7 +9230,6 @@ form.attachmentable ul.thumbnails li .remove {
 	border-color: transparent transparent #222 transparent;
 }
 
-
 table .resizeTitle {
 	width: 95%;
 	text-align: center;
@@ -9251,7 +9246,6 @@ table .resizeBar {
 	background-color: #cccccc;
 	display: inline;
 }
-
 
 .window-richtable form:first-child {
 	padding-top: 20px;
@@ -9359,7 +9353,6 @@ table.ordering tfoot {
 	display: none;
 }
 
-
 th.filtercolumn li.selecton {
 	color: green;
 	font-weight: bold;
@@ -9395,7 +9388,6 @@ th.filtercolumn li.main li {
 	padding-right: 2px;
 }
 
-
 .treearea div.area {
 	border: solid 1px #ffc000;
 	border-radius: 5px;
@@ -9414,7 +9406,6 @@ th.filtercolumn li.main li {
 .treearea span.selected {
 	color: #ffc000;
 }
-
 
 div.pattern div.cell {
 	float: left;
@@ -9467,7 +9458,6 @@ div.pattern div.dot.active {
 	cursor: crosshair;
 	background-color: orange;
 }
-
 
 @-webkit-keyframes load {
 	0%{
@@ -9537,7 +9527,6 @@ div.pattern div.dot.active {
 	height: 36px;
 	border-radius: 20px;
 }
-
 
 /*
  * Bootstrap Responsive v2.3.1
@@ -10648,4 +10637,3 @@ div.pattern div.dot.active {
     overflow: visible !important;
   }
 }
-

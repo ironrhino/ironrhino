@@ -33,6 +33,7 @@ public class AnnotationShadows {
 		private ReadonlyImpl readonly = new ReadonlyImpl();
 		private int displayOrder = Integer.MAX_VALUE;
 		private String alias;
+		private String description;
 		private HiddenImpl hiddenInList = new HiddenImpl();
 		private HiddenImpl hiddenInInput = new HiddenImpl();
 		private HiddenImpl hiddenInView = new HiddenImpl();
@@ -86,6 +87,7 @@ public class AnnotationShadows {
 			this.displayOrder = config.displayOrder();
 			if (StringUtils.isNotBlank(config.alias()))
 				this.alias = config.alias();
+			this.description = config.description();
 			this.hiddenInList = new HiddenImpl(config.hiddenInList());
 			this.hiddenInInput = new HiddenImpl(config.hiddenInInput());
 			this.hiddenInView = new HiddenImpl(config.hiddenInView());
@@ -269,6 +271,14 @@ public class AnnotationShadows {
 
 		public void setAlias(String alias) {
 			this.alias = alias;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
 		}
 
 		public int getDisplayOrder() {

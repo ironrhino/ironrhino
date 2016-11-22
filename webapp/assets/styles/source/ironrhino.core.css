@@ -57,6 +57,10 @@ td.middle {
 	border-top: solid 2px #ccc;
 }
 
+.popover {
+  white-space: pre-wrap;
+}
+
 .modal {
 	z-index: 2050;
 }
