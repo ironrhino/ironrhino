@@ -45,7 +45,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/remoting/*</param-value>
+			<param-value>/assets/*,/remoting/*</param-value>
 		</init-param>
 	</filter>
 	<filter>
@@ -54,7 +54,7 @@
 		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/remoting/*</param-value>
+			<param-value>/assets/*,/remoting/*</param-value>
 		</init-param>
 	</filter>
 	<filter>
@@ -67,7 +67,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/remoting/*</param-value>
+			<param-value>/assets/*,/remoting/*</param-value>
 		</init-param>
 		<init-param>
 			<param-name>singleSession</param-name>
@@ -84,7 +84,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/remoting/*,/api/*</param-value>
+			<param-value>/assets/*,/remoting/*,/api/*</param-value>
 		</init-param>
 	</filter>
 	<filter>
@@ -97,7 +97,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/remoting/*,/api/*</param-value>
+			<param-value>/assets/*,/remoting/*,/api/*</param-value>
 		</init-param>
 	</filter>
 	<filter>
@@ -110,7 +110,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludePatterns</param-name>
-			<param-value>/remoting/*,/api/*</param-value>
+			<param-value>/assets/*,/remoting/*,/api/*</param-value>
 		</init-param>
 		<init-param>
 			<param-name>configFile</param-name>
