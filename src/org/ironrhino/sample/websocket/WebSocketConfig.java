@@ -1,5 +1,6 @@
 package org.ironrhino.sample.websocket;
 
+import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 @ComponentScan
 @EnableWebSocket
+@ClassPresentConditional(value = "com.caucho.config.Config", negated = true)
 public class WebSocketConfig implements WebSocketConfigurer {
 
 	@Override
