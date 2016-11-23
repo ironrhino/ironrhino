@@ -3,6 +3,7 @@
 	<Properties>
     	<Property name="app.home">/tmp/app</Property>
     	<Property name="port.http"></Property>
+    	<Property name="root.logger.level">INFO</Property>
     	<Property name="console.logger.level">INFO</Property>
     	<Property name="hibernate.logger.level">INFO</Property>
   	</Properties>
@@ -63,19 +64,19 @@
 		<Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="${sys:hibernate.logger.level}" additivity="false">
 			<AppenderRef ref="HIBERNATE"/>
 		</Logger>
-		<Logger name="org.ironrhino.core.remoting" level="INFO" additivity="false">
+		<Logger name="org.ironrhino.core.remoting" level="${sys:root.logger.level}" additivity="false">
 			<AppenderRef ref="REMOTING"/>
 		</Logger>
-		<Logger name="rest" level="INFO" additivity="false">
+		<Logger name="rest" level="${sys:root.logger.level}" additivity="false">
 			<AppenderRef ref="REST"/>
 		</Logger>
-		<Logger name="access" level="INFO" additivity="false">
+		<Logger name="access" level="${sys:root.logger.level}" additivity="false">
 			<AppenderRef ref="ACCESS"/>
 		</Logger>
 		<Logger name="access-warn" level="WARN" additivity="false">
 			<AppenderRef ref="ACCESS-WARN"/>
 		</Logger>
-		<Root level="INFO">
+		<Root level="${sys:root.logger.level}">
 			<AppenderRef ref="CONSOLE"/>
 			<AppenderRef ref="APPLICATION"/>
 			<AppenderRef ref="ERROR"/>
