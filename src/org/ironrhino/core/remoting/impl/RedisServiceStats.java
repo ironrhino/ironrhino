@@ -29,7 +29,7 @@ import org.ironrhino.core.remoting.InvocationWarning;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.remoting.StatsType;
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
@@ -77,7 +77,7 @@ public class RedisServiceStats implements ServiceStats {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("remotingStringRedisTemplate")
+	@PriorityQualifier("remotingStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundZSetOperations<String, String> hotspotsOperations;

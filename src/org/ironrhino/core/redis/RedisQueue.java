@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 	private ExecutorService executorService;
 
 	@Autowired
-	@PrioritizedQualifier("mqRedisTemplate")
+	@PriorityQualifier("mqRedisTemplate")
 	private RedisTemplate<String, T> redisTemplate;
 
 	public void setConsuming(boolean consuming) {

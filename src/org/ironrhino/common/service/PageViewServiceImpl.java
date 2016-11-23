@@ -16,7 +16,7 @@ import org.ironrhino.common.util.Location;
 import org.ironrhino.common.util.LocationUtils;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.model.Tuple;
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.RequestUtils;
@@ -36,7 +36,7 @@ public class PageViewServiceImpl implements PageViewService {
 
 	@Autowired(required = false)
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("pageViewStringRedisTemplate")
+	@PriorityQualifier("pageViewStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Override

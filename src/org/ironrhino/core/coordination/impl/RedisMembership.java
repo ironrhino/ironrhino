@@ -17,7 +17,7 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.coordination.Membership;
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class RedisMembership implements Membership {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("coordinationStringRedisTemplate")
+	@PriorityQualifier("coordinationStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@PostConstruct

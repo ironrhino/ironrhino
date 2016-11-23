@@ -6,7 +6,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.throttle.ConcurrencyService;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class RedisConcurrencyService implements ConcurrencyService {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("throttleStringRedisTemplate")
+	@PriorityQualifier("throttleStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Override

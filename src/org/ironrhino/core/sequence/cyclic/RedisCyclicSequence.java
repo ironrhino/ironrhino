@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +22,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("sequenceStringRedisTemplate")
+	@PriorityQualifier("sequenceStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundValueOperations<String, String> boundValueOperations;

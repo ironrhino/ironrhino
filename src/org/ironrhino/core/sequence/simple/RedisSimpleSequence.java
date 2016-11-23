@@ -1,6 +1,6 @@
 package org.ironrhino.core.sequence.simple;
 
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.BoundValueOperations;
@@ -13,7 +13,7 @@ public class RedisSimpleSequence extends AbstractSimpleSequence {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("sequenceStringRedisTemplate")
+	@PriorityQualifier("sequenceStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundValueOperations<String, String> boundValueOperations;

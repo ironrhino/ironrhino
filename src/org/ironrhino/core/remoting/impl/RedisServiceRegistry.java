@@ -18,7 +18,7 @@ import javax.annotation.PreDestroy;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.ExportServicesEvent;
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,7 +37,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("remotingStringRedisTemplate")
+	@PriorityQualifier("remotingStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Autowired

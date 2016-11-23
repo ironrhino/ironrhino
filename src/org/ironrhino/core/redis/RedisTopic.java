@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.metadata.Scope;
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +23,11 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	protected String channelName;
 
 	@Autowired
-	@PrioritizedQualifier("mqRedisTemplate")
+	@PriorityQualifier("mqRedisTemplate")
 	private RedisTemplate redisTemplate;
 
 	@Autowired
-	@PrioritizedQualifier("mqMessageListenerContainer")
+	@PriorityQualifier("mqMessageListenerContainer")
 	private RedisMessageListenerContainer messageListenerContainer;
 
 	@Autowired(required = false)

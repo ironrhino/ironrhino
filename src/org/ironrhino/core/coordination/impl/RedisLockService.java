@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.coordination.LockService;
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class RedisLockService implements LockService {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("coordinationStringRedisTemplate")
+	@PriorityQualifier("coordinationStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Override

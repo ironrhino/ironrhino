@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +33,12 @@ public class RedisCacheManager implements CacheManager {
 	private Logger logger;
 
 	@Autowired
-	@PrioritizedQualifier("cacheRedisTemplate")
+	@PriorityQualifier("cacheRedisTemplate")
 	private RedisTemplate redisTemplate;
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PrioritizedQualifier("cacheStringRedisTemplate")
+	@PriorityQualifier("cacheStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Override

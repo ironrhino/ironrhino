@@ -5,7 +5,7 @@ import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import org.ironrhino.core.scheduled.ScheduledTaskCircuitBreaker;
-import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,7 +18,7 @@ public class RedisScheduledTaskCircuitBreaker implements ScheduledTaskCircuitBre
 	private static final String NAMESPACE_SHORT_CIRCUIT = "ShortCircuit:";
 
 	@Autowired
-	@PrioritizedQualifier("cacheRedisTemplate")
+	@PriorityQualifier("cacheRedisTemplate")
 	private RedisTemplate<String, Object> redisTemplate;
 
 	@Override

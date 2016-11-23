@@ -15,7 +15,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
 
 @Component
-public class PrioritizedQualifierPostProcessor implements BeanPostProcessor, BeanFactoryAware {
+public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -33,7 +33,7 @@ public class PrioritizedQualifierPostProcessor implements BeanPostProcessor, Bea
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 				ReflectionUtils.makeAccessible(field);
 				if (field.isAnnotationPresent(Autowired.class)) {
-					PrioritizedQualifier pq = field.getAnnotation(PrioritizedQualifier.class);
+					PriorityQualifier pq = field.getAnnotation(PriorityQualifier.class);
 					if (pq != null) {
 						String name = pq.value();
 						if (beanFactory.containsBean(name)) {
