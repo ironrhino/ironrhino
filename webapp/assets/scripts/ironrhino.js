@@ -33827,10 +33827,13 @@ var Dialog = {
 	adapt : function(d, iframe) {
 		var useiframe = iframe != null;
 		var hasRow = false;
+		var hasToolbarPagination = false;
 		var hideCloseButton = false;
 		if (!iframe) {
 			$(d).dialog('option', 'title', Ajax.title);
 			hasRow = $('div.row', d).length > 0;
+			hasToolbarPagination = $(
+					'form.richtable div.toolbar select.pageSize', d).length > 0;
 			hideCloseButton = d.find('.custom-dialog-close').length;
 		} else {
 			var doc = iframe.document;
@@ -33844,10 +33847,12 @@ var Dialog = {
 			var height = $(doc).height() + 20;
 			$(iframe).height(height);
 			hasRow = $('div.row', doc).length > 0;
+			hasToolbarPagination = $(
+					'form.richtable div.toolbar select.pageSize', doc).length > 0;
 			hideCloseButton = $(doc).find('.custom-dialog-close').length;
 		}
 		d.dialog('moveToTop');
-		if (hasRow
+		if ((hasRow || hasToolbarPagination)
 				&& !(d.data('windowoptions') && d.data('windowoptions').width)) {
 			d.dialog('option', 'width', $(window).width() > 1345
 							? '90%'
