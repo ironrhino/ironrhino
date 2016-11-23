@@ -4,6 +4,7 @@ import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClients;
+import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 
 public class HttpComponentsClientHttpRequestFactory
@@ -16,6 +17,8 @@ public class HttpComponentsClientHttpRequestFactory
 	public static final String HTTP_HEADER_REQUEST_CHAIN = "X-Request-Chain";
 
 	public static final String MDC_KEY_REQUEST_CHAIN = "requestChain";
+
+	public static final String HTTP_HEADER_REQUEST_FROM = "X-Request-From";
 
 	public static final int DEFAULT_CONNECTTIMEOUT = 5000;
 
@@ -71,6 +74,7 @@ public class HttpComponentsClientHttpRequestFactory
 		String requestChain = MDC.get(MDC_KEY_REQUEST_CHAIN);
 		if (requestChain != null)
 			request.addHeader(HTTP_HEADER_REQUEST_CHAIN, requestChain);
+		request.addHeader(HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
 		if (client != null)
 			request.addHeader("Authorization", "Bearer " + client.fetchAccessToken());
 	}

@@ -228,8 +228,15 @@ public class AppInfo {
 	}
 
 	public static String getInstanceId() {
+		return getInstanceId(false);
+	}
+
+	public static String getInstanceId(boolean lenient) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getAppName()).append("-").append(_instanceId).append("@").append(getHostAddress());
+		sb.append(getAppName());
+		if (!lenient)
+			sb.append("-").append(_instanceId);
+		sb.append("@").append(getHostAddress());
 		int httpPort = getHttpPort();
 		if (httpPort > 0)
 			sb.append(':').append(httpPort);

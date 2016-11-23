@@ -10,6 +10,7 @@ import java.util.Map;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -31,6 +32,7 @@ public class SimpleHttpInvokerRequestExecutor
 		String requestChain = MDC.get(AccessFilter.MDC_KEY_REQUEST_CHAIN);
 		if (requestChain != null)
 			con.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
+		con.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
 		Map<String, String> map = RemotingContext.getContext();
 		if (map != null) {
 			for (Map.Entry<String, String> entry : map.entrySet())

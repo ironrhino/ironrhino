@@ -22,6 +22,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -107,6 +108,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 		String requestChain = MDC.get(AccessFilter.MDC_KEY_REQUEST_CHAIN);
 		if (requestChain != null)
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
+		postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
 		Map<String, String> ctx = RemotingContext.getContext();
 		if (ctx != null) {
 			for (Map.Entry<String, String> entry : ctx.entrySet())

@@ -39,6 +39,8 @@ public class AccessFilter implements Filter {
 	public static final String MDC_KEY_REQUEST_ID = "requestId";
 	public static final String HTTP_HEADER_REQUEST_CHAIN = "X-Request-Chain";
 	public static final String MDC_KEY_REQUEST_CHAIN = "requestChain";
+	public static final String HTTP_HEADER_REQUEST_FROM = "X-Request-From";
+	public static final String MDC_KEY_REQUEST_FROM = "requestFrom";
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -188,6 +190,12 @@ public class AccessFilter implements Filter {
 					sb.append(requestChain);
 				}
 				MDC.put(MDC_KEY_REQUEST_CHAIN, requestChain);
+				String requestFrom = request.getHeader(HTTP_HEADER_REQUEST_FROM);
+				if (requestFrom != null) {
+					// sb.append(" from:");
+					// sb.append(requestFrom);
+					MDC.put(MDC_KEY_REQUEST_FROM, requestFrom);
+				}
 				MDC.put("request", sb.toString());
 			}
 			try {

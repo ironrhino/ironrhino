@@ -15,6 +15,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 
 public class HttpComponentsClientHttpRequestFactory
@@ -62,6 +63,7 @@ public class HttpComponentsClientHttpRequestFactory
 		String requestChain = MDC.get(AccessFilter.MDC_KEY_REQUEST_CHAIN);
 		if (requestChain != null)
 			request.addHeader(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
+		request.addHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
 	}
 
 }

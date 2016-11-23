@@ -3,18 +3,22 @@ package org.ironrhino.core.remoting.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
+import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +35,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	protected static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
+
+	private Logger payloadLogger = LoggerFactory.getLogger("remoting");
 
 	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<>();
 
@@ -58,6 +64,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		RemotingContext.setRequestFrom(request.getHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM));
 		Enumeration<String> en = request.getHeaderNames();
 		while (en.hasMoreElements()) {
 			String name = en.nextElement();
@@ -75,10 +82,13 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			RemoteInvocation invocation = readRemoteInvocation(request);
 			Object proxy = getProxyForService();
 			if (proxy != null) {
-				if (loggingPayload) {
-					logger.info("invoking {}.{}() with:\n{}", clazz.getName(), invocation.getMethodName(),
-							JsonUtils.toJson(invocation.getArguments()));
-				}
+				List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
+				for (Class<?> cl : invocation.getParameterTypes())
+					parameterTypeList.add(cl.getName());
+				logger.info("Invoking {}.{}({}) from {}", clazz.getName(), invocation.getMethodName(),
+						StringUtils.join(parameterTypeList, ","), RemotingContext.getRequestFrom());
+				if (loggingPayload)
+					payloadLogger.info("Request with: {}", JsonUtils.toJson(invocation.getArguments()));
 				long time = System.currentTimeMillis();
 				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
 				time = System.currentTimeMillis() - time;
@@ -98,16 +108,12 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 					MDC.remove("url");
 					if (!result.hasException()) {
 						Object value = result.getValue();
-						if (value != null) {
-							logger.info("returned in {}ms:\n{}", time, JsonUtils.toJson(value));
-						} else {
-							logger.info("returned in {}ms: null", time);
-						}
+						payloadLogger.info("Returned in {}ms: {}", time, JsonUtils.toJson(value));
 					} else {
 						Throwable throwable = result.getException();
 						if (throwable.getCause() != null)
 							throwable = throwable.getCause();
-						logger.error(throwable.getMessage(), throwable);
+						payloadLogger.error(throwable.getMessage(), throwable);
 					}
 				}
 			} else {

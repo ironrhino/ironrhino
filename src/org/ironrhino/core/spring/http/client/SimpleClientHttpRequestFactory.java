@@ -13,6 +13,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 
 public class SimpleClientHttpRequestFactory extends org.springframework.http.client.SimpleClientHttpRequestFactory {
@@ -62,5 +63,6 @@ public class SimpleClientHttpRequestFactory extends org.springframework.http.cli
 		String requestChain = MDC.get(AccessFilter.MDC_KEY_REQUEST_CHAIN);
 		if (requestChain != null)
 			connection.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
+		connection.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
 	}
 }

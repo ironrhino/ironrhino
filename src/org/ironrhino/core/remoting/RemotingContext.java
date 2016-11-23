@@ -9,6 +9,8 @@ public class RemotingContext {
 
 	private static ThreadLocal<Map<String, String>> context = new ThreadLocal<>();
 
+	private static ThreadLocal<String> _from = new ThreadLocal<>();
+
 	public static Map<String, String> getContext() {
 		return context.get();
 	}
@@ -29,10 +31,19 @@ public class RemotingContext {
 		return map.get(key);
 	}
 
+	public static void setRequestFrom(String from) {
+		_from.set(from);
+	}
+
+	public static String getRequestFrom() {
+		return _from.get();
+	}
+
 	public static void clear() {
 		Map<String, String> map = context.get();
 		if (map != null)
 			map.clear();
+		_from.remove();
 	}
 
 }

@@ -31,6 +31,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
 
+	private static Logger payloadLogger = LoggerFactory.getLogger("remoting");
+
 	@Value("${httpInvoker.serialization.type:JAVA}")
 	private volatile SerializationType serializationType = SerializationType.JAVA;
 
@@ -160,10 +162,9 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		} else if (poll) {
 			setServiceUrl(discoverServiceUrl());
 		}
-		if (loggingPayload) {
-			logger.info("invoking {}.{}() with:\n{}", getServiceInterface().getName(), invocation.getMethod().getName(),
-					JsonUtils.toJson(invocation.getArguments()));
-		}
+		logger.info("Invoking {} at {}", invocation.getMethod(), getServiceUrl());
+		if (loggingPayload)
+			payloadLogger.info("Request with: {}", JsonUtils.toJson(invocation.getArguments()));
 		long time = System.currentTimeMillis();
 		Object value;
 		try {
@@ -174,11 +175,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		time = System.currentTimeMillis() - time;
 		if (loggingPayload) {
 			MDC.remove("url");
-			if (value != null) {
-				logger.info("returned in {}ms:\n{}", time, JsonUtils.toJson(value));
-			} else {
-				logger.info("returned in {}ms: null", time);
-			}
+			payloadLogger.info("Returned in {}ms: {}", time, JsonUtils.toJson(value));
 		}
 		return value;
 	}
