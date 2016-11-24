@@ -20,7 +20,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#if !entity??><#assign entity=entityName?eval></#if><#assign isnew = !entity??||entity.new/><#assign isnew = !entity??||entity.new/><#if idAssigned><#assign isnew=!entity??||!entity.id?has_content/></#if><#if isnew>${getText('create')}<#else>${getText('edit')}</#if>${getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
+<title><#if !entity??><#assign entity=entityName?eval></#if><#assign isnew = !entity??||entity.new/><#assign isnew = !entity??||entity.new/><#if idAssigned><#assign isnew=!entity??||!entity.id?has_content/></#if><#if isnew>${getText('create')}<#else>${getText('edit')}</#if>${getText((richtableConfig.alias?has_content)?then(richtableConfig.alias,entityName))}</title>
 </head>
 <body>
 <#assign formDynamicAttributes={}/>
@@ -74,7 +74,7 @@
 			<#if (Parameters[key]?has_content||Parameters[key+'.id']?has_content)>
 				<#assign readonly=true/>
 			</#if>
-			<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key)/>
+			<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key)/>
 			<#assign dynamicAttributes=mergeDynAttrs(config)/>
 			<#if config.inputTemplate?has_content>
 				<#if config.inputTemplate?index_of('<div class="control-group') gt -1>
@@ -194,7 +194,7 @@
 			<#elseif config.type=='imageupload'>
 				<#if !readonly>
 					<@controlGroup id=id group=group/>
-						<@s.hidden id=id name=entityName+"."+key cssClass=config.cssClass+" nocheck" maxlength=(config.maxlength gt 0)?string(config.maxlength,'') dynamicAttributes=dynamicAttributes/>
+						<@s.hidden id=id name=entityName+"."+key cssClass=config.cssClass+" nocheck" maxlength=(config.maxlength gt 0)?then(config.maxlength,'') dynamicAttributes=dynamicAttributes/>
 						<@controlLabel label=label description=description for="${id}-upload-button"/>
 						<div class="controls">
 							<div style="margin-bottom:5px;">
@@ -214,7 +214,7 @@
 					</div>
 				<#else>
 					<@controlGroup id=id group=group/>
-						<@s.hidden id=id name=entityName+"."+key cssClass=config.cssClass+" nocheck" maxlength=(config.maxlength gt 0)?string(config.maxlength,'') dynamicAttributes=dynamicAttributes/>
+						<@s.hidden id=id name=entityName+"."+key cssClass=config.cssClass+" nocheck" maxlength=(config.maxlength gt 0)?then(config.maxlength,'') dynamicAttributes=dynamicAttributes/>
 						<@controlLabel label=label description=description/>
 						<div class="controls">
 							<span>
@@ -245,7 +245,7 @@
 					<#assign label=getText(label)>
 					<#assign description=getText(config.description)>
 					<#assign readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
-					<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
+					<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key+'-'+entry.key)/>
 					<#assign dynamicAttributes=mergeDynAttrs(config)/>
 					<#if config.inputTemplate?has_content>
 						<@config.inputTemplate?interpret/>
@@ -319,9 +319,9 @@
 					<#else>
 						<#if (entity[key][entry.key])!?is_date_like>
 							<#assign value=entity[key][entry.key]/><#if config.cssClass?contains('datetime')><#assign value=value?datetime/><#elseif config.cssClass?contains('time')><#assign value=value?time/><#else><#assign value=value?date/></#if>
-							<@s.textfield id=id label=label name=entityName+'.'+key+'.'+entry.key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+							<@s.textfield id=id label=label name=entityName+'.'+key+'.'+entry.key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 						<#else>
-							<@s.textfield id=id label=label name=entityName+'.'+key+'.'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+							<@s.textfield id=id label=label name=entityName+'.'+key+'.'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 						</#if>
 					</#if>
 					</#if>
@@ -438,9 +438,9 @@
 								<#else>
 									<#if (entity[key][index][entry.key])!?is_date_like>
 										<#assign value=entity[key][index][entry.key]/><#if config.cssClass?contains('datetime')><#assign value=value?datetime/><#elseif config.cssClass?contains('time')><#assign value=value?time/><#else><#assign value=value?date/></#if>
-										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 									<#else>
-										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+										<@s.textfield id="" theme="simple" name=entityName+"."+key+'['+index+'].'+entry.key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 									</#if>
 								</#if>
 								</td>
@@ -456,9 +456,9 @@
 			<#else>
 				<#if (entity[key])!?is_date_like>
 					<#assign value=entity[key]/><#if config.cssClass?contains('datetime')><#assign value=value?datetime/><#elseif config.cssClass?contains('time')><#assign value=value?time/><#else><#assign value=value?date/></#if>
-					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType value=value?string cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 				<#else>
-					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?string(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
+					<@s.textfield id=id label=label name=entityName+"."+key type=config.inputType cssClass=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes />
 				</#if>
 			</#if>
 		</#if>

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<#assign entityDisplayName=getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))/>
+<#assign entityDisplayName=getText((richtableConfig.alias?has_content)?then(richtableConfig.alias,entityName))/>
 <title>${entityDisplayName}${getText('list')}</title>
 </head>
 <body>
@@ -109,7 +109,7 @@
 			<#assign viewable=true>
 		</#if>
 </#list>
-<#assign showActionColumn=richtableConfig.showActionColumn && (richtableConfig.actionColumnButtons?has_content||!readonly.value||viewable)>
+<#assign showActionColumn=richtableConfig.showActionColumn && (richtableConfig.actionColumnButtons?has_content||!readonly.value&&!appendOnly||viewable)>
 <@rtmiddle showActionColumn=showActionColumn/>
 <#list resultPage.result as entity>
 <#assign entityReadonly = readonly.value/>

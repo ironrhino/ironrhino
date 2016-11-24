@@ -13,7 +13,7 @@
 	<#list treeNode.children as t>
 	<li style="float:left;width:50%;">
 	<span style="margin-right:10px;">${t.name}</span>
-	<strong class="pull-right" style="margin-right:20px;">${t.value[(vtype=='d')?string('doubleValue','longValue')]?string}</strong>
+	<strong class="pull-right" style="margin-right:20px;">${t.value[(vtype=='d')?then('doubleValue','longValue')]?string}</strong>
 	</li>
 	</#list>
 	</#if>

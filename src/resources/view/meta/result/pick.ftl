@@ -71,7 +71,7 @@
 	<#assign allwidthed = true/>
 	<#list columnNames as column>
 		<#if treeable && column == 'name'||column == 'fullname'>
-			<#assign columns+={column:{'template':r'<#if entity.leaf??&&!entity.leaf><a href="${href}${href?contains("?")?string("&","?")+"parent="+entity.id}" class="ajax view" data-replacement="${entityName}_pick">${value}</a><#else>${value}</#if>'}}/>
+			<#assign columns+={column:{'template':r'<#if entity.leaf??&&!entity.leaf><a href="${href}${href?contains("?")?then("&","?")+"parent="+entity.id}" class="ajax view" data-replacement="${entityName}_pick">${value}</a><#else>${value}</#if>'}}/>
 		<#else>
 			<#if uiConfigs?? && uiConfigs[column]??>
 				<#assign uiConfig = uiConfigs[column]/>
@@ -124,7 +124,7 @@
 </#if>
 <#assign bottomButtons+=r'
 <#if treeable&&Parameters.parent??>
-<a href="${href}<#if parentEntity.parent?? && (!tree??||parent!=tree)>${href?contains("?")?string("&","?")+"parent="+_parent}</#if>" class="btn ajax view" data-replacement="${entityName}_pick">${getText("upward")}</a>
+<a href="${href}<#if parentEntity.parent?? && (!tree??||parent!=tree)>${href?contains("?")?then("&","?")+"parent="+_parent}</#if>" class="btn ajax view" data-replacement="${entityName}_pick">${getText("upward")}</a>
 </#if>
 <#if filterable><button type="button" class="btn filter">${getText("filter")}</button></#if>
 '>
@@ -143,7 +143,7 @@
 	</#if>
 	<#if renderItem>
 	<li>
-    	<a href="${href}<#if _parent?? && _parent gt 0>${href?contains("?")?string("&","?")+"parent="+ancestor.id}</#if>" class="ajax view" data-replacement="${entityName}_pick">${ancestor.name}</a> <span class="divider">/</span>
+    	<a href="${href}<#if _parent?? && _parent gt 0>${href?contains("?")?then("&","?")+"parent="+ancestor.id}</#if>" class="ajax view" data-replacement="${entityName}_pick">${ancestor.name}</a> <span class="divider">/</span>
 	</li>
 	</#if>
 	</#list>

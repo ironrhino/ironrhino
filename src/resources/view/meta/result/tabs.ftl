@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>${getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}${getText('list')}</title>
+<title>${getText((richtableConfig.alias?has_content)?then(richtableConfig.alias,entityName))}${getText('list')}</title>
 </head>
 <body>
 <#if Parameters.tab?has_content>

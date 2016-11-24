@@ -7,7 +7,7 @@
 </#macro>
 <html>
 <head>
-<title>${getText('view')}${getText((richtableConfig.alias?has_content)?string(richtableConfig.alias!,entityName))}</title>
+<title>${getText('view')}${getText((richtableConfig.alias?has_content)?then(richtableConfig.alias!,entityName))}</title>
 </head>
 <body>
 	<div id="${entityName}_view" class="view form-horizontal groupable"<#if richtableConfig.viewGridColumns gt 0> data-columns="${richtableConfig.viewGridColumns}"</#if>>
@@ -27,7 +27,7 @@
 		<#assign label=getText(label)>
 		<#assign group=getText(config.group)>
 		<#assign description=getText(config.description)>
-		<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key)/>
+		<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key)/>
 		<#if config.type=='embedded'&&config.embeddedUiConfigs??>
 				<#list config.embeddedUiConfigs.entrySet() as entry>
 				<#assign config=entry.value>
@@ -43,7 +43,7 @@
 				</#if>
 				<#assign label=getText(label)>
 				<#assign description=getText(config.description)>
-				<#assign id=(config.id?has_content)?string(config.id!,entityName+'-'+key+'-'+entry.key)/>
+				<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key+'-'+entry.key)/>
 				<@controlGroup id=id group=group/>
 					<@controlLabel label=label description=description/>
 					<div class="controls">

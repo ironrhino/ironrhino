@@ -13,7 +13,7 @@
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
-				<option value="${lv.value}"<#if value=lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?string(lv.label!,lv.value!)}</option>
+				<option value="${lv.value}"<#if value=lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
 				</#list>
 			<#else>
 				<#local group = ""/>
@@ -33,7 +33,7 @@
 							</#if>
 						</#if>
 					<#else>
-						<option value="${lv.value}"<#if value=lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?string(lv.label!,lv.value!)}</option>
+						<option value="${lv.value}"<#if value=lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
 						<#if group?has_content && !lv?has_next>
 						</optgroup>
 						</#if>
@@ -73,7 +73,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			<#if !dictionary.groupable>
 				<#list items as lv>
 				<label for="${name}-${index}" class="checkbox inline"><#t>
-				<input id="${name}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.value)||statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.label)> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+				<input id="${name}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.value)||statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.label)> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?then(lv.label,lv.value!)}<#t>
 				</label><#t>
 				<#local index++>
 				</#list>
@@ -96,7 +96,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 						</#if>
 					<#else>
 						<label for="${name}-${index}" class="checkbox inline"><#t>
-						<input id="${name}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.value)||statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.label)> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+						<input id="${name}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> value="${lv.value}" class="custom ${dynamicAttributes['class']!}"<#if statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.value)||statics['org.apache.struts2.util.ContainUtil'].contains(value,lv.label)> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?then(lv.label,lv.value!)}<#t>
 						</label><#t>
 						<#if group?has_content && index==items?size-1>
 						</span><#lt>
@@ -130,7 +130,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			<#if !dictionary.groupable>
 				<#list items as lv>
 				<label for="${name}-${index}" class="radio inline"><#t>
-				<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}"<#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}"<#if value==lv.value> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+				<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}"<#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}"<#if value==lv.value> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?then(lv.label,lv.value!)}<#t>
 				</label><#t>
 				<#local index++>
 				</#list>
@@ -153,7 +153,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 						</#if>
 					<#else>
 						<label for="${name}-${index}" class="radio inline"><#t>
-						<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${lv.value}"<#if value==lv.value> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?string(lv.label!,lv.value!)}<#t>
+						<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${lv.value}"<#if value==lv.value> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?then(lv.label,lv.value!)}<#t>
 						</label><#t>
 						<#if group?has_content && index==items?size-1>
 						</span><#lt>

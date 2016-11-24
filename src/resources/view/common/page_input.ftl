@@ -102,7 +102,7 @@ $(function() {
 	<@classPresentConditional value="org.ironrhino.common.action.UploadAction">
 	<#assign pageContentDynamicAttributes={'data-uploadurl':'/common/upload'}>
 	</@classPresentConditional>
-<@s.form id="page_input" action="${actionBaseUrl}/${view?has_content?string('save','draft')}" method="post" class="ajax form-horizontal" style="padding-top:13px;">
+<@s.form id="page_input" action="${actionBaseUrl}/${view?has_content?then('save','draft')}" method="post" class="ajax form-horizontal" style="padding-top:13px;">
 	<@s.hidden name="page.id" />
 	<@s.hidden name="page.version" class="version" />
 	<#if view=='embedded'>

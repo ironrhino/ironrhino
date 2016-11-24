@@ -211,8 +211,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				_readonly.setValue(true);
 				return _readonly;
 			}
-			AppendOnly appendOnly = getEntityClass().getAnnotation(AppendOnly.class);
-			if (appendOnly != null) {
+			if (isAppendOnly()) {
 				_readonly = new ReadonlyImpl();
 				_readonly.setValue(false);
 				_readonly.setExpression("!entity.new");
@@ -248,6 +247,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				_readonly = new ReadonlyImpl(rc);
 		}
 		return _readonly;
+	}
+
+	public boolean isAppendOnly() {
+		return getEntityClass().getAnnotation(AppendOnly.class) != null;
 	}
 
 	public String getEntityName() {

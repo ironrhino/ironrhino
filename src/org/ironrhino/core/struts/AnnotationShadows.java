@@ -32,8 +32,9 @@ public class AnnotationShadows {
 		private String thCssClass = "";
 		private ReadonlyImpl readonly = new ReadonlyImpl();
 		private int displayOrder = Integer.MAX_VALUE;
-		private String alias;
-		private String description;
+		private String alias = "";
+		private String description = "";
+		private String group = "";
 		private HiddenImpl hiddenInList = new HiddenImpl();
 		private HiddenImpl hiddenInInput = new HiddenImpl();
 		private HiddenImpl hiddenInView = new HiddenImpl();
@@ -57,7 +58,6 @@ public class AnnotationShadows {
 		private boolean excludedFromLike = false;
 		private boolean excludedFromCriteria = false;
 		private boolean excludedFromOrdering = false;
-		private String group = "";
 		private boolean searchable;
 		private boolean exactMatch;
 		private Set<String> nestSearchableProperties;
@@ -85,8 +85,7 @@ public class AnnotationShadows {
 			this.trim = config.trim();
 			this.readonly = new ReadonlyImpl(config.readonly());
 			this.displayOrder = config.displayOrder();
-			if (StringUtils.isNotBlank(config.alias()))
-				this.alias = config.alias();
+			this.alias = config.alias();
 			this.description = config.description();
 			this.hiddenInList = new HiddenImpl(config.hiddenInList());
 			this.hiddenInInput = new HiddenImpl(config.hiddenInInput());
@@ -131,14 +130,6 @@ public class AnnotationShadows {
 				this.showSum = Number.class.isAssignableFrom(propertyType) || propertyType == short.class
 						|| propertyType == int.class || propertyType == long.class || propertyType == float.class
 						|| propertyType == double.class;
-		}
-
-		public String getGroup() {
-			return group;
-		}
-
-		public void setGroup(String group) {
-			this.group = group;
 		}
 
 		public boolean isExcludedFromLike() {
@@ -279,6 +270,14 @@ public class AnnotationShadows {
 
 		public void setDescription(String description) {
 			this.description = description;
+		}
+
+		public String getGroup() {
+			return group;
+		}
+
+		public void setGroup(String group) {
+			this.group = group;
 		}
 
 		public int getDisplayOrder() {
