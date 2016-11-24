@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.lang.model.SourceVersion;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,6 +70,8 @@ public class AutoConfigResult extends FreemarkerResult {
 	@Override
 	protected String conditionalParse(String param, ActionInvocation invocation) {
 		String result = invocation.getResultCode();
+		if (result == null || !SourceVersion.isIdentifier(result))
+			throw new IllegalArgumentException("Result code must be legal java identifier");
 		String namespace = invocation.getProxy().getNamespace();
 		String actionName = invocation.getInvocationContext().getName();
 		if (namespace.equals("/"))
@@ -118,6 +121,8 @@ public class AutoConfigResult extends FreemarkerResult {
 			}
 		}
 		styleHolder.remove();
+		if (location.contains("./"))
+			throw new IllegalArgumentException("Location must be absolute");
 		return location;
 	}
 

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.lang.model.SourceVersion;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -128,12 +129,12 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		if (StringUtils.isNotBlank(methodAndUid)) {
 			String uid = null;
 			if (methodAndUid.indexOf('/') < 0) {
-				char ch = methodAndUid.charAt(0);
-				if ((ch >= '0' && ch <= '9') || !StringUtils.isAlphanumeric(methodAndUid.replaceAll("_", ""))
-						|| methodAndUid.length() == 22 || methodAndUid.length() == 32) {
-					uid = methodAndUid;
-				} else {
+				if (SourceVersion.isIdentifier(methodAndUid)
+						&& StringUtils.isAlphanumeric(methodAndUid.replaceAll("_", "")) && methodAndUid.length() != 22
+						&& methodAndUid.length() != 32) {
 					mapping.setMethod(methodAndUid);
+				} else {
+					uid = methodAndUid;
 				}
 			} else {
 				String[] array = StringUtils.split(methodAndUid, "/", 2);
