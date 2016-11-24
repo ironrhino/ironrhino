@@ -33,10 +33,12 @@
 				width: 47%;
 				float: right;
 				margin-top: 5%;
-				font-size: 50px;
+				font-size: 30px;
 				color: white;
 				text-shadow: 2px 2px 5px hsl(0, 0%, 61%);
 				padding-top: 70px;
+				padding-right: 10px;
+				word-break: break-all;
 			}
 			.clear{
 				float:none;
