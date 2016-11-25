@@ -1,8 +1,10 @@
 package org.ironrhino.core.spring.configuration;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.ironrhino.core.util.AnnotationUtils;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
@@ -12,33 +14,25 @@ public class ConditionTypeFilter implements TypeFilter {
 
 	public static final ConditionTypeFilter INSTANCE = new ConditionTypeFilter();
 
-	private ConditionTypeFilter() {
+	private List<SimpleCondition<? extends Annotation>> conditions;
 
+	private ConditionTypeFilter() {
+		this.conditions = new ArrayList<>();
+		conditions.add(new RunLevelCondition());
+		conditions.add(new StageCondition());
+		conditions.add(new ClassPresentCondition());
+		conditions.add(new ResourcePresentCondition());
+		conditions.add(new ApplicationContextPropertiesCondition());
+		conditions.add(new AddressAvailabilityCondition());
 	}
 
 	@Override
 	public boolean match(MetadataReader mr, MetadataReaderFactory mrf) throws IOException {
 		AnnotationMetadata metadata = mr.getAnnotationMetadata();
-		RunLevelConditional rc = AnnotationUtils.getAnnotation(metadata, RunLevelConditional.class);
-		if (rc != null && !RunLevelCondition.matches(rc.value(), rc.negated()))
-			return false;
-		StageConditional sc = AnnotationUtils.getAnnotation(metadata, StageConditional.class);
-		if (sc != null && !StageCondition.matches(sc.value(), sc.negated()))
-			return false;
-		ClassPresentConditional cpc = AnnotationUtils.getAnnotation(metadata, ClassPresentConditional.class);
-		if (cpc != null && !ClassPresentCondition.matches(cpc.value(), cpc.negated()))
-			return false;
-		ResourcePresentConditional rpc = AnnotationUtils.getAnnotation(metadata, ResourcePresentConditional.class);
-		if (rpc != null && !ResourcePresentCondition.matches(rpc.value(), rpc.negated()))
-			return false;
-		ApplicationContextPropertiesConditional acpc = AnnotationUtils.getAnnotation(metadata,
-				ApplicationContextPropertiesConditional.class);
-		if (acpc != null && !ApplicationContextPropertiesCondition.matches(acpc.key(), acpc.value(), acpc.negated()))
-			return false;
-		AddressAvailabilityConditional aac = AnnotationUtils.getAnnotation(metadata,
-				AddressAvailabilityConditional.class);
-		if (aac != null && !AddressAvailabilityCondition.matches(aac.address(), aac.timeout(), aac.negated()))
-			return false;
+		for (SimpleCondition<? extends Annotation> condition : conditions) {
+			if (!condition.matches(metadata))
+				return false;
+		}
 		return true;
 	}
 

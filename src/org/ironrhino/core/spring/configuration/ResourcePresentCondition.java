@@ -2,34 +2,18 @@ package org.ironrhino.core.spring.configuration;
 
 import java.io.IOException;
 
-import org.ironrhino.core.util.AnnotationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.core.type.ClassMetadata;
 
-public class ResourcePresentCondition implements Condition {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
+public class ResourcePresentCondition extends SimpleCondition<ResourcePresentConditional> {
 
 	private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver(
 			ResourcePresentCondition.class.getClassLoader());
 
 	@Override
-	public boolean matches(ConditionContext ctx, AnnotatedTypeMetadata metadata) {
-		ResourcePresentConditional annotation = AnnotationUtils.getAnnotation(metadata,
-				ResourcePresentConditional.class);
-		boolean matched = matches(annotation.value(), annotation.negated());
-		if (!matched && (metadata instanceof ClassMetadata)) {
-			ClassMetadata cm = (ClassMetadata) metadata;
-			logger.info("Bean[" + cm.getClassName() + "] is skipped registry");
-		}
-		return matched;
+	public boolean matches(ResourcePresentConditional annotation) {
+		return matches(annotation.value(), annotation.negated());
 	}
 
 	public static boolean matches(String value[], boolean negated) {

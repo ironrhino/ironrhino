@@ -6,36 +6,17 @@ import java.net.Socket;
 import java.net.SocketAddress;
 
 import org.ironrhino.core.jdbc.DatabaseProduct;
-import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.core.type.ClassMetadata;
 
-public class AddressAvailabilityCondition implements Condition {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
+public class AddressAvailabilityCondition extends SimpleCondition<AddressAvailabilityConditional> {
 
 	@Override
-	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-		AddressAvailabilityConditional annotation = AnnotationUtils.getAnnotation(metadata,
-				AddressAvailabilityConditional.class);
-		String address = annotation.address();
-		address = AppInfo.resolvePlaceholders(address);
-		int timeout = annotation.timeout();
-		boolean negated = annotation.negated();
-		boolean matched = matches(address, timeout, negated);
-		if (!matched && (metadata instanceof ClassMetadata)) {
-			ClassMetadata cm = (ClassMetadata) metadata;
-			logger.info("Bean[" + cm.getClassName() + "] is skipped registry");
-		}
-		return matched;
+	public boolean matches(AddressAvailabilityConditional annotation) {
+		return matches(annotation.address(), annotation.timeout(), annotation.negated());
 	}
 
 	public static boolean matches(String address, int timeout, boolean negated) {
+		address = AppInfo.resolvePlaceholders(address);
 		boolean matched = check(address, timeout);
 		if (negated)
 			matched = !matched;
