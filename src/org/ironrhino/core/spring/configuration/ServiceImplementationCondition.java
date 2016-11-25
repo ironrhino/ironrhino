@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
 
@@ -28,39 +28,37 @@ class ServiceImplementationCondition implements Condition {
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		if (context.getEnvironment() != null) {
-			AnnotationAttributes attributes = AnnotationAttributes
-					.fromMap(metadata.getAnnotationAttributes(ServiceImplementationConditional.class.getName()));
-			if (attributes != null) {
-				String serviceInterfaceName = null;
-				String className = ((AnnotationMetadataReadingVisitor) metadata).getClassName();
-				Class<?> serviceInterface = attributes.getClass("serviceInterface");
-				if (serviceInterface != void.class) {
-					serviceInterfaceName = serviceInterface.getName();
-				} else {
-					serviceInterfaceName = findMostMatchedInterface(className);
-				}
-				if (serviceInterfaceName != null) {
-					String implementationClassName = AppInfo.getApplicationContextProperties()
-							.getProperty(serviceInterfaceName);
-					if (StringUtils.isNotBlank(implementationClassName)) {
-						boolean matched = implementationClassName.equals(className);
-						if (matched) {
-							String key = serviceInterfaceName + '=' + implementationClassName;
-							if (!set.contains(key)) {
-								logger.info("Select implementation {} for service {}", implementationClassName,
-										serviceInterfaceName);
-								set.add(key);
-							}
-						}
-						return matched;
-					}
-				}
-				String[] profiles = attributes.getStringArray("profiles");
-				if (profiles.length == 0 || context.getEnvironment().acceptsProfiles(profiles)) {
-					return true;
-				}
-				return false;
+			ServiceImplementationConditional annotation = AnnotationUtils.getAnnotation(metadata,
+					ServiceImplementationConditional.class);
+			String serviceInterfaceName = null;
+			String className = ((AnnotationMetadataReadingVisitor) metadata).getClassName();
+			Class<?> serviceInterface = annotation.serviceInterface();
+			if (serviceInterface != void.class) {
+				serviceInterfaceName = serviceInterface.getName();
+			} else {
+				serviceInterfaceName = findMostMatchedInterface(className);
 			}
+			if (serviceInterfaceName != null) {
+				String implementationClassName = AppInfo.getApplicationContextProperties()
+						.getProperty(serviceInterfaceName);
+				if (StringUtils.isNotBlank(implementationClassName)) {
+					boolean matched = implementationClassName.equals(className);
+					if (matched) {
+						String key = serviceInterfaceName + '=' + implementationClassName;
+						if (!set.contains(key)) {
+							logger.info("Select implementation {} for service {}", implementationClassName,
+									serviceInterfaceName);
+							set.add(key);
+						}
+					}
+					return matched;
+				}
+			}
+			String[] profiles = annotation.profiles();
+			if (profiles.length == 0 || context.getEnvironment().acceptsProfiles(profiles)) {
+				return true;
+			}
+			return false;
 		}
 		return true;
 	}

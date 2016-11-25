@@ -6,12 +6,12 @@ import java.net.Socket;
 import java.net.SocketAddress;
 
 import org.ironrhino.core.jdbc.DatabaseProduct;
+import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.ClassMetadata;
 
@@ -21,12 +21,12 @@ public class AddressAvailabilityCondition implements Condition {
 
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-		AnnotationAttributes attributes = AnnotationAttributes
-				.fromMap(metadata.getAnnotationAttributes(AddressAvailabilityConditional.class.getName()));
-		String address = attributes.getString("address");
+		AddressAvailabilityConditional annotation = AnnotationUtils.getAnnotation(metadata,
+				AddressAvailabilityConditional.class);
+		String address = annotation.address();
 		address = AppInfo.resolvePlaceholders(address);
-		int timeout = attributes.getNumber("timeout");
-		boolean negated = attributes.getBoolean("negated");
+		int timeout = annotation.timeout();
+		boolean negated = annotation.negated();
 		boolean matched = matches(address, timeout, negated);
 		if (!matched && (metadata instanceof ClassMetadata)) {
 			ClassMetadata cm = (ClassMetadata) metadata;

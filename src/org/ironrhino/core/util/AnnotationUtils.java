@@ -22,6 +22,7 @@ import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @SuppressWarnings("unchecked")
 public class AnnotationUtils {
@@ -222,6 +223,14 @@ public class AnnotationUtils {
 				break;
 		}
 		return annotation;
+	}
+
+	public static <T extends Annotation> T getAnnotation(AnnotatedTypeMetadata metadata, Class<T> annotationClass) {
+		Map<String, Object> attributes = metadata.getAnnotationAttributes(annotationClass.getName());
+		if (attributes == null)
+			return null;
+		return org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation(attributes, annotationClass,
+				null);
 	}
 
 }

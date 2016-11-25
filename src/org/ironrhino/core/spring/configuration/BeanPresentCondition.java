@@ -1,12 +1,12 @@
 package org.ironrhino.core.spring.configuration;
 
+import org.ironrhino.core.util.AnnotationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.ConfigurationCondition;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.ClassMetadata;
@@ -18,10 +18,10 @@ class BeanPresentCondition implements ConfigurationCondition {
 
 	@Override
 	public boolean matches(ConditionContext ctx, AnnotatedTypeMetadata metadata) {
-		AnnotationAttributes attributes = AnnotationAttributes
-				.fromMap(metadata.getAnnotationAttributes(BeanPresentConditional.class.getName()));
-		String name = attributes.getString("value");
-		boolean negated = attributes.getBoolean("negated");
+		BeanPresentConditional annotation = AnnotationUtils.getAnnotation(metadata,
+				BeanPresentConditional.class);
+		String name = annotation.value();
+		boolean negated = annotation.negated();
 		BeanDefinitionRegistry bdr = ctx.getRegistry();
 		boolean matched = bdr.containsBeanDefinition(name);
 		if (!matched && name.indexOf('.') > 0) {

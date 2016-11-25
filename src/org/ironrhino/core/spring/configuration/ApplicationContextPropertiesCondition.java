@@ -1,11 +1,11 @@
 package org.ironrhino.core.spring.configuration;
 
+import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.ClassMetadata;
 
@@ -15,11 +15,11 @@ class ApplicationContextPropertiesCondition implements Condition {
 
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-		AnnotationAttributes attributes = AnnotationAttributes
-				.fromMap(metadata.getAnnotationAttributes(ApplicationContextPropertiesConditional.class.getName()));
-		String key = attributes.getString("key");
-		String value = attributes.getString("value");
-		boolean negated = attributes.getBoolean("negated");
+		ApplicationContextPropertiesConditional annotation = AnnotationUtils.getAnnotation(metadata,
+				ApplicationContextPropertiesConditional.class);
+		String key = annotation.key();
+		String value = annotation.value();
+		boolean negated = annotation.negated();
 		boolean matched = matches(key, value, negated);
 		if (!matched && (metadata instanceof ClassMetadata)) {
 			ClassMetadata cm = (ClassMetadata) metadata;
