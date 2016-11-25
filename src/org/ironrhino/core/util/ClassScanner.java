@@ -13,7 +13,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.spring.configuration.CustomAnnotationTypeFilter;
+import org.ironrhino.core.spring.configuration.ConditionTypeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -44,6 +44,7 @@ public class ClassScanner {
 	public ClassScanner() {
 		if (AppInfo.getExcludeFilterRegex() != null)
 			addExcludeFilter(new RegexPatternTypeFilter(Pattern.compile(AppInfo.getExcludeFilterRegex())));
+		addIncludeFilter(ConditionTypeFilter.INSTANCE);
 	}
 
 	@Autowired(required = false)
@@ -73,13 +74,13 @@ public class ClassScanner {
 	public static Collection<Class<?>> scanAnnotated(String basePackage, Class<? extends Annotation>... annotations) {
 		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
-			cs.addIncludeFilter(new CustomAnnotationTypeFilter(anno));
+			cs.addIncludeFilter(new AnnotationTypeFilter(anno));
 		return cs.doScan(basePackage);
 	}
 
 	public static Collection<Class<?>> scanAnnotated(String[] basePackages, Class<? extends Annotation> annotation) {
 		ClassScanner cs = new ClassScanner();
-		cs.addIncludeFilter(new CustomAnnotationTypeFilter(annotation));
+		cs.addIncludeFilter(new AnnotationTypeFilter(annotation));
 		List<Class<?>> classes = new ArrayList<>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));
@@ -92,7 +93,7 @@ public class ClassScanner {
 			Class<? extends Annotation>... annotations) {
 		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
-			cs.addIncludeFilter(new CustomAnnotationTypeFilter(anno));
+			cs.addIncludeFilter(new AnnotationTypeFilter(anno));
 		List<Class<?>> classes = new ArrayList<>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));

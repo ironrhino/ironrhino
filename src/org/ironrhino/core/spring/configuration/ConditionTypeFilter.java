@@ -1,33 +1,23 @@
 package org.ironrhino.core.spring.configuration;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 
 import org.ironrhino.core.util.AnnotationUtils;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.filter.TypeFilter;
 
-public class CustomAnnotationTypeFilter extends AnnotationTypeFilter {
+public class ConditionTypeFilter implements TypeFilter {
 
-	public CustomAnnotationTypeFilter(Class<? extends Annotation> annotationType) {
-		super(annotationType);
-	}
+	public static final ConditionTypeFilter INSTANCE = new ConditionTypeFilter();
 
-	public CustomAnnotationTypeFilter(Class<? extends Annotation> annotationType, boolean considerMetaAnnotations) {
-		super(annotationType, considerMetaAnnotations, false);
-	}
+	private ConditionTypeFilter() {
 
-	public CustomAnnotationTypeFilter(Class<? extends Annotation> annotationType, boolean considerMetaAnnotations,
-			boolean considerInterfaces) {
-		super(annotationType, considerMetaAnnotations, considerInterfaces);
 	}
 
 	@Override
 	public boolean match(MetadataReader mr, MetadataReaderFactory mrf) throws IOException {
-		if (!super.match(mr, mrf))
-			return false;
 		AnnotationMetadata metadata = mr.getAnnotationMetadata();
 		RunLevelConditional rc = AnnotationUtils.getAnnotation(metadata, RunLevelConditional.class);
 		if (rc != null && !RunLevelCondition.matches(rc.value(), rc.negated()))
