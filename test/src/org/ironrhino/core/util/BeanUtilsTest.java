@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.junit.Test;
 
 public class BeanUtilsTest {
@@ -481,7 +482,7 @@ public class BeanUtilsTest {
 		assertNotNull(team3.getName());
 		assertNotNull(team3.getCreateDate());
 
-		Team4 team4 = BeanUtils.conversionService.convert(team, Team4.class);
+		Team4 team4 = CustomConversionService.getSharedInstance().convert(team, Team4.class);
 		assertEquals(team1.getOwner(), team4.getOwner());
 		assertEquals(team1.getCreateDate(), team4.getCreateDate());
 	}

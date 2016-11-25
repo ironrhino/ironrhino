@@ -22,8 +22,6 @@ import org.springframework.core.convert.ConversionService;
 
 public class BeanUtils {
 
-	static ConversionService conversionService = new CustomConversionService();
-
 	public static boolean hasProperty(Class<?> clazz, String name) {
 		if (org.springframework.beans.BeanUtils.getPropertyDescriptor(clazz, name) != null)
 			return true;
@@ -34,9 +32,9 @@ public class BeanUtils {
 		if (properties.length == 0)
 			return;
 		BeanWrapperImpl bws = new BeanWrapperImpl(source);
-		bws.setConversionService(conversionService);
+		bws.setConversionService(CustomConversionService.getSharedInstance());
 		BeanWrapperImpl bwt = new BeanWrapperImpl(target);
-		bwt.setConversionService(conversionService);
+		bwt.setConversionService(CustomConversionService.getSharedInstance());
 		for (String propertyName : properties) {
 			Object value = bws.getPropertyValue(propertyName);
 			if (value != null)
@@ -46,7 +44,7 @@ public class BeanUtils {
 
 	public static void copyProperties(Map<String, Object> source, Object target, String... ignoreProperties) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(target);
-		bw.setConversionService(conversionService);
+		bw.setConversionService(CustomConversionService.getSharedInstance());
 		for (Map.Entry<String, Object> entry : source.entrySet()) {
 			if (bw.isWritableProperty(entry.getKey()))
 				bw.setPropertyValue(entry.getKey(), entry.getValue());
@@ -61,10 +59,10 @@ public class BeanUtils {
 		ignores.addAll(Arrays.asList(ignoreProperties));
 		normalizeCollectionFields(source);
 		BeanWrapperImpl bws = new BeanWrapperImpl(source);
-		bws.setConversionService(conversionService);
+		bws.setConversionService(CustomConversionService.getSharedInstance());
 		PropertyDescriptor[] sourcePds = bws.getPropertyDescriptors();
 		BeanWrapperImpl bwt = new BeanWrapperImpl(target);
-		bwt.setConversionService(conversionService);
+		bwt.setConversionService(CustomConversionService.getSharedInstance());
 		PropertyDescriptor[] targetPds = bwt.getPropertyDescriptors();
 		for (PropertyDescriptor sourcePd : sourcePds) {
 			if (sourcePd.getReadMethod() == null)
@@ -135,7 +133,7 @@ public class BeanUtils {
 
 	public static Object convert(Object bean, String propertyName, String value) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
-		bw.setConversionService(conversionService);
+		bw.setConversionService(CustomConversionService.getSharedInstance());
 		ConversionService cs = ApplicationContextUtils.getBean(ConversionService.class);
 		if (cs != null)
 			bw.setConversionService(cs);
@@ -162,7 +160,7 @@ public class BeanUtils {
 
 	public static void setPropertyValue(Object bean, String propertyName, Object propertyValue) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
-		bw.setConversionService(conversionService);
+		bw.setConversionService(CustomConversionService.getSharedInstance());
 		if (propertyName.indexOf('.') == -1) {
 			bw.setPropertyValue(propertyName, propertyValue);
 			return;
