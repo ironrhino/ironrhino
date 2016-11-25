@@ -324,9 +324,9 @@ Richtable = {
 
 			}
 			if (btn.hasClass('confirm') || action == 'delete') {
-				$.alerts.confirm((btn.data('confirm') || action == 'delete'
+				$.alerts.confirm((btn.data('confirm') || (action == 'delete'
 								? MessageBundle.get('confirm.delete')
-								: MessageBundle.get('confirm.action')),
+								: MessageBundle.get('confirm.action'))),
 						MessageBundle.get('select'), function(b) {
 							if (b) {
 								action();
