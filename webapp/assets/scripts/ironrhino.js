@@ -38548,7 +38548,47 @@ Initialization.richtable = function() {
 												}, 300);
 									});
 						}
-					}).on('click', '.richtable .more', function(event) {
+					}).on('click', '.richtable .action .upload', function() {
+				var t = $(this);
+				var f = t.closest('form');
+				var url = t.data('url');
+				if (!url) {
+					var action = f.attr('action');
+					var abu = f.data('actionbaseurl');
+					var i = action.indexOf('?');
+					if (abu) {
+						url = abu + '/upload';
+						if (i > 0)
+							url += action.substring(i);
+					} else {
+						url = i > 0
+								? (action.substring(0, i) + '/upload' + action
+										.substring(i))
+								: (action + '/upload');
+					}
+				}
+				var file = t.next('input[type="file"]:hidden');
+				if (!file.length) {
+					file = $('<input type="file"/>').insertAfter(t).attr(
+							'accept', t.data('accept')).hide().change(
+							function() {
+								$.ajaxupload(this.files, {
+									url : url,
+									onsuccess : function() {
+										f.submit();
+										setTimeout(function() {
+													f
+															.closest('.reload-container')
+															.find('.reloadable')
+															.trigger('reload');
+												}, 500);
+									}
+								});
+								$(this).remove();
+							});
+				}
+				file.click();
+			}).on('click', '.richtable .more', function(event) {
 				var form = $(event.target).closest('form');
 				if (!$('li.nextPage', form).length)
 					return;

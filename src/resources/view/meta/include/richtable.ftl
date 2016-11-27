@@ -386,10 +386,10 @@ ${formFooter!}
 </#if>
 </#macro>
 
-<#macro btn view='' action='' class='' label='' confirm=false windowoptions=''>
+<#macro btn view='' action='' class='' label='' confirm=false windowoptions='' dynamicAttributes...>
 <#if windowoptions?has_content>
 <#local windowoptions><@windowoptions?interpret/></#local>
 <#local windowoptions=windowoptions?replace('"',"'")/>
 </#if>
-<#if class?has_content && !(view?has_content||action?has_content)><button type="button" class="btn ${class}">${getText(label?has_content?then(label,class))}</button><#else><button type="button" class="btn ${class}<#if confirm&&action?has_content> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if><#if action='delete'> data-shown="selected" data-filterselector=":not([data-deletable='false'])"<#elseif action='enable'> data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])"<#elseif action='disable'> data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])"</#if><#if view?has_content&&windowoptions?has_content> data-windowoptions="${windowoptions}"</#if>>${getText(label?has_content?then(label,view?has_content?then(view,action)))}</button></#if>
+<#if class?has_content && !(view?has_content||action?has_content)><button type="button" class="btn ${class}"<@dynAttrs value=dynamicAttributes/>>${getText(label?has_content?then(label,class))}</button><#else><button type="button" class="btn ${class}<#if confirm&&action?has_content> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if><#if action='delete'> data-shown="selected" data-filterselector=":not([data-deletable='false'])"<#elseif action='enable'> data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])"<#elseif action='disable'> data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])"</#if><#if view?has_content&&windowoptions?has_content> data-windowoptions="${windowoptions}"</#if>>${getText(label?has_content?then(label,view?has_content?then(view,action)))}</button></#if>
 </#macro>
