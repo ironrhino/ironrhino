@@ -17,4 +17,6 @@ public @interface AutoConfig {
 
 	String fileupload() default "";
 
+	boolean lenientPathVariable() default false;
+
 }

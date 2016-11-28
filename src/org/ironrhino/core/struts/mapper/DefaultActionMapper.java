@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.lang.model.SourceVersion;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,8 +20,11 @@ import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsConstants;
 import org.apache.struts2.dispatcher.mapper.ActionMapping;
 import org.ironrhino.common.action.DirectTemplateAction;
+import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.model.ResultPage;
+import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.struts.result.AutoConfigResult;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.config.Configuration;
@@ -146,7 +150,20 @@ public class DefaultActionMapper extends AbstractActionMapper {
 				if (getAvailableMethods(actionClass).contains(methodAndUid)) {
 					mapping.setMethod(methodAndUid);
 				} else {
-					uid = methodAndUid;
+					if (!SourceVersion.isIdentifier(methodAndUid) || StringUtils.isNumeric(methodAndUid)
+							|| methodAndUid.length() == 22 || methodAndUid.length() >= 32) {
+						uid = methodAndUid;
+					} else {
+						AutoConfig ac = actionClass.getAnnotation(AutoConfig.class);
+						if (ac == null && actionClass.getSuperclass() == EntityAction.class)
+							ac = ReflectionUtils.getGenericClass(actionClass).getAnnotation(AutoConfig.class);
+						if (ac != null && ac.lenientPathVariable()) {
+							uid = methodAndUid;
+						} else {
+							// lead to not found
+							mapping.setMethod(methodAndUid);
+						}
+					}
 				}
 			} else {
 				String[] array = StringUtils.split(methodAndUid, "/", 2);
