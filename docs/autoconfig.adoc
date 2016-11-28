@@ -17,11 +17,7 @@ URL由下面几部分组成
 
 . `{actionName}/{methodName}/{id}` 匹配 `/product/view/1`, 则 `actionName=product` `methodName=view`  `id=1`, 等同于 `/product/view?id=1`
 . `{actionName}/{methodName}` 匹配 `/product/view`, 则 `actionName=product` `methodName=view`
-. `{actionName}/${id}` 匹配 `/product/1`, 则 `actionName=product` `methodName=execute` `id=1`, 等同于 `/product?id=1` , 请注意这种情况下为了跟第二种组合区分, `id` 要满足以下几个条件之一
-- 长度为32, 对应UUID的长度, 一般不会用这么长的方法名
-- 长度为22, BASE62压缩UUID后并前面补零的长度, 这是平台默认生成的ID的长度, 一般不会用这么长的方法名
-- 纯数字, 自增长类型的ID符合这个规则, 数字开头不能作为方法名
-- 包含不能作为方法名的字符, 比如包含百分号等
+. `{actionName}/${id}` 匹配 `/product/1`, 则 `actionName=product` `methodName=execute` `id=1`, 等同于 `/product?id=1` , 请注意如果 `id` 是方法名则使用第二种匹配结果
 . `{actionName}` 匹配 `/product`, 则 `actionName=product` `methodName=execute`
 . 以上每种组合前面带上 `{namespace}` 覆盖默认的 `namespace=/`, 比如 `{namespace}/{actionName}/{methodName}/{id}` 匹配 `/my/app/product/view/1`, 则在第一种组合下多了 `namespace=/my/app`
 

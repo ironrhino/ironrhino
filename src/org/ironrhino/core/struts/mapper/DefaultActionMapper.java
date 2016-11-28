@@ -1,13 +1,17 @@
 package org.ironrhino.core.struts.mapper;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-import javax.lang.model.SourceVersion;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +25,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.config.Configuration;
 import com.opensymphony.xwork2.config.ConfigurationManager;
+import com.opensymphony.xwork2.config.entities.ActionConfig;
 import com.opensymphony.xwork2.config.entities.PackageConfig;
 import com.opensymphony.xwork2.inject.Inject;
 
@@ -64,6 +69,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		Configuration config = configManager.getConfiguration();
 
 		String namespace = null;
+		ActionConfig actionConfig = null;
 		String name = null;
 		String methodAndUid = null;
 		// Find the longest matching namespace and name
@@ -80,8 +86,10 @@ public class DefaultActionMapper extends AbstractActionMapper {
 						continue;
 					String[] array = StringUtils.split(temp, "/", 2);
 					name = org.ironrhino.core.util.StringUtils.toCamelCase(array[0]);
-					if (pc.getActionConfigs().containsKey(name))
+					if (pc.getActionConfigs().containsKey(name)) {
 						namespace = ns;
+						actionConfig = pc.getActionConfigs().get(name);
+					}
 				}
 			}
 		}
@@ -129,9 +137,13 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		if (StringUtils.isNotBlank(methodAndUid)) {
 			String uid = null;
 			if (methodAndUid.indexOf('/') < 0) {
-				if (SourceVersion.isIdentifier(methodAndUid)
-						&& StringUtils.isAlphanumeric(methodAndUid.replaceAll("_", "")) && methodAndUid.length() != 22
-						&& methodAndUid.length() != 32) {
+				Class<?> actionClass;
+				try {
+					actionClass = Class.forName(actionConfig.getClassName());
+				} catch (ClassNotFoundException e) {
+					throw new RuntimeException(e);
+				}
+				if (getAvailableMethods(actionClass).contains(methodAndUid)) {
 					mapping.setMethod(methodAndUid);
 				} else {
 					uid = methodAndUid;
@@ -152,6 +164,25 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		if (params.size() > 0)
 			mapping.setParams(params);
 		return mapping;
+	}
+
+	private static Map<Class<?>, Set<String>> methodsCache = new ConcurrentHashMap<>(64);
+
+	private static Set<String> getAvailableMethods(Class<?> actionClass) {
+		return methodsCache.computeIfAbsent(actionClass, DefaultActionMapper::doGetAvailableMethods);
+	}
+
+	private static Set<String> doGetAvailableMethods(Class<?> actionClass) {
+		Set<String> names = new HashSet<>();
+		for (Method m : actionClass.getMethods()) {
+			if (!Modifier.isStatic(m.getModifiers()) && m.getReturnType() == String.class
+					&& m.getParameterTypes().length == 0) {
+				String name = m.getName();
+				if (!name.equals("toString") && !name.startsWith("get"))
+					names.add(name);
+			}
+		}
+		return names;
 	}
 
 }
