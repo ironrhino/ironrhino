@@ -204,7 +204,7 @@ public class BaseAction extends ActionSupport {
 	}
 
 	@Before(priority = 20)
-	public String preAction() throws Exception {
+	protected String preAction() throws Exception {
 		Authorize authorize = findAuthorize();
 		if (authorize != null) {
 			boolean authorized = AuthzUtils.authorize(evalExpression(authorize.ifAllGranted()),
@@ -237,7 +237,7 @@ public class BaseAction extends ActionSupport {
 	}
 
 	@Before(priority = 10)
-	public String returnInputOrExtractRequestBody() throws Exception {
+	protected String returnInputOrExtractRequestBody() throws Exception {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		String method = request.getMethod();
 		InputConfig inputConfig = getAnnotation(InputConfig.class);
@@ -319,7 +319,7 @@ public class BaseAction extends ActionSupport {
 	}
 
 	@BeforeResult
-	public void preResult() throws Exception {
+	protected void preResult() throws Exception {
 		if (StringUtils.isNotBlank(targetUrl) && !hasErrors()
 				&& RequestUtils.isSameOrigin(ServletActionContext.getRequest().getRequestURL().toString(), targetUrl)) {
 			targetUrl = ServletActionContext.getResponse().encodeRedirectURL(targetUrl);

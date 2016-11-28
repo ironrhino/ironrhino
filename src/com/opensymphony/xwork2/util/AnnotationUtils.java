@@ -19,10 +19,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -123,9 +126,20 @@ public class AnnotationUtils {
 	public static Collection<Method> getAnnotatedMethods(Class clazz, Class<? extends Annotation>... annotation){
 		if( SpringProxy.class.isAssignableFrom(clazz) )
 			clazz = clazz.getSuperclass();
-		Collection<Method> toReturn = new HashSet<Method>();
+		
+		Collection<Method> toReturn ;
+		if(annotation.length == 1) {
+			toReturn = methodsCache.get(clazz.getName()+':'+annotation[0].getName());
+			if(toReturn != null)
+				return toReturn;
+		}
+		toReturn = new HashSet<Method>();
 		
 		for(Method m : clazz.getMethods()){
+			if(((m.getModifiers() & (Modifier.ABSTRACT | Modifier.PUBLIC | Modifier.STATIC)) !=
+	                Modifier.PUBLIC) || !m.getDeclaringClass().isInterface())
+				// not default method on interface
+				continue;
 			if( ArrayUtils.isNotEmpty(annotation) && isAnnotatedBy(m, annotation) ){
 				toReturn.add(m);
 			}else if( ArrayUtils.isEmpty(annotation) && ArrayUtils.isNotEmpty(m.getAnnotations())){
@@ -133,8 +147,28 @@ public class AnnotationUtils {
 			}
 		}
 		
+		for (Class<?> c = clazz; c != Object.class; c = c.getSuperclass()) {
+			for(Method m : c.getDeclaredMethods()){
+				if( ArrayUtils.isNotEmpty(annotation) && isAnnotatedBy(m, annotation) ){
+					if(!m.isAccessible())
+						m.setAccessible(true);
+					toReturn.add(m);
+				}else if( ArrayUtils.isEmpty(annotation) && ArrayUtils.isNotEmpty(m.getAnnotations())){
+					if(!m.isAccessible())
+						m.setAccessible(true);
+					toReturn.add(m);
+				}
+			}
+		}
+		
+		if(annotation.length == 1) {
+			methodsCache.put(clazz.getName()+':'+annotation[0].getName(), toReturn);
+		}
+		
 		return toReturn;
 	}
+
+	private static Map<String, Collection<Method>> methodsCache = new ConcurrentHashMap<>(64);
 
 	/**
 	 * Varargs version of <code>AnnotatedElement.isAnnotationPresent()</code>
