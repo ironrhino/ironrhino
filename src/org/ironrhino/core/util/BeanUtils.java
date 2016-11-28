@@ -192,8 +192,7 @@ public class BeanUtils {
 		if (!(bean instanceof Serializable))
 			return;
 		try {
-			Class<?> clazz = bean.getClass();
-			while (clazz != Object.class) {
+			for (Class<?> clazz = bean.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
 				Field[] fields = clazz.getDeclaredFields();
 				for (Field f : fields) {
 					f.setAccessible(true);
@@ -217,7 +216,6 @@ public class BeanUtils {
 						f.set(bean, newValue);
 					}
 				}
-				clazz = clazz.getSuperclass();
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

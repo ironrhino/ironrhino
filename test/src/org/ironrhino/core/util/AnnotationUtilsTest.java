@@ -1,7 +1,6 @@
 package org.ironrhino.core.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -167,7 +166,6 @@ public class AnnotationUtilsTest {
 	@Test
 	public void testGetAnnotation() {
 		assertTrue(AnnotationUtils.getAnnotation(User.class, UiConfig.class, "getNames").hidden());
-		assertNotNull(AnnotationUtils.getAnnotation(User.class, MappedSuperclass.class));
 	}
 
 }

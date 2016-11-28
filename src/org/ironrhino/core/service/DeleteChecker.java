@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
@@ -102,8 +103,9 @@ public class DeleteChecker {
 							.getCollectionMetadata(collectionType.getRole());
 					Class<?> componentClass = collectionMetadata.getElementType().getReturnedClass();
 					try {
-						Class<?> superClass = componentClass;
-						while (true) {
+						for (Class<?> superClass = componentClass; superClass.isAnnotationPresent(Entity.class)
+								|| superClass.isAnnotationPresent(MappedSuperclass.class); superClass = superClass
+										.getSuperclass()) {
 							for (Field f : superClass.getDeclaredFields()) {
 								if (f.getAnnotation(ManyToOne.class) != null
 										|| f.getAnnotation(OneToOne.class) != null) {
@@ -116,10 +118,6 @@ public class DeleteChecker {
 									list.add(new Tuple<>(cm.getMappedClass(), new Tuple<>(name, f.getName())));
 								}
 							}
-							superClass = superClass.getSuperclass();
-							if (superClass.equals(Object.class)
-									|| superClass.getAnnotation(MappedSuperclass.class) == null)
-								break;
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -129,8 +127,9 @@ public class DeleteChecker {
 					ComponentType componentType = (ComponentType) type;
 					Class<?> componentClass = componentType.getReturnedClass();
 					try {
-						Class<?> superClass = componentClass;
-						while (true) {
+						for (Class<?> superClass = componentClass; superClass.isAnnotationPresent(Entity.class)
+								|| superClass.isAnnotationPresent(MappedSuperclass.class); superClass = superClass
+										.getSuperclass()) {
 							for (Field f : superClass.getDeclaredFields()) {
 								if (f.getAnnotation(ManyToOne.class) != null
 										|| f.getAnnotation(OneToOne.class) != null) {
@@ -143,10 +142,6 @@ public class DeleteChecker {
 									list.add(new Tuple<>(cm.getMappedClass(), new Tuple<>(name, f.getName())));
 								}
 							}
-							superClass = superClass.getSuperclass();
-							if (superClass.equals(Object.class)
-									|| superClass.getAnnotation(MappedSuperclass.class) == null)
-								break;
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

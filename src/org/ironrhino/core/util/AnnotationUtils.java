@@ -106,13 +106,11 @@ public class AnnotationUtils {
 		if (set == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			set = new HashSet<>();
 			try {
-				Class<?> cls = clazz;
-				while (!cls.equals(Object.class)) {
+				for (Class<?> cls = clazz; cls != Object.class; cls = cls.getSuperclass()) {
 					Field[] fs = cls.getDeclaredFields();
 					for (Field f : fs)
 						if (f.getAnnotation(annotaionClass) != null)
 							set.add(f.getName());
-					cls = cls.getSuperclass();
 				}
 				PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
 				for (PropertyDescriptor pd : pds)
@@ -160,13 +158,11 @@ public class AnnotationUtils {
 		if (map == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			map = new HashMap<String, T>();
 			try {
-				Class<?> cls = clazz;
-				while (!cls.equals(Object.class)) {
+				for (Class<?> cls = clazz; cls != Object.class; cls = cls.getSuperclass()) {
 					Field[] fs = cls.getDeclaredFields();
 					for (Field f : fs)
 						if (f.getAnnotation(annotaionClass) != null)
 							map.put(f.getName(), f.getAnnotation(annotaionClass));
-					cls = cls.getSuperclass();
 				}
 				PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
 				for (PropertyDescriptor pd : pds)
@@ -208,21 +204,6 @@ public class AnnotationUtils {
 		if (annotation instanceof Annotation)
 			return (T) annotation;
 		return null;
-	}
-
-	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationClass) {
-		clazz = ReflectionUtils.getActualClass(clazz);
-		T annotation = null;
-		Class<?> c = clazz;
-		while (annotation == null && c != null) {
-			annotation = c.getAnnotation(annotationClass);
-			if (annotation != null)
-				break;
-			c = c.getSuperclass();
-			if (c == null || c.getClass().equals(Object.class))
-				break;
-		}
-		return annotation;
 	}
 
 	public static <T extends Annotation> T getAnnotation(AnnotatedTypeMetadata metadata, Class<T> annotationClass) {
