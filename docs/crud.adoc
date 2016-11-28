@@ -44,8 +44,11 @@ public class Product extends BaseEntity {
 product=产品
 price=价格
 featured=精选
+productName=产品名称
+productNameDescription=产品名称以xxx为命名规则
 ----
-然后需要设置列表页面的每一列的宽度, 推荐方案是预留一个列自适应然后为其他所有列设置一个宽度值, 为多行文本设置正确的输入框类型, 只需要在字段上增加 `@UiConfig`
+然后需要设置列表页面的每一列的宽度, 推荐方案是预留一个列自适应然后为其他所有列设置一个宽度值, 为多行文本设置正确的输入框类型, 只需要在字段上增加 `@UiConfig`.
+还可以为字段设置 `alias` 和 `description`, 前者可以让显示的名字和字段名不一样, 后者在名字不能表达完整的意思情况下放一段比较长的说明.
 [source,java]
 .Product.java
 ----
@@ -61,7 +64,7 @@ import org.ironrhino.core.model.BaseEntity;
 @Entity
 public class Product extends BaseEntity {
 
-	@UiConfig(width = "150px")
+	@UiConfig(width = "150px", alias = "productName", description = "productNameDescription")
 	private String name;
 
 	@UiConfig(width = "80px")
@@ -155,6 +158,15 @@ private String description;
 
 ----
 当数量为零的情况下, 数量和描述都不显示.
+
+== 显示汇总
+对于数值类型的字段,可以在 `@UiConfig` 设置 `showSum = true`.
+[source,java]
+.Product.java
+----
+@UiConfig(width = "80px", hiddenInView = @Hidden(expression = "value == 0"), showSum = true )
+private int quantity;
+----
 
 == 控制是否只读
 只读控制可以在实体级别, 只需要为实体类上的 `@Richtable`设置 `readonly` 属性.
