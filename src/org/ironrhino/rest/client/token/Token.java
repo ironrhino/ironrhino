@@ -1,82 +1,29 @@
 package org.ironrhino.rest.client.token;
 
-import java.util.Date;
+import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Token implements java.io.Serializable {
+public interface Token extends Serializable {
 
-	private static final long serialVersionUID = 3664222731669918663L;
+	public String getAccessToken();
 
-	@JsonProperty("access_token")
-	private String accessToken;
+	public String getRefreshToken();
 
-	@JsonProperty("expires_in")
-	private int expiresIn;
+	public String getTokenType();
 
-	@JsonProperty("refresh_token")
-	private String refreshToken;
+	public int getExpiresIn();
+
+	public long getCreateTime();
 
 	@JsonIgnore
-	private long createTime = new Date().getTime();
-
-	@JsonIgnore
-	private Boolean expired;
-
-	public String getAccessToken() {
-		return accessToken;
-	}
-
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public int getExpiresIn() {
-		return expiresIn;
-	}
-
-	public void setExpiresIn(int expiresIn) {
-		this.expiresIn = expiresIn;
-	}
-
-	public String getRefreshToken() {
-		return refreshToken;
-	}
-
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
-	}
-
-	public long getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(long createTime) {
-		this.createTime = createTime;
-	}
-
-	public Boolean getExpired() {
-		return expired;
-	}
-
-	public void setExpired(Boolean expired) {
-		this.expired = expired;
-	}
-
-	@JsonIgnore
-	public boolean isExpired() {
-		if (expired != null)
-			return expired;
-		if (expiresIn <= 0)
+	public default boolean isExpired() {
+		int expiresIn = getExpiresIn();
+		long createTime = getCreateTime();
+		if (expiresIn <= 0 || createTime <= 0)
 			return false;
-		return (new Date().getTime() - createTime) / 1000 >= expiresIn;
-	}
-
-	@Override
-	public String toString() {
-		return "OAuthToken [accessToken=" + accessToken + ", expiresIn=" + expiresIn + ", refreshToken=" + refreshToken
-				+ ", createTime=" + createTime + "]";
+		int offset = expiresIn > 3600 ? expiresIn / 20 : 300;
+		return (System.currentTimeMillis() - createTime) / 1000 > (expiresIn - offset);
 	}
 
 }

@@ -8,11 +8,7 @@ public class CacheBasedTokenStore implements TokenStore {
 
 	private CacheManager cacheManager;
 
-	private String cacheKey = getClass().getSimpleName();
-
-	private String cacheNamespace;
-
-	private int timeToIdle = 3600;
+	private String cacheNamespace = getClass().getSimpleName();
 
 	public CacheManager getCacheManager() {
 		return cacheManager;
@@ -20,14 +16,6 @@ public class CacheBasedTokenStore implements TokenStore {
 
 	public void setCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
-	}
-
-	public String getCacheKey() {
-		return cacheKey;
-	}
-
-	public void setCacheKey(String cacheKey) {
-		this.cacheKey = cacheKey;
 	}
 
 	public String getCacheNamespace() {
@@ -38,24 +26,21 @@ public class CacheBasedTokenStore implements TokenStore {
 		this.cacheNamespace = cacheNamespace;
 	}
 
-	public int getTimeToIdle() {
-		return timeToIdle;
-	}
-
-	public void setTimeToIdle(int timeToIdle) {
-		this.timeToIdle = timeToIdle;
+	@Override
+	public Token getToken(String clientId) {
+		return (Token) cacheManager.get(clientId, cacheNamespace);
 	}
 
 	@Override
-	public Token getToken() {
-		return (Token) cacheManager.get(cacheKey, cacheNamespace, timeToIdle, TimeUnit.SECONDS);
-	}
-
-	@Override
-	public void setToken(Token token) {
-		if (token == null)
-			cacheManager.delete(cacheKey, cacheNamespace);
-		cacheManager.put(cacheKey, token, timeToIdle, -1, TimeUnit.SECONDS, cacheNamespace);
+	public void setToken(String clientId, Token token) {
+		if (token == null) {
+			cacheManager.delete(clientId, cacheNamespace);
+		} else {
+			int timeToLive = token.getExpiresIn();
+			if (token.getRefreshToken() != null)
+				timeToLive += 36000;
+			cacheManager.put(clientId, token, timeToLive, TimeUnit.SECONDS, cacheNamespace);
+		}
 	}
 
 }

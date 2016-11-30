@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Locale;
 
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.rest.client.token.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -16,8 +15,9 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-public class RestTemplate extends org.springframework.web.client.RestTemplate {
+class RestClientTemplate extends RestTemplate {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -25,10 +25,10 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 
 	private int maxAttempts = 2;
 
-	public RestTemplate(RestClient client) {
+	public RestClientTemplate(RestClient client) {
 		super();
 		this.client = client;
-		setRequestFactory(new HttpComponentsClientHttpRequestFactory(client));
+		setRequestFactory(new SimpleClientHttpRequestFactory(client));
 		MappingJackson2HttpMessageConverter jackson2 = null;
 		for (HttpMessageConverter<?> hmc : getMessageConverters()) {
 			if (hmc instanceof MappingJackson2HttpMessageConverter) {
@@ -91,14 +91,10 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 			logger.error(e.getResponseBodyAsString(), e);
 			if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
 				String response = e.getResponseBodyAsString().toLowerCase(Locale.ROOT);
-				Token token = client.getTokenStore().getToken();
 				if (response.contains("invalid_token")) {
-					client.getTokenStore().setToken(null);
+					client.getTokenStore().setToken(client.getClientId(), null);
 				} else if (response.contains("expired_token")) {
-					if (token != null) {
-						token.setExpired(true);
-						client.getTokenStore().setToken(token);
-					}
+					client.getTokenStore().setToken(client.getClientId(), null);
 				}
 				if (--attempts < 1)
 					throw e;

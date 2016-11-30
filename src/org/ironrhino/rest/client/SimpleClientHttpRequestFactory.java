@@ -3,13 +3,7 @@ package org.ironrhino.rest.client;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-import org.slf4j.MDC;
-
 public class SimpleClientHttpRequestFactory extends org.springframework.http.client.SimpleClientHttpRequestFactory {
-
-	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-Id";
-
-	public static final String MDC_KEY_REQUEST_ID = "requestId";
 
 	public static final int DEFAULT_CONNECTTIMEOUT = 5000;
 
@@ -50,11 +44,8 @@ public class SimpleClientHttpRequestFactory extends org.springframework.http.cli
 	@Override
 	protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
 		super.prepareConnection(connection, httpMethod);
-		String requestId = MDC.get(MDC_KEY_REQUEST_ID);
-		if (requestId != null)
-			connection.addRequestProperty(HTTP_HEADER_REQUEST_ID, requestId);
 		if (client != null)
-			connection.addRequestProperty("Authorization", "Bearer " + client.fetchAccessToken());
+			connection.addRequestProperty("Authorization", client.getAuthorizationHeader());
 
 	}
 
