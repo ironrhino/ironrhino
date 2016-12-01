@@ -28,7 +28,7 @@ public class RestClient {
 
 	protected String clientSecret;
 
-	protected String state;
+	protected String scope;
 
 	protected String grantType = "client_credentials";
 
@@ -50,9 +50,9 @@ public class RestClient {
 		this.clientSecret = clientSecret;
 	}
 
-	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret, String state) {
+	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret, String scope) {
 		this(accessTokenEndpoint, clientId, clientSecret);
-		this.state = state;
+		this.scope = scope;
 	}
 
 	public TokenStore getTokenStore() {
@@ -87,12 +87,12 @@ public class RestClient {
 		this.clientSecret = clientSecret;
 	}
 
-	public String getState() {
-		return state;
+	public String getScope() {
+		return scope;
 	}
 
-	public void setState(String state) {
-		this.state = state;
+	public void setScope(String scope) {
+		this.scope = scope;
 	}
 
 	public String getGrantType() {
@@ -168,8 +168,8 @@ public class RestClient {
 		params.add("grant_type", getGrantType());
 		params.add("client_id", getClientId());
 		params.add("client_secret", getClientSecret());
-		if (getState() != null)
-			params.add("state", getState());
+		if (getScope() != null)
+			params.add("scope", getScope());
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 		try {
 			return internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
