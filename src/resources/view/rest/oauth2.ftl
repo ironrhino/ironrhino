@@ -6,9 +6,9 @@
 <li>获取access_token
 	<ul>
 	<li>
-	<h5><em>client_credential</em>方式,此方式获取的token代表的用户是client的所有者</h5>
+	<h5><em>client_credentials</em>方式,此方式获取的token代表的用户是client的所有者</h5>
 	<ol>
-	<li>client访问  <code>${base}/oauth/oauth2/token?grant_type=client_credential&client_id={client_id}&client_secret={client_secret}</code></li>
+	<li>client访问  <code>${base}/oauth/oauth2/token?grant_type=client_credentials&client_id={client_id}&client_secret={client_secret}</code></li>
 	<li>服务器返回 access_token, 示例: <code>{"expires_in":3600,"access_token":"{access_token}","refresh_token":"{refresh_token}"}</code></li>
 	</ol>
 	</li>

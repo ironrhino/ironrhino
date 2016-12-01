@@ -437,7 +437,7 @@ public class Oauth2Action extends BaseAction {
 					new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type.name()),
 					Scope.LOCAL);
 			return JSON;
-		} else if (grant_type == GrantType.client_credential) {
+		} else if (grant_type == GrantType.client_credential || grant_type == GrantType.client_credentials) {
 			client = new Client();
 			client.setId(client_id);
 			client.setSecret(client_secret);

@@ -63,7 +63,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		auth.setClient(client.getId());
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
-		auth.setGrantType(GrantType.client_credential);
+		auth.setGrantType(GrantType.client_credentials);
 		try {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {

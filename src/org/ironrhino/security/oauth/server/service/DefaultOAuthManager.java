@@ -48,7 +48,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client.getId());
 		auth.setResponseType(ResponseType.token);
-		auth.setGrantType(GrantType.client_credential);
+		auth.setGrantType(GrantType.client_credentials);
 		try {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {

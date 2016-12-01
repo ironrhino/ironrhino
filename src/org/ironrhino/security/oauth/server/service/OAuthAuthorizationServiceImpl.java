@@ -26,7 +26,8 @@ public class OAuthAuthorizationServiceImpl implements OAuthAuthorizationService 
 			Client client = oauthManager.findClientById(auth.getClient());
 			if (client != null && client.isEnabled()) {
 				authorization.setClientName(client.getName());
-				if (auth.getGrantType() == GrantType.client_credential)
+				if (auth.getGrantType() == GrantType.client_credential
+						|| auth.getGrantType() == GrantType.client_credentials)
 					authorization.setClientOwner(client.getOwner().getUsername());
 			}
 		}
