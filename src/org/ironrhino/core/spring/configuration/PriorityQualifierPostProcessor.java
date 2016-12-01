@@ -1,7 +1,5 @@
 package org.ironrhino.core.spring.configuration;
 
-import java.lang.reflect.Field;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -12,7 +10,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.ReflectionUtils.FieldCallback;
 
 @Component
 public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFactoryAware {
@@ -28,28 +25,22 @@ public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFa
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		ReflectionUtils.doWithFields(bean.getClass(), new FieldCallback() {
-			@Override
-			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-				ReflectionUtils.makeAccessible(field);
-				if (field.isAnnotationPresent(Autowired.class)) {
-					PriorityQualifier pq = field.getAnnotation(PriorityQualifier.class);
-					if (pq != null) {
-						String name = pq.value();
-						if (beanFactory.containsBean(name)) {
-							ResolvableType rt = ResolvableType.forField(field);
-							if (beanFactory.isTypeMatch(name, rt)) {
-								field.set(bean, beanFactory.getBean(name));
-								logger.info("Injected @PrioritizedQualifier(\"{}\") for field[{}] of bean[{}]", name,
-										field.getName(), beanName);
-							} else {
-								logger.warn("Ignored @PrioritizedQualifier(\"{}\") because it is not type of {}, ",
-										name, rt);
-							}
-						}
-					}
+		ReflectionUtils.doWithFields(bean.getClass(), field -> {
+			ReflectionUtils.makeAccessible(field);
+			PriorityQualifier pq = field.getAnnotation(PriorityQualifier.class);
+			String name = pq.value();
+			if (beanFactory.containsBean(name)) {
+				ResolvableType rt = ResolvableType.forField(field);
+				if (beanFactory.isTypeMatch(name, rt)) {
+					field.set(bean, beanFactory.getBean(name));
+					logger.info("Injected @PrioritizedQualifier(\"{}\") for field[{}] of bean[{}]", name,
+							field.getName(), beanName);
+				} else {
+					logger.warn("Ignored @PrioritizedQualifier(\"{}\") because it is not type of {}, ", name, rt);
 				}
 			}
+		}, field -> {
+			return field.isAnnotationPresent(Autowired.class) && field.isAnnotationPresent(PriorityQualifier.class);
 		});
 		return bean;
 	}

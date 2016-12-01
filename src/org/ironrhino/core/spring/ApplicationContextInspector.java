@@ -1,7 +1,6 @@
 package org.ironrhino.core.spring;
 
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.ReflectionUtils.FieldCallback;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,13 +73,10 @@ public class ApplicationContextInspector {
 							continue;
 						}
 						try {
-							ReflectionUtils.doWithFields(Class.forName(clz), new FieldCallback() {
-								@Override
-								public void doWith(Field field)
-										throws IllegalArgumentException, IllegalAccessException {
-									if (field.isAnnotationPresent(Value.class))
-										list.add(field.getAnnotation(Value.class).value());
-								}
+							ReflectionUtils.doWithFields(Class.forName(clz), field -> {
+								list.add(field.getAnnotation(Value.class).value());
+							}, field -> {
+								return field.isAnnotationPresent(Value.class);
 							});
 						} catch (NoClassDefFoundError e) {
 							e.printStackTrace();
@@ -94,12 +89,10 @@ public class ApplicationContextInspector {
 
 					for (Class<?> clazz : ClassScanner.scanAssignable(ClassScanner.getAppPackages(),
 							ActionSupport.class)) {
-						ReflectionUtils.doWithFields(clazz, new FieldCallback() {
-							@Override
-							public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-								if (field.isAnnotationPresent(Value.class))
-									list.add(field.getAnnotation(Value.class).value());
-							}
+						ReflectionUtils.doWithFields(clazz, field -> {
+							list.add(field.getAnnotation(Value.class).value());
+						}, field -> {
+							return field.isAnnotationPresent(Value.class);
 						});
 					}
 
