@@ -39,6 +39,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 
 	@Override
 	public void initialize(WrappedHttpSession session) {
+		session.setCacheBased(false);
 		String cookie = getCookie(session);
 		if (StringUtils.isNotBlank(cookie)) {
 			cookie = decrypt(cookie, session.getId());

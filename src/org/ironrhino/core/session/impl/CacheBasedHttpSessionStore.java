@@ -50,6 +50,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 
 	@Override
 	public void initialize(WrappedHttpSession session) {
+		session.setCacheBased(true);
 		String sessionString;
 		if (!cacheManager.supportsTimeToIdle() && cacheManager.supportsUpdateTimeToLive())
 			sessionString = (String) cacheManager.get(session.getId(), CACHE_NAMESPACE,

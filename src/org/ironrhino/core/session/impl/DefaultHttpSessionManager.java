@@ -210,22 +210,6 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			session.getRequest().removeAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 			return;
 		}
-		boolean sessionTrackerChanged = false;
-		if (session.isInvalid()) {
-			sessionTrackerChanged = true;
-		}
-		if (session.isNew())
-			sessionTrackerChanged = true;
-		if (session.getNow() - session.getLastAccessedTime() > session.getMinActiveInterval() * 1000) {
-			session.setLastAccessedTime(session.getNow());
-			sessionTrackerChanged = true;
-		}
-		if (!session.isRequestedSessionIdFromURL() && sessionTrackerChanged) {
-			// if (sessionTrackerChanged) {
-			session.setSessionTracker(this.getSessionTracker(session));
-			RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
-					session.getSessionTracker(), globalCookie);
-		}
 		if (checkRemoteAddr) {
 			if (!session.getAttrMap().isEmpty() && session.getAttribute(SESSION_KEY_REMOTE_ADDR) == null)
 				session.setAttribute(SESSION_KEY_REMOTE_ADDR, session.getRequest().getRemoteAddr());
@@ -264,19 +248,38 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	}
 
 	private void doInitialize(WrappedHttpSession session) {
-		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased)
+		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased) {
 			cacheBased.initialize(session);
-		else
+			if (session.isNew())
+				RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
+						session.getSessionTracker(), globalCookie);
+		} else
 			cookieBased.initialize(session);
 	}
 
 	private void doSave(WrappedHttpSession session) {
 		if ("Upgrade".equalsIgnoreCase(session.getRequest().getHeader("Connection"))) // websocket
 			return;
-		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased)
+		if (session.isCacheBased()) {
 			cacheBased.save(session);
-		else
+		} else {
+			boolean sessionTrackerChanged = false;
+			if (session.isInvalid()) {
+				sessionTrackerChanged = true;
+			}
+			if (session.isNew())
+				sessionTrackerChanged = true;
+			if (session.getNow() - session.getLastAccessedTime() > session.getMinActiveInterval() * 1000) {
+				session.setLastAccessedTime(session.getNow());
+				sessionTrackerChanged = true;
+			}
+			if (!session.isRequestedSessionIdFromURL() && sessionTrackerChanged) {
+				session.setSessionTracker(getSessionTracker(session));
+				RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
+						session.getSessionTracker(), globalCookie);
+			}
 			cookieBased.save(session);
+		}
 
 	}
 

@@ -50,6 +50,8 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private boolean fromCookie = true;
 
+	private boolean cacheBased;
+
 	/**
 	 * sessionTracker -> id-creationTime-lastAccessedTime
 	 */
@@ -253,6 +255,14 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	public boolean isRequestedSessionIdFromURL() {
 		return !fromCookie;
+	}
+
+	public boolean isCacheBased() {
+		return cacheBased;
+	}
+
+	public void setCacheBased(boolean cacheBased) {
+		this.cacheBased = cacheBased;
 	}
 
 	public String encodeURL(String url) {

@@ -28,8 +28,10 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		final WrappedHttpSession session = new WrappedHttpSession(request, response, getServletContext(),
 				httpSessionManager);
+		final boolean lazyCommit = !session.isCacheBased();
 		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(request, session);
-		final WrappedHttpServletResponse wrappedHttpResponse = new WrappedHttpServletResponse(response, session);
+		final HttpServletResponse wrappedHttpResponse = lazyCommit ? new WrappedHttpServletResponse(response, session)
+				: new SimpleWrappedHttpServletResponse(response, session);
 		if (httpSessionFilterHooks != null) {
 			int appliedHooks = 0;
 			try {
@@ -59,7 +61,8 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				wrappedHttpResponse.commit();
+				if (lazyCommit)
+					((WrappedHttpServletResponse) wrappedHttpResponse).commit();
 			}
 		} else {
 			wrappedHttpRequest.getAsyncContext().addListener(new AsyncListener() {
@@ -83,7 +86,8 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 					} catch (Exception e) {
 						e.printStackTrace();
 					} finally {
-						wrappedHttpResponse.commit();
+						if (lazyCommit)
+							((WrappedHttpServletResponse) wrappedHttpResponse).commit();
 					}
 				}
 			});
