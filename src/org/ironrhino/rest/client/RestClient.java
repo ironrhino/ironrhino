@@ -139,13 +139,12 @@ public class RestClient {
 		if (token != null && StringUtils.isNotBlank(token.getRefreshToken())) {
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+			MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 			params.add("grant_type", "refresh_token");
 			params.add("client_id", getClientId());
 			params.add("client_secret", getClientSecret());
 			params.add("refresh_token", token.getRefreshToken());
-			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(params,
-					headers);
+			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 			try {
 				token = internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
 			} catch (HttpClientErrorException e) {
@@ -165,14 +164,13 @@ public class RestClient {
 	private Token requestToken() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("grant_type", getGrantType());
 		params.add("client_id", getClientId());
 		params.add("client_secret", getClientSecret());
 		if (getState() != null)
 			params.add("state", getState());
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(params,
-				headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 		try {
 			return internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
 		} catch (HttpClientErrorException e) {
