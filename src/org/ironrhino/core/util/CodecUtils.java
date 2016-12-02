@@ -132,7 +132,7 @@ public class CodecUtils {
 
 	public static String fuzzify(String input) {
 		try {
-			byte[] bytes = Base64.getEncoder().encode(input.getBytes(DEFAULT_ENCODING));
+			byte[] bytes = Base64.getEncoder().withoutPadding().encode(input.getBytes(DEFAULT_ENCODING));
 			swap(bytes);
 			return new String(bytes);
 		} catch (UnsupportedEncodingException e) {
