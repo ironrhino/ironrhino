@@ -140,7 +140,8 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			params.put("resultPage.pageSize", ps);
 		if (StringUtils.isNotBlank(methodAndUid)) {
 			String uid = null;
-			if (methodAndUid.indexOf('/') < 0) {
+			if (methodAndUid.indexOf('/') < 0
+					|| !SourceVersion.isIdentifier(methodAndUid.substring(0, methodAndUid.indexOf('/')))) {
 				Class<?> actionClass;
 				try {
 					actionClass = Class.forName(actionConfig.getClassName());
