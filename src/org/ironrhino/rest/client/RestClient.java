@@ -9,6 +9,7 @@ import org.ironrhino.rest.client.token.Token;
 import org.ironrhino.rest.client.token.TokenStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-public class RestClient {
+public class RestClient implements BeanNameAware {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -40,6 +41,8 @@ public class RestClient {
 
 	protected Class<? extends Token> tokenClass = DefaultToken.class;
 
+	protected String beanName;
+
 	public RestClient() {
 
 	}
@@ -53,6 +56,11 @@ public class RestClient {
 	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret, String scope) {
 		this(accessTokenEndpoint, clientId, clientSecret);
 		this.scope = scope;
+	}
+
+	@Override
+	public void setBeanName(String beanName) {
+		this.beanName = beanName;
 	}
 
 	public TokenStore getTokenStore() {
@@ -120,15 +128,19 @@ public class RestClient {
 		return fetchToken().getAccessToken();
 	}
 
+	public String getTokenStoreKey() {
+		return beanName == null ? getClientId() : beanName + ":" + getClientId();
+	}
+
 	protected Token fetchToken() {
-		String clientId = getClientId();
-		Token token = tokenStore.getToken(clientId);
+		String tokenStoreKey = getTokenStoreKey();
+		Token token = tokenStore.getToken(tokenStoreKey);
 		if (token == null || token.isExpired()) {
 			synchronized (this) {
-				token = tokenStore.getToken(clientId);
+				token = tokenStore.getToken(tokenStoreKey);
 				if (token == null || token.isExpired()) {
 					token = tryRefreshToken(token);
-					tokenStore.setToken(clientId, token);
+					tokenStore.setToken(tokenStoreKey, token);
 				}
 			}
 		}

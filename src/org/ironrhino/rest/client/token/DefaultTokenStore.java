@@ -8,16 +8,16 @@ public class DefaultTokenStore implements TokenStore {
 	private Map<String, Token> map = new ConcurrentHashMap<>();
 
 	@Override
-	public Token getToken(String clientId) {
-		return map.get(clientId);
+	public Token getToken(String key) {
+		return map.get(key);
 	}
 
 	@Override
-	public void setToken(String clientId, Token token) {
+	public void setToken(String key, Token token) {
 		if (token == null)
-			map.remove(clientId);
+			map.remove(key);
 		else
-			map.put(clientId, token);
+			map.put(key, token);
 	}
 
 }

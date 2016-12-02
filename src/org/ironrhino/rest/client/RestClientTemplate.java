@@ -92,9 +92,9 @@ class RestClientTemplate extends RestTemplate {
 			if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
 				String response = e.getResponseBodyAsString().toLowerCase(Locale.ROOT);
 				if (response.contains("invalid_token")) {
-					client.getTokenStore().setToken(client.getClientId(), null);
+					client.getTokenStore().setToken(client.getTokenStoreKey(), null);
 				} else if (response.contains("expired_token")) {
-					client.getTokenStore().setToken(client.getClientId(), null);
+					client.getTokenStore().setToken(client.getTokenStoreKey(), null);
 				}
 				if (--attempts < 1)
 					throw e;
