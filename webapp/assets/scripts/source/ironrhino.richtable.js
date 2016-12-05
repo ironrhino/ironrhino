@@ -221,6 +221,8 @@ Richtable = {
 			// modal : true,
 			closeOnEscape : false,
 			close : function() {
+				if (btn && btn.hasClass('loading'))
+					btn.prop('disabled', false).removeClass('loading');
 				if (reloadonclose
 						&& ($('#' + winid + ' form.richtable').length
 								|| $('#' + winid + ' form.ajax')
@@ -298,7 +300,7 @@ Richtable = {
 			var url = Richtable.getBaseUrl(form) + '/' + action
 					+ Richtable.getPathParams();
 			url += (url.indexOf('?') > 0 ? '&' : '?') + idparams;
-			var action = function() {
+			var func = function() {
 				ajax({
 							url : url,
 							type : 'POST',
@@ -329,11 +331,11 @@ Richtable = {
 								: MessageBundle.get('confirm.action'))),
 						MessageBundle.get('select'), function(b) {
 							if (b) {
-								action();
+								func();
 							}
 						});
 			} else {
-				action();
+				func();
 			}
 		} else {
 			var options = (new Function("return "
@@ -373,7 +375,7 @@ Richtable = {
 	save : function(event) {
 		var btn = $(event.target).closest('button,a');
 		var form = $(event.target).closest('form');
-		var action = function() {
+		var func = function() {
 			var versionproperty = form.data('versionproperty');
 			var modified = false;
 			var theadCells = $('.richtable thead:eq(0) th');
@@ -445,11 +447,11 @@ Richtable = {
 							|| MessageBundle.get('confirm.save'), MessageBundle
 							.get('select'), function(b) {
 						if (b) {
-							action();
+							func();
 						}
 					});
 		} else {
-			action();
+			func();
 		}
 	},
 	editCell : function(cell, type, templateId) {

@@ -1765,54 +1765,58 @@ var Nav = {
 
 var Dialog = {
 	adapt : function(d, iframe) {
-		var useiframe = iframe != null;
-		var hasRow = false;
-		var hasToolbarPagination = false;
-		var hideCloseButton = false;
-		if (!iframe) {
-			$(d).dialog('option', 'title', Ajax.title);
-			hasRow = $('div.row', d).length > 0;
-			hasToolbarPagination = $(
-					'form.richtable div.toolbar select.pageSize', d).length > 0;
-			hideCloseButton = d.find('.custom-dialog-close').length;
-		} else {
-			var doc = iframe.document;
-			if (iframe.contentDocument) {
-				doc = iframe.contentDocument;
-			} else if (iframe.contentWindow) {
-				doc = iframe.contentWindow.document;
+		try {
+			var useiframe = iframe != null;
+			var hasRow = false;
+			var hasToolbarPagination = false;
+			var hideCloseButton = false;
+			if (!iframe) {
+				$(d).dialog('option', 'title', Ajax.title);
+				hasRow = $('div.row', d).length > 0;
+				hasToolbarPagination = $(
+						'form.richtable div.toolbar select.pageSize', d).length > 0;
+				hideCloseButton = d.find('.custom-dialog-close').length;
+			} else {
+				var doc = iframe.document;
+				if (iframe.contentDocument) {
+					doc = iframe.contentDocument;
+				} else if (iframe.contentWindow) {
+					doc = iframe.contentWindow.document;
+				}
+				$(d).dialog('option', 'title', doc.title);
+				$(d).dialog('option', 'minHeight', height);
+				var height = $(doc).height() + 20;
+				$(iframe).height(height);
+				hasRow = $('div.row', doc).length > 0;
+				hasToolbarPagination = $(
+						'form.richtable div.toolbar select.pageSize', doc).length > 0;
+				hideCloseButton = $(doc).find('.custom-dialog-close').length;
 			}
-			$(d).dialog('option', 'title', doc.title);
-			$(d).dialog('option', 'minHeight', height);
-			var height = $(doc).height() + 20;
-			$(iframe).height(height);
-			hasRow = $('div.row', doc).length > 0;
-			hasToolbarPagination = $(
-					'form.richtable div.toolbar select.pageSize', doc).length > 0;
-			hideCloseButton = $(doc).find('.custom-dialog-close').length;
-		}
-		d.dialog('moveToTop');
-		if ((hasRow || hasToolbarPagination)
-				&& !(d.data('windowoptions') && d.data('windowoptions').width)) {
-			d.dialog('option', 'width', $(window).width() > 1345
-							? '90%'
-							: ($(window).width() > 1210 ? '95%' : '100%'));
-		}
-		if (hideCloseButton)
-			$('.ui-dialog-titlebar-close', d.closest('.ui-dialog')).hide();
-		var height = d.outerHeight();
-		if (height >= $(window).height()) {
-			d.dialog('option', 'position', {
-						my : 'top',
-						at : 'top',
-						of : window
-					});
-		} else {
-			d.dialog('option', 'position', {
-						my : 'center',
-						at : 'center',
-						of : window
-					});
+			d.dialog('moveToTop');
+			if ((hasRow || hasToolbarPagination)
+					&& !(d.data('windowoptions') && d.data('windowoptions').width)) {
+				d.dialog('option', 'width', $(window).width() > 1345
+								? '90%'
+								: ($(window).width() > 1210 ? '95%' : '100%'));
+			}
+			if (hideCloseButton)
+				$('.ui-dialog-titlebar-close', d.closest('.ui-dialog')).hide();
+			var height = d.outerHeight();
+			if (height >= $(window).height()) {
+				d.dialog('option', 'position', {
+							my : 'top',
+							at : 'top',
+							of : window
+						});
+			} else {
+				d.dialog('option', 'position', {
+							my : 'center',
+							at : 'center',
+							of : window
+						});
+			}
+		} catch (e) {
+			console.log(e);
 		}
 	},
 	toggleMaximization : function(d) {

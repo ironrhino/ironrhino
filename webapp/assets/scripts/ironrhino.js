@@ -33833,54 +33833,58 @@ var Nav = {
 
 var Dialog = {
 	adapt : function(d, iframe) {
-		var useiframe = iframe != null;
-		var hasRow = false;
-		var hasToolbarPagination = false;
-		var hideCloseButton = false;
-		if (!iframe) {
-			$(d).dialog('option', 'title', Ajax.title);
-			hasRow = $('div.row', d).length > 0;
-			hasToolbarPagination = $(
-					'form.richtable div.toolbar select.pageSize', d).length > 0;
-			hideCloseButton = d.find('.custom-dialog-close').length;
-		} else {
-			var doc = iframe.document;
-			if (iframe.contentDocument) {
-				doc = iframe.contentDocument;
-			} else if (iframe.contentWindow) {
-				doc = iframe.contentWindow.document;
+		try {
+			var useiframe = iframe != null;
+			var hasRow = false;
+			var hasToolbarPagination = false;
+			var hideCloseButton = false;
+			if (!iframe) {
+				$(d).dialog('option', 'title', Ajax.title);
+				hasRow = $('div.row', d).length > 0;
+				hasToolbarPagination = $(
+						'form.richtable div.toolbar select.pageSize', d).length > 0;
+				hideCloseButton = d.find('.custom-dialog-close').length;
+			} else {
+				var doc = iframe.document;
+				if (iframe.contentDocument) {
+					doc = iframe.contentDocument;
+				} else if (iframe.contentWindow) {
+					doc = iframe.contentWindow.document;
+				}
+				$(d).dialog('option', 'title', doc.title);
+				$(d).dialog('option', 'minHeight', height);
+				var height = $(doc).height() + 20;
+				$(iframe).height(height);
+				hasRow = $('div.row', doc).length > 0;
+				hasToolbarPagination = $(
+						'form.richtable div.toolbar select.pageSize', doc).length > 0;
+				hideCloseButton = $(doc).find('.custom-dialog-close').length;
 			}
-			$(d).dialog('option', 'title', doc.title);
-			$(d).dialog('option', 'minHeight', height);
-			var height = $(doc).height() + 20;
-			$(iframe).height(height);
-			hasRow = $('div.row', doc).length > 0;
-			hasToolbarPagination = $(
-					'form.richtable div.toolbar select.pageSize', doc).length > 0;
-			hideCloseButton = $(doc).find('.custom-dialog-close').length;
-		}
-		d.dialog('moveToTop');
-		if ((hasRow || hasToolbarPagination)
-				&& !(d.data('windowoptions') && d.data('windowoptions').width)) {
-			d.dialog('option', 'width', $(window).width() > 1345
-							? '90%'
-							: ($(window).width() > 1210 ? '95%' : '100%'));
-		}
-		if (hideCloseButton)
-			$('.ui-dialog-titlebar-close', d.closest('.ui-dialog')).hide();
-		var height = d.outerHeight();
-		if (height >= $(window).height()) {
-			d.dialog('option', 'position', {
-						my : 'top',
-						at : 'top',
-						of : window
-					});
-		} else {
-			d.dialog('option', 'position', {
-						my : 'center',
-						at : 'center',
-						of : window
-					});
+			d.dialog('moveToTop');
+			if ((hasRow || hasToolbarPagination)
+					&& !(d.data('windowoptions') && d.data('windowoptions').width)) {
+				d.dialog('option', 'width', $(window).width() > 1345
+								? '90%'
+								: ($(window).width() > 1210 ? '95%' : '100%'));
+			}
+			if (hideCloseButton)
+				$('.ui-dialog-titlebar-close', d.closest('.ui-dialog')).hide();
+			var height = d.outerHeight();
+			if (height >= $(window).height()) {
+				d.dialog('option', 'position', {
+							my : 'top',
+							at : 'top',
+							of : window
+						});
+			} else {
+				d.dialog('option', 'position', {
+							my : 'center',
+							at : 'center',
+							of : window
+						});
+			}
+		} catch (e) {
+			console.log(e);
 		}
 	},
 	toggleMaximization : function(d) {
@@ -38159,6 +38163,8 @@ Richtable = {
 			// modal : true,
 			closeOnEscape : false,
 			close : function() {
+				if (btn && btn.hasClass('loading'))
+					btn.prop('disabled', false).removeClass('loading');
 				if (reloadonclose
 						&& ($('#' + winid + ' form.richtable').length
 								|| $('#' + winid + ' form.ajax')
@@ -38236,7 +38242,7 @@ Richtable = {
 			var url = Richtable.getBaseUrl(form) + '/' + action
 					+ Richtable.getPathParams();
 			url += (url.indexOf('?') > 0 ? '&' : '?') + idparams;
-			var action = function() {
+			var func = function() {
 				ajax({
 							url : url,
 							type : 'POST',
@@ -38267,11 +38273,11 @@ Richtable = {
 								: MessageBundle.get('confirm.action'))),
 						MessageBundle.get('select'), function(b) {
 							if (b) {
-								action();
+								func();
 							}
 						});
 			} else {
-				action();
+				func();
 			}
 		} else {
 			var options = (new Function("return "
@@ -38311,7 +38317,7 @@ Richtable = {
 	save : function(event) {
 		var btn = $(event.target).closest('button,a');
 		var form = $(event.target).closest('form');
-		var action = function() {
+		var func = function() {
 			var versionproperty = form.data('versionproperty');
 			var modified = false;
 			var theadCells = $('.richtable thead:eq(0) th');
@@ -38383,11 +38389,11 @@ Richtable = {
 							|| MessageBundle.get('confirm.save'), MessageBundle
 							.get('select'), function(b) {
 						if (b) {
-							action();
+							func();
 						}
 					});
 		} else {
-			action();
+			func();
 		}
 	},
 	editCell : function(cell, type, templateId) {
