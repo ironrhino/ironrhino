@@ -31978,7 +31978,8 @@ MessageBundle = {
 		'confirm.action' : 'please confirm this action?',
 		'unsupported.browser' : 'unsupported browser',
 		'action.denied' : 'requested action denied',
-		'maximum.exceeded' : '{0} , exceed maximum {1}',
+		'maximum.exceeded' : 'quantity {0} exceed maximum {1}',
+		'maxsize.exceeded' : 'size {0} exceed maximum {1}',
 		'max.rows.reached' : 'reached max rows : {0}',
 		'pattern.coords.invalid' : 'coords should be between {0} and {1}',
 		'data.invalid' : 'data invalid,please check it.',
@@ -32023,7 +32024,8 @@ MessageBundle = {
 		'false' : '否',
 		'unsupported.browser' : '你使用的浏览器不支持该功能',
 		'action.denied' : '你拒绝了请求',
-		'maximum.exceeded' : '{0} ,超过最大限制数{1}',
+		'maximum.exceeded' : '数量{0}超过最大限制{1}',
+		'maxsize.exceeded' : '大小{0}超过最大限制{1}',
 		'max.rows.reached' : '已经达到了最大行数: {0}',
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
 		'data.invalid' : '数据错误,请检查',
@@ -32441,10 +32443,16 @@ Form = {
 								.match(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)) {
 					Message.showFieldError(target, null, 'email');
 					valid = false;
-				} else if (evt != 'keyup' && t.hasClass('regex') && value
-						&& !value.match(new RegExp(t.data('regex')))) {
-					Message.showFieldError(target, null, 'regex');
-					valid = false;
+				} else if (evt != 'keyup' && t.hasClass('regex') && value) {
+					var regex = t.data('regex');
+					if (regex) {
+						if (regex.indexOf('^') != 0)
+							regex = '^' + regex + '$';
+						if (!new RegExp(regex).test(value)) {
+							Message.showFieldError(target, null, 'regex');
+							valid = false;
+						}
+					}
 				} else if (evt != 'keyup' && t.hasClass('phone') && value
 						&& !value.match(/^[\d-]+$/)) {
 					Message.showFieldError(target, null, 'phone');
@@ -38548,47 +38556,7 @@ Initialization.richtable = function() {
 												}, 300);
 									});
 						}
-					}).on('click', '.richtable .action .upload', function() {
-				var t = $(this);
-				var f = t.closest('form');
-				var url = t.data('url');
-				if (!url) {
-					var action = f.attr('action');
-					var abu = f.data('actionbaseurl');
-					var i = action.indexOf('?');
-					if (abu) {
-						url = abu + '/upload';
-						if (i > 0)
-							url += action.substring(i);
-					} else {
-						url = i > 0
-								? (action.substring(0, i) + '/upload' + action
-										.substring(i))
-								: (action + '/upload');
-					}
-				}
-				var file = t.next('input[type="file"]:hidden');
-				if (!file.length) {
-					file = $('<input type="file"/>').insertAfter(t).attr(
-							'accept', t.data('accept')).hide().change(
-							function() {
-								$.ajaxupload(this.files, {
-									url : url,
-									onsuccess : function() {
-										f.submit();
-										setTimeout(function() {
-													f
-															.closest('.reload-container')
-															.find('.reloadable')
-															.trigger('reload');
-												}, 500);
-									}
-								});
-								$(this).remove();
-							});
-				}
-				file.click();
-			}).on('click', '.richtable .more', function(event) {
+					}).on('click', '.richtable .more', function(event) {
 				var form = $(event.target).closest('form');
 				if (!$('li.nextPage', form).length)
 					return;
@@ -38897,6 +38865,82 @@ Observation._richtable = function(container) {
 	$('table.richtable', container).each(function() {
 				Richtable.enhance(this);
 			});
+	var uploadBtn = $('.action .upload', container);
+	if (uploadBtn.length) {
+		var t = uploadBtn;
+		var f = t.closest('form');
+		var url = t.data('url');
+		var maxsize = t.data('maxsize');
+		var multiple = t.data('multiple');
+		var maximum = t.data('maximum') || 10;
+		maxsize = maxsize ? parseInt(maxsize) : 15 * 1024 * 1024;
+		if (!url) {
+			var action = f.attr('action');
+			var abu = f.data('actionbaseurl');
+			var i = action.indexOf('?');
+			if (abu) {
+				url = abu + '/upload';
+				if (i > 0)
+					url += action.substring(i);
+			} else {
+				url = i > 0 ? (action.substring(0, i) + '/upload' + action
+						.substring(i)) : (action + '/upload');
+			}
+		}
+		var upload = function(files) {
+			if (!files || !files.length)
+				return;
+			if (files.length > maximum) {
+				Message.showActionError(MessageBundle.get('maximum.exceeded',
+						files.length, maximum));
+				return;
+			}
+			var size = 0;
+			$.each(files, function(i, v) {
+						size += v.size;
+					});
+			if (size > maxsize) {
+				Message.showActionError(MessageBundle.get('maxsize.exceeded',
+						size, maxsize));
+				return;
+			}
+			$.ajaxupload(files, {
+						url : url,
+						onsuccess : function() {
+							f.submit();
+							setTimeout(function() {
+										f.closest('.reload-container')
+												.find('.reloadable')
+												.trigger('reload');
+									}, 500);
+						}
+					});
+		}
+		t.on('click', function() {
+					var file = t.next('input[type="file"]:hidden');
+					if (!file.length) {
+						file = $('<input type="file"/>').prop('multiple',
+								multiple).insertAfter(t).attr('accept',
+								t.data('accept')).hide().change(function() {
+									upload(this.files);
+									$(this).remove();
+								});
+					}
+					file.click();
+				});
+		f.on('dragover', function(e) {
+					$(this).addClass('drophover');
+					return false;
+				}).on('dragleave', function(e) {
+					$(this).removeClass('drophover');
+					return false;
+				}).on('drop', function(e) {
+					e.preventDefault();
+					$(this).removeClass('drophover');
+					upload(e.originalEvent.dataTransfer.files);
+					return true;
+				});
+	}
 };
 (function($) {
 	var BLOCK_COMMENT = new RegExp('/\\*(?:.|[\\n\\r])*?\\*/', 'g');

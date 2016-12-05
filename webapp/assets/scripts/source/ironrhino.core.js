@@ -375,10 +375,16 @@ Form = {
 								.match(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)) {
 					Message.showFieldError(target, null, 'email');
 					valid = false;
-				} else if (evt != 'keyup' && t.hasClass('regex') && value
-						&& !value.match(new RegExp(t.data('regex')))) {
-					Message.showFieldError(target, null, 'regex');
-					valid = false;
+				} else if (evt != 'keyup' && t.hasClass('regex') && value) {
+					var regex = t.data('regex');
+					if (regex) {
+						if (regex.indexOf('^') != 0)
+							regex = '^' + regex + '$';
+						if (!new RegExp(regex).test(value)) {
+							Message.showFieldError(target, null, 'regex');
+							valid = false;
+						}
+					}
 				} else if (evt != 'keyup' && t.hasClass('phone') && value
 						&& !value.match(/^[\d-]+$/)) {
 					Message.showFieldError(target, null, 'phone');
