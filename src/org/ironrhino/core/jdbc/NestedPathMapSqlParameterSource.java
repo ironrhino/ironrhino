@@ -40,7 +40,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 		} else {
 			value = super.getValue(paramName);
 			if (value instanceof Enum) {
-				value = ((Enum<?>) value).name();
+				value = ((Enum<?>) value).ordinal();
 			}
 		}
 		return value;

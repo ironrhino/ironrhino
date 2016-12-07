@@ -93,7 +93,7 @@ public class Person implements Serializable {
 		if (amount == null) {
 			if (other.amount != null)
 				return false;
-		} else if (amount.doubleValue()!=amount.doubleValue())
+		} else if (amount.doubleValue() != amount.doubleValue())
 			return false;
 		if (dob == null) {
 			if (other.dob != null)
