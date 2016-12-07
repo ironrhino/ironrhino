@@ -110,7 +110,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		globalVariables.put(KEY_PROPERTIES, new PropertiesTemplateHashModel());
 		globalVariables.put(KEY_DEV_MODE, devMode);
 		globalVariables.put(KEY_FLUID_LAYOUT,
-				"true".equals(AppInfo.getApplicationContextProperties().get(KEY_FLUID_LAYOUT)));
+				"true".equals(AppInfo.getApplicationContextProperties().getProperty(KEY_FLUID_LAYOUT, "true")));
 		TemplateHashModelEx hash = new SimpleMapModel(globalVariables, DEFAULT_BEANS_WRAPPER);
 		configuration.setAllSharedVariables(hash);
 		configuration.setDateFormat("yyyy-MM-dd");
