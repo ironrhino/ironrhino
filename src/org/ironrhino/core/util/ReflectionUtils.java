@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.lang.model.SourceVersion;
+
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -22,6 +24,8 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.core.PrioritizedParameterNameDiscoverer;
+import org.springframework.core.StandardReflectionParameterNameDiscoverer;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -31,7 +35,14 @@ import javassist.util.proxy.ProxyObject;
 
 public class ReflectionUtils {
 
-	public static ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+	public final static ParameterNameDiscoverer parameterNameDiscoverer;
+	static {
+		PrioritizedParameterNameDiscoverer prioritizedParameterNameDiscoverer = new PrioritizedParameterNameDiscoverer();
+		prioritizedParameterNameDiscoverer.addDiscoverer(new LocalVariableTableParameterNameDiscoverer());
+		if (SourceVersion.latest().compareTo(SourceVersion.RELEASE_8) >= 0)
+			prioritizedParameterNameDiscoverer.addDiscoverer(new StandardReflectionParameterNameDiscoverer());
+		parameterNameDiscoverer = prioritizedParameterNameDiscoverer;
+	}
 
 	private static ClassPool classPool = ClassPool.getDefault();
 
