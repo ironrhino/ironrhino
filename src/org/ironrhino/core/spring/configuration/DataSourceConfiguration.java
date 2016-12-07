@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.ClassUtils;
 
 import com.jolbox.bonecp.BoneCPDataSource;
@@ -149,6 +150,12 @@ public class DataSourceConfiguration {
 	@Primary
 	public JdbcTemplate jdbcTemplate() {
 		return new JdbcTemplate(dataSource());
+	}
+
+	@Bean
+	@Primary
+	public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
+		return new NamedParameterJdbcTemplate(dataSource());
 	}
 
 	protected static class MyConnectionHook extends AbstractConnectionHook {
