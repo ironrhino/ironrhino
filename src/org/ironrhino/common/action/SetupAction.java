@@ -32,7 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -51,7 +52,7 @@ public class SetupAction extends BaseAction {
 	private boolean enabled;
 
 	@Autowired
-	private ConfigurableApplicationContext ctx;
+	private ConfigurableListableBeanFactory ctx;
 
 	@Override
 	@InputConfig(methodName = INPUT)
@@ -113,7 +114,10 @@ public class SetupAction extends BaseAction {
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
 				if (StringUtils.isAlphanumeric(beanName) && ctx.isSingleton(beanName)) {
-					String beanClassName = ctx.getBeanFactory().getBeanDefinition(beanName).getBeanClassName();
+					BeanDefinition bd = ctx.getBeanDefinition(beanName);
+					if (bd.isAbstract())
+						continue;
+					String beanClassName = bd.getBeanClassName();
 					Class<?> clz = beanClassName != null ? Class.forName(beanClassName)
 							: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
 					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Setup.class);
@@ -168,7 +172,10 @@ public class SetupAction extends BaseAction {
 		});
 		for (String beanName : beanNames)
 			if (StringUtils.isAlphanumeric(beanName) && ctx.isSingleton(beanName)) {
-				String beanClassName = ctx.getBeanFactory().getBeanDefinition(beanName).getBeanClassName();
+				BeanDefinition bd = ctx.getBeanDefinition(beanName);
+				if (bd.isAbstract())
+					continue;
+				String beanClassName = bd.getBeanClassName();
 				Class<?> clz = beanClassName != null ? Class.forName(beanClassName)
 						: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
 				Object bean = ctx.getBean(beanName);
@@ -187,7 +194,7 @@ public class SetupAction extends BaseAction {
 				for (int i = 0; i < parameterNames.length; i++) {
 					String pvalue = ServletActionContext.getRequest().getParameter(parameterNames[i]);
 					Class<?> type = parameterTypes[i];
-					value[i] = ctx.getBeanFactory().getConversionService().convert(pvalue, type);
+					value[i] = ctx.getConversionService().convert(pvalue, type);
 				}
 				Object o = m.invoke(entry.getValue(), value);
 				if (o instanceof UserDetails)

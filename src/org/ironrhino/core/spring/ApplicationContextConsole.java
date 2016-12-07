@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.ConversionService;
@@ -63,6 +64,9 @@ public class ApplicationContextConsole {
 					for (String beanName : beanNames) {
 						if (!ctx.isSingleton(beanName))
 							continue;
+						BeanDefinition bd = ctx.getBeanDefinition(beanName);
+						if (bd.isAbstract())
+							continue;
 						if (StringUtils.isAlphanumeric(beanName.replaceAll("_", "")))
 							temp.put(beanName, ctx.getBean(beanName));
 						String[] aliases = ctx.getAliases(beanName);
@@ -86,7 +90,10 @@ public class ApplicationContextConsole {
 			for (String beanName : beanNames) {
 				if (StringUtils.isAlphanumeric(beanName) && ctx.isSingleton(beanName)) {
 					try {
-						String beanClassName = ctx.getBeanDefinition(beanName).getBeanClassName();
+						BeanDefinition bd = ctx.getBeanDefinition(beanName);
+						if (bd.isAbstract())
+							continue;
+						String beanClassName = bd.getBeanClassName();
 						Class<?> clz = beanClassName != null ? Class.forName(beanClassName)
 								: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
 						Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);

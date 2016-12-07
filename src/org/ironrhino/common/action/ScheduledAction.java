@@ -14,7 +14,8 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -26,7 +27,7 @@ public class ScheduledAction extends BaseAction {
 	private static final long serialVersionUID = 8180265410790553918L;
 
 	@Autowired
-	private ConfigurableApplicationContext ctx;
+	private ConfigurableListableBeanFactory ctx;
 
 	@Autowired(required = false)
 	private transient ScheduledTaskCircuitBreaker circuitBreaker;
@@ -60,7 +61,10 @@ public class ScheduledAction extends BaseAction {
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
 				if (ctx.isSingleton(beanName)) {
-					String beanClassName = ctx.getBeanFactory().getBeanDefinition(beanName).getBeanClassName();
+					BeanDefinition bd = ctx.getBeanDefinition(beanName);
+					if (bd.isAbstract())
+						continue;
+					String beanClassName = bd.getBeanClassName();
 					Class<?> clz = null;
 					try {
 						clz = beanClassName != null ? Class.forName(beanClassName)

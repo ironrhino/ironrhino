@@ -69,7 +69,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		String[] beanNames = ctx.getBeanDefinitionNames();
 		for (String beanName : beanNames) {
 			BeanDefinition bd = ctx.getBeanFactory().getBeanDefinition(beanName);
-			if (!bd.isSingleton())
+			if (!bd.isSingleton() || bd.isAbstract())
 				continue;
 			String beanClassName = bd.getBeanClassName();
 			if (beanClassName == null)
