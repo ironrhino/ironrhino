@@ -1,6 +1,8 @@
 package org.ironrhino.core.jdbc;
 
 import java.beans.PropertyDescriptor;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.persistence.Column;
 
@@ -9,6 +11,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.support.JdbcUtils;
 
 public class EntityBeanPropertyRowMapper<T> extends BeanPropertyRowMapper<T> {
 
@@ -19,8 +22,8 @@ public class EntityBeanPropertyRowMapper<T> extends BeanPropertyRowMapper<T> {
 	}
 
 	public EntityBeanPropertyRowMapper(Class<T> mappedClass) {
-		initialize(mappedClass);
 		beanWrapper = new BeanWrapperImpl(mappedClass);
+		initialize(mappedClass);
 	}
 
 	@Override
@@ -39,6 +42,13 @@ public class EntityBeanPropertyRowMapper<T> extends BeanPropertyRowMapper<T> {
 				return column.name();
 		}
 		return super.underscoreName(name);
+	}
+
+	@Override
+	protected Object getColumnValue(ResultSet rs, int index, PropertyDescriptor pd) throws SQLException {
+		if (pd.getPropertyType().isEnum())
+			return JdbcUtils.getResultSetValue(rs, index, null);
+		return super.getColumnValue(rs, index, pd);
 	}
 
 }
