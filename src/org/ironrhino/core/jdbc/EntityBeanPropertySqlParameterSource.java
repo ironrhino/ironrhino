@@ -1,6 +1,7 @@
 package org.ironrhino.core.jdbc;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
@@ -45,11 +46,13 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 		if (beanWrapper.isReadableProperty(name)) {
 			Object value = beanWrapper.getPropertyValue(name);
 			if (value instanceof Enum) {
-				Enumerated enumerated = beanWrapper.getPropertyDescriptor(name).getReadMethod()
-						.getAnnotation(Enumerated.class);
+				Method getter = beanWrapper.getPropertyDescriptor(name).getReadMethod();
+				Enumerated enumerated = getter.getAnnotation(Enumerated.class);
 				if (enumerated == null) {
 					try {
-						enumerated = ReflectionUtils.getField(beanWrapper.getWrappedClass(), name)
+						enumerated = ReflectionUtils
+								.getField(getter.getDeclaringClass(),
+										(name.indexOf('.') > 0 ? name.substring(name.lastIndexOf('.') + 1) : name))
 								.getAnnotation(Enumerated.class);
 					} catch (NoSuchFieldException e) {
 					}
