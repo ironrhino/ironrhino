@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans default-autowire="byName"
 	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" autowire="no" p:jdbcUrl="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1" />
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"/>
 	<bean class="org.ironrhino.core.jdbc.JdbcRepositoryRegistryPostProcessor"/>
+	<tx:annotation-driven order="0" proxy-target-class="true" />
 </beans>
