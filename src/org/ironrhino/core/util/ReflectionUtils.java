@@ -2,6 +2,7 @@ package org.ironrhino.core.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -114,15 +115,31 @@ public class ReflectionUtils {
 	}
 
 	public static String[] getParameterNames(Constructor<?> ctor) {
-		return getParameterNames(null, ctor);
+		return doGetParameterNames(ctor);
 	}
 
 	public static String[] getParameterNames(Method method) {
-		return getParameterNames(method, null);
+		if (method.isBridge())
+			method = BridgeMethodResolver.findBridgedMethod(method);
+		return doGetParameterNames(method);
 	}
 
-	private static String[] getParameterNames(Method method, Constructor<?> ctor) {
-		Annotation[][] annotations = method != null ? method.getParameterAnnotations() : ctor.getParameterAnnotations();
+	public static String[] getParameterNames(JoinPoint jp) {
+		if (!jp.getKind().equals(JoinPoint.METHOD_EXECUTION))
+			return null;
+		Class<?> clz = jp.getTarget().getClass();
+		MethodSignature sig = (MethodSignature) jp.getSignature();
+		Method method;
+		try {
+			method = clz.getDeclaredMethod(sig.getName(), sig.getParameterTypes());
+			return getParameterNames(method);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private static String[] doGetParameterNames(Executable executable) {
+		Annotation[][] annotations = executable.getParameterAnnotations();
 		String[] names = new String[annotations.length];
 		boolean allbind = true;
 		loop: for (int i = 0; i < annotations.length; i++) {
@@ -139,8 +156,11 @@ public class ReflectionUtils {
 			allbind = false;
 		}
 		if (!allbind) {
-			String[] namesDiscovered = method != null ? parameterNameDiscoverer.getParameterNames(method)
-					: parameterNameDiscoverer.getParameterNames(ctor);
+			String[] namesDiscovered;
+			if ((executable instanceof Method))
+				namesDiscovered = parameterNameDiscoverer.getParameterNames((Method) executable);
+			else
+				namesDiscovered = parameterNameDiscoverer.getParameterNames((Constructor<?>) executable);
 			if (namesDiscovered == null)
 				return null;
 			for (int i = 0; i < names.length; i++)
@@ -148,22 +168,6 @@ public class ReflectionUtils {
 					names[i] = namesDiscovered[i];
 		}
 		return names;
-	}
-
-	public static String[] getParameterNames(JoinPoint jp) {
-		if (!jp.getKind().equals(JoinPoint.METHOD_EXECUTION))
-			return null;
-		Class<?> clz = jp.getTarget().getClass();
-		MethodSignature sig = (MethodSignature) jp.getSignature();
-		Method method;
-		try {
-			method = clz.getDeclaredMethod(sig.getName(), sig.getParameterTypes());
-			if (method.isBridge())
-				method = BridgeMethodResolver.findBridgedMethod(method);
-			return getParameterNames(method);
-		} catch (Exception e) {
-			return null;
-		}
 	}
 
 	public static Field getField(Class<?> clazz, String name) throws NoSuchFieldException {
