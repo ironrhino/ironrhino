@@ -30,6 +30,8 @@ public enum SqlVerb implements Displayable {
 		sql = SqlUtils.clearComments(sql).trim();
 		String[] arr = sql.split("\\s");
 		try {
+			if (arr[0].toUpperCase(Locale.ROOT).equals("WITH"))
+				return SELECT;
 			return valueOf(arr[0].toUpperCase(Locale.ROOT));
 		} catch (Exception e) {
 			return null;
