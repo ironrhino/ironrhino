@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<map>
+	<entry key="createTable">create table t_person (name varchar(50) primary key, gender varchar(10), f_dob date, age tinyint, amount decimal(19,2))</entry>
+</map>

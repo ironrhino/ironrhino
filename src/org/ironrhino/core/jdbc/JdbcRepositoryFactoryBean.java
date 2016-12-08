@@ -17,6 +17,7 @@ import java.util.Properties;
 
 import javax.persistence.EnumType;
 import javax.sql.DataSource;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -29,6 +30,8 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.Assert;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean<Object> {
 
@@ -40,7 +43,7 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 
 	private Object jdbcRepositoryBean;
 
-	private Properties sqls;
+	private Map<String, String> sqls;
 
 	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, DataSource dataSource) {
 		Assert.notNull(jdbcRepositoryClass);
@@ -59,7 +62,8 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		this.sqls = loadSqls();
 	}
 
-	private Properties loadSqls() {
+	private Map<String, String> loadSqls() {
+		Map<String, String> map = new HashMap<>();
 		Properties props = new Properties();
 		try (InputStream is = jdbcRepositoryClass
 				.getResourceAsStream(jdbcRepositoryClass.getSimpleName() + ".properties")) {
@@ -75,7 +79,35 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		return props;
+		for (Map.Entry<Object, Object> entry : props.entrySet()) {
+			map.put(entry.getKey().toString(), entry.getValue().toString());
+		}
+		try (InputStream is = jdbcRepositoryClass.getResourceAsStream(jdbcRepositoryClass.getSimpleName() + ".xml")) {
+			if (is != null) {
+				NodeList nl = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is)
+						.getElementsByTagName("entry");
+				for (int i = 0; i < nl.getLength(); i++) {
+					Element entry = (Element) nl.item(i);
+					map.put(entry.getAttribute("key"), entry.getTextContent());
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		try (InputStream is = jdbcRepositoryClass
+				.getResourceAsStream(jdbcRepositoryClass.getSimpleName() + "." + databaseProduct.name() + ".xml")) {
+			if (is != null) {
+				NodeList nl = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is)
+						.getElementsByTagName("entry");
+				for (int i = 0; i < nl.getLength(); i++) {
+					Element entry = (Element) nl.item(i);
+					map.put(entry.getAttribute("key"), entry.getTextContent());
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return map;
 	}
 
 	@Override
@@ -102,11 +134,13 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			this.sqls = loadSqls();
 		Method method = methodInvocation.getMethod();
 		String methodName = method.getName();
-		String sql = sqls.getProperty(methodName);
+		String sql = sqls.get(methodName);
 		if (StringUtils.isBlank(sql))
 			throw new RuntimeException(
 					"No sql found for method: " + jdbcRepositoryClass.getName() + "." + methodName + "()");
 		SqlVerb sqlVerb = SqlVerb.parseBySql(sql);
+		if (sqlVerb == null)
+			throw new IllegalArgumentException("Invalid sql: " + sql);
 		Object[] arguments = methodInvocation.getArguments();
 		Map<String, Object> paramMap;
 		if (arguments.length > 0) {
