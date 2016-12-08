@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,11 +105,18 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			throw new RuntimeException(
 					"No sql found for method: " + jdbcRepositoryClass.getName() + "." + methodName + "()");
 		SqlVerb sqlVerb = SqlVerb.parseBySql(sql);
-		String[] names = ReflectionUtils.getParameterNames(method);
 		Object[] arguments = methodInvocation.getArguments();
-		Map<String, Object> paramMap = new HashMap<>();
-		for (int i = 0; i < names.length; i++)
-			paramMap.put(names[i], arguments[i]);
+		Map<String, Object> paramMap;
+		if (arguments.length > 0) {
+			String[] names = ReflectionUtils.getParameterNames(method);
+			if (names == null)
+				throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
+			paramMap = new HashMap<>();
+			for (int i = 0; i < names.length; i++)
+				paramMap.put(names[i], arguments[i]);
+		} else {
+			paramMap = Collections.emptyMap();
+		}
 		Type returnType = method.getGenericReturnType();
 		switch (sqlVerb) {
 		case SELECT:
