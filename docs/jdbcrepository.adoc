@@ -1,0 +1,102 @@
+= 基于注解的自动生成Jdbc Repository
+
+== 概述
+某些情况下我们不想用JPA/Hibernate而是纯Jdbc方式访问数据库, Spring提供了非常方便的JdbcTemplate和NamedParameterJdbcTemplate,
+Ironrhino在Spring Jdbc基础之上提供了基于注解方式自动向容器注册Repository,
+最大程度上减少样本代码, 只需要提供接口类和模型类再加上对应的sql映射文件.
+
+
+== 示例
+
+首先是领域模型类
+[source,java]
+.Person.java
+----
+public class Person implements Serializable {
+
+	private String name;
+
+	@Enumerated(EnumType.STRING)
+	private Gender gender; //枚举类型, 如果不加@Enumerated则默认使用枚举的ordinal而不是name
+
+	@Column(name = "f_dob") //如果跟数据库的字段名不匹配可以用@Column来映射, 如果字段名是下划线分割可以不用加自动支持
+	private Date dob;
+
+	private int age;
+
+	private BigDecimal amount;
+
+	// getter and setter
+
+}
+
+----
+
+接下来是Repository接口类, 也就是普通的接口类上加注 `@JdbcRepository`, 如果需要配置事务可以在方法上加`@Transactional`
+[source,java]
+.PersonRepository.java
+----
+@JdbcRepository
+public interface PersonRepository {
+
+	@Transactional
+	void createTable();
+
+	@Transactional
+	void dropTable();
+
+	@Transactional
+	void save(Person person); //JDK8支持获取参数名, 如果使用JDK7则需要在参数前面标注 @org.ironrhino.core.metadata.Param("person")
+
+	@Transactional
+	int delete(String name);
+
+	@Transactional(readOnly = true)
+	Person get(String name);
+
+	@Transactional(readOnly = true)
+	List<Person> list();
+
+	@Transactional(readOnly = true)
+	List<Person> listByGender(@org.ironrhino.core.jdbc.Enumerated(EnumType.STRING) Gender gender);
+	//枚举类型默认是ordinal而不是name, 因@javax.persistence.Enumerated不支持标注在参数上, 这里复制了一个注解
+
+	@Transactional(readOnly = true)
+	List<Person> search(String namePrefix);
+
+}
+
+----
+接下来是sql映射文件
+[source,properties]
+.PersonRepository.properties
+----
+createTable=create table t_person (name varchar(50) primary key, gender varchar(10), f_dob date, age integer, amount decimal(19,2))
+dropTable=drop table t_person
+save=insert into t_person(name,gender,f_dob,age,amount) values (:person.name,:person.gender,:person.dob,:person.age,:person.amount)
+get=select * from t_person where name=:name
+delete=delete from t_person where name=:name
+list=select * from t_person
+listByGender=select * from t_person where gender=:gender
+search=select * from t_person where name like concat(:namePrefix,'%')
+----
+支持properties和xml格式, 加载顺序如下, 后面的覆盖前面的
+
+. PersonRepository.properties
+. PersonRepository.ORACLE.properties 可以根据数据库类型覆盖默认的, 数据库类型全部是大写
+. PersonRepository.xml
+. PersonRepository.ORACLE.xml
+
+xml配置
+[source,xml]
+.PersonRepository.ORACLE.xml
+----
+<?xml version="1.0" encoding="UTF-8" ?>
+<map>
+	<entry key="createTable">
+	create table t_person
+	(name varchar2(50) primary key, gender varchar2(10),
+	 f_dob date, age number(3), amount number(19,2))
+	</entry>
+</map>
+----
