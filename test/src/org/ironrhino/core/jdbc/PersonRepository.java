@@ -2,15 +2,17 @@ package org.ironrhino.core.jdbc;
 
 import java.util.List;
 
-import org.ironrhino.core.jdbc.JdbcRepository;
+import javax.persistence.EnumType;
+
+import org.ironrhino.common.model.Gender;
 import org.springframework.transaction.annotation.Transactional;
 
 @JdbcRepository
 public interface PersonRepository {
-	
+
 	@Transactional
 	void createTable();
-	
+
 	@Transactional
 	void dropTable();
 
@@ -25,6 +27,9 @@ public interface PersonRepository {
 
 	@Transactional(readOnly = true)
 	List<Person> list();
+
+	@Transactional(readOnly = true)
+	List<Person> listByGender(@Enumerated(EnumType.STRING) Gender gender);
 
 	@Transactional(readOnly = true)
 	List<Person> search(String namePrefix);

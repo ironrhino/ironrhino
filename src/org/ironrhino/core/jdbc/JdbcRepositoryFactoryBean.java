@@ -2,6 +2,7 @@ package org.ironrhino.core.jdbc;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.EnumType;
 import javax.sql.DataSource;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -112,8 +114,25 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			if (names == null)
 				throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
 			paramMap = new HashMap<>();
-			for (int i = 0; i < names.length; i++)
-				paramMap.put(names[i], arguments[i]);
+			for (int i = 0; i < names.length; i++) {
+				Object arg = arguments[i];
+				if (arg instanceof Enum) {
+					Enum<?> en = (Enum<?>) arg;
+					Annotation[] paramAnnotations = method.getParameterAnnotations()[i];
+					for (Annotation ann : paramAnnotations) {
+						if (ann instanceof Enumerated) {
+							arg = (((Enumerated) ann).value() == EnumType.ORDINAL) ? en.ordinal() : en.name();
+							break;
+						}
+						if (ann instanceof javax.persistence.Enumerated) {
+							arg = (((javax.persistence.Enumerated) ann).value() == EnumType.ORDINAL) ? en.ordinal()
+									: en.name();
+							break;
+						}
+					}
+				}
+				paramMap.put(names[i], arg);
+			}
 		} else {
 			paramMap = Collections.emptyMap();
 		}

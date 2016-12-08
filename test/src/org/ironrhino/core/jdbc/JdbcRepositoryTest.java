@@ -36,6 +36,9 @@ public class JdbcRepositoryTest {
 		List<Person> all = personRepository.list();
 		assertEquals(1, all.size());
 		assertEquals(p, all.get(0));
+		List<Person> females = personRepository.listByGender(Gender.FEMALE);
+		assertEquals(1, females.size());
+		assertEquals(p, females.get(0));
 		List<Person> result = personRepository.search("te");
 		assertEquals(1, result.size());
 		assertEquals(p, result.get(0));
