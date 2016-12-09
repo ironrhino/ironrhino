@@ -6,8 +6,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +32,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -135,12 +139,32 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		Method method = methodInvocation.getMethod();
 		String methodName = method.getName();
 		String sql = sqls.get(methodName);
+		if (StringUtils.isBlank(sql)) {
+			Sql anno = method.getAnnotation(Sql.class);
+			if (anno != null)
+				sql = anno.value();
+		}
 		if (StringUtils.isBlank(sql))
 			throw new RuntimeException(
 					"No sql found for method: " + jdbcRepositoryClass.getName() + "." + methodName + "()");
 		SqlVerb sqlVerb = SqlVerb.parseBySql(sql);
+		if (sqlVerb == null) {
+			Transactional transactional = method.getAnnotation(Transactional.class);
+			if (transactional == null)
+				transactional = method.getDeclaringClass().getAnnotation(Transactional.class);
+			if (transactional != null && transactional.readOnly()) {
+				sqlVerb = SqlVerb.SELECT;
+			}
+			if (sqlVerb == null) {
+				if (methodName.startsWith("get") || methodName.startsWith("load") || methodName.startsWith("query")
+						|| methodName.startsWith("find") || methodName.startsWith("search")
+						|| methodName.startsWith("list") || methodName.startsWith("count"))
+					sqlVerb = SqlVerb.SELECT;
+			}
+		}
 		if (sqlVerb == null)
 			throw new IllegalArgumentException("Invalid sql: " + sql);
+
 		Object[] arguments = methodInvocation.getArguments();
 		Map<String, Object> paramMap;
 		if (arguments.length > 0) {
@@ -175,19 +199,29 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		case SELECT:
 			if (returnType instanceof Class) {
 				Class<?> clz = (Class<?>) returnType;
-				List<?> result = namedParameterJdbcTemplate.query(sql, new NestedPathMapSqlParameterSource(paramMap),
-						new EntityBeanPropertyRowMapper<>(clz));
-				if (result.size() > 1)
-					throw new RuntimeException("Incorrect result size: expected 1, actual " + result.size());
-				return result.isEmpty() ? null : result.get(0);
+				if (isScalar(clz)) {
+					return namedParameterJdbcTemplate.queryForObject(sql, new NestedPathMapSqlParameterSource(paramMap),
+							clz);
+				} else {
+					List<?> result = namedParameterJdbcTemplate.query(sql,
+							new NestedPathMapSqlParameterSource(paramMap), new EntityBeanPropertyRowMapper<>(clz));
+					if (result.size() > 1)
+						throw new RuntimeException("Incorrect result size: expected 1, actual " + result.size());
+					return result.isEmpty() ? null : result.get(0);
+				}
 			} else if (returnType instanceof ParameterizedType) {
 				ParameterizedType pt = (ParameterizedType) returnType;
 				if (pt.getRawType() == List.class || pt.getRawType() == Collection.class) {
 					Type type = pt.getActualTypeArguments()[0];
 					if (type instanceof Class) {
 						Class<?> clz = (Class<?>) type;
-						return namedParameterJdbcTemplate.query(sql, new NestedPathMapSqlParameterSource(paramMap),
-								new EntityBeanPropertyRowMapper<>(clz));
+						if (isScalar(clz)) {
+							return namedParameterJdbcTemplate.queryForList(sql,
+									new NestedPathMapSqlParameterSource(paramMap), clz);
+						} else {
+							return namedParameterJdbcTemplate.query(sql, new NestedPathMapSqlParameterSource(paramMap),
+									new EntityBeanPropertyRowMapper<>(clz));
+						}
 					}
 				}
 			}
@@ -203,6 +237,32 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			}
 		}
 
+	}
+
+	private static boolean isScalar(Class<?> type) {
+		if ((Boolean.TYPE == type) || (Boolean.class == type))
+			return true;
+		if ((Byte.TYPE == type) || (Byte.class == type))
+			return true;
+		if ((Short.TYPE == type) || (Short.class == type))
+			return true;
+		if ((Integer.TYPE == type) || (Integer.class == type))
+			return true;
+		if ((Long.TYPE == type) || (Long.class == type))
+			return true;
+		if ((Float.TYPE == type) || (Float.class == type))
+			return true;
+		if ((Double.TYPE == type) || (Double.class == type) || (Number.class == type))
+			return true;
+		if (BigDecimal.class == type)
+			return true;
+		if (java.sql.Date.class == type)
+			return true;
+		if (Time.class == type)
+			return true;
+		if ((Timestamp.class == type) || (java.util.Date.class == type))
+			return true;
+		return false;
 	}
 
 }

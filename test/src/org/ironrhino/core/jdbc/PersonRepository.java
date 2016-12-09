@@ -34,4 +34,20 @@ public interface PersonRepository {
 	@Transactional(readOnly = true)
 	List<Person> search(String namePrefix);
 
+	@Transactional(readOnly = true)
+	@Sql("select count(*) from t_person")
+	long count();
+
+	@Transactional(readOnly = true)
+	@Sql("select count(*) from t_person where name like concat(:namePrefix,'%')")
+	int countByNamePrefix(String namePrefix);
+
+	@Transactional(readOnly = true)
+	@Sql("select name from t_person")
+	List<String> listNames();
+
+	@Transactional(readOnly = true)
+	@Sql("select age from t_person")
+	List<Integer> listAges();
+
 }
