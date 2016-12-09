@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.util.DateUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +24,18 @@ public class JdbcRepositoryTest {
 	@Autowired
 	private PersonRepository personRepository;
 
+	@Before
+	public void setup() {
+		personRepository.createTable();
+	}
+
+	@After
+	public void cleanup() {
+		personRepository.dropTable();
+	}
+
 	@Test
 	public void test() throws Exception {
-		personRepository.createTable();
 		Person p = new Person();
 		p.setName("test");
 		p.setDob(DateUtils.parseDate10("2000-12-12"));
@@ -51,12 +62,10 @@ public class JdbcRepositoryTest {
 		assertEquals(1, rows);
 		all = personRepository.list();
 		assertTrue(all.isEmpty());
-		personRepository.dropTable();
 	}
 
 	@Test
 	public void testInCondition() throws Exception {
-		personRepository.createTable();
 		Person p = new Person();
 		p.setName("test1");
 		p.setDob(DateUtils.parseDate10("2000-12-12"));
@@ -77,6 +86,27 @@ public class JdbcRepositoryTest {
 		assertEquals(1, personRepository.getByGenders(EnumSet.of(Gender.FEMALE)).size());
 		assertEquals(2, personRepository.getByGenders(EnumSet.of(Gender.MALE)).size());
 		assertEquals(3, personRepository.getByGenders(EnumSet.of(Gender.FEMALE, Gender.MALE)).size());
+	}
+
+	@Test
+	public void testConditionalSql() throws Exception {
+		Person p = new Person();
+		p.setName("test1");
+		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setAge(11);
+		p.setGender(Gender.FEMALE);
+		p.setAmount(new BigDecimal(12));
+		personRepository.save(p);
+		p.setName("test2");
+		p.setGender(Gender.MALE);
+		personRepository.save(p);
+		p.setName("test3");
+		personRepository.save(p);
+		assertEquals(3, personRepository.searchByNameOrGender(null, null).size());
+		assertEquals(1, personRepository.searchByNameOrGender("test1", null).size());
+		assertEquals(1, personRepository.searchByNameOrGender("test1", Gender.FEMALE).size());
+		assertEquals(0, personRepository.searchByNameOrGender("test1", Gender.MALE).size());
+		assertEquals(2, personRepository.searchByNameOrGender(null, Gender.MALE).size());
 	}
 
 }

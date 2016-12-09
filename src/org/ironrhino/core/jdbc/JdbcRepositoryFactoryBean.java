@@ -13,7 +13,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +27,12 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.w3c.dom.Element;
@@ -168,14 +167,15 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			throw new IllegalArgumentException("Invalid sql: " + sql);
 
 		Object[] arguments = methodInvocation.getArguments();
-		Map<String, Object> paramMap;
+		NestedPathMapSqlParameterSource sqlParameterSource = new NestedPathMapSqlParameterSource();
+		Map<String, Object> context = new HashMap<>();
 		if (arguments.length > 0) {
 			String[] names = ReflectionUtils.getParameterNames(methodInvocation.getMethod());
 			if (names == null)
 				throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
-			paramMap = new HashMap<>();
 			for (int i = 0; i < names.length; i++) {
 				Object arg = arguments[i];
+				context.put(names[i], arg);
 				if (arg != null) {
 					if (arg.getClass().isArray()) {
 						Object[] objects = (Object[]) arg;
@@ -203,12 +203,12 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 						arg = convertEnum(arg, methodInvocation.getMethod().getParameterAnnotations()[i]);
 					}
 				}
-				paramMap.put(names[i], arg);
+				sqlParameterSource.addValue(names[i], arg);
 			}
-		} else {
-			paramMap = Collections.emptyMap();
 		}
-		SqlParameterSource sqlParameterSource = new NestedPathMapSqlParameterSource(paramMap);
+		if (!context.isEmpty() && sql.indexOf('@') > -1)
+			sql = ExpressionUtils.evalString(sql, context);
+
 		Type returnType = method.getGenericReturnType();
 		switch (sqlVerb) {
 		case SELECT:

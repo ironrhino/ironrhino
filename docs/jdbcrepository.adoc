@@ -72,6 +72,10 @@ public interface PersonRepository {
 	@Transactional(readOnly = true)
 	@Sql("select * from t_person where name in (:names)") //数组和集合类自动展开
 	List<Person> getByNames(String[] names);
+	
+	@Transactional(readOnly = true)
+	@Sql("select * from t_person @if{name!=null||gender!=null} where 1=1 @if{name!=null} and name=:name @end{} @if{gender!=null} and gender=:gender @end{} @end{}") //动态sql, 使用mvel2的语法
+	List<Person> searchByNameOrGender(String name, @Enumerated(EnumType.STRING) Gender gender);
 
 }
 

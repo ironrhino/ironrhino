@@ -56,6 +56,8 @@ public class ExpressionUtilsTest {
 		assertEquals("2412", result);
 		result = ExpressionUtils.evalString("${null}", context);
 		assertNull(result);
+		result = ExpressionUtils.evalString("iam@if{integer > 10}large@else{}small@end{}", context);
+		assertEquals("iamlarge", result);
 	}
 
 	@Test
