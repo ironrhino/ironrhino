@@ -23,9 +23,11 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 	if (MODERN_BROWSER)
 		$.ajax = function(options) {
 			options.url = UrlUtils.absolutize(options.url);
-			options.xhrFields = {
-				withCredentials : true
-			};
+			if (!UrlUtils.isSameDomain(options.url)
+					&& UrlUtils.isSameOrigin(options.url))
+				options.xhrFields = {
+					withCredentials : true
+				};
 			return $ajax(options);
 		}
 
@@ -142,16 +144,6 @@ UrlUtils = {
 		var arrb = bd.split('.');
 		return (arra[arra.length - 1] == arrb[arrb.length - 1] && arra[arra.length
 				- 2] == arrb[arrb.length - 2]);
-	},
-	makeSameOrigin : function(url, referrer) {
-		referrer = referrer || document.location.href;
-		if (!UrlUtils.isSameOrigin(url, referrer))
-			return referrer.substring(0, referrer.indexOf('/', referrer
-									.indexOf('://')
-									+ 3))
-					+ CONTEXT_PATH + '/webproxy/' + url;
-		else
-			return url;
 	},
 	isAbsolute : function(a) {
 		if (!a)
