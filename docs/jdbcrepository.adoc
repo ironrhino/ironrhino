@@ -3,7 +3,7 @@
 == 概述
 某些情况下我们不想用JPA/Hibernate而是纯Jdbc方式访问数据库, Spring提供了非常方便的JdbcTemplate和NamedParameterJdbcTemplate,
 Ironrhino在Spring Jdbc基础之上提供了基于注解方式自动向容器注册Repository,
-最大程度上减少样本代码, 只需要提供接口类和模型类再加上对应的sql映射文件.
+最大程度上减少样本代码, 只需要提供接口类和模型类, 和对应的sql映射文件(如果使用 `@Sql` 标注则不需要).
 
 
 == 示例
@@ -55,6 +55,7 @@ public interface PersonRepository {
 	Person get(String name);
 
 	@Transactional(readOnly = true)
+	@Sql("select * from t_person") //如果映射文件找不到则使用这里的sql
 	List<Person> list();
 
 	@Transactional(readOnly = true)
@@ -63,6 +64,14 @@ public interface PersonRepository {
 
 	@Transactional(readOnly = true)
 	List<Person> search(String namePrefix);
+
+	@Transactional(readOnly = true)
+	@Sql("select count(*) from t_person")
+	long count();	
+	
+	@Transactional(readOnly = true)
+	@Sql("select * from t_person where name in (:names)") //数组和集合类自动展开
+	List<Person> getByNames(String[] names);
 
 }
 
@@ -80,14 +89,14 @@ list=select * from t_person
 listByGender=select * from t_person where gender=:gender
 search=select * from t_person where name like concat(:namePrefix,'%')
 ----
-支持properties和xml格式, 加载顺序如下, 后面的覆盖前面的
+支持properties和xml格式, 加载顺序如下, 后面的覆盖前面的, 如果根据方法名都没找到对应的sql, 会读取方法上的 `@Sql` 注解的值
 
 . PersonRepository.properties
 . PersonRepository.ORACLE.properties 可以根据数据库类型覆盖默认的, 数据库类型全部是大写
 . PersonRepository.xml
 . PersonRepository.ORACLE.xml
 
-xml配置
+xml配置样例
 [source,xml]
 .PersonRepository.ORACLE.xml
 ----
