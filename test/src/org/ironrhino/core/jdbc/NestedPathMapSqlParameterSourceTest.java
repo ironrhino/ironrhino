@@ -6,7 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
@@ -33,8 +35,8 @@ public class NestedPathMapSqlParameterSourceTest {
 		public Person getSelf() {
 			return self;
 		}
-		
-		public List<Person> getSilbings(){
+
+		public List<Person> getSilbings() {
 			return Collections.singletonList(this);
 		}
 
@@ -79,10 +81,13 @@ public class NestedPathMapSqlParameterSourceTest {
 		p.setAge(12);
 		p.setGrade1(Grade.A);
 		p.setGrade2(Grade.B);
+		Map<String, Person> map = new HashMap<>();
+		map.put("person", p);
 		NestedPathMapSqlParameterSource source = new NestedPathMapSqlParameterSource();
 		source.addValue("p", p);
 		source.addValue("array", new String[] { "A", "B" });
 		source.addValue("list", Arrays.asList(p));
+		source.addValue("map", map);
 		assertTrue(source.hasValue("p"));
 		assertTrue(source.hasValue("p.name"));
 		assertTrue(source.hasValue("p.age"));
@@ -95,11 +100,13 @@ public class NestedPathMapSqlParameterSourceTest {
 		assertEquals(0, source.getValue("p.grade1"));
 		assertEquals("B", source.getValue("p.grade2"));
 		assertEquals("B", source.getValue("p.g2"));
+		assertTrue(source.hasValue("array"));
 		assertTrue(source.hasValue("array[0]"));
 		assertTrue(source.hasValue("array[1]"));
 		assertEquals("A", source.getValue("array[0]"));
 		assertEquals("B", source.getValue("array[1]"));
 		assertFalse(source.hasValue("array[2]"));
+		assertTrue(source.hasValue("list"));
 		assertTrue(source.hasValue("list[0]"));
 		assertFalse(source.hasValue("list[1]"));
 		assertEquals(p, source.getValue("list[0]"));
@@ -108,7 +115,13 @@ public class NestedPathMapSqlParameterSourceTest {
 		assertEquals("name", source.getValue("list[0].self.name"));
 		assertTrue(source.hasValue("list[0].self.silbings[0].name"));
 		assertEquals("name", source.getValue("list[0].self.silbings[0].name"));
-		
+		assertTrue(source.hasValue("map"));
+		assertTrue(source.hasValue("map['person']"));
+		assertTrue(source.hasValue("map[\"person\"]"));
+		assertFalse(source.hasValue("map['person2']"));
+		assertTrue(source.hasValue("map['person'].self.silbings[0].name"));
+		assertEquals("name", source.getValue("map['person'].self.silbings[0].name"));
+
 	}
 
 }

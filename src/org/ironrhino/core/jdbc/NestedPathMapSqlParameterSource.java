@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
@@ -27,27 +28,39 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			return false;
 		if (index1 > 0 && (index3 < 0 || index3 == index2 + 1)) {
 			String top = paramName.substring(0, index1);
-			int sub = Integer.valueOf(paramName.substring(index1 + 1, index2));
-			if (sub < 0)
-				return false;
+			String sub = paramName.substring(index1 + 1, index2);
 			Object topValue = super.hasValue(top) ? topValue = super.getValue(top) : null;
 			if (topValue.getClass().isArray()) {
-				Object[] array = (Object[]) topValue;
-				if (sub >= array.length)
+				if (!StringUtils.isNumeric(sub))
 					return false;
-				topValue = array[sub];
+				int index = Integer.valueOf(sub);
+				Object[] array = (Object[]) topValue;
+				if (index < 0 || index >= array.length)
+					return false;
+				topValue = array[index];
 			} else if (topValue instanceof Collection) {
+				if (!StringUtils.isNumeric(sub))
+					return false;
+				int index = Integer.valueOf(sub);
 				Collection<?> collection = (Collection<?>) topValue;
-				if (sub >= collection.size())
+				if (index < 0 || index >= collection.size())
 					return false;
 				Iterator<?> it = collection.iterator();
 				int i = 0;
 				while (it.hasNext()) {
 					topValue = it.next();
-					if (i == sub)
+					if (i == index)
 						break;
 					i++;
 				}
+			} else if (topValue instanceof Map) {
+				if (!(sub.startsWith("'") && sub.endsWith("'") || sub.startsWith("\"") && sub.endsWith("\"")))
+					return false;
+				sub = sub.substring(1, sub.length() - 1);
+				Map<?, ?> map = ((Map<?, ?>) topValue);
+				if (!map.containsKey(sub))
+					return false;
+				topValue = map.get(sub);
 			} else {
 				return false;
 			}
@@ -81,29 +94,38 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			throw new IllegalArgumentException("Invalid param name: " + paramName);
 		if (index1 > 0 && (index3 < 0 || index3 == index2 + 1)) {
 			String top = paramName.substring(0, index1);
-			int sub = Integer.valueOf(paramName.substring(index1 + 1, index2));
-			if (sub < 0)
-				throw new IllegalArgumentException("Invalid index: " + sub);
+			String sub = paramName.substring(index1 + 1, index2);
 			Object topValue = super.hasValue(top) ? topValue = super.getValue(top) : null;
 			if (topValue == null)
 				return null;
 			if (topValue.getClass().isArray()) {
+				if (!StringUtils.isNumeric(sub))
+					return false;
+				int index = Integer.valueOf(sub);
 				Object[] array = (Object[]) topValue;
-				if (sub >= array.length)
+				if (index < 0 || index >= array.length)
 					throw new IllegalArgumentException("Invalid index: " + sub);
-				topValue = array[sub];
+				topValue = array[index];
 			} else if (topValue instanceof Collection) {
+				if (!StringUtils.isNumeric(sub))
+					return false;
+				int index = Integer.valueOf(sub);
 				Collection<?> collection = (Collection<?>) topValue;
-				if (sub >= collection.size())
+				if (index < 0 || index >= collection.size())
 					throw new IllegalArgumentException("Invalid index: " + sub);
 				Iterator<?> it = collection.iterator();
 				int i = 0;
 				while (it.hasNext()) {
 					topValue = it.next();
-					if (i == sub)
+					if (i == index)
 						break;
 					i++;
 				}
+			} else if (topValue instanceof Map) {
+				if (!(sub.startsWith("'") && sub.endsWith("'") || sub.startsWith("\"") && sub.endsWith("\"")))
+					throw new IllegalArgumentException("Invalid sub: " + sub);
+				sub = sub.substring(1, sub.length() - 1);
+				topValue = ((Map<?, ?>) topValue).get(sub);
 			} else {
 				throw new IllegalArgumentException("Not indexable: " + topValue);
 			}
