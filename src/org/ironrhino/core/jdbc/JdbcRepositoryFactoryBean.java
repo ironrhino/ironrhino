@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.w3c.dom.Element;
@@ -168,25 +170,37 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		Object[] arguments = methodInvocation.getArguments();
 		Map<String, Object> paramMap;
 		if (arguments.length > 0) {
-			String[] names = ReflectionUtils.getParameterNames(method);
+			String[] names = ReflectionUtils.getParameterNames(methodInvocation.getMethod());
 			if (names == null)
 				throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
 			paramMap = new HashMap<>();
 			for (int i = 0; i < names.length; i++) {
 				Object arg = arguments[i];
-				if (arg instanceof Enum) {
-					Enum<?> en = (Enum<?>) arg;
-					Annotation[] paramAnnotations = method.getParameterAnnotations()[i];
-					for (Annotation ann : paramAnnotations) {
-						if (ann instanceof Enumerated) {
-							arg = (((Enumerated) ann).value() == EnumType.ORDINAL) ? en.ordinal() : en.name();
-							break;
+				if (arg != null) {
+					if (arg.getClass().isArray()) {
+						Object[] objects = (Object[]) arg;
+						sql = expandSql(sql, names[i], objects.length);
+						if (objects.length > 0 && Enum.class.isAssignableFrom(arg.getClass().getComponentType())) {
+							for (int j = 0; j < objects.length; j++)
+								objects[j] = convertEnum(objects[j],
+										methodInvocation.getMethod().getParameterAnnotations()[i]);
+							arg = objects;
+
 						}
-						if (ann instanceof javax.persistence.Enumerated) {
-							arg = (((javax.persistence.Enumerated) ann).value() == EnumType.ORDINAL) ? en.ordinal()
-									: en.name();
-							break;
+					}
+					if (arg instanceof Collection) {
+						Collection<?> collection = (Collection<?>) arg;
+						sql = expandSql(sql, names[i], collection.size());
+						if (collection.size() > 0 && collection.iterator().next() instanceof Enum) {
+							List<Object> objects = new ArrayList<>();
+							for (Object obj : collection)
+								objects.add(
+										convertEnum(obj, methodInvocation.getMethod().getParameterAnnotations()[i]));
+							arg = objects;
 						}
+					}
+					if (arg instanceof Enum) {
+						arg = convertEnum(arg, methodInvocation.getMethod().getParameterAnnotations()[i]);
 					}
 				}
 				paramMap.put(names[i], arg);
@@ -194,17 +208,17 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		} else {
 			paramMap = Collections.emptyMap();
 		}
+		SqlParameterSource sqlParameterSource = new NestedPathMapSqlParameterSource(paramMap);
 		Type returnType = method.getGenericReturnType();
 		switch (sqlVerb) {
 		case SELECT:
 			if (returnType instanceof Class) {
 				Class<?> clz = (Class<?>) returnType;
 				if (isScalar(clz)) {
-					return namedParameterJdbcTemplate.queryForObject(sql, new NestedPathMapSqlParameterSource(paramMap),
-							clz);
+					return namedParameterJdbcTemplate.queryForObject(sql, sqlParameterSource, clz);
 				} else {
-					List<?> result = namedParameterJdbcTemplate.query(sql,
-							new NestedPathMapSqlParameterSource(paramMap), new EntityBeanPropertyRowMapper<>(clz));
+					List<?> result = namedParameterJdbcTemplate.query(sql, sqlParameterSource,
+							new EntityBeanPropertyRowMapper<>(clz));
 					if (result.size() > 1)
 						throw new RuntimeException("Incorrect result size: expected 1, actual " + result.size());
 					return result.isEmpty() ? null : result.get(0);
@@ -216,10 +230,9 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 					if (type instanceof Class) {
 						Class<?> clz = (Class<?>) type;
 						if (isScalar(clz)) {
-							return namedParameterJdbcTemplate.queryForList(sql,
-									new NestedPathMapSqlParameterSource(paramMap), clz);
+							return namedParameterJdbcTemplate.queryForList(sql, sqlParameterSource, clz);
 						} else {
-							return namedParameterJdbcTemplate.query(sql, new NestedPathMapSqlParameterSource(paramMap),
+							return namedParameterJdbcTemplate.query(sql, sqlParameterSource,
 									new EntityBeanPropertyRowMapper<>(clz));
 						}
 					}
@@ -227,7 +240,7 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			}
 			throw new UnsupportedOperationException("Unsupported return type: " + returnType.getTypeName());
 		default:
-			int rows = namedParameterJdbcTemplate.update(sql, new NestedPathMapSqlParameterSource(paramMap));
+			int rows = namedParameterJdbcTemplate.update(sql, sqlParameterSource);
 			if (returnType == void.class) {
 				return null;
 			} else if (returnType == int.class) {
@@ -237,6 +250,36 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			}
 		}
 
+	}
+
+	private static String expandSql(String sql, String paramName, int size) {
+		if (size < 1 || size > 100)
+			throw new IllegalArgumentException("invalid size: " + size);
+		StringBuilder sb = new StringBuilder();
+		sb.append('(');
+		for (int i = 0; i < size; i++) {
+			sb.append(":").append(paramName).append('[').append(i).append(']');
+			if (i != size - 1)
+				sb.append(',');
+		}
+		sb.append(')');
+		String regex = "\\(\\s*:" + paramName + "\\s*\\)";
+		return sql.replaceAll(regex, sb.toString());
+	}
+
+	private static Object convertEnum(Object arg, Annotation[] paramAnnotations) {
+		Enum<?> en = (Enum<?>) arg;
+		for (Annotation ann : paramAnnotations) {
+			if (ann instanceof Enumerated) {
+				arg = (((Enumerated) ann).value() == EnumType.ORDINAL) ? en.ordinal() : en.name();
+				break;
+			}
+			if (ann instanceof javax.persistence.Enumerated) {
+				arg = (((javax.persistence.Enumerated) ann).value() == EnumType.ORDINAL) ? en.ordinal() : en.name();
+				break;
+			}
+		}
+		return arg;
 	}
 
 	private static boolean isScalar(Class<?> type) {

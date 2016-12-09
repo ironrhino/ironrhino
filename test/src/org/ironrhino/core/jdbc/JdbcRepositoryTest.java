@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.ironrhino.common.model.Gender;
@@ -51,6 +52,31 @@ public class JdbcRepositoryTest {
 		all = personRepository.list();
 		assertTrue(all.isEmpty());
 		personRepository.dropTable();
+	}
+
+	@Test
+	public void testInCondition() throws Exception {
+		personRepository.createTable();
+		Person p = new Person();
+		p.setName("test1");
+		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setAge(11);
+		p.setGender(Gender.FEMALE);
+		p.setAmount(new BigDecimal(12));
+		personRepository.save(p);
+		p.setName("test2");
+		p.setGender(Gender.MALE);
+		personRepository.save(p);
+		p.setName("test3");
+		personRepository.save(p);
+		assertEquals(0, personRepository.getByNames(new String[] { "test" }).size());
+		assertEquals(1, personRepository.getByNames(new String[] { "test1" }).size());
+		assertEquals(2, personRepository.getByNames(new String[] { "test1", "test2" }).size());
+		assertEquals(2, personRepository.getByNames(new String[] { "test1", "test2", "test" }).size());
+		assertEquals(3, personRepository.getByNames(new String[] { "test1", "test2", "test3" }).size());
+		assertEquals(1, personRepository.getByGenders(EnumSet.of(Gender.FEMALE)).size());
+		assertEquals(2, personRepository.getByGenders(EnumSet.of(Gender.MALE)).size());
+		assertEquals(3, personRepository.getByGenders(EnumSet.of(Gender.FEMALE, Gender.MALE)).size());
 	}
 
 }

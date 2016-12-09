@@ -1,7 +1,12 @@
 package org.ironrhino.core.jdbc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
@@ -19,10 +24,19 @@ public class NestedPathMapSqlParameterSourceTest {
 		private String name;
 		private int age;
 		private Grade grade1;
+		private Person self = this;
 
 		@Column(name = "g2")
 		@Enumerated(EnumType.STRING)
 		private Grade grade2;
+
+		public Person getSelf() {
+			return self;
+		}
+		
+		public List<Person> getSilbings(){
+			return Collections.singletonList(this);
+		}
 
 		public String getName() {
 			return name;
@@ -67,6 +81,8 @@ public class NestedPathMapSqlParameterSourceTest {
 		p.setGrade2(Grade.B);
 		NestedPathMapSqlParameterSource source = new NestedPathMapSqlParameterSource();
 		source.addValue("p", p);
+		source.addValue("array", new String[] { "A", "B" });
+		source.addValue("list", Arrays.asList(p));
 		assertTrue(source.hasValue("p"));
 		assertTrue(source.hasValue("p.name"));
 		assertTrue(source.hasValue("p.age"));
@@ -79,6 +95,20 @@ public class NestedPathMapSqlParameterSourceTest {
 		assertEquals(0, source.getValue("p.grade1"));
 		assertEquals("B", source.getValue("p.grade2"));
 		assertEquals("B", source.getValue("p.g2"));
+		assertTrue(source.hasValue("array[0]"));
+		assertTrue(source.hasValue("array[1]"));
+		assertEquals("A", source.getValue("array[0]"));
+		assertEquals("B", source.getValue("array[1]"));
+		assertFalse(source.hasValue("array[2]"));
+		assertTrue(source.hasValue("list[0]"));
+		assertFalse(source.hasValue("list[1]"));
+		assertEquals(p, source.getValue("list[0]"));
+		assertEquals("name", source.getValue("list[0].name"));
+		assertTrue(source.hasValue("list[0].self.name"));
+		assertEquals("name", source.getValue("list[0].self.name"));
+		assertTrue(source.hasValue("list[0].self.silbings[0].name"));
+		assertEquals("name", source.getValue("list[0].self.silbings[0].name"));
+		
 	}
 
 }
