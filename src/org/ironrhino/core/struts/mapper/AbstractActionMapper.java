@@ -1,10 +1,7 @@
 package org.ironrhino.core.struts.mapper;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.struts2.dispatcher.mapper.ActionMapper;
 import org.apache.struts2.dispatcher.mapper.ActionMapping;
-import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,13 +10,6 @@ public abstract class AbstractActionMapper implements ActionMapper {
 	public static final String ID = "id";
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-
-	public static String getUri(HttpServletRequest request) {
-		String uri = RequestUtils.getRequestUri(request);
-		if (uri.endsWith("/"))
-			uri += "index";
-		return uri;
-	}
 
 	@Override
 	public ActionMapping getMappingFromActionName(String actionName) {

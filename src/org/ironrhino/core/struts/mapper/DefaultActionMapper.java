@@ -25,6 +25,7 @@ import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.struts.result.AutoConfigResult;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.core.util.RequestUtils;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.config.Configuration;
@@ -34,6 +35,10 @@ import com.opensymphony.xwork2.config.entities.PackageConfig;
 import com.opensymphony.xwork2.inject.Inject;
 
 public class DefaultActionMapper extends AbstractActionMapper {
+
+	public final static String DEFAULT_ACTION_NAME = "index";
+
+	public final static String REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION = "IMPLICIT_DEFAULT_ACTION";
 
 	private Collection<ActionMappingMatcher> actionMappingMatchers;
 
@@ -69,7 +74,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 	@Override
 	public ActionMapping getMapping(HttpServletRequest request, ConfigurationManager configManager) {
 		ActionMapping mapping = null;
-		String uri = getUri(request);
+		String uri = RequestUtils.getRequestUri(request);
 		Configuration config = configManager.getConfiguration();
 
 		String namespace = null;
@@ -83,22 +88,32 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		for (Object var : config.getPackageConfigs().values()) {
 			PackageConfig pc = (PackageConfig) var;
 			String ns = pc.getNamespace();
-			if (!uri.equals(ns) && uri.startsWith(ns)) {
+			if (uri.startsWith(ns)) {
 				if (namespace == null || (namespace != null && ns.length() >= namespace.length())) {
 					String temp = uri.substring(ns.length());
-					if ("".equals(temp) || "/".equals(temp))
-						continue;
-					String[] array = StringUtils.split(temp, "/", 2);
-					name = org.ironrhino.core.util.StringUtils.toCamelCase(array[0]);
-					if (pc.getActionConfigs().containsKey(name)) {
-						namespace = ns;
-						actionConfig = pc.getActionConfigs().get(name);
+					if ("".equals(temp) || "/".equals(temp)) {
+						if (uri.endsWith("/")) {
+							name = DEFAULT_ACTION_NAME;
+							namespace = ns;
+							if (pc.getActionConfigs().containsKey(name))
+								actionConfig = pc.getActionConfigs().get(name);
+							request.setAttribute(REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION, true);
+						} else {
+							continue;
+						}
+					} else {
+						String[] array = StringUtils.split(temp, "/", 2);
+						name = org.ironrhino.core.util.StringUtils.toCamelCase(array[0]);
+						if (pc.getActionConfigs().containsKey(name)) {
+							namespace = ns;
+							actionConfig = pc.getActionConfigs().get(name);
+						}
 					}
 				}
 			}
 		}
 
-		if (namespace == null) {
+		if (actionConfig == null) {
 			if (actionMappingMatchers == null)
 				actionMappingMatchers = WebApplicationContextUtils
 						.getWebApplicationContext(ServletActionContext.getServletContext())
@@ -109,8 +124,9 @@ public class DefaultActionMapper extends AbstractActionMapper {
 					return mapping;
 			}
 
-			String location = AutoConfigResult
-					.getTemplateLocation(org.ironrhino.core.util.StringUtils.toCamelCase(uri));
+			String location = AutoConfigResult.getTemplateLocation(org.ironrhino.core.util.StringUtils
+					.toCamelCase(request.getAttribute(REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION) != null
+							? uri + '/' + DEFAULT_ACTION_NAME : uri));
 			if (location != null) {
 				mapping = new ActionMapping();
 				mapping.setNamespace(DirectTemplateAction.NAMESPACE);
@@ -122,10 +138,11 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		}
 
 		String str = uri.substring(namespace.length());
-		String[] arr = StringUtils.split(str, "/", 2);
-		name = org.ironrhino.core.util.StringUtils.toCamelCase(arr[0]);
-		if (arr.length > 1)
-			methodAndUid = arr[1];
+		if (!str.equals("") && !str.equals("/")) {
+			String[] arr = StringUtils.split(str, "/", 2);
+			if (arr.length > 1)
+				methodAndUid = arr[1];
+		}
 
 		mapping = new ActionMapping();
 		mapping.setNamespace(namespace);
