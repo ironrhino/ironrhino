@@ -347,11 +347,23 @@ public class EntityClassHelper {
 						ManyToOne manyToOne = findAnnotation(readMethod, declaredField, ManyToOne.class);
 						if (manyToOne != null && !manyToOne.optional())
 							uci.setRequired(true);
-						if (uci.getType().equals(UiConfig.DEFAULT_TYPE))
-							uci.setType("listpick");
 						uci.setExcludeIfNotEdited(true);
-						if (StringUtils.isBlank(uci.getPickUrl())) {
-							uci.setPickUrl(getPickUrl(returnType));
+						if (BaseTreeableEntity.class.isAssignableFrom(returnType)) {
+							if (uci.getType().equals(UiConfig.DEFAULT_TYPE))
+								uci.setType("treeselect");
+							if (StringUtils.isBlank(uci.getPickUrl())) {
+								String url = AutoConfigPackageProvider.getEntityUrl(returnType);
+								StringBuilder sb = url != null ? new StringBuilder(url)
+										: new StringBuilder("/")
+												.append(StringUtils.uncapitalize(entityClass.getSimpleName()));
+								sb.append("/children");
+								uci.setPickUrl(sb.toString());
+							}
+						} else {
+							if (uci.getType().equals(UiConfig.DEFAULT_TYPE))
+								uci.setType("listpick");
+							if (StringUtils.isBlank(uci.getPickUrl()))
+								uci.setPickUrl(getPickUrl(returnType));
 						}
 						if (StringUtils.isBlank(uci.getListTemplate()) && !uci.isSuppressViewLink()) {
 							String url = AutoConfigPackageProvider.getEntityUrl(returnType);

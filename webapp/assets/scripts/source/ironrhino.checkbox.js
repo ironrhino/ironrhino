@@ -9,8 +9,8 @@
 					allchecked = false;
 					break;
 				}
-		$('input.checkall[type=checkbox]:not(.normal)', group).prop(
-				'checked', allchecked);
+		$('input.checkall[type=checkbox]:not(.normal)', group).prop('checked',
+				allchecked);
 	}
 
 	$.fn.checkbox = function() {
@@ -24,10 +24,13 @@
 			var group = $(this).closest('.checkboxgroup');
 			if (!group.length)
 				group = $(this).closest('form.richtable');
+			if (!group.length)
+				group = $(this).closest('div.controls');
 			if ($(this).hasClass('checkall')) {
 				var b = this.checked;
 				if (group.length)
-					$('input[type=checkbox]:not(.normal)', group).each(function() {
+					$('input[type=checkbox]:not(.normal)', group).each(
+							function() {
 								this.checked = b;
 								var tr = $(this).closest('tr');
 								if (tr.length) {
@@ -62,8 +65,10 @@
 												$(this).removeClass('selected');
 										});
 					}
-				} else {
-					var boxes = $('input[type=checkbox]:not(.checkall):not(.normal)', group);
+				} else if (group.length) {
+					var boxes = $(
+							'input[type=checkbox]:not(.checkall):not(.normal)',
+							group);
 					var start = -1, end = -1, checked = false;
 					for (var i = 0; i < boxes.length; i++) {
 						if ($(boxes[i]).hasClass('lastClicked')) {
@@ -79,16 +84,17 @@
 						end = start;
 						start = tmp;
 					}
-					for (var i = start; i <= end; i++) {
-						boxes[i].checked = checked;
-						tr = $(boxes[i]).closest('tr');
-						if (tr) {
-							if (boxes[i].checked)
-								tr.addClass('selected');
-							else
-								tr.removeClass('selected');
+					if (start >= 0 && end > start)
+						for (var i = start; i <= end; i++) {
+							boxes[i].checked = checked;
+							tr = $(boxes[i]).closest('tr');
+							if (tr) {
+								if (boxes[i].checked)
+									tr.addClass('selected');
+								else
+									tr.removeClass('selected');
+							}
 						}
-					}
 				}
 				$('input[type=checkbox]', group).removeClass('lastClicked');
 				$(this).addClass('lastClicked');

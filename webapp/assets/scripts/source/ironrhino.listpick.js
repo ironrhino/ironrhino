@@ -85,7 +85,6 @@
 		$(this).each(function() {
 			current = $(this);
 			var options = {
-				separator : ',',
 				id : '.listpick-id',
 				name : '.listpick-name',
 				idindex : 0,
@@ -214,7 +213,8 @@
 
 					} else {
 						$(target).on('click', 'button.pick', function() {
-							var checkbox = $('tbody :checked', target);
+							var checkbox = $('table.richtable tbody :checked',
+									target);
 							var ids = [], names = [];
 							checkbox.each(function() {
 								var cell = $($(this).closest('tr')[0].cells[options.idindex]);
@@ -227,43 +227,35 @@
 								ids.push(id);
 								names.push(name);
 							});
-							var separator = options.separator;
 							if (options.name) {
+								var separator = ', ';
 								var nametarget = find(options.name, $(target)
 												.data('listpick'));
 								var name = names.join(separator);
 								nametarget.each(function() {
 									var t = $(this);
-									if (t.is(':input')) {
-										var _names = val(options.name,
-												$(target).data('listpick'))
-												|| '';
-										val(options.name, $(target)
-														.data('listpick'),
-												ArrayUtils.unique((_names
-														+ (_names
-																? separator
-																: '') + name)
-														.split(separator))
-														.join(separator));
-									} else {
-										var picked = t.data('picked') || '';
-										picked = ArrayUtils.unique(((picked
-												? picked + separator
-												: '') + name).split(separator))
-												.join(separator);
-										t.data('picked', picked);
-										val(options.name, $(target)
-														.data('listpick'),
-												picked);
+									var _names = val(options.name, $(target)
+													.data('listpick'))
+											|| '';
+									val(
+											options.name,
+											$(target).data('listpick'),
+											ArrayUtils
+													.unique((_names
+															+ (_names
+																	? separator
+																	: '') + name)
+															.split(separator))
+													.join(separator));
+									if (!t.is(':input')
+											&& !t.find('.remove').length)
 										$('<a class="remove" href="#">&times;</a>')
 												.appendTo(t)
 												.click(removeAction);
-									}
 								});
-
 							}
 							if (options.id) {
+								var separator = ',';
 								var idtarget = find(options.id, $(target)
 												.data('listpick'));
 								var id = ids.join(separator);

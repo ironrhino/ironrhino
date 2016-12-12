@@ -128,27 +128,71 @@
 				win.closest('.ui-dialog').css('z-index', 2500);
 				if (nametarget && nametarget.length)
 					options.value = val(options.name, current) || '';
-				if (options.type != 'treeview') {
-					options.click = function(treenode) {
-						doclick(current, treenode, options);
-					};
-					win.find('.tree').treearea(options);
-				} else {
+				if (options.multiple) {
 					var treeviewoptions = {
 						url : options.url,
-						click : function() {
-							var treenode = $(this).closest('li')
-									.data('treenode');
-							doclick(current, treenode, options);
-						},
 						collapsed : true,
+						template : '<input type="checkbox" class="custom" value="{{id}}"/> <span>{{name}}</span>',
 						placeholder : MessageBundle.get('ajax.loading'),
 						unique : true,
 						separator : options.separator,
-						value : options.value,
 						root : options.root
 					};
 					win.find('.tree').treeview(treeviewoptions);
+					$('<div style="text-align:center;"><button class="btn pick">'
+							+ MessageBundle.get('confirm') + '</button></div>')
+							.appendTo(win).click(function() {
+								var ids = [], names = [];
+								$('input:checked', win).each(function() {
+									ids.push(this.value);
+									names.push($(this).closest('li')
+											.children('span').text());
+								});
+								if (options.name) {
+									var separator = ', ';
+									var nametarget = find(options.name, current);
+									nametarget.each(function() {
+										var t = $(this);
+										val(options.name, current, names
+														.join(separator));
+										if (!t.is(':input')
+												&& !t.find('.remove').length)
+											$('<a class="remove" href="#">&times;</a>')
+													.appendTo(t)
+													.click(removeAction);
+									});
+								}
+								if (options.id) {
+									var separator = ',';
+									val(options.id, current, ids
+													.join(separator));
+								}
+								win.dialog('close');
+							});
+
+				} else {
+					if (options.type == 'treearea') {
+						options.click = function(treenode) {
+							doclick(current, treenode, options);
+						};
+						win.find('.tree').treearea(options);
+					} else {
+						var treeviewoptions = {
+							url : options.url,
+							click : function() {
+								var treenode = $(this).closest('li')
+										.data('treenode');
+								doclick(current, treenode, options);
+							},
+							collapsed : true,
+							placeholder : MessageBundle.get('ajax.loading'),
+							unique : true,
+							separator : options.separator,
+							value : options.value,
+							root : options.root
+						};
+						win.find('.tree').treeview(treeviewoptions);
+					}
 				}
 
 			};

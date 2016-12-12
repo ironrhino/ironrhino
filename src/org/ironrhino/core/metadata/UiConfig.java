@@ -87,6 +87,8 @@ public @interface UiConfig {
 
 	String pickUrl() default "";// for listpick treeselect
 
+	boolean pickMultiple() default false; //for listpick treeselect
+
 	String templateName() default ""; // for dictionary,schema
 
 	boolean excludedFromLike() default false;
