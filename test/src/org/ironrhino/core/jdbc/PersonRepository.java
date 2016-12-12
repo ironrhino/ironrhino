@@ -62,4 +62,7 @@ public interface PersonRepository {
 	@Transactional(readOnly = true)
 	List<Person> searchByNameOrGender(String name, @Enumerated(EnumType.STRING) Gender gender);
 
+	@Transactional(readOnly = true)
+	Person getWithShadow(String name);
+
 }

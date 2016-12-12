@@ -1,6 +1,7 @@
 package org.ironrhino.core.jdbc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -107,6 +108,24 @@ public class JdbcRepositoryTest {
 		assertEquals(1, personRepository.searchByNameOrGender("test1", Gender.FEMALE).size());
 		assertEquals(0, personRepository.searchByNameOrGender("test1", Gender.MALE).size());
 		assertEquals(2, personRepository.searchByNameOrGender(null, Gender.MALE).size());
+	}
+
+	@Test
+	public void testNestedProperty() throws Exception {
+		Person p = new Person();
+		p.setName("test");
+		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setAge(11);
+		p.setGender(Gender.FEMALE);
+		p.setAmount(new BigDecimal(12));
+		personRepository.save(p);
+		Person p2 = personRepository.getWithShadow(p.getName());
+		assertNotNull(p2.getShadow());
+		assertEquals(p2.getName(), p2.getShadow().getName());
+		assertEquals(p2.getGender(), p2.getShadow().getGender());
+		assertEquals(p2.getDob(), p2.getShadow().getDob());
+		assertEquals(p2.getAge(), p2.getShadow().getAge());
+		assertEquals(p2.getAmount(), p2.getShadow().getAmount());
 	}
 
 }

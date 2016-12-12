@@ -11,7 +11,7 @@ import javax.persistence.Enumerated;
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.util.DateUtils;
 
-public class Person implements Serializable {
+public class PersonShadow implements Serializable {
 
 	private static final long serialVersionUID = 7400168548407982903L;
 
@@ -26,8 +26,6 @@ public class Person implements Serializable {
 	private int age;
 
 	private BigDecimal amount;
-
-	private PersonShadow shadow;
 
 	public String getName() {
 		return name;
@@ -69,14 +67,6 @@ public class Person implements Serializable {
 		this.amount = amount;
 	}
 
-	public PersonShadow getShadow() {
-		return shadow;
-	}
-
-	public void setShadow(PersonShadow shadow) {
-		this.shadow = shadow;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -97,7 +87,7 @@ public class Person implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Person other = (Person) obj;
+		PersonShadow other = (PersonShadow) obj;
 		if (age != other.age)
 			return false;
 		if (amount == null) {
