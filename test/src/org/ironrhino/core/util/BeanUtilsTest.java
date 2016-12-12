@@ -401,7 +401,7 @@ public class BeanUtilsTest {
 	}
 
 	@Test
-	public void copyPropertiesIfNotNull() {
+	public void testCopyPropertiesIfNotNull() {
 		User user1 = new User();
 		user1.setId("test");
 		user1.setUsername("username");
@@ -415,7 +415,7 @@ public class BeanUtilsTest {
 	}
 
 	@Test
-	public void getPropertyDescriptor() {
+	public void testGetPropertyDescriptor() {
 		assertNull(BeanUtils.getPropertyDescriptor(User.class, "none"));
 		assertNull(BeanUtils.getPropertyDescriptor(User.class, "team.none"));
 		assertNotNull(BeanUtils.getPropertyDescriptor(User.class, "team"));
@@ -423,7 +423,7 @@ public class BeanUtilsTest {
 	}
 
 	@Test
-	public void setPropertyValue() {
+	public void testSetPropertyValue() {
 		User u = new User();
 		Team team = new Team();
 		team.setName("test");
@@ -434,6 +434,11 @@ public class BeanUtilsTest {
 		BeanUtils.setPropertyValue(u, "team.name", "test");
 		assertNotNull(u.getTeam());
 		assertEquals("test", u.getTeam().getName());
+		u = new User();
+		BeanUtils.setPropertyValue(u, "team.owner.username", "test");
+		assertNotNull(u.getTeam());
+		assertNotNull(u.getTeam().getOwner());
+		assertEquals("test", u.getTeam().getOwner().getUsername());
 	}
 
 	@Test
@@ -536,13 +541,18 @@ public class BeanUtilsTest {
 		User u = new User();
 		assertNull(u.getAttributes());
 		assertNull(u.getTeam());
+		BeanUtils.createParentIfNull(u, "attributes");
+		assertNull(u.getAttributes());
 		BeanUtils.createParentIfNull(u, "attributes['test']");
-		BeanUtils.createParentIfNull(u, "team.owner.username");
 		assertNotNull(u.getAttributes());
+		BeanUtils.createParentIfNull(u, "team");
+		assertNull(u.getTeam());
+		BeanUtils.createParentIfNull(u, "team.owner");
 		assertNotNull(u.getTeam());
 		u = new User();
 		Team t = new Team();
 		u.setTeam(t);
+		BeanUtils.createParentIfNull(u, "team.owner");
 		BeanUtils.createParentIfNull(u, "team.owner.username");
 		assertNotNull(u.getTeam());
 		assertEquals(t, u.getTeam());

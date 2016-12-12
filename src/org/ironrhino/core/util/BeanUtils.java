@@ -164,29 +164,7 @@ public class BeanUtils {
 	public static void setPropertyValue(Object bean, String propertyName, Object propertyValue) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
 		bw.setConversionService(CustomConversionService.getSharedInstance());
-		if (propertyName.indexOf('.') == -1) {
-			bw.setPropertyValue(propertyName, propertyValue);
-			return;
-		}
-		String[] arr = propertyName.split("\\.");
-		int i = 0;
-		String name = null;
-		while (i < arr.length - 1) {
-			if (name == null)
-				name = arr[i];
-			else
-				name += '.' + arr[i];
-			Object value = bw.getPropertyValue(name);
-			if (value == null) {
-				try {
-					value = getPropertyDescriptor(bean.getClass(), name).getPropertyType().newInstance();
-					bw.setPropertyValue(name, value);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-			i++;
-		}
+		createParentIfNull(bean, propertyName);
 		bw.setPropertyValue(propertyName, propertyValue);
 	}
 
@@ -226,8 +204,13 @@ public class BeanUtils {
 	}
 
 	public static void createParentIfNull(Object bean, String nestedPath) {
-		if (bean == null || StringUtils.isBlank(nestedPath)
-				|| nestedPath.indexOf('.') < 0 && nestedPath.indexOf('[') < 0)
+		if (bean == null || StringUtils.isBlank(nestedPath))
+			return;
+		if (nestedPath.lastIndexOf('.') > nestedPath.lastIndexOf('['))
+			nestedPath = nestedPath.substring(0, nestedPath.lastIndexOf('.'));
+		else if (nestedPath.lastIndexOf('[') > nestedPath.lastIndexOf('.'))
+			nestedPath = nestedPath.substring(0, nestedPath.lastIndexOf('['));
+		else
 			return;
 		int end = 0;
 		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
@@ -241,8 +224,11 @@ public class BeanUtils {
 			PropertyDescriptor pd = bw.getPropertyDescriptor(s);
 			if (pd == null || pd.getWriteMethod() == null)
 				return;
-			if (bw.getPropertyValue(s) != null)
+			if (bw.getPropertyValue(s) != null) {
+				if (end < 0)
+					break;
 				continue;
+			}
 			Class<?> type = pd.getPropertyType();
 			Object value;
 			if (Map.class.isAssignableFrom(type))
