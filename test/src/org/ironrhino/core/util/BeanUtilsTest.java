@@ -531,4 +531,25 @@ public class BeanUtilsTest {
 		assertEquals(user.getAttributes(), attributes);
 	}
 
+	@Test
+	public void testCreateParentIfNull() {
+		User u = new User();
+		assertNull(u.getAttributes());
+		assertNull(u.getTeam());
+		BeanUtils.createParentIfNull(u, "attributes['test']");
+		BeanUtils.createParentIfNull(u, "team.owner.username");
+		assertNotNull(u.getAttributes());
+		assertNotNull(u.getTeam());
+		u = new User();
+		Team t = new Team();
+		u.setTeam(t);
+		BeanUtils.createParentIfNull(u, "team.owner.username");
+		assertNotNull(u.getTeam());
+		assertEquals(t, u.getTeam());
+		assertNotNull(u.getTeam().getOwner());
+		u = new User();
+		BeanUtils.createParentIfNull(u, "team.users[0].username");
+		assertNotNull(u.getTeam().getUsers());
+	}
+
 }

@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -14,6 +16,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.spring.converter.CustomConversionService;
@@ -220,6 +223,41 @@ public class BeanUtils {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static void createParentIfNull(Object bean, String nestedPath) {
+		if (bean == null || StringUtils.isBlank(nestedPath)
+				|| nestedPath.indexOf('.') < 0 && nestedPath.indexOf('[') < 0)
+			return;
+		int end = 0;
+		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
+		while (true) {
+			end = nestedPath.indexOf('.', end + 1);
+			String s = nestedPath.substring(0, end < 0 ? nestedPath.length() : end);
+			if (s.indexOf('[') > 0) {
+				s = s.substring(0, s.indexOf('['));
+				end = -1;
+			}
+			PropertyDescriptor pd = bw.getPropertyDescriptor(s);
+			if (pd == null || pd.getWriteMethod() == null)
+				return;
+			if (bw.getPropertyValue(s) != null)
+				continue;
+			Class<?> type = pd.getPropertyType();
+			Object value;
+			if (Map.class.isAssignableFrom(type))
+				value = new HashMap<>();
+			else if (Set.class.isAssignableFrom(type))
+				value = new LinkedHashMap<>();
+			else if (Collection.class.isAssignableFrom(type))
+				value = new ArrayList<>();
+			else
+				value = org.springframework.beans.BeanUtils.instantiateClass(type);
+			bw.setPropertyValue(s, value);
+			if (end < 0)
+				break;
+		}
+
 	}
 
 	public static <T> Function<Object, T> forCopy(Class<T> targetClass) {
