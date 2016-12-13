@@ -1,15 +1,10 @@
 package bootstrap;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler.Default404Servlet;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -28,6 +23,7 @@ public class JettyLauncher {
 				"org.eclipse.jetty.annotations.AnnotationConfiguration");
 		WebAppContext context = new WebAppContext();
 		context.setContextPath("/");
+		context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
 		String webappDir = System.getProperty("webapp.dir");
 		if (webappDir != null) {
 			context.setWar(webappDir);
@@ -38,7 +34,7 @@ public class JettyLauncher {
 		tempDir.mkdirs();
 		context.setTempDirectory(tempDir);
 		context.setServer(server);
-		context.addServlet(NotFoundServlet.class.getName(), "*.class");
+		context.addServlet(Default404Servlet.class, "*.class");
 
 		System.out.println("War - " + warUrl.getPath());
 		System.setProperty("executable-war", warUrl.getPath());
@@ -46,16 +42,6 @@ public class JettyLauncher {
 		server.setStopAtShutdown(true);
 		server.start();
 		server.join();
-	}
-
-	public static class NotFoundServlet extends HttpServlet {
-		private static final long serialVersionUID = 8492638656439246491L;
-
-		@Override
-		protected void doGet(HttpServletRequest request, HttpServletResponse response)
-				throws ServletException, IOException {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
 	}
 
 }
