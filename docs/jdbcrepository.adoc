@@ -76,6 +76,10 @@ public interface PersonRepository {
 	@Transactional(readOnly = true)
 	@Sql("select * from t_person @if{name!=null||gender!=null} where 1=1 @if{name!=null} and name=:name @end{} @if{gender!=null} and gender=:gender @end{} @end{}") //动态sql, 使用mvel2的语法
 	List<Person> searchByNameOrGender(String name, @Enumerated(EnumType.STRING) Gender gender);
+	
+	@Transactional(readOnly = true)
+	@Sql("select a.*,b.memo as \"detail.memo\" from t_person a join t_detail b on a.name=b.name where a.name=:name") //关联对象属性用嵌套路径并用双引号括起来作为别名
+	Person getWithDetail(String name);
 
 }
 
