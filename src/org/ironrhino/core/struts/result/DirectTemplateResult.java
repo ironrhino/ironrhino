@@ -18,7 +18,7 @@ public class DirectTemplateResult extends AutoConfigResult {
 		String uri = RequestUtils.getRequestUri(request);
 		if (uri.endsWith("/")
 				&& request.getAttribute(DefaultActionMapper.REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION) != null)
-			uri += '/' + DefaultActionMapper.DEFAULT_ACTION_NAME;
+			uri += DefaultActionMapper.DEFAULT_ACTION_NAME;
 		return getTemplateLocation(uri);
 	}
 

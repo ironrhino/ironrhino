@@ -126,7 +126,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 
 			String location = AutoConfigResult.getTemplateLocation(org.ironrhino.core.util.StringUtils
 					.toCamelCase(request.getAttribute(REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION) != null
-							? uri + '/' + DEFAULT_ACTION_NAME : uri));
+							? uri + DEFAULT_ACTION_NAME : uri));
 			if (location != null) {
 				mapping = new ActionMapping();
 				mapping.setNamespace(DirectTemplateAction.NAMESPACE);

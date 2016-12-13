@@ -19,6 +19,7 @@ import org.ironrhino.core.struts.MyFreemarkerManager;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 
+import com.google.common.io.Files;
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -127,6 +128,7 @@ public class AutoConfigResult extends FreemarkerResult {
 	}
 
 	public static String getTemplateLocation(String templateName) {
+		templateName = Files.simplifyPath(templateName);
 		String location = cache.get(templateName);
 		if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			ServletContext context = ServletActionContext.getServletContext();
