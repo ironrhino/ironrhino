@@ -2,6 +2,7 @@ package org.ironrhino.core.struts.converter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
+import java.util.Collection;
 import java.util.Map;
 
 import com.opensymphony.xwork2.ActionContext;
@@ -14,6 +15,11 @@ public class MyXWorkConverter extends XWorkConverter {
 	@Override
 	public Object convertValue(Map<String, Object> context, Object target, Member member, String property, Object value,
 			Class toClass) {
+		if (Collection.class.isAssignableFrom(toClass) && value instanceof String[] && target != null) {
+			String[] arr = (String[]) value;
+			if (arr.length == 1 && arr[0].indexOf(',') > 0)
+				value = arr[0].split(",");
+		}
 		Object result = super.convertValue(context, target, member, property, value, toClass);
 		if (TypeConverter.NO_CONVERSION_POSSIBLE.equals(result) && value != null) {
 			try {
