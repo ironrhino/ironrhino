@@ -199,13 +199,15 @@ public class EntityClassHelper {
 					if (Attributable.class.isAssignableFrom(entityClass) && pd.getName().equals("attributes")) {
 						uci.setType("attributes");
 					}
-					if (!uci.getType().equals("dictionary") && collectionClass != null
-							&& elementClass == String.class) {
-						uci.addCssClass("tags");
+					if (collectionClass != null) {
 						uci.setExcludedFromOrdering(true);
-						if (StringUtils.isBlank(uci.getTemplate()))
-							uci.setTemplate(
-									"<#if value?has_content><#list value as var><span class=\"label\">${var}</span><#if var_has_next> </#if></#list></#if>");
+						if (elementClass == String.class
+								&& (StringUtils.isBlank(uci.getType()) || "input".equals(uci.getType()))) {
+							uci.addCssClass("tags");
+							if (StringUtils.isBlank(uci.getTemplate()))
+								uci.setTemplate(
+										"<#if value?has_content><#list value as var><span class=\"label\">${var}</span><#if var_has_next> </#if></#list></#if>");
+						}
 					}
 					if (pd.getWriteMethod() == null)
 						uci.setExcludedFromCriteria(true);

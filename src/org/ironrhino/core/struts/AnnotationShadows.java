@@ -12,6 +12,7 @@ import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.model.Persistable;
 
 public class AnnotationShadows {
 
@@ -518,6 +519,10 @@ public class AnnotationShadows {
 
 		public void setEmbeddedUiConfigs(Map<String, UiConfigImpl> embeddedUiConfigs) {
 			this.embeddedUiConfigs = embeddedUiConfigs;
+		}
+
+		public boolean isReference() {
+			return propertyType != null && Persistable.class.isAssignableFrom(propertyType);
 		}
 
 	}
