@@ -3,11 +3,11 @@ package org.ironrhino.core.hibernate.convert;
 import javax.persistence.Converter;
 
 @Converter(autoApply = true)
-public class StringListConverter extends AbstractListConverter<String> {
+public class LongSetConverter extends AbstractSetConverter<Long> {
 
 	@Override
-	protected String convert(String s) {
-		return s;
+	protected Long convert(String s) {
+		return Long.valueOf(s);
 	}
 
 }
