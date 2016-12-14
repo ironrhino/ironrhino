@@ -139,7 +139,7 @@
 						root : options.root
 					};
 					win.find('.tree').treeview(treeviewoptions);
-					$('<div style="text-align:center;"><button class="btn pick">'
+					$('<div style="text-align:center;"><button class="btn btn-primary pick">'
 							+ MessageBundle.get('confirm') + '</button></div>')
 							.appendTo(win).click(function() {
 								var ids = [], names = [];
@@ -155,11 +155,14 @@
 										var t = $(this);
 										val(options.name, current, names
 														.join(separator));
-										if (!t.is(':input')
-												&& !t.find('.remove').length)
-											$('<a class="remove" href="#">&times;</a>')
-													.appendTo(t)
-													.click(removeAction);
+										if (!t.is(':input')) {
+											if (!t.find('.remove').length)
+												$('<a class="remove" href="#">&times;</a>')
+														.appendTo(t)
+														.click(removeAction);
+											if (!names.length)
+												t.find('.remove').click();
+										}
 									});
 								}
 								if (options.id) {
