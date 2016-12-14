@@ -56,7 +56,6 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 </#macro>
 
 <#macro checkDictionary dictionaryName name="" value=[] disabled=false dynamicAttributes...>
-	<input type="hidden" id="__multiselect_${name!?html}" name="__multiselect_${name?html}" value=""<#rt/><#if disabled> disabled</#if>/>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
@@ -114,6 +113,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 		<#local index = index+1/>
 		</#if>
 		</#list>
+		<input type="hidden" id="__multiselect_${name!?html}" name="__multiselect_${name?html}" value=""<#rt/><#if disabled> disabled</#if>/>
 </#macro>
 
 <#macro radioDictionary dictionaryName name="" value="" disabled=false dynamicAttributes...>

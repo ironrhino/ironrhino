@@ -20,8 +20,8 @@
 	<#if view=='brief'><@s.hidden name="schema.strict"/><#else><@s.checkbox label=getText('strict') name="schema.strict" class="custom"/></#if>
 	<#if view=='brief'><@s.hidden name="schema.description"/><p>${schema.description!}</p><#else><@s.textarea label=getText('description') name="schema.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
 	</#if>
-	<table class="datagrid nullable table table-condensed">
 	<@s.hidden name="__datagrid_schema.fields" />
+	<table class="datagrid nullable table table-condensed">
 		<style scoped>
 		tr.linkage{
 			background-color:#F5F5F5;
