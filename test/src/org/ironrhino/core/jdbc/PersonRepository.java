@@ -36,6 +36,9 @@ public interface PersonRepository {
 	List<Person> search(String namePrefix);
 
 	@Transactional(readOnly = true)
+	List<Person> searchWithLimiting(String namePrefix, Limiting limiting);
+
+	@Transactional(readOnly = true)
 	@Sql("select count(*) from t_person")
 	long count();
 

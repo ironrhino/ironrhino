@@ -128,4 +128,31 @@ public class JdbcRepositoryTest {
 		assertEquals(p2.getAmount(), p2.getShadow().getAmount());
 	}
 
+	@Test
+	public void testLimiting() throws Exception {
+		Person p = new Person();
+		p.setName("test1");
+		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setAge(11);
+		p.setGender(Gender.FEMALE);
+		p.setAmount(new BigDecimal(12));
+		personRepository.save(p);
+		p.setName("test2");
+		p.setGender(Gender.MALE);
+		personRepository.save(p);
+		p.setName("test3");
+		personRepository.save(p);
+		assertEquals(3, personRepository.searchWithLimiting("test", Limiting.of(10)).size());
+		assertEquals(3, personRepository.searchWithLimiting("test", Limiting.of(3)).size());
+		assertEquals(2, personRepository.searchWithLimiting("test", Limiting.of(2)).size());
+		assertEquals(1, personRepository.searchWithLimiting("test", Limiting.of(1)).size());
+		assertEquals(0, personRepository.searchWithLimiting("test", Limiting.of(0)).size());
+		List<Person> list = personRepository.searchWithLimiting("test", Limiting.of(1, 2));
+		assertEquals(2, list.size());
+		assertEquals("test2", list.get(0).getName());
+		list = personRepository.searchWithLimiting("test", Limiting.of(2, 2));
+		assertEquals(1, list.size());
+		assertEquals("test3", list.get(0).getName());
+	}
+
 }

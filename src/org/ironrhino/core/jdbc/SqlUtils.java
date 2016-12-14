@@ -151,6 +151,77 @@ public class SqlUtils {
 		return m.replaceAll("");
 	}
 
+	static String appendLimitingClause(DatabaseProduct databaseProduct, int databaseMajorVersion,
+			int databaseMinorVersion, String sql, String limitingParameterName, Limiting limiting) {
+		switch (databaseProduct) {
+		case MYSQL:
+		case POSTGRESQL:
+		case DB2:
+		case H2:
+			return appendLimitOffset(sql, limitingParameterName, limiting, false);
+		case ORACLE:
+			if (databaseMajorVersion >= 12) {
+				return appendOffsetFetch(sql, limitingParameterName, limiting);
+			} else {
+				StringBuilder sb = new StringBuilder(sql.length() + 100);
+				if (limiting.getOffset() > 0) {
+					sb.append("select * from ( select row_.*, rownum rownum_9527 from ( ");
+				} else {
+					sb.append("select * from ( ");
+				}
+				sb.append(sql);
+				if (limiting.getOffset() > 0) {
+					sb.append(" ) row_ ) where rownum_9527 <= " + (limiting.getLimit() + limiting.getOffset())
+							+ " and rownum_9527 > " + limiting.getOffset());
+				} else {
+					sb.append(" ) where rownum <= " + limiting.getLimit());
+				}
+				return sb.toString();
+			}
+		case SQLSERVER:
+			if (databaseMajorVersion >= 11)
+				return appendOffsetFetch(sql, limitingParameterName, limiting);
+		case DERBY:
+			return appendOffsetFetch(sql, limitingParameterName, limiting);
+		case HSQL:
+			return appendLimitOffset(sql, limitingParameterName, limiting, true);
+		default:
+		}
+		throw new UnsupportedOperationException(databaseProduct + "" + databaseMajorVersion + "." + databaseMinorVersion
+				+ " doesn't support offset limiting");
+	}
+
+	private static String appendLimitOffset(String sql, String limitingParameterName, Limiting limiting,
+			boolean offsetBeforeLimit) {
+		String[] arr = sql.split("\\s+");
+		if (arr.length > 2 && arr[arr.length - 2].equalsIgnoreCase("limit")
+				|| arr.length > 4 && arr[arr.length - 4].equalsIgnoreCase("limit"))
+			return sql;
+		StringBuilder sb = new StringBuilder(sql);
+		if (offsetBeforeLimit) {
+			if (limiting.getOffset() > 0)
+				sb.append(" offset :").append(limitingParameterName).append(".offset");
+			sb.append(" limit :").append(limitingParameterName).append(".limit");
+		} else {
+			sb.append(" limit :").append(limitingParameterName).append(".limit");
+			if (limiting.getOffset() > 0)
+				sb.append(" offset :").append(limitingParameterName).append(".offset");
+		}
+		return sb.toString();
+	}
+
+	private static String appendOffsetFetch(String sql, String limitingParameterName, Limiting limiting) {
+		String[] arr = sql.split("\\s+");
+		if (arr[arr.length - 1].equalsIgnoreCase("only"))
+			return sql;
+		StringBuilder sb = new StringBuilder(sql);
+		if (limiting.getOffset() > 0)
+			sb.append(" offset :").append(limitingParameterName).append(".offset rows");
+		sb.append(" fetch ").append(limiting.getOffset() > 0 ? "next" : "first").append(" :")
+				.append(limitingParameterName).append(".limit rows only");
+		return sb.toString();
+	}
+
 	private static final Pattern ORDERBY_PATTERN = Pattern.compile("\\s+order\\s+by\\s+.+$", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern PARAMETER_PATTERN = Pattern

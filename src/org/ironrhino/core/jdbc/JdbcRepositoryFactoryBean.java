@@ -8,6 +8,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -46,6 +47,10 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 
 	private final DatabaseProduct databaseProduct;
 
+	private final int databaseMajorVersion;
+
+	private final int databaseMinorVersion;
+
 	private Object jdbcRepositoryBean;
 
 	private Map<String, String> sqls;
@@ -59,7 +64,10 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		this.jdbcRepositoryBean = new ProxyFactory(jdbcRepositoryClass, this)
 				.getProxy(jdbcRepositoryClass.getClassLoader());
 		try (Connection c = dataSource.getConnection()) {
-			databaseProduct = DatabaseProduct.parse(c.getMetaData().getDatabaseProductName());
+			DatabaseMetaData dmd = c.getMetaData();
+			databaseProduct = DatabaseProduct.parse(dmd.getDatabaseProductName());
+			databaseMajorVersion = dmd.getDatabaseMajorVersion();
+			databaseMinorVersion = dmd.getDatabaseMinorVersion();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
@@ -177,6 +185,10 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 				Object arg = arguments[i];
 				context.put(names[i], arg);
 				if (arg != null) {
+					if (arg instanceof Limiting) {
+						sql = SqlUtils.appendLimitingClause(databaseProduct, databaseMajorVersion, databaseMinorVersion,
+								sql, names[i], (Limiting) arg);
+					}
 					if (arg.getClass().isArray()) {
 						Object[] objects = (Object[]) arg;
 						sql = expandSql(sql, names[i], objects.length);
