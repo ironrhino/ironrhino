@@ -10,3 +10,7 @@
 +hibernate-validator
 -spring-aspects
 +spring-retry
+-jpa-api
++persistence-api
+-jta
++transaction-api

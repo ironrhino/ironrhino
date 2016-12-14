@@ -16,7 +16,7 @@
 秉承ironrhino一贯的风格, 只需要引入相关的依赖包即可
 
 - ironrhino-batch.jar
-- javax.batch-api.jar
+- batch-api.jar
 - spring-batch-core.jar
 - spring-batch-infrastructure.jar
 
