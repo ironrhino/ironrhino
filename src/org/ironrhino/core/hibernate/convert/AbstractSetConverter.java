@@ -21,20 +21,9 @@ public abstract class AbstractSetConverter<T> extends AbstractCollectionConverte
 
 	@Override
 	protected Collection<T> collection() {
-		return new MySet<>();
+		return new LinkedHashSet<>();
 	}
 
 	protected abstract T convert(String s);
-
-	static class MySet<T> extends LinkedHashSet<T> {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public String toString() {
-			return doConvertToDatabaseColumn(this);
-		}
-
-	}
 
 }

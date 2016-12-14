@@ -19,10 +19,11 @@ public abstract class AbstractCollectionConverter<T> {
 	protected Collection<T> doConvertToEntityAttribute(String string) {
 		if (string == null)
 			return null;
-		String[] arr = string.split(SEPARATOR);
+		String[] arr = string.split(SEPARATOR + "\\s*");
 		Collection<T> collection = collection();
 		for (String s : arr)
-			collection.add(convert(s));
+			if (StringUtils.isNotBlank(s))
+				collection.add(convert(s));
 		return collection;
 	}
 

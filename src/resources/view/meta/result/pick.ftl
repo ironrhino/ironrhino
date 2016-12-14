@@ -118,7 +118,7 @@
 	</#if>
 </#if>
 <#if multiple>
-<#assign bottomButtons=r'<button type="button" class="btn pick" data-shown="selected">${getText("confirm")}</button> '/>
+<#assign bottomButtons=r'<button type="button" class="btn btn-primary pick" data-shown="selected">${getText("confirm")}</button> '/>
 <#else>
 <#assign bottomButtons=''/>
 </#if>

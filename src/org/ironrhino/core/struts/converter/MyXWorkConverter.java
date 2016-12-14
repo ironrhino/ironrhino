@@ -17,8 +17,12 @@ public class MyXWorkConverter extends XWorkConverter {
 			Class toClass) {
 		if (Collection.class.isAssignableFrom(toClass) && value instanceof String[] && target != null) {
 			String[] arr = (String[]) value;
-			if (arr.length == 1 && arr[0].indexOf(',') > 0)
-				value = arr[0].split(",");
+			if (arr.length == 1) {
+				String s = arr[0];
+				if (s.startsWith("[") && s.endsWith("]"))
+					s = s.substring(0, s.length() - 1);
+				value = s.split(",\\s*");
+			}
 		}
 		Object result = super.convertValue(context, target, member, property, value, toClass);
 		if (TypeConverter.NO_CONVERSION_POSSIBLE.equals(result) && value != null) {

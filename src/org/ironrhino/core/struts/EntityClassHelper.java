@@ -108,18 +108,18 @@ public class EntityClassHelper {
 							|| "class".equals(propertyName) || "fieldHandler".equals(propertyName)
 							|| hides.contains(propertyName))
 						continue;
-					Class<?> collectionClass = null;
-					Class<?> elementClass = null;
+					Class<?> collectionType = null;
+					Class<?> elementType = null;
 					if (readMethod.getGenericReturnType() instanceof ParameterizedType) {
 						ParameterizedType pt = (ParameterizedType) readMethod.getGenericReturnType();
 						Type[] args = pt.getActualTypeArguments();
 						if (pt.getRawType() instanceof Class) {
-							collectionClass = (Class<?>) pt.getRawType();
-							if (!Collection.class.isAssignableFrom(collectionClass))
-								collectionClass = null;
+							collectionType = (Class<?>) pt.getRawType();
+							if (!Collection.class.isAssignableFrom(collectionType))
+								collectionType = null;
 						}
-						if (collectionClass != null && args.length == 1 && args[0] instanceof Class)
-							elementClass = (Class<?>) args[0];
+						if (collectionType != null && args.length == 1 && args[0] instanceof Class)
+							elementType = (Class<?>) args[0];
 					}
 
 					UiConfigImpl uci = new UiConfigImpl(pd.getName(), pd.getPropertyType(), uiConfig);
@@ -185,13 +185,13 @@ public class EntityClassHelper {
 						uci.setEmbeddedUiConfigs(map2);
 					}
 
-					if (collectionClass != null && elementClass != null
-							&& elementClass.getAnnotation(Embeddable.class) != null) {
+					if (collectionType != null && elementType != null
+							&& elementType.getAnnotation(Embeddable.class) != null) {
 						HiddenImpl hi = new HiddenImpl();
 						hi.setValue(true);
 						uci.setHiddenInList(hi);
 						uci.setType("collection");
-						uci.setEmbeddedUiConfigs(getUiConfigs(elementClass));
+						uci.setEmbeddedUiConfigs(getUiConfigs(elementType));
 					}
 
 					if (idAssigned && propertyName.equals("id"))
@@ -199,9 +199,9 @@ public class EntityClassHelper {
 					if (Attributable.class.isAssignableFrom(entityClass) && pd.getName().equals("attributes")) {
 						uci.setType("attributes");
 					}
-					if (collectionClass != null) {
+					if (collectionType != null) {
 						uci.setExcludedFromOrdering(true);
-						if (elementClass == String.class
+						if (elementType == String.class
 								&& (StringUtils.isBlank(uci.getType()) || "input".equals(uci.getType()))) {
 							uci.addCssClass("tags");
 							if (StringUtils.isBlank(uci.getTemplate()))
@@ -270,9 +270,11 @@ public class EntityClassHelper {
 					}
 
 					Class<?> returnType = pd.getPropertyType();
-					if (collectionClass != null
+					uci.setCollectionType(collectionType);
+					if (collectionType != null
 							&& (uci.getType().equals("listpick") || uci.getType().equals("treeselect"))) {
 						uci.setPickMultiple(true);
+						returnType = elementType;
 						uci.setPropertyType(returnType);
 					}
 					if (returnType.isArray()) {
@@ -285,10 +287,10 @@ public class EntityClassHelper {
 							uci.setThCssClass("excludeIfNotEdited");
 						}
 					}
-					if (collectionClass != null && elementClass != null && (elementClass.isEnum()
-							|| elementClass == String.class && uci.getType().equals("dictionary"))) {
+					if (collectionType != null && elementType != null && (elementType.isEnum()
+							|| elementType == String.class && uci.getType().equals("dictionary"))) {
 						uci.setMultiple(true);
-						returnType = elementClass;
+						returnType = elementType;
 						uci.setPropertyType(returnType);
 						uci.addCssClass("custom");
 						uci.setThCssClass("excludeIfNotEdited");

@@ -21,20 +21,9 @@ public abstract class AbstractListConverter<T> extends AbstractCollectionConvert
 
 	@Override
 	protected Collection<T> collection() {
-		return new MyList<>();
+		return new ArrayList<>();
 	}
 
 	protected abstract T convert(String s);
-
-	static class MyList<T> extends ArrayList<T> {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public String toString() {
-			return doConvertToDatabaseColumn(this);
-		}
-
-	}
 
 }
