@@ -270,6 +270,11 @@ public class EntityClassHelper {
 					}
 
 					Class<?> returnType = pd.getPropertyType();
+					if (collectionClass != null
+							&& (uci.getType().equals("listpick") || uci.getType().equals("treeselect"))) {
+						uci.setPickMultiple(true);
+						uci.setPropertyType(returnType);
+					}
 					if (returnType.isArray()) {
 						Class<?> clazz = returnType.getComponentType();
 						if (clazz.isEnum() || clazz == String.class) {
