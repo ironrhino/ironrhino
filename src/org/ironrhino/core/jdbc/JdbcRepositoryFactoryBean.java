@@ -191,7 +191,7 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 					}
 					if (arg.getClass().isArray()) {
 						Object[] objects = (Object[]) arg;
-						sql = expandSql(sql, names[i], objects.length);
+						sql = SqlUtils.expandCollectionParameter(sql, names[i], objects.length);
 						if (objects.length > 0 && Enum.class.isAssignableFrom(arg.getClass().getComponentType())) {
 							for (int j = 0; j < objects.length; j++)
 								objects[j] = convertEnum(objects[j],
@@ -202,7 +202,7 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 					}
 					if (arg instanceof Collection) {
 						Collection<?> collection = (Collection<?>) arg;
-						sql = expandSql(sql, names[i], collection.size());
+						sql = SqlUtils.expandCollectionParameter(sql, names[i], collection.size());
 						if (collection.size() > 0 && collection.iterator().next() instanceof Enum) {
 							List<Object> objects = new ArrayList<>();
 							for (Object obj : collection)
@@ -262,21 +262,6 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			}
 		}
 
-	}
-
-	private static String expandSql(String sql, String paramName, int size) {
-		if (size < 1 || size > 100)
-			throw new IllegalArgumentException("invalid size: " + size);
-		StringBuilder sb = new StringBuilder();
-		sb.append('(');
-		for (int i = 0; i < size; i++) {
-			sb.append(":").append(paramName).append('[').append(i).append(']');
-			if (i != size - 1)
-				sb.append(',');
-		}
-		sb.append(')');
-		String regex = "\\(\\s*:" + paramName + "\\s*\\)";
-		return sql.replaceAll(regex, sb.toString());
 	}
 
 	private static Object convertEnum(Object arg, Annotation[] paramAnnotations) {

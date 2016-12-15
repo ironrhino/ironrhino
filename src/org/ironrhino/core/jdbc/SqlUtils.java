@@ -151,6 +151,21 @@ public class SqlUtils {
 		return m.replaceAll("");
 	}
 
+	static String expandCollectionParameter(String sql, String paramName, int size) {
+		if (size < 1 || size > 100)
+			throw new IllegalArgumentException("invalid size: " + size);
+		StringBuilder sb = new StringBuilder();
+		sb.append('(');
+		for (int i = 0; i < size; i++) {
+			sb.append(":").append(paramName).append('[').append(i).append(']');
+			if (i != size - 1)
+				sb.append(',');
+		}
+		sb.append(')');
+		String regex = "\\(\\s*:" + paramName + "\\s*\\)";
+		return sql.replaceAll(regex, sb.toString());
+	}
+
 	static String appendLimitingClause(DatabaseProduct databaseProduct, int databaseMajorVersion,
 			int databaseMinorVersion, String sql, String limitingParameterName, Limiting limiting) {
 		switch (databaseProduct) {
