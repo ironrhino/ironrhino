@@ -56,14 +56,17 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.connectionTimeoutInMs:30000}")
 	private int connectionTimeoutInMs;
 
-	@Value("${dataSource.idleConnectionTestPeriodInMinutes:10}")
-	private int idleConnectionTestPeriodInMinutes;
-
 	@Value("${dataSource.idleMaxAgeInMinutes:30}")
 	private int idleMaxAgeInMinutes;
 
 	@Value("${dataSource.maxConnectionAgeInSeconds:14000}")
 	private int maxConnectionAgeInSeconds;
+
+	@Value("${dataSource.disableJMX:true}")
+	private boolean disableJMX = true;
+
+	@Value("${dataSource.idleConnectionTestPeriodInMinutes:10}")
+	private int idleConnectionTestPeriodInMinutes;
 
 	@Value("${dataSource.connectionTestStatement:}")
 	private String connectionTestStatement;
@@ -71,8 +74,25 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.QueryExecuteTimeLimitInMs:5000}")
 	private long queryExecuteTimeLimitInMs;
 
-	@Value("${dataSource.disableJMX:true}")
-	private boolean disableJMX = true;
+	// aliases for HikariDataSource
+
+	@Value("${dataSource.maximumPoolSize:}") // maxActive
+	private Integer maximumPoolSize;
+
+	@Value("${dataSource.minimumIdle:}") // initialSize
+	private Integer minimumIdle;
+
+	@Value("${dataSource.connectionTimeout:}") // connectionTimeoutInMs
+	private Integer connectionTimeout;
+
+	@Value("${dataSource.idleTimeout:}") // idleMaxAgeInMinutes
+	private Integer idleTimeout;
+
+	@Value("${dataSource.maxLifetime:}") // maxConnectionAgeInSeconds
+	private Integer maxLifetime;
+
+	@Value("${dataSource.registerMbeans:}")
+	private Boolean registerMbeans;
 
 	@Bean(destroyMethod = "close")
 	@Primary
@@ -137,12 +157,24 @@ public class DataSourceConfiguration {
 		ds.setJdbcUrl(jdbcUrl);
 		ds.setUsername(username);
 		ds.setPassword(password);
-		ds.setMaximumPoolSize(maxConnectionsPerPartition);
-		ds.setMinimumIdle(minConnectionsPerPartition);
-		ds.setConnectionTimeout(connectionTimeoutInMs);
-		ds.setIdleTimeout(idleMaxAgeInMinutes * 60 * 1000);
-		ds.setMaxLifetime(maxConnectionAgeInSeconds * 1000);
-		ds.setRegisterMbeans(!disableJMX);
+		if (maximumPoolSize == null)
+			maximumPoolSize = maxConnectionsPerPartition;
+		if (minimumIdle == null)
+			minimumIdle = minConnectionsPerPartition;
+		if (connectionTimeout == null)
+			connectionTimeout = connectionTimeoutInMs;
+		if (idleTimeout == null)
+			idleTimeout = idleMaxAgeInMinutes * 60 * 1000;
+		if (maxLifetime == null)
+			maxLifetime = maxConnectionAgeInSeconds * 1000;
+		if (registerMbeans == null)
+			registerMbeans = !disableJMX;
+		ds.setMaximumPoolSize(maximumPoolSize);
+		ds.setMinimumIdle(minimumIdle);
+		ds.setConnectionTimeout(connectionTimeout);
+		ds.setIdleTimeout(idleTimeout);
+		ds.setMaxLifetime(maxLifetime);
+		ds.setRegisterMbeans(registerMbeans);
 		return ds;
 	}
 
