@@ -2,11 +2,15 @@ package org.ironrhino.core.jdbc;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
+import org.elasticsearch.common.lang3.StringUtils;
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
@@ -60,7 +64,7 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 				Enum<?> en = ((Enum<?>) value);
 				return enumerated != null && enumerated.value() == EnumType.STRING ? en.name() : en.ordinal();
 			}
-			return value;
+			return convertIfNessisary(value);
 		} else {
 			for (PropertyDescriptor pd : beanWrapper.getPropertyDescriptors()) {
 				Enumerated enumerated = null;
@@ -88,13 +92,23 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 						Enum<?> en = ((Enum<?>) value);
 						value = enumerated != null && enumerated.value() == EnumType.STRING ? en.name() : en.ordinal();
 					}
-					return value;
+					return convertIfNessisary(value);
 				}
 			}
 			throw new IllegalArgumentException(
 					"No such property '" + name + "' of bean " + beanWrapper.getWrappedClass().getName());
 		}
 
+	}
+
+	private Object convertIfNessisary(Object value) {
+		if (value instanceof Collection)
+			return StringUtils.join((Collection<?>) value, ",");
+		else if (value instanceof Object[])
+			return StringUtils.join((Object[]) value, ",");
+		else if (value instanceof Map)
+			return JsonUtils.toJson(value);
+		return value;
 	}
 
 }

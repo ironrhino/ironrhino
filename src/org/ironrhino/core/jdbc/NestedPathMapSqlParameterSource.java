@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.util.JsonUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
@@ -86,7 +87,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 
 	public Object getValue(String paramName) throws IllegalArgumentException {
 		if (super.hasValue(paramName))
-			return super.getValue(paramName);
+			return convertIfNessisary(super.getValue(paramName));
 		int index1 = paramName.indexOf('[');
 		int index2 = paramName.indexOf(']');
 		int index3 = paramName.indexOf('.');
@@ -146,6 +147,16 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 		}
 		return null;
 
+	}
+
+	private Object convertIfNessisary(Object value) {
+		if (value instanceof Collection)
+			return StringUtils.join((Collection<?>) value, ",");
+		else if (value instanceof Object[])
+			return StringUtils.join((Object[]) value, ",");
+		else if (value instanceof Map)
+			return JsonUtils.toJson(value);
+		return value;
 	}
 
 }

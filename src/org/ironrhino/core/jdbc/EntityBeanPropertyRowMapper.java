@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import javax.persistence.Column;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanWrapper;
@@ -18,10 +19,12 @@ public class EntityBeanPropertyRowMapper<T> extends MyBeanPropertyRowMapper<T> {
 	private final BeanWrapper beanWrapper;
 
 	public EntityBeanPropertyRowMapper() {
+		setConversionService(CustomConversionService.getSharedInstance());
 		beanWrapper = null;
 	}
 
 	public EntityBeanPropertyRowMapper(Class<T> mappedClass) {
+		setConversionService(CustomConversionService.getSharedInstance());
 		beanWrapper = new BeanWrapperImpl(mappedClass);
 		initialize(mappedClass);
 	}
@@ -46,7 +49,7 @@ public class EntityBeanPropertyRowMapper<T> extends MyBeanPropertyRowMapper<T> {
 
 	@Override
 	protected Object getColumnValue(ResultSet rs, int index, PropertyDescriptor pd) throws SQLException {
-		if (pd.getPropertyType().isEnum())
+		if (!JdbcHelper.isScalar(pd.getPropertyType()))
 			return JdbcUtils.getResultSetValue(rs, index, null);
 		return super.getColumnValue(rs, index, pd);
 	}

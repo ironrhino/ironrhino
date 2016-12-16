@@ -2,16 +2,12 @@ package org.ironrhino.core.jdbc;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.persistence.EnumType;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -194,7 +189,7 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 						sql = SqlUtils.expandCollectionParameter(sql, names[i], objects.length);
 						if (objects.length > 0 && Enum.class.isAssignableFrom(arg.getClass().getComponentType())) {
 							for (int j = 0; j < objects.length; j++)
-								objects[j] = convertEnum(objects[j],
+								objects[j] = JdbcHelper.convertEnum(objects[j],
 										methodInvocation.getMethod().getParameterAnnotations()[i]);
 							arg = objects;
 
@@ -206,13 +201,13 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 						if (collection.size() > 0 && collection.iterator().next() instanceof Enum) {
 							List<Object> objects = new ArrayList<>();
 							for (Object obj : collection)
-								objects.add(
-										convertEnum(obj, methodInvocation.getMethod().getParameterAnnotations()[i]));
+								objects.add(JdbcHelper.convertEnum(obj,
+										methodInvocation.getMethod().getParameterAnnotations()[i]));
 							arg = objects;
 						}
 					}
 					if (arg instanceof Enum) {
-						arg = convertEnum(arg, methodInvocation.getMethod().getParameterAnnotations()[i]);
+						arg = JdbcHelper.convertEnum(arg, methodInvocation.getMethod().getParameterAnnotations()[i]);
 					}
 				}
 				sqlParameterSource.addValue(names[i], arg);
@@ -226,7 +221,7 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		case SELECT:
 			if (returnType instanceof Class) {
 				Class<?> clz = (Class<?>) returnType;
-				if (isScalar(clz)) {
+				if (JdbcHelper.isScalar(clz)) {
 					return namedParameterJdbcTemplate.queryForObject(sql, sqlParameterSource, clz);
 				} else {
 					List<?> result = namedParameterJdbcTemplate.query(sql, sqlParameterSource,
@@ -241,7 +236,7 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 					Type type = pt.getActualTypeArguments()[0];
 					if (type instanceof Class) {
 						Class<?> clz = (Class<?>) type;
-						if (isScalar(clz)) {
+						if (JdbcHelper.isScalar(clz)) {
 							return namedParameterJdbcTemplate.queryForList(sql, sqlParameterSource, clz);
 						} else {
 							return namedParameterJdbcTemplate.query(sql, sqlParameterSource,
@@ -262,47 +257,6 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 			}
 		}
 
-	}
-
-	private static Object convertEnum(Object arg, Annotation[] paramAnnotations) {
-		Enum<?> en = (Enum<?>) arg;
-		for (Annotation ann : paramAnnotations) {
-			if (ann instanceof Enumerated) {
-				arg = (((Enumerated) ann).value() == EnumType.ORDINAL) ? en.ordinal() : en.name();
-				break;
-			}
-			if (ann instanceof javax.persistence.Enumerated) {
-				arg = (((javax.persistence.Enumerated) ann).value() == EnumType.ORDINAL) ? en.ordinal() : en.name();
-				break;
-			}
-		}
-		return arg;
-	}
-
-	private static boolean isScalar(Class<?> type) {
-		if ((Boolean.TYPE == type) || (Boolean.class == type))
-			return true;
-		if ((Byte.TYPE == type) || (Byte.class == type))
-			return true;
-		if ((Short.TYPE == type) || (Short.class == type))
-			return true;
-		if ((Integer.TYPE == type) || (Integer.class == type))
-			return true;
-		if ((Long.TYPE == type) || (Long.class == type))
-			return true;
-		if ((Float.TYPE == type) || (Float.class == type))
-			return true;
-		if ((Double.TYPE == type) || (Double.class == type) || (Number.class == type))
-			return true;
-		if (BigDecimal.class == type)
-			return true;
-		if (java.sql.Date.class == type)
-			return true;
-		if (Time.class == type)
-			return true;
-		if ((Timestamp.class == type) || (java.util.Date.class == type))
-			return true;
-		return false;
 	}
 
 }

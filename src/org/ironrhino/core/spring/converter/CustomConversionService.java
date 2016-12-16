@@ -11,6 +11,8 @@ public class CustomConversionService extends DefaultConversionService {
 		addConverter(new DateConverter());
 		addConverter(new EnumToEnumConverter());
 		addConverter(new SerializableToSerializableConverter());
+		addConverter(new StringToMapConverter());
+		addConverter(new MapToStringConverter());
 	}
 
 	public static CustomConversionService getSharedInstance() {

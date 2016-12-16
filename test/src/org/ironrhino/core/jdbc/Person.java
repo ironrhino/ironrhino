@@ -3,6 +3,8 @@ package org.ironrhino.core.jdbc;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
@@ -26,6 +28,10 @@ public class Person implements Serializable {
 	private int age;
 
 	private BigDecimal amount;
+
+	private Map<String, String> attributes;
+
+	private Set<String> roles;
 
 	private PersonShadow shadow;
 
@@ -67,6 +73,22 @@ public class Person implements Serializable {
 
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
+	}
+
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<String> roles) {
+		this.roles = roles;
 	}
 
 	public PersonShadow getShadow() {
@@ -119,6 +141,16 @@ public class Person implements Serializable {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (attributes == null) {
+			if (other.attributes != null)
+				return false;
+		} else if (!attributes.equals(other.attributes))
+			return false;
+		if (roles == null) {
+			if (other.roles != null)
+				return false;
+		} else if (!roles.equals(other.roles))
 			return false;
 		return true;
 	}

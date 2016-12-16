@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.ironrhino.common.model.Gender;
@@ -43,6 +45,10 @@ public class JdbcRepositoryTest {
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
 		p.setAmount(new BigDecimal(12));
+		p.setAttributes(new HashMap<>());
+		p.getAttributes().put("key", "value");
+		p.setRoles(new LinkedHashSet<>());
+		p.getRoles().add("test");
 		personRepository.save(p);
 		Person p2 = personRepository.get(p.getName());
 		assertEquals(p, p2);
