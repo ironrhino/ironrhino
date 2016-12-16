@@ -46,9 +46,11 @@ public class JdbcRepositoryTest {
 		p.setGender(Gender.FEMALE);
 		p.setAmount(new BigDecimal(12));
 		p.setAttributes(new HashMap<>());
-		p.getAttributes().put("key", "value");
+		p.getAttributes().put("key1", "value1");
+		p.getAttributes().put("key2", "value2");
 		p.setRoles(new LinkedHashSet<>());
-		p.getRoles().add("test");
+		p.getRoles().add("test1");
+		p.getRoles().add("test2");
 		personRepository.save(p);
 		Person p2 = personRepository.get(p.getName());
 		assertEquals(p, p2);

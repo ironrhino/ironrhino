@@ -4,9 +4,6 @@
 <head>
 <title>${getText('query')}</title>
 <style>
-.form-horizontal .control-group {
-    margin-bottom: 0;
-}
 .form-horizontal .control-label {
     width: 150px;
 }
@@ -106,7 +103,7 @@ $(function(){
 	</@s.textarea>
 	<#if params??>
 	<#list params as var>
-	<@s.textfield label="${var}" name="paramMap['${var}']"/>
+	<@s.textfield id="param-"+var?index label="${var}" name="paramMap['${var}']"/>
 	</#list>
 	</#if>
 	<@s.submit value=getText('submit') class="btn-primary"/>

@@ -131,8 +131,6 @@ public class Person implements Serializable {
 			if (other.dob != null)
 				return false;
 		} else if (!DateUtils.formatDate10(dob).equals(DateUtils.formatDate10(other.dob))) {
-			System.out.println(DateUtils.formatDate10(dob));
-			System.out.println(DateUtils.formatDate10(other.dob));
 			return false;
 		}
 		if (gender != other.gender)
