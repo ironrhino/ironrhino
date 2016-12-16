@@ -14,11 +14,11 @@
 	<property name="zookeeper-sources-jar.name" value="ironrhino-zookeeper-${version}-sources.jar" />
 	<property name="zookeeper-sources-jar.includes" value="org/ironrhino/core/zookeeper/**,org/ironrhino/**/ZooKeeper*" />
 	<property name="remoting-common-sources-jar.name" value="ironrhino-remoting-common-${version}-sources.jar" />
-	<property name="remoting-common-sources-jar.includes" value="org/ironrhino/core/remoting/**" />
+	<property name="remoting-common-sources-jar.includes" value="org/ironrhino/core/remoting/**,org/ironrhino/core/remoting/action/**,resources/view/service/**" />
 	<property name="remoting-server-sources-jar.name" value="ironrhino-remoting-server-${version}-sources.jar" />
 	<property name="remoting-server-sources-jar.includes" value="org/ironrhino/core/remoting/server/**" />
 	<property name="remoting-client-sources-jar.name" value="ironrhino-remoting-client-${version}-sources.jar" />
-	<property name="remoting-client-sources-jar.includes" value="org/ironrhino/core/remoting/client/**,org/ironrhino/core/remoting/action/**,resources/view/service/**" />
+	<property name="remoting-client-sources-jar.includes" value="org/ironrhino/core/remoting/client/**" />
 	<property name="hibernate-config-sources-jar.name" value="ironrhino-hibernate-config-${version}-sources.jar" />
 	<property name="hibernate-config-sources-jar.includes" value="resources/spring/applicationContext-hibernate.xml" />
 	<property name="mail-config-sources-jar.name" value="ironrhino-mail-config-${version}-sources.jar" />
