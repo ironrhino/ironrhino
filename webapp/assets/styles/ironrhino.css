@@ -8327,6 +8327,16 @@ div.text-core {
 	}
 }
 
+.form-horizontal fieldset {
+	min-width: inherit;
+}
+
+@-moz-document url-prefix() {
+    .form-horizontal fieldset {
+        display: table-cell;
+    }
+}
+
 .form-horizontal .control-label {
 	width: 100px;
 }
