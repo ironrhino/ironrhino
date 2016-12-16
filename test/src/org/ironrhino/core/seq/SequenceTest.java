@@ -91,8 +91,9 @@ public class SequenceTest {
 		}
 		cdl.await();
 		time = System.currentTimeMillis() - time;
-		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time
-				+ "ms (tps = " + (count.get() * 1000 / time) + ") using " + seq.getClass().getSimpleName());
+		System.out.println(
+				"completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time + "ms (tps = "
+						+ (int) (((double) count.get() / time) * 1000) + ") using " + seq.getClass().getSimpleName());
 		assertEquals(LOOP * THREADS, map.size());
 	}
 

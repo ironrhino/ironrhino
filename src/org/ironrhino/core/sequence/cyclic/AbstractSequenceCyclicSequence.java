@@ -18,6 +18,10 @@ import org.springframework.util.Assert;
 
 public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyclicSequence {
 
+	static final int STATUS_CYCLE_CROSS = 0;
+	static final int STATUS_CYCLE_SAME_AND_SAFE = 1;
+	static final int STATUS_CYCLE_SAME_AND_CRITICAL = 2;
+
 	static final long CRITICAL_THRESHOLD_TIME = 500;
 
 	protected String querySequenceStatement;

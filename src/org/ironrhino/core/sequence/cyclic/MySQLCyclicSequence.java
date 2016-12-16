@@ -16,10 +16,23 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
-	static final long CRITICAL_THRESHOLD_TIME = 1000;
+	private String incrementSql;
+	private String restartSql;
+	private String setVariableSql = "SELECT @TIMESTAMP:=UNIX_TIMESTAMP()";
+	private String selectLastInsertIdSql = "SELECT LAST_INSERT_ID(),@TIMESTAMP";
 
 	@Override
 	public void afterPropertiesSet() {
+		incrementSql = new StringBuilder("UPDATE `").append(getTableName())
+				.append("` SET VALUE=LAST_INSERT_ID(VALUE+1),LAST_UPDATED=@TIMESTAMP WHERE NAME='")
+				.append(getSequenceName()).append("' AND DATE_FORMAT(FROM_UNIXTIME(LAST_UPDATED),'")
+				.append(getDateFormat()).append("')=DATE_FORMAT(FROM_UNIXTIME(@TIMESTAMP),'").append(getDateFormat())
+				.append("')").toString();
+		restartSql = new StringBuilder("UPDATE `").append(getTableName())
+				.append("` SET VALUE=LAST_INSERT_ID(1),LAST_UPDATED=@TIMESTAMP WHERE NAME='").append(getSequenceName())
+				.append("' AND DATE_FORMAT(FROM_UNIXTIME(LAST_UPDATED),'").append(getDateFormat())
+				.append("')!=DATE_FORMAT(FROM_UNIXTIME(@TIMESTAMP),'").append(getDateFormat()).append("')").toString();
+
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			String tableName = getTableName();
 			boolean tableExists = false;
@@ -89,134 +102,64 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 		} catch (SQLException ex) {
 			logger.error(ex.getMessage(), ex);
 		}
+
 	}
 
 	@Override
 	public String nextStringValue() throws DataAccessException {
-		return nextStringValue(3);
-	}
-
-	protected String nextStringValue(int maxAttempts) throws DataAccessException {
-		if (maxAttempts < 1)
-			throw new IllegalArgumentException("max attempts reached");
-		Connection con = null;
-		Statement stmt = null;
-		try {
-			con = getDataSource().getConnection();
+		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
-			stmt = con.createStatement();
-			String sequenceName = getSequenceName();
-			if (sameCycle(stmt) == STATUS_CYCLE_SAME_AND_SAFE) {
-				stmt.executeUpdate("UPDATE `" + getTableName()
-						+ "` SET VALUE = LAST_INSERT_ID(VALUE + 1),LAST_UPDATED = @TIMESTAMP WHERE NAME='"
-						+ sequenceName + "'");
-				return nextId(stmt);
-			} else {
-				if (tryLock(stmt, 1)) {
-					try {
-						if (sameCycle(stmt) != STATUS_CYCLE_CROSS) {
-							stmt.executeUpdate("UPDATE `" + getTableName()
-									+ "` SET VALUE = LAST_INSERT_ID(VALUE + 1),LAST_UPDATED = @TIMESTAMP WHERE NAME='"
-									+ sequenceName + "'");
-						} else {
-							stmt.executeUpdate("UPDATE `" + getTableName()
-									+ "` SET VALUE = LAST_INSERT_ID(1),LAST_UPDATED = @TIMESTAMP WHERE NAME='"
-									+ sequenceName + "'");
-						}
-						return nextId(stmt);
-					} finally {
-						releaseLock(stmt);
-					}
-				} else {
-					if (stmt != null)
-						try {
-							stmt.close();
-							stmt = null;
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-					try {
-						con.close();
-						con = null;
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-					try {
-						Thread.sleep(CRITICAL_THRESHOLD_TIME);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					return nextStringValue(--maxAttempts);
+			int maxAttempts = 3;
+			while (--maxAttempts > 0) {
+				stmt.execute(setVariableSql);
+				int rows = stmt.executeUpdate(incrementSql);
+				if (rows == 1)
+					return nextId(stmt);
+				stmt.execute(setVariableSql);
+				rows = stmt.executeUpdate(restartSql);
+				if (rows == 1)
+					return nextId(stmt);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
+			throw new IllegalArgumentException("max attempts reached");
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain last_insert_id()", ex);
-		} finally {
-			if (stmt != null)
-				try {
-					stmt.close();
-					stmt = null;
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			if (con != null)
-				try {
-					con.close();
-					con = null;
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 		}
 
 	}
 
 	private String nextId(Statement stmt) throws SQLException {
-		int next;
-		Date currentTimestamp;
-		try (ResultSet rs = stmt.executeQuery("SELECT LAST_INSERT_ID(),@TIMESTAMP")) {
-			if (!rs.next()) {
+		try (ResultSet rs = stmt.executeQuery(selectLastInsertIdSql)) {
+			if (!rs.next())
 				throw new DataAccessResourceFailureException("LAST_INSERT_ID() failed after executing an update");
-			}
-			next = rs.getInt(1);
+			int next = rs.getInt(1);
 			Long current = rs.getLong(2);
 			if (current < 10000000000L) // no mills
 				current *= 1000;
-			currentTimestamp = new Date(current);
+			Date currentTimestamp = new Date(current);
 			return getStringValue(currentTimestamp, getPaddingLength(), next);
 		}
 	}
 
-	private int sameCycle(Statement stmt) throws SQLException {
-		try (ResultSet rs = stmt.executeQuery("SELECT LAST_UPDATED,@TIMESTAMP:=UNIX_TIMESTAMP() FROM `" + getTableName()
-				+ "` WHERE NAME='" + getSequenceName() + "'")) {
-			rs.next();
-			Long last = rs.getLong(1);
-			if (last < 10000000000L) // no mills
-				last *= 1000;
-			Date lastUpdated = last > 0 ? new Date(last) : null;
-			Date currentTimestamp = new Date(rs.getLong(2) * 1000);
-			boolean sameCycle = getCycleType().isSameCycle(lastUpdated, currentTimestamp);
-			if (!sameCycle)
-				return STATUS_CYCLE_CROSS;
-			Date cycleStart = getCycleType().getCycleStart(currentTimestamp);
-			if (currentTimestamp.getTime() - cycleStart.getTime() <= CRITICAL_THRESHOLD_TIME) {
-				return STATUS_CYCLE_SAME_AND_CRITICAL;
-			}
-			return STATUS_CYCLE_SAME_AND_SAFE;
+	private String getDateFormat() {
+		switch (getCycleType()) {
+		case MINUTE:
+			return "%Y%m%d%H%i";
+		case HOUR:
+			return "%Y%m%d%H";
+		case DAY:
+			return "%Y%m%d";
+		case MONTH:
+			return "%Y%m";
+		case YEAR:
+			return "%Y";
+		default:
+			throw new UnsupportedOperationException("Unknown cycle type");
 		}
-	}
-
-	private boolean tryLock(Statement stmt, int timeoutInSeconds) throws SQLException {
-		try (ResultSet rs = stmt.executeQuery("SELECT GET_LOCK('" + getLockName() + "'," + timeoutInSeconds + ")")) {
-			if (!rs.next()) {
-				throw new DataAccessResourceFailureException("GET_LOCK() failed after executing an update");
-			}
-			return rs.getInt(1) == 1;
-		}
-	}
-
-	private void releaseLock(Statement stmt) throws SQLException {
-		stmt.execute("SELECT RELEASE_LOCK('" + getLockName() + "')");
 	}
 
 }
