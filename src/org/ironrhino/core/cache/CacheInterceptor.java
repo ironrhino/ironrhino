@@ -1,0 +1,171 @@
+package org.ironrhino.core.cache;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.aop.AopContext;
+import org.ironrhino.core.model.NullObject;
+import org.ironrhino.core.servlet.RequestContext;
+import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.ExpressionUtils;
+import org.ironrhino.core.util.ReflectionUtils;
+import org.mvel2.PropertyAccessException;
+import org.springframework.core.BridgeMethodResolver;
+
+@SuppressWarnings("unchecked")
+public class CacheInterceptor implements MethodInterceptor {
+
+	private final static String MUTEX = "_MUTEX_";
+
+	private CacheManager cacheManager;
+
+	private boolean mutex;
+
+	private int mutexWait;
+
+	public void setCacheManager(CacheManager cacheManager) {
+		this.cacheManager = cacheManager;
+	}
+
+	public void setMutex(boolean mutex) {
+		this.mutex = mutex;
+	}
+
+	public void setMutexWait(int mutexWait) {
+		this.mutexWait = mutexWait;
+	}
+
+	@Override
+	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+		Method method = methodInvocation.getMethod();
+		if (method.isBridge())
+			method = BridgeMethodResolver.findBridgedMethod(method);
+		CheckCache checkCache = method.getAnnotation(CheckCache.class);
+		if (checkCache != null) {
+			if (AopContext.isBypass(CacheAspect.class))
+				return methodInvocation.proceed();
+			Map<String, Object> context = buildContext(methodInvocation);
+			String namespace = ExpressionUtils.evalString(checkCache.namespace(), context);
+			List<String> keys = ExpressionUtils.evalList(checkCache.key(), context);
+			if (keys == null || keys.isEmpty())
+				return methodInvocation.proceed();
+			String keyMutex = MUTEX + StringUtils.join(keys, "_");
+			boolean mutexed = false;
+			if (CacheContext.isForceFlush()) {
+				cacheManager.mdelete(keys, namespace);
+			} else {
+				int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
+				for (String key : keys) {
+					Object value = (timeToIdle > 0 && !cacheManager.supportsTimeToIdle())
+							? cacheManager.get(key, namespace, timeToIdle, checkCache.timeUnit())
+							: cacheManager.get(key, namespace);
+					if (value != null) {
+						putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
+						ExpressionUtils.eval(checkCache.onHit(), context);
+						return value instanceof NullObject ? null : value;
+					}
+				}
+				if (mutex) {
+					int throughPermits = checkCache.throughPermits();
+					if (cacheManager.increment(keyMutex, 1, Math.max(10000, mutexWait), TimeUnit.MILLISECONDS,
+							namespace) <= throughPermits) {
+						mutexed = true;
+					} else {
+						Thread.sleep(mutexWait);
+						for (String key : keys) {
+							Object value = cacheManager.get(key, namespace);
+							if (value != null) {
+								putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
+								ExpressionUtils.eval(checkCache.onHit(), context);
+								return value instanceof NullObject ? null : value;
+							}
+						}
+					}
+				}
+				ExpressionUtils.eval(checkCache.onMiss(), context);
+			}
+			Object result = methodInvocation.proceed();
+			putReturnValueIntoContext(context, result);
+			if (ExpressionUtils.evalBoolean(checkCache.when(), context, true)) {
+				Object cacheResult = (result == null && checkCache.cacheNull()) ? NullObject.get() : result;
+				if (cacheResult != null) {
+					if (checkCache.eternal()) {
+						for (String key : keys)
+							cacheManager.put(key, cacheResult, 0, checkCache.timeUnit(), namespace);
+					} else {
+						int timeToLive = ExpressionUtils.evalInt(checkCache.timeToLive(), context, 0);
+						int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
+						for (String key : keys)
+							cacheManager.put(key, cacheResult, timeToIdle, timeToLive, checkCache.timeUnit(),
+									namespace);
+					}
+				}
+				if (result != null)
+					ExpressionUtils.eval(checkCache.onPut(), context);
+			}
+			if (mutexed)
+				cacheManager.delete(keyMutex, namespace);
+			return result;
+
+		}
+		EvictCache evictCache = method.getAnnotation(EvictCache.class);
+		if (evictCache != null) {
+			Map<String, Object> context = buildContext(methodInvocation);
+			String namespace = ExpressionUtils.evalString(evictCache.namespace(), context);
+			boolean fallback = false;
+			List<String> keys = null;
+			try {
+				keys = ExpressionUtils.evalList(evictCache.key(), context);
+			} catch (PropertyAccessException e) {
+				fallback = true; // required retval
+			}
+			Object retval = methodInvocation.proceed();
+			putReturnValueIntoContext(context, retval);
+			if (fallback)
+				keys = ExpressionUtils.evalList(evictCache.key(), context);
+			if (AopContext.isBypass(CacheAspect.class) || keys == null || keys.size() == 0)
+				return retval;
+			cacheManager.mdelete(keys, namespace);
+			ExpressionUtils.eval(evictCache.onEvict(), context);
+			if (StringUtils.isNotBlank(evictCache.renew())) {
+				Object value = ExpressionUtils.eval(evictCache.renew(), context);
+				// keys may be changed, eval again
+				if (!fallback)
+					keys = ExpressionUtils.evalList(evictCache.key(), context);
+				for (Object key : keys)
+					if (key != null)
+						cacheManager.put(key.toString(), value, 0, TimeUnit.SECONDS, namespace);
+			}
+			return retval;
+		}
+		return methodInvocation.proceed();
+	}
+
+	protected Map<String, Object> buildContext(MethodInvocation methodInvocation) {
+		Map<String, Object> context = new HashMap<>();
+		Object[] args = methodInvocation.getArguments();
+		String[] paramNames = ReflectionUtils.getParameterNames(methodInvocation.getMethod());
+		if (paramNames == null) {
+			throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
+		} else {
+			for (int i = 0; i < args.length; i++)
+				context.put(paramNames[i], args[i]);
+		}
+		context.put(AopContext.CONTEXT_KEY_THIS, methodInvocation.getThis());
+		context.put(AopContext.CONTEXT_KEY_ARGS, methodInvocation.getArguments());
+		context.put(AopContext.CONTEXT_KEY_REQUEST, RequestContext.getRequest());
+		context.put(AopContext.CONTEXT_KEY_USER, AuthzUtils.getUserDetails());
+		return context;
+	}
+
+	protected void putReturnValueIntoContext(Map<String, Object> context, Object value) {
+		context.put(AopContext.CONTEXT_KEY_RETVAL, value);
+	}
+
+}
