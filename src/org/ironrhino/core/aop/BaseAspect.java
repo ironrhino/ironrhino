@@ -17,8 +17,6 @@ public class BaseAspect implements Ordered {
 
 	protected int order;
 
-	private static boolean warnNoDebugSymbolInformation;
-
 	protected boolean isBypass() {
 		return AopContext.isBypass(this.getClass());
 	}
@@ -37,11 +35,7 @@ public class BaseAspect implements Ordered {
 		Object[] args = jp.getArgs();
 		String[] paramNames = ReflectionUtils.getParameterNames(jp);
 		if (paramNames == null) {
-			if (!warnNoDebugSymbolInformation) {
-				warnNoDebugSymbolInformation = true;
-				logger.warn("Unable to resolve method parameter names for method: " + jp.getStaticPart().getSignature()
-						+ ". Debug symbol information is required if you are using parameter names in expressions.");
-			}
+			throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
 		} else {
 			for (int i = 0; i < args.length; i++)
 				context.put(paramNames[i], args[i]);

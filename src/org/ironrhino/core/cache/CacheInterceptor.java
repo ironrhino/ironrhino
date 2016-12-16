@@ -1,25 +1,20 @@
 package org.ironrhino.core.cache;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.aop.AopContext;
+import org.ironrhino.core.aop.AbstractMethodInterceptor;
 import org.ironrhino.core.model.NullObject;
-import org.ironrhino.core.servlet.RequestContext;
-import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExpressionUtils;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.mvel2.PropertyAccessException;
 import org.springframework.core.BridgeMethodResolver;
 
 @SuppressWarnings("unchecked")
-public class CacheInterceptor implements MethodInterceptor {
+public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 
 	private final static String MUTEX = "_MUTEX_";
 
@@ -48,7 +43,7 @@ public class CacheInterceptor implements MethodInterceptor {
 			method = BridgeMethodResolver.findBridgedMethod(method);
 		CheckCache checkCache = method.getAnnotation(CheckCache.class);
 		if (checkCache != null) {
-			if (AopContext.isBypass(CacheAspect.class))
+			if (isBypass())
 				return methodInvocation.proceed();
 			Map<String, Object> context = buildContext(methodInvocation);
 			String namespace = ExpressionUtils.evalString(checkCache.namespace(), context);
@@ -129,7 +124,7 @@ public class CacheInterceptor implements MethodInterceptor {
 			putReturnValueIntoContext(context, retval);
 			if (fallback)
 				keys = ExpressionUtils.evalList(evictCache.key(), context);
-			if (AopContext.isBypass(CacheAspect.class) || keys == null || keys.size() == 0)
+			if (isBypass() || keys == null || keys.size() == 0)
 				return retval;
 			cacheManager.mdelete(keys, namespace);
 			ExpressionUtils.eval(evictCache.onEvict(), context);
@@ -145,27 +140,6 @@ public class CacheInterceptor implements MethodInterceptor {
 			return retval;
 		}
 		return methodInvocation.proceed();
-	}
-
-	protected Map<String, Object> buildContext(MethodInvocation methodInvocation) {
-		Map<String, Object> context = new HashMap<>();
-		Object[] args = methodInvocation.getArguments();
-		String[] paramNames = ReflectionUtils.getParameterNames(methodInvocation.getMethod());
-		if (paramNames == null) {
-			throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
-		} else {
-			for (int i = 0; i < args.length; i++)
-				context.put(paramNames[i], args[i]);
-		}
-		context.put(AopContext.CONTEXT_KEY_THIS, methodInvocation.getThis());
-		context.put(AopContext.CONTEXT_KEY_ARGS, methodInvocation.getArguments());
-		context.put(AopContext.CONTEXT_KEY_REQUEST, RequestContext.getRequest());
-		context.put(AopContext.CONTEXT_KEY_USER, AuthzUtils.getUserDetails());
-		return context;
-	}
-
-	protected void putReturnValueIntoContext(Map<String, Object> context, Object value) {
-		context.put(AopContext.CONTEXT_KEY_RETVAL, value);
 	}
 
 }
