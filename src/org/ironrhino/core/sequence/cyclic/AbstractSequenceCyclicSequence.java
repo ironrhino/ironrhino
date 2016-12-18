@@ -22,11 +22,13 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 	static final int STATUS_CYCLE_SAME_AND_SAFE = 1;
 	static final int STATUS_CYCLE_SAME_AND_CRITICAL = 2;
 
-	static final long CRITICAL_THRESHOLD_TIME = 500;
+	static final long CRITICAL_THRESHOLD_TIME = 1000;
 
 	protected String querySequenceStatement;
 
 	protected String queryTimestampStatement;
+
+	protected String updateTimestampStatement;
 
 	protected String getTimestampColumnType() {
 		return "TIMESTAMP";
@@ -70,6 +72,9 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		querySequenceStatement = getQuerySequenceStatement();
 		queryTimestampStatement = new StringBuilder("SELECT ").append(getCurrentTimestamp()).append(",LAST_UPDATED")
 				.append(" FROM ").append(getTableName()).append(" WHERE NAME='").append(getSequenceName()).append("'")
+				.toString();
+		updateTimestampStatement = new StringBuilder("UPDATE ").append(getTableName())
+				.append(" SET LAST_UPDATED = ? WHERE NAME='").append(getSequenceName()).append("' AND LAST_UPDATED < ?")
 				.toString();
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			String tableName = getTableName();
@@ -142,79 +147,58 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 
 	@Override
 	public String nextStringValue() throws DataAccessException {
-		return nextStringValue(3);
-	}
-
-	protected String nextStringValue(int maxAttempts) throws DataAccessException {
-		if (maxAttempts < 1)
-			throw new IllegalArgumentException("max attempts reached");
-		Connection con = null;
-		Statement stmt = null;
-		try {
-			con = getDataSource().getConnection();
+		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
-			stmt = con.createStatement();
-			Result result = queryTimestampWithSequence(con, stmt);
-			if (sameCycle(result) == STATUS_CYCLE_SAME_AND_SAFE) {
-				return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
-			} else {
-				if (getLockService().tryLock(getLockName())) {
-					try {
-						result = queryTimestampWithSequence(con, stmt);
-						if (sameCycle(result) == STATUS_CYCLE_CROSS) {
-							stmt.executeUpdate("UPDATE " + getTableName() + " SET LAST_UPDATED = "
-									+ getCurrentTimestamp() + " WHERE NAME='" + getSequenceName() + "'");
-							restartSequence(con, stmt);
-							result = queryTimestampWithSequence(con, stmt);
-						}
-						return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
-					} finally {
-						getLockService().unlock(getLockName());
-					}
+			int maxAttempts = 3;
+			con.setAutoCommit(true);
+			CycleType ct = getCycleType();
+			while (--maxAttempts > 0) {
+				Result result = queryTimestampWithSequence(con, stmt);
+				Date now = result.currentTimestamp;
+				if (sameCycle(result) == STATUS_CYCLE_SAME_AND_SAFE) {
+					if (updateLastUpdated(con, now, ct.getCycleStart(ct.skipCycles(now, 1))))
+						return getStringValue(now, getPaddingLength(), result.nextId);
 				} else {
-					if (stmt != null)
+					if (getLockService().tryLock(getLockName())) {
 						try {
-							stmt.close();
-							stmt = null;
-						} catch (SQLException e) {
-							e.printStackTrace();
+							result = queryTimestampWithSequence(con, stmt);
+							if (sameCycle(result) == STATUS_CYCLE_CROSS) {
+								if (updateLastUpdated(con, now, ct.getCycleStart(now))) {
+									restartSequence(con, stmt);
+									result = queryTimestampWithSequence(con, stmt);
+									return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
+								}
+							} else {
+								if (updateLastUpdated(con, now, ct.getCycleStart(ct.skipCycles(now, 1))))
+									return getStringValue(now, getPaddingLength(), result.nextId);
+							}
+						} finally {
+							getLockService().unlock(getLockName());
 						}
-					try {
-						con.close();
-						con = null;
-					} catch (SQLException e) {
-						e.printStackTrace();
 					}
-					try {
-						Thread.sleep(CRITICAL_THRESHOLD_TIME);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					return nextStringValue(--maxAttempts);
+				}
+				try {
+					Thread.sleep(CRITICAL_THRESHOLD_TIME);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
+			throw new IllegalStateException("max attempts reached");
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain next value of sequence", ex);
-		} finally {
-			if (stmt != null)
-				try {
-					stmt.close();
-					stmt = null;
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			if (con != null)
-				try {
-					con.close();
-					con = null;
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
 		}
 	}
 
 	protected void restartSequence(Connection con, Statement stmt) throws SQLException {
 		stmt.execute(getRestartSequenceStatement());
+	}
+
+	private boolean updateLastUpdated(Connection con, Date lastUpdated, Date limit) throws SQLException {
+		try (PreparedStatement ps = con.prepareStatement(updateTimestampStatement)) {
+			ps.setTimestamp(1, new Timestamp(lastUpdated.getTime()));
+			ps.setTimestamp(2, new Timestamp(limit.getTime()));
+			return ps.executeUpdate() == 1;
+		}
 	}
 
 	private int sameCycle(Result result) {

@@ -125,7 +125,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 					e.printStackTrace();
 				}
 			}
-			throw new IllegalArgumentException("max attempts reached");
+			throw new IllegalStateException("max attempts reached");
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain last_insert_id()", ex);
 		}

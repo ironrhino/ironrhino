@@ -66,11 +66,7 @@ public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 	}
 
 	private boolean isCriticalPoint() throws DataAccessException {
-		Connection con = null;
-		Statement stmt = null;
-		try {
-			con = getDataSource().getConnection();
-			stmt = con.createStatement();
+		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			ResultSet rs = stmt.executeQuery(queryTimestampStatement);
 			try {
 				rs.next();
@@ -84,22 +80,7 @@ public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 			}
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain current_timestamp", ex);
-		} finally {
-
-			if (stmt != null)
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			if (con != null)
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-
-		}
+		} 
 	}
 
 }
