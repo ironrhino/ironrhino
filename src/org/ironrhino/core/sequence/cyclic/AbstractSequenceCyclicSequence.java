@@ -217,6 +217,8 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			rs.next();
 			result.currentTimestamp = rs.getTimestamp(1);
 			result.lastTimestamp = rs.getTimestamp(2);
+			if (result.lastTimestamp.after(result.currentTimestamp))
+				throw new IllegalStateException("LAST_UPDATED should before CURRENT_TIMESTAMP");
 			return result;
 		}
 	}
