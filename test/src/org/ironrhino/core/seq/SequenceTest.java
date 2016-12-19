@@ -73,6 +73,8 @@ public class SequenceTest {
 					for (int j = 0; j < LOOP; j++) {
 						try {
 							String id = seq.nextStringValue();
+							if (id.length() == 16 && id.endsWith("0001"))
+								System.out.println(id);
 							Long time2 = System.currentTimeMillis();
 							Long old = map.putIfAbsent(id, time2);
 							if (old != null)

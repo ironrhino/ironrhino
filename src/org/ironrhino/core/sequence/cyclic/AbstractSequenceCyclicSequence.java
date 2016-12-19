@@ -14,21 +14,14 @@ import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.util.Assert;
 
 public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyclicSequence {
 
-	static final int STATUS_CYCLE_CROSS = 0;
-	static final int STATUS_CYCLE_SAME_AND_SAFE = 1;
-	static final int STATUS_CYCLE_SAME_AND_CRITICAL = 2;
+	private String querySequenceStatement;
 
-	static final long CRITICAL_THRESHOLD_TIME = 1000;
+	private String queryTimestampForUpdateStatement;
 
-	protected String querySequenceStatement;
-
-	protected String queryTimestampStatement;
-
-	protected String updateTimestampStatement;
+	private String updateTimestampStatement;
 
 	protected String getTimestampColumnType() {
 		return "TIMESTAMP";
@@ -68,11 +61,10 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(getLockService());
 		querySequenceStatement = getQuerySequenceStatement();
-		queryTimestampStatement = new StringBuilder("SELECT ").append(getCurrentTimestamp()).append(",LAST_UPDATED")
-				.append(" FROM ").append(getTableName()).append(" WHERE NAME='").append(getSequenceName()).append("'")
-				.toString();
+		queryTimestampForUpdateStatement = new StringBuilder("SELECT ").append(getCurrentTimestamp())
+				.append(",LAST_UPDATED").append(" FROM ").append(getTableName()).append(" WHERE NAME='")
+				.append(getSequenceName()).append("' FOR UPDATE").toString();
 		updateTimestampStatement = new StringBuilder("UPDATE ").append(getTableName())
 				.append(" SET LAST_UPDATED = ? WHERE NAME='").append(getSequenceName()).append("' AND LAST_UPDATED < ?")
 				.toString();
@@ -149,36 +141,33 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 	public String nextStringValue() throws DataAccessException {
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
-			int maxAttempts = 3;
-			con.setAutoCommit(true);
 			CycleType ct = getCycleType();
+			int maxAttempts = 3;
 			while (--maxAttempts > 0) {
 				Result result = queryTimestampWithSequence(con, stmt);
 				Date now = result.currentTimestamp;
-				if (sameCycle(result) == STATUS_CYCLE_SAME_AND_SAFE) {
+				if (sameCycle(result)) {
 					if (updateLastUpdated(con, now, ct.getCycleStart(ct.skipCycles(now, 1))))
 						return getStringValue(now, getPaddingLength(), result.nextId);
 				} else {
-					if (getLockService().tryLock(getLockName())) {
-						try {
+					con.setAutoCommit(false);
+					try {
+						result = queryTimestampForUpdate(con, stmt);
+						if (!sameCycle(result) && updateLastUpdated(con, now, ct.getCycleStart(now))) {
+							restartSequence(con, stmt);
 							result = queryTimestampWithSequence(con, stmt);
-							if (sameCycle(result) == STATUS_CYCLE_CROSS) {
-								if (updateLastUpdated(con, now, ct.getCycleStart(now))) {
-									restartSequence(con, stmt);
-									result = queryTimestampWithSequence(con, stmt);
-									return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
-								}
-							} else {
-								if (updateLastUpdated(con, now, ct.getCycleStart(ct.skipCycles(now, 1))))
-									return getStringValue(now, getPaddingLength(), result.nextId);
-							}
-						} finally {
-							getLockService().unlock(getLockName());
+							return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
 						}
+					} catch (Exception e) {
+						con.rollback();
+						con.setAutoCommit(true);
+					} finally {
+						con.commit();
+						con.setAutoCommit(true);
 					}
 				}
 				try {
-					Thread.sleep(CRITICAL_THRESHOLD_TIME);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -201,15 +190,8 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		}
 	}
 
-	private int sameCycle(Result result) {
-		boolean sameCycle = getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp);
-		if (!sameCycle)
-			return STATUS_CYCLE_CROSS;
-		Date cycleStart = getCycleType().getCycleStart(result.currentTimestamp);
-		if (result.currentTimestamp.getTime() - cycleStart.getTime() <= CRITICAL_THRESHOLD_TIME) {
-			return STATUS_CYCLE_SAME_AND_CRITICAL;
-		}
-		return STATUS_CYCLE_SAME_AND_SAFE;
+	private boolean sameCycle(Result result) {
+		return getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp);
 	}
 
 	private Result queryTimestampWithSequence(Connection con, Statement stmt) throws SQLException {
@@ -217,27 +199,15 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		try (ResultSet rs = stmt.executeQuery(querySequenceStatement)) {
 			rs.next();
 			result.nextId = rs.getInt(1);
-			if (rs.getMetaData().getColumnCount() > 1) {
-				result.currentTimestamp = rs.getTimestamp(2);
-				result.lastTimestamp = rs.getTimestamp(3);
-			} else {
-				Result temp = queryTimestamp(con, stmt);
-				result.currentTimestamp = temp.currentTimestamp;
-				result.lastTimestamp = temp.lastTimestamp;
-			}
+			result.currentTimestamp = rs.getTimestamp(2);
+			result.lastTimestamp = rs.getTimestamp(3);
 			return result;
-		} catch (SQLException ex) {
-			if (ex.getSQLState().equals("72000") && ex.getErrorCode() == 8004) { // ORA-08004
-				stmt.execute("ALTER SEQUENCE " + getActualSequenceName() + " INCREMENT BY 1 MINVALUE 0");
-				return queryTimestampWithSequence(con, stmt);
-			}
-			throw ex;
 		}
 	}
 
-	private Result queryTimestamp(Connection con, Statement stmt) throws SQLException {
+	private Result queryTimestampForUpdate(Connection con, Statement stmt) throws SQLException {
 		Result result = new Result();
-		try (ResultSet rs = stmt.executeQuery(queryTimestampStatement)) {
+		try (ResultSet rs = stmt.executeQuery(queryTimestampForUpdateStatement)) {
 			rs.next();
 			result.currentTimestamp = rs.getTimestamp(1);
 			result.lastTimestamp = rs.getTimestamp(2);

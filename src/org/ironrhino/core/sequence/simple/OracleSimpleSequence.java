@@ -17,14 +17,9 @@ public class OracleSimpleSequence extends AbstractSequenceSimpleSequence {
 		boolean autoCommit = con.getAutoCommit();
 		con.setAutoCommit(false);
 		int current;
-		ResultSet rs = null;
-		try {
-			rs = stmt.executeQuery("SELECT " + getActualSequenceName() + ".NEXTVAL FROM DUAL");
+		try (ResultSet rs = stmt.executeQuery("SELECT " + getActualSequenceName() + ".NEXTVAL FROM DUAL")) {
 			rs.next();
 			current = rs.getInt(1);
-		} finally {
-			if (rs != null)
-				rs.close();
 		}
 		stmt.execute("ALTER SEQUENCE " + getActualSequenceName() + " INCREMENT BY -" + current + " MINVALUE 0");
 		stmt.execute("SELECT " + getActualSequenceName() + ".NEXTVAL FROM DUAL");
