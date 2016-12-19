@@ -2,13 +2,23 @@ package org.ironrhino.rest.doc;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +28,10 @@ import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
 import org.ironrhino.rest.doc.annotation.Fields;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -152,10 +166,120 @@ public class ApiDocHelper {
 					args[i] = null;
 				}
 			}
-			return apiDocMethod.invoke(apiDocInstance, args);
+			Object obj = apiDocMethod.invoke(apiDocInstance, args);
+			if (obj == null) {
+				Type returnType = apiDocMethod.getGenericReturnType();
+				if (returnType instanceof ParameterizedType) {
+					ParameterizedType pt = (ParameterizedType) returnType;
+					if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1)
+						return null;
+					Class<?> raw = (Class<?>) pt.getRawType();
+					if (raw == DeferredResult.class || raw == CompletableFuture.class || raw == Callable.class
+							|| raw == Future.class || raw == ResponseEntity.class) {
+						return createSample(pt.getActualTypeArguments()[0]);
+					} else if (raw.isAssignableFrom(Set.class)) {
+						Set<Object> set = new HashSet<>();
+						set.add(createSample(pt.getActualTypeArguments()[0]));
+						return set;
+					} else if (raw.isAssignableFrom(Collection.class)) {
+						List<Object> list = new ArrayList<>();
+						list.add(createSample(pt.getActualTypeArguments()[0]));
+						return list;
+					}
+				} else if (returnType instanceof Class) {
+					return createSample(returnType);
+				}
+			}
+			return obj;
 		}
 		return null;
 
+	}
+
+	private static Object createSample(Type type) {
+		if (type instanceof Class) {
+			Class<?> clazz = (Class<?>) type;
+			if (clazz.isArray()) {
+				return new Object[] { createObject(clazz.getComponentType()) };
+			} else {
+				return createObject(clazz);
+			}
+		}
+		return null;
+	}
+
+	private static Object createObject(Class<?> clazz) {
+		Object object = createValue(clazz, null);
+		if (object != null)
+			return object;
+		try {
+			final Object obj = BeanUtils.instantiateClass(clazz);
+			ReflectionUtils.doWithFields(obj.getClass(), field -> {
+				ReflectionUtils.makeAccessible(field);
+				if (!field.getType().isPrimitive() && field.get(obj) != null) {
+					return;
+				}
+				Object value = createValue(field.getType(), field.getName());
+				if (value == null)
+					value = createObject(field.getType());
+				field.set(obj, value);
+			}, field -> {
+				if (field.getType() == clazz)
+					return false;
+				int mod = field.getModifiers();
+				return !(Modifier.isFinal(mod) || Modifier.isStatic(mod));
+			});
+			return obj;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private static Object createValue(Class<?> type, String fieldName) {
+		if (String.class == type)
+			return suggestStringValue(fieldName);
+		if ((Boolean.TYPE == type) || (Boolean.class == type))
+			return true;
+		if ((Byte.TYPE == type) || (Byte.class == type))
+			return 0;
+		if ((Short.TYPE == type) || (Short.class == type))
+			return 10;
+		if ((Integer.TYPE == type) || (Integer.class == type))
+			return 100;
+		if ((Long.TYPE == type) || (Long.class == type))
+			return 1000;
+		if ((Float.TYPE == type) || (Float.class == type))
+			return 9.9f;
+		if ((Double.TYPE == type) || (Double.class == type) || (Number.class == type))
+			return 12.12d;
+		if (BigDecimal.class == type)
+			return new BigDecimal(12.12);
+		if (Date.class.isAssignableFrom(type))
+			return new Date();
+		if (type.isEnum()) {
+			try {
+				return ((Object[]) type.getMethod("values").invoke(null))[0];
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	private static String suggestStringValue(String fieldName) {
+		if (fieldName == null)
+			return "test";
+		if (fieldName.toLowerCase().equals("id"))
+			return "1KYuu6skj6JP1me78gBWQF";
+		if (fieldName.toLowerCase().endsWith("email"))
+			return "test@test.com";
+		if (fieldName.toLowerCase().endsWith("username"))
+			return "admin";
+		if (fieldName.toLowerCase().endsWith("password"))
+			return "********";
+		if (fieldName.toLowerCase().endsWith("phone") || fieldName.toLowerCase().endsWith("mobile"))
+			return "13888888888";
+		return fieldName.toUpperCase();
 	}
 
 }
