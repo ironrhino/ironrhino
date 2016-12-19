@@ -68,6 +68,14 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		updateTimestampStatement = new StringBuilder("UPDATE ").append(getTableName())
 				.append(" SET LAST_UPDATED = ? WHERE NAME='").append(getSequenceName()).append("' AND LAST_UPDATED < ?")
 				.toString();
+		try {
+			createOrUpgradeTable();
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	protected void createOrUpgradeTable() throws SQLException {
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			String tableName = getTableName();
 			boolean tableExists = false;
@@ -132,8 +140,6 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 				stmt.execute(getInsertStatement());
 				stmt.execute(getCreateSequenceStatement());
 			}
-		} catch (SQLException ex) {
-			logger.error(ex.getMessage(), ex);
 		}
 	}
 
