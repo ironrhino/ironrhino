@@ -9,6 +9,8 @@ import javax.persistence.EnumType;
 
 class JdbcHelper {
 	static boolean isScalar(Class<?> type) {
+		if (String.class == type)
+			return true;
 		if ((Boolean.TYPE == type) || (Boolean.class == type))
 			return true;
 		if ((Byte.TYPE == type) || (Byte.class == type))
