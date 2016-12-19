@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
+import org.springframework.jdbc.core.namedparam.ParsedSql;
 
 public class SqlUtils {
 
@@ -117,6 +119,12 @@ public class SqlUtils {
 	public static Set<String> extractParameters(String sql) {
 		if (StringUtils.isBlank(sql))
 			return Collections.emptySet();
+		ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(sql);
+		if (parsedSql != null) {
+			List<String> names = ReflectionUtils.getFieldValue(parsedSql, "parameterNames");
+			if (names != null)
+				return new LinkedHashSet<>(names);
+		}
 		sql = clearComments(sql);
 		Set<String> names = new LinkedHashSet<>();
 		Matcher m = PARAMETER_PATTERN.matcher(sql);
