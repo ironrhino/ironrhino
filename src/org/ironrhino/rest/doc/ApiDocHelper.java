@@ -168,27 +168,7 @@ public class ApiDocHelper {
 			}
 			Object obj = apiDocMethod.invoke(apiDocInstance, args);
 			if (obj == null) {
-				Type returnType = apiDocMethod.getGenericReturnType();
-				if (returnType instanceof ParameterizedType) {
-					ParameterizedType pt = (ParameterizedType) returnType;
-					if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1)
-						return null;
-					Class<?> raw = (Class<?>) pt.getRawType();
-					if (raw == DeferredResult.class || raw == CompletableFuture.class || raw == Callable.class
-							|| raw == Future.class || raw == ResponseEntity.class) {
-						return createSample(pt.getActualTypeArguments()[0]);
-					} else if (raw.isAssignableFrom(Set.class)) {
-						Set<Object> set = new HashSet<>();
-						set.add(createSample(pt.getActualTypeArguments()[0]));
-						return set;
-					} else if (raw.isAssignableFrom(Collection.class)) {
-						List<Object> list = new ArrayList<>();
-						list.add(createSample(pt.getActualTypeArguments()[0]));
-						return list;
-					}
-				} else if (returnType instanceof Class) {
-					return createSample(returnType);
-				}
+				obj = createSample(apiDocMethod.getGenericReturnType());
 			}
 			return obj;
 		}
@@ -196,16 +176,40 @@ public class ApiDocHelper {
 
 	}
 
-	private static Object createSample(Type type) {
-		if (type instanceof Class) {
-			Class<?> clazz = (Class<?>) type;
-			if (clazz.isArray()) {
-				return new Object[] { createObject(clazz.getComponentType()) };
-			} else {
-				return createObject(clazz);
+	private static Object createSample(Type returnType) {
+		if (returnType instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) returnType;
+			if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1
+					|| !(pt.getActualTypeArguments()[0] instanceof Class))
+				return null;
+			Class<?> raw = (Class<?>) pt.getRawType();
+			Class<?> clazz = (Class<?>) pt.getActualTypeArguments()[0];
+			if (raw == DeferredResult.class || raw == CompletableFuture.class || raw == Callable.class
+					|| raw == Future.class || raw == ResponseEntity.class) {
+				return createSample(clazz);
+			} else if (raw.isAssignableFrom(Set.class)) {
+				Set<Object> set = new HashSet<>();
+				set.add(createSample(clazz));
+				return set;
+			} else if (raw.isAssignableFrom(Collection.class)) {
+				List<Object> list = new ArrayList<>();
+				list.add(createSample(clazz));
+				return list;
 			}
+			return null;
+		} else if (returnType instanceof Class) {
+			return createSample((Class<?>) returnType);
+		} else {
+			return null;
 		}
-		return null;
+	}
+
+	private static Object createSample(Class<?> clazz) {
+		if (clazz.isArray()) {
+			return new Object[] { createObject(clazz.getComponentType()) };
+		} else {
+			return createObject(clazz);
+		}
 	}
 
 	private static Object createObject(Class<?> clazz) {
@@ -216,12 +220,36 @@ public class ApiDocHelper {
 			final Object obj = BeanUtils.instantiateClass(clazz);
 			ReflectionUtils.doWithFields(obj.getClass(), field -> {
 				ReflectionUtils.makeAccessible(field);
-				if (!field.getType().isPrimitive() && field.get(obj) != null) {
+				Object value;
+				Type type = field.getGenericType();
+				if (type instanceof Class) {
+					if (!field.getType().isPrimitive() && field.get(obj) != null) {
+						return;
+					}
+					value = createValue(field.getType(), field.getName());
+					if (value == null)
+						value = createObject(field.getType());
+				} else if (type instanceof ParameterizedType) {
+					ParameterizedType pt = (ParameterizedType) type;
+					if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1
+							|| !(pt.getActualTypeArguments()[0] instanceof Class))
+						return;
+					Class<?> raw = (Class<?>) pt.getRawType();
+					Class<?> clazz2 = (Class<?>) pt.getActualTypeArguments()[0];
+					if (raw.isAssignableFrom(Set.class)) {
+						Set<Object> set = new HashSet<>();
+						set.add(createSample(clazz2));
+						value = set;
+					} else if (raw.isAssignableFrom(Collection.class)) {
+						List<Object> list = new ArrayList<>();
+						list.add(createSample(clazz2));
+						value = list;
+					} else {
+						return;
+					}
+				} else {
 					return;
 				}
-				Object value = createValue(field.getType(), field.getName());
-				if (value == null)
-					value = createObject(field.getType());
 				field.set(obj, value);
 			}, field -> {
 				if (field.getType() == clazz)
