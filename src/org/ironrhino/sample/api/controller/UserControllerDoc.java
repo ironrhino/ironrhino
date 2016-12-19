@@ -4,6 +4,7 @@ import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
+import org.ironrhino.rest.doc.annotation.Status;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.security.model.User;
@@ -47,7 +48,7 @@ public class UserControllerDoc extends UserController {
 	}
 
 	@Override
-	@Api("获取用户")
+	@Api(value = "获取用户", statuses = { @Status(code = 404, description = "用户名不存在") })
 	public DeferredResult<User> get(String username) {
 		DeferredResult<User> result = new DeferredResult<>();
 		result.setResult(createUserForGet());

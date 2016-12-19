@@ -20,9 +20,11 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.doc.annotation.Api;
+import org.ironrhino.rest.doc.annotation.Status;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -73,6 +75,8 @@ public class ApiDoc implements Serializable {
 
 	protected String responseBodySample;
 
+	protected List<StatusObject> statuses;
+
 	public ApiDoc(Class<?> apiDocClazz, Method apiDocMethod, ObjectMapper objectMapper) throws Exception {
 
 		Class<?> clazz = apiDocClazz.getSuperclass();
@@ -82,6 +86,24 @@ public class ApiDoc implements Serializable {
 		Api api = apiDocMethod.getAnnotation(Api.class);
 		this.name = api.value();
 		this.description = api.description();
+		this.statuses = new ArrayList<>(api.statuses().length + 1);
+		boolean has2xx = false;
+		for (Status es : api.statuses()) {
+			HttpStatus hs;
+			try {
+				hs = HttpStatus.valueOf(es.code());
+			} catch (IllegalArgumentException e) {
+				hs = null;
+			}
+			if (hs != null && hs.is2xxSuccessful())
+				has2xx = true;
+			StatusObject so = new StatusObject(es);
+			if (StringUtils.isBlank(so.getMessage()) && hs != null)
+				so.setMessage(hs.getReasonPhrase());
+			this.statuses.add(so);
+		}
+		if (!has2xx)
+			this.statuses.add(0, new StatusObject(HttpStatus.OK));
 
 		Authorize authorize = method.getAnnotation(Authorize.class);
 		if (authorize == null)
@@ -397,6 +419,14 @@ public class ApiDoc implements Serializable {
 
 	public void setResponseBodySample(String responseBodySample) {
 		this.responseBodySample = responseBodySample;
+	}
+
+	public List<StatusObject> getStatuses() {
+		return statuses;
+	}
+
+	public void setStatuses(List<StatusObject> statuses) {
+		this.statuses = statuses;
 	}
 
 }

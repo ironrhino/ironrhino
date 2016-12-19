@@ -1,19 +1,19 @@
 package org.ironrhino.rest.doc.annotation;
 
-import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-@Target(METHOD)
+@Target({ ANNOTATION_TYPE })
 @Retention(RUNTIME)
-public @interface Api {
+public @interface Status {
 
-	String value();
+	int code();
+
+	String message() default "";
 
 	String description() default "";
-
-	Status[] statuses() default {};
 
 }
