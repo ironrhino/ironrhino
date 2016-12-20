@@ -1662,6 +1662,7 @@ Observation.common = function(container) {
 				},
 				complete : function() {
 					$(target).removeClass('loading');
+					$('.loading', target).prop('disabled', false).removeClass('loading');
 				},
 				headers : _opt.headers
 			};

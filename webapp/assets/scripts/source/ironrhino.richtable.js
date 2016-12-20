@@ -601,7 +601,7 @@ Initialization.richtable = function() {
 						var btn = $(event.target).closest('button,a')
 								.addClass('clicked');
 						var form = btn.closest('form');
-						btn.prop('disabled', true);
+						btn.prop('disabled', true).addClass('loading');
 						form.submit();
 						setTimeout(function() {
 									form.closest('.reload-container')

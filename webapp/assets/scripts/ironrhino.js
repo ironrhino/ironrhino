@@ -33730,6 +33730,7 @@ Observation.common = function(container) {
 				},
 				complete : function() {
 					$(target).removeClass('loading');
+					$('.loading', target).prop('disabled', false).removeClass('loading');
 				},
 				headers : _opt.headers
 			};
@@ -38585,7 +38586,7 @@ Initialization.richtable = function() {
 						var btn = $(event.target).closest('button,a')
 								.addClass('clicked');
 						var form = btn.closest('form');
-						btn.prop('disabled', true);
+						btn.prop('disabled', true).addClass('loading');
 						form.submit();
 						setTimeout(function() {
 									form.closest('.reload-container')
