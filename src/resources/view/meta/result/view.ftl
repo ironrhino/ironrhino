@@ -177,7 +177,7 @@
 					<tbody>
 					<#assign size=0>
 					<#assign collections=entity[key]!>
-					<#if collections?is_collection_ex && collections?size gt 0>
+					<#if collections?is_collection && collections?size gt 0>
 					<#list collections as element>
 						<tr>
 							<#list embeddedUiConfigs.entrySet() as entry>
