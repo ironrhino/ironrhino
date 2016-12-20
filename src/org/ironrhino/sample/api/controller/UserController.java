@@ -95,9 +95,7 @@ public class UserController {
 	public RestStatus patch(@PathVariable String username, @RequestBody User user) {
 		User u = (User) userManager.loadUserByUsername(username);
 		if (u == null) {
-			// throw RestStatus.NOT_FOUND;
-			u = new User();
-			u.setUsername(username);
+			throw RestStatus.NOT_FOUND;
 		}
 		if (user.getPassword() != null)
 			u.setLegiblePassword(user.getPassword());

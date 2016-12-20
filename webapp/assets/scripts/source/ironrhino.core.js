@@ -908,6 +908,50 @@ Initialization.common = function() {
 				});
 		document.location.reload();
 		return false;
+	}).on('submit', 'form.api-playground', function(e) {
+		var form = $(e.target);
+		var params = [];
+		form.find('table.requestParams tr').each(function(i, v) {
+			var row = $(this);
+			var name = row.find('input:eq(0)').val();
+			var value = row.find('input:eq(1)').val();
+			if (name)
+				params.push(encodeURIComponent(name) + '='
+						+ encodeURIComponent(value));
+		});
+		var headers = {};
+		form.find('table.requestHeaders tr').each(function(i, v) {
+					var row = $(this);
+					var name = row.find('input:eq(0)').val();
+					var value = row.find('input:eq(1)').val();
+					if (name)
+						headers[name] = value;
+				});
+		if (form.find('input.accessToken').val())
+			headers['Authorization'] = 'Bearer '
+					+ form.find('input.accessToken').val();
+		var url = form.find('.url').text();
+		if (params.length)
+			url += '?' + params.join(',');
+		var options = {
+			global : false,
+			url : url,
+			method : form.attr('method'),
+			headers : headers,
+			dataType : 'text',
+			complete : function(xhr) {
+				form.find('.responseStatus').text(xhr.status + ' '
+						+ xhr.statusText);
+				form.find('.responseHeaders').text(xhr.getAllResponseHeaders());
+				form.find('.responseBody').text(xhr.responseText);
+			}
+		};
+		if (form.find('.requestBody').length) {
+			options.data = form.find('.requestBody').text();
+			options.contentType = 'application/json; charset=UTF-8';
+		}
+		$.ajax(options);
+		return false;
 	});
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
