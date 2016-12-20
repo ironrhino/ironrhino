@@ -38,7 +38,7 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.driverClassName:}")
 	private String driverClassName;
 
-	@Value("${jdbc.url:jdbc:mysql:///#{systemProperties['app.name'].replaceAll('-','_')}?createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&tinyInt1isBit=false&useSSL=false}")
+	@Value("${jdbc.url:jdbc:mysql:///#{systemProperties['app.name'].replaceAll('-','_')}?createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&tinyInt1isBit=false&socketTimeout=5000&useSSL=false}")
 	private String jdbcUrl;
 
 	@Value("${jdbc.username:root}")
@@ -53,7 +53,7 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.initialSize:5}")
 	private int minConnectionsPerPartition;
 
-	@Value("${dataSource.connectionTimeoutInMs:30000}")
+	@Value("${dataSource.connectionTimeoutInMs:5000}")
 	private int connectionTimeoutInMs;
 
 	@Value("${dataSource.idleMaxAgeInMinutes:30}")
