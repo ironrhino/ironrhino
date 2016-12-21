@@ -9,7 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import org.elasticsearch.common.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanWrapper;
