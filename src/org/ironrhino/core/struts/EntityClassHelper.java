@@ -95,7 +95,11 @@ public class EntityClassHelper {
 					try {
 						declaredField = readMethod.getDeclaringClass().getDeclaredField(propertyName);
 					} catch (NoSuchFieldException e) {
-						declaredField = null;
+						try {
+							declaredField = ReflectionUtils.getField(readMethod.getDeclaringClass(), propertyName);
+						} catch (NoSuchFieldException ex) {
+							declaredField = null;
+						}
 					} catch (SecurityException e) {
 						throw new RuntimeException(e);
 					}
