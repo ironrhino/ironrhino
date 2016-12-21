@@ -12,7 +12,11 @@ import org.springframework.context.annotation.Conditional;
 @Conditional(BeanPresentCondition.class)
 public @interface BeanPresentConditional {
 
-	String value();
+	String value() default ""; // alias for name
+
+	String name() default "";
+
+	Class<?> type() default Object.class;
 
 	boolean negated() default false;
 

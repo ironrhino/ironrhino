@@ -16,7 +16,7 @@ import org.hibernate.event.spi.PostUpdateEvent;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.Persistable;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Aspect
 @Component
-@ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@BeanPresentConditional(type = SessionFactory.class)
 public class RecordAspect extends TransactionSynchronizationAdapter implements Ordered {
 
 	private static final String HIBERNATE_EVENTS = "HIBERNATE_EVENTS_FOR_RECORD";
