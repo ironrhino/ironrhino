@@ -56,8 +56,11 @@
 						});
 			}
 			$('thead .add', this).click(function(event) {
-				var row = $(event.target).closest('table.datagrided')
-						.children('tbody').children(':not(.nontemplate):eq(0)');
+				var table = $(event.target).closest('table.datagrided');
+				var row = table.children('tbody')
+						.children(':not(.nontemplate):eq(0)');
+				if (!row.length)
+					row = table.children('tfoot').children('tr:hidden');
 				if (row.length > 0)
 					addRow(event, options, row.eq(0), true);
 			});
@@ -96,6 +99,9 @@
 			}
 		}
 		var r = row.clone(true);
+		if (r.is(':hidden'))
+			r.show().find('._disabled:input').removeClass('_disabled').prop(
+					'disabled', false);
 		$('*', r).removeAttr('id');
 		$('span.info', r).html('');
 		$(':input[type!=checkbox][type!=radio]', r).val('');
@@ -159,7 +165,7 @@
 						$(this).remove();
 				});
 		if (first)
-			row.parent().prepend(r);
+			r.prependTo(table.children('tbody:eq(0)'));
 		else
 			current.after(r);
 		if (!skipRename)
@@ -209,7 +215,19 @@
 				&& options.onbeforeremove.apply(row.get(0)) === false)
 			return;
 		$(':input', row.prev()).eq(0).focus();
-		row.remove();
+		if (table.hasClass('nullable') && $('tr', tbody).length == 1) {
+			var tfoot = table.children('tfoot');
+			if (!tfoot.length)
+				tfoot = $('<tfoot></tfoot>').appendTo(table);
+			$(':input:not([disabled])', row).addClass('_disabled').prop(
+					'disabled', true);
+			if (tfoot.find('tr:hidden').length)
+				row.remove();
+			else
+				row.appendTo(tfoot).hide();
+		} else {
+			row.remove();
+		}
 		rename(tbody);
 		if (options.onremove)
 			options.onremove();
