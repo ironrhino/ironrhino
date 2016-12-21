@@ -1662,7 +1662,8 @@ Observation.common = function(container) {
 				},
 				complete : function() {
 					$(target).removeClass('loading');
-					$('.loading', target).prop('disabled', false).removeClass('loading');
+					$('.loading', target).prop('disabled', false)
+							.removeClass('loading');
 				},
 				headers : _opt.headers
 			};
@@ -1806,12 +1807,19 @@ var Dialog = {
 			var useiframe = iframe != null;
 			var hasRow = false;
 			var hasToolbarPagination = false;
+			var datagridColumns = 0;
 			var hideCloseButton = false;
 			if (!iframe) {
 				$(d).dialog('option', 'title', Ajax.title);
 				hasRow = $('div.row', d).length > 0;
 				hasToolbarPagination = $(
 						'form.richtable div.toolbar select.pageSize', d).length > 0;
+				$('table.datagrid', d).each(function() {
+					var i = $(this).find('tbody tr:eq(0)').find('td').length
+							- 1;
+					if (datagridColumns < i)
+						datagridColumns = i;
+				});
 				hideCloseButton = d.find('.custom-dialog-close').length;
 			} else {
 				var doc = iframe.document;
@@ -1827,14 +1835,27 @@ var Dialog = {
 				hasRow = $('div.row', doc).length > 0;
 				hasToolbarPagination = $(
 						'form.richtable div.toolbar select.pageSize', doc).length > 0;
+				$('table.datagrid', doc).each(function() {
+					var i = $(this).find('tbody tr:eq(0)').find('td').length
+							- 1;
+					if (datagridColumns < i)
+						datagridColumns = i;
+				});
 				hideCloseButton = $(doc).find('.custom-dialog-close').length;
 			}
 			d.dialog('moveToTop');
-			if ((hasRow || hasToolbarPagination)
-					&& !(d.data('windowoptions') && d.data('windowoptions').width)) {
-				d.dialog('option', 'width', $(window).width() > 1345
-								? '90%'
-								: ($(window).width() > 1210 ? '95%' : '100%'));
+			if (!(d.data('windowoptions') && d.data('windowoptions').width)) {
+				if ((hasRow || hasToolbarPagination)) {
+					d.dialog('option', 'width', $(window).width() > 1345
+									? '90%'
+									: ($(window).width() > 1210
+											? '95%'
+											: '100%'));
+				} else if (datagridColumns > 1) {
+					d.dialog('option', 'width', datagridColumns < 3
+									? '60%'
+									: (datagridColumns < 4 ? '80%' : "90%"));
+				}
 			}
 			if (hideCloseButton)
 				$('.ui-dialog-titlebar-close', d.closest('.ui-dialog')).hide();
