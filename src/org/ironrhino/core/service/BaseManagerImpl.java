@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -20,7 +24,6 @@ import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
 import org.hibernate.LockOptions;
 import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -34,6 +37,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
+import org.hibernate.query.Query;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.transform.ResultTransformer;
 import org.ironrhino.core.hibernate.IgnoreCaseSimpleExpression;
@@ -110,12 +114,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			final BaseTreeableEntity entity = (BaseTreeableEntity) obj;
 			boolean childrenNeedChange = false;
 			if (entity.isNew()) {
-				FlushMode mode = session.getFlushMode();
-				session.setFlushMode(FlushMode.MANUAL);
+				FlushMode mode = session.getHibernateFlushMode();
+				session.setHibernateFlushMode(FlushMode.MANUAL);
 				entity.setFullId("");
 				session.save(entity);
 				session.flush();
-				session.setFlushMode(mode);
+				session.setHibernateFlushMode(mode);
 			} else {
 				childrenNeedChange = (entity.getParent() == null && entity.getLevel() != 1
 						|| entity.getParent() != null && (entity.getLevel() - entity.getParent().getLevel() != 1
@@ -226,8 +230,13 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public boolean exists(Serializable id) {
 		if (id == null)
 			return false;
-		return (Long) sessionFactory.getCurrentSession().createCriteria(getEntityClass()).add(Restrictions.eq("id", id))
-				.setProjection(Projections.rowCount()).uniqueResult() > 0;
+		CriteriaBuilder cb = sessionFactory.getCriteriaBuilder();
+		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+		Root<?> root = cq.from(getEntityClass());
+		cq.select(cb.count(cq.from(getEntityClass())));
+		cq.where(cb.equal(root.get("id"), id));
+		Query<Long> query = sessionFactory.getCurrentSession().createQuery(cq);
+		return query.uniqueResult() > 0;
 	}
 
 	@Override
@@ -398,15 +407,20 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> findAll(Order... orders) {
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(getEntityClass());
-		c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+		CriteriaBuilder cb = sessionFactory.getCriteriaBuilder();
+		CriteriaQuery<T> cq = cb.createQuery(getEntityClass());
+		Root<?> root = cq.from(getEntityClass());
 		if (orders.length == 0) {
 			if (Ordered.class.isAssignableFrom(getEntityClass()))
-				c.addOrder(Order.asc("displayOrder"));
-		} else
-			for (Order order : orders)
-				c.addOrder(order);
-		return c.list();
+				cq.orderBy(cb.asc(root.get("displayOrder")));
+		} else {
+			javax.persistence.criteria.Order[] _orders = new javax.persistence.criteria.Order[orders.length];
+			for (int i = 0; i < orders.length; i++)
+				_orders[i] = orders[i].isAscending() ? cb.asc(root.get(orders[i].getPropertyName()))
+						: cb.desc(root.get(orders[i].getPropertyName()));
+			cq.orderBy(_orders);
+		}
+		return sessionFactory.getCurrentSession().createQuery(cq).list();
 	}
 
 	@Override

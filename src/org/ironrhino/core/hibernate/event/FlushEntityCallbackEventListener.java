@@ -38,6 +38,7 @@ public class FlushEntityCallbackEventListener extends DefaultFlushEntityEventLis
 	private boolean copyState(Object entity, Type[] types, Object[] state, SessionFactory sf) {
 		// copy the entity state into the state array and return true if the state has
 		// changed
+		@SuppressWarnings("deprecation")
 		ClassMetadata metadata = sf.getClassMetadata(entity.getClass());
 		Object[] newState = metadata.getPropertyValues(entity);
 		int size = newState.length;

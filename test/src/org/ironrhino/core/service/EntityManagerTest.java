@@ -21,12 +21,12 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.ironrhino.common.model.Gender;
@@ -227,7 +227,7 @@ public class EntityManagerTest {
 		clearData();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Test
 	public void testResultTransformer() {
 		prepareData();
@@ -274,10 +274,10 @@ public class EntityManagerTest {
 	public void testCallback() {
 		prepareData();
 		Person person = entityManager.executeFind(session -> {
-			Query q = session.createQuery("from Person p where p.name=:name");
-			q.setString("name", "test0");
+			Query<Person> q = session.createQuery("from Person p where p.name=:name", Person.class);
+			q.setParameter("name", "test0");
 			q.setMaxResults(1);
-			return (Person) q.uniqueResult();
+			return q.uniqueResult();
 		});
 		assertEquals("test0", person.getName());
 		clearData();

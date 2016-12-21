@@ -6,6 +6,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.TypedValue;
 import org.hibernate.type.StringType;
 
@@ -24,7 +25,7 @@ public class PrefixFindInSetCriterion implements Criterion {
 	@Override
 	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) {
 		String column = criteriaQuery.findColumns(propertyName, criteria)[0];
-		Dialect dialect = criteriaQuery.getFactory().getDialect();
+		Dialect dialect = criteriaQuery.getFactory().getServiceRegistry().getService(JdbcServices.class).getDialect();
 		return dialect.getFunctions().get("concat").render(StringType.INSTANCE, Arrays.asList("','", column),
 				criteriaQuery.getFactory()) + " like ?";
 	}

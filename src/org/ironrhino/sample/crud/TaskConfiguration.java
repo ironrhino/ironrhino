@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import javax.annotation.Resource;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
 import org.ironrhino.core.sequence.Sequence;
 import org.ironrhino.core.sequence.cyclic.DatabaseCyclicSequenceDelegate;
@@ -31,7 +31,7 @@ public class TaskConfiguration {
 		private Sequence taskNo;
 
 		@Override
-		public Serializable generate(SessionImplementor session, Object obj) {
+		public Serializable generate(SharedSessionContractImplementor session, Object obj) {
 			return taskNo.nextStringValue();
 		}
 

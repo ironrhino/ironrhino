@@ -138,6 +138,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			logger.error(e.getMessage(), e);
 		}
 		Properties properties = getHibernateProperties();
+		// version 5.2 introduce ALLOW_UPDATE_OUTSIDE_TRANSACTION
+		// used for RecordAspect.afterCommit()
+		properties.put(AvailableSettings.ALLOW_UPDATE_OUTSIDE_TRANSACTION, true);
 		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
 			properties.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
 		Map<String, Class<?>> added = new HashMap<>();

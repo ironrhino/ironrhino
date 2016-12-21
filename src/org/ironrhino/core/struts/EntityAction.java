@@ -20,13 +20,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
-import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
@@ -35,6 +35,8 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.query.Query;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.AppendOnly;
@@ -263,7 +265,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public String getVersionPropertyName() {
-		ClassMetadata cm = sessionFactory.getClassMetadata(getEntityClass());
+		ClassMetadata cm = (ClassMetadata) ((MetamodelImplementor) ((EntityManagerFactory) sessionFactory)
+				.getMetamodel()).entityPersister(getEntityClass().getName());
 		return cm.isVersioned() ? cm.getPropertyNames()[cm.getVersionProperty()] : null;
 	}
 
@@ -1689,7 +1692,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			StringBuilder hql = new StringBuilder("select ").append(propertyName).append(" from ")
 					.append(getEntityClass().getSimpleName()).append(" where ").append(propertyName)
 					.append(" like :keyword");
-			Query q = session.createQuery(hql.toString());
+			Query<String> q = session.createQuery(hql.toString(), String.class);
 			q.setParameter("keyword", keyword + "%");
 			q.setMaxResults(20);
 			return q.list();
