@@ -76,7 +76,7 @@
 		</#if>
 		<#if !hidden>
 			<#assign columns+=[key]>
-			<#if config['showSum']>
+			<#if resultPage.result?size gt 0 && config['showSum']>
 				<#assign sumColumns+={key:{"value":0,"template":config['template']!}}>
 			</#if>
 			<#assign label=key>

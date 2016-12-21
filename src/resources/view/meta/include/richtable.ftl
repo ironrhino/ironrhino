@@ -11,11 +11,13 @@
 <@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn/>
 <#if resultPage??><#local list=resultPage.result></#if>
 <#local sumColumns={}>
+<#if list?size gt 0>
 <#list columns as name,config>
 	<#if config['showSum']?? && config['showSum']>
 		<#local sumColumns+={name:{"template":config['template']!}}>
 	</#if>
 </#list>
+</#if>
 <#list list as entity>
 <#list sumColumns as name,config>
 	<#if !name?contains('.')><#local val=entity[name]!><#else><#local val=('(entity.'+name+')!')?eval></#if>
