@@ -1814,7 +1814,7 @@ var Dialog = {
 				hasRow = $('div.row', d).length > 0;
 				hasToolbarPagination = $(
 						'form.richtable div.toolbar select.pageSize', d).length > 0;
-				$('table.datagrid', d).each(function() {
+				$('.controls > table', d).each(function() {
 					var i = $(this).find('tbody tr:eq(0)').find('td').length
 							- 1;
 					if (datagridColumns < i)
@@ -1835,7 +1835,7 @@ var Dialog = {
 				hasRow = $('div.row', doc).length > 0;
 				hasToolbarPagination = $(
 						'form.richtable div.toolbar select.pageSize', doc).length > 0;
-				$('table.datagrid', doc).each(function() {
+				$('.controls > table', doc).each(function() {
 					var i = $(this).find('tbody tr:eq(0)').find('td').length
 							- 1;
 					if (datagridColumns < i)
@@ -1854,7 +1854,11 @@ var Dialog = {
 				} else if (datagridColumns > 1) {
 					d.dialog('option', 'width', datagridColumns < 3
 									? '60%'
-									: (datagridColumns < 4 ? '80%' : "90%"));
+									: (datagridColumns < 4
+											? '80%'
+											: (datagridColumns < 5
+													? '90%'
+													: "98%")));
 				}
 			}
 			if (hideCloseButton)
