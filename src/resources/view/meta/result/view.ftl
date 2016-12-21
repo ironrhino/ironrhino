@@ -55,7 +55,11 @@
 						<#assign cssClass=config.cssClass?replace('input-[^ ]+', '', 'r')>
 						<#if config.type=='textarea'>
 							<#if value?has_content>
-							<p<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</p>
+							<#if cssClass?has_content&&cssClass?contains('htmlarea')>
+							${value?no_esc}
+							<#else>
+							<p<#if cssClass?has_content> class="${cssClass}"</#if>>${value}</p>
+							</#if>
 							</#if>
 						<#elseif config.type=='dictionary'>
 							<#if displayDictionaryLabel??>
@@ -130,9 +134,14 @@
 			<#assign template=config.viewTemplate/>
 			</#if>
 			<#if !template?has_content>
+				<#assign cssClass=config.cssClass?replace('input-[^ ]+', '', 'r')>
 				<#if config.type=='textarea'>
 					<#if value?has_content>
-					<p<#if cssClass?has_content> class="${cssClass}"</#if>>${value!}</p>
+					<#if cssClass?has_content&&cssClass?contains('htmlarea')>
+					${value?no_esc}
+					<#else>
+					<p<#if cssClass?has_content> class="${cssClass}"</#if>>${value}</p>
+					</#if>
 					</#if>
 				<#elseif config.type=='dictionary'>
 					<#if displayDictionaryLabel??>
