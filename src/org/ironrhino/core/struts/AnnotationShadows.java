@@ -97,6 +97,10 @@ public class AnnotationShadows {
 			this.template = config.template();
 			this.listTemplate = config.listTemplate();
 			this.viewTemplate = config.viewTemplate();
+			if (this.listTemplate.isEmpty())
+				this.listTemplate = this.template;
+			if (this.viewTemplate.isEmpty())
+				this.viewTemplate = this.template;
 			this.inputTemplate = config.inputTemplate();
 			this.csvTemplate = config.csvTemplate();
 			this.width = config.width();
