@@ -117,10 +117,16 @@
 	</#if>
 	</#if>
 </#if>
-<#if multiple>
-<#assign bottomButtons=r'<button type="button" class="btn btn-primary pick" data-shown="selected">${getText("confirm")}</button> '/>
-<#else>
+<#assign actionColumnButtons=''/>
+<#if (Parameters.editable!)=='true'>
+<#assign actionColumnButtons=r'<@btn view="input" label="edit" windowoptions="${richtableConfig.inputWindowOptions!}"/> '/>
+</#if>
 <#assign bottomButtons=''/>
+<#if (Parameters.creatable!)=='true'>
+<#assign bottomButtons+=r'<@btn view="input" label="create" windowoptions="${richtableConfig.inputWindowOptions!}"/> '/>
+</#if>
+<#if multiple>
+<#assign bottomButtons+=r'<button type="button" class="btn btn-primary pick" data-shown="selected">${getText("confirm")}</button> '/>
 </#if>
 <#assign bottomButtons+=r'
 <#if treeable&&Parameters.parent??>
@@ -151,7 +157,7 @@
 	<li class="active">${parentEntity.name}</li>
 </ul>
 </#if>
-<@richtable entityName=entityName formid=entityName+'_pick_form' columns=columns bottomButtons=bottomButtons searchable=searchable!true readonly=true showCheckColumn=true multipleCheck=multiple columnfilterable=false resizable=false sortable=false showPageSize=false/>
+<@richtable entityName=entityName formid=entityName+'_pick_form' columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons searchable=searchable!true readonly=true showCheckColumn=true multipleCheck=multiple columnfilterable=false resizable=false sortable=false showPageSize=false/>
 </div>
 </body>
 </html>

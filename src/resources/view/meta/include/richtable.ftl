@@ -1,4 +1,4 @@
-<#macro richtable columns entityName formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' createable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
+<#macro richtable columns entityName formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' creatable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
 <@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
 <#nested/>
 </@rtstart>
@@ -58,7 +58,7 @@
 </#list>
 <@rttbodytrend entity=entity showActionColumn=showActionColumn buttons=actionColumnButtons editable=!readonly viewable=viewable entityReadonly=entityReadonly/>
 </#list>
-<@rtend columns=columns?keys sumColumns=sumColumns showCheckColumn=showCheckColumn showActionColumn=showActionColumn showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly createable=createable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
+<@rtend columns=columns?keys sumColumns=sumColumns showCheckColumn=showCheckColumn showActionColumn=showActionColumn showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly creatable=creatable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
 </#macro>
 
 <#macro rtstart formid='',action='',entityName='',resizable=true,sortable=true,includeParameters=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' dynamicAttributes...>
@@ -181,7 +181,7 @@ ${formHeader!}
 </tr>
 </#macro>
 
-<#macro rtend columns sumColumns={} showCheckColumn=true showActionColumn=true showBottomButtons=true buttons='' readonly=false createable=true celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' showPageSize=true formFooter='' inputWindowOptions=''>
+<#macro rtend columns sumColumns={} showCheckColumn=true showActionColumn=true showBottomButtons=true buttons='' readonly=false creatable=true celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' showPageSize=true formFooter='' inputWindowOptions=''>
 <#if filterable>
 <#if !propertyNamesInCriteria?? && uiConfigs??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].filterPropertyNamesInCriteria(uiConfigs)>
@@ -253,7 +253,7 @@ ${formHeader!}
 <#else>
 <#if !readonly>
 <#if !(treeable?? && treeable && tree?? && tree gt 0 && (!parent??||parent lt 1))>
-<#if createable><@btn view="input" label="create" windowoptions="${inputWindowOptions}"/></#if>
+<#if creatable><@btn view="input" label="create" windowoptions="${inputWindowOptions}"/></#if>
 </#if>
 <#if celleditable><@btn action="save" confirm=true/></#if>
 <#if enableable>
