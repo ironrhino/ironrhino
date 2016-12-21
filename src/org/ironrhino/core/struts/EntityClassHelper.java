@@ -298,7 +298,9 @@ public class EntityClassHelper {
 					if (uci.isMultiple()) {
 						if (uci.getType().equals("dictionary")) {
 							uci.setTemplate(
-									"<#if value?has_content><#if displayDictionaryLabel??><#assign templateName><@config.templateName?interpret /></#assign></#if><#list value as var><span class=\"label\"><#if displayDictionaryLabel??><@displayDictionaryLabel dictionaryName=templateName value=var!/><#else>${(var?string)!}</#if></span><#sep> </#list></#if>");
+									"<#if value?has_content><#list value as var><span class=\"label\"><#if displayDictionaryLabel??><@displayDictionaryLabel dictionaryName='"
+											+ uci.getTemplateName()
+											+ "' value=var!/><#else>${(var?string)!}</#if></span><#sep> </#list></#if>");
 						} else {
 							uci.setTemplate(
 									"<#if value?has_content><#list value as var><span class=\"label\">${(var?string)!}</span><#sep> </#list></#if>");
