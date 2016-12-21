@@ -37,10 +37,6 @@ public class RegionAction extends EntityAction<Region> {
 
 	private Region region;
 
-	private Long tree;
-
-	private Long parent;
-
 	private transient EntityManager<Region> entityManager;
 
 	private Collection list;
@@ -82,26 +78,6 @@ public class RegionAction extends EntityAction<Region> {
 
 	public Collection getList() {
 		return list;
-	}
-
-	@Override
-	public Long getTree() {
-		return tree;
-	}
-
-	@Override
-	public void setTree(Long tree) {
-		this.tree = tree;
-	}
-
-	@Override
-	public Long getParent() {
-		return parent;
-	}
-
-	@Override
-	public void setParent(Long parent) {
-		this.parent = parent;
 	}
 
 	public Region getRegion() {
