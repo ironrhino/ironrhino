@@ -384,9 +384,9 @@ public class EntityClassHelper {
 							uci.setListTemplate("<#if value?has_content&&value.id?has_content><a href=\"" + url
 									+ "/view/${value.id}\" class=\"view\" rel=\"richtable\" title=\"${action.getText('view')}\">${value?html}</a></#if>");
 						}
-					} else if (returnType == Integer.TYPE || returnType == Short.TYPE || returnType == Long.TYPE
-							|| returnType == Double.TYPE || returnType == Float.TYPE
-							|| Number.class.isAssignableFrom(returnType)) {
+					} else if (collectionType == null && (returnType == Integer.TYPE || returnType == Short.TYPE
+							|| returnType == Long.TYPE || returnType == Double.TYPE || returnType == Float.TYPE
+							|| Number.class.isAssignableFrom(returnType))) {
 						if (returnType == Integer.TYPE || returnType == Integer.class || returnType == Short.TYPE
 								|| returnType == Short.class) {
 							uci.setInputType("number");

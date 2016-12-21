@@ -20,7 +20,7 @@ public class MyXWorkConverter extends XWorkConverter {
 			if (arr.length == 1) {
 				String s = arr[0];
 				if (s.startsWith("[") && s.endsWith("]"))
-					s = s.substring(0, s.length() - 1);
+					s = s.substring(1, s.length() - 1);
 				value = s.split(",\\s*");
 			}
 		}
