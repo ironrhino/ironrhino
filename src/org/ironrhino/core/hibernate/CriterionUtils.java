@@ -78,7 +78,9 @@ public class CriterionUtils {
 		for (Map.Entry<String, MatchMode> entry : map.entrySet()) {
 			String name = entry.getKey();
 			Criterion temp = (entry.getValue() == MatchMode.EXACT) ? Restrictions.eq(name, value)
-					: Restrictions.like(name, value, entry.getValue());
+					: (entry.getValue() == MatchMode.END) ? matchTag(name, value)
+							: Restrictions.like(name, value, entry.getValue());
+			// END marks as tag
 			criterion = (criterion == null) ? temp : Restrictions.or(criterion, temp);
 		}
 		return criterion;

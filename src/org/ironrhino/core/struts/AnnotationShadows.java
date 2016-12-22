@@ -21,6 +21,7 @@ public class AnnotationShadows {
 		private static final long serialVersionUID = -5963246979386241924L;
 		private Class<?> propertyType;
 		private Class<?> collectionType;
+		private Class<?> elementType;
 		private String id;
 		private String type = UiConfig.DEFAULT_TYPE;
 		private String inputType = UiConfig.DEFAULT_INPUT_TYPE;
@@ -178,6 +179,14 @@ public class AnnotationShadows {
 
 		public void setCollectionType(Class<?> collectionType) {
 			this.collectionType = collectionType;
+		}
+
+		public Class<?> getElementType() {
+			return elementType;
+		}
+
+		public void setElementType(Class<?> elementType) {
+			this.elementType = elementType;
 		}
 
 		public HiddenImpl getHiddenInList() {

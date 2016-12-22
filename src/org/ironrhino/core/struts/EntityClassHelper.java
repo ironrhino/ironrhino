@@ -275,6 +275,7 @@ public class EntityClassHelper {
 
 					Class<?> returnType = pd.getPropertyType();
 					uci.setCollectionType(collectionType);
+					uci.setElementType(elementType);
 					if (collectionType != null
 							&& (uci.getType().equals("listpick") || uci.getType().equals("treeselect"))) {
 						uci.setPickMultiple(true);
