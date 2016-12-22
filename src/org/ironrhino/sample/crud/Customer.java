@@ -15,6 +15,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -32,6 +34,7 @@ import org.ironrhino.core.model.BaseRecordableEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
+import org.ironrhino.core.struts.ValidationException;
 
 @Searchable
 @AutoConfig
@@ -217,6 +220,23 @@ public class Customer extends BaseRecordableEntity {
 	@UiConfig(hiddenInList = @Hidden(true), displayOrder = 100)
 	public String getModifyUser() {
 		return super.getModifyUser();
+	}
+
+	@PrePersist
+	@PreUpdate
+	private void validate() {
+		ValidationException ve = new ValidationException();
+		if (potentialCategories != null && potentialCategories.contains(this.currentCategory)) {
+			ve.addFieldError("customer.potentialCategories", "不能包含当前分类");
+		}
+		if (potentialRanks != null && potentialRanks.contains(this.currentRank)) {
+			ve.addFieldError("customer.potentialRanks", "不能包含当前等级");
+		}
+		if (balance == null || balance.doubleValue() > 100000) {
+			ve.addFieldError("customer.balance", "余额不能大于100,000.00");
+		}
+		if (ve.hasError())
+			throw ve;
 	}
 
 	@Converter(autoApply = true)
