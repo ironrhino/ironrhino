@@ -66,6 +66,7 @@ public class JdbcRepositoryTest {
 		assertEquals(1, personRepository.count());
 		assertEquals(1, personRepository.countByNamePrefix("te"));
 		assertEquals(1, personRepository.listNames().size());
+		assertEquals(1, personRepository.listGenders().size());
 		assertEquals(1, personRepository.listAges().size());
 		int rows = personRepository.delete("test");
 		assertEquals(1, rows);

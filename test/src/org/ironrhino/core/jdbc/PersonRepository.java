@@ -49,6 +49,10 @@ public interface PersonRepository {
 	@Transactional(readOnly = true)
 	@Sql("select name from t_person")
 	List<String> listNames();
+	
+	@Transactional(readOnly = true)
+	@Sql("select gender from t_person")
+	List<String> listGenders();
 
 	@Transactional(readOnly = true)
 	@Sql("select age from t_person")
