@@ -613,9 +613,9 @@ public class AnnotationShadows {
 			this.expression = config.expression();
 			if (!this.value && config.hideWhenBlank())
 				if (StringUtils.isBlank(this.expression))
-					this.expression = "!(value?? && value?string?has_content)";
+					this.expression = "!(value?has_content)";
 				else
-					this.expression = "!(value?? && value?string?has_content) || " + this.expression;
+					this.expression = "!(value?has_content) || " + this.expression;
 		}
 
 		public boolean isValue() {
