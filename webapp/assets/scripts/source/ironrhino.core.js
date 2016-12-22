@@ -253,13 +253,16 @@ Message = {
 				promptTopPosition = field.position().top + field.outerHeight()
 						+ 6;
 				var parentWidth = field.closest('.controls').width();
-				if (parentWidth && (parentWidth - fieldWidth) < prompt.width()) {
+				if (parentWidth
+						&& (parentWidth - fieldWidth) < (prompt.width() - 30)) {
 					promptleftPosition = field.position().left + fieldWidth
 							- (prompt.width() + 10);
 				} else {
 					promptleftPosition = field.position().left + fieldWidth
 							- 30;
 				}
+				if (promptleftPosition < 0)
+					promptleftPosition = 0;
 				prompt.css({
 							"top" : promptTopPosition + "px",
 							"left" : promptleftPosition + "px",

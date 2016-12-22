@@ -75,4 +75,16 @@ public class ValidationException extends RuntimeException {
 		validationAware.addFieldError(fieldName, errorMessage);
 	}
 
+	public boolean hasError() {
+		return validationAware.hasErrors();
+	}
+
+	public boolean hasActionError() {
+		return validationAware.hasActionErrors();
+	}
+
+	public boolean hasFieldError() {
+		return validationAware.hasFieldErrors();
+	}
+
 }
