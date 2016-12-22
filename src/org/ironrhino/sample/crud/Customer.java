@@ -29,7 +29,11 @@ import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseRecordableEntity;
+import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
+import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
+import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
+@Searchable
 @AutoConfig
 @Table(name = "sample_customer")
 @Entity
@@ -38,6 +42,7 @@ public class Customer extends BaseRecordableEntity {
 
 	private static final long serialVersionUID = -2413944328894923968L;
 
+	@SearchableProperty
 	@UiConfig(width = "100px")
 	@NaturalId(mutable = true)
 	private String name;
@@ -53,32 +58,34 @@ public class Customer extends BaseRecordableEntity {
 	@UiConfig(width = "100px", type = "dictionary", templateName = "customer_category")
 	private String currentCategory;
 
-	@UiConfig(type = "dictionary", templateName = "customer_category", hiddenInList = @Hidden(true))
+	@UiConfig(type = "dictionary", templateName = "customer_category", hiddenInList = @Hidden(true), description = "potentialCategories.description")
 	private Set<String> potentialCategories;
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "100px", alias = "rank")
 	@Enumerated
 	@Column(nullable = false)
 	private CustomerRank currentRank = CustomerRank.BRONZE;
 
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true), description = "potentialRanks.description")
 	private Set<CustomerRank> potentialRanks;
 
-	@UiConfig(width = "100px", template = "${value?string('#,##.00')}", showSum = true)
+	@UiConfig(width = "100px", template = "${value?string('#,###.00')}", showSum = true, description = "balance.description")
 	@Column(nullable = false)
 	private BigDecimal balance;
 
+	@SearchableComponent
 	private Set<String> tags;
 
-	@UiConfig(type = "treeselect", width = "200px", pickUrl = "/common/region/children", template = "<#if value?has_content><#list value as id>${beans['regionTreeControl'].tree.getDescendantOrSelfById(id).name}<#sep> </#list></#if>")
+	@UiConfig(type = "treeselect", width = "200px", description = "activeRegions.description", pickUrl = "/common/region/children", template = "<#if value?has_content><#list value as id>${beans['regionTreeControl'].tree.getDescendantOrSelfById(id).name}<#sep> </#list></#if>")
 	private Set<Long> activeRegions;
 
-	@UiConfig(width = "200px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true")
+	@SearchableComponent(nestSearchableProperties = "name")
+	@UiConfig(width = "200px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true", description = "company.description")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company")
 	private Company company;
 
-	@UiConfig(cssClass = "nullable")
+	@UiConfig(cssClass = "nullable", description = "addresses.description")
 	@ElementCollection(fetch = FetchType.EAGER, targetClass = CustomerAddress.class)
 	@CollectionTable(name = "sample_customer_address", joinColumns = @JoinColumn(name = "customer"))
 	@OrderColumn(name = "lineNumber", nullable = false)
