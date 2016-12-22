@@ -293,6 +293,8 @@ public class StringUtils {
 	public static String toCamelCase(String str) {
 		if (str == null)
 			return null;
+		if (str.indexOf('_') < 0)
+			return str;
 		return CAMEL_CASE_TOKENIZER.parse(str);
 	}
 
