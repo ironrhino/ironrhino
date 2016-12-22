@@ -1,5 +1,5 @@
 <#macro richtable columns entityName formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' creatable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
-<@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
+<@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showPageSize=showPageSize showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
 <#nested/>
 </@rtstart>
 <#local size = columns?size>
@@ -61,14 +61,14 @@
 <@rtend columns=columns?keys sumColumns=sumColumns showCheckColumn=showCheckColumn showActionColumn=showActionColumn showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly creatable=creatable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
 </#macro>
 
-<#macro rtstart formid='',action='',entityName='',resizable=true,sortable=true,includeParameters=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' dynamicAttributes...>
+<#macro rtstart formid='' action='' entityName='' resizable=true sortable=true includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' dynamicAttributes...>
 <#local parameterNamesInQueryString=[]>
 <#if !action?has_content>
 <#local action=request.requestURI>
 <#if request.queryString?has_content>
 <#list request.queryString?split('&') as pair>
 	<#local name=pair?keep_before('=')>
-	<#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
+	<#if name!='_'&&name!='pn'&&(!(showPageSize&&name=='ps'))&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
 		<#local action+=action?contains('?')?then('&','?')+pair>
 		<#local parameterNamesInQueryString+=[name]>
 	</#if>

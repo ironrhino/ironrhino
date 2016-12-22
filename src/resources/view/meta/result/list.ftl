@@ -48,7 +48,7 @@
 <#if celleditable&&versionPropertyName??>
 <#assign dynamicAttributes={"data-versionproperty":versionPropertyName}>
 </#if>
-<@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=dynamicAttributes!/>
+<@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showPageSize=richtableConfig.showPageSize showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=dynamicAttributes!/>
 <#assign size=0>
 <#list uiConfigs as key,value>
 	<#assign hidden=value.hiddenInList.value>
