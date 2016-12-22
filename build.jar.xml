@@ -82,6 +82,7 @@
 	<property name="security-oauth-server-remoting-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*,org/ironrhino/security/oauth/server/enums/**" />
 	<property name="rest-jar.name" value="ironrhino-rest-${version}.jar" />
 	<property name="batch-jar.name" value="ironrhino-batch-${version}.jar" />
+	<import file="build.compress.xml" />
 	<target name="set-revision">
 		<script language="javascript">
 			<![CDATA[
@@ -284,6 +285,7 @@
 			<delete file="${target.dir}/${rest-jar.name}" />
 			<delete file="${target.dir}/${batch-jar.name}" />
 			<delete file="${target.dir}/bootstrap.jar" />
+			<antcall target="compressAssets"/>
 			<unzip dest="${webapp.dir}/assets/components">
 				<fileset dir="${webapp.dir}/assets/components" includes="*.zip" />
 			</unzip>
@@ -302,6 +304,7 @@
 				</manifest>
 			</jar>
 			<delete dir="${target.dir}/assets" />
+			<antcall target="cleanAssets"/>
 			<antcall target="append-revision-for-assets" />
 			<mkdir dir="${classes.dir}/META-INF/descriptors"/>
 			<copy todir="${classes.dir}/META-INF/descriptors">

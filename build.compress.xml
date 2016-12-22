@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="ironrhino-compress" default="compress" basedir=".">
+<project name="ironrhino-compress" default="compressAssets" basedir=".">
 
 	<property name="version" value="2.0" />
 	<property name="webapp.dir" location="${basedir}/webapp" />
@@ -7,12 +7,12 @@
 	<property name="classes.dir" location="${webapp.dir}/WEB-INF/classes" />
 	<property name="target.dir" location="${basedir}/target" />
 
-	<target name="compress">
+	<target name="compressAssets">
 		<antcall target="compressScripts" />
 		<antcall target="compressStyles" />
 	</target>
 
-	<target name="compressScripts">
+	<target name="concatScripts">
 		<concat destfile="${webapp.dir}/assets/scripts/ironrhino.js" encoding="utf-8" fixlastline="yes">
 			<filelist>
 				<file name="${webapp.dir}/assets/scripts/source/jquery-2.2.4.js" />
@@ -77,40 +77,11 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.patterninput.js" />
 			</filelist>
 		</concat>
-		<concat destfile="${webapp.dir}/assets/scripts/ironrhino-lite.js" encoding="utf-8" fixlastline="yes">
-			<filelist>
-				<file name="${webapp.dir}/assets/scripts/source/jquery.browser-1.0.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.cookie-1.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.rc4-1.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.form-2.95.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.format-1.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.history-2.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.alerts-1.1.my.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.textext-1.3.1.my.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.throttle-debounce-1.1.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.messagebundle.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.core.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.checkavailable.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.tags.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxupload.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxpanel.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.pagination.js" />
-			</filelist>
-		</concat>
 		<replace file="${webapp.dir}/assets/scripts/ironrhino.js" token="@license" value="license" encoding="utf-8" />
 		<replace file="${webapp.dir}/assets/scripts/ironrhino.js" token="@copyright" value="copyright" encoding="utf-8" />
-		<java jar="${lib.dir}/closure-compiler.jar" fork="true">
-			<arg line=" --js=./webapp/assets/scripts/ironrhino.js --js_output_file=./webapp/assets/scripts/ironrhino-min.js" />
-		</java>
-		<replace file="${webapp.dir}/assets/scripts/ironrhino-lite.js" token="@license" value="license" encoding="utf-8" />
-		<replace file="${webapp.dir}/assets/scripts/ironrhino-lite.js" token="@copyright" value="copyright" encoding="utf-8" />
-		<java jar="${lib.dir}/closure-compiler.jar" fork="true">
-			<arg line=" --js=./webapp/assets/scripts/ironrhino-lite.js --js_output_file=./webapp/assets/scripts/ironrhino-lite-min.js" />
-		</java>
-		<delete file="${basedir}/webapp/assets/scripts/ironrhino-lite.js" />
 	</target>
 
-	<target name="compressStyles">
+	<target name="concatStyles">
 		<concat destfile="${webapp.dir}/assets/styles/ironrhino.css" encoding="utf-8" fixlastline="yes">
 			<filelist>
 				<file name="${webapp.dir}/assets/styles/source/jquery.ui.css" />
@@ -140,6 +111,45 @@
 				<file name="${webapp.dir}/assets/styles/source/bootstrap-responsive.css" />
 			</filelist>
 		</concat>
+		<replaceregexp file="${webapp.dir}/assets/styles/ironrhino.css" match="^\/\*!" replace="/*" byline="true" encoding="utf-8" />
+	</target>
+
+	<target name="compressScripts">
+		<java jar="${lib.dir}/closure-compiler.jar" fork="true">
+			<arg line=" --js=./webapp/assets/scripts/ironrhino.js --js_output_file=./webapp/assets/scripts/ironrhino-min.js" />
+		</java>
+		<concat destfile="${webapp.dir}/assets/scripts/ironrhino-lite.js" encoding="utf-8" fixlastline="yes">
+			<filelist>
+				<file name="${webapp.dir}/assets/scripts/source/jquery.browser-1.0.0.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.cookie-1.0.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.rc4-1.0.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.form-2.95.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.format-1.0.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.history-2.0.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.alerts-1.1.my.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.textext-1.3.1.my.js" />
+				<file name="${webapp.dir}/assets/scripts/source/jquery.throttle-debounce-1.1.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.messagebundle.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.core.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.checkavailable.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.tags.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxupload.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxpanel.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.pagination.js" />
+			</filelist>
+		</concat>
+		<replace file="${webapp.dir}/assets/scripts/ironrhino-lite.js" token="@license" value="license" encoding="utf-8" />
+		<replace file="${webapp.dir}/assets/scripts/ironrhino-lite.js" token="@copyright" value="copyright" encoding="utf-8" />
+		<java jar="${lib.dir}/closure-compiler.jar" fork="true">
+			<arg line=" --js=./webapp/assets/scripts/ironrhino-lite.js --js_output_file=./webapp/assets/scripts/ironrhino-lite-min.js" />
+		</java>
+		<delete file="${basedir}/webapp/assets/scripts/ironrhino-lite.js" />
+	</target>
+
+	<target name="compressStyles">
+		<java jar="${lib.dir}/yuicompressor.jar" fork="true">
+			<arg line=" --charset utf-8 --type css -o ./webapp/assets/styles/ironrhino-min.css ./webapp/assets/styles/ironrhino.css" />
+		</java>
 		<concat destfile="${webapp.dir}/assets/styles/ironrhino-lite.css" encoding="utf-8" fixlastline="yes">
 			<filelist>
 				<file name="${webapp.dir}/assets/styles/source/jquery.alerts.my.css" />
@@ -150,15 +160,18 @@
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.icon.css" />
 			</filelist>
 		</concat>
-		<replaceregexp file="${webapp.dir}/assets/styles/ironrhino.css" match="^\/\*!" replace="/*" byline="true" encoding="utf-8" />
-		<java jar="${lib.dir}/yuicompressor.jar" fork="true">
-			<arg line=" --charset utf-8 --type css -o ./webapp/assets/styles/ironrhino-min.css ./webapp/assets/styles/ironrhino.css" />
-		</java>
 		<replaceregexp file="${webapp.dir}/assets/styles/ironrhino-lite.css" match="^\/\*!" replace="/*" byline="true" encoding="utf-8" />
 		<java jar="${lib.dir}/yuicompressor.jar" fork="true">
 			<arg line=" --charset utf-8 --type css -o ./webapp/assets/styles/ironrhino-lite-min.css ./webapp/assets/styles/ironrhino-lite.css" />
 		</java>
 		<delete file="${basedir}/webapp/assets/styles/ironrhino-lite.css" />
+	</target>
+
+	<target name="cleanAssets">
+		<delete file="${basedir}/webapp/assets/scripts/ironrhino-min.js" />
+		<delete file="${basedir}/webapp/assets/scripts/ironrhino-lite-min.js" />
+		<delete file="${basedir}/webapp/assets/styles/ironrhino-min.css" />
+		<delete file="${basedir}/webapp/assets/styles/ironrhino-lite-min.css" />
 	</target>
 
 </project>
