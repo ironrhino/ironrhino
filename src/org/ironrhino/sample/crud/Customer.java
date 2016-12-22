@@ -59,15 +59,15 @@ public class Customer extends BaseRecordableEntity {
 	private Integer age;
 
 	@UiConfig(width = "100px", type = "dictionary", templateName = "customer_category")
-	private String currentCategory;
+	private String category;
 
 	@UiConfig(type = "dictionary", templateName = "customer_category", hiddenInList = @Hidden(true), description = "potentialCategories.description")
 	private Set<String> potentialCategories;
 
-	@UiConfig(width = "100px", alias = "rank")
+	@UiConfig(width = "100px")
 	@Enumerated
 	@Column(nullable = false)
-	private CustomerRank currentRank = CustomerRank.BRONZE;
+	private CustomerRank rank = CustomerRank.BRONZE;
 
 	@UiConfig(hiddenInList = @Hidden(true), description = "potentialRanks.description")
 	private Set<CustomerRank> potentialRanks;
@@ -122,12 +122,12 @@ public class Customer extends BaseRecordableEntity {
 		this.age = age;
 	}
 
-	public String getCurrentCategory() {
-		return currentCategory;
+	public String getCategory() {
+		return category;
 	}
 
-	public void setCurrentCategory(String currentCategory) {
-		this.currentCategory = currentCategory;
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public Set<String> getPotentialCategories() {
@@ -138,12 +138,12 @@ public class Customer extends BaseRecordableEntity {
 		this.potentialCategories = potentialCategories;
 	}
 
-	public CustomerRank getCurrentRank() {
-		return currentRank;
+	public CustomerRank getRank() {
+		return rank;
 	}
 
-	public void setCurrentRank(CustomerRank currentRank) {
-		this.currentRank = currentRank;
+	public void setRank(CustomerRank rank) {
+		this.rank = rank;
 	}
 
 	public Set<CustomerRank> getPotentialRanks() {
@@ -226,10 +226,10 @@ public class Customer extends BaseRecordableEntity {
 	@PreUpdate
 	private void validate() {
 		ValidationException ve = new ValidationException();
-		if (potentialCategories != null && potentialCategories.contains(this.currentCategory)) {
+		if (potentialCategories != null && potentialCategories.contains(this.category)) {
 			ve.addFieldError("customer.potentialCategories", "不能包含当前分类");
 		}
-		if (potentialRanks != null && potentialRanks.contains(this.currentRank)) {
+		if (potentialRanks != null && potentialRanks.contains(this.rank)) {
 			ve.addFieldError("customer.potentialRanks", "不能包含当前等级");
 		}
 		if (balance == null || balance.doubleValue() > 100000) {
