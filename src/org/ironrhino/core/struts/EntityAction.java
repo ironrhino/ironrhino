@@ -484,8 +484,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						propertyNamesInLike.put(entry.getKey(),
 								entry.getValue().isExactMatch() ? MatchMode.EXACT : MatchMode.ANYWHERE);
 					} else if (String.class.equals(entry.getValue().getElementType())) {
-						propertyNamesInLike.put(entry.getKey(), MatchMode.END);
-						// END marks as tag
+						propertyNamesInLike.put(entry.getKey(), null);
+						// null marks as tag
 					} else if (Persistable.class.isAssignableFrom(entry.getValue().getPropertyType())) {
 						Set<String> nestSearchableProperties = entry.getValue().getNestSearchableProperties();
 						if (nestSearchableProperties != null && nestSearchableProperties.size() > 0) {
