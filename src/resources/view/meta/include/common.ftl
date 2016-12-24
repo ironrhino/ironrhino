@@ -143,5 +143,5 @@ ${getUrl(value,includeContextPath,includeQueryString,secure)}<#t>
 		<#local exclude=[]/>
 	</#if>
 </#if>
-<#list value as attr,val><#if attr=='dynamicAttributes'><#list val as attr2,val2><#if !exclude?seq_contains(attr2)> ${attr2}="${val2?html}"</#if></#list><#else><#if !exclude?seq_contains(attr)> ${attr}="${val?html}"</#if></#if></#list>
+<#list value as attr,val><#if attr=='dynamicAttributes'><#list val as attr2,val2><#if !exclude?seq_contains(attr2)> ${attr2}="${val2?html}"</#if></#list><#else><#if !exclude?seq_contains(attr)> ${attr}="${val?html}"</#if></#if></#list><#t>
 </#macro>

@@ -249,6 +249,10 @@ public class AnnotationShadows {
 			return internalDynamicAttributes;
 		}
 
+		public void setInternalDynamicAttributes(Map<String, String> internalDynamicAttributes) {
+			this.internalDynamicAttributes = internalDynamicAttributes;
+		}
+
 		public String getDynamicAttributes() {
 			return dynamicAttributes;
 		}
