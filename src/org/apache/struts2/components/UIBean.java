@@ -808,7 +808,7 @@ public abstract class UIBean extends Component {
 
                 if (valueClazz != null) {
                     if (value != null) {
-                        addParameter("nameValue", findValue(value, valueClazz));
+                        addParameter("nameValue", value);
                     } else if (name != null) {
                         String expr = completeExpressionIfAltSyntax(name);
 
@@ -816,7 +816,7 @@ public abstract class UIBean extends Component {
                     }
                 } else {
                     if (value != null) {
-                        addParameter("nameValue", findValue(value));
+                        addParameter("nameValue", value);
                     } else if (name != null) {
                         addParameter("nameValue", findValue(name));
                     }
