@@ -74,4 +74,6 @@ public @interface Richtable {
 
 	int viewGridColumns() default 0;
 
+	boolean showQueryForm() default false;
+
 }

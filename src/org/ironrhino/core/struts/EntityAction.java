@@ -481,8 +481,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 				if (entry.getValue().isSearchable() && !entry.getValue().isExcludedFromLike()) {
 					if (String.class.equals(entry.getValue().getPropertyType())) {
-						propertyNamesInLike.put(entry.getKey(),
-								entry.getValue().isExactMatch() ? MatchMode.EXACT : MatchMode.ANYWHERE);
+						propertyNamesInLike.put(entry.getKey(), entry.getValue().isExactMatch() ? MatchMode.EXACT
+								: entry.getValue().getQueryMatchMode());
 					} else if (String.class.equals(entry.getValue().getElementType())) {
 						propertyNamesInLike.put(entry.getKey(), null);
 						// null marks as tag

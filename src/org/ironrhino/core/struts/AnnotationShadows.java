@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.criterion.MatchMode;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
@@ -68,6 +69,7 @@ public class AnnotationShadows {
 		private Map<String, UiConfigImpl> embeddedUiConfigs;
 		private boolean suppressViewLink;
 		private boolean showSum;
+		private MatchMode queryMatchMode;
 
 		public UiConfigImpl() {
 		}
@@ -139,6 +141,7 @@ public class AnnotationShadows {
 				this.showSum = Number.class.isAssignableFrom(propertyType) || propertyType == short.class
 						|| propertyType == int.class || propertyType == long.class || propertyType == float.class
 						|| propertyType == double.class;
+			this.queryMatchMode = config.queryMatchMode();
 		}
 
 		public boolean isExcludedFromLike() {
@@ -547,6 +550,14 @@ public class AnnotationShadows {
 			this.embeddedUiConfigs = embeddedUiConfigs;
 		}
 
+		public MatchMode getQueryMatchMode() {
+			return queryMatchMode;
+		}
+
+		public void setQueryMatchMode(MatchMode queryMatchMode) {
+			this.queryMatchMode = queryMatchMode;
+		}
+
 		public boolean isReference() {
 			return propertyType != null && Persistable.class.isAssignableFrom(propertyType);
 		}
@@ -672,6 +683,7 @@ public class AnnotationShadows {
 		private String viewWindowOptions = "";
 		private int inputGridColumns = 0;
 		private int viewGridColumns = 0;
+		private boolean showQueryForm = false;
 
 		public RichtableImpl() {
 		}
@@ -712,6 +724,7 @@ public class AnnotationShadows {
 				if (this.viewGridColumns == 0)
 					this.viewGridColumns = config.gridColumns();
 			}
+			this.showQueryForm = config.showQueryForm();
 		}
 
 		public String getAlias() {
@@ -912,6 +925,14 @@ public class AnnotationShadows {
 
 		public void setViewGridColumns(int viewGridColumns) {
 			this.viewGridColumns = viewGridColumns;
+		}
+
+		public boolean isshowQueryForm() {
+			return showQueryForm;
+		}
+
+		public void setshowQueryForm(boolean showQueryForm) {
+			this.showQueryForm = showQueryForm;
 		}
 
 	}

@@ -48,14 +48,15 @@
 <#if celleditable&&versionPropertyName??>
 <#assign dynamicAttributes={"data-versionproperty":versionPropertyName}>
 </#if>
-<@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showPageSize=richtableConfig.showPageSize showCheckColumn=richtableConfig.showCheckColumn dynamicAttributes=dynamicAttributes!/>
+<#assign parameterNamesInQueryString=getParameterNamesInQueryString()>
+<@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showPageSize=richtableConfig.showPageSize showCheckColumn=richtableConfig.showCheckColumn showQueryForm=richtableConfig.showQueryForm dynamicAttributes=dynamicAttributes!/>
 <#assign size=0>
 <#list uiConfigs as key,value>
 	<#assign hidden=value.hiddenInList.value>
 	<#if !hidden && value.hiddenInList.expression?has_content>
 	<#assign hidden=value.hiddenInList.expression?eval/>
 	</#if>
-	<#if !hidden && Parameters[key]?has_content && !Parameters[key+'-op']?has_content>
+	<#if !hidden && parameterNamesInQueryString?seq_contains(key) && !Parameters[key+'-op']?has_content>
 	<#assign hidden=true/>
 	</#if>
 	<#if !hidden>
@@ -71,7 +72,7 @@
 		<#if !hidden && config.hiddenInList.expression?has_content>
 		<#assign hidden=config.hiddenInList.expression?eval>
 		</#if>
-		<#if !hidden && Parameters[key]?has_content && !Parameters[key+'-op']?has_content>
+		<#if !hidden && parameterNamesInQueryString?seq_contains(key) && !Parameters[key+'-op']?has_content>
 		<#assign hidden=true/>
 		</#if>
 		<#if !hidden>
@@ -140,7 +141,7 @@
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval>
 	</#if>
-	<#if !hidden && Parameters[key]?has_content && !Parameters[key+'-op']?has_content>
+	<#if !hidden && parameterNamesInQueryString?seq_contains(key) && !Parameters[key+'-op']?has_content>
 	<#assign hidden=true/>
 	</#if>
 	<#if !hidden>
@@ -195,7 +196,7 @@
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval/>
 	</#if>
-	<#if !hidden && Parameters[key]?has_content && !Parameters[key+'-op']?has_content>
+	<#if !hidden && parameterNamesInQueryString?seq_contains(key) && !Parameters[key+'-op']?has_content>
 	<#assign hidden=true/>
 	</#if>
 	<#if !hidden>

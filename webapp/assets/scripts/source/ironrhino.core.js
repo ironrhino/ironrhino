@@ -31,6 +31,28 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 			return $ajax(options);
 		}
 
+	if (typeof $.fn.fieldValue != 'undefined') {
+		// override jquery.form.js
+		$.fn.oldFieldValue = $.fn.fieldValue;
+		$.fn.fieldValue = function(successful) {
+			if ((this.hasClass('ignore-blank') || this.closest('form')
+					.hasClass('ignore-blank'))
+					&& !$.trim(this.val()))
+				return null;
+			return this.oldFieldValue(successful);
+		}
+
+		$.oldFieldValue = $.fieldValue;
+		$.fieldValue = function(el, successful) {
+			var t = $(el);
+			if ((t.hasClass('ignore-blank') || t.closest('form')
+					.hasClass('ignore-blank'))
+					&& !$.trim(t.val()))
+				return null;
+			return $.oldFieldValue(el, successful);
+		}
+	}
+
 	if (typeof $.rc4EncryptStr != 'undefined'
 			&& ($('meta[name="pe"]').attr('content') != 'false')) {
 		var temp = $.param;

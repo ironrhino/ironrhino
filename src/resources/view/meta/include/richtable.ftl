@@ -1,5 +1,5 @@
-<#macro richtable columns entityName formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' creatable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
-<@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showPageSize=showPageSize showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
+<#macro richtable columns entityName formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' creatable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showQueryForm=false showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
+<@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showQueryForm=showQueryForm showPageSize=showPageSize showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
 <#nested/>
 </@rtstart>
 <#local size = columns?size>
@@ -61,7 +61,16 @@
 <@rtend columns=columns?keys sumColumns=sumColumns showCheckColumn=showCheckColumn showActionColumn=showActionColumn showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly creatable=creatable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
 </#macro>
 
-<#macro rtstart formid='' action='' entityName='' resizable=true sortable=true includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' dynamicAttributes...>
+<#macro rtstart formid='' action='' entityName='' resizable=true sortable=true includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' showQueryForm=false dynamicAttributes...>
+<#if showQueryForm>
+<#if !propertyNamesInCriteria?? && uiConfigs??>
+<#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].filterPropertyNamesInCriteria(uiConfigs)>
+</#if>
+<#if !propertyNamesInCriteria?? && entityClass??>
+<#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].getPropertyNamesInCriteria(entityClass)>
+</#if>
+<@renderSearchForm propertyNamesInCriteria=propertyNamesInCriteria!/>
+</#if>
 <#local parameterNamesInQueryString=[]>
 <#if !action?has_content>
 <#local action=request.requestURI>
@@ -78,7 +87,7 @@
 <#if dynamicAttributes['dynamicAttributes']??>
 <#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
-<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName!=action&&entityName?has_content> data-entity="${entityName}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
+<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action&&!action?starts_with(actionBaseUrl+'?')> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName?has_content&&!action?ends_with('/'+entityName)&&!action?ends_with('/'+entityName+'?')> data-entity="${entityName}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
 ${formHeader!}
 <#nested/>
 <#if includeParameters>
@@ -394,4 +403,110 @@ ${formFooter!}
 <#local windowoptions=windowoptions?replace('"',"'")/>
 </#if>
 <#if class?has_content && !(view?has_content||action?has_content)><button type="<#if class='reload'>submit<#else>button</#if>" class="btn ${class}"<@dynAttrs value=dynamicAttributes/>>${getText(label?has_content?then(label,class))}</button><#else><button type="button" class="btn ${class}<#if confirm&&action?has_content> confirm</#if>" data-<#if view?has_content>view="${view}"<#elseif action?has_content>action="${action}"</#if><#if action='delete'> data-shown="selected" data-filterselector=":not([data-deletable='false'])"<#elseif action='enable'> data-shown="selected" data-filterselector="[data-enabled='false']:not([data-readonly='true'])"<#elseif action='disable'> data-shown="selected" data-filterselector="[data-enabled='true']:not([data-readonly='true'])"</#if><#if view?has_content&&windowoptions?has_content> data-windowoptions="${windowoptions}"</#if>>${getText(label?has_content?then(label,view?has_content?then(view,action)))}</button></#if>
+</#macro>
+
+<#function mergeDynAttrs config>
+	<#local dynamicAttributes={}/>
+	<#if config.internalDynamicAttributes?has_content>
+		<#local dynamicAttributes+=config.internalDynamicAttributes/>
+	</#if>
+	<#if config.dynamicAttributes?has_content>
+		<#local da><@config.dynamicAttributes?interpret/></#local>
+		<#local da=da?eval>
+		<#local dynamicAttributes+=da/>
+	</#if>
+	<#return dynamicAttributes>
+</#function>
+
+<#macro controlGroup id="" group="">
+<div<#if id?has_content> id="control-group-${id}"</#if> class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+</#macro>
+
+<#macro controlLabel label description for="">
+<label class="control-label"<#if for?has_content> for="${for}"</#if>><#if description?has_content><span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span> </#if>${label}</label>
+</#macro>
+
+<#function getParameterNamesInQueryString>
+<#local parameterNamesInQueryString=[]>
+<#if request.queryString?has_content>
+<#list request.queryString?split('&') as pair>
+	<#local pname=pair?keep_before('=')>
+	<#if entityName?has_content&&pname?starts_with(entityName+'.')>
+	<#local pname=pname?keep_after('.')>
+	</#if>
+	<#if pname?index_of('.') gt 0>
+	<#local pname=pname?keep_before('.')>
+	</#if>
+	<#local parameterNamesInQueryString+=[pname]>
+</#list>
+</#if>
+<#return parameterNamesInQueryString>
+</#function>
+
+<#macro renderSearchForm propertyNamesInCriteria>
+<#if propertyNamesInCriteria?has_content>
+<#local parameterNamesInQueryString=getParameterNamesInQueryString()>
+<form method="post" class="ajax view form-horizontal groupable query ignore-blank" data-columns="3">
+	<#list propertyNamesInCriteria as key,config>
+		<#local templateName><@config.templateName?interpret/></#local>
+		<#local pickUrl><@config.pickUrl?interpret/></#local>
+		<#local label=key>
+		<#if config.alias?has_content>
+			<#local label=config.alias>
+		</#if>
+		<#local label=getText(label)>
+		<#local group=getText(config.group)>
+		<#local description=getText(config.description)>
+		<#local id='search-'+(config.id?has_content)?then(config.id,entityName+'-'+key)/>
+		<#local dynamicAttributes=mergeDynAttrs(config)/>
+		<#if !config.collectionType?? && !config.multiple && !config.pickMultiple>
+		<#local disabled=parameterNamesInQueryString?seq_contains(key)>
+		<#if config.type=='checkbox'>
+			<@s.checkbox disabled=disabled id=id label=label name=key checked=('true'==(Parameters[key]!)) class=config.cssClass?replace('required','')+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
+		<#elseif config.type=='enum'>
+			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+		<#elseif config.type=='select'>
+			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+		<#elseif config.type=='listpick' && !disabled>
+			<div id="control-group-${id}" class="control-group listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
+				<#local _name=key+"${config.reference?then('.id','')}">
+				<@s.hidden id=id name=_name class="listpick-id ${config.cssClass?replace('required','')}" dynamicAttributes=dynamicAttributes/>
+				<@controlLabel label=label description=description/>
+				<div class="controls">
+				<span class="listpick-name"></span>
+				</div>
+			</div>
+		<#elseif config.type=='treeselect' && !disabled>
+			<div id="control-group-${id}" class="control-group treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
+				<#local _name=key+"${config.reference?then('.id','')}">
+				<@s.hidden id=id name=_name class="treeselect-id ${config.cssClass?replace('required','')}" dynamicAttributes=dynamicAttributes/>
+				<@controlLabel label=label description=description/>
+				<div class="controls">
+				<span class="treeselect-name"></span>
+				</div>
+			</div>
+		<#elseif config.type=='dictionary' && selectDictionary??>
+			<@controlGroup id=id group=group/>
+			<@controlLabel label=label description=description for=id/>
+			<div class="controls">
+				<@selectDictionary disabled=disabled id=id dictionaryName=templateName name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') dynamicAttributes=dynamicAttributes/>
+			</div>
+			</div>
+		<#elseif config.type=='input'>
+			<@s.textfield disabled=disabled id=id label=label name=key value=(Parameters[key]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes>
+			<#if !disabled && config.propertyType.simpleName='String' && config.queryMatchMode.name()!='EXACT'>
+			<@s.param name='after'>
+			<#local opname=config.queryMatchMode.name()>
+			<@s.hidden name=key+'-op' value=(opname=='ANYWHERE')?then('INCLUDE',opname)/>
+			</@s.param>
+			</#if>
+			</@s.textfield>
+		</#if>
+		</#if>
+	</#list>
+	<@s.submit value=getText('search') class="btn-primary">
+		<@s.param name="after"> <input type="reset" class="btn" value="${getText('reset')}"></@s.param>
+	</@s.submit>
+</form>
+</#if>
 </#macro>

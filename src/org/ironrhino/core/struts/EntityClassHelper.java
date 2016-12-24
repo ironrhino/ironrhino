@@ -525,6 +525,12 @@ public class EntityClassHelper {
 					cssClasses.add("datetime");
 				} else if (config.getCssClasses().contains("time")) {
 					cssClasses.add("time");
+				} else if (config.getCssClasses().contains("integer")) {
+					cssClasses.add("integer");
+				} else if (config.getCssClasses().contains("long")) {
+					cssClasses.add("long");
+				} else if (config.getCssClasses().contains("double")) {
+					cssClasses.add("double");
 				}
 				config.setCssClasses(cssClasses);
 				if ("email".equals(config.getInputType()))

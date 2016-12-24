@@ -1,10 +1,4 @@
 <#ftl output_format='HTML'>
-<#macro controlGroup id="" group="">
-<div<#if id?has_content> id="control-group-${id}"</#if> class="control-group"<#if group?has_content> data-group="${group}"</#if>>
-</#macro>
-<#macro controlLabel label description>
-<label class="control-label"><#if description?has_content><span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span> </#if>${label}</label>
-</#macro>
 <html>
 <head>
 <title>${getText('view')}${getText((richtableConfig.alias?has_content)?then(richtableConfig.alias!,entityName))}</title>

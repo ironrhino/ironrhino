@@ -1,22 +1,4 @@
 <#ftl output_format='HTML'>
-<#function mergeDynAttrs config>
-	<#local dynamicAttributes={}/>
-	<#if config.internalDynamicAttributes?has_content>
-		<#local dynamicAttributes+=config.internalDynamicAttributes/>
-	</#if>
-	<#if config.dynamicAttributes?has_content>
-		<#local da><@config.dynamicAttributes?interpret/></#local>
-		<#local da=da?markup_string?eval>
-		<#local dynamicAttributes+=da/>
-	</#if>
-	<#return dynamicAttributes>
-</#function>
-<#macro controlGroup id="" group="">
-<div<#if id?has_content> id="control-group-${id}"</#if> class="control-group"<#if group?has_content> data-group="${group}"</#if>>
-</#macro>
-<#macro controlLabel label description for="">
-<label class="control-label"<#if for?has_content> for="${for}"</#if>><#if description?has_content><span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span> </#if>${label}</label>
-</#macro>
 <!DOCTYPE html>
 <html>
 <head>

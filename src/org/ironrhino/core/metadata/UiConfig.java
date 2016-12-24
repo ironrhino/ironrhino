@@ -7,6 +7,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.hibernate.criterion.MatchMode;
+
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface UiConfig {
@@ -87,7 +89,7 @@ public @interface UiConfig {
 
 	String pickUrl() default "";// for listpick treeselect
 
-	boolean pickMultiple() default false; //for listpick treeselect
+	boolean pickMultiple() default false; // for listpick treeselect
 
 	String templateName() default ""; // for dictionary,schema
 
@@ -104,5 +106,7 @@ public @interface UiConfig {
 	boolean embeddedAsSingle() default false;
 
 	boolean showSum() default false;
+
+	MatchMode queryMatchMode() default MatchMode.ANYWHERE;
 
 }

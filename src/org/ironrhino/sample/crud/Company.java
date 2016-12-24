@@ -10,9 +10,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.criterion.MatchMode;
 import org.ironrhino.common.model.Region;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
@@ -22,12 +24,13 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 @AutoConfig
 @Table(name = "sample_company")
 @Entity
+@Richtable(showQueryForm = true)
 public class Company extends BaseEntity {
 
 	private static final long serialVersionUID = -2413944328894923968L;
 
 	@SearchableProperty
-	@UiConfig(group = "baseInfo")
+	@UiConfig(group = "baseInfo", queryMatchMode = MatchMode.EXACT)
 	@NaturalId(mutable = true)
 	private String name;
 

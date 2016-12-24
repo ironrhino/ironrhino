@@ -40,7 +40,7 @@ import org.ironrhino.core.struts.ValidationException;
 @AutoConfig
 @Table(name = "sample_customer")
 @Entity
-@Richtable(gridColumns = 3, celleditable = false, readonly = @Readonly(expression = "entity.balance<10", deletable = true))
+@Richtable(gridColumns = 3, celleditable = false, readonly = @Readonly(expression = "entity.balance<10", deletable = true), showQueryForm = true)
 public class Customer extends BaseRecordableEntity {
 
 	private static final long serialVersionUID = -2413944328894923968L;

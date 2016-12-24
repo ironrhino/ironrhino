@@ -11,7 +11,6 @@ import org.ironrhino.core.hibernate.CreationUser;
 import org.ironrhino.core.hibernate.UpdateUser;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -22,7 +21,6 @@ public class BaseRecordableEntity extends BaseEntity {
 
 	@NotInCopy
 	@JsonIgnore
-	@SearchableProperty
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
 	@CreationTimestamp
@@ -30,7 +28,6 @@ public class BaseRecordableEntity extends BaseEntity {
 
 	@NotInCopy
 	@JsonIgnore
-	@SearchableProperty
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
 	@UpdateTimestamp
@@ -38,7 +35,6 @@ public class BaseRecordableEntity extends BaseEntity {
 
 	@NotInCopy
 	@JsonIgnore
-	@SearchableProperty(include_in_all = false)
 	@UiConfig(hidden = true)
 	@Column(updatable = false)
 	@CreationUser
@@ -46,7 +42,6 @@ public class BaseRecordableEntity extends BaseEntity {
 
 	@NotInCopy
 	@JsonIgnore
-	@SearchableProperty(include_in_all = false)
 	@UiConfig(hidden = true)
 	@Column(insertable = false)
 	@UpdateUser

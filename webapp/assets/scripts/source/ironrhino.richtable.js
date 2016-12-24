@@ -1,16 +1,7 @@
 Richtable = {
 	getBaseUrl : function(form) {
 		form = form || $('form.richtable');
-		var action = form.prop('action');
-		var entity = form.data('entity');
-		var url;
-		if (action.indexOf('/') == 0 || action.indexOf('://') > 0)
-			url = entity ? action.substring(0, action.lastIndexOf('/') + 1)
-					+ entity : action;
-		else
-			url = entity ? entity : form.prop('action');
-		if (form.data('actionbaseurl'))
-			url = form.data('actionbaseurl');
+		url = form.data('actionbaseurl') || form.prop('action');
 		var p = url.indexOf('?');
 		if (p > 0)
 			url = url.substring(0, p);
@@ -69,6 +60,14 @@ Richtable = {
 		}
 		return url;
 	},
+	getEntityName : function(form) {
+		var entity = form.data('entity');
+		if (!entity) {
+			var entity = form.prop('action');
+			entity = entity.substring(entity.lastIndexOf('/') + 1);
+		}
+		return entity;
+	},
 	open : function(url, reloadonclose, useiframe, form, btn) {
 		form = form || $('form.richtable');
 		reloadonclose = reloadonclose || false;
@@ -116,9 +115,8 @@ Richtable = {
 								create = false;
 							if ($(
 									'input[type="hidden"][name="'
-											+ (form.data('entity') || form
-													.prop('action')) + '.id"]',
-									inputform).val())
+											+ Richtable.getEntityName(form)
+											+ '.id"]', inputform).val())
 								create = false;
 						}
 						if (create && inputform.hasClass('sequential_create')) {
@@ -383,7 +381,7 @@ Richtable = {
 				var row = this;
 				if ($('td.edited', row).length) {
 					modified = true;
-					var entity = form.data('entity') || form.prop('action');
+					var entity = Richtable.getEntityName(form);
 					var params = {};
 					var version = $(row).data('version');
 					if (version != undefined)
@@ -610,8 +608,15 @@ Initialization.richtable = function() {
 								}, 500);
 					}).on('click', '.richtable .action .filter', function() {
 						var f = $(this).closest('form').next('form.criteria');
+						var qf = $(this).closest('form').prev('form.query');
 						if (f.is(':visible')) {
 							f.slideUp();
+							qf.slideDown(100, function() {
+										$('html,body').animate({
+													scrollTop : qf.offset().top
+															- 50
+												}, 300);
+									});
 						} else {
 							f.slideDown(100, function() {
 										$('html,body').animate({
@@ -619,6 +624,7 @@ Initialization.richtable = function() {
 															- 50
 												}, 300);
 									});
+							qf.slideUp();
 						}
 					}).on('click', '.richtable .more', function(event) {
 				var form = $(event.target).closest('form');
@@ -705,10 +711,23 @@ Initialization.richtable = function() {
 					});
 }
 Observation._richtable = function(container) {
+	$('form.query', container).each(function() {
+		var t = $(this);
+		var f = t.next('form.richtable');
+		if (f.length) {
+			t.attr('action', f.attr('action'))
+					.data('replacement', f.attr('id'));
+			$('input[type="reset"]').click(function() {
+						setTimeout(function() {
+									t.submit();
+								}, 100);
+					});
+		}
+	});
 	$('form.criteria', container).each(function() {
 		var t = $(this);
 		var f = t.prev('form.richtable');
-		var entity = f.data('entity') || f.prop('action');
+		var entity = Richtable.getEntityName(f);
 		t.attr('action', f.attr('action')).data('replacement', f.attr('id'));
 		var qs = t.attr('action');
 		var index = qs.indexOf('?');
@@ -855,7 +874,13 @@ Observation._richtable = function(container) {
 						ordering.removeAttr('name');
 					}
 				});
-		$('button.restore', t).click(function() {
+		$('button.restore', t).click(function(e) {
+			$(e.target).closest('form').prev('form.richtable')
+					.prev('form.query').slideDown(100, function() {
+								$('html,body').animate({
+											scrollTop : f.offset().top - 50
+										}, 300);
+							});
 			var b;
 			$(':input[name]', t).each(function() {
 				var h = $('input[type="hidden"][name="' + $(this).attr('name')
