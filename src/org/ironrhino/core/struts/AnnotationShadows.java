@@ -69,7 +69,7 @@ public class AnnotationShadows {
 		private Map<String, UiConfigImpl> embeddedUiConfigs;
 		private boolean suppressViewLink;
 		private boolean showSum;
-		private MatchMode queryMatchMode;
+		private MatchMode queryMatchMode = MatchMode.ANYWHERE;
 
 		public UiConfigImpl() {
 		}
@@ -684,6 +684,7 @@ public class AnnotationShadows {
 		private int inputGridColumns = 0;
 		private int viewGridColumns = 0;
 		private boolean showQueryForm = false;
+		private int queryFormGridColumns = 0;
 
 		public RichtableImpl() {
 		}
@@ -725,6 +726,12 @@ public class AnnotationShadows {
 					this.viewGridColumns = config.gridColumns();
 			}
 			this.showQueryForm = config.showQueryForm();
+			this.queryFormGridColumns = config.queryFormGridColumns();
+			if (this.queryFormGridColumns == 0) {
+				this.queryFormGridColumns = this.inputGridColumns;
+			}
+			if (this.queryFormGridColumns == 0)
+				this.queryFormGridColumns = 3;
 		}
 
 		public String getAlias() {
@@ -927,12 +934,20 @@ public class AnnotationShadows {
 			this.viewGridColumns = viewGridColumns;
 		}
 
-		public boolean isshowQueryForm() {
+		public boolean isShowQueryForm() {
 			return showQueryForm;
 		}
 
-		public void setshowQueryForm(boolean showQueryForm) {
+		public void setShowQueryForm(boolean showQueryForm) {
 			this.showQueryForm = showQueryForm;
+		}
+
+		public int getQueryFormGridColumns() {
+			return queryFormGridColumns;
+		}
+
+		public void setQueryFormGridColumns(int queryFormGridColumns) {
+			this.queryFormGridColumns = queryFormGridColumns;
 		}
 
 	}

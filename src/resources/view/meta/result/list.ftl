@@ -49,7 +49,7 @@
 <#assign dynamicAttributes={"data-versionproperty":versionPropertyName}>
 </#if>
 <#assign parameterNamesInQueryString=getParameterNamesInQueryString()>
-<@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showPageSize=richtableConfig.showPageSize showCheckColumn=richtableConfig.showCheckColumn showQueryForm=richtableConfig.showQueryForm dynamicAttributes=dynamicAttributes!/>
+<@rtstart formid=formid! entityName=entityName formHeader=formHeader! formCssClass=richtableConfig.listFormCssClass showPageSize=richtableConfig.showPageSize showCheckColumn=richtableConfig.showCheckColumn showQueryForm=richtableConfig.showQueryForm queryFormGridColumns=richtableConfig.queryFormGridColumns dynamicAttributes=dynamicAttributes!/>
 <#assign size=0>
 <#list uiConfigs as key,value>
 	<#assign hidden=value.hiddenInList.value>

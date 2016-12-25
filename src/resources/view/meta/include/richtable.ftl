@@ -1,8 +1,8 @@
-<#macro richtable columns entityName='' formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' creatable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showQueryForm=false showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
+<#macro richtable columns entityName='' formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' creatable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showQueryForm=false queryFormGridColumns=3 showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
 <#if !entityName?has_content>
 	<#local entityName=request.requestURI?keep_after_last('/')>
 </#if>
-<@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showQueryForm=showQueryForm showPageSize=showPageSize showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
+<@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showQueryForm=showQueryForm queryFormGridColumns=queryFormGridColumns showPageSize=showPageSize showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
 <#nested/>
 </@rtstart>
 <#local size = columns?size>
@@ -64,7 +64,7 @@
 <@rtend columns=columns?keys sumColumns=sumColumns showCheckColumn=showCheckColumn showActionColumn=showActionColumn showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly creatable=creatable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
 </#macro>
 
-<#macro rtstart formid='' action='' entityName='' resizable=true sortable=true includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' showQueryForm=false dynamicAttributes...>
+<#macro rtstart formid='' action='' entityName='' resizable=true sortable=true includeParameters=true showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true formHeader='' formCssClass='' showQueryForm=false queryFormGridColumns=3 dynamicAttributes...>
 <#if showQueryForm>
 <#if !propertyNamesInCriteria?? && uiConfigs??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].filterPropertyNamesInCriteria(uiConfigs)>
@@ -72,7 +72,7 @@
 <#if !propertyNamesInCriteria?? && entityClass??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].getPropertyNamesInCriteria(entityClass)>
 </#if>
-<@renderSearchForm propertyNamesInCriteria=propertyNamesInCriteria!/>
+<@renderSearchForm propertyNamesInCriteria=propertyNamesInCriteria! gridColumns=queryFormGridColumns/>
 </#if>
 <#local parameterNamesInQueryString=[]>
 <#if !action?has_content>
@@ -446,10 +446,10 @@ ${formFooter!}
 <#return parameterNamesInQueryString>
 </#function>
 
-<#macro renderSearchForm propertyNamesInCriteria>
+<#macro renderSearchForm propertyNamesInCriteria gridColumns=3>
 <#if propertyNamesInCriteria?has_content>
 <#local parameterNamesInQueryString=getParameterNamesInQueryString()>
-<form method="post" class="ajax view form-horizontal groupable query ignore-blank" data-columns="3">
+<form method="post" class="ajax view form-horizontal groupable query ignore-blank" data-columns="${gridColumns}">
 	<#list propertyNamesInCriteria as key,config>
 		<#local templateName><@config.templateName?interpret/></#local>
 		<#local pickUrl><@config.pickUrl?interpret/></#local>
@@ -497,7 +497,7 @@ ${formFooter!}
 			</div>
 		<#elseif config.type=='input'>
 			<@s.textfield disabled=disabled id=id label=label name=key value=(Parameters[key]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes>
-			<#if !disabled && config.propertyType.simpleName='String' && config.queryMatchMode.name()!='EXACT'>
+			<#if !disabled && config.queryMatchMode?? && config.propertyType.simpleName='String' && 'EXACT'!=(config.queryMatchMode.name())!>
 			<@s.param name='after'>
 			<#local opname=config.queryMatchMode.name()>
 			<@s.hidden name=key+'-op' value=(opname=='ANYWHERE')?then('INCLUDE',opname)/>
