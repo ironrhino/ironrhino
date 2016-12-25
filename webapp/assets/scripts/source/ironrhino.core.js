@@ -620,7 +620,8 @@ Ajax = {
 				}
 				var rep = div.find('#' + replacement[key]);
 				if (rep.length) {
-					if (rep.children().length == 0)
+					// if (rep.children().length == 0)
+					if (rep.is(':input'))
 						r.replaceWith(rep);
 					else
 						r.html(rep.html());
@@ -663,9 +664,13 @@ Ajax = {
 
 			if (data.fieldErrors) {
 				if (target) {
-					for (key in data.fieldErrors)
-						Message.showFieldError(target[key],
+					for (key in data.fieldErrors) {
+						var field = $(target).find('[name="' + key + '"]');
+						if (!field.length)
+							field = $(target).find('[name$=".' + key + '"]');
+						Message.showFieldError(field.get(0),
 								data.fieldErrors[key]);
+					}
 					Form.focus(target);
 				} else {
 					for (key in data.fieldErrors)

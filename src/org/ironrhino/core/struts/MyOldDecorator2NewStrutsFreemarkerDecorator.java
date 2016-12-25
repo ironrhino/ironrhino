@@ -44,10 +44,17 @@ public class MyOldDecorator2NewStrutsFreemarkerDecorator extends OldDecorator2Ne
 				try {
 					StringWriter writer = new StringWriter();
 					content.writeBody(writer);
-					String compressed = HtmlUtils.compress(writer.toString(), replacement.split(","));
-					if (compressed == null || compressed.length() == 0) {
+					String[] ids = replacement.split(",");
+					String compressed = HtmlUtils.compress(writer.toString(), ids);
+					if (compressed == null) {
 						super.render(content, request, response, servletContext, ctx);
 					} else {
+						if (StringUtils.isBlank(compressed)) {
+							StringBuilder sb = new StringBuilder();
+							for (String id : ids)
+								sb.append("<div id=\"").append(id).append("\"></div>");
+							compressed = sb.toString();
+						}
 						response.getWriter().write(compressed);
 						response.getWriter().flush();
 						return;
