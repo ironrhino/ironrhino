@@ -1018,7 +1018,10 @@ public abstract class UIBean extends Component {
             tryId = findStringIfAltSyntax(id);
         } else if (form != null) {
         	String formId = (String)form.getParameters().get("id") ;
-            tryId = (formId.indexOf('_') > 0 ? formId.substring(0, formId.lastIndexOf('_')) : formId) + '-' + generatedId;
+        	if( formId != null)
+        		tryId = (formId.indexOf('_') > 0 ? formId.substring(0, formId.lastIndexOf('_')) : formId) + '-' + generatedId;
+        	else
+        		tryId = generatedId;
         } else {
             tryId = generatedId;
         }
