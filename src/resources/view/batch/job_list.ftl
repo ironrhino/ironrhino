@@ -14,6 +14,6 @@
 "lastExecution.endTime":{"alias":"lastEndTime","width":"130px"},
 "lastExecution.duration":{"alias":"duration","width":"80px","template":r"<#if (entity.lastExecution.endTime)?has_content>${statics['org.ironrhino.core.util.DateUtils'].duration(entity.lastExecution.startTime,entity.lastExecution.endTime)}</#if>"}}>
 <#assign rowDynamicAttributes=r'{"class":"${(entity.lastExecution.status.name())!?switch("COMPLETED","success","FAILED","error","STARTING","info","STARTED","info","warning")}"}'>
-<@richtable entityName="job" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons rowDynamicAttributes=rowDynamicAttributes/>
+<@richtable columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons rowDynamicAttributes=rowDynamicAttributes/>
 </body>
 </html>

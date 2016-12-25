@@ -220,7 +220,7 @@
 		<textarea id="rt_select_template_${key}">
 		<#assign templateName><@config.templateName?interpret /></#assign>
 		<#assign templateName=templateName?markup_string/>
-		<@selectDictionary dictionaryName=templateName id=key name="${entityName}.${key}" required=config.required/>
+		<@selectDictionary dictionaryName=templateName id=key name=entityName+"."+key required=config.required/>
 		</textarea>
 		</#if>
 	</#if>

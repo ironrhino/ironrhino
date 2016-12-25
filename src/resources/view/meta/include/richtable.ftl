@@ -1,4 +1,7 @@
-<#macro richtable columns entityName formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' creatable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showQueryForm=false showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
+<#macro richtable columns entityName='' formid='' action='' showActionColumn=true showBottomButtons=true actionColumnWidth='50px' actionColumnButtons='' bottomButtons='' rowid='' resizable=true sortable=true readonly=false readonlyExpression='' creatable=true viewable=false celleditable=true deletable=true enableable=false searchable=false filterable=true downloadable=true searchButtons='' includeParameters=true showQueryForm=false showPageSize=true showCheckColumn=true multipleCheck=true columnfilterable=true rowDynamicAttributes='' formHeader='' formFooter='' formCssClass=''>
+<#if !entityName?has_content>
+	<#local entityName=request.requestURI?keep_after_last('/')>
+</#if>
 <@rtstart formid=formid action=action entityName=entityName resizable=resizable sortable=sortable includeParameters=includeParameters showQueryForm=showQueryForm showPageSize=showPageSize showCheckColumn=showCheckColumn multipleCheck=multipleCheck columnfilterable=columnfilterable formHeader=formHeader formCssClass=formCssClass>
 <#nested/>
 </@rtstart>
@@ -87,7 +90,7 @@
 <#if dynamicAttributes['dynamicAttributes']??>
 <#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
-<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action&&!action?starts_with(actionBaseUrl+'?')> data-actionbaseurl="${actionBaseUrl}"</#if><#if entityName?has_content&&!action?ends_with('/'+entityName)&&!action?ends_with('/'+entityName+'?')> data-entity="${entityName}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
+<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action&&!action?starts_with(actionBaseUrl+'?')> data-actionbaseurl="${actionBaseUrl}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
 ${formHeader!}
 <#nested/>
 <#if includeParameters>
@@ -457,7 +460,7 @@ ${formFooter!}
 		<#local label=getText(label)>
 		<#local group=getText(config.group)>
 		<#local description=getText(config.description)>
-		<#local id='search-'+(config.id?has_content)?then(config.id,entityName+'-'+key)/>
+		<#local id='search-'+(config.id?has_content)?then(config.id,(entityName!)+'-'+key)/>
 		<#local dynamicAttributes=mergeDynAttrs(config)/>
 		<#if !config.collectionType?? && !config.multiple && !config.pickMultiple>
 		<#local disabled=parameterNamesInQueryString?seq_contains(key)>

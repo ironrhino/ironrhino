@@ -38116,8 +38116,14 @@ Richtable = {
 	getEntityName : function(form) {
 		var entity = form.data('entity');
 		if (!entity) {
-			var entity = form.prop('action');
-			entity = entity.substring(entity.lastIndexOf('/') + 1);
+			var entity = $('table.richtable th[data-cellname]', form)
+					.data('cellname');
+			if (entity) {
+				entity = entity.substring(0, entity.indexOf('.'));
+			} else {
+				entity = form.prop('action');
+				entity = entity.substring(entity.lastIndexOf('/') + 1);
+			}
 		}
 		return entity;
 	},

@@ -13,6 +13,6 @@
 <@btn class="reload"/>
 <@btn class="filter"/>
 '>
-<@richtable entityName="page" columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons celleditable=false searchable=true/>
+<@richtable columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons celleditable=false searchable=true/>
 </body>
 </html>
