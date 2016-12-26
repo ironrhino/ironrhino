@@ -34,6 +34,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -166,6 +167,14 @@ public class EntityClassHelper {
 						ri.setValue(true);
 						uci.setReadonly(ri);
 					}
+					
+					OneToMany oneToMany = findAnnotation(readMethod, declaredField, OneToMany.class);
+					if (oneToMany != null && StringUtils.isNotBlank(oneToMany.mappedBy())) {
+						ReadonlyImpl ri = new ReadonlyImpl();
+						ri.setValue(true);
+						uci.setReadonly(ri);
+					}
+					
 
 					Embedded embedded = findAnnotation(readMethod, declaredField, Embedded.class);
 					EmbeddedId embeddedId = findAnnotation(readMethod, declaredField, EmbeddedId.class);
@@ -205,6 +214,7 @@ public class EntityClassHelper {
 					}
 					if (collectionType != null) {
 						uci.setExcludedFromOrdering(true);
+						uci.setThCssClass("excludeIfNotEdited");
 						if (elementType == String.class
 								&& (StringUtils.isBlank(uci.getType()) || "input".equals(uci.getType()))) {
 							uci.addCssClass("tags");
@@ -276,11 +286,18 @@ public class EntityClassHelper {
 					Class<?> returnType = pd.getPropertyType();
 					uci.setCollectionType(collectionType);
 					uci.setElementType(elementType);
-					if (collectionType != null
-							&& (uci.getType().equals("listpick") || uci.getType().equals("treeselect"))) {
-						uci.setPickMultiple(true);
-						returnType = elementType;
-						uci.setPropertyType(returnType);
+					if (collectionType != null && elementType != null) {
+						if (Persistable.class.isAssignableFrom(elementType)) {
+							uci.setTemplate(
+									"<#if value?has_content><#list value as var>${var}<#sep>, </#list></#if>");
+							uci.setPickMultiple(true);
+							returnType = elementType;
+						}
+						if (uci.getType().equals("listpick") || uci.getType().equals("treeselect")) {
+							uci.setPickMultiple(true);
+							returnType = elementType;
+							uci.setPropertyType(returnType);
+						}
 					}
 					if (returnType.isArray()) {
 						Class<?> clazz = returnType.getComponentType();
@@ -381,7 +398,8 @@ public class EntityClassHelper {
 							if (StringUtils.isBlank(uci.getPickUrl()))
 								uci.setPickUrl(getPickUrl(returnType));
 						}
-						if (StringUtils.isBlank(uci.getListTemplate()) && !uci.isSuppressViewLink()) {
+						if (!uci.isPickMultiple() && StringUtils.isBlank(uci.getListTemplate())
+								&& !uci.isSuppressViewLink()) {
 							String url = AutoConfigPackageProvider.getEntityUrl(returnType);
 							if (url == null)
 								url = new StringBuilder("/")

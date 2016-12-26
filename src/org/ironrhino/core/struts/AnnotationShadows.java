@@ -558,8 +558,8 @@ public class AnnotationShadows {
 			this.queryMatchMode = queryMatchMode;
 		}
 
-		public boolean isReference() {
-			return propertyType != null && Persistable.class.isAssignableFrom(propertyType);
+		public boolean isSingleReference() {
+			return collectionType == null && propertyType != null && Persistable.class.isAssignableFrom(propertyType);
 		}
 
 	}

@@ -104,7 +104,7 @@
 				<@s.select disabled=readonly id=id label=label name=entityName+"."+key class=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 			<#elseif config.type=='listpick'>
 				<div id="control-group-${id}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'<#if config.pickMultiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
-					<#assign _name=entityName+"."+key+"${config.reference?then('.id','')}">
+					<#assign _name=entityName+"."+key+"${config.singleReference?then('.id','')}">
 					<@s.hidden id=id name=_name class="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 					<@controlLabel label=label description=description/>
 					<div class="controls<#if readonly> text</#if>">
@@ -113,7 +113,7 @@
 				</div>
 			<#elseif config.type=='treeselect'>
 				<div id="control-group-${id}" class="control-group <#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false<#if config.pickMultiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
-					<#assign _name=entityName+"."+key+"${config.reference?then('.id','')}">
+					<#assign _name=entityName+"."+key+"${config.singleReference?then('.id','')}">
 					<@s.hidden id=id name=_name class="treeselect-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 					<@controlLabel label=label description=description/>
 					<div class="controls<#if readonly> text</#if>">
@@ -286,7 +286,7 @@
 						</div>
 					<#elseif config.type=='listpick'>
 						<div id="control-group-${id}" class="control-group <#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'<#if config.pickMultiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
-						<#assign _name=entityName+'.'+key+'.'+entry.key+"${config.reference?then('.id','')}">
+						<#assign _name=entityName+'.'+key+'.'+entry.key+"${config.singleReference?then('.id','')}">
 						<@s.hidden id=id name=_name class="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 						<@controlLabel label=label description=description/>
 							<div class="controls<#if readonly> text</#if>">
@@ -295,7 +295,7 @@
 						</div>
 					<#elseif config.type=='treeselect'>
 						<div id="control-group-${id}" class="control-group <#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false<#if config.pickMultiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
-							<#assign _name=entityName+'.'+key+'.'+entry.key+"${config.reference?then('.id','')}">
+							<#assign _name=entityName+'.'+key+'.'+entry.key+"${config.singleReference?then('.id','')}">
 							<@s.hidden id=id name=_name class="treeselect-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 							<@controlLabel label=label description=description/>
 							<div class="controls<#if readonly> text</#if>">
@@ -413,13 +413,13 @@
 									</#if>
 								<#elseif config.type=='listpick'>
 										<div class="<#if readonly>_</#if>listpick" data-options="{'url':'<@url value=pickUrl/>'<#if config.pickMultiple>,'multiple':true</#if>}">
-										<#assign _name=entityName+"."+key+'['+index+'].'+entry.key+"${config.reference?then('.id','')}">
+										<#assign _name=entityName+"."+key+'['+index+'].'+entry.key+"${config.singleReference?then('.id','')}">
 										<@s.hidden name=_name class="listpick-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 										<span class="listpick-name"><#if config.pickMultiple&&config.template?has_content><@config.template?interpret/><#else><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></span>
 										</div>
 								<#elseif config.type=='treeselect'>
 										<div class="<#if readonly>_</#if>treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false<#if config.pickMultiple>,'multiple':true</#if>}">
-										<#assign _name=entityName+"."+key+'['+index+'].'+entry.key+"${config.reference?then('.id','')}">
+										<#assign _name=entityName+"."+key+'['+index+'].'+entry.key+"${config.singleReference?then('.id','')}">
 										<@s.hidden name=_name class="treeselect-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 										<span class="treeselect-name"><#if config.pickMultiple&&config.template?has_content><@config.template?interpret/><#else><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></span>
 										</div>

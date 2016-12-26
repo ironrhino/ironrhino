@@ -38583,6 +38583,7 @@ Richtable = {
 		if (cell.data('oldvalue') === undefined)
 			cell.data('oldvalue', '' + cell.data('cellvalue'));
 		cell.removeClass('editing');
+		cell.removeAttr('data-cellvalue');
 		cell.data('cellvalue', value);
 		if (typeof label != 'undefined')
 			cell.text(label);
@@ -38608,6 +38609,8 @@ Richtable = {
 								return;
 							var ar = cellEdit.split(',');
 							var action = ar[0];
+							if (action == 'none')
+								return;
 							var type = ar[1];
 							var template = ar[2];
 							if (action != 'click' && action != 'dblclick') {

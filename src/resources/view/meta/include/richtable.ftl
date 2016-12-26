@@ -472,7 +472,7 @@ ${formFooter!}
 			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='listpick' && !disabled>
 			<div id="control-group-${id}" class="control-group listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
-				<#local _name=key+"${config.reference?then('.id','')}">
+				<#local _name=key+"${config.singleReference?then('.id','')}">
 				<@s.hidden id=id name=_name class="listpick-id ${config.cssClass?replace('required','')}" dynamicAttributes=dynamicAttributes/>
 				<@controlLabel label=label description=description/>
 				<div class="controls">
@@ -481,7 +481,7 @@ ${formFooter!}
 			</div>
 		<#elseif config.type=='treeselect' && !disabled>
 			<div id="control-group-${id}" class="control-group treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
-				<#local _name=key+"${config.reference?then('.id','')}">
+				<#local _name=key+"${config.singleReference?then('.id','')}">
 				<@s.hidden id=id name=_name class="treeselect-id ${config.cssClass?replace('required','')}" dynamicAttributes=dynamicAttributes/>
 				<@controlLabel label=label description=description/>
 				<div class="controls">

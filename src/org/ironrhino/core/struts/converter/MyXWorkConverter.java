@@ -5,6 +5,9 @@ import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Map;
 
+import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.util.BeanUtils;
+
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.conversion.TypeConverter;
 import com.opensymphony.xwork2.conversion.impl.XWorkConverter;
@@ -15,7 +18,17 @@ public class MyXWorkConverter extends XWorkConverter {
 	@Override
 	public Object convertValue(Map<String, Object> context, Object target, Member member, String property, Object value,
 			Class toClass) {
-		if (Collection.class.isAssignableFrom(toClass) && value instanceof String[] && target != null) {
+		if (Persistable.class.isAssignableFrom(toClass) && value instanceof String) {
+			Object entity;
+			try {
+				entity = toClass.newInstance();
+				BeanUtils.setPropertyValue(entity, "id", value);
+				return entity;
+			} catch (InstantiationException | IllegalAccessException e) {
+			}
+		}
+		if ((Collection.class.isAssignableFrom(toClass) || toClass.isArray()) && value instanceof String[]
+				&& target != null) {
 			String[] arr = (String[]) value;
 			if (arr.length == 1) {
 				String s = arr[0];

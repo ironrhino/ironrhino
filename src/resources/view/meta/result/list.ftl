@@ -149,7 +149,15 @@
 		<#if config.type=='listpick'&&celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
 			<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 			<#assign pickUrl=pickUrl?markup_string>
-			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":(value.id?string)!,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue'}"}>
+			<#assign cellvalue=(value.id?string)!>
+			<#if config.pickMultiple && value?has_content>
+				<#assign ids=[]>
+				<#list value as v>
+				<#assign ids+=[v.id]>
+				</#list>
+				<#assign cellvalue=ids?join(',')>
+			</#if>
+			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":cellvalue,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue','multiple':"+config.pickMultiple?string+"}"}>
 		</#if>
 		<#if config.readonly.expression?has_content && config.readonly.expression?eval>
 		<#assign dynamicAttributes+={'data-readonly':'true'}/>
