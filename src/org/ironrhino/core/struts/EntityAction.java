@@ -801,7 +801,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				UiConfigImpl uci = uiConfigs.get("id");
 				if (uci != null && uci.getReadonly().isValue()) {
 					if (_entity.getId() != null) {
-						addActionError(getText("try.again.later"));
+						addFieldError("id", getText("validation.required"));
 						return false;
 					}
 				}
@@ -951,7 +951,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				if (persisted == null) {
 					persisted = entityManager.get((Serializable) bw.getPropertyValue("id"));
 					if (persisted == null) {
-						addActionError(getText("try.again.later"));
+						addFieldError("id", getText("validation.required"));
 						return false;
 					}
 					entityManager.evict(persisted);

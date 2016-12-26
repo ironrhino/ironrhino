@@ -162,10 +162,18 @@ public class EntityClassHelper {
 					}
 
 					OneToOne oneToOne = findAnnotation(readMethod, declaredField, OneToOne.class);
-					if (oneToOne != null && StringUtils.isNotBlank(oneToOne.mappedBy())) {
-						ReadonlyImpl ri = new ReadonlyImpl();
-						ri.setValue(true);
-						uci.setReadonly(ri);
+					if (oneToOne != null) {
+						if (StringUtils.isNotBlank(oneToOne.mappedBy())) {
+							ReadonlyImpl ri = new ReadonlyImpl();
+							ri.setValue(true);
+							uci.setReadonly(ri);
+						}
+						MapsId mapsId = findAnnotation(readMethod, declaredField, MapsId.class);
+						if (mapsId != null) {
+							ReadonlyImpl ri = new ReadonlyImpl();
+							ri.setExpression("!entity.new");
+							uci.setReadonly(ri);
+						}
 					}
 
 					OneToMany oneToMany = findAnnotation(readMethod, declaredField, OneToMany.class);

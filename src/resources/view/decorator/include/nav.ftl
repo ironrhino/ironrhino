@@ -26,5 +26,13 @@
 		  	<li><a href="<@url value="/common/query"/>">${getText('query')}</a></li>
 	  	</ul>
 	</li>
+	<li class="dropdown">
+	 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">${getText('sample')}</a>
+	    <ul class="dropdown-menu">
+		  	<li><a href="<@url value="/sample/customer"/>">${getText('customer')}</a></li>
+		  	<li><a href="<@url value="/sample/company"/>">${getText('company')}</a></li>
+		  	<li><a href="<@url value="/sample/boss"/>">${getText('boss')}</a></li>
+	  	</ul>
+	</li>
   	</@authorize>
 </ul>
