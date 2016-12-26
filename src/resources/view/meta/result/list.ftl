@@ -146,7 +146,7 @@
 	</#if>
 	<#if !hidden>
 		<#assign dynamicAttributes={}>
-		<#if config.type=='listpick'&&celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
+		<#if (config.type=='listpick'||config.type=='treeselect')&&celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
 			<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 			<#assign pickUrl=pickUrl?markup_string>
 			<#assign cellvalue=(value.id?string)!>
@@ -157,7 +157,7 @@
 				</#list>
 				<#assign cellvalue=ids?join(',')>
 			</#if>
-			<#assign dynamicAttributes={"class":"listpick","data-cellvalue":cellvalue,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue','multiple':"+config.pickMultiple?string+"}"}>
+			<#assign dynamicAttributes={"class":config.type,"data-cellvalue":cellvalue,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue','multiple':"+config.pickMultiple?string+"}"}>
 		</#if>
 		<#if config.readonly.expression?has_content && config.readonly.expression?eval>
 		<#assign dynamicAttributes+={'data-readonly':'true'}/>

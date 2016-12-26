@@ -470,22 +470,13 @@ ${formFooter!}
 			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='select'>
 			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
-		<#elseif config.type=='listpick' && !disabled>
-			<div id="control-group-${id}" class="control-group listpick" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
+		<#elseif (config.type=='listpick' || config.type=='treeselect') && !disabled>
+			<div id="control-group-${id}" class="control-group ${config.type}" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
 				<#local _name=key+"${config.singleReference?then('.id','')}">
-				<@s.hidden id=id name=_name class="listpick-id ${config.cssClass?replace('required','')}" dynamicAttributes=dynamicAttributes/>
+				<@s.hidden id=id name=_name class=config.type+"-id ${config.cssClass?replace('required','')}" dynamicAttributes=dynamicAttributes/>
 				<@controlLabel label=label description=description/>
 				<div class="controls">
-				<span class="listpick-name"></span>
-				</div>
-			</div>
-		<#elseif config.type=='treeselect' && !disabled>
-			<div id="control-group-${id}" class="control-group treeselect" data-options="{'url':'<@url value=pickUrl/>','cache':false}"<#if group?has_content> data-group="${group}"</#if>>
-				<#local _name=key+"${config.singleReference?then('.id','')}">
-				<@s.hidden id=id name=_name class="treeselect-id ${config.cssClass?replace('required','')}" dynamicAttributes=dynamicAttributes/>
-				<@controlLabel label=label description=description/>
-				<div class="controls">
-				<span class="treeselect-name"></span>
+				<span class="${config.type}-name"></span>
 				</div>
 			</div>
 		<#elseif config.type=='dictionary' && selectDictionary??>
