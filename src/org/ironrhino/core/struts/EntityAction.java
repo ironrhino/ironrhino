@@ -638,9 +638,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 								continue;
 							}
 						}
-						// bw.setPropertyValue(propertyName, value);
-						// setPropertyValue with javassist proxy failed
-						bw.getPropertyDescriptor(propertyName).getWriteMethod().invoke(bw.getWrappedInstance(), value);
+						bw.setPropertyValue(propertyName, value);
 					}
 				}
 			} else if (editablePropertyNames.contains(propertyName)) {
@@ -1080,9 +1078,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					else
 						obj = em.findOne(listKey, (Serializable) temp.getPropertyValue(listKey));
 					em.evict(obj);
-					// bw.setPropertyValue(propertyName, obj);
-					// setPropertyValue with javassist proxy failed
-					bw.getPropertyDescriptor(propertyName).getWriteMethod().invoke(bw.getWrappedInstance(), obj);
+					bw.setPropertyValue(propertyName, obj);
 					em = getEntityManager(getEntityClass());
 				}
 			}

@@ -23,7 +23,7 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
 		Class<?> sourceClass = sourceType.getType();
 		Class<?> targetClass = targetType.getType();
-		if (sourceClass == targetClass)
+		if (sourceClass == targetClass || targetClass.isAssignableFrom(sourceClass))
 			return false;
 		try {
 			targetClass.getConstructor(sourceClass);
@@ -60,6 +60,8 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 			return null;
 		Class<?> sourceClass = sourceType.getType();
 		Class<?> targetClass = targetType.getType();
+		if (targetClass.isInstance(source))
+			return source;
 		try {
 			Constructor<?> ctor = targetClass.getConstructor(sourceClass);
 			return ctor.newInstance(source);
@@ -75,7 +77,7 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 			BeanUtils.copyProperties(source, target);
 			return target;
 		} catch (Exception e) {
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
 
