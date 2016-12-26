@@ -139,6 +139,7 @@
 									}
 								});
 				win.data('windowoptions', options);
+				win.data('selected', val(options.id, current) || '');
 				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
 					win.mask(MessageBundle.get('ajax.loading'));
@@ -303,4 +304,19 @@
 
 Observation.listpick = function(container) {
 	$$('.listpick', container).listpick();
+	$$('form.pick.richtable').each(function() {
+				var t = $(this);
+				var selected = t.closest('.window-listpick').data('selected');
+				if (selected) {
+					var arr = selected.split(',');
+					$('input[type="checkbox"]', t).each(function() {
+								if ($.inArray(this.value, arr) > -1)
+									$(this).click();
+							});
+					$('input[type="radio"]', t).each(function() {
+								if (this.value == selected)
+									this.checked = true;
+							});
+				}
+			});
 };

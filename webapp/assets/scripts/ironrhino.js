@@ -38583,7 +38583,7 @@ Richtable = {
 		if (cell.data('oldvalue') === undefined)
 			cell.data('oldvalue', '' + cell.data('cellvalue'));
 		cell.removeClass('editing');
-		cell.removeAttr('data-cellvalue');
+		cell.attr('data-cellvalue', value);
 		cell.data('cellvalue', value);
 		if (typeof label != 'undefined')
 			cell.text(label);
@@ -39831,7 +39831,9 @@ Observation.groupable = function(container) {
 						separator : options.separator,
 						root : options.root
 					};
-					win.find('.tree').treeview(treeviewoptions);
+					win.find('.tree').data('selected',
+							val(options.id, current) || '')
+							.treeview(treeviewoptions);
 					$('<div style="text-align:center;"><button class="btn btn-primary pick">'
 							+ MessageBundle.get('confirm') + '</button></div>')
 							.appendTo(win).click(function() {
@@ -39934,6 +39936,17 @@ Observation.groupable = function(container) {
 
 Observation.treeselect = function(container) {
 	$$('.treeselect', container).treeselect();
+	if ($(container).is('li')) {
+		var t = $(container);
+		var selected = t.closest('.tree').data('selected');
+		if (selected) {
+			var arr = selected.split(',');
+			$('input[type="checkbox"]', t).each(function() {
+						if ($.inArray(this.value, arr) > -1)
+							$(this).click();
+					});
+		}
+	}
 };
 Observation.treeview = function(container) {
 	$$('.treeview', container).each(function() {
@@ -40121,6 +40134,7 @@ Observation.treeview = function(container) {
 									}
 								});
 				win.data('windowoptions', options);
+				win.data('selected', val(options.id, current) || '');
 				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
 					win.mask(MessageBundle.get('ajax.loading'));
@@ -40285,6 +40299,21 @@ Observation.treeview = function(container) {
 
 Observation.listpick = function(container) {
 	$$('.listpick', container).listpick();
+	$$('form.pick.richtable').each(function() {
+				var t = $(this);
+				var selected = t.closest('.window-listpick').data('selected');
+				if (selected) {
+					var arr = selected.split(',');
+					$('input[type="checkbox"]', t).each(function() {
+								if ($.inArray(this.value, arr) > -1)
+									$(this).click();
+							});
+					$('input[type="radio"]', t).each(function() {
+								if (this.value == selected)
+									this.checked = true;
+							});
+				}
+			});
 };
 (function($) {
 	$.fn.imagepick = function() {

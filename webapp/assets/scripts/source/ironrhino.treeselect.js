@@ -138,7 +138,9 @@
 						separator : options.separator,
 						root : options.root
 					};
-					win.find('.tree').treeview(treeviewoptions);
+					win.find('.tree').data('selected',
+							val(options.id, current) || '')
+							.treeview(treeviewoptions);
 					$('<div style="text-align:center;"><button class="btn btn-primary pick">'
 							+ MessageBundle.get('confirm') + '</button></div>')
 							.appendTo(win).click(function() {
@@ -241,4 +243,15 @@
 
 Observation.treeselect = function(container) {
 	$$('.treeselect', container).treeselect();
+	if ($(container).is('li')) {
+		var t = $(container);
+		var selected = t.closest('.tree').data('selected');
+		if (selected) {
+			var arr = selected.split(',');
+			$('input[type="checkbox"]', t).each(function() {
+						if ($.inArray(this.value, arr) > -1)
+							$(this).click();
+					});
+		}
+	}
 };

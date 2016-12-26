@@ -525,7 +525,7 @@ Richtable = {
 		if (cell.data('oldvalue') === undefined)
 			cell.data('oldvalue', '' + cell.data('cellvalue'));
 		cell.removeClass('editing');
-		cell.removeAttr('data-cellvalue');
+		cell.attr('data-cellvalue', value);
 		cell.data('cellvalue', value);
 		if (typeof label != 'undefined')
 			cell.text(label);
