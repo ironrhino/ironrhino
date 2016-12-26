@@ -19,10 +19,13 @@ public class MyXWorkConverter extends XWorkConverter {
 	public Object convertValue(Map<String, Object> context, Object target, Member member, String property, Object value,
 			Class toClass) {
 		if (Persistable.class.isAssignableFrom(toClass) && value instanceof String) {
+			String id = (String) value;
+			if(id.isEmpty())
+				return null;
 			Object entity;
 			try {
 				entity = toClass.newInstance();
-				BeanUtils.setPropertyValue(entity, "id", value);
+				BeanUtils.setPropertyValue(entity, "id", id);
 				return entity;
 			} catch (InstantiationException | IllegalAccessException e) {
 			}
