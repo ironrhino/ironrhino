@@ -89,7 +89,7 @@ public class Customer extends BaseRecordableEntity {
 	private Company company;
 
 	@UiConfig(cssClass = "nullable", description = "addresses.description")
-	@ElementCollection(fetch = FetchType.EAGER, targetClass = CustomerAddress.class)
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "sample_customer_address", joinColumns = @JoinColumn(name = "customer"))
 	@OrderColumn(name = "lineNumber", nullable = false)
 	@Fetch(FetchMode.SUBSELECT)
