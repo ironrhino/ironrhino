@@ -288,6 +288,7 @@ public class EntityClassHelper {
 					if (collectionType != null && elementType != null) {
 						if (Persistable.class.isAssignableFrom(elementType)) {
 							uci.setMultiple(true);
+							uci.setExcludedFromCriteria(true);
 							uci.setTemplate("<#if value?has_content><#list value as var>${var}<#sep>, </#list></#if>");
 							returnType = elementType;
 							uci.setPropertyType(returnType);
