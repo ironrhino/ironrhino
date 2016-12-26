@@ -95,6 +95,9 @@
 											</#list>
 											</ol>
 									<#elseif item?is_hash_ex>
+											<#if item.isNew?? && item.getId??>
+											${item}
+											<#else>
 											<ul class="unstyled">
 											<#list item as k,v>
 												<#if k!='class' && v?? && !v?is_method>
@@ -102,6 +105,7 @@
 												</#if>
 											</#list>
 											</ul>
+											</#if>
 									<#else>
 											${item!}
 									</#if>
@@ -238,6 +242,9 @@
 														</#list>
 														</ol>
 												<#elseif item?is_hash_ex>
+														<#if item.isNew?? && item.getId??>
+														${item}
+														<#else>
 														<ul class="unstyled">
 														<#list item as k,v>
 															<#if k!='class' && v?? && !v?is_method>
@@ -245,6 +252,7 @@
 															</#if>
 														</#list>
 														</ul>
+														</#if>
 												<#else>
 														${item!}
 												</#if>
@@ -291,12 +299,16 @@
 										</#list>
 										</ol>
 								<#elseif item?is_hash_ex>
+										<#if item.isNew?? && item.getId??>
+											${item}
+										<#else>
 										<ul class="unstyled">
 										<#list item as k,v>
 											<#if k!='class' && v?? && !v?is_method && item['set'+k?cap_first]??>
 											<li><em>${getText(k)}:</em> ${v?string}</li>
 											</#if>
 										</#list>
+										</#if>
 										</ul>
 								<#else>
 										${item!}
