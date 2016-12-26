@@ -105,7 +105,17 @@
 			<#elseif config.type=='listpick' || config.type=='treeselect'>
 				<div id="control-group-${id}" class="control-group <#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.pickMultiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
 					<#assign _name=entityName+"."+key+"${config.singleReference?then('.id','')}">
+					<#assign _value=''>
+					<#if entity[key]?? && entity[key]?is_enumerable>
+						<#assign arr=[]>
+						<#list entity[key] as v><#assign arr+=[config.reference?then(v.id!,v?string)]></#list>
+						<#assign _value=arr?join(',')>
+					</#if>
+					<#if _value?has_content>
+					<@s.hidden id=id name=_name value=_value class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
+					<#else>
 					<@s.hidden id=id name=_name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
+					</#if>
 					<@controlLabel label=label description=description/>
 					<div class="controls<#if readonly> text</#if>">
 					<span class="${config.type}-name"><#if config.pickMultiple&&config.template?has_content><@config.template?interpret/><#else><#if entity[key]??><#if entity[key].fullname??>${entity[key].fullname!}<#else>${entity[key]!}</#if></#if></#if></span>
@@ -278,7 +288,17 @@
 					<#elseif config.type=='listpick' || config.type=='treeselect'>
 						<div id="control-group-${id}" class="control-group <#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.pickMultiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
 							<#assign _name=entityName+'.'+key+'.'+entry.key+"${config.singleReference?then('.id','')}">
+							<#assign _value=''>
+							<#if entity[key]?? && entity[key][entry.key]?? && entity[key][entry.key]?is_enumerable>
+								<#assign arr=[]>
+								<#list entity[key][entry.key] as v><#assign arr+=[config.reference?then(v.id!,v?string)]></#list>
+								<#assign _value=arr?join(',')>
+							</#if>
+							<#if _value?has_content>
+							<@s.hidden id=id name=_name value=_value class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
+							<#else>
 							<@s.hidden id=id name=_name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
+							</#if>
 							<@controlLabel label=label description=description/>
 							<div class="controls<#if readonly> text</#if>">
 							<span class="${config.type}-name"><#if config.pickMultiple&&config.template?has_content><@config.template?interpret/><#else><#if entity[key][entry.key]??><#if entity[key][entry.key].fullname??>${entity[key][entry.key].fullname!}<#else>${entity[key][entry.key]!}</#if></#if></#if></span>
@@ -396,7 +416,17 @@
 								<#elseif config.type=='listpick' || config.type=='treeselect'>
 										<div class="<#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.pickMultiple>,'multiple':true</#if>}">
 										<#assign _name=entityName+"."+key+'['+index+'].'+entry.key+"${config.singleReference?then('.id','')}">
+										<#assign _value=''>
+										<#if entity[key]?? && entity[key][index]?? && entity[key][index][entry.key]?? && entity[key][index][entry.key]?is_enumerable>
+											<#assign arr=[]>
+											<#list entity[key][index][entry.key] as v><#assign arr+=[config.reference?then(v.id!,v?string)]></#list>
+											<#assign _value=arr?join(',')>
+										</#if>
+										<#if _value?has_content>
+										<@s.hidden name=_name value=_value class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
+										<#else>
 										<@s.hidden name=_name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
+										</#if>
 										<span class="${config.type}-name"><#if config.pickMultiple&&config.template?has_content><@config.template?interpret/><#else><#if (entity[key][index][entry.key])??><#if entity[key][index][entry.key].fullname??>${entity[key][index][entry.key].fullname!}<#else>${entity[key][index][entry.key]!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></span>
 										</div>
 								<#else>

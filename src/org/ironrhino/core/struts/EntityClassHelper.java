@@ -292,6 +292,7 @@ public class EntityClassHelper {
 									"<#if value?has_content><#list value as var>${var}<#sep>, </#list></#if>");
 							uci.setPickMultiple(true);
 							returnType = elementType;
+							uci.setPropertyType(returnType);
 						}
 						if (uci.getType().equals("listpick") || uci.getType().equals("treeselect")) {
 							uci.setPickMultiple(true);
