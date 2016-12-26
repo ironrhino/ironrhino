@@ -462,7 +462,7 @@ ${formFooter!}
 		<#local description=getText(config.description)>
 		<#local id='search-'+(config.id?has_content)?then(config.id,(entityName!)+'-'+key)/>
 		<#local dynamicAttributes=mergeDynAttrs(config)/>
-		<#if !config.collectionType?? && !config.multiple && !config.pickMultiple>
+		<#if !config.collectionType?? && !config.multiple>
 		<#local disabled=parameterNamesInQueryString?seq_contains(key)>
 		<#if config.type=='checkbox'>
 			<@s.checkbox disabled=disabled id=id label=label name=key checked=('true'==(Parameters[key]!)) class=config.cssClass?replace('required','')+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />

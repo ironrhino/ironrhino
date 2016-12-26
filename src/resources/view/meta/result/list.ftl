@@ -150,14 +150,14 @@
 			<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 			<#assign pickUrl=pickUrl?markup_string>
 			<#assign cellvalue=(value.id?string)!>
-			<#if config.pickMultiple && value?has_content>
+			<#if config.multiple && value?has_content>
 				<#assign ids=[]>
 				<#list value as v>
-				<#assign ids+=[v.id]>
+				<#assign ids+=[config.reference?then(v.id!,v)]>
 				</#list>
 				<#assign cellvalue=ids?join(',')>
 			</#if>
-			<#assign dynamicAttributes={"class":config.type,"data-cellvalue":cellvalue,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue','multiple':"+config.pickMultiple?string+"}"}>
+			<#assign dynamicAttributes={"class":config.type,"data-cellvalue":cellvalue,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue','multiple':"+config.multiple?string+"}"}>
 		</#if>
 		<#if config.readonly.expression?has_content && config.readonly.expression?eval>
 		<#assign dynamicAttributes+={'data-readonly':'true'}/>
@@ -167,13 +167,13 @@
 			<#if config.multiple>
 				<#assign temp = []>
 				<#if config.type=='dictionary' && selectDictionary??><#assign templateName><@config.templateName?interpret /></#assign><#assign templateName=templateName?markup_string/></#if>
-				<#list value as var>
+				<#list value as v>
 				<#if config.type=='dictionary' && selectDictionary??>
-				<#assign temp+=[getDictionaryLabel(templateName,var)]/>
+				<#assign temp+=[getDictionaryLabel(templateName,v)]/>
 				<#elseif config.type=='enum'>
-				<#assign temp+=[var.name()]/>
+				<#assign temp+=[v.name()]/>
 				<#else>
-				<#assign temp+=[var]/>
+				<#assign temp+=[config.reference?then(v.id!,v)]/>
 				</#if>
 				</#list>
 				<#assign dynamicAttributes+={'data-cellvalue':temp?join(',')}/>

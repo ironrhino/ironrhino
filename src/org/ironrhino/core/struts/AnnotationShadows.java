@@ -58,7 +58,6 @@ public class AnnotationShadows {
 		private String listOptions = "";
 		private String cellEdit = "";
 		private String pickUrl = "";
-		private boolean pickMultiple;
 		private String templateName = "";
 		private boolean excludedFromLike = false;
 		private boolean excludedFromCriteria = false;
@@ -123,7 +122,6 @@ public class AnnotationShadows {
 				this.listValue = "top";
 			}
 			this.pickUrl = config.pickUrl();
-			this.pickMultiple = config.pickMultiple();
 			this.templateName = config.templateName();
 			if (StringUtils.isBlank(templateName))
 				this.templateName = propertyName;
@@ -230,14 +228,6 @@ public class AnnotationShadows {
 
 		public void setPickUrl(String pickUrl) {
 			this.pickUrl = pickUrl;
-		}
-
-		public boolean isPickMultiple() {
-			return pickMultiple;
-		}
-
-		public void setPickMultiple(boolean pickMultiple) {
-			this.pickMultiple = pickMultiple;
 		}
 
 		public String getTemplateName() {

@@ -167,14 +167,13 @@ public class EntityClassHelper {
 						ri.setValue(true);
 						uci.setReadonly(ri);
 					}
-					
+
 					OneToMany oneToMany = findAnnotation(readMethod, declaredField, OneToMany.class);
 					if (oneToMany != null && StringUtils.isNotBlank(oneToMany.mappedBy())) {
 						ReadonlyImpl ri = new ReadonlyImpl();
 						ri.setValue(true);
 						uci.setReadonly(ri);
 					}
-					
 
 					Embedded embedded = findAnnotation(readMethod, declaredField, Embedded.class);
 					EmbeddedId embeddedId = findAnnotation(readMethod, declaredField, EmbeddedId.class);
@@ -288,16 +287,12 @@ public class EntityClassHelper {
 					uci.setElementType(elementType);
 					if (collectionType != null && elementType != null) {
 						if (Persistable.class.isAssignableFrom(elementType)) {
-							uci.setTemplate(
-									"<#if value?has_content><#list value as var>${var}<#sep>, </#list></#if>");
-							uci.setPickMultiple(true);
+							uci.setMultiple(true);
+							uci.setTemplate("<#if value?has_content><#list value as var>${var}<#sep>, </#list></#if>");
 							returnType = elementType;
 							uci.setPropertyType(returnType);
-						}
-						if (uci.getType().equals("listpick") || uci.getType().equals("treeselect")) {
-							uci.setPickMultiple(true);
-							returnType = elementType;
-							uci.setPropertyType(returnType);
+						} else if (String.class == elementType || Number.class.isAssignableFrom(elementType)) {
+							uci.setMultiple(true);
 						}
 					}
 					if (returnType.isArray()) {
@@ -318,7 +313,7 @@ public class EntityClassHelper {
 						uci.addCssClass("custom");
 						uci.setThCssClass("excludeIfNotEdited");
 					}
-					if (uci.isMultiple()) {
+					if (uci.isMultiple() && StringUtils.isBlank(uci.getTemplate())) {
 						if (uci.getType().equals("dictionary")) {
 							uci.setTemplate(
 									"<#if value?has_content><#list value as var><span class=\"label\"><#if displayDictionaryLabel??><@displayDictionaryLabel dictionaryName='"
@@ -399,7 +394,7 @@ public class EntityClassHelper {
 							if (StringUtils.isBlank(uci.getPickUrl()))
 								uci.setPickUrl(getPickUrl(returnType));
 						}
-						if (!uci.isPickMultiple() && StringUtils.isBlank(uci.getListTemplate())
+						if (!uci.isMultiple() && StringUtils.isBlank(uci.getListTemplate())
 								&& !uci.isSuppressViewLink()) {
 							String url = AutoConfigPackageProvider.getEntityUrl(returnType);
 							if (url == null)
