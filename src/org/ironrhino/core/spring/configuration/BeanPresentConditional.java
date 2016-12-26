@@ -16,7 +16,7 @@ public @interface BeanPresentConditional {
 
 	String name() default "";
 
-	Class<?> type() default Object.class;
+	Class<?> type() default void.class;
 
 	boolean negated() default false;
 

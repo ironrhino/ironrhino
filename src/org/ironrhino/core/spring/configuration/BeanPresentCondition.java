@@ -24,7 +24,7 @@ class BeanPresentCondition implements ConfigurationCondition {
 		if (StringUtils.isBlank(name) && StringUtils.isNotBlank(annotation.value()))
 			name = annotation.value();
 		Class<?> type = annotation.type();
-		if (type == Object.class)
+		if (type == void.class)
 			type = null;
 		if (StringUtils.isBlank(name) && type == null)
 			return false;
