@@ -1,12 +1,18 @@
 package org.ironrhino.sample.crud;
 
+import java.util.Collection;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.NaturalId;
@@ -43,12 +49,12 @@ public class Company extends BaseEntity {
 	@Column(nullable = false, unique = true, length = 9)
 	private String organizationCode;
 
-	@UiConfig(width = "200px", template = "<#if value?has_content>${value.fullname}</#if>", group = "contactInfo")
+	@UiConfig(width = "150px", template = "<#if value?has_content>${value.fullname}</#if>", group = "contactInfo")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "region")
 	private Region region;
 
-	@UiConfig(width = "200px", group = "contactInfo")
+	@UiConfig(width = "150px", group = "contactInfo")
 	private String address;
 
 	@UiConfig(width = "100px", regex = "\\d+", group = "contactInfo")
@@ -57,6 +63,16 @@ public class Company extends BaseEntity {
 	@Lob
 	@UiConfig(type = "textarea", cssClass = "htmlarea", hiddenInList = @Hidden(true), group = "intro")
 	private String intro;
+
+	@UiConfig(width = "150px", description = "customers.description", group = "customer")
+	@OneToMany(mappedBy = "company")
+	@OrderBy("name asc")
+	private Collection<Customer> customers;
+
+	@UiConfig(width = "150px", description = "relatedCustomers.description", group = "customer")
+	@ManyToMany
+	@JoinTable(name = "sample_company_related_customer", joinColumns = @JoinColumn(name = "company"), inverseJoinColumns = @JoinColumn(name = "customer"))
+	private Collection<Customer> relatedCustomers;
 
 	public String getName() {
 		return name;
@@ -112,6 +128,22 @@ public class Company extends BaseEntity {
 
 	public void setIntro(String intro) {
 		this.intro = intro;
+	}
+
+	public Collection<Customer> getCustomers() {
+		return customers;
+	}
+
+	public void setCustomers(Collection<Customer> customers) {
+		this.customers = customers;
+	}
+
+	public Collection<Customer> getRelatedCustomers() {
+		return relatedCustomers;
+	}
+
+	public void setRelatedCustomers(Collection<Customer> relatedCustomers) {
+		this.relatedCustomers = relatedCustomers;
 	}
 
 }
