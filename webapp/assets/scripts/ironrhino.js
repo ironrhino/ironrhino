@@ -25902,7 +25902,7 @@ function log() {
   };
   
 })(this);
-﻿/*
+﻿﻿/*
 * jHtmlArea 0.7.5 - WYSIWYG Html Editor jQuery Plugin
 * Copyright (c) 2012 Chris Pietschmann
 * http://jhtmlarea.codeplex.com
@@ -26282,7 +26282,7 @@ function log() {
                 mousedown(fnTA).
                 blur(fnTA);
 
-            $('form').submit(function () { t.toggleHTMLView(); t.toggleHTMLView(); });
+            //$('form').submit(function () { t.toggleHTMLView(); t.toggleHTMLView(); });
         },
         isArray: function (v) {
             return v && typeof v === 'object' && typeof v.length === 'number' && typeof v.splice === 'function' && !(v.propertyIsEnumerable('length'));
@@ -33421,9 +33421,7 @@ Observation.common = function(container) {
 					no_results_text : ' '
 				});
 	if (typeof $.fn.htmlarea != 'undefined')
-		$('textarea.htmlarea', container).htmlarea({
-					css : CONTEXT_PATH + '/assets/styles/ironrhino-min.css'
-				});
+		$('textarea.htmlarea', container).htmlarea();
 	// bootstrap start
 	$('a[data-toggle="tab"]', container).on('shown', function(e) {
 				$this = $(e.target);
@@ -39514,6 +39512,13 @@ Observation.attachmentableform = function(container) {
 				var cts = groups[key];
 				for (var i = 0; i < cts.length; i++) {
 					$(cts[i]).appendTo(pane);
+					if (typeof $.fn.htmlarea != 'undefined') {
+						$('textarea.htmlarea', cts[i]).each(function() {
+									// rebuild htmlarea
+									jHtmlArea(this).dispose();
+									$(this).htmlarea();
+								});
+					}
 				}
 				index++;
 			}

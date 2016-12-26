@@ -1353,9 +1353,7 @@ Observation.common = function(container) {
 					no_results_text : ' '
 				});
 	if (typeof $.fn.htmlarea != 'undefined')
-		$('textarea.htmlarea', container).htmlarea({
-					css : CONTEXT_PATH + '/assets/styles/ironrhino-min.css'
-				});
+		$('textarea.htmlarea', container).htmlarea();
 	// bootstrap start
 	$('a[data-toggle="tab"]', container).on('shown', function(e) {
 				$this = $(e.target);

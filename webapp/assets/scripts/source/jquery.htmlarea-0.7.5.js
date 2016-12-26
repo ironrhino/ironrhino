@@ -1,4 +1,4 @@
-﻿/*
+﻿﻿/*
 * jHtmlArea 0.7.5 - WYSIWYG Html Editor jQuery Plugin
 * Copyright (c) 2012 Chris Pietschmann
 * http://jhtmlarea.codeplex.com
@@ -378,7 +378,7 @@
                 mousedown(fnTA).
                 blur(fnTA);
 
-            $('form').submit(function () { t.toggleHTMLView(); t.toggleHTMLView(); });
+            //$('form').submit(function () { t.toggleHTMLView(); t.toggleHTMLView(); });
         },
         isArray: function (v) {
             return v && typeof v === 'object' && typeof v.length === 'number' && typeof v.splice === 'function' && !(v.propertyIsEnumerable('length'));
