@@ -126,8 +126,8 @@ Indicator = {
 		ind.show();
 		Indicator.text = '';
 	},
-	showError : function() {
-		Indicator.text = MessageBundle.get('ajax.error');
+	showError : function(msg) {
+		Indicator.text = msg || MessageBundle.get('ajax.error');
 		Indicator.show(true);
 	},
 	hide : function() {
@@ -1185,7 +1185,9 @@ Observation.common = function(container) {
 			}
 		}
 	}
-	$('form', container).each(function() {
+	$$('form', container).each(function() {
+				if ($('input[type="file"]', this).length)
+					$(this).attr('enctype', 'multipart/form-data');
 				if (!$(this).hasClass('ajax'))
 					$(this).submit(function() {
 								$('.action-error').remove();

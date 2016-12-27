@@ -31983,7 +31983,8 @@ MessageBundle = {
 		'max.rows.reached' : 'reached max rows : {0}',
 		'pattern.coords.invalid' : 'coords should be between {0} and {1}',
 		'data.invalid' : 'data invalid,please check it.',
-		'repeat.not.matched' : 'repeat match failed'
+		'repeat.not.matched' : 'repeat match failed',
+		'file.too.large' : 'File too large'
 	},
 	'zh_CN' : {
 		'ajax.loading' : '正在加载...',
@@ -32030,15 +32031,16 @@ MessageBundle = {
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
 		'data.invalid' : '数据错误,请检查',
 		'repeat.not.matched' : '两次输入不一致',
-		'other': '其他'
+		'other' : '其他',
+		'file.too.large' : '文件太大或者网络异常'
 	},
 	get : function() {
 		var key = arguments[0];
 		var lang = MessageBundle.lang();
 		var msg = MessageBundle[lang][key];
-		if (typeof (msg) == 'undefined')
+		if (typeof(msg) == 'undefined')
 			msg = key;
-		for ( var i = 1; i < arguments.length; i++)
+		for (var i = 1; i < arguments.length; i++)
 			msg = msg.replace('{' + (i - 1) + '}', arguments[i]);
 		return msg;
 	},
@@ -32194,8 +32196,8 @@ Indicator = {
 		ind.show();
 		Indicator.text = '';
 	},
-	showError : function() {
-		Indicator.text = MessageBundle.get('ajax.error');
+	showError : function(msg) {
+		Indicator.text = msg || MessageBundle.get('ajax.error');
 		Indicator.show(true);
 	},
 	hide : function() {
@@ -33253,7 +33255,9 @@ Observation.common = function(container) {
 			}
 		}
 	}
-	$('form', container).each(function() {
+	$$('form', container).each(function() {
+				if ($('input[type="file"]', this).length)
+					$(this).attr('enctype', 'multipart/form-data');
 				if (!$(this).hasClass('ajax'))
 					$(this).submit(function() {
 								$('.action-error').remove();
@@ -34263,10 +34267,16 @@ Observation.checkavailable = function(container) {
 					if (typeof options['success'] != 'undefined')
 						options['success'](data, xhr);
 					Ajax.handleResponse(data, options);
+				} else if (xhr.status == 0) {
+					if (progress && progress.length)
+						progress.remove();
+					Indicator.showError(MessageBundle.get('file.too.large'));
 				} else {
 					if (!files.length)
 						Indicator.showError();
 				}
+				$(':submit', options.target).prop('disabled', false);
+				Captcha.refresh();
 				if (typeof options['complete'] != 'undefined')
 					options['complete'](xhr);
 			}

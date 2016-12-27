@@ -1,22 +1,28 @@
 package org.ironrhino.sample.crud;
 
+import java.io.File;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.AbstractEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
 @Searchable
-@AutoConfig
+@AutoConfig(fileupload = "text/plain")
 @Table(name = "sample_boss")
 @Entity
 public class Boss extends AbstractEntity<String> {
@@ -35,6 +41,14 @@ public class Boss extends AbstractEntity<String> {
 	@UiConfig(width = "200px")
 	@NaturalId(mutable = true)
 	private String name;
+
+	@UiConfig(hiddenInList = @Hidden(true), description = "resume.description")
+	@Transient
+	private File resume;
+
+	@Transient
+	@UiConfig(hidden = true)
+	private String resumeFileName;
 
 	@Lob
 	@UiConfig(type = "textarea")
@@ -76,6 +90,28 @@ public class Boss extends AbstractEntity<String> {
 
 	public void setIntro(String intro) {
 		this.intro = intro;
+	}
+
+	public File getResume() {
+		return resume;
+	}
+
+	public void setResume(File resume) {
+		this.resume = resume;
+	}
+
+	public String getResumeFileName() {
+		return resumeFileName;
+	}
+
+	public void setResumeFileName(String resumeFileName) {
+		this.resumeFileName = resumeFileName;
+	}
+
+	@PreUpdate
+	@PrePersist
+	private void processResume() {
+		System.out.println("upload file name: " + resumeFileName + ", path: " + resume);
 	}
 
 }

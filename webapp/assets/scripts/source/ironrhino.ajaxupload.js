@@ -82,10 +82,16 @@
 					if (typeof options['success'] != 'undefined')
 						options['success'](data, xhr);
 					Ajax.handleResponse(data, options);
+				} else if (xhr.status == 0) {
+					if (progress && progress.length)
+						progress.remove();
+					Indicator.showError(MessageBundle.get('file.too.large'));
 				} else {
 					if (!files.length)
 						Indicator.showError();
 				}
+				$(':submit', options.target).prop('disabled', false);
+				Captcha.refresh();
 				if (typeof options['complete'] != 'undefined')
 					options['complete'](xhr);
 			}

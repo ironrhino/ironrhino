@@ -28,7 +28,8 @@ MessageBundle = {
 		'max.rows.reached' : 'reached max rows : {0}',
 		'pattern.coords.invalid' : 'coords should be between {0} and {1}',
 		'data.invalid' : 'data invalid,please check it.',
-		'repeat.not.matched' : 'repeat match failed'
+		'repeat.not.matched' : 'repeat match failed',
+		'file.too.large' : 'File too large'
 	},
 	'zh_CN' : {
 		'ajax.loading' : '正在加载...',
@@ -75,15 +76,16 @@ MessageBundle = {
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
 		'data.invalid' : '数据错误,请检查',
 		'repeat.not.matched' : '两次输入不一致',
-		'other': '其他'
+		'other' : '其他',
+		'file.too.large' : '文件太大或者网络异常'
 	},
 	get : function() {
 		var key = arguments[0];
 		var lang = MessageBundle.lang();
 		var msg = MessageBundle[lang][key];
-		if (typeof (msg) == 'undefined')
+		if (typeof(msg) == 'undefined')
 			msg = key;
-		for ( var i = 1; i < arguments.length; i++)
+		for (var i = 1; i < arguments.length; i++)
 			msg = msg.replace('{' + (i - 1) + '}', arguments[i]);
 		return msg;
 	},

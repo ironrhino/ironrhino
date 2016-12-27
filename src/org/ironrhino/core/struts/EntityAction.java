@@ -858,7 +858,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 				bwp.setConversionService(conversionService);
 				Set<String> editedPropertyNames = new HashSet<>();
-				for (String propertyName : ServletActionContext.getRequest().getParameterMap().keySet()) {
+				for (String parameterName : ActionContext.getContext().getParameters().keySet()) {
+					String propertyName = parameterName;
 					if (propertyName.startsWith("__checkbox_" + getEntityName() + '.')
 							|| propertyName.startsWith("__multiselect_" + getEntityName() + '.')
 							|| propertyName.startsWith("__datagrid_" + getEntityName() + '.'))
@@ -870,6 +871,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					if (propertyName.indexOf('[') > 0)
 						propertyName = propertyName.substring(0, propertyName.indexOf('['));
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
+					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType")) && uiConfig == null
+							&& bwp.isWritableProperty(propertyName)
+							&& ServletActionContext.getRequest().getParameter(parameterName) == null) {
+						editedPropertyNames.add(propertyName);
+						continue;
+					}
 					if (uiConfig == null || uiConfig.getReadonly().isValue()
 							|| fromList && uiConfig.getHiddenInList().isValue()
 							|| !fromList && uiConfig.getHiddenInInput().isValue() || Persistable.class
@@ -969,7 +976,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 
 				Set<String> editedPropertyNames = new HashSet<>();
-				for (String propertyName : ServletActionContext.getRequest().getParameterMap().keySet()) {
+				for (String parameterName : ActionContext.getContext().getParameters().keySet()) {
+					String propertyName = parameterName;
 					if (propertyName.startsWith("__checkbox_" + getEntityName() + '.')
 							|| propertyName.startsWith("__multiselect_" + getEntityName() + '.')
 							|| propertyName.startsWith("__datagrid_" + getEntityName() + '.'))
@@ -985,6 +993,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						continue;
 					}
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
+					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType")) && uiConfig == null
+							&& bwp.isWritableProperty(propertyName)
+							&& ServletActionContext.getRequest().getParameter(parameterName) == null) {
+						editedPropertyNames.add(propertyName);
+						continue;
+					}
 					if (uiConfig == null || uiConfig.getReadonly().isValue()
 							|| fromList && uiConfig.getHiddenInList().isValue()
 							|| !fromList && uiConfig.getHiddenInInput().isValue()
@@ -1709,15 +1723,19 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				ReflectionContextState.setDenyMethodExecution(context, true);
 				for (Map.Entry<String, Object> entry : parameters.entrySet()) {
 					String name = entry.getKey();
-					String[] value = (String[]) entry.getValue();
-					if (name.startsWith(getEntityName() + ".")) {
-						if (name.split("\\.").length > 2) {
-							if (value.length == 1 && StringUtils.isEmpty(value[0])) {
-								value = null;
+					Object value = entry.getValue();
+					if (value instanceof String[]) {
+						String[] arr = (String[]) entry.getValue();
+						if (name.startsWith(getEntityName() + ".")) {
+							if (name.split("\\.").length > 2) {
+								if (arr.length == 1 && StringUtils.isEmpty(arr[0])) {
+									arr = null;
+								}
 							}
 						}
-						temp.setParameter(name, value);
+						value = arr;
 					}
+					temp.setParameter(name, value);
 				}
 			} finally {
 				ReflectionContextState.setCreatingNullObjects(context, false);

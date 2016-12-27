@@ -1,6 +1,7 @@
 package org.ironrhino.core.struts;
 
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -419,7 +420,6 @@ public class EntityClassHelper {
 								|| returnType == Short.class) {
 							uci.setInputType("number");
 							uci.addCssClass("integer");
-
 						} else if (returnType == Long.TYPE || returnType == Long.class) {
 							uci.setInputType("number");
 							uci.addCssClass("long");
@@ -476,6 +476,8 @@ public class EntityClassHelper {
 						uci.addCssClass("email");
 					} else if (returnType == Boolean.TYPE || returnType == Boolean.class) {
 						uci.setType("checkbox");
+					} else if (returnType == File.class) {
+						uci.setInputType("file");
 					}
 
 					SearchableProperty searchableProperty = findAnnotation(readMethod, declaredField,
