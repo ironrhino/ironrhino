@@ -678,16 +678,10 @@ Ajax = {
 				}
 			}
 		}
-		if (options.submitForm) {
+		if ($(target).prop('tagName') == 'FORM') {
 			if (!hasError && $(target).hasClass('disposable'))
-				setTimeout(function() {
-							$(':input', target).prop('disabled', true)
-						}, 100);
-			else
-				setTimeout(function() {
-							$(':submit', target).prop('disabled', false);
-							Captcha.refresh()
-						}, 100);
+				$(target).addClass('disposed').find(':input').prop('disabled',
+						true);
 			if (!hasError && $(target).hasClass('reset') && target.reset) {
 				target.reset();
 				$(target).find('.resetable').html('');
@@ -1619,7 +1613,8 @@ Observation.common = function(container) {
 				},
 				beforeSubmit : function() {
 					Indicator.text = $(target).data('indicator');
-					$(':submit', target).prop('disabled', true);
+					$(':submit:not(:disabled)', target).prop('disabled', true)
+							.addClass('loading');
 					Ajax.fire(target, 'onloading');
 					var form = $(target);
 					var pushstate = false;
@@ -1680,11 +1675,6 @@ Observation.common = function(container) {
 				},
 				error : function() {
 					Form.focus(target);
-					if (_opt.submitForm)
-						setTimeout(function() {
-									$('button[type="submit"]', target).prop(
-											'disabled', false);
-								}, 100);
 					Ajax.fire(target, 'onerror');
 				},
 				success : function(data) {
@@ -1692,8 +1682,11 @@ Observation.common = function(container) {
 				},
 				complete : function() {
 					$(target).removeClass('loading');
-					$('.loading', target).prop('disabled', false)
-							.removeClass('loading');
+					if (!$(target).hasClass('disposed')) {
+						$('.loading', target).prop('disabled', false)
+								.removeClass('loading');
+						Captcha.refresh();
+					}
 				},
 				headers : _opt.headers
 			};
@@ -1702,7 +1695,6 @@ Observation.common = function(container) {
 							'X-Data-Type' : 'json'
 						});
 			$(this).bind('submit', function(e) {
-						_opt.submitForm = true;
 						var form = $(this);
 						var btn = $('.clicked', form);
 						if (!btn.length)

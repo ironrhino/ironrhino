@@ -90,8 +90,6 @@
 					if (!files.length)
 						Indicator.showError();
 				}
-				$(':submit', options.target).prop('disabled', false);
-				Captcha.refresh();
 				if (typeof options['complete'] != 'undefined')
 					options['complete'](xhr);
 			}
