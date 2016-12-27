@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Embeddable;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
@@ -270,7 +272,7 @@ public enum CriterionOperator implements Displayable {
 	ISNOTNULL(0) {
 		@Override
 		boolean supports(Class<?> clazz) {
-			return !clazz.isPrimitive();
+			return !clazz.isPrimitive() && clazz.getAnnotation(Embeddable.class) == null;
 
 		}
 
@@ -282,7 +284,7 @@ public enum CriterionOperator implements Displayable {
 	ISNULL(0) {
 		@Override
 		boolean supports(Class<?> clazz) {
-			return ISNOTNULL.supports(clazz);
+			return ISNOTNULL.supports(clazz) && clazz.getAnnotation(Embeddable.class) == null;
 		}
 
 		@Override
