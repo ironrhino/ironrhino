@@ -33,6 +33,7 @@
 		  	<li><a href="<@url value="/sample/company"/>">${getText('company')}</a></li>
 		  	<li><a href="<@url value="/sample/boss"/>">${getText('boss')}</a></li>
 		  	<li><a href="<@url value="/sample/employee"/>">${getText('employee')}</a></li>
+		  	<li><a href="<@url value="/sample/task"/>">${getText('task')}</a></li>
 		  	<li><a href="<@url value="/sample/person"/>">${getText('person')}</a></li>
 	  	</ul>
 	</li>
