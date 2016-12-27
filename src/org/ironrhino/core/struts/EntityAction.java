@@ -871,7 +871,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					if (propertyName.indexOf('[') > 0)
 						propertyName = propertyName.substring(0, propertyName.indexOf('['));
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
-					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType")) && uiConfig == null
+					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType"))
 							&& bwp.isWritableProperty(propertyName)
 							&& ServletActionContext.getRequest().getParameter(parameterName) == null) {
 						editedPropertyNames.add(propertyName);
@@ -993,7 +993,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						continue;
 					}
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
-					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType")) && uiConfig == null
+					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType"))
 							&& bwp.isWritableProperty(propertyName)
 							&& ServletActionContext.getRequest().getParameter(parameterName) == null) {
 						editedPropertyNames.add(propertyName);
