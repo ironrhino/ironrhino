@@ -88,9 +88,6 @@
 </#list>
 </#if>
 </#if>
-<#if dynamicAttributes['dynamicAttributes']??>
-<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
-</#if>
 <form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action&&!action?starts_with(actionBaseUrl+'?')> data-actionbaseurl="${actionBaseUrl}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
 ${formHeader!}
 <#nested/>
@@ -145,9 +142,6 @@ ${formHeader!}
 		</#if>
 	</#if>
 	<#local cellDynamicAttributes=_cellDynamicAttributes>
-</#if>
-<#if dynamicAttributes['dynamicAttributes']??>
-<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']>
 </#if>
 <#if cellDynamicAttributes['class']?? && dynamicAttributes['class']??>
 <#local cellDynamicAttributes+={'class':dynamicAttributes['class']+' '+cellDynamicAttributes['class']}>

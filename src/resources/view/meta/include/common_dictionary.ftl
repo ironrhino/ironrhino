@@ -1,8 +1,5 @@
 <#macro selectDictionary dictionaryName name="" value="" required=false disabled=false showHeader=true headerKey="" headerValue="" strict=true dynamicAttributes...>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
-	<#if dynamicAttributes['dynamicAttributes']??>
-		<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']/>
-	</#if>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
@@ -62,9 +59,6 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 	<#if value?? && !value?is_indexable>
 	<#local value=[value]/>
 	</#if>
-	<#if dynamicAttributes['dynamicAttributes']??>
-		<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']/>
-	</#if>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 		<#local index = 0/>
 		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
@@ -117,9 +111,6 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 </#macro>
 
 <#macro radioDictionary dictionaryName name="" value="" disabled=false dynamicAttributes...>
-	<#if dynamicAttributes['dynamicAttributes']??>
-		<#local dynamicAttributes+=dynamicAttributes['dynamicAttributes']/>
-	</#if>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
