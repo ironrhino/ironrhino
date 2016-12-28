@@ -297,7 +297,8 @@ public class EntityClassHelper {
 					if (collectionType != null && elementType != null) {
 						if (Persistable.class.isAssignableFrom(elementType)) {
 							uci.setMultiple(true);
-							uci.setExcludedFromCriteria(true);
+							if (oneToMany != null)
+								uci.setExcludedFromCriteria(true);
 							uci.setTemplate("<#if value?has_content><#list value as var>${var}<#sep>, </#list></#if>");
 							returnType = elementType;
 							uci.setPropertyType(returnType);
@@ -384,8 +385,13 @@ public class EntityClassHelper {
 							}
 						}
 						ManyToOne manyToOne = findAnnotation(readMethod, declaredField, ManyToOne.class);
-						if (manyToOne != null && !manyToOne.optional())
+						if (manyToOne != null){
+							if(!manyToOne.optional())
 							uci.setRequired(true);
+							if(joinColumn!=null){
+								uci.setReferencedColumnName(joinColumn.referencedColumnName());
+							}
+						}
 						uci.setExcludeIfNotEdited(true);
 						if (BaseTreeableEntity.class.isAssignableFrom(returnType)) {
 							if (uci.getType().equals(UiConfig.DEFAULT_TYPE))

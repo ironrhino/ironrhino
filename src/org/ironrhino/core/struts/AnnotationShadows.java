@@ -23,6 +23,7 @@ public class AnnotationShadows {
 		private Class<?> propertyType;
 		private Class<?> collectionType;
 		private Class<?> elementType;
+		private String referencedColumnName = "";
 		private String id;
 		private String type = UiConfig.DEFAULT_TYPE;
 		private String inputType = UiConfig.DEFAULT_INPUT_TYPE;
@@ -188,6 +189,14 @@ public class AnnotationShadows {
 
 		public void setElementType(Class<?> elementType) {
 			this.elementType = elementType;
+		}
+
+		public String getReferencedColumnName() {
+			return referencedColumnName;
+		}
+
+		public void setReferencedColumnName(String referencedColumnName) {
+			this.referencedColumnName = referencedColumnName;
 		}
 
 		public HiddenImpl getHiddenInList() {

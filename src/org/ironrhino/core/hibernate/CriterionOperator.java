@@ -1,10 +1,10 @@
 package org.ironrhino.core.hibernate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Embeddable;
 
@@ -146,14 +146,14 @@ public enum CriterionOperator implements Displayable {
 	CONTAINS(1) {
 		@Override
 		boolean supports(Class<?> clazz) {
-			return Set.class.isAssignableFrom(clazz);
+			return Collection.class.isAssignableFrom(clazz);
 		}
 
 		@Override
 		public Criterion operator(String name, Object... values) {
 			Object value = values[0];
-			if (value instanceof Set) {
-				value = ((Set<?>) value).iterator().next();
+			if (value instanceof Collection) {
+				value = ((Collection<?>) value).iterator().next();
 			}
 			return CriterionUtils.matchTag(name, String.valueOf(value));
 		}
