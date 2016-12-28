@@ -340,9 +340,9 @@ ${formFooter!}
 					<#elseif value.type='select'>
 					<#local options=value.listOptions?eval>
 					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#if value.listOptions?starts_with('{')><#list options as key,value>${key}=${value}<#sep>,</#list><#elseif value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
-					<#elseif value.type='listpick'>
+					<#elseif value.type='listpick'||value.type='treeselect'>
 					<#local pickUrl><@value.pickUrl?interpret/></#local>
-					<option value="${key}.id" data-type="listpick" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
+					<option value="${key+value.singleReference?then('.id','')}" data-type="${value.type}" data-pickurl="<@url value=pickUrl/>" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					<#else>
 					<option value="${key}" data-class="${value.cssClass?replace('checkavailable','')}" data-inputtype="${value.inputType}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					</#if>

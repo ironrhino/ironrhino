@@ -832,12 +832,13 @@ Observation._richtable = function(container) {
 								+ (arr[1] || arr[0]) + '</option>')
 								.appendTo(select);
 					}
-				} else if ('listpick' == option.data('type')) {
-					$('<input id="filter_'
-							+ property.val().replace(/\./g, '_')
-							+ '" type="hidden" name="'
-							+ property.val()
-							+ '" class="required"/><span class="listpick removeonadd" data-options="{\'url\':\''
+				} else if ('listpick' == option.data('type')
+						|| 'treeselect' == option.data('type')) {
+					$('<input id="filter_' + property.val().replace(/\./g, '_')
+							+ '" type="hidden" name="' + property.val()
+							+ '" class="required"/><span class="'
+							+ option.data('type')
+							+ ' removeonadd" data-options="{\'url\':\''
 							+ option.data('pickurl')
 							+ '\',\'name\':\'this\',\'id\':\'#filter_'
 							+ property.val().replace(/\./g, '_')
