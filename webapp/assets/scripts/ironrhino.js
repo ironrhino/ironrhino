@@ -40236,6 +40236,8 @@ Observation.treeview = function(container) {
 								ids.push(id);
 								names.push(name);
 							});
+							var onepage = '1' == $('.totalPage', target).text()
+									|| '1';
 							if (options.name) {
 								var separator = ', ';
 								var nametarget = find(options.name, $(target)
@@ -40243,19 +40245,22 @@ Observation.treeview = function(container) {
 								var name = names.join(separator);
 								nametarget.each(function() {
 									var t = $(this);
-									var _names = val(options.name, $(target)
-													.data('listpick'))
-											|| '';
-									val(
-											options.name,
-											$(target).data('listpick'),
-											ArrayUtils
-													.unique((_names
-															+ (_names
-																	? separator
-																	: '') + name)
-															.split(separator))
-													.join(separator));
+									if (onepage) {
+										val(options.name, $(target)
+														.data('listpick'), name);
+									} else {
+										var _names = val(options.name,
+												$(target).data('listpick'))
+												|| '';
+										val(options.name, $(target)
+														.data('listpick'),
+												ArrayUtils.unique((_names
+														+ (_names
+																? separator
+																: '') + name)
+														.split(separator))
+														.join(separator));
+									}
 									if (!t.is(':input')
 											&& !t.find('.remove').length)
 										$('<a class="remove" href="#">&times;</a>')
@@ -40268,14 +40273,34 @@ Observation.treeview = function(container) {
 								var idtarget = find(options.id, $(target)
 												.data('listpick'));
 								var id = ids.join(separator);
-								var _ids = val(options.id, $(target)
-												.data('listpick'))
-										|| '';
-								val(options.id, $(target).data('listpick'),
-										ArrayUtils.unique((_ids
-												+ (_ids ? separator : '') + id)
-												.split(separator))
-												.join(separator));
+								idtarget.each(function() {
+											var t = $(this);
+											if (onepage) {
+												val(
+														options.id,
+														$(target)
+																.data('listpick'),
+														id);
+											} else {
+												var _ids = val(
+														options.id,
+														$(target)
+																.data('listpick'))
+														|| '';
+												val(
+														options.id,
+														$(target)
+																.data('listpick'),
+														ArrayUtils
+																.unique((_ids
+																		+ (_ids
+																				? separator
+																				: '') + id)
+																		.split(separator))
+																.join(separator));
+											}
+										});
+
 							}
 							win.dialog('close');
 							return false;
