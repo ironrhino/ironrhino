@@ -570,7 +570,7 @@ public class EntityClassHelper {
 		for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
 			UiConfigImpl config = entry.getValue();
 			if (!config.isExcludedFromCriteria()) {
-				if (config.getEmbeddedUiConfigs() != null) {
+				if ("embedded".equals(config.getType())) {
 					for (Map.Entry<String, UiConfigImpl> entry2 : config.getEmbeddedUiConfigs().entrySet()) {
 						UiConfigImpl config2 = entry2.getValue();
 						if (!config2.isExcludedFromCriteria()
