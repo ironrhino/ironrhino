@@ -63,6 +63,7 @@ public class AnnotationShadows {
 		private boolean excludedFromLike = false;
 		private boolean excludedFromCriteria = false;
 		private boolean excludedFromOrdering = false;
+		private boolean excludedFromQuery = false;
 		private boolean searchable;
 		private boolean exactMatch;
 		private Set<String> nestSearchableProperties;
@@ -133,6 +134,7 @@ public class AnnotationShadows {
 			this.excludedFromLike = config.excludedFromLike();
 			this.excludedFromCriteria = config.excludedFromCriteria();
 			this.excludedFromOrdering = config.excludedFromOrdering();
+			this.excludedFromQuery = config.excludedFromQuery();
 			this.group = config.group();
 			this.searchable = config.searchable();
 			this.suppressViewLink = config.suppressViewLink();
@@ -165,6 +167,14 @@ public class AnnotationShadows {
 
 		public void setExcludedFromOrdering(boolean excludedFromOrdering) {
 			this.excludedFromOrdering = excludedFromOrdering;
+		}
+
+		public boolean isExcludedFromQuery() {
+			return excludedFromQuery;
+		}
+
+		public void setExcludedFromQuery(boolean excludedFromQuery) {
+			this.excludedFromQuery = excludedFromQuery;
 		}
 
 		public Class<?> getPropertyType() {

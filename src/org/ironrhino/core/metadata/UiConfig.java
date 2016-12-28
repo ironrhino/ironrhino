@@ -96,6 +96,8 @@ public @interface UiConfig {
 	boolean excludedFromCriteria() default false;
 
 	boolean excludedFromOrdering() default false;
+	
+	boolean excludedFromQuery() default false;
 
 	String group() default "";
 

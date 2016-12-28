@@ -458,6 +458,7 @@ ${formFooter!}
 		<#local id='search-'+(config.id?has_content)?then(config.id,(entityName!)+'-'+key)/>
 		<#local dynamicAttributes=mergeDynAttrs(config)/>
 		<#local disabled=parameterNamesInQueryString?seq_contains(key)>
+		<#if !config.excludedFromQuery>
 		<#if config.collectionType??>
 			<@s.hidden name=key+'-op' value="CONTAINS"/>
 		</#if>
@@ -492,6 +493,7 @@ ${formFooter!}
 			</@s.param>
 			</#if>
 			</@s.textfield>
+		</#if>
 		</#if>
 	</#list>
 	<@s.submit value=getText('search') class="btn-primary">
