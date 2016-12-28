@@ -146,24 +146,31 @@ public class CriterionUtils {
 						int index;
 						if ((index = propertyName.indexOf('.')) > 0) {
 							String subPropertyName = propertyName.substring(index + 1);
-							propertyName = propertyName.substring(0, index);
-							if (propertyNames.contains(propertyName)) {
-								Class<?> type = entityBeanWrapper.getPropertyType(propertyName);
-								if (Persistable.class.isAssignableFrom(type)) {
-									String alias = state.getAliases().get(propertyName);
-									if (alias == null) {
-										alias = propertyName + "_";
-										while (state.getAliases().containsValue(alias))
-											alias += "_";
-										dc.createAlias(propertyName, alias);
-										state.getAliases().put(propertyName, alias);
-									}
-									if (desc)
-										dc.addOrder(Order.desc(alias + '.' + subPropertyName));
-									else
-										dc.addOrder(Order.asc(alias + '.' + subPropertyName));
-									state.getOrderings().put(alias + '.' + subPropertyName, desc);
+							String pname = propertyName.substring(0, index);
+							Class<?> type = entityBeanWrapper.getPropertyType(pname);
+							if (Persistable.class.isAssignableFrom(type)) {
+								// @ManyToOne
+								propertyName = pname;
+								String alias = state.getAliases().get(propertyName);
+								if (alias == null) {
+									alias = propertyName + "_";
+									while (state.getAliases().containsValue(alias))
+										alias += "_";
+									dc.createAlias(propertyName, alias);
+									state.getAliases().put(propertyName, alias);
 								}
+								if (desc)
+									dc.addOrder(Order.desc(alias + '.' + subPropertyName));
+								else
+									dc.addOrder(Order.asc(alias + '.' + subPropertyName));
+								state.getOrderings().put(alias + '.' + subPropertyName, desc);
+							} else {
+								// @EmbeddedId or @Embedded
+								if (desc)
+									dc.addOrder(Order.desc(propertyName));
+								else
+									dc.addOrder(Order.asc(propertyName));
+								state.getOrderings().put(propertyName, desc);
 							}
 						} else if (propertyNames.contains(propertyName)) {
 							if (desc)
@@ -208,9 +215,11 @@ public class CriterionUtils {
 					continue;
 				if (propertyName.indexOf('.') > 0) {
 					String subPropertyName = propertyName.substring(propertyName.indexOf('.') + 1);
-					propertyName = propertyName.substring(0, propertyName.indexOf('.'));
-					Class<?> type = entityBeanWrapper.getPropertyType(propertyName);
+					String pname = propertyName.substring(0, propertyName.indexOf('.'));
+					Class<?> type = entityBeanWrapper.getPropertyType(pname);
 					if (Persistable.class.isAssignableFrom(type)) {
+						// @ManyToOne
+						propertyName = pname;
 						BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(type.newInstance());
 						subBeanWrapper.setConversionService(conversionService);
 						if (subPropertyName.equals("id") && StringUtils.isBlank(config.getReferencedColumnName())) {
@@ -265,93 +274,110 @@ public class CriterionUtils {
 								state.getCriteria().add(subalias + '.' + arr[1]);
 							}
 						}
-					}
-				} else {
-					Class<?> type = null;
-					Class<?> collectionType = null;
-					PropertyDescriptor pd = entityBeanWrapper.getPropertyDescriptor(propertyName);
-					Type returnType = pd.getReadMethod().getGenericReturnType();
-					if (returnType instanceof ParameterizedType) {
-						// detect if is @ManyToMany
-						ParameterizedType pt = (ParameterizedType) returnType;
-						if (pt.getActualTypeArguments().length == 1) {
-							Type argType = pt.getActualTypeArguments()[0];
-							Type rawType = pt.getRawType();
-							if (rawType instanceof Class && argType instanceof Class) {
-								collectionType = (Class<?>) rawType;
-								type = (Class<?>) argType;
-								if (!Collection.class.isAssignableFrom(collectionType)
-										|| !Persistable.class.isAssignableFrom(type)) {
-									collectionType = null;
-									type = null;
-								}
-							}
-						}
-					} else if (returnType instanceof Class) {
-						type = (Class<?>) returnType;
-					}
-					if (type == null)
-						type = entityBeanWrapper.getPropertyType(propertyName);
-					if (Persistable.class.isAssignableFrom(type)) {
-						@SuppressWarnings("unchecked")
-						BaseManager<?> em = ApplicationContextUtils
-								.getEntityManager((Class<? extends Persistable<?>>) type);
-						try {
-							BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(type);
-							subBeanWrapper.setConversionService(conversionService);
-							if (parameterValues.length > 0)
-								subBeanWrapper.setPropertyValue("id", parameterValues[0]);
-							if (collectionType == null) {
-								Persistable<?> p = em.get((Serializable) subBeanWrapper.getPropertyValue("id"));
-								if (p == null) {
-									Map<String, NaturalId> naturalIds = AnnotationUtils
-											.getAnnotatedPropertyNameAndAnnotations(type, NaturalId.class);
-									if (naturalIds.size() == 1) {
-										String name = naturalIds.entrySet().iterator().next().getKey();
-										if (parameterValues.length > 0)
-											subBeanWrapper.setPropertyValue(name, parameterValues[0]);
-										p = em.findOne((Serializable) subBeanWrapper.getPropertyValue(name));
-									}
-								}
-								if (p == null) {
-									dc.add(Restrictions.isNull("id"));
-									// return empty result set
-									break;
-								}
-								Criterion criterion = operator.operator(propertyName, p);
-								if (criterion != null) {
-									dc.add(criterion);
-									state.getCriteria().add(propertyName);
-								}
-							} else if (operator == CriterionOperator.CONTAINS) {
-								// @ManyToMany
-								String alias = state.getAliases().get(propertyName);
-								if (alias == null) {
-									alias = propertyName + "_";
-									while (state.getAliases().containsValue(alias))
-										alias += "_";
-									dc.createAlias(propertyName, alias);
-									state.getAliases().put(propertyName, alias);
-								}
-								dc.add(Restrictions.eq(alias + ".id", subBeanWrapper.getPropertyValue("id")));
-								state.getCriteria().add(propertyName);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
 					} else {
-						if (!operator.isEffective(type, parameterValues))
+						// @EmbeddedId or @Embedded
+						BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(type);
+						subBeanWrapper.setConversionService(conversionService);
+						if (!operator.isEffective(subBeanWrapper.getPropertyType(subPropertyName), parameterValues))
 							continue;
 						values = new Object[parameterValues.length];
 						for (int n = 0; n < values.length; n++) {
-							entityBeanWrapper.setPropertyValue(propertyName, parameterValues[n]);
-							values[n] = entityBeanWrapper.getPropertyValue(propertyName);
+							subBeanWrapper.setPropertyValue(subPropertyName, parameterValues[n]);
+							values[n] = subBeanWrapper.getPropertyValue(subPropertyName);
 						}
 						Criterion criterion = operator.operator(propertyName, values);
 						if (criterion != null) {
 							dc.add(criterion);
 							state.getCriteria().add(propertyName);
 						}
+					}
+					continue;
+				}
+				Class<?> type = null;
+				Class<?> collectionType = null;
+				PropertyDescriptor pd = entityBeanWrapper.getPropertyDescriptor(propertyName);
+				Type returnType = pd.getReadMethod().getGenericReturnType();
+				if (returnType instanceof ParameterizedType) {
+					// detect if is @ManyToMany
+					ParameterizedType pt = (ParameterizedType) returnType;
+					if (pt.getActualTypeArguments().length == 1) {
+						Type argType = pt.getActualTypeArguments()[0];
+						Type rawType = pt.getRawType();
+						if (rawType instanceof Class && argType instanceof Class) {
+							collectionType = (Class<?>) rawType;
+							type = (Class<?>) argType;
+							if (!Collection.class.isAssignableFrom(collectionType)
+									|| !Persistable.class.isAssignableFrom(type)) {
+								collectionType = null;
+								type = null;
+							}
+						}
+					}
+				} else if (returnType instanceof Class) {
+					type = (Class<?>) returnType;
+				}
+				if (type == null)
+					type = entityBeanWrapper.getPropertyType(propertyName);
+				if (Persistable.class.isAssignableFrom(type)) {
+					// @ManyToOne or @ManyToMany
+					@SuppressWarnings("unchecked")
+					BaseManager<?> em = ApplicationContextUtils
+							.getEntityManager((Class<? extends Persistable<?>>) type);
+					try {
+						BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(type);
+						subBeanWrapper.setConversionService(conversionService);
+						if (parameterValues.length > 0)
+							subBeanWrapper.setPropertyValue("id", parameterValues[0]);
+						if (collectionType == null) {
+							Persistable<?> p = em.get((Serializable) subBeanWrapper.getPropertyValue("id"));
+							if (p == null) {
+								Map<String, NaturalId> naturalIds = AnnotationUtils
+										.getAnnotatedPropertyNameAndAnnotations(type, NaturalId.class);
+								if (naturalIds.size() == 1) {
+									String name = naturalIds.entrySet().iterator().next().getKey();
+									if (parameterValues.length > 0)
+										subBeanWrapper.setPropertyValue(name, parameterValues[0]);
+									p = em.findOne((Serializable) subBeanWrapper.getPropertyValue(name));
+								}
+							}
+							if (p == null) {
+								dc.add(Restrictions.isNull("id"));
+								// return empty result set
+								break;
+							}
+							Criterion criterion = operator.operator(propertyName, p);
+							if (criterion != null) {
+								dc.add(criterion);
+								state.getCriteria().add(propertyName);
+							}
+						} else if (operator == CriterionOperator.CONTAINS) {
+							// @ManyToMany
+							String alias = state.getAliases().get(propertyName);
+							if (alias == null) {
+								alias = propertyName + "_";
+								while (state.getAliases().containsValue(alias))
+									alias += "_";
+								dc.createAlias(propertyName, alias);
+								state.getAliases().put(propertyName, alias);
+							}
+							dc.add(Restrictions.eq(alias + ".id", subBeanWrapper.getPropertyValue("id")));
+							state.getCriteria().add(propertyName);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} else {
+					if (!operator.isEffective(type, parameterValues))
+						continue;
+					values = new Object[parameterValues.length];
+					for (int n = 0; n < values.length; n++) {
+						entityBeanWrapper.setPropertyValue(propertyName, parameterValues[n]);
+						values[n] = entityBeanWrapper.getPropertyValue(propertyName);
+					}
+					Criterion criterion = operator.operator(propertyName, values);
+					if (criterion != null) {
+						dc.add(criterion);
+						state.getCriteria().add(propertyName);
 					}
 				}
 			}

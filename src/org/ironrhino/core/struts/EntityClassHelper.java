@@ -385,10 +385,10 @@ public class EntityClassHelper {
 							}
 						}
 						ManyToOne manyToOne = findAnnotation(readMethod, declaredField, ManyToOne.class);
-						if (manyToOne != null){
-							if(!manyToOne.optional())
-							uci.setRequired(true);
-							if(joinColumn!=null){
+						if (manyToOne != null) {
+							if (!manyToOne.optional())
+								uci.setRequired(true);
+							if (joinColumn != null) {
 								uci.setReferencedColumnName(joinColumn.referencedColumnName());
 							}
 						}
@@ -542,31 +542,45 @@ public class EntityClassHelper {
 		return map;
 	}
 
+	private static UiConfigImpl clone(UiConfigImpl old) {
+		UiConfigImpl config = new UiConfigImpl();
+		BeanUtils.copyProperties(old, config);
+		Set<String> cssClasses = new LinkedHashSet<>();
+		if (config.getCssClasses().contains("date")) {
+			cssClasses.add("date");
+		} else if (config.getCssClasses().contains("datetime")) {
+			cssClasses.add("datetime");
+		} else if (config.getCssClasses().contains("time")) {
+			cssClasses.add("time");
+		} else if (config.getCssClasses().contains("integer")) {
+			cssClasses.add("integer");
+		} else if (config.getCssClasses().contains("long")) {
+			cssClasses.add("long");
+		} else if (config.getCssClasses().contains("double")) {
+			cssClasses.add("double");
+		}
+		config.setCssClasses(cssClasses);
+		if ("email".equals(config.getInputType()))
+			config.setInputType("text");
+		return config;
+	}
+
 	public static Map<String, UiConfigImpl> filterPropertyNamesInCriteria(Map<String, UiConfigImpl> uiConfigs) {
 		Map<String, UiConfigImpl> propertyNamesInCriterion = new LinkedHashMap<>();
 		for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
-			if (!entry.getValue().isExcludedFromCriteria() && !entry.getKey().endsWith("AsString")
-					&& !CriterionOperator.getSupportedOperators(entry.getValue().getPropertyType()).isEmpty()) {
-				UiConfigImpl config = new UiConfigImpl();
-				BeanUtils.copyProperties(entry.getValue(), config);
-				Set<String> cssClasses = new LinkedHashSet<>();
-				if (config.getCssClasses().contains("date")) {
-					cssClasses.add("date");
-				} else if (config.getCssClasses().contains("datetime")) {
-					cssClasses.add("datetime");
-				} else if (config.getCssClasses().contains("time")) {
-					cssClasses.add("time");
-				} else if (config.getCssClasses().contains("integer")) {
-					cssClasses.add("integer");
-				} else if (config.getCssClasses().contains("long")) {
-					cssClasses.add("long");
-				} else if (config.getCssClasses().contains("double")) {
-					cssClasses.add("double");
+			UiConfigImpl config = entry.getValue();
+			if (!config.isExcludedFromCriteria()) {
+				if (config.getEmbeddedUiConfigs() != null) {
+					for (Map.Entry<String, UiConfigImpl> entry2 : config.getEmbeddedUiConfigs().entrySet()) {
+						UiConfigImpl config2 = entry2.getValue();
+						if (!config2.isExcludedFromCriteria()
+								&& !CriterionOperator.getSupportedOperators(config2.getPropertyType()).isEmpty()) {
+							propertyNamesInCriterion.put(entry.getKey() + '.' + entry2.getKey(), clone(config2));
+						}
+					}
+				} else if (!CriterionOperator.getSupportedOperators(config.getPropertyType()).isEmpty()) {
+					propertyNamesInCriterion.put(entry.getKey(), clone(config));
 				}
-				config.setCssClasses(cssClasses);
-				if ("email".equals(config.getInputType()))
-					config.setInputType("text");
-				propertyNamesInCriterion.put(entry.getKey(), config);
 			}
 		}
 		return propertyNamesInCriterion;
