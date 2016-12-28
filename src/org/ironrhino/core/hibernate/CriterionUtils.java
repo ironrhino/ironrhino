@@ -368,11 +368,27 @@ public class CriterionUtils {
 					}
 				} else {
 					if (!operator.isEffective(type, parameterValues))
-						continue;
+						if (!("dictionary".equals(config.getType())
+								&& (operator == CriterionOperator.IN || operator == CriterionOperator.NOTIN)))
+							continue;
 					values = new Object[parameterValues.length];
 					for (int n = 0; n < values.length; n++) {
 						entityBeanWrapper.setPropertyValue(propertyName, parameterValues[n]);
-						values[n] = entityBeanWrapper.getPropertyValue(propertyName);
+						Object v = entityBeanWrapper.getPropertyValue(propertyName);
+						if (operator == CriterionOperator.CONTAINS) {
+							if (v instanceof Collection) {
+								Collection<?> coll = (Collection<?>) v;
+								v = coll.size() > 0 ? ((Collection<?>) v).iterator().next() : null;
+							} else if (v instanceof Object[]) {
+								Object[] arr = (Object[]) v;
+								v = arr.length > 0 ? arr[0] : null;
+							}
+							if (v instanceof Enum) {
+								Enum<?> en = (Enum<?>) v;
+								v = en.name();
+							}
+						}
+						values[n] = v;
 					}
 					Criterion criterion = operator.operator(propertyName, values);
 					if (criterion != null) {

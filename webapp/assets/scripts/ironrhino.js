@@ -38789,7 +38789,8 @@ Observation._richtable = function(container) {
 		if (f.length) {
 			t.attr('action', f.attr('action'))
 					.data('replacement', f.attr('id'));
-			$('input[type="reset"]').click(function() {
+			$('input[type="reset"]', t).click(function(e) {
+						$('a.remove', t).click();
 						setTimeout(function() {
 									t.submit();
 								}, 100);
@@ -39551,6 +39552,7 @@ Observation.attachmentableform = function(container) {
 	}
 
 	transform = function(container, columns) {
+		container.children('input[type="hidden"]').prependTo(container);
 		var rowclass = container.parents('.container-fluid').length
 				? 'row-fluid'
 				: 'row';

@@ -70,6 +70,7 @@
 	}
 
 	transform = function(container, columns) {
+		container.children('input[type="hidden"]').prependTo(container);
 		var rowclass = container.parents('.container-fluid').length
 				? 'row-fluid'
 				: 'row';

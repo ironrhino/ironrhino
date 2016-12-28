@@ -73,7 +73,7 @@
 <#if !propertyNamesInCriteria?? && entityClass??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].getPropertyNamesInCriteria(entityClass)>
 </#if>
-<@renderSearchForm propertyNamesInCriteria=propertyNamesInCriteria! gridColumns=queryFormGridColumns/>
+<@renderQueryForm propertyNamesInCriteria=propertyNamesInCriteria! gridColumns=queryFormGridColumns/>
 </#if>
 <#local parameterNamesInQueryString=[]>
 <#if !action?has_content>
@@ -330,7 +330,7 @@ ${formFooter!}
 					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(value.propertyType) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					<#elseif value.type='dictionary' && selectDictionary??>
 					<#local templateName><@value.templateName?interpret /></#local>
-					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="<#if value.multiple>CONTAINS,NOTCONTAINS<#else>EQ,NEQ,ISNOTNULL,ISNULL,ISNOTEMPTY,ISEMPTY,IN,NOTIN</#if>">${getText(label)}</option>
 					<#elseif value.type='select'>
 					<#local options=value.listOptions?eval>
 					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#if value.listOptions?starts_with('{')><#list options as key,value>${key}=${value}<#sep>,</#list><#elseif value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
@@ -441,7 +441,7 @@ ${formFooter!}
 <#return parameterNamesInQueryString>
 </#function>
 
-<#macro renderSearchForm propertyNamesInCriteria gridColumns=3>
+<#macro renderQueryForm propertyNamesInCriteria gridColumns=3>
 <#if propertyNamesInCriteria?has_content>
 <#local parameterNamesInQueryString=getParameterNamesInQueryString()>
 <form method="post" class="ajax view form-horizontal groupable query ignore-blank" data-columns="${gridColumns}">
@@ -457,8 +457,10 @@ ${formFooter!}
 		<#local description=getText(config.description)>
 		<#local id='search-'+(config.id?has_content)?then(config.id,(entityName!)+'-'+key)/>
 		<#local dynamicAttributes=mergeDynAttrs(config)/>
-		<#if !config.collectionType?? && !config.multiple>
 		<#local disabled=parameterNamesInQueryString?seq_contains(key)>
+		<#if config.collectionType??>
+			<@s.hidden name=key+'-op' value="CONTAINS"/>
+		</#if>
 		<#if config.type=='checkbox'>
 			<@s.checkbox disabled=disabled id=id label=label name=key checked=('true'==(Parameters[key]!)) class=config.cssClass?replace('required','')+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
 		<#elseif config.type=='enum'>
@@ -490,7 +492,6 @@ ${formFooter!}
 			</@s.param>
 			</#if>
 			</@s.textfield>
-		</#if>
 		</#if>
 	</#list>
 	<@s.submit value=getText('search') class="btn-primary">

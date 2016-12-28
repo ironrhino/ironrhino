@@ -726,7 +726,8 @@ Observation._richtable = function(container) {
 		if (f.length) {
 			t.attr('action', f.attr('action'))
 					.data('replacement', f.attr('id'));
-			$('input[type="reset"]').click(function() {
+			$('input[type="reset"]', t).click(function(e) {
+						$('a.remove', t).click();
 						setTimeout(function() {
 									t.submit();
 								}, 100);
