@@ -1,6 +1,7 @@
 package org.ironrhino.sample.crud;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,8 @@ import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
@@ -58,13 +61,13 @@ public class Customer extends BaseRecordableEntity {
 	@UiConfig(width = "100px")
 	private Integer age;
 
-	@UiConfig(width = "100px", type = "dictionary", templateName = "customer_category")
+	@UiConfig(width = "80px", type = "dictionary", templateName = "customer_category")
 	private String category;
 
 	@UiConfig(type = "dictionary", templateName = "customer_category", hiddenInList = @Hidden(true), description = "potentialCategories.description")
 	private Set<String> potentialCategories;
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "80px")
 	@Enumerated
 	@Column(nullable = false)
 	private CustomerRank rank = CustomerRank.BRONZE;
@@ -72,7 +75,7 @@ public class Customer extends BaseRecordableEntity {
 	@UiConfig(hiddenInList = @Hidden(true), description = "potentialRanks.description")
 	private Set<CustomerRank> potentialRanks;
 
-	@UiConfig(width = "100px", template = "${value?string('#,###.00')}", showSum = true, description = "balance.description")
+	@UiConfig(width = "80px", template = "${value?string('#,###.00')}", showSum = true, description = "balance.description")
 	@Column(nullable = false)
 	private BigDecimal balance;
 
@@ -83,10 +86,15 @@ public class Customer extends BaseRecordableEntity {
 	private Set<Long> activeRegions;
 
 	@SearchableComponent(nestSearchableProperties = "name")
-	@UiConfig(width = "200px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true", description = "company.description")
+	@UiConfig(width = "150px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true", description = "company.description")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company")
 	private Company company;
+
+	@UiConfig(width = "200px", description = "relatedCompanies.description")
+	@ManyToMany
+	@JoinTable(name = "sample_company_related_customer", joinColumns = @JoinColumn(name = "customer"), inverseJoinColumns = @JoinColumn(name = "company"))
+	private Collection<Company> relatedCompanies;
 
 	@UiConfig(cssClass = "nullable", description = "addresses.description")
 	@ElementCollection(fetch = FetchType.EAGER)
@@ -184,6 +192,14 @@ public class Customer extends BaseRecordableEntity {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public Collection<Company> getRelatedCompanies() {
+		return relatedCompanies;
+	}
+
+	public void setRelatedCompanies(Collection<Company> relatedCompanies) {
+		this.relatedCompanies = relatedCompanies;
 	}
 
 	public List<CustomerAddress> getAddresses() {

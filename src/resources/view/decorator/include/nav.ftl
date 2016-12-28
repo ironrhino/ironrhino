@@ -29,12 +29,12 @@
 	<li class="dropdown">
 	 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">${getText('sample')}</a>
 	    <ul class="dropdown-menu">
-		  	<li><a href="<@url value="/sample/customer"/>">${getText('customer')}</a></li>
-		  	<li><a href="<@url value="/sample/company"/>">${getText('company')}</a></li>
-		  	<li><a href="<@url value="/sample/boss"/>">${getText('boss')}</a></li>
-		  	<li><a href="<@url value="/sample/employee"/>">${getText('employee')}</a></li>
-		  	<li><a href="<@url value="/sample/task"/>">${getText('task')}</a></li>
-		  	<li><a href="<@url value="/sample/person"/>">${getText('person')}</a></li>
+		  	<li><a href="<@url value="/sample/customer"/>" class="ajax view">${getText('customer')}</a></li>
+		  	<li><a href="<@url value="/sample/company"/>" class="ajax view">${getText('company')}</a></li>
+		  	<li><a href="<@url value="/sample/boss"/>" class="ajax view">${getText('boss')}</a></li>
+		  	<li><a href="<@url value="/sample/employee"/>" class="ajax view">${getText('employee')}</a></li>
+		  	<li><a href="<@url value="/sample/task"/>" class="ajax view">${getText('task')}</a></li>
+		  	<li><a href="<@url value="/sample/person"/>" class="ajax view">${getText('person')}</a></li>
 	  	</ul>
 	</li>
   	</@authorize>
