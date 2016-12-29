@@ -250,6 +250,8 @@ ${formHeader!}
 </#if>
 </select>
 </li>
+<#elseif !resultPage.defaultPageSize>
+<input type="hidden" name="resultPage.pageSize" value="${resultPage.pageSize}"/>
 </#if>
 </ul>
 </#if>
