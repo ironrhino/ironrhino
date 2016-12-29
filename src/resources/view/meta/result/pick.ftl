@@ -126,7 +126,7 @@
 <#assign bottomButtons+=r'<@btn view="input" label="create" windowoptions="${richtableConfig.inputWindowOptions!}"/> '/>
 </#if>
 <#if multiple>
-<#assign bottomButtons+=r'<button type="button" class="btn btn-primary pick" data-shown="selected">${getText("confirm")}</button> '/>
+<#assign bottomButtons+=r'<button type="button" class="btn btn-primary pick">${getText("confirm")}</button> '/>
 </#if>
 <#assign bottomButtons+=r'
 <#if treeable&&Parameters.parent??>

@@ -214,10 +214,13 @@
 
 					} else {
 						$(target).on('click', 'button.pick', function() {
-							var checkbox = $('table.richtable tbody :checked',
-									target);
-							var ids = [], names = [];
-							checkbox.each(function() {
+							var idSeparator = ',';
+							var nameSeparator = ', ';
+							var checked = {};
+							var uncheckedIds = [];
+							var uncheckedNames = [];
+							$('table.richtable tbody input[type="checkbox"]',
+									target).each(function() {
 								var cell = $($(this).closest('tr')[0].cells[options.idindex]);
 								var id = options.idindex == 0
 										? $(this).val()
@@ -225,75 +228,108 @@
 								cell = $($(this).closest('tr')[0].cells[options.nameindex]);
 								var name = cell.data('cellvalue')
 										|| cell.text();
-								ids.push(id);
-								names.push(name);
+								if (this.checked) {
+									checked[id] = name
+								} else {
+									uncheckedIds.push(id);
+									uncheckedNames.push(name);
+								};
 							});
-							var onepage = '1' == $('.totalPage', target).text()
-									|| '1';
-							if (options.name) {
-								var separator = ', ';
-								var nametarget = find(options.name, $(target)
+							var selectedIds = [];
+							if (options.id) {
+								var v = val(options.id, $(target)
 												.data('listpick'));
-								var name = names.join(separator);
-								nametarget.each(function() {
-									var t = $(this);
-									if (onepage) {
-										val(options.name, $(target)
-														.data('listpick'), name);
-									} else {
-										var _names = val(options.name,
-												$(target).data('listpick'))
-												|| '';
-										val(options.name, $(target)
-														.data('listpick'),
-												ArrayUtils.unique((_names
-														+ (_names
-																? separator
-																: '') + name)
-														.split(separator))
-														.join(separator));
+								if (v)
+									selectedIds = v.split(idSeparator);
+							}
+							var selectedNames = [];
+							if (options.name) {
+								var v = val(options.name, $(target)
+												.data('listpick'));
+								if (v)
+									selectedNames = v.split(nameSeparator);
+								if (options.id) {
+									if (selectedNames.length)
+										$.each(uncheckedIds, function(i, v) {
+													var index = selectedIds
+															.indexOf(v);
+													if (index > -1) {
+														selectedIds.splice(
+																index, 1);
+														selectedNames.splice(
+																index, 1);
+													}
+												});
+									for (var key in checked) {
+										if (selectedIds.indexOf(key) < 0) {
+											selectedIds.push(key);
+											selectedNames.push(checked[key]);
+										}
 									}
-									if (!t.is(':input')
-											&& !t.find('.remove').length)
-										$('<a class="remove" href="#">&times;</a>')
-												.appendTo(t)
-												.click(removeAction);
-								});
+								} else {
+									if (selectedNames.length)
+										$.each(uncheckedNames, function(i, v) {
+													var index = uncheckedNames
+															.indexOf(v);
+													if (index > -1)
+														selectedNames.splice(
+																index, 1);
+												});
+									for (var key in checked)
+										if (selectedNames.indexOf(checked[key]) < 0)
+											selectedNames.push(checked[key]);
+								}
+							}
+							if (options.id && !options.name) {
+								if (selectedIds.length)
+									$.each(uncheckedIds, function(i, v) {
+												var index = selectedIds
+														.indexOf(v);
+												if (index > -1)
+													selectedIds
+															.splice(index, 1);
+											});
+								for (var key in checked)
+									if (selectedIds.indexOf(key) < 0)
+										selectedIds.push(key);
 							}
 							if (options.id) {
-								var separator = ',';
-								var idtarget = find(options.id, $(target)
-												.data('listpick'));
-								var id = ids.join(separator);
-								idtarget.each(function() {
+								find(options.id, $(target).data('listpick'))
+										.each(function() {
 											var t = $(this);
-											if (onepage) {
-												val(
-														options.id,
-														$(target)
-																.data('listpick'),
-														id);
-											} else {
-												var _ids = val(
-														options.id,
-														$(target)
-																.data('listpick'))
-														|| '';
-												val(
-														options.id,
-														$(target)
-																.data('listpick'),
-														ArrayUtils
-																.unique((_ids
-																		+ (_ids
-																				? separator
-																				: '') + id)
-																		.split(separator))
-																.join(separator));
-											}
+											val(options.id, $(target)
+															.data('listpick'),
+													selectedIds
+															.join(idSeparator));
 										});
 
 							}
+							if (options.name) {
+								find(options.name, $(target).data('listpick'))
+										.each(function() {
+											var t = $(this);
+											if (selectedNames.length) {
+												val(
+														options.name,
+														$(target)
+																.data('listpick'),
+														selectedNames
+																.join(idSeparator));
+												if (!t.is(':input')
+														&& !t.find('.remove').length)
+													$('<a class="remove" href="#">&times;</a>')
+															.appendTo(t)
+															.click(removeAction);
+											} else {
+												if (!t.is(':input')) {
+													t.find('.remove').click();
+												} else {
+													t.val('');
+												}
+											}
+										});
+							}
+
 							win.dialog('close');
 							return false;
 						});
