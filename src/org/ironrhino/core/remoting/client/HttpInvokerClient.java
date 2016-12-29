@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -155,20 +156,22 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	}
 
 	@Override
-	public Object invoke(final MethodInvocation invocation) throws Throwable {
+	public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
+		if (AopUtils.isToStringMethod(methodInvocation.getMethod()))
+			return super.invoke(methodInvocation);
 		if (!discovered) {
 			setServiceUrl(discoverServiceUrl());
 			discovered = true;
 		} else if (poll) {
 			setServiceUrl(discoverServiceUrl());
 		}
-		logger.info("Invoking {} at {}", invocation.getMethod(), getServiceUrl());
+		logger.info("Invoking {} at {}", methodInvocation.getMethod(), getServiceUrl());
 		if (loggingPayload)
-			payloadLogger.info("Request with: {}", JsonUtils.toJson(invocation.getArguments()));
+			payloadLogger.info("Request with: {}", JsonUtils.toJson(methodInvocation.getArguments()));
 		long time = System.currentTimeMillis();
 		Object value;
 		try {
-			value = invoke(invocation, maxAttempts);
+			value = invoke(methodInvocation, maxAttempts);
 		} finally {
 			RemotingContext.clear();
 		}
@@ -180,11 +183,11 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return value;
 	}
 
-	public Object invoke(MethodInvocation invocation, int attempts) throws Throwable {
+	public Object invoke(MethodInvocation methodInvocation, int attempts) throws Throwable {
 		String method = null;
 		if (serviceStats != null) {
-			StringBuilder sb = new StringBuilder(invocation.getMethod().getName()).append("(");
-			Class<?>[] parameterTypes = invocation.getMethod().getParameterTypes();
+			StringBuilder sb = new StringBuilder(methodInvocation.getMethod().getName()).append("(");
+			Class<?>[] parameterTypes = methodInvocation.getMethod().getParameterTypes();
 			for (int i = 0; i < parameterTypes.length; i++) {
 				sb.append(parameterTypes[i].getSimpleName());
 				if (i < parameterTypes.length - 1)
@@ -195,7 +198,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		}
 		long time = System.currentTimeMillis();
 		try {
-			Object result = super.invoke(invocation);
+			Object result = super.invoke(methodInvocation);
 			if (serviceStats != null) {
 				serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method.toString(),
 						System.currentTimeMillis() - time, false);
@@ -230,7 +233,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 					}
 				}
 			}
-			return invoke(invocation, attempts);
+			return invoke(methodInvocation, attempts);
 		}
 	}
 
