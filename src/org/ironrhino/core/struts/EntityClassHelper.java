@@ -165,6 +165,7 @@ public class EntityClassHelper {
 					OneToOne oneToOne = findAnnotation(readMethod, declaredField, OneToOne.class);
 					if (oneToOne != null) {
 						if (StringUtils.isNotBlank(oneToOne.mappedBy())) {
+							uci.setInverseRelation(true);
 							ReadonlyImpl ri = new ReadonlyImpl();
 							ri.setValue(true);
 							uci.setReadonly(ri);
@@ -179,6 +180,7 @@ public class EntityClassHelper {
 
 					OneToMany oneToMany = findAnnotation(readMethod, declaredField, OneToMany.class);
 					if (oneToMany != null && StringUtils.isNotBlank(oneToMany.mappedBy())) {
+						uci.setInverseRelation(true);
 						ReadonlyImpl ri = new ReadonlyImpl();
 						ri.setValue(true);
 						uci.setReadonly(ri);

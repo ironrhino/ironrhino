@@ -218,19 +218,31 @@ public class CriterionUtils {
 					String pname = propertyName.substring(0, propertyName.indexOf('.'));
 					Class<?> type = entityBeanWrapper.getPropertyType(pname);
 					if (Persistable.class.isAssignableFrom(type)) {
-						// @ManyToOne
+						// @ManyToOne or @OneToOne
 						propertyName = pname;
 						BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(type.newInstance());
 						subBeanWrapper.setConversionService(conversionService);
-						if (subPropertyName.equals("id") && StringUtils.isBlank(config.getReferencedColumnName())) {
-							if (parameterValues.length > 0)
-								subBeanWrapper.setPropertyValue("id", parameterValues[0]);
-							Criterion criterion = operator.operator(propertyName, subBeanWrapper.getWrappedInstance());
-							if (criterion != null) {
+						if (subPropertyName.equals("id")) {
+							if (config.isInverseRelation()) {
+								// @OneToOne
+								Criterion criterion = Restrictions.eq("id",
+										parameterValues.length > 0 ? parameterValues[0] : null);
 								dc.add(criterion);
 								state.getCriteria().add(propertyName);
+								continue;
 							}
-							continue;
+							if (StringUtils.isBlank(config.getReferencedColumnName())) {
+								// @ManyToOne
+								if (parameterValues.length > 0)
+									subBeanWrapper.setPropertyValue("id", parameterValues[0]);
+								Criterion criterion = operator.operator(propertyName,
+										subBeanWrapper.getWrappedInstance());
+								if (criterion != null) {
+									dc.add(criterion);
+									state.getCriteria().add(propertyName);
+								}
+								continue;
+							}
 						}
 						PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(subBeanWrapper.getWrappedClass(),
 								subPropertyName);
@@ -344,6 +356,13 @@ public class CriterionUtils {
 								dc.add(Restrictions.isNull("id"));
 								// return empty result set
 								break;
+							}
+							if (config.isInverseRelation()) {
+								// @OneToOne
+								Criterion criterion = Restrictions.eq("id",p.getId());
+								dc.add(criterion);
+								state.getCriteria().add(propertyName);
+								continue;
 							}
 							Criterion criterion = operator.operator(propertyName, p);
 							if (criterion != null) {

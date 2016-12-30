@@ -12,6 +12,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
@@ -73,6 +74,10 @@ public class Company extends BaseEntity {
 	@ManyToMany
 	@JoinTable(name = "sample_company_related_customer", joinColumns = @JoinColumn(name = "company"), inverseJoinColumns = @JoinColumn(name = "customer"))
 	private Collection<Customer> relatedCustomers;
+
+	@UiConfig(width = "80px", description = "一对一关系")
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "company")
+	private Boss boss;
 
 	public String getName() {
 		return name;
@@ -144,6 +149,14 @@ public class Company extends BaseEntity {
 
 	public void setRelatedCustomers(Collection<Customer> relatedCustomers) {
 		this.relatedCustomers = relatedCustomers;
+	}
+
+	public Boss getBoss() {
+		return boss;
+	}
+
+	public void setBoss(Boss boss) {
+		this.boss = boss;
 	}
 
 }

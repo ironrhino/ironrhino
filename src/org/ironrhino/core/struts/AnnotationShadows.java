@@ -24,6 +24,7 @@ public class AnnotationShadows {
 		private Class<?> collectionType;
 		private Class<?> elementType;
 		private String referencedColumnName = "";
+		private boolean inverseRelation;
 		private String id;
 		private String type = UiConfig.DEFAULT_TYPE;
 		private String inputType = UiConfig.DEFAULT_INPUT_TYPE;
@@ -207,6 +208,14 @@ public class AnnotationShadows {
 
 		public void setReferencedColumnName(String referencedColumnName) {
 			this.referencedColumnName = referencedColumnName;
+		}
+
+		public boolean isInverseRelation() {
+			return inverseRelation;
+		}
+
+		public void setInverseRelation(boolean inverseRelation) {
+			this.inverseRelation = inverseRelation;
 		}
 
 		public HiddenImpl getHiddenInList() {
