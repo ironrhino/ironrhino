@@ -103,7 +103,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 						}
 					} else {
 						String[] array = StringUtils.split(temp, "/", 2);
-						name = org.ironrhino.core.util.StringUtils.toCamelCase(array[0]);
+						name = array[0];
 						if (pc.getActionConfigs().containsKey(name)) {
 							namespace = ns;
 							actionConfig = pc.getActionConfigs().get(name);
@@ -124,9 +124,9 @@ public class DefaultActionMapper extends AbstractActionMapper {
 					return mapping;
 			}
 
-			String location = AutoConfigResult.getTemplateLocation(org.ironrhino.core.util.StringUtils
-					.toCamelCase(request.getAttribute(REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION) != null
-							? uri + DEFAULT_ACTION_NAME : uri));
+			String location = AutoConfigResult
+					.getTemplateLocation(request.getAttribute(REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION) != null
+							? uri + DEFAULT_ACTION_NAME : uri);
 			if (location != null) {
 				mapping = new ActionMapping();
 				mapping.setNamespace(DirectTemplateAction.NAMESPACE);
@@ -146,7 +146,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 
 		mapping = new ActionMapping();
 		mapping.setNamespace(namespace);
-		mapping.setName(org.ironrhino.core.util.StringUtils.toCamelCase(name));
+		mapping.setName(name);
 		Map<String, Object> params = new HashMap<>(4, 1);
 		// process resultPage.pageNo and resultPage.pageSize
 		String pn = request.getParameter(ResultPage.PAGENO_PARAM_NAME);
