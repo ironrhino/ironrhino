@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
@@ -28,7 +29,7 @@ class RestClientTemplate extends RestTemplate {
 	public RestClientTemplate(RestClient client) {
 		super();
 		this.client = client;
-		setRequestFactory(new SimpleClientHttpRequestFactory(client));
+		setRequestFactory(new HttpComponentsClientHttpRequestFactory(client));
 		MappingJackson2HttpMessageConverter jackson2 = null;
 		for (HttpMessageConverter<?> hmc : getMessageConverters()) {
 			if (hmc instanceof MappingJackson2HttpMessageConverter) {
@@ -43,24 +44,26 @@ class RestClientTemplate extends RestTemplate {
 		jackson2.setObjectMapper(JsonUtils.createNewObjectMapper());
 	}
 
-	public int getConnectTimeout() {
-		SimpleClientHttpRequestFactory cf = (SimpleClientHttpRequestFactory) getRequestFactory();
-		return cf.getConnectTimeout();
-	}
-
 	public void setConnectTimeout(int connectTimeout) {
-		SimpleClientHttpRequestFactory cf = (SimpleClientHttpRequestFactory) getRequestFactory();
-		cf.setConnectTimeout(connectTimeout);
-	}
-
-	public int getReadTimeout() {
-		SimpleClientHttpRequestFactory cf = (SimpleClientHttpRequestFactory) getRequestFactory();
-		return cf.getReadTimeout();
+		ClientHttpRequestFactory chrf = getRequestFactory();
+		if (chrf instanceof org.springframework.http.client.SimpleClientHttpRequestFactory) {
+			org.springframework.http.client.SimpleClientHttpRequestFactory scrf = (org.springframework.http.client.SimpleClientHttpRequestFactory) chrf;
+			scrf.setConnectTimeout(connectTimeout);
+		} else if (chrf instanceof org.springframework.http.client.HttpComponentsClientHttpRequestFactory) {
+			org.springframework.http.client.HttpComponentsClientHttpRequestFactory hccrf = (org.springframework.http.client.HttpComponentsClientHttpRequestFactory) chrf;
+			hccrf.setConnectTimeout(connectTimeout);
+		}
 	}
 
 	public void setReadTimeout(int readTimeout) {
-		SimpleClientHttpRequestFactory cf = (SimpleClientHttpRequestFactory) getRequestFactory();
-		cf.setReadTimeout(readTimeout);
+		ClientHttpRequestFactory chrf = getRequestFactory();
+		if (chrf instanceof org.springframework.http.client.SimpleClientHttpRequestFactory) {
+			org.springframework.http.client.SimpleClientHttpRequestFactory scrf = (org.springframework.http.client.SimpleClientHttpRequestFactory) chrf;
+			scrf.setReadTimeout(readTimeout);
+		} else if (chrf instanceof org.springframework.http.client.HttpComponentsClientHttpRequestFactory) {
+			org.springframework.http.client.HttpComponentsClientHttpRequestFactory hccrf = (org.springframework.http.client.HttpComponentsClientHttpRequestFactory) chrf;
+			hccrf.setReadTimeout(readTimeout);
+		}
 	}
 
 	public int getMaxAttempts() {
