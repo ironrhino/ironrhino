@@ -25,8 +25,8 @@ public class RestClientTests {
 
 	@BeforeClass
 	public static void setup() {
-		restClient = new RestClient("http://localhost:8080/oauth/oauth2/token", "1IbhUczby8QGuxIcA3zUQF",
-				"76IytucIQQgKWDG06xGPsA");
+		restClient = new RestClient("http://localhost:8080/api", "http://localhost:8080/oauth/oauth2/token",
+				"1IbhUczby8QGuxIcA3zUQF", "76IytucIQQgKWDG06xGPsA");
 	}
 
 	@Test
@@ -41,9 +41,9 @@ public class RestClientTests {
 	@Test
 	public void testRestTemplate() {
 		RestTemplate rt = restClient.getRestTemplate();
-		User u = rt.getForObject("http://localhost:8080/api/user/@self", User.class);
+		User u = rt.getForObject("/user/@self", User.class);
 		assertNotNull(u.getUsername());
-		u = rt.getForObject("http://localhost:8080/api/user/admin", User.class);
+		u = rt.getForObject("/user/admin", User.class);
 		assertEquals("admin", u.getUsername());
 	}
 
@@ -56,7 +56,7 @@ public class RestClientTests {
 		params.add("name", "build");
 		params.add("file", new FileSystemResource("build.xml"));
 		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
-		String response = rt.postForEntity("http://localhost:8080/api/upload", request, String.class).getBody();
+		String response = rt.postForEntity("/upload", request, String.class).getBody();
 		JsonNode jn = JsonUtils.fromJson(response, JsonNode.class);
 		assertEquals("build", jn.get("name").asText());
 		assertEquals("file", jn.get("filename").asText());

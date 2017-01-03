@@ -14,6 +14,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -33,6 +34,8 @@ public class RestClient implements BeanNameAware {
 
 	protected String grantType = "client_credentials";
 
+	protected String apiBaseUrl;
+
 	protected RestTemplate restTemplate = new RestClientTemplate(this);
 
 	protected RestTemplate internalRestTemplate = new RestTemplate();
@@ -48,14 +51,25 @@ public class RestClient implements BeanNameAware {
 	}
 
 	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret) {
+		Assert.notNull(accessTokenEndpoint);
+		Assert.notNull(clientId);
+		Assert.notNull(clientSecret);
 		this.accessTokenEndpoint = accessTokenEndpoint;
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
 	}
 
-	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret, String scope) {
-		this(accessTokenEndpoint, clientId, clientSecret);
-		this.scope = scope;
+	public RestClient(String apiBaseUrl, String accessTokenEndpoint, String clientId, String clientSecret) {
+		Assert.notNull(apiBaseUrl);
+		Assert.notNull(accessTokenEndpoint);
+		Assert.notNull(clientId);
+		Assert.notNull(clientSecret);
+		this.apiBaseUrl = apiBaseUrl;
+		if (accessTokenEndpoint.indexOf("://") < 0 && apiBaseUrl != null)
+			accessTokenEndpoint = apiBaseUrl + accessTokenEndpoint;
+		this.accessTokenEndpoint = accessTokenEndpoint;
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
 	}
 
 	@Override
@@ -109,6 +123,14 @@ public class RestClient implements BeanNameAware {
 
 	public void setGrantType(String grantType) {
 		this.grantType = grantType;
+	}
+
+	public String getApiBaseUrl() {
+		return apiBaseUrl;
+	}
+
+	public void setApiBaseUrl(String apiBaseUrl) {
+		this.apiBaseUrl = apiBaseUrl;
 	}
 
 	public Class<? extends Token> getTokenClass() {

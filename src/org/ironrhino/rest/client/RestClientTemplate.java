@@ -1,8 +1,10 @@
 package org.ironrhino.rest.client;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,21 +77,29 @@ class RestClientTemplate extends RestTemplate {
 	}
 
 	@Override
-	protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback,
+	protected <T> T doExecute(URI uri, HttpMethod method, RequestCallback requestCallback,
 			ResponseExtractor<T> responseExtractor) throws RestClientException {
-		return doExecute(url, method, requestCallback, responseExtractor, maxAttempts);
+		if (uri.getHost() == null && StringUtils.isNotBlank(client.getApiBaseUrl())) {
+			String apiBaseUrl = client.getApiBaseUrl();
+			try {
+				uri = new URI(apiBaseUrl + uri.toString());
+			} catch (URISyntaxException e) {
+				throw new IllegalArgumentException("apiBaseUrl " + apiBaseUrl + " is not valid uri");
+			}
+		}
+		return doExecute(uri, method, requestCallback, responseExtractor, maxAttempts);
 	}
 
-	protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback,
+	protected <T> T doExecute(URI uri, HttpMethod method, RequestCallback requestCallback,
 			ResponseExtractor<T> responseExtractor, int attempts) throws RestClientException {
 		try {
-			T result = super.doExecute(url, method, requestCallback, responseExtractor);
+			T result = super.doExecute(uri, method, requestCallback, responseExtractor);
 			return result;
 		} catch (ResourceAccessException e) {
 			logger.error(e.getMessage(), e);
 			if (--attempts < 1)
 				throw e;
-			return doExecute(url, method, requestCallback, responseExtractor, attempts);
+			return doExecute(uri, method, requestCallback, responseExtractor, attempts);
 		} catch (HttpClientErrorException e) {
 			logger.error(e.getResponseBodyAsString(), e);
 			if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
@@ -101,7 +111,7 @@ class RestClientTemplate extends RestTemplate {
 				}
 				if (--attempts < 1)
 					throw e;
-				return doExecute(url, method, requestCallback, responseExtractor, attempts);
+				return doExecute(uri, method, requestCallback, responseExtractor, attempts);
 			}
 			throw e;
 		}
