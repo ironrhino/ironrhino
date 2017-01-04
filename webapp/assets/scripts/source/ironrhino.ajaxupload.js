@@ -40,16 +40,11 @@
 		}
 
 		var progress;
-		if (files.length) {
-			if (!options.progress) {
-				progress = $('#_uploadprogress');
-				if (!progress.length)
-					progress = $('<progress id="_uploadprogress" style="position: fixed;z-index: 10001;left: 45%;top: 0px;width: 100px;" min="0" max="100" value="0">0</progress>')
-							.appendTo(document.body);
-			} else {
-				progress = $(options.progress);
-			}
-		}
+		if (options.progress)
+			progress = $(options.progress);
+		if (progress && !progress.length)
+			progress = null;
+
 		var xhr = new XMLHttpRequest();
 		var url = options.url;
 		if (!url)
@@ -83,8 +78,7 @@
 						options['success'](data, xhr);
 					Ajax.handleResponse(data, options);
 				} else if (xhr.status == 0) {
-					if (progress && progress.length)
-						progress.remove();
+					progress ? progress.remove() : ProgressBar.hide();
 					Indicator.showError(MessageBundle.get('file.too.large'));
 				} else {
 					if (!files.length)
@@ -94,19 +88,21 @@
 					options['complete'](xhr);
 			}
 		}
-		if (progress && progress.length) {
-			xhr.onload = function() {
-				progress.val(100).html(100).remove();
-			};
-			if ("upload" in xhr) {
-				xhr.upload.onprogress = function(event) {
-					if (event.lengthComputable) {
-						var complete = (event.loaded / event.total * 100 | 0);
-						progress.val(complete).html(complete).show();
-					}
+
+		xhr.onload = function() {
+			progress ? progress.val(100).html(100).remove() : ProgressBar
+					.hide();
+		};
+		if ("upload" in xhr) {
+			xhr.upload.onprogress = function(evt) {
+				if (evt.lengthComputable) {
+					var complete = evt.loaded / evt.total;
+					progress ? progress.val(complete).html(complete * 100)
+							.show() : ProgressBar.show(complete);
 				}
 			}
 		}
+
 		if (typeof options.data == 'string') {
 			var arr = options.data.split('&');
 			options.data = {};
@@ -141,6 +137,7 @@
 					return;
 			}
 			xhr.send(formData);
+			progress ? progress.val(0).html(0) : ProgressBar.show(0);
 			return true;
 		} else {
 			var boundary = 'xxxxxxxxx';
@@ -259,7 +256,6 @@
 		if (typeof FileReaderSync != 'undefined') {
 			var bb = new BlobBuilder();
 			var frs = new FileReaderSync();
-			var files = event.data;
 			for (var i = 0; i < files.length; i++) {
 				bb.append('--');
 				bb.append(boundary);
