@@ -1311,11 +1311,15 @@ Observation.common = function(container) {
 		ajax({
 					global : t.data('global'),
 					quiet : true,
+					async : false,
 					type : t.data('method') || 'GET',
 					url : url,
 					data : data,
 					target : f[0],
 					replacement : t.data('replacement'),
+					headers : {
+						'X-Exact-Fragment' : '1'
+					},
 					beforeSend : function() {
 						f.addClass('loading');
 					},

@@ -53,12 +53,12 @@ public class Customer extends BaseRecordableEntity {
 	@NaturalId(mutable = true)
 	private String name;
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "100px", cssClass = "conjunct", dynamicAttributes = "{\"data-replacement\":\"control-group-customer-age\"}")
 	@Enumerated
 	@Column(nullable = false)
 	private Gender gender;
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "100px", hiddenInInput = @Hidden(expression = "entity.gender??&&entity.gender.name()=='FEMALE'"), description = "age.description")
 	private Integer age;
 
 	@UiConfig(width = "80px", type = "dictionary", templateName = "customer_category")
@@ -241,6 +241,8 @@ public class Customer extends BaseRecordableEntity {
 	@PrePersist
 	@PreUpdate
 	private void validate() {
+		if (gender == Gender.FEMALE)
+			age = null;
 		ValidationException ve = new ValidationException();
 		if (potentialCategories != null && potentialCategories.contains(this.category)) {
 			ve.addFieldError("customer.potentialCategories", "不能包含当前分类");

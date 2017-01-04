@@ -52,7 +52,7 @@ public class HtmlUtils {
 			return org.apache.commons.lang3.StringUtils.abbreviate(source.toString(), abbr);
 	}
 
-	public static String compress(String html, String[] id) throws Exception {
+	public static String compress(String html, String[] id) {
 		StringBuilder sb = new StringBuilder();
 		final List<String> ids = Arrays.asList(id);
 		Source source = new Source(html);

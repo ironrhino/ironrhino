@@ -20,6 +20,7 @@ import com.opensymphony.xwork2.ActionContext;
 public class MyOldDecorator2NewStrutsFreemarkerDecorator extends OldDecorator2NewStrutsFreemarkerDecorator {
 
 	public static final String X_FRAGMENT = "X-Fragment";
+	public static final String X_EXACT_FRAGMENT = "X-Exact-Fragment";
 
 	public MyOldDecorator2NewStrutsFreemarkerDecorator(Decorator oldDecorator) {
 		super(oldDecorator);
@@ -32,35 +33,33 @@ public class MyOldDecorator2NewStrutsFreemarkerDecorator extends OldDecorator2Ne
 		if (StringUtils.isNotBlank(replacement)) {
 			if ("_".equals(replacement)) {
 				Writer writer = response.getWriter();
-				try {
-					writer.append("<title>").append(content.getTitle()).append("</title>");
-					content.writeBody(writer);
-					writer.flush();
-					return;
-				} catch (Exception e) {
-
-				}
+				writer.append("<title>").append(content.getTitle()).append("</title>");
+				content.writeBody(writer);
+				writer.flush();
+				return;
 			} else {
-				try {
-					StringWriter writer = new StringWriter();
-					content.writeBody(writer);
-					String[] ids = replacement.split(",");
-					String compressed = HtmlUtils.compress(writer.toString(), ids);
-					if (compressed == null) {
-						super.render(content, request, response, servletContext, ctx);
-					} else {
-						if (StringUtils.isBlank(compressed)) {
-							StringBuilder sb = new StringBuilder();
-							for (String id : ids)
-								sb.append("<div id=\"").append(id).append("\"></div>");
-							compressed = sb.toString();
-						}
+				StringWriter writer = new StringWriter();
+				content.writeBody(writer);
+				String[] ids = replacement.split(",");
+				String compressed = HtmlUtils.compress(writer.toString(), ids);
+				if (compressed == null) {
+					super.render(content, request, response, servletContext, ctx);
+				} else if (compressed.length() == 0) {
+					if (request.getHeader(X_EXACT_FRAGMENT) != null) {
+						StringBuilder sb = new StringBuilder();
+						for (String id : ids)
+							sb.append("<div id=\"").append(id).append("\"></div>");
+						compressed = sb.toString();
 						response.getWriter().write(compressed);
 						response.getWriter().flush();
 						return;
+					} else {
+						super.render(content, request, response, servletContext, ctx);
 					}
-				} catch (Exception e) {
-
+				} else {
+					response.getWriter().write(compressed);
+					response.getWriter().flush();
+					return;
 				}
 			}
 		} else {

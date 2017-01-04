@@ -35,10 +35,15 @@
 		<#assign templateName=templateName?markup_string/>
 		<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 		<#assign pickUrl=pickUrl?markup_string/>
+		<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key)/>
+		<#assign group=getText(config.group)>
 		<#assign value=entity[key]!>
 		<#assign hidden=config.hiddenInInput.value>
 		<#if !hidden && config.hiddenInInput.expression?has_content>
-			<#assign hidden=config.hiddenInInput.expression?eval>
+			<#if config.hiddenInInput.expression?eval>
+			<#assign hidden=true>
+			<div id="control-group-${id}" class="control-group"<#if group?has_content> data-group="${group}"</#if>></div>
+			</#if>
 		</#if>
 		<#if !hidden>
 		<#assign label=key>
@@ -46,7 +51,6 @@
 			<#assign label=config.alias>
 		</#if>
 		<#assign label=getText(label)>
-		<#assign group=getText(config.group)>
 		<#assign description=getText(config.description)>
 		<#assign readonly=naturalIds?keys?seq_contains(key)&&!naturalIdMutable&&!isnew||config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 		<#if !isnew&&idAssigned&&key=='id'>
@@ -56,7 +60,6 @@
 			<#if (Parameters[key]?has_content||Parameters[key+'.id']?has_content)>
 				<#assign readonly=true/>
 			</#if>
-			<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key)/>
 			<#assign dynamicAttributes=mergeDynAttrs(config)/>
 			<#if config.inputTemplate?has_content>
 				<#if config.inputTemplate?index_of('<div class="control-group') gt -1>
