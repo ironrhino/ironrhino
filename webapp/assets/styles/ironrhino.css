@@ -8530,8 +8530,12 @@ button.plain {
 	margin-top: -2px;
 }
 
+input[type="file"] {
+	cursor: pointer;
+	width: 220px;
+}
 input[type="file"]::-webkit-file-upload-button {
-	float: right;
+	cursor: pointer;
 	border: 1px solid #aaaaaa;
 	border-radius: 4px;
 	padding-top: 4px;
