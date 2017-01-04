@@ -23,7 +23,7 @@
 <#if (parameters.dynamicAttributes?? && parameters.dynamicAttributes?size > 0)><#rt/>
 <#assign aKeys = parameters.dynamicAttributes.keySet()><#rt/>
 <#list aKeys as aKey><#rt/>
-<#if aKey!='data-group'>
+<#if !aKey?starts_with('_internal_')>
   <#assign keyValue = parameters.dynamicAttributes.get(aKey)/>
   <#if keyValue?is_string>
       <#assign value = struts.translateVariables(keyValue)!keyValue/>

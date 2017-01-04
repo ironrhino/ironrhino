@@ -532,10 +532,10 @@ public class EntityClassHelper {
 					if (uci.getType().equals("textarea") && uci.getMaxlength() > 0)
 						uci.getInternalDynamicAttributes().put("maxlength", String.valueOf(uci.getMaxlength()));
 					if (StringUtils.isNotBlank(uci.getGroup())) {
-						uci.getInternalDynamicAttributes().put("data-group", I18N.getText(uci.getGroup()));
+						uci.getInternalDynamicAttributes().put("_internal_group", I18N.getText(uci.getGroup()));
 					}
 					if (StringUtils.isNotBlank(uci.getDescription())) {
-						uci.getInternalDynamicAttributes().put("data-description", I18N.getText(uci.getDescription()));
+						uci.getInternalDynamicAttributes().put("_internal_description", I18N.getText(uci.getDescription()));
 					}
 					map.put(propertyName, uci);
 				}
