@@ -7,7 +7,7 @@
 <body>
 <div class="row<#if fluidLayout>-fluid</#if>">
 <div class="span6">
-<form action="${actionBaseUrl}/chart/${uid}" class="ajax view form-inline" data-replacement="c">
+<form action="${actionBaseUrl}/chart/${uid}" class="ajax view form-inline" data-replacement="chart">
 <@s.hidden name="vtype"/>
 <@s.hidden name="ctype"/>
 <span>${getText('date')}</span>
@@ -16,7 +16,7 @@
 </form>
 </div>
 <div class="span6">
-<form action="${actionBaseUrl}/chart/${uid}" class="ajax view form-inline" data-replacement="c">
+<form action="${actionBaseUrl}/chart/${uid}" class="ajax view form-inline" data-replacement="chart">
 <@s.hidden name="vtype"/>
 <@s.hidden name="ctype"/>
 <span>${getText('date.range')}</span>
@@ -27,7 +27,6 @@
 </form>
 </div>
 </div>
-<div id="c">
 <#assign dataurl='${actionBaseUrl}/data'/>
 <#if uid??>
 <#assign dataurl+='/'+uid>
@@ -35,8 +34,7 @@
 <#if request.queryString??>
 <#assign dataurl+='?'+request.queryString>
 </#if>
-<div id="chart" class="chart" data-url="<@url value="${dataurl}"/>" style="width:1024px; height:300px;"<#if Parameters.live??> data-interval="${Parameters.interval?default('60000')}" data-quiet="true"</#if>>
-</div>
+<div id="chart" class="chart" data-url="<@url value="${dataurl}"/>" style="height:600px;"<#if Parameters.live??> data-interval="${Parameters.interval?default('60000')}" data-quiet="true"</#if>>
 </div>
 </body>
 </html>
