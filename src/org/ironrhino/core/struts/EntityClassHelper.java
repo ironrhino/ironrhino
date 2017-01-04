@@ -51,6 +51,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.ironrhino.core.hibernate.CreationUser;
 import org.ironrhino.core.hibernate.CriterionOperator;
 import org.ironrhino.core.hibernate.UpdateUser;
+import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Attributable;
@@ -486,6 +487,12 @@ public class EntityClassHelper {
 						uci.setType("checkbox");
 					} else if (returnType == File.class) {
 						uci.setInputType("file");
+						AutoConfig ac = entityClass.getAnnotation(AutoConfig.class);
+						if (ac != null) {
+							String fu = ac.fileupload();
+							if (fu.indexOf('/') > 0)
+								uci.getInternalDynamicAttributes().put("accept", fu);
+						}
 					}
 
 					SearchableProperty searchableProperty = findAnnotation(readMethod, declaredField,

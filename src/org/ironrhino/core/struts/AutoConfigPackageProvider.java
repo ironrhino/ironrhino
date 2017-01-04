@@ -260,9 +260,10 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		ResultConfig autoCofigResult = new ResultConfig.Builder("*", AutoConfigResult.class.getName()).build();
 		ActionConfig.Builder builder = new ActionConfig.Builder(packageName, actionName, actionClass)
 				.addResultConfig(autoCofigResult);
-		if (StringUtils.isNotBlank(ac.fileupload())) {
+		String fu = ac.fileupload();
+		if (StringUtils.isNotBlank(fu)) {
 			Map<String, String> params = new HashMap<>();
-			params.put("allowedTypes", ac.fileupload());
+			params.put(fu.indexOf('/') > 0 ? "allowedTypes" : "allowedExtensions", fu);
 			List<InterceptorMapping> interceptors = InterceptorBuilder.constructInterceptorReference(pkgConfig,
 					"fileUpload", params, null, objectFactory);
 			interceptors.addAll(InterceptorBuilder.constructInterceptorReference(pkgConfig, "annotationDefaultStack",
