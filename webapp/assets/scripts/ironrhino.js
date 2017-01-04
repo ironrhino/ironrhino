@@ -32089,18 +32089,6 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		}
 	}
 	$.ajaxSettings.traditional = true;
-	var oldXHR = $.ajaxSettings.xhr;
-	$.ajaxSettings.xhr = function() {
-		var xhr = oldXHR();
-		if (xhr instanceof XMLHttpRequest) {
-			xhr.addEventListener("progress", function(evt) {
-						if (evt.lengthComputable)
-							ProgressBar.show(evt.loaded / evt.total);
-					});
-			xhr.addEventListener("loadend", ProgressBar.hide);
-		}
-		return xhr;
-	};
 	var $ajax = $.ajax;
 	if (MODERN_BROWSER)
 		$.ajax = function(options) {
@@ -32799,6 +32787,19 @@ Ajax = {
 
 function ajaxOptions(options) {
 	options = options || {};
+	if (typeof options.global == 'undefined' || options.global) {
+		options.xhr = function() {
+			var xhr = $.ajaxSettings.xhr();
+			if (xhr instanceof XMLHttpRequest) {
+				xhr.addEventListener("progress", function(evt) {
+							if (evt.lengthComputable)
+								ProgressBar.show(evt.loaded / evt.total);
+						});
+				xhr.addEventListener("loadend", ProgressBar.hide);
+			}
+			return xhr;
+		}
+	}
 	if (!options.dataType)
 		options.dataType = 'text';
 	if (!options.headers)
