@@ -14,3 +14,5 @@
 +persistence-api
 -jta
 +transaction-api
++HikariCP
+-bonecp
