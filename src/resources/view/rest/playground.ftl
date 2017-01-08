@@ -6,7 +6,9 @@
 <table class="table">
 <tbody>
 <tr><td style="width:100px;">URL</td><td><div class="url">${url?no_esc}</div></td></tr>
+<@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">
 <tr><td>Access Token</td><td><input type="text" class="accessToken" placeholder="不填会默认使用当前用户"></td></tr>
+</@classPresentConditional>
 <tr><td>请求参数</td><td>
 	<table class="requestParams table datagrid"><tbody>
 	<#if apiDoc.requestParams?has_content>
