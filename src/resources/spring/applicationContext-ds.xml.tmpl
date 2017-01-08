@@ -63,186 +63,152 @@
 			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
-		<property name="maximumPoolSize" value="${dataSource.maxActive:50}" />
-		<property name="minimumIdle" value="${dataSource.initialSize:5}" />
-		<property name="idleTimeout" value="${dataSource.idleMaxAgeInMinutes:3600000}" />
-		<property name="maxLifetime" value="${dataSource.maxConnectionAgeInSeconds:14000000}"/>
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
 	</bean>
-	<bean id="mainGroupRead1" class="com.jolbox.bonecp.BoneCPDataSource"
+	<bean id="mainGroupRead1" class="com.zaxxer.hikari.HikariDataSource"
 		destroy-method="close">
-		<property name="driverClass"
+		<property name="driverClassName"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
 			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
 	</bean>
-	<bean id="mainGroupRead2" class="com.jolbox.bonecp.BoneCPDataSource"
+	<bean id="mainGroupRead2" class="com.zaxxer.hikari.HikariDataSource"
 		destroy-method="close">
-		<property name="driverClass"
+		<property name="driverClassName"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
 			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>	
-	<bean id="mainGroupRead3" class="com.jolbox.bonecp.BoneCPDataSource"
-		destroy-method="close">
-		<property name="driverClass"
-			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
-		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
-		<property name="username" value="${jdbc.username:root}" />
-		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>	
-	<bean id="mainGroupWrite1" class="com.jolbox.bonecp.BoneCPDataSource"
-		destroy-method="close">
-		<property name="driverClass"
-			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
-		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
-		<property name="username" value="${jdbc.username:root}" />
-		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>	
-	<bean id="mainGroupWrite2" class="com.jolbox.bonecp.BoneCPDataSource"
-		destroy-method="close">
-		<property name="driverClass"
-			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
-		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
-		<property name="username" value="${jdbc.username:root}" />
-		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>	
-	<bean id="miscGroupMaster" class="com.jolbox.bonecp.BoneCPDataSource"
-		destroy-method="close">
-		<property name="driverClass"
-			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
-		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
-		<property name="username" value="${jdbc.username:root}" />
-		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>	
-	<bean id="miscGroupRead1" class="com.jolbox.bonecp.BoneCPDataSource"
-		destroy-method="close">
-		<property name="driverClass"
-			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
-		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
-		<property name="username" value="${jdbc.username:root}" />
-		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>	
-	<bean id="miscGroupRead2" class="com.jolbox.bonecp.BoneCPDataSource"
-		destroy-method="close">
-		<property name="driverClass"
-			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
-		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
-		<property name="username" value="${jdbc.username:root}" />
-		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>	
-	<bean id="miscGroupRead3" class="com.jolbox.bonecp.BoneCPDataSource"
-		destroy-method="close">
-		<property name="driverClass"
-			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
-		<property name="jdbcUrl"
-			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
-		<property name="username" value="${jdbc.username:root}" />
-		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
 	</bean>
-	<bean id="miscGroupWrite1" class="com.jolbox.bonecp.BoneCPDataSource"
+	<bean id="mainGroupRead3" class="com.zaxxer.hikari.HikariDataSource"
 		destroy-method="close">
-		<property name="driverClass"
+		<property name="driverClassName"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
 			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
-	</bean>
-	<bean id="miscGroupWrite2" class="com.jolbox.bonecp.BoneCPDataSource"
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
+	</bean>		
+	<bean id="mainGroupWrite1" class="com.zaxxer.hikari.HikariDataSource"
 		destroy-method="close">
-		<property name="driverClass"
+		<property name="driverClassName"
 			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
 		<property name="jdbcUrl"
 			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
 		<property name="username" value="${jdbc.username:root}" />
 		<property name="password" value="${jdbc.password:}" />
-		<property name="maxConnectionsPerPartition" value="${dataSource.maxActive:50}" />
-		<property name="minConnectionsPerPartition" value="${dataSource.initialSize:5}" />
-		<property name="statementsCacheSize" value="${dataSource.statementsCacheSize:50}" />
-		<property name="idleConnectionTestPeriodInMinutes" value="${dataSource.idleConnectionTestPeriodInMinutes:120}" />
-		<property name="idleMaxAgeInMinutes" value="${dataSource.idleMaxAgeInMinutes:60}" />
-		<property name="maxConnectionAgeInSeconds" value="${dataSource.maxConnectionAgeInSeconds:14400}"/>
-		<property name="connectionTestStatement" value="${jdbc.connectionTestStatement:/* ping *\/ select 1}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
 	</bean>
+	<bean id="mainGroupWrite2" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
+		<property name="jdbcUrl"
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
+		<property name="username" value="${jdbc.username:root}" />
+		<property name="password" value="${jdbc.password:}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
+	</bean>
+	<bean id="miscGroupMaster" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
+		<property name="jdbcUrl"
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
+		<property name="username" value="${jdbc.username:root}" />
+		<property name="password" value="${jdbc.password:}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
+	</bean>	
+	<bean id="miscGroupRead1" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
+		<property name="jdbcUrl"
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
+		<property name="username" value="${jdbc.username:root}" />
+		<property name="password" value="${jdbc.password:}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
+	</bean>	
+	<bean id="miscGroupRead2" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
+		<property name="jdbcUrl"
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
+		<property name="username" value="${jdbc.username:root}" />
+		<property name="password" value="${jdbc.password:}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
+	</bean>	
+	<bean id="miscGroupRead3" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
+		<property name="jdbcUrl"
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
+		<property name="username" value="${jdbc.username:root}" />
+		<property name="password" value="${jdbc.password:}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
+	</bean>
+	<bean id="miscGroupWrite1" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
+		<property name="jdbcUrl"
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
+		<property name="password" value="${jdbc.password:}" />
+		<property name="username" value="${jdbc.username:root}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
+	</bean>
+	<bean id="miscGroupWrite2" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName:com.mysql.jdbc.Driver}" />
+		<property name="jdbcUrl"
+			value="${jdbc.url:jdbc:mysql:///ironrhino?autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useServerPrepStmts=true&amp;useSSL=false}" />
+		<property name="username" value="${jdbc.username:root}" />
+		<property name="password" value="${jdbc.password:}" />
+		<property name="maximumPoolSize" value="${dataSource.maximumPoolSize:50}" />
+		<property name="minimumIdle" value="${dataSource.minimumIdle:5}" />
+		<property name="idleTimeout" value="${dataSource.idleTimeout:1800000}" />
+		<property name="maxLifetime" value="${dataSource.maxLifetime:7200000}"/>
 
 </beans>

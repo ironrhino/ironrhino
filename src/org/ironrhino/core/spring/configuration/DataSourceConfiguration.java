@@ -1,9 +1,5 @@
 package org.ironrhino.core.spring.configuration;
 
-import java.sql.Statement;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +7,6 @@ import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,9 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.ClassUtils;
 
-import com.jolbox.bonecp.BoneCPDataSource;
-import com.jolbox.bonecp.ConnectionHandle;
-import com.jolbox.bonecp.hooks.AbstractConnectionHook;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
@@ -47,52 +40,45 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.password:}")
 	private String password;
 
-	@Value("${dataSource.maxActive:500}")
-	private int maxConnectionsPerPartition;
-
-	@Value("${dataSource.initialSize:5}")
-	private int minConnectionsPerPartition;
-
-	@Value("${dataSource.connectionTimeoutInMs:10000}")
-	private int connectionTimeoutInMs;
-
-	@Value("${dataSource.idleMaxAgeInMinutes:30}")
-	private int idleMaxAgeInMinutes;
-
-	@Value("${dataSource.maxConnectionAgeInSeconds:14000}")
-	private int maxConnectionAgeInSeconds;
-
-	@Value("${dataSource.disableJMX:true}")
-	private boolean disableJMX = true;
-
-	@Value("${dataSource.idleConnectionTestPeriodInMinutes:10}")
-	private int idleConnectionTestPeriodInMinutes;
-
-	@Value("${dataSource.connectionTestStatement:}")
-	private String connectionTestStatement;
-
-	@Value("${dataSource.QueryExecuteTimeLimitInMs:5000}")
-	private long queryExecuteTimeLimitInMs;
-
 	// aliases for HikariDataSource
 
-	@Value("${dataSource.maximumPoolSize:}") // maxActive
-	private Integer maximumPoolSize;
+	@Value("${dataSource.maximumPoolSize:500}") // maxActive
+	private int maximumPoolSize;
 
-	@Value("${dataSource.minimumIdle:}") // initialSize
-	private Integer minimumIdle;
+	@Value("${dataSource.minimumIdle:5}") // initialSize
+	private int minimumIdle;
 
-	@Value("${dataSource.connectionTimeout:}") // connectionTimeoutInMs
-	private Integer connectionTimeout;
+	@Value("${dataSource.connectionTimeout:10000}") // connectionTimeoutInMs
+	private long connectionTimeout;
 
-	@Value("${dataSource.idleTimeout:}") // idleMaxAgeInMinutes
-	private Integer idleTimeout;
+	@Value("${dataSource.idleTimeout:1800000}") // idleMaxAgeInMinutes
+	private long idleTimeout;
 
-	@Value("${dataSource.maxLifetime:}") // maxConnectionAgeInSeconds
-	private Integer maxLifetime;
+	@Value("${dataSource.maxLifetime:7200000}") // maxConnectionAgeInSeconds
+	private long maxLifetime;
 
-	@Value("${dataSource.registerMbeans:}")
-	private Boolean registerMbeans;
+	@Value("${dataSource.registerMbeans:false}") // disableJMX
+	private boolean registerMbeans;
+
+	// legacy alias from dbcp and bonecp
+
+	@Value("${dataSource.maxActive:}") // maximumPoolSize
+	private Integer maxConnectionsPerPartition;
+
+	@Value("${dataSource.initialSize:}") // minimumIdle
+	private Integer minConnectionsPerPartition;
+
+	@Value("${dataSource.connectionTimeoutInMs:}") // connectionTimeout
+	private Long connectionTimeoutInMs;
+
+	@Value("${dataSource.idleMaxAgeInMinutes:}") // idleTimeout
+	private Integer idleMaxAgeInMinutes;
+
+	@Value("${dataSource.maxConnectionAgeInSeconds:}") // maxLifetime
+	private Integer maxConnectionAgeInSeconds;
+
+	@Value("${dataSource.disableJMX:}") // registerMbeans
+	private Boolean disableJMX;
 
 	@Bean(destroyMethod = "close")
 	@Primary
@@ -106,48 +92,14 @@ public class DataSourceConfiguration {
 				jdbcUrl = newJdbcUrl;
 			}
 		}
-		DataSource ds;
-		if (ClassUtils.isPresent("com.zaxxer.hikari.HikariDataSource", getClass().getClassLoader())) {
-			ds = hikariDataSource();
-		} else {
-			logger.warn("Please add HikariCP.jar to use HikariDataSource instead of BoneCPDataSource");
-			ds = boneCPDataSource();
-		}
+		DataSource ds = hikariDataSource();
 		logger.info("Using {} to connect {}", ds.getClass().getName(), jdbcUrl);
-		return ds;
-	}
-
-	private DataSource boneCPDataSource() {
-		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
-		BoneCPDataSource ds = new BoneCPDataSource();
-		if (StringUtils.isNotBlank(driverClassName))
-			driverClass = driverClassName;
-		if (StringUtils.isNotBlank(driverClass))
-			ds.setDriverClass(driverClass);
-		else if (databaseProduct != null)
-			ds.setDriverClass(databaseProduct.getDefaultDriverClass());
-		ds.setJdbcUrl(jdbcUrl);
-		ds.setUsername(username);
-		ds.setPassword(password);
-		ds.setMaxConnectionsPerPartition(maxConnectionsPerPartition);
-		ds.setMinConnectionsPerPartition(minConnectionsPerPartition);
-		ds.setConnectionTimeoutInMs(connectionTimeoutInMs);
-		ds.setIdleConnectionTestPeriodInMinutes(idleConnectionTestPeriodInMinutes);
-		ds.setIdleMaxAgeInMinutes(idleMaxAgeInMinutes);
-		ds.setMaxConnectionAgeInSeconds(maxConnectionAgeInSeconds);
-		ds.setDisableJMX(disableJMX);
-		ds.setQueryExecuteTimeLimitInMs(queryExecuteTimeLimitInMs);
-		ds.setConnectionHook(new MyConnectionHook());
-		if (StringUtils.isBlank(connectionTestStatement) && databaseProduct != null)
-			connectionTestStatement = databaseProduct.getValidationQuery();
-		ds.setConnectionTestStatement(connectionTestStatement);
-		ds.setDisableConnectionTracking(true);
 		return ds;
 	}
 
 	private DataSource hikariDataSource() {
 		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
-		com.zaxxer.hikari.HikariDataSource ds = new com.zaxxer.hikari.HikariDataSource();
+		HikariDataSource ds = new HikariDataSource();
 		if (StringUtils.isNotBlank(driverClass))
 			driverClassName = driverClass;
 		if (StringUtils.isNotBlank(driverClassName))
@@ -157,17 +109,17 @@ public class DataSourceConfiguration {
 		ds.setJdbcUrl(jdbcUrl);
 		ds.setUsername(username);
 		ds.setPassword(password);
-		if (maximumPoolSize == null)
+		if (maxConnectionsPerPartition != null)
 			maximumPoolSize = maxConnectionsPerPartition;
-		if (minimumIdle == null)
+		if (minConnectionsPerPartition != null)
 			minimumIdle = minConnectionsPerPartition;
-		if (connectionTimeout == null)
+		if (connectionTimeoutInMs != null)
 			connectionTimeout = connectionTimeoutInMs;
-		if (idleTimeout == null)
+		if (idleMaxAgeInMinutes != null)
 			idleTimeout = idleMaxAgeInMinutes * 60 * 1000;
-		if (maxLifetime == null)
+		if (maxConnectionAgeInSeconds != null)
 			maxLifetime = maxConnectionAgeInSeconds * 1000;
-		if (registerMbeans == null)
+		if (disableJMX != null)
 			registerMbeans = !disableJMX;
 		ds.setMaximumPoolSize(maximumPoolSize);
 		ds.setMinimumIdle(minimumIdle);
@@ -188,22 +140,6 @@ public class DataSourceConfiguration {
 	@Primary
 	public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
 		return new NamedParameterJdbcTemplate(dataSource());
-	}
-
-	protected static class MyConnectionHook extends AbstractConnectionHook {
-
-		private Logger logger = LoggerFactory.getLogger("access-warn");
-
-		@Override
-		public void onQueryExecuteTimeLimitExceeded(ConnectionHandle handle, Statement statement, String sql,
-				Map<Object, Object> logParams, long timeElapsedInNs) {
-			boolean withParams = logParams != null && logParams.size() > 0;
-			StringBuilder sb = new StringBuilder(40);
-			sb.append(" executed /**/ {} /**/ in {} ms");
-			if (withParams)
-				sb.append(" with {}");
-			logger.warn(sb.toString(), sql, TimeUnit.NANOSECONDS.toMillis(timeElapsedInNs), logParams);
-		}
 	}
 
 }
