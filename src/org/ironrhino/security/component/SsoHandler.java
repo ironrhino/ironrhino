@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.session.HttpSessionManager;
+import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
+import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +30,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+@BeanPresentConditional(name = "ssoHandler", negated = true)
+@ApplicationContextPropertiesConditional(key = "portal.baseUrl", value = ApplicationContextPropertiesConditional.ANY)
+@Component("org.ironrhino.security.component.SsoHandler")
 public class SsoHandler extends AccessHandler {
 
 	@Value("${ssoHandler.pattern:}")
@@ -45,7 +51,7 @@ public class SsoHandler extends AccessHandler {
 	@Value("${httpSessionManager.sessionCookieName:" + HttpSessionManager.DEFAULT_SESSION_COOKIE_NAME + "}")
 	protected String sessionCookieName = HttpSessionManager.DEFAULT_SESSION_COOKIE_NAME;
 
-	@Value("${portal.baseUrl:http://www.example.com}")
+	@Value("${portal.baseUrl}")
 	protected String portalBaseUrl;
 
 	@Value("${portal.api.user.self.url:/api/user/@self}")
