@@ -46,8 +46,6 @@
 				<#assign size = schema.fields?size-1>
 			</#if>
 			<#list 0..size as index>
-			<#if schema.fields[index]?? && schema.fields[index].type??>
-			</#if>
 			<tr class="linkage">
 				<td><@s.textfield theme="simple" name="schema.fields[${index}].name" style="width:100px;"/></td>
 				<td>

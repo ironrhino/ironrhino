@@ -64,7 +64,7 @@
 				if (row.length > 0)
 					addRow(event, options, row.eq(0), true);
 			});
-			$('tbody .add', this).click(function(event) {
+			$('tbody td > .add', this).click(function(event) {
 						addRow(event, options)
 					});
 			$('tbody .remove', this).click(function(event) {
@@ -91,7 +91,7 @@
 			return;
 		var maxrows = parseInt(table.data('maxrows'));
 		if (maxrows) {
-			var currentrows = $('tbody tr', table).length;
+			var currentrows = table.children('tbody').children('tr').length;
 			if (currentrows == maxrows) {
 				Message.showActionError(MessageBundle.get('max.rows.reached',
 								currentrows), table.closest('form'));
@@ -160,7 +160,7 @@
 								'html' : true
 							}).change();
 				});
-		$('.datagrided tr', r).each(function(i) {
+		$('.datagrided tbody > tr', r).each(function(i) {
 					if (i > 0)
 						$(this).remove();
 				});
