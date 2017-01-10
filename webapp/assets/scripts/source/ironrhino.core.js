@@ -1018,7 +1018,7 @@ Initialization.common = function() {
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
 	Nav.init();
-	Nav.activate(document.location.pathname);
+	Nav.activate(document.location.href);
 	var hash = document.location.hash;
 	if (hash) {
 		$('.nav-tabs').each(function() {
@@ -1275,48 +1275,42 @@ Observation.common = function(container) {
 			else
 				label.attr('for', this.id);
 		});
-	$$('.linkage', container).each(function() {
-		var c = $(this);
+	$$('.linkage_switch', container).each(function() {
+		var c = $(this).closest('.linkage');
 		c.data('originalclass', c.attr('class'));
-		var sw = $('.linkage_switch', c);
-		var val = sw.val() || 'linkage_default';
-		$('.linkage_component', c).show().each(function() {
-			$$('._disabled:input', this).removeClass('_disabled').prop(
-					'disabled', false).filter('.linkage_switch').each(
-					function() {
-						var t = $(this);
-						setTimeout(function() {
-									t.change()
-								}, 20);
-					});
-		});
-		$('.linkage_component', c).not('.' + val).hide().each(function() {
-			$$(':input:not([disabled])', this).addClass('_disabled').prop(
-					'disabled', true);
-		});
-		c.attr('class', c.data('originalclass') + ' ' + val);
-		sw.change(function() {
-					var c = $(this).closest('.linkage');
-					var sw = $(this);
-					var val = sw.val() || 'linkage_default';
-					$('.linkage_component', c).show().each(function() {
-						$$('._disabled:input', this).removeClass('_disabled')
-								.prop('disabled', false)
-								.filter('.linkage_switch').each(function() {
-											var t = $(this);
-											setTimeout(function() {
-														t.change()
-													}, 20);
-										});
-					});
-					$('.linkage_component', c).not('.' + val).hide().each(
+		$(this).bind('linkage', function() {
+			var c = $(this).closest('.linkage');
+			var sw = $(this);
+			if (sw.is(':hidden'))
+				return false;
+			var val = sw.val() || 'linkage_default';
+			$('.linkage_component', c).each(function() {
+				var t = $(this);
+				var hide = t.is(':not(.' + val + ')');
+				if (!hide
+						&& t.closest('.linkage')[0] != sw.closest('.linkage')[0])
+					hide = t.parent().closest('.linkage_component').is(':not(.'
+							+ val + ')');
+				if (hide) {
+					t.hide();
+					$$(':input:not([disabled])', t).addClass('_disabled').prop(
+							'disabled', true);
+				} else {
+					t.show();
+					$$('._disabled:input', t).removeClass('_disabled').prop(
+							'disabled', false).filter('.linkage_switch').each(
 							function() {
-								$$(':input:not([disabled])', this)
-										.addClass('_disabled').prop('disabled',
-												true);
+								var t = $(this);
+								setTimeout(function() {
+											t.change()
+										}, 20);
 							});
-					c.attr('class', c.data('originalclass') + ' ' + val);
-				});
+				}
+			});
+			c.attr('class', c.data('originalclass') + ' ' + val);
+		}).change(function() {
+					$(this).trigger('linkage')
+				}).trigger('linkage');
 	});
 	$$(':input.conjunct', container).bind('conjunct', function() {
 		var t = $(this);

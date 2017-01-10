@@ -104,7 +104,8 @@
 					'disabled', false);
 		$('*', r).removeAttr('id');
 		$('span.info', r).html('');
-		$(':input[type!=checkbox][type!=radio]', r).val('').change();
+		$(':input[type!=checkbox][type!=radio]:not(.fixedvalue)', r).val('')
+				.change();
 		$('select', r).each(function() {
 					var option = $('option:first', this);
 					if (!option.prop('selected')) {
