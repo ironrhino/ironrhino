@@ -33352,7 +33352,13 @@ Observation.common = function(container) {
 		var val = sw.val() || 'linkage_default';
 		$('.linkage_component', c).show().each(function() {
 			$$('._disabled:input', this).removeClass('_disabled').prop(
-					'disabled', false);
+					'disabled', false).filter('.linkage_switch').each(
+					function() {
+						var t = $(this);
+						setTimeout(function() {
+									t.change()
+								}, 20);
+					});
 		});
 		$('.linkage_component', c).not('.' + val).hide().each(function() {
 			$$(':input:not([disabled])', this).addClass('_disabled').prop(
@@ -33365,7 +33371,13 @@ Observation.common = function(container) {
 					var val = sw.val() || 'linkage_default';
 					$('.linkage_component', c).show().each(function() {
 						$$('._disabled:input', this).removeClass('_disabled')
-								.prop('disabled', false);
+								.prop('disabled', false)
+								.filter('.linkage_switch').each(function() {
+											var t = $(this);
+											setTimeout(function() {
+														t.change()
+													}, 20);
+										});
 					});
 					$('.linkage_component', c).not('.' + val).hide().each(
 							function() {
