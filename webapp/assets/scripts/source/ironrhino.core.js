@@ -480,7 +480,7 @@ Form = {
 			return valid;
 		} else {
 			var valid = true;
-			$(':input', target).each(function() {
+			$(':input:not(:disabled)', target).each(function() {
 						if (!Form.validate(this))
 							valid = false;
 					});
@@ -1279,17 +1279,31 @@ Observation.common = function(container) {
 		var c = $(this);
 		c.data('originalclass', c.attr('class'));
 		var sw = $('.linkage_switch', c);
-		$('.linkage_component', c).show();
-		$('.linkage_component', c).not('.' + sw.val()).hide().filter(':input')
-				.val('');
-		c.attr('class', c.data('originalclass') + ' ' + sw.val());
+		var val = sw.val() || 'linkage_default';
+		$('.linkage_component', c).show().each(function() {
+			$$('._disabled:input', this).removeClass('_disabled').prop(
+					'disabled', false);
+		});
+		$('.linkage_component', c).not('.' + val).hide().each(function() {
+			$$(':input:not([disabled])', this).addClass('_disabled').prop(
+					'disabled', true);
+		});
+		c.attr('class', c.data('originalclass') + ' ' + val);
 		sw.change(function() {
 					var c = $(this).closest('.linkage');
 					var sw = $(this);
-					$('.linkage_component', c).show();
-					$('.linkage_component', c).not('.' + sw.val()).hide()
-							.filter(':input').val('');
-					c.attr('class', c.data('originalclass') + ' ' + sw.val());
+					var val = sw.val() || 'linkage_default';
+					$('.linkage_component', c).show().each(function() {
+						$$('._disabled:input', this).removeClass('_disabled')
+								.prop('disabled', false);
+					});
+					$('.linkage_component', c).not('.' + val).hide().each(
+							function() {
+								$$(':input:not([disabled])', this)
+										.addClass('_disabled').prop('disabled',
+												true);
+							});
+					c.attr('class', c.data('originalclass') + ' ' + val);
 				});
 	});
 	$$(':input.conjunct', container).bind('conjunct', function() {

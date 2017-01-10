@@ -104,11 +104,16 @@
 					'disabled', false);
 		$('*', r).removeAttr('id');
 		$('span.info', r).html('');
-		$(':input[type!=checkbox][type!=radio]', r).val('');
+		$(':input[type!=checkbox][type!=radio]', r).val('').change();
 		$('select', r).each(function() {
-					$('option:first', this).prop('selected', true);
+					var option = $('option:first', this);
+					if (!option.prop('selected')) {
+						option.prop('selected', true);
+						$(this).change();
+					}
 				});
-		$('input[type=checkbox],input[type=radio]', r).prop('checked', false);
+		$('input[type=checkbox],input[type=radio]', r).prop('checked', false)
+				.change();
 		$(':input', r).not('.readonly').prop('readonly', false)
 				.removeAttr('keyupValidate');
 		if (MODERN_BROWSER)
