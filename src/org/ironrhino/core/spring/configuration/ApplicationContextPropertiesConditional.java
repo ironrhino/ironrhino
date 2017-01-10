@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Conditional;
 @Conditional(ApplicationContextPropertiesCondition.class)
 public @interface ApplicationContextPropertiesConditional {
 
+	public static final String ANY = "^_^";
+
 	String key();
 
 	String value();

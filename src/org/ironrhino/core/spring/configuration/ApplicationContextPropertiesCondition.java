@@ -10,7 +10,9 @@ class ApplicationContextPropertiesCondition extends SimpleCondition<ApplicationC
 	}
 
 	public static boolean matches(String key, String value, boolean negated) {
-		boolean matched = value.equals(AppInfo.getApplicationContextProperties().getProperty(key));
+		boolean matched = value.equals(ApplicationContextPropertiesConditional.ANY)
+				? AppInfo.getApplicationContextProperties().getProperty(key) != null
+				: value.equals(AppInfo.getApplicationContextProperties().getProperty(key));
 		if (negated)
 			matched = !matched;
 		return matched;
