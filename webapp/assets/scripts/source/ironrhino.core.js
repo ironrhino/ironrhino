@@ -43,8 +43,8 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 					&& !$.trim(this.val()))
 				return null;
 			var val = this.oldFieldValue(successful);
-			if (val && this.is('[type="password"]')
-					&& !this.hasClass('nosha') && typeof sha1 != 'undefined')
+			if (val && this.is('[type="password"]') && this.hasClass('sha')
+					&& typeof sha1 != 'undefined')
 				val = sha1(val);
 			return val;
 		}
@@ -57,7 +57,7 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 					&& !$.trim(t.val()))
 				return null;
 			var val = $.oldFieldValue(el, successful);
-			if (val && t.is('[type="password"]') && !t.hasClass('nosha')
+			if (val && t.is('[type="password"]') && t.hasClass('sha')
 					&& typeof sha1 != 'undefined')
 				val = sha1(val);
 			return val;

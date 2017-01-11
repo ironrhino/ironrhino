@@ -9,12 +9,12 @@
 	<#if !user.new>
 		<@s.hidden name="user.id" />
 		<@s.textfield label=getText('username') name="user.username" readonly="true"/>
-		<@s.password label=getText('password') name="password"/>
-		<@s.password label=getText('confirmPassword') name="confirmPassword"/>
+		<@s.password label=getText('password') name="password" class="sha"/>
+		<@s.password label=getText('confirmPassword') name="confirmPassword" class="sha"/>
 	<#else>
 		<@s.textfield label=getText('username') name="user.username" class="required checkavailable regex conjunct" data\-replacement="controls-user-roles" data\-regex="${statics['org.ironrhino.security.model.User'].USERNAME_REGEX}" data\-checkurl="${actionBaseUrl}/checkavailable"/>
-		<@s.password label=getText('password') name="password" class="required"/>
-		<@s.password label=getText('confirmPassword') name="confirmPassword" class="required"/>
+		<@s.password label=getText('password') name="password" class="required sha"/>
+		<@s.password label=getText('confirmPassword') name="confirmPassword" class="required sha"/>
 	</#if>
 	<@s.textfield label=getText('name') name="user.name" class="required"/>
 	<@s.textfield label=getText('email') name="user.email" type="email" class="email checkavailable" data\-checkurl="${actionBaseUrl}/checkavailable"/>
