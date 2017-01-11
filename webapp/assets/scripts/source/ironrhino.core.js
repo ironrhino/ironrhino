@@ -45,7 +45,11 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 			var val = this.oldFieldValue(successful);
 			if (val && this.is('[type="password"]') && this.hasClass('sha')
 					&& typeof sha1 != 'undefined')
-				val = sha1(val);
+				try {
+					val = sha1(val);
+				} catch (e) {
+					console.log(e);
+				}
 			return val;
 		}
 
@@ -59,7 +63,11 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 			var val = $.oldFieldValue(el, successful);
 			if (val && t.is('[type="password"]') && t.hasClass('sha')
 					&& typeof sha1 != 'undefined')
-				val = sha1(val);
+				try {
+					val = sha1(val);
+				} catch (e) {
+					console.log(e);
+				}
 			return val;
 		}
 	}
