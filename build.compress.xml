@@ -34,6 +34,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/jquery.throttle-debounce-1.1.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.htmlarea-0.7.5.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.chosen-1.1.0.js" />
+				<file name="${webapp.dir}/assets/scripts/source/sha1-0.4.1.js" />
 				<file name="${webapp.dir}/assets/scripts/source/swfobject-2.2.js" />
 				<file name="${webapp.dir}/assets/scripts/source/bootstrap-2.3.2.js" />
 				<file name="${webapp.dir}/assets/scripts/source/bootstrap.switch-1.3.js" />

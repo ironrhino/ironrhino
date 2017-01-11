@@ -42,7 +42,11 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 					.hasClass('ignore-blank'))
 					&& !$.trim(this.val()))
 				return null;
-			return this.oldFieldValue(successful);
+			var val = this.oldFieldValue(successful);
+			if (val && this.is('[type="password"]')
+					&& !this.hasClass('nosha') && typeof sha1 != 'undefined')
+				val = sha1(val);
+			return val;
 		}
 
 		$.oldFieldValue = $.fieldValue;
@@ -52,7 +56,11 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 					.hasClass('ignore-blank'))
 					&& !$.trim(t.val()))
 				return null;
-			return $.oldFieldValue(el, successful);
+			var val = $.oldFieldValue(el, successful);
+			if (val && t.is('[type="password"]') && !t.hasClass('nosha')
+					&& typeof sha1 != 'undefined')
+				val = sha1(val);
+			return val;
 		}
 	}
 
@@ -62,7 +70,7 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		$.param = function(a, traditional) {
 			if (jQuery.isArray(a) || a.jquery) {
 				jQuery.each(a, function() {
-					if (/password$/.test(this.name.toLowerCase())) {
+					if (this.type == 'password') {
 						try {
 							var key = $.cookie('T');
 							if (key && key.length > 10)

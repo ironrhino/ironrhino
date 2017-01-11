@@ -174,6 +174,10 @@ public class CodecUtils {
 		return md5Hex(shaHex(input, 3));
 	}
 
+	public static String digestShaHex(String input) {
+		return md5Hex(shaHex(input, 2));
+	}
+
 	public static String md5Hex(String input, int times) {
 		for (int i = 0; i < times; i++)
 			input = md5Hex(input);
