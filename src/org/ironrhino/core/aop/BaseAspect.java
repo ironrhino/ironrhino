@@ -41,6 +41,7 @@ public class BaseAspect implements Ordered {
 				context.put(paramNames[i], args[i]);
 		}
 		context.put(AopContext.CONTEXT_KEY_THIS, jp.getThis());
+		context.put(AopContext.CONTEXT_KEY_METHOD_NAME, jp.getSignature().getName());
 		context.put(AopContext.CONTEXT_KEY_ARGS, jp.getArgs());
 		context.put(AopContext.CONTEXT_KEY_REQUEST, RequestContext.getRequest());
 		context.put(AopContext.CONTEXT_KEY_USER, AuthzUtils.getUserDetails());
@@ -48,6 +49,9 @@ public class BaseAspect implements Ordered {
 	}
 
 	protected void putReturnValueIntoContext(Map<String, Object> context, Object value) {
+		String oldName = AopContext.CONTEXT_KEY_RETVAL.substring(1);
+		if (!context.containsKey(oldName))
+			context.put(oldName, value);
 		context.put(AopContext.CONTEXT_KEY_RETVAL, value);
 	}
 

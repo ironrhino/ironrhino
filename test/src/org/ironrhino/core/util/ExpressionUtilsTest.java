@@ -17,12 +17,15 @@ public class ExpressionUtilsTest {
 		context.put("string", "IAMSTRING");
 		context.put("integer", 12);
 		context.put("bool", true);
+		context.put("$bool", false);
 		Object result = ExpressionUtils.evalExpression("string+12", context);
 		assertEquals("IAMSTRING12", result);
 		result = ExpressionUtils.evalExpression("integer+12", context);
 		assertEquals(24, result);
 		result = ExpressionUtils.evalExpression("!bool", context);
 		assertEquals(false, result);
+		result = ExpressionUtils.evalExpression("!$bool", context);
+		assertEquals(true, result);
 	}
 
 	@Test

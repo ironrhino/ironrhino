@@ -33,6 +33,7 @@ public abstract class AbstractMethodInterceptor<ASPECT extends AbstractPointcutA
 				context.put(paramNames[i], args[i]);
 		}
 		context.put(AopContext.CONTEXT_KEY_THIS, methodInvocation.getThis());
+		context.put(AopContext.CONTEXT_KEY_METHOD_NAME, methodInvocation.getMethod().getName());
 		context.put(AopContext.CONTEXT_KEY_ARGS, methodInvocation.getArguments());
 		context.put(AopContext.CONTEXT_KEY_REQUEST, RequestContext.getRequest());
 		context.put(AopContext.CONTEXT_KEY_USER, AuthzUtils.getUserDetails());
@@ -40,6 +41,9 @@ public abstract class AbstractMethodInterceptor<ASPECT extends AbstractPointcutA
 	}
 
 	protected void putReturnValueIntoContext(Map<String, Object> context, Object value) {
+		String oldName = AopContext.CONTEXT_KEY_RETVAL.substring(1);
+		if (!context.containsKey(oldName))
+			context.put(oldName, value);
 		context.put(AopContext.CONTEXT_KEY_RETVAL, value);
 	}
 

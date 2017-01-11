@@ -5,15 +5,17 @@ import java.util.List;
 
 public class AopContext {
 
-	public static final String CONTEXT_KEY_THIS = "_this_";
+	public static final String CONTEXT_KEY_THIS = "$this";
 
-	public static final String CONTEXT_KEY_ARGS = "_args_";
+	public static final String CONTEXT_KEY_METHOD_NAME = "$methodName";
 
-	public static final String CONTEXT_KEY_REQUEST = "_request_";
+	public static final String CONTEXT_KEY_ARGS = "$args";
 
-	public static final String CONTEXT_KEY_USER = "_user_";
+	public static final String CONTEXT_KEY_REQUEST = "$request";
 
-	public static final String CONTEXT_KEY_RETVAL = "retval";
+	public static final String CONTEXT_KEY_USER = "$user";
+
+	public static final String CONTEXT_KEY_RETVAL = "$retval";
 
 	private static ThreadLocal<List<Class<?>>> bypass = new ThreadLocal<>();
 
