@@ -6,7 +6,7 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		container = $(container);
 		var result = $(selector, container);
 		if (container.is(selector))
-			result = result.andSelf();
+			result = result.addBack();
 		return result;
 	}
 	var d = document.domain;
@@ -1105,11 +1105,11 @@ Initialization.common = function() {
 				if (items.length < pagesize) {
 					t.prop('disabled', true);
 				} else {
-					$(window).bind('scroll', function() {
+					$(window).on('scroll', function() {
 						if ($(window).scrollTop() + $(window).height() > $(document)
 								.height()
 								- 10) {
-							$(window).unbind('scroll');
+							$(window).off('scroll');
 							$('.scroll-list .load-more').click();
 						}
 					});
@@ -1130,7 +1130,7 @@ Initialization.common = function() {
 			if ($(window).scrollTop() + $(window).height() > $(document)
 					.height()
 					- 10) {
-				$(window).unbind('scroll');
+				$(window).off('scroll');
 				$('.scroll-list .load-more').click();
 			}
 		});
@@ -1278,7 +1278,7 @@ Observation.common = function(container) {
 	$$('.linkage_switch', container).each(function() {
 		var c = $(this).closest('.linkage');
 		c.data('originalclass', c.attr('class'));
-		$(this).bind('linkage', function() {
+		$(this).on('linkage', function() {
 			var c = $(this).closest('.linkage');
 			var sw = $(this);
 			if (sw.is(':hidden'))
@@ -1312,7 +1312,7 @@ Observation.common = function(container) {
 					$(this).trigger('linkage')
 				}).trigger('linkage');
 	});
-	$$(':input.conjunct', container).bind('conjunct', function() {
+	$$(':input.conjunct', container).on('conjunct', function() {
 		var t = $(this);
 		var f = $(this).closest('form');
 		var data = {};
@@ -1447,7 +1447,7 @@ Observation.common = function(container) {
 		};
 		if (!t.attr('title') && t.data('tipurl'))
 			t.attr('title', MessageBundle.get('ajax.loading'));
-		t.bind(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
+		t.on(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
 				function() {
 					if (!t.hasClass('_tiped')) {
 						t.addClass('_tiped');
@@ -1478,7 +1478,7 @@ Observation.common = function(container) {
 		if (t.data('popurl')) {
 			if (!options.content && t.data('popurl'))
 				options.title = MessageBundle.get('ajax.loading');
-			t.bind(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
+			t.on(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
 					function() {
 						if (!t.hasClass('_poped')) {
 							t.addClass('_poped');
@@ -1755,7 +1755,7 @@ Observation.common = function(container) {
 				$.extend(options.headers, {
 							'X-Data-Type' : 'json'
 						});
-			$(this).bind('submit', function(e) {
+			$(this).on('submit', function(e) {
 						var form = $(this);
 						var btn = $('.clicked', form);
 						if (!btn.length)

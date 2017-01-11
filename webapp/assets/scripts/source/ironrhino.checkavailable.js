@@ -2,7 +2,7 @@
 	$.fn.checkavailable = function() {
 		this.each(function() {
 					var t = $(this);
-					t.bind('checkavailable', function() {
+					t.on('checkavailable', function() {
 						if (!t.val())
 							return;
 						var inputs = $('input[type=hidden]', t.closest('form'))

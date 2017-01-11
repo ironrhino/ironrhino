@@ -32076,7 +32076,7 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		container = $(container);
 		var result = $(selector, container);
 		if (container.is(selector))
-			result = result.andSelf();
+			result = result.addBack();
 		return result;
 	}
 	var d = document.domain;
@@ -33175,11 +33175,11 @@ Initialization.common = function() {
 				if (items.length < pagesize) {
 					t.prop('disabled', true);
 				} else {
-					$(window).bind('scroll', function() {
+					$(window).on('scroll', function() {
 						if ($(window).scrollTop() + $(window).height() > $(document)
 								.height()
 								- 10) {
-							$(window).unbind('scroll');
+							$(window).off('scroll');
 							$('.scroll-list .load-more').click();
 						}
 					});
@@ -33200,7 +33200,7 @@ Initialization.common = function() {
 			if ($(window).scrollTop() + $(window).height() > $(document)
 					.height()
 					- 10) {
-				$(window).unbind('scroll');
+				$(window).off('scroll');
 				$('.scroll-list .load-more').click();
 			}
 		});
@@ -33348,7 +33348,7 @@ Observation.common = function(container) {
 	$$('.linkage_switch', container).each(function() {
 		var c = $(this).closest('.linkage');
 		c.data('originalclass', c.attr('class'));
-		$(this).bind('linkage', function() {
+		$(this).on('linkage', function() {
 			var c = $(this).closest('.linkage');
 			var sw = $(this);
 			if (sw.is(':hidden'))
@@ -33382,7 +33382,7 @@ Observation.common = function(container) {
 					$(this).trigger('linkage')
 				}).trigger('linkage');
 	});
-	$$(':input.conjunct', container).bind('conjunct', function() {
+	$$(':input.conjunct', container).on('conjunct', function() {
 		var t = $(this);
 		var f = $(this).closest('form');
 		var data = {};
@@ -33517,7 +33517,7 @@ Observation.common = function(container) {
 		};
 		if (!t.attr('title') && t.data('tipurl'))
 			t.attr('title', MessageBundle.get('ajax.loading'));
-		t.bind(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
+		t.on(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
 				function() {
 					if (!t.hasClass('_tiped')) {
 						t.addClass('_tiped');
@@ -33548,7 +33548,7 @@ Observation.common = function(container) {
 		if (t.data('popurl')) {
 			if (!options.content && t.data('popurl'))
 				options.title = MessageBundle.get('ajax.loading');
-			t.bind(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
+			t.on(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
 					function() {
 						if (!t.hasClass('_poped')) {
 							t.addClass('_poped');
@@ -33825,7 +33825,7 @@ Observation.common = function(container) {
 				$.extend(options.headers, {
 							'X-Data-Type' : 'json'
 						});
-			$(this).bind('submit', function(e) {
+			$(this).on('submit', function(e) {
 						var form = $(this);
 						var btn = $('.clicked', form);
 						if (!btn.length)
@@ -34187,7 +34187,7 @@ DateUtils = {
 	$.fn.checkavailable = function() {
 		this.each(function() {
 					var t = $(this);
-					t.bind('checkavailable', function() {
+					t.on('checkavailable', function() {
 						if (!t.val())
 							return;
 						var inputs = $('input[type=hidden]', t.closest('form'))
@@ -36660,7 +36660,7 @@ function uploadFiles(files, filenames) {
 	$.fn.ajaxpanel = function() {
 		$(this).each(function() {
 					var t = $(this);
-					t.bind('load', function() {
+					t.on('load', function() {
 								ajaxpanel(t)
 							});
 					if (t.data('timeout')) {
@@ -37852,7 +37852,7 @@ Observation.combobox = function(container) {
 				} else {
 					options.plugins = 'tags prompt focus autocomplete arrow';
 					var list = (new Function("return " + t.data('source')))();
-					t.bind('getSuggestions', function(e, data) {
+					t.on('getSuggestions', function(e, data) {
 								var textext = $(e.target).textext()[0], query = (data
 										? data.query
 										: '')
@@ -37869,7 +37869,7 @@ Observation.combobox = function(container) {
 				$('option', $('#' + t.attr('list'))).each(function() {
 							list.push(this.value);
 						});
-				t.bind('getSuggestions', function(e, data) {
+				t.on('getSuggestions', function(e, data) {
 							var textext = $(e.target).textext()[0], query = (data
 									? data.query
 									: '')
@@ -37882,7 +37882,7 @@ Observation.combobox = function(container) {
 			} else {
 				options.plugins = 'tags prompt focus';
 			}
-			t.val('').textext(options).bind('isTagAllowed', function(e, data) {
+			t.val('').textext(options).on('isTagAllowed', function(e, data) {
 				var inputed = [];
 				$('.text-tags .text-label',
 						$(this).data('textext').wrapElement()).each(function() {
@@ -38628,7 +38628,7 @@ Richtable = {
 				option.format = input.data('format') || 'yyyy-MM-dd';
 				option.pickTime = false;
 			}
-			input.addClass(type).datetimepicker(option).bind('hide',
+			input.addClass(type).datetimepicker(option).on('hide',
 					function(e) {
 						Richtable.updateCell(this)
 					});
@@ -38687,7 +38687,7 @@ Richtable = {
 								action = 'click';
 							}
 							if (!$(cells[i]).data('readonly'))
-								$(cells[i]).unbind(action).bind(action,
+								$(cells[i]).off(action).on(action,
 										function() {
 											Richtable.editCell(this, type,
 													template);
@@ -40796,7 +40796,7 @@ Observation.filtercolumn = function(container) {
 					}
 				});
 			} else {
-				pattern.bind('touchmove', function(ev) {
+				pattern.on('touchmove', function(ev) {
 					ev.preventDefault();
 					var dot = getTouchedDot(ev.originalEvent.touches[0],
 							pattern);
@@ -40814,7 +40814,7 @@ Observation.filtercolumn = function(container) {
 						pattern.data('coords').push(getCoords(dot));
 						pattern.data('previous', dot);
 					}
-				}).bind('touchend', function(ev) {
+				}).on('touchend', function(ev) {
 					ev.preventDefault();
 					var coords = pattern.data('coords');
 					if (coords) {

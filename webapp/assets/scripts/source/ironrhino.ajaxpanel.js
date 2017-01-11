@@ -2,7 +2,7 @@
 	$.fn.ajaxpanel = function() {
 		$(this).each(function() {
 					var t = $(this);
-					t.bind('load', function() {
+					t.on('load', function() {
 								ajaxpanel(t)
 							});
 					if (t.data('timeout')) {

@@ -56,7 +56,7 @@
 					}
 				});
 			} else {
-				pattern.bind('touchmove', function(ev) {
+				pattern.on('touchmove', function(ev) {
 					ev.preventDefault();
 					var dot = getTouchedDot(ev.originalEvent.touches[0],
 							pattern);
@@ -74,7 +74,7 @@
 						pattern.data('coords').push(getCoords(dot));
 						pattern.data('previous', dot);
 					}
-				}).bind('touchend', function(ev) {
+				}).on('touchend', function(ev) {
 					ev.preventDefault();
 					var coords = pattern.data('coords');
 					if (coords) {

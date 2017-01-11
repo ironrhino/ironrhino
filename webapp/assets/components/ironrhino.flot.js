@@ -53,7 +53,7 @@
 
 				$.plot(plot, [data], options);
 				var previousPoint = null;
-				plot.bind('plothover', function(event, pos, item) {
+				plot.on('plothover', function(event, pos, item) {
 							if (item) {
 								if (previousPoint != item.dataIndex) {
 									previousPoint = item.dataIndex;
@@ -100,7 +100,7 @@
 							}
 						});
 				var previousPoint = null;
-				plot.bind('plothover', function(event, pos, item) {
+				plot.on('plothover', function(event, pos, item) {
 							if (item) {
 								if (previousPoint != item.dataIndex) {
 									previousPoint = item.dataIndex;
@@ -151,7 +151,7 @@
 						clickable : true
 					}
 				});
-				plot.bind('plotclick', function(event, pos, obj) {
+				plot.on('plotclick', function(event, pos, obj) {
 							if (!obj) {
 								$('#tooltip').remove();
 								return;

@@ -90,7 +90,7 @@
 				} else {
 					options.plugins = 'tags prompt focus autocomplete arrow';
 					var list = (new Function("return " + t.data('source')))();
-					t.bind('getSuggestions', function(e, data) {
+					t.on('getSuggestions', function(e, data) {
 								var textext = $(e.target).textext()[0], query = (data
 										? data.query
 										: '')
@@ -107,7 +107,7 @@
 				$('option', $('#' + t.attr('list'))).each(function() {
 							list.push(this.value);
 						});
-				t.bind('getSuggestions', function(e, data) {
+				t.on('getSuggestions', function(e, data) {
 							var textext = $(e.target).textext()[0], query = (data
 									? data.query
 									: '')
@@ -120,7 +120,7 @@
 			} else {
 				options.plugins = 'tags prompt focus';
 			}
-			t.val('').textext(options).bind('isTagAllowed', function(e, data) {
+			t.val('').textext(options).on('isTagAllowed', function(e, data) {
 				var inputed = [];
 				$('.text-tags .text-label',
 						$(this).data('textext').wrapElement()).each(function() {

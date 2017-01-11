@@ -502,7 +502,7 @@ Richtable = {
 				option.format = input.data('format') || 'yyyy-MM-dd';
 				option.pickTime = false;
 			}
-			input.addClass(type).datetimepicker(option).bind('hide',
+			input.addClass(type).datetimepicker(option).on('hide',
 					function(e) {
 						Richtable.updateCell(this)
 					});
@@ -561,7 +561,7 @@ Richtable = {
 								action = 'click';
 							}
 							if (!$(cells[i]).data('readonly'))
-								$(cells[i]).unbind(action).bind(action,
+								$(cells[i]).off(action).on(action,
 										function() {
 											Richtable.editCell(this, type,
 													template);
