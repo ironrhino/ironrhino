@@ -203,6 +203,22 @@ public class BeanUtils {
 		}
 	}
 
+	public static boolean isEmpty(Object bean) {
+		if (bean == null)
+			return true;
+		boolean b = true;
+		BeanWrapperImpl bw = new BeanWrapperImpl(bean);
+		for (PropertyDescriptor pd : bw.getPropertyDescriptors()) {
+			if (pd.getReadMethod() != null && pd.getWriteMethod() != null) {
+				if (bw.getPropertyValue(pd.getName()) != null) {
+					b = false;
+					break;
+				}
+			}
+		}
+		return b;
+	}
+
 	public static void createParentIfNull(Object bean, String nestedPath) {
 		if (bean == null || StringUtils.isBlank(nestedPath))
 			return;

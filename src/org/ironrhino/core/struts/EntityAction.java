@@ -62,6 +62,7 @@ import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -1063,11 +1064,21 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				UiConfigImpl uiConfig = getUiConfigs().get(propertyName);
 				Class type = bw.getPropertyDescriptor(propertyName).getPropertyType();
 				if (uiConfig.getReadonly().isValue()
-						|| !naturalIdMutable && naturalIds.keySet().contains(propertyName) && !isnew
-						|| !Persistable.class.isAssignableFrom(type))
+						|| !naturalIdMutable && naturalIds.keySet().contains(propertyName) && !isnew)
 					continue;
-				if (StringUtils.isNotBlank(uiConfig.getReadonly().getExpression()) && evalBoolean(
-						uiConfig.getReadonly().getExpression(), _entity, bw.getPropertyValue(propertyName)))
+				if (uiConfig.getType().equals("collection") && uiConfig.getElementType() != null) {
+					// remove empty element from collection
+					Collection collection = (Collection) bw.getPropertyValue(propertyName);
+					if (collection != null) {
+						Iterator it = collection.iterator();
+						while (it.hasNext())
+							if (BeanUtils.isEmpty(it.next()))
+								it.remove();
+					}
+				}
+				if (!Persistable.class.isAssignableFrom(type)
+						|| StringUtils.isNotBlank(uiConfig.getReadonly().getExpression()) && evalBoolean(
+								uiConfig.getReadonly().getExpression(), _entity, bw.getPropertyValue(propertyName)))
 					continue;
 				String parameterValue = ServletActionContext.getRequest()
 						.getParameter(getEntityName() + '.' + propertyName);

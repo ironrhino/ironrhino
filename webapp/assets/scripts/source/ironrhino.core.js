@@ -38,8 +38,11 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		// override jquery.form.js
 		$.fn.oldFieldValue = $.fn.fieldValue;
 		$.fn.fieldValue = function(successful) {
-			if ((this.hasClass('ignore-blank') || this.closest('form')
-					.hasClass('ignore-blank'))
+			if ((this.hasClass('ignore-blank')
+					|| this.closest('form').hasClass('ignore-blank') || this
+					.is('[type="hidden"]')
+					&& (this.hasClass('listpick-id') || this
+							.hasClass('treeselect-id')))
 					&& !$.trim(this.val()))
 				return null;
 			var val = this.oldFieldValue(successful);
@@ -56,8 +59,11 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		$.oldFieldValue = $.fieldValue;
 		$.fieldValue = function(el, successful) {
 			var t = $(el);
-			if ((t.hasClass('ignore-blank') || t.closest('form')
-					.hasClass('ignore-blank'))
+			if ((t.hasClass('ignore-blank')
+					|| t.closest('form').hasClass('ignore-blank') || t
+					.is('[type="hidden"]')
+					&& (t.hasClass('listpick-id') || t
+							.hasClass('treeselect-id')))
 					&& !$.trim(t.val()))
 				return null;
 			var val = $.oldFieldValue(el, successful);

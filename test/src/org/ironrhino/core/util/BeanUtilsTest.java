@@ -561,5 +561,13 @@ public class BeanUtilsTest {
 		BeanUtils.createParentIfNull(u, "team.users[0].username");
 		assertNotNull(u.getTeam().getUsers());
 	}
+	
+	@Test
+	public void testIsEmpty() {
+		Team3 team = new Team3();
+		assertTrue(BeanUtils.isEmpty(team));
+		team.setCreateDate("");
+		assertTrue(!BeanUtils.isEmpty(team));
+	}
 
 }
