@@ -1,5 +1,6 @@
 package org.ironrhino.core.struts;
 
+import java.beans.PropertyDescriptor;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -1071,9 +1072,21 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					Collection collection = (Collection) bw.getPropertyValue(propertyName);
 					if (collection != null) {
 						Iterator it = collection.iterator();
-						while (it.hasNext())
-							if (BeanUtils.isEmpty(it.next()))
+						while (it.hasNext()) {
+							Object element = it.next();
+							BeanWrapperImpl bwe = new BeanWrapperImpl(element);
+							for (PropertyDescriptor pd : bwe.getPropertyDescriptors()) {
+								// remove transient Persistable
+								if (pd.getReadMethod() != null && pd.getWriteMethod() != null
+										&& Persistable.class.isAssignableFrom(pd.getPropertyType())) {
+									Persistable p = (Persistable) bwe.getPropertyValue(pd.getName());
+									if (p != null && p.isNew())
+										bwe.setPropertyValue(pd.getName(), null);
+								}
+							}
+							if (BeanUtils.isEmpty(element))
 								it.remove();
+						}
 					}
 				}
 				if (!Persistable.class.isAssignableFrom(type)
