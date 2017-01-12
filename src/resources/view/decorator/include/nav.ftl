@@ -16,7 +16,7 @@
 	    <ul class="dropdown-menu">
 	 		<li><a href="<@url value="/oauth/client"/>" class="ajax view">${getText("client")}</a></li>
 			<li><a href="<@url value="/oauth/authorization"/>" class="ajax view">${getText("authorization")}</a></li>
-	 		<li><a href="<@url value="/rest/docs"/>">${getText('docs')}</a></li>
+	 		<li><a href="<@url value="/rest/docs"/>" class="ajax view">${getText('docs')}</a></li>
 	    </ul>
 	</li>
 	<li class="dropdown">

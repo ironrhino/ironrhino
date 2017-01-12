@@ -96,7 +96,7 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 	private String decryptIfNecessary(String name, String value) {
 		if (value != null && name.toLowerCase(Locale.ROOT).endsWith("password") && value.length() >= 20) {
 			String key = session.getSessionTracker();
-			if (!isRequestedSessionIdFromCookie())
+			if (!isRequestedSessionIdFromCookie() || !value.matches("\\p{XDigit}+"))
 				return value;
 			try {
 				if (key.length() > 10)

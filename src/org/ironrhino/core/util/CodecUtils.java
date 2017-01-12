@@ -171,16 +171,7 @@ public class CodecUtils {
 	}
 
 	public static String digest(String input) {
-		boolean isShaInput = (input != null && input.length() == 40);
-		if (isShaInput) {
-			for (int i = 0; i < input.length(); i++) {
-				char c = input.charAt(i);
-				if (!(c >= '0' && c <= '9' || c >= 'a' && c <= 'f')) {
-					isShaInput = false;
-					break;
-				}
-			}
-		}
+		boolean isShaInput = (input != null && input.length() == 40 && input.matches("\\p{XDigit}+"));
 		return md5Hex(shaHex(input, isShaInput ? 2 : 3));
 	}
 
