@@ -214,7 +214,7 @@ Richtable = {
 		}
 		if (!useiframe)
 			if (win.html() && typeof $.fn.mask != 'undefined')
-				win.mask(MessageBundle.get('ajax.loading'));
+				win.mask();
 			else
 				win
 						.html('<div class="loading-indicator" style="text-align:center;">'
@@ -502,8 +502,7 @@ Richtable = {
 				option.format = input.data('format') || 'yyyy-MM-dd';
 				option.pickTime = false;
 			}
-			input.addClass(type).datetimepicker(option).on('hide',
-					function(e) {
+			input.addClass(type).datetimepicker(option).on('hide', function(e) {
 						Richtable.updateCell(this)
 					});
 		}
@@ -561,8 +560,7 @@ Richtable = {
 								action = 'click';
 							}
 							if (!$(cells[i]).data('readonly'))
-								$(cells[i]).off(action).on(action,
-										function() {
+								$(cells[i]).off(action).on(action, function() {
 											Richtable.editCell(this, type,
 													template);
 										});
@@ -724,8 +722,8 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var f = t.next('form.richtable');
 		if (f.length) {
-			t.attr('action', f.attr('action'))
-					.data('replacement', f.attr('id'));
+			t.attr('action', f.attr('action')).attr('data-replacement',
+					f.attr('id'));
 			$('input[type="reset"]', t).click(function(e) {
 						$('a.remove', t).click();
 						setTimeout(function() {
@@ -738,7 +736,8 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var f = t.prev('form.richtable');
 		var entity = Richtable.getEntityName(f);
-		t.attr('action', f.attr('action')).data('replacement', f.attr('id'));
+		t.attr('action', f.attr('action')).attr('data-replacement',
+				f.attr('id'));
 		var qs = t.attr('action');
 		var index = qs.indexOf('?');
 		qs = index > -1 ? qs.substring(index + 1) : '';

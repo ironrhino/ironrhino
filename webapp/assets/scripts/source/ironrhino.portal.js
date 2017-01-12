@@ -113,7 +113,7 @@
 						var mask = typeof $.fn.mask != 'undefined';
 						var pc = portlet.find('.portlet-content');
 						if (mask)
-							pc.mask(MessageBundle.get('ajax.loading'));
+							pc.mask();
 						v.onload = function() {
 							if (mask)
 								pc.unmask();

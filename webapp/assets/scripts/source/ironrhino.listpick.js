@@ -142,7 +142,7 @@
 				win.data('selected', val(options.id, current) || '');
 				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
-					win.mask(MessageBundle.get('ajax.loading'));
+					win.mask();
 				else
 					win.html('<div style="text-align:center;">'
 							+ MessageBundle.get('ajax.loading') + '</div>');

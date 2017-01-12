@@ -32,26 +32,19 @@
 			quiet : true,
 			cache : false,
 			beforeSend : function() {
-				if (!ele.data('quiet')) {
-					if (typeof $.fn.mask != 'undefined') {
-						if (ele.css('min-height') == '0px')
-							ele.data('mhc', 'true').css('min-height', '100px');
-						ele.mask(MessageBundle.get('ajax.loading'));
-					} else {
+				if (!ele.data('quiet'))
+					if (typeof $.fn.mask != 'undefined')
+						ele.mask();
+					else
 						ele.html('<div style="text-align:center;">'
 								+ MessageBundle.get('ajax.loading') + '</div>');
-					}
-				}
-				if (ele.parent('.portlet-content').length) {
+				if (ele.parent('.portlet-content').length)
 					ele.css('height', window.getComputedStyle(ele[0]).height);
-				}
+
 			},
 			complete : function() {
-				if (!ele.data('quiet') && typeof $.fn.unmask != 'undefined') {
+				if (!ele.data('quiet') && typeof $.fn.unmask != 'undefined')
 					ele.unmask();
-					if (ele.data('mhc'))
-						ele.css('min-height', '');
-				}
 				if (ele.parent('.portlet-content').length) {
 					var height = window.getComputedStyle(ele[0]).height;
 					ele.css('height', 'auto');

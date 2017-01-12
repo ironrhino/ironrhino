@@ -1016,7 +1016,18 @@ Initialization.common = function() {
 					method : form.attr('method'),
 					headers : headers,
 					dataType : 'text',
+					beforeSend : function() {
+						if (typeof $.fn.mask != 'undefined')
+							form.mask();
+						else
+							form.addClass('loading');
+					},
+
 					complete : function(xhr) {
+						if (typeof $.fn.mask != 'undefined')
+							form.unmask();
+						else
+							form.removeClass('loading');
 						form.find('.responseStatus').text(xhr.status + ' '
 								+ xhr.statusText);
 						form.find('.responseHeaders').text(xhr
@@ -1170,7 +1181,33 @@ if (HISTORY_ENABLED) {
 								url : url,
 								replaceTitle : true,
 								replacement : event.state.replacement,
-								cache : false
+								cache : false,
+								beforeSend : function() {
+									if (typeof $.fn.mask != 'undefined') {
+										var replacement = event.state.replacement
+												|| Ajax.defaultRepacement;
+										$.each(replacement.split(','),
+												function(i, v) {
+													if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+													$('#' + v).mask();
+												});
+									}
+								},
+								complete : function() {
+									if (typeof $.fn.mask != 'undefined') {
+										var replacement = event.state.replacement
+												|| Ajax.defaultRepacement;
+										$.each(replacement.split(','),
+												function(i, v) {
+													if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+													$('#' + v).unmask();
+												});
+									}
+								}
 							});
 				}
 			};
@@ -1198,6 +1235,15 @@ if (HISTORY_ENABLED) {
 								replaceTitle : true,
 								success : function() {
 									Nav.activate(url);
+								},
+								beforeSend : function() {
+									if (typeof $.fn.mask != 'undefined')
+										$('#' + Ajax.defaultRepacement).mask();
+								},
+								complete : function() {
+									if (typeof $.fn.mask != 'undefined')
+										$('#' + Ajax.defaultRepacement)
+												.unmask();
 								}
 							});
 				}, {
@@ -1748,7 +1794,23 @@ Observation.common = function(container) {
 						return false;
 				},
 				beforeSend : function() {
-					$(target).addClass('loading');
+					if (typeof $.fn.mask != 'undefined'
+							&& !$(target).data('quiet')) {
+						var replacement = $(target).attr('data-replacement');
+						if (replacement) {
+							$.each(replacement.split(','), function(i, v) {
+								if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+										$('#' + v).mask();
+									});
+							$(target).addClass('loading');
+						} else {
+							$(target).mask();
+						}
+					} else {
+						$(target).addClass('loading');
+					}
 				},
 				error : function() {
 					Form.focus(target);
@@ -1758,7 +1820,23 @@ Observation.common = function(container) {
 					Ajax.handleResponse(data, _opt);
 				},
 				complete : function() {
-					$(target).removeClass('loading');
+					if (typeof $.fn.mask != 'undefined'
+							&& !$(target).data('quiet')) {
+						var replacement = $(target).attr('data-replacement');
+						if (replacement) {
+							$.each(replacement.split(','), function(i, v) {
+								if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+										$('#' + v).unmask();
+									});
+							$(target).removeClass('loading');
+						} else {
+							$(target).unmask();
+						}
+					} else {
+						$(target).removeClass('loading');
+					}
 					if (!$(target).hasClass('disposed')) {
 						$('.loading', target).prop('disabled', false)
 								.removeClass('loading');
@@ -1832,6 +1910,17 @@ Observation.common = function(container) {
 					type : $(this).data('method') || 'GET',
 					cache : $(this).hasClass('cache'),
 					beforeSend : function() {
+						if (typeof $.fn.mask != 'undefined'
+								&& t.hasClass('view') && !t.data('quiet')) {
+							var replacement = t.attr('data-replacement')
+									|| Ajax.defaultRepacement;
+							$.each(replacement.split(','), function(i, v) {
+								if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+										$('#' + v).mask();
+									});
+						}
 						t.addClass('loading');
 						$('.action-error').remove();
 						Indicator.text = $(target).data('indicator');
@@ -1841,6 +1930,14 @@ Observation.common = function(container) {
 						Ajax.fire(target, 'onerror');
 					},
 					complete : function() {
+						if (typeof $.fn.mask != 'undefined'
+								&& t.hasClass('view') && !t.data('quiet')) {
+							var replacement = t.attr('data-replacement')
+									|| Ajax.defaultRepacement;
+							$.each(replacement.split(','), function(i, v) {
+										$('#' + v).unmask();
+									});
+						}
 						t.removeClass('loading');
 					}
 				};

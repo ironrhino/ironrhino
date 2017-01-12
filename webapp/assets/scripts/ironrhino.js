@@ -18716,114 +18716,6 @@ function log() {
     })();
 
 }(jQuery));
-/**
- * Copyright (c) 2009 Sergiy Kovalchuk (serg472@gmail.com)
- * 
- * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
- * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
- *  
- * Following code is based on Element.mask() implementation from ExtJS framework (http://extjs.com/)
- *
- */
-;(function($){
-	
-	/**
-	 * Displays loading mask over selected element(s). Accepts both single and multiple selectors.
-	 *
-	 * @param label Text message that will be displayed on top of the mask besides a spinner (optional). 
-	 * 				If not provided only mask will be displayed without a label or a spinner.  	
-	 * @param delay Delay in milliseconds before element is masked (optional). If unmask() is called 
-	 *              before the delay times out, no mask is displayed. This can be used to prevent unnecessary 
-	 *              mask display for quick processes.   	
-	 */
-	$.fn.mask = function(label, delay){
-		$(this).each(function() {
-			if(delay !== undefined && delay > 0) {
-		        var element = $(this);
-		        element.data("_mask_timeout", setTimeout(function() { $.maskElement(element, label)}, delay));
-			} else {
-				$.maskElement($(this), label);
-			}
-		});
-	};
-	
-	/**
-	 * Removes mask from the element(s). Accepts both single and multiple selectors.
-	 */
-	$.fn.unmask = function(){
-		$(this).each(function() {
-			$.unmaskElement($(this));
-		});
-	};
-	
-	/**
-	 * Checks if a single element is masked. Returns false if mask is delayed or not displayed. 
-	 */
-	$.fn.isMasked = function(){
-		return this.hasClass("masked");
-	};
-
-	$.maskElement = function(element, label){
-	
-		//if this element has delayed mask scheduled then remove it and display the new one
-		if (element.data("_mask_timeout") !== undefined) {
-			clearTimeout(element.data("_mask_timeout"));
-			element.removeData("_mask_timeout");
-		}
-
-		if(element.isMasked()) {
-			$.unmaskElement(element);
-		}
-		
-		if(element.css("position") == "static") {
-			element.addClass("masked-relative");
-		}
-		
-		element.addClass("masked");
-		
-		var maskDiv = $('<div class="loadmask"></div>');
-		
-		//auto height fix for IE
-		if(navigator.userAgent.toLowerCase().indexOf("msie") > -1){
-			maskDiv.height(element.height() + parseInt(element.css("padding-top")) + parseInt(element.css("padding-bottom")));
-			maskDiv.width(element.width() + parseInt(element.css("padding-left")) + parseInt(element.css("padding-right")));
-		}
-		
-		//fix for z-index bug with selects in IE6
-		if(navigator.userAgent.toLowerCase().indexOf("msie 6") > -1){
-			element.find("select").addClass("masked-hidden");
-		}
-		
-		element.append(maskDiv);
-		
-		if(label !== undefined) {
-			var maskMsgDiv = $('<div class="loadmask-msg" style="display:none;"></div>');
-			maskMsgDiv.append('<div><span class="icon-loading"></span>' + label + '</div>');
-			element.append(maskMsgDiv);
-			
-			//calculate center position
-			maskMsgDiv.css("top", Math.round(element.height() / 2 - (maskMsgDiv.height() - parseInt(maskMsgDiv.css("padding-top")) - parseInt(maskMsgDiv.css("padding-bottom"))) / 2)+"px");
-			maskMsgDiv.css("left", Math.round(element.width() / 2 - (maskMsgDiv.width() - parseInt(maskMsgDiv.css("padding-left")) - parseInt(maskMsgDiv.css("padding-right"))) / 2)+"px");
-			
-			maskMsgDiv.show();
-		}
-		
-	};
-	
-	$.unmaskElement = function(element){
-		//if this element has delayed mask scheduled then remove it
-		if (element.data("_mask_timeout") !== undefined) {
-			clearTimeout(element.data("_mask_timeout"));
-			element.removeData("_mask_timeout");
-		}
-		
-		element.find(".loadmask-msg,.loadmask").remove();
-		element.removeClass("masked");
-		element.removeClass("masked-relative");
-		element.find("select").removeClass("masked-hidden");
-	};
- 
-})(jQuery);
 // jQuery Alert Dialogs Plugin
 //
 // Version 1.1
@@ -33452,7 +33344,18 @@ Initialization.common = function() {
 					method : form.attr('method'),
 					headers : headers,
 					dataType : 'text',
+					beforeSend : function() {
+						if (typeof $.fn.mask != 'undefined')
+							form.mask();
+						else
+							form.addClass('loading');
+					},
+
 					complete : function(xhr) {
+						if (typeof $.fn.mask != 'undefined')
+							form.unmask();
+						else
+							form.removeClass('loading');
 						form.find('.responseStatus').text(xhr.status + ' '
 								+ xhr.statusText);
 						form.find('.responseHeaders').text(xhr
@@ -33606,7 +33509,33 @@ if (HISTORY_ENABLED) {
 								url : url,
 								replaceTitle : true,
 								replacement : event.state.replacement,
-								cache : false
+								cache : false,
+								beforeSend : function() {
+									if (typeof $.fn.mask != 'undefined') {
+										var replacement = event.state.replacement
+												|| Ajax.defaultRepacement;
+										$.each(replacement.split(','),
+												function(i, v) {
+													if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+													$('#' + v).mask();
+												});
+									}
+								},
+								complete : function() {
+									if (typeof $.fn.mask != 'undefined') {
+										var replacement = event.state.replacement
+												|| Ajax.defaultRepacement;
+										$.each(replacement.split(','),
+												function(i, v) {
+													if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+													$('#' + v).unmask();
+												});
+									}
+								}
 							});
 				}
 			};
@@ -33634,6 +33563,15 @@ if (HISTORY_ENABLED) {
 								replaceTitle : true,
 								success : function() {
 									Nav.activate(url);
+								},
+								beforeSend : function() {
+									if (typeof $.fn.mask != 'undefined')
+										$('#' + Ajax.defaultRepacement).mask();
+								},
+								complete : function() {
+									if (typeof $.fn.mask != 'undefined')
+										$('#' + Ajax.defaultRepacement)
+												.unmask();
 								}
 							});
 				}, {
@@ -34184,7 +34122,23 @@ Observation.common = function(container) {
 						return false;
 				},
 				beforeSend : function() {
-					$(target).addClass('loading');
+					if (typeof $.fn.mask != 'undefined'
+							&& !$(target).data('quiet')) {
+						var replacement = $(target).attr('data-replacement');
+						if (replacement) {
+							$.each(replacement.split(','), function(i, v) {
+								if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+										$('#' + v).mask();
+									});
+							$(target).addClass('loading');
+						} else {
+							$(target).mask();
+						}
+					} else {
+						$(target).addClass('loading');
+					}
 				},
 				error : function() {
 					Form.focus(target);
@@ -34194,7 +34148,23 @@ Observation.common = function(container) {
 					Ajax.handleResponse(data, _opt);
 				},
 				complete : function() {
-					$(target).removeClass('loading');
+					if (typeof $.fn.mask != 'undefined'
+							&& !$(target).data('quiet')) {
+						var replacement = $(target).attr('data-replacement');
+						if (replacement) {
+							$.each(replacement.split(','), function(i, v) {
+								if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+										$('#' + v).unmask();
+									});
+							$(target).removeClass('loading');
+						} else {
+							$(target).unmask();
+						}
+					} else {
+						$(target).removeClass('loading');
+					}
 					if (!$(target).hasClass('disposed')) {
 						$('.loading', target).prop('disabled', false)
 								.removeClass('loading');
@@ -34268,6 +34238,17 @@ Observation.common = function(container) {
 					type : $(this).data('method') || 'GET',
 					cache : $(this).hasClass('cache'),
 					beforeSend : function() {
+						if (typeof $.fn.mask != 'undefined'
+								&& t.hasClass('view') && !t.data('quiet')) {
+							var replacement = t.attr('data-replacement')
+									|| Ajax.defaultRepacement;
+							$.each(replacement.split(','), function(i, v) {
+								if (v.indexOf(':') > -1)
+														v = v.substring(0,
+																v.indexOf(':'));
+										$('#' + v).mask();
+									});
+						}
 						t.addClass('loading');
 						$('.action-error').remove();
 						Indicator.text = $(target).data('indicator');
@@ -34277,6 +34258,14 @@ Observation.common = function(container) {
 						Ajax.fire(target, 'onerror');
 					},
 					complete : function() {
+						if (typeof $.fn.mask != 'undefined'
+								&& t.hasClass('view') && !t.data('quiet')) {
+							var replacement = t.attr('data-replacement')
+									|| Ajax.defaultRepacement;
+							$.each(replacement.split(','), function(i, v) {
+										$('#' + v).unmask();
+									});
+						}
 						t.removeClass('loading');
 					}
 				};
@@ -37072,26 +37061,19 @@ function uploadFiles(files, filenames) {
 			quiet : true,
 			cache : false,
 			beforeSend : function() {
-				if (!ele.data('quiet')) {
-					if (typeof $.fn.mask != 'undefined') {
-						if (ele.css('min-height') == '0px')
-							ele.data('mhc', 'true').css('min-height', '100px');
-						ele.mask(MessageBundle.get('ajax.loading'));
-					} else {
+				if (!ele.data('quiet'))
+					if (typeof $.fn.mask != 'undefined')
+						ele.mask();
+					else
 						ele.html('<div style="text-align:center;">'
 								+ MessageBundle.get('ajax.loading') + '</div>');
-					}
-				}
-				if (ele.parent('.portlet-content').length) {
+				if (ele.parent('.portlet-content').length)
 					ele.css('height', window.getComputedStyle(ele[0]).height);
-				}
+
 			},
 			complete : function() {
-				if (!ele.data('quiet') && typeof $.fn.unmask != 'undefined') {
+				if (!ele.data('quiet') && typeof $.fn.unmask != 'undefined')
 					ele.unmask();
-					if (ele.data('mhc'))
-						ele.css('min-height', '');
-				}
 				if (ele.parent('.portlet-content').length) {
 					var height = window.getComputedStyle(ele[0]).height;
 					ele.css('height', 'auto');
@@ -37145,6 +37127,36 @@ function uploadFiles(files, filenames) {
 Observation.ajaxpanel = function(container) {
 	$('.ajaxpanel', container).ajaxpanel();
 };
+(function($) {
+
+	$.fn.mask = function() {
+		$(this).each(function() {
+			var t = $(this);
+			if (t.hasClass('masked'))
+				return;
+			if (t.css('position') == 'static')
+				t.addClass('masked-relative');
+			if (t.height() < 50)
+				t.addClass('masked-min-height');
+			t
+					.addClass('masked')
+					.append('<div class="mask spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>');
+		});
+		return this;
+	};
+
+	$.fn.unmask = function() {
+		$(this).each(function() {
+			var t = $(this);
+			if (t.data('mhc'))
+				t.css('min-height', '');
+			t.removeClass('masked').removeClass('masked-relative')
+					.removeClass('masked-min-height').find('.mask').remove();
+		});
+		return this;
+	};
+
+})(jQuery);
 (function($) {
 
 	function check(group) {
@@ -37927,7 +37939,7 @@ Observation.datagridTable = function(container) {
 						var mask = typeof $.fn.mask != 'undefined';
 						var pc = portlet.find('.portlet-content');
 						if (mask)
-							pc.mask(MessageBundle.get('ajax.loading'));
+							pc.mask();
 						v.onload = function() {
 							if (mask)
 								pc.unmask();
@@ -38479,7 +38491,7 @@ $(function() {
 		}
 		if (!useiframe)
 			if (win.html() && typeof $.fn.mask != 'undefined')
-				win.mask(MessageBundle.get('ajax.loading'));
+				win.mask();
 			else
 				win.html('<div style="text-align:center;">'
 						+ MessageBundle.get('ajax.loading') + '</div>');
@@ -38722,7 +38734,7 @@ Richtable = {
 		}
 		if (!useiframe)
 			if (win.html() && typeof $.fn.mask != 'undefined')
-				win.mask(MessageBundle.get('ajax.loading'));
+				win.mask();
 			else
 				win
 						.html('<div class="loading-indicator" style="text-align:center;">'
@@ -39010,8 +39022,7 @@ Richtable = {
 				option.format = input.data('format') || 'yyyy-MM-dd';
 				option.pickTime = false;
 			}
-			input.addClass(type).datetimepicker(option).on('hide',
-					function(e) {
+			input.addClass(type).datetimepicker(option).on('hide', function(e) {
 						Richtable.updateCell(this)
 					});
 		}
@@ -39069,8 +39080,7 @@ Richtable = {
 								action = 'click';
 							}
 							if (!$(cells[i]).data('readonly'))
-								$(cells[i]).off(action).on(action,
-										function() {
+								$(cells[i]).off(action).on(action, function() {
 											Richtable.editCell(this, type,
 													template);
 										});
@@ -39232,8 +39242,8 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var f = t.next('form.richtable');
 		if (f.length) {
-			t.attr('action', f.attr('action'))
-					.data('replacement', f.attr('id'));
+			t.attr('action', f.attr('action')).attr('data-replacement',
+					f.attr('id'));
 			$('input[type="reset"]', t).click(function(e) {
 						$('a.remove', t).click();
 						setTimeout(function() {
@@ -39246,7 +39256,8 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var f = t.prev('form.richtable');
 		var entity = Richtable.getEntityName(f);
-		t.attr('action', f.attr('action')).data('replacement', f.attr('id'));
+		t.attr('action', f.attr('action')).attr('data-replacement',
+				f.attr('id'));
 		var qs = t.attr('action');
 		var index = qs.indexOf('?');
 		qs = index > -1 ? qs.substring(index + 1) : '';
@@ -40597,7 +40608,7 @@ Observation.treeview = function(container) {
 				win.data('selected', val(options.id, current) || '');
 				win.closest('.ui-dialog').css('z-index', 2000);
 				if (win.html() && typeof $.fn.mask != 'undefined')
-					win.mask(MessageBundle.get('ajax.loading'));
+					win.mask();
 				else
 					win.html('<div style="text-align:center;">'
 							+ MessageBundle.get('ajax.loading') + '</div>');

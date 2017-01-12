@@ -23,7 +23,6 @@
 				<file name="${webapp.dir}/assets/scripts/source/jquery.rc4-1.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.form-2.95.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.format-1.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.loadmask-0.4.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.alerts-1.1.my.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.textext-1.3.1.my.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.treeview-1.4.js" />
@@ -51,6 +50,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.encodeqrcode.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.upload.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxpanel.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.mask.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.checkbox.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.sortabletable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.datagridtable.js" />
@@ -86,7 +86,6 @@
 		<concat destfile="${webapp.dir}/assets/styles/ironrhino.css" encoding="utf-8" fixlastline="yes">
 			<filelist>
 				<file name="${webapp.dir}/assets/styles/source/jquery.ui.css" />
-				<file name="${webapp.dir}/assets/styles/source/jquery.loadmask.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.treeview.my.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.treeTable.my.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.alerts.my.css" />
@@ -99,6 +98,7 @@
 				<file name="${webapp.dir}/assets/styles/source/bootstrap.datetimepicker.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.core.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.form.css" />
+				<file name="${webapp.dir}/assets/styles/source/ironrhino.mask.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pagination.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.editme.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.portal.css" />

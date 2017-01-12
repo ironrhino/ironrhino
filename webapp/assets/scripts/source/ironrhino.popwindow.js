@@ -64,7 +64,7 @@
 		}
 		if (!useiframe)
 			if (win.html() && typeof $.fn.mask != 'undefined')
-				win.mask(MessageBundle.get('ajax.loading'));
+				win.mask();
 			else
 				win.html('<div style="text-align:center;">'
 						+ MessageBundle.get('ajax.loading') + '</div>');
