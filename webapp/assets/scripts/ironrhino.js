@@ -39240,10 +39240,10 @@ Initialization.richtable = function() {
 Observation._richtable = function(container) {
 	$('form.query', container).each(function() {
 		var t = $(this);
-		var f = t.next('form.richtable');
-		if (f.length) {
-			t.attr('action', f.attr('action')).attr('data-replacement',
-					f.attr('id'));
+		var form = t.next('form.richtable');
+		if (form.length) {
+			t.attr('action', form.attr('action')).attr('data-replacement',
+					form.attr('id'));
 			$('input[type="reset"]', t).click(function(e) {
 						$('a.remove', t).click();
 						setTimeout(function() {
@@ -39254,10 +39254,10 @@ Observation._richtable = function(container) {
 	});
 	$('form.criteria', container).each(function() {
 		var t = $(this);
-		var f = t.prev('form.richtable');
-		var entity = Richtable.getEntityName(f);
-		t.attr('action', f.attr('action')).attr('data-replacement',
-				f.attr('id'));
+		var form = t.prev('form.richtable');
+		var entity = Richtable.getEntityName(form);
+		t.attr('action', form.attr('action')).attr('data-replacement',
+				form.attr('id'));
 		var qs = t.attr('action');
 		var index = qs.indexOf('?');
 		qs = index > -1 ? qs.substring(index + 1) : '';
@@ -39405,23 +39405,25 @@ Observation._richtable = function(container) {
 					}
 				});
 		$('button.restore', t).click(function(e) {
-			$(e.target).closest('form').prev('form.richtable')
-					.prev('form.query').slideDown(100, function() {
-								$('html,body').animate({
-											scrollTop : f.offset().top - 50
-										}, 300);
-							});
+			var t = $(e.target).closest('form');
+			var form = t.prev('form.richtable');
+			form.prev('form.query').slideDown(100, function() {
+						$('html,body').animate({
+									scrollTop : form.offset().top - 50
+								}, 300);
+					});
 			var b;
 			$(':input[name]', t).each(function() {
-				var h = $('input[type="hidden"][name="' + $(this).attr('name')
-								+ '"]', f);
-				if (h.length)
+				var h = form.find('input[type="hidden"][name="' + this.name
+						+ '"]');
+				if (h.length) {
 					b = true;
-				h.remove();
+					h.remove();
+				}
 			});
 			if (b) {
-				$('.inputPage', f).val(1);
-				f.submit();
+				$('.inputPage', form).val(1);
+				form.submit();
 			}
 			$(
 					'table.criteria tbody tr:not(:eq(0)),table.ordering tbody tr:not(:eq(0))',
