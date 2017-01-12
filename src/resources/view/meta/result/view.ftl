@@ -186,6 +186,7 @@
 					<#assign collections=entity[key]!>
 					<#if collections?is_collection && collections?size gt 0>
 					<#list collections as element>
+						<#if element?has_content>
 						<tr>
 							<#list embeddedUiConfigs.entrySet() as entry>
 							<#assign config = entry.value>
@@ -263,7 +264,6 @@
 										${value?string!}
 										</#if>
 								</#if>
-								
 							<#else>
 								<@template?interpret/>
 							</#if>
@@ -271,6 +271,7 @@
 							</#if>
 							</#list>
 						</tr>
+						</#if>
 					</#list>
 					</#if>
 					</tbody>
