@@ -78,10 +78,10 @@
 		<#if !hidden>
 			<#assign columns+=[key]>
 			<#if resultPage.result?size gt 0 && config['showSum']>
-				<#assign sumColumns+={key:{"value":0,"template":config['template']!}}>
+				<#assign sumColumns+={key:{"value":0,"template":config['listTemplate']!}}>
 			</#if>
 			<#assign label=key>
-			<#if celleditable&&!(readonly.value||config.readonly.value) && !(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)>
+			<#if celleditable&&!config['listTemplate']?has_content&&!(readonly.value||config.readonly.value) && !(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)>
 				<#assign cellEdit=config.cellEdit!/>
 				<#if !config.multiple && cellEdit=='' && !(idAssigned && key=='id')>
 					<#if config.type=='input'>
@@ -184,12 +184,9 @@
 				<#assign value=getDictionaryLabel(templateName,value)/>
 			</#if>
 		</#if>
-		<#assign template=config.template/>
-		<#if config.listTemplate?has_content>
 		<#assign template=config.listTemplate/>
-		</#if>
 		<#list sumColumns as name,config>
-			<#if key==name && value?has_content><#assign sumColumns+={name:{"value":config.value+value,"template":config['template']!}}></#if>
+			<#if key==name && value?has_content><#assign sumColumns+={name:{"value":config.value+value,"template":template!}}></#if>
 		</#list>
 		<@rttbodytd entity=entity value=value celleditable=celleditable template=template cellDynamicAttributes=config.cellDynamicAttributes dynamicAttributes=dynamicAttributes/>
 	</#if>
