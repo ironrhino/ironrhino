@@ -34226,6 +34226,10 @@ Observation.common = function(container) {
 			$(this).click(function() {
 				if (!Ajax.fire(target, 'onprepare'))
 					return false;
+				if ($(this).is('ul.nav li a')) {
+					$('li', $(this).closest('.nav')).removeClass('active');
+					Nav.indicate($(this));
+				}
 				var addHistory = HISTORY_ENABLED
 						&& $(this).hasClass('view')
 						&& !$(this).hasClass('nohistory')
@@ -34313,16 +34317,15 @@ Observation.common = function(container) {
 
 var Nav = {
 	init : function() {
-		$(document).on('click', '.nav:not(.nav-tabs):not(.nav-list) li a',
-				function() {
+		$(document).on('click', '.nav:not(.nav-tabs) li a', function() {
 					$('li', $(this).closest('.nav')).removeClass('active');
 					Nav.indicate($(this));
 				});
 	},
 	activate : function(url) {
 		url = UrlUtils.absolutize(url);
-		$('.nav:not(.nav-tabs):not(.nav-list) li').removeClass('active open');
-		$('.nav:not(.nav-tabs):not(.nav-list) li a').each(function() {
+		$('.nav:not(.nav-tabs) li').removeClass('active open');
+		$('.nav:not(.nav-tabs) li a').each(function() {
 					if (this.href == url || url.indexOf(this.href + '?') == 0) {
 						Nav.indicate($(this));
 					}
