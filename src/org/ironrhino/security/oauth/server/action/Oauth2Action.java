@@ -273,6 +273,7 @@ public class Oauth2Action extends BaseAction {
 			displayForNative = client.isNative();
 			setUid(authorization.getId());
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			if (httpErrorHandler != null
 					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 				return NONE;
@@ -299,7 +300,7 @@ public class Oauth2Action extends BaseAction {
 						usernamePasswordAuthenticationFilter.success(request, response, authResult);
 						grantor = (UserDetails) authResult.getPrincipal();
 					} catch (Exception e) {
-						e.printStackTrace();
+						logger.error(e.getMessage(), e);
 					}
 			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 				addFieldError("username", getText(failed.getClass().getName()));
@@ -310,7 +311,7 @@ public class Oauth2Action extends BaseAction {
 				try {
 					usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e.getMessage(), e);
 				}
 				return INPUT;
 			} catch (InternalAuthenticationServiceException failed) {
@@ -340,11 +341,11 @@ public class Oauth2Action extends BaseAction {
 					try {
 						sb.append("&state=").append(URLEncoder.encode(state, "UTF-8"));
 					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
 					}
 				targetUrl = sb.toString();
 			}
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			if (httpErrorHandler != null
 					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 				return NONE;
@@ -371,7 +372,6 @@ public class Oauth2Action extends BaseAction {
 			try {
 				sb.append("&state=").append(URLEncoder.encode(state, "UTF-8"));
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
 			}
 		targetUrl = sb.toString();
 		return REDIRECT;
@@ -399,7 +399,7 @@ public class Oauth2Action extends BaseAction {
 							try {
 								authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
 							} catch (Exception e) {
-								e.printStackTrace();
+								logger.error(e.getMessage(), e);
 							}
 					} catch (InternalAuthenticationServiceException failed) {
 						throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
@@ -408,7 +408,7 @@ public class Oauth2Action extends BaseAction {
 						try {
 							authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error(e.getMessage(), e);
 						}
 						throw new IllegalArgumentException(getText(failed.getClass().getName()));
 					}
@@ -418,6 +418,7 @@ public class Oauth2Action extends BaseAction {
 					throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
 				}
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
 						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
@@ -433,9 +434,8 @@ public class Oauth2Action extends BaseAction {
 			tojson.put("access_token", authorization.getAccessToken());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
-			eventPublisher.publish(
-					new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type.name()),
-					Scope.LOCAL);
+			eventPublisher.publish(new AuthorizeEvent(authorization.getGrantor(), request.getRemoteAddr(),
+					client.getName(), grant_type.name()), Scope.LOCAL);
 			return JSON;
 		} else if (grant_type == GrantType.client_credential || grant_type == GrantType.client_credentials) {
 			client = new Client();
@@ -444,6 +444,7 @@ public class Oauth2Action extends BaseAction {
 			try {
 				authorization = oauthManager.grant(client);
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
 						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
@@ -471,6 +472,7 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
 						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
@@ -506,10 +508,10 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
-				eventPublisher.publish(
-						new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type.name()),
-						Scope.LOCAL);
+				eventPublisher.publish(new AuthorizeEvent(authorization.getGrantor(), request.getRemoteAddr(),
+						client.getName(), grant_type.name()), Scope.LOCAL);
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
 						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
