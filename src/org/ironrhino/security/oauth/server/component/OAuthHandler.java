@@ -117,7 +117,7 @@ public class OAuthHandler extends AccessHandler {
 		if (authorization == null)
 			return handleError(request, response, "invalid_token");
 
-		if (authorization.getExpiresIn() <= 0)
+		if (authorization.getExpiresIn() < 0)
 			return handleError(request, response, "expired_token");
 
 		String[] scopes = null;
