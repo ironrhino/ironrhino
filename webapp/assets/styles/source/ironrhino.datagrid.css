@@ -1,0 +1,28 @@
+.datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+.datagrided tbody > tr:hover > td > .manipulate[class *= "glyphicon-"] {
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+}
+
+.datagrided td.manipulate, .datagrided th.manipulate{
+	width : 80px;
+	padding-left : 10px;
+	text-align : left;
+}
+
+.datagrided [class *= "glyphicon-"] {
+	margin: 3px;
+}
+
+.datagrided td select:only-child{
+	width: 100%;
+}
+
+.datagrided td input:only-child, .datagrided td textarea:only-child, .datagrided td .uneditable-input:only-child{
+	width: 92%;
+	width: calc(100% - 14px);
+}

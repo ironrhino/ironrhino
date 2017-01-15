@@ -98,6 +98,7 @@
 				<file name="${webapp.dir}/assets/styles/source/bootstrap.datetimepicker.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.core.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.form.css" />
+				<file name="${webapp.dir}/assets/styles/source/ironrhino.datagrid.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.mask.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pagination.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.editme.css" />

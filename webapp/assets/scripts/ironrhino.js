@@ -37564,11 +37564,7 @@ Observation.sortableTable = function(container) {
 			if ($(this).hasClass('datagrided'))
 				return;
 			$(this).addClass('datagrided');
-			$('td.manipulate,th.manipulate', this).css({
-						'width' : '80px',
-						'padding-left' : '10px',
-						'text-align' : 'left'
-					}).each(function() {
+			$('td.manipulate,th.manipulate', this).each(function() {
 				var t = $(this);
 				if (!t.html()) {
 					if (t.parent().parent().prop('tagName') == 'THEAD') {
@@ -37783,31 +37779,25 @@ Observation.sortableTable = function(container) {
 	var moveupRow = function(event, options) {
 		var row = $(event.target).closest('tr');
 		if (row.closest('tbody').children().length > 1) {
-			$(row).fadeOut(function() {
-						if ($(this).prev().length)
-							$(this).insertBefore($(this).prev()).fadeIn();
-						else
-							$(this).insertAfter($(this).siblings(':last'))
-									.fadeIn();
-						rename($(this).closest('tbody'));
-						if (options.onmoveup)
-							options.onmoveup.apply(this);
-					});
+			if (row.prev().length)
+				row.insertBefore(row.prev());
+			else
+				row.insertAfter(row.siblings(':last'));
+			rename(row.closest('tbody'));
+			if (options.onmoveup)
+				options.onmoveup.apply(row[0]);
 		}
 	};
 	var movedownRow = function(event, options) {
 		var row = $(event.target).closest('tr');
 		if (row.closest('tbody').children().length > 1) {
-			$(row).fadeOut(function() {
-						if ($(this).next().length)
-							$(this).insertAfter($(this).next()).fadeIn();
-						else
-							$(this).insertBefore($(this).siblings(':first'))
-									.fadeIn();
-						rename($(this).closest('tbody'));
-						if (options.onmovedown)
-							options.onmovedown.apply(this);
-					});
+			if (row.next().length)
+				row.insertAfter(row.next());
+			else
+				row.insertBefore(row.siblings(':first'));
+			rename(row.closest('tbody'));
+			if (options.onmovedown)
+				options.onmovedown.apply(row[0]);
 		}
 	};
 	var rename = function(tbody) {

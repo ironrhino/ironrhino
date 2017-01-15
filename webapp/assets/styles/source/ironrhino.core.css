@@ -58,7 +58,7 @@ td.middle {
 }
 
 .popover {
-  white-space: pre-wrap;
+	white-space: pre-wrap;
 }
 
 .modal {
@@ -453,26 +453,12 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 	filter: alpha(opacity=1) ! important;
 }
 
-.datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
-	opacity: 0;
-	filter: alpha(opacity=0);
-}
-
-.datagrided tbody > tr:hover > td > .manipulate[class *= "glyphicon-"] {
-	opacity: 0.6;
-	filter: alpha(opacity=60);
-}
-
 .unselectable {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	-o-user-select: none;
 	user-select: none;
-}
-
-.datagrided [class *= "glyphicon-"] {
-	margin: 3px;
 }
 
 .codeblock {

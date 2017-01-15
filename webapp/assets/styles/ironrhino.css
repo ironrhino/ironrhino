@@ -7847,7 +7847,7 @@ td.middle {
 }
 
 .popover {
-  white-space: pre-wrap;
+	white-space: pre-wrap;
 }
 
 .modal {
@@ -8242,26 +8242,12 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 	filter: alpha(opacity=1) ! important;
 }
 
-.datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
-	opacity: 0;
-	filter: alpha(opacity=0);
-}
-
-.datagrided tbody > tr:hover > td > .manipulate[class *= "glyphicon-"] {
-	opacity: 0.6;
-	filter: alpha(opacity=60);
-}
-
 .unselectable {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	-o-user-select: none;
 	user-select: none;
-}
-
-.datagrided [class *= "glyphicon-"] {
-	margin: 3px;
 }
 
 .codeblock {
@@ -8866,6 +8852,34 @@ form.attachmentable ul.thumbnails li .remove {
 	margin-right: 10px;
 }
 
+.datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+.datagrided tbody > tr:hover > td > .manipulate[class *= "glyphicon-"] {
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+}
+
+.datagrided td.manipulate, .datagrided th.manipulate{
+	width : 80px;
+	padding-left : 10px;
+	text-align : left;
+}
+
+.datagrided [class *= "glyphicon-"] {
+	margin: 3px;
+}
+
+.datagrided td select:only-child{
+	width: 100%;
+}
+
+.datagrided td input:only-child, .datagrided td textarea:only-child, .datagrided td .uneditable-input:only-child{
+	width: 92%;
+	width: calc(100% - 14px);
+}
 .mask {
 	text-align: center;
 	z-index: 100;
@@ -9364,9 +9378,9 @@ table.richtable td {
 	cursor: pointer;
 }
 
-.richtable tbody input.text , .richtable tbody textarea.text {
+.richtable tbody input.text:only-child , .richtable tbody textarea.text:only-child {
 	width: 90%;
-	width: calc(100% - 13px);
+	width: calc(100% - 14px);
 	margin: 0;
 }
 
@@ -9375,9 +9389,8 @@ table.richtable td {
 	margin: 0;
 }
 
-.richtable tbody select {
-	width: 95%;
-	width: calc(100% - 13px);
+.richtable tbody select:only-child {
+	width: 100%;
 	margin: 0;
 	padding-left: 0;
 }
