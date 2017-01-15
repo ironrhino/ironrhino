@@ -34332,6 +34332,9 @@ var Nav = {
 				});
 	},
 	indicate : function(a) {
+		if (a.is('.accordion-inner > .nav-list > li > a')
+				&& !a.closest('.accordion-body').hasClass('in'))
+			a.closest('.accordion-group').find('.accordion-toggle').click();
 		var dropdown = a.closest('li.dropdown');
 		if (!dropdown.length) {
 			$(a).closest('li').addClass('active');
