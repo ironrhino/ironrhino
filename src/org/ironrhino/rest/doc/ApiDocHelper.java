@@ -281,7 +281,7 @@ public class ApiDocHelper {
 		if ((Double.TYPE == type) || (Double.class == type) || (Number.class == type))
 			return 12.12d;
 		if (BigDecimal.class == type)
-			return new BigDecimal(12.12);
+			return new BigDecimal("12.12");
 		if (Date.class.isAssignableFrom(type))
 			return new Date();
 		if (type.isEnum()) {
