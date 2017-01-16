@@ -281,9 +281,11 @@ public class BaseAction extends ActionSupport {
 
 	@Override
 	public void validate() {
-		if (captchaManager != null && isCaptchaRequired() && !captchaStatus.isFirstReachThreshold()
-				&& !captchaManager.verify(ServletActionContext.getRequest(),
-						ServletActionContext.getRequest().getSession().getId(), true))
+		HttpServletRequest request = ServletActionContext.getRequest();
+		if (captchaManager != null
+				&& (request.getParameter(CaptchaManager.KEY_CAPTCHA) != null
+						|| isCaptchaRequired() && !captchaStatus.isFirstReachThreshold())
+				&& !captchaManager.verify(request, request.getSession().getId(), true))
 			addFieldError(CaptchaManager.KEY_CAPTCHA, getText("captcha.error"));
 		if (csrfRequired) {
 			String value = RequestUtils.getCookieValue(ServletActionContext.getRequest(), COOKIE_NAME_CSRF);
