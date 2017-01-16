@@ -21,7 +21,23 @@
 		$(this).each(function() {
 			if ($(this).hasClass('datagrided'))
 				return;
-			$(this).addClass('datagrided');
+			var tbody = $(this).addClass('datagrided').children('tbody');
+			tbody.sortable({
+						// handle : '.glyphicon-plus',
+						helper : function(e, tr) {
+							var originals = tr.children();
+							var helper = tr.clone();
+							helper.children().each(function(index) {
+										$(this).width(originals.eq(index)
+												.width())
+									});
+							return helper;
+						},
+						opacity : 0.6,
+						update : function(event, ui) {
+							rename(tbody);
+						}
+					});
 			$('td.manipulate,th.manipulate', this).each(function() {
 				var t = $(this);
 				if (!t.html()) {

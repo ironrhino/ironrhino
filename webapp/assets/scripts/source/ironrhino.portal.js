@@ -22,7 +22,7 @@
 								if (savable)
 									portal.portal('layout', 'save');
 							},
-							sort : function(event, ui) {
+							update : function(event, ui) {
 								if (savable)
 									portal.portal('layout', 'save');
 							}
