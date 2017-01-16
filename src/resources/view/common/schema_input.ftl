@@ -33,8 +33,8 @@
 		<thead>
 			<tr>
 				<th>${getText('name')}</th>
-				<th style="width:36%;">${getText('value')}</th>
-				<th>${getText('type')}</th>
+				<th >${getText('value')}</th>
+				<th style="width:60px;">${getText('type')}</th>
 				<th>${getText('required')}</th>
 				<th>${getText('strict')}</th>
 				<th class="manipulate"></th>
@@ -47,9 +47,9 @@
 			</#if>
 			<#list 0..size as index>
 			<tr class="linkage">
-				<td><@s.textfield theme="simple" name="schema.fields[${index}].name" style="width:100px;"/></td>
+				<td><@s.textfield theme="simple" name="schema.fields[${index}].name"/></td>
 				<td>
-					<table class="datagrid showonadd linkage_component SELECT CHECKBOX">
+					<table class="datagrid showonadd linkage_component SELECT CHECKBOX" style="width:100%;">
 						<tbody>
 							<#assign size = 0>
 							<#if schema.fields[index]?? && schema.fields[index].values?? && schema.fields[index].values?size gt 0>
@@ -57,14 +57,14 @@
 							</#if>
 							<#list 0..size as index2>
 							<tr>
-								<td><@s.textfield theme="simple" name="schema.fields[${index}].values[${index2}]" class="required" style="width:95%;"/></td>
+								<td><@s.textfield theme="simple" name="schema.fields[${index}].values[${index2}]" class="required"/></td>
 								<td class="manipulate"></td>
 							</tr>
 							</#list>
 						</tbody>
 					</table>
 				</td>
-				<td><@s.select theme="simple" name="schema.fields[${index}].type" class="linkage_switch required" style="width:80px;" list="@org.ironrhino.common.model.SchemaFieldType@values()" listKey="name" listValue="displayName"/></td>
+				<td><@s.select theme="simple" name="schema.fields[${index}].type" class="linkage_switch required" list="@org.ironrhino.common.model.SchemaFieldType@values()" listKey="name" listValue="displayName"/></td>
 				<td><span class="showonadd linkage_component SELECT INPUT"><@s.checkbox id="" theme="simple" name="schema.fields[${index}].required" class="custom"/></span></td>
 				<td><span class="showonadd linkage_component SELECT"><@s.checkbox id="" theme="simple" name="schema.fields[${index}].strict" class="custom"/></span></td>
 				<td class="manipulate"></td>

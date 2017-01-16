@@ -5,7 +5,7 @@
 </div>
 <table class="table table-bordered table-striped">
 	<thead>
-		<tr><td style="width:100px;">code</td><td style="width:200px;">status</td><td>描述</td></tr>
+		<tr><th style="width:100px;">code</th><th style="width:200px;">status</th><th>描述</th></tr>
 	</thead>
 	<tbody>
 		<tr><td>0</td><td>OK</td><td>操作成功</td></tr>

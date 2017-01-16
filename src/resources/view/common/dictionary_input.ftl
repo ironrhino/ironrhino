@@ -45,10 +45,10 @@
 			</#if>
 			<#list 0..size as index>
 			<tr class="linkage">
-				<td><@s.textfield theme="simple" name="dictionary.items[${index}].value" style="width:90%;" class="required${(!((view=='embedded'||view=='brief')))?then(' showonadd linkage_component option',' ')}"/></td>
-				<td><@s.textfield theme="simple" name="dictionary.items[${index}].label" style="width:90%;"/></td>
+				<td><@s.textfield theme="simple" name="dictionary.items[${index}].value" class="required${(!((view=='embedded'||view=='brief')))?then(' showonadd linkage_component option',' ')}"/></td>
+				<td><@s.textfield theme="simple" name="dictionary.items[${index}].label"/></td>
 				<#if !(view=='embedded'||view=='brief')>
-				<td><select class="linkage_switch required" style="width:100px;">
+				<td><select class="linkage_switch required">
 						<option value="option">${getText('option')}</option>
 						<option value="group"<#if dictionary.items[index]?? && dictionary.items[index].value?? && !dictionary.items[index].value?has_content>selected="selected"</#if>>${getText('group')}</option>
 					</select></td>
