@@ -1,6 +1,5 @@
 package org.ironrhino.core.session;
 
-import java.net.URLDecoder;
 import java.util.Locale;
 import java.util.Map;
 
@@ -101,7 +100,7 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 			try {
 				if (key.length() > 10)
 					key = key.substring(key.length() - 10, key.length());
-				String str = URLDecoder.decode(RC4.decryptWithKey(value, key), "UTF-8");
+				String str = RC4.decryptWithKey(value, key);
 				if (str.endsWith(key))
 					value = str.substring(0, str.length() - key.length());
 			} catch (IllegalArgumentException e) {

@@ -84,8 +84,7 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 							if (key && key.length > 10)
 								key = key
 										.substring(key.length - 10, key.length);
-							this.value = $.rc4EncryptStr(
-									encodeURIComponent(this.value + key), key);
+							this.value = $.rc4EncryptStr(this.value + key, key);
 						} catch (e) {
 						}
 					}

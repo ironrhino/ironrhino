@@ -3,8 +3,6 @@ package org.ironrhino.core.security.util;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Hex;
@@ -129,7 +127,7 @@ public class RC4 {
 		if (input == null)
 			return null;
 		try {
-			return Hex.encodeHexString(rc4(URLEncoder.encode(input, "UTF-8").getBytes(StandardCharsets.UTF_8)));
+			return Hex.encodeHexString(rc4(input.getBytes(StandardCharsets.UTF_8)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return input;
@@ -140,8 +138,7 @@ public class RC4 {
 		if (input == null)
 			return null;
 		try {
-			return URLDecoder.decode(new String(rc4(Hex.decodeHex(input.toCharArray())), StandardCharsets.UTF_8),
-					"UTF-8");
+			return new String(rc4(Hex.decodeHex(input.toCharArray())), StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return input;
