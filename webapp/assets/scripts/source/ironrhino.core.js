@@ -1190,91 +1190,48 @@ Initialization.common = function() {
 };
 
 var HISTORY_ENABLED = MODERN_BROWSER
-		&& (typeof history.pushState != 'undefined' || typeof $.history != 'undefined')
+		&& (typeof history.pushState != 'undefined')
 		&& ($('meta[name="history_enabled"]').attr('content') != 'false');
 if (HISTORY_ENABLED) {
-	var SESSION_HISTORY_SUPPORT = typeof history.pushState != 'undefined'
-			&& document.location.hash.indexOf('#!/') != 0;
-	var _historied_ = false;
 	Initialization.history = function() {
-
-		if (SESSION_HISTORY_SUPPORT) {
-			window.onpopstate = function(event) {
-				var url = document.location.href;
-				Nav.activate(url);
-				if (event.state) {
-					ajax({
-								url : url,
-								replaceTitle : true,
-								replacement : event.state.replacement,
-								cache : false,
-								beforeSend : function() {
-									if (typeof $.fn.mask != 'undefined') {
-										var replacement = event.state.replacement
-												|| Ajax.defaultRepacement;
-										$.each(replacement.split(','),
-												function(i, v) {
-													if (v.indexOf(':') > -1)
-														v = v.substring(0,
-																v.indexOf(':'));
-													$('#' + v).mask();
-												});
-									}
-								},
-								complete : function() {
-									if (typeof $.fn.mask != 'undefined') {
-										var replacement = event.state.replacement
-												|| Ajax.defaultRepacement;
-										$.each(replacement.split(','),
-												function(i, v) {
-													if (v.indexOf(':') > -1)
-														v = v.substring(0,
-																v.indexOf(':'));
-													$('#' + v).unmask();
-												});
-									}
+		window.onpopstate = function(event) {
+			var url = document.location.href;
+			Nav.activate(url);
+			if (event.state) {
+				ajax({
+							url : url,
+							replaceTitle : true,
+							replacement : event.state.replacement,
+							cache : false,
+							beforeSend : function() {
+								if (typeof $.fn.mask != 'undefined') {
+									var replacement = event.state.replacement
+											|| Ajax.defaultRepacement;
+									$.each(replacement.split(','), function(i,
+													v) {
+												if (v.indexOf(':') > -1)
+													v = v.substring(0,
+															v.indexOf(':'));
+												$('#' + v).mask();
+											});
 								}
-							});
-				}
-			};
-			return;
-		}
-		$.history.init(function(hash) {
-					if ((!hash && !_historied_)
-							|| (hash && hash.indexOf('!') < 0))
-						return;
-					var url = document.location.href;
-					if (url.indexOf('#') > 0)
-						url = url.substring(0, url.indexOf('#'));
-					if (hash.length) {
-						hash = hash.substring(1);
-						if (UrlUtils.isSameDomain(hash)) {
-							if (CONTEXT_PATH)
-								hash = CONTEXT_PATH + hash;
-						}
-						url = hash;
-					}
-					_historied_ = true;
-					ajax({
-								url : url,
-								cache : true,
-								replaceTitle : true,
-								success : function() {
-									Nav.activate(url);
-								},
-								beforeSend : function() {
-									if (typeof $.fn.mask != 'undefined')
-										$('#' + Ajax.defaultRepacement).mask();
-								},
-								complete : function() {
-									if (typeof $.fn.mask != 'undefined')
-										$('#' + Ajax.defaultRepacement)
-												.unmask();
+							},
+							complete : function() {
+								if (typeof $.fn.mask != 'undefined') {
+									var replacement = event.state.replacement
+											|| Ajax.defaultRepacement;
+									$.each(replacement.split(','), function(i,
+													v) {
+												if (v.indexOf(':') > -1)
+													v = v.substring(0,
+															v.indexOf(':'));
+												$('#' + v).unmask();
+											});
 								}
-							});
-				}, {
-					unescape : true
-				});
+							}
+						});
+			}
+		};
 	}
 }
 
@@ -1805,16 +1762,11 @@ Observation.common = function(container) {
 										+ param;
 						}
 						var location = document.location.href;
-						if (SESSION_HISTORY_SUPPORT) {
+						if (HISTORY_ENABLED) {
 							history.replaceState({
 										url : location
 									}, '', location);
 							history.pushState(url, '', url);
-						} else {
-							var hash = url;
-							if (CONTEXT_PATH)
-								hash = hash.substring(CONTEXT_PATH.length);
-							$.history.load('!' + hash);
 						}
 					}
 					if (Ajax.fire(target, 'onbeforesubmit') === false)
@@ -1912,7 +1864,7 @@ Observation.common = function(container) {
 					if (UrlUtils.isSameDomain(hash)) {
 						hash = hash.substring(hash.indexOf('://') + 3);
 						hash = hash.substring(hash.indexOf('/'));
-						if (SESSION_HISTORY_SUPPORT) {
+						if (HISTORY_ENABLED) {
 							var location = document.location.href;
 							history.replaceState({
 										url : location
@@ -1922,12 +1874,6 @@ Observation.common = function(container) {
 												.data('replacement'),
 										url : hash
 									}, '', hash);
-						} else {
-							if (CONTEXT_PATH)
-								hash = hash.substring(CONTEXT_PATH.length);
-							hash = hash.replace(/^.*#/, '');
-							$.history.load('!' + hash);
-							return false;
 						}
 					}
 
