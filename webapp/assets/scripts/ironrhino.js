@@ -37580,6 +37580,8 @@ Observation.sortableTable = function(container) {
 						opacity : 0.6,
 						update : function(event, ui) {
 							rename(tbody);
+							if (options.onsort)
+								options.onsort.apply(tbody.get(0));
 						}
 					});
 			$('td.manipulate,th.manipulate', this).each(function() {
@@ -37590,7 +37592,7 @@ Observation.sortableTable = function(container) {
 								.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i>');
 					} else {
 						t
-								.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i><i class="glyphicon glyphicon-minus manipulate remove clickable"></i><i class="glyphicon glyphicon-arrow-up manipulate moveup clickable"></i><i class="glyphicon glyphicon-arrow-down manipulate movedown clickable"></i>');
+								.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i><i class="glyphicon glyphicon-minus manipulate remove clickable"></i>');
 					}
 				}
 			});
@@ -37625,12 +37627,6 @@ Observation.sortableTable = function(container) {
 					});
 			$('tbody .remove', this).click(function(event) {
 						removeRow(event, options)
-					});
-			$('tbody .moveup', this).click(function(event) {
-						moveupRow(event, options)
-					});
-			$('tbody .movedown', this).click(function(event) {
-						movedownRow(event, options)
 					});
 		})
 
@@ -37793,30 +37789,6 @@ Observation.sortableTable = function(container) {
 		rename(tbody);
 		if (options.onremove)
 			options.onremove();
-	};
-	var moveupRow = function(event, options) {
-		var row = $(event.target).closest('tr');
-		if (row.closest('tbody').children().length > 1) {
-			if (row.prev().length)
-				row.insertBefore(row.prev());
-			else
-				row.insertAfter(row.siblings(':last'));
-			rename(row.closest('tbody'));
-			if (options.onmoveup)
-				options.onmoveup.apply(row[0]);
-		}
-	};
-	var movedownRow = function(event, options) {
-		var row = $(event.target).closest('tr');
-		if (row.closest('tbody').children().length > 1) {
-			if (row.next().length)
-				row.insertAfter(row.next());
-			else
-				row.insertBefore(row.siblings(':first'));
-			rename(row.closest('tbody'));
-			if (options.onmovedown)
-				options.onmovedown.apply(row[0]);
-		}
 	};
 	var rename = function(tbody) {
 		var level = $(tbody).parents('table.datagrided').length;

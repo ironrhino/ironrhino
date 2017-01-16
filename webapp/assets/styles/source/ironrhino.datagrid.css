@@ -1,15 +1,13 @@
 .datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
 	opacity: 0;
-	filter: alpha(opacity=0);
 }
 
 .datagrided tbody > tr:hover > td > .manipulate[class *= "glyphicon-"] {
 	opacity: 0.6;
-	filter: alpha(opacity=60);
 }
 
 .datagrided td.manipulate, .datagrided th.manipulate{
-	width : 80px;
+	width : 40px;
 	padding-left : 10px;
 	text-align : left;
 }
