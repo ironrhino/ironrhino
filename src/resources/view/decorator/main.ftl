@@ -35,7 +35,7 @@
 ${head?no_esc}
 </head>
 
-<body class="main ${.lang} ${(page.properties["meta.body_class"])!}<#if modernBrowser> render-location-qrcode</#if>">
+<body class="main ${.lang} ${(page.properties["meta.body_class"])!}">
 <#if !modernBrowser>
 <div class="container<#if fluidLayout>-fluid</#if>">
 <div class="alert">
