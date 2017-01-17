@@ -49,7 +49,7 @@
 			<tr class="linkage">
 				<td><@s.textfield theme="simple" name="schema.fields[${index}].name"/></td>
 				<td>
-					<table class="datagrid showonadd linkage_component SELECT CHECKBOX" style="width:100%;">
+					<table class="datagrid showonadd linkage_component SELECT CHECKBOX">
 						<tbody>
 							<#assign size = 0>
 							<#if schema.fields[index]?? && schema.fields[index].values?? && schema.fields[index].values?size gt 0>

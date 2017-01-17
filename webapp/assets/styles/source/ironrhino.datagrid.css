@@ -16,11 +16,11 @@
 	margin: 3px;
 }
 
-.datagrided td select:only-child{
+.datagrided td > select:only-child, .datagrided td > table.datagrided{
 	width: 100%;
 }
 
-.datagrided td input:only-child, .datagrided td textarea:only-child, .datagrided td .uneditable-input:only-child{
+.datagrided td > input:only-child, .datagrided td > textarea:only-child, .datagrided td > .uneditable-input:only-child{
 	width: 92%;
 	width: calc(100% - 14px);
 }
