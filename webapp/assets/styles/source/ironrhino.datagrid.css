@@ -16,11 +16,16 @@
 	margin: 3px;
 }
 
-.datagrided td > select:only-child, .datagrided td > table.datagrided{
+.datagrided td > select:only-child, .datagrided td > .input-append:only-child, .datagrided td > .input-prepend:only-child, .datagrided td > table.datagrided{
 	width: 100%;
 }
 
 .datagrided td > input:only-child, .datagrided td > textarea:only-child, .datagrided td > .uneditable-input:only-child{
 	width: 92%;
 	width: calc(100% - 14px);
+}
+
+.datagrided td > .input-append:only-child > input, .datagrided td > .input-prepend:only-child > input {
+	width: 90%;
+	width: calc(100% - 44px);
 }
