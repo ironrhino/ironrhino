@@ -282,7 +282,7 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 .spinner > div {
 	width: 18px;
 	height: 18px;
-	background-color: #404040;
+	background-color: #838b8b;
 	border-radius: 100%;
 	display: inline-block;
 	-webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
