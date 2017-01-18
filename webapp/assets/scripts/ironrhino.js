@@ -32362,7 +32362,7 @@ UrlUtils = {
 			return a.substring(0, a.lastIndexOf('/') + 1) + url;
 		}
 	},
-	enhance : function(ele, baseurl) {
+	resolvePath : function(ele, baseurl) {
 		if (!baseurl)
 			return;
 		if (baseurl.indexOf('/') == 0)
@@ -32792,7 +32792,7 @@ Ajax = {
 			}
 			var html = data.replace(/<script(.|\s)*?\/script>/g, '');
 			var div = $('<div/>').html(html);
-			UrlUtils.enhance(div, options.url);
+			UrlUtils.resolvePath(div, options.url);
 			html = div.html();
 			var replacement = options.replacement;
 			if (typeof replacement == 'string') {
@@ -34223,21 +34223,6 @@ Captcha = {
 					this.src = src + '&' + r;
 				});
 		$('input.captcha').val('').focus();
-	}
-};
-ArrayUtils = {
-	unique : function(arr) {
-		if (arr) {
-			var arr2 = [];
-			var provisionalTable = {};
-			for (var i = 0, item; (item = arr[i]) != null; i++) {
-				if (!provisionalTable[item]) {
-					arr2.push(item);
-					provisionalTable[item] = true;
-				}
-			}
-			return arr2;
-		}
 	}
 };
 DateUtils = {
