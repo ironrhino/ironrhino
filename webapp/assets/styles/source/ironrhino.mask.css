@@ -10,10 +10,6 @@
 	height: 100%;
 }
 
-.mask.spinner > div {
-	margin-top: 20px;
-}
-
 .masked-relative {
 	position: relative ! important;
 }

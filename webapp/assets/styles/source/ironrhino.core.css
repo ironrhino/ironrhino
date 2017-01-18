@@ -142,8 +142,8 @@ body.main > #content > form:first-child > .negative-margin:first-child {
 
 body.welcome {
 	padding-top: 10%;
-	background: #DEDEDE;
-	background: linear-gradient(to bottom, #EFEFEF, #DEDEDE, #EFEFEF);
+	background: #dedede;
+	background: linear-gradient(to bottom, #efefef, #dedede, #efefef);
 }
 
 body.welcome .caption {
@@ -279,39 +279,86 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	transition: width 0.4s ease;
 }
 
-.spinner > div {
-	width: 18px;
-	height: 18px;
-	background-color: #838b8b;
-	border-radius: 100%;
-	display: inline-block;
-	-webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-	animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+.spinner {
+	position: relative;
+	margin: 0 auto;
+	width: 50px;
+	height: 50px;
 }
 
-.spinner .bounce1 {
-	-webkit-animation-delay: -0.32s;
-	animation-delay: -0.32s;
+.spinner:before , .spinner:after {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	margin: auto 0;
+	width: 20px;
+	height: 20px;
+	content: "";
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
 }
 
-.spinner .bounce2 {
-	-webkit-animation-delay: -0.16s;
-	animation-delay: -0.16s;
+.spinner:before {
+	left: 0;
+	background-color: #28aadc;
+	-webkit-animation: spinner-left 0.5s infinite ease;
+	animation: spinner-left 0.5s infinite ease;
 }
 
-@-webkit-keyframes sk-bouncedelay {
-	0%, 80%, 100% { -webkit-transform: scale(0) }
-    40% { -webkit-transform: scale(1.0) }
+.spinner:after {
+	right: 0;
+	background-color: #ff3c50;
+	-webkit-animation: spinner-right 0.5s infinite ease;
+	animation: spinner-right 0.5s infinite ease;
 }
 
-@keyframes sk-bouncedelay {
-    0%, 80%, 100% {
-        -webkit-transform: scale(0);
-        transform: scale(0);
-    } 40% {
-          -webkit-transform: scale(1.0);
-          transform: scale(1.0);
-      }
+@-webkit-keyframes spinner-left {
+	0% {
+		-webkit-transform: scale(0.5);
+	}
+	50% {
+		-webkit-transform: scale(1);
+	}
+	100% {
+		-webkit-transform: scale(0.5);
+	}
+}
+
+@keyframes spinner-left {
+	0% {
+		transform: scale(0.5);
+	}
+	50% {
+		transform: scale(1);
+	}
+	100% {
+		transform: scale(0.5);
+	}
+}
+
+@-webkit-keyframes spinner-right {
+	0% {
+		-webkit-transform: scale(1);
+	}
+	50% {
+		-webkit-transform: scale(0.5);
+	}
+	100% {
+		-webkit-transform: scale(1);
+	}
+}
+
+@keyframes spinner-right {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(0.5);
+	}
+	100% {
+		transform: scale(1);
+	}
 }
 
 #nav-breadcrumb {

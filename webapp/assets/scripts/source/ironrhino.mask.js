@@ -11,7 +11,7 @@
 				t.addClass('masked-min-height');
 			t
 					.addClass('masked')
-					.append('<div class="mask spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>');
+					.append('<div class="mask"><div class="spinner"></div></div>');
 		});
 		return this;
 	};
