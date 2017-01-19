@@ -1,6 +1,7 @@
 package org.ironrhino.rest.doc;
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -23,12 +24,15 @@ import java.util.concurrent.Future;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ClassScanner;
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -56,34 +60,41 @@ public class ApiDocHelper {
 		}
 		classPool.insertClassPath(new ClassClassPath(apiDocClass));
 		final CtClass cc = classPool.get(apiDocClass.getName());
-		Collections.sort(methods, (o1, o2) -> {
+		Collections.sort(methods, (m1, m2) -> {
 			int line1 = 0;
 			int line2 = 1;
 			try {
-				Class<?>[] types = o1.getParameterTypes();
+				Class<?>[] types = m1.getParameterTypes();
 				CtClass[] paramTypes = new CtClass[types.length];
 				for (int i = 0; i < types.length; i++) {
 					classPool.insertClassPath(new ClassClassPath(types[i]));
 					paramTypes[i] = classPool.get(types[i].getName());
 				}
-				classPool.insertClassPath(new ClassClassPath(o1.getReturnType()));
-				CtMethod method1 = cc.getMethod(o1.getName(),
-						Descriptor.ofMethod(classPool.get(o1.getReturnType().getName()), paramTypes));
+				classPool.insertClassPath(new ClassClassPath(m1.getReturnType()));
+				CtMethod method1 = cc.getMethod(m1.getName(),
+						Descriptor.ofMethod(classPool.get(m1.getReturnType().getName()), paramTypes));
 				line1 = method1.getMethodInfo().getLineNumber(0);
-				types = o2.getParameterTypes();
+				types = m2.getParameterTypes();
 				paramTypes = new CtClass[types.length];
 				for (int i = 0; i < types.length; i++) {
 					classPool.insertClassPath(new ClassClassPath(types[i]));
 					paramTypes[i] = classPool.get(types[i].getName());
 				}
-				classPool.insertClassPath(new ClassClassPath(o2.getReturnType()));
-				CtMethod method2 = cc.getMethod(o2.getName(),
-						Descriptor.ofMethod(classPool.get(o2.getReturnType().getName()), paramTypes));
+				classPool.insertClassPath(new ClassClassPath(m2.getReturnType()));
+				CtMethod method2 = cc.getMethod(m2.getName(),
+						Descriptor.ofMethod(classPool.get(m2.getReturnType().getName()), paramTypes));
 				line2 = method2.getMethodInfo().getLineNumber(0);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return line1 - line2;
+		});
+		Collections.sort(methods, (m1, m2) -> {
+			Order o1 = m1.getAnnotation(Order.class);
+			int order1 = o1 != null ? o1.value() : methods.indexOf(m1) + 1;
+			Order o2 = m2.getAnnotation(Order.class);
+			int order2 = o2 != null ? o2.value() : methods.indexOf(m2) + 1;
+			return order1 - order2;
 		});
 		return methods;
 	}
@@ -166,7 +177,12 @@ public class ApiDocHelper {
 					args[i] = null;
 				}
 			}
-			Object obj = apiDocMethod.invoke(apiDocInstance, args);
+			Object obj;
+			try {
+				obj = apiDocMethod.invoke(apiDocInstance, args);
+			} catch (InvocationTargetException e) {
+				obj = null;
+			}
 			if (obj == null) {
 				obj = createSample(apiDocMethod.getGenericReturnType());
 			}
@@ -213,7 +229,7 @@ public class ApiDocHelper {
 	}
 
 	private static Object createObject(Class<?> clazz) {
-		Object object = createValue(clazz, null);
+		Object object = createValue(clazz, null, null);
 		if (object != null)
 			return object;
 		try {
@@ -226,7 +242,7 @@ public class ApiDocHelper {
 					if (!field.getType().isPrimitive() && field.get(obj) != null) {
 						return;
 					}
-					value = createValue(field.getType(), field.getName());
+					value = createValue(field.getType(), field.getName(), clazz);
 					if (value == null)
 						value = createObject(field.getType());
 				} else if (type instanceof ParameterizedType) {
@@ -263,9 +279,9 @@ public class ApiDocHelper {
 		}
 	}
 
-	private static Object createValue(Class<?> type, String fieldName) {
+	private static Object createValue(Class<?> type, String fieldName, Class<?> sampleClass) {
 		if (String.class == type)
-			return suggestStringValue(fieldName);
+			return suggestStringValue(fieldName, sampleClass);
 		if ((Boolean.TYPE == type) || (Boolean.class == type))
 			return true;
 		if ((Byte.TYPE == type) || (Byte.class == type))
@@ -291,14 +307,16 @@ public class ApiDocHelper {
 				e.printStackTrace();
 			}
 		}
+		if (type == RestStatus.class)
+			return RestStatus.OK;
 		return null;
 	}
 
-	private static String suggestStringValue(String fieldName) {
+	private static String suggestStringValue(String fieldName, Class<?> sampleClass) {
 		if (fieldName == null)
 			return "test";
 		if (fieldName.toLowerCase().equals("id"))
-			return "1KYuu6skj6JP1me78gBWQF";
+			return CodecUtils.encodeBase62(CodecUtils.md5Hex(sampleClass.getName()));
 		if (fieldName.toLowerCase().endsWith("email"))
 			return "test@test.com";
 		if (fieldName.toLowerCase().endsWith("username"))

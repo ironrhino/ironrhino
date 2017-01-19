@@ -9,10 +9,13 @@ import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.rest.Asserts;
 import org.ironrhino.rest.RestStatus;
+import org.ironrhino.rest.doc.annotation.Api;
+import org.ironrhino.rest.doc.annotation.Status;
 import org.ironrhino.security.LoggedInUser;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +34,8 @@ public class UserController {
 	@Autowired
 	private ExecutorService executorService;
 
+	@Order(0)
+	@Api("获取当前用户信息")
 	@RequestMapping(value = "/@self", method = RequestMethod.GET)
 	@Authorize(ifAnyGranted = { UserRole.ROLE_BUILTIN_USER, UserRole.ROLE_BUILTIN_ANONYMOUS })
 	public User self(@LoggedInUser User loggedInUser) {
@@ -52,14 +57,8 @@ public class UserController {
 		return valid ? RestStatus.OK : RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, "password invalid");
 	}
 
-	// @RequestMapping(value = "/{username}", method = RequestMethod.GET)
-	// public User get(@PathVariable String username) {
-	// User u = (User) userManager.loadUserByUsername(username);
-	// if (u == null)
-	// throw RestStatus.NOT_FOUND;
-	// return u;
-	// }
-
+	@Order(3)
+	@Api(value = "获取用户", statuses = { @Status(code = 404, description = "用户名不存在") })
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
 	public DeferredResult<User> get(final @PathVariable String username) {
 		final DeferredResult<User> dr = new DeferredResult<>(5000L, RestStatus.REQUEST_TIMEOUT);
@@ -104,6 +103,8 @@ public class UserController {
 		return RestStatus.OK;
 	}
 
+	@Order(6)
+	@Api(value = "删除用户", description = "只能删除已经禁用的用户")
 	@RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
 	public RestStatus delete(@PathVariable String username) {
 		User u = (User) userManager.loadUserByUsername(username);

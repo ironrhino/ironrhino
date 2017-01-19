@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.UiConfig;
@@ -217,13 +219,15 @@ public class FieldObject implements Serializable {
 						if (forRequest) {
 							if ("id".equals(name))
 								continue;
-
 						} else {
 							if ("id".equals(name))
 								required = true;
 							if (f.getAnnotation(NaturalId.class) != null)
 								required = true;
 						}
+						Column column = f.getAnnotation(Column.class);
+						if (column != null && !column.nullable())
+							required = true;
 					}
 
 					if (!required) {

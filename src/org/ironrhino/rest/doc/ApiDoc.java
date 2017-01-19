@@ -20,9 +20,9 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.doc.annotation.Api;
-import org.ironrhino.rest.doc.annotation.Status;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
+import org.ironrhino.rest.doc.annotation.Status;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,9 +78,15 @@ public class ApiDoc implements Serializable {
 	protected List<StatusObject> statuses;
 
 	public ApiDoc(Class<?> apiDocClazz, Method apiDocMethod, ObjectMapper objectMapper) throws Exception {
-
 		Class<?> clazz = apiDocClazz.getSuperclass();
-		Method method = clazz.getMethod(apiDocMethod.getName(), apiDocMethod.getParameterTypes());
+		Method method;
+		try {
+			method = clazz.getMethod(apiDocMethod.getName(), apiDocMethod.getParameterTypes());
+		} catch (NoSuchMethodException e) {
+			// @ApiModule on Controller directly
+			clazz = apiDocClazz;
+			method = apiDocMethod;
+		}
 		Object apiDocInstance = apiDocClazz.newInstance();
 
 		Api api = apiDocMethod.getAnnotation(Api.class);
