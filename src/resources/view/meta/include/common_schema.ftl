@@ -63,7 +63,7 @@
 				<#else>
 				<#local persistValueExists=false>
 				<#list attributes as attr>
-					<#if attr.name==field.name && attr.value??>
+					<#if attr.name==field.name && attr.value?has_content>
 						<#local persistValue=attr.value>
 						<#local persistValueExists=true>
 						<#break/>
@@ -112,7 +112,7 @@
 							<#break/>
 						</#if>
 					</#list>
-					<#if !inschema && attr.value?? && attr.value?has_content>
+					<#if !inschema && attr.value?has_content>
 					<tr>
 						<td><input type="text" name="${parameterNamePrefix}attributes[${index}].name" value="${attr.name!?html}"/></td>
 						<td><input type="text" name="${parameterNamePrefix}attributes[${index}].value" value="${attr.value!?html}"/></td>
@@ -131,7 +131,7 @@
 					</#if>
 					<#local index = 0>
 					<#list 0..size as var>
-						<#if isnew || attributes[var].value?? && attributes[var].value?has_content>
+						<#if isnew || attributes[var].value?has_content>
 							<tr>
 								<td><input type="text" name="${parameterNamePrefix}attributes[${index}].name"<#if !isnew> value="${attributes[var].name!?html}</#if>"/></td>
 								<td><input type="text" name="${parameterNamePrefix}attributes[${index}].value"<#if !isnew> value="${attributes[var].value!?html}</#if>"/></td>
@@ -151,7 +151,7 @@
 		<#if !grouping>
 			<ul class="attributes">
 			<#list attributes as attr>
-				<#if attr.value?? && attr.value?has_content && !excludes?seq_contains(attr.name)>
+				<#if attr.value?has_content && !excludes?seq_contains(attr.name)>
 					<li><span class="name">${attr.name?html}:<span><span class="value">${attr.value?html}</span></li>
 				</#if>
 			</#list>
@@ -160,7 +160,7 @@
 			<ul class="attributes">
 			<#local group = ""/>
 			<#list attributes as attr>
-				<#if !attr.value?? || !attr.value?has_content>
+				<#if !attr.value?has_content>
 					<#local name = attr.name/>
 					<#if (!name?has_content)>
 						<#local group = ""/>

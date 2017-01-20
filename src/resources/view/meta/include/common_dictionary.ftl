@@ -56,7 +56,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
-	<#if value?? && !value?is_indexable>
+	<#if value?has_content && !value?is_indexable>
 	<#local value=[value]/>
 	</#if>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>

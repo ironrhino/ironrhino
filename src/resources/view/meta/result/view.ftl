@@ -71,7 +71,7 @@
 							<#if value?has_content>
 								<img src="${value}"/>
 							</#if>
-						<#elseif value??>
+						<#elseif value?has_content>
 							<#if value?is_boolean>
 								${getText(value?string)}
 							<#elseif value?is_unknown_date_like>
@@ -219,7 +219,7 @@
 									<#if value?has_content>
 										<img src="${value}"/>
 									</#if>
-								<#elseif value??>
+								<#elseif value?has_content>
 										<#if value?is_boolean>
 											${getText(value?string)}
 										<#elseif value?is_unknown_date_like>
@@ -276,7 +276,7 @@
 					</#if>
 					</tbody>
 					</table>
-				<#elseif value??>
+				<#elseif value?has_content>
 						<#if value?is_boolean>
 							${getText(value?string)}
 						<#elseif value?is_unknown_date_like>
