@@ -752,6 +752,9 @@ Ajax = {
 			if (!hasError && $(target).hasClass('reset') && target.reset) {
 				target.reset();
 				$(target).find('.resetable').html('');
+				var nav = $(target).find('.nav-tabs');
+				if (nav.length) 
+					nav.find('li:first a').click();
 			}
 		}
 		Indicator.text = '';
