@@ -7846,8 +7846,8 @@ td.middle {
 	border-top: solid 2px #ccc;
 }
 
-.well .nav-tabs > .active > a,.well .nav-tabs > .active > a:hover,.well .nav-tabs > .active > a:focus {
-    background-color: #f5f5f5;
+.well .nav-tabs > .active > a , .well .nav-tabs > .active > a:hover , .well .nav-tabs > .active > a:focus {
+	background-color: #f5f5f5;
 }
 
 .popover {
@@ -7945,8 +7945,9 @@ body.welcome .caption {
 	border-radius: 20px;
 	background-color: #e6e6e6;
 	background-image: linear-gradient(to bottom, #fff, #e6e6e6);
-	margin-top: -40px;
 }
+
+
 
 body.welcome .hero-unit .message-container {
 	margin-top: -30px;
@@ -7972,6 +7973,9 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 @media (orientation: landscape) and (max-height: 400px) {
 	body.welcome {
 		padding-top: 0;
+	}
+	body.welcome .caption {
+		margin-top: -40px;
 	}
 }
 
@@ -8110,9 +8114,11 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	0% {
 		-webkit-transform: scale(0.5);
 	}
+
 	50% {
 		-webkit-transform: scale(1);
 	}
+
 	100% {
 		-webkit-transform: scale(0.5);
 	}
@@ -8122,9 +8128,11 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	0% {
 		transform: scale(0.5);
 	}
+
 	50% {
 		transform: scale(1);
 	}
+
 	100% {
 		transform: scale(0.5);
 	}
@@ -8134,9 +8142,11 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	0% {
 		-webkit-transform: scale(1);
 	}
+
 	50% {
 		-webkit-transform: scale(0.5);
 	}
+
 	100% {
 		-webkit-transform: scale(1);
 	}
@@ -8146,9 +8156,11 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	0% {
 		transform: scale(1);
 	}
+
 	50% {
 		transform: scale(0.5);
 	}
+
 	100% {
 		transform: scale(1);
 	}

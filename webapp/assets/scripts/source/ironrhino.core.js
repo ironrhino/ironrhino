@@ -753,7 +753,7 @@ Ajax = {
 				target.reset();
 				$(target).find('.resetable').html('');
 				var nav = $(target).find('.nav-tabs');
-				if (nav.length) 
+				if (nav.length)
 					nav.find('li:first a').click();
 			}
 		}
@@ -1940,6 +1940,14 @@ var Nav = {
 		$(document).on('click', '.nav:not(.nav-tabs) li a', function() {
 					$('li', $(this).closest('.nav')).removeClass('active');
 					Nav.indicate($(this));
+				}).on('click', '.tab-content .tab-pane button[class*="step-"]',
+				function() {
+					var tabid = $(this).closest('.tab-pane').attr('id');
+					var tab = $(this).closest('.tab-content').prev('.nav-tabs')
+							.find('a[href="#' + tabid + '"]').parent();
+					tab = $(this).hasClass('step-next') ? tab.next() : tab
+							.prev();
+					tab.find('a').click();
 				});
 	},
 	activate : function(url) {
