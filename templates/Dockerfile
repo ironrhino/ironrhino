@@ -1,23 +1,30 @@
 FROM java:8u111-jdk-alpine
 
+ARG user=ironrhino
+
+ARG app=app
+
+ENV USER=${user}
+
 #ENV SPRING_PROFILES_DEFAULT=dual
 
-RUN mkdir /home/ironrhino
+RUN mkdir /home/${user}
 
-RUN adduser -D -h /home/ironrhino ironrhino
+RUN adduser -D -h /home/${user} ${user}
 
-#VOLUME ["/home/ironrhino/$app/conf"]
+VOLUME ["/home/${user}/${app}/conf"] 
+#docker run --volume ~/${app}/conf:/home/${user}/${app}/conf --name ${app} ${app}
 
-#docker run --volume ~/$app/conf:/home/ironrhino/$app/conf --name $app $app
-
-WORKDIR /home/ironrhino
+WORKDIR /home/${user}
 
 ADD target/ROOT.war ROOT.war
 
-RUN chown -R ironrhino:ironrhino /home/ironrhino
+RUN chown -R ${user}:${user} /home/${user}
 
-USER ironrhino
+#RUN apk update && apk add ca-certificates && apk add tzdata && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
+
+USER ${user}
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","ROOT.war"]
+ENTRYPOINT ["java","-server","-Xms128m","-Xmx1024m","-Xmn80m","-Xss256k","-XX:+DisableExplicitGC","-XX:+UseG1GC","-XX:SurvivorRatio=6","-XX:MaxGCPauseMillis=400","-XX:G1ReservePercent=15","-XX:InitiatingHeapOccupancyPercent=40","-XX:ConcGCThreads=2","-Djava.awt.headless=true","-jar","ROOT.war"]
