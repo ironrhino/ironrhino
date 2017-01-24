@@ -211,10 +211,8 @@ public class LocalizedTextUtil {
 	            }
 	        }
 	        defaultTextCache.put(cacheKey, defaultText != null ? defaultText : NULL_DEFAULT_TEXT);
-    	}else if(defaultText.equals(NULL_DEFAULT_TEXT)){
-    		defaultText = null;
     	}
-    	return defaultText;
+    	return NULL_DEFAULT_TEXT.equals(defaultText) ? null : defaultText;
     }
 
     /**
