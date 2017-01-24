@@ -5,7 +5,6 @@ import java.sql.DatabaseMetaData;
 import java.util.Locale;
 
 import org.ironrhino.core.jdbc.DatabaseProduct;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 
 public class DatabaseCyclicSequenceDelegate extends AbstractDatabaseCyclicSequence {
 
@@ -13,13 +12,10 @@ public class DatabaseCyclicSequenceDelegate extends AbstractDatabaseCyclicSequen
 
 	@Override
 	public void afterPropertiesSet() throws java.lang.Exception {
-		Connection con = DataSourceUtils.getConnection(getDataSource());
 		DatabaseProduct databaseProduct = null;
-		try {
+		try (Connection con = getDataSource().getConnection()) {
 			DatabaseMetaData dbmd = con.getMetaData();
 			databaseProduct = DatabaseProduct.parse(dbmd.getDatabaseProductName().toLowerCase(Locale.ROOT));
-		} finally {
-			DataSourceUtils.releaseConnection(con, getDataSource());
 		}
 		if (databaseProduct == DatabaseProduct.MYSQL)
 			seq = new MySQLCyclicSequence();
