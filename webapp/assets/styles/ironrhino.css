@@ -8946,16 +8946,16 @@ form.attachmentable ul.thumbnails li .remove {
 	margin: 3px;
 }
 
-.datagrided td > select:only-child, .datagrided td > .input-append:only-child, .datagrided td > .input-prepend:only-child, .datagrided td > table.datagrided{
+.datagrided td > select, .datagrided td > .input-append, .datagrided td > .input-prepend, .datagrided td > table.datagrided{
 	width: 100%;
 }
 
-.datagrided td > input:only-child, .datagrided td > textarea:only-child, .datagrided td > .uneditable-input:only-child{
+.datagrided td > input, .datagrided td > textarea, .datagrided td > .uneditable-input{
 	width: 92%;
 	width: calc(100% - 14px);
 }
 
-.datagrided td > .input-append:only-child > input, .datagrided td > .input-prepend:only-child > input {
+.datagrided td > .input-append > input, .datagrided td > .input-prepend > input {
 	width: 90%;
 	width: calc(100% - 44px);
 }
@@ -9453,7 +9453,7 @@ table.richtable td {
 	cursor: pointer;
 }
 
-.richtable tbody input.text:only-child , .richtable tbody textarea.text:only-child {
+.richtable tbody input.text , .richtable tbody textarea.text {
 	width: 90%;
 	width: calc(100% - 14px);
 	margin: 0;
@@ -9464,7 +9464,7 @@ table.richtable td {
 	margin: 0;
 }
 
-.richtable tbody select:only-child {
+.richtable tbody select {
 	width: 100%;
 	margin: 0;
 	padding-left: 0;

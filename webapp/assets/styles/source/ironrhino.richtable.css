@@ -58,7 +58,7 @@ table.richtable td {
 	cursor: pointer;
 }
 
-.richtable tbody input.text:only-child , .richtable tbody textarea.text:only-child {
+.richtable tbody input.text , .richtable tbody textarea.text {
 	width: 90%;
 	width: calc(100% - 14px);
 	margin: 0;
@@ -69,7 +69,7 @@ table.richtable td {
 	margin: 0;
 }
 
-.richtable tbody select:only-child {
+.richtable tbody select {
 	width: 100%;
 	margin: 0;
 	padding-left: 0;
