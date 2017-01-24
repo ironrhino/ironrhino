@@ -33373,7 +33373,15 @@ if (HISTORY_ENABLED) {
 }
 
 Observation.common = function(container) {
-	$$('select', container).each(function(e) {
+	$$('input.double', container).each(function() {
+				var t = $(this);
+				var value = t.val();
+				if (value && value.indexOf('E-') > 0) {
+					value = parseFloat(value);
+					t.val(value);
+				}
+			});
+	$$('select', container).each(function() {
 				var t = $(this);
 				var option = t.find('option:eq(0)');
 				if (!option.attr('value') && option.text() && !t.val())
