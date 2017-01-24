@@ -93,6 +93,8 @@ public class LocalizedTextUtil {
     private static boolean reloadBundles = false;
     private static final ResourceBundle EMPTY_BUNDLE = new EmptyResourceBundle();
     private static final ConcurrentMap<String, ResourceBundle> bundlesMap = new ConcurrentHashMap<String, ResourceBundle>();
+    private static final ConcurrentMap<String, String> defaultTextCache = new ConcurrentHashMap<String, String>();
+    private static final String NULL_DEFAULT_TEXT= "\n\t\t\n\t\t\n";
 
     private static ClassLoader delegatedClassLoader;
     private static final String RELOADED = "com.opensymphony.xwork2.util.LocalizedTextUtil.reloaded";
@@ -193,21 +195,26 @@ public class LocalizedTextUtil {
      * @return a localized message based on the specified key, or null if no localized message can be found for it
      */
     public static String findDefaultText(String aTextName, Locale locale) {
-        List<String> localList = DEFAULT_RESOURCE_BUNDLES;
-
-        for (String bundleName : localList) {
-            ResourceBundle bundle = findResourceBundle(bundleName, locale);
-            if (bundle != null) {
-                reloadBundles();
-                try {
-                    return bundle.getString(aTextName);
-                } catch (MissingResourceException e) {
-                    // ignore and try others
-                }
-            }
-        }
-
-        return null;
+    	String cacheKey = String.valueOf(locale) + ':' + aTextName;
+    	String defaultText = defaultTextCache.get(cacheKey);
+    	if(defaultText == null || reloadBundles){
+	        List<String> localList = DEFAULT_RESOURCE_BUNDLES;
+	        for (String bundleName : localList) {
+	            ResourceBundle bundle = findResourceBundle(bundleName, locale);
+	            if (bundle != null) {
+	                reloadBundles();
+	                try {
+	                	defaultText = bundle.getString(aTextName);
+	                } catch (MissingResourceException e) {
+	                    // ignore and try others
+	                }
+	            }
+	        }
+	        defaultTextCache.put(cacheKey, defaultText != null ? defaultText : NULL_DEFAULT_TEXT);
+    	}else if(defaultText.equals(NULL_DEFAULT_TEXT)){
+    		defaultText = null;
+    	}
+    	return defaultText;
     }
 
     /**
