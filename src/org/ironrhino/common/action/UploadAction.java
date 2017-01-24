@@ -117,7 +117,7 @@ public class UploadAction extends BaseAction {
 					StringBuilder sb = new StringBuilder();
 					try {
 						for (int i = 1; i < arr.length; i++) {
-							sb.append("/").append(URLEncoder.encode(arr[i], "UTF-8"));
+							sb.append("/").append(URLEncoder.encode(arr[i], "UTF-8").replaceAll("\\+", "%20"));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -202,7 +202,9 @@ public class UploadAction extends BaseAction {
 			if (folder != null) {
 				try {
 					folder = folder.replace("__", "..");
+					folder = folder.replaceAll(" ", "%20");
 					folder = new URI(folder).normalize().toString();
+					folder = folder.replaceAll("%20", " ");
 					if (folder.contains(".."))
 						folder = "";
 				} catch (Exception e) {
