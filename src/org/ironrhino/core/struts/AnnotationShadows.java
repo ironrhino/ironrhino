@@ -99,15 +99,11 @@ public class AnnotationShadows {
 			this.hiddenInInput = new HiddenImpl(config.hiddenInInput());
 			this.hiddenInView = new HiddenImpl(config.hiddenInView());
 			this.shownInPick = config.shownInPick();
-			this.template = config.template();
 			this.listTemplate = config.listTemplate();
 			this.viewTemplate = config.viewTemplate();
-			if (this.listTemplate.isEmpty())
-				this.listTemplate = this.template;
-			if (this.viewTemplate.isEmpty())
-				this.viewTemplate = this.template;
 			this.inputTemplate = config.inputTemplate();
 			this.csvTemplate = config.csvTemplate();
+			setTemplate(config.template());
 			this.width = config.width();
 			this.dynamicAttributes = config.dynamicAttributes();
 			this.cellDynamicAttributes = config.cellDynamicAttributes();
@@ -454,6 +450,10 @@ public class AnnotationShadows {
 
 		public void setTemplate(String template) {
 			this.template = template;
+			if (StringUtils.isEmpty(this.listTemplate))
+				this.listTemplate = this.template;
+			if (StringUtils.isEmpty(this.viewTemplate))
+				this.viewTemplate = this.template;
 		}
 
 		public String getListTemplate() {

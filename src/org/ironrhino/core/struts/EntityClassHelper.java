@@ -436,25 +436,26 @@ public class EntityClassHelper {
 								|| returnType == Float.class || returnType == BigDecimal.class) {
 							uci.setInputType("number");
 							uci.addCssClass("double");
-							if (returnType == BigDecimal.class) {
-								int scale = column != null ? column.scale() : 2;
-								if (scale == 0)
-									scale = 2;
-								StringBuilder step = new StringBuilder(scale + 2);
-								step.append("0.");
-								for (int i = 0; i < scale - 1; i++)
-									step.append("0");
-								step.append("1");
-								uci.getInternalDynamicAttributes().put("step", step.toString());
-								uci.getInternalDynamicAttributes().put("data-scale", String.valueOf(scale));
-								if (StringUtils.isBlank(uci.getTemplate()) && returnType == BigDecimal.class) {
-									StringBuilder template = new StringBuilder(scale + 40);
-									template.append("<#if value?is_number>${value?string('#,##0.");
-									for (int i = 0; i < scale; i++)
-										template.append("0");
-									template.append("')}<#else>${value!}</#if>");
-									uci.setTemplate(template.toString());
-								}
+							int scale = column != null ? column.scale() : 2;
+							if (scale == 0)
+								scale = 2;
+							StringBuilder step = new StringBuilder(scale + 2);
+							step.append("0.");
+							for (int i = 0; i < scale - 1; i++)
+								step.append("0");
+							step.append("1");
+							uci.getInternalDynamicAttributes().put("step", step.toString());
+							uci.getInternalDynamicAttributes().put("data-scale", String.valueOf(scale));
+							if (StringUtils.isBlank(uci.getTemplate())) {
+								StringBuilder template = new StringBuilder(scale + 40);
+								template.append("<#if value?is_number>${value?string('");
+								if (returnType == BigDecimal.class)
+									template.append("#,##");
+								template.append("0.");
+								for (int i = 0; i < scale; i++)
+									template.append("0");
+								template.append("')}<#else>${value!}</#if>");
+								uci.setTemplate(template.toString());
 							}
 						}
 						Set<String> cssClasses = uci.getCssClasses();
@@ -535,7 +536,8 @@ public class EntityClassHelper {
 						uci.getInternalDynamicAttributes().put("_internal_group", I18N.getText(uci.getGroup()));
 					}
 					if (StringUtils.isNotBlank(uci.getDescription())) {
-						uci.getInternalDynamicAttributes().put("_internal_description", I18N.getText(uci.getDescription()));
+						uci.getInternalDynamicAttributes().put("_internal_description",
+								I18N.getText(uci.getDescription()));
 					}
 					map.put(propertyName, uci);
 				}
