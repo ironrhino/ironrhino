@@ -26,6 +26,7 @@
 						}
 						ajax({
 									global : false,
+									preflight : true,
 									headers : {
 										'X-Target-Field' : t.attr('name')
 									},

@@ -217,6 +217,7 @@
 		r.removeClass('required');
 		if (options && options.onadd)
 			options.onadd.apply(r.get(0));
+		table.trigger('addRow');
 	};
 	var removeRow = function(event, options) {
 		var row = $(event.target).closest('tr');
@@ -245,6 +246,7 @@
 		rename(tbody);
 		if (options.onremove)
 			options.onremove();
+		table.trigger('removeRow');
 	};
 	var rename = function(tbody) {
 		var level = $(tbody).parents('table.datagrided').length;

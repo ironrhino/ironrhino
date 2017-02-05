@@ -745,7 +745,7 @@ Ajax = {
 				}
 			}
 		}
-		if ($(target).prop('tagName') == 'FORM') {
+		if ($(target).prop('tagName') == 'FORM' && !options.preflight) {
 			if (!hasError && $(target).hasClass('disposable'))
 				$(target).addClass('disposed').find(':input').prop('disabled',
 						true);
@@ -1387,6 +1387,7 @@ Observation.common = function(container) {
 				});
 		ajax({
 					global : t.data('global'),
+					preflight : true,
 					quiet : true,
 					async : false,
 					type : t.data('method') || 'GET',

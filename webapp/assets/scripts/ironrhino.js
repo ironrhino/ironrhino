@@ -32879,7 +32879,7 @@ Ajax = {
 				}
 			}
 		}
-		if ($(target).prop('tagName') == 'FORM') {
+		if ($(target).prop('tagName') == 'FORM' && !options.preflight) {
 			if (!hasError && $(target).hasClass('disposable'))
 				$(target).addClass('disposed').find(':input').prop('disabled',
 						true);
@@ -33521,6 +33521,7 @@ Observation.common = function(container) {
 				});
 		ajax({
 					global : t.data('global'),
+					preflight : true,
 					quiet : true,
 					async : false,
 					type : t.data('method') || 'GET',
@@ -34368,6 +34369,7 @@ DateUtils = {
 						}
 						ajax({
 									global : false,
+									preflight : true,
 									headers : {
 										'X-Target-Field' : t.attr('name')
 									},
@@ -37517,6 +37519,7 @@ Observation.sortableTable = function(container) {
 		r.removeClass('required');
 		if (options && options.onadd)
 			options.onadd.apply(r.get(0));
+		table.trigger('addRow');
 	};
 	var removeRow = function(event, options) {
 		var row = $(event.target).closest('tr');
@@ -37545,6 +37548,7 @@ Observation.sortableTable = function(container) {
 		rename(tbody);
 		if (options.onremove)
 			options.onremove();
+		table.trigger('removeRow');
 	};
 	var rename = function(tbody) {
 		var level = $(tbody).parents('table.datagrided').length;
