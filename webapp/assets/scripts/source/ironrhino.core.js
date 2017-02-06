@@ -751,10 +751,6 @@ Ajax = {
 						true);
 			if (!hasError && $(target).hasClass('reset') && target.reset) {
 				target.reset();
-				$(target).find('.resetable').html('');
-				var nav = $(target).find('.nav-tabs');
-				if (nav.length)
-					nav.find('li:first a').click();
 			}
 		}
 		Indicator.text = '';
@@ -897,7 +893,18 @@ Initialization.common = function() {
 				$('.ui-dialog:visible').last()
 						.find('.ui-dialog-titlebar-close').click();
 		}
-	}).on('click', 'form.ajax :submit', function() {
+	}).on('reset', 'form', function(e) {
+				var t = $(e.target);
+				t.find('.resetable').html('');
+				t.find(':input').filter(function() {
+							return $(this).val()
+						}).change();
+				$('.action-error .remove').click();
+				$('.field-error .remove', t).click();
+				var nav = t.find('.nav-tabs');
+				if (nav.length)
+					nav.find('li:first a').click();
+			}).on('click', 'form.ajax :submit', function() {
 				$(this).addClass('clicked');
 			}).on('click', 'label[for]', function(event) {
 				if ($(document.getElementById($(this).attr('for')))
