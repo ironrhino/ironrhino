@@ -33030,9 +33030,11 @@ Initialization.common = function() {
 	}).on('reset', 'form', function(e) {
 				var t = $(e.target);
 				t.find('.resetable').html('');
-				t.find(':input').filter(function() {
-							return $(this).val()
-						}).change();
+				setTimeout(function() {
+							t.find(':input').filter(function() {
+										return $(this).val()
+									}).change();
+						}, 200);
 				$('.action-error .remove').click();
 				$('.field-error .remove', t).click();
 				var nav = t.find('.nav-tabs');
@@ -34094,7 +34096,7 @@ var Nav = {
 				function() {
 					var tabid = $(this).closest('.tab-pane').attr('id');
 					var tab = $(this).closest('.tab-content').prev('.nav-tabs')
-							.find('a[href="#' + tabid + '"]').parent();
+							.find('a[href$="#' + tabid + '"]').parent();
 					tab = $(this).hasClass('step-next') ? tab.next() : tab
 							.prev();
 					tab.find('a').click();
