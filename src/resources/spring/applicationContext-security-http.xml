@@ -16,8 +16,8 @@
 		<security:intercept-url pattern="/locale" access="permitAll" />
 		<security:intercept-url pattern="/setup" access="permitAll" />
 		<security:intercept-url pattern="/api/**" access="permitAll" />
-		<security:intercept-url pattern="/signup*/**" access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
-		<security:intercept-url pattern="/signin*/**" access="hasRole('ROLE_BUILTIN_ANONYMOUS')" />
+		<security:intercept-url pattern="/signup*/**" access="permitAll" />
+		<security:intercept-url pattern="/signin*/**" access="permitAll" />
 		<security:intercept-url pattern="/common/upload" access="hasRole('ROLE_BUILTIN_USER')" />
 		<security:intercept-url pattern="/common/**" access="hasRole('ROLE_ADMINISTRATOR')" />
 		<security:intercept-url pattern="/**" access="hasRole('ROLE_BUILTIN_USER')" />
