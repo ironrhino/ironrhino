@@ -32021,7 +32021,7 @@ MessageBundle = {
 	'en' : {
 		'ajax.loading' : 'loading...',
 		'ajax.error' : 'network error,please try later',
-		'required' : 'please input value',
+		'required' : 'this is required',
 		'required.only.one' : '{0} are required only one',
 		'required.at.least.one' : '{0} are required at least one',
 		'selection.required' : 'please select',
@@ -32109,8 +32109,9 @@ MessageBundle = {
 		return msg;
 	},
 	lang : function() {
-		var lang = ($.cookie('locale') || navigator.language
-				|| navigator.browserLanguage || '');
+		var lang = $('html').attr('lang')
+				|| ($.cookie('locale') || navigator.language
+						|| navigator.browserLanguage || '');
 		var i = lang.indexOf('-');
 		if (i > 0)
 			lang = lang.substring(0, i) + '_'
