@@ -321,8 +321,11 @@ Message = {
 		var msg = msg || MessageBundle.get(msgKey);
 		if (field && $(field).length) {
 			field = $(field).not(':disabled');
-			var tabpane = field.closest('.control-group').parent('.tab-pane');
-			if (tabpane.length && !tabpane.hasClass('active'))
+			var tabpane = field.closest('.tab-pane');
+			if (tabpane.length
+					&& $(field).closest('form').get(0) == tabpane
+							.closest('form').get(0)
+					&& !tabpane.hasClass('active'))
 				$('a[href$="#' + tabpane.attr('id') + '"]').tab('show');
 			var cgroup = field.closest('.control-group');
 			cgroup.addClass('error');
@@ -431,8 +434,10 @@ Form = {
 				}
 			}
 			var valid = true;
-			var tabpane = t.closest('.control-group').parent('.tab-pane');
-			var inhiddenpanel = tabpane.length && t.css('display') != 'none'
+			var tabpane = t.closest('.tab-pane');
+			var inhiddenpanel = tabpane.length
+					&& t.closest('form').get(0) == tabpane.closest('form')
+							.get(0) && t.css('display') != 'none'
 					&& !tabpane.hasClass('active');
 			if (inhiddenpanel
 					&& $('.control-group.error', tabpane
