@@ -282,10 +282,14 @@ Message = {
 			a.push(messages);
 			messages = a;
 		}
-		// if ($.alerts) {
-		// $.alerts.alert(messages.join('\n'), MessageBundle.get('error'));
-		// return;
-		// }
+		if ($(target).hasClass('alerts')) {
+			if ($.alerts) {
+				$.alerts.alert(messages.join('\n'), '');
+			} else {
+				alert(messages.join('\n'));
+			}
+			return;
+		}
 		var html = '';
 		for (var i = 0; i < messages.length; i++)
 			html += Message.compose(messages[i], error
