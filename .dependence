@@ -16,3 +16,4 @@
 +transaction-api
 +HikariCP
 -bonecp
++spring-data-commons

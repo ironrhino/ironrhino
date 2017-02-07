@@ -15,7 +15,7 @@
 |elasticsearch-\*.jar lucene-*.jar mmseg4j-*.jar
 
 |redis
-|jedis-\*.jar commons-pool2-*.jar spring-data-redis-*.jar
+|jedis-\*.jar commons-pool2-*.jar spring-data-redis-*.jar spring-data-commons-*.jar
 
 |rabbitmq
 |rabbitmq-client-\*.jar spring-rabbit-*.jar spring-amqp-*.jar
