@@ -25,6 +25,7 @@
 	cursor: default;
 	padding: 0em;
 	margin: 0em;
+	white-space: pre-wrap;
 }
 
 #popup_content {
@@ -50,6 +51,9 @@
 
 #popup_message {
 	padding-left: 48px;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+    word-break: break-all;
 }
 
 #popup_panel {

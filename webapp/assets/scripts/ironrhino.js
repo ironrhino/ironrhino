@@ -18566,6 +18566,13 @@ function log() {
 		
 		// Public methods
 		
+		info: function(message, title, callback) {
+			if( title == null ) title = 'Info';
+			$.alerts._show(title, message, null, 'info', function(result) {
+				if( callback ) callback(result);
+			});
+		},
+		
 		alert: function(message, title, callback) {
 			if( title == null ) title = 'Alert';
 			$.alerts._show(title, message, null, 'alert', function(result) {
@@ -18608,10 +18615,11 @@ function log() {
 				margin: 0
 			});
 			
-			$("#popup_title").text(title);
+			$("#popup_title").html(title);
 			$("#popup_content").addClass(type);
-			$("#popup_message").text(msg);
-			$("#popup_message").html( $("#popup_message").text().replace(/\n/g, '<br />') );
+			$("#popup_content").addClass(type == 'info' ? 'alert-info' : type == 'confirm' ? 'alert' : '');
+			$("#popup_message").html(msg);
+			//$("#popup_message").html( $("#popup_message").text().replace(/\n/g, '<br />') );
 			
 			$("#popup_container").css({
 				minWidth: $("#popup_container").outerWidth(),
@@ -18622,8 +18630,9 @@ function log() {
 			$.alerts._maintainPosition(true);
 			
 			switch( type ) {
+				case 'info':
 				case 'alert':
-					$("#popup_message").after('<div id="popup_panel"><button id="popup_ok" class="btn">' + $.alerts.okButton + '</button></div>');
+					$("#popup_message").after('<div id="popup_panel"><button id="popup_ok" class="btn btn-primary">' + $.alerts.okButton + '</button></div>');
 					$("#popup_ok").click( function() {
 						$.alerts._hide();
 						callback(true);
@@ -18649,7 +18658,7 @@ function log() {
 					});
 				break;
 				case 'prompt':
-					$("#popup_message").append('<br /><input type="text" size="30" id="popup_prompt" />').after('<div id="popup_panel"><button id="popup_ok" class="btn">' + $.alerts.okButton + '</button> <button id="popup_cancel" class="btn">' + $.alerts.cancelButton + '</button></div>');
+					$("#popup_message").append('<br /><input type="text" size="30" id="popup_prompt" />').after('<div id="popup_panel"><button id="popup_ok" class="btn btn-primary">' + $.alerts.okButton + '</button> <button id="popup_cancel" class="btn">' + $.alerts.cancelButton + '</button></div>');
 					$("#popup_prompt").width( $("#popup_message").width() );
 					$("#popup_ok").click( function() {
 						var val = $("#popup_prompt").val();
@@ -32419,7 +32428,7 @@ Message = {
 		}
 		if ($(target).hasClass('alerts')) {
 			if ($.alerts) {
-				$.alerts.alert(messages.join('\n'), '');
+				$.alerts.info(messages.join('\n'), ' ');
 			} else {
 				alert(messages.join('\n'));
 			}

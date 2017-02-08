@@ -284,7 +284,7 @@ Message = {
 		}
 		if ($(target).hasClass('alerts')) {
 			if ($.alerts) {
-				$.alerts.alert(messages.join('\n'), '');
+				$.alerts.info(messages.join('\n'), ' ');
 			} else {
 				alert(messages.join('\n'));
 			}

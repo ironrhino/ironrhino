@@ -1234,6 +1234,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	cursor: default;
 	padding: 0em;
 	margin: 0em;
+	white-space: pre-wrap;
 }
 
 #popup_content {
@@ -1259,6 +1260,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 
 #popup_message {
 	padding-left: 48px;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+    word-break: break-all;
 }
 
 #popup_panel {
