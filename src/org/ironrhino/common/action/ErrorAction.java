@@ -47,6 +47,7 @@ public class ErrorAction extends BaseAction {
 		if (exception instanceof ErrorMessage) {
 			response.setStatus(HttpServletResponse.SC_OK);
 			addActionError(((ErrorMessage) exception).getLocalizedMessage());
+			request.removeAttribute(RequestDispatcher.ERROR_EXCEPTION);
 			return ERROR;
 		} else if (exception instanceof AccountStatusException) {
 			if (exception instanceof CredentialsExpiredException) {

@@ -139,8 +139,9 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 							logger.error(e.getMessage(), e);
 						}
 					}
+					list = list.subList(list.size() - maximumSessions, list.size());
 				}
-				sessions = StringUtils.join(list.subList(list.size() - maximumSessions, list.size()), ",");
+				sessions = StringUtils.join(list, ",");
 			}
 			cacheManager.put(username, sessions, 12, TimeUnit.HOURS, CACHE_NAMESPACE);
 		}
