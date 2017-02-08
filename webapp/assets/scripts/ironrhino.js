@@ -32477,8 +32477,8 @@ Message = {
 							.closest('form').get(0)
 					&& !tabpane.hasClass('active'))
 				$('a[href$="#' + tabpane.attr('id') + '"]').tab('show');
-			var cgroup = field.closest('.control-group');
-			cgroup.addClass('error');
+			var cgroup = Form.findControlGroup(field);
+			cgroup.length ? cgroup.addClass('error') : field.addClass('error');
 			$('.field-error', field.parent()).remove();
 			if (field.hasClass('sqleditor'))
 				field = field.next('.preview');
@@ -32517,7 +32517,8 @@ Message = {
 			} else if (field.is('[type="hidden"]')) {
 				var fp = field.parent('.listpick,.treeselect');
 				if (fp.length && !fp.is('.control-group')) {
-					cgroup.removeClass('error');
+					cgroup.length ? cgroup.removeClass('error') : field
+							.removeClass('error');
 					$('<span class="field-error">' + msg + '</span>')
 							.appendTo(fp);
 				} else if (cgroup.length) {
@@ -32553,13 +32554,16 @@ Form = {
 	},
 	clearError : function(target) {
 		if ($(target).prop('tagName') == 'FORM') {
-			$('.control-group.error', target).removeClass('error');
+			$('.control-group.error, .error:input', target)
+					.removeClass('error');
 			$('.field-error', target).fadeIn().remove();
 		} else if ($(target).prop('tagName') == 'DIV') {
 			$(target).removeClass('error');
 			$('.field-error', target).fadeIn().remove();
 		} else {
-			$(target).closest('.control-group').removeClass('error');
+			var cg = Form.findControlGroup(target);
+			cg.length ? cg.removeClass('error') : $(target)
+					.removeClass('error');
 			$('.field-error', $(target).parent()).fadeIn().remove();
 		}
 	},
@@ -32705,14 +32709,16 @@ Form = {
 				var labels = [];
 				$.each(inputs, function(i, v) {
 							labels.push($('.control-label',
-									v.closest('.control-group')).text());
+									Form.findControlGroup(v)).text());
 							if (v.val())
 								matched++;
 						});
 				if (matched != 1) {
 					valid = false;
 					$.each(inputs, function(i, v) {
-								v.closest('.control-group').addClass('error');
+								var cg = Form.findControlGroup(v);
+								cg.length ? cg.addClass('error') : v
+										.addClass('error');
 							});
 					Message.showActionError(MessageBundle.get(
 									'required.only.one', '[' + labels + ']'),
@@ -32739,14 +32745,16 @@ Form = {
 				var labels = [];
 				$.each(inputs, function(i, v) {
 							labels.push($('.control-label',
-									v.closest('.control-group')).text());
+									Form.findControlGroup(v)).text());
 							if (v.val())
 								matched++;
 						});
 				if (matched < 1) {
 					valid = false;
 					$.each(inputs, function(i, v) {
-								v.closest('.control-group').addClass('error');
+								var cg = Form.findControlGroup(v);
+								cg.length ? cg.addClass('error') : v
+										.addClass('error');
 							});
 					Message.showActionError(MessageBundle
 									.get('required.at.least.one', '[' + labels
@@ -32755,6 +32763,12 @@ Form = {
 			}
 			return valid;
 		}
+	},
+	findControlGroup : function(target) {
+		var t = $(target);
+		if (t.parent('.input-append,.input-prepend').length)
+			t = t.parent();
+		return t.parent('.controls').parent('.control-group');
 	}
 };
 
@@ -33076,10 +33090,13 @@ Initialization.common = function() {
 			}).on('click', '.removeonclick', function() {
 				$(this).remove()
 			}).on('click', '.field-error .remove', function(e) {
-				Form.clearError($(e.target).closest('.control-group'));
-				$(e.target).closest('.field-error').remove();
-				return false;
-			}).on('validate', ':input', function(ev) {
+		var t = $(e.target);
+		var cg = Form.findControlGroup(t);
+		Form.clearError(cg.length ? cg : t.closest('.field-error')
+				.prev(':input'));
+		t.closest('.field-error').remove();
+		return false;
+	}).on('validate', ':input', function(ev) {
 				Form.validate(this, 'validate');
 			}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
 						if ($(this).val()) {
