@@ -36,17 +36,8 @@
 #popup_content #popup_icon{
 	width: 32px;
 	height: 32px;
-	background: url(../images/alerts.png);
-	background-position: 0px -64px;
+	font-size: 28px;
 	float: left;
-}
-
-#popup_content.confirm #popup_icon {
-	background-position: 0px -32px;
-}
-
-#popup_content.prompt #popup_icon{
-	background-position: 0px 0px;
 }
 
 #popup_message {

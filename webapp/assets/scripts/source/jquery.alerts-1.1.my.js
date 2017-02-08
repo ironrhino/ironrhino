@@ -79,6 +79,8 @@
 			
 			$("BODY").append('<div id="popup_container"><h1 id="popup_title"></h1><div id="popup_content"><div id="popup_icon"></div><div id="popup_message"></div></div></div>');
 			
+			$('#popup_icon').html('<span class="glyphicon glyphicon-' + (type=='confirm'?'alert':type=='prompt'?'question-sign':'info-sign') + '"></span>');
+			
 			if( $.alerts.dialogClass ) $("#popup_container").addClass($.alerts.dialogClass);
 			
 			// IE6 Fix
