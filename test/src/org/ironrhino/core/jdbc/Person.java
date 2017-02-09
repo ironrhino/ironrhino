@@ -22,7 +22,7 @@ public class Person implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 
-	@Column(name = "f_dob")
+	@Column(name = "F_DOB")
 	private Date dob;
 
 	private int age;

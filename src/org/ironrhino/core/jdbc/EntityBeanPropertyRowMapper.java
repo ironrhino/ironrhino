@@ -42,7 +42,7 @@ public class EntityBeanPropertyRowMapper<T> extends MyBeanPropertyRowMapper<T> {
 				}
 			}
 			if (column != null && StringUtils.isNotBlank(column.name()))
-				return column.name();
+				name = lowerCaseName(column.name());
 		}
 		return super.underscoreName(name);
 	}

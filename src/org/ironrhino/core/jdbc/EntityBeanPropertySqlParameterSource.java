@@ -39,7 +39,7 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 				} catch (NoSuchFieldException e) {
 				}
 			}
-			if (column != null && name.equals(column.name()))
+			if (column != null && name.equalsIgnoreCase(column.name()))
 				return true;
 		}
 		return false;
@@ -86,7 +86,7 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 					} catch (NoSuchFieldException e) {
 					}
 				}
-				if (column != null && name.equals(column.name())) {
+				if (column != null && name.equalsIgnoreCase(column.name())) {
 					Object value = beanWrapper.getPropertyValue(pd.getName());
 					if (value instanceof Enum) {
 						Enum<?> en = ((Enum<?>) value);
