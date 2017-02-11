@@ -3,6 +3,8 @@ package org.ironrhino.core.util;
 import java.io.Serializable;
 import java.util.Locale;
 
+import org.ironrhino.core.util.AppInfo.Stage;
+
 public class UserAgent implements Serializable {
 
 	private static final long serialVersionUID = 7964528679540704029L;
@@ -94,7 +96,18 @@ public class UserAgent implements Serializable {
 					name = "msie";
 					String str = "MSIE";
 					int index = userAgent.indexOf(str) + str.length() + 1;
-					version = userAgent.substring(index, userAgent.indexOf(";", index));
+					String s = userAgent.substring(index);
+					index = s.indexOf(';');
+					if (index > 0)
+						version = s.substring(0, index);
+				} else if (userAgent.contains("Trident")) {
+					name = "msie";
+					String str = "rv:";
+					int index = userAgent.indexOf(str) + str.length();
+					String s = userAgent.substring(index);
+					index = s.indexOf(')');
+					if (index > 0)
+						version = s.substring(0, index);
 				} else if (userAgent.contains("Mozilla")) {
 					name = "mozilla";
 				}
@@ -109,7 +122,8 @@ public class UserAgent implements Serializable {
 
 				setVersion(version);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if (AppInfo.getStage() == Stage.DEVELOPMENT)
+					e.printStackTrace();
 			}
 		}
 	}
