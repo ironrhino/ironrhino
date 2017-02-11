@@ -193,7 +193,7 @@
 </#list>
 <@rttbodytrend entity=entity showActionColumn=showActionColumn buttons=richtableConfig.actionColumnButtons editable=!readonly.value viewable=viewable entityReadonly=entityReadonly inputWindowOptions=richtableConfig.inputWindowOptions! viewWindowOptions=richtableConfig.viewWindowOptions!/>
 </#list>
-<@rtend columns=columns sumColumns=sumColumns showCheckColumn=richtableConfig.showCheckColumn showActionColumn=showActionColumn showBottomButtons=richtableConfig.showBottomButtons readonly=readonly.value deletable=!readonly.value||readonly.deletable searchable=searchable filterable=richtableConfig.filterable downloadable=richtableConfig.downloadable showPageSize=richtableConfig.showPageSize! buttons=richtableConfig.bottomButtons! enableable=enableable formFooter=formFooter! inputWindowOptions=richtableConfig.inputWindowOptions!/>
+<@rtend columns=columns sumColumns=sumColumns showCheckColumn=richtableConfig.showCheckColumn showActionColumn=showActionColumn showBottomButtons=richtableConfig.showBottomButtons celleditable=celleditable readonly=readonly.value deletable=!readonly.value||readonly.deletable searchable=searchable filterable=richtableConfig.filterable downloadable=richtableConfig.downloadable showPageSize=richtableConfig.showPageSize! buttons=richtableConfig.bottomButtons! enableable=enableable formFooter=formFooter! inputWindowOptions=richtableConfig.inputWindowOptions!/>
 <#if !readonly.value && hasSelect>
 <div style="display: none;">
 <#list uiConfigs as key,config>
