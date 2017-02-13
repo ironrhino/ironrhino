@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.apache.struts2.views.freemarker.ScopesHashModel;
 import org.ironrhino.core.freemarker.BeansTemplateHashModel;
+import org.ironrhino.core.freemarker.ConstantsTemplateHashModel;
 import org.ironrhino.core.freemarker.FallbackTemplateProvider;
 import org.ironrhino.core.freemarker.MyBeansWrapperBuilder;
 import org.ironrhino.core.freemarker.MyConfiguration;
@@ -64,6 +65,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 
 	public static final String KEY_BASE = "base";
 	public static final String KEY_STATICS = "statics";
+	public static final String KEY_CONSTANTS = "constants";
 	public static final String KEY_BEANS = "beans";
 	public static final String KEY_PROPERTIES = "properties";
 	public static final String KEY_DEV_MODE = "devMode";
@@ -106,6 +108,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		Map<String, Object> globalVariables = new HashMap<>(8);
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
 		globalVariables.put(KEY_STATICS, DEFAULT_BEANS_WRAPPER.getStaticModels());
+		globalVariables.put(KEY_CONSTANTS, new ConstantsTemplateHashModel());
 		globalVariables.put(KEY_BEANS, new BeansTemplateHashModel());
 		globalVariables.put(KEY_PROPERTIES, new PropertiesTemplateHashModel());
 		globalVariables.put(KEY_DEV_MODE, devMode);
