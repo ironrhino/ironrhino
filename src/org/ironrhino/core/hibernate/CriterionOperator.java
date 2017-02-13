@@ -366,24 +366,6 @@ public enum CriterionOperator implements Displayable {
 		this.parametersSize = parametersSize;
 	}
 
-	@Override
-	public String getName() {
-		return Displayable.super.getName();
-	}
-
-	@Override
-	public String getDisplayName() {
-		return Displayable.super.getDisplayName();
-	}
-
-	public static CriterionOperator parse(String name) {
-		if (name != null)
-			for (CriterionOperator en : values())
-				if (name.equals(en.name()) || name.equals(en.getDisplayName()))
-					return en;
-		return null;
-	}
-
 	public abstract Criterion operator(String name, Object... values);
 
 	public int getParametersSize() {
