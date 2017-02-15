@@ -41,6 +41,7 @@ public class AccessFilter implements Filter {
 	public static final String MDC_KEY_REQUEST_CHAIN = "requestChain";
 	public static final String HTTP_HEADER_REQUEST_FROM = "X-Request-From";
 	public static final String MDC_KEY_REQUEST_FROM = "requestFrom";
+	public static final String SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED = "proxy.request.disabled";
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -100,7 +101,8 @@ public class AccessFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
 		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
-		HttpServletRequest request = new ProxySupportHttpServletRequest((HttpServletRequest) req);
+		HttpServletRequest request = "true".equals(System.getProperty(SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED))
+				? (HttpServletRequest) req : new ProxySupportHttpServletRequest((HttpServletRequest) req);
 		HttpServletResponse response = (HttpServletResponse) resp;
 		RequestContext.set(request, response);
 		try {
