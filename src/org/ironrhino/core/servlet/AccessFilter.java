@@ -146,7 +146,12 @@ public class AccessFilter implements Filter {
 
 			if (request.getAttribute("userAgent") == null)
 				request.setAttribute("userAgent", new UserAgent(request.getHeader("User-Agent")));
-			MDC.put("remoteAddr", request.getRemoteAddr());
+			String remoteAddr = request.getRemoteAddr();
+			String proxyAddr = (String) request
+					.getAttribute(ProxySupportHttpServletRequest.REQUEST_ATTRIBUTE_PROXY_ADDR);
+			if (proxyAddr != null)
+				remoteAddr += " via " + proxyAddr;
+			MDC.put("remoteAddr", remoteAddr);
 			MDC.put("method", request.getMethod());
 			StringBuffer url = request.getRequestURL();
 			if (StringUtils.isNotBlank(request.getQueryString()))

@@ -31,6 +31,8 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	// proxy_set_header X-Client-Certificate $ssl_client_cert;
 	public static final String HEADER_NAME_X_CLIENT_CERTIFICATE = "X-Client-Certificate";
 
+	public static final String REQUEST_ATTRIBUTE_PROXY_ADDR = "X-Proxy-Addr";
+
 	public ProxySupportHttpServletRequest(HttpServletRequest request) {
 		super(request);
 		String certificate = request.getHeader(HEADER_NAME_X_CLIENT_CERTIFICATE);
@@ -58,7 +60,11 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 			if (StringUtils.isNotBlank(addr) && (index = addr.indexOf(',')) > 0)
 				addr = addr.substring(0, index);
 		}
-		addr = StringUtils.isNotBlank(addr) ? addr : super.getRemoteAddr();
+		if (StringUtils.isNotBlank(addr)) {
+			setAttribute(REQUEST_ATTRIBUTE_PROXY_ADDR, super.getRemoteAddr());
+		} else {
+			addr = super.getRemoteAddr();
+		}
 		return addr;
 	}
 
