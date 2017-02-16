@@ -32302,23 +32302,58 @@ Indicator = {
 };
 
 ProgressBar = {
-	show : function(percent) {
-		var width = percent;
-		if (typeof percent == 'number')
-			width = percent * 100 + '%';
+	show : function(percent, simulate) {
+		if (percent < 0)
+			percent = 0;
+		else if (percent > 100)
+			percent = 100;
+		else if (percent < 1)
+			percent *= 100;
 		var pb = $('#progress-bar');
-		if (!pb.length)
+		if (!pb.length) {
 			pb = $('<div id="progress-bar"><div class="progress"></div></div>')
 					.prependTo(document.body);
-		$('#progress-bar').css('opacity', '1').find('.progress').css('width',
-				width);
+			setTimeout(function() {
+						pb.data('percent', percent).css('opacity', '1')
+								.find('.progress').css('width', percent + '%');
+					}, 20);
+			return;
+		}
+		if (!simulate)
+			ProgressBar.stopSimulate();
+		var prevPercent = pb.data('percent') || 0;
+		if (prevPercent > percent)
+			return;
+		pb.data('percent', percent).css('opacity', '1').find('.progress').css(
+				'width', percent + '%');
 	},
 	hide : function() {
-		if ($('#progress-bar')) {
+		var pb = $('#progress-bar');
+		if (pb.length) {
+			ProgressBar.show(100);
 			setTimeout(function() {
-						$('#progress-bar').remove()
-					}, 20);
+						pb.remove()
+					}, 200);
 		}
+	},
+	simulate : function() {
+		ProgressBar.show(5, true);
+		var pb = $('#progress-bar');
+		var interval = setInterval(function() {
+					var percent = pb.data('percent');
+					var nextPercent = percent + Math.random() * 10;
+					if (nextPercent > 84) {
+						ProgressBar.stopSimulate();
+					} else {
+						ProgressBar.show(nextPercent, true);
+					}
+				}, 1000);
+		pb.data('interval', interval);
+	},
+	stopSimulate : function() {
+		var intv = $('#progress-bar').data('interval');
+		if (intv)
+			clearInterval(intv);
 	}
 };
 
@@ -32935,11 +32970,11 @@ function ajaxOptions(options) {
 		options.xhr = function() {
 			var xhr = $.ajaxSettings.xhr();
 			if (xhr instanceof XMLHttpRequest) {
-				xhr.addEventListener("progress", function(evt) {
+				xhr.addEventListener('progress', function(evt) {
 							if (evt.lengthComputable)
 								ProgressBar.show(evt.loaded / evt.total);
 						});
-				xhr.addEventListener("loadend", ProgressBar.hide);
+				xhr.addEventListener('loadend', ProgressBar.hide);
 			}
 			return xhr;
 		}
@@ -33030,8 +33065,9 @@ $(_init);
 
 Initialization.common = function() {
 	$(document).ajaxStart(function() {
-				Indicator.show()
-			}).ajaxError(function() {
+				Indicator.show();
+				ProgressBar.simulate();
+			}).ajaxComplete(ProgressBar.hide).ajaxError(function() {
 				Indicator.showError()
 			}).ajaxSuccess(function(ev, xhr) {
 		Indicator.hide();
