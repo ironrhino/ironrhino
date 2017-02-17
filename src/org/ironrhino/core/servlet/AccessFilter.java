@@ -205,12 +205,9 @@ public class AccessFilter implements Filter {
 				}
 				MDC.put("request", sb.toString());
 			}
+			MDC.put("server", " server:" + AppInfo.getInstanceId(true));
+			long start = System.currentTimeMillis();
 			try {
-				if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")
-						&& request.getHeader("Last-Event-Id") == null)
-					accessLog.info("");
-
-				long start = System.currentTimeMillis();
 				chain.doFilter(request, response);
 				long responseTime = System.currentTimeMillis() - start;
 				if (isRequestDispatcher && responseTime > responseTimeThreshold) {
@@ -223,6 +220,12 @@ public class AccessFilter implements Filter {
 				logger.error(e.getMessage(), e);
 				throw e;
 			} finally {
+				if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")
+						&& request.getHeader("Last-Event-Id") == null) {
+					long responseTime = System.currentTimeMillis() - start;
+					MDC.put("responseTime", " responseTime:" + responseTime);
+					accessLog.info("");
+				}
 				MDC.clear();
 			}
 		} finally {
