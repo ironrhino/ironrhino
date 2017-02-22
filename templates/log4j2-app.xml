@@ -1,13 +1,16 @@
 <?xml version="1.0"?>
 <Configuration>
+	<Properties>
+		<Property name="kafka.bootstrap.servers">localhost:9092</Property>
+	</Properties>
 	<Appenders>
 		<Kafka name="KAFKA-ACCESS" topic="app.logs.access">
 			<PatternLayout pattern="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request}%X{server}%X{responseTime}" charset="UTF-8"/>
-			<Property name="bootstrap.servers">localhost:9092</Property>
+			<Property name="bootstrap.servers">${sys:kafka.bootstrap.servers}</Property>
 		</Kafka>
 		<Kafka name="KAFKA-APPLICATION" topic="app.logs.application">
 			<PatternLayout pattern="%d %c %t%X{request}%X{server}%X{url} %p %m%th{10}" charset="UTF-8"/>
-			<Property name="bootstrap.servers">localhost:9092</Property>
+			<Property name="bootstrap.servers">${sys:kafka.bootstrap.servers}</Property>
 		</Kafka>
 	</Appenders>
 	<Loggers>
