@@ -37,6 +37,7 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 				logger.info("Server port auto detected: {}", port);
 			}
 		}
+		System.setProperty(AppInfo.KEY_APP_INSTANCEID, AppInfo.getInstanceId(true));
 		logger.info("Default timezone {}", TimeZone.getDefault().getID());
 		logger.info(
 				"app.name={},app.version={},app.instanceid={},app.stage={},app.runlevel={},app.home={},hostname={},hostaddress={},profiles={}",

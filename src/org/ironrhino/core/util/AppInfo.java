@@ -43,6 +43,8 @@ public class AppInfo {
 
 	public static final String KEY_APP_VERSION = "app.version";
 
+	public static final String KEY_APP_INSTANCEID = "app.instanceId";
+
 	public static final String KEY_RACK = "RACK";
 
 	public static final String DEFAULT_RACK = "/default-rack";
