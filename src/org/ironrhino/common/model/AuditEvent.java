@@ -17,7 +17,6 @@ import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
-import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.UserRole;
@@ -36,7 +35,7 @@ public class AuditEvent extends BaseEntity {
 
 	@UiConfig(width = "100px")
 	@Column(nullable = false)
-	@SearchableProperty(index = Index.NOT_ANALYZED)
+	@SearchableProperty
 	private String username;
 
 	@UiConfig(width = "130px")

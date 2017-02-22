@@ -50,8 +50,8 @@ import org.ironrhino.core.model.Ordered;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.model.Tuple;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchCriteria;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
+import org.ironrhino.core.search.SearchCriteria;
+import org.ironrhino.core.search.SearchService;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.service.BaseManager;
@@ -117,7 +117,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected BaseTreeableEntity parentEntity;
 
 	@Autowired(required = false)
-	protected transient ElasticSearchService<EN> elasticSearchService;
+	protected transient SearchService<EN> searchService;
 
 	@Autowired(required = false)
 	protected transient ConversionService conversionService;
@@ -356,7 +356,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		boolean searchable = isSearchable();
 		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 		if (ownerProperty != null && ownerProperty.getKey().isolate()
-				|| (!searchable || StringUtils.isBlank(keyword) || (searchable && elasticSearchService == null))) {
+				|| (!searchable || StringUtils.isBlank(keyword) || (searchable && searchService == null))) {
 			boolean resetPageSize;
 			if (resultPage == null) {
 				resultPage = new ResultPage();
@@ -377,7 +377,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					searchableProperties.add(entry.getKey());
 			}
 			String query = keyword.trim();
-			ElasticSearchCriteria criteria = new ElasticSearchCriteria();
+			SearchCriteria criteria = new SearchCriteria();
 			criteria.setQuery(query);
 			criteria.setTypes(new String[] { getEntityName() });
 			if (richtableConfig != null && StringUtils.isNotBlank(richtableConfig.order())) {
@@ -410,7 +410,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPaginating(richtableConfig.paginating());
 			prepare(criteria);
 			resultPage.setCriteria(criteria);
-			resultPage = elasticSearchService.search(resultPage, source -> (EN) entityManager.get(source.getId()));
+			resultPage = searchService.search(resultPage, source -> (EN) entityManager.get(source.getId()));
 		}
 		return LIST;
 	}
@@ -569,7 +569,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	}
 
-	protected void prepare(ElasticSearchCriteria esc) {
+	protected void prepare(SearchCriteria esc) {
 
 	}
 

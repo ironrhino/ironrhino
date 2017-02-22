@@ -21,8 +21,6 @@ public @interface SearchableProperty {
 
 	String analyzer() default "";
 
-	String index_analyzer() default "";
-
 	String search_analyzer() default "";
 
 	String format() default "";

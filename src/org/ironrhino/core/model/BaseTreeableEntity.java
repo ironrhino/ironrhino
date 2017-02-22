@@ -23,7 +23,6 @@ import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.FullnameSeperator;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
@@ -37,6 +36,7 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	private static final long serialVersionUID = 2462271646391940930L;
 
 	@Id
+	@SearchableId
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "treeable_entity_seq")
 	@SequenceGenerator(name = "treeable_entity_seq", sequenceName = "treeable_entity_seq", allocationSize = 1)
 	protected Long id;
@@ -101,7 +101,7 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	}
 
 	@CaseInsensitive
-	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
+	@SearchableProperty(boost = 3)
 	public String getName() {
 		return name;
 	}

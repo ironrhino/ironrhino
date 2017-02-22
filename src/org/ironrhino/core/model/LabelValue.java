@@ -3,7 +3,6 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
@@ -12,10 +11,10 @@ public class LabelValue implements Serializable {
 
 	private static final long serialVersionUID = 7629652470042630809L;
 
-	@SearchableProperty(boost = 2, index = Index.NOT_ANALYZED)
+	@SearchableProperty(boost = 2)
 	private String value;
 
-	@SearchableProperty(boost = 2, index = Index.NOT_ANALYZED)
+	@SearchableProperty(boost = 2)
 	private String label;
 
 	private Boolean selected;

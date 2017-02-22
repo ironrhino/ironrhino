@@ -21,8 +21,8 @@ import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.model.ResultPage;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchCriteria;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
+import org.ironrhino.core.search.SearchCriteria;
+import org.ironrhino.core.search.SearchService;
 import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ValueThenKeyComparator;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManager {
 
 	@Autowired(required = false)
-	private transient ElasticSearchService<Page> elasticSearchService;
+	private transient SearchService<Page> searchService;
 
 	@Override
 	@Transactional
@@ -179,7 +179,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 		if (tag.length == 0 || StringUtils.isBlank(tag[0]))
 			return Collections.EMPTY_LIST;
 		List<Page> list;
-		if (elasticSearchService != null) {
+		if (searchService != null) {
 			String query = null;
 			if (tag.length == 1) {
 				query = "tags:" + tag[0];
@@ -190,15 +190,15 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 					sb.append(" AND ").append("tags:").append(tag[i]);
 				query = sb.toString();
 			}
-			ElasticSearchCriteria criteria = new ElasticSearchCriteria();
+			SearchCriteria criteria = new SearchCriteria();
 			criteria.setQuery(query);
 			criteria.setTypes(new String[] { "page" });
 			criteria.addSort("displayOrder", false);
 			criteria.addSort("createDate", true);
 			if (limit > 0)
-				list = elasticSearchService.search(criteria, null, limit);
+				list = searchService.search(criteria, null, limit);
 			else
-				list = elasticSearchService.search(criteria);
+				list = searchService.search(criteria);
 		} else {
 			DetachedCriteria dc = detachedCriteria();
 			dc.addOrder(Order.asc("displayOrder"));
@@ -240,9 +240,9 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 				sb.append(" AND ").append("tags:").append(tag[i]);
 			query = sb.toString();
 		}
-		ElasticSearchCriteria criteria = resultPage.getCriteria();
+		SearchCriteria criteria = resultPage.getCriteria();
 		if (criteria == null) {
-			criteria = new ElasticSearchCriteria();
+			criteria = new SearchCriteria();
 			resultPage.setCriteria(criteria);
 		}
 		criteria.setQuery(query);
@@ -252,8 +252,8 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 			criteria.addSort("createDate", true);
 		}
 
-		if (elasticSearchService != null) {
-			resultPage = elasticSearchService.search(resultPage);
+		if (searchService != null) {
+			resultPage = searchService.search(resultPage);
 		} else {
 			DetachedCriteria dc = detachedCriteria();
 			for (int i = 0; i < tag.length; i++)
@@ -273,11 +273,11 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 	public Map<String, Integer> findMatchedTags(String keyword) {
 		if (keyword == null || keyword.length() < 2)
 			return Collections.EMPTY_MAP;
-		if (elasticSearchService != null) {
-			ElasticSearchCriteria cc = new ElasticSearchCriteria();
+		if (searchService != null) {
+			SearchCriteria cc = new SearchCriteria();
 			cc.setQuery(new StringBuilder("tags:").append(keyword).append("*").toString());
 			cc.setTypes(new String[] { "page" });
-			Map<String, Integer> map = elasticSearchService.countTermsByField(cc, "tags");
+			Map<String, Integer> map = searchService.countTermsByField(cc, "tags");
 			Iterator<Map.Entry<String, Integer>> it = map.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<String, Integer> entry = it.next();

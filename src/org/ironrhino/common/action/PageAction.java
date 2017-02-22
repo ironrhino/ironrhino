@@ -17,7 +17,7 @@ import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.model.ResultPage;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchCriteria;
+import org.ironrhino.core.search.SearchCriteria;
 import org.ironrhino.core.struts.EntityAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,7 +63,7 @@ public class PageAction extends EntityAction<Page> {
 
 	@Override
 	public String execute() {
-		if (StringUtils.isBlank(keyword) || elasticSearchService == null) {
+		if (StringUtils.isBlank(keyword) || searchService == null) {
 			DetachedCriteria dc = pageManager.detachedCriteria();
 			CriteriaState criteriaState = CriterionUtils.filter(dc, getEntityClass());
 			if (StringUtils.isNotBlank(keyword)) {
@@ -94,7 +94,7 @@ public class PageAction extends EntityAction<Page> {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			ElasticSearchCriteria criteria = new ElasticSearchCriteria();
+			SearchCriteria criteria = new SearchCriteria();
 			criteria.setQuery(query);
 			criteria.setTypes(new String[] { "page" });
 			criteria.addSort("displayOrder", false);
@@ -102,7 +102,7 @@ public class PageAction extends EntityAction<Page> {
 			if (resultPage == null)
 				resultPage = new ResultPage<>();
 			resultPage.setCriteria(criteria);
-			resultPage = elasticSearchService.search(resultPage);
+			resultPage = searchService.search(resultPage);
 		}
 		return LIST;
 	}

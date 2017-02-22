@@ -25,8 +25,6 @@
 	<property name="mail-config-sources-jar.includes" value="resources/spring/applicationContext-mail.xml" />
 	<property name="sendmailqueue-config-sources-jar.name" value="ironrhino-sendmailqueue-config-${version}-sources.jar" />
 	<property name="sendmailqueue-config-sources-jar.includes" value="resources/spring/applicationContext-sendmailqueue.xml" />
-	<property name="search-config-sources-jar.name" value="ironrhino-search-config-${version}-sources.jar" />
-	<property name="search-config-sources-jar.includes" value="resources/spring/applicationContext-search.xml" />
 	<property name="redis-config-sources-jar.name" value="ironrhino-redis-config-${version}-sources.jar" />
 	<property name="redis-config-sources-jar.includes" value="resources/spring/applicationContext-redis.xml" />
 	<property name="mongodb-config-sources-jar.name" value="ironrhino-mongodb-config-${version}-sources.jar" />
@@ -151,7 +149,6 @@
 		<delete file="${target.dir}/${hibernate-config-sources-jar.name}" />
 		<delete file="${target.dir}/${mail-config-sources-jar.name}" />
 		<delete file="${target.dir}/${sendmailqueue-config-sources-jar.name}" />
-		<delete file="${target.dir}/${search-config-sources-jar.name}" />
 		<delete file="${target.dir}/${redis-config-sources-jar.name}" />
 		<delete file="${target.dir}/${mongodb-config-sources-jar.name}" />
 		<delete file="${target.dir}/${rabbitmq-config-sources-jar.name}" />
@@ -276,17 +273,6 @@
 				<attribute name="Implementation-Vendor" value="ironrhino" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Id" value="ironrhino-sendmailqueue-config" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				<attribute name="Build-Timestamp" value="${timestamp}" />
-				<attribute name="Build-Revision" value="${revision}" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${search-config-sources-jar.name}" basedir="${src.dir}" includes="${search-config-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-search-config" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-search-config" />
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 				<attribute name="Build-Timestamp" value="${timestamp}" />
 				<attribute name="Build-Revision" value="${revision}" />

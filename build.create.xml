@@ -85,8 +85,6 @@
 					fs.setDir(new File(basedir+'/webapp/WEB-INF/lib'));
 					fs.setIncludes('*.jar');
 					var excludes = '';
-					if(features.indexOf('search')<0)
-						excludes+='elasticsearch-*.jar,lucene-*.jar,mmseg4j-*.jar,';
 					if(features.indexOf('redis')<0)
 						excludes+='jedis-*.jar,commons-pool2-*.jar,spring-data-redis-*.jar,';
 					if(features.indexOf('rabbitmq')<0)
@@ -110,8 +108,6 @@
 					fs = project.createDataType('fileset');
 					fs.setDir(new File(basedir+'/target'));
 					var includes = 'ironrhino-assets-'+version+'.jar,ironrhino-core-'+version+'.jar,ironrhino-hibernate-config-'+version+'.jar,ironrhino-security-'+version+'.jar,ironrhino-security-config-'+version+'.jar,ironrhino-sitemesh-config-'+version+'.jar,';
-					if(features.indexOf('search')>=0)
-						includes += 'ironrhino-search-config-'+version+'.jar,';
 					if(features.indexOf('redis')>=0)
 						includes += 'ironrhino-redis-config-'+version+'.jar,';
 					if(features.indexOf('rabbitmq')>=0)

@@ -16,8 +16,8 @@ import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.model.Persistable;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchCriteria;
-import org.ironrhino.core.search.elasticsearch.ElasticSearchService;
+import org.ironrhino.core.search.SearchCriteria;
+import org.ironrhino.core.search.SearchService;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.ClassScanner;
@@ -50,7 +50,7 @@ public class RegionAction extends EntityAction<Region> {
 	private boolean async;
 
 	@Autowired(required = false)
-	private transient ElasticSearchService<Region> elasticSearchService;
+	private transient SearchService<Region> searchService;
 
 	public boolean isAsync() {
 		return async;
@@ -95,7 +95,7 @@ public class RegionAction extends EntityAction<Region> {
 
 	@Override
 	public String execute() {
-		if (StringUtils.isBlank(keyword) || elasticSearchService == null) {
+		if (StringUtils.isBlank(keyword) || searchService == null) {
 			if (parent != null && parent > 0) {
 				region = entityManager.get(parent);
 			} else {
@@ -115,11 +115,11 @@ public class RegionAction extends EntityAction<Region> {
 			list = region.getChildren();
 		} else {
 			String query = keyword.trim();
-			ElasticSearchCriteria criteria = new ElasticSearchCriteria();
+			SearchCriteria criteria = new SearchCriteria();
 			criteria.setQuery(query);
 			criteria.setTypes(new String[] { "region" });
 			criteria.addSort("displayOrder", false);
-			list = elasticSearchService.search(criteria, source -> entityManager.get(source.getId()));
+			list = searchService.search(criteria, source -> entityManager.get(source.getId()));
 		}
 		return LIST;
 	}

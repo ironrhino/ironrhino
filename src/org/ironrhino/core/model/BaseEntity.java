@@ -7,7 +7,6 @@ import javax.persistence.MappedSuperclass;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
-import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,7 +16,7 @@ public abstract class BaseEntity extends AbstractEntity<String> {
 
 	private static final long serialVersionUID = 5290168777920037800L;
 
-	@SearchableId(type = "string", index = Index.NOT_ANALYZED)
+	@SearchableId
 	@Id
 	@GeneratedValue(generator = "stringId")
 	@GenericGenerator(name = "stringId", strategy = "stringId")

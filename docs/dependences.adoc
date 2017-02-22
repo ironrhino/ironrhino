@@ -11,9 +11,6 @@
 |===
 |功能 |依赖包
 
-|全文索引
-|elasticsearch-\*.jar lucene-*.jar mmseg4j-*.jar
-
 |redis
 |jedis-\*.jar commons-pool2-*.jar spring-data-redis-*.jar spring-data-commons-*.jar
 
