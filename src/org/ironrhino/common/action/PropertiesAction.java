@@ -30,10 +30,20 @@ public class PropertiesAction extends BaseAction {
 		Map<String, String> defaultProperties = applicationContextInspector.getDefaultProperties();
 		Map<String, String> overridedProperties = applicationContextInspector.getOverridedProperties();
 		for (Map.Entry<String, String> entry : defaultProperties.entrySet()) {
-			String overridedValue = overridedProperties.get(entry.getKey());
-			if (overridedValue != null && !overridedValue.equals(entry.getValue()))
-				writer.write("#" + entry.getKey() + '=' + entry.getValue() + "\n");
-			writer.write(entry.getKey() + '=' + (overridedValue != null ? overridedValue : entry.getValue()) + "\n");
+			String key = entry.getKey();
+			String value = entry.getValue();
+			boolean fromSystemProperty = false;
+			String overridedValue = overridedProperties.get(key);
+			if (overridedValue == null) {
+				overridedValue = System.getProperty(key);
+				if (overridedValue != null)
+					fromSystemProperty = true;
+			}
+			if (overridedValue != null && !overridedValue.equals(value) && !key.startsWith("app.")) {
+				writer.write(
+						"#" + key + '=' + value + (fromSystemProperty ? " # overrided by system property\n" : "\n"));
+			}
+			writer.write(key + '=' + (overridedValue != null ? overridedValue : value) + "\n");
 		}
 		writer.write("\n");
 		for (Map.Entry<String, String> entry : overridedProperties.entrySet())

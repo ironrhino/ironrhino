@@ -2,6 +2,7 @@ package org.ironrhino.core.spring;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -56,7 +57,7 @@ public class ApplicationContextInspector {
 						properties.put(s, s.endsWith(".password") ? "********" : env.getProperty(s));
 				}
 			}
-			overridedProperties = properties;
+			overridedProperties = Collections.unmodifiableMap(properties);
 		}
 		return overridedProperties;
 	}
@@ -106,7 +107,7 @@ public class ApplicationContextInspector {
 							map.put(arr[0], arr[1]);
 						}
 					}
-					defaultProperties = map;
+					defaultProperties = Collections.unmodifiableMap(map);
 				}
 			}
 		}
