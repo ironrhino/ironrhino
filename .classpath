@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" output="test/classes" path="test/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/amqp-client-3.6.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/amqp-client-4.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/antlr-runtime-3.5.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aopalliance-1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjrt-1.8.9.jar"/>
@@ -64,10 +64,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/persistence-api-2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.12.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/rabbitmq-client-3.6.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.16.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.6.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.7.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.3.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-core-3.0.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-infrastructure-3.0.7.jar"/>
@@ -85,7 +84,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-kafka-1.1.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-4.3.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-4.3.5.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.6.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-1.7.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.2.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-4.2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-4.2.1.jar"/>

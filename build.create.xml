@@ -88,7 +88,7 @@
 					if(features.indexOf('redis')<0)
 						excludes+='jedis-*.jar,commons-pool2-*.jar,spring-data-redis-*.jar,';
 					if(features.indexOf('rabbitmq')<0)
-						excludes+='rabbitmq-client-*.jar,spring-rabbit-*.jar,spring-amqp-*.jar,';
+						excludes+='amqp-client-*.jar,spring-rabbit-*.jar,spring-amqp-*.jar,';
 					if(features.indexOf('mongodb')<0)
 						excludes+='mongo-java-driver-*.jar,spring-data-mongodb-*.jar,';
 					if(features.indexOf('zookeeper')<0)

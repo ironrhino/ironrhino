@@ -15,7 +15,7 @@
 |jedis-\*.jar commons-pool2-*.jar spring-data-redis-*.jar spring-data-commons-*.jar
 
 |rabbitmq
-|rabbitmq-client-\*.jar spring-rabbit-*.jar spring-amqp-*.jar
+|amqp-client-\*.jar spring-rabbit-*.jar spring-amqp-*.jar
 
 |mongodb
 |mongo-java-driver-\*.jar	spring-data-mongodb-*.jar spring-data-commons-*.jar
