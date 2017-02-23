@@ -27,14 +27,19 @@ import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean<Object> {
+public class JdbcRepositoryFactoryBean
+		implements MethodInterceptor, FactoryBean<Object>, BeanFactoryAware, InitializingBean {
 
 	private final Class<?> jdbcRepositoryClass;
 
@@ -50,6 +55,10 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 
 	private Map<String, String> sqls;
 
+	private BeanFactory beanFactory;
+
+	private Partitioner defaultPartitioner;
+
 	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, DataSource dataSource) {
 		Assert.notNull(jdbcRepositoryClass);
 		Assert.notNull(dataSource);
@@ -58,6 +67,7 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		this.jdbcRepositoryClass = jdbcRepositoryClass;
 		this.jdbcRepositoryBean = new ProxyFactory(jdbcRepositoryClass, this)
 				.getProxy(jdbcRepositoryClass.getClassLoader());
+		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 		try (Connection c = dataSource.getConnection()) {
 			DatabaseMetaData dmd = c.getMetaData();
 			databaseProduct = DatabaseProduct.parse(dmd.getDatabaseProductName());
@@ -66,8 +76,19 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		this.sqls = loadSqls();
+		Partition partition = jdbcRepositoryClass.getAnnotation(Partition.class);
+		if (partition != null)
+			defaultPartitioner = beanFactory.getBean(partition.partitioner());
 	}
 
 	private Map<String, String> loadSqls() {
@@ -213,7 +234,19 @@ public class JdbcRepositoryFactoryBean implements MethodInterceptor, FactoryBean
 				sqlParameterSource.addValue(names[i], arg);
 			}
 		}
-		if (!context.isEmpty() && sql.indexOf('@') > -1)
+		PartitionKey partitionKey = method.getAnnotation(PartitionKey.class);
+		if (partitionKey != null) {
+			Partitioner partitioner = defaultPartitioner;
+			Partition p = method.getAnnotation(Partition.class);
+			if (p != null)
+				partitioner = beanFactory.getBean(p.partitioner());
+			if (partitioner == null)
+				throw new IllegalStateException("No partitioner found");
+			String partition = partitioner.partition(ExpressionUtils.eval(partitionKey.value(), context));
+			if (partition != null)
+				context.put("PARTITION", partition);
+		}
+		if (!context.isEmpty() && (sql.indexOf('@') > -1))
 			sql = ExpressionUtils.evalString(sql, context);
 
 		Type returnType = method.getGenericReturnType();

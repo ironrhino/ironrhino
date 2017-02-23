@@ -7,5 +7,6 @@
 	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" autowire="no" p:jdbcUrl="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1" />
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"/>
 	<bean class="org.ironrhino.core.jdbc.JdbcRepositoryRegistryPostProcessor"/>
+	<bean class="org.ironrhino.core.jdbc.CustomerPartitioner"/>
 	<tx:annotation-driven order="0" proxy-target-class="true" />
 </beans>
