@@ -146,6 +146,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return false;
 	}
 
+	public boolean isFulltextSearchable() {
+		return (getEntityClass().getAnnotation(Searchable.class) != null) && searchService != null;
+	}
+
 	public boolean isEnableable() {
 		return Enableable.class.isAssignableFrom(getEntityClass());
 	}
@@ -353,10 +357,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (richtableConfig == null)
 			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
 		final BaseManager entityManager = getEntityManager(getEntityClass());
-		boolean searchable = isSearchable();
 		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
-		if (ownerProperty != null && ownerProperty.getKey().isolate()
-				|| (!searchable || StringUtils.isBlank(keyword) || (searchable && searchService == null))) {
+		if (ownerProperty != null && ownerProperty.getKey().isolate() || !isFulltextSearchable()
+				|| StringUtils.isBlank(keyword)) {
 			boolean resetPageSize;
 			if (resultPage == null) {
 				resultPage = new ResultPage();
@@ -368,7 +371,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
 			if (richtableConfig != null && resultPage.getPaginating() == null)
 				resultPage.setPaginating(richtableConfig.paginating());
-			resultPage.setCriteria(doPrepareCriteria(entityManager, bw, richtableConfig, searchable, ownerProperty));
+			resultPage
+					.setCriteria(doPrepareCriteria(entityManager, bw, richtableConfig, isSearchable(), ownerProperty));
 			resultPage = entityManager.findByResultPage(resultPage);
 		} else {
 			Set<String> searchableProperties = new HashSet<>();
@@ -379,7 +383,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			String query = keyword.trim();
 			SearchCriteria criteria = new SearchCriteria();
 			criteria.setQuery(query);
-			criteria.setTypes(new String[] { getEntityName() });
+			String indexType = getEntityClass().getAnnotation(Searchable.class).type();
+			if (StringUtils.isBlank(indexType))
+				indexType = getEntityName();
+			criteria.setTypes(new String[] { indexType });
 			if (richtableConfig != null && StringUtils.isNotBlank(richtableConfig.order())) {
 				String[] ar = richtableConfig.order().split(",");
 				for (String s : ar) {

@@ -8,21 +8,11 @@ public class SearchCriteria implements Serializable {
 
 	private static final long serialVersionUID = 2268675250220590326L;
 
-	private String[] indices;
-
 	private String[] types;
 
 	private String query;
 
 	private Map<String, Boolean> sorts = new LinkedHashMap<>(4, 1);
-
-	public String[] getIndices() {
-		return indices;
-	}
-
-	public void setIndices(String[] indices) {
-		this.indices = indices;
-	}
 
 	public String[] getTypes() {
 		return types;

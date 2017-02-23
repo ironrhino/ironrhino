@@ -23,6 +23,7 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseRecordableEntity;
 import org.ironrhino.core.model.Enableable;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.RoledUserDetails;
 import org.ironrhino.core.service.BaseManager;
@@ -44,7 +45,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	public static final String USERNAME_REGEX_FOR_SIGNUP = "^\\w{3,20}$";
 
-	@SearchableProperty(boost = 5)
+	@SearchableProperty(boost = 5, index = Index.NOT_ANALYZED)
 	@NotInCopy
 	@CaseInsensitive
 	@NaturalId
