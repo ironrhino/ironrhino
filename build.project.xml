@@ -15,9 +15,9 @@
 	<property name="server.startup.port" value="8080" />
 	<property name="server.shutdown.port" value="8005" />
 	<property name="webapp.deploy.dir" value="${server.home}/webapps/ROOT" />
-	<property file="build.properties" />
 	<property name="version" value="1.0" />
 	<property name="jar.name" value="app-${version}.jar" />
+	<property file="build.properties" />
 	
 	<import file="build.include.xml" optional="true"/>
 
@@ -645,6 +645,7 @@
 			}
 		]]>
 		</script>
+		<!--
 		<jar jarfile="${target.dir}/${jar.name}" basedir="${classes.dir}">
 			<manifest>
 				<attribute name="Artifact-Version" value="${version}" />
@@ -652,6 +653,7 @@
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
 		</jar>
+		-->
 		<antcall target="reset-append-revision-for-assets" />
 		<script language="javascript">
 			<![CDATA[

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="ironrhino-compress" default="compressAssets" basedir=".">
 
-	<property name="version" value="2.0" />
 	<property name="webapp.dir" location="${basedir}/webapp" />
 	<property name="lib.dir" location="${basedir}/lib" />
 	<property name="classes.dir" location="${webapp.dir}/WEB-INF/classes" />
