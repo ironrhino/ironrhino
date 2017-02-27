@@ -21,9 +21,9 @@
 	<div class="hero-unit">
 	<@s.form id="login" action="${actionBaseUrl}" method="post" class="ajax focus form-horizontal well">
 		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
-		<@s.textfield label=getText('username') name="username" class="required span2"/>
-		<@s.password label=getText('password') name="password" class="required span2 input-pattern submit sha"/>
-		<@s.checkbox label=getText('rememberme') name="rememberme" class="custom"/>
+		<@s.textfield name="username" class="required span2"/>
+		<@s.password name="password" class="required span2 input-pattern submit sha"/>
+		<@s.checkbox name="rememberme" class="custom"/>
 		<@captcha/>
 		<@s.submit value=getText('login') class="btn-primary">
 		<#if getSetting??&&'true'==getSetting('signup.enabled')>

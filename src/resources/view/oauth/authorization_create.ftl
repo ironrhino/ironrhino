@@ -20,8 +20,8 @@
 	<span class="listpick-name"></span>
 	</div>
 	</div>
-	<@s.textfield label=getText('lifetime') name="authorization.lifetime" value="0" class="required span1"/>
-	<@s.textfield label=getText('scope') name="authorization.scope" class="span4"/>
+	<@s.textfield name="authorization.lifetime" value="0" class="required span1"/>
+	<@s.textfield name="authorization.scope" class="span4"/>
 	<@s.submit value=getText('create') class="btn-primary"/>
 </@s.form>
 </body>

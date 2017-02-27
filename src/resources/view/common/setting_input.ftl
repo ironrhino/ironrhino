@@ -16,17 +16,17 @@
 		<@s.hidden name="setting.description"/>
 	<#elseif view=='brief'>
 		<@s.hidden name="setting.key"/>
-		<@s.textarea label=getText('description') name="setting.description" tabindex="-1" readonly=true class="input-xxlarge"/>
+		<@s.textarea name="setting.description" tabindex="-1" readonly=true class="input-xxlarge"/>
 	<#else>
-		<@s.textfield label=getText('key') name="setting.key" class="required checkavailable input-xxlarge"/>
+		<@s.textfield name="setting.key" class="required checkavailable input-xxlarge"/>
 	</#if>
 	<#if view=='embedded'>
-	<@s.textarea label=getText('value') theme="simple" name="setting.value" style="width:95%;" class="${Parameters.class!Parameters.cssClass!}" maxlength="4000"/>
+	<@s.textarea theme="simple" name="setting.value" style="width:95%;" class="${Parameters.class!Parameters.cssClass!}" maxlength="4000"/>
 	<#else>
-	<@s.textarea label=getText('value') name="setting.value" class="input-xxlarge" maxlength="4000"/>
+	<@s.textarea name="setting.value" class="input-xxlarge" maxlength="4000"/>
 	</#if>
 	<#if !(view=='embedded'||view=='brief')>
-		<@s.textarea label=getText('description') name="setting.description" class="input-xxlarge" maxlength="4000"/>
+		<@s.textarea name="setting.description" class="input-xxlarge" maxlength="4000"/>
 	</#if>
 	<@s.submit value=getText('save') class="btn-primary"/>
 </@s.form>

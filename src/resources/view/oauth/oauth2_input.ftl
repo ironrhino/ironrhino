@@ -26,13 +26,13 @@
 			<#if state??><@s.hidden name="state" /></#if>
 			<#if Parameters.login??>
 				<input type="hidden" name="login" value="${Parameters.login!}"/>
-				<@s.textfield label=getText('username') name="username"/>
-				<@s.password label=getText('password') name="password" class="sha"/>
+				<@s.textfield name="username"/>
+				<@s.password name="password" class="sha"/>
 				<@captcha/>
 			<#else>
 			<@authorize ifNotGranted="ROLE_BUILTIN_USER">
-				<@s.textfield label=getText('username') name="username"/>
-				<@s.password label=getText('password') name="password" class="sha"/>
+				<@s.textfield name="username"/>
+				<@s.password name="password" class="sha"/>
 				<@captcha/>
 			</@authorize>
 			<@authorize ifAnyGranted="ROLE_BUILTIN_USER">

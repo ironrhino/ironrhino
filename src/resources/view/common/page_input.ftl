@@ -111,14 +111,14 @@ $(function() {
 	<@s.hidden name="page.tags" value="${(page.tags?join(','))}"/>
 	<@s.hidden name="page.head"/>
 	<@s.hidden name="page.title"/>
-	<@s.textarea theme="simple" id="page_content" label=getText('content') labelposition="top" name="page.content" style="width:100%;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
+	<@s.textarea theme="simple" id="page_content" labelposition="top" name="page.content" style="width:100%;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
 	<#elseif view=='brief'>
 	<@s.hidden name="page.path"/>
 	<@s.hidden name="page.displayOrder"/>
 	<@s.hidden name="page.tags" value="${(page.tags?join(','))}"/>
 	<@s.hidden name="page.head"/>
-	<@s.textfield label=getText('title') name="page.title" style="width:600px;"/>
-	<@s.textarea theme="simple" id="page_content" label=getText('content') labelposition="top" name="page.content" style="width:600px;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
+	<@s.textfield name="page.title" style="width:600px;"/>
+	<@s.textarea theme="simple" id="page_content" labelposition="top" name="page.content" style="width:600px;height:320px;" dynamicAttributes=pageContentDynamicAttributes/>
 	<#else>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#_page_base" data-toggle="tab">${getText('base')}</a></li>
@@ -127,13 +127,13 @@ $(function() {
 	</ul>
 	<div class="tab-content">
 	<div id="_page_base" class="tab-pane active">
-	<@s.textfield id="page_path" label=getText('path') readonly=!page.new name="page.path" class="required checkavailable" style="width:600px;"/>
-	<@s.textfield label=getText('displayOrder') name="page.displayOrder" type="number" class="integer"/>
-	<@s.textfield label=getText('tags') name="page.tags"  class="tags" data\-source="${actionBaseUrl}/suggest" style="width:600px;"/>
-	<@s.textfield label=getText('title') name="page.title" style="width:600px;"/>
+	<@s.textfield id="page_path" readonly=!page.new name="page.path" class="required checkavailable" style="width:600px;"/>
+	<@s.textfield name="page.displayOrder" type="number" class="integer"/>
+	<@s.textfield name="page.tags"  class="tags" data\-source="${actionBaseUrl}/suggest" style="width:600px;"/>
+	<@s.textfield name="page.title" style="width:600px;"/>
 	</div>
 	<div id="_page_content" class="tab-pane">
-	<@s.textarea theme="simple" id="page_content" label=getText('content') labelposition="top" name="page.content" style="width:800px;height:260px;" dynamicAttributes=pageContentDynamicAttributes/>
+	<@s.textarea theme="simple" id="page_content" labelposition="top" name="page.content" style="width:800px;height:260px;" dynamicAttributes=pageContentDynamicAttributes/>
 	</div>
 	<div id="_page_head" class="tab-pane">
 	<@s.textarea theme="simple" id="page_head" name="page.head" style="width:800px;height:300px;"/>

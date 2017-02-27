@@ -21,7 +21,7 @@
 	<#else>
 	<div class="row-fluid">
 	<div class="span4">
-	<@s.select label=getText('type') name="params[${index}].type" class="input-small conjunct" data\-replacement="params_${index}" data\-global="false" list="paramTypes" listKey="top" listValue="top"/>
+	<@s.select name="params[${index}].type" class="input-small conjunct" data\-replacement="params_${index}" data\-global="false" list="paramTypes" listKey="top" listValue="top"/>
 	</div>
 	<div class="span5">
 	<@s.textfield label=getText(param.key) name="params[${index}].value" class="${param.required?then('required','')}"/>
@@ -31,7 +31,7 @@
 	</div>
 	</#list>
 	<#else>
-	<@s.textarea label=getText('jobParameters') name="jobParameters" class="required input-xxlarge" placeholder="workdate(date)=2012-12-12\ncount(long)=12\namount(double)=12.12\nname=test"/>
+	<@s.textarea name="jobParameters" class="required input-xxlarge" placeholder="workdate(date)=2012-12-12\ncount(long)=12\namount(double)=12.12\nname=test"/>
 	</#if>
 	</#if>
 	<@s.submit value=getText('launch') class="btn-primary"/>
