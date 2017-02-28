@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="ironrhino-sources-jar" default="jar-sources" basedir=".">
 
+	<property file="build.properties" />
+
 	<property name="src.dir" location="${basedir}/src" />
 	<property name="webapp.dir" location="${basedir}/webapp" />
 	<property name="classes.dir" location="${webapp.dir}/WEB-INF/classes" />
@@ -79,7 +81,6 @@
 	<property name="security-oauth-server-remoting-sources-jar.includes" value="org/ironrhino/security/oauth/server/component/OAuthHandler.*,org/ironrhino/security/oauth/server/service/OAuthAuthorizationService.*,org/ironrhino/security/oauth/server/domain/OAuthAuthorization.*,org/ironrhino/security/oauth/server/enums/**" />
 	<property name="rest-sources-jar.name" value="ironrhino-rest-${version}-sources.jar" />
 	<property name="batch-sources-jar.name" value="ironrhino-batch-${version}-sources.jar" />
-	<property file="build.properties" />
 	<target name="set-revision">
 		<script language="javascript">
 			<![CDATA[
