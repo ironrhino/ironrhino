@@ -1,5 +1,7 @@
 package org.ironrhino.core.remoting.client;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.GenericRemoteInvocation;
@@ -9,19 +11,19 @@ import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.spring.RemotingClientProxy;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
-import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor;
 import org.springframework.remoting.support.RemoteInvocation;
+import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -32,7 +34,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
 
-	private static Logger payloadLogger = LoggerFactory.getLogger("remoting");
+	private static Logger remotingLogger = LoggerFactory.getLogger("remoting");
 
 	@Value("${httpInvoker.serialization.type:JAVA}")
 	private volatile SerializationType serializationType = SerializationType.JAVA;
@@ -156,55 +158,59 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	}
 
 	@Override
-	public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
-		if (AopUtils.isToStringMethod(methodInvocation.getMethod()))
-			return super.invoke(methodInvocation);
+	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
+			throws Exception {
 		if (!discovered) {
 			setServiceUrl(discoverServiceUrl());
 			discovered = true;
 		} else if (poll) {
 			setServiceUrl(discoverServiceUrl());
 		}
-		logger.info("Invoking {} at {}", methodInvocation.getMethod(), getServiceUrl());
+		String method = stringify(methodInvocation);
+		String requestId = MDC.get("requestId");
+		if (requestId == null) {
+			requestId = CodecUtils.nextId();
+			MDC.put("requestId", requestId);
+			MDC.put("request", "request:" + requestId);
+		}
+		MDC.put("role", "CLIENT");
+		MDC.put("service", getServiceInterface().getName() + '.' + method);
 		if (loggingPayload)
-			payloadLogger.info("Request with: {}", JsonUtils.toJson(methodInvocation.getArguments()));
+			remotingLogger.info("Request: {}", JsonUtils.toJson(methodInvocation.getArguments()));
 		long time = System.currentTimeMillis();
-		Object value;
+		RemoteInvocationResult result;
 		try {
-			value = invoke(methodInvocation, maxAttempts);
+			result = executeRequest(invocation, methodInvocation, method, maxAttempts);
+			time = System.currentTimeMillis() - time;
+			if (loggingPayload) {
+				if (!result.hasInvocationTargetException())
+					remotingLogger.info("Response: {}", JsonUtils.toJson(result.getValue()));
+				else
+					remotingLogger.error("Error:\n",
+							((InvocationTargetException) result.getException()).getTargetException());
+			}
+			remotingLogger.info("Invoked to {} success in {}ms", discoveredHost, time);
 		} finally {
 			RemotingContext.clear();
+			MDC.remove("role");
 		}
-		time = System.currentTimeMillis() - time;
-		if (loggingPayload) {
-			MDC.remove("url");
-			payloadLogger.info("Returned in {}ms: {}", time, JsonUtils.toJson(value));
-		}
-		return value;
+
+		return result;
 	}
 
-	public Object invoke(MethodInvocation methodInvocation, int attempts) throws Throwable {
-		String method = null;
-		if (serviceStats != null) {
-			StringBuilder sb = new StringBuilder(methodInvocation.getMethod().getName()).append("(");
-			Class<?>[] parameterTypes = methodInvocation.getMethod().getParameterTypes();
-			for (int i = 0; i < parameterTypes.length; i++) {
-				sb.append(parameterTypes[i].getSimpleName());
-				if (i < parameterTypes.length - 1)
-					sb.append(',');
-			}
-			sb.append(")");
-			method = sb.toString();
-		}
+	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation,
+			String method, int attempts) throws Exception {
 		long time = System.currentTimeMillis();
 		try {
-			Object result = super.invoke(methodInvocation);
+			RemoteInvocationResult result = super.executeRequest(invocation);
 			if (serviceStats != null) {
 				serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method.toString(),
 						System.currentTimeMillis() - time, false);
 			}
 			return result;
-		} catch (RemoteAccessException e) {
+		} catch (Exception e) {
+			remotingLogger.error("Exception:\n", e.getCause() != null ? e.getCause() : e);
+			remotingLogger.info("Invoked to {} fail in {}ms", discoveredHost, System.currentTimeMillis() - time);
 			if (serviceStats != null) {
 				serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method.toString(),
 						System.currentTimeMillis() - time, true);
@@ -233,7 +239,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 					}
 				}
 			}
-			return invoke(methodInvocation, attempts);
+			return executeRequest(invocation, methodInvocation, method, attempts);
 		}
 	}
 
@@ -272,5 +278,17 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		sb.append(SERVLET_PATH_PREFIX);
 		sb.append(serviceName);
 		return sb.toString();
+	}
+
+	private static String stringify(MethodInvocation methodInvocation) {
+		StringBuilder method = new StringBuilder(methodInvocation.getMethod().getName()).append("(");
+		Class<?>[] parameterTypes = methodInvocation.getMethod().getParameterTypes();
+		for (int i = 0; i < parameterTypes.length; i++) {
+			method.append(parameterTypes[i].getSimpleName());
+			if (i < parameterTypes.length - 1)
+				method.append(',');
+		}
+		method.append(")");
+		return method.toString();
 	}
 }

@@ -30,7 +30,7 @@
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="REMOTING" fileName="${sys:app.home}/logs/${sys:port.http}/remoting.log" filePattern="${sys:app.home}/logs/${sys:port.http}/remoting.log.%d{yyyy-MM-dd}">
-			<PatternLayout pattern="%d %c %t%X{request} %p %m%n%th{10}" charset="UTF-8"/>
+			<PatternLayout pattern="%d%X{request} %X{service} %X{role} %m%th{10}%n" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="REST" fileName="${sys:app.home}/logs/${sys:port.http}/rest.log" filePattern="${sys:app.home}/logs/${sys:port.http}/rest.log.%d{yyyy-MM-dd}">
@@ -63,9 +63,6 @@
 		</Logger>
 		<Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="${sys:hibernate.logger.level}" additivity="false">
 			<AppenderRef ref="HIBERNATE"/>
-		</Logger>
-		<Logger name="org.ironrhino.core.remoting" level="${sys:root.logger.level}" additivity="true">
-			<AppenderRef ref="REMOTING"/>
 		</Logger>
 		<Logger name="remoting" level="${sys:root.logger.level}" additivity="false">
 			<AppenderRef ref="REMOTING"/>

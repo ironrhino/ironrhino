@@ -12,12 +12,20 @@
 			<PatternLayout pattern="%d %c %t%X{request}%X{server}%X{url} %p %m%th{10}" charset="UTF-8"/>
 			<Property name="bootstrap.servers">${sys:kafka.bootstrap.servers}</Property>
 		</Kafka>
+		<Kafka name="KAFKA-REMOTING" topic="app.logs.remoting">
+			<PatternLayout pattern="%d%X{request}%X{server} %X{service} %X{role} %m%th{10}%n" charset="UTF-8"/>
+			<Property name="bootstrap.servers">${sys:kafka.bootstrap.servers}</Property>
+		</Kafka>
 	</Appenders>
 	<Loggers>
 		<Logger name="org.apache.kafka.common.utils.AppInfoParser" level="ERROR"/>
 		<Logger name="access" level="${sys:root.logger.level}" additivity="false">
 			<AppenderRef ref="ACCESS"/>
 			<AppenderRef ref="KAFKA-ACCESS"/>
+		</Logger>
+		<Logger name="remoting" level="${sys:root.logger.level}" additivity="false">
+			<AppenderRef ref="REMOTING"/>
+			<AppenderRef ref="KAFKA-REMOTING"/>
 		</Logger>
 		<Root level="${sys:root.logger.level}">
 			<AppenderRef ref="CONSOLE"/>

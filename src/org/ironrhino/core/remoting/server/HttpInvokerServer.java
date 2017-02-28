@@ -36,7 +36,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	private Logger payloadLogger = LoggerFactory.getLogger("remoting");
+	private Logger remotingLogger = LoggerFactory.getLogger("remoting");
 
 	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<>();
 
@@ -84,38 +84,32 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			if (proxy != null) {
 				List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
 				for (Class<?> cl : invocation.getParameterTypes())
-					parameterTypeList.add(cl.getName());
-				logger.info("Invoking {}.{}({}) from {}", clazz.getName(), invocation.getMethodName(),
-						StringUtils.join(parameterTypeList, ","), RemotingContext.getRequestFrom());
+					parameterTypeList.add(cl.getSimpleName());
+				String method = new StringBuilder(invocation.getMethodName()).append("(")
+						.append(StringUtils.join(parameterTypeList, ",")).append(")").toString();
+				MDC.put("role", "SERVER");
+				MDC.put("service", interfaceName + '.' + method);
 				if (loggingPayload)
-					payloadLogger.info("Request with: {}", JsonUtils.toJson(invocation.getArguments()));
+					remotingLogger.info("Request: {}", JsonUtils.toJson(invocation.getArguments()));
 				long time = System.currentTimeMillis();
 				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
 				time = System.currentTimeMillis() - time;
 				writeRemoteInvocationResult(request, response, invocation, result);
 				if (serviceStats != null) {
-					StringBuilder method = new StringBuilder(invocation.getMethodName()).append("(");
-					Class<?>[] parameterTypes = invocation.getParameterTypes();
-					for (int i = 0; i < parameterTypes.length; i++) {
-						method.append(parameterTypes[i].getSimpleName());
-						if (i < parameterTypes.length - 1)
-							method.append(',');
-					}
-					method.append(")");
-					serviceStats.serverSideEmit(interfaceName, method.toString(), time);
+					serviceStats.serverSideEmit(interfaceName, method, time);
 				}
 				if (loggingPayload) {
-					MDC.remove("url");
 					if (!result.hasException()) {
 						Object value = result.getValue();
-						payloadLogger.info("Returned in {}ms: {}", time, JsonUtils.toJson(value));
+						remotingLogger.info("Response: {}", JsonUtils.toJson(value));
 					} else {
 						Throwable throwable = result.getException();
 						if (throwable.getCause() != null)
 							throwable = throwable.getCause();
-						payloadLogger.error(throwable.getMessage(), throwable);
+						remotingLogger.error("Error:\n", throwable);
 					}
 				}
+				remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
 			} else {
 				String msg = "No Service:" + getServiceInterface().getName();
 				logger.error("No Service:" + getServiceInterface());
@@ -132,6 +126,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		} finally {
 			serviceInterface.remove();
 			RemotingContext.clear();
+			MDC.remove("role");
+			MDC.remove("service");
 		}
 	}
 
