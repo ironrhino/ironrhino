@@ -1,10 +1,8 @@
 #!/bin/bash
 
-ANT_VERSION=1.9.6
-JDK_VERSION=8u74-b02
-TOMCAT_VERSION=8.0.32
-REDIS_VERSION=3.0.7
-#JDK_VERSION=7u80-b15
+ANT_VERSION=1.10.1
+TOMCAT_VERSION=8.0.41
+REDIS_VERSION=3.2.8
 #TOMCAT_VERSION=7.0.68
 
 #must run with sudo
@@ -27,7 +25,7 @@ EOF
 
 #install packages
 apt-get update
-apt-get --force-yes --yes install mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
+apt-get --force-yes --yes install openjdk-8-jdk mysql-server-5.7 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi
@@ -41,22 +39,6 @@ cd /usr/share/fonts
 mkfontscale
 mkfontdir
 fc-cache -fv
-fi
-
-
-#install oracle jdk
-if [ ! -d jdk ];then
-if ! $(ls -l jdk-*linux-x64.tar.gz >/dev/null 2>&1) ; then
-wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/$JDK_VERSION/jdk-${JDK_VERSION:0:-4}-linux-x64.tar.gz"
-fi
-tar xf jdk-*.tar.gz
-rm jdk-*.tar.gz
-mv jdk* jdk
-chown -R $USER:$USER jdk
-echo JAVA_HOME=\"/home/$USER/jdk\" >> /etc/environment
-env JAVA_HOME=\"/home/$USER/jdk\"
-ln -s /home/$USER/jdk/bin/java /usr/bin/java
-ln -s /home/$USER/jdk/bin/javac /usr/bin/javac
 fi
 
 
@@ -174,11 +156,7 @@ EOF
 cd ..
 cd ..
 sed -i '99i export SPRING_PROFILES_DEFAULT=dual' tomcat/bin/catalina.sh
-if [ "${JDK_VERSION:0:1}" = "7" ];then
-sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:+UseParNewGC -XX:CMSMaxAbortablePrecleanTime=5 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
-else
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+DisableExplicitGC -XX:+UseG1GC -XX:SurvivorRatio=6 -XX:MaxGCPauseMillis=400 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=40 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
-fi
 mv tomcat tomcat8080
 cp -R tomcat8080 tomcat8081
 sed -i '99i CATALINA_PID="/tmp/tomcat8080_pid"' tomcat8080/bin/catalina.sh
@@ -322,17 +300,17 @@ fi
 
 
 #config mysql
-if [ -f "/etc/mysql/my.cnf" ] && ! $(more /etc/mysql/my.cnf|grep collation-server >/dev/null 2>&1) ; then
-sed -i '/\[mysqld\]/a\lower_case_table_names = 1' /etc/mysql/my.cnf
-sed -i '/\[mysqld\]/a\innodb_stats_on_metadata = off' /etc/mysql/my.cnf
-sed -i '/\[mysqld\]/a\collation-server = utf8_general_ci' /etc/mysql/my.cnf
-sed -i '/\[mysqld\]/a\character-set-server = utf8' /etc/mysql/my.cnf
-sed -i '/\[mysqld\]/a\open_files_limit = 8192' /etc/my.cnf
-sed -i '/\[mysqld\]/a\max_connections = 1000' /etc/my.cnf
-sed -i '/\[mysqld\]/a\innodb_buffer_pool_size = 1G' /etc/my.cnf
-sed -i '/\[mysqld\]/a\key_buffer_size = 384M' /etc/my.cnf
-sed -i '/\[mysqld\]/a\sort_buffer_size = 4M' /etc/my.cnf
-sed -i '/\[mysqld\]/a\read_buffer_size = 1M' /etc/my.cnf
+if [ -f "/etc/mysql/mysql.conf.d/mysqld.cnf" ] && ! $(more /etc/mysql/mysql.conf.d/mysqld.cnf|grep collation-server >/dev/null 2>&1) ; then
+sed -i '/\[mysqld\]/a\lower_case_table_names = 1' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\innodb_stats_on_metadata = off' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\collation-server = utf8_general_ci' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\character-set-server = utf8' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\open_files_limit = 8192' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\max_connections = 1000' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\innodb_buffer_pool_size = 1G' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\key_buffer_size = 384M' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\sort_buffer_size = 4M' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\read_buffer_size = 1M' /etc/mysql/mysql.conf.d/mysqld.cnf
 sed -i '/\[mysqld\]/a\table_open_cache = 2000' /etc/my.cnf
 service mysql restart
 fi
