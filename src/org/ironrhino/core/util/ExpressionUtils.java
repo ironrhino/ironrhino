@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mvel2.MVEL;
+import org.mvel2.ParserContext;
 import org.mvel2.compiler.CompiledExpression;
 import org.mvel2.compiler.ExpressionCompiler;
 import org.mvel2.templates.CompiledTemplate;
@@ -19,13 +20,20 @@ public class ExpressionUtils {
 
 	private static Map<String, CompiledExpression> expressionCache = new ConcurrentHashMap<>();
 
+	private static ParserContext parserContext = new ParserContext();
+	static {
+		parserContext.addImport("System", Object.class);
+		parserContext.addImport("Runtime", Object.class);
+		parserContext.addImport("Class", Object.class);
+	}
+
 	public static Object evalExpression(String expression, Map<String, ?> context) {
 		if (StringUtils.isBlank(expression))
 			return expression;
 
 		CompiledExpression ce = expressionCache.get(expression);
 		if (ce == null) {
-			ce = new ExpressionCompiler(expression).compile();
+			ce = new ExpressionCompiler(expression, parserContext).compile();
 			expressionCache.put(expression, ce);
 		}
 		return MVEL.executeExpression(ce, context);
