@@ -28,15 +28,22 @@ public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFa
 		ReflectionUtils.doWithFields(bean.getClass(), field -> {
 			ReflectionUtils.makeAccessible(field);
 			PriorityQualifier pq = field.getAnnotation(PriorityQualifier.class);
-			String name = pq.value();
-			if (beanFactory.containsBean(name)) {
-				ResolvableType rt = ResolvableType.forField(field);
-				if (beanFactory.isTypeMatch(name, rt)) {
-					field.set(bean, beanFactory.getBean(name));
-					logger.info("Injected @PrioritizedQualifier(\"{}\") for field[{}] of bean[{}]", name,
-							field.getName(), beanName);
-				} else {
-					logger.warn("Ignored @PrioritizedQualifier(\"{}\") because it is not type of {}, ", name, rt);
+			for (String name : pq.value()) {
+				if (beanFactory.containsBean(name)) {
+					ResolvableType rt = ResolvableType.forField(field);
+					boolean typeMatched = beanFactory.isTypeMatch(name, rt);
+					if (!typeMatched) {
+						typeMatched = beanFactory.isTypeMatch(name, rt.getRawClass());
+					}
+					if (typeMatched) {
+						field.set(bean, beanFactory.getBean(name));
+						logger.info("Injected @PrioritizedQualifier(\"{}\") for field[{}] of bean[{}]", name,
+								field.getName(), beanName);
+						break;
+					} else {
+						logger.warn("Ignored @PrioritizedQualifier(\"{}\") for {} because it is not type of {}, ", name,
+								beanName, rt);
+					}
 				}
 			}
 		}, field -> {
