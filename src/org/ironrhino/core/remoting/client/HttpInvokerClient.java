@@ -166,7 +166,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		} else if (poll) {
 			setServiceUrl(discoverServiceUrl());
 		}
-		String method = stringify(methodInvocation);
 		String requestId = MDC.get("requestId");
 		if (requestId == null) {
 			requestId = CodecUtils.nextId();
@@ -174,13 +173,13 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			MDC.put("request", "request:" + requestId);
 		}
 		MDC.put("role", "CLIENT");
-		MDC.put("service", getServiceInterface().getName() + '.' + method);
+		MDC.put("service", getServiceInterface().getName() + '.' + stringify(methodInvocation));
 		if (loggingPayload)
 			remotingLogger.info("Request: {}", JsonUtils.toJson(methodInvocation.getArguments()));
 		long time = System.currentTimeMillis();
 		RemoteInvocationResult result;
 		try {
-			result = executeRequest(invocation, methodInvocation, method, maxAttempts);
+			result = executeRequest(invocation, methodInvocation, maxAttempts);
 			time = System.currentTimeMillis() - time;
 			if (loggingPayload) {
 				if (!result.hasInvocationTargetException())
@@ -199,48 +198,56 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	}
 
 	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation,
-			String method, int attempts) throws Exception {
-		long time = System.currentTimeMillis();
-		try {
-			RemoteInvocationResult result = super.executeRequest(invocation);
-			if (serviceStats != null) {
-				serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method.toString(),
-						System.currentTimeMillis() - time, false);
-			}
-			return result;
-		} catch (Exception e) {
-			remotingLogger.error("Exception:\n", e.getCause() != null ? e.getCause() : e);
-			remotingLogger.info("Invoked to {} fail in {}ms", discoveredHost, System.currentTimeMillis() - time);
-			if (serviceStats != null) {
-				serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method.toString(),
-						System.currentTimeMillis() - time, true);
-			}
-			if (--attempts < 1)
-				throw e;
-			Throwable throwable = e.getCause();
-			if (throwable instanceof SerializationFailedException && getSerializationType() == SerializationType.FST) {
-				setSerializationType(SerializationType.JAVA);
-				logger.error("downgrade serialization from FST to JAVA for service[{}]: {}",
-						getServiceInterface().getName(), throwable.getMessage());
-			} else if (throwable instanceof JsonMappingException && getSerializationType() == SerializationType.JSON) {
-				setSerializationType(SerializationType.JAVA);
-				logger.error("downgrade serialization from JSON to JAVA for service[{}]: {}",
-						getServiceInterface().getName(), throwable.getMessage());
-			} else {
-				if (urlFromDiscovery) {
-					if (discoveredHost != null) {
-						serviceRegistry.evict(discoveredHost);
-						discoveredHost = null;
-					}
-					String serviceUrl = discoverServiceUrl();
-					if (!serviceUrl.equals(getServiceUrl())) {
-						setServiceUrl(serviceUrl);
-						logger.info("relocate service url:" + serviceUrl);
+			int maxAttempts) throws Exception {
+		String method = null;
+		if (serviceStats != null)
+			method = stringify(methodInvocation);
+		int attempts = maxAttempts;
+		while (attempts > 0) {
+			long time = System.currentTimeMillis();
+			try {
+				RemoteInvocationResult result = super.executeRequest(invocation);
+				if (serviceStats != null) {
+					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
+							System.currentTimeMillis() - time, false);
+				}
+				return result;
+			} catch (Exception e) {
+				remotingLogger.error("Exception:\n", e.getCause() != null ? e.getCause() : e);
+				remotingLogger.info("Invoked to {} fail in {}ms", discoveredHost, System.currentTimeMillis() - time);
+				if (serviceStats != null) {
+					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
+							System.currentTimeMillis() - time, true);
+				}
+				if (--attempts < 1)
+					throw e;
+				Throwable throwable = e.getCause();
+				if (throwable instanceof SerializationFailedException
+						&& getSerializationType() == SerializationType.FST) {
+					setSerializationType(SerializationType.JAVA);
+					logger.error("downgrade serialization from FST to JAVA for service[{}]: {}",
+							getServiceInterface().getName(), throwable.getMessage());
+				} else if (throwable instanceof JsonMappingException
+						&& getSerializationType() == SerializationType.JSON) {
+					setSerializationType(SerializationType.JAVA);
+					logger.error("downgrade serialization from JSON to JAVA for service[{}]: {}",
+							getServiceInterface().getName(), throwable.getMessage());
+				} else {
+					if (urlFromDiscovery) {
+						if (discoveredHost != null) {
+							serviceRegistry.evict(discoveredHost);
+							discoveredHost = null;
+						}
+						String serviceUrl = discoverServiceUrl();
+						if (!serviceUrl.equals(getServiceUrl())) {
+							setServiceUrl(serviceUrl);
+							logger.info("relocate service url " + serviceUrl);
+						}
 					}
 				}
 			}
-			return executeRequest(invocation, methodInvocation, method, attempts);
 		}
+		throw new IllegalArgumentException("maxAttempts should large than 0");
 	}
 
 	@Override
@@ -263,7 +270,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				sb.append(ho);
 				discoveredHost = ho;
 			} else {
-				logger.error("couldn't discover service:" + serviceName);
+				logger.error("couldn't discover service " + serviceName);
 				throw new ServiceNotFoundException(serviceName);
 			}
 		} else {
