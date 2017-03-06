@@ -23,11 +23,11 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	protected String channelName;
 
 	@Autowired
-	@PriorityQualifier("mqRedisTemplate")
+	@PriorityQualifier({ "mqRedisTemplate", "globalRedisTemplate" })
 	private RedisTemplate redisTemplate;
 
 	@Autowired
-	@PriorityQualifier("mqMessageListenerContainer")
+	@PriorityQualifier({ "mqRedisMessageListenerContainer", "globalRedisMessageListenerContainer" })
 	private RedisMessageListenerContainer messageListenerContainer;
 
 	@Autowired(required = false)

@@ -1,17 +1,11 @@
 package org.ironrhino.core.spring.configuration;
 
-import static org.ironrhino.core.metadata.Profiles.CLOUD;
-import static org.ironrhino.core.metadata.Profiles.CLUSTER;
-import static org.ironrhino.core.metadata.Profiles.DUAL;
-
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -24,46 +18,45 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
-@Profile({ DUAL, CLUSTER, CLOUD, "redis" })
+@ApplicationContextPropertiesConditional(key = "global.redis.enabled", value = "true")
 @ClassPresentConditional("org.springframework.data.redis.connection.RedisConnectionFactory")
-public class RedisConfiguration {
+public class GlobalRedisConfiguration {
 
-	@Value("${redis.host:localhost}")
+	@Value("${global.redis.host:localhost}")
 	private String host;
 
-	@Value("${redis.port:6379}")
+	@Value("${global.redis.port:6379}")
 	private int port;
 
-	@Value("${redis.sentinels:}")
+	@Value("${global.redis.sentinels:}")
 	private Set<String> sentinels;
 
-	@Value("${redis.clusterNodes:}")
+	@Value("${global.redis.clusterNodes:}")
 	private Set<String> clusterNodes;
 
-	@Value("${redis.master:master}")
+	@Value("${global.redis.master:master}")
 	private String master;
 
-	@Value("${redis.password:}")
+	@Value("${global.redis.password:}")
 	private String password;
 
-	@Value("${redis.usePool:true}")
+	@Value("${global.redis.usePool:true}")
 	private boolean usePool;
 
-	@Value("${redis.database:0}")
+	@Value("${global.redis.database:0}")
 	private int database;
 
-	@Value("${redis.maxTotal:50}")
+	@Value("${global.redis.maxTotal:50}")
 	private int maxTotal;
 
-	@Value("${redis.maxIdle:10}")
+	@Value("${global.redis.maxIdle:10}")
 	private int maxIdle;
 
-	@Value("${redis.minIdle:1}")
+	@Value("${global.redis.minIdle:1}")
 	private int minIdle;
 
 	@Bean
-	@Primary
-	public JedisConnectionFactory redisConnectionFactory() {
+	public JedisConnectionFactory globalRedisConnectionFactory() {
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
 		poolConfig.setMaxTotal(maxTotal);
 		poolConfig.setMaxIdle(maxIdle);
@@ -89,27 +82,25 @@ public class RedisConfiguration {
 	}
 
 	@Bean
-	@Primary
-	public RedisTemplate<String, ?> redisTemplate() {
+	public RedisTemplate<String, ?> globalRedisTemplate() {
 		RedisTemplate<String, ?> template = new RedisTemplate<>();
-		template.setConnectionFactory(redisConnectionFactory());
+		template.setConnectionFactory(globalRedisConnectionFactory());
 		RedisSerializer<String> stringSerializer = new StringRedisSerializer();
 		template.setKeySerializer(stringSerializer);
 		return template;
 	}
 
 	@Bean
-	public RedisTemplate<String, ?> stringRedisTemplate() {
+	public RedisTemplate<String, ?> globalStringRedisTemplate() {
 		StringRedisTemplate template = new StringRedisTemplate();
-		template.setConnectionFactory(redisConnectionFactory());
+		template.setConnectionFactory(globalRedisConnectionFactory());
 		return template;
 	}
-
+	
 	@Bean
-	@Primary
-	public RedisMessageListenerContainer redisMessageListenerContainer(ExecutorService executorService) {
+	public RedisMessageListenerContainer globalRedisMessageListenerContainer(ExecutorService executorService) {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-		container.setConnectionFactory(redisConnectionFactory());
+		container.setConnectionFactory(globalRedisConnectionFactory());
 		container.setTaskExecutor(executorService);
 		return container;
 	}

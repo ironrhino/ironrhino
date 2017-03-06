@@ -108,8 +108,6 @@
 					fs = project.createDataType('fileset');
 					fs.setDir(new File(basedir+'/target'));
 					var includes = 'ironrhino-assets-'+version+'.jar,ironrhino-core-'+version+'.jar,ironrhino-hibernate-config-'+version+'.jar,ironrhino-security-'+version+'.jar,ironrhino-security-config-'+version+'.jar,ironrhino-sitemesh-config-'+version+'.jar,';
-					if(features.indexOf('redis')>=0)
-						includes += 'ironrhino-redis-config-'+version+'.jar,';
 					if(features.indexOf('rabbitmq')>=0)
 						includes += 'ironrhino-rabbitmq-config-'+version+'.jar,';
 					if(features.indexOf('mongodb')>=0)

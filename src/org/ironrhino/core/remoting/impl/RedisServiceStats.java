@@ -77,7 +77,7 @@ public class RedisServiceStats implements ServiceStats {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PriorityQualifier("remotingStringRedisTemplate")
+	@PriorityQualifier({ "remotingStringRedisTemplate", "globalStringRedisTemplate" })
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	private BoundZSetOperations<String, String> hotspotsOperations;

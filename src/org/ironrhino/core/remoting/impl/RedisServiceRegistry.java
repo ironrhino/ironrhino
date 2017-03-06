@@ -37,7 +37,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PriorityQualifier("remotingStringRedisTemplate")
+	@PriorityQualifier({ "remotingStringRedisTemplate", "globalStringRedisTemplate" })
 	private RedisTemplate<String, String> stringRedisTemplate;
 
 	@Autowired
