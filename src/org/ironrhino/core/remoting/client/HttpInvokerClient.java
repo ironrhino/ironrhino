@@ -138,7 +138,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			port = 8080;
 		String serviceUrl = getServiceUrl();
 		if (serviceUrl == null) {
-			Assert.notNull(serviceRegistry);
+			Assert.notNull(serviceRegistry, "serviceRegistry shouldn't be null");
 			setServiceUrl((secure ? "https" : "http") + "://fakehost/");
 			discovered = false;
 			urlFromDiscovery = true;

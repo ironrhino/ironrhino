@@ -60,8 +60,8 @@ public class JdbcRepositoryFactoryBean
 	private Partitioner defaultPartitioner;
 
 	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, DataSource dataSource) {
-		Assert.notNull(jdbcRepositoryClass);
-		Assert.notNull(dataSource);
+		Assert.notNull(jdbcRepositoryClass, "jdbcRepositoryClass shouldn't be null");
+		Assert.notNull(dataSource, "dataSource shouldn't be null");
 		if (!jdbcRepositoryClass.isInterface())
 			throw new IllegalArgumentException(jdbcRepositoryClass.getName() + " should be interface");
 		this.jdbcRepositoryClass = jdbcRepositoryClass;

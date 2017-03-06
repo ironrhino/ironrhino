@@ -83,7 +83,7 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	private MemcachedClient build(String serverAddress) throws IOException {
-		Assert.hasLength(serverAddress);
+		Assert.hasLength(serverAddress, "serverAddress shouldn't be blank");
 		MemcachedClientBuilder builder = new XMemcachedClientBuilder(AddrUtil.getAddresses(serverAddress));
 		builder.setSessionLocator(new KetamaMemcachedSessionLocator());
 		builder.setCommandFactory(new BinaryCommandFactory());

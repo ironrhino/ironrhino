@@ -82,13 +82,13 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		Assert.hasText(routingDataSourceName);
-		Assert.hasText(shardingParentName);
-		Assert.hasText(shardingNamePrefix);
+		Assert.hasText(routingDataSourceName, "routingDataSourceName shouldn't be blank");
+		Assert.hasText(shardingParentName, "shardingParentName shouldn't be blank");
+		Assert.hasText(shardingNamePrefix, "shardingNamePrefix shouldn't be blank");
 		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDING_HOSTS);
 		if (str != null)
 			shardingHosts = parseHosts(str);
-		Assert.notEmpty(shardingHosts);
+		Assert.notEmpty(shardingHosts, "shardingHosts shouldn't be empty");
 		str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDINGS_PER_HOST);
 		if (str != null)
 			shardingsPerHost = Integer.valueOf(str);
@@ -100,7 +100,7 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 		str = AppInfo.getApplicationContextProperties().getProperty(KEY_JDBC_URL_FORMAT);
 		if (str != null)
 			jdbcUrlFormat = str;
-		Assert.hasText(jdbcUrlFormat);
+		Assert.hasText(jdbcUrlFormat, "jdbcUrlFormat shouldn't be blank");
 		Map<String, String> jdbcUrls = buildJdbcUrls();
 		StringBuilder dataSourceMapping = new StringBuilder();
 		for (Map.Entry<String, String> entry : jdbcUrls.entrySet()) {

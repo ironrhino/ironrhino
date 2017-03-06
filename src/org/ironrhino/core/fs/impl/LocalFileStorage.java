@@ -53,7 +53,7 @@ public class LocalFileStorage implements FileStorage {
 
 	@PostConstruct
 	public void afterPropertiesSet() {
-		Assert.hasText(uri);
+		Assert.hasText(uri, "uri shouldn't be blank");
 		uri = uri.replace('\\', '/');
 		uri = uri.replace(" ", "%20");
 		try {

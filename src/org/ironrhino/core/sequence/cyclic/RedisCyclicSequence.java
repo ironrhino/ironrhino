@@ -29,8 +29,8 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.hasText(getSequenceName());
-		Assert.isTrue(getPaddingLength() > 0);
+		Assert.hasText(getSequenceName(), "sequenceName shouldn't be blank");
+		Assert.isTrue(getPaddingLength() > 0, "paddingLength should large than 0");
 		int maxlength = String.valueOf(Long.MAX_VALUE).length() - getCycleType().getPattern().length();
 		Assert.isTrue(getPaddingLength() <= maxlength, "paddingLength should not large than " + maxlength);
 		boundValueOperations = stringRedisTemplate.boundValueOps(KEY_SEQUENCE + getSequenceName());

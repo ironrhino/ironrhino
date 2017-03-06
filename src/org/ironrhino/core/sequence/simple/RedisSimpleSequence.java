@@ -20,8 +20,8 @@ public class RedisSimpleSequence extends AbstractSimpleSequence {
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.hasText(getSequenceName());
-		Assert.isTrue(getPaddingLength() > 0);
+		Assert.hasText(getSequenceName(), "sequenceName shouldn't be blank");
+		Assert.isTrue(getPaddingLength() > 0, "paddingLength should large than 0");
 		boundValueOperations = stringRedisTemplate.boundValueOps(KEY_SEQUENCE + getSequenceName());
 		boundValueOperations.setIfAbsent("0");
 	}

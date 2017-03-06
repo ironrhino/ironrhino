@@ -73,7 +73,7 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(shardingNames);
+		Assert.notNull(shardingNames, "shardingNames shouldn't be null");
 		Assert.isTrue(shardingNames.size() > 1, "shardings should more than 1");
 		Set<String> set = new HashSet<>();
 		set.addAll(shardingNames);
