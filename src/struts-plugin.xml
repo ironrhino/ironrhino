@@ -9,6 +9,8 @@
 		class="org.ironrhino.core.struts.MyFreemarkerManager" />
 	<bean type="com.opensymphony.xwork2.conversion.impl.XWorkConverter"
 		class="org.ironrhino.core.struts.converter.MyXWorkConverter" />
+	<bean type="org.apache.struts2.dispatcher.multipart.MultiPartRequest" name="jakarta-stream" 
+		class="org.apache.struts2.dispatcher.multipart.JakartaStreamMultiPartRequest" scope="prototype"/>
 	<constant name="struts.devMode" value="false" />
 	<constant name="struts.ognl.allowStaticMethodAccess" value="false" />
 	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
