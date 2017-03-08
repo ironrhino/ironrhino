@@ -539,11 +539,7 @@ public class JakartaStreamMultiPartRequest implements MultiPartRequest {
         String errorKey = "struts.message.upload.error." + e.getClass().getSimpleName();
         if (LOG.isDebugEnabled())
             LOG.debug("Preparing error message for key: [#0]", errorKey);
-        if (LocalizedTextUtil.findText(this.getClass(), errorKey, defaultLocale, null, new Object[0]) == null) {
-            return LocalizedTextUtil.findText(this.getClass(), "struts.messages.error.uploading", defaultLocale, null, new Object[] { e.getMessage() });
-        } else {
-            return LocalizedTextUtil.findText(this.getClass(), errorKey, defaultLocale, null, args);
-        }
+        return LocalizedTextUtil.findText(this.getClass(), errorKey, defaultLocale, e.getMessage(), args);
     }
 
     /**
