@@ -38,12 +38,12 @@
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="ACCESS" fileName="${sys:app.home}/logs/${sys:port.http}/access.log" filePattern="${sys:app.home}/logs/${sys:port.http}/access.log.%d{yyyy-MM-dd}">
-			<PatternLayout pattern="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request}%X{responseTime}%n" charset="UTF-8"/>
+			<PatternLayout pattern="%d %X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request}%X{responseTime}%n" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 		<RollingFile name="ACCESS-WARN" fileName="${sys:app.home}/logs/${sys:port.http}/access-warn.log" filePattern="${sys:app.home}/logs/${sys:port.http}/access-warn.log.%d{yyyy-MM-dd}">
 			<ThresholdFilter level="WARN"/>
-			<PatternLayout pattern="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request} %m%n" charset="UTF-8"/>
+			<PatternLayout pattern="%d %X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request} %m%n" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
 	</Appenders>

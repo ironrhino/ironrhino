@@ -18,11 +18,13 @@ import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesCondi
 import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.User;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -104,8 +106,10 @@ public class SsoHandler extends AccessHandler {
 				User userFromApi = restTemplate.exchange(requestEntity, User.class).getBody();
 				UserDetails ud = map(userFromApi);
 				SecurityContext sc = SecurityContextHolder.getContext();
-				sc.setAuthentication(
-						new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities()));
+				Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(),
+						ud.getAuthorities());
+				sc.setAuthentication(auth);
+				MDC.put("username", auth.getName());
 				Map<String, Object> sessionMap = new HashMap<>(2, 1);
 				sessionMap.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
 				request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API, sessionMap);

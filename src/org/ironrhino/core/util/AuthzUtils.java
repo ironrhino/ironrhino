@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Secured;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.servlet.RequestContext;
+import org.slf4j.MDC;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -194,6 +195,7 @@ public class AuthzUtils {
 		SecurityContext sc = SecurityContextHolder.getContext();
 		Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
 		sc.setAuthentication(auth);
+		MDC.put("username", auth.getName());
 		if (RequestContext.getRequest() != null) // for pageView uu
 			RequestUtils.saveCookie(RequestContext.getRequest(), RequestContext.getResponse(), "UU", ud.getUsername());
 	}

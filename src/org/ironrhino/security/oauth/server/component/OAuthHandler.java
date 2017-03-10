@@ -18,6 +18,7 @@ import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.service.OAuthAuthorizationService;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
@@ -169,6 +170,7 @@ public class OAuthHandler extends AccessHandler {
 		SecurityContext sc = SecurityContextHolder.getContext();
 		Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
 		sc.setAuthentication(auth);
+		MDC.put("username", auth.getName());
 		Map<String, Object> sessionMap = new HashMap<>(2, 1);
 		sessionMap.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
 		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API, sessionMap);

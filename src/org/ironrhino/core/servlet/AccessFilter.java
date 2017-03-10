@@ -168,7 +168,8 @@ public class AccessFilter implements Filter {
 				s = "";
 			MDC.put("referer", " Referer:" + s);
 			s = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
-			MDC.put("username", s != null ? " " + s : " ");
+			if (s != null)
+				MDC.put("username", s);
 			String sessionId = null;
 			if (httpSessionManager != null) {
 				sessionId = httpSessionManager.getSessionId(request);

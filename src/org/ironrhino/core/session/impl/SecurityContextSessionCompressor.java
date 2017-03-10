@@ -8,6 +8,7 @@ import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -75,10 +76,12 @@ public class SecurityContextSessionCompressor implements SessionCompressor<Secur
 				}
 				UserDetails ud = userDetailsService.loadUserByUsername(username);
 				if (!checkDirtyPassword || (ud.getPassword() == null && password == null
-						|| ud.getPassword() != null && CodecUtils.md5Hex(ud.getPassword()).equals(password)))
-					sc.setAuthentication(
-							new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities()));
-				else {
+						|| ud.getPassword() != null && CodecUtils.md5Hex(ud.getPassword()).equals(password))) {
+					Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(),
+							ud.getAuthorities());
+					sc.setAuthentication(auth);
+					MDC.put("username", auth.getName());
+				} else {
 					logger.info("invalidate SecurityContext of \"{}\" because password changed", username);
 				}
 			} catch (UsernameNotFoundException e) {

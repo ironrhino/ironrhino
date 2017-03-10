@@ -5,7 +5,7 @@
 	</Properties>
 	<Appenders>
 		<Kafka name="KAFKA-ACCESS" topic="app.logs.access">
-			<PatternLayout pattern="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request}%X{server}%X{responseTime}" charset="UTF-8"/>
+			<PatternLayout pattern="%d %X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request}%X{server}%X{responseTime}" charset="UTF-8"/>
 			<Property name="bootstrap.servers">${sys:kafka.bootstrap.servers}</Property>
 		</Kafka>
 		<Kafka name="KAFKA-APPLICATION" topic="app.logs.application">
