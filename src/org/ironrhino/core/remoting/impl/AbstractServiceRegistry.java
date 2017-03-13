@@ -19,6 +19,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
@@ -35,6 +36,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			AbstractServiceRegistry.class.getClassLoader());
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
+
+	@Value("${serviceRegistry.useHttps:false}")
+	private boolean useHttps;
 
 	@Autowired
 	private ConfigurableApplicationContext ctx;
@@ -60,7 +64,12 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	public void init() {
-		localHost = AppInfo.getHostAddress() + ':' + (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_PORT);
+		if (!useHttps)
+			localHost = AppInfo.getHostAddress() + ':'
+					+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_HTTP_PORT);
+		else
+			localHost = "https://" + AppInfo.getHostAddress() + ':'
+					+ (AppInfo.getHttpsPort() > 0 ? AppInfo.getHttpsPort() : DEFAULT_HTTPS_PORT);
 		if (ctx instanceof ConfigurableWebApplicationContext) {
 			String ctxPath = ((ConfigurableWebApplicationContext) ctx).getServletContext().getContextPath();
 			if (!ctxPath.isEmpty())

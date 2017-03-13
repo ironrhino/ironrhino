@@ -11,12 +11,13 @@ import javax.management.ObjectName;
 import javax.management.Query;
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 
 public class ContainerDetector {
 
 	@SuppressWarnings("unchecked")
-	public static int port(ServletContext servletContext) {
+	public static int detectHttpPort(ServletContext servletContext, boolean ssl) {
 		String className = servletContext.getClass().getName();
 		if (className.startsWith("org.apache.catalina")) {
 			// tomcat or glassfish
@@ -24,7 +25,7 @@ public class ContainerDetector {
 				// detect via jmx
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 				Set<ObjectName> objs = mbs.queryNames(new ObjectName("*:type=Connector,*"),
-						Query.match(Query.attr("scheme"), Query.value("http")));
+						Query.match(Query.attr("scheme"), Query.value(ssl ? "https" : "http")));
 				for (ObjectName on : objs) {
 					if (((String) mbs.getAttribute(on, "protocol")).toLowerCase().startsWith("http/"))
 						return (Integer) mbs.getAttribute(on, "port");
@@ -55,8 +56,8 @@ public class ContainerDetector {
 
 								}
 							}
-							if (connector.getClass().getMethod("getScheme").invoke(connector).equals("http")
-									&& (name == null || !name.contains("admin")))
+							if (connector.getClass().getMethod("getScheme").invoke(connector)
+									.equals(ssl ? "https" : "http") && (name == null || !name.contains("admin")))
 								return (Integer) connector.getClass().getMethod("getPort").invoke(connector);
 						}
 					}
@@ -66,6 +67,13 @@ public class ContainerDetector {
 		} else if (className.startsWith("org.eclipse.jetty")) {
 			// jetty
 			try {
+				if (ssl) {
+					String port = System.getProperty("jetty.ssl.port");
+					if (StringUtils.isNotBlank(port))
+						return Integer.valueOf(port);
+					else
+						return 0;
+				}
 				Object webAppContext = ReflectionUtils.getFieldValue(servletContext, "this$0");
 				Object server = ReflectionUtils.getFieldValue(webAppContext, "_server");
 				Object[] connectors = (Object[]) server.getClass().getMethod("getConnectors").invoke(server);
@@ -91,8 +99,8 @@ public class ContainerDetector {
 			// wildfly
 			try {
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-				return (Integer) mbs.getAttribute(
-						new ObjectName("jboss.as:socket-binding-group=standard-sockets,socket-binding=http"),
+				return (Integer) mbs.getAttribute(new ObjectName(
+						"jboss.as:socket-binding-group=standard-sockets,socket-binding=" + (ssl ? "https" : "http")),
 						"boundPort");
 			} catch (Throwable e) {
 			}
@@ -101,7 +109,7 @@ public class ContainerDetector {
 			try {
 				Class<?> configClass = servletContext.getClassLoader().loadClass("com.caucho.config.Config");
 				Object server = configClass.getMethod("getProperty", String.class).invoke(null, "server");
-				return (Integer) server.getClass().getMethod("getHttpPort").invoke(server);
+				return (Integer) server.getClass().getMethod(ssl ? "getHttpsPort" : "getHttpPort").invoke(server);
 			} catch (Throwable e) {
 			}
 		} else if (className.startsWith("weblogic.servlet")) {
@@ -111,7 +119,7 @@ public class ContainerDetector {
 				Set<ObjectName> objs = mbs.queryNames(new ObjectName("com.bea:Type=ServerRuntime,*"), null);
 				for (ObjectName on : objs) {
 					try {
-						return (Integer) mbs.getAttribute(on, "ListenPort");
+						return (Integer) mbs.getAttribute(on, ssl ? "SSLListenPort" : "ListenPort");
 					} catch (AttributeNotFoundException e) {
 					}
 				}
@@ -121,8 +129,9 @@ public class ContainerDetector {
 			// websphere
 			try {
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-				Set<ObjectName> objs = mbs
-						.queryNames(new ObjectName("WebSphere:type=endpoint,name=defaultHttpEndpoint,*"), null);
+				Set<ObjectName> objs = mbs.queryNames(
+						new ObjectName("WebSphere:type=endpoint,name=defaultHttpEndpoint" + (ssl ? "-ssl" : "") + ",*"),
+						null);
 				for (ObjectName on : objs)
 					try {
 						return (Integer) mbs.getAttribute(on, "Port");

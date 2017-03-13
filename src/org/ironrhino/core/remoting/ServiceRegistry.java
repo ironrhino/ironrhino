@@ -5,7 +5,9 @@ import java.util.Map;
 
 public interface ServiceRegistry {
 
-	int DEFAULT_PORT = 8080;
+	int DEFAULT_HTTP_PORT = 8080;
+
+	int DEFAULT_HTTPS_PORT = 8443;
 
 	public String getLocalHost();
 

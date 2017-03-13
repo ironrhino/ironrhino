@@ -48,9 +48,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
 
-	@Value("${remoting.channel.secure:false}")
-	private boolean secure;
-
 	private String host;
 
 	private int port;
@@ -87,10 +84,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	public void setPoll(boolean poll) {
 		this.poll = poll;
-	}
-
-	public void setSecure(boolean secure) {
-		this.secure = secure;
 	}
 
 	public void setHost(String host) {
@@ -139,7 +132,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		String serviceUrl = getServiceUrl();
 		if (serviceUrl == null) {
 			Assert.notNull(serviceRegistry, "serviceRegistry shouldn't be null");
-			setServiceUrl((secure ? "https" : "http") + "://fakehost/");
+			setServiceUrl("http://fakehost/");
 			discovered = false;
 			urlFromDiscovery = true;
 		}
@@ -262,11 +255,12 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	protected String discoverServiceUrl() {
 		String serviceName = getServiceInterface().getName();
-		StringBuilder sb = new StringBuilder(secure ? "https" : "http");
-		sb.append("://");
+		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isBlank(host)) {
 			String ho = serviceRegistry.discover(serviceName);
 			if (ho != null) {
+				if (ho.indexOf("://") < 0)
+					sb.append("http://");
 				sb.append(ho);
 				discoveredHost = ho;
 			} else {
@@ -274,6 +268,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				throw new ServiceNotFoundException(serviceName);
 			}
 		} else {
+			sb.append("http://");
 			sb.append(host);
 			if (port != 80) {
 				sb.append(':');

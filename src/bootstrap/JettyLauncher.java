@@ -14,7 +14,7 @@ public class JettyLauncher {
 		int port = 8080;
 		String p = System.getProperty("port.http");
 		if (p == null)
-			p = System.getProperty("jetty.port");
+			p = System.getProperty("jetty.http.port");
 		if (p != null && p.trim().length() > 0)
 			port = Integer.valueOf(p);
 		Server server = new Server(port);

@@ -67,6 +67,8 @@ public class AppInfo {
 
 	private static int httpPort = 0;
 
+	private static int httpsPort = 0;
+
 	private static final Stage STAGE;
 
 	private static final RunLevel RUNLEVEL;
@@ -217,6 +219,10 @@ public class AppInfo {
 		AppInfo.httpPort = httpPort;
 	}
 
+	public static void setHttpsPort(int httpsPort) {
+		AppInfo.httpsPort = httpsPort;
+	}
+
 	public static Stage getStage() {
 		return STAGE;
 	}
@@ -287,6 +293,10 @@ public class AppInfo {
 		return httpPort;
 	}
 
+	public static int getHttpsPort() {
+		return httpsPort;
+	}
+
 	public static String getNodePath() {
 		return NODEPATH;
 	}
@@ -300,6 +310,11 @@ public class AppInfo {
 			p = System.getenv("VCAP_APP_PORT");
 		if (StringUtils.isNotBlank(p) && StringUtils.isNumeric(p))
 			httpPort = Integer.valueOf(p);
+		p = System.getProperty("port.https");
+		if (StringUtils.isBlank(p))
+			p = System.getProperty("port.http.ssl");
+		if (StringUtils.isNotBlank(p) && StringUtils.isNumeric(p))
+			httpsPort = Integer.valueOf(p);
 
 		System.setProperty(AppInfo.KEY_STAGE, AppInfo.getStage().name());
 		System.setProperty(AppInfo.KEY_APP_HOME, AppInfo.getAppHome());
