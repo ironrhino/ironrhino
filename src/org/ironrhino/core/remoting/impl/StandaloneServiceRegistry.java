@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.ironrhino.core.util.AppInfo;
 import org.springframework.stereotype.Component;
 
 @Component("serviceRegistry")
@@ -34,17 +35,30 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public Collection<String> getAllServices() {
-		return exportServices.keySet();
-	}
-
-	@Override
-	public Collection<String> getHostsForService(String service) {
+	public Collection<String> getExportedHostsForService(String service) {
 		return Collections.singleton(getLocalHost());
 	}
 
 	@Override
-	public Map<String, String> getDiscoveredServices(String host) {
+	public Collection<String> getImportedHostsForService(String service) {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public Map<String, String> getImportedServices(String host) {
 		return Collections.emptyMap();
+	}
+
+	@Override
+	public Collection<String> getAllAppNames() {
+		return Collections.singleton(AppInfo.getAppName());
+	}
+
+	@Override
+	public Map<String, String> getExportedServices(String appName) {
+		if (AppInfo.getAppName().equals(appName))
+			return exportedServiceDescriptions;
+		else
+			return Collections.emptyMap();
 	}
 }

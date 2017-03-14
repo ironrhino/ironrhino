@@ -12,4 +12,6 @@ public @interface Remoting {
 
 	Class<?>[] value() default {};
 
+	String description() default "";
+
 }

@@ -11,16 +11,20 @@ public interface ServiceRegistry {
 
 	public String getLocalHost();
 
-	public Map<String, Object> getExportServices();
+	public Map<String, Object> getExportedServices();
 
 	public String discover(String serviceName);
 
 	public void evict(String host);
 
-	public Collection<String> getAllServices();
+	public Collection<String> getAllAppNames();
 
-	public Collection<String> getHostsForService(String service);
+	public Map<String, String> getExportedServices(String appName);
 
-	public Map<String, String> getDiscoveredServices(String host);
+	public Map<String, String> getImportedServices(String host);
+
+	public Collection<String> getExportedHostsForService(String service);
+
+	public Collection<String> getImportedHostsForService(String service);
 
 }

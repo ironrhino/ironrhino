@@ -1,6 +1,7 @@
 package org.ironrhino.core.remoting.action;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.ironrhino.core.metadata.Authorize;
@@ -20,16 +21,16 @@ public class ConsoleAction extends BaseAction {
 	@Autowired
 	private transient ServiceRegistry serviceRegistry;
 
-	private Collection<String> hosts;
+	private Map<String, Collection<String>> hosts;
 
-	private Map<String, String> discoveredServices;
+	private Map<String, String> importedServices;
 
-	public Collection<String> getHosts() {
+	public Map<String, Collection<String>> getHosts() {
 		return hosts;
 	}
 
-	public Map<String, String> getDiscoveredServices() {
-		return discoveredServices;
+	public Map<String, String> getImportedServices() {
+		return importedServices;
 	}
 
 	public ServiceRegistry getServiceRegistry() {
@@ -43,13 +44,15 @@ public class ConsoleAction extends BaseAction {
 
 	@JsonConfig(root = "hosts")
 	public String hosts() {
-		hosts = serviceRegistry.getHostsForService(getUid());
+		hosts = new HashMap<>();
+		hosts.put("exported", serviceRegistry.getExportedHostsForService(getUid()));
+		hosts.put("imported", serviceRegistry.getImportedHostsForService(getUid()));
 		return JSON;
 	}
 
-	@JsonConfig(root = "discoveredServices")
+	@JsonConfig(root = "importedServices")
 	public String services() {
-		discoveredServices = serviceRegistry.getDiscoveredServices(getUid());
+		importedServices = serviceRegistry.getImportedServices(getUid());
 		return JSON;
 	}
 

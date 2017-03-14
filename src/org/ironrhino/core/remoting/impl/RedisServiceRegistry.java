@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.PreDestroy;
@@ -20,6 +21,7 @@ import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,6 +36,8 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	private static final String NAMESPACE_SERVICES = NAMESPACE + "services:";
 
 	private static final String NAMESPACE_HOSTS = NAMESPACE + "hosts:";
+
+	private static final String NAMESPACE_APPS = NAMESPACE + "apps:";
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
@@ -52,18 +56,19 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	protected void onReady() {
-		Set<String> services = getExportServices().keySet();
+		Set<String> services = getExportedServices().keySet();
 		if (!services.isEmpty()) {
 			ExportServicesEvent event = new ExportServicesEvent(new ArrayList<>(services));
 			eventPublisher.publish(event, Scope.GLOBAL);
 		}
 		writeDiscoveredServices();
+		writeExportServiceDescriptions();
 		ready = true;
 	}
 
 	@Override
 	public String discover(String serviceName) {
-		List<String> hosts = getImportServices().get(serviceName);
+		List<String> hosts = importedServiceCandidates.get(serviceName);
 		if (hosts == null || hosts.size() == 0)
 			lookup(serviceName);
 		return super.discover(serviceName);
@@ -73,7 +78,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	protected void lookup(String serviceName) {
 		List<String> list = stringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + serviceName, 0, -1);
 		if (list != null && list.size() > 0)
-			importServices.put(serviceName, new ArrayList<>(list));
+			importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<>(list));
 	}
 
 	@Override
@@ -108,18 +113,19 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 			task.run();
 	}
 
-	@Override
-	public Collection<String> getAllServices() {
-		Set<String> keys = stringRedisTemplate.keys(NAMESPACE_SERVICES + "*");
-		List<String> services = new ArrayList<>(keys.size());
-		for (String s : keys)
-			services.add(s.substring(NAMESPACE_SERVICES.length()));
-		Collections.sort(services);
-		return services;
+	protected void writeExportServiceDescriptions() {
+		if (exportedServiceDescriptions.size() == 0)
+			return;
+		Runnable task = () -> stringRedisTemplate.opsForHash().putAll(NAMESPACE_APPS + AppInfo.getAppName(),
+				exportedServiceDescriptions);
+		if (executorService != null)
+			executorService.execute(task);
+		else
+			task.run();
 	}
 
 	@Override
-	public Collection<String> getHostsForService(String service) {
+	public Collection<String> getExportedHostsForService(String service) {
 		List<String> list = stringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1);
 		List<String> hosts = new ArrayList<>(list.size());
 		hosts.addAll(list);
@@ -128,8 +134,40 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public Map<String, String> getDiscoveredServices(String host) {
+	public Collection<String> getImportedHostsForService(String service) {
+		List<String> result = new ArrayList<>();
+		for (String key : stringRedisTemplate.keys(NAMESPACE_HOSTS + "*")) {
+			if (stringRedisTemplate.opsForHash().hasKey(key, service))
+				result.add(key.substring(NAMESPACE_HOSTS.length()));
+		}
+		Collections.sort(result);
+		return result;
+	}
+
+	@Override
+	public Map<String, String> getImportedServices(String host) {
 		Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(NAMESPACE_HOSTS + host);
+		Map<String, String> services = new TreeMap<>();
+		for (Map.Entry<Object, Object> entry : map.entrySet())
+			services.put((String) entry.getKey(), (String) entry.getValue());
+		return services;
+	}
+
+	@Override
+	public Collection<String> getAllAppNames() {
+		Set<String> keys = stringRedisTemplate.keys(NAMESPACE_APPS + "*");
+		List<String> appNames = new ArrayList<>(keys.size());
+		for (String s : keys)
+			appNames.add(s.substring(NAMESPACE_APPS.length()));
+		Collections.sort(appNames);
+		return appNames;
+	}
+
+	@Override
+	public Map<String, String> getExportedServices(String appName) {
+		if (AppInfo.getAppName().equals(appName))
+			return exportedServiceDescriptions;
+		Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(NAMESPACE_APPS + appName);
 		Map<String, String> services = new TreeMap<>();
 		for (Map.Entry<Object, Object> entry : map.entrySet())
 			services.put((String) entry.getKey(), (String) entry.getValue());

@@ -2,19 +2,23 @@ package org.ironrhino.core.remoting.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
 import org.ironrhino.core.event.InstanceShutdownEvent;
 import org.ironrhino.core.event.InstanceStartupEvent;
 import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.ServiceRegistry;
+import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +47,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Autowired
 	private ConfigurableApplicationContext ctx;
 
-	protected Map<String, List<String>> importServices = new ConcurrentHashMap<>();
+	protected Map<String, List<String>> importedServiceCandidates = new ConcurrentHashMap<>();
 
-	protected Map<String, Object> exportServices = new HashMap<>();
+	protected Map<String, Object> exportedServices = new HashMap<>();
+
+	protected Map<String, String> exportedServiceDescriptions = new TreeMap<>();
 
 	private String localHost;
 
@@ -54,21 +60,17 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		return localHost;
 	}
 
-	public Map<String, List<String>> getImportServices() {
-		return importServices;
-	}
-
 	@Override
-	public Map<String, Object> getExportServices() {
-		return exportServices;
+	public Map<String, Object> getExportedServices() {
+		return exportedServices;
 	}
 
 	public void init() {
 		if (!useHttps)
-			localHost = AppInfo.getHostAddress() + ':'
+			localHost = AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
 					+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_HTTP_PORT);
 		else
-			localHost = "https://" + AppInfo.getHostAddress() + ':'
+			localHost = "https://" + AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
 					+ (AppInfo.getHttpsPort() > 0 ? AppInfo.getHttpsPort() : DEFAULT_HTTPS_PORT);
 		if (ctx instanceof ConfigurableWebApplicationContext) {
 			String ctxPath = ((ConfigurableWebApplicationContext) ctx).getServletContext().getContextPath();
@@ -94,25 +96,34 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				// remoting_client
 				String serviceName = (String) bd.getPropertyValues().getPropertyValue("serviceInterface").getValue();
 				if (IS_CLIENT_PRESENT)
-					importServices.put(serviceName, new ArrayList<String>());
+					importedServiceCandidates.put(serviceName, new ArrayList<String>());
 			} else {
 				if (IS_SERVER_PRESENT)
 					export(clazz, beanName, beanClassName);
 			}
 		}
 		if (IS_SERVER_PRESENT) {
-			for (String serviceName : exportServices.keySet())
+			for (String serviceName : exportedServices.keySet())
 				register(serviceName);
 		} else {
 			logger.warn("No class [" + CLASS_NAME_SERVER + "] found, skip register services");
 		}
 		if (IS_CLIENT_PRESENT) {
-			for (String serviceName : importServices.keySet())
+			for (String serviceName : importedServiceCandidates.keySet())
 				lookup(serviceName);
 		} else {
 			logger.warn("No class [" + CLASS_NAME_CLIENT + "] found, skip lookup services");
 		}
 		onReady();
+	}
+
+	private static String trimAppName(String host) {
+		int i = host.indexOf('@');
+		if (i < 0)
+			return host;
+		String s = host.substring(i + 1);
+		i = host.indexOf("://");
+		return i < 0 ? s : host.substring(0, i + 3) + s;
 	}
 
 	private void export(Class<?> clazz, String beanName, String beanClassName) {
@@ -142,7 +153,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 								logger.info("skiped export service [{}] for bean [{}#{}]@{} because {}=false",
 										inte.getName(), beanClassName, beanName, localHost, key);
 							} else {
-								exportServices.put(inte.getName(), ctx.getBean(beanName));
+								exportedServices.put(inte.getName(), ctx.getBean(beanName));
+								String description = remoting.description();
+								if (StringUtils.isNotBlank(description))
+									description = I18N.getText(description);
+								exportedServiceDescriptions.put(inte.getName(), description);
 								logger.info("exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
 										beanName, localHost);
 							}
@@ -164,7 +179,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 					logger.info("skiped export service [{}] for bean [{}#{}]@{} because {}=false", clazz.getName(),
 							beanClassName, beanName, localHost, key);
 				} else {
-					exportServices.put(clazz.getName(), ctx.getBean(beanName));
+					exportedServices.put(clazz.getName(), ctx.getBean(beanName));
+					String description = remoting.description();
+					if (StringUtils.isNotBlank(description))
+						description = I18N.getText(description);
+					exportedServiceDescriptions.put(clazz.getName(), description);
 					logger.info("exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
 							localHost);
 				}
@@ -176,19 +195,22 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Override
 	public void evict(String host) {
-		for (Map.Entry<String, List<String>> entry : importServices.entrySet()) {
-			List<String> list = entry.getValue();
-			if (!list.isEmpty())
-				list.remove(host);
+		for (Map.Entry<String, List<String>> entry : importedServiceCandidates.entrySet()) {
+			Iterator<String> it = entry.getValue().iterator();
+			while (it.hasNext()) {
+				if (trimAppName(it.next()).equals(host))
+					it.remove();
+			}
 		}
 	}
 
 	@Override
 	public String discover(String serviceName) {
-		List<String> hosts = getImportServices().get(serviceName);
+		List<String> hosts = importedServiceCandidates.get(serviceName);
 		if (hosts != null && hosts.size() > 0) {
 			String host = hosts.get(ThreadLocalRandom.current().nextInt(hosts.size()));
 			onDiscover(serviceName, host);
+			host = trimAppName(host);
 			return host;
 		} else {
 			return null;
@@ -197,7 +219,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	protected void onDiscover(String serviceName, String host) {
-		logger.info("discovered " + serviceName + '@' + host);
+		logger.info("discovered " + serviceName + " from " + host);
 	}
 
 	protected abstract void register(String serviceName);
@@ -210,7 +232,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@PreDestroy
 	public void destroy() {
-		for (String serviceName : exportServices.keySet())
+		for (String serviceName : exportedServices.keySet())
 			unregister(serviceName);
 	}
 
@@ -231,7 +253,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			String instanceId = event.getInstanceId();
 			String host = instanceId.substring(instanceId.lastIndexOf('@') + 1);
 			for (String serviceName : ev.getExportServices()) {
-				List<String> hosts = importServices.get(serviceName);
+				List<String> hosts = importedServiceCandidates.get(serviceName);
 				if (hosts != null && !hosts.contains(host))
 					hosts.add(host);
 			}

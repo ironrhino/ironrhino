@@ -134,7 +134,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	public void prepare() {
 		if (serviceRegistry != null) {
-			for (Map.Entry<String, Object> entry : serviceRegistry.getExportServices().entrySet()) {
+			for (Map.Entry<String, Object> entry : serviceRegistry.getExportedServices().entrySet()) {
 				try {
 					Class<?> intf = Class.forName(entry.getKey());
 					serviceInterface.set(intf);
