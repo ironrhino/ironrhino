@@ -11,6 +11,7 @@ import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -23,12 +24,20 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	protected String channelName;
 
 	@Autowired
-	@PriorityQualifier({ "mqRedisTemplate", "globalRedisTemplate" })
+	@PriorityQualifier("mqRedisTemplate")
 	private RedisTemplate redisTemplate;
 
+	@Autowired(required = false)
+	@Qualifier("globalRedisTemplate")
+	private RedisTemplate globalRedisTemplate;
+
 	@Autowired
-	@PriorityQualifier({ "mqRedisMessageListenerContainer", "globalRedisMessageListenerContainer" })
+	@PriorityQualifier("mqRedisMessageListenerContainer")
 	private RedisMessageListenerContainer messageListenerContainer;
+
+	@Autowired(required = false)
+	@Qualifier("globalRedisMessageListenerContainer")
+	private RedisMessageListenerContainer globalRedisMessageListenerContainer;
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
@@ -51,15 +60,36 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	public void afterPropertiesSet() {
 		Topic globalTopic = new ChannelTopic(getChannelName(Scope.GLOBAL));
 		Topic applicationTopic = new ChannelTopic(getChannelName(Scope.APPLICATION));
-		messageListenerContainer.addMessageListener((message, pattern) -> {
-			try {
-				subscribe((T) redisTemplate.getValueSerializer().deserialize(message.getBody()));
-			} catch (SerializationException e) {
-				// message from other app
-				if (!(e.getCause() instanceof ClassNotFoundException))
-					throw e;
-			}
-		}, Arrays.asList(globalTopic, applicationTopic));
+		if (globalRedisTemplate != null) {
+			globalRedisMessageListenerContainer.addMessageListener((message, pattern) -> {
+				try {
+					subscribe((T) globalRedisTemplate.getValueSerializer().deserialize(message.getBody()));
+				} catch (SerializationException e) {
+					// message from other app
+					if (!(e.getCause() instanceof ClassNotFoundException))
+						throw e;
+				}
+			}, Arrays.asList(globalTopic));
+			messageListenerContainer.addMessageListener((message, pattern) -> {
+				try {
+					subscribe((T) redisTemplate.getValueSerializer().deserialize(message.getBody()));
+				} catch (SerializationException e) {
+					// message from other app
+					if (!(e.getCause() instanceof ClassNotFoundException))
+						throw e;
+				}
+			}, Arrays.asList(applicationTopic));
+		} else {
+			messageListenerContainer.addMessageListener((message, pattern) -> {
+				try {
+					subscribe((T) redisTemplate.getValueSerializer().deserialize(message.getBody()));
+				} catch (SerializationException e) {
+					// message from other app
+					if (!(e.getCause() instanceof ClassNotFoundException))
+						throw e;
+				}
+			}, Arrays.asList(globalTopic, applicationTopic));
+		}
 	}
 
 	protected String getChannelName(Scope scope) {
@@ -82,7 +112,10 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 			else
 				task.run();
 		} else {
-			redisTemplate.convertAndSend(getChannelName(scope), message);
+			if (globalRedisTemplate != null && scope == Scope.GLOBAL)
+				globalRedisTemplate.convertAndSend(getChannelName(scope), message);
+			else
+				redisTemplate.convertAndSend(getChannelName(scope), message);
 		}
 	}
 
