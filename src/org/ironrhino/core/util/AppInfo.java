@@ -362,6 +362,9 @@ public class AppInfo {
 		System.setProperty("console.logger.level", AppInfo.getStage() == Stage.PRODUCTION
 				&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))
 						? "ERROR" : "INFO");
+		String kafkaBootstrapServers = getRawApplicationContextProperties().getProperty("kafka.bootstrap.servers");
+		if (StringUtils.isNotBlank(kafkaBootstrapServers))
+			System.setProperty("kafka.bootstrap.servers", kafkaBootstrapServers);
 
 		// configure timezone
 		String userTimezone = System.getProperty("user.timezone");
@@ -376,43 +379,48 @@ public class AppInfo {
 
 	private static Properties applicationContextProperties = null;
 
+	private static Properties getRawApplicationContextProperties() {
+		Properties properties = new Properties();
+		Resource resource = new ClassPathResource("resources/spring/applicationContext.properties");
+		if (resource.exists()) {
+			try (InputStream is = resource.getInputStream()) {
+				properties.load(is);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		resource = new ClassPathResource(
+				"resources/spring/applicationContext." + AppInfo.getStage().name() + ".properties");
+		if (resource.exists()) {
+			try (InputStream is = resource.getInputStream()) {
+				properties.load(is);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		resource = new FileSystemResource(AppInfo.getAppHome() + "/conf/applicationContext.properties");
+		if (resource.exists()) {
+			try (InputStream is = resource.getInputStream()) {
+				properties.load(is);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		resource = new FileSystemResource(
+				AppInfo.getAppHome() + "/conf/applicationContext." + AppInfo.getStage().name() + ".properties");
+		if (resource.exists()) {
+			try (InputStream is = resource.getInputStream()) {
+				properties.load(is);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return properties;
+	}
+
 	public static Properties getApplicationContextProperties() {
 		if (applicationContextProperties == null) {
-			Properties properties = new Properties();
-			Resource resource = new ClassPathResource("resources/spring/applicationContext.properties");
-			if (resource.exists()) {
-				try (InputStream is = resource.getInputStream()) {
-					properties.load(is);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			resource = new ClassPathResource(
-					"resources/spring/applicationContext." + AppInfo.getStage().name() + ".properties");
-			if (resource.exists()) {
-				try (InputStream is = resource.getInputStream()) {
-					properties.load(is);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			resource = new FileSystemResource(AppInfo.getAppHome() + "/conf/applicationContext.properties");
-			if (resource.exists()) {
-				try (InputStream is = resource.getInputStream()) {
-					properties.load(is);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			resource = new FileSystemResource(
-					AppInfo.getAppHome() + "/conf/applicationContext." + AppInfo.getStage().name() + ".properties");
-			if (resource.exists()) {
-				try (InputStream is = resource.getInputStream()) {
-					properties.load(is);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			Properties properties = getRawApplicationContextProperties();
 			Properties temp = new Properties();
 			MutablePropertySources propertySources = new MutablePropertySources();
 			PropertySource<?> localPropertySource = new PropertiesPropertySource("local", properties);
