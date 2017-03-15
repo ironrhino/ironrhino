@@ -151,7 +151,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 							String key = inte.getName() + ".exported";
 							if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
 								logger.info("skiped export service [{}] for bean [{}#{}]@{} because {}=false",
-										inte.getName(), beanClassName, beanName, localHost, key);
+										inte.getName(), beanClassName, beanName, trimAppName(localHost), key);
 							} else {
 								exportedServices.put(inte.getName(), ctx.getBean(beanName));
 								String description = remoting.description();
@@ -159,7 +159,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 									description = I18N.getText(description);
 								exportedServiceDescriptions.put(inte.getName(), description);
 								logger.info("exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
-										beanName, localHost);
+										beanName, trimAppName(localHost));
 							}
 						}
 					}
@@ -177,7 +177,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				String key = clazz.getName() + ".exported";
 				if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
 					logger.info("skiped export service [{}] for bean [{}#{}]@{} because {}=false", clazz.getName(),
-							beanClassName, beanName, localHost, key);
+							beanClassName, beanName, trimAppName(localHost), key);
 				} else {
 					exportedServices.put(clazz.getName(), ctx.getBean(beanName));
 					String description = remoting.description();
@@ -185,7 +185,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 						description = I18N.getText(description);
 					exportedServiceDescriptions.put(clazz.getName(), description);
 					logger.info("exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
-							localHost);
+							trimAppName(localHost));
 				}
 			}
 			for (Class<?> c : clazz.getInterfaces())

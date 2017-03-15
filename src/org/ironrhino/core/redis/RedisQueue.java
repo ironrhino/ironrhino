@@ -29,7 +29,7 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 	private ExecutorService executorService;
 
 	@Autowired
-	@PriorityQualifier({ "mqRedisTemplate", "globalRedisTemplate"})
+	@PriorityQualifier({ "mqRedisTemplate", "globalRedisTemplate" })
 	private RedisTemplate<String, T> redisTemplate;
 
 	public void setConsuming(boolean consuming) {
