@@ -2,8 +2,6 @@
 
 ANT_VERSION=1.10.1
 TOMCAT_VERSION=8.0.41
-REDIS_VERSION=3.2.8
-#TOMCAT_VERSION=7.0.68
 
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
@@ -72,24 +70,6 @@ cd tomcat && rm -rf bin/*.bat && rm -rf webapps/*
 cd conf
 sed -i  's/\s[3-4][a-x-]*manager.org.apache.juli.FileHandler,//g' logging.properties
 sed -i '/manager/d' logging.properties
-if [ "${TOMCAT_VERSION:0:1}" = "7" ];then
-sed -i 's/tomcat7-websocket/*/g' catalina.properties
-sed -i '/ContextConfig.jarsToSkip/d' catalina.properties
-cat>>catalina.properties<<EOF
-org.apache.catalina.startup.ContextConfig.jarsToSkip=\\
-activiti-*.jar,antlr-*.jar,aopalliance-*.jar,aspectj*.jar,bonecp-*.jar,commons-*.jar,\\
-curator-*.jar,dom4j-*.jar,dynamicreports-*.jar,eaxy-*.jar,ehcache-*.jar,\\
-elasticsearch-*.jar,freemarker-*.jar,guava-*.jar,hessian-*.jar,hibernate-*.jar,\\
-http*.jar,itext*.jar, jackson-*.jar,jasperreports-*.jar,javamail-*.jar,\\
-javassist-*.jar,jboss-logging-*.jar,jedis-*.jar, jericho-*.jar,joda-*.jar,jpa-*.jar,\\
-jsoup-*.jar,jta-*.jar,log4j-*.jar,lucene-*.jar,mmseg4j-*.jar,\\
-mongo-java-driver-*.jar,mvel2-*.jar,mybatis-*.jar,mysql-*.jar,ognl-*.jar,pinyin4j-*.jar,\\
-poi-*.jar,rabbitmq-*.jar,sitemesh-*.jar,slf4j-*.jar,spring-*.jar,struts2-*.jar,\\
-xmemcached-*.jar,xwork-*.jar,zookeeper-*.jar,zxing-*.jar,\\
-ojdbc*.jar,sqljdbc*.jar,postgresql-*.jar,db2*.jar,jconn*.jar,h2-*.jar,hsqldb-*.jar,\\
-ifxjdbc*.jar,derbyclient*.jar,rhino*.jar
-EOF
-else
 sed -i '108,$d' catalina.properties
 cat>>catalina.properties<<EOF
 tomcat.util.scan.StandardJarScanFilter.jarsToSkip=\\
@@ -140,7 +120,6 @@ tomcat.util.buf.StringCache.byte.enabled=true
 #tomcat.util.buf.StringCache.trainThreshold=500000
 #tomcat.util.buf.StringCache.cacheSize=5000
 EOF
-fi
 cat>server.xml<<EOF
 <?xml version="1.0" encoding="utf-8"?>
 <Server port="\${port.shutdown}" shutdown="SHUTDOWN">
@@ -605,7 +584,7 @@ fi
 
 #install redis
 if ! which redis-server > /dev/null && ! $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
-wget http://download.redis.io/releases/redis-$REDIS_VERSION.tar.gz
+wget http://download.redis.io/redis-stable.tar.gz
 fi
 if $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
 tar xf redis-*.tar.gz >/dev/null && rm -rf redis-*.tar.gz
