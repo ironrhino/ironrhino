@@ -121,18 +121,20 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			properties.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
 		Map<String, Class<?>> added = new HashMap<>();
 		List<Class<?>> classes = new ArrayList<>();
-		Collection<Class<?>> scaned = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), Entity.class);
-		if (annotatedClasses != null)
+		if (annotatedClasses != null) {
 			for (Class<?> c : annotatedClasses)
 				if (!added.containsKey(c.getSimpleName()) || !c.isAssignableFrom(added.get(c.getSimpleName()))) {
 					classes.add(c);
 					added.put(c.getSimpleName(), c);
 				}
-		for (Class<?> c : scaned)
-			if (!added.containsKey(c.getSimpleName()) || !c.isAssignableFrom(added.get(c.getSimpleName()))) {
-				classes.add(c);
-				added.put(c.getSimpleName(), c);
-			}
+		} else {
+			Collection<Class<?>> scaned = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), Entity.class);
+			for (Class<?> c : scaned)
+				if (!added.containsKey(c.getSimpleName()) || !c.isAssignableFrom(added.get(c.getSimpleName()))) {
+					classes.add(c);
+					added.put(c.getSimpleName(), c);
+				}
+		}
 		if (StringUtils.isNotBlank(excludeFilter)) {
 			Collection<Class<?>> temp = classes;
 			classes = new ArrayList<>();

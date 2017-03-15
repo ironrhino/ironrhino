@@ -2,9 +2,63 @@
 <beans default-autowire="byName"
 	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" autowire="no" p:jdbcUrl="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1" />
 	<bean class="org.ironrhino.core.spring.configuration.CommonConfiguration"/>
 	<context:component-scan base-package="org.ironrhino.core.hibernate,org.ironrhino.core.service" name-generator="org.ironrhino.core.spring.NameGenerator"/>
+		<bean id="sessionFactory" class="org.ironrhino.core.hibernate.SessionFactoryBean"
+		p:excludeFilter="${hibernate.sessionFactory.excludeFilter:}">
+		<property name="annotatedClasses" value="org.ironrhino.core.service.Person"/>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					${hibernate.dialect:}
+				</prop>
+				<prop key="hibernate.max_fetch_depth">
+					${hibernate.max_fetch_depth:3}
+				</prop>
+				<prop key="hibernate.default_batch_fetch_size">
+					${hibernate.default_batch_fetch_size:10}
+				</prop>
+				<prop key="hibernate.jdbc.fetch_size">
+					${hibernate.jdbc.fetch_size:20}
+				</prop>
+				<prop key="hibernate.jdbc.batch_size">
+					${hibernate.jdbc.batch_size:50}
+				</prop>
+				<prop key="hibernate.order_inserts">
+					${hibernate.order_inserts:true}
+				</prop>
+				<prop key="hibernate.order_updates">
+					${hibernate.order_updates:true}
+				</prop>
+				<prop key="hibernate.jdbc.batch_versioned_data">
+					${hibernate.jdbc.batch_versioned_data:true}
+				</prop>
+				<prop key="hibernate.auto_quote_keyword">
+					${hibernate.auto_quote_keyword:true}
+				</prop>
+				<prop key="hibernate.id.new_generator_mappings">
+					${hibernate.id.new_generator_mappings:false}
+				</prop>
+				<prop key="hibernate.cache.use_second_level_cache">
+					${hibernate.cache.use_second_level_cache:false}
+				</prop>
+				<prop key="hibernate.show_sql">
+					${hibernate.show_sql:false}
+				</prop>
+				<prop key="hibernate.hbm2ddl.auto">
+					${hibernate.hbm2ddl.auto:update}
+				</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+		p:defaultTimeout="${hibernate.transaction.defaultTimeount:-1}" />
+	<bean
+		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+	<tx:annotation-driven order="0" proxy-target-class="true" />
 </beans>
