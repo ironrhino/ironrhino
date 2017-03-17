@@ -324,16 +324,16 @@ server {
 	location /stub_status {
 		stub_status;
 	}	
-	location ~ ^/assets/ {
+	location /assets/ {
 		root   /home/$USER/tomcat8080/webapps/ROOT;
 		expires      max;
 		add_header Cache-Control public;
 		charset utf-8;
     }
-    location ~ ^/remoting/ {
+    location /remoting/ {
 		return     403;
 	}
-    location ~ ^/websocket/ {
+    location /websocket/ {
 		proxy_pass http://backend;
 		proxy_http_version 1.1;
 		proxy_set_header  X-Forwarded-For  \$proxy_add_x_forwarded_for;
