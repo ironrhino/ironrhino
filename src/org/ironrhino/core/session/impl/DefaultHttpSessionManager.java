@@ -4,12 +4,15 @@ import java.math.BigInteger;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.session.HttpSessionStore;
 import org.ironrhino.core.session.WrappedHttpSession;
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.util.RequestUtils;
@@ -63,11 +66,17 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Value("${httpSessionManager.checkRemoteAddr:false}")
 	private boolean checkRemoteAddr;
 
-	@Value("${httpSessionManager.alwaysUseCacheBased:false}")
-	private boolean alwaysUseCacheBased;
-
 	@Value("${globalCookie:false}")
 	private boolean globalCookie;
+
+	@Value("${httpSessionManager.alwaysUseCacheBased:}")
+	private Boolean alwaysUseCacheBased;
+
+	@PostConstruct
+	private void init() {
+		if (alwaysUseCacheBased == null)
+			alwaysUseCacheBased = (AppInfo.getStage() == Stage.PRODUCTION);
+	}
 
 	public String getDefaultLocaleName() {
 		return defaultLocaleName;
