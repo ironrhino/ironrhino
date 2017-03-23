@@ -22,6 +22,7 @@ public class ExpressionUtils {
 
 	private static ParserContext parserContext = new ParserContext();
 	static {
+		parserContext.addImport("java.lang.System", Object.class);
 		parserContext.addImport("System", Object.class);
 		parserContext.addImport("Runtime", Object.class);
 		parserContext.addImport("Class", Object.class);
@@ -30,6 +31,8 @@ public class ExpressionUtils {
 	public static Object evalExpression(String expression, Map<String, ?> context) {
 		if (StringUtils.isBlank(expression))
 			return expression;
+		if (expression.contains("java.") || expression.contains("javax."))
+			throw new IllegalArgumentException("Illegal expression: " + expression);
 
 		CompiledExpression ce = expressionCache.get(expression);
 		if (ce == null) {
