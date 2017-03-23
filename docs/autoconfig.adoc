@@ -43,7 +43,7 @@ Action的方法返回一个String类型的result, 框架需要将result转换成
 
 当result为 `success` 并且methodName不为 `execute`,
 这种情况会重定向到 `/{namespace}/{actionName}` 也就是会调转到 `execute` ,
-比如对于一个典型的模块, `execute` 方法返回 `success` 作为主入口返回一个主页面, 其他方法执行某些操作后返回 `success` 重定向会主页面.
+比如对于一个典型的模块, `execute` 方法返回 `success` 作为主入口返回一个主页面, 其他方法执行某些操作后返回 `success` 重定向回主页面.
 增删改查尤其适用, `execute` 返回列表页面, 增删改之后还是回到列表页面.
 
 
