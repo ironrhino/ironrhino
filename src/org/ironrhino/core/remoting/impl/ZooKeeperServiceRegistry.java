@@ -56,7 +56,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	public void afterPropertiesSet() {
 		servicesParentPath = zooKeeperPath + "/services";
 		hostsParentPath = zooKeeperPath + "/hosts";
-		hostsParentPath = zooKeeperPath + "/apps";
+		appsParentPath = zooKeeperPath + "/apps";
 	}
 
 	@Override
