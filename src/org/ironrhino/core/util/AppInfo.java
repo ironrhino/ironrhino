@@ -354,6 +354,10 @@ public class AppInfo {
 			configurationFiles.append(",classpath:log4j2-app.xml");
 			System.setProperty("log4j.mergeStrategy", SimpleMergeStrategy.class.getName());
 		}
+		if (AppInfo.class.getClassLoader().getResource("log4j2." + AppInfo.getStage().name() + ".xml") != null) {
+			configurationFiles.append(",classpath:log4j2." + AppInfo.getStage().name() + ".xml");
+			System.setProperty("log4j.mergeStrategy", SimpleMergeStrategy.class.getName());
+		}
 		System.setProperty("log4j.configurationFile", configurationFiles.toString());
 		System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
 		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
