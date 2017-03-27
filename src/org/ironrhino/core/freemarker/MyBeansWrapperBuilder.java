@@ -1,6 +1,7 @@
 package org.ironrhino.core.freemarker;
 
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -12,14 +13,11 @@ import freemarker.template.Version;
 @SuppressWarnings("rawtypes")
 public class MyBeansWrapperBuilder extends BeansWrapperConfiguration {
 
-	private final static WeakHashMap/*
-									 * <ClassLoader, Map<PropertyAssignments,
-									 * WeakReference<MyBeansWrapper>>
-									 */
-	INSTANCE_CACHE = new WeakHashMap();
-	private final static ReferenceQueue INSTANCE_CACHE_REF_QUEUE = new ReferenceQueue();
+	private final static Map<ClassLoader, Map<BeansWrapperConfiguration, WeakReference<BeansWrapper>>> INSTANCE_CACHE = new WeakHashMap<ClassLoader, Map<BeansWrapperConfiguration, WeakReference<BeansWrapper>>>();
+	private final static ReferenceQueue<BeansWrapper> INSTANCE_CACHE_REF_QUEUE = new ReferenceQueue<BeansWrapper>();
 
-	private static class BeansWrapperFactory implements _BeansAPI._BeansWrapperSubclassFactory {
+	private static class BeansWrapperFactory
+			implements _BeansAPI._BeansWrapperSubclassFactory<BeansWrapper, BeansWrapperConfiguration> {
 
 		private static final BeansWrapperFactory INSTANCE = new BeansWrapperFactory();
 

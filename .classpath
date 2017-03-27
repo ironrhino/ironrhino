@@ -26,7 +26,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dynamicreports-core-4.0.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ehcache-core-2.6.11.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/freemarker-2.3.25.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/freemarker-2.3.26.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/fst-2.48.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/guava-18.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/h2-1.4.192.jar"/>
