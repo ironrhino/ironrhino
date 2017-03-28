@@ -50,10 +50,9 @@ public class JsonUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(JsonUtils.class);
 
-	private static ObjectMapper objectMapper = createNewObjectMapper();
-
 	public static ObjectMapper getObjectMapper() {
-		return objectMapper;
+		// TODO ObjectMapper break thread safety with 2.8.7 ?
+		return createNewObjectMapper();
 	}
 
 	public static ObjectMapper createNewObjectMapper() {
@@ -111,7 +110,7 @@ public class JsonUtils {
 
 	public static String toJson(Object object) {
 		try {
-			return objectMapper.writeValueAsString(object);
+			return getObjectMapper().writeValueAsString(object);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return null;
@@ -120,7 +119,7 @@ public class JsonUtils {
 
 	public static String toJsonWithView(Object object, Class<?> serializationView) {
 		try {
-			return objectMapper.writerWithView(serializationView).writeValueAsString(object);
+			return getObjectMapper().writerWithView(serializationView).writeValueAsString(object);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return null;
@@ -139,15 +138,16 @@ public class JsonUtils {
 	@SuppressWarnings("unchecked")
 	public static <T> T fromJson(String json, TypeReference<T> type)
 			throws JsonParseException, JsonMappingException, IOException {
-		return (T) objectMapper.readValue(json, type);
+		return (T) getObjectMapper().readValue(json, type);
 	}
 
 	public static <T> T fromJson(String json, Class<T> cls)
 			throws JsonParseException, JsonMappingException, IOException {
-		return objectMapper.readValue(json, cls);
+		return getObjectMapper().readValue(json, cls);
 	}
 
 	public static <T> T fromJson(String json, Type type) throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper objectMapper = getObjectMapper();
 		return objectMapper.readValue(json, objectMapper.getTypeFactory().constructType(type));
 	}
 
