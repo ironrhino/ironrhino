@@ -42,6 +42,14 @@ class ServiceImplementationCondition implements Condition {
 				String implementationClassName = AppInfo.getApplicationContextProperties()
 						.getProperty(serviceInterfaceName);
 				if (StringUtils.isNotBlank(implementationClassName)) {
+					try {
+						serviceInterface = Class.forName(serviceInterfaceName);
+						if (!serviceInterface.isAssignableFrom(Class.forName(implementationClassName)))
+							throw new IllegalArgumentException(
+									implementationClassName + " is not type of " + serviceInterfaceName);
+					} catch (ClassNotFoundException e) {
+						throw new RuntimeException(e);
+					}
 					boolean matched = implementationClassName.equals(className);
 					if (matched) {
 						String key = serviceInterfaceName + '=' + implementationClassName;
