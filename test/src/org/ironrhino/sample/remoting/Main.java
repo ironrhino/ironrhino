@@ -9,7 +9,7 @@ public class Main {
 	public static void main(String[] args) {
 		AppInfo.initialize();
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"classpath*:org/ironrhino/sample/remoting/test_without_zk.xml");
+				"classpath*:org/ironrhino/sample/remoting/test.xml");
 		UserService userService = ctx.getBean(UserService.class);
 		System.out.println(userService.loadUserByUsername("admin").getUsername());
 		int loop = 1000;

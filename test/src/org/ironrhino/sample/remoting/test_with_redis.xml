@@ -3,9 +3,10 @@
 	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-	<context:property-placeholder ignore-resource-not-found="true" location="classpath:resources/spring/applicationContext.properties,classpath:resources/spring/applicationContext.${STAGE}.properties,file:///${app.home}/conf/applicationContext.properties,file:${app.home}/conf/applicationContext.${STAGE}.properties"/>
+	<import resource="classpath:org/ironrhino/core/config/redis.xml"/>
 	<context:annotation-config />
+	<bean id="eventPublisher" class="org.ironrhino.core.event.EventPublisher"/>
+	<bean id="serviceRegistry" class="org.ironrhino.core.remoting.impl.RedisServiceRegistry" />
 	<bean id="userService" class="org.ironrhino.core.remoting.client.HttpInvokerClient"
-		p:serviceInterface="org.ironrhino.security.service.UserService"
-		p:host="localhost" />
+		p:serviceInterface="org.ironrhino.security.service.UserService" />
 </beans>
