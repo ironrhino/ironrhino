@@ -50,9 +50,10 @@ public class JsonUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(JsonUtils.class);
 
+	private static final ObjectMapper sharedObjectMapper = createNewObjectMapper();
+
 	public static ObjectMapper getObjectMapper() {
-		// TODO ObjectMapper break thread safety with 2.8.7 ?
-		return createNewObjectMapper();
+		return sharedObjectMapper;
 	}
 
 	public static ObjectMapper createNewObjectMapper() {
