@@ -2,7 +2,6 @@ package org.ironrhino.core.remoting.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -196,11 +195,13 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Override
 	public void evict(String host) {
 		for (Map.Entry<String, List<String>> entry : importedServiceCandidates.entrySet()) {
-			Iterator<String> it = entry.getValue().iterator();
-			while (it.hasNext()) {
-				if (trimAppName(it.next()).equals(host))
-					it.remove();
-			}
+			List<String> hosts = entry.getValue();
+			List<String> tobeRemoved = new ArrayList<>();
+			for (String s : hosts)
+				if (trimAppName(s).equals(host) || s.indexOf(host) > 0)
+					tobeRemoved.add(s);
+			for (String s : tobeRemoved)
+				hosts.remove(s);
 		}
 	}
 
@@ -215,7 +216,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		} else {
 			return null;
 		}
-
 	}
 
 	protected void onDiscover(String serviceName, String host) {
