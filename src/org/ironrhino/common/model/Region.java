@@ -17,7 +17,7 @@ import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
-import org.ironrhino.core.util.StringUtils;
+import org.ironrhino.core.util.PinyinUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -116,13 +116,13 @@ public class Region extends BaseTreeableEntity<Region> {
 	@JsonIgnore
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
 	public String getNameAsPinyin() {
-		return StringUtils.pinyin(name);
+		return PinyinUtils.pinyin(name);
 	}
 
 	@JsonIgnore
 	@SearchableProperty(boost = 3, index = Index.NOT_ANALYZED)
 	public String getNameAsPinyinAbbr() {
-		return StringUtils.pinyinAbbr(name);
+		return PinyinUtils.pinyinAbbr(name);
 	}
 
 	@JsonIgnore
