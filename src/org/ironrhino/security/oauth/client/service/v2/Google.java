@@ -67,7 +67,7 @@ public class Google extends OAuth2Provider {
 
 	@Override
 	protected Profile getProfileFromContent(String content) throws Exception {
-		JsonNode data = JsonUtils.getObjectMapper().readValue(content, JsonNode.class);
+		JsonNode data = JsonUtils.fromJson(content, JsonNode.class);
 		Profile p = new Profile();
 		p.setUid(generateUid(data.get("id").textValue()));
 		p.setDisplayName(data.get("name").textValue());

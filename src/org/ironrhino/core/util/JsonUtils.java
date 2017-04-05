@@ -111,7 +111,7 @@ public class JsonUtils {
 
 	public static String toJson(Object object) {
 		try {
-			return getObjectMapper().writeValueAsString(object);
+			return sharedObjectMapper.writeValueAsString(object);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return null;
@@ -120,7 +120,7 @@ public class JsonUtils {
 
 	public static String toJsonWithView(Object object, Class<?> serializationView) {
 		try {
-			return getObjectMapper().writerWithView(serializationView).writeValueAsString(object);
+			return sharedObjectMapper.writerWithView(serializationView).writeValueAsString(object);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return null;
@@ -129,7 +129,7 @@ public class JsonUtils {
 
 	public static boolean isValidJson(String content) {
 		try {
-			getObjectMapper().readTree(content);
+			sharedObjectMapper.readTree(content);
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -139,17 +139,16 @@ public class JsonUtils {
 	@SuppressWarnings("unchecked")
 	public static <T> T fromJson(String json, TypeReference<T> type)
 			throws JsonParseException, JsonMappingException, IOException {
-		return (T) getObjectMapper().readValue(json, type);
+		return (T) sharedObjectMapper.readValue(json, type);
 	}
 
 	public static <T> T fromJson(String json, Class<T> cls)
 			throws JsonParseException, JsonMappingException, IOException {
-		return getObjectMapper().readValue(json, cls);
+		return sharedObjectMapper.readValue(json, cls);
 	}
 
 	public static <T> T fromJson(String json, Type type) throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper objectMapper = getObjectMapper();
-		return objectMapper.readValue(json, objectMapper.getTypeFactory().constructType(type));
+		return sharedObjectMapper.readValue(json, sharedObjectMapper.getTypeFactory().constructType(type));
 	}
 
 	public static <T extends Enum<T>> String enumToJson(Class<T> clazz) {
@@ -161,20 +160,18 @@ public class JsonUtils {
 	}
 
 	public static String unprettify(String json) {
-		ObjectMapper objectMapper = getObjectMapper();
 		try {
-			JsonNode node = objectMapper.readTree(json);
-			return objectMapper.writeValueAsString(node);
+			JsonNode node = sharedObjectMapper.readTree(json);
+			return sharedObjectMapper.writeValueAsString(node);
 		} catch (Exception e) {
 			return json;
 		}
 	}
 
 	public static String prettify(String json) {
-		ObjectMapper objectMapper = getObjectMapper();
 		try {
-			JsonNode node = objectMapper.readTree(json);
-			ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter());
+			JsonNode node = sharedObjectMapper.readTree(json);
+			ObjectWriter writer = sharedObjectMapper.writer(new DefaultPrettyPrinter());
 			return writer.writeValueAsString(node);
 		} catch (Exception e) {
 			return json;
