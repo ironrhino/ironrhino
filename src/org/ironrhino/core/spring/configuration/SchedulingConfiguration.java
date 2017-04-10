@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.slf4j.Logger;
@@ -18,7 +17,7 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @EnableScheduling
@@ -44,12 +43,10 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 
 	@Bean
 	public TaskScheduler taskScheduler() {
-		return new ConcurrentTaskScheduler(taskSchedulerThreadPool());
-	}
-
-	@Bean(destroyMethod = "shutdown")
-	public ScheduledExecutorService taskSchedulerThreadPool() {
-		return Executors.newScheduledThreadPool(taskSchedulerPoolSize, new NameableThreadFactory("taskScheduler"));
+		ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+		threadPoolTaskScheduler.setPoolSize(taskSchedulerPoolSize);
+		threadPoolTaskScheduler.setThreadNamePrefix("taskScheduler-");
+		return threadPoolTaskScheduler;
 	}
 
 	@Bean(destroyMethod = "shutdown")
