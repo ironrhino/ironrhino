@@ -86,6 +86,8 @@ public class Oauth2Action extends BaseAction {
 	private String password;
 	private String client_id;
 	private String client_secret;
+	private String device_id;
+	private String device_name;
 	private String redirect_uri;
 	private String scope;
 	private String code;
@@ -186,6 +188,22 @@ public class Oauth2Action extends BaseAction {
 
 	public void setClient_secret(String client_secret) {
 		this.client_secret = client_secret;
+	}
+
+	public String getDevice_id() {
+		return device_id;
+	}
+
+	public void setDevice_id(String device_id) {
+		this.device_id = device_id;
+	}
+
+	public String getDevice_name() {
+		return device_name;
+	}
+
+	public void setDevice_name(String device_name) {
+		this.device_name = device_name;
 	}
 
 	public GrantType getGrant_type() {
@@ -413,7 +431,10 @@ public class Oauth2Action extends BaseAction {
 						throw new IllegalArgumentException(getText(failed.getClass().getName()));
 					}
 					UserDetails u = userDetailsService.loadUserByUsername(username);
-					authorization = oauthManager.grant(client, u.getUsername());
+					if (StringUtils.isNotBlank(device_id))
+						authorization = oauthManager.grant(client, u.getUsername(), device_id, device_name);
+					else
+						authorization = oauthManager.grant(client, u.getUsername());
 				} catch (UsernameNotFoundException e) {
 					throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
 				}

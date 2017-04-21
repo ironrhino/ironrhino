@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
@@ -83,9 +85,18 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public Authorization grant(Client client, String grantor) {
-		if (exclusive)
-			deleteAuthorizationsByGrantor(grantor, client.getId(), GrantType.password);
+	protected Authorization doGrant(Client client, String grantor, String deviceId, String deviceName) {
+		if (deviceId != null) {
+			List<Authorization> auths = findAuthorizationsByGrantor(grantor).stream()
+					.filter(a -> a.getClient().equals(client.getClientId()) && a.getDeviceId() != null)
+					.collect(Collectors.toList());
+			Optional<Authorization> auth = auths.stream().filter(a -> deviceId.equals(a.getDeviceId())).findAny();
+			if (auth.isPresent()) {
+				return refresh(client, auth.get().getRefreshToken());
+			} else if (maximumDevices > 0 && auths.size() >= maximumDevices) {
+				throw new IllegalArgumentException("maximum_devices_reached");
+			}
+		}
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
@@ -95,6 +106,10 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
+		if (StringUtils.isNotBlank(deviceName)) {
+			auth.setDeviceId(deviceId);
+			auth.setDeviceName(deviceName);
+		}
 		try {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {

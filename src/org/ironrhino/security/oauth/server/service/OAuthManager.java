@@ -18,6 +18,8 @@ public interface OAuthManager {
 
 	public Authorization grant(Client client, String grantor);
 
+	public Authorization grant(Client client, String grantor, String deviceId, String deviceName);
+
 	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType)
 			throws Exception;
 

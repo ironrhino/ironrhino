@@ -76,6 +76,12 @@ public class Authorization extends BaseEntity {
 	@UiConfig(width = "130px")
 	private String address;
 
+	@UiConfig(hiddenInList = @Hidden(true), alias = "device_id")
+	private String deviceId;
+
+	@UiConfig(width = "130px", alias = "device_name")
+	private String deviceName;
+
 	@NotInCopy
 	@UiConfig(width = "130px")
 	@Column(nullable = false, updatable = false)
@@ -185,6 +191,22 @@ public class Authorization extends BaseEntity {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
 	}
 
 	@JsonIgnore

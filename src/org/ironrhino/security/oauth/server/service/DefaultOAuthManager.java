@@ -59,21 +59,44 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public Authorization grant(Client client, String grantor) {
-		if (exclusive)
-			deleteAuthorizationsByGrantor(grantor, client.getId(), GrantType.password);
+	protected Authorization doGrant(Client client, String grantor, String deviceId, String deviceName) {
+		if (deviceId != null) {
+			DetachedCriteria dc = authorizationManager.detachedCriteria();
+			dc.add(Restrictions.eq("client", client.getClientId()));
+			dc.add(Restrictions.eq("grantor", grantor));
+			dc.add(Restrictions.eq("deviceId", deviceId));
+			Authorization auth = authorizationManager.findByCriteria(dc);
+			if (auth != null) {
+				auth.setAccessToken(CodecUtils.nextId());
+				auth.setRefreshToken(CodecUtils.nextId());
+				auth.setModifyDate(new Date());
+				authorizationManager.save(auth);
+				return auth;
+			} else {
+				dc = authorizationManager.detachedCriteria();
+				dc.add(Restrictions.eq("client", client.getClientId()));
+				dc.add(Restrictions.eq("grantor", grantor));
+				dc.add(Restrictions.isNotNull("deviceId"));
+				if (maximumDevices > 0 && authorizationManager.countByCriteria(dc) >= maximumDevices)
+					throw new IllegalArgumentException("maximum_devices_reached");
+			}
+		}
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client.getId());
 		auth.setGrantor(grantor);
+		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
+		if (StringUtils.isNotBlank(deviceName)) {
+			auth.setDeviceId(deviceId);
+			auth.setDeviceName(deviceName);
+		}
 		try {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {
 		}
-		auth.setRefreshToken(CodecUtils.nextId());
 		authorizationManager.save(auth);
 		return auth;
 	}

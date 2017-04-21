@@ -17,6 +17,7 @@
 	<ol>
 	<li>client访问  <code>${base}/oauth/oauth2/token?grant_type=password&client_id={client_id}&client_secret={client_secret}&username={username}&password={password}</code></li>
 	<li>服务器返回 access_token, 示例: <code>{"expires_in":3600,"access_token":"{access_token}","refresh_token":"{refresh_token}"}</code></li>
+	<li>如果是移动App请求, 请带上设备号和设备名称参数 <code>device_id={device_id}&device_name={device_name}</code></li>
 	</ol>
 	</li>
 	<li>
