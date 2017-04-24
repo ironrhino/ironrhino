@@ -122,5 +122,5 @@ public void test(){
 ----
 
 == 注意事项
-远程服务是在Servlet容器里面发布的, 端口默认使用的是8080, 因为没有办法自动发现容器的http端口, 如果不是用默认8080端口则需要指明系统属性 `port.http`
+远程服务是在Servlet容器里面发布的, 会自动发现容器对外提供的http端口, 如果存在多个端口或者前端做了转发可以指定系统属性 `port.http` 来固定发布端口
 比如 `java -Dport.http=8081 -jar target/ROOT.war` ( `war-standalone` 方式构建出来内嵌jetty的war包), 其他方式可以在jvm启动参数里面带上 `-Dport.http=8081`
