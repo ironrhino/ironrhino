@@ -29,6 +29,9 @@ public class RedisScheduledTaskCircuitBreaker implements ScheduledTaskCircuitBre
 
 	@Override
 	public void setShortCircuit(String task, boolean value) {
-		redisTemplate.opsForValue().set(NAMESPACE_SHORT_CIRCUIT + task, value);
+		if (!value)
+			redisTemplate.delete(NAMESPACE_SHORT_CIRCUIT + task);
+		else
+			redisTemplate.opsForValue().set(NAMESPACE_SHORT_CIRCUIT + task, value);
 	}
 }
