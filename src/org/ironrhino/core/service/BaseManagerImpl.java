@@ -667,7 +667,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public long iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc, boolean commitPerFetch) {
 		Session iterateSession = sessionFactory.openSession();
 		iterateSession.setCacheMode(CacheMode.IGNORE);
-		Session callbackSession = sessionFactory.openSession();
+		Session callbackSession = commitPerFetch ? sessionFactory.openSession() : iterateSession;
 		if (dc == null) {
 			dc = detachedCriteria();
 			dc.addOrder(Order.asc("id"));
@@ -727,7 +727,8 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			throw e;
 		} finally {
 			try {
-				callbackSession.close();
+				if (callbackSession != iterateSession)
+					callbackSession.close();
 			} finally {
 				iterateSession.close();
 			}
