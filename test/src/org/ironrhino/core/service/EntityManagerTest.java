@@ -191,16 +191,32 @@ public class EntityManagerTest {
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
-		List<Person> males = new ArrayList<>();
 		long count = entityManager.iterate(2, new IterateCallback() {
 			@Override
 			public void process(Object[] entityArray, Session session) {
+				for (Object obj : entityArray) {
+					Person p = (Person) obj;
+					if (p.getGender() == Gender.MALE) {
+						p.setGender(Gender.FEMALE);
+						session.update(p);
+					}
+				}
+			}
+		}, dc, true);
+		assertEquals(5, count);
+		dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("gender", Gender.FEMALE));
+		dc.addOrder(Order.asc("name"));
+		List<Person> females = new ArrayList<>();
+		count = entityManager.iterate(2, new IterateCallback() {
+			@Override
+			public void process(Object[] entityArray, Session session) {
 				for (Object obj : entityArray)
-					males.add((Person) obj);
+					females.add((Person) obj);
 			}
 		}, dc, false);
-		assertEquals(5, count);
-		assertEquals(5, males.size());
+		assertEquals(9, count);
+		assertEquals(9, females.size());
 		clearData();
 	}
 

@@ -40,6 +40,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.transform.ResultTransformer;
 import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.model.BaseTreeableEntity;
@@ -664,21 +665,22 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Override
 	public long iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc, boolean commitPerFetch) {
-		Session hibernateSession = sessionFactory.openSession();
+		Session iterateSession = sessionFactory.openSession();
+		iterateSession.setCacheMode(CacheMode.IGNORE);
+		Session callbackSession = sessionFactory.openSession();
 		if (dc == null) {
 			dc = detachedCriteria();
 			dc.addOrder(Order.asc("id"));
 		}
-		Criteria c = dc.getExecutableCriteria(hibernateSession);
-		hibernateSession.setCacheMode(CacheMode.IGNORE);
+		Criteria c = dc.getExecutableCriteria(iterateSession);
+		c.setFetchSize(fetchSize);
 		ScrollableResults cursor = null;
-		Transaction hibernateTransaction = null;
+		Transaction transaction = null;
 		long count = 0;
 		try {
-			hibernateTransaction = hibernateSession.beginTransaction();
-			c.setFetchSize(fetchSize);
+			transaction = callbackSession.beginTransaction();
 			cursor = c.scroll(ScrollMode.FORWARD_ONLY);
-			RowBuffer buffer = new RowBuffer(hibernateSession, fetchSize, callback);
+			RowBuffer buffer = new RowBuffer(callbackSession, fetchSize, callback);
 			Object prev = null;
 			while (true) {
 				try {
@@ -701,8 +703,8 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 					count += buffer.flush();
 					prev = null;
 					if (commitPerFetch) {
-						hibernateTransaction.commit();
-						hibernateTransaction = hibernateSession.beginTransaction();
+						transaction.commit();
+						transaction = callbackSession.beginTransaction();
 					}
 				}
 			}
@@ -711,20 +713,24 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			}
 			count += buffer.close();
 			cursor.close();
-			hibernateTransaction.commit();
+			transaction.commit();
 			return count;
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
-			if (hibernateTransaction != null) {
+			if (transaction != null && transaction.getStatus() == TransactionStatus.ACTIVE) {
 				try {
-					hibernateTransaction.rollback();
+					transaction.rollback();
 				} catch (Exception e1) {
 					logger.warn("Failed to rollback Hibernate", e1);
 				}
 			}
 			throw e;
 		} finally {
-			hibernateSession.close();
+			try {
+				callbackSession.close();
+			} finally {
+				iterateSession.close();
+			}
 		}
 	}
 
