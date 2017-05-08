@@ -46,7 +46,7 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 				continue;
 			String key = remotingService.getName() + ".imported";
 			if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
-				logger.info("skiped import service [{}] because {}=false", remotingService.getName(), key);
+				logger.info("Skipped import service [{}] because {}=false", remotingService.getName(), key);
 				continue;
 			}
 			String beanName = NameGenerator.buildDefaultBeanName(remotingService.getName());
@@ -58,8 +58,11 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 					continue;
 				try {
 					Class<?> beanClass = Class.forName(beanClassName);
-					if (remotingService.isAssignableFrom(beanClass))
+					if (remotingService.isAssignableFrom(beanClass)) {
+						logger.info("Skipped import service [{}] because bean[{}#{}] exists", remotingService.getName(),
+								beanClassName, beanName);
 						continue;
+					}
 				} catch (ClassNotFoundException e) {
 					logger.error(e.getMessage(), e);
 					e.printStackTrace();
@@ -73,7 +76,7 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 			propertyValues.addPropertyValue("serviceInterface", remotingService.getName());
 			beanDefinition.setPropertyValues(propertyValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
-			logger.info("imported service [{}] for bean [{}#{}]", remotingService.getName(),
+			logger.info("Imported service [{}] for bean [{}#{}]", remotingService.getName(),
 					beanDefinition.getBeanClassName(), beanName);
 		}
 	}

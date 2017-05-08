@@ -105,13 +105,13 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			for (String serviceName : exportedServices.keySet())
 				register(serviceName);
 		} else {
-			logger.warn("No class [" + CLASS_NAME_SERVER + "] found, skip register services");
+			logger.warn("No class [" + CLASS_NAME_SERVER + "] found, skipped register services");
 		}
 		if (IS_CLIENT_PRESENT) {
 			for (String serviceName : importedServiceCandidates.keySet())
 				lookup(serviceName);
 		} else {
-			logger.warn("No class [" + CLASS_NAME_CLIENT + "] found, skip lookup services");
+			logger.warn("No class [" + CLASS_NAME_CLIENT + "] found, skipped lookup services");
 		}
 		onReady();
 	}
@@ -141,15 +141,15 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				} else {
 					for (Class<?> inte : classes) {
 						if (!inte.isInterface()) {
-							logger.warn("class [{}] in @Remoting on class [{}] must be interface", inte.getName(),
+							logger.warn("Class [{}] in @Remoting on class [{}] must be interface", inte.getName(),
 									clazz.getName());
 						} else if (!inte.isAssignableFrom(clazz)) {
-							logger.warn(" class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
+							logger.warn("Class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
 									inte.getName());
 						} else {
 							String key = inte.getName() + ".exported";
 							if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
-								logger.info("skiped export service [{}] for bean [{}#{}]@{} because {}=false",
+								logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false",
 										inte.getName(), beanClassName, beanName, trimAppName(localHost), key);
 							} else {
 								exportedServices.put(inte.getName(), ctx.getBean(beanName));
@@ -157,7 +157,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 								if (StringUtils.isNotBlank(description))
 									description = I18N.getText(description);
 								exportedServiceDescriptions.put(inte.getName(), description);
-								logger.info("exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
+								logger.info("Exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
 										beanName, trimAppName(localHost));
 							}
 						}
@@ -175,7 +175,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (remoting != null) {
 				String key = clazz.getName() + ".exported";
 				if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
-					logger.info("skiped export service [{}] for bean [{}#{}]@{} because {}=false", clazz.getName(),
+					logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false", clazz.getName(),
 							beanClassName, beanName, trimAppName(localHost), key);
 				} else {
 					exportedServices.put(clazz.getName(), ctx.getBean(beanName));
@@ -183,7 +183,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 					if (StringUtils.isNotBlank(description))
 						description = I18N.getText(description);
 					exportedServiceDescriptions.put(clazz.getName(), description);
-					logger.info("exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
+					logger.info("Exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
 							trimAppName(localHost));
 				}
 			}
@@ -219,7 +219,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	protected void onDiscover(String serviceName, String host) {
-		logger.info("discovered " + serviceName + " from " + host);
+		logger.info("Discovered " + serviceName + " from " + host);
 	}
 
 	protected abstract void register(String serviceName);

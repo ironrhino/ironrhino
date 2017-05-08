@@ -26,7 +26,8 @@ public class NameGenerator extends AnnotationBeanNameGenerator {
 
 		}
 		String shortClassName = ClassUtils.getShortName(beanClassName);
-		if (shortClassName.endsWith("Impl") && shortClassName.length() > 4)
+		if (shortClassName.endsWith("Impl") && shortClassName.length() > 4
+				|| shortClassName.endsWith("Mock") && shortClassName.length() > 4)
 			shortClassName = shortClassName.substring(0, shortClassName.length() - 4);
 		return Introspector.decapitalize(shortClassName);
 	}
