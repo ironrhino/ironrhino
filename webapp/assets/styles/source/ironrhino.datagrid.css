@@ -16,16 +16,16 @@
 	margin: 3px;
 }
 
-.datagrided td > select, .datagrided td > .input-append, .datagrided td > .input-prepend, .datagrided td > table.datagrided{
+.datagrided.adaptive td > select:only-child, .datagrided.adaptive td > .input-append:only-child, .datagrided.adaptive td > .input-prepend:only-child, .datagrided.adaptive td > table.datagrided{
 	width: 100%;
 }
 
-.datagrided td > input, .datagrided td > textarea, .datagrided td > .uneditable-input{
+.datagrided.adaptive td > input:only-child, .datagrided.adaptive td > textarea:only-child, .datagrided.adaptive td > .uneditable-input:only-child{
 	width: 92%;
 	width: calc(100% - 14px);
 }
 
-.datagrided td > .input-append > input, .datagrided td > .input-prepend > input {
+.datagrided.adaptive td > .input-append:only-child > input, .datagrided.adaptive td > .input-prepend:only-child > input {
 	width: 90%;
 	width: calc(100% - 44px);
 }

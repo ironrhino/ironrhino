@@ -144,7 +144,7 @@
 				<@controlGroup id=id group=group/>
 				<@controlLabel label=label description=description/>
 				<div class="controls">
-				<table class="datagrid table table-condensed nullable">
+				<table class="datagrid adaptive table table-condensed nullable">
 					<thead>
 						<tr>
 							<td>${getText('name')}</td>
@@ -313,7 +313,7 @@
 					<input type="hidden" name="__datagrid_${entityName}.${key}"/>
 					<@controlLabel label=label description=description/>
 					<div class="controls">
-						<table class="table table-bordered table-fixed middle datagrid ${config.cssClass}">
+						<table class="table table-bordered table-fixed middle datagrid adaptive ${config.cssClass}">
 						<thead>
 							<tr>
 								<#list embeddedUiConfigs.entrySet() as entry>

@@ -21,7 +21,7 @@
 	<#if view=='brief'><@s.hidden name="schema.description"/><p>${schema.description!}</p><#else><@s.textarea name="schema.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
 	</#if>
 	<@s.hidden name="__datagrid_schema.fields" />
-	<table class="datagrid nullable table table-condensed">
+	<table class="datagrid adaptive nullable table table-condensed">
 		<style scoped>
 		tr.linkage{
 			background-color:#F5F5F5;
@@ -49,7 +49,7 @@
 			<tr class="linkage">
 				<td><@s.textfield theme="simple" name="schema.fields[${index}].name"/></td>
 				<td>
-					<table class="datagrid showonadd linkage_component SELECT CHECKBOX">
+					<table class="datagrid adaptive showonadd linkage_component SELECT CHECKBOX">
 						<tbody>
 							<#assign size = 0>
 							<#if schema.fields[index]?? && schema.fields[index].values?? && schema.fields[index].values?size gt 0>

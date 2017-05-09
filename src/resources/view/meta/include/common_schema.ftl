@@ -34,7 +34,7 @@
 	</#if>
 	<#if !ignoreIfNotFound || schema??&&schema.fields??&&schema.fields?size gt 0>
 	<input type="hidden" name="__datagrid_${parameterNamePrefix}attributes"/>
-	<table class="datagrid table table-condensed nullable">
+	<table class="datagrid adaptive table table-condensed nullable">
 		<thead>
 			<tr>
 				<td>${getText('name')}</td>
