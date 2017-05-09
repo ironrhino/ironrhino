@@ -38152,8 +38152,8 @@ Observation.suggestion = function(container) {
 									});
 						}
 					t.typeahead({
-								minLength : 2,
-								items : 20,
+								minLength : t.data('minLength') || 2,
+								items : t.data('items') || 20,
 								source : source,
 								matcher : function(item) {
 									return true;
