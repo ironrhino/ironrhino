@@ -45,10 +45,10 @@ public class BeanUtils {
 		}
 	}
 
-	public static void copyProperties(Map<String, Object> source, Object target, String... ignoreProperties) {
+	public static void copyProperties(Map<String, ?> source, Object target, String... ignoreProperties) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(target);
 		bw.setConversionService(CustomConversionService.getSharedInstance());
-		for (Map.Entry<String, Object> entry : source.entrySet()) {
+		for (Map.Entry<String, ?> entry : source.entrySet()) {
 			if (bw.isWritableProperty(entry.getKey()))
 				bw.setPropertyValue(entry.getKey(), entry.getValue());
 		}
