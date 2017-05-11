@@ -76,10 +76,10 @@ public class Authorization extends BaseEntity {
 	@UiConfig(width = "130px")
 	private String address;
 
-	@UiConfig(hiddenInList = @Hidden(true), alias = "device_id")
+	@UiConfig(hiddenInList = @Hidden(true))
 	private String deviceId;
 
-	@UiConfig(width = "130px", alias = "device_name")
+	@UiConfig(hiddenInList = @Hidden(true))
 	private String deviceName;
 
 	@NotInCopy
