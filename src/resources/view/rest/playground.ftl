@@ -7,7 +7,21 @@
 <tbody>
 <tr><td style="width:100px;">URL</td><td><div class="url">${url?no_esc}</div></td></tr>
 <@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">
-<tr><td>Access Token</td><td><input type="text" class="accessToken" placeholder="不填会默认使用当前用户"></td></tr>
+<tr><td>Access Token</td><td><input type="text" name="accessToken" class="input-xlarge" placeholder="不填会默认使用当前用户"> <button type="button" class="btn last-accessToken">最近使用</button> <button type="button" class="btn fetch-accessToken">重新获取</button>
+	<#if !base?has_content>
+		<#assign base=statics['org.ironrhino.core.util.RequestUtils'].getBaseUrl(request)>
+	</#if>
+	<div class="fetch-accessToken-form" style="display: none;padding-top: 20px;" data-endpoint="${base}/oauth/oauth2/token">
+	<div><select name="grant_type" class="input-xlarge"><option>client_credentials</option><option>password</option></select></div>
+	<div style="padding-top: 5px;"><input type="text" name="client_id" class="input-xlarge required" placeholder="client_id"></div>
+	<div style="padding-top: 5px;"><input type="text" name="client_secret" class="input-xlarge required" placeholder="client_secret"></div>
+	<div class="grant-type-password" style="display:none;">
+	<div style="padding-top: 5px;"><input type="text" name="username" class="input-xlarge required" placeholder="username"></div>
+	<div style="padding-top: 5px;"><input type="password" name="password" class="input-xlarge required" placeholder="password"></div>
+	</div>
+	<div style="padding-top: 5px; padding-bottom: 10px;"><button type="button" class="btn btn-primary">发送请求</button></div>
+	</div>
+</td></tr>
 </@classPresentConditional>
 <tr><td>请求参数</td><td>
 	<table class="requestParams table datagrid adaptive"><tbody>
