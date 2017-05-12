@@ -11,12 +11,14 @@ import org.ironrhino.core.servlet.RequestContext;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class AuthzUtils {
@@ -214,4 +216,13 @@ public class AuthzUtils {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return principal instanceof UserDetails ? isPasswordValid((UserDetails) principal, password) : false;
 	}
+
+	public static UserDetails getUserDetails(String username, String password) {
+		UserDetailsService uds = ApplicationContextUtils.getBean(UserDetailsService.class);
+		UserDetails ud = uds.loadUserByUsername(username);
+		if (!isPasswordValid(ud, password))
+			throw new BadCredentialsException(username);
+		return ud;
+	}
+
 }

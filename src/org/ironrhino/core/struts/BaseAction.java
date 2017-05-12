@@ -14,6 +14,7 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Csrf;
 import org.ironrhino.core.metadata.CurrentPassword;
+import org.ironrhino.core.metadata.DoubleCheck;
 import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
@@ -23,7 +24,9 @@ import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -205,6 +208,7 @@ public class BaseAction extends ActionSupport {
 
 	@Before(priority = 20)
 	protected String preAction() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
 		Authorize authorize = findAuthorize();
 		if (authorize != null) {
 			boolean authorized = AuthzUtils.authorize(evalExpression(authorize.ifAllGranted()),
@@ -228,9 +232,36 @@ public class BaseAction extends ActionSupport {
 				return ACCESSDENIED;
 			}
 		}
+		DoubleCheck doubleCheck = getAnnotation(DoubleCheck.class);
+		if (doubleCheck != null && !request.getMethod().equalsIgnoreCase("GET")) {
+			String username = request.getParameter(DoubleCheck.PARAMETER_NAME_USERNAME);
+			String password = request.getParameter(DoubleCheck.PARAMETER_NAME_PASSWORD);
+			if (StringUtils.isBlank(username)) {
+				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("validation.required"));
+				return ERROR;
+			}
+			if (username.equals(AuthzUtils.getUsername())) {
+				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
+				return ERROR;
+			}
+			try {
+				UserDetails ud = AuthzUtils.getUserDetails(username, password);
+				if (!AuthzUtils.authorizeUserDetails(ud, null, doubleCheck.value(), null)) {
+					addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
+					return ERROR;
+				}
+				request.setAttribute(DoubleCheck.ATTRIBUTE_NAME_DOUBLE_CHECKER, ud);
+			} catch (UsernameNotFoundException e) {
+				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText(e.getClass().getName()));
+				return ERROR;
+			} catch (BadCredentialsException e) {
+				addFieldError(DoubleCheck.PARAMETER_NAME_PASSWORD, getText(e.getClass().getName()));
+				return ERROR;
+			}
+		}
 		Captcha captcha = getAnnotation(Captcha.class);
 		if (captcha != null && captchaManager != null) {
-			captchaStatus = captchaManager.getCaptchaStatus(ServletActionContext.getRequest(), captcha);
+			captchaStatus = captchaManager.getCaptchaStatus(request, captcha);
 		}
 		csrfRequired = captchaStatus == null && getAnnotation(Csrf.class) != null;
 		return null;

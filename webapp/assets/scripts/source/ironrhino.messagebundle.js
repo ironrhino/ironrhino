@@ -29,7 +29,10 @@ MessageBundle = {
 		'pattern.coords.invalid' : 'coords should be between {0} and {1}',
 		'data.invalid' : 'data invalid,please check it.',
 		'repeat.not.matched' : 'repeat match failed',
-		'file.too.large' : 'File too large'
+		'file.too.large' : 'File too large',
+		'double.check' : 'Double Check',
+		'double.check.username' : 'D.C. User',
+		'double.check.password' : 'D.C. Password'
 	},
 	'zh_CN' : {
 		'ajax.loading' : '正在加载...',
@@ -77,7 +80,10 @@ MessageBundle = {
 		'data.invalid' : '数据错误,请检查',
 		'repeat.not.matched' : '两次输入不一致',
 		'other' : '其他',
-		'file.too.large' : '文件太大或者网络异常'
+		'file.too.large' : '文件太大或者网络异常',
+		'double.check' : '复核',
+		'double.check.username' : '复核用户',
+		'double.check.password' : '复核密码'
 	},
 	get : function() {
 		var key = arguments[0];
