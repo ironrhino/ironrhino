@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -158,7 +159,7 @@ public class FtpFileStorage implements FileStorage {
 			String modificationTime = ftpClient.getModificationTime(getRealPath(path, ftpClient));
 			try {
 				Date d = DateUtils.parse(modificationTime, "yyyyMMddHHmmss");
-				return d.getTime() + 8 * 3600 * 1000;
+				return d.getTime() + TimeZone.getDefault().getRawOffset();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
