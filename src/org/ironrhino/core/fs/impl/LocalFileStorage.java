@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,15 +51,11 @@ public class LocalFileStorage implements FileStorage {
 	}
 
 	@PostConstruct
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws Exception {
 		Assert.hasText(uri, "uri shouldn't be blank");
 		uri = uri.replace('\\', '/');
 		uri = uri.replace(" ", "%20");
-		try {
-			this.directory = new File(new URI(uri));
-		} catch (URISyntaxException e) {
-			logger.error(e.getMessage(), e);
-		}
+		this.directory = new File(new URI(uri));
 		if (this.directory.isFile())
 			throw new IllegalStateException(directory + " is not directory");
 		if (!this.directory.exists())

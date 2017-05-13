@@ -155,7 +155,7 @@ public class UploadAction extends BaseAction {
 	@Override
 	@JsonConfig(root = "filename")
 	@InputConfig(methodName = "list")
-	public String execute() {
+	public String execute() throws IOException {
 		if (file != null) {
 			int i = 0;
 			String[] arr = excludeSuffix.split(",");
@@ -196,7 +196,7 @@ public class UploadAction extends BaseAction {
 		return json ? JSON : list();
 	}
 
-	public String list() {
+	public String list() throws IOException {
 		if (folder == null) {
 			folder = getUid();
 			if (folder != null) {
@@ -224,14 +224,14 @@ public class UploadAction extends BaseAction {
 	}
 
 	@Override
-	public String pick() {
+	public String pick() throws IOException {
 		list();
 		return "pick";
 	}
 
 	@Override
 	@Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-	public String delete() {
+	public String delete() throws IOException {
 		String[] paths = getId();
 		if (paths != null) {
 			for (String path : paths) {
@@ -242,7 +242,7 @@ public class UploadAction extends BaseAction {
 		return list();
 	}
 
-	public String mkdir() {
+	public String mkdir() throws IOException {
 		String path = getUid();
 		if (path != null) {
 			if (!path.startsWith("/"))
@@ -254,7 +254,7 @@ public class UploadAction extends BaseAction {
 	}
 
 	@Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-	public String rename() {
+	public String rename() throws IOException {
 		String oldName = getUid();
 		if (filename == null || filename.length == 0) {
 			addActionError(getText("validation.required"));
@@ -277,7 +277,7 @@ public class UploadAction extends BaseAction {
 	}
 
 	@JsonConfig(root = "files")
-	public String files() {
+	public String files() throws IOException {
 		String path = Files.simplifyPath(getUploadRootDir() + '/' + folder);
 		Map<String, Boolean> map = fileStorage.listFilesAndDirectory(path);
 		files = new LinkedHashMap<>();
@@ -318,7 +318,7 @@ public class UploadAction extends BaseAction {
 		return doGetFileUrl(path);
 	}
 
-	private String createPath(String filename, boolean autorename) {
+	private String createPath(String filename, boolean autorename) throws IOException {
 		String dir = getUploadRootDir() + "/";
 		if (StringUtils.isNotBlank(folder))
 			dir = dir + folder + "/";
