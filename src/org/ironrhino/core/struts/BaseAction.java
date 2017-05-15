@@ -232,33 +232,6 @@ public class BaseAction extends ActionSupport {
 				return ACCESSDENIED;
 			}
 		}
-		DoubleCheck doubleCheck = getAnnotation(DoubleCheck.class);
-		if (doubleCheck != null && !request.getMethod().equalsIgnoreCase("GET")) {
-			String username = request.getParameter(DoubleCheck.PARAMETER_NAME_USERNAME);
-			String password = request.getParameter(DoubleCheck.PARAMETER_NAME_PASSWORD);
-			if (StringUtils.isBlank(username)) {
-				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("validation.required"));
-				return ERROR;
-			}
-			if (username.equals(AuthzUtils.getUsername())) {
-				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
-				return ERROR;
-			}
-			try {
-				UserDetails doubleChecker = AuthzUtils.getUserDetails(username, password);
-				if (!AuthzUtils.authorizeUserDetails(doubleChecker, null, doubleCheck.value(), null)) {
-					addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
-					return ERROR;
-				}
-				AuthzUtils.DOUBLE_CHCKER_HOLDER.set(doubleChecker);
-			} catch (UsernameNotFoundException e) {
-				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText(e.getClass().getName()));
-				return ERROR;
-			} catch (BadCredentialsException e) {
-				addFieldError(DoubleCheck.PARAMETER_NAME_PASSWORD, getText(e.getClass().getName()));
-				return ERROR;
-			}
-		}
 		Captcha captcha = getAnnotation(Captcha.class);
 		if (captcha != null && captchaManager != null) {
 			captchaStatus = captchaManager.getCaptchaStatus(request, captcha);
@@ -325,7 +298,41 @@ public class BaseAction extends ActionSupport {
 			if (csrf == null || !csrf.equals(value))
 				addActionError(getText("csrf.error"));
 		}
-		validateCurrentPassword();
+		if (!hasErrors())
+			validateDoubleCheck();
+		if (!hasErrors())
+			validateCurrentPassword();
+	}
+
+	private void validateDoubleCheck() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		DoubleCheck doubleCheck = getAnnotation(DoubleCheck.class);
+		if (doubleCheck != null) {
+			String username = request.getParameter(DoubleCheck.PARAMETER_NAME_USERNAME);
+			String password = request.getParameter(DoubleCheck.PARAMETER_NAME_PASSWORD);
+			if (StringUtils.isBlank(username)) {
+				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("validation.required"));
+				return;
+			}
+			if (username.equals(AuthzUtils.getUsername())) {
+				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
+				return;
+			}
+			try {
+				UserDetails doubleChecker = AuthzUtils.getUserDetails(username, password);
+				if (!AuthzUtils.authorizeUserDetails(doubleChecker, null, doubleCheck.value(), null)) {
+					addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
+					return;
+				}
+				AuthzUtils.DOUBLE_CHCKER_HOLDER.set(doubleChecker);
+			} catch (UsernameNotFoundException e) {
+				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText(e.getClass().getName()));
+				return;
+			} catch (BadCredentialsException e) {
+				addFieldError(DoubleCheck.PARAMETER_NAME_PASSWORD, getText(e.getClass().getName()));
+				return;
+			}
+		}
 	}
 
 	private void validateCurrentPassword() {
