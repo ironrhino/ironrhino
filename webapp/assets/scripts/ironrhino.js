@@ -33899,7 +33899,7 @@ Observation.common = function(container) {
 					var t = $(target);
 					if (t.hasClass('doublecheck')) {
 						if (!t.find('[name="doubleCheckUsername"]').length) {
-							var modal = $('<div class="modal pop hide fade in"><div class="modal-header"><a class="close" data-dismiss="modal">×</a><h3 style="text-align:center;">'
+							var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal">×</a><h3 style="text-align:center;">'
 									+ MessageBundle.get('double.check')
 									+ '</h3></div><div class="modal-body"></div></div>')
 									.appendTo(target);
@@ -33914,9 +33914,11 @@ Observation.common = function(container) {
 											+ '</label><div class="controls"><input id="doubleCheckPassword" type="password" name="doubleCheckPassword" class="required" autocomplete="off"></div></div><div class="form-actions"><button type="submit" class="btn btn-primary">'
 											+ MessageBundle.get('confirm')
 											+ '</button></div></div>');
-							modal.modal('show').on('hidden', function() {
+							modal.on('shown', function() {
+										$('.modal-backdrop').insertAfter(this);
+									}).on('hidden', function() {
 										$(this).remove();
-									})
+									}).modal('show');
 							return false;
 						}
 					}
