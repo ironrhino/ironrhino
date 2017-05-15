@@ -245,12 +245,12 @@ public class BaseAction extends ActionSupport {
 				return ERROR;
 			}
 			try {
-				UserDetails ud = AuthzUtils.getUserDetails(username, password);
-				if (!AuthzUtils.authorizeUserDetails(ud, null, doubleCheck.value(), null)) {
+				UserDetails doubleChecker = AuthzUtils.getUserDetails(username, password);
+				if (!AuthzUtils.authorizeUserDetails(doubleChecker, null, doubleCheck.value(), null)) {
 					addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
 					return ERROR;
 				}
-				request.setAttribute(DoubleCheck.ATTRIBUTE_NAME_DOUBLE_CHECKER, ud);
+				AuthzUtils.DOUBLE_CHCKER_HOLDER.set(doubleChecker);
 			} catch (UsernameNotFoundException e) {
 				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText(e.getClass().getName()));
 				return ERROR;

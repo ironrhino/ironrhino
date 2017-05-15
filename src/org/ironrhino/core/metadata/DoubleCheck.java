@@ -10,8 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface DoubleCheck {
 
-	static final String ATTRIBUTE_NAME_DOUBLE_CHECKER = "_DOUBLE_CHECKER";
-
 	static final String PARAMETER_NAME_USERNAME = "doubleCheckUsername";
 
 	static final String PARAMETER_NAME_PASSWORD = "doubleCheckPassword";

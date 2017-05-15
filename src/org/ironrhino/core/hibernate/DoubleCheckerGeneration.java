@@ -5,8 +5,7 @@ import org.hibernate.Session;
 import org.hibernate.tuple.AnnotationValueGeneration;
 import org.hibernate.tuple.GenerationTiming;
 import org.hibernate.tuple.ValueGenerator;
-import org.ironrhino.core.metadata.DoubleCheck;
-import org.ironrhino.core.servlet.RequestContext;
+import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class DoubleCheckerGeneration implements AnnotationValueGeneration<DoubleChecker> {
@@ -19,26 +18,18 @@ public class DoubleCheckerGeneration implements AnnotationValueGeneration<Double
 	public void initialize(DoubleChecker annotation, Class<?> propertyType) {
 		if (UserDetails.class.isAssignableFrom(propertyType)) {
 			generator = new ValueGenerator<UserDetails>() {
+				@SuppressWarnings("unchecked")
 				@Override
 				public UserDetails generateValue(Session session, Object obj) {
-					try {
-						return (UserDetails) RequestContext.getRequest()
-								.getAttribute(DoubleCheck.ATTRIBUTE_NAME_DOUBLE_CHECKER);
-					} catch (Exception e) {
-						return null;
-					}
+					return AuthzUtils.getDoubleChecker((Class<? extends UserDetails>) propertyType);
 				}
 			};
 		} else if (String.class == propertyType) {
 			generator = new ValueGenerator<String>() {
 				@Override
 				public String generateValue(Session session, Object obj) {
-					try {
-						return ((UserDetails) RequestContext.getRequest()
-								.getAttribute(DoubleCheck.ATTRIBUTE_NAME_DOUBLE_CHECKER)).getUsername();
-					} catch (Exception e) {
-						return null;
-					}
+					UserDetails ud = AuthzUtils.getDoubleChecker(UserDetails.class);
+					return ud != null ? ud.getUsername() : null;
 				}
 			};
 		} else {

@@ -23,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class AuthzUtils {
 
+	public static final ThreadLocal<UserDetails> DOUBLE_CHCKER_HOLDER = new ThreadLocal<>();
+
 	public static Object authentication(String property) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null)
@@ -219,10 +221,22 @@ public class AuthzUtils {
 
 	public static UserDetails getUserDetails(String username, String password) {
 		UserDetailsService uds = ApplicationContextUtils.getBean(UserDetailsService.class);
+		if (uds == null)
+			return null;
 		UserDetails ud = uds.loadUserByUsername(username);
 		if (!isPasswordValid(ud, password))
 			throw new BadCredentialsException(username);
 		return ud;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends UserDetails> T getDoubleChecker(Class<T> clazz) {
+		UserDetails ud = DOUBLE_CHCKER_HOLDER.get();
+		if (ud == null)
+			return null;
+		if (clazz.isAssignableFrom(ud.getClass()))
+			return (T) ud;
+		return null;
 	}
 
 }
