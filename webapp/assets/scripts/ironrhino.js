@@ -32065,7 +32065,7 @@ MessageBundle = {
 		'double.check.password' : 'D.C. Password',
 		'current.password' : 'Current Password'
 	},
-	'zh_CN' : {
+	'zh' : {
 		'ajax.loading' : '正在加载...',
 		'ajax.error' : '错误,请稍后再试',
 		'required' : '请填写',
