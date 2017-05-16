@@ -68,8 +68,6 @@ public class BaseAction extends ActionSupport {
 
 	protected String requestBody;
 
-	protected String currentPassword;
-
 	protected String originalActionName;
 
 	protected String originalMethod;
@@ -142,10 +140,6 @@ public class BaseAction extends ActionSupport {
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
-	}
-
-	public void setCurrentPassword(String currentPassword) {
-		this.currentPassword = currentPassword;
 	}
 
 	public String getUid() {
@@ -343,6 +337,7 @@ public class BaseAction extends ActionSupport {
 		HttpSession session = request.getSession();
 		String currentPasswordThreshold = (String) session.getAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD);
 		int threshold = StringUtils.isNumeric(currentPasswordThreshold) ? Integer.valueOf(currentPasswordThreshold) : 0;
+		String currentPassword = request.getParameter(CurrentPassword.PARAMETER_NAME_USERNAME);
 		boolean valid = currentPassword != null && AuthzUtils.isPasswordValid(currentPassword);
 		if (!valid) {
 			addFieldError("currentPassword", getText("currentPassword.error"));

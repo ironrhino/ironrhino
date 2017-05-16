@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface CurrentPassword {
 
+	static final String PARAMETER_NAME_USERNAME = "currentPassword";
+
 	int threshold() default 3;
 
 }

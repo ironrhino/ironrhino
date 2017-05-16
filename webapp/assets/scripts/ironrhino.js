@@ -32062,7 +32062,8 @@ MessageBundle = {
 		'file.too.large' : 'File too large',
 		'double.check' : 'Double Check',
 		'double.check.username' : 'D.C. User',
-		'double.check.password' : 'D.C. Password'
+		'double.check.password' : 'D.C. Password',
+		'current.password' : 'Current Password'
 	},
 	'zh_CN' : {
 		'ajax.loading' : '正在加载...',
@@ -32107,13 +32108,14 @@ MessageBundle = {
 		'maxsize.exceeded' : '大小{0}超过最大限制{1}',
 		'max.rows.reached' : '已经达到了最大行数: {0}',
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
-		'data.invalid' : '数据错误,请检查',
+		'data.invalid' : '数据错误, 请检查',
 		'repeat.not.matched' : '两次输入不一致',
 		'other' : '其他',
 		'file.too.large' : '文件太大或者网络异常',
 		'double.check' : '复核',
 		'double.check.username' : '复核用户',
-		'double.check.password' : '复核密码'
+		'double.check.password' : '复核密码',
+		'current.password' : '当前密码'
 	},
 	get : function() {
 		var key = arguments[0];
@@ -33897,30 +33899,42 @@ Observation.common = function(container) {
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
 					var t = $(target);
-					if (t.hasClass('doublecheck')) {
-						if (!t.find('[name="doubleCheckUsername"]').length) {
-							var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal">×</a><h3 style="text-align:center;">'
-									+ MessageBundle.get('double.check')
-									+ '</h3></div><div class="modal-body"></div></div>')
-									.appendTo(target);
+					var dc = t.hasClass('double-check');
+					var cp = t.hasClass('current-password');
+					if (dc && !t.find('[name="doubleCheckUsername"]').length
+							|| cp && !t.find('[name="currentPassword"]').length) {
+						var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal">×</a><h3 style="text-align:center;">'
+								+ MessageBundle.get(dc
+										? 'double.check'
+										: '&nbsp;')
+								+ '</h3></div><div class="modal-body"><fieldset class="form-horizontal"><div class="form-actions"><button type="submit" class="btn btn-primary">'
+								+ MessageBundle.get('confirm')
+								+ '</button></div></fieldset></div></div>')
+								.appendTo(target);
+						if (dc) {
 							modal
-									.find('.modal-body')
-									.append('<div class="form-horizontal"><div class="control-group"><label class="control-label" for="doubleCheckUsername">'
+									.find('.form-horizontal')
+									.prepend('<div class="control-group"><label class="control-label" for="doubleCheckUsername">'
 											+ MessageBundle
 													.get('double.check.username')
 											+ '</label><div class="controls"><input id="doubleCheckUsername" type="text" name="doubleCheckUsername" class="required" autocomplete="off"></div></div><div class="control-group"><label class="control-label" for="doubleCheckPassword">'
 											+ MessageBundle
 													.get('double.check.password')
-											+ '</label><div class="controls"><input id="doubleCheckPassword" type="password" name="doubleCheckPassword" class="required" autocomplete="off"></div></div><div class="form-actions"><button type="submit" class="btn btn-primary">'
-											+ MessageBundle.get('confirm')
-											+ '</button></div></div>');
-							modal.on('shown', function() {
-										$('.modal-backdrop').insertAfter(this);
-									}).on('hidden', function() {
-										$(this).remove();
-									}).modal('show');
-							return false;
+											+ '</label><div class="controls"><input id="doubleCheckPassword" type="password" name="doubleCheckPassword" class="required" autocomplete="off"></div></div>');
+						} else {
+							modal
+									.find('.form-horizontal')
+									.prepend('<div class="control-group"><label class="control-label" for="currentPassword">'
+											+ MessageBundle
+													.get('current.password')
+											+ '</label><div class="controls"><input id="currentPassword" type="password" name="currentPassword" class="required" autocomplete="off"></div></div>');
 						}
+						modal.on('shown', function() {
+									$('.modal-backdrop').insertAfter(this);
+								}).on('hidden', function() {
+									$(this).remove();
+								}).modal('show');
+						return false;
 					}
 					Ajax.fire(target, 'onbeforeserialize');
 				},
@@ -34002,9 +34016,15 @@ Observation.common = function(container) {
 				},
 				success : function(data) {
 					var t = $(target);
-					if (t.hasClass('doublecheck')) {
+					if (t.hasClass('double-check')) {
 						if (!data.fieldErrors
 								|| !(data.fieldErrors['doubleCheckUsername'] || data.fieldErrors['doubleCheckPassword'])) {
+							t.find('.modal').find('a.close').click();
+						}
+					}
+					if (t.hasClass('current-password')) {
+						if (!data.fieldErrors
+								|| !(data.fieldErrors['currentPassword'])) {
 							t.find('.modal').find('a.close').click();
 						}
 					}

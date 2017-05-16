@@ -58,6 +58,8 @@ public class UserAction extends EntityAction<User> {
 
 	private String password;
 
+	private String currentPassword;
+
 	private String confirmPassword;
 
 	@Value("${login.defaultTargetUrl:/}")
@@ -93,6 +95,14 @@ public class UserAction extends EntityAction<User> {
 
 	public Set<String> getHiddenRoles() {
 		return hiddenRoles;
+	}
+
+	public String getCurrentPassword() {
+		return currentPassword;
+	}
+
+	public void setCurrentPassword(String currentPassword) {
+		this.currentPassword = currentPassword;
 	}
 
 	public String getConfirmPassword() {

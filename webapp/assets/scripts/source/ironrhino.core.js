@@ -1745,30 +1745,42 @@ Observation.common = function(container) {
 					if (!Ajax.fire(target, 'onprepare'))
 						return false;
 					var t = $(target);
-					if (t.hasClass('doublecheck')) {
-						if (!t.find('[name="doubleCheckUsername"]').length) {
-							var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal">×</a><h3 style="text-align:center;">'
-									+ MessageBundle.get('double.check')
-									+ '</h3></div><div class="modal-body"></div></div>')
-									.appendTo(target);
+					var dc = t.hasClass('double-check');
+					var cp = t.hasClass('current-password');
+					if (dc && !t.find('[name="doubleCheckUsername"]').length
+							|| cp && !t.find('[name="currentPassword"]').length) {
+						var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal">×</a><h3 style="text-align:center;">'
+								+ MessageBundle.get(dc
+										? 'double.check'
+										: '&nbsp;')
+								+ '</h3></div><div class="modal-body"><fieldset class="form-horizontal"><div class="form-actions"><button type="submit" class="btn btn-primary">'
+								+ MessageBundle.get('confirm')
+								+ '</button></div></fieldset></div></div>')
+								.appendTo(target);
+						if (dc) {
 							modal
-									.find('.modal-body')
-									.append('<div class="form-horizontal"><div class="control-group"><label class="control-label" for="doubleCheckUsername">'
+									.find('.form-horizontal')
+									.prepend('<div class="control-group"><label class="control-label" for="doubleCheckUsername">'
 											+ MessageBundle
 													.get('double.check.username')
 											+ '</label><div class="controls"><input id="doubleCheckUsername" type="text" name="doubleCheckUsername" class="required" autocomplete="off"></div></div><div class="control-group"><label class="control-label" for="doubleCheckPassword">'
 											+ MessageBundle
 													.get('double.check.password')
-											+ '</label><div class="controls"><input id="doubleCheckPassword" type="password" name="doubleCheckPassword" class="required" autocomplete="off"></div></div><div class="form-actions"><button type="submit" class="btn btn-primary">'
-											+ MessageBundle.get('confirm')
-											+ '</button></div></div>');
-							modal.on('shown', function() {
-										$('.modal-backdrop').insertAfter(this);
-									}).on('hidden', function() {
-										$(this).remove();
-									}).modal('show');
-							return false;
+											+ '</label><div class="controls"><input id="doubleCheckPassword" type="password" name="doubleCheckPassword" class="required" autocomplete="off"></div></div>');
+						} else {
+							modal
+									.find('.form-horizontal')
+									.prepend('<div class="control-group"><label class="control-label" for="currentPassword">'
+											+ MessageBundle
+													.get('current.password')
+											+ '</label><div class="controls"><input id="currentPassword" type="password" name="currentPassword" class="required" autocomplete="off"></div></div>');
 						}
+						modal.on('shown', function() {
+									$('.modal-backdrop').insertAfter(this);
+								}).on('hidden', function() {
+									$(this).remove();
+								}).modal('show');
+						return false;
 					}
 					Ajax.fire(target, 'onbeforeserialize');
 				},
@@ -1850,9 +1862,15 @@ Observation.common = function(container) {
 				},
 				success : function(data) {
 					var t = $(target);
-					if (t.hasClass('doublecheck')) {
+					if (t.hasClass('double-check')) {
 						if (!data.fieldErrors
 								|| !(data.fieldErrors['doubleCheckUsername'] || data.fieldErrors['doubleCheckPassword'])) {
+							t.find('.modal').find('a.close').click();
+						}
+					}
+					if (t.hasClass('current-password')) {
+						if (!data.fieldErrors
+								|| !(data.fieldErrors['currentPassword'])) {
 							t.find('.modal').find('a.close').click();
 						}
 					}

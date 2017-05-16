@@ -32,7 +32,8 @@ MessageBundle = {
 		'file.too.large' : 'File too large',
 		'double.check' : 'Double Check',
 		'double.check.username' : 'D.C. User',
-		'double.check.password' : 'D.C. Password'
+		'double.check.password' : 'D.C. Password',
+		'current.password' : 'Current Password'
 	},
 	'zh_CN' : {
 		'ajax.loading' : '正在加载...',
@@ -77,13 +78,14 @@ MessageBundle = {
 		'maxsize.exceeded' : '大小{0}超过最大限制{1}',
 		'max.rows.reached' : '已经达到了最大行数: {0}',
 		'pattern.coords.invalid' : '坐标数必须在{0}和{1}之间',
-		'data.invalid' : '数据错误,请检查',
+		'data.invalid' : '数据错误, 请检查',
 		'repeat.not.matched' : '两次输入不一致',
 		'other' : '其他',
 		'file.too.large' : '文件太大或者网络异常',
 		'double.check' : '复核',
 		'double.check.username' : '复核用户',
-		'double.check.password' : '复核密码'
+		'double.check.password' : '复核密码',
+		'current.password' : '当前密码'
 	},
 	get : function() {
 		var key = arguments[0];
