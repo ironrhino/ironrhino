@@ -110,8 +110,9 @@ public class RSA {
 
 	public RSA(InputStream is, String password) throws Exception {
 		KeyStore ks = KeyStore.getInstance("pkcs12", "SunJSSE");
-		ks.load(is, password.toCharArray());
-		IOUtils.closeQuietly(is);
+		try (InputStream ins = is) {
+			ks.load(ins, password.toCharArray());
+		}
 		Enumeration<String> aliases = ks.aliases();
 		if (aliases.hasMoreElements()) {
 			String alias = aliases.nextElement();

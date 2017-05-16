@@ -68,12 +68,8 @@ public class LocalFileStorage implements FileStorage {
 		path = Files.simplifyPath(path);
 		File dest = new File(directory, path);
 		dest.getParentFile().mkdirs();
-		FileOutputStream os = new FileOutputStream(dest);
-		try {
-			IOUtils.copy(is, os);
-		} finally {
-			IOUtils.closeQuietly(os);
-			IOUtils.closeQuietly(is);
+		try (InputStream ins = is; FileOutputStream os = new FileOutputStream(dest)) {
+			IOUtils.copy(ins, os);
 		}
 	}
 

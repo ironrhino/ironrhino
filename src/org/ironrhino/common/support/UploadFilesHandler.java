@@ -49,25 +49,23 @@ public class UploadFilesHandler extends AccessHandler {
 				response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
 				return true;
 			}
-			InputStream is = fileStorage.open(path);
-			if (is == null) {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-				return true;
+			try (InputStream is = fileStorage.open(path)) {
+				if (is == null) {
+					response.sendError(HttpServletResponse.SC_NOT_FOUND);
+					return true;
+				}
+				if (lastModified > 0)
+					response.setDateHeader("Last-Modified", lastModified);
+				String filename = path.substring(path.lastIndexOf("/") + 1);
+				String contentType = servletContext.getMimeType(filename);
+				if (contentType != null)
+					response.setContentType(contentType);
+				try (OutputStream os = response.getOutputStream()) {
+					IOUtils.copy(is, os);
+				} catch (Exception e) {
+					// supress ClientAbortException
+				}
 			}
-			if (lastModified > 0)
-				response.setDateHeader("Last-Modified", lastModified);
-			String filename = path.substring(path.lastIndexOf("/") + 1);
-			String contentType = servletContext.getMimeType(filename);
-			if (contentType != null)
-				response.setContentType(contentType);
-			OutputStream os = response.getOutputStream();
-			try {
-				IOUtils.copy(is, os);
-				IOUtils.closeQuietly(os);
-			} catch (Exception e) {
-				// supress ClientAbortException
-			}
-			IOUtils.closeQuietly(is);
 		} catch (FileNotFoundException fne) {
 			try {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
