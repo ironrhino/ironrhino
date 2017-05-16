@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -30,6 +31,7 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 				httpSessionManager);
 		final boolean lazyCommit = !session.isCacheBased();
 		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(request, session);
+		LocaleContextHolder.setLocale(wrappedHttpRequest.getLocale(), true);
 		final HttpServletResponse wrappedHttpResponse = lazyCommit ? new WrappedHttpServletResponse(response, session)
 				: new SimpleWrappedHttpServletResponse(response, session);
 		if (httpSessionFilterHooks != null) {

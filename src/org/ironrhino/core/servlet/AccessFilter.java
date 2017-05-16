@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -103,6 +104,7 @@ public class AccessFilter implements Filter {
 		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
 		HttpServletRequest request = "true".equals(System.getProperty(SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED))
 				? (HttpServletRequest) req : new ProxySupportHttpServletRequest((HttpServletRequest) req);
+		LocaleContextHolder.setLocale(request.getLocale(), true);
 		HttpServletResponse response = (HttpServletResponse) resp;
 		RequestContext.set(request, response);
 		try {
