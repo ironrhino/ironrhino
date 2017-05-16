@@ -171,7 +171,11 @@ public class CodecUtils {
 	}
 
 	public static String digest(String input) {
-		boolean isShaInput = (input != null && input.length() == 40 && input.matches("\\p{XDigit}+"));
+		if (input == null)
+			return null;
+		if (input.length() > 255)
+			return input; // avoid long password DOS attack
+		boolean isShaInput = input.length() == 40 && input.matches("\\p{XDigit}+");
 		return md5Hex(shaHex(input, isShaInput ? 2 : 3));
 	}
 
