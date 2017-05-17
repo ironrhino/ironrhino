@@ -25,7 +25,7 @@ Initialization.apiplayground = function() {
 		}
 		var url = form.find('.url').text();
 		if (params.length)
-			url += '?' + params.join(',');
+			url += '?' + params.join('&');
 		var options = {
 			global : false,
 			url : url,
