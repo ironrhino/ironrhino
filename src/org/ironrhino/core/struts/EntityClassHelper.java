@@ -41,6 +41,13 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.CreationTimestamp;
@@ -71,11 +78,14 @@ import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.ClassUtils;
 
 public class EntityClassHelper {
 
 	private static Map<Class<?>, Map<String, UiConfigImpl>> uiConfigCache = new ConcurrentHashMap<>(64);
 	private static Map<Class<?>, Boolean> idAssignedCache = new ConcurrentHashMap<>(64);
+	private static boolean HIBERNATE_VALIDATOR_PRESENT = ClassUtils
+			.isPresent("org.hibernate.validator.HibernateValidator", null);
 
 	public static Map<String, UiConfigImpl> getUiConfigs(Class<?> entityClass) {
 		Map<String, UiConfigImpl> map = uiConfigCache.get(entityClass);
@@ -426,12 +436,25 @@ public class EntityClassHelper {
 							|| returnType == Long.TYPE || returnType == Double.TYPE || returnType == Float.TYPE
 							|| Number.class.isAssignableFrom(returnType))) {
 						if (returnType == Integer.TYPE || returnType == Integer.class || returnType == Short.TYPE
-								|| returnType == Short.class) {
+								|| returnType == Short.class || returnType == Long.TYPE || returnType == Long.class) {
 							uci.setInputType("number");
-							uci.addCssClass("integer");
-						} else if (returnType == Long.TYPE || returnType == Long.class) {
-							uci.setInputType("number");
-							uci.addCssClass("long");
+							uci.addCssClass((returnType == Long.TYPE || returnType == Long.class) ? "long" : "integer");
+							Min min = findAnnotation(readMethod, declaredField, Min.class);
+							if (min != null)
+								uci.getInternalDynamicAttributes().put("min", String.valueOf(min.value()));
+							Max max = findAnnotation(readMethod, declaredField, Max.class);
+							if (min != null)
+								uci.getInternalDynamicAttributes().put("max", String.valueOf(max.value()));
+							if (HIBERNATE_VALIDATOR_PRESENT) {
+								org.hibernate.validator.constraints.Range range = findAnnotation(readMethod,
+										declaredField, org.hibernate.validator.constraints.Range.class);
+								if (range != null) {
+									if (range.min() != 0)
+										uci.getInternalDynamicAttributes().put("min", String.valueOf(range.min()));
+									if (range.max() != Integer.MAX_VALUE)
+										uci.getInternalDynamicAttributes().put("max", String.valueOf(range.max()));
+								}
+							}
 						} else if (returnType == Double.TYPE || returnType == Double.class || returnType == Float.TYPE
 								|| returnType == Float.class || returnType == BigDecimal.class) {
 							uci.setInputType("number");
@@ -446,6 +469,12 @@ public class EntityClassHelper {
 							step.append("1");
 							uci.getInternalDynamicAttributes().put("step", step.toString());
 							uci.getInternalDynamicAttributes().put("data-scale", String.valueOf(scale));
+							DecimalMin min = findAnnotation(readMethod, declaredField, DecimalMin.class);
+							if (min != null)
+								uci.getInternalDynamicAttributes().put("min", min.value());
+							DecimalMax max = findAnnotation(readMethod, declaredField, DecimalMax.class);
+							if (min != null)
+								uci.getInternalDynamicAttributes().put("max", max.value());
 							if (StringUtils.isBlank(uci.getTemplate())) {
 								StringBuilder template = new StringBuilder(scale + 40);
 								template.append("<#if value?is_number>${value?string('");
@@ -480,10 +509,34 @@ public class EntityClassHelper {
 						// uci.setInputType(temporalType);
 						if (StringUtils.isBlank(uci.getCellEdit()))
 							uci.setCellEdit("click," + temporalType);
-					} else if (String.class == returnType && pd.getName().toLowerCase(Locale.ROOT).contains("email")
-							&& !pd.getName().contains("Password")) {
-						uci.setInputType("email");
-						uci.addCssClass("email");
+					} else if (String.class == returnType) {
+						Size size = findAnnotation(readMethod, declaredField, Size.class);
+						if (size != null) {
+							if (size.min() != 0)
+								uci.getInternalDynamicAttributes().put("minlength", String.valueOf(size.min()));
+							if (size.max() != Integer.MAX_VALUE)
+								uci.getInternalDynamicAttributes().put("maxlength", String.valueOf(size.max()));
+						}
+						if (HIBERNATE_VALIDATOR_PRESENT) {
+							org.hibernate.validator.constraints.Length length = findAnnotation(readMethod,
+									declaredField, org.hibernate.validator.constraints.Length.class);
+							if (length != null) {
+								if (length.min() != 0)
+									uci.getInternalDynamicAttributes().put("minlength", String.valueOf(length.min()));
+								if (length.max() != Integer.MAX_VALUE)
+									uci.getInternalDynamicAttributes().put("maxlength", String.valueOf(length.max()));
+							}
+						}
+						Pattern pattern = findAnnotation(readMethod, declaredField, Pattern.class);
+						if (pattern != null) {
+							uci.addCssClass("regex");
+							uci.getInternalDynamicAttributes().put("data-regex", pattern.regexp());
+						}
+						if (pd.getName().toLowerCase(Locale.ROOT).contains("email")
+								&& !pd.getName().contains("Password")) {
+							uci.setInputType("email");
+							uci.addCssClass("email");
+						}
 					} else if (returnType == Boolean.TYPE || returnType == Boolean.class) {
 						uci.setType("checkbox");
 					} else if (returnType == File.class) {
@@ -494,6 +547,14 @@ public class EntityClassHelper {
 							if (fu.indexOf('/') > 0)
 								uci.getInternalDynamicAttributes().put("accept", fu);
 						}
+					}
+
+					uci.setRequired(findAnnotation(readMethod, declaredField, NotNull.class) != null);
+					if (HIBERNATE_VALIDATOR_PRESENT) {
+						uci.setRequired(findAnnotation(readMethod, declaredField,
+								org.hibernate.validator.constraints.NotEmpty.class) != null
+								|| findAnnotation(readMethod, declaredField,
+										org.hibernate.validator.constraints.NotBlank.class) != null);
 					}
 
 					SearchableProperty searchableProperty = findAnnotation(readMethod, declaredField,
