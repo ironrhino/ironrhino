@@ -10,7 +10,7 @@
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
-				<option value="${lv.value}"<#if value=lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
+				<option value="${lv.value}"<#if value?string==lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
 				</#list>
 			<#else>
 				<#local group = ""/>
@@ -30,7 +30,7 @@
 							</#if>
 						</#if>
 					<#else>
-						<option value="${lv.value}"<#if value=lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
+						<option value="${lv.value}"<#if value?string==lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
 						<#if group?has_content && !lv?has_next>
 						</optgroup>
 						</#if>
@@ -45,11 +45,11 @@
 </#macro>
 
 <#function getDictionaryLabel dictionaryName value="">
-	<#return beans['dictionaryControl'].getDictionaryLabel(dictionaryName,value)>
+	<#return beans['dictionaryControl'].getDictionaryLabel(dictionaryName,value?string)>
 </#function>
 
 <#macro displayDictionaryLabel dictionaryName value="">
-${getDictionaryLabel(dictionaryName,value)}<#t>
+${getDictionaryLabel(dictionaryName,value?string)}<#t>
 </#macro>
 
 <#macro checkDictionary dictionaryName name="" value=[] disabled=false dynamicAttributes...>
@@ -100,7 +100,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			</#if>
 		</#if>
 		<#list value as v>
-		<#if !dictionary?? || !(dictionary.itemsAsMap!)?keys?seq_contains(v)>
+		<#if !dictionary?? || !(dictionary.itemsAsMap!)?keys?seq_contains(v?string)>
 		<label for="${name}-${index}" class="checkbox inline"><#t>
 		<input id="${name}-${index}" type="checkbox"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${v}" checked<@dynAttrs value=dynamicAttributes exclude='class'/>/>${v}<#t>
 		</label><#t>
@@ -121,7 +121,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 			<#if !dictionary.groupable>
 				<#list items as lv>
 				<label for="${name}-${index}" class="radio inline"><#t>
-				<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}"<#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}"<#if value==lv.value> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?then(lv.label,lv.value!)}<#t>
+				<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if> value="${lv.value}"<#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}"<#if value?string==lv.value> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?then(lv.label,lv.value!)}<#t>
 				</label><#t>
 				<#local index++>
 				</#list>
@@ -144,7 +144,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 						</#if>
 					<#else>
 						<label for="${name}-${index}" class="radio inline"><#t>
-						<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${lv.value}"<#if value==lv.value> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?then(lv.label,lv.value!)}<#t>
+						<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${lv.value}"<#if value?string==lv.value> checked</#if><@dynAttrs value=dynamicAttributes exclude='class'/>/>${lv.label?has_content?then(lv.label,lv.value!)}<#t>
 						</label><#t>
 						<#if group?has_content && index==items?size-1>
 						</span><#lt>
@@ -154,7 +154,7 @@ ${getDictionaryLabel(dictionaryName,value)}<#t>
 				</#list>
 			</#if>
 		</#if>
-		<#if !dictionary?? || value?has_content && !(dictionary.itemsAsMap!)?keys?seq_contains(value)>
+		<#if !dictionary?? || value?has_content && !(dictionary.itemsAsMap!)?keys?seq_contains(value?string)>
 		<label for="${name}-${index}" class="radio inline"><#t>
 		<input id="${name}-${index}" type="radio"<#if name?has_content> name="${name}"</#if><#if disabled> disabled</#if> class="custom ${dynamicAttributes['class']!}" value="${value}"checked<@dynAttrs value=dynamicAttributes exclude='class'/>/>${value}<#t>
 		</label><#t>
