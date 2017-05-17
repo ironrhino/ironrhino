@@ -45,6 +45,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
+import org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
@@ -185,6 +187,13 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			}
+		}
+		if (ClassUtils.isPresent("javax.validation.Configuration", getClass().getClassLoader())) {
+			final javax.validation.Configuration<?> configuration = javax.validation.Validation.byDefaultProvider()
+					.configure();
+			configuration.messageInterpolator(
+					new LocaleContextMessageInterpolator(configuration.getDefaultMessageInterpolator()));
+			props.put("javax.persistence.validation.factory", configuration.buildValidatorFactory());
 		}
 		super.afterPropertiesSet();
 	}
