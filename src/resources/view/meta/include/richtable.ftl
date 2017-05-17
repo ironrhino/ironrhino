@@ -304,10 +304,13 @@ ${formHeader!}
 </#if>
 ${totalResults}<span class="recordLabel"> ${getText('record')}</span>
 <#if downloadable && request.requestURI?ends_with(actionBaseUrl) && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
-<button type="submit" class="noajax plain" formaction="${actionBaseUrl}/csv<#if request.queryString?has_content>?${request.queryString}</#if>" style="padding-top:2px;">
-<span class="glyphicon glyphicon-download-alt clickable">
-</span>
-</button>
+<#local downloadUrl=actionBaseUrl+'/csv'>
+<#list Parameters as name,value>
+<#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&(name!='keyword'||value?has_content)>
+<#local downloadUrl+=downloadUrl?contains('?')?then('&','?')+name+'='+value?url>
+</#if>
+</#list>
+<a target="_blank" download="data.csv" href="${downloadUrl}" style="padding-top:2px;"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
 </#if>
 </div>
 </div>
