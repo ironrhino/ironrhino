@@ -5,6 +5,7 @@ import org.hibernate.Session;
 import org.hibernate.tuple.AnnotationValueGeneration;
 import org.hibernate.tuple.GenerationTiming;
 import org.hibernate.tuple.ValueGenerator;
+import org.ironrhino.core.metadata.DoubleChecker;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 

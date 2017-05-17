@@ -250,7 +250,7 @@ public class Customer extends BaseRecordableEntity {
 		if (potentialRanks != null && potentialRanks.contains(this.rank)) {
 			ve.addFieldError("customer.potentialRanks", "不能包含当前等级");
 		}
-		if (balance == null || balance.doubleValue() > 100000) {
+		if (balance != null && balance.doubleValue() > 100000) {
 			ve.addFieldError("customer.balance", "余额不能大于100,000.00");
 		}
 		if (ve.hasError())

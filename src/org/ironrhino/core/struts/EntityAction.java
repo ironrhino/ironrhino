@@ -38,6 +38,7 @@ import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.CaseInsensitive;
+import org.ironrhino.core.metadata.DoubleChecker;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Owner;
 import org.ironrhino.core.metadata.Readonly;
@@ -148,6 +149,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public boolean isFulltextSearchable() {
 		return (getEntityClass().getAnnotation(Searchable.class) != null) && searchService != null;
+	}
+
+	public boolean isDoubleCheck() {
+		return !AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), DoubleChecker.class).isEmpty();
 	}
 
 	public boolean isEnableable() {
@@ -1715,9 +1720,21 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		Authorize authorize = super.findAuthorize();
 		if (authorize == null) {
 			Class<?> c = getEntityClass();
-			return c.getAnnotation(Authorize.class);
+			authorize = c.getAnnotation(Authorize.class);
 		}
 		return authorize;
+	}
+
+	@Override
+	protected DoubleChecker findDoubleChecker() {
+		DoubleChecker doubleCheck = super.findDoubleChecker();
+		if (doubleCheck == null
+				&& ActionContext.getContext().getActionInvocation().getProxy().getMethod().equals("save")) {
+			Map<String, DoubleChecker> map = AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(getEntityClass(),
+					DoubleChecker.class);
+			doubleCheck = map.size() > 0 ? map.values().iterator().next() : null;
+		}
+		return doubleCheck;
 	}
 
 	// need call once before view

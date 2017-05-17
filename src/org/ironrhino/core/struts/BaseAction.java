@@ -14,7 +14,7 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Csrf;
 import org.ironrhino.core.metadata.CurrentPassword;
-import org.ironrhino.core.metadata.DoubleCheck;
+import org.ironrhino.core.metadata.DoubleChecker;
 import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
@@ -300,30 +300,30 @@ public class BaseAction extends ActionSupport {
 
 	private void validateDoubleCheck() {
 		HttpServletRequest request = ServletActionContext.getRequest();
-		DoubleCheck doubleCheck = getAnnotation(DoubleCheck.class);
+		DoubleChecker doubleCheck = findDoubleChecker();
 		if (doubleCheck != null) {
-			String username = request.getParameter(DoubleCheck.PARAMETER_NAME_USERNAME);
-			String password = request.getParameter(DoubleCheck.PARAMETER_NAME_PASSWORD);
+			String username = request.getParameter(DoubleChecker.PARAMETER_NAME_USERNAME);
+			String password = request.getParameter(DoubleChecker.PARAMETER_NAME_PASSWORD);
 			if (StringUtils.isBlank(username)) {
-				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("validation.required"));
+				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText("validation.required"));
 				return;
 			}
 			if (username.equals(AuthzUtils.getUsername())) {
-				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
+				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText("access.denied"));
 				return;
 			}
 			try {
 				UserDetails doubleChecker = AuthzUtils.getUserDetails(username, password);
 				if (!AuthzUtils.authorizeUserDetails(doubleChecker, null, doubleCheck.value(), null)) {
-					addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText("access.denied"));
+					addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText("access.denied"));
 					return;
 				}
 				AuthzUtils.DOUBLE_CHCKER_HOLDER.set(doubleChecker);
 			} catch (UsernameNotFoundException e) {
-				addFieldError(DoubleCheck.PARAMETER_NAME_USERNAME, getText(e.getClass().getName()));
+				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText(e.getClass().getName()));
 				return;
 			} catch (BadCredentialsException e) {
-				addFieldError(DoubleCheck.PARAMETER_NAME_PASSWORD, getText(e.getClass().getName()));
+				addFieldError(DoubleChecker.PARAMETER_NAME_PASSWORD, getText(e.getClass().getName()));
 				return;
 			}
 		}
@@ -389,6 +389,10 @@ public class BaseAction extends ActionSupport {
 		if (authorize == null)
 			authorize = getClass().getAnnotation(Authorize.class);
 		return authorize;
+	}
+
+	protected DoubleChecker findDoubleChecker() {
+		return getAnnotation(DoubleChecker.class);
 	}
 
 	private static String[] evalExpression(String[] arr) {
