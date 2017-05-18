@@ -81,7 +81,6 @@ public class FtpFileStorage implements FileStorage {
 
 			@Override
 			public FTPClient create() throws Exception {
-				logger.info("create FTPClient");
 				FTPClient ftpClient = new FTPClient();
 				ftpClient.setControlEncoding(controlEncoding);
 				ftpClient.connect(uri.getHost(), uri.getPort() > 0 ? uri.getPort() : ftpClient.getDefaultPort());
@@ -235,12 +234,10 @@ public class FtpFileStorage implements FileStorage {
 
 	@Override
 	public boolean exists(String path) throws IOException {
-		try (InputStream is = open(path)) {
-			boolean b = is != null;
-			if (!b)
-				b = isDirectory(path);
-			return b;
-		}
+		boolean isFile = execute(ftpClient -> {
+			return ftpClient.getModificationTime(getRealPath(path, ftpClient)) != null;
+		});
+		return isFile || isDirectory(path);
 	}
 
 	@Override
