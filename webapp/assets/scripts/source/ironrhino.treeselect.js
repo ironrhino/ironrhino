@@ -65,7 +65,7 @@
 		}
 	}
 	function removeAction(event) {
-		current = $(event.target).closest('.treeselect');
+		var current = $(event.target).closest('.treeselect');
 		var options = current.data('_options');
 		val(options.name, current, null);
 		val(options.id, current, null);
@@ -109,7 +109,7 @@
 				}
 			}
 			var func = function(event) {
-				current = $(event.target).closest('.treeselect');
+				var current = $(event.target).closest('.treeselect');
 				var winid = '_tree_window';
 				current.data('winid', winid);
 				$('#' + winid).remove();

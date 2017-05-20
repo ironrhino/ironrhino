@@ -40065,7 +40065,7 @@ Observation.groupable = function(container) {
 		}
 	}
 	function removeAction(event) {
-		current = $(event.target).closest('.treeselect');
+		var current = $(event.target).closest('.treeselect');
 		var options = current.data('_options');
 		val(options.name, current, null);
 		val(options.id, current, null);
@@ -40109,7 +40109,7 @@ Observation.groupable = function(container) {
 				}
 			}
 			var func = function(event) {
-				current = $(event.target).closest('.treeselect');
+				var current = $(event.target).closest('.treeselect');
 				var winid = '_tree_window';
 				current.data('winid', winid);
 				$('#' + winid).remove();
@@ -40367,7 +40367,7 @@ Observation.treeview = function(container) {
 		}
 	}
 	function removeAction(event) {
-		current = $(event.target).closest('.listpick');
+		var current = $(event.target).closest('.listpick');
 		var options = current.data('_options');
 		var viewlink = current.find('a.view[rel="richtable"]');
 		if (current.is('td') && viewlink.length)
@@ -40418,7 +40418,7 @@ Observation.treeview = function(container) {
 			var func = function(event) {
 				if ($(event.target).is('a.view[rel="richtable"]'))
 					return true;
-				current = $(event.target).closest('.listpick');
+				var current = $(event.target).closest('.listpick');
 				var options = current.data('_options');
 				var winid = current.data('winid');
 				if (winid) {

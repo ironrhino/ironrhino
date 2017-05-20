@@ -65,7 +65,7 @@
 		}
 	}
 	function removeAction(event) {
-		current = $(event.target).closest('.listpick');
+		var current = $(event.target).closest('.listpick');
 		var options = current.data('_options');
 		var viewlink = current.find('a.view[rel="richtable"]');
 		if (current.is('td') && viewlink.length)
@@ -116,7 +116,7 @@
 			var func = function(event) {
 				if ($(event.target).is('a.view[rel="richtable"]'))
 					return true;
-				current = $(event.target).closest('.listpick');
+				var current = $(event.target).closest('.listpick');
 				var options = current.data('_options');
 				var winid = current.data('winid');
 				if (winid) {
