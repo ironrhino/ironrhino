@@ -443,7 +443,7 @@ public class EntityClassHelper {
 							if (min != null)
 								uci.getInternalDynamicAttributes().put("min", String.valueOf(min.value()));
 							Max max = findAnnotation(readMethod, declaredField, Max.class);
-							if (min != null)
+							if (max != null)
 								uci.getInternalDynamicAttributes().put("max", String.valueOf(max.value()));
 							if (HIBERNATE_VALIDATOR_PRESENT) {
 								org.hibernate.validator.constraints.Range range = findAnnotation(readMethod,
