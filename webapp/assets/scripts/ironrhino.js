@@ -32923,7 +32923,8 @@ Ajax = {
 			div.remove();
 			if (options.onsuccess)
 				options.onsuccess.apply(window, [data, xhr]);
-			Ajax.fire(target, 'onsuccess', data, xhr);
+			if (!options.preflight)
+				Ajax.fire(target, 'onsuccess', data, xhr);
 		} else {
 			Ajax.jsonResult = data;
 			if (data.fieldErrors || data.actionErrors) {
@@ -32934,7 +32935,8 @@ Ajax = {
 			} else {
 				if (options.onsuccess)
 					options.onsuccess.apply(window, [data, xhr]);
-				Ajax.fire(target, 'onsuccess', data, xhr);
+				if (!options.preflight)
+					Ajax.fire(target, 'onsuccess', data, xhr);
 			}
 			setTimeout(function() {
 						Message.showActionError(data.actionErrors, target);
