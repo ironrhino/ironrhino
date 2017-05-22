@@ -247,7 +247,9 @@ input.error:focus, select.error:focus, textarea.error:focus {
 
 .field-error-popover {
 	position: absolute;
+	/*
 	z-index: 100000;
+	*/
 }
 
 .field-error-popover .field-error-content {

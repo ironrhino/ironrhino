@@ -9079,7 +9079,9 @@ input.error:focus, select.error:focus, textarea.error:focus {
 
 .field-error-popover {
 	position: absolute;
+	/*
 	z-index: 100000;
+	*/
 }
 
 .field-error-popover .field-error-content {
@@ -9401,11 +9403,11 @@ form.attachmentable ul.thumbnails li .remove {
 	margin: 3px;
 }
 
-.datagrided.adaptive td > select:only-child, .datagrided.adaptive td > .input-append:only-child, .datagrided.adaptive td > .input-prepend:only-child, .datagrided.adaptive td > table.datagrided{
+.datagrided.adaptive td > select:only-of-type, .datagrided.adaptive td > .input-append:only-child, .datagrided.adaptive td > .input-prepend:only-child, .datagrided.adaptive td > table.datagrided{
 	width: 100%;
 }
 
-.datagrided.adaptive td > input:only-child, .datagrided.adaptive td > textarea:only-child, .datagrided.adaptive td > .uneditable-input:only-child{
+.datagrided.adaptive td > input:only-of-type, .datagrided.adaptive td > textarea:only-of-type, .datagrided.adaptive td > .uneditable-input:only-child{
 	width: 92%;
 	width: calc(100% - 14px);
 }
