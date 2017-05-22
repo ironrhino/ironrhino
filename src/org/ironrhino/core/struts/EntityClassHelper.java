@@ -549,12 +549,14 @@ public class EntityClassHelper {
 						}
 					}
 
-					uci.setRequired(findAnnotation(readMethod, declaredField, NotNull.class) != null);
+					if (findAnnotation(readMethod, declaredField, NotNull.class) != null)
+						uci.setRequired(true);
 					if (HIBERNATE_VALIDATOR_PRESENT) {
-						uci.setRequired(findAnnotation(readMethod, declaredField,
+						if (findAnnotation(readMethod, declaredField,
 								org.hibernate.validator.constraints.NotEmpty.class) != null
 								|| findAnnotation(readMethod, declaredField,
-										org.hibernate.validator.constraints.NotBlank.class) != null);
+										org.hibernate.validator.constraints.NotBlank.class) != null)
+							uci.setRequired(true);
 					}
 
 					SearchableProperty searchableProperty = findAnnotation(readMethod, declaredField,
