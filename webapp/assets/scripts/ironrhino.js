@@ -32848,7 +32848,7 @@ Ajax = {
 			return false;
 		return true;
 	},
-	handleResponse : function(data, options) {
+	handleResponse : function(data, options, xhr) {
 		if (!data)
 			return;
 		var hasError = false;
@@ -32922,19 +32922,19 @@ Ajax = {
 			}
 			div.remove();
 			if (options.onsuccess)
-				options.onsuccess.apply(window);
-			Ajax.fire(target, 'onsuccess', data);
+				options.onsuccess.apply(window, [data, xhr]);
+			Ajax.fire(target, 'onsuccess', data, xhr);
 		} else {
 			Ajax.jsonResult = data;
 			if (data.fieldErrors || data.actionErrors) {
 				hasError = true;
 				if (options.onerror)
-					options.onerror.apply(window);
-				Ajax.fire(target, 'onerror', data);
+					options.onerror.apply(window, [data, xhr]);
+				Ajax.fire(target, 'onerror', data, xhr);
 			} else {
 				if (options.onsuccess)
-					options.onsuccess.apply(window);
-				Ajax.fire(target, 'onsuccess', data);
+					options.onsuccess.apply(window, [data, xhr]);
+				Ajax.fire(target, 'onsuccess', data, xhr);
 			}
 			setTimeout(function() {
 						Message.showActionError(data.actionErrors, target);
@@ -33022,7 +33022,7 @@ function ajaxOptions(options) {
 	}
 	var success = options.success;
 	options.success = function(data, textStatus, xhr) {
-		Ajax.handleResponse(data, options);
+		Ajax.handleResponse(data, options, xhr);
 		if (success && !(data.fieldErrors || data.actionErrors))
 			success(data, textStatus, xhr);
 	};
@@ -33885,7 +33885,9 @@ Observation.common = function(container) {
 		var _opt = ajaxOptions({
 					url : this.tagName == 'FORM' ? this.action : this.href,
 					target : target,
-					onsuccess : function(data) {
+					onsuccess : function(data,xhr) {
+						console.log(data);
+						console.log(xhr);
 						var version = $('input[type="hidden"].version', target);
 						version.val(parseInt(version.val() || '0') + 1);
 					}
@@ -34014,7 +34016,7 @@ Observation.common = function(container) {
 					Form.focus(target);
 					Ajax.fire(target, 'onerror');
 				},
-				success : function(data) {
+				success : function(data, textStatus, xhr) {
 					var t = $(target);
 					if (t.hasClass('double-check')) {
 						if (!data.fieldErrors
@@ -34028,7 +34030,7 @@ Observation.common = function(container) {
 							t.find('.modal').find('a.close').click();
 						}
 					}
-					Ajax.handleResponse(data, _opt);
+					Ajax.handleResponse(data, _opt, xhr);
 				},
 				complete : function() {
 					if (typeof $.fn.mask != 'undefined'
