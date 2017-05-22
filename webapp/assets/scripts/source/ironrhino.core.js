@@ -1013,20 +1013,21 @@ Initialization.common = function() {
 	}).on('mouseenter', '.popover,.tooltip', function() {
 				$(this).remove()
 			}).on('click', '.action-error strong.force-override', function(e) {
-		var msgcontainer = $(e.target).closest('.message-container');
-		if (msgcontainer.length) {
-			var form = msgcontainer.next('form');
-			$('input[type="hidden"].version', form).remove();
-			msgcontainer.fadeOut().remove();
-			form.submit();
-		} else {
-			var button = $('button[data-action="save"]:visible');
-			$('tr', button.closest('form')).removeData('version')
-					.removeAttr('data-version');
-			button.click();
-		}
+				var msgcontainer = $(e.target).closest('.message-container');
+				if (msgcontainer.length) {
+					var form = msgcontainer.next('form');
+					$('input[type="hidden"].version', form).val('');
+					msgcontainer.fadeOut().remove();
+					form.submit();
+				} else {
+					var button = $('button[data-action="save"]:visible');
+					$('tr', button.closest('form')).filter(function() {
+								return $(this).find('td.edited').length;
+							}).removeData('version').removeAttr('data-version');
+					button.click();
+				}
 
-	}).on('change', 'select', function(e) {
+			}).on('change', 'select', function(e) {
 				var t = $(this);
 				var option = t.find('option:eq(0)');
 				if (!option.attr('value') && option.text()) {
@@ -1731,9 +1732,10 @@ Observation.common = function(container) {
 		var _opt = ajaxOptions({
 					url : this.tagName == 'FORM' ? this.action : this.href,
 					target : target,
-					onsuccess : function(data) {
-						var version = $('input[type="hidden"].version', target);
-						version.val(parseInt(version.val() || '0') + 1);
+					onsuccess : function(data, xhr) {
+						var ver = xhr.getResponseHeader('X-Entity-Version');
+						if (ver)
+							$('input[type="hidden"].version', target).val(ver);
 					}
 				});
 		if (this.tagName == 'FORM') {

@@ -752,9 +752,19 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		BaseManager<Persistable<?>> entityManager = getEntityManager(getEntityClass());
+		String versionPropertyName = getVersionPropertyName();
+		int previousVersion = 0;
+		if (versionPropertyName != null) {
+			previousVersion = (Integer) bwp.getPropertyValue(versionPropertyName);
+		}
 		beforeSave((EN) _entity);
 		entityManager.save(_entity);
 		afterSave((EN) _entity);
+		if (versionPropertyName != null) {
+			int currentVersion = (Integer) bwp.getPropertyValue(versionPropertyName);
+			if (currentVersion != previousVersion)
+				ServletActionContext.getResponse().setIntHeader("X-Entity-Version", currentVersion);
+		}
 		addActionMessage(getText("save.success"));
 		return SUCCESS;
 	}
@@ -1002,7 +1012,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						propertyName = propertyName.substring(0, propertyName.indexOf('.'));
 					if (propertyName.indexOf('[') > 0)
 						propertyName = propertyName.substring(0, propertyName.indexOf('['));
-					if (propertyName.equals(versionPropertyName)) {
+					if (propertyName.equals(versionPropertyName)
+							&& StringUtils.isNotBlank(ServletActionContext.getRequest().getParameter(parameterName))) {
 						editedPropertyNames.add(propertyName);
 						continue;
 					}
