@@ -40450,217 +40450,191 @@ Observation.treeview = function(container) {
 							+ MessageBundle.get('ajax.loading') + '</div>');
 				var target = win.get(0);
 				target.onsuccess = function() {
-					$(target).data('listpick', current);
+					win.data('listpick', current);
 					if (typeof $.fn.mask != 'undefined')
 						win.unmask();
 					Dialog.adapt(win);
 					if (!options.multiple) {
-						$(target).on('click', 'tbody input[type=radio]',
-								function() {
-									var cell = $($(this).closest('tr')[0].cells[options.idindex]);
-									var id = options.idindex == 0 ? $(this)
-											.val() : cell.data('cellvalue')
-											|| cell.text();
-									cell = $($(this).closest('tr')[0].cells[options.nameindex]);
-									var name = cell.data('cellvalue')
-											|| cell.text();
-									if (options.name) {
-										var nametarget = find(options.name,
-												$(target).data('listpick'));
-										var viewlink = nametarget
-												.find('a.view[rel="richtable"]');
-										if (nametarget.is('td')
-												&& viewlink.length) {
-											var href = viewlink.attr('href');
-											viewlink
-													.attr(
-															'href',
-															href
-																	.substring(
-																			0,
-																			href
-																					.lastIndexOf('/')
-																					+ 1)
-																	+ id);
-											viewlink.text(name);
-										} else
-											val(options.name, $(target)
-															.data('listpick'),
-													name);
-										nametarget.each(function() {
-											var t = $(this);
-											if (!t.is(':input')
-													&& !t.find('a.remove').length)
-												$('<a class="remove" href="#">&times;</a>')
-														.appendTo(t)
-														.click(removeAction);
-										});
-									}
-									if (options.id) {
-										val(options.id, $(target)
-														.data('listpick'), id);
-										var idtarget = find(options.id,
-												$(target).data('listpick'));
-									}
-									if (options.mapping) {
-										for (var k in options.mapping) {
-											cell = $($(this).closest('tr')[0].cells[options.mapping[k]]);
-											val(k, $(target).data('listpick'),
-													cell.data('cellvalue')
-															|| cell.text());
-										}
-									}
-									win.dialog('close');
-									return false;
+						win.on('click', 'tbody input[type=radio]', function() {
+							var cell = $($(this).closest('tr')[0].cells[options.idindex]);
+							var id = options.idindex == 0
+									? $(this).val()
+									: cell.data('cellvalue') || cell.text();
+							cell = $($(this).closest('tr')[0].cells[options.nameindex]);
+							var name = cell.data('cellvalue') || cell.text();
+							if (options.name) {
+								var nametarget = find(options.name, win
+												.data('listpick'));
+								var viewlink = nametarget
+										.find('a.view[rel="richtable"]');
+								if (nametarget.is('td') && viewlink.length) {
+									var href = viewlink.attr('href');
+									viewlink.attr('href', href.substring(0,
+													href.lastIndexOf('/') + 1)
+													+ id);
+									viewlink.text(name);
+								} else
+									val(options.name, win.data('listpick'),
+											name);
+								nametarget.each(function() {
+									var t = $(this);
+									if (!t.is(':input')
+											&& !t.find('a.remove').length)
+										$('<a class="remove" href="#">&times;</a>')
+												.appendTo(t)
+												.click(removeAction);
 								});
+							}
+							if (options.id) {
+								val(options.id, win.data('listpick'), id);
+								var idtarget = find(options.id, win
+												.data('listpick'));
+							}
+							if (options.mapping) {
+								for (var k in options.mapping) {
+									cell = $($(this).closest('tr')[0].cells[options.mapping[k]]);
+									val(k, win.data('listpick'), cell
+													.data('cellvalue')
+													|| cell.text());
+								}
+							}
+							win.dialog('close');
+							return false;
+						});
 
 					} else {
-						$(target).on('click', 'button.pick',
-								function(evt, keepopen) {
-									var idSeparator = ',';
-									var nameSeparator = ', ';
-									var checked = {};
-									var uncheckedIds = [];
-									var uncheckedNames = [];
-									$(
-											'table.richtable tbody input[type="checkbox"]',
-											target).each(function() {
-										var cell = $($(this).closest('tr')[0].cells[options.idindex]);
-										var id = options.idindex == 0 ? $(this)
-												.val() : cell.data('cellvalue')
-												|| cell.text();
-										cell = $($(this).closest('tr')[0].cells[options.nameindex]);
-										var name = cell.data('cellvalue')
-												|| cell.text();
-										if (this.checked) {
-											checked[id] = name
-										} else {
-											uncheckedIds.push(id);
-											uncheckedNames.push(name);
-										};
-									});
-									var selectedIds = [];
-									if (options.id) {
-										var v = val(options.id, $(target)
+						win.on('click', 'button.pick', function(evt, keepopen) {
+							var idSeparator = ',';
+							var nameSeparator = ', ';
+							var checked = {};
+							var uncheckedIds = [];
+							var uncheckedNames = [];
+							$('table.richtable tbody input[type="checkbox"]',
+									target).each(function() {
+								var cell = $($(this).closest('tr')[0].cells[options.idindex]);
+								var id = options.idindex == 0
+										? $(this).val()
+										: cell.data('cellvalue') || cell.text();
+								cell = $($(this).closest('tr')[0].cells[options.nameindex]);
+								var name = cell.data('cellvalue')
+										|| cell.text();
+								if (this.checked) {
+									checked[id] = name
+								} else {
+									uncheckedIds.push(id);
+									uncheckedNames.push(name);
+								};
+							});
+							var selectedIds = [];
+							if (options.id) {
+								var v = win.data('selected')
+										|| val(options.id, win.data('listpick'));
+								if (v)
+									selectedIds = v.split(idSeparator);
+							}
+							var selectedNames = [];
+							if (options.name) {
+								var v = win.data('selectednames')
+										|| val(options.name, win
 														.data('listpick'));
-										if (v)
-											selectedIds = v.split(idSeparator);
-									}
-									var selectedNames = [];
-									if (options.name) {
-										var v = val(options.name, $(target)
-														.data('listpick'));
-										if (v)
-											selectedNames = v
-													.split(nameSeparator);
-										if (options.id) {
-											if (selectedNames.length)
-												$.each(uncheckedIds, function(
-																i, v) {
-															var index = selectedIds
-																	.indexOf(v);
-															if (index > -1) {
-																selectedIds
-																		.splice(
-																				index,
-																				1);
-																selectedNames
-																		.splice(
-																				index,
-																				1);
-															}
-														});
-											for (var key in checked) {
-												if (selectedIds.indexOf(key) < 0) {
-													selectedIds.push(key);
-													selectedNames
-															.push(checked[key]);
-												}
-											}
-										} else {
-											if (selectedNames.length)
-												$.each(uncheckedNames,
-														function(i, v) {
-															var index = uncheckedNames
-																	.indexOf(v);
-															if (index > -1)
-																selectedNames
-																		.splice(
-																				index,
-																				1);
-														});
-											for (var key in checked)
-												if (selectedNames
-														.indexOf(checked[key]) < 0)
-													selectedNames
-															.push(checked[key]);
-										}
-									}
-									if (options.id && !options.name) {
-										if (selectedIds.length)
-											$.each(uncheckedIds,
-													function(i, v) {
-														var index = selectedIds
-																.indexOf(v);
-														if (index > -1)
-															selectedIds.splice(
-																	index, 1);
-													});
-										for (var key in checked)
-											if (selectedIds.indexOf(key) < 0)
-												selectedIds.push(key);
-									}
-									if (options.id) {
-										find(options.id,
-												$(target).data('listpick'))
-												.each(function() {
-													var t = $(this);
-													val(
-															options.id,
-															$(target)
-																	.data('listpick'),
-															selectedIds
-																	.join(idSeparator));
-												});
-
-									}
-									if (options.name) {
-										find(options.name,
-												$(target).data('listpick'))
-												.each(function() {
-													var t = $(this);
-													if (selectedNames.length) {
-														val(
-																options.name,
-																$(target)
-																		.data('listpick'),
-																selectedNames
-																		.join(nameSeparator));
-														if (!t.is(':input')
-																&& !t
-																		.find('.remove').length)
-															$('<a class="remove" href="#">&times;</a>')
-																	.appendTo(t)
-																	.click(removeAction);
-													} else {
-														if (!t.is(':input')) {
-															t.find('.remove')
-																	.click();
-														} else {
-															t.val('');
-														}
+								if (v)
+									selectedNames = v.split(nameSeparator);
+								if (options.id) {
+									if (selectedNames.length)
+										$.each(uncheckedIds, function(i, v) {
+													var index = selectedIds
+															.indexOf(v);
+													if (index > -1) {
+														selectedIds.splice(
+																index, 1);
+														selectedNames.splice(
+																index, 1);
 													}
 												});
+									for (var key in checked) {
+										if (selectedIds.indexOf(key) < 0) {
+											selectedIds.push(key);
+											selectedNames.push(checked[key]);
+										}
 									}
-									if (keepopen) {
-										win.data('selected', val(options.id,
-														current)
-														|| '');
-									} else {
-										win.dialog('close');
-									}
-									return false;
-								});
+								} else {
+									if (selectedNames.length)
+										$.each(uncheckedNames, function(i, v) {
+													var index = uncheckedNames
+															.indexOf(v);
+													if (index > -1)
+														selectedNames.splice(
+																index, 1);
+												});
+									for (var key in checked)
+										if (selectedNames.indexOf(checked[key]) < 0)
+											selectedNames.push(checked[key]);
+								}
+							}
+							if (options.id && !options.name) {
+								if (selectedIds.length)
+									$.each(uncheckedIds, function(i, v) {
+												var index = selectedIds
+														.indexOf(v);
+												if (index > -1)
+													selectedIds
+															.splice(index, 1);
+											});
+								for (var key in checked)
+									if (selectedIds.indexOf(key) < 0)
+										selectedIds.push(key);
+							}
+							if (options.id) {
+								if (keepopen)
+									win.data('selected', selectedIds
+													.join(idSeparator));
+								else
+									find(options.id, win.data('listpick'))
+											.each(function() {
+												var t = $(this);
+												val(
+														options.id,
+														win.data('listpick'),
+														selectedIds
+																.join(idSeparator));
+											});
+
+							}
+							if (options.name) {
+								if (keepopen)
+									win.data('selectednames', selectedNames
+													.join(nameSeparator));
+								else
+									find(options.name, win.data('listpick'))
+											.each(function() {
+												var t = $(this);
+												if (selectedNames.length) {
+													val(
+															options.name,
+															win
+																	.data('listpick'),
+															selectedNames
+																	.join(nameSeparator));
+													if (!t.is(':input')
+															&& !t
+																	.find('.remove').length)
+														$('<a class="remove" href="#">&times;</a>')
+																.appendTo(t)
+																.click(removeAction);
+												} else {
+													if (!t.is(':input')) {
+														t.find('.remove')
+																.click();
+													} else {
+														t.val('');
+													}
+												}
+											});
+							}
+							if (!keepopen)
+								win.dialog('close');
+							return false;
+						});
 					}
 				};
 				var url = options.url;
