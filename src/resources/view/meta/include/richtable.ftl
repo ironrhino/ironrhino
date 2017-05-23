@@ -461,12 +461,12 @@ ${formFooter!}
 		<#local label=getText(label)>
 		<#local group=getText(config.group)>
 		<#local description=getText(config.description)>
-		<#local id='search-'+(config.id?has_content)?then(config.id,(entityName!)+'-'+key)/>
+		<#local id='query-'+(config.id?has_content)?then(config.id,(entityName!)+'-'+key)/>
 		<#local dynamicAttributes=mergeDynAttrs(config)/>
 		<#local disabled=parameterNamesInQueryString?seq_contains(key)>
 		<#if !config.excludedFromQuery>
 		<#if config.collectionType??>
-			<@s.hidden name=key+'-op' value="CONTAINS"/>
+			<@s.hidden id="" name=key+'-op' value="CONTAINS"/>
 		</#if>
 		<#if config.type=='checkbox'>
 			<@s.checkbox disabled=disabled id=id label=label name=key checked=('true'==(Parameters[key]!)) class=config.cssClass?replace('required','')+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
@@ -495,14 +495,18 @@ ${formFooter!}
 			<#if !disabled && config.queryMatchMode?? && config.propertyType.simpleName='String' && 'EXACT'!=(config.queryMatchMode.name())!>
 			<@s.param name='after'>
 			<#local opname=config.queryMatchMode.name()>
-			<@s.hidden name=key+'-op' value=(opname=='ANYWHERE')?then('INCLUDE',opname)/>
+			<@s.hidden id="" name=key+'-op' value=(opname=='ANYWHERE')?then('INCLUDE',opname)/>
+			</@s.param>
+			<#elseif disabled && (Parameters[key+'-op']!)=='BETWEEN'>
+			<@s.param name='after'>
+			- <@s.textfield theme="simple" disabled=true name=key value=(request.parameterMap[key][1]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
 			</@s.param>
 			</#if>
 			</@s.textfield>
 		</#if>
 		</#if>
 	</#list>
-	<@s.submit value=getText('search') class="btn-primary">
+	<@s.submit value=getText('query') class="btn-primary">
 		<@s.param name="after"> <input type="reset" class="btn" value="${getText('reset')}"></@s.param>
 	</@s.submit>
 </form>
