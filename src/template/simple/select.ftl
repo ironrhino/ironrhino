@@ -49,11 +49,8 @@
 <#include "/${parameters.templateDir}/${parameters.expandTheme}/dynamic-attributes.ftl" />
 >
 <#if parameters.headerKey?? && parameters.headerValue??>
-    <option value="${parameters.headerKey?html}"
-    <#if tag.contains(parameters.nameValue, parameters.headerKey) || tag.contains(parameters.nameValue, parameters.headerValue)>
-    selected="selected"
-    </#if>
-    >${parameters.headerValue?html}</option>
+    <option value="${parameters.headerKey?html}"<#rt/>
+    <#if tag.contains(parameters.nameValue, parameters.headerKey) || tag.contains(parameters.nameValue, parameters.headerValue)> selected="selected"<#rt/></#if>>${parameters.headerValue?html}</option>
 </#if>
 <#if parameters.emptyOption!false>
     <option value=""></option>
