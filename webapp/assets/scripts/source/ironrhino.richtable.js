@@ -1042,3 +1042,17 @@ Observation._richtable = function(container) {
 				});
 	}
 };
+Observation.richtable = function(container) {
+	var qf = $('form.query[data-replacement]', container);
+	if (qf.find('[class^="row"]').length > 1) {
+		$('<div class="more"><span><i class="glyphicon glyphicon-chevron-up"></i></span></div>')
+				.insertBefore(qf.find('.form-actions')).find('span').click(
+						function(e) {
+							$(e.target).closest('span').find('i')
+									.toggleClass('glyphicon-chevron-up')
+									.toggleClass('glyphicon-chevron-down')
+									.closest('form')
+									.find('[class^="row"]:gt(0)').toggle();
+						}).click();
+	}
+};

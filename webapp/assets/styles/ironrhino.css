@@ -9955,6 +9955,33 @@ table.ordering tfoot {
 	display: none;
 }
 
+form.query div.more {
+	text-align: center;
+	border-top: 1px solid #ddd;
+	transition: border-color .15s ease-in-out;
+}
+
+form.query div.more span {
+	display: inline-block;
+	margin-top: -1px;
+	padding: 0 40px;
+	color: #ddd;
+	border: 1px solid #ddd;
+	border-top-color: #fff;
+	cursor: pointer;
+	transition: border-color .15s ease-in-out;
+}
+
+form.query div.more:hover {
+	border-top-color: #888;
+}
+
+form.query div.more:hover span {
+	color: #888;
+	border-color: #888;
+	border-top-color: #fff;
+}
+
 th.filtercolumn li.selecton {
 	color: green;
 	font-weight: bold;
