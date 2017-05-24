@@ -103,13 +103,21 @@ table.ordering tfoot {
 	display: none;
 }
 
-form.query div.more {
+form.query div.form-actions {
+	padding-left: 20px;
+	text-align: center;
+	border-top: 0;
+	background-color: transparent;
+}
+
+form.query div.fold {
 	text-align: center;
 	border-top: 1px solid #ddd;
+	margin-bottom: -20px;
 	transition: border-color .15s ease-in-out;
 }
 
-form.query div.more span {
+form.query div.fold span {
 	display: inline-block;
 	margin-top: -1px;
 	padding: 0 40px;
@@ -120,11 +128,11 @@ form.query div.more span {
 	transition: border-color .15s ease-in-out;
 }
 
-form.query div.more:hover {
+form.query div.fold:hover {
 	border-top-color: #888;
 }
 
-form.query div.more:hover span {
+form.query div.fold:hover span {
 	color: #888;
 	border-color: #888;
 	border-top-color: #fff;

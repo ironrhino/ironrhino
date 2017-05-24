@@ -100,13 +100,17 @@ Richtable = {
 				var inputforms = $('#' + winid + ' form.ajax');
 				inputforms.each(function() {
 					var inputform = $(this);
-					$(':input:visible', inputform).filter(function(i) {
-						return $(this).attr('name')
-								&& !($(this).val() || $(this).hasClass('date')
-										|| $(this).hasClass('datetime')
-										|| $(this).hasClass('time') || $(this)
-										.prop('tagName') == 'BUTTON');
-					}).eq(0).focus();
+					if (!$(	'input[type="hidden"][name="'
+									+ Richtable.getEntityName(form) + '.id"]',
+							inputform).length)
+						$(':input:visible', inputform).filter(function(i) {
+							return $(this).attr('name')
+									&& !($(this).val()
+											|| $(this).hasClass('date')
+											|| $(this).hasClass('datetime')
+											|| $(this).hasClass('time') || $(this)
+											.prop('tagName') == 'BUTTON');
+						}).eq(0).focus();
 					if (!inputform.hasClass('keepopen')
 							&& !inputform.hasClass('richtable')) {
 						$(':input[name]', inputform).change(function(e) {
@@ -1043,16 +1047,22 @@ Observation._richtable = function(container) {
 	}
 };
 Observation.richtable = function(container) {
-	var qf = $('form.query[data-replacement]', container);
-	if (qf.find('[class^="row"]').length > 1) {
-		$('<div class="more"><span><i class="glyphicon glyphicon-chevron-up"></i></span></div>')
-				.insertBefore(qf.find('.form-actions')).find('span').click(
-						function(e) {
-							$(e.target).closest('span').find('i')
-									.toggleClass('glyphicon-chevron-up')
-									.toggleClass('glyphicon-chevron-down')
-									.closest('form')
-									.find('[class^="row"]:gt(0)').toggle();
-						}).click();
-	}
+	var f = $('form.query[data-replacement]', container);
+	var tabs = f.find('.tab-pane');
+	if (!tabs.length)
+		tabs = f;
+	tabs.each(function() {
+		var tab = $(this);
+		if (tab.find('[class^="row"]').length > 1) {
+			$('<div class="fold"><span><i class="glyphicon glyphicon-chevron-up"></i></span></div>')
+					.insertAfter(tab.find('[class^="row"]:last')).find('span')
+					.click(function(e) {
+						$(e.target).closest('span').find('i')
+								.toggleClass('glyphicon-chevron-up')
+								.toggleClass('glyphicon-chevron-down');
+						tab.find('[class^="row"]:gt(0)').toggle();
+					}).click();
+		}
+	});
+
 };
