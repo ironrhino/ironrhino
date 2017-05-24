@@ -75,8 +75,9 @@
 					if (data.indexOf('[') == 0 || data.indexOf('{') == 0)
 						data = $.parseJSON(data);
 					if (typeof options['success'] != 'undefined')
-						options['success'](data, xhr);
-					Ajax.handleResponse(data, options);
+						options['success'](data, xhr.statusText, xhr);
+					if (!options.beforeSerialize)
+						Ajax.handleResponse(data, options, xhr);
 				} else if (xhr.status == 0) {
 					progress ? progress.remove() : ProgressBar.hide();
 					Indicator.showError(MessageBundle.get('file.too.large'));
