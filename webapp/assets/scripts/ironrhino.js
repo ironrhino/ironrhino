@@ -38974,21 +38974,21 @@ Initialization.richtable = function() {
 						var f = $(this).closest('form').next('form.criteria');
 						var qf = $(this).closest('form').prev('form.query');
 						if (f.is(':visible')) {
-							f.slideUp();
+							f.hide();
 							qf.slideDown(100, function() {
 										$('html,body').animate({
 													scrollTop : qf.offset().top
 															- 50
-												}, 300);
+												}, 100);
 									});
 						} else {
 							f.slideDown(100, function() {
 										$('html,body').animate({
 													scrollTop : f.offset().top
 															- 50
-												}, 300);
+												}, 100);
 									});
-							qf.slideUp();
+							qf.hide();
 						}
 					}).on('click', '.richtable .more', function(event) {
 				var form = $(event.target).closest('form');
@@ -39247,7 +39247,7 @@ Observation._richtable = function(container) {
 			form.prev('form.query').slideDown(100, function() {
 						$('html,body').animate({
 									scrollTop : form.offset().top - 50
-								}, 300);
+								}, 100);
 					});
 			var b;
 			$(':input[name]', t).each(function() {
