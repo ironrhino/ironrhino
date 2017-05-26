@@ -44,7 +44,7 @@ public class Authorization extends BaseEntity {
 	private String accessToken = CodecUtils.nextId();
 
 	@Column(length = 32)
-	@UiConfig(template = "<#if value?has_content><a href=\"<@url value='/oauth/client/view/${value}'/>\" rel=\"richtable\">${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('oauthManager').findClientById(value)}</a></#if>")
+	@UiConfig(template = "<#if value?has_content><a href=\"<@url value='/oauth/client/view/${value}'/>\" rel=\"richtable\">${beans['oauthManager'].findClientById(value)}</a></#if>")
 	private String client;
 
 	private String grantor;

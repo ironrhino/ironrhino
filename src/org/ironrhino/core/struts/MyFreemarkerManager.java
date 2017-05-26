@@ -65,6 +65,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 
 	public static final String KEY_BASE = "base";
 	public static final String KEY_STATICS = "statics";
+	public static final String KEY_ENUMS = "enums";
 	public static final String KEY_CONSTANTS = "constants";
 	public static final String KEY_BEANS = "beans";
 	public static final String KEY_PROPERTIES = "properties";
@@ -108,6 +109,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		Map<String, Object> globalVariables = new HashMap<>(8);
 		globalVariables.putAll(templateProvider.getAllSharedVariables());
 		globalVariables.put(KEY_STATICS, DEFAULT_BEANS_WRAPPER.getStaticModels());
+		globalVariables.put(KEY_ENUMS, DEFAULT_BEANS_WRAPPER.getEnumModels());
 		globalVariables.put(KEY_CONSTANTS, new ConstantsTemplateHashModel());
 		globalVariables.put(KEY_BEANS, new BeansTemplateHashModel());
 		globalVariables.put(KEY_PROPERTIES, new PropertiesTemplateHashModel());
