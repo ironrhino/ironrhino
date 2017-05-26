@@ -11,7 +11,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
@@ -74,9 +73,6 @@ public class Page extends BaseRecordableEntity implements Ordered<Page> {
 
 	@SearchableProperty(index = Index.NOT_ANALYZED)
 	private Set<String> tags = new LinkedHashSet<>(0);
-
-	@Version
-	private int version = -1;
 
 	public String getHead() {
 		return head;
@@ -141,14 +137,6 @@ public class Page extends BaseRecordableEntity implements Ordered<Page> {
 
 	public void setTags(Set<String> tags) {
 		this.tags = tags;
-	}
-
-	public int getVersion() {
-		return version;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
 	}
 
 	public String abbreviate(int size) {

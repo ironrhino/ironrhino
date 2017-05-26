@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -47,6 +48,9 @@ public class BaseRecordableEntity extends BaseEntity {
 	@UpdateUser
 	protected String modifyUser;
 
+	@Version
+	private int version;
+
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -77,6 +81,14 @@ public class BaseRecordableEntity extends BaseEntity {
 
 	public void setModifyUser(String modifyUser) {
 		this.modifyUser = modifyUser;
+	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
 	}
 
 }

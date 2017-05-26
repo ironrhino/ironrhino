@@ -3,7 +3,6 @@ package org.ironrhino.common.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.common.record.RecordAware;
@@ -50,9 +49,6 @@ public class Setting extends BaseRecordableEntity {
 
 	@UiConfig(hidden = true)
 	private boolean hidden;
-
-	@Version
-	private int version = -1;
 
 	public Setting() {
 
@@ -101,14 +97,6 @@ public class Setting extends BaseRecordableEntity {
 
 	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
-	}
-
-	public int getVersion() {
-		return version;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
 	}
 
 }

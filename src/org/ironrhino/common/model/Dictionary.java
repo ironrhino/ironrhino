@@ -12,7 +12,6 @@ import javax.persistence.Entity;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
@@ -24,7 +23,7 @@ import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.model.BaseEntity;
+import org.ironrhino.core.model.BaseRecordableEntity;
 import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
@@ -39,7 +38,7 @@ import org.ironrhino.core.struts.ValidationException;
 @Entity
 @Table(name = "common_dictionary")
 @Richtable(searchable = true, order = "name asc", exportable = true, importable = true)
-public class Dictionary extends BaseEntity {
+public class Dictionary extends BaseRecordableEntity {
 
 	private static final long serialVersionUID = -8352037604261222984L;
 
@@ -60,9 +59,6 @@ public class Dictionary extends BaseEntity {
 	@SearchableComponent
 	@UiConfig(hiddenInList = @Hidden(true), excludedFromCriteria = true)
 	private List<LabelValue> items = new ArrayList<>();
-
-	@Version
-	private int version = -1;
 
 	public String getName() {
 		return name;
@@ -86,14 +82,6 @@ public class Dictionary extends BaseEntity {
 
 	public void setItems(List<LabelValue> items) {
 		this.items = items;
-	}
-
-	public int getVersion() {
-		return version;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
 	}
 
 	@UiConfig(hidden = true)

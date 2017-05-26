@@ -21,7 +21,6 @@ import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -102,9 +101,6 @@ public class Customer extends BaseRecordableEntity {
 	@OrderColumn(name = "lineNumber", nullable = false)
 	@Fetch(FetchMode.SUBSELECT)
 	private List<CustomerAddress> addresses;
-
-	@Version
-	private int version = -1;
 
 	public String getName() {
 		return name;
@@ -208,14 +204,6 @@ public class Customer extends BaseRecordableEntity {
 
 	public void setAddresses(List<CustomerAddress> addresses) {
 		this.addresses = addresses;
-	}
-
-	public int getVersion() {
-		return version;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
 	}
 
 	@UiConfig(hiddenInList = @Hidden(true), displayOrder = 97)

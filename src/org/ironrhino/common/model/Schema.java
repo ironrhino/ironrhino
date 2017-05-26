@@ -12,7 +12,6 @@ import javax.persistence.Entity;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
@@ -23,7 +22,7 @@ import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.model.BaseEntity;
+import org.ironrhino.core.model.BaseRecordableEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
@@ -36,7 +35,7 @@ import org.ironrhino.core.struts.ValidationException;
 @Entity
 @Table(name = "common_schema")
 @Richtable(searchable = true, order = "name asc", exportable = true, importable = true)
-public class Schema extends BaseEntity {
+public class Schema extends BaseRecordableEntity {
 
 	private static final long serialVersionUID = -8352037604269012984L;
 
@@ -60,9 +59,6 @@ public class Schema extends BaseEntity {
 	@SearchableComponent
 	@UiConfig(hiddenInList = @Hidden(true), excludedFromCriteria = true)
 	private List<SchemaField> fields = new ArrayList<>();
-
-	@Version
-	private int version = -1;
 
 	public Schema() {
 
@@ -98,14 +94,6 @@ public class Schema extends BaseEntity {
 
 	public void setFields(List<SchemaField> fields) {
 		this.fields = fields;
-	}
-
-	public int getVersion() {
-		return version;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
 	}
 
 	public Schema merge(Schema other) {
