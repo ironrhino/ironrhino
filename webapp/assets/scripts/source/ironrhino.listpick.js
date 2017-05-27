@@ -1,14 +1,13 @@
 (function($) {
-	var current;
 	function find(expr, container) {
 		if (!container || expr.indexOf('#') > -1)
 			container = document;
 		var i = expr.indexOf('@');
 		if (i == 0)
-			return current;
+			return $(container);
 		else if (i > 0)
 			expr = expr.substring(0, i);
-		return (expr == 'this') ? current : $(expr, container);
+		return (expr == 'this') ? $(container) : $(expr, container);
 	}
 	function val(expr, container, val) {// expr #id #id@attr .class@attr
 		// @attr
@@ -19,7 +18,7 @@
 		if (arguments.length > 2) {
 			var i = expr.indexOf('@');
 			if (i < 0) {
-				var ele = expr == 'this' ? current : $(expr, container);
+				var ele = expr == 'this' ? $(container) : $(expr, container);
 				ele.each(function() {
 							var t = $(this);
 							if (t.is(':input')) {
@@ -34,10 +33,11 @@
 							}
 						});
 			} else if (i == 0) {
-				current.attr(expr.substring(i + 1), val);
+				$(container).attr(expr.substring(i + 1), val);
 			} else {
 				var selector = expr.substring(0, i);
-				var ele = selector == 'this' ? current : $(selector, container);
+				var ele = selector == 'this' ? $(container) : $(selector,
+						container);
 				if (ele.parents('.richtable').length
 						&& ele.prop('tagName') == 'TD'
 						&& expr.indexOf('data-cellvalue') > -1)
@@ -48,7 +48,7 @@
 		} else {
 			var i = expr.indexOf('@');
 			if (i < 0) {
-				var ele = expr == 'this' ? current : $(expr, container);
+				var ele = expr == 'this' ? $(container) : $(expr, container);
 				if (ele.is(':input'))
 					return ele.val();
 				else
@@ -56,10 +56,11 @@
 								return this.nodeType == 3;
 							}).text();
 			} else if (i == 0) {
-				return current.attr(expr.substring(i + 1));
+				return $(container).attr(expr.substring(i + 1));
 			} else {
 				var selector = expr.substring(0, i);
-				var ele = selector == 'this' ? current : $(selector, container);
+				var ele = selector == 'this' ? $(container) : $(selector,
+						container);
 				return ele.attr(expr.substring(i + 1));
 			}
 		}
@@ -83,7 +84,7 @@
 	}
 	$.fn.listpick = function() {
 		$(this).each(function() {
-			current = $(this);
+			var current = $(this);
 			var options = {
 				id : '.listpick-id',
 				name : '.listpick-name',
