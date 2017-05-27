@@ -310,7 +310,7 @@ ${totalResults}<span class="recordLabel"> ${getText('record')}</span>
 <#local downloadUrl+=downloadUrl?contains('?')?then('&','?')+name+'='+value?url>
 </#if>
 </#list>
-<a target="_blank" download="data.csv" href="${downloadUrl}" style="padding-top:2px;"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
+<a target="_blank" download="data.csv" href="${downloadUrl}" style="color:#666;padding-top:2px;"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
 </#if>
 </div>
 </div>
