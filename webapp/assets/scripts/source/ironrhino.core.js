@@ -657,6 +657,11 @@ Form = {
 		var t = $(target);
 		if (t.parent('.input-append,.input-prepend').length)
 			t = t.parent();
+		if (t.is('[type="hidden"]')) {
+			var cg = t.parent('.control-group');
+			if (cg.length)
+				return cg;
+		}
 		return t.parent('.controls').parent('.control-group');
 	}
 };
