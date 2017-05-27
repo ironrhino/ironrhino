@@ -8686,18 +8686,16 @@ ul.attributes li.group ul {
 }
 
 a.remove {
-	font-size: 16px;
 	font-weight: bold;
-	color: #000000;
-	text-shadow: 0 1px 0 #ffffff;
+	color: #000;
+    margin-left: 5px;
+    cursor: pointer;
 	opacity: 0.2;
 	filter: alpha(opacity=20);
 }
 
-a.remove:hover {
-	color: #000000;
+a.remove:hover, a.remove:focus {
 	text-decoration: none;
-	cursor: pointer;
 	opacity: 0.4;
 	filter: alpha(opacity=40);
 }
@@ -8709,11 +8707,6 @@ a.remove:hover {
 .treeselect .controls span , .listpick .controls span {
 	display: inline-block;
 	margin: 5px 0;
-}
-
-.treeselect .controls span a.remove , .listpick .controls span a.remove {
-	font-size: 13px;
-	margin-left: 5px;
 }
 
 .loading {
