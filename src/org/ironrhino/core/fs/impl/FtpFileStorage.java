@@ -163,6 +163,7 @@ public class FtpFileStorage implements FileStorage {
 			execute(ftpClient -> {
 				String realPath = getRealPath(path, ftpClient);
 				String workingDirectory = ftpClient.printWorkingDirectory();
+				workingDirectory = org.ironrhino.core.util.StringUtils.trimTailSlash(workingDirectory);
 				String relativePath = realPath.substring(workingDirectory.length() + 1);
 				String[] arr = relativePath.split("/");
 				StringBuilder sb = new StringBuilder(workingDirectory);
