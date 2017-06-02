@@ -31,6 +31,11 @@ public class Identity implements Serializable {
 		}
 	}
 
+	public Identity(String identityType, String identityNo) {
+		this.identityType = identityType;
+		this.identityNo = identityNo;
+	}
+
 	public String getIdentityType() {
 		return identityType;
 	}

@@ -9,15 +9,20 @@ import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.Hidden;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.AbstractEntity;
 
-@AutoConfig
+@AutoConfig(fileupload = Person.FILE_MIME_TYPE)
 @Entity
 @Table(name = "sample_person")
+@Richtable(order = "id.identityNo asc", bottomButtons = "<@btn class='upload' data\\-accept='" + Person.FILE_MIME_TYPE
+		+ "' label='import'/> <@btn view='input' label='create'/> <@btn action='save'/> <@btn action='delete'/> <@btn class='reload'/> <@btn class='filter'/>")
 public class Person extends AbstractEntity<Identity> {
 
 	private static final long serialVersionUID = -8352037604261222984L;
+
+	static final String FILE_MIME_TYPE = "text/csv";
 
 	@EmbeddedId
 	@UiConfig(alias = "identity")
