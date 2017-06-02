@@ -473,7 +473,7 @@ public class EntityClassHelper {
 							if (min != null)
 								uci.getInternalDynamicAttributes().put("min", min.value());
 							DecimalMax max = findAnnotation(readMethod, declaredField, DecimalMax.class);
-							if (min != null)
+							if (max != null)
 								uci.getInternalDynamicAttributes().put("max", max.value());
 							if (StringUtils.isBlank(uci.getTemplate())) {
 								StringBuilder template = new StringBuilder(scale + 40);
