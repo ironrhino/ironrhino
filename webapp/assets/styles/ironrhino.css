@@ -8979,10 +8979,11 @@ input.latlng {
 	width: 180px ! important;
 }
 
- .error input.required:not(:disabled), input.required:focus {
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAAUUlEQVR42mNgGHzgPwNDFxCr/mNg+AekVUB8fIp5/zIwTIYqngzi41QMVHQGqPgNkP4Ppc/gM1kDqKgCZDKIBvI1cSoGKtgJteEflL+DPqEFAKYgJItbm6p6AAAAAElFTkSuQmCC);
-	background-repeat: no-repeat;
+ .error input.required:not(:disabled), input.required:focus, input.required:hover:not(:disabled) {
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6' viewBox='0 0 1000 1000'><path d='M990,430l-408.7,16.4L818.7,80L689.1,10L500,395L311.5,10L181.3,80l237.3,366.4L10,430v140l405.9-22L188.6,920L311,990l189-385l189,385l122.4-70L584.1,548L990,570L990,430z' fill='red'/></svg>");
 	background-position: right;
+	background-position: calc(100% - 2px);
+	background-repeat: no-repeat;
 }
 
 textarea {
