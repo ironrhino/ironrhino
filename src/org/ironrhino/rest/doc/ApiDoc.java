@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.rest.doc.annotation.Status;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -221,6 +223,8 @@ public class ApiDoc implements Serializable {
 			Annotation[][] apiDocParameterAnnotations = apiDocMethod.getParameterAnnotations();
 			Annotation[][] array = method.getParameterAnnotations();
 			for (int i = 0; i < parameterTypes.length; i++) {
+				String parameterName = parameterNames[i];
+				Class<?> parameterType = parameterTypes[i];
 				Annotation[] apiDocAnnotations = apiDocParameterAnnotations[i];
 				Annotation[] annotations = array[i];
 				Field fd = null;
@@ -237,11 +241,16 @@ public class ApiDoc implements Serializable {
 						requestFields = (Fields) anno;
 					}
 				}
+				boolean bindAnnotationPresent = false;
 				for (int j = 0; j < annotations.length; j++) {
 					Annotation anno = annotations[j];
+					if (anno.annotationType().getPackage().equals(RequestBody.class.getPackage())
+							|| anno.annotationType().isAnnotationPresent(Qualifier.class))
+						// @RequestBody @LoggedInUser ...
+						bindAnnotationPresent = true;
 					if (anno instanceof RequestBody) {
 						requestBodyRequired = ((RequestBody) anno).required();
-						Class<?> requestBodyClass = parameterTypes[i];
+						Class<?> requestBodyClass = parameterType;
 						if (Collection.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "collection";
 						} else if (ResultPage.class.isAssignableFrom(requestBodyClass)) {
@@ -268,30 +277,39 @@ public class ApiDoc implements Serializable {
 					}
 					if (anno instanceof PathVariable) {
 						PathVariable ann = (PathVariable) anno;
-						pathVariables.add(FieldObject.create(
-								StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterNames[i],
-								parameterTypes[i], true, null, fd));
+						pathVariables.add(
+								FieldObject.create(StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterName,
+										parameterType, true, null, fd));
 					}
 					if (anno instanceof RequestParam) {
 						RequestParam ann = (RequestParam) anno;
-						if (!Map.class.isAssignableFrom(parameterTypes[i]))
+						if (!Map.class.isAssignableFrom(parameterType))
 							requestParams.add(FieldObject.create(
-									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterNames[i],
-									parameterTypes[i], ann.required(), ann.defaultValue(), fd));
+									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterName, parameterType,
+									ann.required(), ann.defaultValue(), fd));
 					}
 					if (anno instanceof RequestHeader) {
 						RequestHeader ann = (RequestHeader) anno;
-						if (!Map.class.isAssignableFrom(parameterTypes[i]))
+						if (!Map.class.isAssignableFrom(parameterType))
 							requestHeaders.add(FieldObject.create(
-									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterNames[i],
-									parameterTypes[i], ann.required(), ann.defaultValue(), fd));
+									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterName, parameterType,
+									ann.required(), ann.defaultValue(), fd));
 					}
 					if (anno instanceof CookieValue) {
 						CookieValue ann = (CookieValue) anno;
-						if (!Map.class.isAssignableFrom(parameterTypes[i]))
+						if (!Map.class.isAssignableFrom(parameterType))
 							cookieValues.add(FieldObject.create(
-									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterNames[i],
-									parameterTypes[i], ann.required(), ann.defaultValue(), fd));
+									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterName, parameterType,
+									ann.required(), ann.defaultValue(), fd));
+					}
+				}
+				if (!bindAnnotationPresent && Arrays.asList(methods).contains("GET")) {
+					// bind object not @RequestParam
+					String paramPackageName = parameterType.getPackage().getName();
+					if (!paramPackageName.startsWith("java.") && !paramPackageName.startsWith("javax.")
+							&& !paramPackageName.startsWith("org.springframework.")
+							&& Serializable.class.isAssignableFrom(parameterType)) {
+						requestParams.addAll(FieldObject.createList(parameterType, requestFields, true));
 					}
 				}
 			}
