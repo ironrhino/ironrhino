@@ -863,16 +863,17 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					}
 					return false;
 				}
-				for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet())
-					if (entry.getValue().isUnique() && StringUtils.isNotBlank(
-							ServletActionContext.getRequest().getParameter(getEntityName() + '.' + entry.getKey()))) {
-						persisted = entityManager.findOne(entry.getKey(),
-								(Serializable) bw.getPropertyValue(entry.getKey()));
-						if (persisted != null) {
-							addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
-							return false;
-						}
+			}
+			for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
+				if (entry.getValue().isUnique() && StringUtils.isNotBlank(
+						ServletActionContext.getRequest().getParameter(getEntityName() + '.' + entry.getKey()))) {
+					persisted = entityManager.findOne(entry.getKey(),
+							(Serializable) bw.getPropertyValue(entry.getKey()));
+					if (persisted != null) {
+						addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
+						return false;
 					}
+				}
 			}
 			try {
 				Persistable temp = _entity;
@@ -961,22 +962,21 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					}
 					return false;
 				}
-
-				for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet())
-					if (entry.getValue().isUnique() && StringUtils.isNotBlank(
-							ServletActionContext.getRequest().getParameter(getEntityName() + '.' + entry.getKey()))) {
-						persisted = entityManager.findOne(entry.getKey(),
-								(Serializable) bw.getPropertyValue(entry.getKey()));
-						entityManager.evict(persisted);
-						if (persisted != null && !persisted.getId().equals(_entity.getId())) {
-							addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
-							return false;
-						}
+			}
+			for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
+				if (entry.getValue().isUnique() && StringUtils.isNotBlank(
+						ServletActionContext.getRequest().getParameter(getEntityName() + '.' + entry.getKey()))) {
+					persisted = entityManager.findOne(entry.getKey(),
+							(Serializable) bw.getPropertyValue(entry.getKey()));
+					entityManager.evict(persisted);
+					if (persisted != null && !persisted.getId().equals(_entity.getId())) {
+						addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
+						return false;
 					}
-
-				if (persisted != null && !persisted.getId().equals(_entity.getId())) {
-					persisted = null;
 				}
+			}
+			if (persisted != null && !persisted.getId().equals(_entity.getId())) {
+				persisted = null;
 			}
 			try {
 				if (persisted == null) {

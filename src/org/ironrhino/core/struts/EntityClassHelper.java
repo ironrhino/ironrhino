@@ -267,8 +267,10 @@ public class EntityClassHelper {
 					if (column != null) {
 						if (column.length() != 255 && uci.getMaxlength() == 0)
 							uci.setMaxlength(column.length());
-						if (column.unique())
+						if (column.unique()) {
 							uci.setUnique(true);
+							uci.addCssClass("checkavailable");
+						}
 						if (!column.updatable() && !column.insertable()) {
 							HiddenImpl hi = uci.getHiddenInInput();
 							if (hi == null || hi.isDefaultOptions()) {
