@@ -1363,21 +1363,40 @@ Observation.common = function(container) {
 		$$('.custom[type="file"]', container).each(function() {
 			var t = $(this);
 			t.hide().change(function() {
-						var names = [];
-						for (var i = 0; i < this.files.length; i++)
-							names.push(this.files[i].name);
-						var filename = names.join(', ');
-						var fp = t.next('.filepick');
-						if (filename) {
-							fp.find('.file-holder').text(filename);
-							fp.find('.remove').show();
-							fp.find('.filepick-handle').hide();
+				var names = [];
+				for (var i = 0; i < this.files.length; i++) {
+					var f = this.files[i];
+					var size = f.size;
+					size = size / 1024;
+					size = Math.round(size * 100) / 100;
+					if (size >= 1024) {
+						size = size / 1024;
+						size = Math.round(size * 100) / 100;
+						if (size >= 1024) {
+							size = size / 1024;
+							size = Math.round(size * 100) / 100;
+							size = size + ' GB';
 						} else {
-							fp.find('.file-holder').text('');
-							fp.find('.remove').hide();
-							fp.find('.filepick-handle').show();
+							size = size + ' MB';
 						}
-					});
+					} else {
+						size = size + ' KB';
+					}
+					names.push('<i class="tiped" title="' + size + '">'
+							+ f.name + '</i>');
+				}
+				var files = names.join(', ');
+				var fp = t.next('.filepick');
+				if (files) {
+					_observe(fp.find('.file-holder').html(files));
+					fp.find('.remove').show();
+					fp.find('.filepick-handle').hide();
+				} else {
+					fp.find('.file-holder').text('');
+					fp.find('.remove').hide();
+					fp.find('.filepick-handle').show();
+				}
+			});
 			var fp = $('<div class="filepick"><span class="file-holder"></span><a class="remove" href="#" style="display:none;">&times;</a><span class="filepick-handle glyphicon glyphicon-list"></span></div>')
 					.insertAfter(t);
 			fp.find('.filepick-handle').click(function() {
@@ -1555,35 +1574,18 @@ Observation.common = function(container) {
 			href.find('span').css('vertical-align', 'top');
 	});
 	$$('.tiped', container).each(function() {
-		var t = $(this);
-		var options = {
-			html : true,
-			trigger : t.data('trigger') || 'hover',
-			placement : t.data('placement') || 'top'
-		};
-		if (!t.attr('title') && t.data('tipurl'))
-			t.attr('title', MessageBundle.get('ajax.loading'));
-		t.on(options.trigger == 'hover' ? 'mouseenter' : options.trigger,
-				function() {
-					if (!t.hasClass('_tiped')) {
-						t.addClass('_tiped');
-						$.ajax({
-									url : t.data('tipurl'),
-									global : false,
-									dataType : 'html',
-									success : function(data) {
-										t.attr('data-original-title', data);
-										t.tooltip(options).tooltip('show');
-									}
-								});
-					}
-				});
-		if (t.is(':input')) {
-			options.trigger = 'focus';
-			options.placement = 'right';
-		}
-		t.tooltip(options);
-	});
+				var t = $(this);
+				var options = {
+					html : true,
+					trigger : t.data('trigger') || t.is(':input')
+							? 'focus'
+							: 'hover',
+					placement : t.data('placement') || t.is(':input')
+							? 'right'
+							: 'top'
+				};
+				t.tooltip(options);
+			});
 	$$('.poped', container).each(function() {
 		var t = $(this);
 		var options = {
