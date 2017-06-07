@@ -90,6 +90,13 @@ MessageBundle = {
 	get : function() {
 		var key = arguments[0];
 		var lang = MessageBundle.lang();
+		if (!MessageBundle[lang]) {
+			var i = lang.indexOf('_');
+			if (i > 0)
+				lang = lang.substring(0, i);
+			if (!MessageBundle[lang])
+				lang = 'en';
+		}
 		var msg = MessageBundle[lang][key];
 		if (typeof(msg) == 'undefined')
 			msg = key;
@@ -105,13 +112,6 @@ MessageBundle = {
 		if (i > 0)
 			lang = lang.substring(0, i) + '_'
 					+ lang.substring(i + 1).toUpperCase();
-		if (!MessageBundle[lang]) {
-			var i = lang.indexOf('_');
-			if (i > 0)
-				lang = lang.substring(0, i);
-			if (!MessageBundle[lang])
-				lang = 'en';
-		}
 		return lang;
 	},
 	shortLang : function() {
