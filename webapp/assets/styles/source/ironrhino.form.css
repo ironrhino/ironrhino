@@ -87,6 +87,16 @@ div.form-horizontal .controls , .controls.text {
 	padding: 10px 20px 10px;
 }
 
+.form-horizontal .controls .filepick{
+	padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.filepick .filepick-handle{
+	cursor: pointer;
+	margin-right: 5px;
+}
+
 .hero-unit .form-horizontal {
 	font-size: 13px;
 	font-weight: normal;

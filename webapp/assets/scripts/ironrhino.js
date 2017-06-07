@@ -32558,7 +32558,8 @@ Message = {
 							"opacity" : 0.8
 						});
 			} else if (field.is('[type="hidden"]')) {
-				var fp = field.parent('.listpick,.treeselect');
+				var selector = '.listpick,.treeselect';
+				var fp = field.parent(selector);
 				if (fp.length && !fp.is('.control-group')) {
 					cgroup.length ? cgroup.removeClass('error') : field
 							.removeClass('error');
@@ -32569,13 +32570,17 @@ Message = {
 					$('<span class="field-error">' + msg + '</span>')
 							.appendTo($('.controls', cgroup));
 				} else {
-					if (field.next('.listpick,.treeselect').length) {
+					if (field.next(selector).length) {
 						$('<span class="field-error">' + msg + '</span>')
 								.insertAfter(field.next());
 					} else {
 						Message.showActionError(msg);
 					}
 				}
+			} else if (field.is('.custom[type="file"]')) {
+				$('<span class="field-error">' + msg + '</span>')
+						.insertAfter(field.next('.filepick')
+								.find('.filepick-handle'));
 			} else
 				Message.showActionError(msg);
 		} else
@@ -32641,16 +32646,16 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.sqleditor,.chzn-done'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
-					if (t.prop('tagName') == 'SELECT'
-							|| t.is('[type="hidden"]'))
-						Message.showFieldError(target, null,
-								'selection.required');
-					else
-						Message.showFieldError(target, null, 'required');
+					Message.showFieldError(target, null,
+							t.prop('tagName') == 'SELECT'
+									|| t.is('[type="hidden"]')
+									|| t.is('.custom[type="file"]')
+									? 'selection.required'
+									: 'required');
 					if (inhiddenpanel)
 						$('a[href="#' + t.closest('.tab-pane').attr('id')
 								+ '"]').tab('show');
@@ -33495,7 +33500,7 @@ Observation.common = function(container) {
 					}
 				}
 			});
-	if (MODERN_BROWSER)
+	if (MODERN_BROWSER) {
 		$$('input[type="checkbox"].custom,input[type="radio"].custom',
 				container).each(function(i) {
 			$(this).hide();
@@ -33509,6 +33514,36 @@ Observation.common = function(container) {
 			else
 				label.attr('for', this.id);
 		});
+		$$('.custom[type="file"]', container).each(function() {
+			var t = $(this);
+			t.hide().change(function() {
+						var names = [];
+						for (var i = 0; i < this.files.length; i++)
+							names.push(this.files[i].name);
+						var filename = names.join(', ');
+						var fp = t.next('.filepick');
+						if (filename) {
+							fp.find('.file-holder').text(filename);
+							fp.find('.remove').show();
+							fp.find('.filepick-handle').hide();
+						} else {
+							fp.find('.file-holder').text('');
+							fp.find('.remove').hide();
+							fp.find('.filepick-handle').show();
+						}
+					});
+			var fp = $('<div class="filepick"><span class="file-holder"></span><a class="remove" href="#" style="display:none;">&times;</a><span class="filepick-handle glyphicon glyphicon-list"></span></div>')
+					.insertAfter(t);
+			fp.find('.filepick-handle').click(function() {
+						t.click();
+						return false;
+					});
+			fp.find('a.remove').click(function() {
+						t.val(null).trigger('change');
+						return false;
+					});
+		});
+	}
 	$$('.linkage_switch', container).each(function() {
 		var c = $(this).closest('.linkage');
 		c.data('originalclass', c.attr('class'));

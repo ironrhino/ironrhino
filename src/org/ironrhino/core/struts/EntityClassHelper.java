@@ -543,6 +543,7 @@ public class EntityClassHelper {
 						uci.setType("checkbox");
 					} else if (returnType == File.class) {
 						uci.setInputType("file");
+						uci.addCssClass("custom");
 						AutoConfig ac = entityClass.getAnnotation(AutoConfig.class);
 						if (ac != null) {
 							String fu = ac.fileupload();
