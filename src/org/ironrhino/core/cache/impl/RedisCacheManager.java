@@ -93,9 +93,9 @@ public class RedisCacheManager implements CacheManager {
 		if (key == null)
 			return null;
 		String actualKey = generateKey(key, namespace);
-		if (timeToIdle > 0)
-			redisTemplate.expire(actualKey, timeToIdle, timeUnit);
 		try {
+			if (timeToIdle > 0)
+				redisTemplate.expire(actualKey, timeToIdle, timeUnit);
 			return redisTemplate.opsForValue().get(actualKey);
 		} catch (SerializationFailedException e) {
 			logger.warn(e.getMessage(), e);
