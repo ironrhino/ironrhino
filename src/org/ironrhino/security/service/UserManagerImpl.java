@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Order(0)
 public class UserManagerImpl extends BaseManagerImpl<User> implements UserManager {
 
-	public static final String DEFAULT_CACHE_NAMESPACE = "user";
+	private static final String CACHE_NAMESPACE = "user";
 
 	@Autowired(required = false)
 	private List<UserRoleMapper> userRoleMappers;
@@ -39,41 +39,31 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 	@Value("${user.password.expiresInDays:0}")
 	private int passwordExpiresInDays;
 
-	@Value("${userManager.cacheNamespace:" + DEFAULT_CACHE_NAMESPACE + "}")
-	private String cacheNamespace = DEFAULT_CACHE_NAMESPACE;
-
-	public String getCacheNamespace() {
-		return cacheNamespace;
-	}
-
 	@Override
 	@Transactional
-	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
-			+ ".cacheNamespace}", key = "${[user.username,user.email]}")
+	@EvictCache(namespace = CACHE_NAMESPACE, key = "${[user.username,user.email]}")
 	public void delete(User user) {
 		super.delete(user);
 	}
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
-			+ ".cacheNamespace}", key = "${[user.username,user.email]}")
+	@EvictCache(namespace = CACHE_NAMESPACE, key = "${[user.username,user.email]}")
 	public void save(User user) {
 		super.save(user);
 	}
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
-			+ ".cacheNamespace}", key = "${[user.username,user.email]}")
+	@EvictCache(namespace = CACHE_NAMESPACE, key = "${[user.username,user.email]}")
 	public void update(User user) {
 		super.update(user);
 	}
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS + ".cacheNamespace}", key = "${key = [];foreach (user : "
-			+ AopContext.CONTEXT_KEY_RETVAL + ") { key.add(user.username); key.add(user.email);} return key;}")
+	@EvictCache(namespace = CACHE_NAMESPACE, key = "${key = [];foreach (user : " + AopContext.CONTEXT_KEY_RETVAL
+			+ ") { key.add(user.username); key.add(user.email);} return key;}")
 	public List<User> delete(Serializable... id) {
 		return super.delete(id);
 	}
@@ -85,8 +75,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 
 	@Override
 	@Transactional(readOnly = true)
-	@CheckCache(namespace = "${" + AopContext.CONTEXT_KEY_THIS
-			+ ".cacheNamespace}", key = "${username}", cacheNull = true)
+	@CheckCache(namespace = CACHE_NAMESPACE, key = "${username}", cacheNull = true)
 	public UserDetails loadUserByUsername(String username) {
 		if (StringUtils.isBlank(username))
 			return null;
