@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -78,6 +79,8 @@ public class JsonUtils {
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		objectMapper.setTimeZone(TimeZone.getDefault());
+		objectMapper.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
+				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
 		objectMapper.registerModule(new SimpleModule().addDeserializer(Date.class, new JsonDeserializer<Date>() {
 			@Override
 			public Date deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
@@ -95,13 +98,6 @@ public class JsonUtils {
 				if (d == null)
 					throw new RuntimeException(date + " is not valid date");
 				return d;
-			}
-		}).addDeserializer(GrantedAuthority.class, new JsonDeserializer<SimpleGrantedAuthority>() {
-			@Override
-			public SimpleGrantedAuthority deserialize(JsonParser jsonParser,
-					DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-				JsonNode node = jsonParser.readValueAsTree();
-				return new SimpleGrantedAuthority(node.get("authority").textValue());
 			}
 		}));
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)

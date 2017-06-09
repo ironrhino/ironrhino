@@ -19,18 +19,14 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonHttpInvokerSerializationHelper {
@@ -40,16 +36,9 @@ public class JsonHttpInvokerSerializationHelper {
 	private static ObjectMapper objectMapper = new ObjectMapper()
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).registerModule(new SimpleModule()
-					.addDeserializer(GrantedAuthority.class, new JsonDeserializer<SimpleGrantedAuthority>() {
-						@Override
-						public SimpleGrantedAuthority deserialize(JsonParser jsonParser,
-								DeserializationContext deserializationContext)
-								throws IOException, JsonProcessingException {
-							JsonNode node = jsonParser.readValueAsTree();
-							return new SimpleGrantedAuthority(node.get("authority").textValue());
-						}
-					}));
+			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+			.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
+			.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
 
 	public static void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
 		GenericRemoteInvocation invocation = (GenericRemoteInvocation) remoteInvocation;
