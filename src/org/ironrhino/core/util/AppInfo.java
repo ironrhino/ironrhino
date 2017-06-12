@@ -362,10 +362,12 @@ public class AppInfo {
 		System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
 		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
 			System.setProperty("AsyncLogger.RingBufferSize", "16384");
-		System.setProperty("hibernate.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
-		System.setProperty("console.logger.level", AppInfo.getStage() == Stage.PRODUCTION
-				&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))
-						? "ERROR" : "INFO");
+		if (System.getProperty("hibernate.logger.level") == null)
+			System.setProperty("hibernate.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
+		if (System.getProperty("console.logger.level") == null)
+			System.setProperty("console.logger.level", AppInfo.getStage() == Stage.PRODUCTION
+					&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))
+							? "ERROR" : "INFO");
 		String kafkaBootstrapServers = getRawApplicationContextProperties().getProperty("kafka.bootstrap.servers");
 		if (StringUtils.isNotBlank(kafkaBootstrapServers))
 			System.setProperty("kafka.bootstrap.servers", kafkaBootstrapServers);
