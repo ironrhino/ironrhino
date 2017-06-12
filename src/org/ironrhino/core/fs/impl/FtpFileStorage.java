@@ -73,6 +73,9 @@ public class FtpFileStorage implements FileStorage {
 	@Value("${ftp.pool.maxWaitMillis:60000}")
 	protected int maxWaitMillis;
 
+	@Value("${ftp.pool.minEvictableIdleTimeMillis:300000}")
+	protected int minEvictableIdleTimeMillis;
+
 	private ObjectPool<FTPClient> pool;
 
 	@PostConstruct
@@ -147,6 +150,8 @@ public class FtpFileStorage implements FileStorage {
 		poolConfig.setMaxIdle(maxIdle);
 		poolConfig.setMinIdle(minIdle);
 		poolConfig.setMaxWaitMillis(maxWaitMillis);
+		poolConfig.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+		poolConfig.setSoftMinEvictableIdleTimeMillis(poolConfig.getMinEvictableIdleTimeMillis());
 		poolConfig.setLifo(false);
 		poolConfig.setTestOnBorrow(true);
 		pool = new GenericObjectPool<FTPClient>(factory, poolConfig);
