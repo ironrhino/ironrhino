@@ -492,15 +492,24 @@ ${formFooter!}
 			</div>
 		<#elseif config.type=='input'>
 			<@s.textfield disabled=disabled id=id label=label name=key value=(Parameters[key]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes>
-			<#if !disabled && config.queryMatchMode?? && config.propertyType.simpleName='String' && 'EXACT'!=(config.queryMatchMode.name())!>
-			<@s.param name='after'>
-			<#local opname=config.queryMatchMode.name()>
-			<@s.hidden id="" name=key+'-op' value=(opname=='ANYWHERE')?then('INCLUDE',opname)/>
-			</@s.param>
-			<#elseif disabled && (Parameters[key+'-op']!)=='BETWEEN'>
-			<@s.param name='after'>
-			- <@s.textfield theme="simple" disabled=true name=key value=(request.parameterMap[key][1]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
-			</@s.param>
+			<#if !disabled>
+				<#if config.queryMatchMode?? && config.propertyType.simpleName=='String' && 'EXACT'!=(config.queryMatchMode.name())!>
+				<@s.param name='after'>
+				<#local opname=config.queryMatchMode.name()>
+				<@s.hidden id="" name=key+'-op' value=(opname=='ANYWHERE')?then('INCLUDE',opname)/>
+				</@s.param>
+				<#elseif config.queryWithRange>
+				<@s.param name='after'>
+				<@s.hidden id="" name=key+'-op' value='BETWEEN'/>
+				- <@s.textfield theme="simple" id=""label=label name=key value=(Parameters[key]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
+				</@s.param>
+				</#if>
+			<#else>
+				<#if (Parameters[key+'-op']!)=='BETWEEN'>
+				<@s.param name='after'>
+				- <@s.textfield theme="simple" disabled=true name=key value=(request.parameterMap[key][1]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
+				</@s.param>
+				</#if>
 			</#if>
 			</@s.textfield>
 		</#if>

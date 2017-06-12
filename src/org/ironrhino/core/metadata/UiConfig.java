@@ -109,4 +109,6 @@ public @interface UiConfig {
 
 	MatchMode queryMatchMode() default MatchMode.ANYWHERE;
 
+	boolean queryWithRange() default false;
+
 }

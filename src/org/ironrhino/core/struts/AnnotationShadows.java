@@ -2,11 +2,13 @@ package org.ironrhino.core.struts;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.MatchMode;
 import org.ironrhino.core.metadata.Hidden;
@@ -72,6 +74,7 @@ public class AnnotationShadows {
 		private boolean suppressViewLink;
 		private boolean showSum;
 		private MatchMode queryMatchMode = MatchMode.ANYWHERE;
+		private boolean queryWithRange;
 
 		public UiConfigImpl() {
 		}
@@ -136,10 +139,13 @@ public class AnnotationShadows {
 			this.searchable = config.searchable();
 			this.suppressViewLink = config.suppressViewLink();
 			if (config.showSum())
-				this.showSum = Number.class.isAssignableFrom(propertyType) || propertyType == short.class
-						|| propertyType == int.class || propertyType == long.class || propertyType == float.class
-						|| propertyType == double.class;
+				this.showSum = Number.class.isAssignableFrom(propertyType)
+						|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(propertyType));
 			this.queryMatchMode = config.queryMatchMode();
+			if (Number.class.isAssignableFrom(propertyType)
+					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(propertyType))
+					|| Date.class.isAssignableFrom(propertyType))
+				this.queryWithRange = config.queryWithRange();
 		}
 
 		public boolean isExcludedFromLike() {
@@ -574,6 +580,14 @@ public class AnnotationShadows {
 
 		public void setQueryMatchMode(MatchMode queryMatchMode) {
 			this.queryMatchMode = queryMatchMode;
+		}
+
+		public boolean isQueryWithRange() {
+			return queryWithRange;
+		}
+
+		public void setQueryWithRange(boolean queryWithRange) {
+			this.queryWithRange = queryWithRange;
 		}
 
 		public boolean isReference() {
