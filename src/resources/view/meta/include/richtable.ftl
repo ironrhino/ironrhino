@@ -464,20 +464,21 @@ ${formFooter!}
 		<#local id='query-'+(config.id?has_content)?then(config.id,(entityName!)+'-'+key)/>
 		<#local dynamicAttributes=mergeDynAttrs(config)/>
 		<#local disabled=parameterNamesInQueryString?seq_contains(key)>
+		<#local cssClass=config.cssClass?replace('required','')>
 		<#if !config.excludedFromQuery>
 		<#if config.collectionType??>
 			<@s.hidden id="" name=key+'-op' value="CONTAINS"/>
 		</#if>
 		<#if config.type=='checkbox'>
-			<@s.checkbox disabled=disabled id=id label=label name=key checked=('true'==(Parameters[key]!)) class=config.cssClass?replace('required','')+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
+			<@s.checkbox disabled=disabled id=id label=label name=key checked=('true'==(Parameters[key]!)) class=cssClass+cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
 		<#elseif config.type=='enum'>
-			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='select'>
-			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif (config.type=='listpick' || config.type=='treeselect') && !disabled>
 			<div id="control-group-${id}" class="control-group ${config.type}" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
 				<#local _name=key+"${config.singleReference?then('.id','')}">
-				<@s.hidden id=id name=_name class=config.type+"-id ${config.cssClass?replace('required','')}" dynamicAttributes=dynamicAttributes/>
+				<@s.hidden id=id name=_name class=config.type+"-id ${cssClass}" dynamicAttributes=dynamicAttributes/>
 				<@controlLabel label=label description=description/>
 				<div class="controls">
 				<span class="${config.type}-name"></span>
@@ -487,11 +488,12 @@ ${formFooter!}
 			<@controlGroup id=id group=group/>
 			<@controlLabel label=label description=description for=id/>
 			<div class="controls">
-				<@selectDictionary disabled=disabled id=id dictionaryName=templateName name=key value=(Parameters[key]!) class=config.cssClass?replace('required','') dynamicAttributes=dynamicAttributes/>
+				<@selectDictionary disabled=disabled id=id dictionaryName=templateName name=key value=(Parameters[key]!) class=cssClass dynamicAttributes=dynamicAttributes/>
 			</div>
 			</div>
 		<#elseif config.type=='input'>
-			<@s.textfield disabled=disabled id=id label=label name=key value=(Parameters[key]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes>
+			<#if !disabled && config.queryWithRange><#local cssClass+=' not-ignore-blank'/></#if>
+			<@s.textfield disabled=disabled id=id label=label name=key value=(Parameters[key]!) type=config.inputType class=cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes>
 			<#if !disabled>
 				<#if config.queryMatchMode?? && config.propertyType.simpleName=='String' && 'EXACT'!=(config.queryMatchMode.name())!>
 				<@s.param name='after'>
@@ -501,13 +503,13 @@ ${formFooter!}
 				<#elseif config.queryWithRange>
 				<@s.param name='after'>
 				<@s.hidden id="" name=key+'-op' value='BETWEEN'/>
-				- <@s.textfield theme="simple" id=""label=label name=key value=(Parameters[key]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
+				- <@s.textfield theme="simple" id=""label=label name=key value=(Parameters[key]!) type=config.inputType class=cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
 				</@s.param>
 				</#if>
 			<#else>
 				<#if (Parameters[key+'-op']!)=='BETWEEN'>
 				<@s.param name='after'>
-				- <@s.textfield theme="simple" disabled=true name=key value=(request.parameterMap[key][1]!) type=config.inputType class=config.cssClass?replace('required','') maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
+				- <@s.textfield theme="simple" disabled=true name=key value=(request.parameterMap[key][1]!) type=config.inputType class=cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
 				</@s.param>
 				</#if>
 			</#if>

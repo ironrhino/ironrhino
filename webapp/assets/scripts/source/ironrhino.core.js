@@ -38,8 +38,9 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		// override jquery.form.js
 		$.fn.oldFieldValue = $.fn.fieldValue;
 		$.fn.fieldValue = function(successful) {
-			if ((this.hasClass('ignore-blank') || this.closest('form')
-					.hasClass('ignore-blank'))
+			if ((this.hasClass('ignore-blank') || !this
+					.hasClass('not-ignore-blank')
+					&& this.closest('form').hasClass('ignore-blank'))
 					&& !$.trim(this.val()))
 				return null;
 			var val = this.oldFieldValue(successful);
@@ -56,8 +57,8 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 		$.oldFieldValue = $.fieldValue;
 		$.fieldValue = function(el, successful) {
 			var t = $(el);
-			if ((t.hasClass('ignore-blank') || t.closest('form')
-					.hasClass('ignore-blank'))
+			if ((t.hasClass('ignore-blank') || !t.hasClass('not-ignore-blank')
+					&& t.closest('form').hasClass('ignore-blank'))
 					&& !$.trim(t.val()))
 				return null;
 			var val = $.oldFieldValue(el, successful);

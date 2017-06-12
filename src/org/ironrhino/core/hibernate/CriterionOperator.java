@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.persistence.Embeddable;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
@@ -21,10 +22,10 @@ public enum CriterionOperator implements Displayable {
 	EQ(1) {
 		@Override
 		boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz == Boolean.class || clazz == String.class
-					|| Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz)
-					|| Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
+			return clazz == Boolean.class || clazz == String.class || Number.class.isAssignableFrom(clazz)
+					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(clazz))
+					|| Date.class.isAssignableFrom(clazz) || Persistable.class.isAssignableFrom(clazz)
+					|| clazz.isEnum();
 		}
 
 		@Override
@@ -172,8 +173,8 @@ public enum CriterionOperator implements Displayable {
 	LT(1) {
 		@Override
 		boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz == String.class || Number.class.isAssignableFrom(clazz)
+			return clazz == String.class || Number.class.isAssignableFrom(clazz)
+					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(clazz))
 					|| Date.class.isAssignableFrom(clazz);
 		}
 
@@ -226,8 +227,8 @@ public enum CriterionOperator implements Displayable {
 	BETWEEN(2) {
 		@Override
 		boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz == String.class || Number.class.isAssignableFrom(clazz)
+			return clazz == String.class || Number.class.isAssignableFrom(clazz)
+					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(clazz))
 					|| Date.class.isAssignableFrom(clazz);
 		}
 
@@ -381,10 +382,13 @@ public enum CriterionOperator implements Displayable {
 		} else {
 			if (size > 0 && values.length != size)
 				return false;
+			boolean allBlank = true;
 			for (String s : values)
-				if (StringUtils.isBlank(s))
-					return false;
-			return true;
+				if (StringUtils.isNotBlank(s)) {
+					allBlank = false;
+					break;
+				}
+			return !allBlank;
 		}
 	}
 
