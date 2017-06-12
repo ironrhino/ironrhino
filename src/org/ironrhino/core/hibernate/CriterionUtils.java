@@ -209,8 +209,12 @@ public class CriterionUtils {
 					} catch (IllegalArgumentException e) {
 
 					}
-				if (operator == null)
-					operator = CriterionOperator.EQ;
+				if (operator == null) {
+					if (parameterValues.length == 1 && StringUtils.isEmpty(parameterValues[0]))
+						continue;
+					else
+						operator = CriterionOperator.EQ;
+				}
 				if (parameterValues.length < operator.getParametersSize())
 					continue;
 				if (propertyName.indexOf('.') > 0) {
@@ -359,7 +363,7 @@ public class CriterionUtils {
 							}
 							if (config.isInverseRelation()) {
 								// @OneToOne
-								Criterion criterion = Restrictions.eq("id",p.getId());
+								Criterion criterion = Restrictions.eq("id", p.getId());
 								dc.add(criterion);
 								state.getCriteria().add(propertyName);
 								continue;
