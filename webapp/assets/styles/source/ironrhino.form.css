@@ -235,7 +235,7 @@ span.checkboxgroup {
 	height: 10px;
 }
 
-.control-group.error .glyphicon , span.field-error {
+.control-group.error .glyphicon, .control-group.error .controls span, .control-group.error .controls a.remove, span.field-error {
 	color: #b94a48;
 }
 

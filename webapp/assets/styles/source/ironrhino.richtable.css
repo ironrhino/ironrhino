@@ -103,22 +103,34 @@ table.ordering tfoot {
 	display: none;
 }
 
+form.query {
+	margin-bottom: 10px;
+}
+
 form.query div.form-actions {
-	padding-left: 20px;
+	padding: 0;
 	text-align: center;
 	border-top: 0;
 	background-color: transparent;
+	margin-top: 0;
+	margin-bottom: 10px;
 }
 
 form.query div.fold {
 	text-align: center;
 	border-top: 1px solid #ddd;
-	margin-bottom: -20px;
+	margin-bottom: -25px;
 	transition: border-color .15s ease-in-out;
+}
+
+form.query div.fold ~ div.form-actions {
+	text-align: right;
 }
 
 form.query div.fold span {
 	display: inline-block;
+	height: 30px;
+	line-height: 30px;
 	margin-top: -1px;
 	padding: 0 40px;
 	color: #ddd;
