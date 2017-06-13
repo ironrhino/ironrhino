@@ -3,6 +3,7 @@ package org.ironrhino.core.spring.configuration;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +23,12 @@ import redis.clients.jedis.JedisPoolConfig;
 @ClassPresentConditional("org.springframework.data.redis.connection.RedisConnectionFactory")
 public class GlobalRedisConfiguration {
 
-	@Value("${global.redis.host:localhost}")
+	// alias for hostName
+	@Value("${global.redis.host:}")
 	private String host;
+
+	@Value("${global.redis.hostName:localhost}")
+	private String hostName;
 
 	@Value("${global.redis.port:6379}")
 	private int port;
@@ -72,7 +77,9 @@ public class GlobalRedisConfiguration {
 					: new JedisConnectionFactory(redisClusterConfiguration);
 		} else {
 			jedisConnectionFactory = usePool ? new JedisConnectionFactory(poolConfig) : new JedisConnectionFactory();
-			jedisConnectionFactory.setHostName(host);
+			if (StringUtils.isNotBlank(host))
+				hostName = host;
+			jedisConnectionFactory.setHostName(hostName);
 			jedisConnectionFactory.setPort(port);
 		}
 		jedisConnectionFactory.setUsePool(usePool);
@@ -96,7 +103,7 @@ public class GlobalRedisConfiguration {
 		template.setConnectionFactory(globalRedisConnectionFactory());
 		return template;
 	}
-	
+
 	@Bean
 	public RedisMessageListenerContainer globalRedisMessageListenerContainer(ExecutorService executorService) {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();

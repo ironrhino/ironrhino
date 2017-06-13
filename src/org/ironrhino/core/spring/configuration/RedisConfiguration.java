@@ -7,6 +7,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +29,12 @@ import redis.clients.jedis.JedisPoolConfig;
 @ClassPresentConditional("org.springframework.data.redis.connection.RedisConnectionFactory")
 public class RedisConfiguration {
 
-	@Value("${redis.host:localhost}")
+	// alias for hostName
+	@Value("${redis.host:}")
 	private String host;
+
+	@Value("${redis.hostName:localhost}")
+	private String hostName;
 
 	@Value("${redis.port:6379}")
 	private int port;
@@ -79,7 +84,9 @@ public class RedisConfiguration {
 					: new JedisConnectionFactory(redisClusterConfiguration);
 		} else {
 			jedisConnectionFactory = usePool ? new JedisConnectionFactory(poolConfig) : new JedisConnectionFactory();
-			jedisConnectionFactory.setHostName(host);
+			if (StringUtils.isNotBlank(host))
+				hostName = host;
+			jedisConnectionFactory.setHostName(hostName);
 			jedisConnectionFactory.setPort(port);
 		}
 		jedisConnectionFactory.setUsePool(usePool);
