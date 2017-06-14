@@ -8485,7 +8485,7 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	min-width: 80px;
 	float: right;
 	font-weight: bold;
-	padding: 0px 2px;
+	padding: 0 10px 0 2px;
 	background: #FFEF7A;
 	margin-left: -60px;
 	border-radius: 0px 0px 5px 5px;
