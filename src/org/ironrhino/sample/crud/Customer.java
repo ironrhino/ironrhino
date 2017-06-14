@@ -1,11 +1,13 @@
 package org.ironrhino.sample.crud;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.AttributeConverter;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.Converter;
@@ -26,6 +28,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.common.model.Gender;
+import org.ironrhino.core.hibernate.convert.EnumArrayConverter;
 import org.ironrhino.core.hibernate.convert.EnumSetConverter;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
@@ -72,7 +75,7 @@ public class Customer extends BaseRecordableEntity {
 	private CustomerRank rank = CustomerRank.BRONZE;
 
 	@UiConfig(hiddenInList = @Hidden(true), description = "potentialRanks.description")
-	private Set<CustomerRank> potentialRanks;
+	private CustomerRank[] potentialRanks;
 
 	@UiConfig(width = "80px", template = "${value?string('#,###.00')}", showSum = true, description = "balance.description")
 	@Column(nullable = false)
@@ -82,7 +85,7 @@ public class Customer extends BaseRecordableEntity {
 	private Set<String> tags;
 
 	@UiConfig(type = "treeselect", width = "200px", description = "activeRegions.description", pickUrl = "/common/region/children", template = "<#if value?has_content><#list value as id>${beans['regionTreeControl'].tree.getDescendantOrSelfById(id).name}<#sep> </#list></#if>")
-	private Set<Long> activeRegions;
+	private Long[] activeRegions;
 
 	@SearchableComponent(nestSearchableProperties = "name")
 	@UiConfig(width = "150px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true", description = "company.description")
@@ -150,11 +153,11 @@ public class Customer extends BaseRecordableEntity {
 		this.rank = rank;
 	}
 
-	public Set<CustomerRank> getPotentialRanks() {
+	public CustomerRank[] getPotentialRanks() {
 		return potentialRanks;
 	}
 
-	public void setPotentialRanks(Set<CustomerRank> potentialRanks) {
+	public void setPotentialRanks(CustomerRank[] potentialRanks) {
 		this.potentialRanks = potentialRanks;
 	}
 
@@ -174,11 +177,11 @@ public class Customer extends BaseRecordableEntity {
 		this.tags = tags;
 	}
 
-	public Set<Long> getActiveRegions() {
+	public Long[] getActiveRegions() {
 		return activeRegions;
 	}
 
-	public void setActiveRegions(Set<Long> activeRegions) {
+	public void setActiveRegions(Long[] activeRegions) {
 		this.activeRegions = activeRegions;
 	}
 
@@ -235,7 +238,7 @@ public class Customer extends BaseRecordableEntity {
 		if (potentialCategories != null && potentialCategories.contains(this.category)) {
 			ve.addFieldError("customer.potentialCategories", "不能包含当前分类");
 		}
-		if (potentialRanks != null && potentialRanks.contains(this.rank)) {
+		if (potentialRanks != null && Arrays.asList(potentialRanks).contains(this.rank)) {
 			ve.addFieldError("customer.potentialRanks", "不能包含当前等级");
 		}
 		if (balance != null && balance.doubleValue() > 100000) {
@@ -247,6 +250,11 @@ public class Customer extends BaseRecordableEntity {
 
 	@Converter(autoApply = true)
 	public static class CustomerRankSetConverter extends EnumSetConverter<CustomerRank> {
+
+	}
+	
+	@Converter(autoApply = true)
+	public static class CustomerRankArrayConverter extends EnumArrayConverter<CustomerRank> implements AttributeConverter<CustomerRank[], String>{
 
 	}
 }

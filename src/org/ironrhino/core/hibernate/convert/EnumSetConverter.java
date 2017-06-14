@@ -12,7 +12,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 
 public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeConverter<Set<T>, String> {
 
-	public static final String SEPARATOR = ",";
+	public static final String SEPARATOR = AbstractCollectionConverter.SEPARATOR;
 
 	private Class<T> enumType;
 
