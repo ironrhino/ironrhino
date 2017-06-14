@@ -37,8 +37,15 @@ public abstract class SimpleCondition<T extends Annotation> implements Condition
 	}
 
 	public boolean matches(AnnotatedTypeMetadata metadata) {
-		T annotation = AnnotationUtils.getAnnotation(metadata, annotationClass);
-		return annotation == null || matches(annotation);
+		T[] annotations = AnnotationUtils.getAnnotationsByType(metadata, annotationClass);
+		boolean matched = true;
+		for (T annotation : annotations) {
+			if (!matches(annotation)) {
+				matched = false;
+				break;
+			}
+		}
+		return matched;
 	}
 
 	public abstract boolean matches(T annotation);
