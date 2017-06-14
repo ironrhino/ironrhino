@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,15 @@ import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.junit.Test;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+import org.springframework.core.type.classreading.MetadataReader;
+import org.springframework.core.type.classreading.MetadataReaderFactory;
 
 public class AnnotationUtilsTest {
 
@@ -166,6 +175,18 @@ public class AnnotationUtilsTest {
 	@Test
 	public void testGetAnnotation() {
 		assertTrue(AnnotationUtils.getAnnotation(User.class, UiConfig.class, "getNames").hidden());
+	}
+	
+	@Test
+	public void testGetAnnotationsByType() throws IOException {
+		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+		MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
+		Resource resource = resourcePatternResolver
+				.getResource("org/ironrhino/core/spring/configuration/RedisConfiguration.class");
+		MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
+		AnnotatedTypeMetadata metadata = metadataReader.getAnnotationMetadata();
+		assertEquals(1,AnnotationUtils.getAnnotationsByType(metadata, ClassPresentConditional.class).length);
+		assertEquals(0,AnnotationUtils.getAnnotationsByType(metadata, UiConfig.class).length);
 	}
 
 }

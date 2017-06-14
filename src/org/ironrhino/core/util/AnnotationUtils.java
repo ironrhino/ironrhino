@@ -3,6 +3,8 @@ package org.ironrhino.core.util;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Repeatable;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -212,6 +214,34 @@ public class AnnotationUtils {
 			return null;
 		return org.springframework.core.annotation.AnnotationUtils.synthesizeAnnotation(attributes, annotationClass,
 				null);
+	}
+
+	public static <T extends Annotation> T[] getAnnotationsByType(AnnotatedTypeMetadata metadata,
+			Class<T> annotationClass) {
+		if (metadata.isAnnotated(annotationClass.getName())) {
+			T[] array = (T[]) Array.newInstance(annotationClass, 1);
+			array[0] = getAnnotation(metadata, annotationClass);
+			return array;
+		} else {
+			Class<? extends Annotation> annotationContainer = getAnnotationContainer(annotationClass);
+			if (annotationContainer != null) {
+				Annotation anno = getAnnotation(metadata, annotationContainer);
+				if (anno != null)
+					try {
+						return (T[]) annotationContainer.getMethod("value").invoke(anno);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+			}
+		}
+		return (T[]) Array.newInstance(annotationClass, 0);
+	}
+
+	public static Class<? extends Annotation> getAnnotationContainer(Class<?> annotationClass) {
+		Repeatable r = annotationClass.getAnnotation(Repeatable.class);
+		if (r == null)
+			return null;
+		return r.value();
 	}
 
 }
