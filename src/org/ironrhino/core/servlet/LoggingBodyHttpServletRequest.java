@@ -8,6 +8,9 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.JsonDesensitizer;
 import org.slf4j.Logger;
 
 public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
@@ -64,7 +67,10 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 							String encoding = getCharacterEncoding();
 							if (encoding == null)
 								encoding = "UTF-8";
-							logger.info("\n{}", new String(bytes, 0, bytes.length, encoding));
+							String str = new String(bytes, 0, bytes.length, encoding);
+							if (AppInfo.getStage() != Stage.DEVELOPMENT)
+								str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
+							logger.info("\n{}", str);
 						}
 
 					};

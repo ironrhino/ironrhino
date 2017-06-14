@@ -8,6 +8,9 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.JsonDesensitizer;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
@@ -67,7 +70,10 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 									encoding = "UTF-8";
 								MDC.remove("method");
 								MDC.remove("url");
-								logger.info("\n{}", new String(bytes, 0, bytes.length, encoding));
+								String str = new String(bytes, 0, bytes.length, encoding);
+								if (AppInfo.getStage() != Stage.DEVELOPMENT)
+									str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
+								logger.info("\n{}", str);
 							}
 						}
 
