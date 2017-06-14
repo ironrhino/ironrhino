@@ -1,6 +1,7 @@
 package org.ironrhino.rest;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -60,9 +61,9 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter() {
 
 			@Override
-			protected void writeInternal(Object object, HttpOutputMessage outputMessage)
+			protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
 					throws IOException, HttpMessageNotWritableException {
-				super.writeInternal(object, outputMessage);
+				super.writeInternal(object, type, outputMessage);
 				outputMessage.getBody().close();
 			}
 
