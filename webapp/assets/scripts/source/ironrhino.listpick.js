@@ -366,7 +366,7 @@
 
 Observation.listpick = function(container) {
 	$$('.listpick', container).listpick();
-	$$('form.pick.richtable').each(function() {
+	$$('form.pick.richtable', container).each(function() {
 				var t = $(this);
 				var selected = t.closest('.window-listpick').data('selected');
 				if (selected) {
