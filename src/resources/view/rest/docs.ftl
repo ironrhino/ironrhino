@@ -62,9 +62,9 @@
 		      <div class="accordion-inner">
 		      	<#assign partial=Parameters.partial!/>
 		        <ul class="nav nav-list">
-					<li<#if partial=='prerequisite'> class="active"</#if>><a href="<@url value="${actionBaseUrl}?partial=prerequisite"/><#if version?has_content>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">接入准备</a></li>
-					<li<#if partial=='oauth2'> class="active"</#if>><a href="<@url value="${actionBaseUrl}?partial=oauth2"/><#if version?has_content>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">OAuth2</a></li>
-					<li<#if partial=='status'> class="active"</#if>><a href="<@url value="${actionBaseUrl}?partial=status"/><#if version?has_content>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">通用返回状态消息</a></li>
+					<li<#if partial=='prerequisite'> class="active"</#if>><a href="${actionBaseUrl}?partial=prerequisite<#if version?has_content>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">接入准备</a></li>
+					<li<#if partial=='oauth2'> class="active"</#if>><a href="${actionBaseUrl}?partial=oauth2<#if version?has_content>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">OAuth2</a></li>
+					<li<#if partial=='status'> class="active"</#if>><a href="${actionBaseUrl}?partial=status<#if version?has_content>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">通用返回状态消息</a></li>
 				</ul>
 		      </div>
 		    </div>

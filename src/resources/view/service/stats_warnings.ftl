@@ -31,7 +31,7 @@
 		<tr<#if var.failed> class="error"<#else> class="warning"</#if>>
 			<td>${var.source!}</td>
 			<td>${var.target!}</td>
-			<td><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(var.service)?url}"/>" class="ajax view" data-replacement="count">${var.service!}</a></td>
+			<td><a href="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(var.service)?url}" class="ajax view" data-replacement="count">${var.service!}</a></td>
 			<td>${var.time?string}</td>
 			<td>${var.date?datetime}</td>
 		</tr>

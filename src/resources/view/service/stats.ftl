@@ -96,7 +96,7 @@ Initialization.stats = function() {
       <div class="accordion-inner">
         <ul class="nav nav-list">
         	<#list value as var>
-			<li><a href="<@url value="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(key+'.'+var)?url}"/>" class="ajax view" data-replacement="count">${var}</a></li>
+			<li><a href="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(key+'.'+var)?url}" class="ajax view" data-replacement="count">${var}</a></li>
 			</#list>
 		</ul>
       </div>
