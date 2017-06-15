@@ -19,7 +19,7 @@ import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.servlet.AccessFilter;
-import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.JsonDesensitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -44,7 +44,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private Map<Class<?>, Object> proxies = new HashMap<>();
 
-	@Value("${httpInvoker.loggingPayload:false}")
+	@Value("${httpInvoker.loggingPayload:true}")
 	private boolean loggingPayload;
 
 	@Autowired(required = false)
@@ -90,7 +90,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 				MDC.put("role", "SERVER");
 				MDC.put("service", interfaceName + '.' + method);
 				if (loggingPayload)
-					remotingLogger.info("Request: {}", JsonUtils.toJson(invocation.getArguments()));
+					remotingLogger.info("Request: {}",
+							JsonDesensitizer.DEFAULT_INSTANCE.toJson(invocation.getArguments()));
 				long time = System.currentTimeMillis();
 				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
 				time = System.currentTimeMillis() - time;
@@ -101,7 +102,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 				if (loggingPayload) {
 					if (!result.hasException()) {
 						Object value = result.getValue();
-						remotingLogger.info("Response: {}", JsonUtils.toJson(value));
+						remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
 					} else {
 						Throwable throwable = result.getException();
 						if (throwable.getCause() != null)

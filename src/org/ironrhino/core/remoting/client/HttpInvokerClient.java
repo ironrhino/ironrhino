@@ -12,7 +12,7 @@ import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.spring.RemotingClientProxy;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
-import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.JsonDesensitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -39,7 +39,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Value("${httpInvoker.serialization.type:JAVA}")
 	private volatile SerializationType serializationType = SerializationType.JAVA;
 
-	@Value("${httpInvoker.loggingPayload:false}")
+	@Value("${httpInvoker.loggingPayload:true}")
 	private boolean loggingPayload;
 
 	@Autowired(required = false)
@@ -168,7 +168,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		MDC.put("role", "CLIENT");
 		MDC.put("service", getServiceInterface().getName() + '.' + stringify(methodInvocation));
 		if (loggingPayload)
-			remotingLogger.info("Request: {}", JsonUtils.toJson(methodInvocation.getArguments()));
+			remotingLogger.info("Request: {}",
+					JsonDesensitizer.DEFAULT_INSTANCE.toJson(methodInvocation.getArguments()));
 		long time = System.currentTimeMillis();
 		RemoteInvocationResult result;
 		try {
@@ -176,7 +177,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			time = System.currentTimeMillis() - time;
 			if (loggingPayload) {
 				if (!result.hasInvocationTargetException())
-					remotingLogger.info("Response: {}", JsonUtils.toJson(result.getValue()));
+					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(result.getValue()));
 				else
 					remotingLogger.error("Error:\n",
 							((InvocationTargetException) result.getException()).getTargetException());
