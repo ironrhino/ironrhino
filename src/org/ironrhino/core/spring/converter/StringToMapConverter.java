@@ -15,10 +15,12 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public class StringToMapConverter implements GenericConverter {
 
+	@Override
 	public Set<GenericConverter.ConvertiblePair> getConvertibleTypes() {
 		return Collections.singleton(new GenericConverter.ConvertiblePair(String.class, Map.class));
 	}
 
+	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
 		if (source == null) {
 			return null;

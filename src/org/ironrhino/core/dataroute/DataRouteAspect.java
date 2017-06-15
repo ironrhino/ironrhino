@@ -16,6 +16,7 @@ public class DataRouteAspect extends AbstractPointcutAdvisor {
 	private int order = -2;
 
 	private transient final StaticMethodMatcherPointcut pointcut = new StaticMethodMatcherPointcut() {
+		@Override
 		public boolean matches(Method method, Class<?> targetClass) {
 			if (method.isBridge())
 				method = BridgeMethodResolver.findBridgedMethod(method);

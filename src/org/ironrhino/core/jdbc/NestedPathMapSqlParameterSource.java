@@ -19,6 +19,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 		super(map);
 	}
 
+	@Override
 	public boolean hasValue(String paramName) {
 		if (super.hasValue(paramName))
 			return true;
@@ -85,6 +86,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 		return false;
 	}
 
+	@Override
 	public Object getValue(String paramName) throws IllegalArgumentException {
 		if (super.hasValue(paramName))
 			return convertIfNessisary(super.getValue(paramName));

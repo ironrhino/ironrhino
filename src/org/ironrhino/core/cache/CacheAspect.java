@@ -36,6 +36,7 @@ public class CacheAspect extends AbstractPointcutAdvisor {
 	private int order = Ordered.HIGHEST_PRECEDENCE + 3;
 
 	private transient final StaticMethodMatcherPointcut pointcut = new StaticMethodMatcherPointcut() {
+		@Override
 		public boolean matches(Method method, Class<?> targetClass) {
 			if (method.isBridge())
 				method = BridgeMethodResolver.findBridgedMethod(method);

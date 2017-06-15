@@ -33,6 +33,7 @@ public class Person extends AbstractEntity<Identity> {
 	@Column(nullable = false)
 	private String name;
 
+	@Override
 	public Identity getId() {
 		return id;
 	}

@@ -15,7 +15,7 @@ public abstract class AbstractMethodInterceptor<ASPECT extends AbstractPointcutA
 	private Class<?> aspectClass;
 
 	public AbstractMethodInterceptor() {
-		aspectClass = (Class<?>) ReflectionUtils.getGenericClass(getClass());
+		aspectClass = ReflectionUtils.getGenericClass(getClass());
 	}
 
 	protected boolean isBypass() {

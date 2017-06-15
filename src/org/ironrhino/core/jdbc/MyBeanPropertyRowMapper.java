@@ -134,6 +134,7 @@ class MyBeanPropertyRowMapper<T> implements RowMapper<T> {
 		return name.toLowerCase(Locale.US);
 	}
 
+	@Override
 	public T mapRow(ResultSet rs, int rowNumber) throws SQLException {
 		Assert.state(mappedClass != null, "Mapped class was not specified");
 		T mappedObject = BeanUtils.instantiateClass(mappedClass);
@@ -147,7 +148,7 @@ class MyBeanPropertyRowMapper<T> implements RowMapper<T> {
 		for (int index = 1; index <= columnCount; index++) {
 			String column = JdbcUtils.lookupColumnName(rsmd, index);
 			String field = lowerCaseName(column.replaceAll(" ", ""));
-			PropertyDescriptor pd = (PropertyDescriptor) mappedFields.get(field);
+			PropertyDescriptor pd = mappedFields.get(field);
 			boolean fromFind = false;
 			if (pd == null) {
 				pd = tryFindPropertyDescriptor(column, bw);

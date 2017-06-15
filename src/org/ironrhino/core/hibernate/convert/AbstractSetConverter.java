@@ -24,6 +24,7 @@ public abstract class AbstractSetConverter<T> extends AbstractCollectionConverte
 		return new LinkedHashSet<>();
 	}
 
+	@Override
 	protected abstract T convert(String s);
 
 }

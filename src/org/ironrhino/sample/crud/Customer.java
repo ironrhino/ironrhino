@@ -209,21 +209,25 @@ public class Customer extends BaseRecordableEntity {
 		this.addresses = addresses;
 	}
 
+	@Override
 	@UiConfig(hiddenInList = @Hidden(true), displayOrder = 97)
 	public Date getCreateDate() {
 		return super.getCreateDate();
 	}
 
+	@Override
 	@UiConfig(hiddenInList = @Hidden(true), displayOrder = 98)
 	public Date getModifyDate() {
 		return super.getModifyDate();
 	}
 
+	@Override
 	@UiConfig(hiddenInList = @Hidden(true), displayOrder = 99)
 	public String getCreateUser() {
 		return super.getCreateUser();
 	}
 
+	@Override
 	@UiConfig(hiddenInList = @Hidden(true), displayOrder = 100)
 	public String getModifyUser() {
 		return super.getModifyUser();

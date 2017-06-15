@@ -120,6 +120,7 @@ public class ReflectionUtilsTest {
 
 	static class ServiceImpl implements Service {
 
+		@Override
 		public String echo(String name3, @Param("test4") String name4) {
 			return name3 + name4;
 		}

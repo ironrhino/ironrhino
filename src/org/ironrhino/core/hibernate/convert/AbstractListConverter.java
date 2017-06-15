@@ -24,6 +24,7 @@ public abstract class AbstractListConverter<T> extends AbstractCollectionConvert
 		return new ArrayList<>();
 	}
 
+	@Override
 	protected abstract T convert(String s);
 
 }
