@@ -206,27 +206,27 @@
 	</#if>
 	<#if !hidden>
 		<#if config.type=='enum'>
-		<textarea id="rt_select_template_${key}">
+		<template id="rt_select_template_${key}">
 		<#if config.required>
-		<@s.select theme="simple" name=entityName+"."+key list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue/>
+		<@s.select id="" theme="simple" name=entityName+"."+key list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue/>
 		<#else>
-		<@s.select theme="simple" name=entityName+"."+key list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
+		<@s.select id="" theme="simple" name=entityName+"."+key list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
 		</#if>
-		</textarea>
+		</template>
 		<#elseif config.type=='select'>
-		<textarea id="rt_select_template_${key}">
+		<template id="rt_select_template_${key}">
 		<#if config.required>
-		<@s.select theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue/>
+		<@s.select id="" theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue/>
 		<#else>
-		<@s.select theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
+		<@s.select id="" theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
 		</#if>
-		</textarea>
+		</template>
 		<#elseif config.type=='dictionary' && selectDictionary??>
-		<textarea id="rt_select_template_${key}">
+		<template id="rt_select_template_${key}">
 		<#assign templateName><@config.templateName?interpret /></#assign>
 		<#assign templateName=templateName?markup_string/>
 		<@selectDictionary dictionaryName=templateName id=key name=entityName+"."+key required=config.required/>
-		</textarea>
+		</template>
 		</#if>
 	</#if>
 </#list></div>
