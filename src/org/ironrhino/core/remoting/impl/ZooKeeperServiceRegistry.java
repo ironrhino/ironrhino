@@ -136,34 +136,41 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public Collection<String> getExportedHostsForService(String service) {
+	public Map<String, Collection<String>> getExportedHostsForService(String service) {
 		try {
+			Map<String, Collection<String>> result = new TreeMap<>();
+			Map<String, String> map = getImportedHostsForService(service);
 			List<String> children = curatorFramework.getChildren().watched()
 					.forPath(new StringBuilder().append(servicesParentPath).append("/").append(service).toString());
-			List<String> hosts = new ArrayList<>(children.size());
-			for (String host : children)
-				hosts.add(unescapeSlash(host));
-			Collections.sort(hosts);
-			return hosts;
+			for (String host : children) {
+				host = unescapeSlash(host);
+				List<String> consumers = new ArrayList<>();
+				for (Map.Entry<String, String> entry : map.entrySet())
+					if (entry.getValue().equals(host))
+						consumers.add(entry.getKey());
+				Collections.sort(consumers);
+				result.put(host, consumers);
+			}
+			return result;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return Collections.emptyList();
+			return Collections.emptyMap();
 		}
 	}
 
 	@Override
-	public Collection<String> getImportedHostsForService(String service) {
+	public Map<String, String> getImportedHostsForService(String service) {
 		try {
-			List<String> result = new ArrayList<>();
+			Map<String, String> result = new TreeMap<>();
 			for (String host : curatorFramework.getChildren().forPath(hostsParentPath)) {
-				if (getImportedServices(host).containsKey(service))
-					result.add(host);
+				Map<String, String> importedServices = getImportedServices(host);
+				if (importedServices.containsKey(service))
+					result.put(host, importedServices.get(service));
 			}
-			Collections.sort(result);
 			return result;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return Collections.emptyList();
+			return Collections.emptyMap();
 		}
 	}
 

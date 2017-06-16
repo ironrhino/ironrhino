@@ -11,6 +11,7 @@ public interface ServiceRegistry {
 
 	public String getLocalHost();
 
+	// key: service name, value: service object
 	public Map<String, Object> getExportedServices();
 
 	public String discover(String serviceName);
@@ -19,12 +20,16 @@ public interface ServiceRegistry {
 
 	public Collection<String> getAllAppNames();
 
+	// key: service name, value: service description
 	public Map<String, String> getExportedServices(String appName);
 
+	// key: service name, value: service provider host
 	public Map<String, String> getImportedServices(String host);
 
-	public Collection<String> getExportedHostsForService(String service);
+	// key: service provider host, value: service consumer hosts
+	public Map<String, Collection<String>> getExportedHostsForService(String service);
 
-	public Collection<String> getImportedHostsForService(String service);
+	// key: service consumer host, value: service provider host
+	public Map<String, String> getImportedHostsForService(String service);
 
 }

@@ -12,14 +12,16 @@ $('.service').click(function(){
 	}else{
 		var url = '${actionBaseUrl}/hosts/'+t.text();
 		$.getJSON(url,function(data){
-			var div = $('<div class="row-fluid"><div class="exported span6"><h5 style="text-align:center;">Exported By:</h5></div><div class="imported span6"><h5 style="text-align:center;">Imported By:</h5></div></div>').insertAfter(t);
-			var ul = $('<ul class="thumbnails"/>').appendTo(div.find('.exported'));
-			$.each(data.exported,function(i,v){
-				$('<li/>').appendTo(ul).html('<a class="host" href="#">'+v+'</a>');
-			});
-			ul = $('<ul class="thumbnails"/>').appendTo(div.find('.imported'));
-			$.each(data.imported,function(i,v){
-				$('<li/>').appendTo(ul).html('<a class="host" href="#">'+v+'</a>');
+			var table = $('<table class="table table-bordered" style="margin-top:5px;"><thead><tr><th style="width:50%;">Exported By:</th><th>Imported By:</th></tr></head><tbody></tbody></table>').insertAfter(t);
+			$.each(data,function(k,v){
+				var row = $('<tr><td class="provider middle"></td><td class="consumers"></td></tr>').appendTo(table.find('tbody'));
+				row.find('.provider').html('<a class="host" href="#">'+k+'</a>');
+				if(v.length){
+					var ul = $('<ul class="unstyled"/>').appendTo(row.find('.consumers'));
+					$.each(v,function(i,val){
+						$('<li/>').appendTo(ul).html('<a class="host" href="#">'+val+'</a>');
+					});
+				}
 			});
 		});
 	}

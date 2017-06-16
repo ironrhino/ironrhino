@@ -1,7 +1,6 @@
 package org.ironrhino.core.remoting.action;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.ironrhino.core.metadata.Authorize;
@@ -44,9 +43,7 @@ public class ConsoleAction extends BaseAction {
 
 	@JsonConfig(root = "hosts")
 	public String hosts() {
-		hosts = new HashMap<>();
-		hosts.put("exported", serviceRegistry.getExportedHostsForService(getUid()));
-		hosts.put("imported", serviceRegistry.getImportedHostsForService(getUid()));
+		hosts = serviceRegistry.getExportedHostsForService(getUid());
 		return JSON;
 	}
 

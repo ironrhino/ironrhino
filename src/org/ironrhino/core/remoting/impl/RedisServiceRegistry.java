@@ -125,22 +125,28 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public Collection<String> getExportedHostsForService(String service) {
-		List<String> list = stringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1);
-		List<String> hosts = new ArrayList<>(list.size());
-		hosts.addAll(list);
-		Collections.sort(hosts);
-		return hosts;
+	public Map<String, Collection<String>> getExportedHostsForService(String service) {
+		Map<String, Collection<String>> result = new TreeMap<>();
+		Map<String, String> map = getImportedHostsForService(service);
+		for (String host : stringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1)) {
+			List<String> consumers = new ArrayList<>();
+			for (Map.Entry<String, String> entry : map.entrySet())
+				if (entry.getValue().equals(host))
+					consumers.add(entry.getKey());
+			Collections.sort(consumers);
+			result.put(host, consumers);
+		}
+		return result;
 	}
 
 	@Override
-	public Collection<String> getImportedHostsForService(String service) {
-		List<String> result = new ArrayList<>();
+	public Map<String, String> getImportedHostsForService(String service) {
+		Map<String, String> result = new TreeMap<>();
 		for (String key : stringRedisTemplate.keys(NAMESPACE_HOSTS + "*")) {
-			if (stringRedisTemplate.opsForHash().hasKey(key, service))
-				result.add(key.substring(NAMESPACE_HOSTS.length()));
+			Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(key);
+			if (map.containsKey(service))
+				result.put(key.substring(NAMESPACE_HOSTS.length()), (String) map.get(service));
 		}
-		Collections.sort(result);
 		return result;
 	}
 
