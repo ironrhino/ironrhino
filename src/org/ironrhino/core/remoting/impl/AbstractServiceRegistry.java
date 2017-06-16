@@ -1,6 +1,7 @@
 package org.ironrhino.core.remoting.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,12 +208,25 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Override
 	public String discover(String serviceName) {
-		List<String> hosts = importedServiceCandidates.get(serviceName);
-		if (hosts != null && hosts.size() > 0) {
-			String host = hosts.get(ThreadLocalRandom.current().nextInt(hosts.size()));
+		String host = null;
+		try {
+			// try find lowest load service provider
+			int consumers = 0;
+			for (Map.Entry<String, Collection<String>> entry : getExportedHostsForService(serviceName).entrySet()) {
+				if (host == null || entry.getValue().size() < consumers) {
+					host = entry.getKey();
+					consumers = entry.getValue().size();
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			List<String> hosts = importedServiceCandidates.get(serviceName);
+			if (hosts != null && hosts.size() > 0)
+				host = hosts.get(ThreadLocalRandom.current().nextInt(hosts.size()));
+		}
+		if (host != null) {
 			onDiscover(serviceName, host);
-			host = trimAppName(host);
-			return host;
+			return trimAppName(host);
 		} else {
 			return null;
 		}
