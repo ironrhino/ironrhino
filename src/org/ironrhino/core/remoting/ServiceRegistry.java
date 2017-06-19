@@ -14,7 +14,7 @@ public interface ServiceRegistry {
 	// key: service name, value: service object
 	public Map<String, Object> getExportedServices();
 
-	public String discover(String serviceName);
+	public String discover(String serviceName, boolean poll);
 
 	public void evict(String host);
 

@@ -44,6 +44,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Value("${serviceRegistry.useHttps:false}")
 	private boolean useHttps;
 
+	@Value("${serviceRegistry.lbNodesThreshold:8}")
+	private int lbNodesThreshold = 8;
+
 	@Autowired
 	private ConfigurableApplicationContext ctx;
 
@@ -207,22 +210,26 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	@Override
-	public String discover(String serviceName) {
+	public String discover(String serviceName, boolean poll) {
 		String host = null;
-		try {
-			// try find lowest load service provider
-			int consumers = 0;
-			for (Map.Entry<String, Collection<String>> entry : getExportedHostsForService(serviceName).entrySet()) {
-				if (host == null || entry.getValue().size() < consumers) {
-					host = entry.getKey();
-					consumers = entry.getValue().size();
+		List<String> candidates = importedServiceCandidates.get(serviceName);
+		boolean loadBalancing = !poll && (candidates != null && candidates.size() <= lbNodesThreshold);
+		if (loadBalancing) {
+			try {
+				int consumers = 0;
+				for (Map.Entry<String, Collection<String>> entry : getExportedHostsForService(serviceName).entrySet()) {
+					if (host == null || entry.getValue().size() < consumers) {
+						host = entry.getKey();
+						consumers = entry.getValue().size();
+					}
 				}
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			List<String> hosts = importedServiceCandidates.get(serviceName);
-			if (hosts != null && hosts.size() > 0)
-				host = hosts.get(ThreadLocalRandom.current().nextInt(hosts.size()));
+		}
+		if (host == null) {
+			if (candidates != null && candidates.size() > 0)
+				host = candidates.get(ThreadLocalRandom.current().nextInt(candidates.size()));
 		}
 		if (host != null) {
 			onDiscover(serviceName, host);

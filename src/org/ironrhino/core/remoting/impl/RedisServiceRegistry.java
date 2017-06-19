@@ -67,11 +67,11 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public String discover(String serviceName) {
+	public String discover(String serviceName, boolean poll) {
 		List<String> hosts = importedServiceCandidates.get(serviceName);
 		if (hosts == null || hosts.size() == 0)
 			lookup(serviceName);
-		return super.discover(serviceName);
+		return super.discover(serviceName, poll);
 	}
 
 	@Override

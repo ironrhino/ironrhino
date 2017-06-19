@@ -157,7 +157,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			setServiceUrl(discoverServiceUrl());
 			discovered = true;
 		} else if (poll) {
-			setServiceUrl(discoverServiceUrl());
+			setServiceUrl(discoverServiceUrl(true));
 		}
 		String requestId = MDC.get("requestId");
 		if (requestId == null) {
@@ -255,10 +255,14 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	}
 
 	protected String discoverServiceUrl() {
+		return discoverServiceUrl(false);
+	}
+
+	protected String discoverServiceUrl(boolean poll) {
 		String serviceName = getServiceInterface().getName();
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isBlank(host)) {
-			String ho = serviceRegistry.discover(serviceName);
+			String ho = serviceRegistry.discover(serviceName, poll);
 			if (ho != null) {
 				if (ho.indexOf("://") < 0)
 					sb.append("http://");
