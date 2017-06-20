@@ -49,10 +49,8 @@ $(document).on('click','a.host',function(e){
 </head>
 <body>
 
-<div class="row<#if fluidLayout>-fluid</#if>" style="margin-bottom: 20px;">
 <div style="text-align:center;">
 <a class="host" href="#"><strong>${serviceRegistry.localHost}</strong></a>
-</div>
 </div>
 <hr/>
 <#list serviceRegistry.getAllAppNames() as appName>
