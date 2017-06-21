@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AutoConfig
 @Entity
 @Table(name = "sample_employee")
+@Richtable(showQueryForm = true)
 public class Employee implements Persistable<String> {
 
 	private static final long serialVersionUID = 2110061290463634971L;

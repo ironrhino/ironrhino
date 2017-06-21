@@ -117,7 +117,9 @@ form.query div.form-actions {
 }
 
 form.query div.fold {
+	/*
 	text-align: center;
+	*/
 	border-top: 1px solid #ddd;
 	margin-bottom: -25px;
 	transition: border-color .15s ease-in-out;
