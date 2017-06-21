@@ -107,6 +107,36 @@ form.query {
 	margin-bottom: 10px;
 }
 
+form.query div.row-fluid{
+	border: 1px solid #ddd;
+	width: calc( 100% - 2px );
+}
+
+form.query.folded div.row-fluid{
+	border-top-width: 0;
+	border-bottom-width: 0;
+}
+
+form.query.folded div.row-fluid:first-of-type{
+	border-top-width: 1px;
+	padding-top: 10px;
+}
+
+form.query.folded .tab-pane.active div.row-fluid:first-of-type{
+	border-top-width: 0;
+	margin-top: -20px;
+}
+
+form.query.folded .tab-pane.active div.row-fluid:last-of-type{
+	border-bottom-width: 1px;
+	margin-bottom: 6px;
+}
+
+form.query:not(.folded) div.row-fluid{
+	padding-top: 10px;
+	margin-bottom: 5px;
+}
+
 form.query div.form-actions {
 	padding: 0;
 	text-align: center;
@@ -125,10 +155,6 @@ form.query div.fold {
 	transition: border-color .15s ease-in-out;
 }
 
-form.query div.fold ~ div.form-actions {
-	text-align: right;
-}
-
 form.query div.fold span {
 	display: inline-block;
 	height: 30px;
@@ -139,16 +165,14 @@ form.query div.fold span {
 	border: 1px solid #ddd;
 	border-top-color: #fff;
 	cursor: pointer;
-	transition: border-color .15s ease-in-out;
-}
-
-form.query div.fold:hover {
-	border-top-color: #888;
 }
 
 form.query div.fold:hover span {
 	color: #888;
-	border-color: #888;
-	border-top-color: #fff;
 }
 
+/*
+form.query div.fold ~ div.form-actions {
+	text-align: right;
+}
+*/

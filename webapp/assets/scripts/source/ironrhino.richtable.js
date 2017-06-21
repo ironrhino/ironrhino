@@ -1049,6 +1049,8 @@ Observation._richtable = function(container) {
 };
 Observation.richtable = function(container) {
 	var f = $('form.query[data-replacement]', container);
+	if (f.find('[class^="row"]').length > 1) 
+			f.addClass('folded');
 	var tabs = f.find('.tab-pane');
 	if (!tabs.length)
 		tabs = f;
