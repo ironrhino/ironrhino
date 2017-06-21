@@ -72,8 +72,8 @@
 	transform = function(container, columns) {
 		container.children('input[type="hidden"]').prependTo(container);
 		var rowclass = container.parents('.container-fluid').length
-				? 'row-fluid'
-				: 'row';
+				|| container.parents('.ui-dialog-content')
+				&& $('#content.container-fluid').length ? 'row-fluid' : 'row';
 		var span = 'span' + (12 / columns);
 		var current = 0;
 		container.find('.control-group').filter(function(i) {

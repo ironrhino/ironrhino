@@ -2117,7 +2117,7 @@ var Dialog = {
 			var hideCloseButton = false;
 			if (!iframe) {
 				$(d).dialog('option', 'title', Ajax.title);
-				hasRow = $('div.row', d).length > 0;
+				hasRow = $('div[class*="row"]', d).length > 0;
 				hasToolbarPagination = $(
 						'form.richtable div.toolbar select.pageSize', d).length > 0;
 				$('.controls > table', d).each(function() {
