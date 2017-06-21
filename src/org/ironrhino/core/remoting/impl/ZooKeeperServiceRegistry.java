@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
 import org.ironrhino.core.event.InstanceShutdownEvent;
 import org.ironrhino.core.remoting.ExportServicesEvent;
@@ -152,6 +153,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 				result.put(host, consumers);
 			}
 			return result;
+		} catch (NoNodeException e) {
+			return Collections.emptyMap();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Collections.emptyMap();
@@ -168,6 +171,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 					result.put(host, importedServices.get(service));
 			}
 			return result;
+		} catch (NoNodeException e) {
+			return Collections.emptyMap();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Collections.emptyMap();
@@ -184,6 +189,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			Map<String, String> services = new TreeMap<>();
 			services.putAll(map);
 			return services;
+		} catch (NoNodeException e) {
+			return Collections.emptyMap();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Collections.emptyMap();
@@ -198,6 +205,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			services.addAll(list);
 			Collections.sort(services);
 			return services;
+		} catch (NoNodeException e) {
+			return Collections.emptyList();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Collections.emptyList();
@@ -217,6 +226,9 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			Map<String, String> services = new TreeMap<>();
 			services.putAll(map);
 			return services;
+		} catch (NoNodeException e) {
+			logger.error(e.getMessage(), e);
+			return Collections.emptyMap();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Collections.emptyMap();
