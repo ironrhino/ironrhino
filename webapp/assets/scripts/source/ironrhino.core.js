@@ -1956,7 +1956,7 @@ Observation.common = function(container) {
 						var form = $(this);
 						var btn = $('.clicked', form);
 						if (!btn.length)
-							btn = $(':input:focus[type=submit]', form);
+							btn = $(':input:focus[type="submit"]', form);
 						if (btn.hasClass('noajax'))
 							return true;
 						if (btn.hasClass('reload') || btn.data('action'))

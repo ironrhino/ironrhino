@@ -34110,7 +34110,7 @@ Observation.common = function(container) {
 						var form = $(this);
 						var btn = $('.clicked', form);
 						if (!btn.length)
-							btn = $(':input:focus[type=submit]', form);
+							btn = $(':input:focus[type="submit"]', form);
 						if (btn.hasClass('noajax'))
 							return true;
 						if (btn.hasClass('reload') || btn.data('action'))
@@ -38532,7 +38532,7 @@ Richtable = {
 								create = false;
 						}
 						if (create && inputform.hasClass('sequential_create')) {
-							$('button[type="submit"]', inputform)
+							$('[type="submit"]', inputform)
 									.addClass('btn-primary')
 									.after(' <button type="submit" class="btn sequential_create">'
 											+ MessageBundle
@@ -38557,7 +38557,7 @@ Richtable = {
 						inputform.data('replacement', winid + ':content');
 					if (!inputform.hasClass('view')
 							&& !inputform.hasClass('keepopen')) {
-						$('button[type=submit]', inputform).click(function(e) {
+						$('[type="submit"]', inputform).click(function(e) {
 							$(e.target).closest('form')[0].onsuccess = function() {
 								inputforms.removeClass('dirty');
 								inputforms.removeClass('dontreload');
