@@ -353,35 +353,25 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> findListByCriteria(DetachedCriteria dc) {
-		try {
-			Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
-			c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-			return c.list();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw new RuntimeException(e.getMessage(), e);
-		}
+		Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
+		c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+		return c.list();
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> findBetweenListByCriteria(DetachedCriteria dc, int start, int end) {
-		try {
-			Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
-			if (!(start == 0 && end == Integer.MAX_VALUE)) {
-				int firstResult = start;
-				if (firstResult < 0)
-					firstResult = 0;
-				c.setFirstResult(firstResult);
-				int maxResults = end - firstResult;
-				if (maxResults > 0)
-					c.setMaxResults(maxResults);
-			}
-			return c.list();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw new RuntimeException(e.getMessage(), e);
+		Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
+		if (!(start == 0 && end == Integer.MAX_VALUE)) {
+			int firstResult = start;
+			if (firstResult < 0)
+				firstResult = 0;
+			c.setFirstResult(firstResult);
+			int maxResults = end - firstResult;
+			if (maxResults > 0)
+				c.setMaxResults(maxResults);
 		}
+		return c.list();
 	}
 
 	@Override
@@ -570,13 +560,13 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			root.setName("");
 			assemble(root, (List<TE>) findAll(Order.asc("level")));
 			return root;
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 
-	private <TE extends BaseTreeableEntity<TE>> void assemble(TE te, List<TE> list) throws Exception {
+	private <TE extends BaseTreeableEntity<TE>> void assemble(TE te, List<TE> list)
+			throws InstantiationException, IllegalAccessException {
 		List<TE> children = new ArrayList<>();
 		Iterator<TE> it = list.iterator();
 		while (it.hasNext()) {
@@ -639,12 +629,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public <K> K execute(HibernateCallback<K> callback) {
-		try {
-			return callback.doInHibernate(sessionFactory.getCurrentSession());
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw new RuntimeException(e.getMessage(), e);
-		}
+		return callback.doInHibernate(sessionFactory.getCurrentSession());
 	}
 
 	@Override
