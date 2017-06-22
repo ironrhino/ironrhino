@@ -107,32 +107,36 @@ form.query {
 	margin-bottom: 10px;
 }
 
-form.query div.row-fluid{
+form.query div[class*="row"]{
 	border: 1px solid #ddd;
 	box-sizing: border-box;
 }
 
-form.query.folded div.row-fluid{
+form.query div.row, form.query div.row [class*="span"]{
+	margin-left: 0;
+}
+
+form.query.folded div[class*="row"]{
 	border-top-width: 0;
 	border-bottom-width: 0;
 }
 
-form.query.folded div.row-fluid:first-of-type{
+form.query.folded div[class*="row"]:first-of-type{
 	border-top-width: 1px;
 	padding-top: 10px;
 }
 
-form.query.folded .tab-pane.active div.row-fluid:first-of-type{
+form.query.folded .tab-pane.active div[class*="row"]:first-of-type{
 	border-top-width: 0;
 	margin-top: -20px;
 }
 
-form.query.folded .tab-pane.active div.row-fluid:last-of-type{
+form.query.folded .tab-pane.active div[class*="row"]:last-of-type{
 	border-bottom-width: 1px;
 	margin-bottom: 6px;
 }
 
-form.query:not(.folded) div.row-fluid{
+form.query:not(.folded) div[class*="row"]{
 	padding-top: 10px;
 	margin-bottom: 5px;
 }

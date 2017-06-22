@@ -75,7 +75,7 @@ public class Company extends BaseEntity {
 	@JoinTable(name = "sample_company_related_customer", joinColumns = @JoinColumn(name = "company"), inverseJoinColumns = @JoinColumn(name = "customer"))
 	private Collection<Customer> relatedCustomers;
 
-	@UiConfig(width = "80px", description = "一对一关系")
+	@UiConfig(width = "80px", group = "contactInfo", description = "一对一关系")
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "company")
 	private Boss boss;
 
