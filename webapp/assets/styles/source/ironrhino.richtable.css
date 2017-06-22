@@ -109,7 +109,7 @@ form.query {
 
 form.query div.row-fluid{
 	border: 1px solid #ddd;
-	width: calc( 100% - 2px );
+	box-sizing: border-box;
 }
 
 form.query.folded div.row-fluid{
