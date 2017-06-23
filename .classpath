@@ -59,7 +59,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.13.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.40.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/objenesis-2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/objenesis-2.6.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.1.12.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/persistence-api-2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
