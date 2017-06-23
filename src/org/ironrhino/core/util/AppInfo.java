@@ -303,6 +303,10 @@ public class AppInfo {
 
 	public static void initialize() {
 
+		if (System.getProperty("http.maxConnections") == null)
+			System.setProperty("http.maxConnections", "100");
+		System.setProperty("sun.net.http.errorstream.enableBuffering", "true");
+
 		String p = System.getProperty("port.http");
 		if (StringUtils.isBlank(p))
 			p = System.getProperty("port.http.nonssl");

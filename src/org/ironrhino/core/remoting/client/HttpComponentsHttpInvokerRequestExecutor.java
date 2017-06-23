@@ -40,9 +40,9 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 
 	private long timeToLive = 60;
 
-	private int maxConnPerRoute = 1000;
+	private int maxConnPerRoute = 100;
 
-	private int maxConnTotal = 1000;
+	private int maxConnTotal = 100;
 
 	public SerializationType getSerializationType() {
 		return serializationType;

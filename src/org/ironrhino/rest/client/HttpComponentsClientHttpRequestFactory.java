@@ -20,7 +20,7 @@ public class HttpComponentsClientHttpRequestFactory
 
 	public HttpComponentsClientHttpRequestFactory(RestClient client) {
 		HttpClient httpClient = HttpClients.custom().disableAuthCaching().disableConnectionState()
-				.disableCookieManagement().setMaxConnPerRoute(1000).setMaxConnTotal(1000)
+				.disableCookieManagement().setMaxConnPerRoute(100).setMaxConnTotal(100)
 				.setRetryHandler((ex, executionCount, context) -> {
 					if (executionCount > 3)
 						return false;

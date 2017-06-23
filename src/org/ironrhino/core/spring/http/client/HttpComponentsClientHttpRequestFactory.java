@@ -46,7 +46,7 @@ public class HttpComponentsClientHttpRequestFactory
 
 	private HttpClientBuilder builder() {
 		return HttpClients.custom().disableAuthCaching().disableConnectionState().disableCookieManagement()
-				.setMaxConnPerRoute(1000).setMaxConnTotal(1000).setRetryHandler((ex, executionCount, context) -> {
+				.setMaxConnPerRoute(100).setMaxConnTotal(100).setRetryHandler((ex, executionCount, context) -> {
 					if (executionCount > 3)
 						return false;
 					if (ex instanceof NoHttpResponseException)

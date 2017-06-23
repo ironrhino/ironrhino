@@ -18,7 +18,7 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 public class SimpleHttpInvokerRequestExecutor
 		extends org.springframework.remoting.httpinvoker.SimpleHttpInvokerRequestExecutor {
 
-	private SerializationType serializationType;
+	private final SerializationType serializationType;
 
 	public SimpleHttpInvokerRequestExecutor(SerializationType serializationType) {
 		this.serializationType = serializationType;
