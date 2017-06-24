@@ -56,8 +56,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private int maxAttempts = 3;
 
-	@Value("${httpInvoker.poll:false}")
-	private boolean poll;
+	@Value("${httpInvoker.polling:false}")
+	private boolean polling;
 
 	private boolean urlFromDiscovery;
 
@@ -82,8 +82,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return true;
 	}
 
-	public void setPoll(boolean poll) {
-		this.poll = poll;
+	public void setPolling(boolean polling) {
+		this.polling = polling;
 	}
 
 	public void setHost(String host) {
@@ -156,7 +156,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		if (!discovered) {
 			setServiceUrl(discoverServiceUrl());
 			discovered = true;
-		} else if (poll) {
+		} else if (polling) {
 			setServiceUrl(discoverServiceUrl(true));
 		}
 		String requestId = MDC.get("requestId");
@@ -258,11 +258,11 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return discoverServiceUrl(false);
 	}
 
-	protected String discoverServiceUrl(boolean poll) {
+	protected String discoverServiceUrl(boolean polling) {
 		String serviceName = getServiceInterface().getName();
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isBlank(host)) {
-			String ho = serviceRegistry.discover(serviceName, poll);
+			String ho = serviceRegistry.discover(serviceName, polling);
 			if (ho != null) {
 				if (ho.indexOf("://") < 0)
 					sb.append("http://");

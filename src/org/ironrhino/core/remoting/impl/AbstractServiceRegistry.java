@@ -210,10 +210,10 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	@Override
-	public String discover(String serviceName, boolean poll) {
+	public String discover(String serviceName, boolean polling) {
 		String host = null;
 		List<String> candidates = importedServiceCandidates.get(serviceName);
-		boolean loadBalancing = !poll && (candidates != null && candidates.size() <= lbNodesThreshold);
+		boolean loadBalancing = !polling && (candidates != null && candidates.size() <= lbNodesThreshold);
 		if (loadBalancing) {
 			try {
 				int consumers = 0;
