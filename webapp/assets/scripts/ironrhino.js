@@ -34122,6 +34122,7 @@ Observation.common = function(container) {
 					} else {
 						form.ajaxSubmit(options);
 					}
+					btn.removeClass('clicked');
 				}
 				if (btn.hasClass('confirm')) {
 					$.alerts.confirm((btn.data('confirm') || MessageBundle
@@ -34129,12 +34130,13 @@ Observation.common = function(container) {
 									.get('select'), function(b) {
 								if (b) {
 									func();
+								} else {
+									btn.removeClass('clicked');
 								}
 							});
 				} else {
 					func();
 				}
-				btn.removeClass('clicked');
 				return false;
 			});
 			return;
