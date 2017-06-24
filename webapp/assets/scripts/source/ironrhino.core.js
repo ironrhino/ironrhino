@@ -1953,23 +1953,36 @@ Observation.common = function(container) {
 							'X-Data-Type' : 'json'
 						});
 			$(this).on('submit', function(e) {
-						var form = $(this);
-						var btn = $('.clicked', form);
-						if (!btn.length)
-							btn = $(':input:focus[type="submit"]', form);
-						if (btn.hasClass('noajax'))
-							return true;
-						if (btn.hasClass('reload') || btn.data('action'))
-							options.pushState = false;
-						if ('multipart/form-data' == $(this).attr('enctype')) {
-							options.target = target;
-							$.ajaxupload(options);
-						} else {
-							$(this).ajaxSubmit(options);
-						}
-						btn.removeClass('clicked');
-						return false;
-					});
+				var form = $(this);
+				var btn = $('.clicked', form);
+				if (!btn.length)
+					btn = $(':input:focus[type="submit"]', form);
+				if (btn.hasClass('noajax'))
+					return true;
+				if (btn.hasClass('reload') || btn.data('action'))
+					options.pushState = false;
+				var func = function() {
+					if ('multipart/form-data' == form.attr('enctype')) {
+						options.target = target;
+						$.ajaxupload(options);
+					} else {
+						form.ajaxSubmit(options);
+					}
+				}
+				if (btn.hasClass('confirm')) {
+					$.alerts.confirm((btn.data('confirm') || MessageBundle
+									.get('confirm.action')), MessageBundle
+									.get('select'), function(b) {
+								if (b) {
+									func();
+								}
+							});
+				} else {
+					func();
+				}
+				btn.removeClass('clicked');
+				return false;
+			});
 			return;
 		} else {
 			$(this).click(function() {
