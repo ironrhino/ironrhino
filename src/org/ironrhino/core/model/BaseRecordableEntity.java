@@ -49,7 +49,8 @@ public class BaseRecordableEntity extends BaseEntity {
 	protected String modifyUser;
 
 	@Version
-	private int version;
+	@NotInCopy
+	private int version = -1;
 
 	public Date getCreateDate() {
 		return createDate;

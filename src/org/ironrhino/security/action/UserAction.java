@@ -193,7 +193,11 @@ public class UserAction extends EntityAction<User> {
 	public String save() {
 		if (!makeEntityValid())
 			return INPUT;
+		int previousVersion = user.getVersion();
 		userManager.save(user);
+		int currentVersion = user.getVersion();
+		if (currentVersion != previousVersion)
+			ServletActionContext.getResponse().setIntHeader("X-Entity-Version", currentVersion);
 		addActionMessage(getText("save.success"));
 		return SUCCESS;
 	}
@@ -241,6 +245,16 @@ public class UserAction extends EntityAction<User> {
 			if (StringUtils.isNotBlank(password))
 				user.setLegiblePassword(password);
 			userManager.evict(user);
+			int versionInDb = user.getVersion();
+			int versionInUi = temp.getVersion();
+			if (versionInUi > -1) {
+				if (versionInUi < versionInDb) {
+					addActionError(getText("validation.version.conflict"));
+					return false;
+				} else {
+					user.setVersion(versionInUi);
+				}
+			}
 		}
 		try {
 			userRoleManager.checkMutex(user.getRoles());
