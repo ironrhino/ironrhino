@@ -3,6 +3,7 @@ package org.ironrhino.core.service;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -666,7 +667,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			transaction = callbackSession.beginTransaction();
 			cursor = c.scroll(ScrollMode.FORWARD_ONLY);
 			RowBuffer buffer = new RowBuffer(callbackSession, fetchSize, callback);
-			Object prev = null;
+			T prev = null;
 			while (true) {
 				try {
 					if (!cursor.next()) {
@@ -675,7 +676,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				} catch (ObjectNotFoundException e) {
 					continue;
 				}
-				Object item = cursor.get(0);
+				T item = (T) cursor.get(0);
 				if (prev != null && item != prev) {
 					buffer.put(prev);
 				}
@@ -720,19 +721,19 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		}
 	}
 
-	private static class RowBuffer {
-		private Object[] buffer;
+	private class RowBuffer {
+		private T[] buffer;
 		private int currentIndex;
 		private Session hibernateSession;
 		private IterateCallback callback;
 
 		RowBuffer(Session hibernateSession, int fetchSize, IterateCallback callback) {
 			this.hibernateSession = hibernateSession;
-			this.buffer = new Object[fetchSize];
+			this.buffer = (T[]) Array.newInstance(getEntityClass(), fetchSize);
 			this.callback = callback;
 		}
 
-		public void put(Object row) {
+		public void put(T row) {
 			buffer[currentIndex] = row;
 			currentIndex++;
 		}

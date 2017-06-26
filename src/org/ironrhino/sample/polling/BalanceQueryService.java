@@ -39,8 +39,7 @@ public class BalanceQueryService {
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("status", BalanceQueryStatus.INITIALIZED));
 		entityManager.iterate(10, (entities, session) -> {
-			for (Object obj : entities) {
-				BalanceQuery bq = (BalanceQuery) obj;
+			for (BalanceQuery bq : entities) {
 				stringRedisTemplate.opsForList().leftPush(key, bq.getId());
 				bq.setStatus(BalanceQueryStatus.PROCESSING);
 				bq.setModifyDate(new Date());

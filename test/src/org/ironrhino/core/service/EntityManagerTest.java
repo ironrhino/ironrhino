@@ -191,11 +191,10 @@ public class EntityManagerTest {
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
-		long count = entityManager.iterate(2, new IterateCallback() {
+		long count = entityManager.iterate(2, new IterateCallback<Person>() {
 			@Override
-			public void process(Object[] entityArray, Session session) {
-				for (Object obj : entityArray) {
-					Person p = (Person) obj;
+			public void process(Person[] entityArray, Session session) {
+				for (Person p : entityArray) {
 					if (p.getGender() == Gender.MALE) {
 						p.setGender(Gender.FEMALE);
 						session.update(p);
@@ -208,11 +207,10 @@ public class EntityManagerTest {
 		dc.add(Restrictions.eq("gender", Gender.FEMALE));
 		dc.addOrder(Order.asc("name"));
 		List<Person> males = new ArrayList<>();
-		count = entityManager.iterate(2, new IterateCallback() {
+		count = entityManager.iterate(2, new IterateCallback<Person>() {
 			@Override
-			public void process(Object[] entityArray, Session session) {
-				for (Object obj : entityArray) {
-					Person p = (Person) obj;
+			public void process(Person[] entityArray, Session session) {
+				for (Person p : entityArray) {
 					if (p.getGender() == Gender.FEMALE) {
 						p.setGender(Gender.MALE);
 						males.add(p);
@@ -226,9 +224,9 @@ public class EntityManagerTest {
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
-		count = entityManager.iterate(2, new IterateCallback() {
+		count = entityManager.iterate(2, new IterateCallback<Person>() {
 			@Override
-			public void process(Object[] entityArray, Session session) {
+			public void process(Person[] entityArray, Session session) {
 
 			}
 		}, dc, true);
