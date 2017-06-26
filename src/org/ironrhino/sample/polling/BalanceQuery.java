@@ -23,8 +23,8 @@ public class BalanceQuery extends BaseEntity {
 
 	private static final long serialVersionUID = 3825969412916897020L;
 
-	@UiConfig(width = "150px")
-	@Column(nullable = false)
+	@UiConfig(width = "150px", regex="\\d+")
+	@Column(nullable = false, length = 20)
 	private String accountNo;
 
 	@UiConfig(width = "80px", readonly = @Readonly(true))

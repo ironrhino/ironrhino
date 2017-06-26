@@ -59,20 +59,28 @@ public class BalanceQueryService {
 				break;
 			logger.info("dequeue {}", id);
 			BalanceQuery bq = entityManager.get(id);
-			if (bq != null) {
-				try {
-					entityManager.executeUpdate(
-							"update BalanceQuery t set t.balance=?3,t.status=?4,t.modifyDate=?5 where t.id=?1 and t.status=?2",
-							bq.getId(), BalanceQueryStatus.PROCESSING, queryBalance(bq.getAccountNo()),
-							BalanceQueryStatus.SUCCESSFUL, new Date());
+			if (bq == null) {
+				logger.warn("not found: {}", id);
+				continue;
+			}
+			try {
+				int result = entityManager.executeUpdate(
+						"update BalanceQuery t set t.balance=?3,t.status=?4,t.modifyDate=?5 where t.id=?1 and t.status=?2",
+						bq.getId(), BalanceQueryStatus.PROCESSING, queryBalance(bq.getAccountNo()),
+						BalanceQueryStatus.SUCCESSFUL, new Date());
+				if (result == 1)
 					logger.info("process {} successfully", id);
-				} catch (Exception e) {
-					entityManager.executeUpdate(
-							"update BalanceQuery t set t.errorInfo=?3,t.status=?4,t.modifyDate=?5 where t.id=?1 and t.status=?2",
-							bq.getId(), BalanceQueryStatus.PROCESSING, ExceptionUtils.getDetailMessage(e),
-							BalanceQueryStatus.FAILED, new Date());
+				else
+					logger.warn("process {} successfully and ignored", id);
+			} catch (Exception e) {
+				int result = entityManager.executeUpdate(
+						"update BalanceQuery t set t.errorInfo=?3,t.status=?4,t.modifyDate=?5 where t.id=?1 and t.status=?2",
+						bq.getId(), BalanceQueryStatus.PROCESSING, ExceptionUtils.getDetailMessage(e),
+						BalanceQueryStatus.FAILED, new Date());
+				if (result == 1)
 					logger.info("process {} failed", id);
-				}
+				else
+					logger.warn("process {} failed and ignored", id);
 			}
 		}
 	}
