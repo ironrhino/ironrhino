@@ -171,7 +171,13 @@ $(function(){
 				</#if>
 			</div>
 			<div class="action span2">
-				<input type="submit" class="btn noajax" value="${getText('export')}" formaction="${actionBaseUrl}/export"/>
+				<#assign downloadUrl=actionBaseUrl+'/export'>
+				<#list Parameters as name,value>
+				<#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&(name!='keyword'||value?has_content)>
+				<#assign downloadUrl+=downloadUrl?contains('?')?then('&','?')+name+'='+value?url>
+				</#if>
+				</#list>
+				<a target="_blank" download="data.csv" class="btn" href="${downloadUrl}">${getText('export')}</a>
 			</div>
 			<div class="status span5">
 				${resultPage.totalResults} ${getText('record')} , ${getText('tookInMillis',[resultPage.tookInMillis])}
