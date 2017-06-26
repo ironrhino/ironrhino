@@ -994,9 +994,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				if (versionPropertyName != null) {
 					int versionInDb = (Integer) bwp.getPropertyValue(versionPropertyName);
 					int versionInUi = (Integer) bw.getPropertyValue(versionPropertyName);
-					if (versionInUi > -1 && versionInUi < versionInDb) {
-						addActionError(getText("validation.version.conflict"));
-						return false;
+					if (versionInUi > -1) {
+						if (versionInUi < versionInDb) {
+							addActionError(getText("validation.version.conflict"));
+							return false;
+						} else {
+							bwp.setPropertyValue(versionPropertyName, versionInUi);
+						}
 					}
 				}
 
@@ -1013,11 +1017,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						propertyName = propertyName.substring(0, propertyName.indexOf('.'));
 					if (propertyName.indexOf('[') > 0)
 						propertyName = propertyName.substring(0, propertyName.indexOf('['));
-					if (propertyName.equals(versionPropertyName)
-							&& StringUtils.isNotBlank(ServletActionContext.getRequest().getParameter(parameterName))) {
-						editedPropertyNames.add(propertyName);
+					if (propertyName.equals(versionPropertyName))
 						continue;
-					}
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
 					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType"))
 							&& bwp.isWritableProperty(propertyName)
