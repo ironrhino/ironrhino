@@ -33932,9 +33932,20 @@ Observation.common = function(container) {
 					url : this.tagName == 'FORM' ? this.action : this.href,
 					target : target,
 					onsuccess : function(data, xhr) {
-						var ver = xhr.getResponseHeader('X-Entity-Version');
-						if (ver)
-							$('input[type="hidden"].version', target).val(ver);
+						var headers = xhr.getAllResponseHeaders().split('\n');
+						$.each(headers, function(i, v) {
+									var name = v.split(':')[0];
+									if (name.indexOf('X-Postback') == 0) {
+										$(
+												'[name="'
+														+ name
+																.substring(name
+																		.lastIndexOf('-')
+																		+ 1)
+														+ '"]', target).val(xhr
+												.getResponseHeader(name));
+									}
+								});
 					}
 				});
 		if (this.tagName == 'FORM') {
@@ -38811,8 +38822,10 @@ Richtable = {
 					var entity = Richtable.getEntityName(form);
 					var params = {};
 					var version = $(row).data('version');
+					var versionParamName = entity + '.'
+							+ (versionproperty || 'version');
 					if (version)
-						params[entity + '.' + (versionproperty || 'version')] = version;
+						params[versionParamName] = version;
 					params[entity + '.id'] = $(this).data('rowid')
 							|| $('input[type="checkbox"]:eq(0)', this).val();
 					$.each(row.cells, function(i) {
@@ -38827,37 +38840,42 @@ Richtable = {
 					var url = Richtable.getBaseUrl(form) + '/save'
 							+ Richtable.getPathParams();
 					ajax({
-						url : url,
-						type : 'POST',
-						data : params,
-						dataType : 'json',
-						headers : {
-							'X-Edit' : 'cell'
-						},
-						beforeSend : function() {
-							btn.prop('disabled', true).addClass('loading');
-							form.addClass('loading');
-						},
-						onsuccess : function(data, xhr) {
-							$('td', row).removeClass('edited')
-									.removeData('oldvalue');
-							var ver = xhr.getResponseHeader('X-Entity-Version');
-							if (ver)
-								$(row).attr('data-version', ver).data(
-										'version', ver);
-							$('[data-action="save"]', form)
-									.removeClass('btn-primary').hide();
-							setTimeout(function() {
-										form.closest('.reload-container')
-												.find('.reloadable')
-												.trigger('reload');
-									}, 500);
-						},
-						complete : function() {
-							btn.prop('disabled', false).removeClass('loading');
-							form.removeClass('loading');
-						}
-					});
+								url : url,
+								type : 'POST',
+								data : params,
+								dataType : 'json',
+								headers : {
+									'X-Edit' : 'cell'
+								},
+								beforeSend : function() {
+									btn.prop('disabled', true)
+											.addClass('loading');
+									form.addClass('loading');
+								},
+								onsuccess : function(data, xhr) {
+									$('td', row).removeClass('edited')
+											.removeData('oldvalue');
+									var ver = xhr
+											.getResponseHeader('X-Postback-'
+													+ versionParamName);
+									if (ver)
+										$(row).attr('data-version', ver).data(
+												'version', ver);
+									$('[data-action="save"]', form)
+											.removeClass('btn-primary').hide();
+									setTimeout(function() {
+												form
+														.closest('.reload-container')
+														.find('.reloadable')
+														.trigger('reload');
+											}, 500);
+								},
+								complete : function() {
+									btn.prop('disabled', false)
+											.removeClass('loading');
+									form.removeClass('loading');
+								}
+							});
 				}
 			});
 			if (!modified) {
@@ -39466,8 +39484,8 @@ Observation._richtable = function(container) {
 };
 Observation.richtable = function(container) {
 	var f = $('form.query[data-replacement]', container);
-	if (f.find('[class^="row"]').length > 1) 
-			f.addClass('folded');
+	if (f.find('[class^="row"]').length > 1)
+		f.addClass('folded');
 	var tabs = f.find('.tab-pane');
 	if (!tabs.length)
 		tabs = f;

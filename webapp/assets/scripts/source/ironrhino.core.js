@@ -1778,9 +1778,20 @@ Observation.common = function(container) {
 					url : this.tagName == 'FORM' ? this.action : this.href,
 					target : target,
 					onsuccess : function(data, xhr) {
-						var ver = xhr.getResponseHeader('X-Entity-Version');
-						if (ver)
-							$('input[type="hidden"].version', target).val(ver);
+						var headers = xhr.getAllResponseHeaders().split('\n');
+						$.each(headers, function(i, v) {
+									var name = v.split(':')[0];
+									if (name.indexOf('X-Postback') == 0) {
+										$(
+												'[name="'
+														+ name
+																.substring(name
+																		.lastIndexOf('-')
+																		+ 1)
+														+ '"]', target).val(xhr
+												.getResponseHeader(name));
+									}
+								});
 					}
 				});
 		if (this.tagName == 'FORM') {
