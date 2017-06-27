@@ -1208,8 +1208,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 }
 
 #popup_container {
-	font-family: Arial, sans-serif;
-	font-size: 12px;
 	min-width: 300px; /* Dialog will be no smaller than this */
 	max-width: 600px; /* Dialog will wrap after this width */
 	background: #FFF;
