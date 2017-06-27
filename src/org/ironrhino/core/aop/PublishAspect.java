@@ -1,7 +1,9 @@
 package org.ironrhino.core.aop;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -61,6 +63,7 @@ public class PublishAspect extends TransactionSynchronizationAdapter implements 
 		List<AbstractEvent> events = getHibernateEvents(false);
 		if (events == null || events.isEmpty())
 			return;
+		Map<Persistable<?>, EntityOperationType> actions = new HashMap<>();
 		for (AbstractEvent event : events) {
 			Object entity;
 			EntityOperationType action;
@@ -76,9 +79,16 @@ public class PublishAspect extends TransactionSynchronizationAdapter implements 
 			} else {
 				continue;
 			}
-			PublishAware publishAware = ReflectionUtils.getActualClass(entity).getAnnotation(PublishAware.class);
+			EntityOperationType previousAction = actions.get(entity);
+			if (previousAction == EntityOperationType.CREATE || previousAction == EntityOperationType.DELETE)
+				continue;
+			actions.put((Persistable<?>) entity, action);
+		}
+		for (Map.Entry<Persistable<?>, EntityOperationType> entry : actions.entrySet()) {
+			PublishAware publishAware = ReflectionUtils.getActualClass(entry.getKey())
+					.getAnnotation(PublishAware.class);
 			if (publishAware != null)
-				eventPublisher.publish(new EntityOperationEvent<>((Persistable<?>) entity, action),
+				eventPublisher.publish(new EntityOperationEvent<>(entry.getKey(), entry.getValue()),
 						publishAware.scope());
 		}
 	}
