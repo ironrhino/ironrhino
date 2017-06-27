@@ -10,14 +10,15 @@ import org.aspectj.lang.annotation.Before;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.event.spi.AbstractEvent;
+import org.hibernate.event.spi.FlushEntityEvent;
 import org.hibernate.event.spi.PostDeleteEvent;
 import org.hibernate.event.spi.PostInsertEvent;
-import org.hibernate.event.spi.PostUpdateEvent;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,19 +78,39 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 			try {
 				Object entity;
 				EntityOperationType action;
+				String payload = null;
 				if (event instanceof PostInsertEvent) {
 					entity = ((PostInsertEvent) event).getEntity();
 					action = EntityOperationType.CREATE;
-				} else if (event instanceof PostUpdateEvent) {
-					entity = ((PostUpdateEvent) event).getEntity();
+					payload = JsonUtils.toJson(entity);
+				} else if (event instanceof FlushEntityEvent) {
+					FlushEntityEvent fee = (FlushEntityEvent) event;
+					entity = fee.getEntity();
 					action = EntityOperationType.UPDATE;
+					int[] dirtyProperties = fee.getDirtyProperties();
+					if (dirtyProperties == null)
+						continue;
+					String[] propertyNames = fee.getEntityEntry().getPersister().getEntityMetamodel()
+							.getPropertyNames();
+					StringBuilder sb = new StringBuilder();
+					for (int i = 0; i < dirtyProperties.length; i++) {
+						sb.append(propertyNames[dirtyProperties[i]]);
+						sb.append(": ");
+						sb.append(JsonUtils.toJson(fee.getDatabaseSnapshot()[dirtyProperties[i]]));
+						sb.append(" -> ");
+						sb.append(JsonUtils.toJson(fee.getPropertyValues()[dirtyProperties[i]]));
+						if (i < dirtyProperties.length - 1)
+							sb.append("\n------\n");
+					}
+					payload = sb.toString();
 				} else if (event instanceof PostDeleteEvent) {
 					entity = ((PostDeleteEvent) event).getEntity();
 					action = EntityOperationType.DELETE;
+					payload = JsonUtils.toJson(entity);
 				} else {
 					continue;
 				}
-
+				session.evict(entity);
 				Record record = new Record();
 				UserDetails ud = AuthzUtils.getUserDetails();
 				if (ud != null) {
@@ -98,7 +119,7 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 				}
 				record.setEntityId(String.valueOf(((Persistable<?>) entity).getId()));
 				record.setEntityClass(ReflectionUtils.getActualClass(entity).getName());
-				record.setEntityToString(entity.toString());
+				record.setEntityToString(payload != null ? payload : entity.toString());
 				record.setAction(action.name());
 				record.setRecordDate(new Date());
 				session.save(record);

@@ -29,6 +29,7 @@ import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
+import org.hibernate.event.spi.FlushEntityEventListener;
 import org.hibernate.event.spi.PostDeleteEventListener;
 import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostLoadEventListener;
@@ -94,6 +95,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 
 	@Autowired(required = false)
 	private List<PostLoadEventListener> postLoadEventListeners;
+
+	@Autowired(required = false)
+	private List<FlushEntityEventListener> flushEntityEventListeners;
 
 	private Class<?>[] annotatedClasses;
 
@@ -245,6 +249,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 					postDeleteEventListeners.toArray(new PostDeleteEventListener[0]));
 		if (postLoadEventListeners != null)
 			registry.appendListeners(EventType.POST_LOAD, postLoadEventListeners.toArray(new PostLoadEventListener[0]));
+		if (flushEntityEventListeners != null)
+			registry.appendListeners(EventType.FLUSH_ENTITY,
+					flushEntityEventListeners.toArray(new FlushEntityEventListener[0]));
 		return sessionFactory;
 
 	}
