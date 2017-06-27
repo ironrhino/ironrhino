@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.ironrhino.core.metadata.AutoConfig;
-import org.ironrhino.core.metadata.Readonly;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
@@ -23,11 +23,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AutoConfig
 @Entity
 @Table(name = "sample_task")
+@Richtable(order = "id desc")
 public class Task implements Persistable<String> {
 
 	private static final long serialVersionUID = 2110061290463634971L;
 
-	@UiConfig(width = "100px", alias = "taskNo", readonly = @Readonly(true), description = "taskNo.description")
 	@Id
 	@GeneratedValue(generator = "taskNo")
 	@GenericGenerator(name = "taskNo", strategy = "taskNo")
@@ -57,6 +57,11 @@ public class Task implements Persistable<String> {
 	public void setId(String id) {
 		if (StringUtils.isNotBlank(id))
 			this.id = id;
+	}
+
+	@UiConfig(width = "100px", displayOrder = -1, description = "taskNo.description")
+	public String getTaskNo() {
+		return getId();
 	}
 
 	@Override
