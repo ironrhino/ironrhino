@@ -3,6 +3,8 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
@@ -50,6 +52,16 @@ public class LabelValue implements Serializable {
 
 	public void setSelected(Boolean selected) {
 		this.selected = selected;
+	}
+
+	@Override
+	public boolean equals(Object another) {
+		return EqualsBuilder.reflectionEquals(this, another);
+	}
+
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
 	@Override

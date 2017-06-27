@@ -41,12 +41,12 @@ public class Tuple<K, V> implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this, false);
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
 	@Override
 	public boolean equals(Object that) {
-		return EqualsBuilder.reflectionEquals(this, that, false);
+		return EqualsBuilder.reflectionEquals(this, that);
 	}
 
 	@Override
