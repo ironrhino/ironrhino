@@ -68,7 +68,11 @@
 	function removeAction(event) {
 		var current = $(event.target).closest('.treeselect');
 		var options = current.data('_options');
-		val(options.name, current, null);
+		var viewlink = current.find('a.view[rel="richtable"]');
+		if (current.is('td') && viewlink.length)
+			viewlink.text(null);
+		else
+			val(options.name, current, null);
 		val(options.id, current, null);
 		if (options.id) {
 			var idtarget = find(options.id);
@@ -100,6 +104,9 @@
 					remove.click(removeAction);
 				} else {
 					var text = val(options.name, current);
+					var viewlink = current.find('a.view[rel="richtable"]');
+					if (current.is('td') && viewlink.length)
+						text = viewlink.text();
 					if (text) {
 						if (text.indexOf('...') < 0)
 							$('<a class="remove" href="#">&times;</a>')
@@ -110,6 +117,8 @@
 				}
 			}
 			var func = function(event) {
+				if ($(event.target).is('a.view[rel="richtable"]'))
+					return true;
 				var current = $(event.target).closest('.treeselect');
 				var winid = '_tree_window';
 				current.data('winid', winid);
@@ -220,12 +229,26 @@
 		if (options.name) {
 			var nametarget = find(options.name, current);
 			var name = options.full ? treenode.fullname : treenode.name;
-			val(options.name, current, name);
 			nametarget.each(function() {
-						var t = $(this);
-						if (!t.is(':input'))
-							$('<a class="remove" href="#">&times;</a>')
-									.appendTo(t).click(removeAction);
+						var viewlink = nametarget
+								.find('a.view[rel="richtable"]');
+						if (nametarget.is('td') && viewlink.length) {
+							var href = viewlink.attr('href');
+							viewlink.attr('href', href.substring(0, href
+													.lastIndexOf('/')
+													+ 1)
+											+ treenode.id);
+							viewlink.text(name);
+							if (!viewlink.next('.remove').length)
+								$('<a class="remove" href="#">&times;</a>')
+										.insertAfter(viewlink).click(removeAction);
+						} else {
+							val(options.name, current, name);
+							var t = $(this);
+							if (!t.is(':input'))
+								$('<a class="remove" href="#">&times;</a>')
+										.appendTo(t).click(removeAction);
+						}
 					});
 		}
 		if (options.id) {

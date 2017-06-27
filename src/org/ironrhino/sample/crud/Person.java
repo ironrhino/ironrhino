@@ -3,9 +3,12 @@ package org.ironrhino.sample.crud;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.NaturalId;
+import org.ironrhino.common.model.Region;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.Hidden;
@@ -32,6 +35,18 @@ public class Person extends AbstractEntity<Identity> {
 	@NaturalId(mutable = true)
 	@Column(nullable = false)
 	private String name;
+
+	@UiConfig(width = "200px")
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Region region;
+
+	public Region getRegion() {
+		return region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
+	}
 
 	@Override
 	public Identity getId() {
