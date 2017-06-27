@@ -34121,11 +34121,14 @@ Observation.common = function(container) {
 				var form = $(this);
 				var btn = $('.clicked', form);
 				if (!btn.length)
-					btn = $(':input:focus[type="submit"]', form);
+					btn = $(':input:submit:focus', form);
 				if (btn.hasClass('noajax'))
 					return true;
-				if (btn.hasClass('reload') || btn.data('action'))
+				var confirm = btn.hasClass('confirm');
+				if (btn.hasClass('reload') || btn.data('action')) {
 					options.pushState = false;
+					confirm = false;
+				}
 				var func = function() {
 					if ('multipart/form-data' == form.attr('enctype')) {
 						options.target = target;
@@ -34135,7 +34138,7 @@ Observation.common = function(container) {
 					}
 					btn.removeClass('clicked');
 				}
-				if (btn.hasClass('confirm')) {
+				if (confirm) {
 					$.alerts.confirm((btn.data('confirm') || MessageBundle
 									.get('confirm.action')), MessageBundle
 									.get('select'), function(b) {
