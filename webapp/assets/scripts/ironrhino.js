@@ -32732,7 +32732,7 @@ Form = {
 			return valid;
 		} else {
 			var valid = true;
-			$(':input:not(:disabled)', target).each(function() {
+			$(':input:not(:button):not(:disabled)', target).each(function() {
 						if (!Form.validate(this))
 							valid = false;
 					});
