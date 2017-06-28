@@ -12,6 +12,8 @@ import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.event.LoginEvent;
+import org.ironrhino.core.security.verfication.WrongVerificationCodeException;
+import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
@@ -33,6 +35,7 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -68,6 +71,9 @@ public class LoginAction extends BaseAction {
 
 	@Autowired
 	protected EventPublisher eventPublisher;
+
+	@Autowired(required = false)
+	protected VerificationManager verificationManager;
 
 	public String getUsername() {
 		return username;
@@ -109,6 +115,11 @@ public class LoginAction extends BaseAction {
 			}
 		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 			addFieldError("username", getText(failed.getClass().getName()));
+			try {
+				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
 		} catch (CredentialsNeedResetException failed) {
 			addFieldError("password", getText(failed.getClass().getName()));
 		} catch (BadCredentialsException failed) {
@@ -131,6 +142,13 @@ public class LoginAction extends BaseAction {
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 				}
+			}
+		} catch (WrongVerificationCodeException failed) {
+			addFieldError("verificationCode", getText(failed.getClass().getName()));
+			try {
+				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
 		if (authResult != null)
@@ -155,6 +173,22 @@ public class LoginAction extends BaseAction {
 		if (username == null)
 			username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 		return SUCCESS;
+	}
+
+	public String sendVerificationCode() {
+		if (verificationManager == null)
+			return NONE;
+		String method = ServletActionContext.getRequest().getMethod();
+		if (!method.equalsIgnoreCase("POST")) {
+			addActionError(getText("validation.error"));
+		} else if (verificationManager != null && StringUtils.isNotBlank(username)) {
+			try {
+				verificationManager.send(username);
+			} catch (AuthenticationException e) {
+				addFieldError("username", getText(e.getClass().getName()));
+			}
+		}
+		return JSON;
 	}
 
 }

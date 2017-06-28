@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +19,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
@@ -81,6 +82,9 @@ public class Oauth2Action extends BaseAction {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
+
+	@Autowired(required = false)
+	protected VerificationManager verificationManager;
 
 	private String username;
 	private String password;
@@ -410,34 +414,38 @@ public class Oauth2Action extends BaseAction {
 				if (client.getOwner() == null || !client.getOwner().getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
 					throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
 				try {
-					try {
-						Authentication authResult = authenticationManager
-								.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-						if (authResult != null)
-							try {
-								authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
-							} catch (Exception e) {
-								logger.error(e.getMessage(), e);
-							}
-					} catch (InternalAuthenticationServiceException failed) {
-						throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
-					} catch (AuthenticationException failed) {
-						logger.error(failed.getMessage(), failed);
+					Authentication authResult = authenticationManager
+							.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+					if (authResult != null)
 						try {
-							authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
+							authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
 						} catch (Exception e) {
 							logger.error(e.getMessage(), e);
 						}
-						throw new IllegalArgumentException(getText(failed.getClass().getName()));
-					}
-					UserDetails u = userDetailsService.loadUserByUsername(username);
-					if (StringUtils.isNotBlank(device_id))
-						authorization = oauthManager.grant(client, u.getUsername(), device_id, device_name);
-					else
-						authorization = oauthManager.grant(client, u.getUsername());
-				} catch (UsernameNotFoundException e) {
-					throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
+				} catch (InternalAuthenticationServiceException failed) {
+					throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
 				}
+				// catch (BadVerificationCodeException e) {
+				// throw new IllegalArgumentException("INVALID_VERIFICATION_CODE");
+				// } catch (UsernameNotFoundException e) {
+				// throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
+				// } catch (BadCredentialsException e) {
+				// throw new IllegalArgumentException("BAD_CREDENTIALS");
+				// }
+				catch (AuthenticationException failed) {
+					logger.error(failed.getMessage(), failed);
+					try {
+						authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+					}
+					throw new IllegalArgumentException(getText(failed.getClass().getName()));
+				}
+				UserDetails u = userDetailsService.loadUserByUsername(username);
+				if (StringUtils.isNotBlank(device_id))
+					authorization = oauthManager.grant(client, u.getUsername(), device_id, device_name);
+				else
+					authorization = oauthManager.grant(client, u.getUsername());
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
@@ -451,7 +459,7 @@ public class Oauth2Action extends BaseAction {
 				}
 				return NONE;
 			}
-			tojson = new HashMap<>();
+			tojson = new LinkedHashMap<>();
 			tojson.put("access_token", authorization.getAccessToken());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
@@ -477,7 +485,7 @@ public class Oauth2Action extends BaseAction {
 				}
 				return NONE;
 			}
-			tojson = new HashMap<>();
+			tojson = new LinkedHashMap<>();
 			tojson.put("access_token", authorization.getAccessToken());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
@@ -488,7 +496,7 @@ public class Oauth2Action extends BaseAction {
 			client.setSecret(client_secret);
 			try {
 				authorization = oauthManager.refresh(client, refresh_token);
-				tojson = new HashMap<>();
+				tojson = new LinkedHashMap<>();
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
@@ -525,7 +533,7 @@ public class Oauth2Action extends BaseAction {
 			client.setRedirectUri(redirect_uri);
 			try {
 				authorization = oauthManager.authenticate(code, client);
-				tojson = new HashMap<>();
+				tojson = new LinkedHashMap<>();
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
@@ -553,7 +561,7 @@ public class Oauth2Action extends BaseAction {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		if (access_token == null && token != null)
 			access_token = token;
-		tojson = new HashMap<>();
+		tojson = new LinkedHashMap<>();
 		authorization = oauthManager.retrieve(access_token);
 		if (authorization == null) {
 			if (httpErrorHandler != null
@@ -588,6 +596,49 @@ public class Oauth2Action extends BaseAction {
 					revoked ? HttpServletResponse.SC_OK : HttpServletResponse.SC_NOT_FOUND, null);
 		}
 		return NONE;
+	}
+
+	@JsonConfig(root = "tojson")
+	public String sendVerificationCode() {
+		if (verificationManager == null) {
+			tojson = new LinkedHashMap<>();
+			tojson.put("code", "2");
+			tojson.put("status", "FORBIDDEN");
+			return NONE;
+		}
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		try {
+			client = oauthManager.findClientById(client_id);
+			if (client == null)
+				throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
+			if (!client.getSecret().equals(client_secret))
+				throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+			if (client.getOwner() == null || !client.getOwner().getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
+				throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
+			if (verificationManager != null && StringUtils.isNotBlank(username)) {
+				try {
+					verificationManager.send(username);
+					tojson = new LinkedHashMap<>();
+					tojson.put("code", "0");
+					tojson.put("status", "OK");
+				} catch (AuthenticationException failed) {
+					throw new IllegalArgumentException(getText(failed.getClass().getName()));
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			if (httpErrorHandler != null
+					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
+				return NONE;
+			try {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			return NONE;
+		}
+		return JSON;
 	}
 
 }

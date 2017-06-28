@@ -19,12 +19,33 @@
 	<div class="span6 offset3">
 	<h2 class="caption">${getText('login')}</h2>
 	<div class="hero-unit">
+	<#assign verificationCodeEnabled = (properties['verification.code.enabled']!)=='true'>
+	<#assign verificationCodeRequired = false>
+	<#assign passwordCodeRequired = true>
+	<#if verificationCodeEnabled && username?has_content>
+		<#assign verificationCodeRequired = beans['verificationManager'].isVerificationRequired(username)>
+		<#assign passwordCodeRequired = beans['verificationManager'].isPasswordRequired(username)>
+	</#if>
 	<@s.form id="login" action="${actionBaseUrl}" method="post" class="ajax focus form-horizontal well">
 		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
-		<@s.textfield name="username" class="required span2"/>
+		<#assign dynamicAttributes={}>
+		<#if verificationCodeEnabled>
+		<#assign dynamicAttributes+={'data-replacement':'verification'}>
+		</#if>
+		<@s.textfield name="username" class="required span2${verificationCodeEnabled?then(' conjunct','')}" dynamicAttributes=dynamicAttributes/>
+		<#if verificationCodeEnabled><div id="verification"></#if>
+		<#if passwordCodeRequired>
 		<@s.password name="password" class="required span2 input-pattern submit sha"/>
+		</#if>
+		<#if verificationCodeRequired>
+		<@s.textfield name="verificationCode" class="required input-small" maxlength="${properties['verification.code.length']!'6'}">
+			<@s.param name="after"> <button type="button" class="btn sendVerificationCode" data-interval="${properties['verification.code.resend.interval']!'60'}">${getText('send')}</button></@s.param>
+		</@s.textfield>
+		<#else>
 		<@s.checkbox name="rememberme" class="custom"/>
 		<@captcha/>
+		</#if>
+		<#if verificationCodeEnabled></div></#if>
 		<@s.submit value=getText('login') class="btn-primary">
 		<#if getSetting??&&'true'==getSetting('signup.enabled')>
 		<@resourcePresentConditional value="resources/view/signup.ftl">

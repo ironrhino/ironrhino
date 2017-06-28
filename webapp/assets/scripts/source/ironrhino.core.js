@@ -1101,6 +1101,43 @@ Initialization.common = function() {
 				});
 		document.location.reload();
 		return false;
+	}).on('focus', '[name="verificationCode"]', function() {
+				var t = $(this);
+				if (!t.val())
+					t.next('.sendVerificationCode:not(:disabled)').click();
+			}).on('click', '.sendVerificationCode', function() {
+		var btn = $(this);
+		var f = btn.closest('form');
+		var cooldown = parseInt(btn.data('cooldown') || 60);
+		var userparam = btn.data('username') || 'username';
+		var userinput = f.find('[name="' + userparam + '"]');
+		var data = {};
+		data[userparam] = userinput.val();
+		if (Form.validate(userinput)) {
+			ajax({
+						type : 'POST',
+						url : btn.data('url') || f.attr('action')
+								+ '/sendVerificationCode',
+						target : f[0],
+						data : data,
+						onsuccess : function() {
+							btn.prop('disabled', true).css('width',
+									btn.outerWidth()).data('text', btn.text())
+									.text(cooldown);
+							var intv = setInterval(function() {
+										var cd = parseInt(btn.text()) - 1;
+										if (cd <= 0) {
+											clearInterval(intv);
+											btn.prop('disabled', false)
+													.text(btn.data('text'));
+										} else {
+											btn.text(parseInt(btn.text()) - 1);
+										}
+									}, 1000);
+						}
+					});
+		}
+		return false;
 	});
 	$.alerts.okButton = MessageBundle.get('confirm');
 	$.alerts.cancelButton = MessageBundle.get('cancel');
