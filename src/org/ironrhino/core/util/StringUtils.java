@@ -2,6 +2,7 @@ package org.ironrhino.core.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.Locale;
 
 public class StringUtils {
@@ -416,6 +417,12 @@ public class StringUtils {
 			return null;
 		input = input.trim();
 		return input.replaceAll("\\s+", " ");
+	}
+
+	public static String toString(Object value) {
+		if (value != null && value.getClass().isArray())
+			return Arrays.toString((Object[]) value);
+		return String.valueOf(value);
 	}
 
 }

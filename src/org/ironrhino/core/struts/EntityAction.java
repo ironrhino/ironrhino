@@ -852,7 +852,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					logger.error(e.getMessage(), e);
 				}
 				persisted = entityManager.findOne(caseInsensitive, args);
-				entityManager.evict(persisted);
+				// entityManager.evict(persisted);
 				if (persisted != null) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
@@ -951,7 +951,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					logger.error(e.getMessage(), e);
 				}
 				persisted = entityManager.findOne(caseInsensitive, args);
-				entityManager.evict(persisted);
+				// entityManager.evict(persisted);
 				if (persisted != null && !persisted.getId().equals(_entity.getId())) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
@@ -969,7 +969,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						ServletActionContext.getRequest().getParameter(getEntityName() + '.' + entry.getKey()))) {
 					persisted = entityManager.findOne(entry.getKey(),
 							(Serializable) bw.getPropertyValue(entry.getKey()));
-					entityManager.evict(persisted);
+					// entityManager.evict(persisted);
 					if (persisted != null && !persisted.getId().equals(_entity.getId())) {
 						addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
 						return false;
@@ -986,7 +986,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						addFieldError("id", getText("validation.required"));
 						return false;
 					}
-					entityManager.evict(persisted);
+					// entityManager.evict(persisted);
 				}
 				BeanWrapperImpl bwp = new BeanWrapperImpl(persisted);
 				bwp.setConversionService(conversionService);

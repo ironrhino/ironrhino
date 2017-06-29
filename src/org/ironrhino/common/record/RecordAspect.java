@@ -1,6 +1,8 @@
 package org.ironrhino.common.record;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -10,9 +12,15 @@ import org.aspectj.lang.annotation.Before;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.event.spi.AbstractEvent;
-import org.hibernate.event.spi.FlushEntityEvent;
 import org.hibernate.event.spi.PostDeleteEvent;
 import org.hibernate.event.spi.PostInsertEvent;
+import org.hibernate.event.spi.PostUpdateEvent;
+import org.hibernate.id.ForeignGenerator;
+import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.tuple.entity.EntityMetamodel;
+import org.hibernate.type.BagType;
+import org.hibernate.type.ListType;
+import org.hibernate.type.Type;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.Persistable;
@@ -20,6 +28,7 @@ import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
@@ -28,6 +37,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import com.google.common.base.Objects;
 
 @Aspect
 @Component
@@ -80,33 +91,73 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 				EntityOperationType action;
 				String payload = null;
 				if (event instanceof PostInsertEvent) {
-					entity = ((PostInsertEvent) event).getEntity();
+					PostInsertEvent pie = (PostInsertEvent) event;
+					entity = pie.getEntity();
 					action = EntityOperationType.CREATE;
-					payload = JsonUtils.toJson(entity);
-				} else if (event instanceof FlushEntityEvent) {
-					FlushEntityEvent fee = (FlushEntityEvent) event;
-					entity = fee.getEntity();
-					action = EntityOperationType.UPDATE;
-					int[] dirtyProperties = fee.getDirtyProperties();
-					if (dirtyProperties == null)
-						continue;
-					String[] propertyNames = fee.getEntityEntry().getPersister().getEntityMetamodel()
-							.getPropertyNames();
+					String[] propertyNames = pie.getPersister().getEntityMetamodel().getPropertyNames();
 					StringBuilder sb = new StringBuilder();
-					for (int i = 0; i < dirtyProperties.length; i++) {
-						sb.append(propertyNames[dirtyProperties[i]]);
-						sb.append(": ");
-						sb.append(JsonUtils.toJson(fee.getDatabaseSnapshot()[dirtyProperties[i]]));
-						sb.append(" -> ");
-						sb.append(JsonUtils.toJson(fee.getPropertyValues()[dirtyProperties[i]]));
-						if (i < dirtyProperties.length - 1)
+					boolean sep = false;
+					for (int i = 0; i < propertyNames.length; i++) {
+						Object value = pie.getState()[i];
+						if (value == null || value instanceof Collection && ((Collection<?>) value).isEmpty()
+								|| value.getClass().isArray() && Array.getLength(value) == 0)
+							continue;
+						if (sep)
 							sb.append("\n------\n");
+						sb.append(propertyNames[i]);
+						sb.append(": ");
+						sb.append(StringUtils.toString(value));
+						sep = true;
 					}
 					payload = sb.toString();
+				} else if (event instanceof PostUpdateEvent) {
+					PostUpdateEvent pue = (PostUpdateEvent) event;
+					entity = pue.getEntity();
+					action = EntityOperationType.UPDATE;
+					Object[] databaseSnapshot = pue.getOldState();
+					Object[] propertyValues = pue.getState();
+					int[] dirtyProperties = pue.getDirtyProperties();
+					if (databaseSnapshot == null || dirtyProperties == null)
+						continue;
+					EntityMetamodel em = pue.getPersister().getEntityMetamodel();
+					String[] propertyNames = em.getPropertyNames();
+					StringBuilder sb = new StringBuilder();
+					boolean sep = false;
+					for (int i = 0; i < dirtyProperties.length; i++) {
+						String propertyName = propertyNames[dirtyProperties[i]];
+						Type type = em.getPropertyTypes()[dirtyProperties[i]];
+						if (type instanceof BagType)
+							continue;
+						IdentifierGenerator ig = em.getIdentifierProperty().getIdentifierGenerator();
+						if (ig instanceof ForeignGenerator) {
+							if (propertyName.equals(((ForeignGenerator) ig).getPropertyName()))
+								continue; // @MapsId
+						}
+						Object oldValue = databaseSnapshot[dirtyProperties[i]];
+						Object newValue = propertyValues[dirtyProperties[i]];
+						if (oldValue instanceof Persistable)
+							oldValue = ((Persistable<?>) oldValue).getId();
+						if (newValue instanceof Persistable)
+							newValue = ((Persistable<?>) newValue).getId();
+						if (Objects.equal(oldValue, newValue))
+							continue;
+						if (sep)
+							sb.append("\n------\n");
+						sb.append(propertyName);
+						sb.append(": ");
+						sb.append(
+								type instanceof ListType ? JsonUtils.toJson(oldValue) : StringUtils.toString(oldValue));
+						sb.append(" -> ");
+						sb.append(
+								type instanceof ListType ? JsonUtils.toJson(newValue) : StringUtils.toString(newValue));
+						sep = true;
+					}
+					payload = sb.toString();
+					if (payload.isEmpty())
+						continue;
 				} else if (event instanceof PostDeleteEvent) {
 					entity = ((PostDeleteEvent) event).getEntity();
 					action = EntityOperationType.DELETE;
-					payload = JsonUtils.toJson(entity);
 				} else {
 					continue;
 				}
