@@ -20,7 +20,7 @@ public class MyXWorkConverter extends XWorkConverter {
 			Class toClass) {
 		if (Persistable.class.isAssignableFrom(toClass) && value instanceof String) {
 			String id = (String) value;
-			if(id.isEmpty())
+			if (id.isEmpty())
 				return null;
 			Object entity;
 			try {
@@ -35,9 +35,11 @@ public class MyXWorkConverter extends XWorkConverter {
 			String[] arr = (String[]) value;
 			if (arr.length == 1) {
 				String s = arr[0];
+				if (s == null)
+					return null;
 				if (s.startsWith("[") && s.endsWith("]"))
 					s = s.substring(1, s.length() - 1);
-				value = s.split(",\\s*");
+				value = s.isEmpty() ? new String[0] : s.split(",\\s*");
 			}
 		}
 		Object result = super.convertValue(context, target, member, property, value, toClass);
