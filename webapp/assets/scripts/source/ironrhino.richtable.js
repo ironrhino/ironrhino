@@ -76,6 +76,7 @@ Richtable = {
 	},
 	open : function(url, reloadonclose, useiframe, form, btn) {
 		form = form || $('form.richtable');
+		var reloadable = form.closest('.reload-container').find('.reloadable');
 		reloadonclose = reloadonclose || false;
 		useiframe = useiframe || false;
 		var winindex = $(document).data('winindex') || 0;
@@ -167,9 +168,7 @@ Richtable = {
 									// }, 1000);
 								}
 								setTimeout(function() {
-											form.closest('.reload-container')
-													.find('.reloadable')
-													.trigger('reload');
+											reloadable.trigger('reload');
 										}, 500);
 							};
 						});
@@ -275,6 +274,7 @@ Richtable = {
 	click : function(event) {
 		var btn = $(event.target).closest('button,a');
 		var form = btn.closest('form');
+		var reloadable = form.closest('.reload-container').find('.reloadable');
 		if (btn.attr('onclick') || btn.hasClass('raw'))
 			return;
 		var idparams;
@@ -320,9 +320,7 @@ Richtable = {
 							success : function() {
 								form.submit();
 								setTimeout(function() {
-											form.closest('.reload-container')
-													.find('.reloadable')
-													.trigger('reload');
+											reloadable.trigger('reload');
 										}, 500);
 							},
 							complete : function() {
@@ -383,6 +381,7 @@ Richtable = {
 	save : function(event) {
 		var btn = $(event.target).closest('button,a');
 		var form = $(event.target).closest('form');
+		var reloadable = form.closest('.reload-container').find('.reloadable');
 		var func = function() {
 			var versionproperty = form.data('versionproperty');
 			var modified = false;
@@ -436,10 +435,7 @@ Richtable = {
 									$('[data-action="save"]', form)
 											.removeClass('btn-primary').hide();
 									setTimeout(function() {
-												form
-														.closest('.reload-container')
-														.find('.reloadable')
-														.trigger('reload');
+												reloadable.trigger('reload');
 											}, 500);
 								},
 								complete : function() {
@@ -617,12 +613,12 @@ Initialization.richtable = function() {
 						var btn = $(event.target).closest('button,a')
 								.addClass('clicked');
 						var form = btn.closest('form');
+						var reloadable = form.closest('.reload-container')
+								.find('.reloadable');
 						btn.prop('disabled', true).addClass('loading');
 						form.submit();
 						setTimeout(function() {
-									form.closest('.reload-container')
-											.find('.reloadable')
-											.trigger('reload');
+									reloadable.trigger('reload');
 								}, 500);
 					}).on('click', '.richtable .action .filter', function() {
 						var f = $(this).closest('form').next('form.criteria');
