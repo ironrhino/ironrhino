@@ -22,6 +22,8 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public T get(Serializable id);
 
+	public boolean exists(Serializable id);
+
 	public T get(Serializable id, LockOptions lockOptions);
 
 	public List<T> get(List<? extends Serializable> ids);
@@ -50,9 +52,15 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public T findByNaturalId(Serializable... objects);
 
+	public boolean existsNaturalId(Serializable... objects);
+
 	public T findOne(Serializable... objects);
 
+	public boolean existsOne(Serializable... objects);
+
 	public T findOne(boolean caseInsensitive, Serializable... objects);
+
+	public boolean existsOne(boolean caseInsensitive, Serializable... objects);
 
 	public List<T> findAll(Order... orders);
 

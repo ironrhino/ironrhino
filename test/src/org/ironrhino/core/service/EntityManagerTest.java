@@ -1,9 +1,12 @@
 package org.ironrhino.core.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,14 +54,20 @@ public class EntityManagerTest {
 		assertNotNull(person2.getCreateDate());
 		person.setGender(Gender.FEMALE);
 		entityManager.update(person);
+		assertTrue(entityManager.existsNaturalId("test"));
 		person2 = entityManager.findByNaturalId("test");
 		assertEquals(Gender.FEMALE, person2.getGender());
 		person2 = entityManager.findOne("test");
 		assertEquals(Gender.FEMALE, person2.getGender());
+		assertTrue(entityManager.existsOne("name", "test"));
+		assertTrue(entityManager.existsOne(true, new Serializable[] { "name", "Test" }));
 		person2 = entityManager.findOne("name", "test");
 		assertEquals(Gender.FEMALE, person2.getGender());
+		assertTrue(entityManager.exists(person.getId()));
 		entityManager.delete(person2);
+		assertFalse(entityManager.exists(person.getId()));
 		assertNull(entityManager.findByNaturalId("test"));
+
 	}
 
 	@Test
