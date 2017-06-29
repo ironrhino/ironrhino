@@ -11,6 +11,7 @@ import org.ironrhino.core.servlet.RequestContext;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -171,7 +172,7 @@ public class AuthzUtils {
 		if (sc == null)
 			return null;
 		Authentication auth = sc.getAuthentication();
-		if (auth == null)
+		if (auth == null || auth instanceof AnonymousAuthenticationToken)
 			return null;
 		return auth.getName();
 	}
