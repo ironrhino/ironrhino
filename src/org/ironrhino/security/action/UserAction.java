@@ -244,7 +244,6 @@ public class UserAction extends EntityAction<User> {
 			BeanUtils.copyProperties(temp, user);
 			if (StringUtils.isNotBlank(password))
 				user.setLegiblePassword(password);
-			userManager.evict(user);
 			int versionInDb = user.getVersion();
 			int versionInUi = temp.getVersion();
 			if (versionInUi > -1) {
