@@ -813,7 +813,6 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 			}
 		}
-		Persistable persisted = null;
 		Map<String, NaturalId> naturalIds = getNaturalIds();
 		boolean naturalIdMutable = isNaturalIdMutable();
 		boolean caseInsensitive = AnnotationUtils
@@ -830,8 +829,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						return false;
 					}
 				}
-				persisted = entityManager.get(_entity.getId());
-				if (persisted != null) {
+				if (entityManager.exists(_entity.getId())) {
 					addFieldError(getEntityName() + ".id", getText("validation.already.exists"));
 					return false;
 				}
@@ -851,9 +849,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 				}
-				persisted = entityManager.findOne(caseInsensitive, args);
-				// entityManager.evict(persisted);
-				if (persisted != null) {
+				if (entityManager.existsOne(caseInsensitive, args)) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
 						String fieldName = getEntityName() + '.' + it.next();
@@ -868,9 +864,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
 				if (entry.getValue().isUnique() && StringUtils.isNotBlank(
 						ServletActionContext.getRequest().getParameter(getEntityName() + '.' + entry.getKey()))) {
-					persisted = entityManager.findOne(entry.getKey(),
-							(Serializable) bw.getPropertyValue(entry.getKey()));
-					if (persisted != null) {
+					if (entityManager.existsOne(entry.getKey(), (Serializable) bw.getPropertyValue(entry.getKey()))) {
 						addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
 						return false;
 					}
@@ -935,6 +929,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				logger.error(e.getMessage(), e);
 			}
 		} else {
+			Persistable persisted = null;
 			if (naturalIdMutable && naturalIds.size() > 0) {
 				Serializable[] args = new Serializable[naturalIds.size() * 2];
 				Iterator<String> it = naturalIds.keySet().iterator();
@@ -976,14 +971,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					}
 				}
 			}
-			if (persisted != null && !persisted.getId().equals(_entity.getId())) {
-				persisted = null;
-			}
 			try {
 				if (persisted == null) {
 					persisted = entityManager.get((Serializable) bw.getPropertyValue("id"));
 					if (persisted == null) {
-						addFieldError("id", getText("validation.required"));
+						addFieldError("id", getText("validation.not.exists"));
 						return false;
 					}
 					// entityManager.evict(persisted);
@@ -1073,9 +1065,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			for (Object o : siblings) {
 				BaseTreeableEntity sibling = (BaseTreeableEntity) o;
-				entityManager.evict(sibling);
 				if (!treeEntity.isNew() && sibling.getId().equals(treeEntity.getId()))
 					continue;
+				entityManager.evict(sibling);
 				String name = sibling.getName();
 				if (name.equals(treeEntity.getName()) || AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), CaseInsensitive.class)

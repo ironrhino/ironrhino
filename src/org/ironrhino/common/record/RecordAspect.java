@@ -19,14 +19,12 @@ import org.hibernate.id.ForeignGenerator;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.tuple.entity.EntityMetamodel;
 import org.hibernate.type.BagType;
-import org.hibernate.type.ListType;
 import org.hibernate.type.Type;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.StringUtils;
 import org.slf4j.Logger;
@@ -141,15 +139,17 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 							newValue = ((Persistable<?>) newValue).getId();
 						if (Objects.equal(oldValue, newValue))
 							continue;
+						if (oldValue instanceof Collection && ((Collection<?>) oldValue).isEmpty() && newValue == null
+								|| newValue instanceof Collection && ((Collection<?>) newValue).isEmpty()
+										&& oldValue == null)
+							continue;
 						if (sep)
 							sb.append("\n------\n");
 						sb.append(propertyName);
 						sb.append(": ");
-						sb.append(
-								type instanceof ListType ? JsonUtils.toJson(oldValue) : StringUtils.toString(oldValue));
+						sb.append(StringUtils.toString(oldValue));
 						sb.append(" -> ");
-						sb.append(
-								type instanceof ListType ? JsonUtils.toJson(newValue) : StringUtils.toString(newValue));
+						sb.append(StringUtils.toString(newValue));
 						sep = true;
 					}
 					payload = sb.toString();
