@@ -19,12 +19,9 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
-import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,15 +29,10 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.io.Files;
 
+@Primary
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = { CLOUD, CLUSTER })
-public class MongoFileStorage implements FileStorage {
-
-	@Value("${fileStorage.uri:file}")
-	protected String uri;
-
-	@Value("${fileStorage.baseUrl:}")
-	protected String baseUrl;
+public class MongoFileStorage extends AbstractFileStorage {
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -247,21 +239,6 @@ public class MongoFileStorage implements FileStorage {
 			sortedMap.put(entry.getKey(), entry.getValue());
 		return sortedMap;
 	}
-
-	@Override
-	public String getFileUrl(String path) {
-		path = Files.simplifyPath(path);
-		if (!path.startsWith("/"))
-			path = '/' + path;
-		return StringUtils.isNotBlank(baseUrl) ? baseUrl + path : path;
-	}
-
-	private ValueThenKeyComparator<String, Boolean> comparator = new ValueThenKeyComparator<String, Boolean>() {
-		@Override
-		protected int compareValue(Boolean a, Boolean b) {
-			return b.compareTo(a);
-		}
-	};
 
 	private static class File implements Serializable {
 

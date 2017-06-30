@@ -16,7 +16,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.input.ProxyInputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -28,29 +27,26 @@ import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.DateUtils;
-import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.google.common.io.Files;
 
+@Primary
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = "ftp")
-public class FtpFileStorage implements FileStorage {
+public class FtpFileStorage extends AbstractFileStorage {
 
 	@Autowired
 	private Logger logger;
 
 	@Value("${fileStorage.uri:ftp://test:test@localhost}")
 	protected URI uri;
-
-	@Value("${fileStorage.baseUrl:}")
-	protected String baseUrl;
 
 	@Value("${ftp.controlEncoding:UTF-8}")
 	protected String controlEncoding;
@@ -77,6 +73,42 @@ public class FtpFileStorage implements FileStorage {
 	protected int minEvictableIdleTimeMillis;
 
 	private ObjectPool<FTPClient> pool;
+
+	public void setUri(URI uri) {
+		this.uri = uri;
+	}
+
+	public void setControlEncoding(String controlEncoding) {
+		this.controlEncoding = controlEncoding;
+	}
+
+	public void setBinaryMode(boolean binaryMode) {
+		this.binaryMode = binaryMode;
+	}
+
+	public void setPassiveMode(boolean passiveMode) {
+		this.passiveMode = passiveMode;
+	}
+
+	public void setMaxTotal(int maxTotal) {
+		this.maxTotal = maxTotal;
+	}
+
+	public void setMaxIdle(int maxIdle) {
+		this.maxIdle = maxIdle;
+	}
+
+	public void setMinIdle(int minIdle) {
+		this.minIdle = minIdle;
+	}
+
+	public void setMaxWaitMillis(int maxWaitMillis) {
+		this.maxWaitMillis = maxWaitMillis;
+	}
+
+	public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
+		this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -300,24 +332,9 @@ public class FtpFileStorage implements FileStorage {
 		});
 	}
 
-	@Override
-	public String getFileUrl(String path) {
-		path = Files.simplifyPath(path);
-		if (!path.startsWith("/"))
-			path = '/' + path;
-		return StringUtils.isNotBlank(baseUrl) ? baseUrl + path : path;
-	}
-
 	private String getRealPath(String path, FTPClient ftpClient) throws IOException {
 		return Files.simplifyPath(ftpClient.printWorkingDirectory() + uri.getPath() + path);
 	}
-
-	private ValueThenKeyComparator<String, Boolean> comparator = new ValueThenKeyComparator<String, Boolean>() {
-		@Override
-		protected int compareValue(Boolean a, Boolean b) {
-			return b.compareTo(a);
-		}
-	};
 
 	public <T> T execute(Callback<T> callback) throws IOException {
 		FTPClient ftpClient = null;
