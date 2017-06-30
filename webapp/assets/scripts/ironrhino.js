@@ -32231,8 +32231,8 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 			&& ($('meta[name="pe"]').attr('content') != 'false')) {
 		var temp = $.param;
 		$.param = function(a, traditional) {
-			if (jQuery.isArray(a) || a.jquery) {
-				jQuery.each(a, function() {
+			if ($.isArray(a) || a.jquery) {
+				$.each(a, function() {
 					if (this.type == 'password') {
 						try {
 							var key = $.cookie('T');
@@ -32884,9 +32884,10 @@ Ajax = {
 			UrlUtils.resolvePath(div, options.url);
 			html = div.html();
 			var replacement = options.replacement;
-			if (typeof replacement == 'string') {
+			if (typeof replacement == 'string'
+					|| typeof replacement == 'number') {
 				var map = {};
-				var entries = replacement.split(',');
+				var entries = replacement.toString().split(',');
 				var arr = [];
 				for (var i = 0; i < entries.length; i++) {
 					var entry = entries[i];
@@ -38464,13 +38465,13 @@ Richtable = {
 				+ Richtable.getPathParams();
 		if (id) {
 			url += (url.indexOf('?') > 0 ? '&' : '?');
-			if (typeof id == 'string') {
-				url += 'id=' + id;
-			} else {
+			if ($.isArray(id)) {
 				var ids = [];
 				for (var i = 0; i < id.length; i++)
 					ids.push('id=' + id[i]);
 				url += ids.join('&');
+			} else {
+				url += 'id=' + id;
 			}
 		}
 		if (includeParams) {

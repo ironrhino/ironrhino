@@ -33,13 +33,13 @@ Richtable = {
 				+ Richtable.getPathParams();
 		if (id) {
 			url += (url.indexOf('?') > 0 ? '&' : '?');
-			if (typeof id == 'string') {
-				url += 'id=' + id;
-			} else {
+			if ($.isArray(id)) {
 				var ids = [];
 				for (var i = 0; i < id.length; i++)
 					ids.push('id=' + id[i]);
 				url += ids.join('&');
+			} else {
+				url += 'id=' + id;
 			}
 		}
 		if (includeParams) {
