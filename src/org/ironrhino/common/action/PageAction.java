@@ -34,7 +34,7 @@ public class PageAction extends EntityAction<Page> {
 	private boolean draft;
 
 	@Autowired
-	private transient PageManager pageManager;
+	private PageManager pageManager;
 
 	private String cmsPath = "/p/";
 

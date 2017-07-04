@@ -60,10 +60,10 @@ public class UploadAction extends BaseAction {
 	protected String fileStoragePath;
 
 	@Autowired
-	private transient FileStorage fileStorage;
+	private FileStorage fileStorage;
 
 	@Autowired
-	private transient TemplateProvider templateProvider;
+	private TemplateProvider templateProvider;
 
 	private String suffix;
 

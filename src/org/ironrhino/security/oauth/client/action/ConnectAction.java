@@ -36,16 +36,16 @@ public class ConnectAction extends BaseAction {
 	private List<OAuthProvider> providers;
 
 	@Autowired
-	private transient UserManager userManager;
+	private UserManager userManager;
 
 	@Autowired
-	private transient EventPublisher eventPublisher;
+	private EventPublisher eventPublisher;
 
 	@Autowired
-	private transient SettingControl settingControl;
+	private SettingControl settingControl;
 
 	@Autowired
-	private transient OAuthProviderManager oauthProviderManager;
+	private OAuthProviderManager oauthProviderManager;
 
 	public List<OAuthProvider> getProviders() {
 		return providers;

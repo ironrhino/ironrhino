@@ -58,16 +58,16 @@ public class LoginAction extends BaseAction {
 	protected String defaultTargetUrl;
 
 	@Autowired
-	protected transient UserDetailsService userDetailsService;
+	protected UserDetailsService userDetailsService;
 
 	@Autowired
-	protected transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
+	protected DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
 
 	@Autowired
-	private transient AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager;
 
 	@Autowired
-	protected transient EventPublisher eventPublisher;
+	protected EventPublisher eventPublisher;
 
 	public String getUsername() {
 		return username;
@@ -152,7 +152,8 @@ public class LoginAction extends BaseAction {
 	@Override
 	public String input() {
 		HttpServletRequest request = ServletActionContext.getRequest();
-		username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
+		if (username == null)
+			username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 		return SUCCESS;
 	}
 

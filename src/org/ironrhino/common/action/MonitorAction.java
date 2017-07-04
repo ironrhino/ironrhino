@@ -45,7 +45,7 @@ public class MonitorAction extends BaseAction {
 	private Chart chart;
 
 	@Autowired
-	private transient StatControl statControl;
+	private StatControl statControl;
 
 	public boolean isLocalhost() {
 		return localhost;

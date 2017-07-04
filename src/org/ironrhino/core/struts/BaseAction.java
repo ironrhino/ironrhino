@@ -85,10 +85,10 @@ public class BaseAction extends ActionSupport {
 	private String actionBaseUrl;
 
 	@Autowired(required = false)
-	protected transient CaptchaManager captchaManager;
+	protected CaptchaManager captchaManager;
 
 	@Autowired(required = false)
-	protected transient DynamicAuthorizerManager dynamicAuthorizerManager;
+	protected DynamicAuthorizerManager dynamicAuthorizerManager;
 
 	public void setCsrf(String csrf) {
 		this.csrf = csrf;

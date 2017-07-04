@@ -41,7 +41,7 @@ public class PageViewAction extends BaseAction {
 	private Map<String, Long> dataMap;
 
 	@Autowired
-	private transient PageViewService pageViewService;
+	private PageViewService pageViewService;
 
 	public String getDomain() {
 		return domain;

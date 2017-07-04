@@ -59,19 +59,19 @@ public class Oauth2Action extends BaseAction {
 	protected static Logger logger = LoggerFactory.getLogger(Oauth2Action.class);
 
 	@Autowired
-	protected transient EventPublisher eventPublisher;
+	protected EventPublisher eventPublisher;
 
 	@Autowired
-	private transient OAuthManager oauthManager;
+	private OAuthManager oauthManager;
 
 	@Autowired(required = false)
 	private HttpErrorHandler httpErrorHandler;
 
 	@Autowired
-	private transient UserDetailsService userDetailsService;
+	private UserDetailsService userDetailsService;
 
 	@Autowired
-	private transient DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
+	private DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
 
 	@Autowired
 	protected AuthenticationFailureHandler authenticationFailureHandler;
@@ -80,7 +80,7 @@ public class Oauth2Action extends BaseAction {
 	protected AuthenticationSuccessHandler authenticationSuccessHandler;
 
 	@Autowired
-	private transient AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager;
 
 	private String username;
 	private String password;

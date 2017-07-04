@@ -75,19 +75,19 @@ public class UserAction extends EntityAction<User> {
 	private boolean userCurrentPasswordNeeded;
 
 	@Autowired
-	private transient UserManager userManager;
+	private UserManager userManager;
 
 	@Autowired
-	private transient UserRoleManager userRoleManager;
+	private UserRoleManager userRoleManager;
 
 	@Autowired(required = false)
-	private transient UserRoleFilter userRoleFilter;
+	private UserRoleFilter userRoleFilter;
 
 	@Autowired(required = false)
-	private transient PasswordStrengthChecker passwordStrengthChecker;
+	private PasswordStrengthChecker passwordStrengthChecker;
 
 	@Autowired
-	protected transient EventPublisher eventPublisher;
+	protected EventPublisher eventPublisher;
 
 	public List<LabelValue> getRoles() {
 		return roles;

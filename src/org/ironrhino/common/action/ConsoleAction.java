@@ -38,7 +38,7 @@ public class ConsoleAction extends BaseAction {
 	private Object result;
 
 	@Autowired
-	private transient ApplicationContextConsole applicationContextConsole;
+	private ApplicationContextConsole applicationContextConsole;
 
 	public String getExpression() {
 		return expression;

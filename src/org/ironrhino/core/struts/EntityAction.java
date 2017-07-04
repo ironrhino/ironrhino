@@ -118,10 +118,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected BaseTreeableEntity parentEntity;
 
 	@Autowired(required = false)
-	protected transient SearchService<EN> searchService;
+	protected SearchService<EN> searchService;
 
 	@Autowired(required = false)
-	protected transient ConversionService conversionService;
+	protected ConversionService conversionService;
 
 	@Value("${csv.defaultEncoding:GBK}")
 	private String csvDefaultEncoding = "GBK";
@@ -1093,7 +1093,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							Object element = it.next();
 							BeanWrapperImpl bwe = new BeanWrapperImpl(element);
 							for (PropertyDescriptor pd : bwe.getPropertyDescriptors()) {
-								// remove transient Persistable
+								// remove Persistable
 								if (pd.getReadMethod() != null && pd.getWriteMethod() != null
 										&& Persistable.class.isAssignableFrom(pd.getPropertyType())) {
 									Persistable p = (Persistable) bwe.getPropertyValue(pd.getName());
@@ -1822,9 +1822,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@Inject
-	private transient ValueStackFactory valueStackFactory;
+	private ValueStackFactory valueStackFactory;
 
 	@Inject
-	private transient FreemarkerManager freemarkerManager;
+	private FreemarkerManager freemarkerManager;
 
 }

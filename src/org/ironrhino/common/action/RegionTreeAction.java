@@ -25,7 +25,7 @@ public class RegionTreeAction extends BaseAction {
 	private Long parent;
 
 	@Autowired
-	private transient BaseTreeControl<Region> regionTreeControl;
+	private BaseTreeControl<Region> regionTreeControl;
 
 	public Long getTree() {
 		return tree;

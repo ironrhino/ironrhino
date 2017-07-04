@@ -18,7 +18,7 @@ public class ConsoleAction extends BaseAction {
 	private static final long serialVersionUID = 8180265410790553918L;
 
 	@Autowired
-	private transient ServiceRegistry serviceRegistry;
+	private ServiceRegistry serviceRegistry;
 
 	private Map<String, Collection<String>> hosts;
 

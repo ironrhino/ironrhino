@@ -53,7 +53,7 @@ public class StatsAction extends BaseAction {
 	private List<InvocationSample> samples;
 
 	@Autowired(required = false)
-	private transient ServiceStats serviceStats;
+	private ServiceStats serviceStats;
 
 	public String getService() {
 		return service;

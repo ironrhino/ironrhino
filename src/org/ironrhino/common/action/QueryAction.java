@@ -48,7 +48,7 @@ public class QueryAction extends BaseAction {
 	private String csvDefaultEncoding = "GBK";
 
 	@Autowired
-	protected transient JdbcQueryService jdbcQueryService;
+	protected JdbcQueryService jdbcQueryService;
 
 	public String getSql() {
 		return sql;

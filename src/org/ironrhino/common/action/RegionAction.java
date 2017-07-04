@@ -37,7 +37,7 @@ public class RegionAction extends EntityAction<Region> {
 
 	private Region region;
 
-	private transient EntityManager<Region> entityManager;
+	private EntityManager<Region> entityManager;
 
 	private Collection list;
 
@@ -50,7 +50,7 @@ public class RegionAction extends EntityAction<Region> {
 	private boolean async;
 
 	@Autowired(required = false)
-	private transient SearchService<Region> searchService;
+	private SearchService<Region> searchService;
 
 	public boolean isAsync() {
 		return async;

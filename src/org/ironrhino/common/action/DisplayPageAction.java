@@ -24,10 +24,10 @@ public class DisplayPageAction extends BaseAction {
 	private boolean preview;
 
 	@Autowired
-	private transient PageManager pageManager;
+	private PageManager pageManager;
 
 	@Autowired
-	private transient SettingControl settingControl;
+	private SettingControl settingControl;
 
 	public boolean isPreview() {
 		return preview;

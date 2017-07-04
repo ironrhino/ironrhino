@@ -30,7 +30,7 @@ public class ScheduledAction extends BaseAction {
 	private ConfigurableListableBeanFactory ctx;
 
 	@Autowired(required = false)
-	private transient ScheduledTaskCircuitBreaker circuitBreaker;
+	private ScheduledTaskCircuitBreaker circuitBreaker;
 
 	private String task;
 

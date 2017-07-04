@@ -97,7 +97,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@SearchableProperty
 	@Column(length = 4000)
 	@Convert(converter = StringSetConverter.class)
-	@UiConfig(displayOrder = 100, alias = "role", template = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#if r_has_next> </#if></#list>", csvTemplate = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#if r_has_next>,</#if></#list>")
+	@UiConfig(displayOrder = 100, template = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#if r_has_next> </#if></#list>", csvTemplate = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#if r_has_next>,</#if></#list>")
 	private Set<String> roles = new LinkedHashSet<>(0);
 
 	@NotInCopy

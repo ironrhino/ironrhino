@@ -62,16 +62,16 @@ public class SignupAction extends BaseAction {
 	private String passwordEntryPoint;
 
 	@Autowired
-	private transient UserManager userManager;
+	private UserManager userManager;
 
 	@Autowired
-	private transient SettingControl settingControl;
+	private SettingControl settingControl;
 
 	@Autowired
-	private transient EventPublisher eventPublisher;
+	private EventPublisher eventPublisher;
 
 	@Autowired(required = false)
-	private transient MailService mailService;
+	private MailService mailService;
 
 	public String getUsername() {
 		return username;
