@@ -220,15 +220,15 @@ ${formHeader!}
 <li class="disabled firstPage"><a title="${getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
 <li class="disabled"><a title="${getText('previouspage')}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
 <#else>
-<li class="firstPage"><a title="${getText('firstpage')}" href="${resultPage.renderUrl(1)}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
-<li class="prevPage"><a title="${getText('previouspage')}" href="${resultPage.renderUrl(resultPage.previousPage)}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
+<li class="firstPage"><a title="${getText('firstpage')}" href="${resultPage.renderUrl(1)}" rel="first"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
+<li class="prevPage"><a title="${getText('previouspage')}" href="${resultPage.renderUrl(resultPage.previousPage)}" rel="prev"><i class="glyphicon glyphicon-step-backward"></i></a></li>
 </#if>
 <#if resultPage.last>
 <li class="disabled"><a title="${getText('nextpage')}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
 <li class="disabled lastPage"><a title="${getText('lastpage')}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
 <#else>
-<li class="nextPage"><a title="${getText('nextpage')}" href="${resultPage.renderUrl(resultPage.nextPage)}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
-<li class="lastPage"><a title="${getText('lastpage')}" href="${resultPage.renderUrl(resultPage.totalPage)}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
+<li class="nextPage"><a title="${getText('nextpage')}" href="${resultPage.renderUrl(resultPage.nextPage)}" rel="next"><i class="glyphicon glyphicon-step-forward"></i></a></li>
+<li class="lastPage"><a title="${getText('lastpage')}" href="${resultPage.renderUrl(resultPage.totalPage)}" rel="last"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
 </#if>
 <li class="pageNo">
 <span class="input-append">
@@ -274,9 +274,9 @@ ${formHeader!}
 <#if !readonly||deletable><button type="button" class="btn confirm" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${getText("delete")}</button></#if>
 <#if 'treeview'!=Parameters.view!&&treeable??&&treeable&&parentEntity??>
 <#if parentEntity.parent?? && (!tree??||parent!=tree)>
-<a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}<#if tree??>&tree=${tree}</#if>">${getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}<#if tree??>&tree=${tree}</#if>" rel="up">${getText("upward")}</a>
 <#else>
-<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>">${getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" rel="up">${getText("upward")}</a>
 </#if>
 </#if>
 <@btn class="reload"/>

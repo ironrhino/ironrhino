@@ -130,7 +130,7 @@
 </#if>
 <#assign bottomButtons+=r'
 <#if treeable&&Parameters.parent??>
-<a href="${href}<#if parentEntity.parent?? && (!tree??||parent!=tree)>${href?contains("?")?then("&","?")+"parent="+_parent}</#if>" class="btn ajax view" data-replacement="${entityName}_pick">${getText("upward")}</a>
+<a href="${href}<#if parentEntity.parent?? && (!tree??||parent!=tree)>${href?contains("?")?then("&","?")+"parent="+_parent}</#if>" class="btn ajax view" rel="up" data-replacement="${entityName}_pick">${getText("upward")}</a>
 </#if>
 <#if filterable><button type="button" class="btn filter">${getText("filter")}</button></#if>
 '>

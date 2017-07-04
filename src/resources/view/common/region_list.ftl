@@ -24,9 +24,9 @@
 <#assign bottomButtons+=r'
 <#if region?? && parent??>
 <#if region.parent?? && (!tree??||parent!=tree)>
-<a class="btn ajax view" href="${actionBaseUrl+"?parent="+region.parent.id}<#if tree??>&tree=${tree}</#if>">${getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl+"?parent="+region.parent.id}<#if tree??>&tree=${tree}</#if>" rel="up">${getText("upward")}</a>
 <#else>
-<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>">${getText("upward")}</a>
+<a class="btn ajax view" href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" rel="up">${getText("upward")}</a>
 </#if>
 </#if>
 '+'

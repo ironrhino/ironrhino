@@ -140,15 +140,15 @@ $(function(){
 				<li class="disabled firstPage"><a title="${getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
 				<li class="disabled"><a title="${getText('previouspage')}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
 				<#else>
-				<li class="firstPage"><a title="${getText('firstpage')}" href="${resultPage.renderUrl(1)}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
-				<li class="prevPage"><a title="${getText('previouspage')}" href="${resultPage.renderUrl(resultPage.previousPage)}"><i class="glyphicon glyphicon-step-backward"></i></a></li>
+				<li class="firstPage"><a title="${getText('firstpage')}" href="${resultPage.renderUrl(1)}" rel="first"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
+				<li class="prevPage"><a title="${getText('previouspage')}" href="${resultPage.renderUrl(resultPage.previousPage)}" rel="prev"><i class="glyphicon glyphicon-step-backward"></i></a></li>
 				</#if>
 				<#if resultPage.last>
 				<li class="disabled"><a title="${getText('nextpage')}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
 				<li class="disabled lastPage"><a title="${getText('lastpage')}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
 				<#else>
-				<li class="nextPage"><a title="${getText('nextpage')}" href="${resultPage.renderUrl(resultPage.nextPage)}"><i class="glyphicon glyphicon-step-forward"></i></a></li>
-				<li class="lastPage"><a title="${getText('lastpage')}" href="${resultPage.renderUrl(resultPage.totalPage)}"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
+				<li class="nextPage"><a title="${getText('nextpage')}" href="${resultPage.renderUrl(resultPage.nextPage)}" rel="next"><i class="glyphicon glyphicon-step-forward"></i></a></li>
+				<li class="lastPage"><a title="${getText('lastpage')}" href="${resultPage.renderUrl(resultPage.totalPage)}" rel="last"><i class="glyphicon glyphicon-fast-forward"></i></a></li>
 				</#if>
 				<li>
 				<span class="input-append">
