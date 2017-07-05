@@ -108,6 +108,39 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
+	public long ttl(String key, String namespace) {
+		if (key == null)
+			return 0;
+		String actualKey = generateKey(key, namespace);
+		long value = redisTemplate.getExpire(actualKey, TimeUnit.MILLISECONDS);
+		if (value == -2)
+			value = 0; // not exists
+		return value;
+	}
+
+	@Override
+	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, boolean initialDelay) {
+		if (key == null)
+			return;
+		key = key + KEY_SUFFIX_DELAY;
+		long i = ttl(key, namespace);
+		if (i <= 0) {
+			if (initialDelay)
+				try {
+					Thread.sleep(timeUnit.toMillis(interval));
+				} catch (InterruptedException e) {
+				}
+			put(key, "", interval, timeUnit, namespace);
+		} else {
+			try {
+				Thread.sleep(i);
+			} catch (InterruptedException e) {
+			}
+			put(key, "", interval, timeUnit, namespace);
+		}
+	}
+
+	@Override
 	public void delete(String key, String namespace) {
 		if (StringUtils.isBlank(key))
 			return;

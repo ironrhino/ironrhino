@@ -147,6 +147,32 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
+	public long ttl(String key, String namespace) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, boolean initialDelay) {
+		if (key == null)
+			return;
+		key = key + KEY_SUFFIX_DELAY;
+		if (!exists(key, namespace)) {
+			if (initialDelay)
+				try {
+					Thread.sleep(timeUnit.toMillis(interval));
+				} catch (InterruptedException e) {
+				}
+			put(key, "", interval, timeUnit, namespace);
+		} else {
+			try {
+				Thread.sleep(timeUnit.toMillis(interval));
+			} catch (InterruptedException e) {
+			}
+			put(key, "", interval, timeUnit, namespace);
+		}
+	}
+
+	@Override
 	public void delete(String key, String namespace) {
 		if (key == null)
 			return;

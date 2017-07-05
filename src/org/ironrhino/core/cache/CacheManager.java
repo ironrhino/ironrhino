@@ -10,6 +10,8 @@ public interface CacheManager {
 
 	String DEFAULT_TIME_TO_IDLE = "-1";
 
+	String KEY_SUFFIX_DELAY = "$$delay";
+
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace);
 
 	public void put(String key, Object value, int timeToIdle, int timeToLive, TimeUnit timeUnit, String namespace);
@@ -19,6 +21,10 @@ public interface CacheManager {
 	public Object get(String key, String namespace);
 
 	public Object get(String key, String namespace, int timeToIdle, TimeUnit timeUnit);
+
+	public long ttl(String key, String namespace);
+
+	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, boolean initialDelay);
 
 	public void delete(String key, String namespace);
 

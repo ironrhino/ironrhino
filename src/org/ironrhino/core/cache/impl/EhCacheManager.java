@@ -111,6 +111,41 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
+	public long ttl(String key, String namespace) {
+		if (key == null)
+			return 0;
+		Cache cache = getCache(namespace, false);
+		if (cache == null)
+			return 0;
+		Element element = cache.get(key);
+		if (element != null)
+			return element.getExpirationTime() - System.currentTimeMillis();
+		return 0;
+	}
+
+	@Override
+	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, boolean initialDelay) {
+		if (key == null)
+			return;
+		key = key + KEY_SUFFIX_DELAY;
+		long i = ttl(key, namespace);
+		if (i <= 0) {
+			if (initialDelay)
+				try {
+					Thread.sleep(timeUnit.toMillis(interval));
+				} catch (InterruptedException e) {
+				}
+			put(key, "", interval, timeUnit, namespace);
+		} else {
+			try {
+				Thread.sleep(i);
+			} catch (InterruptedException e) {
+			}
+			put(key, "", interval, timeUnit, namespace);
+		}
+	}
+
+	@Override
 	public void delete(String key, String namespace) {
 		if (key == null)
 			return;
