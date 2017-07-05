@@ -268,44 +268,29 @@ public class Oauth2Action extends BaseAction {
 	}
 
 	public String auth() {
-		HttpServletRequest request = ServletActionContext.getRequest();
-		HttpServletResponse response = ServletActionContext.getResponse();
-		try {
-			client = oauthManager.findClientById(client_id);
-			if (client == null)
-				throw new IllegalArgumentException("CLIENT_ID_INVALID");
-			UserDetails grantor = AuthzUtils.getUserDetails();
-			if (!"force".equals(approval_prompt) && grantor != null) {
-				List<Authorization> auths = oauthManager.findAuthorizationsByGrantor(grantor.getUsername());
-				for (Authorization auth : auths) {
-					if (Objects.equals(auth.getClient(), client.getId())
-							&& Objects.equals(auth.getResponseType(), response_type)
-							&& Objects.equals(auth.getScope(), scope)) {
-						authorization = auth;
-						break;
-					}
-				}
-				if (authorization != null) {
-					authorization = oauthManager.reuse(authorization);
-					return grant();
+		client = oauthManager.findClientById(client_id);
+		if (client == null)
+			throw new IllegalArgumentException("CLIENT_ID_INVALID");
+		UserDetails grantor = AuthzUtils.getUserDetails();
+		if (!"force".equals(approval_prompt) && grantor != null) {
+			List<Authorization> auths = oauthManager.findAuthorizationsByGrantor(grantor.getUsername());
+			for (Authorization auth : auths) {
+				if (Objects.equals(auth.getClient(), client.getId())
+						&& Objects.equals(auth.getResponseType(), response_type)
+						&& Objects.equals(auth.getScope(), scope)) {
+					authorization = auth;
+					break;
 				}
 			}
-			authorization = oauthManager.generate(client, redirect_uri, scope, response_type);
-			client = oauthManager.findClientById(authorization.getClient());
-			displayForNative = client.isNative();
-			setUid(authorization.getId());
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
-				return NONE;
-			try {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			if (authorization != null) {
+				authorization = oauthManager.reuse(authorization);
+				return grant();
 			}
-			return NONE;
 		}
+		authorization = oauthManager.generate(client, redirect_uri, scope, response_type);
+		client = oauthManager.findClientById(authorization.getClient());
+		displayForNative = client.isNative();
+		setUid(authorization.getId());
 		return INPUT;
 	}
 
@@ -342,41 +327,28 @@ public class Oauth2Action extends BaseAction {
 				return INPUT;
 			}
 		}
-		try {
-			if (authorization == null)
-				authorization = oauthManager.grant(getUid(), grantor.getUsername());
-			client = oauthManager.findClientById(authorization.getClient());
-			displayForNative = client.isNative();
-			granted = true;
-			if (displayForNative) {
-				return INPUT;
+		if (authorization == null)
+			authorization = oauthManager.grant(getUid(), grantor.getUsername());
+		client = oauthManager.findClientById(authorization.getClient());
+		displayForNative = client.isNative();
+		granted = true;
+		if (displayForNative) {
+			return INPUT;
+		} else {
+			StringBuilder sb = new StringBuilder(redirect_uri);
+			if (authorization.isClientSide()) {
+				sb.append("#");
+				sb.append("access_token=").append(authorization.getAccessToken());
+				sb.append("&expires_in=").append(authorization.getExpiresIn());
 			} else {
-				StringBuilder sb = new StringBuilder(redirect_uri);
-				if (authorization.isClientSide()) {
-					sb.append("#");
-					sb.append("access_token=").append(authorization.getAccessToken());
-					sb.append("&expires_in=").append(authorization.getExpiresIn());
-				} else {
-					sb.append(sb.indexOf("?") > 0 ? "&" : "?").append("code=").append(authorization.getCode());
+				sb.append(sb.indexOf("?") > 0 ? "&" : "?").append("code=").append(authorization.getCode());
+			}
+			if (StringUtils.isNotBlank(state))
+				try {
+					sb.append("&state=").append(URLEncoder.encode(state, "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
 				}
-				if (StringUtils.isNotBlank(state))
-					try {
-						sb.append("&state=").append(URLEncoder.encode(state, "UTF-8"));
-					} catch (UnsupportedEncodingException e) {
-					}
-				targetUrl = sb.toString();
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
-				return NONE;
-			try {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			return NONE;
+			targetUrl = sb.toString();
 		}
 		return REDIRECT;
 	}
@@ -433,7 +405,6 @@ public class Oauth2Action extends BaseAction {
 				// throw new IllegalArgumentException("BAD_CREDENTIALS");
 				// }
 				catch (AuthenticationException failed) {
-					logger.error(failed.getMessage(), failed);
 					try {
 						authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
 					} catch (Exception e) {
@@ -447,7 +418,8 @@ public class Oauth2Action extends BaseAction {
 				else
 					authorization = oauthManager.grant(client, u.getUsername());
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				logger.error("Exchange token by password for \"{}\" failed with {}: {}", username,
+						e.getClass().getName(), e.getMessage());
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
 						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
@@ -455,7 +427,6 @@ public class Oauth2Action extends BaseAction {
 					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
-					e1.printStackTrace();
 				}
 				return NONE;
 			}
@@ -473,7 +444,8 @@ public class Oauth2Action extends BaseAction {
 			try {
 				authorization = oauthManager.grant(client);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				logger.error("Exchange token by client_credentials for \"{}\" failed with {}: {}", client_id,
+						e.getClass().getName(), e.getMessage());
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
 						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
@@ -481,7 +453,6 @@ public class Oauth2Action extends BaseAction {
 					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
-					e1.printStackTrace();
 				}
 				return NONE;
 			}
@@ -501,7 +472,8 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				logger.error("Refresh token \"{}\" failed with {}: {}", refresh_token, e.getClass().getName(),
+						e.getMessage());
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
 						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
@@ -509,7 +481,6 @@ public class Oauth2Action extends BaseAction {
 					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 					return NONE;
 				} catch (IOException e1) {
-					e1.printStackTrace();
 				}
 				return NONE;
 			}
@@ -523,7 +494,6 @@ public class Oauth2Action extends BaseAction {
 				try {
 					response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
 				} catch (IOException e1) {
-					e1.printStackTrace();
 				}
 				return NONE;
 			}
@@ -540,14 +510,14 @@ public class Oauth2Action extends BaseAction {
 				eventPublisher.publish(new AuthorizeEvent(authorization.getGrantor(), request.getRemoteAddr(),
 						client.getName(), grant_type.name()), Scope.LOCAL);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				logger.error("Exchange token by code for \"{}\" failed with {}: {}", code, e.getClass().getName(),
+						e.getMessage());
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
 						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 					return NONE;
 				try {
 					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 				} catch (IOException e1) {
-					e1.printStackTrace();
 				}
 				return NONE;
 			}
@@ -627,14 +597,14 @@ public class Oauth2Action extends BaseAction {
 				}
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			logger.error("Send verification code to \"{}\" failed with {}: {}", username, e.getClass().getName(),
+					e.getMessage());
 			if (httpErrorHandler != null
 					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
 				return NONE;
 			try {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			} catch (IOException e1) {
-				e1.printStackTrace();
 			}
 			return NONE;
 		}

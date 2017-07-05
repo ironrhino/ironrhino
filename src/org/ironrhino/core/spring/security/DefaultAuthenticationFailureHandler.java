@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,6 +22,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandler {
+
+	@Autowired
+	private Logger logger;
 
 	@Autowired
 	private UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
@@ -38,8 +42,9 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException e) throws IOException, ServletException {
 		request.getSession().removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+		String username = request.getParameter(usernamePasswordAuthenticationFilter.getUsernameParameter());
+		logger.warn("Authenticate \"{}\" failed with {}: {}", username, e.getClass().getSimpleName(), e.getMessage());
 		if (e instanceof BadCredentialsException) {
-			String username = request.getParameter(usernamePasswordAuthenticationFilter.getUsernameParameter());
 			if (username != null)
 				cacheManager.delay(username, delayNamespace, delayInterval, TimeUnit.SECONDS, false);
 		}

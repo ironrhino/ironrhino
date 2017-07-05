@@ -20,16 +20,15 @@ public interface OAuthManager {
 
 	public Authorization grant(Client client, String grantor, String deviceId, String deviceName);
 
-	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType)
-			throws Exception;
+	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType);
 
 	public Authorization reuse(Authorization authorization);
 
-	public Authorization grant(String authorizationId, String grantor) throws Exception;
+	public Authorization grant(String authorizationId, String grantor);
 
 	public void deny(String authorizationId);
 
-	public Authorization authenticate(String code, Client client) throws Exception;
+	public Authorization authenticate(String code, Client client);
 
 	public Authorization retrieve(String accessToken);
 
