@@ -2,7 +2,9 @@ package org.ironrhino.core.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Locale;
 
 public class StringUtils {
@@ -420,6 +422,14 @@ public class StringUtils {
 	}
 
 	public static String toString(Object value) {
+		if (value instanceof java.sql.Date)
+			return DateUtils.formatDate10((Date) value);
+		if (value instanceof Timestamp)
+			return DateUtils.formatDatetime((Date) value);
+		if (value instanceof Date)
+			return DateUtils.formatDatetime((Date) value);
+		if (value instanceof Enum)
+			return ((Enum<?>) value).name();
 		if (value != null && value.getClass().isArray())
 			return Arrays.toString((Object[]) value);
 		return String.valueOf(value);
