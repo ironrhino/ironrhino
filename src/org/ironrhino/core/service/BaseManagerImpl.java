@@ -700,13 +700,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	@Deprecated
-	public List<T> executeQuery(String queryString, Object... args) {
-		return find(queryString, args);
-	}
-
-	@Override
 	@Transactional
 	public <K> K execute(HibernateCallback<K> callback) {
 		return callback.doInHibernate(sessionFactory.getCurrentSession());

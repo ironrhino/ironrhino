@@ -17,11 +17,6 @@ public class MyConfiguration extends Configuration {
 
 	private Collection<FallbackTemplateProvider> fallbackTemplateProviders;
 
-	@Deprecated
-	public MyConfiguration() {
-		super();
-	}
-
 	public MyConfiguration(Version version) {
 		super(version);
 	}

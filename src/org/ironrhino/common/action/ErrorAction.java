@@ -94,9 +94,4 @@ public class ErrorAction extends BaseAction {
 		return result;
 	}
 
-	@Deprecated
-	public String handle() {
-		return execute();
-	}
-
 }
