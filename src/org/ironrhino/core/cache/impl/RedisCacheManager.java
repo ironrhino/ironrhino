@@ -119,15 +119,15 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, boolean initialDelay) {
+	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, int initialDelay) {
 		if (key == null)
 			return;
 		key = key + KEY_SUFFIX_DELAY;
 		long i = ttl(key, namespace);
 		if (i <= 0) {
-			if (initialDelay)
+			if (initialDelay > 0)
 				try {
-					Thread.sleep(timeUnit.toMillis(interval));
+					Thread.sleep(timeUnit.toMillis(initialDelay));
 				} catch (InterruptedException e) {
 				}
 			put(key, "", interval, timeUnit, namespace);

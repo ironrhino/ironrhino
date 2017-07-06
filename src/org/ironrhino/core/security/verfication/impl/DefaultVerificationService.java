@@ -68,7 +68,7 @@ public class DefaultVerificationService implements VerificationService {
 		boolean verified = verificationCode != null
 				&& verificationCode.equals(cacheManager.get(receiver, CACHE_NAMESPACE));
 		if (!verified) {
-			cacheManager.delay(receiver, CACHE_NAMESPACE, verifyInterval, TimeUnit.SECONDS, false);
+			cacheManager.delay(receiver, CACHE_NAMESPACE, verifyInterval, TimeUnit.SECONDS, verifyInterval / 2);
 			Integer times = (Integer) cacheManager.get(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
 			if (times == null)
 				times = 1;

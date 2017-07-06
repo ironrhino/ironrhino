@@ -46,7 +46,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
 		logger.warn("Authenticate \"{}\" failed with {}: {}", username, e.getClass().getSimpleName(), e.getMessage());
 		if (e instanceof BadCredentialsException) {
 			if (username != null)
-				cacheManager.delay(username, delayNamespace, delayInterval, TimeUnit.SECONDS, false);
+				cacheManager.delay(username, delayNamespace, delayInterval, TimeUnit.SECONDS, delayInterval / 2);
 		}
 	}
 

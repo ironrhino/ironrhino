@@ -24,7 +24,7 @@ public interface CacheManager {
 
 	public long ttl(String key, String namespace);
 
-	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, boolean initialDelay);
+	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, int initialDelay);
 
 	public void delete(String key, String namespace);
 
