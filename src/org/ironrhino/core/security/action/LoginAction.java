@@ -114,42 +114,26 @@ public class LoginAction extends BaseAction {
 				addActionError(ExceptionUtils.getRootMessage(failed));
 			}
 		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
+			usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			addFieldError("username", getText(failed.getClass().getName()));
-			try {
-				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
 		} catch (CredentialsNeedResetException failed) {
 			addFieldError("password", getText(failed.getClass().getName()));
 		} catch (BadCredentialsException failed) {
+			usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			addFieldError("password", getText(failed.getClass().getName()));
 			captchaManager.addCaptchaCount(request);
-			try {
-				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
 		} catch (CredentialsExpiredException failed) {
 			UserDetails ud = userDetailsService.loadUserByUsername(username);
 			if (ud instanceof Persistable) {
 				addActionMessage(getText(failed.getClass().getName()));
 				authResult = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
 			} else {
+				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				addFieldError("password", getText(failed.getClass().getName()));
-				try {
-					usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-				}
 			}
 		} catch (WrongVerificationCodeException failed) {
+			usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			addFieldError("verificationCode", getText(failed.getClass().getName()));
-			try {
-				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
 		}
 		if (authResult != null)
 			try {

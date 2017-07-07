@@ -11,6 +11,7 @@ import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ErrorMessage;
+import org.ironrhino.core.util.LocalizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +63,12 @@ public class ErrorAction extends BaseAction {
 			}
 			addActionError(getText(exception.getClass().getName()));
 			return "accountStatus";
-		} else if (exception != null)
-			logger.error(exception.getMessage(), exception);
+		} else if (exception != null) {
+			if (exception instanceof LocalizedException || exception instanceof ErrorMessage)
+				logger.error(exception.getLocalizedMessage());
+			else
+				logger.error(exception.getMessage(), exception);
+		}
 		try {
 			errorcode = Integer.valueOf(getUid());
 		} catch (Exception e) {

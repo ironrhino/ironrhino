@@ -267,7 +267,7 @@ public class Oauth2Action extends BaseAction {
 		return SUCCESS;
 	}
 
-	public String auth() {
+	public String auth() throws Exception {
 		client = oauthManager.findClientById(client_id);
 		if (client == null)
 			throw new IllegalArgumentException("CLIENT_ID_INVALID");
@@ -294,7 +294,7 @@ public class Oauth2Action extends BaseAction {
 		return INPUT;
 	}
 
-	public String grant() {
+	public String grant() throws Exception {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		UserDetails grantor = AuthzUtils.getUserDetails();
@@ -302,24 +302,17 @@ public class Oauth2Action extends BaseAction {
 			try {
 				Authentication authResult = authenticationManager
 						.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-				if (authResult != null)
-					try {
+				if (authResult != null){
 						usernamePasswordAuthenticationFilter.success(request, response, authResult);
 						grantor = (UserDetails) authResult.getPrincipal();
-					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
 					}
 			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 				addFieldError("username", getText(failed.getClass().getName()));
 				return INPUT;
 			} catch (BadCredentialsException | CredentialsExpiredException | CredentialsNeedResetException failed) {
+				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				addFieldError("password", getText(failed.getClass().getName()));
 				captchaManager.addCaptchaCount(request);
-				try {
-					usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-				}
 				return INPUT;
 			} catch (InternalAuthenticationServiceException failed) {
 				logger.error(failed.getMessage(), failed);
@@ -389,11 +382,7 @@ public class Oauth2Action extends BaseAction {
 					Authentication authResult = authenticationManager
 							.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 					if (authResult != null)
-						try {
 							authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
-						} catch (Exception e) {
-							logger.error(e.getMessage(), e);
-						}
 				} catch (InternalAuthenticationServiceException failed) {
 					throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
 				}
@@ -405,11 +394,7 @@ public class Oauth2Action extends BaseAction {
 				// throw new IllegalArgumentException("BAD_CREDENTIALS");
 				// }
 				catch (AuthenticationException failed) {
-					try {
-						authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
-					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
-					}
+					authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
 					throw new IllegalArgumentException(getText(failed.getClass().getName()));
 				}
 				UserDetails u = userDetailsService.loadUserByUsername(username);
@@ -419,12 +404,12 @@ public class Oauth2Action extends BaseAction {
 					authorization = oauthManager.grant(client, u.getUsername());
 			} catch (Exception e) {
 				logger.error("Exchange token by password for \"{}\" failed with {}: {}", username,
-						e.getClass().getName(), e.getMessage());
+						e.getClass().getName(), e.getLocalizedMessage());
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
+						HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
 					return NONE;
 				} catch (IOException e1) {
 				}
@@ -445,12 +430,12 @@ public class Oauth2Action extends BaseAction {
 				authorization = oauthManager.grant(client);
 			} catch (Exception e) {
 				logger.error("Exchange token by client_credentials for \"{}\" failed with {}: {}", client_id,
-						e.getClass().getName(), e.getMessage());
+						e.getClass().getName(), e.getLocalizedMessage());
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
+						HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
 					return NONE;
 				} catch (IOException e1) {
 				}
@@ -473,12 +458,12 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("refresh_token", authorization.getRefreshToken());
 			} catch (Exception e) {
 				logger.error("Refresh token \"{}\" failed with {}: {}", refresh_token, e.getClass().getName(),
-						e.getMessage());
+						e.getLocalizedMessage());
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
+						HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
 					return NONE;
 				} catch (IOException e1) {
 				}
@@ -511,12 +496,12 @@ public class Oauth2Action extends BaseAction {
 						client.getName(), grant_type.name()), Scope.LOCAL);
 			} catch (Exception e) {
 				logger.error("Exchange token by code for \"{}\" failed with {}: {}", code, e.getClass().getName(),
-						e.getMessage());
+						e.getLocalizedMessage());
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
+						HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
 					return NONE;
 				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
 				} catch (IOException e1) {
 				}
 				return NONE;
@@ -598,12 +583,12 @@ public class Oauth2Action extends BaseAction {
 			}
 		} catch (Exception e) {
 			logger.error("Send verification code to \"{}\" failed with {}: {}", username, e.getClass().getName(),
-					e.getMessage());
+					e.getLocalizedMessage());
 			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage()))
+					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
 				return NONE;
 			try {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
 			} catch (IOException e1) {
 			}
 			return NONE;

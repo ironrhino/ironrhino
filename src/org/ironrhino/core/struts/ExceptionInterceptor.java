@@ -33,7 +33,10 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 		try {
 			return invocation.invoke();
 		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
+			if (e instanceof LocalizedException || e instanceof ErrorMessage)
+				logger.error(e.getLocalizedMessage());
+			else
+				logger.error(e.getMessage(), e);
 			if (e instanceof MethodFailedException || e instanceof CompletionException)
 				e = e.getCause();
 			if (e instanceof NoSuchMethodException)
