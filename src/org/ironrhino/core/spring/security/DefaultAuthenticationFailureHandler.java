@@ -7,8 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.throttle.ThrottleService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,10 +30,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
 	private UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
 
 	@Autowired
-	private CacheManager cacheManager;
-
-	@Value("${authenticationFailureHandler.delayNamespace:username}")
-	private String delayNamespace;
+	private ThrottleService throttleService;
 
 	@Value("${authenticationFailureHandler.delayInterval:5}")
 	private int delayInterval;
@@ -46,7 +43,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
 		logger.warn("Authenticate \"{}\" failed with {}: {}", username, e.getClass().getSimpleName(), e.getMessage());
 		if (e instanceof BadCredentialsException) {
 			if (username != null)
-				cacheManager.delay(username, delayNamespace, delayInterval, TimeUnit.SECONDS, delayInterval / 2);
+				throttleService.delay("username:" + username, delayInterval, TimeUnit.SECONDS, delayInterval / 2);
 		}
 	}
 

@@ -8,6 +8,7 @@ import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
+import org.ironrhino.core.throttle.ThrottleService;
 import org.ironrhino.core.util.CodecUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class DefaultVerificationService implements VerificationService {
 
 	@Autowired
 	private CacheManager cacheManager;
+
+	@Autowired
+	private ThrottleService throttleService;
 
 	@Autowired(required = false)
 	private List<VerificationCodeNotifier> verificationCodeNotifiers;
@@ -70,7 +74,7 @@ public class DefaultVerificationService implements VerificationService {
 		boolean verified = verificationCode != null
 				&& verificationCode.equals(cacheManager.get(receiver, CACHE_NAMESPACE));
 		if (!verified) {
-			cacheManager.delay(receiver, CACHE_NAMESPACE, verifyInterval, TimeUnit.SECONDS, verifyInterval / 2);
+			throttleService.delay("verification:" + receiver, verifyInterval, TimeUnit.SECONDS, verifyInterval / 2);
 			Integer times = (Integer) cacheManager.get(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
 			if (times == null)
 				times = 1;

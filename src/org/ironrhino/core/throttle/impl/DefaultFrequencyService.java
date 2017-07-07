@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component("frequencyService")
 public class DefaultFrequencyService implements FrequencyService {
 
-	private static final String NAMESPACE = "frequency:";
+	private static final String NAMESPACE = "frequency";
 
 	@Autowired
 	private CacheManager cacheManager;

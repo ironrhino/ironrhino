@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
-import org.ironrhino.core.util.IllegalConcurrentAccessException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -117,34 +116,6 @@ public class RedisCacheManager implements CacheManager {
 		if (value == -2)
 			value = 0; // not exists
 		return value;
-	}
-
-	@Override
-	public void delay(String key, String namespace, int interval, TimeUnit timeUnit, int initialDelay) {
-		if (key == null)
-			return;
-		String dkey = key + KEY_SUFFIX_DELAY;
-		String ckey = key + KEY_SUFFIX_CONCURRENT;
-		long i = ttl(dkey, namespace);
-		if (i <= 0) {
-			if (!putIfAbsent(ckey, "", Math.max(initialDelay, (int) TimeUnit.SECONDS.convert(1, timeUnit)), timeUnit,
-					namespace))
-				throw new IllegalConcurrentAccessException(key);
-			if (initialDelay > 0)
-				try {
-					Thread.sleep(timeUnit.toMillis(initialDelay));
-				} catch (InterruptedException e) {
-				}
-			put(dkey, "", interval, timeUnit, namespace);
-		} else {
-			if (!putIfAbsent(ckey, "", (int) i, TimeUnit.MILLISECONDS, namespace))
-				throw new IllegalConcurrentAccessException(key);
-			try {
-				Thread.sleep(i);
-			} catch (InterruptedException e) {
-			}
-			put(dkey, "", interval, timeUnit, namespace);
-		}
 	}
 
 	@Override
