@@ -40,6 +40,18 @@ public class CodecUtils {
 		}
 	};
 
+	private static ThreadLocal<SoftReference<MessageDigest>> SHA256 = new ThreadLocal<SoftReference<MessageDigest>>() {
+
+		@Override
+		protected SoftReference<MessageDigest> initialValue() {
+			try {
+				return new SoftReference<>(MessageDigest.getInstance("SHA-256"));
+			} catch (NoSuchAlgorithmException e) {
+				throw new IllegalStateException("sha algorythm found");
+			}
+		}
+	};
+
 	public static byte[] md5(byte[] input) {
 		SoftReference<MessageDigest> instanceRef = MD5.get();
 		MessageDigest md5;
@@ -130,6 +142,51 @@ public class CodecUtils {
 		}
 	}
 
+	public static byte[] sha256(byte[] input) {
+		SoftReference<MessageDigest> instanceRef = SHA256.get();
+		MessageDigest sha256;
+		if (instanceRef == null || (sha256 = instanceRef.get()) == null) {
+			try {
+				sha256 = MessageDigest.getInstance("SHA-256");
+				instanceRef = new SoftReference<>(sha256);
+			} catch (NoSuchAlgorithmException e) {
+				throw new IllegalStateException("sha-256 algorythm found");
+			}
+			SHA256.set(instanceRef);
+		}
+		sha256.reset();
+		sha256.update(input);
+		return sha256.digest();
+	}
+
+	public static byte[] sha256(String input) {
+		return sha256(input, DEFAULT_ENCODING);
+	}
+
+	public static byte[] sha256(String input, String encoding) {
+		try {
+			return sha256(input.getBytes(encoding));
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalArgumentException(e.getMessage(), e);
+		}
+	}
+
+	public static String sha256Hex(byte[] input) {
+		return Hex.encodeHexString(sha256(input));
+	}
+
+	public static String sha256Hex(String input) {
+		return sha256Hex(input, DEFAULT_ENCODING);
+	}
+
+	public static String sha256Hex(String input, String encoding) {
+		try {
+			return sha256Hex(input.getBytes(encoding));
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalArgumentException(e.getMessage(), e);
+		}
+	}
+
 	public static String fuzzify(String input) {
 		try {
 			byte[] bytes = Base64.getEncoder().withoutPadding().encode(input.getBytes(DEFAULT_ENCODING));
@@ -170,18 +227,14 @@ public class CodecUtils {
 		return new String(chars);
 	}
 
+	@Deprecated
 	public static String digest(String input) {
-		return digest(input, null);
-	}
-
-	public static String digest(String input, String salt) {
 		if (input == null)
 			return null;
 		if (input.length() > 255)
 			return input; // avoid long password DOS attack
 		boolean isShaInput = input.length() == 40 && input.matches("\\p{XDigit}+");
-		String result = shaHex(input, isShaInput ? 2 : 3);
-		return md5Hex(StringUtils.isBlank(salt) ? result : salt + result);
+		return md5Hex(shaHex(input, isShaInput ? 2 : 3));
 	}
 
 	public static String md5Hex(String input, int times) {
