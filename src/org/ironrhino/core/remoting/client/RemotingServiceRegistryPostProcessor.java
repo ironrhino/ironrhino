@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -62,6 +63,15 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 						logger.info("Skipped import service [{}] because bean[{}#{}] exists", remotingService.getName(),
 								beanClassName, beanName);
 						continue;
+					}
+					if (bd instanceof RootBeanDefinition && FactoryBean.class.isAssignableFrom(beanClass)) {
+						Class<?> targetType = ((RootBeanDefinition) bd).getTargetType();
+						if (remotingService.isAssignableFrom(targetType)) {
+							beanClassName = targetType.getName();
+							logger.info("Skipped import service [{}] because bean[{}#{}] exists",
+									remotingService.getName(), beanClassName, beanName);
+							continue;
+						}
 					}
 				} catch (ClassNotFoundException e) {
 					logger.error(e.getMessage(), e);
