@@ -1,6 +1,7 @@
 package org.ironrhino.core.remoting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.ironrhino.sample.remoting.PersonRepository;
 import org.ironrhino.sample.remoting.TestService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -33,6 +35,9 @@ public class RemoteServiceTests {
 	@Autowired
 	private TestService testService;
 
+	@Autowired
+	private PersonRepository personRepository;
+
 	@BeforeClass
 	public static void setup() {
 		executorService = Executors.newFixedThreadPool(THREADS);
@@ -41,6 +46,11 @@ public class RemoteServiceTests {
 	@AfterClass
 	public static void destroy() {
 		executorService.shutdown();
+	}
+
+	@Test
+	public void testJdbcRepository() {
+		assertNotNull(personRepository.findAll());
 	}
 
 	@Test

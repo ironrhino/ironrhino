@@ -8,4 +8,7 @@
 	<bean id="testService" class="org.ironrhino.core.remoting.client.HttpInvokerClient"
 		p:serviceInterface="org.ironrhino.sample.remoting.TestService"
 		p:host="localhost" />
+	<bean id="personRepository" class="org.ironrhino.core.remoting.client.HttpInvokerClient"
+		p:serviceInterface="org.ironrhino.sample.remoting.PersonRepository"
+		p:host="localhost" />
 </beans>
