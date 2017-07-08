@@ -17,6 +17,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @ApplicationContextPropertiesConditional(key = "verification.code.enabled", value = "true")
@@ -31,6 +33,11 @@ public class VerificationAuthenticationProvider extends DaoAuthenticationProvide
 
 	@Value("${verification.code.qualified:true}")
 	private boolean verificationCodeQualified = true;
+
+	public VerificationAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+		setUserDetailsService(userDetailsService);
+		setPasswordEncoder(passwordEncoder);
+	}
 
 	@PostConstruct
 	public void init() {
