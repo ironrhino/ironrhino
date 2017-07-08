@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 public @interface JdbcRepository {
 
+	String value() default "";
+
 	String dataSource() default "dataSource";
 
 }

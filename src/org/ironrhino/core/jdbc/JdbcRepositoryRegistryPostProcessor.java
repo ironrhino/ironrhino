@@ -29,11 +29,14 @@ public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegist
 		for (Class<?> jdbcRepositoryClass : jdbcRepositoryClasses) {
 			if (!jdbcRepositoryClass.isInterface())
 				continue;
-			String beanName = NameGenerator.buildDefaultBeanName(jdbcRepositoryClass.getName());
-			if (registry.containsBeanDefinition(beanName)) {
-				beanName = jdbcRepositoryClass.getName();
-			}
 			JdbcRepository annotation = jdbcRepositoryClass.getAnnotation(JdbcRepository.class);
+			String beanName = annotation.value();
+			if (StringUtils.isBlank(beanName)) {
+				beanName = NameGenerator.buildDefaultBeanName(jdbcRepositoryClass.getName());
+				if (registry.containsBeanDefinition(beanName)) {
+					beanName = jdbcRepositoryClass.getName();
+				}
+			}
 			String dataSourceBeanName = annotation.dataSource();
 			if (StringUtils.isBlank(dataSourceBeanName))
 				dataSourceBeanName = "dataSource";
