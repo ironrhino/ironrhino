@@ -26,6 +26,7 @@ Initialization.apiplayground = function() {
 		var url = form.find('.url').text();
 		if (params.length)
 			url += '?' + params.join('&');
+		var startTime = new Date().getTime();
 		var options = {
 			global : false,
 			url : url,
@@ -44,8 +45,9 @@ Initialization.apiplayground = function() {
 					form.unmask();
 				else
 					form.removeClass('loading');
-				form.find('.responseStatus').text(xhr.status + ' '
-						+ xhr.statusText);
+				form.find('.responseStatus').html(xhr.status + ' '
+						+ xhr.statusText + ' <span class="badge">'
+						+ (new Date().getTime() - startTime) + 'ms</span>');
 				form.find('.responseHeaders').text(xhr.getAllResponseHeaders());
 				form.find('.responseBody').text(xhr.responseText);
 			}
