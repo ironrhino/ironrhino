@@ -179,7 +179,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				if (!result.hasInvocationTargetException())
 					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(result.getValue()));
 				else
-					remotingLogger.error("Error:\n",
+					remotingLogger.error("Error:",
 							((InvocationTargetException) result.getException()).getTargetException());
 			}
 			remotingLogger.info("Invoked to {} success in {}ms", discoveredHost, time);

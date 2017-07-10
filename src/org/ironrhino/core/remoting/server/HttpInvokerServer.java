@@ -2,8 +2,10 @@ package org.ironrhino.core.remoting.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +22,7 @@ import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.JsonDesensitizer;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -107,7 +110,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 						Throwable throwable = result.getException();
 						if (throwable.getCause() != null)
 							throwable = throwable.getCause();
-						remotingLogger.error("Error:\n", throwable);
+						remotingLogger.error("Error:", throwable);
 					}
 				}
 				remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
@@ -177,6 +180,12 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	protected void writeRemoteInvocationResult(HttpServletRequest request, HttpServletResponse response,
 			RemoteInvocation invocation, RemoteInvocationResult result) throws IOException {
+		if (result.hasInvocationTargetException()) {
+			try {
+				trimStackTraceElements(((InvocationTargetException) result.getException()).getTargetException(), 5);
+			} catch (Exception ex) {
+			}
+		}
 		SerializationType serializationType = SerializationType.parse(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
 		if (serializationType != SerializationType.JAVA) {
 			response.setContentType(serializationType.getContentType());
@@ -187,4 +196,12 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		}
 	}
 
+	private static void trimStackTraceElements(Throwable throwable, int maxStackTraceElements) {
+		StackTraceElement[] elements = ReflectionUtils.getFieldValue(throwable, "stackTrace");
+		if (elements.length > maxStackTraceElements) {
+			System.out.println(elements.length);
+			ReflectionUtils.setFieldValue(throwable, "stackTrace",
+					Arrays.copyOfRange(elements, 0, maxStackTraceElements));
+		}
+	}
 }
