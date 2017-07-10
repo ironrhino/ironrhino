@@ -6,7 +6,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.spring.NameGenerator;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,9 +14,6 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class ScheduledTaskCircuitBreakerAspect extends BaseAspect {
-
-	@Autowired
-	private Logger logger;
 
 	@Autowired(required = false)
 	private ScheduledTaskCircuitBreaker circuitBreaker;
@@ -39,8 +35,7 @@ public class ScheduledTaskCircuitBreakerAspect extends BaseAspect {
 		String task = sb.append(beanName).append('.').append(jp.getSignature().getName()).append('(').append(')')
 				.toString();
 		if (circuitBreaker.isShortCircuit(task)) {
-			logger.info("Break execution : {}", task);
-			return null;
+			throw new IllegalStateException("Execution[\"" + task + "\"] is short circuit");
 		} else {
 			return jp.proceed();
 		}
