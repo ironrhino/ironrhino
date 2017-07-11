@@ -1,3 +1,8 @@
+#popup-overlay {
+	background-color: #fff;
+	transition: background-color .4s;
+}
+
 #popup-container {
 	min-width: 300px; /* Dialog will be no smaller than this */
 	max-width: 600px; /* Dialog will wrap after this width */
@@ -5,6 +10,22 @@
 	border: solid 8px #999;
 	color: #000;
 	border-radius: 8px;
+	animation: popup 0.3s;
+}
+
+@keyframes popup {
+  0% {
+    transform: scale(0.7);
+    }
+  45% {
+    transform: scale(1.05);
+    }
+  80% {
+    transform: scale(0.95);
+    }
+  100% {
+    transform: scale(1);
+    }
 }
 
 #popup-container .popup-title {
