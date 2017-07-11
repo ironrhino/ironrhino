@@ -318,9 +318,16 @@ Message = {
 			a.push(messages);
 			messages = a;
 		}
-		if ($(target).hasClass('alerts')) {
+		if ($(target).hasClass('alerts')
+				|| $(target).find('.clicked').hasClass('alerts')) {
 			if ($.alerts) {
-				$.alerts.info(messages.join('\n'), ' ');
+				(error ? $.alerts.alert : $.alerts.info)(messages.join('\n'),
+						' ');
+				if (!error) {
+					setTimeout(function() {
+								$('#popup-container .popup-ok').click();
+							}, 5000);
+				}
 			} else {
 				alert(messages.join('\n'));
 			}
@@ -1106,7 +1113,7 @@ Initialization.common = function() {
 				if (!t.val())
 					t.next('.sendVerificationCode:not(:disabled)').click();
 			}).on('click', '.sendVerificationCode', function() {
-		var btn = $(this);
+		var btn = $(this).addClass('clicked');
 		var f = btn.closest('form');
 		var cooldown = parseInt(btn.data('cooldown') || 60);
 		var userparam = btn.data('username') || 'username';
