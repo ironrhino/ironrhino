@@ -12,8 +12,8 @@ import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.event.LoginEvent;
-import org.ironrhino.core.security.verfication.WrongVerificationCodeException;
 import org.ironrhino.core.security.verfication.VerificationManager;
+import org.ironrhino.core.security.verfication.WrongVerificationCodeException;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
@@ -148,7 +148,7 @@ public class LoginAction extends BaseAction {
 			}
 		if (StringUtils.isBlank(targetUrl))
 			targetUrl = defaultTargetUrl;
-		return SUCCESS;
+		return REDIRECT;
 	}
 
 	@Override

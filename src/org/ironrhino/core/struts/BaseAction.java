@@ -355,7 +355,8 @@ public class BaseAction extends ActionSupport {
 
 	@BeforeResult
 	protected void preResult() throws Exception {
-		if (StringUtils.isNotBlank(targetUrl) && !hasErrors()
+		if (StringUtils.isNotBlank(targetUrl)
+				&& REDIRECT.equals(ActionContext.getContext().getActionInvocation().getResultCode()) && !hasErrors()
 				&& RequestUtils.isSameOrigin(ServletActionContext.getRequest().getRequestURL().toString(), targetUrl)) {
 			targetUrl = ServletActionContext.getResponse().encodeRedirectURL(targetUrl);
 			ServletActionContext.getResponse().setHeader("X-Redirect-To", targetUrl);
