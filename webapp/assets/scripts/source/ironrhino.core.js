@@ -307,13 +307,19 @@ Message = {
 	showError : function() {
 		Message.showActionError(MessageBundle.get.apply(this, arguments));
 	},
+	showActionSuccessMessage : function(message, target) {
+		Message._show(message, target, 'success');
+	},
+	showActionWarning : function(message, target) {
+		Message._show(message, target, 'warn');
+	},
 	showActionError : function(messages, target) {
-		Message.show(messages, target, 'error');
+		Message._show(messages, target, 'error');
 	},
 	showActionMessage : function(messages, target) {
-		Message.show(messages, target, 'info');
+		Message._show(messages, target, 'info');
 	},
-	show : function(messages, target, type) {
+	_show : function(messages, target, type) {
 		if (!messages)
 			return;
 		if (typeof messages == 'string') {
@@ -805,8 +811,11 @@ Ajax = {
 					Ajax.fire(target, 'onsuccess', data, xhr);
 			}
 			setTimeout(function() {
-						Message.showActionError(data.actionErrors, target);
+						Message.showActionSuccessMessage(
+								data.actionSuccessMessage, target);
 						Message.showActionMessage(data.actionMessages, target);
+						Message.showActionWarning(data.actionWarning, target);
+						Message.showActionError(data.actionErrors, target);
 					}, 500);
 
 			if (data.fieldErrors) {

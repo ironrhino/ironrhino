@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.JsonConfig;
+import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.beans.BeanUtils;
 
@@ -39,24 +40,23 @@ public class JsonResult implements Result {
 			ValidationAware validationAwareAction = (ValidationAware) action;
 			if (validationAwareAction.hasErrors()) {
 				hasErrors = true;
-				if (validationAwareAction.hasActionErrors()) {
+				if (validationAwareAction.hasActionErrors())
 					map.put("actionErrors", validationAwareAction.getActionErrors());
-				}
-				if (validationAwareAction.hasFieldErrors()) {
+				if (validationAwareAction.hasFieldErrors())
 					map.put("fieldErrors", validationAwareAction.getFieldErrors());
-				}
 				return JsonUtils.toJson(map);
 			}
-			// else {
-			// map.put("hasErrors", false);
-			// }
-			if (validationAwareAction.hasActionMessages()) {
-				// map.put("hasActionMessages", true);
+
+			if (validationAwareAction.hasActionMessages())
 				map.put("actionMessages", validationAwareAction.getActionMessages());
+
+			if (action instanceof BaseAction) {
+				BaseAction baseAction = (BaseAction) action;
+				if (StringUtils.isNotBlank(baseAction.getActionWarning()))
+					map.put("actionWarning", baseAction.getActionWarning());
+				if (StringUtils.isNotBlank(baseAction.getActionSuccessMessage()))
+					map.put("actionSuccessMessage", baseAction.getActionSuccessMessage());
 			}
-			// else {
-			// map.put("hasActionMessages", false);
-			// }
 		}
 		if (!hasErrors) {
 			if (jsonConfig == null || jsonConfig.propertyName() == null || jsonConfig.propertyName().length == 0) {

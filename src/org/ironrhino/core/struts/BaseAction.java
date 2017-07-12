@@ -90,6 +90,10 @@ public class BaseAction extends ActionSupport {
 	@Autowired(required = false)
 	protected DynamicAuthorizerManager dynamicAuthorizerManager;
 
+	private String actionWarning;
+
+	private String actionSuccessMessage;
+
 	public void setCsrf(String csrf) {
 		this.csrf = csrf;
 	}
@@ -167,6 +171,22 @@ public class BaseAction extends ActionSupport {
 
 	public boolean isAjax() {
 		return "XMLHttpRequest".equalsIgnoreCase(ServletActionContext.getRequest().getHeader("X-Requested-With"));
+	}
+
+	public String getActionWarning() {
+		return actionWarning;
+	}
+
+	protected void setActionWarning(String actionWarning) {
+		this.actionWarning = actionWarning;
+	}
+
+	public String getActionSuccessMessage() {
+		return actionSuccessMessage;
+	}
+
+	protected void setActionSuccessMessage(String actionSuccessMessage) {
+		this.actionSuccessMessage = actionSuccessMessage;
 	}
 
 	@Override

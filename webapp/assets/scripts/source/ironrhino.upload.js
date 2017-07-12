@@ -183,8 +183,11 @@ Observation.upload = function(container) {
 											.prependTo($('#content'));
 						}
 					} else {
-						Message.showActionError(data.actionErrors);
+						Message
+								.showActionSuccessMessage(data.actionSuccessMessage);
 						Message.showActionMessage(data.actionMessages);
+						Message.showActionWarning(data.actionWarning);
+						Message.showActionError(data.actionErrors);
 					}
 					$('#files button.reload').trigger('click');
 				}
