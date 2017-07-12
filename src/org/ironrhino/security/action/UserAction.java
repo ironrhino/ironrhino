@@ -218,12 +218,12 @@ public class UserAction extends EntityAction<User> {
 		if (user.isNew()) {
 			if (StringUtils.isNotBlank(user.getUsername())) {
 				user.setUsername(user.getUsername().toLowerCase(Locale.ROOT));
-				if (userManager.findByNaturalId(user.getUsername()) != null) {
+				if (userManager.existsNaturalId(user.getUsername())) {
 					addFieldError("user.username", getText("validation.already.exists"));
 					return false;
 				}
 			}
-			if (StringUtils.isNotBlank(user.getEmail()) && userManager.findOne("email", user.getEmail()) != null) {
+			if (StringUtils.isNotBlank(user.getEmail()) && userManager.existsOne("email", user.getEmail())) {
 				addFieldError("user.email", getText("validation.already.exists"));
 				return false;
 			}
@@ -237,7 +237,7 @@ public class UserAction extends EntityAction<User> {
 				user = userManager.findByNaturalId(temp.getUsername());
 			}
 			if (StringUtils.isNotBlank(temp.getEmail()) && !temp.getEmail().equals(user.getEmail())
-					&& userManager.findOne("email", temp.getEmail()) != null) {
+					&& userManager.existsOne("email", temp.getEmail())) {
 				addFieldError("user.email", getText("validation.already.exists"));
 				return false;
 			}
@@ -335,17 +335,17 @@ public class UserAction extends EntityAction<User> {
 			addActionError(getText("access.denied"));
 			return ACCESSDENIED;
 		}
-		user.setId(AuthzUtils.<User>getUserDetails().getId());
-		if (!makeEntityValid())
-			return INPUT;
-		User userInSession = AuthzUtils.getUserDetails();
-		if (userInSession == null || user == null) {
-			return "profile";
+		User temp = user;
+		User user = AuthzUtils.getUserDetails();
+		if (StringUtils.isNotBlank(temp.getEmail()) && !temp.getEmail().equals(user.getEmail())
+				&& userManager.existsOne("email", temp.getEmail())) {
+			addFieldError("user.email", getText("validation.already.exists"));
+			return inputprofile();
 		}
-		userInSession.setName(user.getName());
-		userInSession.setEmail(user.getEmail());
-		userInSession.setPhone(user.getPhone());
-		userManager.save(userInSession);
+		user.setName(temp.getName());
+		user.setEmail(temp.getEmail());
+		user.setPhone(temp.getPhone());
+		userManager.save(user);
 		addActionMessage(getText("save.success"));
 		eventPublisher.publish(
 				new ProfileEditedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),
