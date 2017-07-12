@@ -137,9 +137,6 @@
 					popupOk.click(function() {
 								$.alerts._hide();
 								callback(true);
-							}).keypress(function(e) {
-								if (e.keyCode == 13 || e.keyCode == 27)
-									popupOk.trigger('click');
 							}).focus();
 					break;
 				case 'confirm' :
@@ -159,12 +156,6 @@
 								$.alerts._hide();
 								if (callback)
 									callback(false);
-							});
-					popupPanel.keyup(function(e) {
-								if (e.keyCode == 13)
-									popupOk.trigger('click');
-								if (e.keyCode == 27)
-									popupCancel.trigger('click');
 							});
 					break;
 				case 'prompt' :
@@ -189,7 +180,7 @@
 								if (callback)
 									callback(null);
 							});
-					popupContainer.keyup(function(e) {
+					popupPrompt.keyup(function(e) {
 								if (e.keyCode == 13)
 									popupOk.trigger('click');
 								if (e.keyCode == 27)

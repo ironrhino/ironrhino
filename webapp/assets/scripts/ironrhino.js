@@ -18661,9 +18661,6 @@ function log() {
 					popupOk.click(function() {
 								$.alerts._hide();
 								callback(true);
-							}).keypress(function(e) {
-								if (e.keyCode == 13 || e.keyCode == 27)
-									popupOk.trigger('click');
 							}).focus();
 					break;
 				case 'confirm' :
@@ -18683,12 +18680,6 @@ function log() {
 								$.alerts._hide();
 								if (callback)
 									callback(false);
-							});
-					popupPanel.keyup(function(e) {
-								if (e.keyCode == 13)
-									popupOk.trigger('click');
-								if (e.keyCode == 27)
-									popupCancel.trigger('click');
 							});
 					break;
 				case 'prompt' :
@@ -18713,7 +18704,7 @@ function log() {
 								if (callback)
 									callback(null);
 							});
-					popupContainer.keyup(function(e) {
+					popupPrompt.keyup(function(e) {
 								if (e.keyCode == 13)
 									popupOk.trigger('click');
 								if (e.keyCode == 27)
@@ -33178,7 +33169,10 @@ Initialization.common = function() {
 			$('input[type="hidden"][name="csrf"]').val(csrf);
 	}).keyup(function(e) {
 		if (e.keyCode == 27) {
-			if ($('.modal:visible').length)
+			if ($('#popup-container').length) {
+				$('#popup-container').remove();
+				$('#popup-overlay').remove();
+			} else if ($('.modal:visible').length)
 				$('.modal:visible').last().find('.close').click();
 			else if ($('.ui-dialog:visible').length)
 				$('.ui-dialog:visible').last()

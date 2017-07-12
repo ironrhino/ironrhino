@@ -967,7 +967,10 @@ Initialization.common = function() {
 			$('input[type="hidden"][name="csrf"]').val(csrf);
 	}).keyup(function(e) {
 		if (e.keyCode == 27) {
-			if ($('.modal:visible').length)
+			if ($('#popup-container').length) {
+				$('#popup-container').remove();
+				$('#popup-overlay').remove();
+			} else if ($('.modal:visible').length)
 				$('.modal:visible').last().find('.close').click();
 			else if ($('.ui-dialog:visible').length)
 				$('.ui-dialog:visible').last()
