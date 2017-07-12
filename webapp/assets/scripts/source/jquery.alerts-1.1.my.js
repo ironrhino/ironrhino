@@ -121,9 +121,10 @@
 								}).focus();
 					}
 					if (options.timer) {
-						setTimeout(function() {
+						var timer = setTimeout(function() {
 									$.alerts._hide();
 								}, options.timer);
+						popupContainer.data('timer', timer);
 					}
 					break;
 				case 'confirm' :
@@ -214,9 +215,15 @@
 		},
 
 		_hide : function() {
-			$("#popup-container").remove();
-			$.alerts._overlay('hide');
-			$.alerts._maintainPosition(false);
+			var popupContainer = $("#popup-container");
+			if (popupContainer.length) {
+				var timer = popupContainer.data('timer');
+				if (timer)
+					clearTimeout(timer);
+				popupContainer.remove();
+				$.alerts._overlay('hide');
+				$.alerts._maintainPosition(false);
+			}
 		},
 
 		_overlay : function(status) {
