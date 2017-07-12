@@ -929,25 +929,29 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				logger.error(e.getMessage(), e);
 			}
 		} else {
-			Persistable persisted = null;
+			Persistable persisted = entityManager.get((Serializable) bw.getPropertyValue("id"));
+			if (persisted == null) {
+				addFieldError("id", getText("validation.not.exists"));
+				return false;
+			}
+			BeanWrapperImpl bwp = new BeanWrapperImpl(persisted);
+			bwp.setConversionService(conversionService);
 			if (naturalIdMutable && naturalIds.size() > 0) {
 				Serializable[] args = new Serializable[naturalIds.size() * 2];
 				Iterator<String> it = naturalIds.keySet().iterator();
+				boolean changed = false;
 				int i = 0;
-				try {
-					while (it.hasNext()) {
-						String name = it.next();
-						args[i] = name;
-						i++;
-						args[i] = (Serializable) bw.getPropertyValue(name);
-						i++;
-					}
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
+				while (it.hasNext()) {
+					String name = it.next();
+					args[i] = name;
+					i++;
+					args[i] = (Serializable) bw.getPropertyValue(name);
+					Serializable oldValue = (Serializable) bwp.getPropertyValue(name);
+					if (args[i] != null && !args[i].equals(oldValue))
+						changed = true;
+					i++;
 				}
-				persisted = entityManager.findOne(caseInsensitive, args);
-				// entityManager.evict(persisted);
-				if (persisted != null && !persisted.getId().equals(_entity.getId())) {
+				if (changed && entityManager.existsOne(caseInsensitive, args)) {
 					it = naturalIds.keySet().iterator();
 					while (it.hasNext()) {
 						String fieldName = getEntityName() + '.' + it.next();
@@ -962,26 +966,16 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
 				if (entry.getValue().isUnique() && StringUtils.isNotBlank(
 						ServletActionContext.getRequest().getParameter(getEntityName() + '.' + entry.getKey()))) {
-					persisted = entityManager.findOne(entry.getKey(),
-							(Serializable) bw.getPropertyValue(entry.getKey()));
-					// entityManager.evict(persisted);
-					if (persisted != null && !persisted.getId().equals(_entity.getId())) {
+					Serializable newValue = (Serializable) bw.getPropertyValue(entry.getKey());
+					Serializable oldValue = (Serializable) bwp.getPropertyValue(entry.getKey());
+					boolean changed = (newValue != null && !newValue.equals(oldValue));
+					if (changed && entityManager.existsOne(entry.getKey(), newValue)) {
 						addFieldError(getEntityName() + '.' + entry.getKey(), getText("validation.already.exists"));
 						return false;
 					}
 				}
 			}
 			try {
-				if (persisted == null) {
-					persisted = entityManager.get((Serializable) bw.getPropertyValue("id"));
-					if (persisted == null) {
-						addFieldError("id", getText("validation.not.exists"));
-						return false;
-					}
-					// entityManager.evict(persisted);
-				}
-				BeanWrapperImpl bwp = new BeanWrapperImpl(persisted);
-				bwp.setConversionService(conversionService);
 				String versionPropertyName = getVersionPropertyName();
 				if (versionPropertyName != null) {
 					int versionInDb = (Integer) bwp.getPropertyValue(versionPropertyName);
