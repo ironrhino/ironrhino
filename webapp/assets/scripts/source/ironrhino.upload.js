@@ -7,32 +7,36 @@ Initialization.upload = function() {
 							replacement : 'files'
 						});
 			}).on('click', '#files button.mkdir', function() {
-		$.alerts.prompt('', 'newfolder', '', function(t) {
-					if (t) {
-						var folder = $('#current_folder').text() + t;
-						var url = $('#upload_form').prop('action');
-						if (!url)
-							url = CONTEXT_PATH + '/common/upload';
-						url += '/mkdir' + encodeURI(folder);
-						ajax({
-									url : url,
-									dataType : 'json',
-									success : function() {
-										$('#folder').val(folder);
-										$('#files button.reload').click();
-										if (typeof history.pushState != 'undefined') {
-											var url = $('#upload_form')
-													.prop('action');
-											if (!url)
-												url = CONTEXT_PATH
-														+ '/common/upload';
-											url += '/list' + encodeURI(folder)
-											history.pushState(url, '', url);
-										}
+		$.alerts.show({
+			type : 'prompt',
+			value : 'newfolder',
+			callback : function(t) {
+				if (t) {
+					var folder = $('#current_folder').text() + t;
+					var url = $('#upload_form').prop('action');
+					if (!url)
+						url = CONTEXT_PATH + '/common/upload';
+					url += '/mkdir' + encodeURI(folder);
+					ajax({
+								url : url,
+								dataType : 'json',
+								success : function() {
+									$('#folder').val(folder);
+									$('#files button.reload').click();
+									if (typeof history.pushState != 'undefined') {
+										var url = $('#upload_form')
+												.prop('action');
+										if (!url)
+											url = CONTEXT_PATH
+													+ '/common/upload';
+										url += '/list' + encodeURI(folder)
+										history.pushState(url, '', url);
 									}
-								});
-					}
-				});
+								}
+							});
+				}
+			}
+		});
 	}).on('click', '#files button.snapshot', function() {
 		$.snapshot({
 			onsnapshot : function(canvas, timestamp) {
@@ -200,38 +204,41 @@ function addMore(n) {
 	}
 }
 function deleteFiles(file) {
-	$.alerts.confirm(MessageBundle.get('confirm.delete'), MessageBundle
-					.get('select'), function(b) {
-				if (b) {
-					var url = $('#upload_form').prop('action');
-					if (!url)
-						url = CONTEXT_PATH + '/common/upload';
-					url += '/delete';
-					var options = {
-						type : $('#upload_form').attr('method'),
-						url : url,
-						dataType : 'json',
-						complete : function() {
-							$('#files button.reload').click();
-						}
-					};
-					if (file) {
-						var data = $('#upload_form').serialize();
-						var params = [];
-						params.push('id=' + file);
-						if (data) {
-							var arr = data.split('&');
-							for (var i = 0; i < arr.length; i++) {
-								var arr2 = arr[i].split('=', 2);
-								if (arr2[0] != 'id')
-									params.push(arr[i]);
+	$.alerts.show({
+				type : 'confirm',
+				message : MessageBundle.get('confirm.delete'),
+				callback : function(b) {
+					if (b) {
+						var url = $('#upload_form').prop('action');
+						if (!url)
+							url = CONTEXT_PATH + '/common/upload';
+						url += '/delete';
+						var options = {
+							type : $('#upload_form').attr('method'),
+							url : url,
+							dataType : 'json',
+							complete : function() {
+								$('#files button.reload').click();
 							}
+						};
+						if (file) {
+							var data = $('#upload_form').serialize();
+							var params = [];
+							params.push('id=' + file);
+							if (data) {
+								var arr = data.split('&');
+								for (var i = 0; i < arr.length; i++) {
+									var arr2 = arr[i].split('=', 2);
+									if (arr2[0] != 'id')
+										params.push(arr[i]);
+								}
+							}
+							options.data = params.join('&');
+						} else {
+							options.data = $('#upload_form').serialize();
 						}
-						options.data = params.join('&');
-					} else {
-						options.data = $('#upload_form').serialize();
+						ajax(options);
 					}
-					ajax(options);
 				}
 			});
 

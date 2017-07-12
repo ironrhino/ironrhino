@@ -1264,7 +1264,12 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	color: #3a87ad;
 }
 
-#popup-container .popup-content.alert, #popup-container .popup-content.confirm{
+#popup-container .popup-content.warn{
+	background-color: #fcf8e3;
+	color: #8a6d3b;
+}
+
+#popup-container .popup-content.confirm{
 	background-color: #fcf8e3;
 	color: #c09853;
 }

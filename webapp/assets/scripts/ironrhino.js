@@ -18568,59 +18568,26 @@ function log() {
 		okButton : '&nbsp;OK&nbsp;', // text for the OK button
 		cancelButton : '&nbsp;Cancel&nbsp;', // text for the Cancel button
 
-		// Public methods
+		show : function(options) {
+			if (typeof options == 'string')
+				options = {
+					message : options
+				};
+			var _options = {
+				showConfirmButton : true
+			}
+			$.extend(_options, options);
+			options = _options;
 
-		info : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'info',
-					function(result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		alert : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'alert', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		success : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'success', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		error : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'error', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		confirm : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'confirm', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		prompt : function(message, value, title, callback) {
-			return $.alerts._show(title, message, value, 'prompt', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		// Private methods
-
-		_show : function(title, msg, value, type, callback) {
+			var type = options.type || 'info';
+			var title = options.title;
+			var message = options.message;
+			var callback = options.callback;
+			if (type == 'confirm') {
+				var title = title || MessageBundle.get('select');
+				var message = message || btn.data('confirm')
+						|| MessageBundle.get('confirm.action');
+			}
 
 			$.alerts._hide();
 			$.alerts._overlay('show');
@@ -18642,7 +18609,7 @@ function log() {
 			else
 				popupContainer.find(".popup-title").remove();
 			popupContainer.find(".popup-content").addClass(type);
-			popupMessage.html(msg);
+			popupMessage.html(message);
 
 			popupContainer.css({
 						minWidth : popupContainer.outerWidth(),
@@ -18654,20 +18621,30 @@ function log() {
 			var glyphicon = 'info-sign';
 			switch (type) {
 				case 'info' :
-				case 'alert' :
+				case 'warn' :
 				case 'success' :
 				case 'error' :
 					if (type == 'success')
 						glyphicon = 'ok-circle';
 					else if (type == 'error')
 						glyphicon = 'remove-circle';
-					var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
-							+ $.alerts.okButton + '</button></div>')
-							.insertAfter(popupMessage).find(".popup-ok");
-					popupOk.click(function() {
-								$.alerts._hide();
-								callback(true);
-							}).focus();
+					else if (type == 'warn')
+						glyphicon = 'alert';
+					if (options.showConfirmButton) {
+						var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
+								+ $.alerts.okButton + '</button></div>')
+								.insertAfter(popupMessage).find(".popup-ok");
+						popupOk.click(function() {
+									$.alerts._hide();
+									if (callback)
+										callback(true);
+								}).focus();
+					}
+					if (options.timer) {
+						setTimeout(function() {
+									$.alerts._hide();
+								}, options.timer);
+					}
 					break;
 				case 'confirm' :
 					glyphicon = 'question-sign';
@@ -18688,6 +18665,11 @@ function log() {
 								if (callback)
 									callback(false);
 							});
+					if (options.timer) {
+						setTimeout(function() {
+									popupOk.click();
+								}, options.timer);
+					}
 					break;
 				case 'prompt' :
 					glyphicon = 'question-sign';
@@ -18718,9 +18700,17 @@ function log() {
 								if (e.keyCode == 27)
 									popupCancel.trigger('click');
 							});
-					if (value)
-						popupPrompt.val(value);
+					if (options.value)
+						popupPrompt.val(options.value);
+					if (options.inputPlaceholder)
+						popupPrompt.attr('placeholder',
+								options.inputPlaceholder);
 					popupPrompt.focus().select();
+					if (options.timer) {
+						setTimeout(function() {
+									popupOk.click();
+								}, options.timer);
+					}
 					break;
 			}
 
@@ -32510,9 +32500,12 @@ Message = {
 		Message.showActionError(MessageBundle.get.apply(this, arguments));
 	},
 	showActionError : function(messages, target) {
-		Message.showActionMessage(messages, target, true);
+		Message.show(messages, target, 'error');
 	},
-	showActionMessage : function(messages, target, error) {
+	showActionMessage : function(messages, target) {
+		Message.show(messages, target, 'info');
+	},
+	show : function(messages, target, type) {
 		if (!messages)
 			return;
 		if (typeof messages == 'string') {
@@ -32520,23 +32513,23 @@ Message = {
 			a.push(messages);
 			messages = a;
 		}
+		type = type || 'info';
 		if ($.alerts) {
-			if (error) {
-				var popup = $.alerts.error(messages.join('\n'));
-				if (target)
-					popup.data('target', target);
-				return;
-			} else if ($(target).hasClass('alerts')
-					|| $(target).find('.clicked').hasClass('alerts')) {
-				var popup = $.alerts.info(messages.join('\n'), ' ');
-				if (target)
-					popup.data('target', target);
-				setTimeout(function() {
-							$('#popup-container .popup-ok').click();
-						}, 5000);
-				return;
+			var options = {
+				type : type,
+				message : messages.join('\n')
+			};
+			if (type == 'success') {
+				options.showConfirmButton = false;
+				options.timer = 3000;
 			}
+			var popup = $.alerts.show(options);
+			_observe(popup);
+			if (target)
+				popup.data('target', target);
+			return;
 		}
+		var error = type == 'error';
 		var html = '';
 		for (var i = 0; i < messages.length; i++)
 			html += Message.compose(messages[i], error
@@ -34236,41 +34229,42 @@ Observation.common = function(container) {
 							'X-Data-Type' : 'json'
 						});
 			$(this).on('submit', function(e) {
-				var form = $(this);
-				var btn = $('.clicked', form);
-				if (!btn.length)
-					btn = $(':input:submit:focus', form);
-				if (btn.hasClass('noajax'))
-					return true;
-				var confirm = btn.hasClass('confirm');
-				if (btn.hasClass('reload') || btn.data('action')) {
-					options.pushState = false;
-					confirm = false;
-				}
-				var func = function() {
-					if ('multipart/form-data' == form.attr('enctype')) {
-						options.target = target;
-						$.ajaxupload(options);
-					} else {
-						form.ajaxSubmit(options);
-					}
-					btn.removeClass('clicked');
-				}
-				if (confirm) {
-					$.alerts.confirm((btn.data('confirm') || MessageBundle
-									.get('confirm.action')), MessageBundle
-									.get('select'), function(b) {
-								if (b) {
-									func();
-								} else {
-									btn.removeClass('clicked');
-								}
-							});
-				} else {
-					func();
-				}
-				return false;
-			});
+						var form = $(this);
+						var btn = $('.clicked', form);
+						if (!btn.length)
+							btn = $(':input:submit:focus', form);
+						if (btn.hasClass('noajax'))
+							return true;
+						var confirm = btn.hasClass('confirm');
+						if (btn.hasClass('reload') || btn.data('action')) {
+							options.pushState = false;
+							confirm = false;
+						}
+						var func = function() {
+							if ('multipart/form-data' == form.attr('enctype')) {
+								options.target = target;
+								$.ajaxupload(options);
+							} else {
+								form.ajaxSubmit(options);
+							}
+							btn.removeClass('clicked');
+						}
+						if (confirm) {
+							$.alerts.show({
+										type : 'confirm',
+										callback : function(b) {
+											if (b) {
+												func();
+											} else {
+												btn.removeClass('clicked');
+											}
+										}
+									});
+						} else {
+							func();
+						}
+						return false;
+					});
 			return;
 		} else {
 			$(this).click(function() {
@@ -36755,32 +36749,36 @@ Initialization.upload = function() {
 							replacement : 'files'
 						});
 			}).on('click', '#files button.mkdir', function() {
-		$.alerts.prompt('', 'newfolder', '', function(t) {
-					if (t) {
-						var folder = $('#current_folder').text() + t;
-						var url = $('#upload_form').prop('action');
-						if (!url)
-							url = CONTEXT_PATH + '/common/upload';
-						url += '/mkdir' + encodeURI(folder);
-						ajax({
-									url : url,
-									dataType : 'json',
-									success : function() {
-										$('#folder').val(folder);
-										$('#files button.reload').click();
-										if (typeof history.pushState != 'undefined') {
-											var url = $('#upload_form')
-													.prop('action');
-											if (!url)
-												url = CONTEXT_PATH
-														+ '/common/upload';
-											url += '/list' + encodeURI(folder)
-											history.pushState(url, '', url);
-										}
+		$.alerts.show({
+			type : 'prompt',
+			value : 'newfolder',
+			callback : function(t) {
+				if (t) {
+					var folder = $('#current_folder').text() + t;
+					var url = $('#upload_form').prop('action');
+					if (!url)
+						url = CONTEXT_PATH + '/common/upload';
+					url += '/mkdir' + encodeURI(folder);
+					ajax({
+								url : url,
+								dataType : 'json',
+								success : function() {
+									$('#folder').val(folder);
+									$('#files button.reload').click();
+									if (typeof history.pushState != 'undefined') {
+										var url = $('#upload_form')
+												.prop('action');
+										if (!url)
+											url = CONTEXT_PATH
+													+ '/common/upload';
+										url += '/list' + encodeURI(folder)
+										history.pushState(url, '', url);
 									}
-								});
-					}
-				});
+								}
+							});
+				}
+			}
+		});
 	}).on('click', '#files button.snapshot', function() {
 		$.snapshot({
 			onsnapshot : function(canvas, timestamp) {
@@ -36948,38 +36946,41 @@ function addMore(n) {
 	}
 }
 function deleteFiles(file) {
-	$.alerts.confirm(MessageBundle.get('confirm.delete'), MessageBundle
-					.get('select'), function(b) {
-				if (b) {
-					var url = $('#upload_form').prop('action');
-					if (!url)
-						url = CONTEXT_PATH + '/common/upload';
-					url += '/delete';
-					var options = {
-						type : $('#upload_form').attr('method'),
-						url : url,
-						dataType : 'json',
-						complete : function() {
-							$('#files button.reload').click();
-						}
-					};
-					if (file) {
-						var data = $('#upload_form').serialize();
-						var params = [];
-						params.push('id=' + file);
-						if (data) {
-							var arr = data.split('&');
-							for (var i = 0; i < arr.length; i++) {
-								var arr2 = arr[i].split('=', 2);
-								if (arr2[0] != 'id')
-									params.push(arr[i]);
+	$.alerts.show({
+				type : 'confirm',
+				message : MessageBundle.get('confirm.delete'),
+				callback : function(b) {
+					if (b) {
+						var url = $('#upload_form').prop('action');
+						if (!url)
+							url = CONTEXT_PATH + '/common/upload';
+						url += '/delete';
+						var options = {
+							type : $('#upload_form').attr('method'),
+							url : url,
+							dataType : 'json',
+							complete : function() {
+								$('#files button.reload').click();
 							}
+						};
+						if (file) {
+							var data = $('#upload_form').serialize();
+							var params = [];
+							params.push('id=' + file);
+							if (data) {
+								var arr = data.split('&');
+								for (var i = 0; i < arr.length; i++) {
+									var arr2 = arr[i].split('=', 2);
+									if (arr2[0] != 'id')
+										params.push(arr[i]);
+								}
+							}
+							options.data = params.join('&');
+						} else {
+							options.data = $('#upload_form').serialize();
 						}
-						options.data = params.join('&');
-					} else {
-						options.data = $('#upload_form').serialize();
+						ajax(options);
 					}
-					ajax(options);
 				}
 			});
 
@@ -38881,12 +38882,15 @@ Richtable = {
 
 			}
 			if (btn.hasClass('confirm') || action == 'delete') {
-				$.alerts.confirm((btn.data('confirm') || (action == 'delete'
-								? MessageBundle.get('confirm.delete')
-								: MessageBundle.get('confirm.action'))),
-						MessageBundle.get('select'), function(b) {
-							if (b) {
-								func();
+				$.alerts.show({
+							type : 'confirm',
+							message : (btn.data('confirm') || (action == 'delete'
+									? MessageBundle.get('confirm.delete')
+									: MessageBundle.get('confirm.action'))),
+							callback : function(b) {
+								if (b) {
+									func();
+								}
 							}
 						});
 			} else {
@@ -39002,11 +39006,14 @@ Richtable = {
 		}
 
 		if (btn.hasClass('confirm')) {
-			$.alerts.confirm(btn.data('confirm')
-							|| MessageBundle.get('confirm.save'), MessageBundle
-							.get('select'), function(b) {
-						if (b) {
-							func();
+			$.alerts.show({
+						type : 'confirm',
+						message : btn.data('confirm')
+								|| MessageBundle.get('confirm.save'),
+						callback : function(b) {
+							if (b) {
+								func();
+							}
 						}
 					});
 		} else {
@@ -41159,21 +41166,23 @@ Observation.latlng = function(container) {
 		var data = {};
 		data[name] = t.html();
 		if (t.hasClass('edited'))
-			$.alerts.confirm(MessageBundle.get('confirm.save'), MessageBundle
-							.get('select'), function(b) {
-						if (b) {
-							ajax({
-										url : url,
-										type : 'POST',
-										data : data,
-										global : false,
-										success : function() {
-											t.removeClass('edited');
-										}
-									});
+			$.alerts.show({
+						type : 'confirm',
+						message : MessageBundle.get('confirm.save'),
+						callback : function(b) {
+							if (b) {
+								ajax({
+											url : url,
+											type : 'POST',
+											data : data,
+											global : false,
+											success : function() {
+												t.removeClass('edited');
+											}
+										});
+							}
 						}
 					});
-
 	}
 })(jQuery);
 

@@ -308,9 +308,12 @@ Message = {
 		Message.showActionError(MessageBundle.get.apply(this, arguments));
 	},
 	showActionError : function(messages, target) {
-		Message.showActionMessage(messages, target, true);
+		Message.show(messages, target, 'error');
 	},
-	showActionMessage : function(messages, target, error) {
+	showActionMessage : function(messages, target) {
+		Message.show(messages, target, 'info');
+	},
+	show : function(messages, target, type) {
 		if (!messages)
 			return;
 		if (typeof messages == 'string') {
@@ -318,23 +321,19 @@ Message = {
 			a.push(messages);
 			messages = a;
 		}
+		type = type || 'info';
 		if ($.alerts) {
-			if (error) {
-				var popup = $.alerts.error(messages.join('\n'));
-				if (target)
-					popup.data('target', target);
-				return;
-			} else if ($(target).hasClass('alerts')
-					|| $(target).find('.clicked').hasClass('alerts')) {
-				var popup = $.alerts.info(messages.join('\n'), ' ');
-				if (target)
-					popup.data('target', target);
-				setTimeout(function() {
-							$('#popup-container .popup-ok').click();
-						}, 5000);
-				return;
-			}
+			var options = {
+				type : type,
+				message : messages.join('\n')
+			};
+			var popup = $.alerts.show(options);
+			_observe(popup);
+			if (target)
+				popup.data('target', target);
+			return;
 		}
+		var error = type == 'error';
 		var html = '';
 		for (var i = 0; i < messages.length; i++)
 			html += Message.compose(messages[i], error
@@ -2034,41 +2033,42 @@ Observation.common = function(container) {
 							'X-Data-Type' : 'json'
 						});
 			$(this).on('submit', function(e) {
-				var form = $(this);
-				var btn = $('.clicked', form);
-				if (!btn.length)
-					btn = $(':input:submit:focus', form);
-				if (btn.hasClass('noajax'))
-					return true;
-				var confirm = btn.hasClass('confirm');
-				if (btn.hasClass('reload') || btn.data('action')) {
-					options.pushState = false;
-					confirm = false;
-				}
-				var func = function() {
-					if ('multipart/form-data' == form.attr('enctype')) {
-						options.target = target;
-						$.ajaxupload(options);
-					} else {
-						form.ajaxSubmit(options);
-					}
-					btn.removeClass('clicked');
-				}
-				if (confirm) {
-					$.alerts.confirm((btn.data('confirm') || MessageBundle
-									.get('confirm.action')), MessageBundle
-									.get('select'), function(b) {
-								if (b) {
-									func();
-								} else {
-									btn.removeClass('clicked');
-								}
-							});
-				} else {
-					func();
-				}
-				return false;
-			});
+						var form = $(this);
+						var btn = $('.clicked', form);
+						if (!btn.length)
+							btn = $(':input:submit:focus', form);
+						if (btn.hasClass('noajax'))
+							return true;
+						var confirm = btn.hasClass('confirm');
+						if (btn.hasClass('reload') || btn.data('action')) {
+							options.pushState = false;
+							confirm = false;
+						}
+						var func = function() {
+							if ('multipart/form-data' == form.attr('enctype')) {
+								options.target = target;
+								$.ajaxupload(options);
+							} else {
+								form.ajaxSubmit(options);
+							}
+							btn.removeClass('clicked');
+						}
+						if (confirm) {
+							$.alerts.show({
+										type : 'confirm',
+										callback : function(b) {
+											if (b) {
+												func();
+											} else {
+												btn.removeClass('clicked');
+											}
+										}
+									});
+						} else {
+							func();
+						}
+						return false;
+					});
 			return;
 		} else {
 			$(this).click(function() {

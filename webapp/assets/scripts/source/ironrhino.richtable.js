@@ -332,12 +332,15 @@ Richtable = {
 
 			}
 			if (btn.hasClass('confirm') || action == 'delete') {
-				$.alerts.confirm((btn.data('confirm') || (action == 'delete'
-								? MessageBundle.get('confirm.delete')
-								: MessageBundle.get('confirm.action'))),
-						MessageBundle.get('select'), function(b) {
-							if (b) {
-								func();
+				$.alerts.show({
+							type : 'confirm',
+							message : (btn.data('confirm') || (action == 'delete'
+									? MessageBundle.get('confirm.delete')
+									: MessageBundle.get('confirm.action'))),
+							callback : function(b) {
+								if (b) {
+									func();
+								}
 							}
 						});
 			} else {
@@ -453,11 +456,14 @@ Richtable = {
 		}
 
 		if (btn.hasClass('confirm')) {
-			$.alerts.confirm(btn.data('confirm')
-							|| MessageBundle.get('confirm.save'), MessageBundle
-							.get('select'), function(b) {
-						if (b) {
-							func();
+			$.alerts.show({
+						type : 'confirm',
+						message : btn.data('confirm')
+								|| MessageBundle.get('confirm.save'),
+						callback : function(b) {
+							if (b) {
+								func();
+							}
 						}
 					});
 		} else {

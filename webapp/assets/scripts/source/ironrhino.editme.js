@@ -11,21 +11,23 @@
 		var data = {};
 		data[name] = t.html();
 		if (t.hasClass('edited'))
-			$.alerts.confirm(MessageBundle.get('confirm.save'), MessageBundle
-							.get('select'), function(b) {
-						if (b) {
-							ajax({
-										url : url,
-										type : 'POST',
-										data : data,
-										global : false,
-										success : function() {
-											t.removeClass('edited');
-										}
-									});
+			$.alerts.show({
+						type : 'confirm',
+						message : MessageBundle.get('confirm.save'),
+						callback : function(b) {
+							if (b) {
+								ajax({
+											url : url,
+											type : 'POST',
+											data : data,
+											global : false,
+											success : function() {
+												t.removeClass('edited');
+											}
+										});
+							}
 						}
 					});
-
 	}
 })(jQuery);
 

@@ -44,59 +44,30 @@
 		okButton : '&nbsp;OK&nbsp;', // text for the OK button
 		cancelButton : '&nbsp;Cancel&nbsp;', // text for the Cancel button
 
-		// Public methods
+		show : function(options) {
+			if (typeof options == 'string')
+				options = {
+					message : options
+				};
+			var _options = {
+				showConfirmButton : true
+			}
+			$.extend(_options, options);
+			options = _options;
 
-		info : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'info',
-					function(result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		alert : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'alert', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		success : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'success', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		error : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'error', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		confirm : function(message, title, callback) {
-			return $.alerts._show(title, message, null, 'confirm', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		prompt : function(message, value, title, callback) {
-			return $.alerts._show(title, message, value, 'prompt', function(
-							result) {
-						if (callback)
-							callback(result);
-					});
-		},
-
-		// Private methods
-
-		_show : function(title, msg, value, type, callback) {
+			var type = options.type || 'info';
+			var title = options.title;
+			var message = options.message;
+			var callback = options.callback;
+			if (type == 'confirm') {
+				var title = title || MessageBundle.get('select');
+				var message = message || btn.data('confirm')
+						|| MessageBundle.get('confirm.action');
+			} else if (type == 'success') {
+				if (!options.timer)
+					options.timer = 3000;
+				options.showConfirmButton = false;
+			}
 
 			$.alerts._hide();
 			$.alerts._overlay('show');
@@ -118,7 +89,7 @@
 			else
 				popupContainer.find(".popup-title").remove();
 			popupContainer.find(".popup-content").addClass(type);
-			popupMessage.html(msg);
+			popupMessage.html(message);
 
 			popupContainer.css({
 						minWidth : popupContainer.outerWidth(),
@@ -130,20 +101,30 @@
 			var glyphicon = 'info-sign';
 			switch (type) {
 				case 'info' :
-				case 'alert' :
+				case 'warn' :
 				case 'success' :
 				case 'error' :
 					if (type == 'success')
 						glyphicon = 'ok-circle';
 					else if (type == 'error')
 						glyphicon = 'remove-circle';
-					var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
-							+ $.alerts.okButton + '</button></div>')
-							.insertAfter(popupMessage).find(".popup-ok");
-					popupOk.click(function() {
-								$.alerts._hide();
-								callback(true);
-							}).focus();
+					else if (type == 'warn')
+						glyphicon = 'alert';
+					if (options.showConfirmButton) {
+						var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
+								+ $.alerts.okButton + '</button></div>')
+								.insertAfter(popupMessage).find(".popup-ok");
+						popupOk.click(function() {
+									$.alerts._hide();
+									if (callback)
+										callback(true);
+								}).focus();
+					}
+					if (options.timer) {
+						setTimeout(function() {
+									$.alerts._hide();
+								}, options.timer);
+					}
 					break;
 				case 'confirm' :
 					glyphicon = 'question-sign';
@@ -164,6 +145,11 @@
 								if (callback)
 									callback(false);
 							});
+					if (options.timer) {
+						setTimeout(function() {
+									popupOk.click();
+								}, options.timer);
+					}
 					break;
 				case 'prompt' :
 					glyphicon = 'question-sign';
@@ -194,9 +180,17 @@
 								if (e.keyCode == 27)
 									popupCancel.trigger('click');
 							});
-					if (value)
-						popupPrompt.val(value);
+					if (options.value)
+						popupPrompt.val(options.value);
+					if (options.inputPlaceholder)
+						popupPrompt.attr('placeholder',
+								options.inputPlaceholder);
 					popupPrompt.focus().select();
+					if (options.timer) {
+						setTimeout(function() {
+									popupOk.click();
+								}, options.timer);
+					}
 					break;
 			}
 
