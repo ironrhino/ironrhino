@@ -252,7 +252,7 @@ input.error:focus, select.error:focus, textarea.error:focus {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
 }
 
-.action-error strong.force-override {
+strong.force-override {
 	cursor: pointer;
 }
 

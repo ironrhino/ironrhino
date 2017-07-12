@@ -50,6 +50,21 @@
 	margin: 0em;
 }
 
+#popup-container .popup-content.info, #popup-container .popup-content.success, #popup-container .popup-content.prompt {
+	background-color: #d9edf7;
+	color: #3a87ad;
+}
+
+#popup-container .popup-content.alert, #popup-container .popup-content.confirm{
+	background-color: #fcf8e3;
+	color: #c09853;
+}
+
+#popup-container .popup-content.error{
+	background-color: #f2dede;
+	color: #a94442;
+}
+
 #popup-container .popup-icon{
 	text-align: center;
 	height: 40px;
@@ -83,8 +98,17 @@
     margin: 15px 5px 0;
     padding: 10px 22px;
 }
+
+#popup-container .popup-panel button:focus, #popup-container .popup-panel button:hover {
+	color: #eee;
+}
+
 #popup-container .popup-ok {
     background-color: #3085d6;
+}
+
+#popup-container .error .popup-ok {
+	background-color: #dd3333;
 }
 
 #popup-container .popup-cancel {

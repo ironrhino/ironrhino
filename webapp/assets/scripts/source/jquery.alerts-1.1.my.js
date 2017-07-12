@@ -43,34 +43,52 @@
 		// Draggables plugin)
 		okButton : '&nbsp;OK&nbsp;', // text for the OK button
 		cancelButton : '&nbsp;Cancel&nbsp;', // text for the Cancel button
-		dialogClass : null, // if specified, this class will be applied to all
-		// dialogs
 
 		// Public methods
 
 		info : function(message, title, callback) {
-			$.alerts._show(title, message, null, 'info', function(result) {
+			return $.alerts._show(title, message, null, 'info',
+					function(result) {
 						if (callback)
 							callback(result);
 					});
 		},
 
 		alert : function(message, title, callback) {
-			$.alerts._show(title, message, null, 'alert', function(result) {
+			return $.alerts._show(title, message, null, 'alert', function(
+							result) {
+						if (callback)
+							callback(result);
+					});
+		},
+
+		success : function(message, title, callback) {
+			return $.alerts._show(title, message, null, 'success', function(
+							result) {
+						if (callback)
+							callback(result);
+					});
+		},
+
+		error : function(message, title, callback) {
+			return $.alerts._show(title, message, null, 'error', function(
+							result) {
 						if (callback)
 							callback(result);
 					});
 		},
 
 		confirm : function(message, title, callback) {
-			$.alerts._show(title, message, null, 'confirm', function(result) {
+			return $.alerts._show(title, message, null, 'confirm', function(
+							result) {
 						if (callback)
 							callback(result);
 					});
 		},
 
 		prompt : function(message, value, title, callback) {
-			$.alerts._show(title, message, value, 'prompt', function(result) {
+			return $.alerts._show(title, message, value, 'prompt', function(
+							result) {
 						if (callback)
 							callback(result);
 					});
@@ -83,27 +101,11 @@
 			$.alerts._hide();
 			$.alerts._overlay('show');
 
-			var popupContainer = $('<div id="popup-container"><h1 class="popup-title"></h1><div class="popup-content"><div class="popup-icon"></div><div class="popup-message"></div></div></div>')
+			var popupContainer = $('<div id="popup-container"><div class="popup-content"><div class="popup-icon"></div><div class="popup-message"></div></div></div>')
 					.appendTo(document.body);
 
-			popupContainer.find('.popup-icon')
-					.html('<span class="glyphicon glyphicon-'
-							+ (type == 'confirm' || type == 'alert'
-									? 'alert'
-									: type == 'prompt'
-											? 'question-sign'
-											: 'info-sign') + '"></span>');
-
-			if ($.alerts.dialogClass)
-				popupContainer.addClass($.alerts.dialogClass);
-
-			// IE6 Fix
-			var pos = ($.browser.msie && parseInt($.browser.version) <= 6)
-					? 'absolute'
-					: 'fixed';
-
 			popupContainer.css({
-						position : pos,
+						position : 'fixed',
 						zIndex : 99999,
 						padding : 0,
 						margin : 0
@@ -111,13 +113,11 @@
 
 			var popupMessage = popupContainer.find(".popup-message");
 			if (title != null)
-				popupContainer.find(".popup-title").html(title);
+				popupContainer.prepend('<h1 class="popup-title">' + title
+						+ '</h1>');
 			else
 				popupContainer.find(".popup-title").remove();
 			popupContainer.find(".popup-content").addClass(type);
-			popupContainer.find(".popup-content").addClass(type == 'info'
-					? 'alert-info'
-					: type == 'confirm' ? 'alert' : '');
 			popupMessage.html(msg);
 
 			popupContainer.css({
@@ -127,10 +127,16 @@
 
 			$.alerts._reposition();
 			$.alerts._maintainPosition(true);
-
+			var glyphicon = 'info-sign';
 			switch (type) {
 				case 'info' :
 				case 'alert' :
+				case 'success' :
+				case 'error' :
+					if (type == 'success')
+						glyphicon = 'ok-circle';
+					else if (type == 'error')
+						glyphicon = 'remove-circle';
 					var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
 							+ $.alerts.okButton + '</button></div>')
 							.insertAfter(popupMessage).find(".popup-ok");
@@ -140,6 +146,7 @@
 							}).focus();
 					break;
 				case 'confirm' :
+					glyphicon = 'question-sign';
 					var popupPanel = $('<div class="popup-panel"><button class="popup-ok">'
 							+ $.alerts.okButton
 							+ '</button> <button class="popup-cancel">'
@@ -159,8 +166,9 @@
 							});
 					break;
 				case 'prompt' :
+					glyphicon = 'question-sign';
 					popupMessage
-							.append('<br /><input type="text" size="30" class="popup-prompt" />')
+							.append('<input type="text" size="30" class="popup-prompt" />')
 							.after('<div class="popup-panel"><button class="popup-ok">'
 									+ $.alerts.okButton
 									+ '</button> <button class="popup-cancel">'
@@ -192,8 +200,12 @@
 					break;
 			}
 
+			popupContainer.find('.popup-icon')
+					.append('<span class="glyphicon glyphicon-' + glyphicon
+							+ '"></span>');
+
 			// Make draggable
-			if ($.alerts.draggable) {
+			if ($.alerts.draggable && title != null) {
 				try {
 					popupContainer.draggable({
 								handle : $(".popup-title")
@@ -204,6 +216,7 @@
 				} catch (e) { /* requires jQuery UI draggables */
 				}
 			}
+			return popupContainer;
 		},
 
 		_hide : function() {
@@ -271,18 +284,5 @@
 		}
 
 	}
-
-	// Shortuct functions
-	jAlert = function(message, title, callback) {
-		$.alerts.alert(message, title, callback);
-	}
-
-	jConfirm = function(message, title, callback) {
-		$.alerts.confirm(message, title, callback);
-	};
-
-	jPrompt = function(message, value, title, callback) {
-		$.alerts.prompt(message, value, title, callback);
-	};
 
 })(jQuery);

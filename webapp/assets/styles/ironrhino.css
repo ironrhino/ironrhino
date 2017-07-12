@@ -1259,6 +1259,21 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	margin: 0em;
 }
 
+#popup-container .popup-content.info, #popup-container .popup-content.success, #popup-container .popup-content.prompt {
+	background-color: #d9edf7;
+	color: #3a87ad;
+}
+
+#popup-container .popup-content.alert, #popup-container .popup-content.confirm{
+	background-color: #fcf8e3;
+	color: #c09853;
+}
+
+#popup-container .popup-content.error{
+	background-color: #f2dede;
+	color: #a94442;
+}
+
 #popup-container .popup-icon{
 	text-align: center;
 	height: 40px;
@@ -1292,8 +1307,17 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
     margin: 15px 5px 0;
     padding: 10px 22px;
 }
+
+#popup-container .popup-panel button:focus, #popup-container .popup-panel button:hover {
+	color: #eee;
+}
+
 #popup-container .popup-ok {
     background-color: #3085d6;
+}
+
+#popup-container .error .popup-ok {
+	background-color: #dd3333;
 }
 
 #popup-container .popup-cancel {
@@ -9112,7 +9136,7 @@ input.error:focus, select.error:focus, textarea.error:focus {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
 }
 
-.action-error strong.force-override {
+strong.force-override {
 	cursor: pointer;
 }
 
