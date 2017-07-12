@@ -172,6 +172,7 @@ public class LoginAction extends BaseAction {
 				addFieldError("username", getText(e.getClass().getName()));
 			}
 		}
+		setActionSuccessMessage(getText("send.success"));
 		return JSON;
 	}
 

@@ -33012,7 +33012,7 @@ Ajax = {
 						Message.showActionMessage(data.actionMessages, target);
 						Message.showActionWarning(data.actionWarning, target);
 						Message.showActionError(data.actionErrors, target);
-					}, 500);
+					}, 100);
 
 			if (data.fieldErrors) {
 				if (target) {
