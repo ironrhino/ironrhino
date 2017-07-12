@@ -1132,11 +1132,7 @@ Initialization.common = function() {
 				});
 		document.location.reload();
 		return false;
-	}).on('focus', '[name="verificationCode"]', function() {
-				var t = $(this);
-				if (!t.val())
-					t.next('.sendVerificationCode:not(:disabled)').click();
-			}).on('click', '.sendVerificationCode', function() {
+	}).on('click', '.sendVerificationCode', function() {
 		var btn = $(this).addClass('clicked');
 		var f = btn.closest('form');
 		var cooldown = parseInt(btn.data('cooldown') || 60);
@@ -1152,6 +1148,9 @@ Initialization.common = function() {
 						target : f[0],
 						data : data,
 						onsuccess : function() {
+							var input = f.find('[name="verificationCode"]');
+							Form.clearError(input);
+							input.val('').focus();
 							btn.prop('disabled', true).css('width',
 									btn.outerWidth()).data('text', btn.text())
 									.text(cooldown);

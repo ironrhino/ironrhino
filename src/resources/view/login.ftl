@@ -26,7 +26,7 @@
 		<#assign verificationCodeRequired = beans['verificationManager'].isVerificationRequired(username)>
 		<#assign passwordCodeRequired = beans['verificationManager'].isPasswordRequired(username)>
 	</#if>
-	<@s.form id="login" action="${actionBaseUrl}" method="post" class="ajax form-horizontal well${verificationCodeRequired?then('',' focus')}">
+	<@s.form id="login" action="${actionBaseUrl}" method="post" class="ajax focus form-horizontal well">
 		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
 		<#assign dynamicAttributes={}>
 		<#if verificationCodeEnabled>
@@ -39,7 +39,7 @@
 		</#if>
 		<#if verificationCodeRequired>
 		<@s.textfield name="verificationCode" class="required input-small" maxlength="${properties['verification.code.length']!'6'}">
-			<@s.param name="after"> <button type="button" class="btn sendVerificationCode alerts" data-interval="${properties['verification.code.resend.interval']!'60'}">${getText('send')}</button></@s.param>
+			<@s.param name="after"> <button type="button" class="btn sendVerificationCode" data-interval="${properties['verification.code.resend.interval']!'60'}">${getText('send')}</button></@s.param>
 		</@s.textfield>
 		<#else>
 		<@s.checkbox name="rememberme" class="custom"/>
