@@ -101,15 +101,15 @@
 			var glyphicon = 'info-sign';
 			switch (type) {
 				case 'info' :
-				case 'warn' :
+				case 'warning' :
 				case 'success' :
 				case 'error' :
 					if (type == 'success')
 						glyphicon = 'ok-circle';
 					else if (type == 'error')
 						glyphicon = 'remove-circle';
-					else if (type == 'warn')
-						glyphicon = 'alert';
+					else if (type == 'warning')
+						glyphicon = 'warning-sign';
 					if (options.showConfirmButton) {
 						var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
 								+ $.alerts.okButton + '</button></div>')

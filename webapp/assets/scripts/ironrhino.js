@@ -18625,15 +18625,15 @@ function log() {
 			var glyphicon = 'info-sign';
 			switch (type) {
 				case 'info' :
-				case 'warn' :
+				case 'warning' :
 				case 'success' :
 				case 'error' :
 					if (type == 'success')
 						glyphicon = 'ok-circle';
 					else if (type == 'error')
 						glyphicon = 'remove-circle';
-					else if (type == 'warn')
-						glyphicon = 'alert';
+					else if (type == 'warning')
+						glyphicon = 'warning-sign';
 					if (options.showConfirmButton) {
 						var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
 								+ $.alerts.okButton + '</button></div>')
@@ -32514,7 +32514,7 @@ Message = {
 		Message._show(message, target, 'success');
 	},
 	showActionWarning : function(message, target) {
-		Message._show(message, target, 'warn');
+		Message._show(message, target, 'warning');
 	},
 	showActionError : function(messages, target) {
 		Message._show(messages, target, 'error');
@@ -32542,12 +32542,17 @@ Message = {
 				popup.data('target', target);
 			return;
 		}
-		var error = type == 'error';
 		var html = '';
+		var classes;
+		switch (type) {
+			case 'error' :
+				classes = 'action-error alert alert-error';
+				break;
+			default :
+				classes = 'action-message alert alert-' + type;
+		}
 		for (var i = 0; i < messages.length; i++)
-			html += Message.compose(messages[i], error
-							? 'action-error alert alert-error'
-							: 'action-message alert alert-info');
+			html += Message.compose(messages[i], classes);
 		if (html) {
 			var parent = $('#content');
 			if ($('.ui-dialog:visible').length)
@@ -32557,7 +32562,8 @@ Message = {
 			if (!$('#message', parent).length)
 				$('<div id="message"></div>').prependTo(parent);
 			var msg = $('#message', parent);
-			if (error && target && $(target).prop('tagName') == 'FORM') {
+			if (type == 'error' && target
+					&& $(target).prop('tagName') == 'FORM') {
 				if (!$(target).attr('id'))
 					$(target).attr('id', 'form' + new Date().getTime());
 				var fid = $(target).attr('id');
