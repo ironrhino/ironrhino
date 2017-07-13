@@ -911,6 +911,7 @@ function ajax(options) {
 }
 
 var CONTEXT_PATH = $('meta[name="context_path"]').attr('content') || '';
+var VERBOSE_MODE = $('meta[name="verbose_mode"]').attr('content') || '';
 
 if (typeof(Initialization) == 'undefined')
 	Initialization = {};
@@ -2061,7 +2062,7 @@ Observation.common = function(container) {
 							}
 							btn.removeClass('clicked');
 						}
-						if (confirm) {
+						if (confirm && VERBOSE_MODE != 'LOW') {
 							$.alerts.show({
 										type : 'confirm',
 										callback : function(b) {

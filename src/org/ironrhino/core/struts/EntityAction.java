@@ -766,7 +766,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				ServletActionContext.getResponse()
 						.setIntHeader("X-Postback-" + getEntityName() + "." + versionPropertyName, currentVersion);
 		}
-		addActionMessage(getText("save.success"));
+		notify("save.success");
 		return SUCCESS;
 	}
 
@@ -1343,7 +1343,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (deletable) {
 				List<Persistable<?>> list = entityManager.delete(id);
 				if (list.size() > 0)
-					addActionMessage(getText("delete.success"));
+					notify("delete.success");
 			}
 		}
 		return SUCCESS;
@@ -1586,7 +1586,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				en.setEnabled(enabled);
 				em.save((Persistable) en);
 			}
-			addActionMessage(getText("operate.success"));
+			notify("operate.success");
 		}
 		return SUCCESS;
 	}
@@ -1615,7 +1615,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		}
 		entity.setParent(parentEntity);
 		em.save(entity);
-		addActionMessage(getText("operate.success"));
+		notify("operate.success");
 		return SUCCESS;
 	}
 

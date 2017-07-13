@@ -331,7 +331,8 @@ Richtable = {
 						});
 
 			}
-			if (btn.hasClass('confirm') || action == 'delete') {
+			if ((btn.hasClass('confirm') || action == 'delete')
+					&& VERBOSE_MODE != 'LOW') {
 				$.alerts.show({
 							type : 'confirm',
 							message : (btn.data('confirm') || (action == 'delete'
@@ -455,7 +456,7 @@ Richtable = {
 			}
 		}
 
-		if (btn.hasClass('confirm')) {
+		if (btn.hasClass('confirm') && VERBOSE_MODE != 'LOW') {
 			$.alerts.show({
 						type : 'confirm',
 						message : btn.data('confirm')

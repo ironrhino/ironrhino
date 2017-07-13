@@ -27,6 +27,10 @@
 <#if request.contextPath!=''>
 <meta name="context_path" content="${request.contextPath}" />
 </#if>
+<#assign verboseMode = properties['verboseMode']!>
+<#if verboseMode?has_content>
+<meta name="verbose_mode" content="${verboseMode}" />
+</#if>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="shortcut icon" href="<@url value="/assets/images/favicon.ico"/>" />
 <link href="<@url value="/assets/styles/ironrhino${devMode?then('','-min')}.css"/>" media="all" rel="stylesheet" type="text/css" />

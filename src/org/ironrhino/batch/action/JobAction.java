@@ -272,7 +272,7 @@ public class JobAction extends BaseAction {
 	public String stop() throws Exception {
 		Long executionId = Long.valueOf(getUid());
 		jobOperator.stop(executionId);
-		addActionMessage(getText("operate.success"));
+		notify("operate.success");
 		return SUCCESS;
 	}
 
@@ -285,7 +285,7 @@ public class JobAction extends BaseAction {
 	public String abandon() throws Exception {
 		Long executionId = Long.valueOf(getUid());
 		jobOperator.abandon(executionId);
-		addActionMessage(getText("operate.success"));
+		notify("operate.success");
 		return SUCCESS;
 	}
 

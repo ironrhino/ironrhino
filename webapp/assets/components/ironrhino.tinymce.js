@@ -55,13 +55,26 @@ $(function() {
 			e.preventDefault();
 		if (e.stopPropagation)
 			e.stopPropagation();
-		if (confirm(MessageBundle.get('confirm.delete'))) {
+		var func = function() {
 			$.post(	CONTEXT_PATH
 							+ ($('#' + tinymce.EditorManager.activeEditor.id)
 									.data('uploadurl')) + '/delete', {
 						folder : $('#mce-browse-folder').val(),
 						id : id
 					}, browse);
+		}
+		if (VERBOSE_MODE != 'LOW') {
+			$.alerts.show({
+						type : 'confirm',
+						message : MessageBundle.get('confirm.delete'),
+						callback : function(b) {
+							if (b) {
+								func();
+							}
+						}
+					});
+		} else {
+			func();
 		}
 	});
 });

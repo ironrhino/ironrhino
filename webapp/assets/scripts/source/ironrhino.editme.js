@@ -10,24 +10,33 @@
 		var name = t.data('name') || 'content';
 		var data = {};
 		data[name] = t.html();
-		if (t.hasClass('edited'))
-			$.alerts.show({
-						type : 'confirm',
-						message : MessageBundle.get('confirm.save'),
-						callback : function(b) {
-							if (b) {
-								ajax({
-											url : url,
-											type : 'POST',
-											data : data,
-											global : false,
-											success : function() {
-												t.removeClass('edited');
-											}
-										});
+		if (t.hasClass('edited')) {
+			var func = function() {
+				ajax({
+							url : url,
+							type : 'POST',
+							data : data,
+							global : false,
+							success : function() {
+								t.removeClass('edited');
 							}
-						}
-					});
+						});
+			}
+			if (VERBOSE_MODE != 'LOW') {
+				$.alerts.show({
+							type : 'confirm',
+							message : MessageBundle.get('confirm.save'),
+							callback : function(b) {
+								if (b) {
+									func();
+								}
+							}
+						});
+			} else {
+				func();
+			}
+
+		}
 	}
 })(jQuery);
 

@@ -141,7 +141,7 @@ public class SignupAction extends BaseAction {
 		eventPublisher.publish(new SignupEvent(user.getUsername(), request.getRemoteAddr()), Scope.LOCAL);
 		if (activationRequired) {
 			user.setPassword(password);// for send mail
-			addActionMessage(getText("signup.success"));
+			notify("signup.success");
 			sendActivationMail(user);
 		} else {
 			AuthzUtils.autoLogin(user);
@@ -222,7 +222,7 @@ public class SignupAction extends BaseAction {
 			smm.setTo(user.toString() + '<' + user.getEmail() + '>');
 			smm.setSubject(getText("mail.subject.user_forgot"));
 			mailService.send(smm, "template/user_forgot.ftl", model);
-			addActionMessage(getText("operate.success"));
+			notify("operate.success");
 		}
 		return "forgot";
 	}

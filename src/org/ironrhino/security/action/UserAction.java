@@ -198,7 +198,7 @@ public class UserAction extends EntityAction<User> {
 		int currentVersion = user.getVersion();
 		if (currentVersion != previousVersion)
 			ServletActionContext.getResponse().setIntHeader("X-Postback-user.version", currentVersion);
-		addActionMessage(getText("save.success"));
+		notify("save.success");
 		return SUCCESS;
 	}
 
@@ -282,7 +282,7 @@ public class UserAction extends EntityAction<User> {
 		String[] id = getId();
 		if (id != null) {
 			userManager.delete((Serializable[]) id);
-			addActionMessage(getText("delete.success"));
+			notify("delete.success");
 		}
 		return SUCCESS;
 	}
@@ -311,7 +311,7 @@ public class UserAction extends EntityAction<User> {
 			boolean passwordExpired = !user.isCredentialsNonExpired();
 			user.setLegiblePassword(password);
 			userManager.save(user);
-			addActionMessage(getText("save.success"));
+			notify("save.success");
 			eventPublisher.publish(
 					new PasswordChangedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),
 					Scope.LOCAL);
@@ -346,7 +346,7 @@ public class UserAction extends EntityAction<User> {
 		user.setEmail(temp.getEmail());
 		user.setPhone(temp.getPhone());
 		userManager.save(user);
-		addActionMessage(getText("save.success"));
+		notify("save.success");
 		eventPublisher.publish(
 				new ProfileEditedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),
 				Scope.LOCAL);

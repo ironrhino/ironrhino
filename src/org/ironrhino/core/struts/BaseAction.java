@@ -15,6 +15,7 @@ import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Csrf;
 import org.ironrhino.core.metadata.CurrentPassword;
 import org.ironrhino.core.metadata.DoubleChecker;
+import org.ironrhino.core.metadata.VerboseMode;
 import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
@@ -187,6 +188,21 @@ public class BaseAction extends ActionSupport {
 
 	protected void setActionSuccessMessage(String actionSuccessMessage) {
 		this.actionSuccessMessage = actionSuccessMessage;
+	}
+
+	protected void notify(String message) {
+		switch (VerboseMode.current()) {
+		case LOW:
+			break;
+		case MEDIUM:
+			setActionSuccessMessage(getText(message));
+			break;
+		case HIGH:
+			addActionMessage(getText(message));
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override

@@ -18589,7 +18589,7 @@ function log() {
 						|| MessageBundle.get('confirm.action');
 			} else if (type == 'success') {
 				if (!options.timer)
-					options.timer = 3000;
+					options.timer = 2000;
 				options.showConfirmButton = false;
 			}
 
@@ -33114,6 +33114,7 @@ function ajax(options) {
 }
 
 var CONTEXT_PATH = $('meta[name="context_path"]').attr('content') || '';
+var VERBOSE_MODE = $('meta[name="verbose_mode"]').attr('content') || '';
 
 if (typeof(Initialization) == 'undefined')
 	Initialization = {};
@@ -34264,7 +34265,7 @@ Observation.common = function(container) {
 							}
 							btn.removeClass('clicked');
 						}
-						if (confirm) {
+						if (confirm && VERBOSE_MODE != 'LOW') {
 							$.alerts.show({
 										type : 'confirm',
 										callback : function(b) {
@@ -36964,44 +36965,50 @@ function addMore(n) {
 	}
 }
 function deleteFiles(file) {
-	$.alerts.show({
-				type : 'confirm',
-				message : MessageBundle.get('confirm.delete'),
-				callback : function(b) {
-					if (b) {
-						var url = $('#upload_form').prop('action');
-						if (!url)
-							url = CONTEXT_PATH + '/common/upload';
-						url += '/delete';
-						var options = {
-							type : $('#upload_form').attr('method'),
-							url : url,
-							dataType : 'json',
-							complete : function() {
-								$('#files button.reload').click();
-							}
-						};
-						if (file) {
-							var data = $('#upload_form').serialize();
-							var params = [];
-							params.push('id=' + file);
-							if (data) {
-								var arr = data.split('&');
-								for (var i = 0; i < arr.length; i++) {
-									var arr2 = arr[i].split('=', 2);
-									if (arr2[0] != 'id')
-										params.push(arr[i]);
-								}
-							}
-							options.data = params.join('&');
-						} else {
-							options.data = $('#upload_form').serialize();
-						}
-						ajax(options);
-					}
+	var func = function() {
+		var url = $('#upload_form').prop('action');
+		if (!url)
+			url = CONTEXT_PATH + '/common/upload';
+		url += '/delete';
+		var options = {
+			type : $('#upload_form').attr('method'),
+			url : url,
+			dataType : 'json',
+			complete : function() {
+				$('#files button.reload').click();
+			}
+		};
+		if (file) {
+			var data = $('#upload_form').serialize();
+			var params = [];
+			params.push('id=' + file);
+			if (data) {
+				var arr = data.split('&');
+				for (var i = 0; i < arr.length; i++) {
+					var arr2 = arr[i].split('=', 2);
+					if (arr2[0] != 'id')
+						params.push(arr[i]);
 				}
-			});
-
+			}
+			options.data = params.join('&');
+		} else {
+			options.data = $('#upload_form').serialize();
+		}
+		ajax(options);
+	};
+	if (VERBOSE_MODE != 'LOW') {
+		$.alerts.show({
+					type : 'confirm',
+					message : MessageBundle.get('confirm.delete'),
+					callback : function(b) {
+						if (b) {
+							func();
+						}
+					}
+				});
+	} else {
+		func();
+	}
 }
 function uploadFiles(files, filenames) {
 	if (files && files.length) {
@@ -38899,7 +38906,8 @@ Richtable = {
 						});
 
 			}
-			if (btn.hasClass('confirm') || action == 'delete') {
+			if ((btn.hasClass('confirm') || action == 'delete')
+					&& VERBOSE_MODE != 'LOW') {
 				$.alerts.show({
 							type : 'confirm',
 							message : (btn.data('confirm') || (action == 'delete'
@@ -39023,7 +39031,7 @@ Richtable = {
 			}
 		}
 
-		if (btn.hasClass('confirm')) {
+		if (btn.hasClass('confirm') && VERBOSE_MODE != 'LOW') {
 			$.alerts.show({
 						type : 'confirm',
 						message : btn.data('confirm')
@@ -41183,24 +41191,33 @@ Observation.latlng = function(container) {
 		var name = t.data('name') || 'content';
 		var data = {};
 		data[name] = t.html();
-		if (t.hasClass('edited'))
-			$.alerts.show({
-						type : 'confirm',
-						message : MessageBundle.get('confirm.save'),
-						callback : function(b) {
-							if (b) {
-								ajax({
-											url : url,
-											type : 'POST',
-											data : data,
-											global : false,
-											success : function() {
-												t.removeClass('edited');
-											}
-										});
+		if (t.hasClass('edited')) {
+			var func = function() {
+				ajax({
+							url : url,
+							type : 'POST',
+							data : data,
+							global : false,
+							success : function() {
+								t.removeClass('edited');
 							}
-						}
-					});
+						});
+			}
+			if (VERBOSE_MODE != 'LOW') {
+				$.alerts.show({
+							type : 'confirm',
+							message : MessageBundle.get('confirm.save'),
+							callback : function(b) {
+								if (b) {
+									func();
+								}
+							}
+						});
+			} else {
+				func();
+			}
+
+		}
 	}
 })(jQuery);
 

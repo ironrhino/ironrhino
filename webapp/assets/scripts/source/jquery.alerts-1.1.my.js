@@ -65,7 +65,7 @@
 						|| MessageBundle.get('confirm.action');
 			} else if (type == 'success') {
 				if (!options.timer)
-					options.timer = 3000;
+					options.timer = 2000;
 				options.showConfirmButton = false;
 			}
 

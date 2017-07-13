@@ -187,7 +187,7 @@ public class RegionAction extends EntityAction<Region> {
 		}
 
 		entityManager.save(region);
-		addActionMessage(getText("save.success"));
+		notify("save.success");
 		return SUCCESS;
 	}
 
@@ -197,7 +197,7 @@ public class RegionAction extends EntityAction<Region> {
 		if (id != null) {
 			entityManager.setEntityClass(Region.class);
 			entityManager.delete((Serializable[]) id);
-			addActionMessage(getText("delete.success"));
+			notify("delete.success");
 		}
 		return SUCCESS;
 	}
@@ -226,7 +226,7 @@ public class RegionAction extends EntityAction<Region> {
 		region = entityManager.get(region.getId());
 		region.setCoordinate(temp.getCoordinate());
 		entityManager.save(region);
-		addActionMessage(getText("save.success"));
+		notify("save.success");
 		return JSON;
 	}
 
@@ -298,7 +298,7 @@ public class RegionAction extends EntityAction<Region> {
 					&& source.getParent().getId().equals(target.getId()))) {
 				source.setParent(target);
 				entityManager.save(source);
-				addActionMessage(getText("operate.success"));
+				notify("operate.success");
 			}
 		}
 		return SUCCESS;
@@ -339,7 +339,7 @@ public class RegionAction extends EntityAction<Region> {
 				}
 			}
 			entityManager.delete(source);
-			addActionMessage(getText("operate.success"));
+			notify("operate.success");
 		}
 		return SUCCESS;
 	}

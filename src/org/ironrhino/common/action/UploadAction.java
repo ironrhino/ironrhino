@@ -181,7 +181,7 @@ public class UploadAction extends BaseAction {
 				i++;
 			}
 			filename = array;
-			addActionMessage(getText("operate.success"));
+			notify("operate.success");
 		} else if (StringUtils.isNotBlank(requestBody) && filename != null && filename.length > 0) {
 			if (requestBody.startsWith("data:image"))
 				requestBody = requestBody.substring(requestBody.indexOf(',') + 1);

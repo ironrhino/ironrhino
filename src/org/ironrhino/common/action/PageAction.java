@@ -171,7 +171,7 @@ public class PageAction extends EntityAction<Page> {
 			page.setContent(temp.getContent());
 		}
 		pageManager.save(page);
-		addActionMessage(getText("save.success"));
+		notify("save.success");
 		return JSON;
 	}
 
@@ -226,7 +226,7 @@ public class PageAction extends EntityAction<Page> {
 		String[] id = getId();
 		if (id != null) {
 			pageManager.delete((Serializable[]) id);
-			addActionMessage(getText("delete.success"));
+			notify("delete.success");
 		}
 		return SUCCESS;
 	}
@@ -238,7 +238,7 @@ public class PageAction extends EntityAction<Page> {
 		page = pageManager.get(getUid());
 		page.setContent(content);
 		pageManager.save(page);
-		addActionMessage(getText("save.success"));
+		notify("save.success");
 		return JSON;
 	}
 

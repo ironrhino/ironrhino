@@ -48,7 +48,7 @@ public class ClientAction extends EntityAction<Client> {
 		client.setEnabled(false);
 		client.setOwner(AuthzUtils.<User>getUserDetails());
 		getEntityManager(Client.class).save(client);
-		addActionMessage(getText("save.success"));
+		notify("save.success");
 		return SUCCESS;
 	}
 
@@ -93,7 +93,7 @@ public class ClientAction extends EntityAction<Client> {
 						clientManager.save(temp);
 					}
 				}
-				addActionMessage(getText("operate.success"));
+				notify("operate.success");
 			}
 		}
 		return REFERER;

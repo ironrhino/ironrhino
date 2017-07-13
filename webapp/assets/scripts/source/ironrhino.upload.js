@@ -207,44 +207,50 @@ function addMore(n) {
 	}
 }
 function deleteFiles(file) {
-	$.alerts.show({
-				type : 'confirm',
-				message : MessageBundle.get('confirm.delete'),
-				callback : function(b) {
-					if (b) {
-						var url = $('#upload_form').prop('action');
-						if (!url)
-							url = CONTEXT_PATH + '/common/upload';
-						url += '/delete';
-						var options = {
-							type : $('#upload_form').attr('method'),
-							url : url,
-							dataType : 'json',
-							complete : function() {
-								$('#files button.reload').click();
-							}
-						};
-						if (file) {
-							var data = $('#upload_form').serialize();
-							var params = [];
-							params.push('id=' + file);
-							if (data) {
-								var arr = data.split('&');
-								for (var i = 0; i < arr.length; i++) {
-									var arr2 = arr[i].split('=', 2);
-									if (arr2[0] != 'id')
-										params.push(arr[i]);
-								}
-							}
-							options.data = params.join('&');
-						} else {
-							options.data = $('#upload_form').serialize();
-						}
-						ajax(options);
-					}
+	var func = function() {
+		var url = $('#upload_form').prop('action');
+		if (!url)
+			url = CONTEXT_PATH + '/common/upload';
+		url += '/delete';
+		var options = {
+			type : $('#upload_form').attr('method'),
+			url : url,
+			dataType : 'json',
+			complete : function() {
+				$('#files button.reload').click();
+			}
+		};
+		if (file) {
+			var data = $('#upload_form').serialize();
+			var params = [];
+			params.push('id=' + file);
+			if (data) {
+				var arr = data.split('&');
+				for (var i = 0; i < arr.length; i++) {
+					var arr2 = arr[i].split('=', 2);
+					if (arr2[0] != 'id')
+						params.push(arr[i]);
 				}
-			});
-
+			}
+			options.data = params.join('&');
+		} else {
+			options.data = $('#upload_form').serialize();
+		}
+		ajax(options);
+	};
+	if (VERBOSE_MODE != 'LOW') {
+		$.alerts.show({
+					type : 'confirm',
+					message : MessageBundle.get('confirm.delete'),
+					callback : function(b) {
+						if (b) {
+							func();
+						}
+					}
+				});
+	} else {
+		func();
+	}
 }
 function uploadFiles(files, filenames) {
 	if (files && files.length) {
