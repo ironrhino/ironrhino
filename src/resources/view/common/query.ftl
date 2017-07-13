@@ -1,4 +1,5 @@
 <#ftl output_format='HTML'>
+<#assign view=Parameters.view!/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -92,8 +93,15 @@ $(function(){
 </head>
 <body>
 <@s.form id="query-form" action="${actionBaseUrl}" method="post" class="form-horizontal ajax view history">
-	<@s.textarea label="sql" name="sql" class="required span8 sqleditor codeblock" placeholder="select username,name,email from user where username=:username">
-	<#if tables?? && tables?size gt 0>
+	<#if view?has_content>
+	<@s.hidden name="view" value="${view}"/>
+	</#if>
+	<#if view=='embedded'>
+	<@s.hidden name="sql"/>
+	<#else>
+	<#assign readonly=(view=='brief')&&sql?has_content>
+	<@s.textarea label="sql" name="sql" class="required span8 sqleditor codeblock" readonly=readonly placeholder="select username,name,email from user where username=:username">
+	<#if !readonly && tables?? && tables?size gt 0>
 	<@s.param name="after">
 	<div style="display:inline-block;vertical-align:top;margin-left:20px;">
 	<@s.select id="tables" theme="simple" class="chosen input-medium" list="tables" listKey="top" listValue="top" headerKey="" headerValue=""/>
@@ -101,9 +109,23 @@ $(function(){
 	</@s.param>
 	</#if>
 	</@s.textarea>
+	</#if>
 	<#if params??>
 	<#list params as var>
+	<#assign type=Parameters[var+'-type']!'text'/>
+	<#if type=='date'>
+	<@s.textfield id="param-"+var?index label="${var}" name="paramMap['${var}']" class="date"/>
+	<#elseif type=='datetime'>
+	<@s.textfield id="param-"+var?index label="${var}" name="paramMap['${var}']" class="datetime"/>
+	<#elseif type=='integer'||type=='long'>
+	<@s.textfield type="number" id="param-"+var?index label="${var}" name="paramMap['${var}']" class="${type}"/>
+	<#elseif type=='double'||type='decimal'>
+	<@s.textfield type="number" id="param-"+var?index label="${var}" name="paramMap['${var}']" class="double" step="0.01"/>
+	<#elseif type=='textarea'>
+	<@s.textarea id="param-"+var?index label="${var}" name="paramMap['${var}']" class="input-xxlarge" style="height:50px;"/>
+	<#else>
 	<@s.textfield id="param-"+var?index label="${var}" name="paramMap['${var}']"/>
+	</#if>
 	</#list>
 	</#if>
 	<@s.submit value=getText('submit') class="btn-primary"/>

@@ -19,14 +19,14 @@ $(function(){
 				},
 				success:function(data){
 					if(data && data.actionErrors){
-						alert(data.actionErrors[0]);
+						Message.showActionError(data.actionErrors);
 					}else{
-						alert(MessageBundle.get('success'));
+						Message.showActionMessage(MessageBundle.get('success'));
 					}
 					t.prop('disabled',false);
 				},
 				error:function(data){
-					alert(MessageBundle.get('error'));
+					Message.showActionError(MessageBundle.get('error'));
 					t.prop('disabled',false);
 				}
 			});
@@ -43,7 +43,7 @@ $(function(){
 								,function(data){
 									if(data && data.actionErrors){
 										$(t).closest('.switch').bootstrapSwitch('toggleState');
-										alert(data.actionErrors[0]);
+										Message.showActionError(data.actionErrors);
 										return;
 									}
 								});
@@ -54,18 +54,16 @@ $(function(){
 </script>
 </head>
 <body>
-<@s.form id="form" action="${actionBaseUrl}" method="post" class="ajax focus form-inline well">
+<@s.form id="form" action="${actionBaseUrl}" method="post" class="form-horizontal ajax focus form-inline">
 	<div class="row-fluid">
-	<div class="span6">
-	<span>${getText('expression')}: </span><@s.textfield theme="simple" id="expression" name="expression" class="required" style="width:80%;"/>
+	<div class="span8">
+	<@s.textarea label="expression" name="expression" class="required input-xxlarge" style="height:100px;"/>
 	</div>
-	<div class="span3">
-	<span>${getText('scope')}: </span><@s.select theme="simple" id="scope" name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/>
-	</div>
-	<div class="span3">
-	<@s.submit id="submit" theme="simple" value=getText('confirm') />
+	<div class="span4">
+	<@s.select label="scope" name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/>
 	</div>
 	</div>
+	<@s.submit value=getText('submit') class="btn-primary"/>
 </@s.form>
 <hr/>
 
