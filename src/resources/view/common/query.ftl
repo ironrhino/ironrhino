@@ -93,9 +93,11 @@ $(function(){
 </head>
 <body>
 <@s.form id="query-form" action="${actionBaseUrl}" method="post" class="form-horizontal ajax view history">
-	<#if view?has_content>
-	<@s.hidden name="view" value="${view}"/>
+	<#list Parameters as name,value>
+	<#if name=='view'||name?ends_with('-type')>
+	<input type="hidden" name="${name}" value="${value}" />
 	</#if>
+	</#list>
 	<#if view=='embedded'>
 	<@s.hidden name="sql"/>
 	<#else>
