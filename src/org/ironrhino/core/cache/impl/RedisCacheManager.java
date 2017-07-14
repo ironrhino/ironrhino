@@ -3,12 +3,15 @@ package org.ironrhino.core.cache.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
@@ -22,6 +25,8 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -40,6 +45,11 @@ public class RedisCacheManager implements CacheManager {
 	@Qualifier("stringRedisTemplate")
 	@PriorityQualifier("cacheStringRedisTemplate")
 	private RedisTemplate<String, String> stringRedisTemplate;
+
+	@PostConstruct
+	public void init() {
+		redisTemplate.setValueSerializer(new FallbackToStringSerializer());
+	}
 
 	@Override
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
@@ -271,6 +281,21 @@ public class RedisCacheManager implements CacheManager {
 				"local keys = redis.call('keys', ARGV[1]) \n for i=1,#keys,5000 do \n redis.call('del', unpack(keys, i, math.min(i+4999, #keys))) \n end \n return true",
 				Boolean.class);
 		stringRedisTemplate.execute(script, null, namespace + ":*");
+	}
+
+	private static class FallbackToStringSerializer extends JdkSerializationRedisSerializer {
+
+		@Override
+		public Object deserialize(byte[] bytes) {
+			try {
+				return super.deserialize(bytes);
+			} catch (SerializationException se) {
+				if (org.ironrhino.core.util.StringUtils.isUtf8(bytes))
+					return new String(bytes, StandardCharsets.UTF_8);
+				throw se;
+			}
+		}
+
 	}
 
 }

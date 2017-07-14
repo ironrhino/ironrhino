@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring.data.redis;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.PostConstruct;
 
@@ -33,14 +34,24 @@ public class FstRedisSerializer implements RedisSerializer<Serializable> {
 
 	@Override
 	public byte[] serialize(Serializable object) throws SerializationException {
-		return conf.asByteArray(object);
+		try {
+			return conf.asByteArray(object);
+		} catch (Exception e) {
+			throw new SerializationException("Cannot serialize", e);
+		}
 	}
 
 	@Override
 	public Serializable deserialize(byte[] bytes) throws SerializationException {
 		if (bytes == null || bytes.length == 0)
 			return null;
-		return (Serializable) conf.asObject(bytes);
+		try {
+			return (Serializable) conf.asObject(bytes);
+		} catch (Exception e) {
+			if (org.ironrhino.core.util.StringUtils.isUtf8(bytes))
+				return new String(bytes, StandardCharsets.UTF_8);
+			throw new SerializationException("Cannot deserialize", e);
+		}
 	}
 
 }

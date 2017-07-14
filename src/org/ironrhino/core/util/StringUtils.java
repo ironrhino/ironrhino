@@ -395,6 +395,36 @@ public class StringUtils {
 		return utf8codeCheck(urlCode);
 	}
 
+	public static boolean isUtf8(byte[] bytes) {
+		int expectedLength = 0;
+		for (int i = 0; i < bytes.length; i++) {
+			if ((bytes[i] & 0b10000000) == 0b00000000) {
+				expectedLength = 1;
+			} else if ((bytes[i] & 0b11100000) == 0b11000000) {
+				expectedLength = 2;
+			} else if ((bytes[i] & 0b11110000) == 0b11100000) {
+				expectedLength = 3;
+			} else if ((bytes[i] & 0b11111000) == 0b11110000) {
+				expectedLength = 4;
+			} else if ((bytes[i] & 0b11111100) == 0b11111000) {
+				expectedLength = 5;
+			} else if ((bytes[i] & 0b11111110) == 0b11111100) {
+				expectedLength = 6;
+			} else {
+				return false;
+			}
+			while (--expectedLength > 0) {
+				if (++i >= bytes.length) {
+					return false;
+				}
+				if ((bytes[i] & 0b11000000) != 0b10000000) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public static String trimLocale(String s) {
 		if (s == null)
 			return null;
