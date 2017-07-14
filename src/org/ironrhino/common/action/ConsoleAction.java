@@ -75,8 +75,8 @@ public class ConsoleAction extends BaseAction {
 			if (throwable.getCause() instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable.getCause()).getTargetException();
 			logger.error(throwable.getMessage(), throwable);
-			String msg = throwable.getMessage();
-			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + throwable.getMessage()) : ""));
+			String msg = throwable.getLocalizedMessage();
+			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			Map<String, Collection<String>> map = new HashMap<>();
 			map.put("actionErrors", getActionErrors());
 			return ERROR;

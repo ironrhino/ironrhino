@@ -6,8 +6,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.aop.BaseAspect;
-import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExpressionUtils;
+import org.ironrhino.core.util.IllegalConcurrentAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +40,7 @@ public class ConcurrencyAspect extends BaseAspect {
 					concurrencyService.release(key);
 				}
 			} else {
-				throw new ErrorMessage("no available permits for @Concurrency");
+				throw new IllegalConcurrentAccessException(key);
 			}
 		} else {
 			concurrencyService.acquire(key, permits);
