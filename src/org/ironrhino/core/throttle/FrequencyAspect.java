@@ -32,7 +32,7 @@ public class FrequencyAspect extends BaseAspect {
 			key = jp.getSignature().toLongString();
 		}
 		int limits = ExpressionUtils.evalInt(frequency.limits(), context, 0);
-		if (frequencyService.available(key, limits) > 1) {
+		if (frequencyService.available(key, limits) > 0) {
 			frequencyService.increment(key, 1, frequency.duration(), frequency.timeUnit());
 			return jp.proceed();
 		} else {
