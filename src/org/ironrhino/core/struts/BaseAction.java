@@ -100,7 +100,7 @@ public class BaseAction extends ActionSupport {
 	}
 
 	public String getCsrf() {
-		if (csrfRequired && csrf == null) {
+		if (csrf == null) {
 			csrf = CodecUtils.nextId();
 			RequestUtils.saveCookie(ServletActionContext.getRequest(), ServletActionContext.getResponse(),
 					COOKIE_NAME_CSRF, csrf, false, true);
