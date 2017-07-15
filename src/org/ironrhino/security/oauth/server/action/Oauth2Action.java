@@ -18,7 +18,6 @@ import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Scope;
-import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.CredentialsNeedResetException;
@@ -567,8 +566,6 @@ public class Oauth2Action extends BaseAction {
 				throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
 			if (!client.getSecret().equals(client_secret))
 				throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
-			if (client.getOwner() == null || !client.getOwner().getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
-				throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
 			if (verificationManager != null && StringUtils.isNotBlank(username)) {
 				try {
 					verificationManager.send(username);
