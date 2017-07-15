@@ -308,6 +308,17 @@ Richtable = {
 			var url = Richtable.getBaseUrl(form) + '/' + action
 					+ Richtable.getPathParams();
 			url += (url.indexOf('?') > 0 ? '&' : '?') + idparams;
+			var download = btn.attr('download');
+			if (download || btn.hasClass('download')) {
+				var link = document.createElement('a');
+				link.href = url;
+				if (download)
+					link.download = download;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				return;
+			}
 			var func = function() {
 				ajax({
 							url : url,
