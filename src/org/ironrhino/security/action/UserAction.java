@@ -1,7 +1,6 @@
 package org.ironrhino.security.action;
 
 import java.beans.PropertyDescriptor;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -275,16 +274,6 @@ public class UserAction extends EntityAction<User> {
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public String delete() {
-		String[] id = getId();
-		if (id != null) {
-			userManager.delete((Serializable[]) id);
-			notify("delete.success");
-		}
-		return SUCCESS;
 	}
 
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
