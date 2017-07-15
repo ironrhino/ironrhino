@@ -849,6 +849,8 @@ Ajax = {
 			}
 		}
 		Indicator.text = '';
+		if (options.oncomplete)
+			options.oncomplete.apply(window, [data, xhr]);
 		Ajax.fire(target, 'oncomplete', data);
 	},
 	jsonResult : null,
@@ -961,7 +963,7 @@ Initialization.common = function() {
 				ProgressBar.simulate();
 			}).ajaxComplete(ProgressBar.hide).ajaxError(function() {
 				Indicator.showError()
-			}).ajaxSuccess(function(ev, xhr) {
+			}).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 		Indicator.hide();
 		var url = xhr.getResponseHeader('X-Redirect-To');
 		if (url) {
@@ -979,9 +981,6 @@ Initialization.common = function() {
 			}
 			return;
 		}
-		var csrf = xhr.getResponseHeader('X-Csrf');
-		if (csrf)
-			$('input[type="hidden"][name="csrf"]').val(csrf);
 	}).keyup(function(e) {
 		if (e.keyCode == 27) {
 			if ($('#popup-container').length) {
@@ -1858,27 +1857,11 @@ Observation.common = function(container) {
 	}
 	$$('a.ajax,form.ajax', container).each(function() {
 		var target = this;
-		var _opt = ajaxOptions({
-					url : this.tagName == 'FORM' ? this.action : this.href,
-					target : target,
-					onsuccess : function(data, xhr) {
-						var headers = xhr.getAllResponseHeaders().split('\n');
-						$.each(headers, function(i, v) {
-									var name = v.split(':')[0];
-									if (name.indexOf('X-Postback') == 0) {
-										$(
-												'[name="'
-														+ name
-																.substring(name
-																		.lastIndexOf('-')
-																		+ 1)
-														+ '"]', target).val(xhr
-												.getResponseHeader(name));
-									}
-								});
-					}
-				});
 		if (this.tagName == 'FORM') {
+			var _opt = ajaxOptions({
+						url : this.tagName == 'FORM' ? this.action : this.href,
+						target : target
+					});
 			var options = {
 				beforeSerialize : function() {
 					$('.action-error').remove();
@@ -2016,6 +1999,18 @@ Observation.common = function(container) {
 							t.find('.modal').find('a.close').click();
 						}
 					}
+					var headers = xhr.getAllResponseHeaders().split('\n');
+					$.each(headers, function(i, v) {
+								var name = v.split(':')[0];
+								if (name.indexOf('X-Postback') == 0) {
+									$(
+											'[name="'
+													+ name.substring(name
+															.lastIndexOf('-')
+															+ 1) + '"]', target)
+											.val(xhr.getResponseHeader(name));
+								}
+							});
 					Ajax.handleResponse(data, _opt, xhr);
 				},
 				complete : function() {
