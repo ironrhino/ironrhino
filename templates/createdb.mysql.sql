@@ -40,3 +40,25 @@ begin
     select * from temp_dictionary;
 end $$
 delimiter ;
+
+drop function if exists next_id;
+delimiter $$
+create function next_id() returns varchar(22) not deterministic
+begin
+  declare digits char(62) default "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  declare s varchar(22) default "";
+  declare n numeric(39) default uuid_short();
+  while n > 0 do
+    set s = concat(substr(digits, (n mod 62) + 1, 1), s);
+    set n = floor(n / 62);
+  end while;
+  while length(s) < 22 do
+	if length(s) = 21 then
+		set s = concat(substr(digits, floor(rand() * 8), 1), s);
+	else
+		set s = concat(substr(digits, floor(rand() * 63), 1), s);
+    end if;
+  end while;
+  return s;
+end$$
+delimiter ;
