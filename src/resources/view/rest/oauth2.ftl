@@ -13,7 +13,7 @@
 	</ol>
 	</li>
 	<li>
-	<h5><em>password</em>方式,此方式获取的token代表的用户是username对应的用户,<strong>client所有者需要管理员权限</strong></h5>
+	<h5><em>password</em>方式,此方式获取的token代表的用户是username对应的用户</h5>
 	<ol>
 	<li>client访问<br><code>${base}/oauth/oauth2/token?grant_type=password&client_id={client_id}&client_secret={client_secret}&username={username}&password={password}</code></li>
 	<li>服务器返回 access_token, 示例:<br><code>{"expires_in":3600,"access_token":"{access_token}","refresh_token":"{refresh_token}"}</code></li>

@@ -302,10 +302,10 @@ public class Oauth2Action extends BaseAction {
 			try {
 				Authentication authResult = authenticationManager
 						.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-				if (authResult != null){
-						usernamePasswordAuthenticationFilter.success(request, response, authResult);
-						grantor = (UserDetails) authResult.getPrincipal();
-					}
+				if (authResult != null) {
+					usernamePasswordAuthenticationFilter.success(request, response, authResult);
+					grantor = (UserDetails) authResult.getPrincipal();
+				}
 			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 				addFieldError("username", getText(failed.getClass().getName()));
 				return INPUT;
@@ -376,13 +376,11 @@ public class Oauth2Action extends BaseAction {
 					throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
 				if (!client.getSecret().equals(client_secret))
 					throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
-				if (client.getOwner() == null || !client.getOwner().getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
-					throw new IllegalArgumentException("CLIENT_UNAUTHORIZED");
 				try {
 					Authentication authResult = authenticationManager
 							.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 					if (authResult != null)
-							authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
+						authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
 				} catch (InternalAuthenticationServiceException failed) {
 					throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
 				}
@@ -584,8 +582,8 @@ public class Oauth2Action extends BaseAction {
 		} catch (Exception e) {
 			logger.error("Send verification code to \"{}\" failed with {}: {}", username, e.getClass().getName(),
 					e.getLocalizedMessage());
-			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
+			if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
+					HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
 				return NONE;
 			try {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
