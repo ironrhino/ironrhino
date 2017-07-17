@@ -270,7 +270,7 @@
 						<#if readonly>
 							<@s.hidden name=entityName+"."+key />
 						</#if>
-						<@selectDictionary disabled=readonly id="" dictionaryName=templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
+						<@selectDictionary disabled=readonly dictionaryName=templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 						<#else>
 						<#if readonly>
 						<#if entity[key]?has_content>
@@ -279,7 +279,7 @@
 						</#list>
 						</#if>
 						</#if>
-						<@checkDictionary disabled=readonly id="" dictionaryName=templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
+						<@checkDictionary disabled=readonly dictionaryName=templateName name=entityName+'.'+key+'.'+entry.key required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 						</#if>
 						</div>
 						</div>

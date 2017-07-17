@@ -208,17 +208,17 @@
 		<#if config.type=='enum'>
 		<template id="rt_select_template_${key}">
 		<#if config.required>
-		<@s.select id="" theme="simple" name=entityName+"."+key list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue/>
+		<@s.select theme="simple" name=entityName+"."+key list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue/>
 		<#else>
-		<@s.select id="" theme="simple" name=entityName+"."+key list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
+		<@s.select theme="simple" name=entityName+"."+key list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
 		</#if>
 		</template>
 		<#elseif config.type=='select'>
 		<template id="rt_select_template_${key}">
 		<#if config.required>
-		<@s.select id="" theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue/>
+		<@s.select theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue/>
 		<#else>
-		<@s.select id="" theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
+		<@s.select theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
 		</#if>
 		</template>
 		<#elseif config.type=='dictionary' && selectDictionary??>

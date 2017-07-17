@@ -8,7 +8,7 @@
 <@s.form id="upload_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="form-inline">
 	<div class="row<#if fluidLayout>-fluid</#if>">
 	<#list 1..(Parameters.size!'4')?number as index>
-		<div class="span3"><@s.file theme="simple" name="file" multiple="true"/></div>
+		<div class="span3"><@s.file theme="simple" id="" name="file" multiple="true"/></div>
 	</#list>
 	</div>
 	<div style="text-align:center;padding-top:30px;">

@@ -1012,18 +1012,16 @@ public abstract class UIBean extends Component {
      */
     protected void populateComponentHtmlId(Form form) {
         String tryId;
-        String generatedId = name != null ? (name.indexOf('.') > 0 ? name.substring(name.lastIndexOf('.') + 1) : name) : "";
         if (id != null) {
-            // this check is needed for backwards compatibility with 2.1.x
-            tryId = findStringIfAltSyntax(id);
+            tryId = id;
         } else if (form != null) {
         	String formId = (String)form.getParameters().get("id") ;
-        	if( formId != null)
-        		tryId = (formId.indexOf('_') > 0 ? formId.substring(0, formId.lastIndexOf('_')) : formId) + '-' + generatedId;
+        	if( formId != null && name != null )
+        		tryId = formId + '-' + name.replaceAll("\\.", "-");
         	else
-        		tryId = generatedId;
+        		tryId = "";
         } else {
-            tryId = generatedId;
+            tryId = "";
         }
         addParameter("id", tryId);
         addParameter("escapedId", escape(tryId));

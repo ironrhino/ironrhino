@@ -85,19 +85,19 @@ Initialization.pageView = function() {
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="pv_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}</span>
-<@s.textfield theme="simple" id="" name="date" class="date"/>
+<@s.textfield theme="simple" name="date" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="pv_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}${getText('range')}</span>
-<@s.textfield theme="simple" id="" name="from" class="date"/>
+<@s.textfield theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
-<@s.textfield theme="simple" id="" name="to" class="date"/>
+<@s.textfield theme="simple" name="to" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
@@ -118,11 +118,11 @@ Initialization.pageView = function() {
 </div>
 <div class="span4 offset4">
 <form class="ajax view form-inline" data-replacement="uip_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}${getText('range')}</span>
-<@s.textfield theme="simple" id="" name="from" class="date"/>
+<@s.textfield theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
-<@s.textfield theme="simple" id="" name="to" class="date"/>
+<@s.textfield theme="simple" name="to" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
@@ -143,11 +143,11 @@ Initialization.pageView = function() {
 </div>
 <div class="span4 offset4">
 <form class="ajax view form-inline" data-replacement="usid_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}${getText('range')}</span>
-<@s.textfield theme="simple" id="" name="from" class="date"/>
+<@s.textfield theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
-<@s.textfield theme="simple" id="" name="to" class="date"/>
+<@s.textfield theme="simple" name="to" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
@@ -168,11 +168,11 @@ Initialization.pageView = function() {
 </div>
 <div class="span4 offset4">
 <form class="ajax view form-inline" data-replacement="uu_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}${getText('range')}</span>
-<@s.textfield theme="simple" id="" name="from" class="date"/>
+<@s.textfield theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
-<@s.textfield theme="simple" id="" name="to" class="date"/>
+<@s.textfield theme="simple" name="to" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
@@ -193,15 +193,15 @@ Initialization.pageView = function() {
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="url_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}</span>
-<@s.textfield theme="simple" id="" name="date" class="date"/>
+<@s.textfield theme="simple" name="date" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="url_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <input type="hidden" name="date" value=""/>
 <@s.submit value=getText('total') theme="simple"/>
 </form>
@@ -223,15 +223,15 @@ Initialization.pageView = function() {
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="fr_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}</span>
-<@s.textfield theme="simple" id="" name="date" class="date"/>
+<@s.textfield theme="simple" name="date" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="fr_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <input type="hidden" name="date" value=""/>
 <@s.submit value=getText('total') theme="simple"/>
 </form>
@@ -253,15 +253,15 @@ Initialization.pageView = function() {
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="pr_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}</span>
-<@s.textfield theme="simple" id="" name="date" class="date"/>
+<@s.textfield theme="simple" name="date" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="pr_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <input type="hidden" name="date" value=""/>
 <@s.submit value=getText('total') theme="simple"/>
 </form>
@@ -283,15 +283,15 @@ Initialization.pageView = function() {
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="ct_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}</span>
-<@s.textfield theme="simple" id="" name="date" class="date"/>
+<@s.textfield theme="simple" name="date" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="ct_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <input type="hidden" name="date" value=""/>
 <@s.submit value=getText('total') theme="simple"/>
 </form>
@@ -313,15 +313,15 @@ Initialization.pageView = function() {
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="kw_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}</span>
-<@s.textfield theme="simple" id="" name="date" class="date"/>
+<@s.textfield theme="simple" name="date" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="kw_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <input type="hidden" name="date" value=""/>
 <@s.submit value=getText('total') theme="simple"/>
 </form>
@@ -343,15 +343,15 @@ Initialization.pageView = function() {
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="se_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <span>${getText('date')}</span>
-<@s.textfield theme="simple" id="" name="date" class="date"/>
+<@s.textfield theme="simple" name="date" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span4">
 <form class="ajax view form-inline" data-replacement="se_result">
-<@s.hidden name="domain" id=""/>
+<@s.hidden name="domain"/>
 <input type="hidden" name="date" value=""/>
 <@s.submit value=getText('total') theme="simple"/>
 </form>

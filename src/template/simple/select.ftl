@@ -135,10 +135,10 @@
     <input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.id?html}" value=""<#rt/>
   </#if>
   <#if ( !parameters.id?has_content && parameters.name?has_content)>
-    <input type="hidden" id="__multiselect_${parameters.id?html}" name="__multiselect_${parameters.id?html}" value=""<#rt/>
+    <input type="hidden" id="__multiselect_${parameters.name?html}" name="__multiselect_${parameters.name?html}" value=""<#rt/>
   </#if>
    <#if ( !parameters.id?has_content && !parameters.name?has_content)>
-     <input type="hidden" id="" name="" value="" <#rt/>
+     <input type="hidden" name="" value="" <#rt/>
   </#if>
   
 <#if parameters.disabled!false>

@@ -467,7 +467,7 @@ ${formFooter!}
 		<#local cssClass=config.cssClass?replace('required','')>
 		<#if !config.excludedFromQuery>
 		<#if config.collectionType??>
-			<@s.hidden id="" name=key+'-op' value="CONTAINS"/>
+			<@s.hidden name=key+'-op' value="CONTAINS"/>
 		</#if>
 		<#if config.type=='checkbox'>
 			<@s.checkbox disabled=disabled id=id label=label name=key checked=('true'==(Parameters[key]!)) class=cssClass+cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
@@ -498,12 +498,12 @@ ${formFooter!}
 				<#if config.queryMatchMode?? && config.propertyType.simpleName=='String' && 'EXACT'!=(config.queryMatchMode.name())!>
 				<@s.param name='after'>
 				<#local opname=config.queryMatchMode.name()>
-				<@s.hidden id="" name=key+'-op' value=(opname=='ANYWHERE')?then('INCLUDE',opname)/>
+				<@s.hidden name=key+'-op' value=(opname=='ANYWHERE')?then('INCLUDE',opname)/>
 				</@s.param>
 				<#elseif config.queryWithRange>
 				<@s.param name='after'>
-				<@s.hidden id="" name=key+'-op' value='BETWEEN'/>
-				- <@s.textfield theme="simple" id=""label=label name=key value=(Parameters[key]!) type=config.inputType class=cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
+				<@s.hidden name=key+'-op' value='BETWEEN'/>
+				- <@s.textfield theme="simple" label=label name=key value=(Parameters[key]!) type=config.inputType class=cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes/>
 				</@s.param>
 				</#if>
 			<#else>

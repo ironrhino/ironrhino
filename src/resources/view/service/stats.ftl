@@ -125,16 +125,16 @@ Initialization.stats = function() {
 </#if>
 <form action="${baseaction}" class="ajax view form-inline" data-replacement="count_result">
 <span>${getText('date')}</span>
-<@s.textfield theme="simple" id="" name="date" class="date"/>
+<@s.textfield theme="simple" name="date" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span5 offset1">
 <form action="${baseaction}" class="ajax view form-inline" data-replacement="count_result">
 <span>${getText('date')}${getText('range')}</span>
-<@s.textfield theme="simple" id="" name="from" class="date"/>
+<@s.textfield theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
-<@s.textfield theme="simple" id="" name="to" class="date"/>
+<@s.textfield theme="simple" name="to" class="date"/>
 <@s.submit value=getText('query') theme="simple"/>
 </form>
 </div>
