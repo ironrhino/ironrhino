@@ -23,6 +23,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -133,6 +134,11 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Override
 	protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
 		argumentResolvers.add(new AuthenticationPrincipalArgumentResolver());
+		if (ClassUtils.isPresent("org.ironrhino.security.oauth.server.component.OAuthAuthorizationArgumentResolver",
+				null)) {
+			argumentResolvers
+					.add(new org.ironrhino.security.oauth.server.component.OAuthAuthorizationArgumentResolver());
+		}
 		super.addArgumentResolvers(argumentResolvers);
 	}
 

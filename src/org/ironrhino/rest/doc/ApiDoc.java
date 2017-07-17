@@ -245,8 +245,9 @@ public class ApiDoc implements Serializable {
 				for (int j = 0; j < annotations.length; j++) {
 					Annotation anno = annotations[j];
 					if (anno.annotationType().getPackage().equals(RequestBody.class.getPackage())
+							|| anno.annotationType().equals(Qualifier.class)
 							|| anno.annotationType().isAnnotationPresent(Qualifier.class))
-						// @RequestBody @LoggedInUser ...
+						// @RequestBody @Qualifier @LoggedInUser ...
 						bindAnnotationPresent = true;
 					if (anno instanceof RequestBody) {
 						requestBodyRequired = ((RequestBody) anno).required();
