@@ -37,7 +37,7 @@
 </form>
 </div>
 </div>
-<div id="result"<#if Parameters.live??> class="ajaxpanel" data-interval="${Parameters.interval?default('60000')}" data-quiet="true"</#if>>
+<div id="result"<#if Parameters.live??> class="ajaxpanel" data-interval="${Parameters.interval!'60000'}" data-quiet="true"</#if>>
 <#list result as key,value>
 <table class="treeTable expanded table table-hover table-bordered" style="width:100%;">
   <#if key??>

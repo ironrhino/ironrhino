@@ -20,7 +20,7 @@
 	<#if view=='brief'><@s.hidden name="schema.strict"/><#else><@s.checkbox name="schema.strict" class="custom"/></#if>
 	<#if view=='brief'><@s.hidden name="schema.description"/><p>${schema.description!}</p><#else><@s.textarea name="schema.description" class="input-xxlarge" style="height:50px;" maxlength="4000"/></#if>
 	</#if>
-	<@s.hidden name="__datagrid_schema.fields" />
+	<@s.hidden name="__datagrid_schema.fields"/>
 	<table class="datagrid adaptive nullable table table-condensed">
 		<style scoped>
 		tr.linkage{
