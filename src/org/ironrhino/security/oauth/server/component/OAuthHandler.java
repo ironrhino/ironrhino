@@ -36,8 +36,7 @@ import org.springframework.stereotype.Component;
 @Order(0)
 public class OAuthHandler extends AccessHandler {
 
-	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST = "_OAUTH_REQUEST";
-	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT = "_OAUTH_CLIENT";
+	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION = "_OAUTH_AUTHORIZATION";
 	public static final String SESSION_ID_PREFIX = "tk_";
 
 	@Autowired
@@ -142,7 +141,6 @@ public class OAuthHandler extends AccessHandler {
 			String clientName = authorization.getClientName();
 			if (clientName == null)
 				return handleError(request, response, "invalid_client");
-			request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_CLIENT, clientId);
 			UserAgent ua = new UserAgent(request.getHeader("User-Agent"));
 			ua.setAppId(clientId);
 			ua.setAppName(clientName);
@@ -174,7 +172,7 @@ public class OAuthHandler extends AccessHandler {
 		Map<String, Object> sessionMap = new HashMap<>(2, 1);
 		sessionMap.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
 		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API, sessionMap);
-		request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
+		request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION, authorization);
 		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API, SESSION_ID_PREFIX + token);
 		return false;
 

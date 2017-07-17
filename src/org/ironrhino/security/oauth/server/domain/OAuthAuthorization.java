@@ -24,6 +24,10 @@ public class OAuthAuthorization implements Serializable {
 
 	private String address;
 
+	private String deviceId;
+
+	private String deviceName;
+
 	private int expiresIn;
 
 	private String clientId;
@@ -94,6 +98,22 @@ public class OAuthAuthorization implements Serializable {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
 	}
 
 	public int getExpiresIn() {

@@ -25,7 +25,6 @@ import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationF
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExceptionUtils;
-import org.ironrhino.security.oauth.server.component.OAuthHandler;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
@@ -367,7 +366,6 @@ public class Oauth2Action extends BaseAction {
 	public String token() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
-		request.setAttribute(OAuthHandler.REQUEST_ATTRIBUTE_KEY_OAUTH_REQUEST, true);
 		if (grant_type == GrantType.password) {
 			client = oauthManager.findClientById(client_id);
 			try {
