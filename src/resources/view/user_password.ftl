@@ -17,7 +17,7 @@ ${getText('org.springframework.security.authentication.CredentialsExpiredExcepti
 	</#if>
 	<@s.password name="password" class="required input-pattern sha" readonly=userProfileReadonly/>
 	<@s.password name="confirmPassword" class="required repeat input-pattern submit sha" data\-repeatwith="password" readonly=userProfileReadonly/>
-	<@s.submit value=getText('save') class="btn-primary" disabled=userProfileReadonly/>
+	<@s.submit label=getText('save') class="btn-primary" disabled=userProfileReadonly/>
 </@s.form>
 </body>
 </html>

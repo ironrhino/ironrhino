@@ -9,7 +9,7 @@
 	<@s.textfield name="user.name" class="required" readonly=userProfileReadonly/>
 	<@s.textfield name="user.email" type="email" class="email" readonly=userProfileReadonly/>
 	<@s.textfield name="user.phone" readonly=userProfileReadonly/>
-	<@s.submit value=getText('save') class="btn-primary" disabled=userProfileReadonly />
+	<@s.submit label=getText('save') class="btn-primary" disabled=userProfileReadonly />
 </@s.form>
 </body>
 </html>

@@ -24,7 +24,7 @@
 <form class="ajax view form-inline" data-replacement="result">
 <span>${getText('date')}</span>
 <@s.textfield theme="simple" name="date" class="date"/>
-<@s.submit value=getText('query') theme="simple"/>
+<@s.submit label=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span6">
@@ -33,7 +33,7 @@
 <@s.textfield theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
 <@s.textfield theme="simple" name="to" class="date"/>
-<@s.submit value=getText('query') theme="simple"/>
+<@s.submit label=getText('query') theme="simple"/>
 </form>
 </div>
 </div>

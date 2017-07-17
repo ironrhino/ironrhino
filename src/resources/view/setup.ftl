@@ -29,7 +29,7 @@
 		<@s.textfield label=getText(p.label?has_content?then(p.label,p.name)) name=p.name value=defaultValue! placeholder=getText(p.placeholder!) class="${p.cssClass}" dynamicAttributes=p.dynamicAttributes/>
 		</#if>
 		</#list>
-		<@s.submit value=getText('confirm') class="btn-primary"/>
+		<@s.submit label=getText('confirm') class="btn-primary"/>
 	</@s.form>
 	</div>
 	</div>

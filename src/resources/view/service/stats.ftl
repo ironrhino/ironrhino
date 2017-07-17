@@ -126,7 +126,7 @@ Initialization.stats = function() {
 <form action="${baseaction}" class="ajax view form-inline" data-replacement="count_result">
 <span>${getText('date')}</span>
 <@s.textfield theme="simple" name="date" class="date"/>
-<@s.submit value=getText('query') theme="simple"/>
+<@s.submit label=getText('query') theme="simple"/>
 </form>
 </div>
 <div class="span5 offset1">
@@ -135,7 +135,7 @@ Initialization.stats = function() {
 <@s.textfield theme="simple" name="from" class="date"/>
 <i class="glyphicon glyphicon-arrow-right"></i>
 <@s.textfield theme="simple" name="to" class="date"/>
-<@s.submit value=getText('query') theme="simple"/>
+<@s.submit label=getText('query') theme="simple"/>
 </form>
 </div>
 </div>

@@ -63,7 +63,7 @@ $(function(){
 	<@s.select name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/>
 	</div>
 	</div>
-	<@s.submit value=getText('submit') class="btn-primary"/>
+	<@s.submit label=getText('submit') class="btn-primary"/>
 </@s.form>
 <hr/>
 

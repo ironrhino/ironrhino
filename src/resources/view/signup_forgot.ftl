@@ -22,7 +22,7 @@
 	<@s.form method="post" action="${actionBaseUrl}/forgot" class="ajax reset form-horizontal well">
 		<@s.textfield name="email" type="email" class="required email"/>
 		<@captcha/>
-		<@s.submit value=getText('confirm')  class="btn-primary">
+		<@s.submit label=getText('confirm')  class="btn-primary">
 		<@s.param name="after"> <a class="btn" href="${getUrl('/signup')}">${getText('signup')}</a> <a class="btn" href="${getUrl('/login')}">${getText('login')}</a></@s.param>
 		</@s.submit>
 	</@s.form>

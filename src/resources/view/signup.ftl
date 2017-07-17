@@ -24,7 +24,7 @@
 		<@s.textfield name="username" class="span2 checkavailable regex" data\-regex="${statics['org.ironrhino.security.model.User'].USERNAME_REGEX_FOR_SIGNUP}" data\-checkurl="${getUrl('/signup/checkavailable')}"/>
 		<@s.password name="password" class="required span2 sha"/>
 		<@s.password name="confirmPassword" class="required span2 sha"/>
-		<@s.submit value=getText('signup') class="btn-primary">
+		<@s.submit label=getText('signup') class="btn-primary">
 		<@s.param name="after"> <a class="btn hidden-pad hidden-tablet hidden-phone" href="${getUrl('/signup/forgot')}">${getText('signup.forgot')}</a> <a class="btn" href="${getUrl('/login')}">${getText('login')}</a></@s.param>
 		</@s.submit>
 	</@s.form>

@@ -12,7 +12,7 @@
 	</#list>
 	</div>
 	<div style="text-align:center;padding-top:30px;">
-	<@s.submit theme="simple" value="${getText('upload')}"/>
+	<@s.submit theme="simple" label="${getText('upload')}"/>
 	<label for="autorename">${getText('autorename')}:</label><@s.checkbox theme="simple" id="autorename" name="autorename" class="custom"/>
 	</div>
 	<table id="files" class="checkboxgroup table table-striped middle" style="margin-top:50px;">

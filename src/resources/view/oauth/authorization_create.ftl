@@ -22,7 +22,7 @@
 	</div>
 	<@s.textfield name="authorization.lifetime" value="0" class="required span1"/>
 	<@s.textfield name="authorization.scope" class="span4"/>
-	<@s.submit value=getText('create') class="btn-primary"/>
+	<@s.submit label=getText('create') class="btn-primary"/>
 </@s.form>
 </body>
 </html>

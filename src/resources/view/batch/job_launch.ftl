@@ -34,7 +34,7 @@
 	<@s.textarea name="jobParameters" class="required input-xxlarge" placeholder="workdate(date)=2012-12-12\ncount(long)=12\namount(double)=12.12\nname=test"/>
 	</#if>
 	</#if>
-	<@s.submit value=getText('launch') class="btn-primary"/>
+	<@s.submit label=getText('launch') class="btn-primary"/>
 </@s.form>
 </body>
 </html>

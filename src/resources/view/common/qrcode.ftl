@@ -20,7 +20,7 @@
 		<@s.file label=getText('qrcode') name="file" class="custom" accept="image/*"/>
 		<@s.textfield name="url" class="input-xxlarge"/>
 		<@s.textfield name="encoding" class="input-small"/>
-		<@s.submit value=getText('confirm') />
+		<@s.submit label=getText('confirm') />
 		</@s.form>
 	</div>
 	<div id="encode" class="tab-pane">
@@ -30,7 +30,7 @@
 		<@s.textfield type="number" name="width" class="integer positive" min="10"/>
 		<@s.textfield type="number" name="height" class="integer positive" min="10"/>
 		<@s.file label=getText('watermark') name="file" class="custom" accept="image/*"/>
-		<@s.submit value=getText('confirm') />
+		<@s.submit label=getText('confirm') />
 		</@s.form>
 	</div>
 </div>

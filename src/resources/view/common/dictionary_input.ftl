@@ -58,7 +58,7 @@
 			</#list>
 		</tbody>
 	</table>
-	<@s.submit value=getText('save') class="btn-primary"/>
+	<@s.submit label=getText('save') class="btn-primary"/>
 </@s.form>
 </body>
 </html>

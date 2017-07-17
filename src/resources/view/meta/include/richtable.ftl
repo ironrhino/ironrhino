@@ -517,7 +517,7 @@ ${formFooter!}
 		</#if>
 		</#if>
 	</#list>
-	<@s.submit value=getText('query') class="btn-primary">
+	<@s.submit label=getText('query') class="btn-primary">
 		<@s.param name="after"> <input type="reset" class="btn" value="${getText('reset')}"></@s.param>
 	</@s.submit>
 </form>

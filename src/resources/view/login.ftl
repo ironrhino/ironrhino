@@ -46,7 +46,7 @@
 		<@captcha/>
 		</#if>
 		<#if verificationCodeEnabled></div></#if>
-		<@s.submit value=getText('login') class="btn-primary">
+		<@s.submit label=getText('login') class="btn-primary">
 		<#if getSetting??&&'true'==getSetting('signup.enabled')>
 		<@resourcePresentConditional value="resources/view/signup.ftl">
 		<@s.param name="after"> <a class="btn" href="${getUrl('/signup')}">${getText('signup')}</a></@s.param>

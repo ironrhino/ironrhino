@@ -28,7 +28,7 @@
 	<#if !(view=='embedded'||view=='brief')>
 		<@s.textarea name="setting.description" class="input-xxlarge" maxlength="4000"/>
 	</#if>
-	<@s.submit value=getText('save') class="btn-primary"/>
+	<@s.submit label=getText('save') class="btn-primary"/>
 </@s.form>
 </body>
 </html>
