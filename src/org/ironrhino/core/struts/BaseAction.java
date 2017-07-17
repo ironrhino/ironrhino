@@ -206,6 +206,25 @@ public class BaseAction extends ActionSupport {
 	}
 
 	@Override
+	public boolean hasActionMessages() {
+		return super.hasActionMessages() || actionWarning != null || actionSuccessMessage != null;
+	}
+
+	@Override
+	public void clearMessages() {
+		super.clearMessages();
+		setActionWarning(null);
+		setActionSuccessMessage(null);
+	}
+
+	@Override
+	public void clearErrorsAndMessages() {
+		super.clearErrorsAndMessages();
+		setActionWarning(null);
+		setActionSuccessMessage(null);
+	}
+
+	@Override
 	public String execute() throws Exception {
 		return SUCCESS;
 	}
