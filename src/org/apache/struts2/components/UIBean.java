@@ -803,24 +803,10 @@ public abstract class UIBean extends Component {
         if (parameters.containsKey("value")) {
             parameters.put("nameValue", parameters.get("value"));
         } else {
-            if (evaluateNameValue()) {
-                final Class valueClazz = getValueClassType();
-
-                if (valueClazz != null) {
-                    if (value != null) {
-                        addParameter("nameValue", value);
-                    } else if (name != null) {
-                        String expr = completeExpressionIfAltSyntax(name);
-
-                        addParameter("nameValue", findValue(expr, valueClazz));
-                    }
-                } else {
-                    if (value != null) {
-                        addParameter("nameValue", value);
-                    } else if (name != null) {
-                        addParameter("nameValue", findValue(name));
-                    }
-                }
+            if (value != null) {
+                addParameter("nameValue", value);
+            } else if (name != null && evaluateNameValue()) {
+                addParameter("nameValue", findValue(name, getValueClassType()));
             }
         }
 

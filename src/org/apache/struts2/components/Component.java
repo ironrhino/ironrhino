@@ -22,7 +22,6 @@
 package org.apache.struts2.components;
 
 import com.opensymphony.xwork2.inject.Inject;
-import com.opensymphony.xwork2.util.TextParseUtil;
 import com.opensymphony.xwork2.util.ValueStack;
 import org.apache.struts2.StrutsConstants;
 import org.apache.struts2.StrutsException;
@@ -201,7 +200,9 @@ public class Component {
      * @return  the String value found.
      */
     protected String findString(String expr) {
-        return (String) findValue(expr, String.class);
+    		return expr;
+    		// disable eval %{} by ironrhino, use freemarker ${} instead 
+        // return (String) findValue(expr, String.class);
     }
 
     /**
@@ -254,7 +255,8 @@ public class Component {
             return null;
         }
 
-        expr = stripExpressionIfAltSyntax(expr);
+        // no need to strip anymore
+        // expr = stripExpressionIfAltSyntax(expr);
 
         return getStack().findValue(expr, throwExceptionOnELFailure);
     }
@@ -267,41 +269,6 @@ public class Component {
      */
 	protected String stripExpressionIfAltSyntax(String expr) {
 		return ComponentUtils.stripExpressionIfAltSyntax(stack, expr);
-	}
-
-    /**
-     * Is the altSyntax enabled? [TRUE]
-     * <p/>
-     * See <code>struts.properties</code> where the altSyntax flag is defined.
-     */
-    public boolean altSyntax() {
-        return ComponentUtils.altSyntax(stack);
-    }
-
-    /**
-     * Adds the sorrounding %{ } to the expression for proper processing.
-     * @param expr the expression.
-     * @return the modified expression if altSyntax is enabled, or the parameter 
-     * expression otherwise.
-     */
-	protected String completeExpressionIfAltSyntax(String expr) {
-		if (altSyntax()) {
-			return "%{" + expr + "}";
-		}
-		return expr;
-	}
-
-    /**
-     * This check is needed for backwards compatibility with 2.1.x
-     * @param expr the expression.
-     * @return the found string if altSyntax is enabled. The parameter
-     * expression otherwise.
-     */
-	protected String findStringIfAltSyntax(String expr) {
-		if (altSyntax()) {
-		    return findString(expr);
-		}
-		return expr;
 	}
 
     /**
@@ -350,17 +317,12 @@ public class Component {
      * @return  the Object found, or <tt>null</tt> if not found.
      */
     protected Object findValue(String expr, Class toType) {
-        if (altSyntax() && toType == String.class) {
-        	if (ComponentUtils.containsExpression(expr)) {
-        		return TextParseUtil.translateVariables('%', expr, stack);
-        	} else {
-        		return expr;
-        	}
-        } else {
-            expr = stripExpressionIfAltSyntax(expr);
-
-            return getStack().findValue(expr, toType, throwExceptionOnELFailure);
+    	    if (expr == null) {
+            return null;
         }
+        // no need to strip anymore
+        // expr = stripExpressionIfAltSyntax(expr);
+        return getStack().findValue(expr, toType, throwExceptionOnELFailure);
     }
 
     /**
