@@ -34,7 +34,6 @@ import org.apache.struts2.components.template.Template;
 import org.apache.struts2.components.template.TemplateEngine;
 import org.apache.struts2.components.template.TemplateEngineManager;
 import org.apache.struts2.components.template.TemplateRenderingContext;
-import org.apache.struts2.util.TextProviderHelper;
 import org.apache.struts2.views.annotations.StrutsTagAttribute;
 import org.apache.struts2.views.util.ContextUtil;
 
@@ -44,7 +43,6 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -470,46 +468,10 @@ public abstract class UIBean extends Component {
     protected String id;
     protected String cssClass;
     protected String cssStyle;
-    protected String cssErrorClass;
-    protected String cssErrorStyle;
     protected String disabled;
     protected String label;
-    protected String labelPosition;
-    protected String labelSeparator;
-    protected String requiredPosition;
-    protected String errorPosition;
     protected String name;
-    protected String requiredLabel;
-    protected String tabindex;
     protected String value;
-    protected String title;
-
-    // HTML scripting events attributes
-    protected String onclick;
-    protected String ondblclick;
-    protected String onmousedown;
-    protected String onmouseup;
-    protected String onmouseover;
-    protected String onmousemove;
-    protected String onmouseout;
-    protected String onfocus;
-    protected String onblur;
-    protected String onkeypress;
-    protected String onkeydown;
-    protected String onkeyup;
-    protected String onselect;
-    protected String onchange;
-
-    // common html attributes
-    protected String accesskey;
-
-    // javascript tooltip attribute
-    protected String tooltip;
-    protected String tooltipConfig;
-    protected String javascriptTooltip;
-    protected String tooltipDelay;
-    protected String tooltipCssClass;
-    protected String tooltipIconPath;
 
     // dynamic attributes
     protected Map<String,Object> dynamicAttributes = new HashMap<String,Object>();
@@ -660,122 +622,16 @@ public abstract class UIBean extends Component {
         addParameter("themeExpansionToken", uiThemeExpansionToken);
         addParameter("expandTheme", uiThemeExpansionToken + theme);
 
-        String name = null;
-        String providedLabel = null;
-
-        if (this.key != null) {
-
-            if(this.name == null) {
-                this.name = key;
-            }
-
-            if(this.label == null) {
-                // lookup the label from a TextProvider (default value is the key)
-                providedLabel = TextProviderHelper.getText(key, key, stack);
-            }
-
-        }
-
-        if (this.name != null) {
-            name = findString(this.name);
-            addParameter("name", name);
+        if (name != null) {
+            addParameter("name", findString(name));
         }
 
         if (label != null) {
             addParameter("label", findString(label));
-        } else {
-            if (providedLabel != null) {
-                // label found via a TextProvider
-                addParameter("label", providedLabel);
-            }
-        }
-
-        if (labelSeparator != null) {
-            addParameter("labelseparator", findString(labelSeparator));
-        }
-
-        if (labelPosition != null) {
-            addParameter("labelposition", findString(labelPosition));
-        }
-
-        if (requiredPosition != null) {
-            addParameter("requiredPosition", findString(requiredPosition));
-        }
-
-        if (errorPosition != null) {
-            addParameter("errorposition", findString(errorPosition));
         }
         
-        if (requiredLabel != null) {
-            addParameter("required", findValue(requiredLabel, Boolean.class));
-        }
-
         if (disabled != null) {
             addParameter("disabled", findValue(disabled, Boolean.class));
-        }
-
-        if (tabindex != null) {
-            addParameter("tabindex", findString(tabindex));
-        }
-
-        if (onclick != null) {
-            addParameter("onclick", findString(onclick));
-        }
-
-        if (ondblclick != null) {
-            addParameter("ondblclick", findString(ondblclick));
-        }
-
-        if (onmousedown != null) {
-            addParameter("onmousedown", findString(onmousedown));
-        }
-
-        if (onmouseup != null) {
-            addParameter("onmouseup", findString(onmouseup));
-        }
-
-        if (onmouseover != null) {
-            addParameter("onmouseover", findString(onmouseover));
-        }
-
-        if (onmousemove != null) {
-            addParameter("onmousemove", findString(onmousemove));
-        }
-
-        if (onmouseout != null) {
-            addParameter("onmouseout", findString(onmouseout));
-        }
-
-        if (onfocus != null) {
-            addParameter("onfocus", findString(onfocus));
-        }
-
-        if (onblur != null) {
-            addParameter("onblur", findString(onblur));
-        }
-
-        if (onkeypress != null) {
-            addParameter("onkeypress", findString(onkeypress));
-        }
-
-        if (onkeydown != null) {
-            addParameter("onkeydown", findString(onkeydown));
-        }
-
-        if (onkeyup != null) {
-            addParameter("onkeyup", findString(onkeyup));
-        }
-
-        if (onselect != null) {
-            addParameter("onselect", findString(onselect));
-        }
-
-        if (onchange != null) {
-            addParameter("onchange", findString(onchange));
-        }
-
-        if (accesskey != null) {
-            addParameter("accesskey", findString(accesskey));
         }
 
         if (cssClass != null) {
@@ -786,17 +642,6 @@ public abstract class UIBean extends Component {
             addParameter("cssStyle", findString(cssStyle));
         }
 
-        if (cssErrorClass != null) {
-            addParameter("cssErrorClass", findString(cssErrorClass));
-        }
-
-        if (cssErrorStyle != null) {
-            addParameter("cssErrorStyle", findString(cssErrorStyle));
-        }
-
-        if (title != null) {
-            addParameter("title", findString(title));
-        }
 
 
         // see if the value was specified as a parameter already
@@ -823,68 +668,6 @@ public abstract class UIBean extends Component {
                 List<String> tags = (List<String>) form.getParameters().get("tagNames");
                 tags.add(name);
             }
-        }
-
-
-        // tooltip & tooltipConfig
-        if (tooltipConfig != null) {
-            addParameter("tooltipConfig", findValue(tooltipConfig));
-        }
-        if (tooltip != null) {
-            addParameter("tooltip", findString(tooltip));
-
-            Map tooltipConfigMap = getTooltipConfig(this);
-
-            if (form != null) { // inform the containing form that we need tooltip javascript included
-                form.addParameter("hasTooltip", Boolean.TRUE);
-
-                // tooltipConfig defined in component itseilf will take precedence
-                // over those defined in the containing form
-                Map overallTooltipConfigMap = getTooltipConfig(form);
-                overallTooltipConfigMap.putAll(tooltipConfigMap); // override parent form's tooltip config
-
-                for (Object o : overallTooltipConfigMap.entrySet()) {
-                    Map.Entry entry = (Map.Entry) o;
-                    addParameter((String) entry.getKey(), entry.getValue());
-                }
-            }
-            else {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("No ancestor Form found, javascript based tooltip will not work, however standard HTML tooltip using alt and title attribute will still work ");
-                }
-            }
-
-            //TODO: this is to keep backward compatibility, remove once when tooltipConfig is dropped
-            String  jsTooltipEnabled = (String) getParameters().get("jsTooltipEnabled");
-            if (jsTooltipEnabled != null)
-                this.javascriptTooltip = jsTooltipEnabled;
-
-            //TODO: this is to keep backward compatibility, remove once when tooltipConfig is dropped
-            String tooltipIcon = (String) getParameters().get("tooltipIcon");
-            if (tooltipIcon != null)
-                this.addParameter("tooltipIconPath", tooltipIcon);
-            if (this.tooltipIconPath != null)
-                this.addParameter("tooltipIconPath", findString(this.tooltipIconPath));
-
-            //TODO: this is to keep backward compatibility, remove once when tooltipConfig is dropped
-            String tooltipDelayParam = (String) getParameters().get("tooltipDelay");
-            if (tooltipDelayParam != null)
-                this.addParameter("tooltipDelay", tooltipDelayParam);
-            if (this.tooltipDelay != null)
-                this.addParameter("tooltipDelay", findString(this.tooltipDelay));
-
-            if (this.javascriptTooltip != null) {
-                Boolean jsTooltips = (Boolean) findValue(this.javascriptTooltip, Boolean.class);
-                //TODO use a Boolean model when tooltipConfig is dropped
-                this.addParameter("jsTooltipEnabled", jsTooltips.toString());
-
-                if (form != null)
-                    form.addParameter("hasTooltip", jsTooltips);
-                if (this.tooltipCssClass != null)
-                    this.addParameter("tooltipCssClass", findString(this.tooltipCssClass));
-            }
-
-
         }
 
         evaluateExtraParams();
@@ -940,46 +723,6 @@ public abstract class UIBean extends Component {
         	LOG.warn("Cannot find an Ancestor form, custom onsubmit is NOT enabled");
             }
         }
-    }
-
-    protected Map getTooltipConfig(UIBean component) {
-        Object tooltipConfigObj = component.getParameters().get("tooltipConfig");
-        Map<String, String> tooltipConfig = new LinkedHashMap<String, String>();
-
-        if (tooltipConfigObj instanceof Map) {
-            // we get this if its configured using
-            // 1] UI component's tooltipConfig attribute  OR
-            // 2] <param name="tooltip" value="" /> param tag value attribute
-
-            tooltipConfig = new LinkedHashMap<String, String>((Map)tooltipConfigObj);
-        } else if (tooltipConfigObj instanceof String) {
-
-            // we get this if its configured using
-            // <param name="tooltipConfig"> ... </param> tag's body
-            String tooltipConfigStr = (String) tooltipConfigObj;
-            String[] tooltipConfigArray = tooltipConfigStr.split("\\|");
-
-            for (String aTooltipConfigArray : tooltipConfigArray) {
-                String[] configEntry = aTooltipConfigArray.trim().split("=");
-                String key = configEntry[0].trim();
-                String value;
-                if (configEntry.length > 1) {
-                    value = configEntry[1].trim();
-                    tooltipConfig.put(key, value);
-                } else {
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn("component " + component + " tooltip config param " + key + " has no value defined, skipped");
-                    }
-                }
-            }
-        }
-        if (component.javascriptTooltip != null)
-            tooltipConfig.put("jsTooltipEnabled", component.javascriptTooltip);
-        if (component.tooltipIconPath != null)
-            tooltipConfig.put("tooltipIcon", component.tooltipIconPath);
-        if (component.tooltipDelay != null)
-            tooltipConfig.put("tooltipDelay", component.tooltipDelay);
-        return tooltipConfig;
     }
 
     /**
@@ -1067,21 +810,6 @@ public abstract class UIBean extends Component {
         this.cssStyle = cssStyle;
     }
 
-    @StrutsTagAttribute(description="The css error class to use for element")
-    public void setCssErrorClass(String cssErrorClass) {
-        this.cssErrorClass = cssErrorClass;
-    }
-
-    @StrutsTagAttribute(description="The css error style definitions for element to use")
-    public void setCssErrorStyle(String cssErrorStyle) {
-        this.cssErrorStyle = cssErrorStyle;
-    }
-
-    @StrutsTagAttribute(description="Set the html title attribute on rendered html element")
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     @StrutsTagAttribute(description="Set the html disabled attribute on rendered html element")
     public void setDisabled(String disabled) {
         this.disabled = disabled;
@@ -1091,40 +819,10 @@ public abstract class UIBean extends Component {
     public void setLabel(String label) {
         this.label = label;
     }
-
-    @StrutsTagAttribute(description="String that will be appended to the label", defaultValue=":")
-    public void setLabelSeparator(String labelseparator) {
-        this.labelSeparator = labelseparator;
-    }
-
-    @StrutsTagAttribute(description="Define label position of form element (top/left)")
-    public void setLabelposition(String labelPosition) {
-        this.labelPosition = labelPosition;
-    }
-
-    @StrutsTagAttribute(description="Define required position of required form element (left|right)")
-    public void setRequiredPosition(String requiredPosition) {
-        this.requiredPosition = requiredPosition;
-    }
-
-    @StrutsTagAttribute(description="Define error position of form element (top|bottom)")
-    public void setErrorPosition(String errorPosition) {
-        this.errorPosition = errorPosition;
-    }
     
     @StrutsTagAttribute(description="The name to set for element")
     public void setName(String name) {
         this.name = name;
-    }
-
-    @StrutsTagAttribute(description="If set to true, the rendered element will indicate that input is required", type="Boolean", defaultValue="false")
-    public void setRequiredLabel(String requiredLabel) {
-        this.requiredLabel = requiredLabel;
-    }
-
-    @StrutsTagAttribute(description="Set the html tabindex attribute on rendered html element")
-    public void setTabindex(String tabindex) {
-        this.tabindex = tabindex;
     }
 
     @StrutsTagAttribute(description="Preset the value of input element.")
@@ -1132,115 +830,9 @@ public abstract class UIBean extends Component {
         this.value = value;
     }
 
-    @StrutsTagAttribute(description="Set the html onclick attribute on rendered html element")
-    public void setOnclick(String onclick) {
-        this.onclick = onclick;
-    }
-
-    @StrutsTagAttribute(description="Set the html ondblclick attribute on rendered html element")
-    public void setOndblclick(String ondblclick) {
-        this.ondblclick = ondblclick;
-    }
-
-    @StrutsTagAttribute(description="Set the html onmousedown attribute on rendered html element")
-    public void setOnmousedown(String onmousedown) {
-        this.onmousedown = onmousedown;
-    }
-
-    @StrutsTagAttribute(description="Set the html onmouseup attribute on rendered html element")
-    public void setOnmouseup(String onmouseup) {
-        this.onmouseup = onmouseup;
-    }
-
-    @StrutsTagAttribute(description="Set the html onmouseover attribute on rendered html element")
-    public void setOnmouseover(String onmouseover) {
-        this.onmouseover = onmouseover;
-    }
-
-    @StrutsTagAttribute(description="Set the html onmousemove attribute on rendered html element")
-    public void setOnmousemove(String onmousemove) {
-        this.onmousemove = onmousemove;
-    }
-
-    @StrutsTagAttribute(description="Set the html onmouseout attribute on rendered html element")
-    public void setOnmouseout(String onmouseout) {
-        this.onmouseout = onmouseout;
-    }
-
-    @StrutsTagAttribute(description="Set the html onfocus attribute on rendered html element")
-    public void setOnfocus(String onfocus) {
-        this.onfocus = onfocus;
-    }
-
-    @StrutsTagAttribute(description=" Set the html onblur attribute on rendered html element")
-    public void setOnblur(String onblur) {
-        this.onblur = onblur;
-    }
-
-    @StrutsTagAttribute(description="Set the html onkeypress attribute on rendered html element")
-    public void setOnkeypress(String onkeypress) {
-        this.onkeypress = onkeypress;
-    }
-
-    @StrutsTagAttribute(description="Set the html onkeydown attribute on rendered html element")
-    public void setOnkeydown(String onkeydown) {
-        this.onkeydown = onkeydown;
-    }
-
-    @StrutsTagAttribute(description="Set the html onkeyup attribute on rendered html element")
-    public void setOnkeyup(String onkeyup) {
-        this.onkeyup = onkeyup;
-    }
-
-    @StrutsTagAttribute(description="Set the html onselect attribute on rendered html element")
-    public void setOnselect(String onselect) {
-        this.onselect = onselect;
-    }
-
-    @StrutsTagAttribute(description="Set the html onchange attribute on rendered html element")
-    public void setOnchange(String onchange) {
-        this.onchange = onchange;
-    }
-
-    @StrutsTagAttribute(description="Set the html accesskey attribute on rendered html element")
-    public void setAccesskey(String accesskey) {
-        this.accesskey = accesskey;
-    }
-
-    @StrutsTagAttribute(description="Set the tooltip of this particular component")
-    public void setTooltip(String tooltip) {
-        this.tooltip = tooltip;
-    }
-
-    @StrutsTagAttribute(description="Deprecated. Use individual tooltip configuration attributes instead.")
-    public void setTooltipConfig(String tooltipConfig) {
-        this.tooltipConfig = tooltipConfig;
-    }
-
     @StrutsTagAttribute(description="Set the key (name, value, label) for this particular component")
     public void setKey(String key) {
         this.key = key;
-    }
-
-    @StrutsTagAttribute(description="Use JavaScript to generate tooltips", type="Boolean", defaultValue="false")
-    public void setJavascriptTooltip(String javascriptTooltip) {
-        this.javascriptTooltip = javascriptTooltip;
-    }
-
-    @StrutsTagAttribute(description="CSS class applied to JavaScrip tooltips", defaultValue="StrutsTTClassic")
-    public void setTooltipCssClass(String tooltipCssClass) {
-        this.tooltipCssClass = tooltipCssClass;
-    }
-
-    @StrutsTagAttribute(description="Delay in milliseconds, before showing JavaScript tooltips ",
-        defaultValue="Classic")
-    public void setTooltipDelay(String tooltipDelay) {
-        this.tooltipDelay = tooltipDelay;
-    }
-
-    @StrutsTagAttribute(description="Icon path used for image that will have the tooltip")
-    public void setTooltipIconPath(String tooltipIconPath) {
-        this.tooltipIconPath = tooltipIconPath;
     }
 
 	public void setDynamicAttributes(Map<String, Object> dynamicAttributes) {

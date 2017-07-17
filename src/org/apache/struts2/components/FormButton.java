@@ -42,7 +42,6 @@ public abstract class FormButton extends ClosingUIBean {
 
     protected String action;
     protected String method;
-    protected String align;
     protected String type;
 
     public FormButton(ValueStack stack, HttpServletRequest request, HttpServletResponse response) {
@@ -52,9 +51,12 @@ public abstract class FormButton extends ClosingUIBean {
     //public void evaluateParams() {
     public void evaluateExtraParams() {
         super.evaluateExtraParams();
-        if (align == null) {
-            align = "right";
-        }
+        String cssClass = (String)getParameters().get("cssClass");
+        if(cssClass == null)
+        		cssClass = "btn";
+        else
+        		cssClass = "btn " + cssClass;
+        addParameter("cssClass", cssClass);
 
         String submitType = BUTTONTYPE_INPUT;
         if (type != null && (BUTTONTYPE_BUTTON.equalsIgnoreCase(type) || (supportsImageType() && BUTTONTYPE_IMAGE.equalsIgnoreCase(type))))
@@ -88,8 +90,6 @@ public abstract class FormButton extends ClosingUIBean {
             addParameter("name", name);
         }
 
-        addParameter("align", findString(align));
-
     }
 
     /**
@@ -112,11 +112,6 @@ public abstract class FormButton extends ClosingUIBean {
     @StrutsTagAttribute(description="Set method attribute.")
     public void setMethod(String method) {
         this.method = method;
-    }
-
-    @StrutsTagAttribute(description="HTML align attribute.")
-    public void setAlign(String align) {
-        this.align = align;
     }
 
     @StrutsTagAttribute(description="The type of submit to use. Valid values are <i>input</i>, " +

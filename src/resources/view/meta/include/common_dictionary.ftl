@@ -107,7 +107,7 @@ ${getDictionaryLabel(dictionaryName,value?string)}<#t>
 		<#local index = index+1/>
 		</#if>
 		</#list>
-		<input type="hidden" id="__multiselect_${name!?html}" name="__multiselect_${name?html}" value=""<#rt/><#if disabled> disabled</#if>/>
+		<#if !disabled && name?has_content><input type="hidden" name="__multiselect_${name?html}"/></#if>
 </#macro>
 
 <#macro radioDictionary dictionaryName name="" value="" disabled=false dynamicAttributes...>
