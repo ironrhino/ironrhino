@@ -851,6 +851,10 @@ $.fieldValue = function(el, successful) {
 	if (successful === undefined) {
 		successful = true;
 	}
+	
+	if (t == 'submit' && $(el).hasClass('clicked')) {
+		return $(el).val();
+	}
 
 	if (successful && (!n || el.disabled || t == 'reset' || t == 'button' ||
 		(t == 'checkbox' || t == 'radio') && !el.checked ||
