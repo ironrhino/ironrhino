@@ -57,10 +57,10 @@ $(function(){
 <@s.form id="form" action="${actionBaseUrl}" method="post" class="form-horizontal ajax focus form-inline">
 	<div class="row-fluid">
 	<div class="span8">
-	<@s.textarea label="expression" name="expression" class="required input-xxlarge" style="height:100px;"/>
+	<@s.textarea name="expression" class="required input-xxlarge" style="height:100px;"/>
 	</div>
 	<div class="span4">
-	<@s.select label="scope" name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/>
+	<@s.select name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/>
 	</div>
 	</div>
 	<@s.submit value=getText('submit') class="btn-primary"/>

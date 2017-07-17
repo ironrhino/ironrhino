@@ -102,7 +102,7 @@ $(function(){
 	<@s.hidden name="sql"/>
 	<#else>
 	<#assign readonly=(view=='brief')&&sql?has_content>
-	<@s.textarea label="sql" name="sql" class="required span8 sqleditor codeblock" readonly=readonly placeholder="select username,name,email from user where username=:username">
+	<@s.textarea name="sql" class="required span8 sqleditor codeblock" readonly=readonly placeholder="select username,name,email from user where username=:username">
 	<#if !readonly && tables?? && tables?size gt 0>
 	<@s.param name="after">
 	<div style="display:inline-block;vertical-align:top;margin-left:20px;">
