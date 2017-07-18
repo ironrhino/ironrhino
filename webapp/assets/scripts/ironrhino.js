@@ -34815,8 +34815,11 @@ Observation.checkavailable = function(container) {
 				$(':input', options.target).each(function(i, v) {
 					if (this.name
 							&& !(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
-									&& !this.checked))
-						formData.append(this.name, fieldValue(this));
+									&& !this.checked)) {
+						var value = fieldValue(this);
+						if (value != null)
+							formData.append(this.name, value);
+					}
 				});
 			} else if (options.data)
 				$.each(options.data, function(k, v) {
@@ -34854,6 +34857,9 @@ Observation.checkavailable = function(container) {
 							if (this.name
 									&& !(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
 											&& !this.checked)) {
+								var value = fieldValue(this);
+								if (value == null)
+									return;
 								var bb = new BlobBuilder();
 								bb.append('--');
 								bb.append(boundary);
@@ -34862,7 +34868,7 @@ Observation.checkavailable = function(container) {
 										.append('Content-Disposition: form-data; name="');
 								bb.append(this.name);
 								bb.append('" ');
-								bb.append(fieldValue(this));
+								bb.append(value);
 								bb.append('\r\n');
 								body.append(bb.getBlob());
 							}
@@ -34941,6 +34947,8 @@ Observation.checkavailable = function(container) {
 	}
 
 	function fieldValue(el) {
+		if ($(el).is(':submit:not(.clicked)'))
+			return null;
 		return typeof $.fieldValue != 'undefined' ? $.fieldValue(el) : $(el)
 				.val();
 	}
