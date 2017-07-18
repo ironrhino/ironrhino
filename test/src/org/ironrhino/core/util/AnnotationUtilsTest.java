@@ -79,15 +79,15 @@ public class AnnotationUtilsTest {
 		public void setAttributes(Map<String, String> attributes) {
 			this.attributes = attributes;
 		}
-		
+
 		@PrePersist
-		private void validate(){
-			
+		private void validate() {
+
 		}
-		
+
 		@PreUpdate
-		private void validateUpdate(){
-			
+		private void validateUpdate() {
+
 		}
 
 	}
@@ -117,45 +117,64 @@ public class AnnotationUtilsTest {
 		public void setPassword(String password) {
 			this.password = password;
 		}
-		
+
 		@PrePersist
-		public void validate1(){
-			
+		public void validate1() {
+
 		}
-		
+
 		@PrePersist
-		protected void validate2(){
-			
+		protected void validate2() {
+
 		}
-		
+
 		@PrePersist
-		private void validate3(){
-			
+		private void validate3() {
+
 		}
 
 	}
 
 	@Test
 	public void testGetAnnotatedMethod() {
+		for (int i = 0; i < 100; i++)
+			doTestGetAnnotatedMethod();
+	}
+
+	private void doTestGetAnnotatedMethod() {
 		assertEquals("validateUpdate", AnnotationUtils.getAnnotatedMethod(User.class, PreUpdate.class).getName());
 		assertNull(AnnotationUtils.getAnnotatedMethod(User.class, Trigger.class));
 	}
 
 	@Test
 	public void testGetAnnotatedMethods() {
-		assertEquals(4,
-				AnnotationUtils.getAnnotatedMethods(User.class, PrePersist.class).size());
+		for (int i = 0; i < 100; i++)
+			doTestGetAnnotatedMethods();
+	}
+
+	public void doTestGetAnnotatedMethods() {
+		assertEquals(4, AnnotationUtils.getAnnotatedMethods(User.class, PrePersist.class).size());
 		assertTrue(AnnotationUtils.getAnnotatedMethods(User.class, Trigger.class).isEmpty());
 	}
 
 	@Test
 	public void testGetAnnotatedPropertyNames() {
+		for (int i = 0; i < 100; i++)
+			doTestGetAnnotatedPropertyNames();
+	}
+
+	public void doTestGetAnnotatedPropertyNames() {
 		assertEquals(4, AnnotationUtils.getAnnotatedPropertyNames(User.class, UiConfig.class).size());
 		assertTrue(AnnotationUtils.getAnnotatedMethods(User.class, Trigger.class).isEmpty());
 	}
 
 	@Test
 	public void testGetAnnotatedPropertyNameAndValues() {
+		for (int i = 0; i < 100; i++)
+			doTestGetAnnotatedPropertyNameAndValues();
+	}
+
+	public void doTestGetAnnotatedPropertyNameAndValues() {
 		User user = new User();
 		user.setUsername("username");
 		Map<String, Object> map = AnnotationUtils.getAnnotatedPropertyNameAndValues(user, UiConfig.class);
@@ -166,17 +185,17 @@ public class AnnotationUtilsTest {
 
 	@Test
 	public void testGetAnnotatedPropertyNameAndAnnnotations() {
+		for (int i = 0; i < 100; i++)
+			doTestGetAnnotatedPropertyNameAndAnnnotations();
+	}
+
+	public void doTestGetAnnotatedPropertyNameAndAnnnotations() {
 		Map<String, UiConfig> map = AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(User.class, UiConfig.class);
 		assertEquals(4, map.size());
 		assertTrue(map.get("attributes").hidden());
 		assertTrue(AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(User.class, Trigger.class).isEmpty());
 	}
 
-	@Test
-	public void testGetAnnotation() {
-		assertTrue(AnnotationUtils.getAnnotation(User.class, UiConfig.class, "getNames").hidden());
-	}
-	
 	@Test
 	public void testGetAnnotationsByType() throws IOException {
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
@@ -185,8 +204,8 @@ public class AnnotationUtilsTest {
 				.getResource("org/ironrhino/core/spring/configuration/RedisConfiguration.class");
 		MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
 		AnnotatedTypeMetadata metadata = metadataReader.getAnnotationMetadata();
-		assertEquals(1,AnnotationUtils.getAnnotationsByType(metadata, ClassPresentConditional.class).length);
-		assertEquals(0,AnnotationUtils.getAnnotationsByType(metadata, UiConfig.class).length);
+		assertEquals(1, AnnotationUtils.getAnnotationsByType(metadata, ClassPresentConditional.class).length);
+		assertEquals(0, AnnotationUtils.getAnnotationsByType(metadata, UiConfig.class).length);
 	}
 
 }

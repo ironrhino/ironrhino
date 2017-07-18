@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.Order;
@@ -29,7 +27,10 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 @SuppressWarnings("unchecked")
 public class AnnotationUtils {
 
-	private static Map<String, Object> cache = new ConcurrentHashMap<String, Object>(256);
+	private static Map<String, Set<Method>> annotatedMethodsCache = new ConcurrentHashMap<>(64);
+	private static Map<String, Set<String>> annotatedPropertyNamesCache = new ConcurrentHashMap<>(64);
+	private static Map<String, Map<String, ? extends Annotation>> annotatedPropertyNameAndAnnotationsCache = new ConcurrentHashMap<>(
+			64);
 
 	private static ValueThenKeyComparator<Method, Integer> comparator = new ValueThenKeyComparator<Method, Integer>() {
 		@Override
@@ -49,12 +50,11 @@ public class AnnotationUtils {
 	public static Set<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
 		clazz = ReflectionUtils.getActualClass(clazz);
 		StringBuilder sb = new StringBuilder();
-		sb.append("getAnnotatedMethods:");
 		sb.append(clazz.getName());
 		sb.append(',');
 		sb.append(annotaionClass.getName());
 		String key = sb.toString();
-		Set<Method> methods = (Set<Method>) cache.get(key);
+		Set<Method> methods = annotatedMethodsCache.get(key);
 		if (methods == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			final Map<Method, Integer> map = new HashMap<Method, Integer>();
 			try {
@@ -91,7 +91,7 @@ public class AnnotationUtils {
 			for (Map.Entry<Method, Integer> entry : list)
 				methods.add(entry.getKey());
 			methods = Collections.unmodifiableSet(methods);
-			cache.put(key, methods);
+			annotatedMethodsCache.put(key, methods);
 		}
 		return methods;
 	}
@@ -99,12 +99,11 @@ public class AnnotationUtils {
 	public static Set<String> getAnnotatedPropertyNames(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
 		clazz = ReflectionUtils.getActualClass(clazz);
 		StringBuilder sb = new StringBuilder();
-		sb.append("getAnnotatedPropertyNames:");
 		sb.append(clazz.getName());
 		sb.append(',');
 		sb.append(annotaionClass.getName());
 		String key = sb.toString();
-		Set<String> set = (Set<String>) cache.get(key);
+		Set<String> set = annotatedPropertyNamesCache.get(key);
 		if (set == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			set = new HashSet<>();
 			try {
@@ -122,7 +121,7 @@ public class AnnotationUtils {
 				e.printStackTrace();
 			}
 			set = Collections.unmodifiableSet(set);
-			cache.put(key, set);
+			annotatedPropertyNamesCache.put(key, set);
 		}
 		return set;
 	}
@@ -151,12 +150,11 @@ public class AnnotationUtils {
 			Class<T> annotaionClass) {
 		clazz = ReflectionUtils.getActualClass(clazz);
 		StringBuilder sb = new StringBuilder();
-		sb.append("getAnnotatedPropertyNameAndAnnotations:");
 		sb.append(clazz.getName());
 		sb.append(',');
 		sb.append(annotaionClass.getName());
 		String key = sb.toString();
-		Map<String, T> map = (Map<String, T>) cache.get(key);
+		Map<String, T> map = (Map<String, T>) annotatedPropertyNameAndAnnotationsCache.get(key);
 		if (map == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			map = new HashMap<String, T>();
 			try {
@@ -174,38 +172,9 @@ public class AnnotationUtils {
 				e.printStackTrace();
 			}
 			map = Collections.unmodifiableMap(map);
-			cache.put(key, map);
+			annotatedPropertyNameAndAnnotationsCache.put(key, map);
 		}
 		return map;
-	}
-
-	public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationClass, String methodName,
-			Class<?>... paramTypes) {
-		clazz = ReflectionUtils.getActualClass(clazz);
-		StringBuilder sb = new StringBuilder();
-		sb.append("getAnnotation:");
-		sb.append(clazz.getName());
-		sb.append(',');
-		sb.append(annotationClass.getName());
-		sb.append(',');
-		sb.append(methodName);
-		if (paramTypes.length > 0) {
-			sb.append('(');
-			sb.append(StringUtils.join(paramTypes, ","));
-			sb.append(')');
-		}
-		String key = sb.toString();
-		Object annotation = cache.get(key);
-		if (annotation == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
-			Method method = org.springframework.beans.BeanUtils.findMethod(clazz, methodName, paramTypes);
-			annotation = method != null ? method.getAnnotation(annotationClass) : null;
-			if (annotation == null)
-				annotation = NullObject.get();
-			cache.put(key, annotation);
-		}
-		if (annotation instanceof Annotation)
-			return (T) annotation;
-		return null;
 	}
 
 	public static <T extends Annotation> T getAnnotation(AnnotatedTypeMetadata metadata, Class<T> annotationClass) {

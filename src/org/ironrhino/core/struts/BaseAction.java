@@ -2,6 +2,7 @@ package org.ironrhino.core.struts;
 
 import java.io.BufferedReader;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -20,10 +21,10 @@ import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizerManager;
-import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.RequestUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -436,8 +437,9 @@ public class BaseAction extends ActionSupport {
 	}
 
 	protected <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-		return AnnotationUtils.getAnnotation(getClass(), annotationClass,
+		Method method = BeanUtils.findMethod(getClass(),
 				ActionContext.getContext().getActionInvocation().getProxy().getMethod());
+		return method != null ? method.getAnnotation(annotationClass) : null;
 	}
 
 	protected Authorize findAuthorize() {
