@@ -61,8 +61,7 @@
 			var callback = options.callback;
 			if (type == 'confirm') {
 				var title = title || MessageBundle.get('select');
-				var message = message || btn.data('confirm')
-						|| MessageBundle.get('confirm.action');
+				var message = message || MessageBundle.get('confirm.action');
 			} else if (type == 'success') {
 				if (!options.timer)
 					options.timer = 2000;

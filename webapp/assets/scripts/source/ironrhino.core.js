@@ -2066,6 +2066,7 @@ Observation.common = function(container) {
 						if (confirm && VERBOSE_MODE != 'LOW') {
 							$.alerts.show({
 										type : 'confirm',
+										message : btn.data('confirm'),
 										callback : function(b) {
 											if (b) {
 												func();

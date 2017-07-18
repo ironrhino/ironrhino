@@ -18589,8 +18589,7 @@ function log() {
 			var callback = options.callback;
 			if (type == 'confirm') {
 				var title = title || MessageBundle.get('select');
-				var message = message || btn.data('confirm')
-						|| MessageBundle.get('confirm.action');
+				var message = message || MessageBundle.get('confirm.action');
 			} else if (type == 'success') {
 				if (!options.timer)
 					options.timer = 2000;
@@ -34273,6 +34272,7 @@ Observation.common = function(container) {
 						if (confirm && VERBOSE_MODE != 'LOW') {
 							$.alerts.show({
 										type : 'confirm',
+										message : btn.data('confirm'),
 										callback : function(b) {
 											if (b) {
 												func();
