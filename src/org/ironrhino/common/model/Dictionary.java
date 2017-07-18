@@ -1,6 +1,7 @@
 package org.ironrhino.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -93,7 +94,7 @@ public class Dictionary extends BaseRecordableEntity {
 		for (LabelValue lv : items)
 			if (StringUtils.isNotBlank(lv.getValue()))
 				map.put(lv.getValue(), StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel() : lv.getValue());
-		return map;
+		return Collections.unmodifiableMap(map);
 	}
 
 	@UiConfig(hidden = true)
@@ -118,7 +119,7 @@ public class Dictionary extends BaseRecordableEntity {
 				temp.put(lv.getValue(), StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel() : lv.getValue());
 			}
 		}
-		return map;
+		return Collections.unmodifiableMap(map);
 	}
 
 	@UiConfig(hidden = true)

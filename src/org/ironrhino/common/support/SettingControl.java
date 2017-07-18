@@ -140,7 +140,7 @@ public class SettingControl {
 				list.add(s);
 		}
 		Collections.sort(list, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
-		return list;
+		return Collections.unmodifiableList(list);
 	}
 
 	public String getStringValue(String key) {
