@@ -1,303 +1,38 @@
 (function($) {
 	$.ajaxupload = function(files, options) {
-		if (!files.length) {
-			options = files;
-			files = null;
-			if (!options)
-				return false;
-			if (options.target && options.target.tagName == 'FORM') {
-				options.name = [];
-				files = [];
-				$('input[type="file"]', options.target).each(function() {
-							if (!this.name)
-								return;
-							var fs = this.files;
-							if (fs && fs.length > 0)
-								for (var i = 0; i < fs.length; i++) {
-									options.name.push(this.name);
-									files.push(fs[i]);
-								}
-						});
+		var options = options || {};
+		var formdata;
+		var data = options.data;
+		if (data) {
+			if (data.constructor === FormData) {
+				// for $.fn.ajaxsubmit
+				formdata = data;
 			} else {
-				return false;
+				formdata = new FormData();
+				for (var key in data)
+					formdata.append(key, data[key]);
 			}
-		}
-		var _options = {
-			name : 'file'
-		};
-		options = options || {};
-		$.extend(_options, options);
-		options = _options;
-		if (typeof options.beforeSerialize == 'function') {
-			if (options.beforeSerialize() === false)
-				return false;
-		}
-		if (!(options.name instanceof Array)) {
-			var arr = [];
-			for (var i = 0; i < files.length; i++)
-				arr[i] = options.name;
-			options.name = arr;
-		}
-
-		var progress;
-		if (options.progress)
-			progress = $(options.progress);
-		if (progress && !progress.length)
-			progress = null;
-
-		var xhr = new XMLHttpRequest();
-		var url = options.url;
-		if (!url)
-			if (options.target && options.target.tagName == 'FORM') {
-				url = options.target.action;
-				var formaction = $(options.target).find('.clicked:submit')
-						.attr('formaction');
-				if (formaction)
-					url = formaction;
-			} else
-				url = document.location.href;
-		xhr.open('POST', url);
-		if (!files.length)
-			Indicator.show();
-		var headers = options.headers || {};
-		if (!headers["X-Requested-With"])
-			headers['X-Requested-With'] = 'XMLHttpRequest';
-		for (var k in headers)
-			xhr.setRequestHeader(k, headers[k]);
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4) {
-				if (xhr.status == 200 || xhr.status == 304) {
-					if (!files.length)
-						Indicator.hide();
-					if (options.target && options.target.tagName == 'FORM')
-						$('input[type="file"]', options.target).val('');
-					var data = xhr.responseText;
-					if (data.indexOf('[') == 0 || data.indexOf('{') == 0)
-						data = $.parseJSON(data);
-					if (typeof options['success'] != 'undefined')
-						options['success'](data, xhr.statusText, xhr);
-					if (!options.beforeSerialize)
-						Ajax.handleResponse(data, options, xhr);
-				} else if (xhr.status == 0) {
-					progress ? progress.remove() : ProgressBar.hide();
-					Indicator.showError(MessageBundle.get('file.too.large'));
-				} else {
-					if (!files.length)
-						Indicator.showError();
-				}
-				if (typeof options['complete'] != 'undefined')
-					options['complete'](xhr);
-			}
-		}
-
-		xhr.onload = function() {
-			progress ? progress.val(100).html(100).remove() : ProgressBar
-					.hide();
-		};
-		if ("upload" in xhr) {
-			xhr.upload.onprogress = function(evt) {
-				if (evt.lengthComputable) {
-					var complete = evt.loaded / evt.total;
-					progress ? progress.val(complete).html(complete * 100)
-							.show() : ProgressBar.show(complete);
-				}
-			}
-		}
-
-		if (typeof options.data == 'string') {
-			var arr = options.data.split('&');
-			options.data = {};
-			for (var i = 0; i < arr.length; i++) {
-				var arr2 = arr[i].split('=', 2);
-				options.data[arr2[0]] = arr2.length == 2
-						? decodeURIComponent(arr2[1])
-						: '';
-			}
-		}
-		if (!!window.FormData) {
-			var formData = new FormData();
-			for (var i = 0; i < files.length; i++)
-				formData.append(options.name[i], files[i]);
-			if (options.target && options.target.tagName == 'FORM') {
-				$(':input', options.target).each(function(i, v) {
-					if (this.name
-							&& !(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
-									&& !this.checked)) {
-						var value = fieldValue(this);
-						if (value != null)
-							formData.append(this.name, value);
-					}
-				});
-			} else if (options.data)
-				$.each(options.data, function(k, v) {
-							formData.append(k, v);
-						});
-			if (typeof options.beforeSubmit == 'function') {
-				if (options.beforeSubmit() === false)
-					return;
-			}
-			if (typeof options.beforeSend == 'function') {
-				if (options.beforeSend() === false)
-					return;
-			}
-			xhr.send(formData);
-			progress ? progress.val(0).html(0) : ProgressBar.show(0);
-			return true;
 		} else {
-			var boundary = 'xxxxxxxxx';
-			xhr.setRequestHeader('Content-Type',
-					'multipart/form-data, boundary=' + boundary);
-			if (!window.BlobBuilder && window.WebKitBlobBuilder)
-				window.BlobBuilder = window.WebKitBlobBuilder;
-			if (typeof FileReader != 'undefined'
-					&& typeof BlobBuilder != 'undefined') {
-				for (var i = 0; i < files.length; i++) {
-					var f = files[i];
-					var reader = new FileReader();
-					reader.sourceFile = f;
-					reader.name = options.name[i];
-					var completed = 0;
-					var boundary = 'xxxxxxxxx';
-					var body = new BlobBuilder();
-					if (options.target && options.target.tagName == 'FORM') {
-						$(':input', options.target).each(function(i, v) {
-							if (this.name
-									&& !(this.disabled || 'file' == this.type || ('checkbox' == this.type || 'radio' == this.type)
-											&& !this.checked)) {
-								var value = fieldValue(this);
-								if (value == null)
-									return;
-								var bb = new BlobBuilder();
-								bb.append('--');
-								bb.append(boundary);
-								bb.append('\r\n');
-								bb
-										.append('Content-Disposition: form-data; name="');
-								bb.append(this.name);
-								bb.append('" ');
-								bb.append(value);
-								bb.append('\r\n');
-								body.append(bb.getBlob());
-							}
-						});
-					} else if (options.data) {
-						$.each(options.data, function(k, v) {
-							var bb = new BlobBuilder();
-							bb.append('--');
-							bb.append(boundary);
-							bb.append('\r\n');
-							bb.append('Content-Disposition: form-data; name="');
-							bb.append(k);
-							bb.append('" ');
-							bb.append(v);
-							bb.append('\r\n');
-							body.append(bb.getBlob());
-						});
-					}
-					reader.onload = function(evt) {
-						var f = evt.target.sourceFile;
-						var bb = new BlobBuilder();
-						bb.append('--');
-						bb.append(boundary);
-						bb.append('\r\n');
-						bb.append('Content-Disposition: form-data; name=');
-						bb.append(reader.name);
-						bb.append('; filename=');
-						bb.append(f.name);
-						bb.append('\r\n');
-						bb.append('Content-Type: ');
-						bb.append(f.type);
-						bb.append('\r\n\r\n');
-						bb.append(evt.target.result);
-						bb.append('\r\n');
-						body.append(bb.getBlob());
-						completed++;
-						if (completed == files.length) {
-							body.append('--');
-							body.append(boundary);
-							body.append('--');
-							if (typeof options.beforeSubmit == 'function') {
-								if (options.beforeSubmit() === false)
-									return;
-							}
-							if (typeof options.beforeSend == 'function') {
-								if (options.beforeSend() === false)
-									return;
-							}
-							xhr.send(body.getBlob());
-						}
-					};
-					reader.readAsArrayBuffer(f);
-				}
-				return true;
-			}
-			body = compose(files, options, boundary);
-			if (body) {
-				if (typeof options.beforeSubmit == 'function') {
-					if (options.beforeSubmit() === false)
-						return;
-				}
-				if (typeof options.beforeSend == 'function') {
-					if (options.beforeSend() === false)
-						return;
-				}
-				if (xhr.sendAsBinary)
-					xhr.sendAsBinary(body);
-				else
-					xhr.send(body);
-				return true;
-			} else {
-				xhr.abort();
-			}
-			return true;
+			formdata = new FormData();
 		}
-	}
-
-	function fieldValue(el) {
-		if ($(el).is(':submit:not(.clicked)'))
-			return null;
-		return typeof $.fieldValue != 'undefined' ? $.fieldValue(el) : $(el)
-				.val();
-	}
-
-	function compose(files, options, boundary) {
-		var name = options.name;
-		if (typeof FileReaderSync != 'undefined') {
-			var bb = new BlobBuilder();
-			var frs = new FileReaderSync();
-			for (var i = 0; i < files.length; i++) {
-				bb.append('--');
-				bb.append(boundary);
-				bb.append('\r\n');
-				bb.append('Content-Disposition: form-data; name=');
-				bb.append(name[i]);
-				bb.append('; filename=');
-				bb.append(files[i].name);
-				bb.append('\r\n');
-				bb.append('Content-Type: ');
-				bb.append(files[i].type);
-				bb.append('\r\n\r\n');
-				bb.append(frs.readAsArrayBuffer(files[i]));
-				bb.append('\r\n');
-			}
-			bb.append('--');
-			bb.append(boundary);
-			bb.append('--');
-			return bb.getBlob();
-		} else if (files[0].getAsBinary) {
-			var body = '';
-			for (var i = 0; i < files.length; i++) {
-				body += '--' + boundary + '\r\n';
-				body += 'Content-Disposition: form-data; name=' + name
-						+ '; filename=' + files[i].name + '\r\n';
-				body += 'Content-Type: ' + files[i].type + '\r\n\r\n';
-				body += files[i].getAsBinary() + '\r\n';
-			}
-			body += '--' + boundary + '--';
-			return body;
+		if ($.isArray(files)) {
+			// for $.fn.ajaxsubmit
+			$.each(files, function(i, v) {
+						if (v.name && v.value)
+							formdata.append(v.name, v.value);
+						else
+							formdata.append(options.name || 'file', v);
+					});
 		} else {
-			return null;
+			for (var i = 0; i < files.length; i++)
+				formdata.append(options.name || 'file', files[i]);
 		}
+		options.data = formdata;
+		$.ajax($.extend(options, {
+					contentType : false,
+					processData : false,
+					cache : false,
+					type : 'POST'
+				}));
 	}
-
 })(jQuery);

@@ -5,7 +5,7 @@
 <title>${getText('upload')}</title>
 </head>
 <body>
-<@s.form id="upload_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="form-inline">
+<@s.form id="upload_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="ajax view form-inline">
 	<div class="row<#if fluidLayout>-fluid</#if>">
 	<#list 1..(Parameters.size!'4')?number as index>
 		<div class="span3"><@s.file theme="simple" id="" name="file" multiple="true"/></div>

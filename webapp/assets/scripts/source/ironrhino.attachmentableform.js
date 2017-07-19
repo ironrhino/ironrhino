@@ -32,6 +32,7 @@
 							upload(this.files, null, t);
 							$(this).remove();
 						}).click();
+				$(this).blur();
 			});
 			t.find('button.snapshot').click(function() {
 				$.snapshot({
@@ -41,21 +42,16 @@
 										'yyyyMMddHHmmssSSS')
 										+ '.png';
 								var file;
-								if (canvas && canvas.mozGetAsFile)
-									upload([canvas.mozGetAsFile(filename)],
-											null, t);
-								else if (canvas && canvas.toBlob)
+								if (canvas && canvas.toBlob)
 									canvas.toBlob(function(blob) {
 												upload([blob], [filename], t);
 											}, 'image/png');
-								else
-									upload([dataURLtoBlob(canvas.toDataURL())],
-											[filename], t);
 							},
 							onerror : function(msg) {
 								Message.showError(msg);
 							}
 						});
+				$(this).blur();
 			});
 			var ul = t.find('ul.attachments').on('dragover', function(e) {
 						$(this).addClass('drophover');
@@ -91,10 +87,6 @@
 						url : CONTEXT_PATH + '/common/upload',
 						name : 'file',
 						data : data,
-						beforeSend : Indicator.show,
-						complete : function(xhr) {
-							Indicator.hide();
-						},
 						success : function(data) {
 							appendAttachments(form, data);
 						}

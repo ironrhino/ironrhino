@@ -1032,7 +1032,7 @@ Observation._richtable = function(container) {
 			}
 			$.ajaxupload(files, {
 						url : url,
-						onsuccess : function() {
+						success : function() {
 							f.submit();
 							setTimeout(function() {
 										f.closest('.reload-container')

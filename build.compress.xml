@@ -38,9 +38,9 @@
 				<file name="${webapp.dir}/assets/scripts/source/bootstrap.datetimepicker-zh-CN-0.0.11.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.messagebundle.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.core.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxupload.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxform.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.checkavailable.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxupload.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.snapshot.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.concatsnapshot.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.concatimage.js" />
@@ -130,10 +130,10 @@
 				<file name="${webapp.dir}/assets/scripts/source/jquery.throttle-debounce-1.1.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.messagebundle.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.core.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxupload.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxform.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.checkavailable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.tags.js" />
-				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxupload.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxpanel.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.pagination.js" />
 			</filelist>

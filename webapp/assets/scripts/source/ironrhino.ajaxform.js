@@ -44,16 +44,41 @@
 			return this;
 		}
 
-		var q = $.param(a, traditional);
-		if (options.data) {
-			// extra data
-			var qx = $.param(options.data, traditional);
-			q = (q ? (q + '&' + qx) : qx);
+		var $form = this.eq(0);
+		var fileselector = 'input[name][type="file"]:enabled';
+		var hasfile = false;
+		$form.find(fileselector).each(function() {
+					if (this.value)
+						hasfile = true;
+				});
+		if (hasfile) {
+			var formdata = new FormData();
+			for (var i = 0; i < a.length; i++)
+				formdata.append(a[i].name, a[i].value);
+			if (options.data)
+				for (var k in options.data)
+					formdata.append(k, options.data[k])
+			options.data = formdata;
+			var files = [];
+			$form.find(fileselector).each(function() {
+						var fs = this.files;
+						for (var i = 0; i < fs.length; i++)
+							files.push({
+										name : this.name,
+										value : fs[i]
+									});
+					});
+			$.ajaxupload(files, options);
+		} else {
+			var q = $.param(a, traditional);
+			if (options.data) {
+				// extra data
+				var qx = $.param(options.data, traditional);
+				q = (q ? (q + '&' + qx) : qx);
+			}
+			options.data = q;
+			$.ajax(options);
 		}
-		options.data = q; // data is the query string for 'post'
-
-		$.ajax(options);
-
 		// fire 'notify' event
 		this.trigger('form-submit-notify', [this, options]);
 		return this;
@@ -89,7 +114,7 @@
 	$.fieldValue = function(el) {
 		var n = el.name, t = el.type, tag = el.tagName.toLowerCase(), $t = $(el), $f = $t
 				.closest('form');
-		if (!n || el.disabled || t == 'reset' || t == 'button'
+		if (!n || el.disabled || t == 'reset' || t == 'button' || t == 'file'
 				|| (t == 'checkbox' || t == 'radio') && !el.checked
 				|| (t == 'submit' || t == 'image') && !$t.hasClass('clicked')
 				|| tag == 'select' && el.selectedIndex < 0) {

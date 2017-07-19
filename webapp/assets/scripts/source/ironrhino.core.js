@@ -813,11 +813,15 @@ Ajax = {
 			}
 		}
 		if ($(target).prop('tagName') == 'FORM' && !options.preflight) {
-			if (!hasError && $(target).hasClass('disposable'))
-				$(target).addClass('disposed').find(':input').prop('disabled',
-						true);
-			if (!hasError && $(target).hasClass('reset') && target.reset) {
-				target.reset();
+			if (!hasError) {
+				if ($(target).hasClass('disposable'))
+					$(target).addClass('disposed').find(':input').prop(
+							'disabled', true);
+				if ($(target).hasClass('reset') && target.reset) {
+					target.reset();
+				} else {
+					$('input[name][type="file"]:enabled', target).val('');
+				}
 			}
 		}
 		Indicator.text = '';
@@ -2027,18 +2031,7 @@ Observation.common = function(container) {
 							confirm = false;
 						}
 						var func = function() {
-							var hasfile = false;
-							form.find('input[name][type="file"]:enabled').each(
-									function() {
-										if (this.value)
-											hasfile = true;
-									});
-							if (hasfile) {
-								options.target = target;
-								$.ajaxupload(options);
-							} else {
-								form.ajaxsubmit(options);
-							}
+							form.ajaxsubmit(options);
 							btn.removeClass('clicked');
 						}
 						if (confirm && VERBOSE_MODE != 'LOW') {

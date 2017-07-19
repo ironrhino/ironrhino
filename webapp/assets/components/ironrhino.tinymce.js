@@ -161,6 +161,6 @@ function upload(files) {
 				url : CONTEXT_PATH
 						+ $('#' + tinymce.EditorManager.activeEditor.id)
 								.data('uploadurl') + '?folder=' + folder,
-				onsuccess : browse
+				success : browse
 			});
 }
