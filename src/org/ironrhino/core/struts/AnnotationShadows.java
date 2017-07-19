@@ -89,8 +89,8 @@ public class AnnotationShadows {
 			this.inputType = config.inputType();
 			this.listKey = config.listKey();
 			this.listValue = config.listValue();
-			this.required = config.required();
-			this.unique = config.unique();
+			setRequired(config.required());
+			setUnique(config.unique());
 			this.maxlength = config.maxlength();
 			this.regex = config.regex();
 			this.trim = config.trim();
@@ -111,7 +111,7 @@ public class AnnotationShadows {
 			this.dynamicAttributes = config.dynamicAttributes();
 			this.cellDynamicAttributes = config.cellDynamicAttributes();
 			this.cellEdit = config.cellEdit();
-			this.excludeIfNotEdited = config.excludeIfNotEdited();
+			setExcludeIfNotEdited(config.excludeIfNotEdited());
 			if (StringUtils.isNotBlank(config.cssClass()))
 				this.cssClasses.addAll(Arrays.asList(config.cssClass().split("\\s")));
 			this.thCssClass = config.thCssClass();
@@ -298,6 +298,10 @@ public class AnnotationShadows {
 
 		public void setRequired(boolean required) {
 			this.required = required;
+			if (this.required)
+				cssClasses.add("required");
+			else
+				cssClasses.remove("required");
 		}
 
 		public boolean isUnique() {
@@ -306,6 +310,10 @@ public class AnnotationShadows {
 
 		public void setUnique(boolean unique) {
 			this.unique = unique;
+			if (this.unique)
+				cssClasses.add("checkavailable");
+			else
+				cssClasses.remove("checkavailable");
 		}
 
 		public boolean isMultiple() {
@@ -413,12 +421,6 @@ public class AnnotationShadows {
 		}
 
 		public String getCssClass() {
-			if (required)
-				addCssClass("required");
-			if (unique)
-				addCssClass("checkavailable");
-			if (excludeIfNotEdited)
-				addCssClass("excludeIfNotEdited");
 			return StringUtils.join(cssClasses, " ");
 		}
 
@@ -508,6 +510,11 @@ public class AnnotationShadows {
 
 		public void setExcludeIfNotEdited(boolean excludeIfNotEdited) {
 			this.excludeIfNotEdited = excludeIfNotEdited;
+			if (excludeIfNotEdited) {
+				cssClasses.add("excludeIfNotEdited");
+			} else {
+				cssClasses.remove("excludeIfNotEdited");
+			}
 		}
 
 		public String getCellEdit() {

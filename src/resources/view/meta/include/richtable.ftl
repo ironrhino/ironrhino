@@ -466,7 +466,7 @@ ${formFooter!}
 		<#local id='query-'+(config.id?has_content)?then(config.id,(entityName!)+'-'+key)/>
 		<#local dynamicAttributes=mergeDynAttrs(config)/>
 		<#local disabled=parameterNamesInQueryString?seq_contains(key)>
-		<#local cssClass=config.cssClass?replace('required','')>
+		<#local cssClass=config.cssClass>
 		<#if !config.excludedFromQuery>
 		<#if config.collectionType??>
 			<@s.hidden name=key+'-op' value="CONTAINS"/>
