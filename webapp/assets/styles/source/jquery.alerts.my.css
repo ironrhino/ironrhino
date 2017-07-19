@@ -50,9 +50,14 @@
 	margin: 0em;
 }
 
-#popup-container .popup-content.info, #popup-container .popup-content.success, #popup-container .popup-content.prompt {
+#popup-container .popup-content.info, #popup-container .popup-content.prompt {
 	background-color: #d9edf7;
 	color: #3a87ad;
+}
+
+#popup-container .popup-content.success{
+	background-color: #dff0d8;
+	color: #3c763d;
 }
 
 #popup-container .popup-content.warning{
@@ -104,18 +109,42 @@
     padding: 10px 22px;
 }
 
-#popup-container .popup-panel button:focus, #popup-container .popup-panel button:hover {
-	color: #eee;
-}
 
 #popup-container .popup-ok {
     background-color: #3085d6;
+}
+
+#popup-container .popup-ok:hover {
+    background-color: #3276b1;
+}
+
+#popup-container .success .popup-ok {
+	background-color: #5cb85c;
+}
+
+#popup-container .success .popup-ok:hover {
+	background-color: #47a447;
+}
+
+#popup-container .warning .popup-ok {
+	background-color: #f0ad4e;
+}
+
+#popup-container .warning .popup-ok:hover {
+	background-color: #ed9c28;
 }
 
 #popup-container .error .popup-ok {
 	background-color: #dd3333;
 }
 
+#popup-container .error .popup-ok:hover {
+	background-color: #d2322d;
+}
+
 #popup-container .popup-cancel {
     background-color: #c0c0c0;
+}
+#popup-container .popup-cancel:hover {
+    background-color: #b0b0b0;
 }
