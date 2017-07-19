@@ -31216,6 +31216,17 @@ MessageBundle = {
 };
 var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 (function() {
+	if (!String.prototype.startsWith) {
+		String.prototype.startsWith = function(prefix, position) {
+			return this.substr(position || 0, prefix.length) === prefix;
+		};
+	}
+	if (!String.prototype.endsWith) {
+		String.prototype.endsWith = function(suffix, position) {
+			var value = position ? this.substring(0, position) : this;
+			return value.startsWith(suffix, value.length - suffix.length);
+		};
+	}
 	$$ = function(selector, container) {
 		if (!container)
 			return $(selector);
