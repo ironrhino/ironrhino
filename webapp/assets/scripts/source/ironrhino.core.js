@@ -34,45 +34,6 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 			return $ajax(options);
 		}
 
-	if (typeof $.fn.fieldValue != 'undefined') {
-		// override jquery.form.js
-		$.fn.oldFieldValue = $.fn.fieldValue;
-		$.fn.fieldValue = function(successful) {
-			if ((this.hasClass('ignore-blank') || !this
-					.hasClass('not-ignore-blank')
-					&& this.closest('form').hasClass('ignore-blank'))
-					&& !$.trim(this.val()))
-				return null;
-			var val = this.oldFieldValue(successful);
-			if (val && this.is('[type="password"]') && this.hasClass('sha')
-					&& typeof sha1 != 'undefined')
-				try {
-					val = sha1(val);
-				} catch (e) {
-					console.log(e);
-				}
-			return val;
-		}
-
-		$.oldFieldValue = $.fieldValue;
-		$.fieldValue = function(el, successful) {
-			var t = $(el);
-			if ((t.hasClass('ignore-blank') || !t.hasClass('not-ignore-blank')
-					&& t.closest('form').hasClass('ignore-blank'))
-					&& !$.trim(t.val()))
-				return null;
-			var val = $.oldFieldValue(el, successful);
-			if (val && t.is('[type="password"]') && t.hasClass('sha')
-					&& typeof sha1 != 'undefined')
-				try {
-					val = sha1(val);
-				} catch (e) {
-					console.log(e);
-				}
-			return val;
-		}
-	}
-
 	if (typeof $.rc4EncryptStr != 'undefined'
 			&& ($('meta[name="pe"]').attr('content') != 'false')) {
 		var temp = $.param;
@@ -2059,7 +2020,7 @@ Observation.common = function(container) {
 								options.target = target;
 								$.ajaxupload(options);
 							} else {
-								form.ajaxSubmit(options);
+								form.ajaxsubmit(options);
 							}
 							btn.removeClass('clicked');
 						}
