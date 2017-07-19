@@ -92,9 +92,11 @@
 ${formHeader!}
 <#nested/>
 <#if includeParameters>
-<#list Parameters as name,value>
+<#list request.parameterMap as name,values>
 <#if !parameterNamesInQueryString?seq_contains(name)&&name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
-<input type="hidden" name="${name}" value="${value}" />
+<#list values as value>
+<input type="hidden" name="${name}" value="${value}"/>
+</#list>
 </#if>
 </#list>
 </#if>
