@@ -32564,7 +32564,7 @@ Observation.common = function(container) {
 		}
 	}
 	$$('form', container).each(function() {
-				if ($('input[type="file"]', this).length)
+				if ($('input[name][type="file"]', this).length)
 					$(this).attr('enctype', 'multipart/form-data');
 				if (!$(this).hasClass('ajax'))
 					$(this).submit(function() {
@@ -33232,7 +33232,13 @@ Observation.common = function(container) {
 							confirm = false;
 						}
 						var func = function() {
-							if ('multipart/form-data' == form.attr('enctype')) {
+							var hasfile = false;
+							form.find('input[name][type="file"]:enabled').each(
+									function() {
+										if (this.value)
+											hasfile = true;
+									});
+							if (hasfile) {
 								options.target = target;
 								$.ajaxupload(options);
 							} else {
