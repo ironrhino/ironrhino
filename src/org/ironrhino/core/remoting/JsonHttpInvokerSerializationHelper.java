@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -145,6 +146,7 @@ public class JsonHttpInvokerSerializationHelper {
 			Throwable throwable;
 			try {
 				throwable = (Throwable) clz.getConstructor(String.class).newInstance(map.get("message"));
+				ExceptionUtils.trimStackTrace(throwable, 0);
 			} catch (Exception e) {
 				throw new RemoteException(e.getMessage(), e);
 			}

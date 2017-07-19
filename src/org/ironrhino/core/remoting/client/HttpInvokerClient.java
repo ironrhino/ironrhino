@@ -12,6 +12,7 @@ import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.spring.RemotingClientProxy;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
+import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
+import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -242,6 +244,28 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			}
 		}
 		throw new IllegalArgumentException("maxAttempts should large than 0");
+	}
+
+	@Override
+	protected RemoteAccessException convertHttpInvokerAccessException(Throwable ex) {
+		RemoteAccessException rae = super.convertHttpInvokerAccessException(ex);
+		if (rae.getCause() != null)
+			ExceptionUtils.trimStackTrace(rae.getCause(), 20);
+		ExceptionUtils.trimStackTrace(rae, 10);
+		return rae;
+	}
+
+	@Override
+	protected Object recreateRemoteInvocationResult(RemoteInvocationResult result) throws Throwable {
+		Throwable exception = result.getException();
+		if (exception != null) {
+			Throwable exToThrow = exception;
+			if (exToThrow instanceof InvocationTargetException)
+				exToThrow = ((InvocationTargetException) exToThrow).getTargetException();
+			ExceptionUtils.fillInClientStackTraceIfPossible(exToThrow, 20);
+			throw exToThrow;
+		}
+		return result.getValue();
 	}
 
 	@Override

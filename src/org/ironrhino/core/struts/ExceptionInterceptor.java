@@ -52,6 +52,43 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 								.addFieldError(StringUtils.uncapitalize(cv.getRootBeanClass().getSimpleName()) + "."
 										+ cv.getPropertyPath(), cv.getMessage());
 					}
+				} else if (e instanceof ValidationException) {
+					// dehydrated ConstraintViolationException for remoting service
+					boolean parsed = false;
+					String message = e.getMessage();
+					int i = message.indexOf("List of constraint violations:[");
+					if (i > 0) {
+						message = message.substring(message.lastIndexOf('[') + 2, message.lastIndexOf(']'));
+						for (String violation : message.split("\n")) {
+							if (violation.contains("ConstraintViolationImpl{")) {
+								int index = violation.indexOf("interpolatedMessage='");
+								if (index > 0) {
+									index += 21;
+									String interpolatedMessage = violation.substring(index,
+											violation.indexOf("'", index + 1));
+									index = violation.indexOf("propertyPath=");
+									if (index > 0) {
+										index += 13;
+										String propertyPath = violation.substring(index,
+												violation.indexOf(",", index + 1));
+										index = violation.indexOf("rootBeanClass=class ");
+										if (index > 0) {
+											index += 20;
+											String rootBeanClass = violation.substring(index,
+													violation.indexOf(",", index + 1));
+											validationAwareAction.addFieldError(StringUtils.uncapitalize(
+													rootBeanClass.substring(rootBeanClass.lastIndexOf('.') + 1)) + "."
+													+ propertyPath, interpolatedMessage);
+											parsed = true;
+										}
+									}
+								}
+							}
+						}
+					}
+					if (!parsed) {
+						validationAwareAction.addActionError(message);
+					}
 				} else if (e instanceof OptimisticLockingFailureException
 						|| cause instanceof OptimisticLockingFailureException) {
 					validationAwareAction.addActionError(findText("try.again.later", null));

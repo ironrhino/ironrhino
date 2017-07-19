@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +13,8 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.RemotingContext;
@@ -21,6 +22,7 @@ import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -182,7 +184,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			RemoteInvocation invocation, RemoteInvocationResult result) throws IOException {
 		if (result.hasInvocationTargetException()) {
 			try {
-				trimStackTraceElements(((InvocationTargetException) result.getException()).getTargetException(), 5);
+				InvocationTargetException ite = (InvocationTargetException) result.getException();
+				ReflectionUtils.setFieldValue(ite, "target", translateAndTrim(ite.getTargetException(), 10));
 			} catch (Exception ex) {
 			}
 		}
@@ -196,12 +199,14 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		}
 	}
 
-	private static void trimStackTraceElements(Throwable throwable, int maxStackTraceElements) {
-		StackTraceElement[] elements = ReflectionUtils.getFieldValue(throwable, "stackTrace");
-		if (elements.length > maxStackTraceElements) {
-			System.out.println(elements.length);
-			ReflectionUtils.setFieldValue(throwable, "stackTrace",
-					Arrays.copyOfRange(elements, 0, maxStackTraceElements));
+	protected Throwable translateAndTrim(Throwable throwable, int maxStackTraceElements) {
+		if (throwable instanceof ConstraintViolationException) {
+			ValidationException ve = new ValidationException(throwable.getMessage());
+			ve.setStackTrace(throwable.getStackTrace());
+			throwable = ve;
 		}
+		ExceptionUtils.trimStackTrace(throwable, maxStackTraceElements);
+		return throwable;
 	}
+
 }
