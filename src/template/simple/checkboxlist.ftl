@@ -29,8 +29,6 @@
 	<#include "/${parameters.templateDir}/${parameters.expandTheme}/dynamic-attributes.ftl" />
 />${itemValue?html}</label>
 </@s.iterator>
-    <#else>
-    &nbsp;
 </#if>
 <#if !(parameters.disabled!false) && parameters.name?has_content>
 <input type="hidden" name="__multiselect_${parameters.name?html}"/>
