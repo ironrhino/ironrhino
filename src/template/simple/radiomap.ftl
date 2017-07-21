@@ -10,12 +10,12 @@
     <#else>
         <#assign itemValue = stack.findString('top')/>
     </#if>
-<label for="${parameters.id?html}${itemKeyStr?html}" class="radio inline"><#rt/>    
+<label for="${parameters.id?html}-${itemKeyStr?html}" class="radio inline"><#rt/>    
 <input type="radio"<#rt/>
 <#if parameters.name?has_content>
  name="${parameters.name?html}"<#rt/>
 </#if>
- id="${parameters.id?html}${itemKeyStr?html}"<#rt/>
+ id="${parameters.id?html}-${itemKeyStr?html}"<#rt/>
 <#if tag.contains(parameters.nameValue!'', itemKeyStr) || tag.contains(parameters.nameValue!'', itemValue)>
  checked="checked"<#rt/>
 </#if>

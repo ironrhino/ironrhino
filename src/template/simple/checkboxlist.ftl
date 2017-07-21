@@ -13,9 +13,9 @@
             <#assign itemValue = stack.findString('top')/>
     </#if>
     <#assign itemKeyStr=itemKey.toString() />
-    <label for="${parameters.name?html}-${itemCount}" class="checkbox inline"><#rt/>
-<input type="checkbox" name="${parameters.name?html}" value="${itemKeyStr?html}"<#rt/>
-       id="${parameters.name?html}-${itemCount}"<#rt/>
+    <label for="${parameters.id?html}-${itemCount}" class="checkbox inline"><#rt/>
+<input type="checkbox" name="${parameters.id?html}" value="${itemKeyStr?html}"<#rt/>
+       id="${parameters.id?html}-${itemCount}"<#rt/>
     <#if tag.contains(parameters.nameValue, itemKey) || tag.contains(parameters.nameValue, itemValue)>
        checked="checked"<#rt/>
     </#if>
