@@ -24,8 +24,8 @@ public class RedisLockService implements LockService {
 
 	private static final String NAMESPACE = "lock:";
 
-	@Value("${lockService.maxHoldTime:300}")
-	private int maxHoldTime = 300;
+	@Value("${lockService.maxHoldTime:3600}")
+	private int maxHoldTime = 3600;
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
