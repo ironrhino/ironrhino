@@ -9252,7 +9252,6 @@ img.captcha {
 input[type="checkbox"].custom + label.custom {
 	background-color: #fafafa;
 	border: 1px solid #cacece;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05);
 	padding: 8px;
 	border-radius: 3px;
 	display: inline-block;
@@ -9275,15 +9274,9 @@ input[type="checkbox"].custom + label.custom:hover {
 	background-color: #eaeaea;
 }
 
-input[type="checkbox"].custom + label.custom:active , input[type="checkbox"].custom:checked + label.custom:active {
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px 1px 3px rgba(0, 0, 0, 0.1);
-}
-
 input[type="checkbox"].custom:checked + label.custom {
-	background-color: #e9ecee;
-	border: 1px solid #adb8c0;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05), inset 15px 10px -12px rgba(255, 255, 255, 0.1);
-	color: #99a1a7;
+	background-color: #3b99fc;
+	border-color: #3b99fc;
 }
 
 input[type="checkbox"].custom:checked + label.custom:after {
@@ -9291,14 +9284,12 @@ input[type="checkbox"].custom:checked + label.custom:after {
 	position: absolute;
 	top: -2px;
 	left: 3px;
-	color: #99a1a7;
+	color: #fff;
 }
 
 input[type="radio"].custom + label.custom {
-	-webkit-appearance: none;
 	background-color: #fafafa;
 	border: 1px solid #cacece;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05);
 	padding: 9px;
 	border-radius: 50px;
 	display: inline-block;
@@ -9321,6 +9312,11 @@ input[type="radio"].custom + label.custom:hover {
 	background-color: #eaeaea;
 }
 
+input[type="radio"].custom:checked + label.custom {
+	background-color: #fff;
+	border: 1px solid #adb8c0;
+}
+
 input[type="radio"].custom:checked + label.custom:after {
 	content: ' ';
 	width: 12px;
@@ -9328,22 +9324,9 @@ input[type="radio"].custom:checked + label.custom:after {
 	border-radius: 50px;
 	position: absolute;
 	top: 3px;
-	background: #99a1a7;
-	box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3);
-	text-shadow: 0px;
+	background: #3b99fc;
 	left: 3px;
 	font-size: 32px;
-}
-
-input[type="radio"].custom:checked + label.custom {
-	background-color: #e9ecee;
-	color: #99a1a7;
-	border: 1px solid #adb8c0;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05), inset 15px 10px -12px rgba(255, 255, 255, 0.1), inset 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-input[type="radio"].custom + label.custom:active , input[type="radio"].custom:checked + label.custom:active {
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .controls > label.custom {
