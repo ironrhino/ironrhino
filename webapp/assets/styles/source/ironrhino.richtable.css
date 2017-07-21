@@ -11,12 +11,8 @@
 }
 
 table.richtable thead {
-	background: #DEDEDE;
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EFEFEF), to(#EFEFEF), color-stop(.5, #DEDEDE));
-	background: -moz-linear-gradient(center top, #EFEFEF, #DEDEDE, #EFEFEF);
-	background: -o-linear-gradient(top, #EFEFEF, #DEDEDE, #EFEFEF);
-	background: -ms-linear-gradient(top, #EFEFEF, #DEDEDE, #EFEFEF);
-	background: linear-gradient(to bottom, #EFEFEF, #DEDEDE, #EFEFEF);
+	background-color: #efefef;
+	background-image: linear-gradient(to bottom, #efefef, #dedede, #efefef);
 }
 
 table.richtable td , table.richtable th {

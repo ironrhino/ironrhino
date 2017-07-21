@@ -34,9 +34,8 @@
 	text-align: center;
 	line-height: 1.75em;
 	color: #666;
-	background: #CCCCCC;
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#CCCCCC), to(#CCCCCC), color-stop(.5,#A7A7A7));
-	background: -moz-linear-gradient(center top , #CCCCCC, #A7A7A7, #CCCCCC);
+	background: #ccc;
+	background-image: linear-gradient(to bottom, #ccc, #a7a7a7, #ccc);
 	border: solid 1px #FFF;
 	border-bottom: solid 1px #999;
 	cursor: default;

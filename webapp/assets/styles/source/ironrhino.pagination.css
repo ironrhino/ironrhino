@@ -61,8 +61,6 @@
 }
 
 .toolbar .pagination ul {
-	-webkit-box-shadow: none;
-	-moz-box-shadow: none;
 	box-shadow: none;
 }
 
@@ -87,8 +85,6 @@
 
 .toolbar .pagination .pageSize {
 	border: 1px solid #ddd;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
 	border-radius: 3px;
 	width: 60px;
 	height: 30px;
@@ -107,8 +103,6 @@
 .toolbar input[name="keyword"] {
 	margin: 0;
 	width: 100px;
-	-moz-transition: width .2s ease-in .5s;
-	-webkit-transition: width .2s ease-in .5s;
 	transition: width .2s ease-in .5s;
 }
 
@@ -117,11 +111,7 @@
 }
 
 .toolbar.pagination ul {
-	-webkit-border-radius: 0;
-	-moz-border-radius: 0;
 	border-radius: 0;
-	-webkit-box-shadow: none;
-	-moz-box-shadow: none;
 	box-shadow: none;
 }
 
@@ -136,14 +126,10 @@
 }
 
 .toolbar .pagination li.firstPage a {
-	-webkit-border-radius: 3px 0 0 3px;
-	-moz-border-radius: 3px 0 0 3px;
 	border-radius: 3px 0 0 3px;
 }
 
 .toolbar .pagination li.lastPage a {
-	-webkit-border-radius: 0 3px 3px 0;
-	-moz-border-radius: 0 3px 3px 0;
 	border-radius: 0 3px 3px 0;
 }
 
