@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -35,8 +36,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import com.google.common.base.Objects;
 
 @Aspect
 @Component
@@ -137,7 +136,7 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 							oldValue = ((Persistable<?>) oldValue).getId();
 						if (newValue instanceof Persistable)
 							newValue = ((Persistable<?>) newValue).getId();
-						if (Objects.equal(oldValue, newValue))
+						if (Objects.equals(oldValue, newValue))
 							continue;
 						if (oldValue instanceof Collection && ((Collection<?>) oldValue).isEmpty() && newValue == null
 								|| newValue instanceof Collection && ((Collection<?>) newValue).isEmpty()
