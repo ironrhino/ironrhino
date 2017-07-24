@@ -35689,7 +35689,7 @@ Observation.upload = function(container) {
 					uploadFiles(e.originalEvent.dataTransfer.files);
 					return true;
 				});
-		$(document.body).on('dragover', function(e) {
+		$(document).on('dragover', function(e) {
 					return false;
 				}).on('drop', function(e) {
 			var id = e.originalEvent.dataTransfer.getData('Text');
