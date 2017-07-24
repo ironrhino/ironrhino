@@ -344,7 +344,7 @@ Richtable = {
 			}
 			if ((btn.hasClass('confirm') || action == 'delete')
 					&& VERBOSE_MODE != 'LOW') {
-				$.alerts.show({
+				$.alerts({
 							type : 'confirm',
 							message : (btn.data('confirm') || (action == 'delete'
 									? MessageBundle.get('confirm.delete')
@@ -468,7 +468,7 @@ Richtable = {
 		}
 
 		if (btn.hasClass('confirm') && VERBOSE_MODE != 'LOW') {
-			$.alerts.show({
+			$.alerts({
 						type : 'confirm',
 						message : btn.data('confirm')
 								|| MessageBundle.get('confirm.save'),

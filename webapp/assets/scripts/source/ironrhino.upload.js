@@ -7,7 +7,7 @@ Initialization.upload = function() {
 							replacement : 'files'
 						});
 			}).on('click', '#files button.mkdir', function() {
-		$.alerts.show({
+		$.alerts({
 			type : 'prompt',
 			value : 'newfolder',
 			callback : function(t) {
@@ -215,7 +215,7 @@ function deleteFiles(file) {
 		ajax(options);
 	};
 	if (VERBOSE_MODE != 'LOW') {
-		$.alerts.show({
+		$.alerts({
 					type : 'confirm',
 					message : MessageBundle.get('confirm.delete'),
 					callback : function(b) {

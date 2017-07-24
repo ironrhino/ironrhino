@@ -17536,294 +17536,6 @@ ctrlr.prototype.setObjectValue=function(data){
     })();
 
 }(jQuery));
-// jQuery Alert Dialogs Plugin
-//
-// Version 1.1
-//
-// Cory S.N. LaViska
-// A Beautiful Site (http://abeautifulsite.net/)
-// 14 May 2009
-//
-// Visit http://abeautifulsite.net/notebook/87 for more information
-//
-// Usage:
-// jAlert( message, [title, callback] )
-// jConfirm( message, [title, callback] )
-// jPrompt( message, [value, title, callback] )
-// 
-// History:
-//
-// 1.00 - Released (29 December 2008)
-//
-// 1.01 - Fixed bug where unbinding would destroy all resize events
-//
-// License:
-// 
-// This plugin is dual-licensed under the GNU General Public License and the MIT
-// License and
-// is copyright 2008 A Beautiful Site, LLC.
-//
-(function($) {
-
-	$.alerts = {
-
-		// These properties can be read/written by accessing
-		// $.alerts.propertyName from your scripts at any time
-
-		verticalOffset : -75, // vertical offset of the dialog from center
-		// screen, in pixels
-		horizontalOffset : 0, // horizontal offset of the dialog from center
-		// screen, in pixels/
-		repositionOnResize : true, // re-centers the dialog on window resize
-		overlayOpacity : .6, // transparency level of overlay
-		overlayColor : '#000', // base color of overlay
-		draggable : true, // make the dialogs draggable (requires UI
-		// Draggables plugin)
-		okButton : '&nbsp;OK&nbsp;', // text for the OK button
-		cancelButton : '&nbsp;Cancel&nbsp;', // text for the Cancel button
-
-		show : function(options) {
-			if (typeof options == 'string')
-				options = {
-					message : options
-				};
-			var _options = {
-				showConfirmButton : true
-			}
-			$.extend(_options, options);
-			options = _options;
-
-			var type = options.type || 'info';
-			var title = options.title;
-			var message = options.message;
-			var callback = options.callback;
-			if (type == 'confirm') {
-				var title = title || MessageBundle.get('select');
-				var message = message || MessageBundle.get('confirm.action');
-			} else if (type == 'success') {
-				if (!options.timer)
-					options.timer = 2000;
-				options.showConfirmButton = false;
-			}
-
-			$.alerts._hide();
-			$.alerts._overlay('show');
-
-			var popupContainer = $('<div id="popup-container"><div class="popup-content"><div class="popup-icon"></div><div class="popup-message"></div></div></div>')
-					.appendTo(document.body);
-
-			popupContainer.css({
-						position : 'fixed',
-						zIndex : 99999,
-						padding : 0,
-						margin : 0
-					});
-
-			var popupMessage = popupContainer.find(".popup-message");
-			if (title != null)
-				popupContainer.prepend('<h1 class="popup-title">' + title
-						+ '</h1>');
-			else
-				popupContainer.find(".popup-title").remove();
-			popupContainer.find(".popup-content").addClass(type);
-			popupMessage.html(message);
-
-			popupContainer.css({
-						minWidth : popupContainer.outerWidth(),
-						maxWidth : popupContainer.outerWidth()
-					});
-
-			$.alerts._reposition();
-			$.alerts._maintainPosition(true);
-			var glyphicon = 'info-sign';
-			switch (type) {
-				case 'info' :
-				case 'warning' :
-				case 'success' :
-				case 'error' :
-					if (type == 'success')
-						glyphicon = 'ok-circle';
-					else if (type == 'error')
-						glyphicon = 'remove-circle';
-					else if (type == 'warning')
-						glyphicon = 'warning-sign';
-					if (options.showConfirmButton) {
-						var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
-								+ $.alerts.okButton + '</button></div>')
-								.insertAfter(popupMessage).find(".popup-ok");
-						popupOk.click(function() {
-									$.alerts._hide();
-									if (callback)
-										callback(true);
-								}).focus();
-					}
-					if (options.timer) {
-						var timer = setTimeout(function() {
-									$.alerts._hide();
-								}, options.timer);
-						popupContainer.data('timer', timer);
-					}
-					break;
-				case 'confirm' :
-					glyphicon = 'question-sign';
-					var popupPanel = $('<div class="popup-panel"><button class="popup-ok">'
-							+ $.alerts.okButton
-							+ '</button> <button class="popup-cancel">'
-							+ $.alerts.cancelButton + '</button></div>')
-							.insertAfter(popupMessage);
-					var popupOk = popupPanel.find(".popup-ok");
-					var popupCancel = popupPanel.find(".popup-cancel");
-					popupOk.click(function() {
-								$.alerts._hide();
-								if (callback)
-									callback(true);
-							}).focus();
-					popupCancel.click(function() {
-								$.alerts._hide();
-								if (callback)
-									callback(false);
-							});
-					if (options.timer) {
-						setTimeout(function() {
-									popupOk.click();
-								}, options.timer);
-					}
-					break;
-				case 'prompt' :
-					glyphicon = 'question-sign';
-					popupMessage
-							.append('<input type="text" size="30" class="popup-prompt" />')
-							.after('<div class="popup-panel"><button class="popup-ok">'
-									+ $.alerts.okButton
-									+ '</button> <button class="popup-cancel">'
-									+ $.alerts.cancelButton + '</button></div>');
-					var popupPrompt = popupContainer.find(".popup-prompt");
-					popupPrompt.width(popupMessage.width());
-					var popupOk = popupContainer.find(".popup-ok");
-					var popupCancel = popupContainer.find(".popup-cancel");
-					popupOk.click(function() {
-								var val = popupPrompt.val();
-								$.alerts._hide();
-								if (callback)
-									callback(val);
-							});
-					popupCancel.click(function() {
-								$.alerts._hide();
-								if (callback)
-									callback(null);
-							});
-					popupPrompt.keyup(function(e) {
-								if (e.keyCode == 13)
-									popupOk.trigger('click');
-								if (e.keyCode == 27)
-									popupCancel.trigger('click');
-							});
-					if (options.value)
-						popupPrompt.val(options.value);
-					if (options.inputPlaceholder)
-						popupPrompt.attr('placeholder',
-								options.inputPlaceholder);
-					popupPrompt.focus().select();
-					if (options.timer) {
-						setTimeout(function() {
-									popupOk.click();
-								}, options.timer);
-					}
-					break;
-			}
-
-			popupContainer.find('.popup-icon')
-					.append('<span class="glyphicon glyphicon-' + glyphicon
-							+ '"></span>');
-
-			// Make draggable
-			if ($.alerts.draggable && title != null) {
-				try {
-					popupContainer.draggable({
-								handle : $(".popup-title")
-							});
-					popupContainer.find(".popup-title").css({
-								cursor : 'move'
-							});
-				} catch (e) { /* requires jQuery UI draggables */
-				}
-			}
-			return popupContainer;
-		},
-
-		_hide : function() {
-			var popupContainer = $("#popup-container");
-			if (popupContainer.length) {
-				var timer = popupContainer.data('timer');
-				if (timer)
-					clearTimeout(timer);
-				popupContainer.remove();
-				$.alerts._overlay('hide');
-				$.alerts._maintainPosition(false);
-			}
-		},
-
-		_overlay : function(status) {
-			switch (status) {
-				case 'show' :
-					$.alerts._overlay('hide');
-					$('<div id="popup-overlay"></div>').appendTo(document.body)
-							.css({
-										position : 'absolute',
-										zIndex : 99998,
-										top : '0px',
-										left : '0px',
-										width : '100%',
-										height : $(document).height(),
-										background : $.alerts.overlayColor,
-										opacity : $.alerts.overlayOpacity
-									});
-					break;
-				case 'hide' :
-					$("#popup-overlay").remove();
-					break;
-			}
-		},
-
-		_reposition : function() {
-			var top = (($(window).height() / 2) - ($("#popup-container")
-					.outerHeight() / 2))
-					+ $.alerts.verticalOffset;
-			var left = (($(window).width() / 2) - ($("#popup-container")
-					.outerWidth() / 2))
-					+ $.alerts.horizontalOffset;
-			if (top < 0)
-				top = 0;
-			if (left < 0)
-				left = 0;
-
-			// IE6 fix
-			if ($.browser.msie && parseInt($.browser.version) <= 6)
-				top = top + $(window).scrollTop();
-
-			$("#popup-container").css({
-						top : top + 'px',
-						left : left + 'px'
-					});
-			$("#popup-overlay").height($(document).height());
-		},
-
-		_maintainPosition : function(status) {
-			if ($.alerts.repositionOnResize) {
-				switch (status) {
-					case true :
-						$(window).bind('resize', $.alerts._reposition);
-						break;
-					case false :
-						$(window).unbind('resize', $.alerts._reposition);
-						break;
-				}
-			}
-		}
-
-	}
-
-})(jQuery);
 ;/**
  * jQuery TextExt Plugin
  * http://textextjs.com
@@ -31109,6 +30821,8 @@ MessageBundle = {
 		'no.selection' : 'no selection',
 		'no.modification' : 'no modification',
 		'select' : 'please select',
+		'ok' : 'OK',
+		'cancel' : 'Cancel',
 		'confirm.delete' : 'are you sure to delete?',
 		'confirm.save' : 'are you sure to save?',
 		'confirm.exit' : 'you have unsaved modification,are you sure to exit?',
@@ -31154,6 +30868,7 @@ MessageBundle = {
 		'import' : '导入',
 		'upload' : '上传',
 		'snapshot' : '拍照',
+		'ok' : '确定',
 		'cancel' : '取消',
 		'error' : '错误',
 		'success' : '操作成功',
@@ -31214,6 +30929,222 @@ MessageBundle = {
 		return lang;
 	}
 };
+;
+(function($) {
+
+	$.alerts = function(options) {
+		if (typeof options == 'string')
+			options = {
+				message : options
+			};
+		var _options = {
+			showConfirmButton : true
+		}
+		$.extend(_options, options);
+		options = _options;
+		var okButton = MessageBundle.get('ok') || 'OK';
+		var cancelButton = MessageBundle.get('cancel') || 'Cancel';
+		var type = options.type || 'info';
+		var title = options.title;
+		var message = options.message;
+		var callback = options.callback;
+		if (type == 'confirm') {
+			var title = title || MessageBundle.get('select');
+			var message = message || MessageBundle.get('confirm.action');
+		} else if (type == 'success') {
+			if (!options.timer)
+				options.timer = 2000;
+			options.showConfirmButton = false;
+		}
+
+		hide();
+		overlay('show');
+
+		var container = $('<div id="popup-container"><div class="popup-content"><div class="popup-icon"></div><div class="popup-message"></div></div></div>')
+				.appendTo(document.body);
+		var popupMessage = container.find(".popup-message");
+		if (title != null)
+			container.prepend('<h1 class="popup-title">' + title + '</h1>');
+		else
+			container.find(".popup-title").remove();
+		container.find(".popup-content").addClass(type);
+		popupMessage.html(message);
+
+		container.css({
+					minWidth : container.outerWidth(),
+					maxWidth : container.outerWidth()
+				});
+
+		reposition();
+		maintainPosition(true);
+		var glyphicon = 'info-sign';
+		switch (type) {
+			case 'info' :
+			case 'warning' :
+			case 'success' :
+			case 'error' :
+				if (type == 'success')
+					glyphicon = 'ok-circle';
+				else if (type == 'error')
+					glyphicon = 'remove-circle';
+				else if (type == 'warning')
+					glyphicon = 'warning-sign';
+				if (options.showConfirmButton) {
+					var popupOk = $('<div class="popup-panel"><button class="popup-ok">'
+							+ okButton + '</button></div>')
+							.insertAfter(popupMessage).find(".popup-ok");
+					popupOk.click(function() {
+								hide();
+								if (callback)
+									callback(true);
+							}).focus();
+				}
+				if (options.timer) {
+					var timer = setTimeout(function() {
+								hide();
+							}, options.timer);
+					container.data('timer', timer);
+				}
+				break;
+			case 'confirm' :
+				glyphicon = 'question-sign';
+				var popupPanel = $('<div class="popup-panel"><button class="popup-ok">'
+						+ okButton
+						+ '</button> <button class="popup-cancel">'
+						+ cancelButton + '</button></div>')
+						.insertAfter(popupMessage);
+				var popupOk = popupPanel.find(".popup-ok");
+				var popupCancel = popupPanel.find(".popup-cancel");
+				popupOk.click(function() {
+							hide();
+							if (callback)
+								callback(true);
+						}).focus();
+				popupCancel.click(function() {
+							hide();
+							if (callback)
+								callback(false);
+						});
+				if (options.timer) {
+					setTimeout(function() {
+								popupOk.click();
+							}, options.timer);
+				}
+				break;
+			case 'prompt' :
+				glyphicon = 'question-sign';
+				popupMessage
+						.append('<input type="text" size="30" class="popup-prompt" />')
+						.after('<div class="popup-panel"><button class="popup-ok">'
+								+ okButton
+								+ '</button> <button class="popup-cancel">'
+								+ cancelButton + '</button></div>');
+				var popupPrompt = container.find(".popup-prompt");
+				popupPrompt.width(popupMessage.width());
+				var popupOk = container.find(".popup-ok");
+				var popupCancel = container.find(".popup-cancel");
+				popupOk.click(function() {
+							var val = popupPrompt.val();
+							hide();
+							if (callback)
+								callback(val);
+						});
+				popupCancel.click(function() {
+							hide();
+							if (callback)
+								callback(null);
+						});
+				popupPrompt.keyup(function(e) {
+							if (e.keyCode == 13)
+								popupOk.trigger('click');
+							if (e.keyCode == 27)
+								popupCancel.trigger('click');
+						});
+				if (options.value)
+					popupPrompt.val(options.value);
+				if (options.inputPlaceholder)
+					popupPrompt.attr('placeholder', options.inputPlaceholder);
+				popupPrompt.focus().select();
+				if (options.timer) {
+					setTimeout(function() {
+								popupOk.click();
+							}, options.timer);
+				}
+				break;
+		}
+
+		container.find('.popup-icon')
+				.append('<span class="glyphicon glyphicon-' + glyphicon
+						+ '"></span>');
+
+		// Make draggable
+		if (title != null) {
+			try {
+				container.draggable({
+							handle : $('.popup-title')
+						});
+				container.find('.popup-title').css({
+							cursor : 'move'
+						});
+			} catch (e) { /* requires jQuery UI draggables */
+			}
+		}
+		return container;
+	}
+
+	$.alerts.show = $.alerts;
+
+	function hide() {
+		var container = $('#popup-container');
+		if (container.length) {
+			var timer = container.data('timer');
+			if (timer)
+				clearTimeout(timer);
+			container.remove();
+			overlay('hide');
+			maintainPosition(false);
+		}
+	}
+
+	function overlay(status) {
+		switch (status) {
+			case 'show' :
+				overlay('hide');
+				$('<div id="popup-overlay"></div>').appendTo(document.body);
+				break;
+			case 'hide' :
+				$('#popup-overlay').remove();
+				break;
+		}
+	}
+
+	function reposition() {
+		var container = $('#popup-container');
+		var top = (($(window).height() / 2) - (container.outerHeight() / 2))
+				- 75;
+		var left = (($(window).width() / 2) - (container.outerWidth() / 2));
+		if (top < 0)
+			top = 0;
+		if (left < 0)
+			left = 0;
+		container.css({
+					top : top + 'px',
+					left : left + 'px'
+				});
+	}
+
+	function maintainPosition(status) {
+		switch (status) {
+			case true :
+				$(window).bind('resize', reposition);
+				break;
+			case false :
+				$(window).unbind('resize', reposition);
+				break;
+		}
+	}
+
+})(jQuery);
 var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 (function() {
 	if (!String.prototype.startsWith) {
@@ -31521,7 +31452,7 @@ Message = {
 				type : type,
 				message : messages.join('\n')
 			};
-			var popup = $.alerts.show(options);
+			var popup = $.alerts(options);
 			_observe(popup);
 			if (target)
 				popup.data('target', target);
@@ -32376,8 +32307,6 @@ Initialization.common = function() {
 		}
 		return false;
 	});
-	$.alerts.okButton = MessageBundle.get('confirm');
-	$.alerts.cancelButton = MessageBundle.get('cancel');
 	Nav.init();
 	Nav.activate(document.location.href);
 	var hash = document.location.hash;
@@ -33251,7 +33180,7 @@ Observation.common = function(container) {
 							btn.removeClass('clicked');
 						}
 						if (confirm && VERBOSE_MODE != 'LOW') {
-							$.alerts.show({
+							$.alerts({
 										type : 'confirm',
 										message : btn.data('confirm'),
 										callback : function(b) {
@@ -35668,7 +35597,7 @@ Initialization.upload = function() {
 							replacement : 'files'
 						});
 			}).on('click', '#files button.mkdir', function() {
-		$.alerts.show({
+		$.alerts({
 			type : 'prompt',
 			value : 'newfolder',
 			callback : function(t) {
@@ -35876,7 +35805,7 @@ function deleteFiles(file) {
 		ajax(options);
 	};
 	if (VERBOSE_MODE != 'LOW') {
-		$.alerts.show({
+		$.alerts({
 					type : 'confirm',
 					message : MessageBundle.get('confirm.delete'),
 					callback : function(b) {
@@ -37703,7 +37632,7 @@ Richtable = {
 			}
 			if ((btn.hasClass('confirm') || action == 'delete')
 					&& VERBOSE_MODE != 'LOW') {
-				$.alerts.show({
+				$.alerts({
 							type : 'confirm',
 							message : (btn.data('confirm') || (action == 'delete'
 									? MessageBundle.get('confirm.delete')
@@ -37827,7 +37756,7 @@ Richtable = {
 		}
 
 		if (btn.hasClass('confirm') && VERBOSE_MODE != 'LOW') {
-			$.alerts.show({
+			$.alerts({
 						type : 'confirm',
 						message : btn.data('confirm')
 								|| MessageBundle.get('confirm.save'),
@@ -39991,7 +39920,7 @@ Observation.latlng = function(container) {
 						});
 			}
 			if (VERBOSE_MODE != 'LOW') {
-				$.alerts.show({
+				$.alerts({
 							type : 'confirm',
 							message : MessageBundle.get('confirm.save'),
 							callback : function(b) {

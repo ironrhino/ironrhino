@@ -305,7 +305,7 @@ Message = {
 				type : type,
 				message : messages.join('\n')
 			};
-			var popup = $.alerts.show(options);
+			var popup = $.alerts(options);
 			_observe(popup);
 			if (target)
 				popup.data('target', target);
@@ -1160,8 +1160,6 @@ Initialization.common = function() {
 		}
 		return false;
 	});
-	$.alerts.okButton = MessageBundle.get('confirm');
-	$.alerts.cancelButton = MessageBundle.get('cancel');
 	Nav.init();
 	Nav.activate(document.location.href);
 	var hash = document.location.hash;
@@ -2035,7 +2033,7 @@ Observation.common = function(container) {
 							btn.removeClass('clicked');
 						}
 						if (confirm && VERBOSE_MODE != 'LOW') {
-							$.alerts.show({
+							$.alerts({
 										type : 'confirm',
 										message : btn.data('confirm'),
 										callback : function(b) {

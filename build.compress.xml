@@ -20,7 +20,6 @@
 				<file name="${webapp.dir}/assets/scripts/source/jquery.ui-1.11.3.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.rc4-1.0.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.format-1.0.js" />
-				<file name="${webapp.dir}/assets/scripts/source/jquery.alerts-1.1.my.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.textext-1.3.1.my.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.treeview-1.4.js" />
 				<file name="${webapp.dir}/assets/scripts/source/jquery.treeview.async-0.1.my.js" />
@@ -37,6 +36,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/bootstrap.datetimepicker-0.0.11.js" />
 				<file name="${webapp.dir}/assets/scripts/source/bootstrap.datetimepicker-zh-CN-0.0.11.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.messagebundle.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.alerts.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.core.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxupload.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxform.js" />
@@ -87,7 +87,6 @@
 				<file name="${webapp.dir}/assets/styles/source/jquery.ui.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.treeview.my.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.treeTable.my.css" />
-				<file name="${webapp.dir}/assets/styles/source/jquery.alerts.my.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.textext.my.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.clickmenu.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.chosen.css" />
@@ -95,6 +94,7 @@
 				<file name="${webapp.dir}/assets/styles/source/bootstrap.css" />
 				<file name="${webapp.dir}/assets/styles/source/bootstrap.switch.css" />
 				<file name="${webapp.dir}/assets/styles/source/bootstrap.datetimepicker.css" />
+				<file name="${webapp.dir}/assets/styles/source/ironrhino.alerts.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.core.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.form.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.datagrid.css" />

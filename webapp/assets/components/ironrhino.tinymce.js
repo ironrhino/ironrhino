@@ -64,7 +64,7 @@ $(function() {
 					}, browse);
 		}
 		if (VERBOSE_MODE != 'LOW') {
-			$.alerts.show({
+			$.alerts({
 						type : 'confirm',
 						message : MessageBundle.get('confirm.delete'),
 						callback : function(b) {
