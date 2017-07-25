@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
@@ -331,30 +332,34 @@ public class BaseAction extends ActionSupport {
 	@Override
 	public void validate() {
 		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
 		if (captchaManager != null
 				&& (request.getParameter(CaptchaManager.KEY_CAPTCHA) != null
 						|| isCaptchaRequired() && !captchaStatus.isFirstReachThreshold())
 				&& !captchaManager.verify(request, request.getSession().getId(), true))
 			addFieldError(CaptchaManager.KEY_CAPTCHA, getText("captcha.error"));
 		if (csrfRequired) {
-			String value = RequestUtils.getCookieValue(ServletActionContext.getRequest(), COOKIE_NAME_CSRF);
-			RequestUtils.deleteCookie(ServletActionContext.getRequest(), ServletActionContext.getResponse(),
-					COOKIE_NAME_CSRF);
+			String value = RequestUtils.getCookieValue(request, COOKIE_NAME_CSRF);
+			RequestUtils.deleteCookie(request, response, COOKIE_NAME_CSRF);
 			if (csrf == null || !csrf.equals(value))
 				addActionError(getText("csrf.error"));
 		}
 		if (!hasErrors())
-			validateDoubleCheck();
+			validateDoubleCheck(request, response);
 		if (!hasErrors())
-			validateCurrentPassword();
+			validateCurrentPassword(request, response);
 	}
 
-	private void validateDoubleCheck() {
-		HttpServletRequest request = ServletActionContext.getRequest();
+	private void validateDoubleCheck(HttpServletRequest request, HttpServletResponse response) {
 		DoubleChecker doubleCheck = findDoubleChecker();
 		if (doubleCheck != null) {
 			String username = request.getParameter(DoubleChecker.PARAMETER_NAME_USERNAME);
 			String password = request.getParameter(DoubleChecker.PARAMETER_NAME_PASSWORD);
+			if (username == null) {
+				response.setHeader("X-Double-Check", "1");
+				addFieldError("X-" + DoubleChecker.PARAMETER_NAME_USERNAME, getText("validation.required"));
+				return;
+			}
 			if (StringUtils.isBlank(username)) {
 				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText("validation.required"));
 				return;
@@ -380,15 +385,19 @@ public class BaseAction extends ActionSupport {
 		}
 	}
 
-	private void validateCurrentPassword() {
+	private void validateCurrentPassword(HttpServletRequest request, HttpServletResponse response) {
 		CurrentPassword currentPasswordAnn = getAnnotation(CurrentPassword.class);
 		if (currentPasswordAnn == null)
 			return;
-		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpSession session = request.getSession();
 		String currentPasswordThreshold = (String) session.getAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD);
 		int threshold = StringUtils.isNumeric(currentPasswordThreshold) ? Integer.valueOf(currentPasswordThreshold) : 0;
-		String currentPassword = request.getParameter(CurrentPassword.PARAMETER_NAME_USERNAME);
+		String currentPassword = request.getParameter(CurrentPassword.PARAMETER_NAME_CURRENT_PASSWORD);
+		if (currentPassword == null) {
+			response.setHeader("X-Current-Password", "1");
+			addFieldError("X-" + CurrentPassword.PARAMETER_NAME_CURRENT_PASSWORD, getText("validation.required"));
+			return;
+		}
 		boolean valid = currentPassword != null && AuthzUtils.isPasswordValid(currentPassword);
 		if (!valid) {
 			addFieldError("currentPassword", getText("currentPassword.error"));
@@ -406,20 +415,21 @@ public class BaseAction extends ActionSupport {
 
 	@BeforeResult
 	protected void preResult() throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
 		if (StringUtils.isNotBlank(targetUrl)
 				&& REDIRECT.equals(ActionContext.getContext().getActionInvocation().getResultCode()) && !hasErrors()
-				&& RequestUtils.isSameOrigin(ServletActionContext.getRequest().getRequestURL().toString(), targetUrl)) {
-			targetUrl = ServletActionContext.getResponse().encodeRedirectURL(targetUrl);
-			ServletActionContext.getResponse().setHeader("X-Redirect-To", targetUrl);
+				&& RequestUtils.isSameOrigin(request.getRequestURL().toString(), targetUrl)) {
+			targetUrl = response.encodeRedirectURL(targetUrl);
+			response.setHeader("X-Redirect-To", targetUrl);
 		}
 		if (!(returnInput || !isAjax() || (isCaptchaRequired() && captchaStatus.isFirstReachThreshold())
 				|| !(isUseJson() || hasErrors()))) {
 			ActionContext.getContext().getActionInvocation().setResultCode(JSON);
 			if (csrfRequired) {
 				csrf = CodecUtils.nextId();
-				RequestUtils.saveCookie(ServletActionContext.getRequest(), ServletActionContext.getResponse(),
-						COOKIE_NAME_CSRF, csrf, false, true);
-				ServletActionContext.getResponse().addHeader("X-Postback-csrf", csrf);
+				RequestUtils.saveCookie(request, response, COOKIE_NAME_CSRF, csrf, false, true);
+				response.addHeader("X-Postback-csrf", csrf);
 			}
 		} else if (!isUseJson() && hasFieldErrors()) {
 			StringBuilder sb = new StringBuilder();
@@ -427,7 +437,7 @@ public class BaseAction extends ActionSupport {
 				sb.append(entry.getKey()).append(": ").append(StringUtils.join(entry.getValue(), "\t")).append("; ");
 			}
 			sb.delete(sb.length() - 2, sb.length() - 1);
-			ServletActionContext.getResponse().setHeader("X-Field-Errors", sb.toString());
+			response.setHeader("X-Field-Errors", sb.toString());
 		}
 	}
 
