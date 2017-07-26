@@ -32481,6 +32481,16 @@ if (HISTORY_ENABLED) {
 }
 
 Observation.common = function(container) {
+	$$('td.action,.toolbar div.action,.form-actions', container).each(
+			function() {
+				var children = $(this).contents();
+				for (var i = 0; i < children.length - 1; i++) {
+					var current = children.eq(i);
+					if (current.hasClass('btn')
+							&& children.get(i + 1).nodeType != 3)
+						current.after(' ');
+				}
+			});
 	$$('input.double', container).each(function() {
 				var t = $(this);
 				var value = t.val();
