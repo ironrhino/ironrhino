@@ -17,7 +17,11 @@ ${getText('org.springframework.security.authentication.CredentialsExpiredExcepti
 	</#if>
 	<@s.password name="password" class="required input-pattern sha" readonly=userProfileReadonly/>
 	<@s.password name="confirmPassword" class="required repeat input-pattern submit sha" data\-repeatwith="password" readonly=userProfileReadonly/>
-	<@s.submit label=getText('save') class="btn-primary" disabled=userProfileReadonly/>
+	<@s.submit label=getText('save') class="btn-primary" disabled=userProfileReadonly>
+	<@s.param name="after">
+	<button type="button" class="btn dialog-close">${getText('cancel')}</button>
+	</@s.param>
+	</@s.submit>
 </@s.form>
 </body>
 </html>

@@ -6,6 +6,8 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 				+ MessageBundle.get(dc ? 'double.check' : '&nbsp;')
 				+ '</h3></div><div class="modal-body"><form class="form-horizontal"><fieldset><div class="form-actions"><button type="submit" class="btn btn-primary">'
 				+ MessageBundle.get('confirm')
+				+ '</button> <button type="button" class="btn dialog-close">'
+				+ MessageBundle.get('cancel')
 				+ '</button></div></fieldset></form></div></div>')
 				.appendTo(document.body);
 		if (dc) {

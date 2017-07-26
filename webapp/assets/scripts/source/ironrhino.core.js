@@ -1027,7 +1027,10 @@ Initialization.common = function() {
 			}).on('dblclick', '.ui-dialog-titlebar', function() {
 		Dialog.toggleMaximization($('.ui-dialog-content', $(this)
 						.closest('.ui-dialog')));
-	}).on('click', '.ui-dialog .dialog-close', function(evt) {
+	}).on('click', '.modal .dialog-close', function(evt) {
+				evt.preventDefault();
+				$(evt.target).closest('.modal').find('.close').click();
+			}).on('click', '.ui-dialog .dialog-close', function(evt) {
 		evt.preventDefault();
 		$(evt.target).closest('.ui-dialog').find('.ui-dialog-titlebar-close')
 				.click();
