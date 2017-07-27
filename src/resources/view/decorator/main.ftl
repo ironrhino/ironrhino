@@ -25,7 +25,7 @@
 ${head?no_esc}
 </head>
 
-<body class="main ${.lang} ${(page.properties["meta.body_class"])!}">
+<body class="main<#if sidebarLayout> sidebar</#if> ${.lang} ${(page.properties["meta.body_class"])!}">
 <#include "include/top.ftl" ignore_missing=true/>
 <#if 'welcome'!=page.properties["meta.body_class"]!>
 <@authorize ifNotGranted="ROLE_BUILTIN_ANONYMOUS">
@@ -51,6 +51,7 @@ ${head?no_esc}
 </div>
 </div>
 </header>
+<#include "include/sidebar.ftl" ignore_missing=true/>
 </@authorize>
 </#if>
 <div id="content" class="container<#if fluidLayout>-fluid</#if>">

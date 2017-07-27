@@ -53,6 +53,7 @@ public class FreemarkerConfigurer {
 	public static final String KEY_PROPERTIES = "properties";
 	public static final String KEY_DEV_MODE = "devMode";
 	public static final String KEY_FLUID_LAYOUT = "fluidLayout";
+	public static final String KEY_SIDEBAR_LAYOUT = "sidebarLayout";
 	public static final String KEY_MODERN_BROWSER = "modernBrowser";
 
 	@Getter
@@ -86,6 +87,9 @@ public class FreemarkerConfigurer {
 
 	@Value("${fluidLayout:true}")
 	private boolean fluidLayout = true;
+
+	@Value("${sidebarLayout:true}")
+	private boolean sidebarLayout = true;
 
 	@Autowired(required = false)
 	private List<OverridableTemplateProvider> overridableTemplateProviders;
@@ -187,6 +191,7 @@ public class FreemarkerConfigurer {
 		if (StringUtils.isNotBlank(ssoServerBase))
 			allSharedVariables.put("ssoServerBase", ssoServerBase);
 		allSharedVariables.put(KEY_FLUID_LAYOUT, fluidLayout);
+		allSharedVariables.put(KEY_SIDEBAR_LAYOUT, sidebarLayout);
 		allSharedVariables.put(KEY_MODERN_BROWSER, true); // drop legacy browser supports
 		allSharedVariables.put(KEY_DEV_MODE, AppInfo.getStage() == Stage.DEVELOPMENT);
 		allSharedVariables.put(KEY_STATICS, DEFAULT_BEANS_WRAPPER.getStaticModels());

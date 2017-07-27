@@ -2134,8 +2134,14 @@ var Nav = {
 	},
 	indicate : function(a) {
 		if (a.is('.accordion-inner > .nav-list > li > a')
-				&& !a.closest('.accordion-body').hasClass('in'))
-			a.closest('.accordion-group').find('.accordion-toggle').click();
+				&& !a.closest('.accordion-body').hasClass('in')) {
+			if (a.closest('.nav-sidebar').length) {
+				a.closest('.accordion-body').addClass('in').css('height',
+						'auto');
+			} else {
+				a.closest('.accordion-group').find('.accordion-toggle').click();
+			}
+		}
 		var dropdown = a.closest('li.dropdown');
 		if (!dropdown.length) {
 			$(a).closest('li').addClass('active');

@@ -1007,7 +1007,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	{
 	background-color: #ccc;
 }
-
 /* modify by zhouyanming
 1.sprite css
 2.fixed span position
@@ -1065,7 +1064,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .treeTable tbody tr td {
   padding: .3em 1.5em;
 }
-
 
 .text-core {
   position: relative;
@@ -1264,7 +1262,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	color: black;
 	cursor: default;
 }
-
 
 /*
  * add border-radius: 4px; to .chosen-container-multi .chosen-choices
@@ -7296,7 +7293,6 @@ button.close {
 	background-color: #b0b0b0;
 }
 
-
 /*override bootstrap start*/
 body.main {
 	padding-top: 60px;
@@ -7453,8 +7449,6 @@ body.welcome .caption {
 	background-image: linear-gradient(to bottom, #fff, #e6e6e6);
 }
 
-
-
 body.welcome .hero-unit .message-container {
 	margin-top: -30px;
 	font-size: 15px;
@@ -7481,6 +7475,7 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	body.welcome {
 		padding-top: 0;
 	}
+
 	body.welcome .caption {
 		margin-top: -40px;
 	}
@@ -7752,13 +7747,13 @@ ul.attributes li.group ul {
 a.remove {
 	font-weight: bold;
 	color: #000;
-    margin-left: 5px;
-    cursor: pointer;
+	margin-left: 5px;
+	cursor: pointer;
 	opacity: 0.2;
 	filter: alpha(opacity=20);
 }
 
-a.remove:hover, a.remove:focus {
+a.remove:hover , a.remove:focus {
 	text-decoration: none;
 	opacity: 0.4;
 	filter: alpha(opacity=40);
@@ -7884,7 +7879,57 @@ div.text-core {
 	}
 }
 
+body.sidebar .navbar .brand {
+	margin-left: 0;
+}
 
+body.sidebar .navbar .btn-navbar {
+	float: left;
+	display: block;
+	margin-left: 0;
+}
+
+.nav-sidebar {
+	display: none;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	width: 256px;
+	padding-top: 50px;
+	z-index: 1000000;
+	background-color: #fff;
+}
+
+.nav-sidebar .accordion-group {
+	border-radius: 0;
+}
+
+.nav-sidebar .accordion-heading a{
+	font-size: 1.1em;
+	font-weight: bold;
+	text-decoration: none;
+	color: #777;
+}
+
+.nav-sidebar .accordion-heading a:hover{
+	color: #333;
+}
+
+.nav-sidebar-modal {
+	display: none;
+	position: fixed;
+	z-index: 999999;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: #000;
+	opacity: .6;
+}
 select.input-medium{
 	width: 164px;
 }
@@ -8418,7 +8463,6 @@ form.attachmentable ul.thumbnails li .remove {
 	margin-right: 10px;
 }
 
-
 .datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
 	opacity: 0;
 }
@@ -8469,7 +8513,6 @@ form.attachmentable ul.thumbnails li .remove {
 .masked-min-height {
 	min-height: 50px ! important;
 }
-
 
 .toolbar > [class *= "span"] {
 	margin-top: 0;
@@ -8626,7 +8669,6 @@ form.attachmentable ul.thumbnails li .remove {
 	border: 0;
 }
 
-
 .editme {
 	margin: 0px;
 	padding: 0px;
@@ -8643,7 +8685,6 @@ form.attachmentable ul.thumbnails li .remove {
 .editme:focus {
 	outline: 1px solid #ffc000;
 }
-
 
 .portal-column {
 	float: left;
@@ -8810,7 +8851,6 @@ form.attachmentable ul.thumbnails li .remove {
 	border-radius: 0 6px 6px 0;
 }
 
-
 .sortcol {
 	padding-left: 10px ! important;
 	text-align: center ! important;
@@ -8845,7 +8885,6 @@ form.attachmentable ul.thumbnails li .remove {
 	border-color: transparent transparent #222 transparent;
 }
 
-
 table .resizeTitle {
 	width: 95%;
 	text-align: center;
@@ -8862,7 +8901,6 @@ table .resizeBar {
 	background-color: #cccccc;
 	display: inline;
 }
-
 
 .window-richtable form:first-child {
 	padding-top: 20px;
@@ -9077,7 +9115,6 @@ th.filtercolumn li.main li {
 	padding-right: 2px;
 }
 
-
 .treearea div.area {
 	border: solid 1px #ffc000;
 	border-radius: 5px;
@@ -9094,7 +9131,6 @@ th.filtercolumn li.main li {
 .treearea span.selected {
 	color: #ffc000;
 }
-
 
 div.pattern div.cell {
 	float: left;
@@ -9147,7 +9183,6 @@ div.pattern div.dot.active {
 	cursor: crosshair;
 	background-color: orange;
 }
-
 
 @-webkit-keyframes load {
 	0%{
@@ -9217,7 +9252,6 @@ div.pattern div.dot.active {
 	height: 36px;
 	border-radius: 20px;
 }
-
 
 /*
  * Bootstrap Responsive v2.3.1
@@ -10306,4 +10340,3 @@ div.pattern div.dot.active {
     overflow: visible !important;
   }
 }
-

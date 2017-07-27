@@ -154,8 +154,6 @@ body.welcome .caption {
 	background-image: linear-gradient(to bottom, #fff, #e6e6e6);
 }
 
-
-
 body.welcome .hero-unit .message-container {
 	margin-top: -30px;
 	font-size: 15px;
@@ -182,6 +180,7 @@ body.welcome.zh .hero-unit button[type="submit"]:only-child {
 	body.welcome {
 		padding-top: 0;
 	}
+
 	body.welcome .caption {
 		margin-top: -40px;
 	}
@@ -453,13 +452,13 @@ ul.attributes li.group ul {
 a.remove {
 	font-weight: bold;
 	color: #000;
-    margin-left: 5px;
-    cursor: pointer;
+	margin-left: 5px;
+	cursor: pointer;
 	opacity: 0.2;
 	filter: alpha(opacity=20);
 }
 
-a.remove:hover, a.remove:focus {
+a.remove:hover , a.remove:focus {
 	text-decoration: none;
 	opacity: 0.4;
 	filter: alpha(opacity=40);
