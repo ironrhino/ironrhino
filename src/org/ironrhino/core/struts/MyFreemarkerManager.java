@@ -71,6 +71,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	public static final String KEY_PROPERTIES = "properties";
 	public static final String KEY_DEV_MODE = "devMode";
 	public static final String KEY_FLUID_LAYOUT = "fluidLayout";
+	public static final String KEY_MODERN_BROWSER = "modernBrowser";
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -86,8 +87,9 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		if (devMode)
 			LocalizedTextUtil.setReloadBundles(true);
 		MyConfiguration configuration = new MyConfiguration(DEFAULT_VERSION);
-		configuration.setTemplateExceptionHandler(AppInfo.getStage() == Stage.PRODUCTION
-				? TemplateExceptionHandler.IGNORE_HANDLER : TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+		configuration.setTemplateExceptionHandler(
+				AppInfo.getStage() == Stage.PRODUCTION ? TemplateExceptionHandler.IGNORE_HANDLER
+						: TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 		if (mruMaxStrongSize > 0) {
 			configuration.setSetting(Configuration.CACHE_STORAGE_KEY, "strong:" + mruMaxStrongSize);
 		}
@@ -116,6 +118,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		globalVariables.put(KEY_DEV_MODE, devMode);
 		globalVariables.put(KEY_FLUID_LAYOUT,
 				"true".equals(AppInfo.getApplicationContextProperties().getProperty(KEY_FLUID_LAYOUT, "true")));
+		globalVariables.put(KEY_MODERN_BROWSER, true); // drop legacy browser supports
 		TemplateHashModelEx hash = new SimpleMapModel(globalVariables, DEFAULT_BEANS_WRAPPER);
 		configuration.setAllSharedVariables(hash);
 		configuration.setDateFormat("yyyy-MM-dd");
