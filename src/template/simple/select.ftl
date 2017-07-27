@@ -82,6 +82,6 @@
 </@s.iterator>
 <#include "/${parameters.templateDir}/${parameters.expandTheme}/optgroup.ftl" />
 </select>
-<#if parameters.multiple!false && !(parameters.disabled!false) && parameters.name?has_content>
+<#if (parameters.multiple!false) && !(parameters.disabled!false) && parameters.name?has_content>
 <input type="hidden" name="__multiselect_${parameters.name?html}"/>
 </#if>

@@ -820,7 +820,7 @@ public class OgnlRuntime {
     public static Object invokeMethod(Object target, Method method, Object[] argsArray)
             throws InvocationTargetException, IllegalAccessException
     {
-    		if (Modifier.isPublic(method.getModifiers()))
+    		if (Modifier.isPublic(method.getModifiers()) && Modifier.isPublic(method.getDeclaringClass().getModifiers()))
         {
     			return method.invoke(target, argsArray);
         }
