@@ -30,26 +30,26 @@ ${head?no_esc}
 <#if 'welcome'!=page.properties["meta.body_class"]!>
 <@authorize ifNotGranted="ROLE_BUILTIN_ANONYMOUS">
 <header class="navbar navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container<#if fluidLayout>-fluid</#if>">
-    	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+<div class="navbar-inner">
+<div class="container<#if fluidLayout>-fluid</#if>">
+	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+		<span class="icon-bar"></span>
+		<span class="icon-bar"></span>
+		<span class="icon-bar"></span>
+	</a>
+	<#include "include/brand.ftl" ignore_missing=true/>
+	<div class="btn-group pull-right">
+	<#assign user = authentication("principal")>
+		<a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
+		<i class="glyphicon glyphicon-user"></i> <#if user.name??>${user.name}<#elseif user.username??>${user.username}<#else>${(user?string)!}</#if> <span class="caret"></span>
 		</a>
-		<#include "include/brand.ftl" ignore_missing=true/>
-		<div class="btn-group pull-right">
-			<#assign user = authentication("principal")>
-	        <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
-	          <i class="glyphicon glyphicon-user"></i> <#if user.name??>${user.name}<#elseif user.username??>${user.username}<#else>${(user?string)!}</#if> <span class="caret"></span>
-	        </a>
-	        <#include "include/dropdown.ftl" ignore_missing=true/>
-		</div>
-		<div class="nav-collapse">
-	        <#include "include/nav.ftl" ignore_missing=true/>
-      </div>
-    </div>
-  </div>
+		<#include "include/dropdown.ftl" ignore_missing=true/>
+	</div>
+	<div class="nav-collapse">
+		<#include "include/nav.ftl" ignore_missing=true/>
+	</div>
+</div>
+</div>
 </header>
 </@authorize>
 </#if>
