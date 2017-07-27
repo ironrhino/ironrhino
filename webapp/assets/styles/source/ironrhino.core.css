@@ -136,14 +136,6 @@ td.middle {
 	transform: rotate(360deg);
 }
 
-body.main > #content > form:first-child {
-	margin-top: 20px;
-}
-
-body.main > #content > form:first-child > .negative-margin:first-child {
-	margin-top: -20px;
-}
-
 body.welcome {
 	padding-top: 10%;
 	background-color: #dedede;
