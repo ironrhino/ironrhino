@@ -3,6 +3,8 @@ package org.ironrhino.core.struts.result;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -16,8 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.dispatcher.StrutsResultSupport;
-import org.apache.struts2.views.jasperreports.ValueStackDataSource;
-import org.apache.struts2.views.jasperreports.ValueStackShadowMap;
+import org.apache.struts2.util.MakeIterator;
 
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.util.ValueStack;
@@ -25,7 +26,9 @@ import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
 
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRField;
 import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JRRewindableDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
@@ -157,7 +160,7 @@ public class JasperReportsResult extends StrutsResultSupport {
 		ServletContext servletContext = ServletActionContext.getServletContext();
 		String systemId = servletContext.getRealPath(finalLocation);
 
-		Map<String, Object> parameters = new ValueStackShadowMap(stack);
+		Map<String, Object> parameters = new HashMap<>();
 		File directory = new File(systemId.substring(0, systemId.lastIndexOf(File.separator)));
 		parameters.put("reportDirectory", directory);
 		parameters.put(JRParameter.REPORT_LOCALE, invocation.getInvocationContext().getLocale());
@@ -301,6 +304,82 @@ public class JasperReportsResult extends StrutsResultSupport {
 
 		reportParameters = conditionalParse(reportParameters, invocation);
 		exportParameters = conditionalParse(exportParameters, invocation);
+	}
+
+	static class ValueStackDataSource implements JRRewindableDataSource {
+
+		Iterator<?> iterator;
+		ValueStack valueStack;
+		String dataSource;
+		boolean firstTimeThrough = true;
+
+		public ValueStackDataSource(ValueStack valueStack, String dataSourceParam) {
+			this.valueStack = valueStack;
+
+			dataSource = dataSourceParam;
+			Object dataSourceValue = valueStack.findValue(dataSource);
+
+			if (dataSourceValue != null) {
+				if (MakeIterator.isIterable(dataSourceValue)) {
+					iterator = MakeIterator.convert(dataSourceValue);
+				} else {
+					Object[] array = new Object[1];
+					array[0] = dataSourceValue;
+					iterator = MakeIterator.convert(array);
+				}
+			} else {
+				throw new IllegalArgumentException("Data source value for data source " + dataSource + " was null");
+			}
+		}
+
+		@Override
+		public Object getFieldValue(JRField field) throws JRException {
+			String expression = field.getDescription();
+			if (expression == null) {
+				// Description is optional so use the field name as a default
+				expression = field.getName();
+			}
+
+			Object value = valueStack.findValue(expression);
+
+			if (MakeIterator.isIterable(value)) {
+				// wrap value with ValueStackDataSource if not already wrapped
+				return new ValueStackDataSource(this.valueStack, expression);
+			} else {
+				return value;
+			}
+		}
+
+		@Override
+		public void moveFirst() throws JRException {
+			Object dataSourceValue = valueStack.findValue(dataSource);
+			if (dataSourceValue != null) {
+				if (MakeIterator.isIterable(dataSourceValue)) {
+					iterator = MakeIterator.convert(dataSourceValue);
+				} else {
+					Object[] array = new Object[1];
+					array[0] = dataSourceValue;
+					iterator = MakeIterator.convert(array);
+				}
+			} else {
+				throw new IllegalArgumentException("Data source value for data source " + dataSource + " was null");
+			}
+		}
+
+		@Override
+		public boolean next() throws JRException {
+			if (firstTimeThrough) {
+				firstTimeThrough = false;
+			} else {
+				valueStack.pop();
+			}
+			if ((iterator != null) && (iterator.hasNext())) {
+				valueStack.push(iterator.next());
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 
 }
