@@ -16,6 +16,7 @@
 package com.opensymphony.xwork2.spring;
 
 import com.opensymphony.xwork2.ObjectFactory;
+import com.opensymphony.xwork2.inject.Container;
 import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
@@ -40,9 +41,11 @@ import java.util.Map;
  *
  * @author Simon Stewart (sms@lateral.net)
  */
-@SuppressWarnings({"serial", "rawtypes"})
 public class SpringObjectFactory extends ObjectFactory implements ApplicationContextAware {
-    private static final Logger LOG = LoggerFactory.getLogger(SpringObjectFactory.class);
+	
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOG = LoggerFactory.getLogger(SpringObjectFactory.class);
 
     protected ApplicationContext appContext;
     protected AutowireCapableBeanFactory autoWiringFactory;
@@ -51,6 +54,15 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
     private boolean useClassCache = true;
     private boolean alwaysRespectAutowireStrategy = false;
     private boolean enableAopSupport = true;
+    
+	public SpringObjectFactory() {
+
+    }
+    
+	@Inject
+	public SpringObjectFactory(Container container) {
+    		super(container);
+    }
 
     @Inject(value="applicationContextPath",required=false)
     public void setApplicationContextPath(String ctx) {
@@ -160,7 +172,7 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
         if (appContext.containsBean(beanName)) {
             o = appContext.getBean(beanName);
         } else {
-            Class beanClazz = getClassInstance(beanName);
+            Class<?> beanClazz = getClassInstance(beanName);
             o = buildBean(beanClazz, extraContext);
         }
         if (injectInternal) {
@@ -175,9 +187,9 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
      * @throws Exception
      */
     @Override
-    public Object buildBean(Class clazz, Map<String, Object> extraContext) throws Exception {
-    	if(clazz.isArray())
-    		return null;
+    public Object buildBean(Class<?> clazz, Map<String, Object> extraContext) throws Exception {
+    		if(clazz.isArray())
+    			return null;
         Object bean;
 
         try {
@@ -243,13 +255,13 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
         }
     }
 
-    public Class getClassInstance(String className) throws ClassNotFoundException {
-        Class clazz = null;
+    public Class<?> getClassInstance(String className) throws ClassNotFoundException {
+        Class<?> clazz = null;
         if (useClassCache) {
             synchronized(classes) {
                 // this cache of classes is needed because Spring sucks at dealing with situations where the
                 // class instance changes
-                clazz = (Class) classes.get(className);
+                clazz = (Class<?>) classes.get(className);
             }
         }
 
