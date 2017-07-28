@@ -1,6 +1,8 @@
-package org.ironrhino.core.struts;
+package org.ironrhino.core.struts.sitemesh;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.struts2.views.freemarker.FreemarkerManager;
 
 import com.opensymphony.module.sitemesh.DecoratorMapper;
 import com.opensymphony.sitemesh.Content;
@@ -14,8 +16,11 @@ public class MyFreemarkerMapper2DecoratorSelector implements DecoratorSelector {
 
 	private final DecoratorMapper decoratorMapper;
 
-	public MyFreemarkerMapper2DecoratorSelector(DecoratorMapper decoratorMapper) {
+	private final FreemarkerManager freemarkerManager;
+
+	public MyFreemarkerMapper2DecoratorSelector(DecoratorMapper decoratorMapper, FreemarkerManager freemarkerManager) {
 		this.decoratorMapper = decoratorMapper;
+		this.freemarkerManager = freemarkerManager;
 	}
 
 	@Override
@@ -27,7 +32,7 @@ public class MyFreemarkerMapper2DecoratorSelector implements DecoratorSelector {
 		if (decorator == null || decorator.getPage() == null) {
 			return new NoDecorator();
 		} else {
-			return new MyOldDecorator2NewStrutsFreemarkerDecorator(decorator);
+			return new MyOldDecorator2NewStrutsFreemarkerDecorator(decorator, freemarkerManager);
 		}
 	}
 }

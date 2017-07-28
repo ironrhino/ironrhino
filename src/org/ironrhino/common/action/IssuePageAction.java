@@ -7,7 +7,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.search.SearchCriteria;
 import org.ironrhino.core.struts.BaseAction;
-import org.ironrhino.core.struts.RequestDecoratorMapper;
+import org.ironrhino.core.struts.sitemesh.RequestDecoratorMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.ActionContext;

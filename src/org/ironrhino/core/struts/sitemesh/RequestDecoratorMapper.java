@@ -1,4 +1,4 @@
-package org.ironrhino.core.struts;
+package org.ironrhino.core.struts.sitemesh;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,15 +18,15 @@ import com.opensymphony.module.sitemesh.mapper.DefaultDecorator;
 
 public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 
-	private ServletContext sc;
+	private static ServletContext servletContext;
 
 	private String decoratorParameter = "decorator";
 
 	@Override
 	public void init(Config config, Properties properties, DecoratorMapper parent) throws InstantiationException {
 		super.init(config, properties, parent);
-		sc = config.getServletContext();
-		sc.setAttribute(this.getClass().getName(), this);
+		servletContext = config.getServletContext();
+		servletContext.setAttribute(this.getClass().getName(), this);
 		decoratorParameter = properties.getProperty("decorator.parameter", "decorator");
 	}
 
@@ -61,7 +61,7 @@ public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 	}
 
 	public static void setDecorator(String name) {
-		RequestDecoratorMapper rdm = (RequestDecoratorMapper) ServletActionContext.getServletContext()
+		RequestDecoratorMapper rdm = (RequestDecoratorMapper) servletContext
 				.getAttribute(RequestDecoratorMapper.class.getName());
 		if (rdm != null)
 			rdm.setDecorator(ServletActionContext.getRequest(), name);

@@ -1,4 +1,4 @@
-package org.ironrhino.core.struts;
+package org.ironrhino.core.struts.sitemesh;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.sitemesh.OldDecorator2NewStrutsFreemarkerDecorator;
+import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.ironrhino.core.util.HtmlUtils;
 
 import com.opensymphony.module.sitemesh.Decorator;
@@ -22,8 +22,8 @@ public class MyOldDecorator2NewStrutsFreemarkerDecorator extends OldDecorator2Ne
 	public static final String X_FRAGMENT = "X-Fragment";
 	public static final String X_EXACT_FRAGMENT = "X-Exact-Fragment";
 
-	public MyOldDecorator2NewStrutsFreemarkerDecorator(Decorator oldDecorator) {
-		super(oldDecorator);
+	public MyOldDecorator2NewStrutsFreemarkerDecorator(Decorator oldDecorator, FreemarkerManager freemarkerManager) {
+		super(oldDecorator, freemarkerManager);
 	}
 
 	@Override

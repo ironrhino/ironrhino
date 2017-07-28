@@ -3,14 +3,11 @@
 	"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
 	"http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	<bean type="com.opensymphony.xwork2.config.PackageProvider" name="ironrhino-autoconfig"
-		class="org.ironrhino.core.struts.AutoConfigPackageProvider" />
-	<bean type="org.apache.struts2.views.freemarker.FreemarkerManager"
-		class="org.ironrhino.core.struts.MyFreemarkerManager" />
-	<bean type="com.opensymphony.xwork2.conversion.impl.XWorkConverter"
-		class="org.ironrhino.core.struts.converter.MyXWorkConverter" />
-	<bean type="org.apache.struts2.dispatcher.multipart.MultiPartRequest" name="jakarta-stream" 
-		class="org.apache.struts2.dispatcher.multipart.JakartaStreamMultiPartRequest" scope="prototype"/>
+	<bean type="com.opensymphony.xwork2.config.PackageProvider" name="ironrhino-autoconfig" class="org.ironrhino.core.struts.AutoConfigPackageProvider" />
+	<bean type="org.apache.struts2.views.freemarker.FreemarkerManager" class="org.ironrhino.core.struts.MyFreemarkerManager" />
+	<bean class="org.ironrhino.core.struts.sitemesh.MyFreemarkerPageFilter" static="true" optional="true"/>
+	<bean type="com.opensymphony.xwork2.conversion.impl.XWorkConverter" class="org.ironrhino.core.struts.converter.MyXWorkConverter" />
+	<bean type="org.apache.struts2.dispatcher.multipart.MultiPartRequest" name="jakarta-stream" class="org.apache.struts2.dispatcher.multipart.JakartaStreamMultiPartRequest" scope="prototype"/>
 	<bean type="com.opensymphony.xwork2.ObjectFactory" name="struts-spring" class="org.ironrhino.core.struts.StrutsSpringObjectFactory" />
 	<constant name="struts.objectFactory" value="struts-spring" />
 	<constant name="struts.devMode" value="false" />
