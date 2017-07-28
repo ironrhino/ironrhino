@@ -17,10 +17,6 @@ public @interface UiConfig {
 
 	String DEFAULT_INPUT_TYPE = "text";
 
-	String DEFAULT_LIST_KEY = "id";
-
-	String DEFAULT_LIST_VALUE = "name";
-
 	String alias() default "";
 
 	String description() default "";
@@ -79,9 +75,9 @@ public @interface UiConfig {
 
 	boolean excludeIfNotEdited() default false;
 
-	String listKey() default DEFAULT_LIST_KEY;
+	String listKey() default "";
 
-	String listValue() default DEFAULT_LIST_VALUE;
+	String listValue() default "";
 
 	String listOptions() default ""; // for select,multiselect
 
@@ -96,7 +92,7 @@ public @interface UiConfig {
 	boolean excludedFromCriteria() default false;
 
 	boolean excludedFromOrdering() default false;
-	
+
 	boolean excludedFromQuery() default false;
 
 	String group() default "";

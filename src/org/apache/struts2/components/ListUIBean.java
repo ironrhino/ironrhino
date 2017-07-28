@@ -22,13 +22,14 @@
 package org.apache.struts2.components;
 
 import com.opensymphony.xwork2.util.ValueStack;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.util.ContainUtil;
 import org.apache.struts2.util.MakeIterator;
 import org.apache.struts2.views.annotations.StrutsTagAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 
@@ -90,22 +91,14 @@ public abstract class ListUIBean extends UIBean {
             addParameter("list", MakeIterator.convert(value));
         }
 
-        if (value instanceof Collection) {
-            addParameter("listSize", Integer.valueOf(((Collection<?>) value).size()));
-        } else if (value instanceof Map) {
-            addParameter("listSize", Integer.valueOf(((Map<?,?>) value).size()));
-        } else if (value != null && value.getClass().isArray()) {
-            addParameter("listSize", Integer.valueOf(Array.getLength(value)));
-        }
-
-        if (listKey != null) {
+        if (StringUtils.isNotBlank(listKey)) {
             listKey = stripExpressionIfAltSyntax(listKey);
             addParameter("listKey", listKey);
         } else if (value instanceof Map) {
             addParameter("listKey", "key");
         }
 
-        if (listValue != null) {
+        if (StringUtils.isNotBlank(listValue)) {
             listValue = stripExpressionIfAltSyntax(listValue);
             addParameter("listValue", listValue);
         } else if (value instanceof Map) {

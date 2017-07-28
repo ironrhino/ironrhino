@@ -43,7 +43,6 @@ import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Owner;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
-import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Attachmentable;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Enableable;
@@ -1117,12 +1116,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					bw.setPropertyValue(propertyName, null);
 				} else {
 					String listKey = uiConfig.getListKey();
+					if (StringUtils.isBlank(listKey))
+						listKey = "id";
 					BeanWrapperImpl temp = new BeanWrapperImpl(type.newInstance());
 					temp.setConversionService(conversionService);
 					temp.setPropertyValue(listKey, parameterValue);
 					BaseManager em = getEntityManager(type);
 					Persistable obj;
-					if (listKey.equals(UiConfig.DEFAULT_LIST_KEY))
+					if (listKey.equals("id"))
 						obj = em.get((Serializable) temp.getPropertyValue(listKey));
 					else
 						obj = em.findOne(listKey, (Serializable) temp.getPropertyValue(listKey));

@@ -57,8 +57,8 @@ public class AnnotationShadows {
 		private String dynamicAttributes = "";
 		private String cellDynamicAttributes = "";
 		private boolean excludeIfNotEdited;
-		private String listKey = UiConfig.DEFAULT_LIST_KEY;
-		private String listValue = UiConfig.DEFAULT_LIST_VALUE;
+		private String listKey = "";
+		private String listValue = "";
 		private String listOptions = "";
 		private String cellEdit = "";
 		private String pickUrl = "";

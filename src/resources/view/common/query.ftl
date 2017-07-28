@@ -106,7 +106,7 @@ $(function(){
 	<#if !readonly && tables?? && tables?size gt 0>
 	<@s.param name="after">
 	<div style="display:inline-block;vertical-align:top;margin-left:20px;">
-	<@s.select id="tables" theme="simple" class="chosen input-medium" list="tables" listKey="top" listValue="top" headerKey="" headerValue=""/>
+	<@s.select id="tables" theme="simple" class="chosen input-medium" list="tables" headerKey="" headerValue=""/>
 	</div>
 	</@s.param>
 	</#if>

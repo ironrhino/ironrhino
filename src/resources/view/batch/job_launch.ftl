@@ -21,7 +21,7 @@
 	<#else>
 	<div class="row-fluid">
 	<div class="span4">
-	<@s.select name="params[${index}].type" class="input-small conjunct" data\-replacement="params_${index}" data\-global="false" list="paramTypes" listKey="top" listValue="top"/>
+	<@s.select name="params[${index}].type" class="input-small conjunct" data\-replacement="params_${index}" data\-global="false" list="paramTypes"/>
 	</div>
 	<div class="span5">
 	<@s.textfield label=getText(param.key) name="params[${index}].value" class="${param.required?then('required','')}"/>
