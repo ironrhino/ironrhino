@@ -21,3 +21,4 @@
 +jedis
 -ironrhino-redis-config
 -eaxy
+-struts2-spring-plugin

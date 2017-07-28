@@ -92,15 +92,8 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
      *
      * @param autowireStrategy
      */
-    @SuppressWarnings("deprecation")
 	public void setAutowireStrategy(int autowireStrategy) {
         switch (autowireStrategy) {
-            case AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT:
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Setting autowire strategy to autodetect");
-                }
-                this.autowireStrategy = autowireStrategy;
-                break;
             case AutowireCapableBeanFactory.AUTOWIRE_BY_NAME:
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Setting autowire strategy to name");
