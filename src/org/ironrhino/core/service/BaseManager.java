@@ -30,6 +30,8 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public void evict(T obj);
 
+	public void refresh(T obj);
+
 	public void delete(T obj);
 
 	public List<T> delete(Serializable... id);

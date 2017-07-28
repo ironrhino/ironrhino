@@ -313,6 +313,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public void refresh(T obj) {
+		sessionFactory.getCurrentSession().refresh(obj);
+	}
+
+	@Override
 	public DetachedCriteria detachedCriteria() {
 		return DetachedCriteria.forClass(getEntityClass());
 	}
