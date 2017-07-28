@@ -49,9 +49,6 @@ public abstract class ListUIBean extends UIBean {
     protected Object list;
     protected String listKey;
     protected String listValue;
-    protected String listCssClass;
-    protected String listCssStyle;
-    protected String listTitle;
 
     // indicate if an exception is to be thrown when value attribute is null
     protected boolean throwExceptionOnNullValueAttribute = false;
@@ -115,17 +112,6 @@ public abstract class ListUIBean extends UIBean {
             addParameter("listValue", "value");
         }
 
-        if (listCssClass != null && listCssClass.trim().length() > 0) {
-            addParameter("listCssClass", listCssClass);
-        }
-
-        if (listCssStyle != null && listCssStyle.trim().length() > 0) {
-            addParameter("listCssStyle", listCssStyle);
-        }
-
-        if (listTitle != null && listTitle.trim().length() > 0) {
-            addParameter("listTitle", listTitle);
-        }
     }
 
     public boolean contains(Object obj1, Object obj2) {
@@ -151,22 +137,6 @@ public abstract class ListUIBean extends UIBean {
     public void setListValue(String listValue) {
         this.listValue = listValue;
     }
-
-    @StrutsTagAttribute(description = "Property of list objects to get css class from")
-    public void setListCssClass(String listCssClass) {
-        this.listCssClass = listCssClass;
-    }
-
-    @StrutsTagAttribute(description = "Property of list objects to get css style from")
-    public void setListCssStyle(String listCssStyle) {
-        this.listCssStyle = listCssStyle;
-    }
-
-    @StrutsTagAttribute(description = "Property of list objects to get title from")
-    public void setListTitle(String listTitle) {
-        this.listTitle = listTitle;
-    }
-
 
     public void setThrowExceptionOnNullValueAttribute(boolean throwExceptionOnNullValueAttribute) {
         this.throwExceptionOnNullValueAttribute = throwExceptionOnNullValueAttribute;

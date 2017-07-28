@@ -44,39 +44,9 @@
         <#else>
             <#assign itemValue = stack.findString('top')/>
         </#if>
-        <#if parameters.listCssClass?has_content>
-            <#if stack.findString(parameters.listCssClass)?has_content>
-              <#assign itemCssClass= stack.findString(parameters.listCssClass)/>
-            <#else>
-              <#assign itemCssClass = ''/>
-            </#if>
-        </#if>
-        <#if parameters.listCssStyle?has_content>
-            <#if stack.findString(parameters.listCssStyle)?has_content>
-              <#assign itemCssStyle= stack.findString(parameters.listCssStyle)/>
-            <#else>
-              <#assign itemCssStyle = ''/>
-            </#if>
-        </#if>
-        <#if parameters.listTitle?has_content>
-            <#if stack.findString(parameters.listTitle)?has_content>
-              <#assign itemTitle= stack.findString(parameters.listTitle)/>
-            <#else>
-              <#assign itemTitle = ''/>
-            </#if>
-        </#if>
     <option value="${itemKeyStr?html}"<#rt/>
         <#if tag.contains(parameters.nameValue, itemKey) || tag.contains(parameters.nameValue, itemValue)>
  selected="selected"<#rt/>
-        </#if>
-        <#if itemCssClass?has_content>
- class="${itemCssClass?html}"<#rt/>
-        </#if>
-        <#if itemCssStyle?has_content>
- style="${itemCssStyle?html}"<#rt/>
-        </#if>
-        <#if itemTitle?has_content>
- title="${itemTitle?html}"<#rt/>
         </#if>
     >${itemValue?html}</option><#lt/>
 </@s.iterator>
