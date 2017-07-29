@@ -35,7 +35,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationContextConsole {
 
-	private static final String SET_PROPERTY_EXPRESSION_PATTERN = "^[a-zA-Z][a-zA-Z0-9_\\-]*\\.[a-zA-Z][a-zA-Z0-9_]*\\s*=\\s*.+$";
+	private static final String PROPERTY_EXPRESSION_PATTERN = "[a-zA-Z][a-zA-Z0-9_\\-]*\\.[a-zA-Z][a-zA-Z0-9_]*";
+
+	private static final String GET_PROPERTY_EXPRESSION_PATTERN = "^" + PROPERTY_EXPRESSION_PATTERN + "$";
+
+	private static final String SET_PROPERTY_EXPRESSION_PATTERN = "^" + PROPERTY_EXPRESSION_PATTERN + "\\s*=\\s*.+$";
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -126,7 +130,7 @@ public class ApplicationContextConsole {
 				try {
 					value = ExpressionUtils.evalExpression(expression, getBeans());
 				} catch (PropertyAccessException pe) {
-					if (!expression.endsWith(")"))
+					if (expression.matches(GET_PROPERTY_EXPRESSION_PATTERN))
 						value = executeGetProperty(expression);
 					else
 						throw pe;
