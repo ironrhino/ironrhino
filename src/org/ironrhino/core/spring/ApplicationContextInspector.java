@@ -104,7 +104,8 @@ public class ApplicationContextInspector {
 						if (start > -1 && end > start) {
 							str = str.substring(start + 2, end);
 							String[] arr = str.split(":", 2);
-							map.put(arr[0], arr[1]);
+							if (arr.length > 1)
+								map.put(arr[0], arr[1]);
 						}
 					}
 					defaultProperties = Collections.unmodifiableMap(map);
