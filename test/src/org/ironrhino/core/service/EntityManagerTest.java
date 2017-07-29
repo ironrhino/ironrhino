@@ -9,7 +9,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -176,6 +178,17 @@ public class EntityManagerTest {
 
 		clearData();
 		assertEquals(0, entityManager.countAll());
+
+		prepareData();
+
+		Map<String, Object> args = new HashMap<>();
+		args.put("gender", Gender.MALE);
+		males = entityManager.find("from Person p where p.gender=:gender", args);
+		assertEquals(5, males.size());
+		entityManager.executeUpdate("delete from Person p where p.gender=:gender", args);
+		males = entityManager.find("from Person p where p.gender=:gender", args);
+		assertEquals(0, males.size());
+		clearData();
 	}
 
 	@Test

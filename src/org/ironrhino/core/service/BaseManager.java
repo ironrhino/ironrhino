@@ -2,6 +2,7 @@ package org.ironrhino.core.service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
@@ -68,9 +69,13 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public List<T> find(String queryString, Object... args);
 
+	public List<T> find(String queryString, Map<String, ?> args);
+
 	public <TE extends BaseTreeableEntity<TE>> TE loadTree();
 
 	public int executeUpdate(String queryString, Object... args);
+
+	public int executeUpdate(String queryString, Map<String, ?> args);
 
 	public <K> K execute(HibernateCallback<K> callback);
 

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.PostPersist;
@@ -636,6 +637,15 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<T> find(final String queryString, Map<String, ?> args) {
+		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
+		for (Map.Entry<String, ?> entry : args.entrySet())
+			query.setParameter(entry.getKey(), entry.getValue());
+		return query.list();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public <TE extends BaseTreeableEntity<TE>> TE loadTree() {
 		if (getEntityClass() == null || !(BaseTreeableEntity.class.isAssignableFrom(getEntityClass())))
 			throw new IllegalArgumentException(
@@ -697,12 +707,21 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Override
 	@Transactional
-	public int executeUpdate(String queryString, Object... values) {
-		Query queryObject = sessionFactory.getCurrentSession().createQuery(queryString);
-		for (int i = 0; i < values.length; i++) {
-			queryObject.setParameter(String.valueOf(i + 1), values[i]);
+	public int executeUpdate(String queryString, Object... args) {
+		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
+		for (int i = 0; i < args.length; i++) {
+			query.setParameter(String.valueOf(i + 1), args[i]);
 		}
-		return queryObject.executeUpdate();
+		return query.executeUpdate();
+	}
+
+	@Override
+	@Transactional
+	public int executeUpdate(String queryString, Map<String, ?> args) {
+		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
+		for (Map.Entry<String, ?> entry : args.entrySet())
+			query.setParameter(entry.getKey(), entry.getValue());
+		return query.executeUpdate();
 	}
 
 	@Override
