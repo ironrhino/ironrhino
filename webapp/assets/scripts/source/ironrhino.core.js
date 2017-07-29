@@ -1,5 +1,17 @@
 var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 (function() {
+	try {
+		if (window.self !== window.top) {
+			window.topWindow = window.top;
+			window.topDocument = window.top.document;
+		} else {
+			window.topWindow = window;
+			window.topDocument = document;
+		}
+	} catch (e) {
+		window.topWindow = window;
+		window.topDocument = document;
+	}
 	if (!String.prototype.startsWith) {
 		String.prototype.startsWith = function(prefix, position) {
 			return this.substr(position || 0, prefix.length) === prefix;
@@ -104,9 +116,9 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 Indicator = {
 	text : '',
 	show : function(iserror) {
-		if (!$('#indicator').length)
-			$('<div id="indicator"></div>').appendTo(document.body);
-		var ind = $('#indicator');
+		if (!$('#indicator', topDocument).length)
+			$('<div id="indicator"></div>').appendTo(topDocument.body);
+		var ind = $('#indicator', topDocument);
 		if (iserror && ind.hasClass('loading'))
 			ind.removeClass('loading');
 		if (!iserror && !ind.hasClass('loading'))
@@ -123,8 +135,9 @@ Indicator = {
 	},
 	hide : function() {
 		Indicator.text = '';
-		if ($('#indicator'))
-			$('#indicator').hide()
+		var ind = $('#indicator', topDocument);
+		if (ind.length)
+			ind.hide()
 	}
 };
 
@@ -136,10 +149,10 @@ ProgressBar = {
 			percent = 100;
 		else if (percent < 1)
 			percent *= 100;
-		var pb = $('#progress-bar');
+		var pb = $('#progress-bar', topDocument);
 		if (!pb.length) {
 			pb = $('<div id="progress-bar"><div class="progress"></div></div>')
-					.prependTo(document.body);
+					.prependTo(topDocument.body);
 			setTimeout(function() {
 						pb.data('percent', percent).css('opacity', '1')
 								.find('.progress').css('width', percent + '%');
@@ -155,7 +168,7 @@ ProgressBar = {
 				'width', percent + '%');
 	},
 	hide : function() {
-		var pb = $('#progress-bar');
+		var pb = $('#progress-bar', topDocument);
 		if (pb.length) {
 			ProgressBar.show(100);
 			setTimeout(function() {
@@ -165,7 +178,7 @@ ProgressBar = {
 	},
 	simulate : function() {
 		ProgressBar.show(5, true);
-		var pb = $('#progress-bar');
+		var pb = $('#progress-bar', topDocument);
 		var interval = setInterval(function() {
 					var percent = pb.data('percent');
 					var nextPercent = percent + Math.random() * 10;
@@ -178,7 +191,7 @@ ProgressBar = {
 		pb.data('interval', interval);
 	},
 	stopSimulate : function() {
-		var intv = $('#progress-bar').data('interval');
+		var intv = $('#progress-bar', topDocument).data('interval');
 		if (intv)
 			clearInterval(intv);
 	}

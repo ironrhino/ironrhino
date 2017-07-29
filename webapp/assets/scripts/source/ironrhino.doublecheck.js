@@ -9,10 +9,10 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 				+ '</button> <button type="button" class="btn dialog-close">'
 				+ MessageBundle.get('cancel')
 				+ '</button></div></fieldset></form></div></div>')
-				.appendTo(document.body);
+				.appendTo(topDocument.body);
 		if (dc) {
 			modal
-					.find('.form-horizontal')
+					.find('fieldset')
 					.prepend('<div class="control-group"><label class="control-label" for="doubleCheckUsername">'
 							+ MessageBundle.get('double.check.username')
 							+ '</label><div class="controls"><input id="doubleCheckUsername" type="text" name="doubleCheckUsername" class="required" autocomplete="off"></div></div><div class="control-group"><label class="control-label" for="doubleCheckPassword">'
@@ -20,7 +20,7 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 							+ '</label><div class="controls"><input id="doubleCheckPassword" type="password" name="doubleCheckPassword" class="required input-pattern sha submit" autocomplete="off"></div></div>');
 		} else {
 			modal
-					.find('.form-horizontal')
+					.find('fieldset')
 					.prepend('<div class="control-group"><label class="control-label" for="currentPassword">'
 							+ MessageBundle.get('current.password')
 							+ '</label><div class="controls"><input id="currentPassword" type="password" name="currentPassword" class="required input-pattern sha submit" autocomplete="off"></div></div>');
@@ -81,7 +81,7 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 			};
 			$.ajax(ajaxOptions);
 			return false;
-		});
+		}).find('input:eq(0)').focus();
 		return false;
 	}
 });

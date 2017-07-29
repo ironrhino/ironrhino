@@ -30961,7 +30961,7 @@ MessageBundle = {
 		overlay('show');
 
 		var container = $('<div id="popup-container"><div class="popup-content"><div class="popup-icon"></div><div class="popup-message"></div></div></div>')
-				.appendTo(document.body);
+				.appendTo(topDocument.body);
 		var popupMessage = container.find(".popup-message");
 		if (title != null)
 			container.prepend('<h1 class="popup-title">' + title + '</h1>');
@@ -31095,7 +31095,7 @@ MessageBundle = {
 	$.alerts.show = $.alerts;
 
 	function hide() {
-		var container = $('#popup-container');
+		var container = $('#popup-container', topDocument);
 		if (container.length) {
 			var timer = container.data('timer');
 			if (timer)
@@ -31110,19 +31110,18 @@ MessageBundle = {
 		switch (status) {
 			case 'show' :
 				overlay('hide');
-				$('<div id="popup-overlay"></div>').appendTo(document.body);
+				$('<div id="popup-overlay"></div>').appendTo(topDocument.body);
 				break;
 			case 'hide' :
-				$('#popup-overlay').remove();
+				$('#popup-overlay', topDocument).remove();
 				break;
 		}
 	}
 
 	function reposition() {
-		var container = $('#popup-container');
-		var top = (($(window).height() / 2) - (container.outerHeight() / 2))
-				- 75;
-		var left = (($(window).width() / 2) - (container.outerWidth() / 2));
+		var container = $('#popup-container', topDocument);
+		var top = (($(topWindow).height() / 2) - (container.outerHeight() / 2)) - 75;
+		var left = (($(topWindow).width() / 2) - (container.outerWidth() / 2));
 		if (top < 0)
 			top = 0;
 		if (left < 0)
@@ -31136,10 +31135,10 @@ MessageBundle = {
 	function maintainPosition(status) {
 		switch (status) {
 			case true :
-				$(window).bind('resize', reposition);
+				$(topWindow).bind('resize', reposition);
 				break;
 			case false :
-				$(window).unbind('resize', reposition);
+				$(topWindow).unbind('resize', reposition);
 				break;
 		}
 	}
@@ -31147,6 +31146,18 @@ MessageBundle = {
 })(jQuery);
 var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 (function() {
+	try {
+		if (window.self !== window.top) {
+			window.topWindow = window.top;
+			window.topDocument = window.top.document;
+		} else {
+			window.topWindow = window;
+			window.topDocument = document;
+		}
+	} catch (e) {
+		window.topWindow = window;
+		window.topDocument = document;
+	}
 	if (!String.prototype.startsWith) {
 		String.prototype.startsWith = function(prefix, position) {
 			return this.substr(position || 0, prefix.length) === prefix;
@@ -31251,9 +31262,9 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 Indicator = {
 	text : '',
 	show : function(iserror) {
-		if (!$('#indicator').length)
-			$('<div id="indicator"></div>').appendTo(document.body);
-		var ind = $('#indicator');
+		if (!$('#indicator', topDocument).length)
+			$('<div id="indicator"></div>').appendTo(topDocument.body);
+		var ind = $('#indicator', topDocument);
 		if (iserror && ind.hasClass('loading'))
 			ind.removeClass('loading');
 		if (!iserror && !ind.hasClass('loading'))
@@ -31270,8 +31281,9 @@ Indicator = {
 	},
 	hide : function() {
 		Indicator.text = '';
-		if ($('#indicator'))
-			$('#indicator').hide()
+		var ind = $('#indicator', topDocument);
+		if (ind.length)
+			ind.hide()
 	}
 };
 
@@ -31283,10 +31295,10 @@ ProgressBar = {
 			percent = 100;
 		else if (percent < 1)
 			percent *= 100;
-		var pb = $('#progress-bar');
+		var pb = $('#progress-bar', topDocument);
 		if (!pb.length) {
 			pb = $('<div id="progress-bar"><div class="progress"></div></div>')
-					.prependTo(document.body);
+					.prependTo(topDocument.body);
 			setTimeout(function() {
 						pb.data('percent', percent).css('opacity', '1')
 								.find('.progress').css('width', percent + '%');
@@ -31302,7 +31314,7 @@ ProgressBar = {
 				'width', percent + '%');
 	},
 	hide : function() {
-		var pb = $('#progress-bar');
+		var pb = $('#progress-bar', topDocument);
 		if (pb.length) {
 			ProgressBar.show(100);
 			setTimeout(function() {
@@ -31312,7 +31324,7 @@ ProgressBar = {
 	},
 	simulate : function() {
 		ProgressBar.show(5, true);
-		var pb = $('#progress-bar');
+		var pb = $('#progress-bar', topDocument);
 		var interval = setInterval(function() {
 					var percent = pb.data('percent');
 					var nextPercent = percent + Math.random() * 10;
@@ -31325,7 +31337,7 @@ ProgressBar = {
 		pb.data('interval', interval);
 	},
 	stopSimulate : function() {
-		var intv = $('#progress-bar').data('interval');
+		var intv = $('#progress-bar', topDocument).data('interval');
 		if (intv)
 			clearInterval(intv);
 	}
@@ -40121,7 +40133,7 @@ Observation.filtercolumn = function(container) {
 			t.next('.add-on').click(function() {
 				$('#pattern-modal').remove();
 				var modal = $('<div id="pattern-modal" class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div class="modal-body" style="max-height:600px;"><div class="message" style="height: 38px;"></div><div class="pattern" style="margin-top: -38px;"></div></div></div>')
-						.appendTo(document.body);
+						.appendTo(topDocument.body);
 				modal.find('button.close').click(function() {
 							modal.remove();
 						});
@@ -40171,10 +40183,10 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 				+ '</button> <button type="button" class="btn dialog-close">'
 				+ MessageBundle.get('cancel')
 				+ '</button></div></fieldset></form></div></div>')
-				.appendTo(document.body);
+				.appendTo(topDocument.body);
 		if (dc) {
 			modal
-					.find('.form-horizontal')
+					.find('fieldset')
 					.prepend('<div class="control-group"><label class="control-label" for="doubleCheckUsername">'
 							+ MessageBundle.get('double.check.username')
 							+ '</label><div class="controls"><input id="doubleCheckUsername" type="text" name="doubleCheckUsername" class="required" autocomplete="off"></div></div><div class="control-group"><label class="control-label" for="doubleCheckPassword">'
@@ -40182,7 +40194,7 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 							+ '</label><div class="controls"><input id="doubleCheckPassword" type="password" name="doubleCheckPassword" class="required input-pattern sha submit" autocomplete="off"></div></div>');
 		} else {
 			modal
-					.find('.form-horizontal')
+					.find('fieldset')
 					.prepend('<div class="control-group"><label class="control-label" for="currentPassword">'
 							+ MessageBundle.get('current.password')
 							+ '</label><div class="controls"><input id="currentPassword" type="password" name="currentPassword" class="required input-pattern sha submit" autocomplete="off"></div></div>');
@@ -40243,7 +40255,7 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 			};
 			$.ajax(ajaxOptions);
 			return false;
-		});
+		}).find('input:eq(0)').focus();
 		return false;
 	}
 });

@@ -30,7 +30,7 @@
 		overlay('show');
 
 		var container = $('<div id="popup-container"><div class="popup-content"><div class="popup-icon"></div><div class="popup-message"></div></div></div>')
-				.appendTo(document.body);
+				.appendTo(topDocument.body);
 		var popupMessage = container.find(".popup-message");
 		if (title != null)
 			container.prepend('<h1 class="popup-title">' + title + '</h1>');
@@ -164,7 +164,7 @@
 	$.alerts.show = $.alerts;
 
 	function hide() {
-		var container = $('#popup-container');
+		var container = $('#popup-container', topDocument);
 		if (container.length) {
 			var timer = container.data('timer');
 			if (timer)
@@ -179,19 +179,18 @@
 		switch (status) {
 			case 'show' :
 				overlay('hide');
-				$('<div id="popup-overlay"></div>').appendTo(document.body);
+				$('<div id="popup-overlay"></div>').appendTo(topDocument.body);
 				break;
 			case 'hide' :
-				$('#popup-overlay').remove();
+				$('#popup-overlay', topDocument).remove();
 				break;
 		}
 	}
 
 	function reposition() {
-		var container = $('#popup-container');
-		var top = (($(window).height() / 2) - (container.outerHeight() / 2))
-				- 75;
-		var left = (($(window).width() / 2) - (container.outerWidth() / 2));
+		var container = $('#popup-container', topDocument);
+		var top = (($(topWindow).height() / 2) - (container.outerHeight() / 2)) - 75;
+		var left = (($(topWindow).width() / 2) - (container.outerWidth() / 2));
 		if (top < 0)
 			top = 0;
 		if (left < 0)
@@ -205,10 +204,10 @@
 	function maintainPosition(status) {
 		switch (status) {
 			case true :
-				$(window).bind('resize', reposition);
+				$(topWindow).bind('resize', reposition);
 				break;
 			case false :
-				$(window).unbind('resize', reposition);
+				$(topWindow).unbind('resize', reposition);
 				break;
 		}
 	}
