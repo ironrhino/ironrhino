@@ -3,49 +3,26 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Searchable(root = false)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Attribute implements Serializable {
 
 	private static final long serialVersionUID = 3709022318256011161L;
 
+	@SearchableProperty
 	private String name;
 
+	@SearchableProperty
 	private String value;
-
-	public Attribute() {
-	}
-
-	public Attribute(String name, String value) {
-		this.name = name;
-		this.value = value;
-	}
-
-	public Attribute(String name) {
-		this.name = name;
-	}
-
-	@SearchableProperty
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@SearchableProperty
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
 
 	public boolean isNull() {
 		return name == null && value == null;
@@ -57,16 +34,6 @@ public class Attribute implements Serializable {
 
 	public boolean isBlank() {
 		return StringUtils.isBlank(name) && StringUtils.isBlank(value);
-	}
-
-	@Override
-	public boolean equals(Object another) {
-		return EqualsBuilder.reflectionEquals(this, another);
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
 	@Override

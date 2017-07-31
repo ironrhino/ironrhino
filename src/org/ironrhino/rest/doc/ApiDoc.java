@@ -41,6 +41,9 @@ import org.springframework.web.context.request.async.DeferredResult;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.Data;
+
+@Data
 public class ApiDoc implements Serializable {
 
 	private static final long serialVersionUID = -3039539795219938302L;
@@ -359,142 +362,6 @@ public class ApiDoc implements Serializable {
 			}
 
 		}
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String[] getRequiredAuthorities() {
-		return requiredAuthorities;
-	}
-
-	public void setRequiredAuthorities(String[] requiredAuthorities) {
-		this.requiredAuthorities = requiredAuthorities;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public String[] getMethods() {
-		return methods;
-	}
-
-	public void setMethods(String[] methods) {
-		this.methods = methods;
-	}
-
-	public List<FieldObject> getPathVariables() {
-		return pathVariables;
-	}
-
-	public void setPathVariables(List<FieldObject> pathVariables) {
-		this.pathVariables = pathVariables;
-	}
-
-	public List<FieldObject> getRequestParams() {
-		return requestParams;
-	}
-
-	public void setRequestParams(List<FieldObject> requestParams) {
-		this.requestParams = requestParams;
-	}
-
-	public List<FieldObject> getRequestHeaders() {
-		return requestHeaders;
-	}
-
-	public void setRequestHeaders(List<FieldObject> requestHeaders) {
-		this.requestHeaders = requestHeaders;
-	}
-
-	public List<FieldObject> getCookieValues() {
-		return cookieValues;
-	}
-
-	public void setCookieValues(List<FieldObject> cookieValues) {
-		this.cookieValues = cookieValues;
-	}
-
-	public List<FieldObject> getRequestBody() {
-		return requestBody;
-	}
-
-	public void setRequestBody(List<FieldObject> requestBody) {
-		this.requestBody = requestBody;
-	}
-
-	public List<FieldObject> getResponseBody() {
-		return responseBody;
-	}
-
-	public void setResponseBody(List<FieldObject> responseBody) {
-		this.responseBody = responseBody;
-	}
-
-	public boolean isRequestBodyRequired() {
-		return requestBodyRequired;
-	}
-
-	public void setRequestBodyRequired(boolean requestBodyRequired) {
-		this.requestBodyRequired = requestBodyRequired;
-	}
-
-	public String getRequestBodyType() {
-		return requestBodyType;
-	}
-
-	public void setRequestBodyType(String requestBodyType) {
-		this.requestBodyType = requestBodyType;
-	}
-
-	public String getResponseBodyType() {
-		return responseBodyType;
-	}
-
-	public void setResponseBodyType(String responseBodyType) {
-		this.responseBodyType = responseBodyType;
-	}
-
-	public String getRequestBodySample() {
-		return requestBodySample;
-	}
-
-	public void setRequestBodySample(String requestBodySample) {
-		this.requestBodySample = requestBodySample;
-	}
-
-	public String getResponseBodySample() {
-		return responseBodySample;
-	}
-
-	public void setResponseBodySample(String responseBodySample) {
-		this.responseBodySample = responseBodySample;
-	}
-
-	public List<StatusObject> getStatuses() {
-		return statuses;
-	}
-
-	public void setStatuses(List<StatusObject> statuses) {
-		this.statuses = statuses;
 	}
 
 }

@@ -18,10 +18,15 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Entity
 @Table(name = "sample_employee")
 @Richtable(showQueryForm = true)
+@Getter
+@Setter
 public class Employee implements Persistable<String> {
 
 	private static final long serialVersionUID = 2110061290463634971L;
@@ -46,43 +51,9 @@ public class Employee implements Persistable<String> {
 	private String description;
 
 	@Override
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		if (StringUtils.isNotBlank(id))
-			this.id = id;
-	}
-
-	@Override
 	@JsonIgnore
 	public boolean isNew() {
 		return id == null || StringUtils.isBlank(id);
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
 	}
 
 	@Override

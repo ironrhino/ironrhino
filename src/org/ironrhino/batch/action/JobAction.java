@@ -37,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -58,65 +61,32 @@ public class JobAction extends BaseAction {
 	@Autowired
 	private JobOperator jobOperator;
 
+	@Getter
 	private List list;
 
+	@Getter
 	private Job job;
 
+	@Getter
 	private JobInstance jobInstance;
 
+	@Getter
 	private JobExecution jobExecution;
 
+	@Getter
+	@Setter
 	private String jobParameters;
 
+	@Getter
+	@Setter
 	private List<SimpleJobParameter> params;
 
+	@Getter
 	private EnumSet<ParameterType> paramTypes;
 
+	@Getter
+	@Setter
 	private ResultPage<JobInstanceInfo> resultPage;
-
-	public List getList() {
-		return list;
-	}
-
-	public Job getJob() {
-		return job;
-	}
-
-	public JobInstance getJobInstance() {
-		return jobInstance;
-	}
-
-	public JobExecution getJobExecution() {
-		return jobExecution;
-	}
-
-	public String getJobParameters() {
-		return jobParameters;
-	}
-
-	public void setJobParameters(String jobParameters) {
-		this.jobParameters = jobParameters;
-	}
-
-	public List<SimpleJobParameter> getParams() {
-		return params;
-	}
-
-	public void setParams(List<SimpleJobParameter> params) {
-		this.params = params;
-	}
-
-	public EnumSet<ParameterType> getParamTypes() {
-		return paramTypes;
-	}
-
-	public ResultPage<JobInstanceInfo> getResultPage() {
-		return resultPage;
-	}
-
-	public void setResultPage(ResultPage<JobInstanceInfo> resultPage) {
-		this.resultPage = resultPage;
-	}
 
 	@Override
 	public String execute() throws Exception {

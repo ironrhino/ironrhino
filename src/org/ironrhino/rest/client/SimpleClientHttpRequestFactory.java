@@ -3,6 +3,8 @@ package org.ironrhino.rest.client;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
+import lombok.Getter;
+
 public class SimpleClientHttpRequestFactory extends org.springframework.http.client.SimpleClientHttpRequestFactory {
 
 	public static final int DEFAULT_CONNECTTIMEOUT = 5000;
@@ -11,8 +13,10 @@ public class SimpleClientHttpRequestFactory extends org.springframework.http.cli
 
 	private RestClient client;
 
+	@Getter
 	private int connectTimeout = DEFAULT_CONNECTTIMEOUT;
 
+	@Getter
 	private int readTimeout = DEFAULT_READTIMEOUT;
 
 	public SimpleClientHttpRequestFactory(RestClient client) {
@@ -21,18 +25,10 @@ public class SimpleClientHttpRequestFactory extends org.springframework.http.cli
 		super.setReadTimeout(readTimeout);
 	}
 
-	public int getConnectTimeout() {
-		return connectTimeout;
-	}
-
 	@Override
 	public void setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
 		super.setConnectTimeout(connectTimeout);
-	}
-
-	public int getReadTimeout() {
-		return readTimeout;
 	}
 
 	@Override

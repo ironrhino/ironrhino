@@ -28,9 +28,14 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class AnnotationUtilsTest {
 
 	@MappedSuperclass
+	@Getter
+	@Setter
 	public static class Base implements Serializable, Persistable<String> {
 
 		private static final long serialVersionUID = 1616212908678942555L;
@@ -46,38 +51,9 @@ public class AnnotationUtilsTest {
 			return id == null;
 		}
 
-		@Override
-		public String getId() {
-			return id;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
-
 		@UiConfig(hidden = true)
 		public List<String> getNames() {
 			return names;
-		}
-
-		public void setNames(List<String> names) {
-			this.names = names;
-		}
-
-		public Set<String> getTags() {
-			return tags;
-		}
-
-		public void setTags(Set<String> tags) {
-			this.tags = tags;
-		}
-
-		public Map<String, String> getAttributes() {
-			return attributes;
-		}
-
-		public void setAttributes(Map<String, String> attributes) {
-			this.attributes = attributes;
 		}
 
 		@PrePersist
@@ -92,6 +68,8 @@ public class AnnotationUtilsTest {
 
 	}
 
+	@Getter
+	@Setter
 	public static class User extends Base {
 
 		private static final long serialVersionUID = -1634488900558289348L;
@@ -101,21 +79,9 @@ public class AnnotationUtilsTest {
 		@NotInCopy
 		private String password;
 
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
 		@UiConfig
 		public String getPassword() {
 			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
 		}
 
 		@PrePersist

@@ -16,12 +16,17 @@ import javax.persistence.Enumerated;
 
 import org.junit.Test;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class NestedPathMapSqlParameterSourceTest {
 
 	static enum Grade {
 		A, B, C;
 	}
 
+	@Getter
+	@Setter
 	static class Person {
 		private String name;
 		private int age;
@@ -32,44 +37,8 @@ public class NestedPathMapSqlParameterSourceTest {
 		@Enumerated(EnumType.STRING)
 		private Grade grade2;
 
-		public Person getSelf() {
-			return self;
-		}
-
 		public List<Person> getSilbings() {
 			return Collections.singletonList(this);
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public int getAge() {
-			return age;
-		}
-
-		public void setAge(int age) {
-			this.age = age;
-		}
-
-		public Grade getGrade1() {
-			return grade1;
-		}
-
-		public void setGrade1(Grade grade1) {
-			this.grade1 = grade1;
-		}
-
-		public Grade getGrade2() {
-			return grade2;
-		}
-
-		public void setGrade2(Grade grade2) {
-			this.grade2 = grade2;
 		}
 
 	}

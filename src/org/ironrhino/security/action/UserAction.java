@@ -44,32 +44,48 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class UserAction extends EntityAction<User> {
 
 	private static final long serialVersionUID = -79191921685741502L;
 
+	@Getter
+	@Setter
 	private User user;
 
+	@Getter
 	private List<LabelValue> roles;
 
+	@Getter
 	private Set<String> hiddenRoles;
 
+	@Getter
+	@Setter
 	private String password;
 
+	@Getter
+	@Setter
 	private String currentPassword;
 
+	@Getter
+	@Setter
 	private String confirmPassword;
 
 	@Value("${login.defaultTargetUrl:/}")
 	private String defaultTargetUrl;
 
+	@Getter
 	@Value("${user.profile.readonly:false}")
 	private boolean userProfileReadonly;
 
+	@Getter
 	@Value("${user.password.readonly:false}")
 	private boolean userPasswordReadonly;
 
+	@Getter
 	@Value("${user.password.currentPasswordNeeded:true}")
 	private boolean userCurrentPasswordNeeded;
 
@@ -87,58 +103,6 @@ public class UserAction extends EntityAction<User> {
 
 	@Autowired
 	protected EventPublisher eventPublisher;
-
-	public List<LabelValue> getRoles() {
-		return roles;
-	}
-
-	public Set<String> getHiddenRoles() {
-		return hiddenRoles;
-	}
-
-	public String getCurrentPassword() {
-		return currentPassword;
-	}
-
-	public void setCurrentPassword(String currentPassword) {
-		this.currentPassword = currentPassword;
-	}
-
-	public String getConfirmPassword() {
-		return confirmPassword;
-	}
-
-	public void setConfirmPassword(String confirmPassword) {
-		this.confirmPassword = confirmPassword;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public boolean isUserProfileReadonly() {
-		return userProfileReadonly;
-	}
-
-	public boolean isUserPasswordReadonly() {
-		return userPasswordReadonly;
-	}
-
-	public boolean isUserCurrentPasswordNeeded() {
-		return userCurrentPasswordNeeded;
-	}
 
 	@Override
 	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {

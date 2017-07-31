@@ -24,12 +24,21 @@ import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.JsonUtils;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(indexes = { @javax.persistence.Index(columnList = "username,date desc") })
 @Searchable
 @Richtable(searchable = true, order = "date desc", readonly = @Readonly(true))
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuditEvent extends BaseEntity {
 
 	private static final long serialVersionUID = -7691080078972338500L;
@@ -53,18 +62,6 @@ public class AuditEvent extends BaseEntity {
 	@Column(name = "event", nullable = false)
 	private String event;
 
-	public AuditEvent() {
-
-	}
-
-	public AuditEvent(String username, Date date, String address, String event) {
-		this.username = username;
-		this.address = address;
-		if (date != null)
-			this.date = date;
-		this.event = event;
-	}
-
 	public AuditEvent(String username, Date date, String address, String eventKey, String... arguments) {
 		this.username = username;
 		this.address = address;
@@ -83,38 +80,6 @@ public class AuditEvent extends BaseEntity {
 	public AuditEvent(AbstractAuditEvent abstractEvent) {
 		this(abstractEvent.getUsername(), new Date(abstractEvent.getTimestamp()), abstractEvent.getRemoteAddr(),
 				abstractEvent.getClass().getName(), abstractEvent.getArguments());
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getEvent() {
-		return event;
-	}
-
-	public void setEvent(String event) {
-		this.event = event;
 	}
 
 	public String getDisplayEvent() {

@@ -19,19 +19,16 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class ClientAction extends EntityAction<Client> {
 
 	private static final long serialVersionUID = -4833030589707102084L;
 
+	@Getter
+	@Setter
 	private Client client;
-
-	public Client getClient() {
-		return client;
-	}
-
-	public void setClient(Client client) {
-		this.client = client;
-	}
 
 	@Override
 	@Authorize(ifAllGranted = UserRole.ROLE_BUILTIN_USER)

@@ -14,6 +14,9 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class AuthorizationAction extends EntityAction<Authorization> {
 
 	private static final long serialVersionUID = 2920367147774798742L;
@@ -21,15 +24,9 @@ public class AuthorizationAction extends EntityAction<Authorization> {
 	@Autowired
 	private OAuthManager oauthManager;
 
+	@Getter
+	@Setter
 	private Authorization authorization;
-
-	public Authorization getAuthorization() {
-		return authorization;
-	}
-
-	public void setAuthorization(Authorization authorization) {
-		this.authorization = authorization;
-	}
 
 	@InputConfig(resultName = "create")
 	@Validations(requiredStrings = {

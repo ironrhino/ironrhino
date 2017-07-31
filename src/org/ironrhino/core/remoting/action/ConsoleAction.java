@@ -11,6 +11,8 @@ import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
+
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class ConsoleAction extends BaseAction {
@@ -18,23 +20,14 @@ public class ConsoleAction extends BaseAction {
 	private static final long serialVersionUID = 8180265410790553918L;
 
 	@Autowired
+	@Getter
 	private ServiceRegistry serviceRegistry;
 
+	@Getter
 	private Map<String, Collection<String>> hosts;
 
+	@Getter
 	private Map<String, String> importedServices;
-
-	public Map<String, Collection<String>> getHosts() {
-		return hosts;
-	}
-
-	public Map<String, String> getImportedServices() {
-		return importedServices;
-	}
-
-	public ServiceRegistry getServiceRegistry() {
-		return serviceRegistry;
-	}
 
 	@Override
 	public String execute() {

@@ -29,6 +29,7 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 	@Value("${hibernate.convert_foreign_key_to_index:true}")
 	private boolean convertForeignKeyToIndex = true;
 
+	@Override
 	public SchemaManagementTool initiateService(Map configurationValues, ServiceRegistryImplementor registry) {
 		if (!convertForeignKeyToIndex)
 			return super.initiateService(configurationValues, registry);
@@ -36,6 +37,7 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 			return new HibernateSchemaManagementTool() {
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				public SchemaMigrator getSchemaMigrator(Map options) {
 					SchemaMigrator sm = super.getSchemaMigrator(options);
 					return new SchemaMigrator() {

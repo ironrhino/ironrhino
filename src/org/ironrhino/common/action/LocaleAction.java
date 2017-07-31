@@ -18,6 +18,9 @@ import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig(namespace = "/")
 public class LocaleAction extends BaseAction {
 
@@ -25,8 +28,11 @@ public class LocaleAction extends BaseAction {
 
 	public static final String SETTING_KEY_AVAILABLE_LOCALES = "availableLocales";
 
+	@Getter
+	@Setter
 	private String lang;
 
+	@Getter
 	private Locale[] availableLocales;
 
 	@Value("${globalCookie:false}")
@@ -37,18 +43,6 @@ public class LocaleAction extends BaseAction {
 
 	@Autowired
 	private HttpSessionManager httpSessionManager;
-
-	public String getLang() {
-		return lang;
-	}
-
-	public void setLang(String lang) {
-		this.lang = lang;
-	}
-
-	public Locale[] getAvailableLocales() {
-		return availableLocales;
-	}
 
 	@Override
 	public String execute() {

@@ -7,6 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.Getter;
+
+@Getter
 public class CriteriaState implements Serializable {
 
 	private static final long serialVersionUID = 5124542493138454854L;
@@ -16,17 +19,5 @@ public class CriteriaState implements Serializable {
 	private Map<String, Boolean> orderings = new LinkedHashMap<>(4);
 
 	private Set<String> criteria = new HashSet<>();
-
-	public Map<String, String> getAliases() {
-		return aliases;
-	}
-
-	public Map<String, Boolean> getOrderings() {
-		return orderings;
-	}
-
-	public Set<String> getCriteria() {
-		return criteria;
-	}
 
 }

@@ -10,41 +10,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public abstract class AbstractCyclicSequence implements CyclicSequence, InitializingBean, BeanNameAware {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Getter
+	@Setter
 	private CycleType cycleType = CycleType.DAY;
 
+	@Setter
 	private String sequenceName;
 
 	private String beanName;
 
+	@Getter
+	@Setter
 	private int paddingLength = 4;
-
-	@Override
-	public CycleType getCycleType() {
-		return cycleType;
-	}
-
-	public void setCycleType(CycleType cycleType) {
-		this.cycleType = cycleType;
-	}
 
 	public String getSequenceName() {
 		return StringUtils.isNotBlank(sequenceName) ? sequenceName : beanName;
-	}
-
-	public void setSequenceName(String sequenceName) {
-		this.sequenceName = sequenceName;
-	}
-
-	public int getPaddingLength() {
-		return paddingLength;
-	}
-
-	public void setPaddingLength(int paddingLength) {
-		this.paddingLength = paddingLength;
 	}
 
 	@Override

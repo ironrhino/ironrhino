@@ -40,6 +40,9 @@ import com.opensymphony.xwork2.interceptor.annotations.BeforeResult;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 import com.opensymphony.xwork2.util.ValueStack;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class BaseAction extends ActionSupport {
 
 	private static final long serialVersionUID = -3183957331611790404L;
@@ -65,8 +68,12 @@ public class BaseAction extends ActionSupport {
 	private boolean returnInput;
 
 	// logic id or natrual id
+	@Getter
+	@Setter
 	private String[] id;
 
+	@Getter
+	@Setter
 	protected String keyword;
 
 	protected String requestBody;
@@ -75,8 +82,11 @@ public class BaseAction extends ActionSupport {
 
 	protected String originalMethod;
 
+	@Getter
+	@Setter
 	protected String targetUrl;
 
+	@Getter
 	protected String responseBody;
 
 	protected CaptchaStatus captchaStatus;
@@ -93,8 +103,10 @@ public class BaseAction extends ActionSupport {
 	@Autowired(required = false)
 	protected DynamicAuthorizerManager dynamicAuthorizerManager;
 
+	@Getter
 	private String actionWarning;
 
+	@Getter
 	private String actionSuccessMessage;
 
 	public void setCsrf(String csrf) {
@@ -118,18 +130,6 @@ public class BaseAction extends ActionSupport {
 		return captchaStatus != null && captchaStatus.isRequired();
 	}
 
-	public String getTargetUrl() {
-		return targetUrl;
-	}
-
-	public void setTargetUrl(String targetUrl) {
-		this.targetUrl = targetUrl;
-	}
-
-	public String getResponseBody() {
-		return responseBody;
-	}
-
 	public String getActionBaseUrl() {
 		if (actionBaseUrl == null) {
 			ActionProxy proxy = ActionContext.getContext().getActionInvocation().getProxy();
@@ -139,14 +139,6 @@ public class BaseAction extends ActionSupport {
 			actionBaseUrl = sb.toString();
 		}
 		return actionBaseUrl;
-	}
-
-	public String getKeyword() {
-		return keyword;
-	}
-
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
 	}
 
 	public String getUid() {
@@ -160,14 +152,6 @@ public class BaseAction extends ActionSupport {
 		this.id = new String[] { id };
 	}
 
-	public void setId(String[] id) {
-		this.id = id;
-	}
-
-	public String[] getId() {
-		return id;
-	}
-
 	public boolean isUseJson() {
 		return JSON.equalsIgnoreCase(ServletActionContext.getRequest().getHeader("X-Data-Type"));
 	}
@@ -176,16 +160,8 @@ public class BaseAction extends ActionSupport {
 		return "XMLHttpRequest".equalsIgnoreCase(ServletActionContext.getRequest().getHeader("X-Requested-With"));
 	}
 
-	public String getActionWarning() {
-		return actionWarning;
-	}
-
 	protected void setActionWarning(String actionWarning) {
 		this.actionWarning = actionWarning;
-	}
-
-	public String getActionSuccessMessage() {
-		return actionSuccessMessage;
 	}
 
 	protected void setActionSuccessMessage(String actionSuccessMessage) {

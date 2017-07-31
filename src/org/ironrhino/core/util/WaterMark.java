@@ -11,17 +11,14 @@ import javax.imageio.ImageIO;
 
 import org.springframework.core.io.Resource;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class WaterMark {
 
+	@Getter
+	@Setter
 	private Resource mark;
-
-	public Resource getMark() {
-		return mark;
-	}
-
-	public void setMark(Resource mark) {
-		this.mark = mark;
-	}
 
 	public BufferedImage mark(Image image) throws IOException {
 		return mark(image, mark.getFile());

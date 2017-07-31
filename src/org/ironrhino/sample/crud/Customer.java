@@ -41,11 +41,16 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.struts.ValidationException;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Searchable
 @AutoConfig
 @Table(name = "sample_customer")
 @Entity
 @Richtable(gridColumns = 3, celleditable = false, readonly = @Readonly(expression = "entity.balance<10", deletable = true), showQueryForm = true)
+@Getter
+@Setter
 public class Customer extends BaseRecordableEntity {
 
 	private static final long serialVersionUID = -2413944328894923968L;
@@ -105,110 +110,6 @@ public class Customer extends BaseRecordableEntity {
 	@Fetch(FetchMode.SUBSELECT)
 	private List<CustomerAddress> addresses;
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Gender getGender() {
-		return gender;
-	}
-
-	public void setGender(Gender gender) {
-		this.gender = gender;
-	}
-
-	public Integer getAge() {
-		return age;
-	}
-
-	public void setAge(Integer age) {
-		this.age = age;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public Set<String> getPotentialCategories() {
-		return potentialCategories;
-	}
-
-	public void setPotentialCategories(Set<String> potentialCategories) {
-		this.potentialCategories = potentialCategories;
-	}
-
-	public CustomerRank getRank() {
-		return rank;
-	}
-
-	public void setRank(CustomerRank rank) {
-		this.rank = rank;
-	}
-
-	public CustomerRank[] getPotentialRanks() {
-		return potentialRanks;
-	}
-
-	public void setPotentialRanks(CustomerRank[] potentialRanks) {
-		this.potentialRanks = potentialRanks;
-	}
-
-	public BigDecimal getBalance() {
-		return balance;
-	}
-
-	public void setBalance(BigDecimal balance) {
-		this.balance = balance;
-	}
-
-	public Set<String> getTags() {
-		return tags;
-	}
-
-	public void setTags(Set<String> tags) {
-		this.tags = tags;
-	}
-
-	public Long[] getActiveRegions() {
-		return activeRegions;
-	}
-
-	public void setActiveRegions(Long[] activeRegions) {
-		this.activeRegions = activeRegions;
-	}
-
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
-
-	public Collection<Company> getRelatedCompanies() {
-		return relatedCompanies;
-	}
-
-	public void setRelatedCompanies(Collection<Company> relatedCompanies) {
-		this.relatedCompanies = relatedCompanies;
-	}
-
-	public List<CustomerAddress> getAddresses() {
-		return addresses;
-	}
-
-	public void setAddresses(List<CustomerAddress> addresses) {
-		this.addresses = addresses;
-	}
-
 	@Override
 	@UiConfig(hiddenInList = @Hidden(true), displayOrder = 97)
 	public Date getCreateDate() {
@@ -256,9 +157,10 @@ public class Customer extends BaseRecordableEntity {
 	public static class CustomerRankSetConverter extends EnumSetConverter<CustomerRank> {
 
 	}
-	
+
 	@Converter(autoApply = true)
-	public static class CustomerRankArrayConverter extends EnumArrayConverter<CustomerRank> implements AttributeConverter<CustomerRank[], String>{
+	public static class CustomerRankArrayConverter extends EnumArrayConverter<CustomerRank>
+			implements AttributeConverter<CustomerRank[], String> {
 
 	}
 }

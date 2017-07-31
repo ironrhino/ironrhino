@@ -29,12 +29,17 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.ValidationException;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Searchable
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(name = "common_schema")
 @Richtable(searchable = true, order = "name asc", exportable = true, importable = true)
+@Getter
+@Setter
 public class Schema extends BaseRecordableEntity {
 
 	private static final long serialVersionUID = -8352037604269012984L;
@@ -59,42 +64,6 @@ public class Schema extends BaseRecordableEntity {
 	@SearchableComponent
 	@UiConfig(hiddenInList = @Hidden(true), excludedFromCriteria = true)
 	private List<SchemaField> fields = new ArrayList<>();
-
-	public Schema() {
-
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public boolean isStrict() {
-		return strict;
-	}
-
-	public void setStrict(boolean strict) {
-		this.strict = strict;
-	}
-
-	public List<SchemaField> getFields() {
-		return fields;
-	}
-
-	public void setFields(List<SchemaField> fields) {
-		this.fields = fields;
-	}
 
 	public Schema merge(Schema other) {
 		if (other != null)

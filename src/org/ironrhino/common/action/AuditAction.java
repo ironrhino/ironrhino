@@ -10,6 +10,9 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig(namespace = "/")
 public class AuditAction extends BaseAction {
 
@@ -20,24 +23,15 @@ public class AuditAction extends BaseAction {
 	@Autowired
 	private AuditEventManager auditEventManager;
 
+	@Getter
+	@Setter
 	private Long since;
 
+	@Getter
 	private List<AuditEvent> events;
 
 	public int getPageSize() {
 		return PAGESIZE;
-	}
-
-	public List<AuditEvent> getEvents() {
-		return events;
-	}
-
-	public Long getSince() {
-		return since;
-	}
-
-	public void setSince(Long since) {
-		this.since = since;
 	}
 
 	@Override

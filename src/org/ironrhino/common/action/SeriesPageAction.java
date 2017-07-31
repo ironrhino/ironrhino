@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.interceptor.annotations.Before;
 
+import lombok.Getter;
+
 @AutoConfig(namespace = SeriesPageAction.NAMESPACE, actionName = SeriesPageAction.ACTION_NAME)
 public class SeriesPageAction extends BaseAction {
 
@@ -24,31 +26,19 @@ public class SeriesPageAction extends BaseAction {
 	@Autowired
 	protected PageManager pageManager;
 
+	@Getter
 	protected List<Page> pages;
 
+	@Getter
 	protected Page page;
 
+	@Getter
 	protected Page previousPage;
 
+	@Getter
 	protected Page nextPage;
 
 	private String name;
-
-	public Page getPreviousPage() {
-		return previousPage;
-	}
-
-	public Page getNextPage() {
-		return nextPage;
-	}
-
-	public Page getPage() {
-		return page;
-	}
-
-	public List<Page> getPages() {
-		return pages;
-	}
 
 	public void setName(String name) {
 		this.name = name;

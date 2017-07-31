@@ -21,10 +21,15 @@ import org.ironrhino.core.model.AbstractEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Searchable
 @AutoConfig(fileupload = "text/plain")
 @Table(name = "sample_boss")
 @Entity
+@Getter
+@Setter
 public class Boss extends AbstractEntity<String> {
 
 	private static final long serialVersionUID = 4908831348636951422L;
@@ -57,55 +62,6 @@ public class Boss extends AbstractEntity<String> {
 	@Override
 	public boolean isNew() {
 		return id == null;
-	}
-
-	@Override
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Company getCompany() {
-		return company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getIntro() {
-		return intro;
-	}
-
-	public void setIntro(String intro) {
-		this.intro = intro;
-	}
-
-	public File getResume() {
-		return resume;
-	}
-
-	public void setResume(File resume) {
-		this.resume = resume;
-	}
-
-	public String getResumeFileName() {
-		return resumeFileName;
-	}
-
-	public void setResumeFileName(String resumeFileName) {
-		this.resumeFileName = resumeFileName;
 	}
 
 	@PreUpdate

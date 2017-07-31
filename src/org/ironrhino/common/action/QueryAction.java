@@ -24,6 +24,9 @@ import org.ironrhino.core.util.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
@@ -31,14 +34,22 @@ public class QueryAction extends BaseAction {
 
 	private static final long serialVersionUID = 8180265410790553918L;
 
+	@Getter
+	@Setter
 	protected String sql;
 
+	@Getter
 	protected Set<String> params;
 
+	@Getter
 	protected List<String> tables;
 
+	@Getter
+	@Setter
 	protected Map<String, String> paramMap = new HashMap<>();
 
+	@Getter
+	@Setter
 	protected ResultPage<Map<String, Object>> resultPage;
 
 	@Value("${query.result.maxSize:100000}")
@@ -49,38 +60,6 @@ public class QueryAction extends BaseAction {
 
 	@Autowired
 	protected JdbcQueryService jdbcQueryService;
-
-	public String getSql() {
-		return sql;
-	}
-
-	public void setSql(String sql) {
-		this.sql = sql;
-	}
-
-	public Map<String, String> getParamMap() {
-		return paramMap;
-	}
-
-	public void setParamMap(Map<String, String> paramMap) {
-		this.paramMap = paramMap;
-	}
-
-	public Set<String> getParams() {
-		return params;
-	}
-
-	public List<String> getTables() {
-		return tables;
-	}
-
-	public ResultPage<Map<String, Object>> getResultPage() {
-		return resultPage;
-	}
-
-	public void setResultPage(ResultPage<Map<String, Object>> resultPage) {
-		this.resultPage = resultPage;
-	}
 
 	@Override
 	public String execute() {

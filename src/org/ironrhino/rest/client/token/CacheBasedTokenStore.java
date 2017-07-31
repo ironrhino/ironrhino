@@ -4,27 +4,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class CacheBasedTokenStore implements TokenStore {
 
+	@Getter
+	@Setter
 	private CacheManager cacheManager;
 
+	@Getter
+	@Setter
 	private String cacheNamespace = "Token";
-
-	public CacheManager getCacheManager() {
-		return cacheManager;
-	}
-
-	public void setCacheManager(CacheManager cacheManager) {
-		this.cacheManager = cacheManager;
-	}
-
-	public String getCacheNamespace() {
-		return cacheNamespace;
-	}
-
-	public void setCacheNamespace(String cacheNamespace) {
-		this.cacheNamespace = cacheNamespace;
-	}
 
 	@Override
 	public Token getToken(String key) {

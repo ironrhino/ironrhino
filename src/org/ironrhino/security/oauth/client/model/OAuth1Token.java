@@ -2,6 +2,11 @@ package org.ironrhino.security.oauth.client.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class OAuth1Token extends OAuthToken {
 
 	private static final long serialVersionUID = 1320442804849307877L;
@@ -33,22 +38,6 @@ public class OAuth1Token extends OAuthToken {
 		}
 		if (token == null || secret == null)
 			throw new IllegalArgumentException("token or secret is null");
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	public String getSecret() {
-		return secret;
-	}
-
-	public void setSecret(String secret) {
-		this.secret = secret;
 	}
 
 }

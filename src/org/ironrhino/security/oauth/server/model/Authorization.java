@@ -26,12 +26,17 @@ import org.ironrhino.security.oauth.server.enums.ResponseType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(name = "oauth_authorization")
 @Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
 @ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
+@Getter
+@Setter
 public class Authorization extends BaseEntity {
 
 	public static final int DEFAULT_LIFETIME = 3600;
@@ -92,121 +97,9 @@ public class Authorization extends BaseEntity {
 	@Column(nullable = false)
 	private Date modifyDate = new Date();
 
-	public String getAccessToken() {
-		return accessToken;
-	}
-
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public String getClient() {
-		return client;
-	}
-
-	public void setClient(String client) {
-		this.client = client;
-	}
-
-	public String getGrantor() {
-		return grantor;
-	}
-
-	public void setGrantor(String grantor) {
-		this.grantor = grantor;
-	}
-
-	public String getScope() {
-		return scope;
-	}
-
-	public void setScope(String scope) {
-		this.scope = scope;
-	}
-
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	public Date getModifyDate() {
-		return modifyDate;
-	}
-
-	public void setModifyDate(Date modifyDate) {
-		this.modifyDate = modifyDate;
-	}
-
-	public int getLifetime() {
-		return lifetime;
-	}
-
-	public void setLifetime(int lifetime) {
-		this.lifetime = lifetime;
-	}
-
 	public int getExpiresIn() {
 		return lifetime > 0 ? lifetime - (int) ((System.currentTimeMillis() - modifyDate.getTime()) / 1000)
 				: Integer.MAX_VALUE;
-	}
-
-	public String getRefreshToken() {
-		return refreshToken;
-	}
-
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public ResponseType getResponseType() {
-		return responseType;
-	}
-
-	public void setResponseType(ResponseType responseType) {
-		this.responseType = responseType;
-	}
-
-	public GrantType getGrantType() {
-		return grantType;
-	}
-
-	public void setGrantType(GrantType grantType) {
-		this.grantType = grantType;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
-
-	public String getDeviceName() {
-		return deviceName;
-	}
-
-	public void setDeviceName(String deviceName) {
-		this.deviceName = deviceName;
 	}
 
 	@JsonIgnore

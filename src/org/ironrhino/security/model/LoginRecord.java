@@ -17,12 +17,17 @@ import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.UserRole;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Searchable
 @Table(name = "loginrecord")
 @Richtable(searchable = true, order = "date desc", readonly = @Readonly(true))
+@Getter
+@Setter
 public class LoginRecord extends BaseEntity {
 
 	private static final long serialVersionUID = -7691080078972338500L;
@@ -46,45 +51,5 @@ public class LoginRecord extends BaseEntity {
 	@Column(name = "date")
 	@CreationTimestamp
 	private Date date;
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public boolean isFailed() {
-		return failed;
-	}
-
-	public void setFailed(boolean failed) {
-		this.failed = failed;
-	}
-
-	public String getCause() {
-		return cause;
-	}
-
-	public void setCause(String cause) {
-		this.cause = cause;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
 
 }

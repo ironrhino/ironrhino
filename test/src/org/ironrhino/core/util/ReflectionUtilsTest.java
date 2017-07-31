@@ -12,6 +12,9 @@ import javax.annotation.PostConstruct;
 import org.ironrhino.core.metadata.Param;
 import org.junit.Test;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class ReflectionUtilsTest {
 
 	@Test
@@ -63,15 +66,9 @@ public class ReflectionUtilsTest {
 	}
 
 	static class A {
+		@Getter
+		@Setter
 		private String a;
-
-		public String getA() {
-			return a;
-		}
-
-		public void setA(String a) {
-			this.a = a;
-		}
 
 		@PostConstruct
 		private void pc1() {
@@ -81,15 +78,9 @@ public class ReflectionUtilsTest {
 	}
 
 	static class B extends A {
+		@Getter
+		@Setter
 		private String b;
-
-		public String getB() {
-			return b;
-		}
-
-		public void setB(String b) {
-			this.b = b;
-		}
 
 		@PostConstruct
 		private void pc2() {

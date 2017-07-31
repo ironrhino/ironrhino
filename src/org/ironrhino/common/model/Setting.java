@@ -16,6 +16,10 @@ import org.ironrhino.core.model.BaseRecordableEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @RecordAware
 @PublishAware
 @AutoConfig
@@ -23,6 +27,9 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 @Entity
 @Table(name = "common_setting")
 @Richtable(searchable = true, readonly = @Readonly(expression = "entity.readonly"), order = "key asc", exportable = true, importable = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class Setting extends BaseRecordableEntity {
 
 	private static final long serialVersionUID = -8352037603261222984L;
@@ -50,53 +57,9 @@ public class Setting extends BaseRecordableEntity {
 	@UiConfig(hidden = true)
 	private boolean hidden;
 
-	public Setting() {
-
-	}
-
 	public Setting(String key, String value) {
 		this.key = key;
 		this.value = value;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public boolean isReadonly() {
-		return readonly;
-	}
-
-	public void setReadonly(boolean readonly) {
-		this.readonly = readonly;
-	}
-
-	public boolean isHidden() {
-		return hidden;
-	}
-
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
 	}
 
 }

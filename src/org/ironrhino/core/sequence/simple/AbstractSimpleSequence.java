@@ -8,30 +8,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public abstract class AbstractSimpleSequence implements SimpleSequence, InitializingBean, BeanNameAware {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Setter
 	private String sequenceName;
 
 	private String beanName;
 
+	@Getter
+	@Setter
 	private int paddingLength = 4;
 
 	public String getSequenceName() {
 		return StringUtils.isNotBlank(sequenceName) ? sequenceName : beanName;
-	}
-
-	public void setSequenceName(String sequenceName) {
-		this.sequenceName = sequenceName;
-	}
-
-	public int getPaddingLength() {
-		return paddingLength;
-	}
-
-	public void setPaddingLength(int paddingLength) {
-		this.paddingLength = paddingLength;
 	}
 
 	@Override

@@ -20,12 +20,17 @@ import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.Getter;
+import lombok.Setter;
+
 class RestClientTemplate extends RestTemplate {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private RestClient client;
 
+	@Getter
+	@Setter
 	private int maxAttempts = 2;
 
 	public RestClientTemplate(RestClient client) {
@@ -66,14 +71,6 @@ class RestClientTemplate extends RestTemplate {
 			org.springframework.http.client.HttpComponentsClientHttpRequestFactory hccrf = (org.springframework.http.client.HttpComponentsClientHttpRequestFactory) chrf;
 			hccrf.setReadTimeout(readTimeout);
 		}
-	}
-
-	public int getMaxAttempts() {
-		return maxAttempts;
-	}
-
-	public void setMaxAttempts(int maxAttempts) {
-		this.maxAttempts = maxAttempts;
 	}
 
 	@Override

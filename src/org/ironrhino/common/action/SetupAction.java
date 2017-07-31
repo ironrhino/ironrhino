@@ -39,6 +39,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+import lombok.Data;
+
 @AutoConfig(namespace = "/")
 public class SetupAction extends BaseAction {
 
@@ -204,6 +206,7 @@ public class SetupAction extends BaseAction {
 		logger.info("setup finished");
 	}
 
+	@Data
 	public static class SetupParameterImpl implements Serializable, Ordered<SetupParameterImpl> {
 
 		private static final long serialVersionUID = -3004203941981232510L;
@@ -258,62 +261,6 @@ public class SetupAction extends BaseAction {
 			}
 		}
 
-		public Class<?> getParameterType() {
-			return parameterType;
-		}
-
-		public void setParameterType(Class<?> parameterType) {
-			this.parameterType = parameterType;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getType() {
-			return type;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
-
-		public String getLabel() {
-			return label;
-		}
-
-		public void setLabel(String label) {
-			this.label = label;
-		}
-
-		public String getDefaultValue() {
-			return defaultValue;
-		}
-
-		public void setDefaultValue(String defaultValue) {
-			this.defaultValue = defaultValue;
-		}
-
-		public String getPlaceholder() {
-			return placeholder;
-		}
-
-		public void setPlaceholder(String placeholder) {
-			this.placeholder = placeholder;
-		}
-
-		public boolean isRequired() {
-			return required;
-		}
-
-		public void setRequired(boolean required) {
-			this.required = required;
-		}
-
 		public String getCssClass() {
 			if (required)
 				addCssClass("required");
@@ -322,27 +269,6 @@ public class SetupAction extends BaseAction {
 
 		public void addCssClass(String cssClass) {
 			this.cssClasses.add(cssClass);
-		}
-
-		public Set<String> getCssClasses() {
-			return cssClasses;
-		}
-
-		public Map<String, String> getDynamicAttributes() {
-			return dynamicAttributes;
-		}
-
-		public void setDynamicAttributes(Map<String, String> dynamicAttributes) {
-			this.dynamicAttributes = dynamicAttributes;
-		}
-
-		@Override
-		public int getDisplayOrder() {
-			return displayOrder;
-		}
-
-		public void setDisplayOrder(int displayOrder) {
-			this.displayOrder = displayOrder;
 		}
 
 		@Override

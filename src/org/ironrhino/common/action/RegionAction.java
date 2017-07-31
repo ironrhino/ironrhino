@@ -30,63 +30,39 @@ import com.opensymphony.xwork2.validator.annotations.StringLengthFieldValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class RegionAction extends EntityAction<Region> {
 
 	private static final long serialVersionUID = -4643055307938016102L;
 
-	private Region region;
-
 	private EntityManager<Region> entityManager;
 
+	@Getter
+	@Setter
+	private Region region;
+
+	@Getter
 	private Collection list;
 
+	@Setter
 	private String southWest;
 
+	@Setter
 	private String northEast;
 
+	@Getter
+	@Setter
 	private int zoom;
 
+	@Getter
+	@Setter
 	private boolean async;
 
 	@Autowired(required = false)
 	private SearchService<Region> searchService;
-
-	public boolean isAsync() {
-		return async;
-	}
-
-	public void setAsync(boolean async) {
-		this.async = async;
-	}
-
-	public int getZoom() {
-		return zoom;
-	}
-
-	public void setZoom(int zoom) {
-		this.zoom = zoom;
-	}
-
-	public void setSouthWest(String southWest) {
-		this.southWest = southWest;
-	}
-
-	public void setNorthEast(String northEast) {
-		this.northEast = northEast;
-	}
-
-	public Collection getList() {
-		return list;
-	}
-
-	public Region getRegion() {
-		return region;
-	}
-
-	public void setRegion(Region region) {
-		this.region = region;
-	}
 
 	public void setEntityManager(EntityManager<Region> entityManager) {
 		entityManager.setEntityClass(Region.class);

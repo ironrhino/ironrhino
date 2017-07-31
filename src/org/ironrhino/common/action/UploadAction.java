@@ -30,6 +30,9 @@ import org.springframework.beans.factory.annotation.Value;
 import com.google.common.io.Files;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig(fileupload = "image/*,video/*,text/*,application/x-shockwave-flash,application/pdf,application/msword,application/vnd.ms-powerpoint,application/octet-stream,application/zip,application/x-rar-compressed")
 public class UploadAction extends BaseAction {
 
@@ -37,20 +40,31 @@ public class UploadAction extends BaseAction {
 
 	public static final String UPLOAD_DIR = "/upload";
 
+	@Setter
 	private File[] file;
 
+	@Setter
 	private String[] fileFileName;
 
+	@Getter
+	@Setter
 	private String[] filename; // for override default filename
 
+	@Getter
+	@Setter
 	private String folder;
 
 	private String folderEncoded;
 
+	@Getter
+	@Setter
 	private boolean autorename;
 
+	@Getter
+	@Setter
 	private boolean json;
 
+	@Getter
 	private Map<String, Boolean> files;
 
 	@Value("${upload.excludeSuffix:jsp,jspx,php,asp,rb,py,sh}")
@@ -65,43 +79,9 @@ public class UploadAction extends BaseAction {
 	@Autowired
 	private TemplateProvider templateProvider;
 
+	@Getter
+	@Setter
 	private String suffix;
-
-	public String getSuffix() {
-		return suffix;
-	}
-
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
-	}
-
-	public Map<String, Boolean> getFiles() {
-		return files;
-	}
-
-	public boolean isAutorename() {
-		return autorename;
-	}
-
-	public void setAutorename(boolean autorename) {
-		this.autorename = autorename;
-	}
-
-	public boolean isJson() {
-		return json;
-	}
-
-	public void setJson(boolean json) {
-		this.json = json;
-	}
-
-	public void setFolder(String folder) {
-		this.folder = folder;
-	}
-
-	public String getFolder() {
-		return folder;
-	}
 
 	public String getUploadRootDir() {
 		return UPLOAD_DIR;
@@ -129,22 +109,6 @@ public class UploadAction extends BaseAction {
 			}
 		}
 		return folderEncoded;
-	}
-
-	public void setFile(File[] file) {
-		this.file = file;
-	}
-
-	public void setFileFileName(String[] fileFileName) {
-		this.fileFileName = fileFileName;
-	}
-
-	public void setFilename(String[] filename) {
-		this.filename = filename;
-	}
-
-	public String[] getFilename() {
-		return filename;
 	}
 
 	@Override

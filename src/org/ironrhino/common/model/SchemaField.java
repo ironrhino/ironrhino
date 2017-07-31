@@ -4,13 +4,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
+import lombok.Data;
+
 @Searchable(root = false)
+@Data
 public class SchemaField implements Serializable {
 
 	private static final long serialVersionUID = 9104177103768030668L;
@@ -29,55 +30,5 @@ public class SchemaField implements Serializable {
 
 	@SearchableProperty(index = Index.NO)
 	private boolean strict;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public List<String> getValues() {
-		return values;
-	}
-
-	public void setValues(List<String> values) {
-		this.values = values;
-	}
-
-	public SchemaFieldType getType() {
-		return type;
-	}
-
-	public void setType(SchemaFieldType type) {
-		this.type = type;
-	}
-
-	public boolean isRequired() {
-		return required;
-	}
-
-	public void setRequired(boolean required) {
-		this.required = required;
-	}
-
-	public boolean isStrict() {
-		return strict;
-	}
-
-	public void setStrict(boolean strict) {
-		this.strict = strict;
-	}
-
-	@Override
-	public boolean equals(Object another) {
-		return EqualsBuilder.reflectionEquals(this, another);
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
-	}
 
 }

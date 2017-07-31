@@ -53,6 +53,7 @@ public class OldDecorator2NewStrutsFreemarkerDecorator extends BaseWebAppDecorat
 		}
 	}
 
+	@Override
 	protected void render(Content content, HttpServletRequest request, HttpServletResponse response,
 			ServletContext servletContext, SiteMeshWebAppContext webAppContext) throws IOException, ServletException {
 
@@ -132,58 +133,73 @@ public class OldDecorator2NewStrutsFreemarkerDecorator extends BaseWebAppDecorat
 			this.action = action;
 		}
 
+		@Override
 		public Object getAction() {
 			return action;
 		}
 
+		@Override
 		public boolean isExecuted() {
 			return false;
 		}
 
+		@Override
 		public ActionContext getInvocationContext() {
 			return null;
 		}
 
+		@Override
 		public ActionProxy getProxy() {
 			return null;
 		}
 
+		@Override
 		public Result getResult() throws Exception {
 			return null;
 		}
 
+		@Override
 		public String getResultCode() {
 			return null;
 		}
 
+		@Override
 		public void setResultCode(String resultCode) {
 		}
 
+		@Override
 		public ValueStack getStack() {
 			return null;
 		}
 
+		@Override
 		public void addPreResultListener(PreResultListener listener) {
 		}
 
+		@Override
 		public String invoke() throws Exception {
 			return null;
 		}
 
+		@Override
 		public String invokeActionOnly() throws Exception {
 			return null;
 		}
 
+		@Override
 		public void setActionEventListener(ActionEventListener listener) {
 		}
 
+		@Override
 		public void init(ActionProxy proxy) {
 		}
 
+		@Override
 		public ActionInvocation serialize() {
 			return null;
 		}
 
+		@Override
 		public ActionInvocation deserialize(ActionContext actionContext) {
 			return null;
 		}

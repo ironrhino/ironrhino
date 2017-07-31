@@ -50,6 +50,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 public class Oauth2Action extends BaseAction {
 
@@ -84,181 +87,68 @@ public class Oauth2Action extends BaseAction {
 	@Autowired(required = false)
 	protected VerificationManager verificationManager;
 
+	@Getter
+	@Setter
 	private String username;
+	@Getter
+	@Setter
 	private String password;
+	@Getter
+	@Setter
 	private String client_id;
+	@Getter
+	@Setter
 	private String client_secret;
+	@Getter
+	@Setter
 	private String device_id;
+	@Getter
+	@Setter
 	private String device_name;
+	@Getter
+	@Setter
 	private String redirect_uri;
+	@Getter
+	@Setter
 	private String scope;
+	@Getter
+	@Setter
 	private String code;
+	@Getter
+	@Setter
 	private ResponseType response_type;
+	@Getter
+	@Setter
 	private GrantType grant_type;
+	@Getter
+	@Setter
 	private String state;
+	@Getter
+	@Setter
 	private String access_token;
+	@Getter
+	@Setter
 	private String refresh_token;
+	@Getter
+	@Setter
 	private String token;
+	@Getter
+	@Setter
 	private String approval_prompt;
+
+	@Getter
 	private Authorization authorization;
+	@Getter
 	private Client client;
 
+	@Getter
 	private Map<String, Serializable> tojson;
+	@Getter
 	private boolean displayForNative;
+	@Getter
 	private boolean granted;
+	@Getter
 	private boolean denied;
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public Map<String, Serializable> getTojson() {
-		return tojson;
-	}
-
-	public Client getClient() {
-		return client;
-	}
-
-	public Authorization getAuthorization() {
-		return authorization;
-	}
-
-	public String getState() {
-		return state;
-	}
-
-	public void setState(String state) {
-		this.state = state;
-	}
-
-	public String getAccess_token() {
-		return access_token;
-	}
-
-	public void setAccess_token(String access_token) {
-		this.access_token = access_token;
-	}
-
-	public String getRefresh_token() {
-		return refresh_token;
-	}
-
-	public void setRefresh_token(String refresh_token) {
-		this.refresh_token = refresh_token;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getClient_id() {
-		return client_id;
-	}
-
-	public void setClient_id(String client_id) {
-		this.client_id = client_id;
-	}
-
-	public String getClient_secret() {
-		return client_secret;
-	}
-
-	public void setClient_secret(String client_secret) {
-		this.client_secret = client_secret;
-	}
-
-	public String getDevice_id() {
-		return device_id;
-	}
-
-	public void setDevice_id(String device_id) {
-		this.device_id = device_id;
-	}
-
-	public String getDevice_name() {
-		return device_name;
-	}
-
-	public void setDevice_name(String device_name) {
-		this.device_name = device_name;
-	}
-
-	public GrantType getGrant_type() {
-		return grant_type;
-	}
-
-	public void setGrant_type(GrantType grant_type) {
-		this.grant_type = grant_type;
-	}
-
-	public String getRedirect_uri() {
-		return redirect_uri;
-	}
-
-	public void setRedirect_uri(String redirect_uri) {
-		this.redirect_uri = redirect_uri;
-	}
-
-	public String getScope() {
-		return scope;
-	}
-
-	public void setScope(String scope) {
-		this.scope = scope;
-	}
-
-	public ResponseType getResponse_type() {
-		return response_type;
-	}
-
-	public void setResponse_type(ResponseType response_type) {
-		this.response_type = response_type;
-	}
-
-	public String getApproval_prompt() {
-		return approval_prompt;
-	}
-
-	public void setApproval_prompt(String approval_prompt) {
-		this.approval_prompt = approval_prompt;
-	}
-
-	public boolean isDisplayForNative() {
-		return displayForNative;
-	}
-
-	public boolean isGranted() {
-		return granted;
-	}
-
-	public boolean isDenied() {
-		return denied;
-	}
 
 	@Override
 	public String execute() {

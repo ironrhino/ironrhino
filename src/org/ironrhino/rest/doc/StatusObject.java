@@ -5,6 +5,9 @@ import java.io.Serializable;
 import org.ironrhino.rest.doc.annotation.Status;
 import org.springframework.http.HttpStatus;
 
+import lombok.Data;
+
+@Data
 public class StatusObject implements Serializable {
 
 	private static final long serialVersionUID = 7945088092832154760L;
@@ -31,30 +34,6 @@ public class StatusObject implements Serializable {
 	public StatusObject(HttpStatus httpStatus) {
 		this.code = httpStatus.value();
 		this.message = httpStatus.getReasonPhrase();
-	}
-
-	public int getCode() {
-		return code;
-	}
-
-	public void setCode(int code) {
-		this.code = code;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 }

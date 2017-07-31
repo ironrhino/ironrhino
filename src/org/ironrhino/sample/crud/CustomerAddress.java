@@ -9,12 +9,13 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ironrhino.common.model.Region;
 import org.ironrhino.core.metadata.UiConfig;
 
+import lombok.Data;
+
 @Embeddable
+@Data
 public class CustomerAddress implements Serializable {
 
 	private static final long serialVersionUID = -2175577393105618397L;
@@ -31,44 +32,5 @@ public class CustomerAddress implements Serializable {
 
 	@UiConfig(cssClass = "input-xxlarge")
 	private String address;
-
-	public AddressType getType() {
-		return type;
-	}
-
-	public void setType(AddressType type) {
-		this.type = type;
-	}
-
-	public Region getRegion() {
-		return region;
-	}
-
-	public void setRegion(Region region) {
-		this.region = region;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
-	}
-
-	@Override
-	public String toString() {
-		return "{type=" + type + ", region=" + region + ", address=" + address + "}";
-	}
 
 }

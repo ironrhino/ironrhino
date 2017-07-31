@@ -20,116 +20,62 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class StatsAction extends BaseAction {
 
 	private static final long serialVersionUID = -6901193289995112304L;
 
+	@Getter
+	@Setter
 	private Date date;
 
+	@Getter
+	@Setter
 	private Date from;
 
+	@Getter
+	@Setter
 	private Date to;
 
+	@Getter
+	@Setter
 	private int limit = 10;
 
+	@Getter
 	private List<Tuple<Date, Long>> dataList;
 
+	@Getter
 	private Tuple<Date, Long> max;
 
+	@Getter
 	private Long total;
 
+	@Getter
+	@Setter
 	private String service;
 
+	@Getter
+	@Setter
 	private StatsType type = StatsType.SERVER_SIDE;
 
+	@Getter
 	private Map<String, Set<String>> services;
 
+	@Getter
 	private Map<String, Long> hotspots;
 
+	@Getter
 	private List<InvocationWarning> warnings;
 
+	@Getter
 	private List<InvocationSample> samples;
 
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
-
-	public String getService() {
-		return service;
-	}
-
-	public void setService(String service) {
-		this.service = service;
-	}
-
-	public StatsType getType() {
-		return type;
-	}
-
-	public void setType(StatsType type) {
-		this.type = type;
-	}
-
-	public Map<String, Set<String>> getServices() {
-		return services;
-	}
-
-	public Map<String, Long> getHotspots() {
-		return hotspots;
-	}
-
-	public List<InvocationWarning> getWarnings() {
-		return warnings;
-	}
-
-	public List<InvocationSample> getSamples() {
-		return samples;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public Date getFrom() {
-		return from;
-	}
-
-	public void setFrom(Date from) {
-		this.from = from;
-	}
-
-	public Date getTo() {
-		return to;
-	}
-
-	public void setTo(Date to) {
-		this.to = to;
-	}
-
-	public int getLimit() {
-		return limit;
-	}
-
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
-
-	public List<Tuple<Date, Long>> getDataList() {
-		return dataList;
-	}
-
-	public Tuple<Date, Long> getMax() {
-		return max;
-	}
-
-	public Long getTotal() {
-		return total;
-	}
 
 	@Override
 	public String execute() {

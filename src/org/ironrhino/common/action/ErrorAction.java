@@ -20,6 +20,8 @@ import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.Getter;
+
 @AutoConfig(namespace = "/")
 public class ErrorAction extends BaseAction {
 
@@ -27,6 +29,7 @@ public class ErrorAction extends BaseAction {
 
 	private static Logger logger = LoggerFactory.getLogger(ErrorAction.class);
 
+	@Getter
 	private Throwable exception;
 
 	@Value("${password.entryPoint:}")
@@ -34,10 +37,6 @@ public class ErrorAction extends BaseAction {
 
 	@Autowired(required = false)
 	private HttpErrorHandler httpErrorHandler;
-
-	public Throwable getException() {
-		return exception;
-	}
 
 	@Override
 	public String execute() {

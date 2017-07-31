@@ -4,11 +4,14 @@ import org.ironrhino.core.model.Persistable;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
 
+import lombok.Getter;
+
 public class EntityOperationEvent<T extends Persistable<?>> extends BaseEvent<T> implements ResolvableTypeProvider {
 
 	private static final long serialVersionUID = -3336231774669978161L;
 
-	private EntityOperationType type;
+	@Getter
+	private final EntityOperationType type;
 
 	public EntityOperationEvent(T entity, EntityOperationType type) {
 		super(entity);
@@ -17,10 +20,6 @@ public class EntityOperationEvent<T extends Persistable<?>> extends BaseEvent<T>
 
 	public T getEntity() {
 		return getSource();
-	}
-
-	public EntityOperationType getType() {
-		return type;
 	}
 
 	@Override

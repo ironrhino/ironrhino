@@ -10,14 +10,17 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.Test;
+
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 public class XmlUtilsTest {
 
 	@XmlRootElement
+	@Getter
+	@Setter
 	public static class User implements Serializable {
 
 		private static final long serialVersionUID = -7632092470064636390L;
@@ -33,85 +36,15 @@ public class XmlUtilsTest {
 			createDate = cal.getTime();
 		}
 
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		public boolean isEnabled() {
-			return enabled;
-		}
-
-		public void setEnabled(boolean enabled) {
-			this.enabled = enabled;
-		}
-
-		public Date getCreateDate() {
-			return createDate;
-		}
-
-		public void setCreateDate(Date createDate) {
-			this.createDate = createDate;
-		}
-
-		public List<Name> getNames() {
-			return names;
-		}
-
-		public void setNames(List<Name> names) {
-			this.names = names;
-		}
-
 	}
 
 	@XmlRootElement
+	@Data
 	public static class Name implements Serializable {
 
 		private static final long serialVersionUID = 2600540506012485655L;
 		private String first;
 		private String last;
-
-		public String getFirst() {
-			return first;
-		}
-
-		public void setFirst(String first) {
-			this.first = first;
-		}
-
-		public String getLast() {
-			return last;
-		}
-
-		public void setLast(String last) {
-			this.last = last;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			return EqualsBuilder.reflectionEquals(this, o, false);
-		}
-
-		@Override
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this, false);
-		}
-
-		@Override
-		public String toString() {
-			return ToStringBuilder.reflectionToString(this);
-		}
 
 	}
 

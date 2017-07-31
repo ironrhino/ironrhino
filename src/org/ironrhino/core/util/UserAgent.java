@@ -5,6 +5,11 @@ import java.util.Locale;
 
 import org.ironrhino.core.util.AppInfo.Stage;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class UserAgent implements Serializable {
 
 	private static final long serialVersionUID = 7964528679540704029L;
@@ -29,16 +34,8 @@ public class UserAgent implements Serializable {
 
 	private String appName;
 
-	public UserAgent() {
-
-	}
-
 	public UserAgent(String userAgent) {
 		setUserAgent(userAgent);
-	}
-
-	public String getUserAgent() {
-		return userAgent;
 	}
 
 	public void setUserAgent(String userAgent) {
@@ -128,14 +125,6 @@ public class UserAgent implements Serializable {
 		}
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
 	public void setVersion(String version) {
 		this.version = version;
 		if (version != null && !version.equals("unknown")) {
@@ -148,50 +137,6 @@ public class UserAgent implements Serializable {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public int getMajorVersion() {
-		return majorVersion;
-	}
-
-	public int getMinorVersion() {
-		return minorVersion;
-	}
-
-	public String getPlatform() {
-		return platform;
-	}
-
-	public String getAppId() {
-		return appId;
-	}
-
-	public void setAppId(String appId) {
-		this.appId = appId;
-	}
-
-	public String getAppName() {
-		return appName;
-	}
-
-	public void setAppName(String appName) {
-		this.appName = appName;
-	}
-
-	public String getDevice() {
-		return device;
-	}
-
-	public void setDevice(String device) {
-		this.device = device;
-	}
-
-	public boolean isMobile() {
-		return mobile;
-	}
-
-	public void setMobile(boolean mobile) {
-		this.mobile = mobile;
 	}
 
 }

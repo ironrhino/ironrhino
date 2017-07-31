@@ -25,6 +25,8 @@ import com.opensymphony.xwork2.util.ValueStack;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRField;
 import net.sf.jasperreports.engine.JRParameter;
@@ -62,66 +64,28 @@ public class JasperReportsResult extends StrutsResultSupport {
 
 	private final static Logger LOG = LoggerFactory.getLogger(JasperReportsResult.class);
 
+	@Setter
 	protected String dataSource;
+	@Setter
 	protected String format;
+	@Setter
 	protected String documentName;
+	@Setter
 	protected String contentDisposition;
+	@Setter
 	protected String timeZone;
 
+	@Getter
+	@Setter
 	protected String connection;
 
+	@Getter
+	@Setter
 	protected String reportParameters;
 
+	@Getter
+	@Setter
 	protected String exportParameters;
-
-	public void setDataSource(String dataSource) {
-		this.dataSource = dataSource;
-	}
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
-	public void setDocumentName(String documentName) {
-		this.documentName = documentName;
-	}
-
-	public void setContentDisposition(String contentDisposition) {
-		this.contentDisposition = contentDisposition;
-	}
-
-	/**
-	 * set time zone id
-	 *
-	 * @param timeZone
-	 */
-	public void setTimeZone(final String timeZone) {
-		this.timeZone = timeZone;
-	}
-
-	public String getReportParameters() {
-		return reportParameters;
-	}
-
-	public void setReportParameters(String reportParameters) {
-		this.reportParameters = reportParameters;
-	}
-
-	public String getExportParameters() {
-		return exportParameters;
-	}
-
-	public void setExportParameters(String exportParameters) {
-		this.exportParameters = exportParameters;
-	}
-
-	public String getConnection() {
-		return connection;
-	}
-
-	public void setConnection(String connection) {
-		this.connection = connection;
-	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override

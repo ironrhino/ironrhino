@@ -21,12 +21,19 @@ import org.ironrhino.core.util.PinyinUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @PublishAware
 @AutoConfig
 @Searchable
 @Entity
 @Table(name = "common_region")
 @FullnameSeperator(independent = false, seperator = "")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Region extends BaseTreeableEntity<Region> {
 
 	private static final long serialVersionUID = 8878381261391688086L;
@@ -47,10 +54,6 @@ public class Region extends BaseTreeableEntity<Region> {
 	@UiConfig(cssClass = "positive", dynamicAttributes = "{\"min\":\"1\"}")
 	private Integer rank;
 
-	public Region() {
-
-	}
-
 	public Region(String name) {
 		this.name = name;
 	}
@@ -58,22 +61,6 @@ public class Region extends BaseTreeableEntity<Region> {
 	public Region(String name, int displayOrder) {
 		this.name = name;
 		this.displayOrder = displayOrder;
-	}
-
-	public Coordinate getCoordinate() {
-		return coordinate;
-	}
-
-	public void setCoordinate(Coordinate coordinate) {
-		this.coordinate = coordinate;
-	}
-
-	public String getAreacode() {
-		return areacode;
-	}
-
-	public void setAreacode(String areacode) {
-		this.areacode = areacode;
 	}
 
 	@Override
@@ -86,31 +73,11 @@ public class Region extends BaseTreeableEntity<Region> {
 		return fullname;
 	}
 
-	public void setFullname(String fullname) {
-		this.fullname = fullname;
-	}
-
 	@Override
 	public void setParent(Region parent) {
 		super.setParent(parent);
 		if (this.fullname != null)
 			this.fullname = super.getFullname();
-	}
-
-	public String getPostcode() {
-		return postcode;
-	}
-
-	public void setPostcode(String postcode) {
-		this.postcode = postcode;
-	}
-
-	public Integer getRank() {
-		return rank;
-	}
-
-	public void setRank(Integer rank) {
-		this.rank = rank;
 	}
 
 	@JsonIgnore

@@ -27,11 +27,16 @@ import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAllGranted = UserRole.ROLE_ADMINISTRATOR)
 @Entity
 @Table(name = "oauth_client")
 @Richtable(order = "name asc", celleditable = false)
+@Getter
+@Setter
 public class Client extends BaseEntity implements Enableable, Attachmentable {
 
 	private static final long serialVersionUID = -7297737795748467475L;
@@ -72,77 +77,9 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 
 	private List<String> attachments = new ArrayList<>(0);
 
-	@Override
-	public List<String> getAttachments() {
-		return attachments;
-	}
-
-	@Override
-	public void setAttachments(List<String> attachments) {
-		this.attachments = attachments;
-	}
-
 	@UiConfig(displayOrder = 2, width = "200px", alias = "client_id")
 	public String getClientId() {
 		return getId();
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getSecret() {
-		return secret;
-	}
-
-	public void setSecret(String secret) {
-		this.secret = secret;
-	}
-
-	public String getRedirectUri() {
-		return redirectUri;
-	}
-
-	public void setRedirectUri(String redirectUri) {
-		this.redirectUri = redirectUri;
-	}
-
-	public User getOwner() {
-		return owner;
-	}
-
-	public void setOwner(User owner) {
-		this.owner = owner;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	@Override
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
 	}
 
 	@Override

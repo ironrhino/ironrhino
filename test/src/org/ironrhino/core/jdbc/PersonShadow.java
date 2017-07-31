@@ -11,6 +11,9 @@ import javax.persistence.Enumerated;
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.util.DateUtils;
 
+import lombok.Data;
+
+@Data
 public class PersonShadow implements Serializable {
 
 	private static final long serialVersionUID = 7400168548407982903L;
@@ -26,46 +29,6 @@ public class PersonShadow implements Serializable {
 	private int age;
 
 	private BigDecimal amount;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Gender getGender() {
-		return gender;
-	}
-
-	public void setGender(Gender gender) {
-		this.gender = gender;
-	}
-
-	public Date getDob() {
-		return dob;
-	}
-
-	public void setDob(Date dob) {
-		this.dob = dob;
-	}
-
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-
-	public BigDecimal getAmount() {
-		return amount;
-	}
-
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
 
 	@Override
 	public int hashCode() {

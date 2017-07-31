@@ -29,11 +29,17 @@ import org.jsoup.select.Elements;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 @Searchable
 @AutoConfig
 @Entity
 @Table(name = "common_page")
 @Richtable(searchable = true)
+@Getter
+@Setter
 public class Page extends BaseRecordableEntity implements Ordered<Page> {
 
 	private static final long serialVersionUID = 4688382703803043164L;
@@ -74,71 +80,6 @@ public class Page extends BaseRecordableEntity implements Ordered<Page> {
 	@SearchableProperty(index = Index.NOT_ANALYZED)
 	private Set<String> tags = new LinkedHashSet<>(0);
 
-	public String getHead() {
-		return head;
-	}
-
-	public void setHead(String head) {
-		this.head = head;
-	}
-
-	@Override
-	public int getDisplayOrder() {
-		return displayOrder;
-	}
-
-	public void setDisplayOrder(int displayOrder) {
-		this.displayOrder = displayOrder;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getDraft() {
-		return draft;
-	}
-
-	public void setDraft(String draft) {
-		this.draft = draft;
-	}
-
-	public Date getDraftDate() {
-		return draftDate;
-	}
-
-	public void setDraftDate(Date draftDate) {
-		this.draftDate = draftDate;
-	}
-
-	public Set<String> getTags() {
-		return tags;
-	}
-
-	public void setTags(Set<String> tags) {
-		this.tags = tags;
-	}
-
 	public String abbreviate(int size) {
 		return StringUtils.isNotBlank(content) ? StringUtils.abbreviate(Jsoup.parse(content).text().trim(), size).trim()
 				: null;
@@ -160,36 +101,12 @@ public class Page extends BaseRecordableEntity implements Ordered<Page> {
 		return images;
 	}
 
-	public static class Image implements Serializable {
+	public static @Data class Image implements Serializable {
 
 		private static final long serialVersionUID = -3425565099362299759L;
 		private String src;
 		private String alt;
 		private String title;
-
-		public String getSrc() {
-			return src;
-		}
-
-		public void setSrc(String src) {
-			this.src = src;
-		}
-
-		public String getAlt() {
-			return alt;
-		}
-
-		public void setAlt(String alt) {
-			this.alt = alt;
-		}
-
-		public String getTitle() {
-			return title;
-		}
-
-		public void setTitle(String title) {
-			this.title = title;
-		}
 
 	}
 

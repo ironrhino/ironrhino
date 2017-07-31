@@ -38,6 +38,9 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @ClassPresentConditional("org.ironrhino.security.service.UserManagerImpl")
 public class SignupAction extends BaseAction {
@@ -50,12 +53,20 @@ public class SignupAction extends BaseAction {
 
 	protected static Logger logger = LoggerFactory.getLogger(SignupAction.class);
 
+	@Getter
+	@Setter
 	private String email;
 
+	@Getter
+	@Setter
 	private String username;
 
+	@Getter
+	@Setter
 	private String password;
 
+	@Getter
+	@Setter
 	private String confirmPassword;
 
 	@Value("${password.entryPoint:}")
@@ -72,38 +83,6 @@ public class SignupAction extends BaseAction {
 
 	@Autowired(required = false)
 	private MailService mailService;
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getConfirmPassword() {
-		return confirmPassword;
-	}
-
-	public void setConfirmPassword(String confirmPassword) {
-		this.confirmPassword = confirmPassword;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
 	@Override
 	public String input() {

@@ -15,89 +15,50 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 public class PageViewAction extends BaseAction {
 
 	private static final long serialVersionUID = -6901193289995112304L;
 
+	@Getter
+	@Setter
 	private Date date;
 
+	@Getter
+	@Setter
 	private Date from;
 
+	@Getter
+	@Setter
 	private Date to;
 
+	@Getter
 	private List<Tuple<Date, Long>> dataList;
 
+	@Getter
 	private Tuple<Date, Long> max;
 
+	@Getter
 	private Long total;
 
+	@Setter
 	private int limit;
 
+	@Getter
+	@Setter
 	private String domain;
 
+	@Getter
 	private Set<String> domains;
 
+	@Getter
 	private Map<String, Long> dataMap;
 
 	@Autowired
 	private PageViewService pageViewService;
-
-	public String getDomain() {
-		return domain;
-	}
-
-	public void setDomain(String domain) {
-		this.domain = domain;
-	}
-
-	public Set<String> getDomains() {
-		return domains;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public Date getFrom() {
-		return from;
-	}
-
-	public void setFrom(Date from) {
-		this.from = from;
-	}
-
-	public Date getTo() {
-		return to;
-	}
-
-	public void setTo(Date to) {
-		this.to = to;
-	}
-
-	public List<Tuple<Date, Long>> getDataList() {
-		return dataList;
-	}
-
-	public Tuple<Date, Long> getMax() {
-		return max;
-	}
-
-	public Long getTotal() {
-		return total;
-	}
-
-	public Map<String, Long> getDataMap() {
-		return dataMap;
-	}
-
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
 
 	@Override
 	public String execute() {

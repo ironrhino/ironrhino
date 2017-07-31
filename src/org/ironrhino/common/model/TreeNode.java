@@ -18,12 +18,19 @@ import org.ironrhino.core.model.Attribute;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @PublishAware
 @AutoConfig
 @Entity
 @Table(name = "common_treenode")
 @Searchable
 @Richtable(order = "displayOrder,name")
+@Getter
+@Setter
+@NoArgsConstructor
 public class TreeNode extends BaseTreeableEntity<TreeNode> implements Attributable {
 
 	private static final long serialVersionUID = 8878337541387688086L;
@@ -37,10 +44,6 @@ public class TreeNode extends BaseTreeableEntity<TreeNode> implements Attributab
 	@UiConfig(hiddenInList = @Hidden(true))
 	private List<Attribute> attributes = new ArrayList<>();
 
-	public TreeNode() {
-
-	}
-
 	public TreeNode(String name) {
 		this.name = name;
 	}
@@ -48,24 +51,6 @@ public class TreeNode extends BaseTreeableEntity<TreeNode> implements Attributab
 	public TreeNode(String name, int displayOrder) {
 		this.name = name;
 		this.displayOrder = displayOrder;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	@Override
-	public List<Attribute> getAttributes() {
-		return attributes;
-	}
-
-	@Override
-	public void setAttributes(List<Attribute> attributes) {
-		this.attributes = attributes;
 	}
 
 }

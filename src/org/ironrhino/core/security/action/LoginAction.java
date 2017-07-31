@@ -43,6 +43,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class LoginAction extends BaseAction {
@@ -53,8 +56,12 @@ public class LoginAction extends BaseAction {
 
 	protected static Logger logger = LoggerFactory.getLogger(LoginAction.class);
 
+	@Getter
+	@Setter
 	protected String password;
 
+	@Getter
+	@Setter
 	protected String username;
 
 	@Value("${login.defaultTargetUrl:/}")
@@ -74,22 +81,6 @@ public class LoginAction extends BaseAction {
 
 	@Autowired(required = false)
 	protected VerificationManager verificationManager;
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
 	@Override
 	@Redirect

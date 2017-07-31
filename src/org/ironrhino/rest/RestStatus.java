@@ -9,6 +9,9 @@ import org.ironrhino.core.metadata.UiConfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @JsonIgnoreProperties({ "localizedMessage", "cause", "stackTrace", "suppressed" })
 public class RestStatus extends RuntimeException {
 
@@ -38,14 +41,22 @@ public class RestStatus extends RuntimeException {
 	public static final RestStatus UNAUTHORIZED = valueOf(CODE_UNAUTHORIZED, null, 401);
 	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND, null, 404);
 
+	@Getter
+	@Setter
 	@UiConfig(required = true)
 	private String code;
 
+	@Getter
+	@Setter
 	@UiConfig(required = true)
 	private String status;
 
+	@Getter
+	@Setter
 	private String message;
 
+	@Getter
+	@Setter
 	@JsonIgnore
 	private Integer httpStatusCode;
 
@@ -68,39 +79,6 @@ public class RestStatus extends RuntimeException {
 		this.status = status;
 		this.message = message;
 		this.httpStatusCode = httpStatusCode;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public Integer getHttpStatusCode() {
-		return httpStatusCode;
-	}
-
-	public void setHttpStatusCode(Integer httpStatusCode) {
-		this.httpStatusCode = httpStatusCode;
-	}
-
-	@Override
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 	public static RestStatus valueOf(String code) {

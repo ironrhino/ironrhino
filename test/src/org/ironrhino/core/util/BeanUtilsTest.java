@@ -21,9 +21,13 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.junit.Test;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 public class BeanUtilsTest {
 
-	public static class Base implements Serializable, Persistable<String> {
+	public static @Data class Base implements Serializable, Persistable<String> {
 
 		private static final long serialVersionUID = 1616212908678942555L;
 		protected String id;
@@ -36,39 +40,6 @@ public class BeanUtilsTest {
 			return id == null;
 		}
 
-		@Override
-		public String getId() {
-			return id;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
-
-		public List<String> getNames() {
-			return names;
-		}
-
-		public void setNames(List<String> names) {
-			this.names = names;
-		}
-
-		public Set<String> getTags() {
-			return tags;
-		}
-
-		public void setTags(Set<String> tags) {
-			this.tags = tags;
-		}
-
-		public Map<String, String> getAttributes() {
-			return attributes;
-		}
-
-		public void setAttributes(Map<String, String> attributes) {
-			this.attributes = attributes;
-		}
-
 	}
 
 	public static enum UserType {
@@ -79,6 +50,8 @@ public class BeanUtilsTest {
 		A, B
 	}
 
+	@Getter
+	@Setter
 	public static class User extends Base {
 
 		private static final long serialVersionUID = -1634488900558289348L;
@@ -90,40 +63,10 @@ public class BeanUtilsTest {
 
 		private UserType type = UserType.A;
 
-		public Team getTeam() {
-			return team;
-		}
-
-		public void setTeam(Team team) {
-			this.team = team;
-		}
-
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		public UserType getType() {
-			return type;
-		}
-
-		public void setType(UserType type) {
-			this.type = type;
-		}
-
 	}
 
+	@Getter
+	@Setter
 	public static class User2 extends Base {
 
 		private static final long serialVersionUID = 5095445311043690504L;
@@ -133,36 +76,14 @@ public class BeanUtilsTest {
 
 		private UserType2 type = UserType2.A;
 
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		public UserType2 getType() {
-			return type;
-		}
-
-		public void setType(UserType2 type) {
-			this.type = type;
-		}
-
 	}
 
 	public static enum TeamType {
 		A, B
 	}
 
+	@Getter
+	@Setter
 	public static class Team extends Base {
 
 		private static final long serialVersionUID = 8360294456202382419L;
@@ -177,52 +98,14 @@ public class BeanUtilsTest {
 
 		private Date createDate = new Date();
 
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public User getOwner() {
-			return owner;
-		}
-
-		public void setOwner(User owner) {
-			this.owner = owner;
-		}
-
-		public TeamType getType() {
-			return type;
-		}
-
-		public void setType(TeamType type) {
-			this.type = type;
-		}
-
-		public List<User> getUsers() {
-			return users;
-		}
-
-		public void setUsers(List<User> users) {
-			this.users = users;
-		}
-
-		public Date getCreateDate() {
-			return createDate;
-		}
-
-		public void setCreateDate(Date createDate) {
-			this.createDate = createDate;
-		}
-
 	}
 
 	public static enum TeamType2 {
 		A, B
 	}
 
+	@Getter
+	@Setter
 	public static class Team2 extends Base {
 
 		private static final long serialVersionUID = 3455118342183020069L;
@@ -235,40 +118,10 @@ public class BeanUtilsTest {
 
 		private List<User2> users;
 
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public User2 getOwner() {
-			return owner;
-		}
-
-		public void setOwner(User2 owner) {
-			this.owner = owner;
-		}
-
-		public TeamType2 getType() {
-			return type;
-		}
-
-		public void setType(TeamType2 type) {
-			this.type = type;
-		}
-
-		public List<User2> getUsers() {
-			return users;
-		}
-
-		public void setUsers(List<User2> users) {
-			this.users = users;
-		}
-
 	}
 
+	@Getter
+	@Setter
 	public static class Team3 extends Base {
 
 		private static final long serialVersionUID = 1709649066766563947L;
@@ -279,32 +132,10 @@ public class BeanUtilsTest {
 
 		private String createDate;
 
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getOwner() {
-			return owner;
-		}
-
-		public void setOwner(String owner) {
-			this.owner = owner;
-		}
-
-		public String getCreateDate() {
-			return createDate;
-		}
-
-		public void setCreateDate(String createDate) {
-			this.createDate = createDate;
-		}
-
 	}
 
+	@Getter
+	@Setter
 	public static class Team4 extends Base {
 
 		private static final long serialVersionUID = 4712258219610091729L;
@@ -320,30 +151,6 @@ public class BeanUtilsTest {
 			this.name = team.getName();
 			this.owner = team.getOwner();
 			this.createDate = team.getCreateDate();
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public User getOwner() {
-			return owner;
-		}
-
-		public void setOwner(User owner) {
-			this.owner = owner;
-		}
-
-		public Date getCreateDate() {
-			return createDate;
-		}
-
-		public void setCreateDate(Date createDate) {
-			this.createDate = createDate;
 		}
 
 	}
@@ -561,7 +368,7 @@ public class BeanUtilsTest {
 		BeanUtils.createParentIfNull(u, "team.users[0].username");
 		assertNotNull(u.getTeam().getUsers());
 	}
-	
+
 	@Test
 	public void testIsEmpty() {
 		Team3 team = new Team3();

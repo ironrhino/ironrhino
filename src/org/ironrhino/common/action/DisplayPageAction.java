@@ -11,6 +11,9 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig(namespace = DisplayPageAction.NAMESPACE, actionName = DisplayPageAction.ACTION_NAME)
 public class DisplayPageAction extends BaseAction {
 
@@ -19,8 +22,11 @@ public class DisplayPageAction extends BaseAction {
 	public static final String NAMESPACE = "/";
 	public static final String ACTION_NAME = "_display_page_";
 
+	@Getter
 	private Page page;
 
+	@Getter
+	@Setter
 	private boolean preview;
 
 	@Autowired
@@ -28,18 +34,6 @@ public class DisplayPageAction extends BaseAction {
 
 	@Autowired
 	private SettingControl settingControl;
-
-	public boolean isPreview() {
-		return preview;
-	}
-
-	public void setPreview(boolean preview) {
-		this.preview = preview;
-	}
-
-	public Page getPage() {
-		return page;
-	}
 
 	@Override
 	public String execute() {

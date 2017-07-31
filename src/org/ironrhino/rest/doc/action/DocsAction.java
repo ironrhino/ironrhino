@@ -15,6 +15,9 @@ import org.ironrhino.rest.doc.ApiDocHelper;
 import org.ironrhino.rest.doc.ApiModuleObject;
 import org.springframework.beans.factory.annotation.Value;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 public class DocsAction extends BaseAction {
 
@@ -25,12 +28,19 @@ public class DocsAction extends BaseAction {
 	@Value("${apiBaseUrl:}")
 	protected String apiBaseUrl;
 
+	@Getter
+	@Setter
 	protected String category = "";
 
+	@Getter
+	@Setter
 	protected String module;
 
+	@Getter
+	@Setter
 	protected String api;
 
+	@Getter
 	protected ApiDoc apiDoc;
 
 	public String getApiBaseUrl() {
@@ -45,34 +55,6 @@ public class DocsAction extends BaseAction {
 			cache = ApiDocHelper.getApiModules();
 		}
 		return cache;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public String getModule() {
-		return module;
-	}
-
-	public void setModule(String module) {
-		this.module = module;
-	}
-
-	public String getApi() {
-		return api;
-	}
-
-	public void setApi(String api) {
-		this.api = api;
-	}
-
-	public ApiDoc getApiDoc() {
-		return apiDoc;
 	}
 
 	@Override

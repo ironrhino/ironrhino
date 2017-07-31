@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.io.Files;
 
+import lombok.Data;
+
 @Primary
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = { CLOUD, CLUSTER })
@@ -240,6 +242,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 		return sortedMap;
 	}
 
+	@Data
 	private static class File implements Serializable {
 
 		private static final long serialVersionUID = -7690537474523537861L;
@@ -252,38 +255,6 @@ public class MongoFileStorage extends AbstractFileStorage {
 		private long lastModified;
 
 		private byte[] data;
-
-		public String getPath() {
-			return path;
-		}
-
-		public void setPath(String path) {
-			this.path = path;
-		}
-
-		public boolean isDirectory() {
-			return directory;
-		}
-
-		public void setDirectory(boolean directory) {
-			this.directory = directory;
-		}
-
-		public long getLastModified() {
-			return lastModified;
-		}
-
-		public void setLastModified(long lastModified) {
-			this.lastModified = lastModified;
-		}
-
-		public byte[] getData() {
-			return data;
-		}
-
-		public void setData(byte[] data) {
-			this.data = data;
-		}
 
 	}
 

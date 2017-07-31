@@ -15,15 +15,20 @@ import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name = "sample_balance_query")
 @AutoConfig
 @Richtable(readonly = @Readonly(expression = "!entity.new"), order = "createDate desc", showActionColumn = false)
+@Getter
+@Setter
 public class BalanceQuery extends BaseEntity {
 
 	private static final long serialVersionUID = 3825969412916897020L;
 
-	@UiConfig(width = "150px", regex="\\d+")
+	@UiConfig(width = "150px", regex = "\\d+")
 	@Column(nullable = false, length = 20)
 	private String accountNo;
 
@@ -46,53 +51,5 @@ public class BalanceQuery extends BaseEntity {
 	@Lob
 	@Column(insertable = false)
 	private String errorInfo;
-
-	public String getAccountNo() {
-		return accountNo;
-	}
-
-	public void setAccountNo(String accountNo) {
-		this.accountNo = accountNo;
-	}
-
-	public BigDecimal getBalance() {
-		return balance;
-	}
-
-	public void setBalance(BigDecimal balance) {
-		this.balance = balance;
-	}
-
-	public BalanceQueryStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(BalanceQueryStatus status) {
-		this.status = status;
-	}
-
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	public Date getModifyDate() {
-		return modifyDate;
-	}
-
-	public void setModifyDate(Date modifyDate) {
-		this.modifyDate = modifyDate;
-	}
-
-	public String getErrorInfo() {
-		return errorInfo;
-	}
-
-	public void setErrorInfo(String errorInfo) {
-		this.errorInfo = errorInfo;
-	}
 
 }

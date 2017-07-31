@@ -28,8 +28,13 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @MappedSuperclass
+@Getter
+@Setter
 public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends AbstractEntity<Long>
 		implements Treeable<T>, Ordered {
 
@@ -71,18 +76,10 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		return fullId;
 	}
 
-	public void setFullId(String fullId) {
-		this.fullId = fullId;
-	}
-
 	@Override
 	@SearchableId
 	public Long getId() {
 		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	@Override
@@ -91,23 +88,10 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		return id == null || id == 0;
 	}
 
-	@Override
-	public int getLevel() {
-		return level;
-	}
-
-	public void setLevel(int level) {
-		this.level = level;
-	}
-
 	@CaseInsensitive
 	@SearchableProperty(boost = 3)
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	@JsonIgnore
@@ -150,10 +134,6 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		return displayOrder;
 	}
 
-	public void setDisplayOrder(int displayOrder) {
-		this.displayOrder = displayOrder;
-	}
-
 	@Override
 	public int compareTo(Object object) {
 		if (!(object instanceof Ordered))
@@ -170,10 +150,6 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	@UiConfig(hidden = true)
 	public Collection<T> getChildren() {
 		return children;
-	}
-
-	public void setChildren(Collection<T> children) {
-		this.children = children;
 	}
 
 	@JsonIgnore
@@ -196,10 +172,6 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	@UiConfig(hidden = true)
 	public T getParent() {
 		return parent;
-	}
-
-	public void setParent(T parent) {
-		this.parent = parent;
 	}
 
 	public T getDescendantOrSelfById(Long id) {

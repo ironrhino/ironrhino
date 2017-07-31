@@ -11,49 +11,31 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.HtmlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig(namespace = "/", actionName = "region")
 public class RegionTreeAction extends BaseAction {
 
 	private static final long serialVersionUID = -1333891551369466096L;
 
+	@Getter
 	private Collection<Region> children;
 
+	@Getter
+	@Setter
 	private boolean async = true;
 
+	@Getter
+	@Setter
 	private Long tree;
 
+	@Getter
+	@Setter
 	private Long parent;
 
 	@Autowired
 	private BaseTreeControl<Region> regionTreeControl;
-
-	public Long getTree() {
-		return tree;
-	}
-
-	public void setTree(Long tree) {
-		this.tree = tree;
-	}
-
-	public Long getParent() {
-		return parent;
-	}
-
-	public void setParent(Long parent) {
-		this.parent = parent;
-	}
-
-	public boolean isAsync() {
-		return async;
-	}
-
-	public void setAsync(boolean async) {
-		this.async = async;
-	}
-
-	public Collection<Region> getChildren() {
-		return children;
-	}
 
 	@JsonConfig(root = "children")
 	public String children() {

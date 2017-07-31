@@ -14,6 +14,9 @@ import org.ironrhino.core.servlet.RequestContext;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class ResultPage<T> implements Serializable {
 
 	private static final long serialVersionUID = -3653886488085413894L;
@@ -33,34 +36,48 @@ public class ResultPage<T> implements Serializable {
 		}
 	};
 
+	@Setter
 	private int pageNo = 1;
 
+	@Getter
 	private int pageSize = DEFAULT_PAGE_SIZE;
 
 	private int totalPage = 0;
 
+	@Getter
+	@Setter
 	private long totalResults = -1;
 
 	@JsonIgnore
 	private Object criteria;
 
 	@JsonIgnore
+	@Getter
+	@Setter
 	private boolean reverse;
 
 	@JsonIgnore
+	@Getter
+	@Setter
 	private boolean counting = true;
 
 	@JsonIgnore
+	@Getter
+	@Setter
 	private Boolean paginating;
 
 	@JsonIgnore
+	@Getter
 	private boolean executed;
 
+	@Getter
+	@Setter
 	private long tookInMillis;
 
 	@JsonIgnore
 	private int start = -1;
 
+	@Getter
 	private Collection<T> result = new ArrayList<>(0);
 
 	public int getStart() {
@@ -71,58 +88,14 @@ public class ResultPage<T> implements Serializable {
 		this.pageNo = start / pageSize + 1;
 	}
 
-	public boolean isReverse() {
-		return reverse;
-	}
-
-	public void setReverse(boolean reverse) {
-		this.reverse = reverse;
-	}
-
-	public boolean isCounting() {
-		return counting;
-	}
-
-	public void setCounting(boolean counting) {
-		this.counting = counting;
-	}
-
-	public Boolean getPaginating() {
-		return paginating;
-	}
-
-	public void setPaginating(Boolean paginating) {
-		this.paginating = paginating;
-	}
-
 	public boolean isPaginating() {
 		return paginating == null || paginating;
-	}
-
-	public boolean isExecuted() {
-		return executed;
-	}
-
-	public long getTookInMillis() {
-		return tookInMillis;
-	}
-
-	public void setTookInMillis(long tookInMillis) {
-		this.tookInMillis = tookInMillis;
 	}
 
 	public int getPageNo() {
 		if (start >= 0)
 			return start / pageSize + 1;
 		return pageNo;
-	}
-
-	public void setPageNo(int pageNo) {
-		this.pageNo = pageNo;
-	}
-
-	public int getPageSize() {
-		return pageSize;
 	}
 
 	public void setPageSize(int pageSize) {
@@ -133,10 +106,6 @@ public class ResultPage<T> implements Serializable {
 		this.pageSize = pageSize;
 	}
 
-	public Collection<T> getResult() {
-		return result;
-	}
-
 	public void setResult(Collection<T> result) {
 		this.result = result;
 		this.executed = true;
@@ -145,14 +114,6 @@ public class ResultPage<T> implements Serializable {
 	public int getTotalPage() {
 		totalPage = (int) (totalResults % pageSize == 0 ? totalResults / pageSize : totalResults / pageSize + 1);
 		return totalPage;
-	}
-
-	public long getTotalResults() {
-		return totalResults;
-	}
-
-	public void setTotalResults(long totalResults) {
-		this.totalResults = totalResults;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -237,9 +198,8 @@ public class ResultPage<T> implements Serializable {
 					continue;
 				try {
 					for (String value : values)
-						sb.append(name)
-								.append('=').append(URLEncoder
-										.encode(value.length() > 256 ? value.substring(0, 256) : value, "UTF-8"))
+						sb.append(name).append('=').append(
+								URLEncoder.encode(value.length() > 256 ? value.substring(0, 256) : value, "UTF-8"))
 								.append('&');
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();

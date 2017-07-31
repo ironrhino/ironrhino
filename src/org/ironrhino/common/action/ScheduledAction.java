@@ -20,6 +20,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class ScheduledAction extends BaseAction {
@@ -30,25 +33,16 @@ public class ScheduledAction extends BaseAction {
 	private ConfigurableListableBeanFactory ctx;
 
 	@Autowired(required = false)
+	@Getter
 	private ScheduledTaskCircuitBreaker circuitBreaker;
 
+	@Setter
 	private String task;
 
+	@Setter
 	private boolean shortCircuit;
 
 	private static List<String> tasks;
-
-	public ScheduledTaskCircuitBreaker getCircuitBreaker() {
-		return circuitBreaker;
-	}
-
-	public void setTask(String task) {
-		this.task = task;
-	}
-
-	public void setShortCircuit(boolean shortCircuit) {
-		this.shortCircuit = shortCircuit;
-	}
 
 	public List<String> getTasks() {
 		return tasks;

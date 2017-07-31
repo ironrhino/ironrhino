@@ -88,6 +88,8 @@ import com.opensymphony.xwork2.util.ValueStackFactory;
 import com.opensymphony.xwork2.util.reflection.ReflectionContextState;
 
 import freemarker.template.Template;
+import lombok.Getter;
+import lombok.Setter;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class EntityAction<EN extends Persistable<?>> extends BaseAction {
@@ -108,12 +110,19 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	private Map<String, NaturalId> _naturalIds;
 
+	@Getter
+	@Setter
 	protected ResultPage<EN> resultPage;
 
+	@Getter
+	@Setter
 	protected Long tree;
 
+	@Getter
+	@Setter
 	protected Long parent;
 
+	@Getter
 	protected BaseTreeableEntity parentEntity;
 
 	@Autowired(required = false)
@@ -173,34 +182,6 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public Persistable getEntity() {
 		return _entity;
-	}
-
-	public ResultPage getResultPage() {
-		return resultPage;
-	}
-
-	public void setResultPage(ResultPage resultPage) {
-		this.resultPage = resultPage;
-	}
-
-	public Long getTree() {
-		return tree;
-	}
-
-	public void setTree(Long tree) {
-		this.tree = tree;
-	}
-
-	public Long getParent() {
-		return parent;
-	}
-
-	public void setParent(Long parent) {
-		this.parent = parent;
-	}
-
-	public BaseTreeableEntity getParentEntity() {
-		return parentEntity;
 	}
 
 	public RichtableImpl getRichtableConfig() {

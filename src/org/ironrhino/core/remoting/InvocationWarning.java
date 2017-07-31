@@ -5,6 +5,11 @@ import java.util.Date;
 
 import org.ironrhino.core.util.DateUtils;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class InvocationWarning implements Serializable {
 
 	private static final long serialVersionUID = -7375531820015503869L;
@@ -21,64 +26,12 @@ public class InvocationWarning implements Serializable {
 
 	private Date date = new Date();
 
-	public InvocationWarning() {
-
-	}
-
 	public InvocationWarning(String source, String target, String service, long time, boolean failed) {
 		this.source = source;
 		this.target = target;
 		this.service = service;
 		this.time = time;
 		this.failed = failed;
-	}
-
-	public String getSource() {
-		return source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	public String getTarget() {
-		return target;
-	}
-
-	public void setTarget(String target) {
-		this.target = target;
-	}
-
-	public String getService() {
-		return service;
-	}
-
-	public void setService(String service) {
-		this.service = service;
-	}
-
-	public long getTime() {
-		return time;
-	}
-
-	public void setTime(long time) {
-		this.time = time;
-	}
-
-	public boolean isFailed() {
-		return failed;
-	}
-
-	public void setFailed(boolean failed) {
-		this.failed = failed;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
 	}
 
 	@Override

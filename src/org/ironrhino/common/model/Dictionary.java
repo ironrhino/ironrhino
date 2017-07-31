@@ -33,6 +33,9 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.ValidationException;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @RecordAware
 @PublishAware
 @AutoConfig
@@ -41,6 +44,8 @@ import org.ironrhino.core.struts.ValidationException;
 @Entity
 @Table(name = "common_dictionary")
 @Richtable(searchable = true, order = "name asc", exportable = true, importable = true)
+@Getter
+@Setter
 public class Dictionary extends BaseRecordableEntity {
 
 	private static final long serialVersionUID = -8352037604261222984L;
@@ -62,30 +67,6 @@ public class Dictionary extends BaseRecordableEntity {
 	@SearchableComponent
 	@UiConfig(hiddenInList = @Hidden(true), excludedFromCriteria = true)
 	private List<LabelValue> items = new ArrayList<>();
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public List<LabelValue> getItems() {
-		return items;
-	}
-
-	public void setItems(List<LabelValue> items) {
-		this.items = items;
-	}
 
 	@UiConfig(hidden = true)
 	@NotInCopy

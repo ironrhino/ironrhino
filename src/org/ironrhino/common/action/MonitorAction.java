@@ -16,112 +16,58 @@ import org.ironrhino.core.stat.analysis.TreeNode;
 import org.ironrhino.core.struts.BaseAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 public class MonitorAction extends BaseAction {
 
 	private static final long serialVersionUID = -8946871669998582841L;
 
+	@Getter
+	@Setter
 	private Date date;
 
+	@Getter
+	@Setter
 	private Date from;
 
+	@Getter
+	@Setter
 	private Date to;
 
+	@Getter
+	@Setter
 	private boolean localhost;
 
+	@Getter
+	@Setter
 	private String vtype = "l"; // value type l for longValue or d for
 	// doubleValue
 
+	@Getter
+	@Setter
 	private String ctype = "bar";// chart type, bar,line ...
 
+	@Getter
+	@Setter
 	private String namespace;
 
+	@Getter
+	@Setter
 	private String filter;
 
+	@Getter
 	private Map<String, List<TreeNode>> result;
 
+	@Getter
 	private TreeNode treeNode;
 
+	@Getter
 	private Chart chart;
 
 	@Autowired
 	private StatControl statControl;
-
-	public boolean isLocalhost() {
-		return localhost;
-	}
-
-	public void setLocalhost(boolean localhost) {
-		this.localhost = localhost;
-	}
-
-	public String getVtype() {
-		return vtype;
-	}
-
-	public void setVtype(String vtype) {
-		this.vtype = vtype;
-	}
-
-	public String getCtype() {
-		return ctype;
-	}
-
-	public void setCtype(String ctype) {
-		this.ctype = ctype;
-	}
-
-	public String getNamespace() {
-		return namespace;
-	}
-
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
-
-	public String getFilter() {
-		return filter;
-	}
-
-	public void setFilter(String filter) {
-		this.filter = filter;
-	}
-
-	public Date getFrom() {
-		return from;
-	}
-
-	public void setFrom(Date from) {
-		this.from = from;
-	}
-
-	public Date getTo() {
-		return to;
-	}
-
-	public void setTo(Date to) {
-		this.to = to;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public Chart getChart() {
-		return chart;
-	}
-
-	public Map<String, List<TreeNode>> getResult() {
-		return result;
-	}
-
-	public TreeNode getTreeNode() {
-		return treeNode;
-	}
 
 	@Override
 	public String execute() {

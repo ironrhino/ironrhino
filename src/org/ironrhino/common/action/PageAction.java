@@ -25,12 +25,18 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class PageAction extends EntityAction<Page> {
 
 	private static final long serialVersionUID = 67252386921293136L;
 
+	@Getter
+	@Setter
 	private Page page;
 
+	@Getter
 	private boolean draft;
 
 	@Autowired
@@ -43,22 +49,10 @@ public class PageAction extends EntityAction<Page> {
 		cmsPath = val;
 	}
 
-	public boolean isDraft() {
-		return draft;
-	}
-
 	public String getCmsPath() {
 		if (cmsPath.endsWith("/"))
 			return cmsPath.substring(0, cmsPath.length() - 1);
 		return cmsPath;
-	}
-
-	public Page getPage() {
-		return page;
-	}
-
-	public void setPage(Page page) {
-		this.page = page;
 	}
 
 	@Override

@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.interceptor.annotations.Before;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig(namespace = ColumnPageAction.NAMESPACE, actionName = ColumnPageAction.ACTION_NAME)
 public class ColumnPageAction extends BaseAction {
 
@@ -28,51 +31,27 @@ public class ColumnPageAction extends BaseAction {
 	@Autowired
 	protected SettingControl settingControl;
 
-	protected String column;
-
-	protected String[] columns;
-
-	protected ResultPage<Page> resultPage;
-
 	private String name;
 
+	@Getter
+	@Setter
+	protected String column;
+
+	@Getter
+	protected String[] columns;
+
+	@Getter
+	@Setter
+	protected ResultPage<Page> resultPage;
+
+	@Getter
 	protected Page page;
 
+	@Getter
 	protected Page previousPage;
 
+	@Getter
 	protected Page nextPage;
-
-	public ResultPage<Page> getResultPage() {
-		return resultPage;
-	}
-
-	public void setResultPage(ResultPage<Page> resultPage) {
-		this.resultPage = resultPage;
-	}
-
-	public String getColumn() {
-		return column;
-	}
-
-	public void setColumn(String column) {
-		this.column = column;
-	}
-
-	public String[] getColumns() {
-		return columns;
-	}
-
-	public Page getPage() {
-		return page;
-	}
-
-	public Page getPreviousPage() {
-		return previousPage;
-	}
-
-	public Page getNextPage() {
-		return nextPage;
-	}
 
 	public void setName(String name) {
 		this.name = name;

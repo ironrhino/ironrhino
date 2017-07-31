@@ -5,11 +5,16 @@ import java.io.Serializable;
 import javax.persistence.Embeddable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ironrhino.core.metadata.UiConfig;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Embeddable
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Identity implements Serializable {
 
 	private static final long serialVersionUID = 3472143402158894620L;
@@ -19,47 +24,12 @@ public class Identity implements Serializable {
 
 	private String identityNo;
 
-	public Identity() {
-
-	}
-
 	public Identity(String str) {
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split("-");
 			identityType = arr[0];
 			identityNo = arr[1];
 		}
-	}
-
-	public Identity(String identityType, String identityNo) {
-		this.identityType = identityType;
-		this.identityNo = identityNo;
-	}
-
-	public String getIdentityType() {
-		return identityType;
-	}
-
-	public void setIdentityType(String identityType) {
-		this.identityType = identityType;
-	}
-
-	public String getIdentityNo() {
-		return identityNo;
-	}
-
-	public void setIdentityNo(String identityNo) {
-		this.identityNo = identityNo;
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
-	}
-
-	@Override
-	public boolean equals(Object that) {
-		return EqualsBuilder.reflectionEquals(this, that);
 	}
 
 	@Override

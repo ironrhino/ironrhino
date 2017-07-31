@@ -20,10 +20,15 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Entity
 @Table(name = "sample_task")
 @Richtable(order = "id desc")
+@Getter
+@Setter
 public class Task implements Persistable<String> {
 
 	private static final long serialVersionUID = 2110061290463634971L;
@@ -49,16 +54,6 @@ public class Task implements Persistable<String> {
 	@UiConfig(type = "textarea")
 	private String description;
 
-	@Override
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		if (StringUtils.isNotBlank(id))
-			this.id = id;
-	}
-
 	@UiConfig(width = "100px", displayOrder = -1, description = "taskNo.description")
 	public String getTaskNo() {
 		return getId();
@@ -68,30 +63,6 @@ public class Task implements Persistable<String> {
 	@JsonIgnore
 	public boolean isNew() {
 		return id == null || StringUtils.isBlank(id);
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public Employee getEmployee() {
-		return employee;
-	}
-
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	@Override

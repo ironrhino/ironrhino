@@ -16,11 +16,16 @@ import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.AbstractEntity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig(fileupload = Person.FILE_MIME_TYPE)
 @Entity
 @Table(name = "sample_person")
 @Richtable(order = "id.identityNo asc", bottomButtons = "<@btn class='upload' data\\-accept='" + Person.FILE_MIME_TYPE
 		+ "' label='import'/> <@btn view='input' label='create'/> <@btn action='save'/> <@btn action='delete'/> <@btn class='reload'/> <@btn class='filter'/>")
+@Getter
+@Setter
 public class Person extends AbstractEntity<Identity> {
 
 	private static final long serialVersionUID = -8352037604261222984L;
@@ -40,34 +45,9 @@ public class Person extends AbstractEntity<Identity> {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Region region;
 
-	public Region getRegion() {
-		return region;
-	}
-
-	public void setRegion(Region region) {
-		this.region = region;
-	}
-
-	@Override
-	public Identity getId() {
-		return id;
-	}
-
-	public void setId(Identity id) {
-		this.id = id;
-	}
-
 	@Override
 	public boolean isNew() {
 		return id == null || id.getIdentityType() == null || id.getIdentityNo() == null;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	@UiConfig(type = "dictionary", width = "200px", displayOrder = -2, hiddenInView = @Hidden(true))

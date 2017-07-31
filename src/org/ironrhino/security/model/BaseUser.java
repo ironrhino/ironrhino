@@ -36,7 +36,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @MappedSuperclass
+@Getter
+@Setter
 public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, Enableable {
 
 	private static final long serialVersionUID = -6135434863820342822L;
@@ -108,15 +113,6 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	private Map<String, String> attributes;
 
 	@Override
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	@Override
 	@JsonIgnore
 	public String getPassword() {
 		return password;
@@ -127,17 +123,9 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 		this.password = password;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	public void setName(String name) {
 		name = StringUtils.isBlank(name) ? null : name;
 		this.name = name;
-	}
-
-	public String getEmail() {
-		return email;
 	}
 
 	public void setEmail(String email) {
@@ -150,10 +138,6 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 			email = name + "@gmail.com";
 		}
 		this.email = email;
-	}
-
-	public String getPhone() {
-		return phone;
 	}
 
 	public void setPhone(String phone) {
@@ -183,49 +167,6 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	public void setRoles(Set<String> roles) {
 		if (roles != null)
 			this.roles = roles;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	@Override
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	public Date getAccountExpireDate() {
-		return accountExpireDate;
-	}
-
-	public void setAccountExpireDate(Date accountExpireDate) {
-		this.accountExpireDate = accountExpireDate;
-	}
-
-	public Date getPasswordModifyDate() {
-		return passwordModifyDate;
-	}
-
-	public void setPasswordModifyDate(Date passwordModifyDate) {
-		this.passwordModifyDate = passwordModifyDate;
-	}
-
-	public int getPasswordExpiresInDays() {
-		return passwordExpiresInDays;
-	}
-
-	public void setPasswordExpiresInDays(int passwordExpiresInDays) {
-		this.passwordExpiresInDays = passwordExpiresInDays;
-	}
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return authorities;
-	}
-
-	public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
-		this.authorities = authorities;
 	}
 
 	@Override
@@ -269,14 +210,6 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 			attributes.remove(key);
 		else
 			attributes.put(key, value);
-	}
-
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
 	}
 
 	public <T extends Persistable<?>> T getExtra(Class<T> clazz) {

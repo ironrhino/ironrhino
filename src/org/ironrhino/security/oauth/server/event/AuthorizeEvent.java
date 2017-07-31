@@ -2,12 +2,16 @@ package org.ironrhino.security.oauth.server.event;
 
 import org.ironrhino.core.event.AbstractAuditEvent;
 
+import lombok.Getter;
+
 public class AuthorizeEvent extends AbstractAuditEvent {
 
 	private static final long serialVersionUID = -7010579774919637248L;
 
+	@Getter
 	private String client;
 
+	@Getter
 	private String grantType;
 
 	public AuthorizeEvent(String username, String remoteAddr) {
@@ -18,14 +22,6 @@ public class AuthorizeEvent extends AbstractAuditEvent {
 		super(username, remoteAddr);
 		this.client = clientId;
 		this.grantType = grantType;
-	}
-
-	public String getClient() {
-		return client;
-	}
-
-	public String getGrantType() {
-		return grantType;
 	}
 
 	@Override

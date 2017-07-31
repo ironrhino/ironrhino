@@ -16,80 +16,41 @@ import org.ironrhino.core.util.ErrorMessage;
 import com.google.zxing.NotFoundException;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig(fileupload = "image/*")
 public class QrcodeAction extends BaseAction {
 
 	private static final long serialVersionUID = 8180265410790553918L;
 
+	@Getter
+	@Setter
 	private boolean decode = false;
 
+	@Getter
+	@Setter
 	private String content;
 
+	@Getter
+	@Setter
 	private String encoding = "UTF-8";
 
+	@Getter
+	@Setter
 	private String url;
 
+	@Getter
+	@Setter
 	private File file;
 
+	@Getter
+	@Setter
 	private int width = 400;
 
+	@Getter
+	@Setter
 	private int height = 400;
-
-	public boolean isDecode() {
-		return decode;
-	}
-
-	public void setDecode(boolean decode) {
-		this.decode = decode;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getEncoding() {
-		return encoding;
-	}
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public File getFile() {
-		return file;
-	}
-
-	public void setFile(File file) {
-		this.file = file;
-	}
 
 	@Override
 	@InputConfig(resultName = "success")

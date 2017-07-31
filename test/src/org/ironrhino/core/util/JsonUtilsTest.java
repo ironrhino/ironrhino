@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class JsonUtilsTest {
 
 	static enum Status {
@@ -31,6 +34,8 @@ public class JsonUtilsTest {
 		}
 	}
 
+	@Getter
+	@Setter
 	static class User {
 		@JsonView(View.Summary.class)
 		private String username;
@@ -45,22 +50,6 @@ public class JsonUtilsTest {
 		@JsonView(View.Detail.class)
 		private Date date = DateUtils.beginOfDay(new Date());
 
-		public Date getDate() {
-			return date;
-		}
-
-		public void setDate(Date date) {
-			this.date = date;
-		}
-
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
 		@JsonIgnore
 		public String getPassword() {
 			return password;
@@ -69,30 +58,6 @@ public class JsonUtilsTest {
 		@JsonProperty
 		public void setPassword(String password) {
 			this.password = password;
-		}
-
-		public int getAge() {
-			return age;
-		}
-
-		public void setAge(int age) {
-			this.age = age;
-		}
-
-		public Status getStatus() {
-			return status;
-		}
-
-		public void setStatus(Status status) {
-			this.status = status;
-		}
-
-		public String getContent() {
-			return content;
-		}
-
-		public void setContent(String content) {
-			this.content = content;
 		}
 
 	}

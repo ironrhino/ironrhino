@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class RoundRobin<T> {
 
 	protected List<TargetWrapper<T>> targetWrappers = new ArrayList<>();
@@ -70,10 +73,14 @@ public class RoundRobin<T> {
 
 		public static final int DEFAULT_WEIGHT = 1;
 
-		private T target;
+		@Getter
+		private final T target;
 
+		@Getter
+		@Setter
 		private int weight = DEFAULT_WEIGHT;
 
+		@Getter
 		private AtomicInteger stat = new AtomicInteger(0);
 
 		public TargetWrapper(T target) {
@@ -86,21 +93,6 @@ public class RoundRobin<T> {
 				this.weight = weight;
 		}
 
-		public T getTarget() {
-			return target;
-		}
-
-		public int getWeight() {
-			return weight;
-		}
-
-		public void setWeight(int weight) {
-			this.weight = weight;
-		}
-
-		public AtomicInteger getStat() {
-			return stat;
-		}
 	}
 
 }

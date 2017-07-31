@@ -3,65 +3,30 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Searchable(root = false)
+@Data
+@NoArgsConstructor
 public class LabelValue implements Serializable {
 
 	private static final long serialVersionUID = 7629652470042630809L;
 
 	@SearchableProperty(boost = 2)
-	private String value;
-
-	@SearchableProperty(boost = 2)
 	private String label;
 
+	@SearchableProperty(boost = 2)
+	private String value;
+
 	private Boolean selected;
-
-	public LabelValue() {
-
-	}
 
 	public LabelValue(String label, String value) {
 		this.label = label;
 		this.value = value;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public Boolean getSelected() {
-		return selected;
-	}
-
-	public void setSelected(Boolean selected) {
-		this.selected = selected;
-	}
-
-	@Override
-	public boolean equals(Object another) {
-		return EqualsBuilder.reflectionEquals(this, another);
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
 	@Override

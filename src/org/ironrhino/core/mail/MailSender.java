@@ -12,30 +12,21 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class MailSender {
 
+	@Getter
+	@Setter
 	private String defaultFrom = "zhouyanming@gmail.com";
 
+	@Getter
+	@Setter
 	private String defaultTo = "zhouyanming@gmail.com";
 
 	@Autowired
 	private JavaMailSenderImpl javaMailSender;
-
-	public String getDefaultFrom() {
-		return defaultFrom;
-	}
-
-	public void setDefaultFrom(String defaultFrom) {
-		this.defaultFrom = defaultFrom;
-	}
-
-	public String getDefaultTo() {
-		return defaultTo;
-	}
-
-	public void setDefaultTo(String defaultTo) {
-		this.defaultTo = defaultTo;
-	}
 
 	public void send(final SimpleMailMessage smm) {
 		send(smm, true);

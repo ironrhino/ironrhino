@@ -27,11 +27,16 @@ import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Searchable
 @AutoConfig
 @Table(name = "sample_company")
 @Entity
 @Richtable(showQueryForm = true)
+@Getter
+@Setter
 public class Company extends BaseEntity {
 
 	private static final long serialVersionUID = -2413944328894923968L;
@@ -78,85 +83,5 @@ public class Company extends BaseEntity {
 	@UiConfig(width = "80px", group = "contactInfo", description = "一对一关系")
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "company")
 	private Boss boss;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public CompanyType getType() {
-		return type;
-	}
-
-	public void setType(CompanyType type) {
-		this.type = type;
-	}
-
-	public String getOrganizationCode() {
-		return organizationCode;
-	}
-
-	public void setOrganizationCode(String organizationCode) {
-		this.organizationCode = organizationCode;
-	}
-
-	public Region getRegion() {
-		return region;
-	}
-
-	public void setRegion(Region region) {
-		this.region = region;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public String getIntro() {
-		return intro;
-	}
-
-	public void setIntro(String intro) {
-		this.intro = intro;
-	}
-
-	public Collection<Customer> getCustomers() {
-		return customers;
-	}
-
-	public void setCustomers(Collection<Customer> customers) {
-		this.customers = customers;
-	}
-
-	public Collection<Customer> getRelatedCustomers() {
-		return relatedCustomers;
-	}
-
-	public void setRelatedCustomers(Collection<Customer> relatedCustomers) {
-		this.relatedCustomers = relatedCustomers;
-	}
-
-	public Boss getBoss() {
-		return boss;
-	}
-
-	public void setBoss(Boss boss) {
-		this.boss = boss;
-	}
 
 }

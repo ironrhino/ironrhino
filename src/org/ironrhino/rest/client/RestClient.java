@@ -20,30 +20,51 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class RestClient implements BeanNameAware {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Getter
+	@Setter
 	protected String accessTokenEndpoint;
 
+	@Getter
+	@Setter
 	protected String clientId;
 
+	@Getter
+	@Setter
 	protected String clientSecret;
 
+	@Getter
+	@Setter
 	protected String scope;
 
+	@Getter
+	@Setter
 	protected String grantType = "client_credentials";
 
+	@Getter
+	@Setter
 	protected String apiBaseUrl;
 
+	@Getter
 	protected RestTemplate restTemplate = new RestClientTemplate(this);
 
 	protected RestTemplate internalRestTemplate = new RestTemplate();
 
+	@Getter
+	@Setter
 	protected TokenStore tokenStore = new DefaultTokenStore();
 
+	@Getter
+	@Setter
 	protected Class<? extends Token> tokenClass = DefaultToken.class;
 
+	@Setter
 	protected String beanName;
 
 	public RestClient() {
@@ -70,80 +91,6 @@ public class RestClient implements BeanNameAware {
 		this.accessTokenEndpoint = accessTokenEndpoint;
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
-	}
-
-	@Override
-	public void setBeanName(String beanName) {
-		this.beanName = beanName;
-	}
-
-	public TokenStore getTokenStore() {
-		return tokenStore;
-	}
-
-	public void setTokenStore(TokenStore tokenStore) {
-		this.tokenStore = tokenStore;
-	}
-
-	public String getAccessTokenEndpoint() {
-		return accessTokenEndpoint;
-	}
-
-	public void setAccessTokenEndpoint(String accessTokenEndpoint) {
-		this.accessTokenEndpoint = accessTokenEndpoint;
-	}
-
-	public String getClientId() {
-		return clientId;
-	}
-
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
-	}
-
-	public String getClientSecret() {
-		return clientSecret;
-	}
-
-	public void setClientSecret(String clientSecret) {
-		this.clientSecret = clientSecret;
-	}
-
-	public String getScope() {
-		return scope;
-	}
-
-	public void setScope(String scope) {
-		this.scope = scope;
-	}
-
-	public String getGrantType() {
-		return grantType;
-	}
-
-	public void setGrantType(String grantType) {
-		this.grantType = grantType;
-	}
-
-	public String getApiBaseUrl() {
-		return apiBaseUrl;
-	}
-
-	public void setApiBaseUrl(String apiBaseUrl) {
-		this.apiBaseUrl = apiBaseUrl;
-	}
-
-	public Class<? extends Token> getTokenClass() {
-		return tokenClass;
-	}
-
-	public void setTokenClass(Class<? extends Token> tokenClass) {
-		if (tokenClass != null)
-			this.tokenClass = tokenClass;
-	}
-
-	public RestTemplate getRestTemplate() {
-		return restTemplate;
 	}
 
 	public String fetchAccessToken() {

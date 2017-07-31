@@ -5,7 +5,14 @@ import java.util.Locale;
 
 import javax.persistence.Embeddable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Embeddable
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Coordinate implements Serializable {
 
 	private static final long serialVersionUID = 5828814302557010566L;
@@ -15,15 +22,6 @@ public class Coordinate implements Serializable {
 	private Double latitude;
 
 	private Double longitude;
-
-	public Coordinate() {
-
-	}
-
-	public Coordinate(Double latitude, Double longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
 
 	public Coordinate(String latLng) {
 		if (latLng == null || latLng.trim().length() == 0) {
@@ -39,34 +37,6 @@ public class Coordinate implements Serializable {
 	public Coordinate(String latitude, String longitude) {
 		this.latitude = parseLatOrLong(latitude);
 		this.longitude = parseLatOrLong(longitude);
-	}
-
-	public Double getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(Double latitude) {
-		this.latitude = latitude;
-	}
-
-	public Double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(Double longitude) {
-		this.longitude = longitude;
-	}
-
-	@Override
-	public int hashCode() {
-		return toString().hashCode();
-	}
-
-	@Override
-	public boolean equals(Object that) {
-		if (that == null)
-			return false;
-		return this.toString().equals(that.toString());
 	}
 
 	@Override

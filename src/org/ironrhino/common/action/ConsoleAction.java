@@ -23,6 +23,9 @@ import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
 import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class ConsoleAction extends BaseAction {
@@ -31,34 +34,19 @@ public class ConsoleAction extends BaseAction {
 
 	private static Logger logger = LoggerFactory.getLogger(ConsoleAction.class);
 
+	@Getter
+	@Setter
 	private String expression;
 
+	@Getter
+	@Setter
 	private Scope scope = Scope.LOCAL;
 
+	@Getter
 	private Object result;
 
 	@Autowired
 	private ApplicationContextConsole applicationContextConsole;
-
-	public String getExpression() {
-		return expression;
-	}
-
-	public void setExpression(String expression) {
-		this.expression = expression;
-	}
-
-	public Scope getScope() {
-		return scope;
-	}
-
-	public void setScope(Scope scope) {
-		this.scope = scope;
-	}
-
-	public Object getResult() {
-		return result;
-	}
 
 	@Override
 	@InputConfig(resultName = "success")
