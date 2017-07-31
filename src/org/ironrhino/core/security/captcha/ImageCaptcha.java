@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class ImageCaptcha {
 
 	public static final int width = 200;// 80
@@ -41,11 +39,10 @@ public class ImageCaptcha {
 		}
 	}
 
-	public ImageCaptcha(String challenge, String fuzzifiedChallenge) {
+	public ImageCaptcha(String challenge) {
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = image.createGraphics();
-		char[] use = fonts.size() > 0 && StringUtils.isNotBlank(fuzzifiedChallenge) ? fuzzifiedChallenge.toCharArray()
-				: challenge.toCharArray();
+		char[] use = challenge.toCharArray();
 		g.setColor(new Color(240, 240, 240));
 		g.fillRect(0, 0, 200, 50);
 		for (int i = 0; i < use.length; i++) {

@@ -1,11 +1,14 @@
 package org.ironrhino.core.security.captcha.impl;
 
+import java.awt.GraphicsEnvironment;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.security.captcha.CaptchaManager;
@@ -19,6 +22,26 @@ import org.springframework.stereotype.Component;
 public class DefaultCaptchaManager implements CaptchaManager {
 
 	private static final char[] CHINESE_NUMBERS = "零壹贰叁肆伍陆柒捌玖".toCharArray();
+	private static final boolean CHINESE_FONT_PRESENT;
+	static {
+		boolean b = SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_MAC_OSX;
+		if (!b)
+			try {
+				GraphicsEnvironment.getLocalGraphicsEnvironment().preferLocaleFonts();
+				String[] names = GraphicsEnvironment.getLocalGraphicsEnvironment()
+						.getAvailableFontFamilyNames(Locale.CHINA);
+				for (String s : names) {
+					char c = s.charAt(0);
+					if (!Character.isLowerCase(c) && !Character.isUpperCase(c)) {
+						b = true;
+						break;
+					}
+				}
+			} catch (Throwable t) {
+
+			}
+		CHINESE_FONT_PRESENT = b;
+	}
 
 	private static final String REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED = "CAPTACHA_THRESHOLD_ADDED";
 	private static final String REQUEST_ATTRIBUTE_KEY_CAPTACHA_STATUS = "CAPTACHA_STATUS";
@@ -32,7 +55,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
 
 	public static final int CACHE_THRESHOLD_TIME_TO_LIVE = 3600;
 
-	@Value("${captchaManager.bypass:false}")
+	@Value("${captchaManager.bypass:true}")
 	private boolean bypass;
 
 	@Autowired
@@ -44,43 +67,9 @@ public class DefaultCaptchaManager implements CaptchaManager {
 		String answer = answer(challenge);
 		cacheManager.put(CACHE_PREFIX_ANSWER + token, answer, -1, CACHE_ANSWER_TIME_TO_LIVE, TimeUnit.SECONDS,
 				KEY_CAPTCHA);
+		if (CHINESE_FONT_PRESENT)
+			challenge = fuzzifyChallenge(challenge);
 		return challenge;
-	}
-
-	@Override
-	public String fuzzifyChallenge(String challenge) {
-		char[] chars = challenge.toCharArray();
-		StringBuilder sb = new StringBuilder();
-		for (char c : chars)
-			sb.append(CHINESE_NUMBERS[Integer.parseInt(String.valueOf(c))]);
-		return sb.toString();
-	}
-
-	@Override
-	public String clarifyChallenge(String input) {
-		if (StringUtils.isNumeric(input))
-			return input;
-		char[] chars = input.toCharArray();
-		StringBuilder sb = new StringBuilder();
-		for (char c : chars) {
-			for (int i = 0; i < CHINESE_NUMBERS.length; i++) {
-				if (c == CHINESE_NUMBERS[i]) {
-					sb.append(String.valueOf(i));
-					break;
-				}
-			}
-		}
-		return sb.toString();
-	}
-
-	protected String answer(String challenge) {
-		return challenge;
-	}
-
-	protected boolean verify(String input, String answer) {
-		if (input == null || answer == null)
-			return false;
-		return clarifyChallenge(input).equals(answer);
 	}
 
 	@Override
@@ -141,6 +130,42 @@ public class DefaultCaptchaManager implements CaptchaManager {
 		else
 			addCaptchaCount(request);
 		return pass;
+	}
+
+	protected String fuzzifyChallenge(String challenge) {
+		char[] chars = challenge.toCharArray();
+		StringBuilder sb = new StringBuilder();
+		for (char c : chars)
+			sb.append(CHINESE_NUMBERS[Integer.parseInt(String.valueOf(c))]);
+		return sb.toString();
+	}
+
+	protected String clarifyChallenge(String input) {
+		if (StringUtils.isNumeric(input))
+			return input;
+		char[] chars = input.toCharArray();
+		StringBuilder sb = new StringBuilder();
+		for (char c : chars) {
+			for (int i = 0; i < CHINESE_NUMBERS.length; i++) {
+				if (c == CHINESE_NUMBERS[i]) {
+					sb.append(String.valueOf(i));
+					break;
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	protected String answer(String challenge) {
+		return challenge;
+	}
+
+	protected boolean verify(String input, String answer) {
+		if (input == null || answer == null)
+			return false;
+		if (CHINESE_FONT_PRESENT)
+			input = clarifyChallenge(input);
+		return input.equals(answer);
 	}
 
 	protected String getCountKey(HttpServletRequest request) {

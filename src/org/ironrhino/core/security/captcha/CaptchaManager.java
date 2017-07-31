@@ -10,10 +10,6 @@ public interface CaptchaManager {
 
 	public String getChallenge(HttpServletRequest request, String token);
 
-	public String fuzzifyChallenge(String challenge);
-
-	public String clarifyChallenge(String challenge);
-
 	public boolean verify(HttpServletRequest request, String token, boolean cleanup);
 
 	public CaptchaStatus getCaptchaStatus(HttpServletRequest request, Captcha captcha);
