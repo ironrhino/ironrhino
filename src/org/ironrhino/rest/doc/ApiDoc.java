@@ -11,9 +11,9 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.StringUtils;
@@ -154,6 +154,7 @@ public class ApiDoc implements Serializable {
 		}
 
 		Class<?> responseBodyClass = method.getReturnType();
+		Type responseBodyGenericType = method.getGenericReturnType();
 		if (Collection.class.isAssignableFrom(responseBodyClass)) {
 			responseBodyType = "collection";
 		} else if (ResultPage.class.isAssignableFrom(responseBodyClass)) {
@@ -165,6 +166,7 @@ public class ApiDoc implements Serializable {
 			if (type instanceof Class) {
 				responseBodyClass = (Class<?>) type;
 			} else if (type instanceof ParameterizedType) {
+				responseBodyGenericType = pt;
 				pt = (ParameterizedType) type;
 				if (Collection.class.isAssignableFrom((Class<?>) pt.getRawType())) {
 					responseBodyType = "collection";
@@ -177,7 +179,9 @@ public class ApiDoc implements Serializable {
 			Type type = pt.getActualTypeArguments()[0];
 			if (type instanceof Class) {
 				responseBodyClass = (Class<?>) type;
+				responseBodyGenericType = pt;
 			} else if (type instanceof ParameterizedType) {
+				responseBodyGenericType = pt;
 				pt = (ParameterizedType) type;
 				if (Collection.class.isAssignableFrom((Class<?>) pt.getRawType())) {
 					responseBodyType = "collection";
@@ -190,24 +194,25 @@ public class ApiDoc implements Serializable {
 		responseBody = FieldObject.createList(responseBodyClass, responseFields, false);
 
 		Object responseSample = ApiDocHelper.generateSample(apiDocInstance, apiDocMethod, responseFields);
+		if (responseSample == null)
+			responseSample = ApiDocHelper.createSample(responseBodyGenericType);
 		if (responseSample instanceof String) {
 			responseBodySample = (String) responseSample;
 		} else if (responseSample != null) {
 			Class<?> view = null;
 			if (responseSample instanceof DeferredResult)
 				responseSample = ((DeferredResult<?>) responseSample).getResult();
-			else if (responseSample instanceof CompletableFuture)
-				responseSample = ((CompletableFuture<?>) responseSample).get();
-			else if (responseSample instanceof Callable)
-				responseSample = ((Callable<?>) responseSample).call();
 			else if (responseSample instanceof Future)
 				responseSample = ((Future<?>) responseSample).get();
+			else if (responseSample instanceof Callable)
+				responseSample = ((Callable<?>) responseSample).call();
 			else if (responseSample instanceof ResponseEntity)
 				responseSample = ((ResponseEntity<?>) responseSample).getBody();
 			else if (responseSample instanceof MappingJacksonValue) {
 				view = ((MappingJacksonValue) responseSample).getSerializationView();
 				responseSample = ((MappingJacksonValue) responseSample).getValue();
 			}
+
 			JsonView jsonView = method.getAnnotation(JsonView.class);
 			if (view == null && jsonView != null)
 				view = jsonView.value()[0];
@@ -218,6 +223,7 @@ public class ApiDoc implements Serializable {
 		}
 
 		Class<?>[] parameterTypes = method.getParameterTypes();
+		Type[] genericParameterTypes = method.getGenericParameterTypes();
 		if (parameterTypes.length > 0) {
 			String[] parameterNames = ReflectionUtils.getParameterNames(method);
 			Annotation[][] apiDocParameterAnnotations = apiDocMethod.getParameterAnnotations();
@@ -225,6 +231,7 @@ public class ApiDoc implements Serializable {
 			for (int i = 0; i < parameterTypes.length; i++) {
 				String parameterName = parameterNames[i];
 				Class<?> parameterType = parameterTypes[i];
+				Type genericParameterType = genericParameterTypes[i];
 				Annotation[] apiDocAnnotations = apiDocParameterAnnotations[i];
 				Annotation[] annotations = array[i];
 				Field fd = null;
@@ -246,20 +253,26 @@ public class ApiDoc implements Serializable {
 					Annotation anno = annotations[j];
 					if (anno.annotationType().getPackage().equals(RequestBody.class.getPackage())
 							|| anno.annotationType().equals(Qualifier.class)
-							|| anno.annotationType().isAnnotationPresent(Qualifier.class))
+							|| anno.annotationType().isAnnotationPresent(Qualifier.class)) {
 						// @RequestBody @Qualifier @LoggedInUser ...
 						bindAnnotationPresent = true;
+					}
+
 					if (anno instanceof RequestBody) {
-						requestBodyRequired = ((RequestBody) anno).required();
+						RequestBody ann = (RequestBody) anno;
+						requestBodyRequired = ann.required();
 						Class<?> requestBodyClass = parameterType;
 						if (Collection.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "collection";
 						} else if (ResultPage.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "resultPage";
 						}
-						Type gtype = method.getGenericParameterTypes()[i];
-						if (gtype instanceof ParameterizedType) {
-							ParameterizedType pt = (ParameterizedType) gtype;
+						if (genericParameterType instanceof ParameterizedType) {
+							ParameterizedType pt = (ParameterizedType) genericParameterType;
+							if (pt.getRawType() == Optional.class) {
+								requestBodyRequired = false;
+								genericParameterType = pt.getActualTypeArguments()[0];
+							}
 							requestBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
 						}
 						if (requestBodyClass.getGenericSuperclass() instanceof ParameterizedType) {
@@ -269,39 +282,69 @@ public class ApiDoc implements Serializable {
 						requestBody = FieldObject.createList(requestBodyClass, requestFields, true);
 						if (requestFields != null) {
 							Object requestSample = ApiDocHelper.generateSample(apiDocInstance, null, requestFields);
+							if (requestSample == null)
+								requestSample = ApiDocHelper.createSample(genericParameterType);
 							if (requestSample instanceof String) {
 								requestBodySample = (String) requestSample;
 							} else if (requestSample != null) {
 								requestBodySample = objectMapper.writeValueAsString(requestSample);
 							}
 						}
-					}
-					if (anno instanceof PathVariable) {
+					} else if (anno instanceof PathVariable) {
 						PathVariable ann = (PathVariable) anno;
-						pathVariables.add(
-								FieldObject.create(StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterName,
-										parameterType, true, null, fd));
-					}
-					if (anno instanceof RequestParam) {
+						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
+						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
+						Class<?> fieldType = parameterType;
+						boolean fieldRequired = ann.required();
+						if (parameterType == Optional.class) {
+							fieldType = (Class<?>) ((ParameterizedType) genericParameterType)
+									.getActualTypeArguments()[0];
+							fieldRequired = false;
+						}
+						if (!Map.class.isAssignableFrom(fieldType))
+							pathVariables.add(FieldObject.create(fieldName, fieldType, fieldRequired, null, fd));
+					} else if (anno instanceof RequestParam) {
 						RequestParam ann = (RequestParam) anno;
-						if (!Map.class.isAssignableFrom(parameterType))
-							requestParams.add(FieldObject.create(
-									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterName, parameterType,
-									ann.required(), ann.defaultValue(), fd));
-					}
-					if (anno instanceof RequestHeader) {
+						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
+						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
+						Class<?> fieldType = parameterType;
+						boolean fieldRequired = ann.required();
+						if (parameterType == Optional.class) {
+							fieldType = (Class<?>) ((ParameterizedType) genericParameterType)
+									.getActualTypeArguments()[0];
+							fieldRequired = false;
+						}
+						if (!Map.class.isAssignableFrom(fieldType))
+							requestParams.add(
+									FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(), fd));
+					} else if (anno instanceof RequestHeader) {
 						RequestHeader ann = (RequestHeader) anno;
-						if (!Map.class.isAssignableFrom(parameterType))
-							requestHeaders.add(FieldObject.create(
-									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterName, parameterType,
-									ann.required(), ann.defaultValue(), fd));
-					}
-					if (anno instanceof CookieValue) {
+						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
+						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
+						Class<?> fieldType = parameterType;
+						boolean fieldRequired = ann.required();
+						if (parameterType == Optional.class) {
+							fieldType = (Class<?>) ((ParameterizedType) genericParameterType)
+									.getActualTypeArguments()[0];
+							fieldRequired = false;
+						}
+						if (!Map.class.isAssignableFrom(fieldType))
+							requestHeaders.add(
+									FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(), fd));
+					} else if (anno instanceof CookieValue) {
 						CookieValue ann = (CookieValue) anno;
-						if (!Map.class.isAssignableFrom(parameterType))
-							cookieValues.add(FieldObject.create(
-									StringUtils.isNotBlank(ann.value()) ? ann.value() : parameterName, parameterType,
-									ann.required(), ann.defaultValue(), fd));
+						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
+						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
+						Class<?> fieldType = parameterType;
+						boolean fieldRequired = ann.required();
+						if (parameterType == Optional.class) {
+							fieldType = (Class<?>) ((ParameterizedType) genericParameterType)
+									.getActualTypeArguments()[0];
+							fieldRequired = false;
+						}
+						if (!Map.class.isAssignableFrom(fieldType))
+							cookieValues.add(
+									FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(), fd));
 					}
 				}
 				if (!bindAnnotationPresent && Arrays.asList(methods).contains("GET")) {

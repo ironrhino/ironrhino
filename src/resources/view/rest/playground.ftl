@@ -44,7 +44,7 @@
 	<tr><td><input type="text" placeholder="名字"></td><td class="center middle"> = </td><td><input type="text" placeholder="值"></td><td class="manipulate"></td></tr>
 	</#if>
 	</tbody></table>
-</td></tr>						
+</td></tr>
 <#if apiDoc.requestBodySample?has_content>
 <tr><td>请求消息体</td><td>
 <code class="requestBody block" contenteditable>${apiDoc.requestBodySample}</code>

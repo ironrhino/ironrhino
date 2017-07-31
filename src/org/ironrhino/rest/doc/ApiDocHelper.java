@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
@@ -192,7 +191,7 @@ public class ApiDocHelper {
 
 	}
 
-	private static Object createSample(Type returnType) {
+	public static Object createSample(Type returnType) {
 		if (returnType instanceof ParameterizedType) {
 			ParameterizedType pt = (ParameterizedType) returnType;
 			if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1
@@ -200,14 +199,14 @@ public class ApiDocHelper {
 				return null;
 			Class<?> raw = (Class<?>) pt.getRawType();
 			Class<?> clazz = (Class<?>) pt.getActualTypeArguments()[0];
-			if (raw == DeferredResult.class || raw == CompletableFuture.class || raw == Callable.class
-					|| raw == Future.class || raw == ResponseEntity.class) {
+			if (DeferredResult.class.isAssignableFrom(raw) || Future.class.isAssignableFrom(raw)
+					|| Callable.class.isAssignableFrom(raw) || ResponseEntity.class.isAssignableFrom(raw)) {
 				return createSample(clazz);
-			} else if (raw.isAssignableFrom(Set.class)) {
+			} else if (Set.class.isAssignableFrom(raw)) {
 				Set<Object> set = new HashSet<>();
 				set.add(createSample(clazz));
 				return set;
-			} else if (raw.isAssignableFrom(Collection.class)) {
+			} else if (Collection.class.isAssignableFrom(raw)) {
 				List<Object> list = new ArrayList<>();
 				list.add(createSample(clazz));
 				return list;
@@ -252,11 +251,11 @@ public class ApiDocHelper {
 						return;
 					Class<?> raw = (Class<?>) pt.getRawType();
 					Class<?> clazz2 = (Class<?>) pt.getActualTypeArguments()[0];
-					if (raw.isAssignableFrom(Set.class)) {
+					if (Set.class.isAssignableFrom(raw)) {
 						Set<Object> set = new HashSet<>();
 						set.add(createSample(clazz2));
 						value = set;
-					} else if (raw.isAssignableFrom(Collection.class)) {
+					} else if (Collection.class.isAssignableFrom(raw)) {
 						List<Object> list = new ArrayList<>();
 						list.add(createSample(clazz2));
 						value = list;
