@@ -164,6 +164,8 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@Override
 	@JsonIgnore
 	public Set<String> getRoles() {
+		if (roles == null)
+			roles = new LinkedHashSet<>();
 		return roles;
 	}
 
@@ -179,7 +181,8 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	@JsonSetter
 	public void setRoles(Set<String> roles) {
-		this.roles = roles;
+		if (roles != null)
+			this.roles = roles;
 	}
 
 	@Override

@@ -285,7 +285,8 @@ public class RedisServiceStats implements ServiceStats {
 			stringRedisTemplate.delete(keys);
 			long count = 0;
 			for (String str : results)
-				count += Long.valueOf(str);
+				if (StringUtils.isNumeric(str))
+					count += Long.valueOf(str);
 			if (count > 0)
 				stringRedisTemplate.opsForValue().set(prefix, String.valueOf(count));
 		}
