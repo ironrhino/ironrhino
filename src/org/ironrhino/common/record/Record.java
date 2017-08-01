@@ -2,8 +2,8 @@ package org.ironrhino.common.record;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
@@ -29,7 +29,7 @@ public class Record extends BaseEntity {
 	private String entityId;
 
 	@UiConfig
-	@Lob
+	@Column(length = 32767) // oracle 12c max size of varchar2
 	private String entityToString;
 
 	@UiConfig(width = "80px")
