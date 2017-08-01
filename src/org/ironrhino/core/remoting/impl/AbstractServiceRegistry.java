@@ -280,7 +280,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				return;
 			ExportServicesEvent ev = (ExportServicesEvent) event;
 			String instanceId = event.getInstanceId();
-			String host = instanceId.substring(instanceId.lastIndexOf('@') + 1);
+			String appName = instanceId.substring(0, instanceId.lastIndexOf('@'));
+			appName = appName.substring(0, appName.lastIndexOf('-'));
+			String host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
 			for (String serviceName : ev.getExportServices()) {
 				List<String> hosts = importedServiceCandidates.get(serviceName);
 				if (hosts != null && !hosts.contains(host))
