@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
@@ -31,7 +32,6 @@ import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.remoting.StatsType;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
-import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
@@ -256,22 +256,28 @@ public class RedisServiceStats implements ServiceStats {
 
 	@Trigger
 	@Scheduled(cron = "${serviceStats.archive.cron:0 1 0 * * ?}")
-	@Mutex
 	public void archive() {
-		stringRedisTemplate.delete(KEY_HOTSPOTS);
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DAY_OF_YEAR, -days);
-		Date date = cal.getTime();
-		String day = DateUtils.formatDate8(date);
-		for (Map.Entry<String, Set<String>> entry : getServices().entrySet()) {
-			String serviceName = entry.getKey();
-			for (String method : entry.getValue()) {
-				for (StatsType type : StatsType.values()) {
-					updateMax(serviceName, method, type);
-					archive(serviceName, method, day, type);
+		String lockName = "lock:serviceStats.archive()";
+		if (stringRedisTemplate.opsForValue().setIfAbsent(lockName, ""))
+			try {
+				stringRedisTemplate.expire(lockName, 5, TimeUnit.MINUTES);
+				stringRedisTemplate.delete(KEY_HOTSPOTS);
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.DAY_OF_YEAR, -days);
+				Date date = cal.getTime();
+				String day = DateUtils.formatDate8(date);
+				for (Map.Entry<String, Set<String>> entry : getServices().entrySet()) {
+					String serviceName = entry.getKey();
+					for (String method : entry.getValue()) {
+						for (StatsType type : StatsType.values()) {
+							updateMax(serviceName, method, type);
+							archive(serviceName, method, day, type);
+						}
+					}
 				}
+			} finally {
+				stringRedisTemplate.delete(lockName);
 			}
-		}
 	}
 
 	private void archive(String serviceName, String method, String day, StatsType type) {

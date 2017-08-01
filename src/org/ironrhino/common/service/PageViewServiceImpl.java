@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.util.Location;
@@ -17,7 +18,6 @@ import org.ironrhino.common.util.LocationUtils;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
-import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -245,36 +245,42 @@ public class PageViewServiceImpl implements PageViewService {
 
 	@Trigger
 	@Scheduled(cron = "${pageViewService.archive.cron:0 5 0 * * ?}")
-	@Mutex
 	public void archive() {
 		if (stringRedisTemplate == null)
 			return;
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DAY_OF_YEAR, -1);
-		Date yesterday = cal.getTime();
-		String day = DateUtils.formatDate8(yesterday);
-		stringRedisTemplate.delete(
-				new StringBuilder(KEY_PAGE_VIEW).append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-		stringRedisTemplate.delete(
-				new StringBuilder(KEY_PAGE_VIEW).append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-		stringRedisTemplate.delete(
-				new StringBuilder(KEY_PAGE_VIEW).append("uu:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-		updateMax(day, "pv", null);
-		updateMax(day, "uip", null);
-		updateMax(day, "usid", null);
-		updateMax(day, "uu", null);
-		for (String domain : getDomains()) {
-			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uip:")
-					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("usid:")
-					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-			stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uu:")
-					.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-			updateMax(day, "pv", domain);
-			updateMax(day, "uip", domain);
-			updateMax(day, "usid", domain);
-			updateMax(day, "uu", domain);
-		}
+		String lockName = "lock:pageViewService.archive()";
+		if (stringRedisTemplate.opsForValue().setIfAbsent(lockName, ""))
+			try {
+				stringRedisTemplate.expire(lockName, 5, TimeUnit.MINUTES);
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.DAY_OF_YEAR, -1);
+				Date yesterday = cal.getTime();
+				String day = DateUtils.formatDate8(yesterday);
+				stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("uip:").append(day)
+						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
+				stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("usid:").append(day)
+						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
+				stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("uu:").append(day)
+						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
+				updateMax(day, "pv", null);
+				updateMax(day, "uip", null);
+				updateMax(day, "usid", null);
+				updateMax(day, "uu", null);
+				for (String domain : getDomains()) {
+					stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":")
+							.append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+					stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":")
+							.append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+					stringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uu:")
+							.append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
+					updateMax(day, "pv", domain);
+					updateMax(day, "uip", domain);
+					updateMax(day, "usid", domain);
+					updateMax(day, "uu", domain);
+				}
+			} finally {
+				stringRedisTemplate.delete(lockName);
+			}
 	}
 
 	private boolean addUnique(String day, String type, final String value, String domain) {
