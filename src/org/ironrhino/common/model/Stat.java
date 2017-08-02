@@ -10,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -22,10 +21,17 @@ import org.ironrhino.core.stat.Key;
 import org.ironrhino.core.stat.KeyValuePair;
 import org.ironrhino.core.stat.Value;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @AutoConfig
 @Entity
 @Table(name = "common_stat")
 @Richtable(readonly = @Readonly(true), order = "date desc")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Stat extends KeyValuePair implements Persistable<String> {
 
 	private static final long serialVersionUID = -1795832273603877285L;
@@ -36,30 +42,12 @@ public class Stat extends KeyValuePair implements Persistable<String> {
 	@Column(length = 22)
 	private String id;
 
-	public Stat() {
-
-	}
-
 	public Stat(Key key, Value value, Date date, String host) {
 		super();
 		this.key = key;
 		this.value = value;
 		this.date = date;
 		this.host = host;
-	}
-
-	@Override
-	public boolean isNew() {
-		return StringUtils.isBlank(id);
-	}
-
-	@Override
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	@Override

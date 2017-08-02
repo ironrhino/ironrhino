@@ -59,11 +59,6 @@ public class Boss extends AbstractEntity<String> {
 	@UiConfig(type = "textarea")
 	private String intro;
 
-	@Override
-	public boolean isNew() {
-		return id == null;
-	}
-
 	@PreUpdate
 	@PrePersist
 	private void processResume() {

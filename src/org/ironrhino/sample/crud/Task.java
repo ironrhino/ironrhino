@@ -10,15 +10,12 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableComponent;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -57,12 +54,6 @@ public class Task implements Persistable<String> {
 	@UiConfig(width = "100px", displayOrder = -1, description = "taskNo.description")
 	public String getTaskNo() {
 		return getId();
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isNew() {
-		return id == null || StringUtils.isBlank(id);
 	}
 
 	@Override

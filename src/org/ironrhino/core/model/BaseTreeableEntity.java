@@ -76,18 +76,6 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		return fullId;
 	}
 
-	@Override
-	@SearchableId
-	public Long getId() {
-		return id;
-	}
-
-	@Override
-	@JsonIgnore
-	public boolean isNew() {
-		return id == null || id == 0;
-	}
-
 	@CaseInsensitive
 	@SearchableProperty(boost = 3)
 	public String getName() {
