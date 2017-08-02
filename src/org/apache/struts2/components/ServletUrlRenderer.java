@@ -132,6 +132,16 @@ public class ServletUrlRenderer implements UrlRenderer {
 			int slash = action.lastIndexOf('/');
 			String id = formComponent.getId();
 			if (id == null) {
+				int index = action.indexOf('?');
+				if (index != -1) {
+					action = action.substring(0, index);
+				}
+				index = action.indexOf('#');
+				if (index != -1) {
+					action = action.substring(0, index);
+				}
+				if (action.endsWith("/"))
+					action = action.substring(0, action.length() - 1);
 				slash = action.lastIndexOf('/');
 				int dot = action.indexOf('.', slash);
 				if (dot != -1) {
