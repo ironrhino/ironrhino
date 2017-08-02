@@ -58,7 +58,6 @@ public class MyFreemarkerManager extends FreemarkerManager {
 
 	public static final BeansWrapper DEFAULT_BEANS_WRAPPER = new MyBeansWrapperBuilder(DEFAULT_VERSION).build();
 
-	public static final String ATTR_APPLICATION_FREEMARKER_MANAGEER = ".freemarker.FreemarkerManager";
 	private static final String ATTR_APPLICATION_MODEL = ".freemarker.Application";
 	private static final String ATTR_SESSION_MODEL = ".freemarker.Session";
 	private static final String ATTR_REQUEST_MODEL = ".freemarker.Request";
@@ -84,7 +83,6 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		// Configuration configuration =
 		// super.createConfiguration(servletContext);
 		/** super.createConfiguration(servletContext) start **/
-		servletContext.setAttribute(ATTR_APPLICATION_FREEMARKER_MANAGEER, this);
 		boolean devMode = AppInfo.getStage() == Stage.DEVELOPMENT;
 		if (devMode)
 			LocalizedTextUtil.setReloadBundles(true);
@@ -188,6 +186,11 @@ public class MyFreemarkerManager extends FreemarkerManager {
 			logger.debug(e.getMessage());
 		}
 		return configuration;
+	}
+
+	@Override
+	protected ObjectWrapper createObjectWrapper(ServletContext servletContext) {
+		return DEFAULT_BEANS_WRAPPER;
 	}
 
 	@Override
