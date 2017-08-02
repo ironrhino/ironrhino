@@ -35805,14 +35805,15 @@ function uploadFiles(files, filenames) {
 		};
 		if (filenames && filenames.length)
 			data.filename = filenames;
-		return $.ajaxupload(files, {
-					url : $('#upload_form').prop('action'),
-					name : $('#upload_form input[type="file"]').attr('name'),
-					data : data,
-					success : function() {
-						$('#files button.reload').trigger('click');
-					}
-				});
+		return $.ajaxupload(files, ajaxOptions({
+							url : $('#upload_form').prop('action'),
+							name : $('#upload_form input[type="file"]')
+									.attr('name'),
+							data : data,
+							success : function() {
+								$('#files button.reload').trigger('click');
+							}
+						}));
 	}
 }
 (function($) {
@@ -38297,17 +38298,17 @@ Observation._richtable = function(container) {
 						size, maxsize));
 				return;
 			}
-			$.ajaxupload(files, {
-						url : url,
-						success : function() {
-							f.submit();
-							setTimeout(function() {
-										f.closest('.reload-container')
-												.find('.reloadable')
-												.trigger('reload');
-									}, 500);
-						}
-					});
+			$.ajaxupload(files, ajaxOptions({
+								url : url,
+								success : function() {
+									f.submit();
+									setTimeout(function() {
+												f.closest('.reload-container')
+														.find('.reloadable')
+														.trigger('reload');
+											}, 500);
+								}
+							}));
 		}
 		t.on('click', function() {
 					var file = t.next('input[type="file"]:hidden');
@@ -38675,14 +38676,14 @@ if (window.FileReader)
 			if (filenames && filenames.length) {
 				data.filename = filenames;
 			}
-			return $.ajaxupload(files, {
-						url : CONTEXT_PATH + '/common/upload',
-						name : 'file',
-						data : data,
-						success : function(data) {
-							appendAttachments(form, data);
-						}
-					});
+			return $.ajaxupload(files, ajaxOptions({
+								url : CONTEXT_PATH + '/common/upload',
+								name : 'file',
+								data : data,
+								success : function(data) {
+									appendAttachments(form, data);
+								}
+							}));
 		}
 	}
 

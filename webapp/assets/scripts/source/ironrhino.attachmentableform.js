@@ -83,14 +83,14 @@
 			if (filenames && filenames.length) {
 				data.filename = filenames;
 			}
-			return $.ajaxupload(files, {
-						url : CONTEXT_PATH + '/common/upload',
-						name : 'file',
-						data : data,
-						success : function(data) {
-							appendAttachments(form, data);
-						}
-					});
+			return $.ajaxupload(files, ajaxOptions({
+								url : CONTEXT_PATH + '/common/upload',
+								name : 'file',
+								data : data,
+								success : function(data) {
+									appendAttachments(form, data);
+								}
+							}));
 		}
 	}
 

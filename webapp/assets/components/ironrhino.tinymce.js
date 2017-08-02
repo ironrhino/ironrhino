@@ -157,10 +157,11 @@ function browse() {
 
 function upload(files) {
 	var folder = $('#mce-browse-folder').val() || '/';
-	$.ajaxupload(files, {
-				url : CONTEXT_PATH
-						+ $('#' + tinymce.EditorManager.activeEditor.id)
-								.data('uploadurl') + '?folder=' + folder,
-				success : browse
-			});
+	$.ajaxupload(files, ajaxOptions({
+						url : CONTEXT_PATH
+								+ $('#' + tinymce.EditorManager.activeEditor.id)
+										.data('uploadurl') + '?folder='
+								+ folder,
+						success : browse
+					}));
 }

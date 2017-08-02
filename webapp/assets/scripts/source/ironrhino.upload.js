@@ -236,13 +236,14 @@ function uploadFiles(files, filenames) {
 		};
 		if (filenames && filenames.length)
 			data.filename = filenames;
-		return $.ajaxupload(files, {
-					url : $('#upload_form').prop('action'),
-					name : $('#upload_form input[type="file"]').attr('name'),
-					data : data,
-					success : function() {
-						$('#files button.reload').trigger('click');
-					}
-				});
+		return $.ajaxupload(files, ajaxOptions({
+							url : $('#upload_form').prop('action'),
+							name : $('#upload_form input[type="file"]')
+									.attr('name'),
+							data : data,
+							success : function() {
+								$('#files button.reload').trigger('click');
+							}
+						}));
 	}
 }

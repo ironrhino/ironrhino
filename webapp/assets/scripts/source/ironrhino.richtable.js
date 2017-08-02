@@ -1030,17 +1030,17 @@ Observation._richtable = function(container) {
 						size, maxsize));
 				return;
 			}
-			$.ajaxupload(files, {
-						url : url,
-						success : function() {
-							f.submit();
-							setTimeout(function() {
-										f.closest('.reload-container')
-												.find('.reloadable')
-												.trigger('reload');
-									}, 500);
-						}
-					});
+			$.ajaxupload(files, ajaxOptions({
+								url : url,
+								success : function() {
+									f.submit();
+									setTimeout(function() {
+												f.closest('.reload-container')
+														.find('.reloadable')
+														.trigger('reload');
+											}, 500);
+								}
+							}));
 		}
 		t.on('click', function() {
 					var file = t.next('input[type="file"]:hidden');
