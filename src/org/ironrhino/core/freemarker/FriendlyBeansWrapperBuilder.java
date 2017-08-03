@@ -10,8 +10,7 @@ import freemarker.ext.beans.BeansWrapperConfiguration;
 import freemarker.ext.beans._BeansAPI;
 import freemarker.template.Version;
 
-@SuppressWarnings("rawtypes")
-public class MyBeansWrapperBuilder extends BeansWrapperConfiguration {
+public class FriendlyBeansWrapperBuilder extends BeansWrapperConfiguration {
 
 	private final static Map<ClassLoader, Map<BeansWrapperConfiguration, WeakReference<BeansWrapper>>> INSTANCE_CACHE = new WeakHashMap<ClassLoader, Map<BeansWrapperConfiguration, WeakReference<BeansWrapper>>>();
 	private final static ReferenceQueue<BeansWrapper> INSTANCE_CACHE_REF_QUEUE = new ReferenceQueue<BeansWrapper>();
@@ -23,12 +22,12 @@ public class MyBeansWrapperBuilder extends BeansWrapperConfiguration {
 
 		@Override
 		public BeansWrapper create(BeansWrapperConfiguration bwConf) {
-			return new MyBeansWrapper(bwConf, true);
+			return new FriendlyBeansWrapper(bwConf, true);
 		}
 
 	}
 
-	public MyBeansWrapperBuilder(Version incompatibleImprovements) {
+	public FriendlyBeansWrapperBuilder(Version incompatibleImprovements) {
 		super(incompatibleImprovements);
 	}
 
@@ -40,7 +39,7 @@ public class MyBeansWrapperBuilder extends BeansWrapperConfiguration {
 	}
 
 	/** For unit testing only */
-	static Map getInstanceCache() {
+	static Map<ClassLoader, Map<BeansWrapperConfiguration, WeakReference<BeansWrapper>>> getInstanceCache() {
 		return INSTANCE_CACHE;
 	}
 

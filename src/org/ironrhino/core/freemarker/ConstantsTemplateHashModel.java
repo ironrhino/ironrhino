@@ -3,8 +3,6 @@ package org.ironrhino.core.freemarker;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import org.ironrhino.core.struts.MyFreemarkerManager;
-
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -26,7 +24,7 @@ public class ConstantsTemplateHashModel implements TemplateHashModel {
 			Object value = field.get(null);
 			if (value == null)
 				return null;
-			return MyFreemarkerManager.DEFAULT_BEANS_WRAPPER.wrap(value);
+			return FreemarkerConfigurer.DEFAULT_BEANS_WRAPPER.wrap(value);
 		} catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
 			throw new TemplateModelException(e);
 		}

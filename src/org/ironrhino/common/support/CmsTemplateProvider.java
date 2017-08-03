@@ -8,9 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.Page;
 import org.ironrhino.common.service.PageManager;
 import org.ironrhino.core.freemarker.FallbackTemplateProvider;
-import org.ironrhino.core.struts.MyFreemarkerManager;
+import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -22,11 +21,8 @@ import freemarker.template.Template;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CmsTemplateProvider implements FallbackTemplateProvider {
 
-	@Value("${view.ftl.location:" + MyFreemarkerManager.DEFAULT_FTL_LOCATION + "}")
-	private String ftlLocation = MyFreemarkerManager.DEFAULT_FTL_LOCATION;
-
-	@Value("${view.ftl.classpath:" + MyFreemarkerManager.DEFAULT_FTL_CLASSPATH + "}")
-	private String ftlClasspath = MyFreemarkerManager.DEFAULT_FTL_CLASSPATH;
+	@Autowired
+	FreemarkerConfigurer freemarkerConfigurer;
 
 	@Autowired
 	private PageManager pageManager;
@@ -43,6 +39,8 @@ public class CmsTemplateProvider implements FallbackTemplateProvider {
 		if (!name.startsWith("/"))
 			name = '/' + name;
 		String path = null;
+		String ftlLocation = freemarkerConfigurer.getFtlLocation();
+		String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
 		if (name.startsWith(ftlClasspath))
 			path = name.substring(ftlClasspath.length());
 		if (name.startsWith(ftlLocation))

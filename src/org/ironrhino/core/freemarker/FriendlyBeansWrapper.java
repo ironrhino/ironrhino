@@ -7,22 +7,21 @@ import freemarker.ext.beans.BeansWrapperConfiguration;
 import freemarker.ext.util.ModelFactory;
 import freemarker.template.Version;
 
-@SuppressWarnings("rawtypes")
-public class MyBeansWrapper extends BeansWrapper {
+public class FriendlyBeansWrapper extends BeansWrapper {
 
-	public MyBeansWrapper(Version incompatibleImprovements) {
+	public FriendlyBeansWrapper(Version incompatibleImprovements) {
 		super(new BeansWrapperConfiguration(incompatibleImprovements) {
 		}, false);
 	}
 
-	protected MyBeansWrapper(BeansWrapperConfiguration bwConf, boolean writeProtected) {
+	protected FriendlyBeansWrapper(BeansWrapperConfiguration bwConf, boolean writeProtected) {
 		super(bwConf, writeProtected, true);
 	}
 
 	@Override
-	protected ModelFactory getModelFactory(Class clazz) {
+	protected ModelFactory getModelFactory(Class<?> clazz) {
 		if (Map.class.isAssignableFrom(clazz)) {
-			return MyMapModel.FACTORY;
+			return FriendlyMapModel.FACTORY;
 		}
 		return super.getModelFactory(clazz);
 	}

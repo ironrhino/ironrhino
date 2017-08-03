@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
-import org.ironrhino.core.freemarker.TemplateProvider;
+import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -77,7 +77,7 @@ public class UploadAction extends BaseAction {
 	private FileStorage fileStorage;
 
 	@Autowired
-	private TemplateProvider templateProvider;
+	private FreemarkerConfigurer freemarkerConfigurer;
 
 	@Getter
 	@Setter
@@ -135,7 +135,7 @@ public class UploadAction extends BaseAction {
 						String path = createPath(fn, autorename);
 						String url = doGetFileUrl(path);
 						if (url.startsWith("/"))
-							url = templateProvider.getAssetsBase() + url;
+							url = freemarkerConfigurer.getAssetsBase() + url;
 						array[i] = url;
 						fileStorage.write(new FileInputStream(f), path);
 					} catch (IOException e) {
@@ -263,7 +263,7 @@ public class UploadAction extends BaseAction {
 				}
 				String url = doGetFileUrl(path);
 				if (url.startsWith("/"))
-					url = templateProvider.getAssetsBase() + url;
+					url = freemarkerConfigurer.getAssetsBase() + url;
 				files.put(new StringBuilder(url).append("/").append(s).toString(), true);
 			}
 		}

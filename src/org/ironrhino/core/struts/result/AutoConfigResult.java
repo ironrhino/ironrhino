@@ -14,29 +14,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsStatics;
 import org.apache.struts2.views.freemarker.FreemarkerResult;
+import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.struts.BaseAction;
-import org.ironrhino.core.struts.MyFreemarkerManager;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.google.common.io.Files;
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
-import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.ClassLoaderUtil;
 
 public class AutoConfigResult extends FreemarkerResult {
 
 	private static final long serialVersionUID = -2277156996891287055L;
 
-	@Inject(value = "view.ftl.location", required = false)
-	private static String ftlLocation = MyFreemarkerManager.DEFAULT_FTL_LOCATION;
-
-	@Inject(value = "view.ftl.classpath", required = false)
-	private static String ftlClasspath = MyFreemarkerManager.DEFAULT_FTL_CLASSPATH;
-
 	private static ThreadLocal<String> styleHolder = new ThreadLocal<>();
+
+	private static FreemarkerConfigurer freemarkerConfigurer;
 
 	public static void setStyle(String style) {
 		styleHolder.set(style);
@@ -87,7 +83,12 @@ public class AutoConfigResult extends FreemarkerResult {
 			templateName = getTemplateName(namespace, actionName, result, false);
 			location = cache.get(templateName);
 			if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
-				ServletContext context = ServletActionContext.getServletContext();
+				ServletContext servletContext = ServletActionContext.getServletContext();
+				if (freemarkerConfigurer == null)
+					freemarkerConfigurer = WebApplicationContextUtils.getWebApplicationContext(servletContext)
+							.getBean(FreemarkerConfigurer.class);
+				String ftlLocation = freemarkerConfigurer.getFtlLocation();
+				String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
 				URL url = null;
 				location = getTemplateLocation(templateName);
 				if (location == null) {
@@ -95,7 +96,7 @@ public class AutoConfigResult extends FreemarkerResult {
 						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(result)
 								.append(".").append(styleHolder.get()).append(".ftl").toString();
 						try {
-							url = context.getResource(location);
+							url = servletContext.getResource(location);
 						} catch (MalformedURLException e) {
 							e.printStackTrace();
 						}
@@ -104,7 +105,7 @@ public class AutoConfigResult extends FreemarkerResult {
 						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(result)
 								.append(".ftl").toString();
 						try {
-							url = context.getResource(location);
+							url = servletContext.getResource(location);
 						} catch (MalformedURLException e) {
 							e.printStackTrace();
 						}
@@ -131,11 +132,16 @@ public class AutoConfigResult extends FreemarkerResult {
 		templateName = Files.simplifyPath(templateName);
 		String location = cache.get(templateName);
 		if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
-			ServletContext context = ServletActionContext.getServletContext();
+			ServletContext servletContext = ServletActionContext.getServletContext();
+			if (freemarkerConfigurer == null)
+				freemarkerConfigurer = WebApplicationContextUtils.getWebApplicationContext(servletContext)
+						.getBean(FreemarkerConfigurer.class);
+			String ftlLocation = freemarkerConfigurer.getFtlLocation();
+			String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
 			URL url = null;
 			location = new StringBuilder().append(ftlLocation).append(templateName).append(".ftl").toString();
 			try {
-				url = context.getResource(location);
+				url = servletContext.getResource(location);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}

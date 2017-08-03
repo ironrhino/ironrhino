@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.spring.converter.DateConverter;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
@@ -36,6 +37,9 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import freemarker.template.Configuration;
+import freemarker.template.TemplateException;
 
 public class ApiConfigBase extends WebMvcConfigurationSupport {
 
@@ -111,8 +115,13 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	}
 
 	@Bean
-	public FreeMarkerConfig freeMarkerConfig() {
-		FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
+	public FreeMarkerConfig freeMarkerConfig(FreemarkerConfigurer freemarkerConfigurer) {
+		FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer() {
+			protected Configuration newConfiguration() throws IOException, TemplateException {
+				return freemarkerConfigurer.createConfiguration();
+			}
+
+		};
 		freeMarkerConfigurer.setTemplateLoaderPath("classpath:/resources/view");
 		freeMarkerConfigurer.setDefaultEncoding("UTF-8");
 		return freeMarkerConfigurer;
