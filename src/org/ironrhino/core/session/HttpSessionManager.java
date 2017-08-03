@@ -34,8 +34,6 @@ public interface HttpSessionManager extends HttpSessionStore {
 
 	public String getSessionTrackerName();
 
-	public boolean supportSessionTrackerFromURL();
-
 	public String getLocaleCookieName();
 
 	public Locale getLocale(HttpServletRequest request);

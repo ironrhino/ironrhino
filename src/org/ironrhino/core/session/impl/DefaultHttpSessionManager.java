@@ -41,9 +41,6 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Value("${httpSessionManager.sessionTrackerName:" + DEFAULT_SESSION_TRACKER_NAME + "}")
 	private String sessionTrackerName = DEFAULT_SESSION_TRACKER_NAME;
 
-	@Value("${httpSessionManager.supportSessionTrackerFromURL:false}")
-	private boolean supportSessionTrackerFromURL;
-
 	@Getter
 	@Value("${httpSessionManager.localeCookieName:" + DEFAULT_COOKIE_NAME_LOCALE + "}")
 	private String localeCookieName = DEFAULT_COOKIE_NAME_LOCALE;
@@ -87,11 +84,6 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	private void init() {
 		if (alwaysUseCacheBased == null)
 			alwaysUseCacheBased = (AppInfo.getStage() == Stage.PRODUCTION);
-	}
-
-	@Override
-	public boolean supportSessionTrackerFromURL() {
-		return supportSessionTrackerFromURL;
 	}
 
 	@Override

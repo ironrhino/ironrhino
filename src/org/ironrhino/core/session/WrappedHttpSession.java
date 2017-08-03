@@ -48,8 +48,6 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private boolean isnew;
 
-	private boolean fromCookie = true;
-
 	private boolean cacheBased;
 
 	/**
@@ -70,35 +68,6 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 		this.httpSessionManager = httpSessionManager;
 		requestURL = request.getRequestURL().toString();
 		sessionTracker = RequestUtils.getCookieValue(request, httpSessionManager.getSessionTrackerName());
-		if (StringUtils.isBlank(sessionTracker) && httpSessionManager.supportSessionTrackerFromURL()) {
-			sessionTracker = (String) request.getAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_TRACKER_IN_URL);
-			if (StringUtils.isBlank(sessionTracker))
-				sessionTracker = request.getParameter(httpSessionManager.getSessionTrackerName());
-			if (StringUtils.isBlank(sessionTracker)) {
-				String requestURL = request.getRequestURL().toString();
-				if (requestURL.indexOf(';') > -1) {
-					requestURL = requestURL.substring(requestURL.indexOf(';') + 1);
-					String[] array = requestURL.split(";");
-					for (String pair : array) {
-						if (pair.indexOf('=') > 0) {
-							String k = pair.substring(0, pair.indexOf('='));
-							if (k.equals(httpSessionManager.getSessionTrackerName())) {
-								sessionTracker = pair.substring(pair.indexOf('=') + 1);
-								break;
-							}
-						}
-					}
-				}
-			}
-			if (StringUtils.isNotBlank(sessionTracker)) {
-				fromCookie = false;
-			} else {
-				String referer = request.getHeader("Referer");
-				if (referer != null && RequestUtils.isSameOrigin(requestURL, referer)) {
-					fromCookie = false;
-				}
-			}
-		}
 		if (SESSION_TRACKER_PATTERN == null)
 			SESSION_TRACKER_PATTERN = Pattern.compile(';' + httpSessionManager.getSessionTrackerName() + "=.+");
 		httpSessionManager.initialize(this);
@@ -250,11 +219,11 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	}
 
 	public boolean isRequestedSessionIdFromCookie() {
-		return fromCookie;
+		return true;
 	}
 
 	public boolean isRequestedSessionIdFromURL() {
-		return !fromCookie;
+		return false;
 	}
 
 	public boolean isCacheBased() {
