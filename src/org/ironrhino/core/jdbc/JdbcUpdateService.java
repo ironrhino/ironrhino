@@ -26,25 +26,39 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class JdbcUpdateService {
 
 	@Autowired
 	private Logger logger;
 
+	@Getter
+	@Setter
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+	@Getter
+	@Setter
 	private DatabaseProduct databaseProduct;
 
+	@Getter
+	@Setter
 	private int databaseMajorVersion;
 
+	@Getter
+	@Setter
 	private int databaseMinorVersion;
 
+	@Getter
+	@Setter
 	@Value("${jdbcQueryService.restricted:true}")
 	private boolean restricted = true;
 
+	@Setter
 	@Value("${jdbcQueryService.queryTimeout:0}")
 	private int queryTimeout;
 
@@ -55,50 +69,6 @@ public class JdbcUpdateService {
 	private String quoteString = "\"";
 
 	private boolean supportsBatchUpdates;
-
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
-
-	public JdbcTemplate getJdbcTemplate() {
-		return jdbcTemplate;
-	}
-
-	public void setDatabaseProduct(DatabaseProduct databaseProduct) {
-		this.databaseProduct = databaseProduct;
-	}
-
-	public DatabaseProduct getDatabaseProduct() {
-		return databaseProduct;
-	}
-
-	public int getDatabaseMajorVersion() {
-		return databaseMajorVersion;
-	}
-
-	public void setDatabaseMajorVersion(int databaseMajorVersion) {
-		this.databaseMajorVersion = databaseMajorVersion;
-	}
-
-	public int getDatabaseMinorVersion() {
-		return databaseMinorVersion;
-	}
-
-	public void setDatabaseMinorVersion(int databaseMinorVersion) {
-		this.databaseMinorVersion = databaseMinorVersion;
-	}
-
-	public void setQueryTimeout(int queryTimeout) {
-		this.queryTimeout = queryTimeout;
-	}
-
-	public boolean isRestricted() {
-		return restricted;
-	}
-
-	public void setRestricted(boolean restricted) {
-		this.restricted = restricted;
-	}
 
 	@PostConstruct
 	public void init() {

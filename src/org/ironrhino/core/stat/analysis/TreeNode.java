@@ -10,6 +10,11 @@ import org.ironrhino.core.stat.Key;
 import org.ironrhino.core.stat.Value;
 import org.ironrhino.core.util.NumberUtils;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class TreeNode implements Serializable {
 
 	private static final long serialVersionUID = 5312284581467948055L;
@@ -28,62 +33,6 @@ public class TreeNode implements Serializable {
 	private String longPercent;
 
 	private String doublePercent;
-
-	public String getLongPercent() {
-		return longPercent;
-	}
-
-	public void setLongPercent(String longPercent) {
-		this.longPercent = longPercent;
-	}
-
-	public String getDoublePercent() {
-		return doublePercent;
-	}
-
-	public void setDoublePercent(String doublePercent) {
-		this.doublePercent = doublePercent;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public Key getKey() {
-		return key;
-	}
-
-	public void setKey(Key key) {
-		this.key = key;
-	}
-
-	public TreeNode getParent() {
-		return parent;
-	}
-
-	public void setParent(TreeNode parent) {
-		this.parent = parent;
-	}
-
-	public List<TreeNode> getChildren() {
-		return children;
-	}
-
-	public void setChildren(List<TreeNode> children) {
-		this.children = children;
-	}
-
-	public Value getValue() {
-		return value;
-	}
-
-	public void setValue(Value value) {
-		this.value = value;
-	}
 
 	public boolean isRoot() {
 		return parent == null;

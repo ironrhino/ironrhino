@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+
 @Component("lockService")
 @ServiceImplementationConditional(profiles = CLUSTER)
 public class ZooKeeperLockService implements LockService {
@@ -23,14 +25,11 @@ public class ZooKeeperLockService implements LockService {
 	@Autowired
 	private CuratorFramework curatorFramework;
 
+	@Setter
 	@Value("${lockService.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
 	private ConcurrentHashMap<String, InterProcessMutex> locks = new ConcurrentHashMap<>();
-
-	public void setZooKeeperPath(String zooKeeperPath) {
-		this.zooKeeperPath = zooKeeperPath;
-	}
 
 	@Override
 	public boolean tryLock(String name) {

@@ -38,6 +38,9 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class JdbcQueryService {
@@ -45,20 +48,31 @@ public class JdbcQueryService {
 	@Autowired
 	private Logger logger;
 
+	@Getter
+	@Setter
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+	@Getter
+	@Setter
 	private DatabaseProduct databaseProduct;
 
+	@Getter
+	@Setter
 	private int databaseMajorVersion;
 
+	@Getter
+	@Setter
 	private int databaseMinorVersion;
 
+	@Getter
+	@Setter
 	@Value("${jdbcQueryService.restricted:true}")
 	private boolean restricted = true;
 
+	@Setter
 	@Value("${jdbcQueryService.queryTimeout:0}")
 	private int queryTimeout;
 
@@ -75,50 +89,6 @@ public class JdbcQueryService {
 
 	public int getCsvMaxRows() {
 		return csvMaxRows > 0 ? csvMaxRows : 1000 * ResultPage.DEFAULT_PAGE_SIZE;
-	}
-
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
-
-	public JdbcTemplate getJdbcTemplate() {
-		return jdbcTemplate;
-	}
-
-	public void setDatabaseProduct(DatabaseProduct databaseProduct) {
-		this.databaseProduct = databaseProduct;
-	}
-
-	public DatabaseProduct getDatabaseProduct() {
-		return databaseProduct;
-	}
-
-	public int getDatabaseMajorVersion() {
-		return databaseMajorVersion;
-	}
-
-	public void setDatabaseMajorVersion(int databaseMajorVersion) {
-		this.databaseMajorVersion = databaseMajorVersion;
-	}
-
-	public int getDatabaseMinorVersion() {
-		return databaseMinorVersion;
-	}
-
-	public void setDatabaseMinorVersion(int databaseMinorVersion) {
-		this.databaseMinorVersion = databaseMinorVersion;
-	}
-
-	public void setQueryTimeout(int queryTimeout) {
-		this.queryTimeout = queryTimeout;
-	}
-
-	public boolean isRestricted() {
-		return restricted;
-	}
-
-	public void setRestricted(boolean restricted) {
-		this.restricted = restricted;
 	}
 
 	@PostConstruct

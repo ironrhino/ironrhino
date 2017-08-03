@@ -5,17 +5,22 @@ import java.lang.reflect.Type;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.remoting.support.RemoteInvocation;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
 public class GenericRemoteInvocation extends RemoteInvocation {
 
 	private static final long serialVersionUID = -2740913342844528055L;
 
+	@Getter
+	@Setter
 	private String[] genericParameterTypes;
 
+	@Getter
+	@Setter
 	private String genericReturnType;
-
-	public GenericRemoteInvocation() {
-
-	}
 
 	public GenericRemoteInvocation(MethodInvocation methodInvocation) {
 		super(methodInvocation);
@@ -27,22 +32,6 @@ public class GenericRemoteInvocation extends RemoteInvocation {
 		}
 		Type type = methodInvocation.getMethod().getGenericReturnType();
 		genericReturnType = JsonHttpInvokerSerializationHelper.toCanonical(type);
-	}
-
-	public String[] getGenericParameterTypes() {
-		return genericParameterTypes;
-	}
-
-	public void setGenericParameterTypes(String[] genericParameterTypes) {
-		this.genericParameterTypes = genericParameterTypes;
-	}
-
-	public String getGenericReturnType() {
-		return genericReturnType;
-	}
-
-	public void setGenericReturnType(String genericReturnType) {
-		this.genericReturnType = genericReturnType;
 	}
 
 }

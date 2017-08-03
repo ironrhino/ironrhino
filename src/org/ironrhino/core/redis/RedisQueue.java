@@ -15,12 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.support.collections.DefaultRedisList;
 
+import lombok.Setter;
+
 public abstract class RedisQueue<T extends Serializable> implements org.ironrhino.core.message.Queue<T> {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Setter
 	protected String queueName;
 
+	@Setter
 	protected boolean consuming;
 
 	private volatile boolean stopConsuming;
@@ -28,21 +32,10 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
+	@Setter
 	@Autowired
 	@PriorityQualifier({ "mqRedisTemplate", "globalRedisTemplate" })
 	private RedisTemplate<String, T> redisTemplate;
-
-	public void setConsuming(boolean consuming) {
-		this.consuming = consuming;
-	}
-
-	public void setQueueName(String queueName) {
-		this.queueName = queueName;
-	}
-
-	public void setRedisTemplate(RedisTemplate<String, T> redisTemplate) {
-		this.redisTemplate = redisTemplate;
-	}
 
 	protected BlockingDeque<T> queue;
 

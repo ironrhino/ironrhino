@@ -13,28 +13,21 @@ import org.ironrhino.core.util.ExpressionUtils;
 import org.mvel2.PropertyAccessException;
 import org.springframework.core.BridgeMethodResolver;
 
+import lombok.Setter;
+
 @SuppressWarnings("unchecked")
 public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 
 	private final static String MUTEX = "_MUTEX_";
 
+	@Setter
 	private CacheManager cacheManager;
 
+	@Setter
 	private boolean mutex;
 
+	@Setter
 	private int mutexWait;
-
-	public void setCacheManager(CacheManager cacheManager) {
-		this.cacheManager = cacheManager;
-	}
-
-	public void setMutex(boolean mutex) {
-		this.mutex = mutex;
-	}
-
-	public void setMutexWait(int mutexWait) {
-		this.mutexWait = mutexWait;
-	}
 
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {

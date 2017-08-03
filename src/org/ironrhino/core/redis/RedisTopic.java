@@ -18,11 +18,15 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.serializer.SerializationException;
 
+import lombok.Setter;
+
 @SuppressWarnings("rawtypes")
 public abstract class RedisTopic<T extends Serializable> implements org.ironrhino.core.message.Topic<T> {
 
+	@Setter
 	protected String channelName;
 
+	@Setter
 	@Autowired
 	@PriorityQualifier("mqRedisTemplate")
 	private RedisTemplate redisTemplate;
@@ -41,14 +45,6 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
-
-	public void setChannelName(String channelName) {
-		this.channelName = channelName;
-	}
-
-	public void setRedisTemplate(RedisTemplate redisTemplate) {
-		this.redisTemplate = redisTemplate;
-	}
 
 	public RedisTopic() {
 		Class<?> clazz = ReflectionUtils.getGenericClass(getClass(), RedisTopic.class);

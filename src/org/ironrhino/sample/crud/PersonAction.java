@@ -11,6 +11,8 @@ import org.ironrhino.core.struts.EntityAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Setter;
+
 public class PersonAction extends EntityAction<Person> {
 
 	private static final long serialVersionUID = 7605233440758696630L;
@@ -18,11 +20,8 @@ public class PersonAction extends EntityAction<Person> {
 	@Autowired
 	private EntityManager<Person> personManager;
 
+	@Setter
 	private File file;
-
-	public void setFile(File file) {
-		this.file = file;
-	}
 
 	@Transactional // only if needed
 	public String upload() throws IOException {

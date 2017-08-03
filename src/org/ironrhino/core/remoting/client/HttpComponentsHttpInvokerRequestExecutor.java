@@ -32,49 +32,28 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.StringUtils;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvokerRequestExecutor {
 
 	private CloseableHttpClient httpClient;
 
+	@Getter
+	@Setter
 	private SerializationType serializationType = SerializationType.JAVA;
 
+	@Getter
+	@Setter
 	private long timeToLive = 60;
 
+	@Getter
+	@Setter
 	private int maxConnPerRoute = 100;
 
+	@Getter
+	@Setter
 	private int maxConnTotal = 100;
-
-	public SerializationType getSerializationType() {
-		return serializationType;
-	}
-
-	public void setSerializationType(SerializationType serializationType) {
-		this.serializationType = serializationType;
-	}
-
-	public long getTimeToLive() {
-		return timeToLive;
-	}
-
-	public void setTimeToLive(long timeToLive) {
-		this.timeToLive = timeToLive;
-	}
-
-	public int getMaxConnPerRoute() {
-		return maxConnPerRoute;
-	}
-
-	public void setMaxConnPerRoute(int maxConnPerRoute) {
-		this.maxConnPerRoute = maxConnPerRoute;
-	}
-
-	public int getMaxConnTotal() {
-		return maxConnTotal;
-	}
-
-	public void setMaxConnTotal(int maxConnTotal) {
-		this.maxConnTotal = maxConnTotal;
-	}
 
 	@PostConstruct
 	public void init() {

@@ -10,17 +10,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class MultiVersionPasswordEncoder implements PasswordEncoder {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private SortedMap<Integer, VersionedPasswordEncoder> map;
 
+	@Getter
+	@Setter
 	private List<VersionedPasswordEncoder> versions;
-
-	public void setVersions(List<VersionedPasswordEncoder> versions) {
-		this.versions = versions;
-	}
 
 	@PostConstruct
 	public void afterPropertiesSet() {

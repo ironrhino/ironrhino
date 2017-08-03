@@ -13,37 +13,18 @@ import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SimpleJobParametersValidator implements JobParametersValidator, InitializingBean {
 
 	private Map<String, ParameterType> requiredKeys;
 
 	private Map<String, ParameterType> optionalKeys;
-
-	public SimpleJobParametersValidator() {
-
-	}
-
-	public SimpleJobParametersValidator(Map<String, ParameterType> requiredKeys,
-			Map<String, ParameterType> optionalKeys) {
-		setRequiredKeys(requiredKeys);
-		setOptionalKeys(optionalKeys);
-	}
-
-	public Map<String, ParameterType> getRequiredKeys() {
-		return requiredKeys;
-	}
-
-	public void setRequiredKeys(Map<String, ParameterType> requiredKeys) {
-		this.requiredKeys = requiredKeys;
-	}
-
-	public Map<String, ParameterType> getOptionalKeys() {
-		return optionalKeys;
-	}
-
-	public void setOptionalKeys(Map<String, ParameterType> optionalKeys) {
-		this.optionalKeys = optionalKeys;
-	}
 
 	@Override
 	public void afterPropertiesSet() throws IllegalStateException {

@@ -24,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Aspect
 @Component
 public class PublishAspect extends TransactionSynchronizationAdapter implements Ordered {
@@ -33,19 +36,12 @@ public class PublishAspect extends TransactionSynchronizationAdapter implements 
 	@Autowired
 	private EventPublisher eventPublisher;
 
+	@Getter
+	@Setter
 	private int order;
 
 	public PublishAspect() {
 		order = 1;
-	}
-
-	@Override
-	public int getOrder() {
-		return order;
-	}
-
-	public void setOrder(int order) {
-		this.order = order;
 	}
 
 	protected boolean isBypass() {

@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Key implements Serializable, Comparable<Key> {
 
 	private static final long serialVersionUID = -4752654130307409656L;
@@ -17,6 +20,8 @@ public class Key implements Serializable, Comparable<Key> {
 
 	private boolean cumulative = true;
 
+	@Getter
+	@Setter
 	private long lastWriteTime = System.currentTimeMillis();
 
 	public Key(String... strings) {
@@ -97,14 +102,6 @@ public class Key implements Serializable, Comparable<Key> {
 		String d = descendant.toString();
 		String a = this.toString();
 		return d.startsWith(a) && !(excludeSelf && d.equals(a));
-	}
-
-	public long getLastWriteTime() {
-		return lastWriteTime;
-	}
-
-	public void setLastWriteTime(long lastWriteTime) {
-		this.lastWriteTime = lastWriteTime;
 	}
 
 	@Override

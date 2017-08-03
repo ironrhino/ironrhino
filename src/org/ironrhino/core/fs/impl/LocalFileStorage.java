@@ -29,6 +29,9 @@ import org.springframework.util.Assert;
 
 import com.google.common.io.Files;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Primary
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = { DEFAULT, DUAL })
@@ -37,14 +40,12 @@ public class LocalFileStorage extends AbstractFileStorage {
 	@Autowired
 	private Logger logger;
 
+	@Getter
+	@Setter
 	@Value("${fileStorage.uri:file:///${app.context}/assets/}")
 	protected URI uri;
 
 	private File directory;
-
-	public void setUri(URI uri) {
-		this.uri = uri;
-	}
 
 	@PostConstruct
 	public void afterPropertiesSet() throws Exception {

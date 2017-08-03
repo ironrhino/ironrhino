@@ -4,8 +4,13 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class IndividualSettingsJdbcTemplate extends JdbcTemplate {
 
+	@Getter
+	@Setter
 	private int defaultFetchSize;
 
 	private ThreadLocal<Integer> fetchSizeHolder = new ThreadLocal<Integer>() {
@@ -17,6 +22,8 @@ public class IndividualSettingsJdbcTemplate extends JdbcTemplate {
 
 	};
 
+	@Getter
+	@Setter
 	private int defaultMaxRows;
 
 	private ThreadLocal<Integer> maxRowsHolder = new ThreadLocal<Integer>() {
@@ -28,6 +35,8 @@ public class IndividualSettingsJdbcTemplate extends JdbcTemplate {
 
 	};
 
+	@Getter
+	@Setter
 	private int defaultQueryTimeout;
 
 	private ThreadLocal<Integer> queryTimeoutHolder = new ThreadLocal<Integer>() {
@@ -47,14 +56,6 @@ public class IndividualSettingsJdbcTemplate extends JdbcTemplate {
 		super(ds);
 	}
 
-	public int getDefaultFetchSize() {
-		return defaultFetchSize;
-	}
-
-	public void setDefaultFetchSize(int defaultFetchSize) {
-		this.defaultFetchSize = defaultFetchSize;
-	}
-
 	@Override
 	public int getFetchSize() {
 		int value = fetchSizeHolder.get();
@@ -67,14 +68,6 @@ public class IndividualSettingsJdbcTemplate extends JdbcTemplate {
 		fetchSizeHolder.set(fetchSize);
 	}
 
-	public int getDefaultMaxRows() {
-		return defaultMaxRows;
-	}
-
-	public void setDefaultMaxRows(int defaultMaxRows) {
-		this.defaultMaxRows = defaultMaxRows;
-	}
-
 	@Override
 	public int getMaxRows() {
 		int value = maxRowsHolder.get();
@@ -85,14 +78,6 @@ public class IndividualSettingsJdbcTemplate extends JdbcTemplate {
 	@Override
 	public void setMaxRows(int fetchSize) {
 		maxRowsHolder.set(fetchSize);
-	}
-
-	public int getDefaultQueryTimeout() {
-		return defaultQueryTimeout;
-	}
-
-	public void setDefaultQueryTimeout(int defaultQueryTimeout) {
-		this.defaultQueryTimeout = defaultQueryTimeout;
 	}
 
 	@Override

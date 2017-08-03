@@ -35,6 +35,8 @@ import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
+import lombok.Setter;
+
 public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	protected static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
@@ -52,19 +54,13 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Value("${httpInvoker.loggingPayload:true}")
 	private boolean loggingPayload;
 
+	@Setter
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
+	@Setter
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
-
-	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
-	}
-
-	public void setServiceStats(ServiceStats serviceStat) {
-		this.serviceStats = serviceStat;
-	}
 
 	@Override
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)

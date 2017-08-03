@@ -12,22 +12,19 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class FirewallHandler extends AccessHandler {
 
 	public static final String KEY_ALLOWEDADDRPATTERN = "firewallHandler.allowedAddrPattern";
 
+	@Getter
+	@Setter
 	@Value("${" + KEY_ALLOWEDADDRPATTERN + ":}")
 	private String allowedAddrPattern;
-
-	public String getAllowedAddrPattern() {
-		return allowedAddrPattern;
-	}
-
-	public void setAllowedAddrPattern(String allowedAddrPattern) {
-		this.allowedAddrPattern = allowedAddrPattern;
-	}
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {

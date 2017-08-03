@@ -10,6 +10,9 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public abstract class RabbitQueue<T extends Serializable> implements Queue<T> {
 
 	@Autowired
@@ -18,25 +21,13 @@ public abstract class RabbitQueue<T extends Serializable> implements Queue<T> {
 	@Autowired
 	protected RabbitAdmin rabbitAdmin;
 
+	@Getter
+	@Setter
 	protected String queueName = "";
 
+	@Getter
+	@Setter
 	protected boolean durable = true;
-
-	public String getQueueName() {
-		return queueName;
-	}
-
-	public void setQueueName(String queueName) {
-		this.queueName = queueName;
-	}
-
-	public boolean isDurable() {
-		return durable;
-	}
-
-	public void setDurable(boolean durable) {
-		this.durable = durable;
-	}
 
 	public RabbitQueue() {
 		Class<?> clazz = ReflectionUtils.getGenericClass(getClass(), RabbitQueue.class);

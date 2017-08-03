@@ -13,16 +13,25 @@ import org.ironrhino.core.stat.Key;
 import org.ironrhino.core.stat.KeyValuePair;
 import org.ironrhino.core.stat.Value;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class PeriodAnalyzer extends AbstractAnalyzer<List<Value>> {
 
+	@Getter
 	private List<Value> result = new ArrayList<>(24);
 
+	@Getter
 	private Map<String, List<Value>> perHostResult = new TreeMap<>();
 
 	private Key key;
 
+	@Getter
+	@Setter
 	private boolean cumulative;
 
+	@Getter
+	@Setter
 	private boolean perHostEnabled;
 
 	Calendar calendar = Calendar.getInstance();
@@ -50,31 +59,6 @@ public class PeriodAnalyzer extends AbstractAnalyzer<List<Value>> {
 	public PeriodAnalyzer(Key key, Iterator<? extends KeyValuePair> iterator) {
 		super(iterator);
 		this.key = key;
-	}
-
-	public boolean isPerHostEnabled() {
-		return perHostEnabled;
-	}
-
-	public void setPerHostEnabled(boolean perHostEnabled) {
-		this.perHostEnabled = perHostEnabled;
-	}
-
-	public boolean isCumulative() {
-		return cumulative;
-	}
-
-	public void setCumulative(boolean cumulative) {
-		this.cumulative = cumulative;
-	}
-
-	@Override
-	public List<Value> getResult() {
-		return result;
-	}
-
-	public Map<String, List<Value>> getPerHostResult() {
-		return perHostResult;
 	}
 
 	@Override

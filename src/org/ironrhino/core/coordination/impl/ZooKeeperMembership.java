@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+
 @Component("membership")
 @ServiceImplementationConditional(profiles = CLUSTER)
 public class ZooKeeperMembership implements Membership {
@@ -35,6 +37,7 @@ public class ZooKeeperMembership implements Membership {
 	@Autowired(required = false)
 	private List<LeaderChangeListener> leaderChangeListeners;
 
+	@Setter
 	@Value("${membership.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
@@ -43,10 +46,6 @@ public class ZooKeeperMembership implements Membership {
 	@Autowired
 	public ZooKeeperMembership(CuratorFramework curatorFramework) {
 		this.curatorFramework = curatorFramework;
-	}
-
-	public void setZooKeeperPath(String zooKeeperPath) {
-		this.zooKeeperPath = zooKeeperPath;
 	}
 
 	@Override

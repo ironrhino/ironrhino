@@ -20,6 +20,9 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component("logoutSuccessHandler")
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DefaultLogoutSuccessHandler extends AbstractAuthenticationTargetUrlRequestHandler
@@ -36,16 +39,9 @@ public class DefaultLogoutSuccessHandler extends AbstractAuthenticationTargetUrl
 		setDefaultTargetUrl(defaultTargetUrl);
 	}
 
+	@Getter
+	@Setter
 	private boolean useReferer;
-
-	public boolean isUseReferer() {
-		return useReferer;
-	}
-
-	@Override
-	public void setUseReferer(boolean useReferer) {
-		this.useReferer = useReferer;
-	}
 
 	@Override
 	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {

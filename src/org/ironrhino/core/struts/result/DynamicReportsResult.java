@@ -15,36 +15,21 @@ import org.apache.struts2.dispatcher.StrutsResultSupport;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.util.ValueStack;
 
+import lombok.Setter;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 
 public class DynamicReportsResult extends StrutsResultSupport {
 
 	private static final long serialVersionUID = -2433174799621182907L;
 
+	@Setter
 	protected String format;
+	@Setter
 	protected String documentName;
+	@Setter
 	protected String contentDisposition;
+	@Setter
 	protected String jasperReportBuilder;
-
-	public DynamicReportsResult() {
-		super();
-	}
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
-	public void setDocumentName(String documentName) {
-		this.documentName = documentName;
-	}
-
-	public void setContentDisposition(String contentDisposition) {
-		this.contentDisposition = contentDisposition;
-	}
-
-	public void setJasperReportBuilder(String jasperReportBuilder) {
-		this.jasperReportBuilder = jasperReportBuilder;
-	}
 
 	@Override
 	protected void doExecute(String finalLocation, ActionInvocation invocation) throws Exception {

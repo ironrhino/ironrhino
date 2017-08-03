@@ -21,50 +21,32 @@ import org.springframework.util.Assert;
 
 import com.google.common.hash.Hashing;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class RoutingDataSource extends AbstractDataSource implements InitializingBean, BeanFactoryAware {
 
 	protected BeanFactory beanFactory;
 
 	protected DataSource defaultNode;
 
+	@Getter
 	protected List<DataSource> shardings;
 
+	@Setter
 	protected String defaultName;
 
+	@Getter
+	@Setter
 	protected List<String> shardingNames;
 
+	@Getter
+	@Setter
 	protected Router defaultRouter;
 
+	@Getter
 	@Autowired(required = false)
 	protected Map<String, Router> routers;
-
-	public Router getDefaultRouter() {
-		return defaultRouter;
-	}
-
-	public void setDefaultRouter(Router defaultRouter) {
-		this.defaultRouter = defaultRouter;
-	}
-
-	public Map<String, Router> getRouters() {
-		return routers;
-	}
-
-	public List<DataSource> getShardings() {
-		return shardings;
-	}
-
-	public void setDefaultName(String defaultName) {
-		this.defaultName = defaultName;
-	}
-
-	public List<String> getShardingNames() {
-		return shardingNames;
-	}
-
-	public void setShardingNames(List<String> shardingNames) {
-		this.shardingNames = shardingNames;
-	}
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {

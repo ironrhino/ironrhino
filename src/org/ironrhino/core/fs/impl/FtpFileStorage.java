@@ -37,6 +37,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.io.Files;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Primary
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = "ftp")
@@ -45,70 +48,52 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Autowired
 	private Logger logger;
 
+	@Getter
+	@Setter
 	@Value("${fileStorage.uri:ftp://test:test@localhost}")
 	protected URI uri;
 
+	@Getter
+	@Setter
 	@Value("${ftp.controlEncoding:UTF-8}")
 	protected String controlEncoding;
 
+	@Getter
+	@Setter
 	@Value("${ftp.binaryMode:true}")
 	protected boolean binaryMode;
 
+	@Getter
+	@Setter
 	@Value("${ftp.passiveMode:true}")
 	protected boolean passiveMode;
 
+	@Getter
+	@Setter
 	@Value("${ftp.pool.maxTotal:20}")
 	protected int maxTotal;
 
+	@Getter
+	@Setter
 	@Value("${ftp.pool.maxIdle:5}")
 	protected int maxIdle;
 
+	@Getter
+	@Setter
 	@Value("${ftp.pool.minIdle:1}")
 	protected int minIdle;
 
+	@Getter
+	@Setter
 	@Value("${ftp.pool.maxWaitMillis:60000}")
 	protected int maxWaitMillis;
 
+	@Getter
+	@Setter
 	@Value("${ftp.pool.minEvictableIdleTimeMillis:300000}")
 	protected int minEvictableIdleTimeMillis;
 
 	private ObjectPool<FTPClient> pool;
-
-	public void setUri(URI uri) {
-		this.uri = uri;
-	}
-
-	public void setControlEncoding(String controlEncoding) {
-		this.controlEncoding = controlEncoding;
-	}
-
-	public void setBinaryMode(boolean binaryMode) {
-		this.binaryMode = binaryMode;
-	}
-
-	public void setPassiveMode(boolean passiveMode) {
-		this.passiveMode = passiveMode;
-	}
-
-	public void setMaxTotal(int maxTotal) {
-		this.maxTotal = maxTotal;
-	}
-
-	public void setMaxIdle(int maxIdle) {
-		this.maxIdle = maxIdle;
-	}
-
-	public void setMinIdle(int minIdle) {
-		this.minIdle = minIdle;
-	}
-
-	public void setMaxWaitMillis(int maxWaitMillis) {
-		this.maxWaitMillis = maxWaitMillis;
-	}
-
-	public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
-		this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
-	}
 
 	@PostConstruct
 	public void init() {

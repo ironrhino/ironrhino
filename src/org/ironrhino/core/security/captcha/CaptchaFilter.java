@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+
 @Component
 public class CaptchaFilter implements Filter {
 
@@ -25,17 +27,11 @@ public class CaptchaFilter implements Filter {
 	@Autowired
 	private transient CaptchaManager captchaManager;
 
+	@Setter
 	private String imageCaptchaUrl = DEFAULT_IMAGE_CAPTCHA_URL;
 
+	@Setter
 	private String imageCaptchaVerifyUrl = DEFAULT_IMAGE_CAPTCHA_VERIFY_URL;
-
-	public void setImageCaptchaUrl(String imageCaptchaUrl) {
-		this.imageCaptchaUrl = imageCaptchaUrl;
-	}
-
-	public void setImageCaptchaVerifyUrl(String imageCaptchaVerifyUrl) {
-		this.imageCaptchaVerifyUrl = imageCaptchaVerifyUrl;
-	}
 
 	@Override
 	public void destroy() {

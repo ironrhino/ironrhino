@@ -10,17 +10,16 @@ import org.ironrhino.core.util.RequestUtils;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.Result;
 
+import lombok.Setter;
+
 public class RefererResult implements Result {
 
 	private static final long serialVersionUID = 6487995341022610712L;
 
 	public static final String INCLUDE_QUERY_STRING = "X-Include-Query-String";
 
+	@Setter
 	private boolean includeQueryString = false;
-
-	public void setIncludeQueryString(boolean includeQueryString) {
-		this.includeQueryString = includeQueryString;
-	}
 
 	@Override
 	public void execute(ActionInvocation invocation) throws Exception {

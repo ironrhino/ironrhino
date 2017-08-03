@@ -9,10 +9,15 @@ import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class DataRouteAspect extends AbstractPointcutAdvisor {
 
 	private static final long serialVersionUID = -9093221616339043624L;
 
+	@Getter
+	@Setter
 	private int order = -2;
 
 	private transient final StaticMethodMatcherPointcut pointcut = new StaticMethodMatcherPointcut() {
@@ -28,16 +33,6 @@ public class DataRouteAspect extends AbstractPointcutAdvisor {
 	};
 
 	private transient final DataRouteInterceptor interceptor = new DataRouteInterceptor();
-
-	@Override
-	public int getOrder() {
-		return order;
-	}
-
-	@Override
-	public void setOrder(int order) {
-		this.order = order;
-	}
 
 	@Override
 	public Pointcut getPointcut() {

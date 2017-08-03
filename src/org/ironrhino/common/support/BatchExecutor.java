@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class BatchExecutor {
 
 	@Autowired
@@ -22,15 +25,9 @@ public class BatchExecutor {
 	@Autowired(required = false)
 	MailService mailService;
 
+	@Getter
+	@Setter
 	private List<String> commands = Collections.emptyList();
-
-	public List<String> getCommands() {
-		return commands;
-	}
-
-	public void setCommands(List<String> commands) {
-		this.commands = commands;
-	}
 
 	public void execute() {
 		for (String cmd : commands) {

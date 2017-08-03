@@ -91,8 +91,10 @@ public class BaseAction extends ActionSupport {
 
 	protected CaptchaStatus captchaStatus;
 
+	@Setter
 	protected String csrf;
 
+	@Getter
 	protected boolean csrfRequired;
 
 	private String actionBaseUrl;
@@ -109,10 +111,6 @@ public class BaseAction extends ActionSupport {
 	@Getter
 	private String actionSuccessMessage;
 
-	public void setCsrf(String csrf) {
-		this.csrf = csrf;
-	}
-
 	public String getCsrf() {
 		if (csrf == null) {
 			csrf = CodecUtils.nextId();
@@ -120,10 +118,6 @@ public class BaseAction extends ActionSupport {
 					COOKIE_NAME_CSRF, csrf, false, true);
 		}
 		return csrf;
-	}
-
-	public boolean isCsrfRequired() {
-		return csrfRequired;
 	}
 
 	public boolean isCaptchaRequired() {

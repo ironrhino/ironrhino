@@ -30,6 +30,9 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
@@ -38,26 +41,34 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private static Logger remotingLogger = LoggerFactory.getLogger("remoting");
 
+	@Getter
 	@Value("${httpInvoker.serialization.type:JAVA}")
 	private volatile SerializationType serializationType = SerializationType.JAVA;
 
 	@Value("${httpInvoker.loggingPayload:true}")
 	private boolean loggingPayload;
 
+	@Setter
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
+	@Setter
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
 
+	@Setter
 	private String host;
 
+	@Setter
 	private int port;
 
+	@Setter
 	private String contextPath;
 
+	@Setter
 	private int maxAttempts = 3;
 
+	@Setter
 	@Value("${httpInvoker.polling:false}")
 	private boolean polling;
 
@@ -82,38 +93,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Override
 	public boolean isSingleton() {
 		return true;
-	}
-
-	public void setPolling(boolean polling) {
-		this.polling = polling;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	public void setContextPath(String contextPath) {
-		this.contextPath = contextPath;
-	}
-
-	public void setMaxAttempts(int maxAttempts) {
-		this.maxAttempts = maxAttempts;
-	}
-
-	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
-	}
-
-	public void setServiceStats(ServiceStats serviceStat) {
-		this.serviceStats = serviceStat;
-	}
-
-	public SerializationType getSerializationType() {
-		return serializationType;
 	}
 
 	public void setSerializationType(SerializationType serializationType) {

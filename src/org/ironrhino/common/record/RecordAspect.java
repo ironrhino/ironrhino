@@ -37,6 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Aspect
 @Component
 @BeanPresentConditional(type = SessionFactory.class)
@@ -50,19 +53,12 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	@Getter
+	@Setter
 	private int order;
 
 	public RecordAspect() {
 		order = 1;
-	}
-
-	@Override
-	public int getOrder() {
-		return order;
-	}
-
-	public void setOrder(int order) {
-		this.order = order;
 	}
 
 	protected boolean isBypass() {

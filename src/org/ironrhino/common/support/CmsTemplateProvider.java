@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import lombok.Setter;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -27,12 +28,8 @@ public class CmsTemplateProvider implements FallbackTemplateProvider {
 	@Autowired
 	private PageManager pageManager;
 
+	@Setter
 	private Configuration configuration;
-
-	@Override
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
 
 	@Override
 	public Template getTemplate(String name, Locale locale, String encoding, boolean parse) throws IOException {

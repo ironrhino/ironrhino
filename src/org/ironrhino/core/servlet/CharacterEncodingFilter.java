@@ -12,23 +12,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import lombok.Setter;
+
 public class CharacterEncodingFilter extends OncePerRequestFilter {
 
 	public static final String PARAMETER_NAME_INPUT_ENCODING = "_input_encoding";
 
 	public static final String PARAMETER_NAME_OUTPUT_ENCODING = "_output_encoding";
 
+	@Setter
 	private String encoding;
 
+	@Setter
 	private boolean forceEncoding = false;
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	public void setForceEncoding(boolean forceEncoding) {
-		this.forceEncoding = forceEncoding;
-	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

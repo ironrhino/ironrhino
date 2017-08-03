@@ -32,6 +32,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
 public class AccessFilter implements Filter {
 
@@ -54,12 +57,16 @@ public class AccessFilter implements Filter {
 
 	public static final boolean DEFAULT_PRINT = true;
 
+	@Getter
+	@Setter
 	@Value("${accessFilter.responseTimeThreshold:" + DEFAULT_RESPONSETIMETHRESHOLD + "}")
 	public long responseTimeThreshold = DEFAULT_RESPONSETIMETHRESHOLD;
 
+	@Setter
 	@Value("${accessFilter.print:" + DEFAULT_PRINT + "}")
 	private boolean print = DEFAULT_PRINT;
 
+	@Setter
 	@Value("${accessFilter.excludePatterns:}")
 	private String excludePatterns;
 
@@ -70,22 +77,6 @@ public class AccessFilter implements Filter {
 
 	@Autowired
 	private HttpSessionManager httpSessionManager;
-
-	public void setExcludePatterns(String excludePatterns) {
-		this.excludePatterns = excludePatterns;
-	}
-
-	public void setPrint(boolean print) {
-		this.print = print;
-	}
-
-	public long getResponseTimeThreshold() {
-		return responseTimeThreshold;
-	}
-
-	public void setResponseTimeThreshold(long responseTimeThreshold) {
-		this.responseTimeThreshold = responseTimeThreshold;
-	}
 
 	@PostConstruct
 	public void _init() {
@@ -103,7 +94,8 @@ public class AccessFilter implements Filter {
 			throws IOException, ServletException {
 		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
 		HttpServletRequest request = "true".equals(System.getProperty(SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED))
-				? (HttpServletRequest) req : new ProxySupportHttpServletRequest((HttpServletRequest) req);
+				? (HttpServletRequest) req
+				: new ProxySupportHttpServletRequest((HttpServletRequest) req);
 		LocaleContextHolder.setLocale(request.getLocale(), true);
 		HttpServletResponse response = (HttpServletResponse) resp;
 		RequestContext.set(request, response);

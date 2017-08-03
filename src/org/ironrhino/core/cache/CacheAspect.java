@@ -13,6 +13,9 @@ import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
 public class CacheAspect extends AbstractPointcutAdvisor {
 
@@ -33,6 +36,8 @@ public class CacheAspect extends AbstractPointcutAdvisor {
 	@Value("${cacheAspect.mutexWait:" + DEFAULT_MUTEX_WAIT + "}")
 	private int mutexWait = DEFAULT_MUTEX_WAIT;
 
+	@Getter
+	@Setter
 	private int order = Ordered.HIGHEST_PRECEDENCE + 3;
 
 	private transient final StaticMethodMatcherPointcut pointcut = new StaticMethodMatcherPointcut() {
@@ -45,16 +50,6 @@ public class CacheAspect extends AbstractPointcutAdvisor {
 	};
 
 	private volatile transient CacheInterceptor interceptor;
-
-	@Override
-	public int getOrder() {
-		return order;
-	}
-
-	@Override
-	public void setOrder(int order) {
-		this.order = order;
-	}
 
 	@Override
 	public Pointcut getPointcut() {

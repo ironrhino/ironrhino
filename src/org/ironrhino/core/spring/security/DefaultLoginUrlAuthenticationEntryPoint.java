@@ -17,10 +17,13 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.security.web.util.RedirectUrlBuilder;
 
+import lombok.Setter;
+
 public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
 	static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
 
+	@Setter
 	@Value("${ssoServerBase:}")
 	private String ssoServerBase;
 
@@ -29,10 +32,6 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticat
 
 	public DefaultLoginUrlAuthenticationEntryPoint(String loginFormUrl) {
 		super(loginFormUrl);
-	}
-
-	public void setSsoServerBase(String ssoServerBase) {
-		this.ssoServerBase = ssoServerBase;
 	}
 
 	@Override

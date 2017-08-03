@@ -23,6 +23,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component("httpSessionManager")
 public class DefaultHttpSessionManager implements HttpSessionManager {
 
@@ -34,15 +37,19 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	@Getter
 	@Value("${httpSessionManager.sessionTrackerName:" + DEFAULT_SESSION_TRACKER_NAME + "}")
 	private String sessionTrackerName = DEFAULT_SESSION_TRACKER_NAME;
 
 	@Value("${httpSessionManager.supportSessionTrackerFromURL:false}")
 	private boolean supportSessionTrackerFromURL;
 
+	@Getter
 	@Value("${httpSessionManager.localeCookieName:" + DEFAULT_COOKIE_NAME_LOCALE + "}")
 	private String localeCookieName = DEFAULT_COOKIE_NAME_LOCALE;
 
+	@Getter
+	@Setter
 	@Value("${httpSessionManager.defaultLocaleName:}")
 	private String defaultLocaleName;
 
@@ -57,9 +64,13 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Value("${httpSessionManager.lifetime:" + DEFAULT_LIFETIME + "}")
 	private int lifetime;
 
+	@Getter
+	@Setter
 	@Value("${httpSessionManager.maxInactiveInterval:" + DEFAULT_MAXINACTIVEINTERVAL + "}")
 	private int maxInactiveInterval;
 
+	@Getter
+	@Setter
 	@Value("${httpSessionManager.minActiveInterval:" + DEFAULT_MINACTIVEINTERVAL + "}")
 	private int minActiveInterval;
 
@@ -76,40 +87,6 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	private void init() {
 		if (alwaysUseCacheBased == null)
 			alwaysUseCacheBased = (AppInfo.getStage() == Stage.PRODUCTION);
-	}
-
-	public String getDefaultLocaleName() {
-		return defaultLocaleName;
-	}
-
-	public void setDefaultLocaleName(String defaultLocaleName) {
-		this.defaultLocaleName = defaultLocaleName;
-	}
-
-	public int getMaxInactiveInterval() {
-		return maxInactiveInterval;
-	}
-
-	public void setMaxInactiveInterval(int maxInactiveInterval) {
-		this.maxInactiveInterval = maxInactiveInterval;
-	}
-
-	public int getMinActiveInterval() {
-		return minActiveInterval;
-	}
-
-	public void setMinActiveInterval(int minActiveInterval) {
-		this.minActiveInterval = minActiveInterval;
-	}
-
-	@Override
-	public String getLocaleCookieName() {
-		return localeCookieName;
-	}
-
-	@Override
-	public String getSessionTrackerName() {
-		return sessionTrackerName;
 	}
 
 	@Override

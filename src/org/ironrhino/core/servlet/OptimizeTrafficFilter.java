@@ -21,25 +21,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import lombok.Setter;
+
 public class OptimizeTrafficFilter implements Filter {
 
+	@Setter
 	private boolean etag = true;
 
+	@Setter
 	private boolean compress = true;
 
+	@Setter
 	private int cacheSeconds = 86400;
-
-	public void setEtag(boolean etag) {
-		this.etag = etag;
-	}
-
-	public void setCompress(boolean compress) {
-		this.compress = compress;
-	}
-
-	public void setCacheSeconds(int cacheSeconds) {
-		this.cacheSeconds = cacheSeconds;
-	}
 
 	@Override
 	public void doFilter(ServletRequest rq, ServletResponse rs, FilterChain chain)

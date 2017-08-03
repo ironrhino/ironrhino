@@ -20,6 +20,9 @@ import org.springframework.beans.factory.support.ChildBeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.util.Assert;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
 	public static final String KEY_SHARDING_HOSTS = "routingDataSource.shardingHosts";
@@ -32,53 +35,37 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Getter
+	@Setter
 	protected String routingDataSourceName = "dataSource";
 
+	@Getter
+	@Setter
 	protected String defaultRouterName;
 
+	@Getter
+	@Setter
 	protected String shardingParentName = "abstractDataSource";
 
+	@Getter
+	@Setter
 	protected String shardingNamePrefix;
 
+	@Getter
+	@Setter
 	protected List<String> shardingHosts;
 
+	@Getter
+	@Setter
 	protected int shardingsPerHost;
 
+	@Getter
+	@Setter
 	protected int shardingGeneration;
 
+	@Getter
+	@Setter
 	protected String jdbcUrlFormat;
-
-	public void setRoutingDataSourceName(String routingDataSourceName) {
-		this.routingDataSourceName = routingDataSourceName;
-	}
-
-	public void setDefaultRouterName(String defaultRouterName) {
-		this.defaultRouterName = defaultRouterName;
-	}
-
-	public void setShardingParentName(String shardingParentName) {
-		this.shardingParentName = shardingParentName;
-	}
-
-	public void setShardingNamePrefix(String shardingNamePrefix) {
-		this.shardingNamePrefix = shardingNamePrefix;
-	}
-
-	public void setShardingHosts(List<String> shardingHosts) {
-		this.shardingHosts = shardingHosts;
-	}
-
-	public void setShardingsPerHost(int shardingsPerHost) {
-		this.shardingsPerHost = shardingsPerHost;
-	}
-
-	public void setShardingGeneration(int shardingGeneration) {
-		this.shardingGeneration = shardingGeneration;
-	}
-
-	public void setJdbcUrlFormat(String jdbcUrlFormat) {
-		this.jdbcUrlFormat = jdbcUrlFormat;
-	}
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {

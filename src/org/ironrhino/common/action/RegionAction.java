@@ -18,7 +18,7 @@ import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.SearchCriteria;
 import org.ironrhino.core.search.SearchService;
-import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.ClassScanner;
 import org.springframework.beans.BeanUtils;
@@ -37,8 +37,6 @@ import lombok.Setter;
 public class RegionAction extends EntityAction<Region> {
 
 	private static final long serialVersionUID = -4643055307938016102L;
-
-	private EntityManager<Region> entityManager;
 
 	@Getter
 	@Setter
@@ -64,13 +62,9 @@ public class RegionAction extends EntityAction<Region> {
 	@Autowired(required = false)
 	private SearchService<Region> searchService;
 
-	public void setEntityManager(EntityManager<Region> entityManager) {
-		entityManager.setEntityClass(Region.class);
-		this.entityManager = entityManager;
-	}
-
 	@Override
 	public String execute() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		if (StringUtils.isBlank(keyword) || searchService == null) {
 			if (parent != null && parent > 0) {
 				region = entityManager.get(parent);
@@ -102,6 +96,7 @@ public class RegionAction extends EntityAction<Region> {
 
 	@Override
 	public String input() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		if (getUid() != null)
 			region = entityManager.get(Long.valueOf(getUid()));
 		if (region == null)
@@ -115,6 +110,7 @@ public class RegionAction extends EntityAction<Region> {
 					@StringLengthFieldValidator(type = ValidatorType.FIELD, fieldName = "region.areacode", maxLength = "6", key = "validation.invalid"),
 					@StringLengthFieldValidator(type = ValidatorType.FIELD, fieldName = "region.postcode", maxLength = "6", key = "validation.invalid") })
 	public String save() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		Collection<Region> siblings = null;
 		if (region.isNew()) {
 			if (parent != null && parent > 0) {
@@ -169,9 +165,9 @@ public class RegionAction extends EntityAction<Region> {
 
 	@Override
 	public String delete() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		String[] id = getId();
 		if (id != null) {
-			entityManager.setEntityClass(Region.class);
 			entityManager.delete((Serializable[]) id);
 			notify("delete.success");
 		}
@@ -184,8 +180,8 @@ public class RegionAction extends EntityAction<Region> {
 
 	@Override
 	public String treeview() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		if (parent != null && parent > 0) {
-			entityManager.setEntityClass(Region.class);
 			region = entityManager.get(parent);
 			if (region == null)
 				return NOTFOUND;
@@ -198,6 +194,7 @@ public class RegionAction extends EntityAction<Region> {
 			@RequiredFieldValidator(type = ValidatorType.FIELD, fieldName = "region.coordinate.latitude", key = "validation.required"),
 			@RequiredFieldValidator(type = ValidatorType.FIELD, fieldName = "region.coordinate.longitude", key = "validation.required") })
 	public String mark() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		Region temp = region;
 		region = entityManager.get(region.getId());
 		region.setCoordinate(temp.getCoordinate());
@@ -208,6 +205,7 @@ public class RegionAction extends EntityAction<Region> {
 
 	@JsonConfig(root = "list")
 	public String markers() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		String[] array = southWest.split(",");
 		Double bottom = new Double(array[0]);
 		Double left = new Double(array[1]);
@@ -251,6 +249,7 @@ public class RegionAction extends EntityAction<Region> {
 
 	@Override
 	public String move() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		String[] id = getId();
 		if (id != null && id.length == 2) {
 			Region source = null;
@@ -281,6 +280,7 @@ public class RegionAction extends EntityAction<Region> {
 	}
 
 	public String merge() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		String[] id = getId();
 		if (id != null && id.length == 2) {
 			Region source = null;
@@ -322,6 +322,7 @@ public class RegionAction extends EntityAction<Region> {
 
 	@JsonConfig(root = "list")
 	public String unmarked() {
+		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.isNull("coordinate.latitude"));
 		String uid = getUid();

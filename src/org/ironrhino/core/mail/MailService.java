@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 
 import freemarker.template.Template;
+import lombok.Getter;
+import lombok.Setter;
 
 public class MailService {
 
@@ -28,23 +30,14 @@ public class MailService {
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
+	@Getter
+	@Setter
 	private boolean forceLocalAsync;
 
+	@Setter
 	private int forceLocalAsyncFailureThreshold = 3;
 
 	private int _failureCount;
-
-	public boolean isForceSync() {
-		return forceLocalAsync;
-	}
-
-	public void setForceLocalAsync(boolean forceLocalAsync) {
-		this.forceLocalAsync = forceLocalAsync;
-	}
-
-	public void setForceLocalAsyncFailureThreshold(int forceLocalAsyncFailureThreshold) {
-		this.forceLocalAsyncFailureThreshold = forceLocalAsyncFailureThreshold;
-	}
 
 	public void send(SimpleMailMessage smm) {
 		send(smm, true);

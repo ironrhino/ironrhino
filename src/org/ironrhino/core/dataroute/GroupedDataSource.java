@@ -24,23 +24,34 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class GroupedDataSource extends AbstractDataSource implements InitializingBean, BeanFactoryAware, BeanNameAware {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private BeanFactory beanFactory;
 
+	@Getter
+	@Setter
 	private int maxAttempts = 3;
 
 	// inject starts
+	@Getter
+	@Setter
 	private String masterName;
 
+	@Getter
+	@Setter
 	private Map<String, Integer> writeSlaveNames;
 
+	@Getter
+	@Setter
 	private Map<String, Integer> readSlaveNames;
 
 	// inject end
-
+	@Getter
 	private String groupName;
 
 	private DataSource master;
@@ -49,47 +60,19 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 
 	private Map<String, DataSource> readSlaves = new HashMap<>();
 
+	@Getter
 	private RoundRobin<String> readRoundRobin;
 
+	@Getter
 	private RoundRobin<String> writeRoundRobin;
 
 	private Set<DataSource> deadDataSources = new HashSet<>();
 
 	private Map<DataSource, Integer> failureCount = new ConcurrentHashMap<>();
 
+	@Getter
+	@Setter
 	private int deadFailureThreshold = 3;
-
-	public void setDeadFailureThreshold(int deadFailureThreshold) {
-		this.deadFailureThreshold = deadFailureThreshold;
-	}
-
-	public void setMasterName(String masterName) {
-		this.masterName = masterName;
-	}
-
-	public void setReadSlaveNames(Map<String, Integer> readSlaveNames) {
-		this.readSlaveNames = readSlaveNames;
-	}
-
-	public void setWriteSlaveNames(Map<String, Integer> writeSlaveNames) {
-		this.writeSlaveNames = writeSlaveNames;
-	}
-
-	public void setMaxAttempts(int maxAttempts) {
-		this.maxAttempts = maxAttempts;
-	}
-
-	public RoundRobin<String> getReadRoundRobin() {
-		return readRoundRobin;
-	}
-
-	public RoundRobin<String> getWriteRoundRobin() {
-		return writeRoundRobin;
-	}
-
-	public String getGroupName() {
-		return groupName;
-	}
 
 	@Override
 	public void setBeanName(String beanName) {

@@ -11,23 +11,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class BaseAspect implements Ordered {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Getter
+	@Setter
 	protected int order;
 
 	protected boolean isBypass() {
 		return AopContext.isBypass(this.getClass());
-	}
-
-	@Override
-	public int getOrder() {
-		return order;
-	}
-
-	public void setOrder(int order) {
-		this.order = order;
 	}
 
 	protected Map<String, Object> buildContext(JoinPoint jp) {
