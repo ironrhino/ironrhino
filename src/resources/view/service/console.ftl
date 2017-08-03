@@ -32,7 +32,7 @@ $(document).on('click','a.host',function(e){
 	var host = t.text();
 	var url = '${actionBaseUrl}/services/'+host;
 	$.getJSON(url,function(data){
-		$('<div id="imported-services"/>').insertAfter($('hr:last')).prepend('<h4 style="text-align:center;">Imported by '+host+'</h4>');
+		$('<div id="imported-services"/>').insertAfter($('hr:last')).prepend('<h4 class="center">Imported by '+host+'</h4>');
 		var ul = $('<ul class="thumbnails"/>').appendTo($('#imported-services'));
 		$.each(data,function(k,v){
 			$('<li/>').addClass('span6').appendTo(ul).html(k+'<a class="host pull-right" href="#">'+v+'</a>');
@@ -49,14 +49,14 @@ $(document).on('click','a.host',function(e){
 </head>
 <body>
 
-<div style="text-align:center;">
+<div class="center">
 <a class="host" href="#"><strong>${serviceRegistry.localHost}</strong></a>
 </div>
 <hr/>
 <#list serviceRegistry.getAllAppNames() as appName>
 <#assign services = serviceRegistry.getExportedServices(appName)>
 <#if services?size gt 0>
-<h3 style="text-align:center;">${appName}</h3>
+<h3 class="center">${appName}</h3>
 <div class="services">
 	<ul class="thumbnails">
 	<#list services as service,description>

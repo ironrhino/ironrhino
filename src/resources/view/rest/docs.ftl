@@ -109,7 +109,7 @@
     </div>
     <div id="apidoc" class="span9">
 		<#if apiDoc??>
-			<h4 style="text-align:center;">${apiDoc.name}</h4>
+			<h4 class="center">${apiDoc.name}</h4>
 			<#if apiDoc.description?has_content>
 			<div class="alert alert-info">
 			  ${apiDoc.description?no_esc}

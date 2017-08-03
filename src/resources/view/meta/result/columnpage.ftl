@@ -31,7 +31,7 @@
     </div>
     <div class="span10">
     <#if page??>
-    	<h3 class="title" style="text-align:center;">${page.title!}</h3>
+    	<h3 class="title center">${page.title!}</h3>
     	<div class="content"><@includePage path="${page.path}"/></div>
 	</#if>
     </div>

@@ -11,7 +11,7 @@
 		<div class="span3"><@s.file theme="simple" id="" name="file" multiple="true"/></div>
 	</#list>
 	</div>
-	<div style="text-align:center;padding-top:30px;">
+	<div class="center" style="padding-top:30px;">
 	<@s.submit theme="simple" label="${getText('upload')}"/>
 	<label for="autorename">${getText('autorename')}:</label><@s.checkbox theme="simple" id="autorename" name="autorename" class="custom"/>
 	</div>
@@ -21,7 +21,7 @@
 		<tr style="font-weight:bold;height:43px;">
 			<td style="width:30px" class="checkbox"><input type="checkbox" class="checkbox checkall custom"/></td>
 			<td style="width:300px;"><span style="line-height:28px;">${getText('name')}</span><input type="search" class="filter input-small pull-right"/></td>
-			<td style="width:150px" class="center;">${getText('preview')}</td>
+			<td style="width:150px;">${getText('preview')}</td>
 			<td >${getText('path')}</td>
 		</tr>
 		</thead>

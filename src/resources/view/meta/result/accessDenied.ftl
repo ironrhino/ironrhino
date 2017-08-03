@@ -19,7 +19,7 @@
 </#if>
 </head>
 <body>
-<h3 style="text-align:center;">
+<h3 class="center">
 <#if redirectToLogin>
 <a href="<@url value="${ssoServerBase!}/login?targetUrl=${returnUrl?url}"/>">${getText('login.required')}</a>
 <#else>

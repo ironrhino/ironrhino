@@ -5,7 +5,7 @@
 <title>${getText('pageView')}</title>
 </head>
 <body>
-<h4 style="text-align:center;"><#if date??>${date?string('yyyy-MM-dd')}<#else>${getText('total')}</#if></h4>
+<h4 class="center"><#if date??>${date?string('yyyy-MM-dd')}<#else>${getText('total')}</#if></h4>
 <ul class="unstyled flotpiechart" style="height:300px;">
 	<#if dataMap??>
 	<#list dataMap as key,value>

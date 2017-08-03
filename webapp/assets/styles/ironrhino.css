@@ -7312,6 +7312,10 @@ body {
 	font-family: Tahoma, 'Microsoft Yahei', sans-serif;
 }
 
+.center {
+	text-align: center;
+}
+
 .table.middle th , .table.middle td {
 	vertical-align: middle;
 }

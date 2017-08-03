@@ -1,7 +1,7 @@
 <#if !base?has_content>
 	<#assign base=statics['org.ironrhino.core.util.RequestUtils'].getBaseUrl(request)>
 </#if>
-<h4 style="text-align:center;">OAuth2</h4>
+<h4 class="center">OAuth2</h4>
 <ol>
 <li>获取access_token
 	<ul>

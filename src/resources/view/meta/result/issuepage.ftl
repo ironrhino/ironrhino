@@ -14,8 +14,8 @@
 <div class="issue ${name}">
 <#if page??>
 <div>
-	<h3 class="title" style="text-align:center;">${page.title!}</h3>
-	<div class="date" style="text-align:center;">${page.createDate?date}</div>
+	<h3 class="title center">${page.title!}</h3>
+	<div class="date center">${page.createDate?date}</div>
 	<div class="content">
 		<@includePage path="${page.path}"/>
 	</div>

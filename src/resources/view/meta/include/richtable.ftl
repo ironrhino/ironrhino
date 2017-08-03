@@ -205,7 +205,7 @@ ${formHeader!}
 <#if sumColumns?keys?size gt 0>
 <tfoot>
 <tr>
-<#if showCheckColumn><td style="text-align:center;">∑</td></#if>
+<#if showCheckColumn><td class="center">∑</td></#if>
 <#list columns as name>
 <td><#if sumColumns[name]?? && sumColumns[name].value??><#if sumColumns[name].template?has_content><#local template=sumColumns[name].template><#else><#local template=r'${value}'></#if><#local value=sumColumns[name].value><@template?interpret/></#if></td>
 </#list>
@@ -358,7 +358,7 @@ ${formFooter!}
 			</#list>
 			</select>
 			</td>
-			<td style="text-align:center;"></td>
+			<td class="center"></td>
 			<td class="manipulate"></td>
 		</tr>
 	</tbody>
@@ -389,13 +389,13 @@ ${formFooter!}
 			<option value="desc">${getText('descending')}</option>
 			</select>
 			</td>
-			<td style="text-align:center;"></td>
+			<td class="center"></td>
 			<td class="manipulate"></td>
 		</tr>
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="4" style="text-align:center;"><button type="submit" class="btn btn-primary">${getText('search')}</button> <button type="button" class="btn restore">${getText('restore')}</button></td>
+			<td colspan="4" class="center"><button type="submit" class="btn btn-primary">${getText('search')}</button> <button type="button" class="btn restore">${getText('restore')}</button></td>
 		</tr>
 	</tfoot>
 </table>

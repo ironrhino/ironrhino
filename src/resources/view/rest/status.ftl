@@ -1,4 +1,4 @@
-<h4 style="text-align:center;">通用返回状态消息</h4>
+<h4 class="center">通用返回状态消息</h4>
 <div class="alert alert-info">
 消息格式： <code>{"code":"{code}","status":"{status}"}</code> <br/>
 如果有详细的错误信息：<code>{"code":"{code}","status":"{status}","message":"{message}"}</code>

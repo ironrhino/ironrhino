@@ -58,7 +58,7 @@
 </#if>
 <@richtable columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons/>
 <form id="move" action="${actionBaseUrl}/move" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${getText('confirm')}?');" onsuccess="$('#region_form').submit()">
-	<div style="padding-top:10px;text-align:center;">
+	<div class="center">
 	<input id="regionId1" type="hidden" name="id"/>
 	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId1','cache':false}"></span>
 	--&gt;
@@ -68,7 +68,7 @@
 	</div>
 </form>
 <form id="merge" action="${actionBaseUrl}/merge" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${getText('confirm')}?');" onsuccess="$('#region_form').submit()">
-	<div style="padding-top:10px;text-align:center;">
+	<div class="center">
 	<input id="regionId3" type="hidden" name="id"/>
 	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId3','cache':false}"></span>
 	--&gt;
