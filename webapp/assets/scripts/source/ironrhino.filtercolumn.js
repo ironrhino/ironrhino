@@ -13,7 +13,8 @@
 			var colsHidden = [];
 			for (var i = 0; i < cells.length; i++) {
 				var th = $(cells[i]);
-				if (th.hasClass('nofilter') || th.hasClass('filtercolumn'))
+				if (th.hasClass('nofilter') || th.hasClass('filtercolumn')
+						|| !th.text())
 					hideInList.push(i + 1);
 				if (th.hasClass('filtered'))
 					colsHidden.push(i + 1);
