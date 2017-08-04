@@ -32,7 +32,7 @@ public class AutoConfigResult extends FreemarkerResult {
 
 	private static ThreadLocal<String> styleHolder = new ThreadLocal<>();
 
-	private static FreemarkerConfigurer freemarkerConfigurer;
+	private volatile static FreemarkerConfigurer freemarkerConfigurer;
 
 	public static void setStyle(String style) {
 		styleHolder.set(style);

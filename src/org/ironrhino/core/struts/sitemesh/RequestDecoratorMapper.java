@@ -7,7 +7,7 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts2.ServletActionContext;
+import org.ironrhino.core.servlet.RequestContext;
 
 import com.opensymphony.module.sitemesh.Config;
 import com.opensymphony.module.sitemesh.Decorator;
@@ -18,14 +18,12 @@ import com.opensymphony.module.sitemesh.mapper.DefaultDecorator;
 
 public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 
-	private static ServletContext servletContext;
-
 	private String decoratorParameter = "decorator";
 
 	@Override
 	public void init(Config config, Properties properties, DecoratorMapper parent) throws InstantiationException {
 		super.init(config, properties, parent);
-		servletContext = config.getServletContext();
+		ServletContext servletContext = config.getServletContext();
 		servletContext.setAttribute(this.getClass().getName(), this);
 		decoratorParameter = properties.getProperty("decorator.parameter", "decorator");
 	}
@@ -54,16 +52,20 @@ public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 		return result == null ? super.getDecorator(request, page) : result;
 	}
 
-	public void setDecorator(HttpServletRequest request, String name) {
+	private void setDecorator(HttpServletRequest request, String name) {
 		Decorator result = getNamedDecorator(request, name);
 		if (result != null)
 			request.setAttribute(decoratorParameter, name);
 	}
 
 	public static void setDecorator(String name) {
-		RequestDecoratorMapper rdm = (RequestDecoratorMapper) servletContext
-				.getAttribute(RequestDecoratorMapper.class.getName());
-		if (rdm != null)
-			rdm.setDecorator(ServletActionContext.getRequest(), name);
+		HttpServletRequest request = RequestContext.getRequest();
+		if (request != null) {
+			RequestDecoratorMapper rdm = (RequestDecoratorMapper) request.getServletContext()
+					.getAttribute(RequestDecoratorMapper.class.getName());
+			if (rdm != null) {
+				rdm.setDecorator(request, name);
+			}
+		}
 	}
 }

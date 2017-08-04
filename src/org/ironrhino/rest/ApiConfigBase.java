@@ -117,6 +117,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Bean
 	public FreeMarkerConfig freeMarkerConfig(FreemarkerConfigurer freemarkerConfigurer) {
 		FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer() {
+			@Override
 			protected Configuration newConfiguration() throws IOException, TemplateException {
 				return freemarkerConfigurer.createConfiguration();
 			}

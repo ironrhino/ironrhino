@@ -54,17 +54,15 @@ public class ExceptionUtils {
 	public static void fillInClientStackTraceIfPossible(Throwable ex, int maxClientStackTraceElements) {
 		// org.springframework.remoting.support.RemoteInvocationUtils.fillInClientStackTraceIfPossible()
 		if (ex != null) {
-			if (ex != null) {
-				StackTraceElement[] clientStack = new Throwable().getStackTrace();
-				StackTraceElement[] serverStack = ex.getStackTrace();
-				int clientStacks = Math.min(maxClientStackTraceElements, clientStack.length);
-				StackTraceElement[] combinedStack = new StackTraceElement[serverStack.length + 1 + clientStacks + 1];
-				System.arraycopy(serverStack, 0, combinedStack, 0, serverStack.length);
-				combinedStack[serverStack.length] = new StackTraceElement("^", "^", null, 0);
-				System.arraycopy(clientStack, 0, combinedStack, serverStack.length + 1, clientStacks);
-				combinedStack[combinedStack.length - 1] = new StackTraceElement(".", ".", null, 0);
-				ex.setStackTrace(combinedStack);
-			}
+			StackTraceElement[] clientStack = new Throwable().getStackTrace();
+			StackTraceElement[] serverStack = ex.getStackTrace();
+			int clientStacks = Math.min(maxClientStackTraceElements, clientStack.length);
+			StackTraceElement[] combinedStack = new StackTraceElement[serverStack.length + 1 + clientStacks + 1];
+			System.arraycopy(serverStack, 0, combinedStack, 0, serverStack.length);
+			combinedStack[serverStack.length] = new StackTraceElement("^", "^", null, 0);
+			System.arraycopy(clientStack, 0, combinedStack, serverStack.length + 1, clientStacks);
+			combinedStack[combinedStack.length - 1] = new StackTraceElement(".", ".", null, 0);
+			ex.setStackTrace(combinedStack);
 		}
 	}
 }
