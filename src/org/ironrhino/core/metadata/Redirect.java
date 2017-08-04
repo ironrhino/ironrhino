@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 @Retention(RUNTIME)
 public @interface Redirect {
+	String RESPONSE_HEADER_NAME = "X-Redirect-To";
 }

@@ -963,16 +963,7 @@ Initialization.common = function() {
 		if (url) {
 			$('body')
 					.html('<div class="modal"><div class="modal-body"><div class="progress progress-striped active"><div class="bar" style="width: 50%;"></div></div></div></div>');
-			var url = UrlUtils.absolutize(url);
-			try {
-				var href = top.location.href;
-				if (href && UrlUtils.isSameDomain(href, url))
-					top.location.href = url;
-				else
-					document.location.href = url;
-			} catch (e) {
-				document.location.href = url;
-			}
+			topWindow.location.href = UrlUtils.absolutize(url);
 			return;
 		}
 	}).keyup(function(e) {

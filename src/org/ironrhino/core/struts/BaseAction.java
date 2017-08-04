@@ -17,6 +17,7 @@ import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Csrf;
 import org.ironrhino.core.metadata.CurrentPassword;
 import org.ironrhino.core.metadata.DoubleChecker;
+import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.VerboseMode;
 import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.security.captcha.CaptchaStatus;
@@ -391,7 +392,7 @@ public class BaseAction extends ActionSupport {
 				&& REDIRECT.equals(ActionContext.getContext().getActionInvocation().getResultCode()) && !hasErrors()
 				&& RequestUtils.isSameOrigin(request.getRequestURL().toString(), targetUrl)) {
 			targetUrl = response.encodeRedirectURL(targetUrl);
-			response.setHeader("X-Redirect-To", targetUrl);
+			response.setHeader(Redirect.RESPONSE_HEADER_NAME, targetUrl);
 		}
 		if (!(returnInput || !isAjax() || (isCaptchaRequired() && captchaStatus.isFirstReachThreshold())
 				|| !(isUseJson() || hasErrors()))) {

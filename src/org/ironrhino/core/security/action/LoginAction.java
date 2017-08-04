@@ -147,6 +147,8 @@ public class LoginAction extends BaseAction {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		if (username == null)
 			username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
+		if (isAjax())
+			ServletActionContext.getResponse().setHeader(Redirect.RESPONSE_HEADER_NAME, targetUrl);
 		return SUCCESS;
 	}
 
