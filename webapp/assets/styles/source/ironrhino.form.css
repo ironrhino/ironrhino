@@ -327,7 +327,7 @@ input[type="checkbox"].custom + label.custom {
 	background-color: #fafafa;
 	border: 1px solid #cacece;
 	padding: 8px;
-	border-radius: 3px;
+	border-radius: 4px;
 	display: inline-block;
 	vertical-align: middle;
 	margin-bottom: 0;

@@ -1841,7 +1841,7 @@ legend + .control-group {
   background-repeat: repeat-x;
   border: 1px solid #cccccc;
   border-bottom-color: #b3b3b3;
-  border-radius: 4px;
+  border-radius: 2px;
   user-select: none;
 }
 .btn:hover,
