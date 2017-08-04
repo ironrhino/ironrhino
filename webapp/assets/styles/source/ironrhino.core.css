@@ -170,6 +170,7 @@ body.welcome .hero-unit button[type="submit"]:only-child {
 	width: 170px;
 	height: 30px;
 	font-size: 18px;
+	border: 0;
 }
 
 body.welcome.zh .hero-unit button[type="submit"]:only-child {
