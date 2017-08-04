@@ -1,5 +1,6 @@
 drop database if exists ironrhino;
-create database ironrhino default charset utf8 collate utf8_general_ci;
+create database ironrhino default charset utf8mb4 collate utf8mb4_unicode_ci;
+-- ALTER TABLE user MODIFY name VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 use ironrhino;
 
 drop function if exists get_dictionary_label;

@@ -282,8 +282,8 @@ fi
 if [ -f "/etc/mysql/mysql.conf.d/mysqld.cnf" ] && ! $(more /etc/mysql/mysql.conf.d/mysqld.cnf|grep collation-server >/dev/null 2>&1) ; then
 sed -i '/\[mysqld\]/a\lower_case_table_names = 1' /etc/mysql/mysql.conf.d/mysqld.cnf
 sed -i '/\[mysqld\]/a\innodb_stats_on_metadata = off' /etc/mysql/mysql.conf.d/mysqld.cnf
-sed -i '/\[mysqld\]/a\collation-server = utf8_general_ci' /etc/mysql/mysql.conf.d/mysqld.cnf
-sed -i '/\[mysqld\]/a\character-set-server = utf8' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\collation-server = utf8mb4_unicode_ci' /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i '/\[mysqld\]/a\character-set-server = utf8mb4' /etc/mysql/mysql.conf.d/mysqld.cnf
 sed -i '/\[mysqld\]/a\open_files_limit = 8192' /etc/mysql/mysql.conf.d/mysqld.cnf
 sed -i '/\[mysqld\]/a\max_connections = 1000' /etc/mysql/mysql.conf.d/mysqld.cnf
 sed -i '/\[mysqld\]/a\innodb_buffer_pool_size = 1G' /etc/mysql/mysql.conf.d/mysqld.cnf
