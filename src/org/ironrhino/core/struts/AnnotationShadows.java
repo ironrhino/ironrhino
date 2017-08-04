@@ -1,5 +1,6 @@
 package org.ironrhino.core.struts;
 
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,12 +11,14 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.struts2.ServletActionContext;
 import org.hibernate.criterion.MatchMode;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Persistable;
+import org.springframework.beans.BeanWrapperImpl;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -326,6 +329,22 @@ public class AnnotationShadows {
 			}
 			if (this.queryFormGridColumns == 0)
 				this.queryFormGridColumns = 3;
+			overrideByRequestParameters(this);
+		}
+
+		private static void overrideByRequestParameters(RichtableImpl richtable) {
+			if (ServletActionContext.getRequest() == null)
+				return;
+			BeanWrapperImpl bw = new BeanWrapperImpl(richtable);
+			for (PropertyDescriptor pd : bw.getPropertyDescriptors()) {
+				if (pd.getReadMethod() == null || pd.getWriteMethod() == null)
+					continue;
+				Object value = bw.getPropertyValue(pd.getName());
+				if (Boolean.TRUE.equals(value)) {
+					if ("false".equals(ServletActionContext.getRequest().getParameter("richtable." + pd.getName())))
+						bw.setPropertyValue(pd.getName(), false);
+				}
+			}
 		}
 
 	}
