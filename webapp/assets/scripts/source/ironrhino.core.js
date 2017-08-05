@@ -2022,7 +2022,8 @@ Observation.common = function(container) {
 					});
 			return;
 		} else {
-			$(this).click(function() {
+			$(this).click(function(e) {
+				e.preventDefault();
 				if (!Ajax.fire(target, 'onprepare'))
 					return false;
 				if ($(this).is('ul.nav li a')) {
@@ -2102,7 +2103,6 @@ Observation.common = function(container) {
 						Nav.activate(options.url);
 					};
 				ajax(options);
-				return false;
 			});
 		}
 	});
