@@ -1,7 +1,9 @@
 package org.ironrhino.core.struts.converter;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
@@ -18,9 +20,16 @@ public class MyXWorkConverter extends XWorkConverter {
 	@Override
 	public Object convertValue(Map<String, Object> context, Object target, Member member, String property, Object value,
 			Class toClass) {
-		if (Persistable.class.isAssignableFrom(toClass) && value instanceof String) {
-			String id = (String) value;
-			if (id.isEmpty())
+		if (Persistable.class.isAssignableFrom(toClass)) {
+			String id = null;
+			if (value instanceof String) {
+				id = (String) value;
+			} else if (value instanceof String[]) {
+				String[] arr = (String[]) value;
+				if (arr.length == 1)
+					id = arr[0];
+			}
+			if (id == null || id.isEmpty())
 				return null;
 			Object entity;
 			try {
@@ -29,8 +38,7 @@ public class MyXWorkConverter extends XWorkConverter {
 				return entity;
 			} catch (InstantiationException | IllegalAccessException e) {
 			}
-		}
-		if ((Collection.class.isAssignableFrom(toClass) || toClass.isArray()) && value instanceof String[]
+		} else if ((Collection.class.isAssignableFrom(toClass) || toClass.isArray()) && value instanceof String[]
 				&& target != null) {
 			String[] arr = (String[]) value;
 			if (arr.length == 1) {
@@ -44,6 +52,9 @@ public class MyXWorkConverter extends XWorkConverter {
 		}
 		Object result = super.convertValue(context, target, member, property, value, toClass);
 		if (TypeConverter.NO_CONVERSION_POSSIBLE.equals(result) && value != null) {
+			if (File.class.isAssignableFrom(toClass) || Path.class.isAssignableFrom(toClass)
+					|| toClass.getName().startsWith("java."))
+				return result;
 			try {
 				Constructor ctor = toClass.getConstructor(value.getClass());
 				result = ctor.newInstance(value);
