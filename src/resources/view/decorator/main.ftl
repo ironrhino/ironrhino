@@ -25,7 +25,7 @@
 ${head?no_esc}
 </head>
 
-<body class="main<#if sidebarLayout> sidebar</#if> ${.lang} ${(page.properties["meta.body_class"])!}">
+<body lang="${.lang}" class="main<#if sidebarLayout> sidebar</#if><#assign body_class=(page.properties["meta.body_class"])!/><#if body_class?has_content> ${body_class}</#if>">
 <#include "include/top.ftl" ignore_missing=true/>
 <#if 'welcome'!=page.properties["meta.body_class"]!>
 <@authorize ifNotGranted="ROLE_BUILTIN_ANONYMOUS">

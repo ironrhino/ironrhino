@@ -7470,7 +7470,7 @@ body.welcome .hero-unit button[type="submit"]:only-child {
 	border: 0;
 }
 
-body.welcome.zh .hero-unit button[type="submit"]:only-child {
+body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 	letter-spacing: 15px;
 	text-indent: 10px;
 }

@@ -16,7 +16,7 @@
 <#include "include/assets.ftl" ignore_missing=true/>
 ${head?no_esc}
 </head>
-<body class="simple ${.lang}">
+<body lang="${.lang}" class="simple">
 <div id="content" class="simple">
 <#if action.hasActionMessages() || action.hasActionErrors()>
 <div id="message">
