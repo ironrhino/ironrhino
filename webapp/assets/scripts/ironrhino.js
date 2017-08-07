@@ -38405,7 +38405,7 @@ $(function() {
 			Nav.activate(document.location.href);
 		}
 		$(document).on('click', '.btn.btn-navbar', function(e) {
-			$('.nav-sidebar').toggle();
+			$('.nav-sidebar').toggleClass('visible');
 			var modal = $('.nav-sidebar-modal');
 			if (!modal.length)
 				modal = $('<div class="nav-sidebar-modal"></div>')

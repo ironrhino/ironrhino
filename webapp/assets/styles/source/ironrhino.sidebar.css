@@ -9,32 +9,40 @@ body.sidebar .navbar .btn-navbar {
 }
 
 .nav-sidebar {
-	display: none;
 	position: fixed;
 	left: 0;
 	right: 0;
 	top: 0;
 	bottom: 0;
+	width: 0;
 	overflow-x: hidden;
 	overflow-y: auto;
-	width: 256px;
 	padding-top: 50px;
 	z-index: 1000000;
 	background-color: #fff;
+	transition: width 0.2s ease;
+}
+
+.nav-sidebar.visible {
+	width: 256px;
+}
+
+.nav-sidebar .accordion {
+	width: 256px;
 }
 
 .nav-sidebar .accordion-group {
 	border-radius: 0;
 }
 
-.nav-sidebar .accordion-heading a{
+.nav-sidebar .accordion-heading a {
 	font-size: 1.1em;
 	font-weight: bold;
 	text-decoration: none;
 	color: #777;
 }
 
-.nav-sidebar .accordion-heading a:hover{
+.nav-sidebar .accordion-heading a:hover {
 	color: #333;
 }
 
@@ -49,3 +57,4 @@ body.sidebar .navbar .btn-navbar {
 	background-color: #000;
 	opacity: .6;
 }
+
