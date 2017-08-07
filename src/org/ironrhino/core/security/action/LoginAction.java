@@ -19,6 +19,7 @@ import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
+import org.ironrhino.core.struts.sitemesh.MyOldDecorator2NewStrutsFreemarkerDecorator;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.RequestUtils;
@@ -147,7 +148,7 @@ public class LoginAction extends BaseAction {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		if (username == null)
 			username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
-		if (isAjax())
+		if (isAjax() && request.getHeader(MyOldDecorator2NewStrutsFreemarkerDecorator.X_FRAGMENT) == null)
 			ServletActionContext.getResponse().setHeader(Redirect.RESPONSE_HEADER_NAME, targetUrl);
 		return SUCCESS;
 	}
