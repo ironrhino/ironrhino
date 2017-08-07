@@ -128,11 +128,19 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	protected ScopesHashModel buildScopesHashModel(ServletContext servletContext, HttpServletRequest request,
 			HttpServletResponse response, ObjectWrapper wrapper, ValueStack stack) {
 		ScopesHashModel model = new ScopesHashModel(wrapper, servletContext, request, stack);
-		String value = RequestUtils.getCookieValue(request, FreemarkerConfigurer.KEY_FLUID_LAYOUT);
-		if ("true".equals(value)) {
-			model.put(FreemarkerConfigurer.KEY_FLUID_LAYOUT, true);
-		} else if ("false".equals(value)) {
-			model.put(FreemarkerConfigurer.KEY_FLUID_LAYOUT, false);
+		if (!freemarkerConfigurer.isFrozenLayout()) {
+			String value = RequestUtils.getCookieValue(request, FreemarkerConfigurer.KEY_FLUID_LAYOUT);
+			if ("true".equals(value)) {
+				model.put(FreemarkerConfigurer.KEY_FLUID_LAYOUT, true);
+			} else if ("false".equals(value)) {
+				model.put(FreemarkerConfigurer.KEY_FLUID_LAYOUT, false);
+			}
+			value = RequestUtils.getCookieValue(request, FreemarkerConfigurer.KEY_SIDEBAR_LAYOUT);
+			if ("true".equals(value)) {
+				model.put(FreemarkerConfigurer.KEY_SIDEBAR_LAYOUT, true);
+			} else if ("false".equals(value)) {
+				model.put(FreemarkerConfigurer.KEY_SIDEBAR_LAYOUT, false);
+			}
 		}
 		ServletContextHashModel servletContextModel = (ServletContextHashModel) servletContext
 				.getAttribute(ATTR_APPLICATION_MODEL);

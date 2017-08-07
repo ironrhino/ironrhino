@@ -1,6 +1,16 @@
 <ul class="dropdown-menu">
-	<li><a href="#" class="layout-change">${getText('layout.change')}</a></li>
+	<#if frozenLayout??&&!frozenLayout>
+	<li><div style="padding: 3px 20px;">${getText('layout.change')}</div></li>
+	<li>
+	<div class="btn-group layout-change" style="padding-left: 12px;">
+	  <button class="btn<#if fluidLayout&&!sidebarLayout> active</#if>">A</button>
+	  <button class="btn<#if fluidLayout&&sidebarLayout> active</#if>">B</button>
+	  <button class="btn<#if !fluidLayout&&!sidebarLayout> active</#if>">C</button>
+	  <button class="btn<#if !fluidLayout&&sidebarLayout> active</#if>">D</button>
+	</div>
+	</li>
 	<li class="divider"></li>
+	</#if>
 	<@resourcePresentConditional value="resources/view/audit.ftl">
 	<li><a href="<@url value="/audit"/>" class="ajax view">${getText('auditEvent')}</a></li>
 	<li class="divider"></li>

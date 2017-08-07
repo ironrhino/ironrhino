@@ -7356,6 +7356,10 @@ td.middle {
 	border-top: solid 2px #ccc;
 }
 
+.dropdown-menu .btn-group .btn {
+	background-image: none;
+}
+
 .well .nav-tabs > .active > a , .well .nav-tabs > .active > a:hover , .well .nav-tabs > .active > a:focus {
 	background-color: #f5f5f5;
 }

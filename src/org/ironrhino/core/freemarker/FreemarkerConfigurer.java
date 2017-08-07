@@ -54,6 +54,7 @@ public class FreemarkerConfigurer {
 	public static final String KEY_DEV_MODE = "devMode";
 	public static final String KEY_FLUID_LAYOUT = "fluidLayout";
 	public static final String KEY_SIDEBAR_LAYOUT = "sidebarLayout";
+	public static final String KEY_FROZEN_LAYOUT = "frozenLayout";
 	public static final String KEY_MODERN_BROWSER = "modernBrowser";
 
 	@Getter
@@ -85,11 +86,17 @@ public class FreemarkerConfigurer {
 	@Value("${ssoServerBase:}")
 	private String ssoServerBase;
 
-	@Value("${fluidLayout:true}")
+	@Getter
+	@Value("${layout.fluid:true}")
 	private boolean fluidLayout = true;
 
-	@Value("${sidebarLayout:true}")
-	private boolean sidebarLayout = true;
+	@Getter
+	@Value("${layout.sidebar:false}")
+	private boolean sidebarLayout = false;
+
+	@Getter
+	@Value("${layout.frozen:false}")
+	private boolean frozenLayout = false;
 
 	@Autowired(required = false)
 	private List<OverridableTemplateProvider> overridableTemplateProviders;
@@ -192,6 +199,7 @@ public class FreemarkerConfigurer {
 			allSharedVariables.put("ssoServerBase", ssoServerBase);
 		allSharedVariables.put(KEY_FLUID_LAYOUT, fluidLayout);
 		allSharedVariables.put(KEY_SIDEBAR_LAYOUT, sidebarLayout);
+		allSharedVariables.put(KEY_FROZEN_LAYOUT, frozenLayout);
 		allSharedVariables.put(KEY_MODERN_BROWSER, true); // drop legacy browser supports
 		allSharedVariables.put(KEY_DEV_MODE, AppInfo.getStage() == Stage.DEVELOPMENT);
 		allSharedVariables.put(KEY_STATICS, DEFAULT_BEANS_WRAPPER.getStaticModels());
