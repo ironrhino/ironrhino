@@ -2,8 +2,8 @@ package org.ironrhino.core.session.impl;
 
 import java.math.BigInteger;
 import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.Cookie;
 
@@ -80,17 +80,16 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 	}
 
 	private String getCookie(WrappedHttpSession session) {
-		Map<String, String> cookieMap = new HashMap<>(4, 1);
+		Map<String, String> cookieMap = new TreeMap<>();
 		Cookie[] cookies = session.getRequest().getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies)
-				if (cookie.getName().startsWith(sessionCookieName)) {
+				if (isSessionCookie(cookie.getName()))
 					try {
 						cookieMap.put(cookie.getName(), URLDecoder.decode(cookie.getValue(), "UTF-8"));
 					} catch (Exception e) {
 						logger.error(e.getMessage(), e);
 					}
-				}
 		}
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < cookieMap.size(); i++) {
@@ -122,12 +121,15 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 
 	private void clearCookie(WrappedHttpSession session) {
 		Cookie[] cookies = session.getRequest().getCookies();
-		if (cookies != null) {
+		if (cookies != null)
 			for (Cookie cookie : cookies)
-				if (cookie.getName().startsWith(sessionCookieName)) {
+				if (isSessionCookie(cookie.getName()))
 					RequestUtils.deleteCookie(session.getRequest(), session.getResponse(), cookie.getName(), true);
-				}
-		}
+	}
+
+	private boolean isSessionCookie(String name) {
+		return name.equals(sessionCookieName)
+				|| name.startsWith(sessionCookieName) && name.matches(sessionCookieName + "\\d*");
 	}
 
 }
