@@ -1,16 +1,17 @@
 package org.ironrhino.core.struts;
 
-import com.opensymphony.xwork2.inject.Container;
-import com.opensymphony.xwork2.inject.Inject;
-import com.opensymphony.xwork2.spring.SpringObjectFactory;
-import com.opensymphony.xwork2.util.logging.Logger;
-import com.opensymphony.xwork2.util.logging.LoggerFactory;
+import javax.servlet.ServletContext;
+
 import org.apache.struts2.StrutsConstants;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.ServletContext;
+import com.opensymphony.xwork2.inject.Container;
+import com.opensymphony.xwork2.inject.Inject;
+import com.opensymphony.xwork2.spring.SpringObjectFactory;
+import com.opensymphony.xwork2.util.logging.Logger;
+import com.opensymphony.xwork2.util.logging.LoggerFactory;
 
 public class StrutsSpringObjectFactory extends SpringObjectFactory {
 
@@ -23,9 +24,9 @@ public class StrutsSpringObjectFactory extends SpringObjectFactory {
 			@Inject(value = StrutsConstants.STRUTS_OBJECTFACTORY_SPRING_AUTOWIRE, required = false) String autoWire,
 			@Inject(value = StrutsConstants.STRUTS_OBJECTFACTORY_SPRING_AUTOWIRE_ALWAYS_RESPECT, required = false) String alwaysAutoWire,
 			@Inject(value = StrutsConstants.STRUTS_OBJECTFACTORY_SPRING_USE_CLASS_CACHE, required = false) String useClassCacheStr,
-			@Inject ServletContext servletContext, @Inject Container container) {
+			@Inject ServletContext servletContext, @Inject(StrutsConstants.STRUTS_DEVMODE) String devMode,
+			@Inject Container container) {
 
-		super(container);
 		boolean useClassCache = "true".equals(useClassCacheStr);
 		if (LOG.isInfoEnabled()) {
 			LOG.info("Initializing Struts-Spring integration...");
