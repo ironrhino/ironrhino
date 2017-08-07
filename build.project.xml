@@ -19,7 +19,7 @@
 	<property name="version" value="1.0" />
 	<property name="jar.name" value="app-${version}.jar" />
 
-	<import file="build.include.xml" optional="true"/>
+	<import file="build.include.xml" optional="true" />
 
 	<condition property="cmd.suffix" value="bat">
 		<os family="windows" />
@@ -32,8 +32,8 @@
 
 	<path id="lib.classpath">
 		<fileset dir="${webapp.dir}/WEB-INF/lib">
-					<include name="*.jar" />
-				</fileset>
+			<include name="*.jar" />
+		</fileset>
 		<fileset dir="${lib.dir}">
 			<exclude name="closure*.jar" />
 			<exclude name="yuicompressor*.jar" />
@@ -573,7 +573,6 @@
 		        <include name="com/**"/>
 		        <include name="org/**"/>
 		        <exclude name="org/ironrhino/**"/>
-		    	<include name="template/**"/>
 		    </patternset>
 		</unzip>
 		<copy todir="${webapp.dir}/WEB-INF/classes" preservelastmodified="true">
