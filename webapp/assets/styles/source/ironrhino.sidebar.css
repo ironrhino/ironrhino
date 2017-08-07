@@ -20,7 +20,7 @@ body.sidebar .navbar .btn-navbar {
 	padding-top: 50px;
 	z-index: 1000000;
 	background-color: #fff;
-	transition: width 0.2s ease;
+	transition: width .2s ease;
 }
 
 .nav-sidebar.visible {
@@ -47,7 +47,6 @@ body.sidebar .navbar .btn-navbar {
 }
 
 .nav-sidebar-modal {
-	display: none;
 	position: fixed;
 	z-index: 999999;
 	top: 0;
@@ -55,6 +54,10 @@ body.sidebar .navbar .btn-navbar {
 	bottom: 0;
 	left: 0;
 	background-color: #000;
-	opacity: .6;
+	opacity: .1;
+	transition: opacity .2s ease;
 }
 
+.nav-sidebar-modal.visible {
+	opacity: .6;
+}

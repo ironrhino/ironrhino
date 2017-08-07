@@ -38407,12 +38407,15 @@ $(function() {
 			Nav.activate(document.location.href);
 		}
 		$(document).on('click', '.btn.btn-navbar', function(e) {
-			$('.nav-sidebar').toggleClass('visible');
-			var modal = $('.nav-sidebar-modal');
-			if (!modal.length)
-				modal = $('<div class="nav-sidebar-modal"></div>')
+			var sidebar = $('.nav-sidebar');
+			sidebar.toggleClass('visible');
+			if (sidebar.hasClass('visible')) {
+				var modal = $('<div class="nav-sidebar-modal"></div>')
 						.appendTo(document.body);
-			modal.toggle();
+				modal.addClass('visible');
+			} else {
+				$('.nav-sidebar-modal').remove();
+			}
 		}).on('click', '.nav-sidebar-modal', function() {
 					$('.btn.btn-navbar').click();
 				}).on('click', '.nav-sidebar .nav-list li a', function() {
