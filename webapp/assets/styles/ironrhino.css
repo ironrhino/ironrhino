@@ -7447,7 +7447,6 @@ body.welcome {
 
 body.welcome .caption {
 	text-align: center;
-	text-shadow: 1px 1px 1px gray;
 	border-radius: 20px;
 	background-color: #e6e6e6;
 	background-image: linear-gradient(to bottom, #fff, #e6e6e6);
