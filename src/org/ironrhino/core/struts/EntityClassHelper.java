@@ -45,6 +45,8 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -87,6 +89,7 @@ public class EntityClassHelper {
 	private static boolean HIBERNATE_VALIDATOR_PRESENT = ClassUtils
 			.isPresent("org.hibernate.validator.HibernateValidator", null);
 
+	@SuppressWarnings("deprecation")
 	public static Map<String, UiConfigImpl> getUiConfigs(Class<?> entityClass) {
 		Map<String, UiConfigImpl> map = uiConfigCache.get(entityClass);
 		if (map == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
@@ -560,13 +563,13 @@ public class EntityClassHelper {
 
 					if (findAnnotation(readMethod, declaredField, NotNull.class) != null)
 						uci.setRequired(true);
-					if (HIBERNATE_VALIDATOR_PRESENT) {
-						if (findAnnotation(readMethod, declaredField,
-								org.hibernate.validator.constraints.NotEmpty.class) != null
-								|| findAnnotation(readMethod, declaredField,
-										org.hibernate.validator.constraints.NotBlank.class) != null)
-							uci.setRequired(true);
-					}
+					if (findAnnotation(readMethod, declaredField, NotEmpty.class) != null
+							|| findAnnotation(readMethod, declaredField, NotBlank.class) != null
+							|| HIBERNATE_VALIDATOR_PRESENT && (findAnnotation(readMethod, declaredField,
+									org.hibernate.validator.constraints.NotEmpty.class) != null
+									|| findAnnotation(readMethod, declaredField,
+											org.hibernate.validator.constraints.NotBlank.class) != null))
+						uci.setRequired(true);
 
 					SearchableProperty searchableProperty = findAnnotation(readMethod, declaredField,
 							SearchableProperty.class);
