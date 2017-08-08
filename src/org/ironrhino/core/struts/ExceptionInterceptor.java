@@ -33,6 +33,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 		try {
 			return invocation.invoke();
 		} catch (Throwable e) {
+			ExceptionUtils.trimStackTrace(e, 20);
 			if (e instanceof LocalizedException || e instanceof ErrorMessage)
 				logger.error(e.getLocalizedMessage());
 			else

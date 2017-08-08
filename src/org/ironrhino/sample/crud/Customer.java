@@ -23,6 +23,8 @@ import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -84,6 +86,8 @@ public class Customer extends BaseRecordableEntity {
 
 	@UiConfig(width = "80px", template = "${value?string('#,###.00')}", showSum = true, description = "balance.description")
 	@Column(nullable = false)
+	@DecimalMax("100000.00")
+	@DecimalMin("1.00")
 	private BigDecimal balance;
 
 	@SearchableComponent
@@ -145,9 +149,6 @@ public class Customer extends BaseRecordableEntity {
 		}
 		if (potentialRanks != null && Arrays.asList(potentialRanks).contains(this.rank)) {
 			ve.addFieldError("customer.potentialRanks", "不能包含当前等级");
-		}
-		if (balance != null && balance.doubleValue() > 100000) {
-			ve.addFieldError("customer.balance", "余额不能大于100,000.00");
 		}
 		if (ve.hasError())
 			throw ve;
