@@ -62,7 +62,12 @@ public class RegionSetup {
 	@SuppressWarnings("unchecked")
 	private void save(Region region) {
 		String shortName = LocationUtils.shortenName(region.getName());
-		region.setAreacode(regionAreacodeMap.get(region.getName()));
+		String areacode = null;
+		if (region.getParent() != null)
+			areacode = regionAreacodeMap.get(region.getParent().getName() + region.getName());
+		if (areacode == null)
+			areacode = regionAreacodeMap.get(region.getName());
+		region.setAreacode(areacode);
 		if (regionCoordinateMap != null) {
 			List<String> coordinateAndParentName = regionCoordinateMap.get(region.getName());
 			if (coordinateAndParentName.isEmpty())
@@ -124,7 +129,19 @@ public class RegionSetup {
 			if (StringUtils.isBlank(line))
 				continue;
 			String arr[] = line.split("\\s+", 2);
-			map.put(arr[1], arr[0]);
+			String name = arr[1];
+			String areacode = arr[0];
+			if (map.putIfAbsent(name, areacode) != null) {
+				String parentAreacode = areacode.substring(0, 4) + "00";
+				String parentName = null;
+				for (Map.Entry<String, String> entry : map.entrySet()) {
+					if (entry.getValue().equals(parentAreacode)) {
+						parentName = entry.getKey();
+						break;
+					}
+				}
+				map.put(parentName + name, areacode);
+			}
 		}
 		return map;
 	}
