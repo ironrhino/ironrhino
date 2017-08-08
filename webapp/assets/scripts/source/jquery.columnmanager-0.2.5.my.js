@@ -73,20 +73,7 @@
 	 */
 	var hideCell = function(cell)
 	{
-		if ( jQuery.browser.msie )
-		{
-			(hideCell = function(c)
-			{
-				c.style.setAttribute('display', 'none');
-			})(cell);
-		}
-		else
-		{
-			(hideCell = function(c)
-			{
-				c.style.display = 'none';
-			})(cell);
-		}
+		cell.style.display = 'none';
 	};
 
 	/**
@@ -96,20 +83,7 @@
 	 */
 	var showCell = function(cell)
 	{
-		if ( jQuery.browser.msie )
-		{
-			(showCell = function(c)
-			{
-				c.style.setAttribute('display', 'block');
-			})(cell);
-		}
-		else
-		{
-			(showCell = function(c)
-			{
-				c.style.display = 'table-cell';
-			})(cell);
-		}
+		cell.style.display = 'table-cell';
 	};
 
 	/**
@@ -119,20 +93,7 @@
 	 */
 	var cellVisible = function(cell)
 	{
-		if ( jQuery.browser.msie )
-		{
-			return (cellVisible = function(c)
-			{
-				return c.style.getAttribute('display') != 'none';
-			})(cell);
-		}
-		else
-		{
-			return (cellVisible = function(c)
-			{
-				return c.style.display != 'none';
-			})(cell);
-		}
+		return cell.style.display != 'none';
 	};
 
 	/**

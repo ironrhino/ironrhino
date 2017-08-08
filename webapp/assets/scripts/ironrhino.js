@@ -23031,7 +23031,7 @@ ctrlr.prototype.setObjectValue=function(data){
 	$.fn.clickMenu = function(options) 
 	{
 		var shown = false;
-		var liOffset = ( ($.browser.msie) ? 4 : 2 );
+		var liOffset = 2;
 
 		var settings = $.extend({}, defaults, options);
 
@@ -23085,15 +23085,6 @@ ctrlr.prototype.setObjectValue=function(data){
 					//show it
 					div.isVisible = true; //we use this over :visible to speed up traversing
 					$(div).show();
-					if ( $.browser.msie ) //fixing a display-bug in ie6 and adding min-width
-					{
-						var cW = $(getOneChild(div, 'UL')).width();
-						if ( cW < 100 )
-						{
-							cW = 100;
-						}
-						$(div).css('width', cW);
-					}
 					div.timer = null;
 				}, delay);
 			}
@@ -23429,20 +23420,6 @@ ctrlr.prototype.setObjectValue=function(data){
 			}
 			//add shadows
 			$('ul', this).shadowBox();
-			//ie6? - add iframes
-			if ( $.browser.msie && (!$.browser.version || parseInt($.browser.version) <= 6) )
-			{
-				if ( $.fn.bgiframe )
-				{
-					$('div.outerbox', this).bgiframe();
-				}
-				else
-				{
-					/* thanks to Mark Gibson - http://www.nabble.com/forum/ViewPost.jtp?post=6504414&framed=y */
-					$('div.outerbox', this).append('<iframe style="display:block;position:absolute;top:0;left:0;z-index:-1;filter:mask();' + 
-									'width:expression(this.parentNode.offsetWidth);height:expression(this.parentNode.offsetHeight)"/>');
-				}
-			}
 			//assign events
 			$(this).bind('closemenu', function(){clean();}); //assign closemenu-event, through wich the menu can be closed from outside the plugin
 			//add click event handling, if there are any elements inside the main menu
@@ -23569,20 +23546,7 @@ ctrlr.prototype.setObjectValue=function(data){
 	 */
 	var hideCell = function(cell)
 	{
-		if ( jQuery.browser.msie )
-		{
-			(hideCell = function(c)
-			{
-				c.style.setAttribute('display', 'none');
-			})(cell);
-		}
-		else
-		{
-			(hideCell = function(c)
-			{
-				c.style.display = 'none';
-			})(cell);
-		}
+		cell.style.display = 'none';
 	};
 
 	/**
@@ -23592,20 +23556,7 @@ ctrlr.prototype.setObjectValue=function(data){
 	 */
 	var showCell = function(cell)
 	{
-		if ( jQuery.browser.msie )
-		{
-			(showCell = function(c)
-			{
-				c.style.setAttribute('display', 'block');
-			})(cell);
-		}
-		else
-		{
-			(showCell = function(c)
-			{
-				c.style.display = 'table-cell';
-			})(cell);
-		}
+		cell.style.display = 'table-cell';
 	};
 
 	/**
@@ -23615,20 +23566,7 @@ ctrlr.prototype.setObjectValue=function(data){
 	 */
 	var cellVisible = function(cell)
 	{
-		if ( jQuery.browser.msie )
-		{
-			return (cellVisible = function(c)
-			{
-				return c.style.getAttribute('display') != 'none';
-			})(cell);
-		}
-		else
-		{
-			return (cellVisible = function(c)
-			{
-				return c.style.display != 'none';
-			})(cell);
-		}
+		return cell.style.display != 'none';
 	};
 
 	/**
@@ -24430,7 +24368,7 @@ ctrlr.prototype.setObjectValue=function(data){
                 priv.initToolBar.call(this, opts);
 
                 var iframe = this.iframe = $("<iframe/>").height(textarea.height());
-                iframe.width(textarea.width() - ($.browser.msie ? 0 : 4));
+                iframe.width(textarea.width() - 4);
                 var htmlarea = this.htmlarea = $("<div/>").append(iframe);
 
                 container.append(htmlarea).append(textarea.hide());
@@ -31144,7 +31082,6 @@ MessageBundle = {
 	}
 
 })(jQuery);
-var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 (function() {
 	try {
 		if (window.self !== window.top) {
@@ -31192,16 +31129,15 @@ var MODERN_BROWSER = !$.browser.msie || $.browser.version > 8;
 	}
 	$.ajaxSettings.traditional = true;
 	var $ajax = $.ajax;
-	if (MODERN_BROWSER)
-		$.ajax = function(options) {
-			options.url = UrlUtils.absolutize(options.url);
-			if (!UrlUtils.isSameDomain(options.url)
-					&& UrlUtils.isSameOrigin(options.url))
-				options.xhrFields = {
-					withCredentials : true
-				};
-			return $ajax(options);
-		}
+	$.ajax = function(options) {
+		options.url = UrlUtils.absolutize(options.url);
+		if (!UrlUtils.isSameDomain(options.url)
+				&& UrlUtils.isSameOrigin(options.url))
+			options.xhrFields = {
+				withCredentials : true
+			};
+		return $ajax(options);
+	}
 
 	if (typeof $.rc4EncryptStr != 'undefined'
 			&& ($('meta[name="pe"]').attr('content') != 'false')) {
@@ -31366,8 +31302,8 @@ UrlUtils = {
 		b = b || document.location.href;
 		var ad = UrlUtils.extractDomain(a);
 		var bd = UrlUtils.extractDomain(b);
-		if ($.browser.msie && ad != bd)
-			return false;
+		if (ad == bd)
+			return true;
 		var arra = ad.split('.');
 		var arrb = bd.split('.');
 		return (arra[arra.length - 1] == arrb[arrb.length - 1] && arra[arra.length
@@ -32439,8 +32375,7 @@ Initialization.common = function() {
 		});
 };
 
-var HISTORY_ENABLED = MODERN_BROWSER
-		&& (typeof history.pushState != 'undefined')
+var HISTORY_ENABLED = (typeof history.pushState != 'undefined')
 		&& ($('meta[name="history_enabled"]').attr('content') != 'false');
 if (HISTORY_ENABLED) {
 	Initialization.history = function() {
@@ -32574,69 +32509,67 @@ Observation.common = function(container) {
 					}
 				}
 			});
-	if (MODERN_BROWSER) {
-		$$('input[type="checkbox"].custom,input[type="radio"].custom',
-				container).each(function(i) {
-			$(this).hide();
-			if (!this.id)
-				this.id = ('a' + (i + Math.random())).replace('.', '')
-						.substring(0, 9);
-			var label = $(this).next('label.custom');
-			if (!label.length)
-				$(this).after($('<label class="custom" for="' + this.id
-						+ '"></label>'));
-			else
-				label.attr('for', this.id);
-		});
-		$$('.custom[type="file"]', container).each(function() {
-			var t = $(this);
-			t.hide().change(function() {
-				var names = [];
-				for (var i = 0; i < this.files.length; i++) {
-					var f = this.files[i];
-					var size = f.size;
+	$$('input[type="checkbox"].custom,input[type="radio"].custom', container)
+			.each(function(i) {
+				$(this).hide();
+				if (!this.id)
+					this.id = ('a' + (i + Math.random())).replace('.', '')
+							.substring(0, 9);
+				var label = $(this).next('label.custom');
+				if (!label.length)
+					$(this).after($('<label class="custom" for="' + this.id
+							+ '"></label>'));
+				else
+					label.attr('for', this.id);
+			});
+	$$('.custom[type="file"]', container).each(function() {
+		var t = $(this);
+		t.hide().change(function() {
+			var names = [];
+			for (var i = 0; i < this.files.length; i++) {
+				var f = this.files[i];
+				var size = f.size;
+				size = size / 1024;
+				size = Math.round(size * 100) / 100;
+				if (size >= 1024) {
 					size = size / 1024;
 					size = Math.round(size * 100) / 100;
 					if (size >= 1024) {
 						size = size / 1024;
 						size = Math.round(size * 100) / 100;
-						if (size >= 1024) {
-							size = size / 1024;
-							size = Math.round(size * 100) / 100;
-							size = size + ' GB';
-						} else {
-							size = size + ' MB';
-						}
+						size = size + ' GB';
 					} else {
-						size = size + ' KB';
+						size = size + ' MB';
 					}
-					names.push('<i class="tiped" title="' + size + '">'
-							+ f.name + '</i>');
-				}
-				var files = names.join(', ');
-				var fp = t.next('.filepick');
-				if (files) {
-					_observe(fp.find('.file-holder').html(files));
-					fp.find('.remove').show();
-					fp.find('.filepick-handle').hide();
 				} else {
-					fp.find('.file-holder').text('');
-					fp.find('.remove').hide();
-					fp.find('.filepick-handle').show();
+					size = size + ' KB';
 				}
-			});
-			var fp = $('<div class="filepick"><span class="file-holder"></span><a class="remove" href="#" style="display:none;">&times;</a><span class="filepick-handle glyphicon glyphicon-list"></span></div>')
-					.insertAfter(t);
-			fp.find('.filepick-handle').click(function() {
-						t.click();
-						return false;
-					});
-			fp.find('a.remove').click(function() {
-						t.val(null).trigger('change');
-						return false;
-					});
+				names.push('<i class="tiped" title="' + size + '">' + f.name
+						+ '</i>');
+			}
+			var files = names.join(', ');
+			var fp = t.next('.filepick');
+			if (files) {
+				_observe(fp.find('.file-holder').html(files));
+				fp.find('.remove').show();
+				fp.find('.filepick-handle').hide();
+			} else {
+				fp.find('.file-holder').text('');
+				fp.find('.remove').hide();
+				fp.find('.filepick-handle').show();
+			}
 		});
-	}
+		var fp = $('<div class="filepick"><span class="file-holder"></span><a class="remove" href="#" style="display:none;">&times;</a><span class="filepick-handle glyphicon glyphicon-list"></span></div>')
+				.insertAfter(t);
+		fp.find('.filepick-handle').click(function() {
+					t.click();
+					return false;
+				});
+		fp.find('a.remove').click(function() {
+					t.val(null).trigger('change');
+					return false;
+				});
+	});
 	$$('.linkage_switch', container).each(function() {
 		var c = $(this).closest('.linkage');
 		c.data('originalclass', c.attr('class'));
@@ -36426,20 +36359,19 @@ Observation.sortableTable = function(container) {
 				.change();
 		$(':input', r).not('.readonly').prop('readonly', false)
 				.removeAttr('keyupValidate');
-		if (MODERN_BROWSER)
-			$('input[type="checkbox"].custom,input[type="radio"].custom', r)
-					.each(function(i) {
-						$(this).hide();
-						if (!this.id)
-							this.id = ('a' + (i + Math.random())).replace('.',
-									'').substring(0, 9);
-						var label = $(this).next('label.custom');
-						if (!label.length)
-							$(this).after($('<label class="custom" for="'
-									+ this.id + '"></label>'));
-						else
-							label.attr('for', this.id);
-					});
+		$('input[type="checkbox"].custom,input[type="radio"].custom', r).each(
+				function(i) {
+					$(this).hide();
+					if (!this.id)
+						this.id = ('a' + (i + Math.random())).replace('.', '')
+								.substring(0, 9);
+					var label = $(this).next('label.custom');
+					if (!label.length)
+						$(this).after($('<label class="custom" for="' + this.id
+								+ '"></label>'));
+					else
+						label.attr('for', this.id);
+				});
 		$('select.decrease', r).each(function() {
 			var selectedValues = $.map($('select.decrease', table), function(e,
 							i) {
@@ -37528,8 +37460,6 @@ Richtable = {
 				}
 			}
 		};
-		if ($.browser.msie && $.browser.version <= 8)
-			opt.height = 600;
 		win.data('windowoptions', opt);
 		win.dialog(opt);
 		win.dialog('open');

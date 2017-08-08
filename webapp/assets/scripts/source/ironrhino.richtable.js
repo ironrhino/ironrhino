@@ -262,8 +262,6 @@ Richtable = {
 				}
 			}
 		};
-		if ($.browser.msie && $.browser.version <= 8)
-			opt.height = 600;
 		win.data('windowoptions', opt);
 		win.dialog(opt);
 		win.dialog('open');

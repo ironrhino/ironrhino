@@ -50,7 +50,7 @@
 	$.fn.clickMenu = function(options) 
 	{
 		var shown = false;
-		var liOffset = ( ($.browser.msie) ? 4 : 2 );
+		var liOffset = 2;
 
 		var settings = $.extend({}, defaults, options);
 
@@ -104,15 +104,6 @@
 					//show it
 					div.isVisible = true; //we use this over :visible to speed up traversing
 					$(div).show();
-					if ( $.browser.msie ) //fixing a display-bug in ie6 and adding min-width
-					{
-						var cW = $(getOneChild(div, 'UL')).width();
-						if ( cW < 100 )
-						{
-							cW = 100;
-						}
-						$(div).css('width', cW);
-					}
 					div.timer = null;
 				}, delay);
 			}
@@ -448,20 +439,6 @@
 			}
 			//add shadows
 			$('ul', this).shadowBox();
-			//ie6? - add iframes
-			if ( $.browser.msie && (!$.browser.version || parseInt($.browser.version) <= 6) )
-			{
-				if ( $.fn.bgiframe )
-				{
-					$('div.outerbox', this).bgiframe();
-				}
-				else
-				{
-					/* thanks to Mark Gibson - http://www.nabble.com/forum/ViewPost.jtp?post=6504414&framed=y */
-					$('div.outerbox', this).append('<iframe style="display:block;position:absolute;top:0;left:0;z-index:-1;filter:mask();' + 
-									'width:expression(this.parentNode.offsetWidth);height:expression(this.parentNode.offsetHeight)"/>');
-				}
-			}
 			//assign events
 			$(this).bind('closemenu', function(){clean();}); //assign closemenu-event, through wich the menu can be closed from outside the plugin
 			//add click event handling, if there are any elements inside the main menu
