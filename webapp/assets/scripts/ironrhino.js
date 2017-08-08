@@ -29668,17 +29668,13 @@ $(function () {
 			this.language = options.language in dates ? options.language : 'en'
 			this.pickDate = options.pickDate;
 			this.pickTime = options.pickTime;
-			this.isInput = this.$element.is('input');
 			this.component = false;
 			if (this.$element.find('.input-append').length
 					|| this.$element.find('.input-prepend').length)
 				this.component = this.$element.find('.add-on');
 			this.format = options.format;
 			if (!this.format) {
-				if (this.isInput)
-					this.format = this.$element.data('format');
-				else
-					this.format = this.$element.find('input').data('format');
+				this.format = this.$element.data('format');
 				if (!this.format)
 					this.format = 'MM/dd/yyyy';
 			}
@@ -29753,6 +29749,8 @@ $(function () {
 		},
 
 		show : function(e) {
+			if(e && e.target)
+				this.$element = $(e.target);
 			this.widget.show();
 			this.height = this.component ? this.component.outerHeight()
 					: this.$element.outerHeight() + 5;
@@ -29800,15 +29798,7 @@ $(function () {
 			var formatted = '';
 			if (!this._unset)
 				formatted = this.formatDate(this._date);
-			if (!this.isInput) {
-				if (this.component) {
-					var input = this.$element.find('input');
-					input.val(formatted);
-				}
-				this.$element.data('date', formatted);
-			} else {
-				this.$element.val(formatted);
-			}
+			this.$element.val(formatted);
 		},
 
 		setValue : function(newDate) {
@@ -29932,11 +29922,7 @@ $(function () {
 		update : function(newDate) {
 			var dateStr = newDate;
 			if (!dateStr) {
-				if (this.isInput) {
-					dateStr = this.$element.val();
-				} else {
-					dateStr = this.$element.find('input').val();
-				}
+				dateStr = this.$element.val();
 				if (dateStr) {
 					this._date = this.parseDate(dateStr);
 				}
@@ -30391,6 +30377,8 @@ $(function () {
 		},
 
 		change : function(e) {
+			if(e && e.target)
+				this.$element = $(e.target);
 			var input = $(e.target);
 			var val = input.val();
 			if (val) {
@@ -30471,30 +30459,17 @@ $(function () {
 							}
 						});
 			}
-			if (this.isInput) {
-				this.$element.on({
-					'focus' : $.proxy(this.show, this),
-					'change' : $.proxy(this.change, this)
-				});
-			} else {
-				this.$element.on({
-					'change' : $.proxy(this.change, this)
-				}, 'input');
-				if (this.component) {
-					this.component.on('click', $.proxy(this.show, this));
-				} else {
-					this.$element.on('click', $.proxy(this.show, this));
-				}
-			}
+			this.$element.on({
+				'focus' : $.proxy(this.show, this),
+				'change' : $.proxy(this.change, this)
+			});
 		},
 
 		_attachDatePickerGlobalEvents : function() {
 			$(window).on('resize.datetimepicker' + this.id,
 					$.proxy(this.place, this));
-			// if (!this.isInput) {
 			$(document).on('mousedown.datetimepicker' + this.id,
 					$.proxy(this.hide, this));
-			// }
 		},
 
 		_detachDatePickerEvents : function() {
@@ -30504,28 +30479,15 @@ $(function () {
 			if (this.pickDate && this.pickTime) {
 				this.widget.off('click.togglePicker');
 			}
-			if (this.isInput) {
-				this.$element.off({
-					'focus' : this.show,
-					'change' : this.change
-				});
-			} else {
-				this.$element.off({
-					'change' : this.change
-				}, 'input');
-				if (this.component) {
-					this.component.off('click', this.show);
-				} else {
-					this.$element.off('click', this.show);
-				}
-			}
+			this.$element.off({
+				'focus' : this.show,
+				'change' : this.change
+			});
 		},
 
 		_detachDatePickerGlobalEvents : function() {
 			$(window).off('resize.datetimepicker' + this.id);
-			// if (!this.isInput) {
 			$(document).off('mousedown.datetimepicker' + this.id);
-			// }
 		},
 
 		_isInFixed : function() {
@@ -32669,25 +32631,28 @@ Observation.common = function(container) {
 						option.pickTime = false;
 					}
 					t.focus(function() {
-						var dp = t.data('datetimepicker');
+						var _t = $(this);
+						var dp = _t.data('datetimepicker');
 						if (!dp) {
-							t.datetimepicker(option).on('changeDate',
+							_t.datetimepicker(option).on('changeDate',
 									function(e) {
-										t.data('changed', true);
-										if (t.hasClass('date'))
-											t.blur();
+										var _t = $(e.target);
+										_t.data('changed', true);
+										if (_t.hasClass('date'))
+											_t.blur();
 									});
-							dp = t.data('datetimepicker');
+							dp = _t.data('datetimepicker');
 							dp.show();
 						}
 					}).blur(function() {
-						var dp = t.data('datetimepicker');
+						var _t = $(this);
+						var dp = _t.data('datetimepicker');
 						if (dp) {
-							if (t.data('changed'))
-								t.removeData('changed').trigger('validate')
+							if (_t.data('changed'))
+								_t.removeData('changed').trigger('validate')
 										.trigger('conjunct');
 							dp.widget.remove();
-							t.removeData('datetimepicker');
+							_t.removeData('datetimepicker');
 						}
 					});
 				});

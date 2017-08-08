@@ -1585,25 +1585,28 @@ Observation.common = function(container) {
 						option.pickTime = false;
 					}
 					t.focus(function() {
-						var dp = t.data('datetimepicker');
+						var _t = $(this);
+						var dp = _t.data('datetimepicker');
 						if (!dp) {
-							t.datetimepicker(option).on('changeDate',
+							_t.datetimepicker(option).on('changeDate',
 									function(e) {
-										t.data('changed', true);
-										if (t.hasClass('date'))
-											t.blur();
+										var _t = $(e.target);
+										_t.data('changed', true);
+										if (_t.hasClass('date'))
+											_t.blur();
 									});
-							dp = t.data('datetimepicker');
+							dp = _t.data('datetimepicker');
 							dp.show();
 						}
 					}).blur(function() {
-						var dp = t.data('datetimepicker');
+						var _t = $(this);
+						var dp = _t.data('datetimepicker');
 						if (dp) {
-							if (t.data('changed'))
-								t.removeData('changed').trigger('validate')
+							if (_t.data('changed'))
+								_t.removeData('changed').trigger('validate')
 										.trigger('conjunct');
 							dp.widget.remove();
-							t.removeData('datetimepicker');
+							_t.removeData('datetimepicker');
 						}
 					});
 				});
