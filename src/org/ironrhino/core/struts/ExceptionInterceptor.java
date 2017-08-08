@@ -52,7 +52,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 								.addFieldError(StringUtils.uncapitalize(cv.getRootBeanClass().getSimpleName()) + "."
 										+ cv.getPropertyPath(), cv.getMessage());
 					}
-				} else if (e instanceof ValidationException) {
+				} else if (e instanceof javax.validation.ValidationException) {
 					// dehydrated ConstraintViolationException for remoting service
 					boolean parsed = false;
 					String message = e.getMessage();
