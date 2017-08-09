@@ -11,7 +11,6 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Session;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,7 @@ public class AuthorizedWebSocket {
 					if (roles.length == 0 || AuthzUtils.authorizeUserDetails(
 							userDetailsService.loadUserByUsername(
 									(String) s.getUserProperties().get(USER_PROPERTIES_NAME_USERNAME)),
-							null, StringUtils.join(roles, ","), null))
+							null, String.join(",", roles), null))
 						s.getBasicRemote().sendText(message);
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);

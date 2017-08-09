@@ -32,7 +32,7 @@ public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeCo
 		List<String> names = new ArrayList<>();
 		for (Enum<?> en : set)
 			names.add(en.name());
-		return StringUtils.join(names, SEPARATOR);
+		return String.join(SEPARATOR, names);
 	}
 
 	@Override

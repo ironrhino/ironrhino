@@ -580,7 +580,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				List<String> list = new ArrayList<>(doubles);
 				for (int i = 0; i < doubles; i++)
 					list.add("lower(entity." + String.valueOf(objects[2 * i]) + ")=lower(?" + (i + 1) + ")");
-				hql += StringUtils.join(list, " and ");
+				hql += String.join(" and ", list);
 			}
 			query = sessionFactory.getCurrentSession().createQuery(hql);
 			for (int i = 0; i < doubles; i++)
@@ -617,7 +617,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				List<String> list = new ArrayList<>(doubles);
 				for (int i = 0; i < doubles; i++)
 					list.add("lower(entity." + String.valueOf(objects[2 * i]) + ")=lower(?" + (i + 1) + ")");
-				hql += StringUtils.join(list, " and ");
+				hql += String.join(" and ", list);
 			}
 			query = sessionFactory.getCurrentSession().createQuery(hql);
 			for (int i = 0; i < doubles; i++)

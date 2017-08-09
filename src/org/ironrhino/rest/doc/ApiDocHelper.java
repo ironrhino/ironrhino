@@ -150,7 +150,7 @@ public class ApiDocHelper {
 						throw new ErrorMessage(
 								sampleFileName + " with " + apiDocInstance.getClass().getName() + " is not found!");
 					}
-					return StringUtils.join(IOUtils.readLines(is, StandardCharsets.UTF_8), "\n");
+					return String.join("\n", IOUtils.readLines(is, StandardCharsets.UTF_8));
 				}
 			}
 			String sampleMethodName = fields.sampleMethodName();

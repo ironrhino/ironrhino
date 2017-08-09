@@ -72,7 +72,7 @@ public class AuditEvent extends BaseEntity {
 		} else {
 			Map<String, String> map = new HashMap<>();
 			map.put("key", eventKey);
-			map.put("arguments", StringUtils.join(arguments, ","));
+			map.put("arguments", String.join(",", arguments));
 			this.event = JsonUtils.toJson(map);
 		}
 	}

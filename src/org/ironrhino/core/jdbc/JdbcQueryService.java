@@ -453,7 +453,7 @@ public class JdbcQueryService {
 					}
 					arr[i] = text;
 				}
-				lh.handleLine(index, StringUtils.join(arr, seperator));
+				lh.handleLine(index, String.join(seperator, arr));
 			}
 		});
 	}

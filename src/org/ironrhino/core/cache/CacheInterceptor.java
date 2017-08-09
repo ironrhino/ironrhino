@@ -43,7 +43,7 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 			List<String> keys = ExpressionUtils.evalList(checkCache.key(), context);
 			if (keys == null || keys.isEmpty())
 				return methodInvocation.proceed();
-			String keyMutex = MUTEX + StringUtils.join(keys, "_");
+			String keyMutex = MUTEX + String.join("_", keys);
 			boolean mutexed = false;
 			if (CacheContext.isForceFlush()) {
 				cacheManager.mdelete(keys, namespace);

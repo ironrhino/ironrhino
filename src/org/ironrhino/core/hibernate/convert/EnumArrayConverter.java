@@ -4,7 +4,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 
 @SuppressWarnings("unchecked")
@@ -26,7 +25,7 @@ public abstract class EnumArrayConverter<T extends Enum<T>> {
 		List<String> names = new ArrayList<>();
 		for (T en : array)
 			names.add(en.name());
-		return StringUtils.join(names, SEPARATOR);
+		return String.join(SEPARATOR, names);
 	}
 
 	public T[] convertToEntityAttribute(String string) {

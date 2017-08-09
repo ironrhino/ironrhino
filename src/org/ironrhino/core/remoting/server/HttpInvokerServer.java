@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
@@ -87,7 +86,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 				for (Class<?> cl : invocation.getParameterTypes())
 					parameterTypeList.add(cl.getSimpleName());
 				String method = new StringBuilder(invocation.getMethodName()).append("(")
-						.append(StringUtils.join(parameterTypeList, ",")).append(")").toString();
+						.append(String.join(",", parameterTypeList)).append(")").toString();
 				MDC.put("role", "SERVER");
 				MDC.put("service", interfaceName + '.' + method);
 				if (loggingPayload)

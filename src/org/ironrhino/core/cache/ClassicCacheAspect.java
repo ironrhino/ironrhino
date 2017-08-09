@@ -46,7 +46,7 @@ public class ClassicCacheAspect extends BaseAspect {
 		List<String> keys = ExpressionUtils.evalList(checkCache.key(), context);
 		if (keys == null || keys.isEmpty())
 			return jp.proceed();
-		String keyMutex = MUTEX + StringUtils.join(keys, "_");
+		String keyMutex = MUTEX + String.join("_", keys);
 		boolean mutexed = false;
 		if (CacheContext.isForceFlush()) {
 			cacheManager.mdelete(keys, namespace);

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.stat.Key;
 import org.ironrhino.core.stat.Value;
 import org.ironrhino.core.util.NumberUtils;
@@ -75,7 +74,7 @@ public class TreeNode implements Serializable {
 		Iterator<TreeNode> it = children.iterator();
 		while (it.hasNext()) {
 			TreeNode node = it.next();
-			String path = StringUtils.join(node.getKey().getNames(), ">");
+			String path = String.join(">", node.getKey().getNames());
 			if (filter.equals(path) || path.startsWith(filter + ">") || filter.startsWith(path + ">"))
 				node.filter(filter);
 			else

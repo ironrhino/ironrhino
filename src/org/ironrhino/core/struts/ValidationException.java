@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.opensymphony.xwork2.ValidationAwareSupport;
 
 public class ValidationException extends RuntimeException {
@@ -37,13 +35,13 @@ public class ValidationException extends RuntimeException {
 			StringBuilder sb = new StringBuilder();
 			Collection<String> actionErrors = getActionErrors();
 			if (actionErrors != null && !actionErrors.isEmpty())
-				sb.append(StringUtils.join(actionErrors, ";"));
+				sb.append(String.join(";", actionErrors));
 			Map<String, List<String>> fieldErrors = getFieldErrors();
 			if (fieldErrors != null && !fieldErrors.isEmpty()) {
 				if (sb.length() > 0)
 					sb.append(';');
 				for (Map.Entry<String, List<String>> entry : fieldErrors.entrySet())
-					sb.append(entry.getKey()).append(": ").append(StringUtils.join(entry.getValue(), ",")).append(';');
+					sb.append(entry.getKey()).append(": ").append(String.join(",", entry.getValue())).append(';');
 				sb.deleteCharAt(sb.length() - 1);
 			}
 			msg = sb.toString();

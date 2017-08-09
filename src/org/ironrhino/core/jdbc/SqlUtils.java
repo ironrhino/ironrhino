@@ -61,7 +61,7 @@ public class SqlUtils {
 		StringBuilder sb = new StringBuilder("insert into ");
 		sb.append(tableName);
 		sb.append("(");
-		sb.append(StringUtils.join(properties, ","));
+		sb.append(String.join(",", properties));
 		sb.append(") values (");
 		for (int i = 0; i < properties.size(); i++) {
 			sb.append(":").append(properties.get(i));

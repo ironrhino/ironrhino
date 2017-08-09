@@ -349,7 +349,7 @@ public class AppInfo {
 				defaultProfiles = "default";
 			defaultProfiles = defaultProfiles + ',' + featureProfiles;
 			System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME,
-					StringUtils.join(new TreeSet<>(Arrays.asList(defaultProfiles.split("\\s*,\\s*"))), ","));
+					String.join(",", new TreeSet<>(Arrays.asList(defaultProfiles.split("\\s*,\\s*")))));
 		}
 
 		// configure log4j2
@@ -371,7 +371,8 @@ public class AppInfo {
 		if (System.getProperty("console.logger.level") == null)
 			System.setProperty("console.logger.level", AppInfo.getStage() == Stage.PRODUCTION
 					&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))
-							? "ERROR" : "INFO");
+							? "ERROR"
+							: "INFO");
 		String kafkaBootstrapServers = getRawApplicationContextProperties().getProperty("kafka.bootstrap.servers");
 		if (StringUtils.isNotBlank(kafkaBootstrapServers))
 			System.setProperty("kafka.bootstrap.servers", kafkaBootstrapServers);

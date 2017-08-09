@@ -170,7 +170,7 @@ public class AnnotationShadows {
 		}
 
 		public String getCssClass() {
-			return StringUtils.join(cssClasses, " ");
+			return String.join(" ", cssClasses);
 		}
 
 		public void addCssClass(String cssClass) {

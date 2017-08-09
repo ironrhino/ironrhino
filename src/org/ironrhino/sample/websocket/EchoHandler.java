@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public class EchoHandler extends TextWebSocketHandler {
 				try {
 					if (roles.length == 0 || AuthzUtils.authorizeUserDetails(
 							userDetailsService.loadUserByUsername(s.getPrincipal().getName()), null,
-							StringUtils.join(roles, ","), null))
+							String.join(",", roles), null))
 						s.sendMessage(new TextMessage(message));
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);

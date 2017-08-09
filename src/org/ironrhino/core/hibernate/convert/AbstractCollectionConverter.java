@@ -13,7 +13,7 @@ public abstract class AbstractCollectionConverter<T> {
 			return null;
 		if (collection.isEmpty())
 			return "";
-		return StringUtils.join(collection.iterator(), SEPARATOR);
+		return StringUtils.join(collection, SEPARATOR);
 	}
 
 	protected Collection<T> doConvertToEntityAttribute(String string) {

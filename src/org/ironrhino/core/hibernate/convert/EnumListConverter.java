@@ -30,7 +30,7 @@ public abstract class EnumListConverter<T extends Enum<T>> implements AttributeC
 		List<String> names = new ArrayList<>();
 		for (Enum<?> en : list)
 			names.add(en.name());
-		return StringUtils.join(names, SEPARATOR);
+		return String.join(SEPARATOR, names);
 	}
 
 	@Override

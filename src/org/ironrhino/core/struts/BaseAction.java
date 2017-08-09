@@ -405,7 +405,7 @@ public class BaseAction extends ActionSupport {
 		} else if (!isUseJson() && hasFieldErrors()) {
 			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<String, List<String>> entry : getFieldErrors().entrySet()) {
-				sb.append(entry.getKey()).append(": ").append(StringUtils.join(entry.getValue(), "\t")).append("; ");
+				sb.append(entry.getKey()).append(": ").append(String.join("\t", entry.getValue())).append("; ");
 			}
 			sb.delete(sb.length() - 2, sb.length() - 1);
 			response.setHeader("X-Field-Errors", sb.toString());

@@ -138,7 +138,7 @@ public class UserRoleManager {
 						includes.add(role);
 				if (includes.size() > 1) {
 					throw new ErrorMessage("validation.mutex.violation",
-							new Object[] { StringUtils.join(displayRoles(includes), ",") });
+							new Object[] { String.join(",", displayRoles(includes)) });
 				}
 			}
 		}

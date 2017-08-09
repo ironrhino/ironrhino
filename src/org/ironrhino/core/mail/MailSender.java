@@ -72,7 +72,7 @@ public class MailSender {
 				array[i] = email;
 			}
 		}
-		return StringUtils.join(array, ",");
+		return String.join(",", array);
 	}
 
 	public void send(MimeMessage mimeMessage) {

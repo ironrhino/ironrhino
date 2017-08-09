@@ -125,7 +125,7 @@ public class Key implements Serializable, Comparable<Key> {
 
 	@Override
 	public String toString() {
-		return (StringUtils.isNotBlank(namespace) ? namespace + ":" : "") + StringUtils.join(names, '>')
+		return (StringUtils.isNotBlank(namespace) ? namespace + ":" : "") + String.join(">", names)
 				+ (cumulative ? "" : ",0");
 	}
 

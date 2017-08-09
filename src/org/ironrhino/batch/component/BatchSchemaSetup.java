@@ -10,7 +10,6 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -55,7 +54,7 @@ public class BatchSchemaSetup {
 			try (InputStream is = Job.class.getResourceAsStream(file)) {
 				if (is == null)
 					throw new UnsupportedOperationException("Database " + dp.name() + " is not supported");
-				String[] arr = StringUtils.join(IOUtils.readLines(is), "\n").split(";");
+				String[] arr = String.join("\n", IOUtils.readLines(is)).split(";");
 				try (Statement stmt = conn.createStatement()) {
 					for (String sql : arr) {
 						if (!tablePrefix.equalsIgnoreCase("BATCH_")) {

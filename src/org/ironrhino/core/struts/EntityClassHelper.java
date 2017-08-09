@@ -601,7 +601,7 @@ public class EntityClassHelper {
 								for (String name : naturalIds.keySet())
 									if (!name.equals(pd.getName()))
 										list.add(StringUtils.uncapitalize(entityClass.getSimpleName()) + '.' + name);
-								uci.getInternalDynamicAttributes().put("data-checkwith", StringUtils.join(list, ","));
+								uci.getInternalDynamicAttributes().put("data-checkwith", String.join(",", list));
 							}
 						}
 					}
@@ -714,7 +714,7 @@ public class EntityClassHelper {
 				columns.add(pd.getName());
 		}
 		if (!columns.isEmpty()) {
-			sb.append("?columns=" + StringUtils.join(columns, ','));
+			sb.append("?columns=" + String.join(",", columns));
 		}
 		return sb.toString();
 	}
