@@ -7672,6 +7672,7 @@ body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 
 #nav-breadcrumb {
 	font-size: 1.1em;
+	margin-bottom: 10px;
 }
 
 #powered-by {
@@ -8927,6 +8928,10 @@ table .resizeBar {
 
 .window-listpick form.criteria select {
 	width: 200px;
+}
+
+table.richtable{
+	margin-bottom: 10px;
 }
 
 table.richtable thead {

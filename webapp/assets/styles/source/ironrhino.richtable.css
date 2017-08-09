@@ -10,6 +10,10 @@
 	width: 200px;
 }
 
+table.richtable{
+	margin-bottom: 10px;
+}
+
 table.richtable thead {
 	background-color: #efefef;
 	background-image: linear-gradient(to bottom, #efefef, #dedede, #efefef);
