@@ -2144,7 +2144,8 @@ var Nav = {
 		var dropdown = a.closest('li.dropdown');
 		if (!dropdown.length) {
 			$(a).closest('li').addClass('active');
-			$('#nav-breadcrumb').remove();
+			if (a.is('.navbar .nav > li > a'))
+				$('#nav-breadcrumb').remove();
 			return;
 		}
 		if (a.hasClass('dropdown-toggle'))
