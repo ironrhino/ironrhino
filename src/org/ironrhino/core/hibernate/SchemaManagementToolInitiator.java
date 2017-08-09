@@ -1,6 +1,7 @@
 package org.ironrhino.core.hibernate;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -104,32 +105,21 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 
 	public void dropExistsForeignKey() {
 		try (Connection conn = dataSource.getConnection()) {
-			DatabaseProduct dp = DatabaseProduct.parse(conn.getMetaData().getDatabaseProductName());
-			if (dp == null)
-				return;
+			DatabaseMetaData dbmd = conn.getMetaData();
+			DatabaseProduct dp = DatabaseProduct.parse(dbmd.getDatabaseProductName());
 			Map<String, String> foreignKeys = new HashMap<String, String>();
-			String querySql;
-			switch (dp) {
-			case MYSQL:
-			case POSTGRESQL:
-				StringBuilder sb = new StringBuilder();
-				sb.append("select constraint_name,table_name from information_schema.table_constraints where table_");
-				sb.append(dp == DatabaseProduct.MYSQL ? "schema" : "catalog");
-				sb.append("='");
-				sb.append(conn.getCatalog());
-				sb.append(
-						"' and lower(constraint_type)='foreign key' and length(constraint_name)=27 and lower(constraint_name) like 'fk%'");
-				querySql = sb.toString();
-				break;
-			case ORACLE:
-				querySql = "select constraint_name,table_name from user_constraints where constraint_type='R' and length(constraint_name)=27 and lower(constraint_name) like 'fk%'";
-				break;
-			default:
-				return;
-			}
-			try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(querySql)) {
-				while (rs.next())
-					foreignKeys.put(rs.getString("constraint_name"), rs.getString("table_name"));
+			ResultSet tables = dbmd.getTables(conn.getCatalog(), conn.getSchema(), "%",
+					new String[] { "TABLE" });
+			while (tables.next()) {
+				String table = tables.getString(3);
+				try (ResultSet importedKeys = dbmd.getImportedKeys(conn.getCatalog(), conn.getSchema(),
+						table)) {
+					while (importedKeys.next()) {
+						String fkName = importedKeys.getString("FK_NAME");
+						if (fkName != null && fkName.length() == 27 && fkName.toLowerCase().startsWith("fk"))
+							foreignKeys.put(fkName, importedKeys.getString("FKTABLE_NAME"));
+					}
+				}
 			}
 			if (foreignKeys.isEmpty())
 				return;
