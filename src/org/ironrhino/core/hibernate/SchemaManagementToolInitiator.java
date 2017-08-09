@@ -1,7 +1,6 @@
 package org.ironrhino.core.hibernate;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -106,25 +105,45 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 	public void dropExistsForeignKey() {
 		try (Connection conn = dataSource.getConnection()) {
 			DatabaseProduct dp = DatabaseProduct.parse(conn.getMetaData().getDatabaseProductName());
-			if (dp == DatabaseProduct.MYSQL) {
-				Map<String, String> foreignKeys = new HashMap<String, String>();
-				try (PreparedStatement stmt = conn.prepareStatement(
-						"select * from information_schema.table_constraints where table_schema=? and constraint_type=? and constraint_name like ?")) {
-					stmt.setString(1, conn.getCatalog());
-					stmt.setString(2, "FOREIGN KEY");
-					stmt.setString(3, "FK%");
-					ResultSet rs = stmt.executeQuery();
-					while (rs.next())
-						foreignKeys.put(rs.getString("CONSTRAINT_NAME"), rs.getString("TABLE_NAME"));
-					rs.close();
+			if (dp == null)
+				return;
+			Map<String, String> foreignKeys = new HashMap<String, String>();
+			String querySql;
+			switch (dp) {
+			case MYSQL:
+			case POSTGRESQL:
+				StringBuilder sb = new StringBuilder();
+				sb.append("select constraint_name,table_name from information_schema.table_constraints where table_");
+				sb.append(dp == DatabaseProduct.MYSQL ? "schema" : "catalog");
+				sb.append("='");
+				sb.append(conn.getCatalog());
+				sb.append(
+						"' and lower(constraint_type)='foreign key' and length(constraint_name)=27 and lower(constraint_name) like 'fk%'");
+				querySql = sb.toString();
+				break;
+			case ORACLE:
+				querySql = "select constraint_name,table_name from user_constraints where constraint_type='R' and length(constraint_name)=27 and lower(constraint_name) like 'fk%'";
+				break;
+			default:
+				return;
+			}
+			try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(querySql)) {
+				while (rs.next())
+					foreignKeys.put(rs.getString("constraint_name"), rs.getString("table_name"));
+			}
+			if (foreignKeys.isEmpty())
+				return;
+			try (Statement stmt = conn.createStatement()) {
+				for (Map.Entry<String, String> entry : foreignKeys.entrySet()) {
+					StringBuilder dropSql = new StringBuilder();
+					dropSql.append("alter table ");
+					dropSql.append(entry.getValue());
+					dropSql.append(" drop ");
+					dropSql.append(dp == DatabaseProduct.MYSQL ? "foreign key " : "constraint ");
+					dropSql.append(entry.getKey());
+					stmt.addBatch(dropSql.toString());
 				}
-				if (foreignKeys.isEmpty())
-					return;
-				try (Statement stmt = conn.createStatement()) {
-					for (Map.Entry<String, String> entry : foreignKeys.entrySet())
-						stmt.addBatch("alter table " + entry.getValue() + " drop foreign key " + entry.getKey());
-					stmt.executeBatch();
-				}
+				stmt.executeBatch();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
