@@ -1,16 +1,21 @@
 package org.ironrhino.common.support;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipFile;
 
 import javax.xml.namespace.NamespaceContext;
 
@@ -24,6 +29,7 @@ import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.aop.PublishAspect;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.util.XmlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +39,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Component
 public class RegionSetup {
@@ -42,6 +52,8 @@ public class RegionSetup {
 	private Map<String, String> regionAreacodeMap;
 
 	private ListMultimap<String, String> regionCoordinateMap;
+
+	private Map<String, List<Rgn>> rgnMap;
 
 	@Autowired
 	private EntityManager<Region> entityManager;
@@ -54,9 +66,13 @@ public class RegionSetup {
 			return;
 		regionAreacodeMap = regionAreacodeMap();
 		regionCoordinateMap = regionCoordinateMap();
+		rgnMap = rgnMap();
 		List<Region> regions = RegionParser.parse();
 		for (Region region : regions)
 			save(region);
+		regionCoordinateMap = null;
+		regionAreacodeMap = null;
+		rgnMap = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -68,6 +84,15 @@ public class RegionSetup {
 		if (areacode == null)
 			areacode = regionAreacodeMap.get(region.getName());
 		region.setAreacode(areacode);
+		if (region.getParent() != null) {
+			Rgn rgn = findMatched(region);
+			if (rgn != null) {
+				if (region.getAreacode() == null && StringUtils.isNotBlank(rgn.getI()))
+					region.setAreacode(rgn.getI());
+				if (StringUtils.isNotBlank(rgn.getZ()))
+					region.setPostcode(rgn.getZ());
+			}
+		}
 		if (regionCoordinateMap != null) {
 			List<String> coordinateAndParentName = regionCoordinateMap.get(region.getName());
 			if (coordinateAndParentName.isEmpty())
@@ -114,6 +139,88 @@ public class RegionSetup {
 		Collections.sort(list);
 		for (Region child : list)
 			save(child);
+	}
+
+	private Rgn findMatched(Region region) {
+		if (region.getAreacode() != null) {
+			List<Rgn> rgns = rgnMap.get(region.getAreacode().substring(0, 2) + "0000");
+			return findMatched(region, rgns);
+		} else {
+			for (List<Rgn> rgns : rgnMap.values()) {
+				Rgn rgn = findMatched(region, rgns);
+				if (rgn != null)
+					return rgn;
+			}
+		}
+		return null;
+	}
+
+	private Rgn findMatched(Region region, List<Rgn> rgns) {
+		if (rgns == null || rgns.isEmpty())
+			return null;
+		for (Rgn rgn : rgns) {
+			if (matchs(region, rgn))
+				return rgn;
+			Rgn r = findMatched(region, rgn.getC());
+			if (r != null)
+				return r;
+		}
+		return null;
+	}
+
+	private static boolean matchs(Region region, Rgn rgn) {
+		if (region.getAreacode() != null && region.getAreacode().equals(rgn.getI()))
+			return true;
+		String name1 = region.getName();
+		String name2 = LocationUtils.shortenName(name1);
+		String name3 = rgn.getN();
+		String name4 = rgn.getA();
+		if (name1.equals(name3))
+			return true;
+		if (name2.equals(name4) && name1.endsWith("区") && (name3.endsWith("县") || name3.endsWith("市")))
+			return true;
+		return false;
+	}
+
+	@Getter
+	@Setter
+	private static class Rgn {
+		private String i;
+		private String n;
+		private String a;
+		private String y;
+		private String b;
+		private String z;
+		private List<Rgn> c;
+	}
+
+	private static Map<String, List<Rgn>> rgnMap() {
+		Map<String, List<Rgn>> map = new LinkedHashMap<>();
+		try (InputStream is = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("resources/data/region.zip")) {
+			// https://github.com/xixilive/chinese_regions_db
+			File tempZipFile = File.createTempFile("region", "zip");
+			try (OutputStream os = new FileOutputStream(tempZipFile)) {
+				IOUtils.copy(is, os);
+			}
+			try (ZipFile zf = new ZipFile(tempZipFile)) {
+				zf.stream().filter(ze -> ze.getName().endsWith(".json")).forEach(ze -> {
+					try (InputStream zeis = zf.getInputStream(ze)) {
+						List<Rgn> rgns = JsonUtils.getObjectMapper().readValue(zeis, new TypeReference<List<Rgn>>() {
+						});
+						map.put(ze.getName().substring(0, ze.getName().indexOf('.')), rgns);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				});
+			}
+			tempZipFile.delete();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return map;
 	}
 
 	private static Map<String, String> regionAreacodeMap() {
