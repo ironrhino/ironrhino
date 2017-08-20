@@ -211,8 +211,18 @@ public class FtpFileStorage extends AbstractFileStorage {
 			if (is == null)
 				return null;
 			return new ProxyInputStream(is) {
+
+				private final Object closeLock = new Object();
+				private volatile boolean closed = false;
+
 				@Override
 				public void close() throws IOException {
+					synchronized (closeLock) {
+						if (closed) {
+							return;
+						}
+						closed = true;
+					}
 					super.close();
 					ftpClient.completePendingCommand();
 					try {
