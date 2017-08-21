@@ -18,6 +18,7 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.pool2.BasePooledObjectFactory;
@@ -150,13 +151,19 @@ public class FtpFileStorage extends AbstractFileStorage {
 				if (ftpClient.isConnected()) {
 					try {
 						ftpClient.logout();
+					} catch (FTPConnectionClosedException e) {
+						// Ignore
 					} catch (IOException e) {
-						logger.error(e.getMessage(), e);
+						if (!e.getMessage().equals("Broken pipe"))
+							logger.error(e.getMessage(), e);
 					} finally {
 						try {
 							ftpClient.disconnect();
+						} catch (FTPConnectionClosedException e) {
+							// Ignore
 						} catch (IOException e) {
-							logger.error(e.getMessage(), e);
+							if (!e.getMessage().equals("Broken pipe"))
+								logger.error(e.getMessage(), e);
 						}
 					}
 				}
