@@ -211,6 +211,17 @@ public class ClassScanner {
 				packages.addAll(Arrays.asList(cs.value()));
 			}
 			packages.addAll(Arrays.asList(arr));
+			List<String> subPackages = new ArrayList<>();
+			loop: for (String s : packages) {
+				for (String s2 : packages) {
+					if (s.startsWith(s2 + ".")) {
+						subPackages.add(s);
+						continue loop;
+					}
+				}
+			}
+			for (String subPackage : subPackages)
+				packages.remove(subPackage);
 			return packages.toArray(new String[0]);
 		} else {
 			Set<String> packages = new TreeSet<>();
