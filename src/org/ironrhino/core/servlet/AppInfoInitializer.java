@@ -1,6 +1,10 @@
 package org.ironrhino.core.servlet;
 
+import java.io.IOException;
 import java.util.TimeZone;
+import java.util.jar.Attributes;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -30,6 +34,7 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 		System.setProperty("app.context", context);
 		String defaultProfiles = System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 		logger = LoggerFactory.getLogger(getClass());
+		printVersion(servletContext);
 		if (AppInfo.getHttpPort() == 0) {
 			int port = ContainerDetector.detectHttpPort(servletContext, false);
 			if (port > 0) {
@@ -51,5 +56,25 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 				AppInfo.getAppName(), AppInfo.getAppVersion(), AppInfo.getInstanceId(), AppInfo.getStage().toString(),
 				AppInfo.getRunLevel().toString(), AppInfo.getAppHome(), AppInfo.getHostName(), AppInfo.getHostAddress(),
 				defaultProfiles != null ? defaultProfiles : "default");
+	}
+
+	private void printVersion(ServletContext servletContext) {
+		for (String path : servletContext.getResourcePaths("/WEB-INF/lib")) {
+			String filename = path.substring(path.lastIndexOf('/') + 1);
+			if (filename.startsWith("ironrhino-core-") && filename.endsWith(".jar")) {
+				try (JarInputStream jis = new JarInputStream(servletContext.getResourceAsStream(path))) {
+					Manifest mf = jis.getManifest();
+					if (mf != null) {
+						Attributes attr = mf.getMainAttributes();
+						String version = attr.getValue("Implementation-Version");
+						String revision = attr.getValue("Build-Revision");
+						logger.info("You are running with Ironrhino Core: version={}, revision={}", version, revision);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
+		}
 	}
 }
