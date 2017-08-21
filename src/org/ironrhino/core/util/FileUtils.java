@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
@@ -15,6 +16,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class FileUtils {
+
+	public static String normalizePath(String input) {
+		return Paths.get(input).normalize().toString();
+	}
 
 	public static File zip(File file) throws Exception {
 		return zip(file, null);

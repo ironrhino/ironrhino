@@ -24,10 +24,10 @@ import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ErrorMessage;
+import org.ironrhino.core.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.google.common.io.Files;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
 import lombok.Getter;
@@ -183,7 +183,7 @@ public class UploadAction extends BaseAction {
 		files = new LinkedHashMap<>();
 		if (StringUtils.isNotBlank(folder))
 			files.put("..", Boolean.FALSE);
-		files.putAll(fileStorage.listFilesAndDirectory(Files.simplifyPath(getUploadRootDir() + folder)));
+		files.putAll(fileStorage.listFilesAndDirectory(FileUtils.normalizePath(getUploadRootDir() + folder)));
 		return ServletActionContext.getRequest().getParameter("pick") != null ? "pick" : LIST;
 	}
 
@@ -199,7 +199,7 @@ public class UploadAction extends BaseAction {
 		String[] paths = getId();
 		if (paths != null) {
 			for (String path : paths) {
-				if (!fileStorage.delete(Files.simplifyPath(getUploadRootDir() + '/' + folder + '/' + path)))
+				if (!fileStorage.delete(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + path)))
 					addActionError(getText("delete.forbidden", new String[] { path }));
 			}
 		}
@@ -212,7 +212,8 @@ public class UploadAction extends BaseAction {
 			if (!path.startsWith("/"))
 				path = '/' + path;
 			folder = path;
-			fileStorage.mkdir(Files.simplifyPath(getUploadRootDir() + (folder.startsWith("/") ? "" : "/") + folder));
+			fileStorage
+					.mkdir(FileUtils.normalizePath(getUploadRootDir() + (folder.startsWith("/") ? "" : "/") + folder));
 		}
 		return list();
 	}
@@ -227,22 +228,22 @@ public class UploadAction extends BaseAction {
 		String newName = filename[0];
 		if (oldName.equals(newName))
 			return list();
-		if (!fileStorage.exists(Files.simplifyPath(getUploadRootDir() + '/' + folder + '/' + oldName))) {
+		if (!fileStorage.exists(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + oldName))) {
 			addActionError(getText("validation.not.exists"));
 			return list();
 		}
-		if (fileStorage.exists(Files.simplifyPath(getUploadRootDir() + '/' + folder + '/' + newName))) {
+		if (fileStorage.exists(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + newName))) {
 			addActionError(getText("validation.already.exists"));
 			return list();
 		}
-		fileStorage.rename(Files.simplifyPath(getUploadRootDir() + '/' + folder + '/' + oldName),
-				Files.simplifyPath(getUploadRootDir() + '/' + folder + '/' + newName));
+		fileStorage.rename(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + oldName),
+				FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + newName));
 		return list();
 	}
 
 	@JsonConfig(root = "files")
 	public String files() throws IOException {
-		String path = Files.simplifyPath(getUploadRootDir() + '/' + folder);
+		String path = FileUtils.normalizePath(getUploadRootDir() + '/' + folder);
 		Map<String, Boolean> map = fileStorage.listFilesAndDirectory(path);
 		files = new LinkedHashMap<>();
 		String[] suffixes = null;
@@ -251,7 +252,7 @@ public class UploadAction extends BaseAction {
 		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
 			String s = entry.getKey();
 			if (!entry.getValue()) {
-				files.put(Files.simplifyPath(folder + '/' + s) + "/", false);
+				files.put(FileUtils.normalizePath(folder + '/' + s) + "/", false);
 			} else {
 				if (suffixes != null) {
 					boolean matches = false;
@@ -288,14 +289,14 @@ public class UploadAction extends BaseAction {
 			dir = dir + folder + "/";
 		String path = dir + filename;
 		if (autorename) {
-			boolean exists = fileStorage.exists(Files.simplifyPath(path));
+			boolean exists = fileStorage.exists(FileUtils.normalizePath(path));
 			int i = 2;
 			while (exists) {
 				path = dir + '(' + (i++) + ')' + filename;
-				exists = fileStorage.exists(Files.simplifyPath(path));
+				exists = fileStorage.exists(FileUtils.normalizePath(path));
 			}
 		}
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		return path;
 	}
 

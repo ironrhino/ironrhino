@@ -20,14 +20,13 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.ironrhino.core.util.FileUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import com.google.common.io.Files;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +59,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public void write(InputStream is, String path) throws IOException {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		File dest = new File(directory, path);
 		dest.getParentFile().mkdirs();
 		try (InputStream ins = is; FileOutputStream os = new FileOutputStream(dest)) {
@@ -70,38 +69,38 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public InputStream open(String path) throws IOException {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		return new FileInputStream(new File(directory, path));
 	}
 
 	@Override
 	public boolean mkdir(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		return new File(directory, path).mkdirs();
 	}
 
 	@Override
 	public boolean delete(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		return new File(directory, path).delete();
 	}
 
 	@Override
 	public long getLastModified(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		return new File(directory, path).lastModified();
 	}
 
 	@Override
 	public boolean exists(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		return new File(directory, path).exists();
 	}
 
 	@Override
 	public boolean rename(String fromPath, String toPath) {
-		fromPath = Files.simplifyPath(fromPath);
-		toPath = Files.simplifyPath(toPath);
+		fromPath = FileUtils.normalizePath(fromPath);
+		toPath = FileUtils.normalizePath(toPath);
 		String s1 = fromPath.substring(0, fromPath.lastIndexOf('/'));
 		String s2 = toPath.substring(0, fromPath.lastIndexOf('/'));
 		if (!s1.equals(s2))
@@ -111,13 +110,13 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		return new File(directory, path).isDirectory();
 	}
 
 	@Override
 	public List<String> listFiles(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		final List<String> list = new ArrayList<>();
 		new File(directory, path).listFiles(f -> {
 			if (f.isFile()) {
@@ -130,7 +129,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		final Map<String, Boolean> map = new HashMap<>();
 		new File(directory, path).listFiles(f -> {
 			map.put(f.getName(), f.isFile());

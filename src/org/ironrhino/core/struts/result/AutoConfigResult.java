@@ -18,9 +18,9 @@ import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.FileUtils;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.google.common.io.Files;
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -129,7 +129,7 @@ public class AutoConfigResult extends FreemarkerResult {
 	}
 
 	public static String getTemplateLocation(String templateName) {
-		templateName = Files.simplifyPath(templateName);
+		templateName = FileUtils.normalizePath(templateName);
 		String location = cache.get(templateName);
 		if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			ServletContext servletContext = ServletActionContext.getServletContext();

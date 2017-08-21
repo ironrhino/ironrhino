@@ -20,14 +20,13 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.ironrhino.core.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-
-import com.google.common.io.Files;
 
 import lombok.Data;
 
@@ -47,7 +46,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public void write(InputStream is, String path) throws IOException {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			throw new IOException("cannot direct access path /");
 		File file = mongoTemplate.findById(path, File.class);
@@ -85,7 +84,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public InputStream open(String path) throws IOException {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			throw new IOException("cannot direct access path /");
 		File file = mongoTemplate.findById(path, File.class);
@@ -98,7 +97,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean mkdir(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return true;
 		File file = mongoTemplate.findById(path, File.class);
@@ -133,7 +132,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean delete(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return false;
 		File file = mongoTemplate.findById(path, File.class);
@@ -153,7 +152,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public long getLastModified(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return -1;
 		File file = mongoTemplate.findById(path, File.class);
@@ -162,7 +161,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean exists(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return true;
 		return mongoTemplate.findById(path, File.class) != null;
@@ -170,8 +169,8 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean rename(String fromPath, String toPath) {
-		fromPath = Files.simplifyPath(fromPath);
-		toPath = Files.simplifyPath(toPath);
+		fromPath = FileUtils.normalizePath(fromPath);
+		toPath = FileUtils.normalizePath(toPath);
 		if (fromPath.equals("/") || toPath.equals("/"))
 			return false;
 		String s1 = fromPath.substring(0, fromPath.lastIndexOf('/'));
@@ -195,7 +194,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return true;
 		File file = mongoTemplate.findById(path, File.class);
@@ -204,7 +203,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public List<String> listFiles(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null || !file.isDirectory())
 			return null;
@@ -223,7 +222,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		final Map<String, Boolean> map = new HashMap<>();
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null || !file.isDirectory())

@@ -2,10 +2,9 @@ package org.ironrhino.core.fs.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.fs.FileStorage;
+import org.ironrhino.core.util.FileUtils;
 import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.springframework.beans.factory.annotation.Value;
-
-import com.google.common.io.Files;
 
 public abstract class AbstractFileStorage implements FileStorage {
 
@@ -14,7 +13,7 @@ public abstract class AbstractFileStorage implements FileStorage {
 
 	@Override
 	public String getFileUrl(String path) {
-		path = Files.simplifyPath(path);
+		path = FileUtils.normalizePath(path);
 		if (!path.startsWith("/"))
 			path = '/' + path;
 		return StringUtils.isNotBlank(baseUrl) ? baseUrl + path : path;

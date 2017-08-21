@@ -30,13 +30,12 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.DateUtils;
+import org.ironrhino.core.util.FileUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-
-import com.google.common.io.Files;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -335,7 +334,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	private String getRealPath(String path, FTPClient ftpClient) throws IOException {
-		return Files.simplifyPath(ftpClient.printWorkingDirectory() + uri.getPath() + path);
+		return FileUtils.normalizePath(ftpClient.printWorkingDirectory() + uri.getPath() + path);
 	}
 
 	public <T> T execute(Callback<T> callback) throws IOException {
