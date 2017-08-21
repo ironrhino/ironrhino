@@ -18,13 +18,13 @@
 |amqp-client-\*.jar spring-rabbit-*.jar spring-amqp-*.jar
 
 |mongodb
-|mongo-java-driver-\*.jar	spring-data-mongodb-*.jar spring-data-commons-*.jar
+|mongo-java-driver-\*.jar spring-data-mongodb-*.jar spring-data-commons-*.jar
 
 |zookeeper
 |zookeeper-\*.jar curator-*.jar
 
 |报表
-|jasperreports-\*.jar commons-digester-*.jar commons-collections-\*.jar dynamicreports-core-*.jar poi-\*.jar itext*.jar struts2-jasperreports-plugin-*.jar
+|jasperreports-\*.jar commons-digester-*.jar commons-collections-\*.jar dynamicreports-core-*.jar poi-\*.jar itext\*.jar
 
 |二维码
 |zxing-*.jar
