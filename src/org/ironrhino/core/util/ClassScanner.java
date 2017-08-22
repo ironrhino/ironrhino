@@ -79,6 +79,7 @@ public class ClassScanner {
 	}
 
 	public static Collection<Class<?>> scanAnnotated(String[] basePackages, Class<? extends Annotation> annotation) {
+		basePackages = deduplicate(Arrays.asList(basePackages)).toArray(new String[0]);
 		ClassScanner cs = new ClassScanner();
 		cs.addIncludeFilter(new AnnotationTypeFilter(annotation));
 		List<Class<?>> classes = new ArrayList<>();
@@ -91,6 +92,7 @@ public class ClassScanner {
 	@SafeVarargs
 	public static Collection<Class<?>> scanAnnotated(String[] basePackages,
 			Class<? extends Annotation>... annotations) {
+		basePackages = deduplicate(Arrays.asList(basePackages)).toArray(new String[0]);
 		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
 			cs.addIncludeFilter(new AnnotationTypeFilter(anno));
@@ -112,6 +114,7 @@ public class ClassScanner {
 	}
 
 	public static Collection<Class<?>> scanAssignable(String[] basePackages, Class<?>... classes) {
+		basePackages = deduplicate(Arrays.asList(basePackages)).toArray(new String[0]);
 		ClassScanner cs = new ClassScanner();
 		for (Class<?> clz : classes)
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
@@ -191,72 +194,38 @@ public class ClassScanner {
 	}
 
 	public static String[] getAppPackages() {
-		return getAppPackages(true);
+		String appBasePackage = AppInfo.getAppBasePackage();
+		if (StringUtils.isNotBlank(appBasePackage)) {
+			if (!appBasePackage.contains("org.ironrhino"))
+				appBasePackage = "org.ironrhino," + appBasePackage;
+		} else {
+			appBasePackage = "org.ironrhino";
+		}
+		String[] arr = appBasePackage.split(",+");
+		Set<String> packages = new TreeSet<>();
+		Collection<Class<?>> componentScans = scanAnnotated(arr, ComponentScan.class);
+		for (Class<?> c : componentScans) {
+			ComponentScan cs = AnnotatedElementUtils.getMergedAnnotation(c, ComponentScan.class);
+			packages.addAll(Arrays.asList(cs.value()));
+		}
+		packages.addAll(Arrays.asList(arr));
+		deduplicate(packages);
+		return packages.toArray(new String[0]);
 	}
 
-	public static String[] getAppPackages(boolean strict) {
-		if (strict) {
-			String appBasePackage = AppInfo.getAppBasePackage();
-			if (StringUtils.isNotBlank(appBasePackage)) {
-				if (!appBasePackage.contains("org.ironrhino"))
-					appBasePackage = "org.ironrhino," + appBasePackage;
-			} else {
-				appBasePackage = "org.ironrhino";
-			}
-			String[] arr = appBasePackage.split(",+");
-			Set<String> packages = new TreeSet<>();
-			Collection<Class<?>> componentScans = scanAnnotated(arr, ComponentScan.class);
-			for (Class<?> c : componentScans) {
-				ComponentScan cs = AnnotatedElementUtils.getMergedAnnotation(c, ComponentScan.class);
-				packages.addAll(Arrays.asList(cs.value()));
-			}
-			packages.addAll(Arrays.asList(arr));
-			List<String> subPackages = new ArrayList<>();
-			loop: for (String s : packages) {
-				for (String s2 : packages) {
-					if (s.startsWith(s2 + ".")) {
-						subPackages.add(s);
-						continue loop;
-					}
+	private static Collection<String> deduplicate(Collection<String> packages) {
+		List<String> subPackages = new ArrayList<>();
+		loop: for (String s : packages) {
+			for (String s2 : packages) {
+				if (s.startsWith(s2 + ".")) {
+					subPackages.add(s);
+					continue loop;
 				}
 			}
-			for (String subPackage : subPackages)
-				packages.remove(subPackage);
-			return packages.toArray(new String[0]);
-		} else {
-			Set<String> packages = new TreeSet<>();
-			for (Package p : Package.getPackages()) {
-				String name = p.getName();
-				if (isExcludePackage(name))
-					continue;
-				int deep = name.split("\\.").length;
-				if (deep <= 2)
-					packages.add(name);
-				else
-					packages.add(name.substring(0, name.indexOf(".", name.indexOf(".") + 1)));
-			}
-			return packages.toArray(new String[0]);
 		}
+		for (String subPackage : subPackages)
+			packages.remove(subPackage);
+		return packages;
 	}
-
-	private static boolean isExcludePackage(String name) {
-		if (name.equals("net") || name.equals("com") || name.equals("org")) {
-			return true;
-		}
-		for (String s : excludePackages) {
-			if (name.equals(s) || name.startsWith(s + '.'))
-				return true;
-		}
-		return false;
-	}
-
-	private static String[] excludePackages = new String[] { "java", "javax", "com.sun", "sun", "org.w3c", "org.xml",
-			"antlr", "com.bea", "com.caucho", "com.chenlb", "com.fasterxml", "com.google", "com.ibm", "com.jolbox",
-			"com.microsoft", "com.mongodb", "com.mysql", "com.opensymphony", "com.oracle", "com.rabbitmq", "com.taobao",
-			"com.vmware", "freemarker", "javassist", "jsr166y", "net.htmlparser", "net.sf", "net.sourceforge", "ognl",
-			"oracle", "org.antlr", "org.aopalliance", "org.apache", "org.aspectj", "org.bson", "org.cloudfoundry",
-			"org.codehaus", "org.elasticsearch", "org.dom4j", "org.eclipse", "org.hibernate", "org.ietf", "org.jboss",
-			"org.jcp", "org.mvel2", "org.postgresql", "org.slf4j", "org.springframework", "org.tartarus",
-			"org.ironrhino.core", "redis", "weblogic" };
 
 }
