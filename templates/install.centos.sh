@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ANT_VERSION=1.10.1
-TOMCAT_VERSION=8.0.41
+TOMCAT_VERSION=8.0.46
 
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
@@ -40,7 +40,7 @@ yum -y install java-1.8.0-openjdk-devel mysql-server subversion git nginx chkcon
 
 
 #install ant
-if [ ! -d ant ];then
+if [ ! -f /usr/bin/ant ];then
 if ! $(ls -l apache-ant-*.tar.gz >/dev/null 2>&1) ; then
 wget http://mirrors.aliyun.com/apache/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
 if [ $? -ne 0 ]; then

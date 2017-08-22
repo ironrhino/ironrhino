@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ANT_VERSION=1.10.1
-TOMCAT_VERSION=8.0.41
+TOMCAT_VERSION=8.0.46
 
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
@@ -13,7 +13,7 @@ fi
 
 #using aliyun as apt mirror
 cp /etc/apt/sources.list /etc/apt/sources.list.bak
-sed -i "s/us\.archive\.ubuntu\.com/mirrors.aliyun.com/g" /etc/apt/sources.list
+sed -i "s/archive\.ubuntu\.com/mirrors.aliyun.com/g" /etc/apt/sources.list
 
 #add nginx
 cat>>/etc/apt/sources.list<<EOF
@@ -41,7 +41,7 @@ fi
 
 
 #install ant
-if [ ! -d ant ];then
+if [ ! -f /usr/bin/ant ];then
 if ! $(ls -l apache-ant-*.tar.gz >/dev/null 2>&1) ; then
 wget http://mirrors.aliyun.com/apache/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
 if [ $? -ne 0 ]; then
