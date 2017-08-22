@@ -1,7 +1,7 @@
 <#ftl output_format='HTML'>
 <#assign method=apiDoc.methods[0]>
 <#assign url=apiBaseUrl+apiDoc.url>
-<#assign url=url?replace('\\{(.+)\\}','<span style="background:yellow;" contenteditable>$1</span>','r')>
+<#assign url=url?replace('\\{(.+)\\}','<span style="background:yellow;border-bottom:1px solid;padding:2px;" contenteditable>$1</span>','r')>
 <form class="api-playground" method="${method}">
 <table class="table">
 <tbody>
