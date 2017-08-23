@@ -88,7 +88,7 @@
 				<#if uiConfig.listTemplate?has_content>
 				<#assign template = uiConfig.listTemplate/>
 				</#if>
-				<#if uiConfig.type=='dictionary'>
+				<#if !template?has_content && uiConfig.type=='dictionary'>
 					<#assign templateName><@uiConfig.templateName?interpret /></#assign>
 					<#assign templateName=templateName?markup_string/>
 					<#assign template = r'<#if displayDictionaryLabel??><@displayDictionaryLabel dictionaryName="'+templateName+r'" value=value!/><#else>${value!}</#if>'/>
