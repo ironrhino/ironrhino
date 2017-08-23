@@ -1,8 +1,12 @@
+.treeview a.selected {
+	background-color: #eee;
+}
+
 .treeview a span {
 	cursor: pointer;
 }
 
-.treeview,.treeview ul {
+.treeview , .treeview ul {
 	padding: 0;
 	margin: 0;
 	list-style: none;
@@ -17,31 +21,18 @@
 	cursor: pointer;
 }
 
-/* fix for IE6 */
-* html .hitarea {
-	display: inline;
-	float: none;
-}
-
 .treeview li {
 	margin: 0;
 	padding: 3px 0pt 3px 16px;
-}
-
-.treeview a.selected {
-	background-color: #eee;
-}
-
-#treecontrol {
-	margin: 1em 0;
-	display: none;
-}
-
-.treeview li {
 	background: url(../images/treeview-default-line.gif) 0 0 no-repeat;
 }
 
-.treeview li.collapsable,.treeview li.expandable {
+.treeview li a {
+	position: relative;
+	top: -3px;
+}
+
+.treeview li.collapsable , .treeview li.expandable {
 	background-position: 0 -176px;
 }
 
@@ -53,7 +44,7 @@
 	background-position: 0 -1766px
 }
 
-.treeview li.lastCollapsable,.treeview li.lastExpandable {
+.treeview li.lastCollapsable , .treeview li.lastExpandable {
 	background-image: url(../images/treeview-default.gif);
 }
 
@@ -65,12 +56,11 @@
 	background-position: -32px -67px
 }
 
-.treeview div.lastCollapsable-hitarea,.treeview div.lastExpandable-hitarea
-	{
+.treeview div.lastCollapsable-hitarea , .treeview div.lastExpandable-hitarea {
 	background-position: 0;
 }
 
-.treeview li.active > a , .treeview div.head.active > a 
-	{
+.treeview li.active > a , .treeview div.head.active > a {
 	background-color: #ccc;
 }
+

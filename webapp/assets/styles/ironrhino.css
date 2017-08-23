@@ -931,11 +931,15 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
   transition: 0.1s linear all;
    overflow: visible;
 }
+.treeview a.selected {
+	background-color: #eee;
+}
+
 .treeview a span {
 	cursor: pointer;
 }
 
-.treeview,.treeview ul {
+.treeview , .treeview ul {
 	padding: 0;
 	margin: 0;
 	list-style: none;
@@ -950,31 +954,18 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	cursor: pointer;
 }
 
-/* fix for IE6 */
-* html .hitarea {
-	display: inline;
-	float: none;
-}
-
 .treeview li {
 	margin: 0;
 	padding: 3px 0pt 3px 16px;
-}
-
-.treeview a.selected {
-	background-color: #eee;
-}
-
-#treecontrol {
-	margin: 1em 0;
-	display: none;
-}
-
-.treeview li {
 	background: url(../images/treeview-default-line.gif) 0 0 no-repeat;
 }
 
-.treeview li.collapsable,.treeview li.expandable {
+.treeview li a {
+	position: relative;
+	top: -3px;
+}
+
+.treeview li.collapsable , .treeview li.expandable {
 	background-position: 0 -176px;
 }
 
@@ -986,7 +977,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	background-position: 0 -1766px
 }
 
-.treeview li.lastCollapsable,.treeview li.lastExpandable {
+.treeview li.lastCollapsable , .treeview li.lastExpandable {
 	background-image: url(../images/treeview-default.gif);
 }
 
@@ -998,15 +989,14 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	background-position: -32px -67px
 }
 
-.treeview div.lastCollapsable-hitarea,.treeview div.lastExpandable-hitarea
-	{
+.treeview div.lastCollapsable-hitarea , .treeview div.lastExpandable-hitarea {
 	background-position: 0;
 }
 
-.treeview li.active > a , .treeview div.head.active > a 
-	{
+.treeview li.active > a , .treeview div.head.active > a {
 	background-color: #ccc;
 }
+
 /* modify by zhouyanming
 1.sprite css
 2.fixed span position
