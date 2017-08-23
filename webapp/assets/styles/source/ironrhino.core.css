@@ -33,6 +33,11 @@ td.middle {
 	vertical-align: middle;
 }
 
+td.compact-horizontal {
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .table-fixed {
 	table-layout: fixed;
 }

@@ -7318,6 +7318,11 @@ td.middle {
 	vertical-align: middle;
 }
 
+td.compact-horizontal {
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .table-fixed {
 	table-layout: fixed;
 }
@@ -8422,6 +8427,7 @@ div.preview {
 }
 
 code.block {
+	display: block;
 	word-break: break-all;
 	word-wrap: break-word;
 	white-space: pre;

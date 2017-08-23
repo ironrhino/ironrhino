@@ -23,7 +23,7 @@
 	</div>
 </td></tr>
 </@classPresentConditional>
-<tr><td>请求参数</td><td>
+<tr><td>请求参数</td><td class="compact-horizontal">
 	<table class="requestParams table datagrid adaptive"><tbody>
 	<#if apiDoc.requestParams?has_content>
 	<#list apiDoc.requestParams as param>
@@ -34,7 +34,7 @@
 	</#if>
 	</tbody></table>
 </td></tr>
-<tr><td>请求头</td><td>
+<tr><td>请求头</td><td class="compact-horizontal">
 	<table class="requestHeaders table datagrid adaptive"><tbody>
 	<#if apiDoc.requestHeaders?has_content>
 	<#list apiDoc.requestHeaders as header>
@@ -57,7 +57,7 @@
 <p class="responseHeaders"></p>
 </td></tr>
 <tr><td>响应消息体</td><td>
-<code class="responseBody block" style="display:inline-block;min-width:100%;min-height:50px;"></code></td></tr>
+<code class="responseBody block" style="display:inline-block;box-sizing:border-box;min-width:100%;min-height:50px;"></code></td></tr>
 </tbody>
 </table>
 <button type="submit" class="btn btn-primary btn-block">${getText('confirm')}</button>

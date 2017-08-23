@@ -484,6 +484,7 @@ div.preview {
 }
 
 code.block {
+	display: block;
 	word-break: break-all;
 	word-wrap: break-word;
 	white-space: pre;
