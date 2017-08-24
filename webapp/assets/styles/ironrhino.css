@@ -8026,6 +8026,10 @@ div.form-horizontal .controls , .controls.text {
 	margin-bottom: 10px;
 }
 
+.form-horizontal .control-group:empty {
+	margin-bottom: 0;
+}
+
 .form-actions {
 	padding: 10px 20px 10px;
 }
