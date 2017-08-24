@@ -417,7 +417,8 @@ public class EntityClassHelper {
 							}
 						}
 						uci.setExcludeIfNotEdited(true);
-						if (BaseTreeableEntity.class.isAssignableFrom(returnType)) {
+						if (BaseTreeableEntity.class.isAssignableFrom(returnType)
+								&& uci.getType().equals(UiConfig.DEFAULT_TYPE)) {
 							if (uci.getType().equals(UiConfig.DEFAULT_TYPE))
 								uci.setType("treeselect");
 							if (StringUtils.isBlank(uci.getPickUrl())) {
