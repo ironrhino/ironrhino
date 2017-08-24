@@ -851,12 +851,6 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 			}
 			try {
-				Persistable temp = _entity;
-				_entity = getEntityClass().newInstance();
-				bw = new BeanWrapperImpl(temp);
-				bw.setConversionService(conversionService);
-				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
-				bwp.setConversionService(conversionService);
 				Set<String> editedPropertyNames = new HashSet<>();
 				for (String parameterName : ActionContext.getContext().getParameters().keySet()) {
 					String propertyName = parameterName;
@@ -872,7 +866,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						propertyName = propertyName.substring(0, propertyName.indexOf('['));
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
 					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType"))
-							&& bwp.isWritableProperty(propertyName)
+							&& bw.isWritableProperty(propertyName)
 							&& ServletActionContext.getRequest().getParameter(parameterName) == null) {
 						editedPropertyNames.add(propertyName);
 						continue;
@@ -880,20 +874,19 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					if (uiConfig == null || uiConfig.getReadonly().isValue()
 							|| fromList && uiConfig.getHiddenInList().isValue()
 							|| !fromList && uiConfig.getHiddenInInput().isValue() || Persistable.class
-									.isAssignableFrom(bwp.getPropertyDescriptor(propertyName).getPropertyType()))
+									.isAssignableFrom(bw.getPropertyDescriptor(propertyName).getPropertyType()))
 						continue;
 					if (StringUtils.isNotBlank(uiConfig.getReadonly().getExpression()) && evalBoolean(
-							uiConfig.getReadonly().getExpression(), _entity, bwp.getPropertyValue(propertyName)))
+							uiConfig.getReadonly().getExpression(), _entity, bw.getPropertyValue(propertyName)))
 						continue;
 					if (fromList) {
-						if (StringUtils.isNotBlank(uiConfig.getHiddenInList().getExpression())
-								&& evalBoolean(uiConfig.getHiddenInList().getExpression(), _entity,
-										bwp.getPropertyValue(propertyName)))
+						if (StringUtils.isNotBlank(uiConfig.getHiddenInList().getExpression()) && evalBoolean(
+								uiConfig.getHiddenInList().getExpression(), _entity, bw.getPropertyValue(propertyName)))
 							continue;
 					} else {
 						if (StringUtils.isNotBlank(uiConfig.getHiddenInInput().getExpression())
 								&& evalBoolean(uiConfig.getHiddenInInput().getExpression(), _entity,
-										bwp.getPropertyValue(propertyName)))
+										bw.getPropertyValue(propertyName)))
 							continue;
 					}
 					editedPropertyNames.add(propertyName);
@@ -902,6 +895,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					if (isAttachmentable())
 						editedPropertyNames.add("attachments");
 				}
+				_entity = getEntityClass().newInstance();
+				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
+				bwp.setConversionService(conversionService);
 				for (String name : editedPropertyNames)
 					bwp.setPropertyValue(name, bw.getPropertyValue(name));
 				bw = bwp;
@@ -1002,14 +998,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							uiConfig.getReadonly().getExpression(), persisted, bwp.getPropertyValue(propertyName)))
 						continue;
 					if (fromList) {
-						if (StringUtils.isNotBlank(uiConfig.getHiddenInList().getExpression())
-								&& evalBoolean(uiConfig.getHiddenInList().getExpression(), _entity,
-										bwp.getPropertyValue(propertyName)))
+						if (StringUtils.isNotBlank(uiConfig.getHiddenInList().getExpression()) && evalBoolean(
+								uiConfig.getHiddenInList().getExpression(), _entity, bw.getPropertyValue(propertyName)))
 							continue;
 					} else {
 						if (StringUtils.isNotBlank(uiConfig.getHiddenInInput().getExpression())
 								&& evalBoolean(uiConfig.getHiddenInInput().getExpression(), _entity,
-										bwp.getPropertyValue(propertyName)))
+										bw.getPropertyValue(propertyName)))
 							continue;
 					}
 					editedPropertyNames.add(propertyName);
