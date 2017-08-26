@@ -618,6 +618,8 @@ sed -i '/pam_limits/d' /etc/pam.d/su
 sed -i '53i session    required   pam_limits.so' /etc/pam.d/su
 sed -i '$i *               soft    nofile          65535' /etc/security/limits.conf
 sed -i '$i *               hard    nofile          65535' /etc/security/limits.conf
+sed -i '$i root            soft    nofile          65535' /etc/security/limits.conf
+sed -i '$i root            hard    nofile          65535' /etc/security/limits.conf
 reboot
 fi
 
