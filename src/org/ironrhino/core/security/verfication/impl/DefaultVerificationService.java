@@ -5,11 +5,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
+import org.ironrhino.core.security.verfication.VerficationCodeGenerator;
 import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.throttle.ThrottleService;
-import org.ironrhino.core.util.CodecUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +31,9 @@ public class DefaultVerificationService implements VerificationService {
 
 	@Autowired
 	private ThrottleService throttleService;
+
+	@Autowired
+	private VerficationCodeGenerator verficationCodeGenerator;
 
 	@Autowired(required = false)
 	private List<VerificationCodeNotifier> verificationCodeNotifiers;
@@ -54,18 +57,24 @@ public class DefaultVerificationService implements VerificationService {
 	private boolean reuse = true;
 
 	@Override
-	public void send(String receiver) throws ReceiverNotFoundException {
-		String verficationCode = (String) cacheManager.get(receiver, CACHE_NAMESPACE);
-		if (verficationCode != null && cacheManager.exists(receiver + SUFFIX_RESEND, CACHE_NAMESPACE)) {
-			logger.warn("{} is trying resend within cooldown time", receiver);
-			return;
+	public void send(String receiver, final String verficationCode) throws ReceiverNotFoundException {
+		String codeToSend;
+		if (verficationCode == null) {
+			codeToSend = (String) cacheManager.get(receiver, CACHE_NAMESPACE);
+			if (codeToSend != null && cacheManager.exists(receiver + SUFFIX_RESEND, CACHE_NAMESPACE)) {
+				logger.warn("{} is trying resend within cooldown time", receiver);
+				return;
+			}
+		} else {
+			codeToSend = verficationCode;
+			cacheManager.put(receiver, codeToSend, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 		}
-		if (verficationCode == null || !reuse) {
-			verficationCode = CodecUtils.randomDigitalString(length);
-			cacheManager.put(receiver, verficationCode, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
+		if (codeToSend == null || !reuse) {
+			codeToSend = verficationCodeGenerator.generator(receiver, length);
+			cacheManager.put(receiver, codeToSend, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 		}
 		for (VerificationCodeNotifier notifier : verificationCodeNotifiers)
-			notifier.send(receiver, verficationCode);
+			notifier.send(receiver, codeToSend);
 		cacheManager.put(receiver + SUFFIX_RESEND, "", resendInterval, TimeUnit.SECONDS, CACHE_NAMESPACE);
 	}
 
