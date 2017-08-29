@@ -262,10 +262,9 @@ public class RequestUtils {
 			return host;
 		InternetDomainName domainName = InternetDomainName.from(host);
 		if (domainName.isUnderPublicSuffix())
-			return "." + domainName.topPrivateDomain().toString();
+			return domainName.topPrivateDomain().toString();
 		String[] array = host.split("\\.");
 		StringBuilder sb = new StringBuilder();
-		sb.append('.');
 		sb.append(array[array.length - 2]);
 		sb.append('.');
 		sb.append(array[array.length - 1]);
