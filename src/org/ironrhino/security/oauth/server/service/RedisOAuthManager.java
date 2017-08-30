@@ -52,7 +52,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public Authorization grant(Client client) {
+	public Authorization grant(Client client, String deviceId, String deviceName) {
 		Client orig = findClientById(client.getClientId());
 		if (orig == null)
 			throw new IllegalArgumentException("client_id_not_exists");
@@ -66,6 +66,10 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.client_credentials);
+		if (StringUtils.isNotBlank(deviceId)) {
+			auth.setDeviceId(deviceId);
+			auth.setDeviceName(deviceName);
+		}
 		try {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {
@@ -81,7 +85,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 
 	@Override
 	protected Authorization doGrant(Client client, String grantor, String deviceId, String deviceName) {
-		if (deviceId != null) {
+		if (StringUtils.isNotBlank(deviceId)) {
 			List<Authorization> auths = findAuthorizationsByGrantor(grantor).stream()
 					.filter(a -> a.getClient().equals(client.getClientId()) && a.getDeviceId() != null)
 					.collect(Collectors.toList());
@@ -101,7 +105,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
-		if (StringUtils.isNotBlank(deviceName)) {
+		if (StringUtils.isNotBlank(deviceId)) {
 			auth.setDeviceId(deviceId);
 			auth.setDeviceName(deviceName);
 		}

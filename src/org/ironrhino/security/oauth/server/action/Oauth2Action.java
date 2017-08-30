@@ -283,10 +283,7 @@ public class Oauth2Action extends BaseAction {
 					throw new IllegalArgumentException(getText(failed.getClass().getName()));
 				}
 				UserDetails u = userDetailsService.loadUserByUsername(username);
-				if (StringUtils.isNotBlank(device_id))
-					authorization = oauthManager.grant(client, u.getUsername(), device_id, device_name);
-				else
-					authorization = oauthManager.grant(client, u.getUsername());
+				authorization = oauthManager.grant(client, u.getUsername(), device_id, device_name);
 			} catch (Exception e) {
 				logger.error("Exchange token by password for \"{}\" failed with {}: {}", username,
 						e.getClass().getName(), e.getLocalizedMessage());
@@ -312,7 +309,7 @@ public class Oauth2Action extends BaseAction {
 			client.setId(client_id);
 			client.setSecret(client_secret);
 			try {
-				authorization = oauthManager.grant(client);
+				authorization = oauthManager.grant(client, device_id, device_name);
 			} catch (Exception e) {
 				logger.error("Exchange token by client_credentials for \"{}\" failed with {}: {}", client_id,
 						e.getClass().getName(), e.getLocalizedMessage());

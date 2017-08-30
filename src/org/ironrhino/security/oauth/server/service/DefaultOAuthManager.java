@@ -37,7 +37,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	private AuthorizationManager authorizationManager;
 
 	@Override
-	public Authorization grant(Client client) {
+	public Authorization grant(Client client, String deviceId, String deviceName) {
 		Client orig = findClientById(client.getClientId());
 		if (orig == null)
 			throw new IllegalArgumentException("client_id_not_exists");
@@ -49,6 +49,10 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		auth.setClient(client.getId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.client_credentials);
+		if (StringUtils.isNotBlank(deviceId)) {
+			auth.setDeviceId(deviceId);
+			auth.setDeviceName(deviceName);
+		}
 		try {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {
@@ -60,7 +64,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 
 	@Override
 	protected Authorization doGrant(Client client, String grantor, String deviceId, String deviceName) {
-		if (deviceId != null) {
+		if (StringUtils.isNotBlank(deviceId)) {
 			DetachedCriteria dc = authorizationManager.detachedCriteria();
 			dc.add(Restrictions.eq("client", client.getClientId()));
 			dc.add(Restrictions.eq("grantor", grantor));
@@ -89,7 +93,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
-		if (StringUtils.isNotBlank(deviceName)) {
+		if (StringUtils.isNotBlank(deviceId)) {
 			auth.setDeviceId(deviceId);
 			auth.setDeviceName(deviceName);
 		}

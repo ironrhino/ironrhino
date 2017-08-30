@@ -20,11 +20,6 @@ public abstract class AbstractOAuthManager implements OAuthManager {
 	protected int maximumDevices;
 
 	@Override
-	public Authorization grant(Client client, String grantor) {
-		return grant(client, grantor, null, null);
-	}
-
-	@Override
 	public Authorization grant(Client client, String grantor, String deviceId, String deviceName) {
 		if (exclusive)
 			deleteAuthorizationsByGrantor(grantor, client.getId(), GrantType.password);

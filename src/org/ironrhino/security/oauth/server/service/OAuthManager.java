@@ -14,9 +14,15 @@ public interface OAuthManager {
 
 	int DEFAULT_EXPIRE_TIME = 14 * 24 * 3600;
 
-	public Authorization grant(Client client);
+	public default Authorization grant(Client client) {
+		return grant(client, null, null);
+	}
 
-	public Authorization grant(Client client, String grantor);
+	public Authorization grant(Client client, String deviceId, String deviceName);
+
+	public default Authorization grant(Client client, String grantor) {
+		return grant(client, grantor, null, null);
+	}
 
 	public Authorization grant(Client client, String grantor, String deviceId, String deviceName);
 
