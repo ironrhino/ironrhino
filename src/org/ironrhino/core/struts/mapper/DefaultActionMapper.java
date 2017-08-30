@@ -126,7 +126,8 @@ public class DefaultActionMapper extends AbstractActionMapper {
 
 			String location = AutoConfigResult
 					.getTemplateLocation(request.getAttribute(REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION) != null
-							? uri + DEFAULT_ACTION_NAME : uri);
+							? uri + DEFAULT_ACTION_NAME
+							: uri);
 			if (location != null) {
 				mapping = new ActionMapping();
 				mapping.setNamespace(DirectTemplateAction.NAMESPACE);
@@ -186,7 +187,8 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			} else {
 				String[] array = StringUtils.split(methodAndUid, "/", 2);
 				mapping.setMethod(array[0]);
-				uid = array[1];
+				if (array.length > 1)
+					uid = array[1];
 			}
 			if (StringUtils.isNotBlank(uid)) {
 				try {
