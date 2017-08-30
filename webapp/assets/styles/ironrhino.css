@@ -8530,6 +8530,26 @@ form.attachmentable ul.thumbnails li .remove {
 	min-height: 50px ! important;
 }
 
+.wave {
+	position: relative;
+	overflow: hidden;
+}
+
+.wave .ripple {
+	position: absolute;
+	border-radius: 50%;
+	width: 100px;
+	height: 100px;
+	margin-top: -50px;
+	margin-left: -50px;
+	opacity: 0;
+	background: radial-gradient(rgba(0, 0, 0, 0.2) 0, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.5) 60%, rgba(255, 255, 255, 0) 70%);
+	transition: all 0.5s ease-out;
+	transition-property: transform, opacity;
+	transform: scale(0) translate(0, 0);
+	pointer-events: none;
+}
+
 .toolbar > [class *= "span"] {
 	margin-top: 0;
 	margin-bottom: 0;
@@ -8960,6 +8980,10 @@ table.richtable th.checkbox , table.richtable th.radio {
 table.richtable td {
 	word-wrap: break-all;
 	white-space: pre-wrap;
+}
+
+table.richtable tfoot td {
+	white-space: nowrap;
 }
 
 .richtable th {

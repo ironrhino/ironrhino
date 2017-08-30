@@ -49,6 +49,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.upload.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.ajaxpanel.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.mask.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.wave.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.checkbox.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.sortabletable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.datagridtable.js" />
@@ -102,6 +103,7 @@
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.form.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.datagrid.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.mask.css" />
+				<file name="${webapp.dir}/assets/styles/source/ironrhino.wave.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pagination.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.editme.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.portal.css" />
