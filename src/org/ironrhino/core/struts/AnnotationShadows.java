@@ -198,10 +198,6 @@ public class AnnotationShadows {
 			return propertyType != null && Persistable.class.isAssignableFrom(propertyType);
 		}
 
-		public boolean isSingleReference() {
-			return collectionType == null && propertyType != null && Persistable.class.isAssignableFrom(propertyType);
-		}
-
 	}
 
 	@Data

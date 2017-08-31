@@ -93,7 +93,7 @@ public class Customer extends BaseRecordableEntity {
 	@SearchableComponent
 	private Set<String> tags;
 
-	@UiConfig(type = "treeselect", width = "200px", description = "activeRegions.description", pickUrl = "/common/region/children", template = "<#if value?has_content><#list value as id>${beans['regionTreeControl'].tree.getDescendantOrSelfById(id).name}<#sep> </#list></#if>")
+	@UiConfig(type = "treeselect", width = "200px", description = "activeRegions.description", pickUrl = "/common/region/children", template = "<#if value?has_content><#list value as id>${beans['regionTreeControl'].tree.getDescendantOrSelfById(id).name}<#sep>, </#list></#if>")
 	private Long[] activeRegions;
 
 	@SearchableComponent(nestSearchableProperties = "name")

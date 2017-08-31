@@ -5,9 +5,7 @@
 </head>
 <body>
 	<div id="${entityName}_view" class="view form-horizontal groupable"<#if richtableConfig.viewGridColumns gt 0> data-columns="${richtableConfig.viewGridColumns}"</#if>>
-	<#list uiConfigs.entrySet() as entry>
-		<#assign key=entry.key>
-		<#assign config=entry.value>
+	<#list uiConfigs as key,config>
 		<#assign value=entity[key]!>
 		<#assign hidden=config.hiddenInView.value>
 		<#if !hidden && config.hiddenInView.expression?has_content>
@@ -23,21 +21,20 @@
 		<#assign description=getText(config.description)>
 		<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key)/>
 		<#if config.type=='embedded'&&config.embeddedUiConfigs??>
-				<#list config.embeddedUiConfigs.entrySet() as entry>
-				<#assign config=entry.value>
-				<#assign value=(entity[key][entry.key])!>
+				<#list config.embeddedUiConfigs as key2,config>
+				<#assign value=(entity[key][key2])!>
 				<#assign hidden=config.hiddenInView.value>
 				<#if !hidden && config.hiddenInView.expression?has_content>
 					<#assign hidden=config.hiddenInView.expression?eval>
 				</#if>
 				<#if !hidden>
-				<#assign label=entry.key>
+				<#assign label=key2>
 				<#if config.alias?has_content>
 					<#assign label=config.alias>
 				</#if>
 				<#assign label=getText(label)>
 				<#assign description=getText(config.description)>
-				<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key+'-'+entry.key)/>
+				<#assign id=(config.id?has_content)?then(config.id,entityName+'-'+key+'-'+key2)/>
 				<@controlGroup id=id group=group/>
 					<@controlLabel label=label description=description/>
 					<div class="controls">
@@ -162,21 +159,20 @@
 					<table class="table table-bordered table-fixed middle ${config.cssClass}">
 					<thead>
 						<tr>
-							<#list embeddedUiConfigs.entrySet() as entry>
-							<#assign config=entry.value>
+							<#list embeddedUiConfigs as key2,config>
 							<#assign cssClass=config.cssClass?replace('input-[^ ]+', '', 'r')>
 							<#assign hidden=config.hiddenInView.value>
 							<#if !hidden && config.hiddenInView.expression?has_content>
 								<#assign hidden=config.hiddenInView.expression?eval>
 							</#if>
 							<#if !hidden>
-							<#assign label2=entry.key>
+							<#assign label2=key2>
 							<#if config.alias?has_content>
 								<#assign label2=config.alias>
 							</#if>
 							<#assign label2=getText(label2)>
 							<#assign description2=getText(config.description)>
-							<th<#if entry.value.width?has_content> style="width:${entry.value.width};"</#if>>${label2}<#if description2?has_content> <span data-content="${description2}" class="poped glyphicon glyphicon-question-sign"></span></#if></th>
+							<th<#if config.width?has_content> style="width:${config.width};"</#if>>${label2}<#if description2?has_content> <span data-content="${description2}" class="poped glyphicon glyphicon-question-sign"></span></#if></th>
 							</#if>
 							</#list>
 						</tr>
@@ -188,10 +184,9 @@
 					<#list collections as element>
 						<#if element?has_content>
 						<tr>
-							<#list embeddedUiConfigs.entrySet() as entry>
-							<#assign config = entry.value>
+							<#list embeddedUiConfigs as key2,config>
 							<#assign cssClass=config.cssClass?replace('input-[^ ]+', '', 'r')>
-							<#assign value=element[entry.key]!>
+							<#assign value=element[key2]!>
 							<#assign hidden=config.hiddenInView.value>
 							<#if !hidden && config.hiddenInView.expression?has_content>
 								<#assign hidden=config.hiddenInView.expression?eval>

@@ -344,7 +344,7 @@ ${formFooter!}
 					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#if value.listOptions?starts_with('{')><#list options as key,value>${key}=${value}<#sep>,</#list><#elseif value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					<#elseif value.type='listpick'||value.type='treeselect'>
 					<#local pickUrl><@value.pickUrl?interpret/></#local>
-					<option value="${key+value.singleReference?then('.id','')}" data-type="${value.type}" data-pickurl="<@url value=pickUrl/>" data-operators="<#if value.multiple&&value.reference>CONTAINS<#else>${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}</#if>">${getText(label)}</option>
+					<option value="${key}" data-type="${value.type}" data-pickurl="<@url value=pickUrl/>" data-operators="<#if value.multiple&&value.reference>CONTAINS<#else>${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}</#if>">${getText(label)}</option>
 					<#else>
 					<option value="${key}" data-class="${value.cssClass}" data-inputtype="${value.inputType}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.propertyType)?join(',')}">${getText(label)}</option>
 					</#if>
@@ -479,8 +479,7 @@ ${formFooter!}
 			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif (config.type=='listpick' || config.type=='treeselect') && !disabled>
 			<div id="control-group-${id}" class="control-group ${config.type}" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
-				<#local _name=key+"${config.singleReference?then('.id','')}">
-				<@s.hidden id=id name=_name class=config.type+"-id ${cssClass}" dynamicAttributes=dynamicAttributes/>
+				<@s.hidden id=id name=key class=config.type+"-id ${cssClass}" dynamicAttributes=dynamicAttributes/>
 				<@controlLabel label=label description=description/>
 				<div class="controls">
 				<span class="${config.type}-name"></span>
