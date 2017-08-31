@@ -38839,7 +38839,12 @@ Observation.attachmentableform = function(container) {
 	}
 
 	transform = function(container, columns) {
-		container.children('input[type="hidden"]').prependTo(container);
+		if (container.is('form')) {
+			var con = container.children('fieldset');
+			if (!con.length)
+				con = container;
+			con.children('input[type="hidden"]').prependTo(con);
+		}
 		var rowclass = container.parents('.container-fluid').length
 				|| container.parents('.ui-dialog-content')
 				&& $('#content.container-fluid').length ? 'row-fluid' : 'row';
