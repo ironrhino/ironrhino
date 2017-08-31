@@ -160,7 +160,7 @@ public class UserAction extends EntityAction<User> {
 		userManager.save(user);
 		int currentVersion = user.getVersion();
 		if (currentVersion != previousVersion)
-			ServletActionContext.getResponse().setIntHeader("X-Postback-user.version", currentVersion);
+			ServletActionContext.getResponse().addHeader("X-Postback", "user.version=" + currentVersion);
 		notify("save.success");
 		return SUCCESS;
 	}

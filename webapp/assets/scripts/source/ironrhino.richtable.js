@@ -439,12 +439,19 @@ Richtable = {
 								onsuccess : function(data, xhr) {
 									$('td', row).removeClass('edited')
 											.removeData('oldvalue');
-									var ver = xhr
-											.getResponseHeader('X-Postback-'
-													+ versionParamName);
-									if (ver)
-										$(row).attr('data-version', ver).data(
-												'version', ver);
+									var postback = xhr
+											.getResponseHeader('X-Postback');
+									if (postback)
+										$.each(postback.split(', '), function(
+														i, v) {
+													var pair = v.split('=', 2);
+													if (pair[0] == versionParamName)
+														$(row).attr(
+																'data-version',
+																pair[1]).data(
+																'version',
+																pair[1]);
+												});
 									$('[data-action="save"]', form)
 											.removeClass('btn-primary').hide();
 									setTimeout(function() {

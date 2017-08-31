@@ -743,8 +743,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (versionPropertyName != null) {
 			int currentVersion = (Integer) bwp.getPropertyValue(versionPropertyName);
 			if (currentVersion != previousVersion)
-				ServletActionContext.getResponse()
-						.setIntHeader("X-Postback-" + getEntityName() + "." + versionPropertyName, currentVersion);
+				ServletActionContext.getResponse().addHeader("X-Postback",
+						getEntityName() + "." + versionPropertyName + "=" + currentVersion);
 		}
 		notify("save.success");
 		return SUCCESS;

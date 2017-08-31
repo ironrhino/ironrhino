@@ -32990,18 +32990,13 @@ Observation.common = function(container) {
 					Ajax.fire(target, 'onerror');
 				},
 				success : function(data, textStatus, xhr) {
-					var headers = xhr.getAllResponseHeaders().split('\n');
-					$.each(headers, function(i, v) {
-								var name = v.split(':')[0];
-								if (name.indexOf('X-Postback') == 0) {
-									$(
-											'[name="'
-													+ name.substring(name
-															.lastIndexOf('-')
-															+ 1) + '"]', target)
-											.val(xhr.getResponseHeader(name));
-								}
-							});
+					var postback = xhr.getResponseHeader('X-Postback');
+					if (postback)
+						$.each(postback.split(', '), function(i, v) {
+									var pair = v.split('=', 2);
+									$('[name="' + pair[0] + '"]', target)
+											.val(pair[1]);
+								});
 					Ajax.handleResponse(data, _opt, xhr);
 				},
 				complete : function() {
@@ -37682,12 +37677,19 @@ Richtable = {
 								onsuccess : function(data, xhr) {
 									$('td', row).removeClass('edited')
 											.removeData('oldvalue');
-									var ver = xhr
-											.getResponseHeader('X-Postback-'
-													+ versionParamName);
-									if (ver)
-										$(row).attr('data-version', ver).data(
-												'version', ver);
+									var postback = xhr
+											.getResponseHeader('X-Postback');
+									if (postback)
+										$.each(postback.split(', '), function(
+														i, v) {
+													var pair = v.split('=', 2);
+													if (pair[0] == versionParamName)
+														$(row).attr(
+																'data-version',
+																pair[1]).data(
+																'version',
+																pair[1]);
+												});
 									$('[data-action="save"]', form)
 											.removeClass('btn-primary').hide();
 									setTimeout(function() {

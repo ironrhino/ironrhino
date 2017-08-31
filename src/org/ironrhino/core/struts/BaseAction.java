@@ -400,7 +400,7 @@ public class BaseAction extends ActionSupport {
 			if (csrfRequired) {
 				csrf = CodecUtils.nextId();
 				RequestUtils.saveCookie(request, response, COOKIE_NAME_CSRF, csrf, false, true);
-				response.addHeader("X-Postback-csrf", csrf);
+				response.addHeader("X-Postback", "csrf=" + csrf);
 			}
 		} else if (!isUseJson() && hasFieldErrors()) {
 			StringBuilder sb = new StringBuilder();
