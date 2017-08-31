@@ -424,8 +424,13 @@ ${formFooter!}
 	<#return dynamicAttributes>
 </#function>
 
-<#macro controlGroup id="" group="">
+<#macro controlGroup label description for="" id="" group="">
 <div<#if id?has_content> id="control-group-${id}"</#if> class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+	<@controlLabel label=label description=description for=for/>
+	<div class="controls">
+	<#nested>
+	</div>
+</div>
 </#macro>
 
 <#macro controlLabel label description for="">
@@ -486,12 +491,9 @@ ${formFooter!}
 				</div>
 			</div>
 		<#elseif config.type=='dictionary' && selectDictionary??>
-			<@controlGroup id=id group=group/>
-			<@controlLabel label=label description=description for=id/>
-			<div class="controls">
+			<@controlGroup id=id group=group label=label description=description for=id>
 				<@selectDictionary disabled=disabled id=id dictionaryName=templateName name=key value=(Parameters[key]!) class=cssClass dynamicAttributes=dynamicAttributes/>
-			</div>
-			</div>
+			</@controlGroup>
 		<#elseif config.type=='input'>
 			<#if !disabled && config.queryWithRange><#local cssClass+=' not-ignore-blank'/></#if>
 			<@s.textfield disabled=disabled id=id label=label name=key value=(Parameters[key]!) type=config.inputType class=cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes>

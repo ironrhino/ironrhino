@@ -1,11 +1,13 @@
 <#ftl output_format='HTML'>
-<#macro renderField key config nestedKey="">
+<#macro renderControlGroup key config nestedKey='' nestedConfig={}>
+	<#local group=getText(config.group)>
 	<#if nestedKey==''>
 		<#local id=(config.id?has_content)?then(config.id,entityName+'-'+key)/>
 		<#local label=(config.alias?has_content)?then(config.alias,key)/><#local label=getText(label)>
 		<#local name=entityName+'.'+key>
 		<#local value=(entity[key])!>
 	<#else>
+		<#local config=nestedConfig>
 		<#local id=(config.id?has_content)?then(config.id,entityName+'-'+key+'-'+nestedKey)/>
 		<#local label=(config.alias?has_content)?then(config.alias,nestedKey)/><#local label=getText(label)>
 		<#local name=entityName+'.'+key+'.'+nestedKey>
@@ -32,12 +34,9 @@
 			<#if config.inputTemplate?index_of('<div class="control-group') gt -1>
 			<@config.inputTemplate?interpret/>
 			<#else>
-			<@controlGroup id=id group=group/>
-				<@controlLabel label=label description=description/>
-				<div class="controls">
+			<@controlGroup id=id group=group label=label description=description>
 				<@config.inputTemplate?interpret/>
-				</div>
-			</div>
+			</@controlGroup>
 			</#if>
 		<#elseif config.type=='textarea'>
 			<@s.textarea id=id label=label name=name class=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
@@ -59,9 +58,7 @@
 			<#if readonly><@s.hidden name=name/></#if>
 			<@s.select disabled=readonly id=id label=label name=name class=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='dictionary'&&selectDictionary??>
-			<@controlGroup id=id group=group/>
-			<@controlLabel label=label description=description for=id/>
-			<div class="controls">
+			<@controlGroup id=id group=group label=label description=description for=id>
 				<#if !config.multiple>
 					<#if readonly><@s.hidden name=name/></#if>
 					<@selectDictionary disabled=readonly id=id dictionaryName=templateName name=name required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
@@ -69,8 +66,7 @@
 					<#if readonly><#if value?has_content><#list value as en><@s.hidden id="" name=name value=en.name()/></#list></#if></#if>
 					<@checkDictionary disabled=readonly id=id dictionaryName=templateName name=name class=config.cssClass dynamicAttributes=dynamicAttributes/>
 				</#if>
-			</div>
-			</div>
+			</@controlGroup>
 		<#elseif config.type=='listpick'||config.type=='treeselect'>
 			<div id="control-group-${id}" class="control-group <#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
 				<#if config.multiple&&value?has_content&&value?is_enumerable>
@@ -85,9 +81,7 @@
 				</div>
 			</div>
 		<#elseif config.type=='attributes'>
-			<@controlGroup id=id group=group/>
-			<@controlLabel label=label description=description/>
-			<div class="controls">
+			<@controlGroup id=id group=group label=label description=description>
 			<table class="datagrid adaptive table table-condensed nullable">
 				<thead>
 					<tr>
@@ -108,8 +102,7 @@
 					</#list>
 				</tbody>
 			</table>
-			</div>
-			</div>	
+			</@controlGroup>	
 		<#elseif config.type=='schema'>
 			<#if editAttributes??>
 				<div id="editAttributes"<#if group?has_content> data-group="${group}"</#if>>
@@ -118,126 +111,117 @@
 			</#if>
 		<#elseif config.type=='imageupload'>
 			<#if !readonly>
-				<@controlGroup id=id group=group/>
+				<@controlGroup id=id group=group label=label description=description for="${id}-upload-button">
 					<@s.hidden id=id name=name class=config.cssClass+" nocheck" maxlength=(config.maxlength gt 0)?then(config.maxlength,'') dynamicAttributes=dynamicAttributes/>
-					<@controlLabel label=label description=description for="${id}-upload-button"/>
-					<div class="controls">
-						<div style="margin-bottom:5px;">
-						<button id="${id}-upload-button" class="btn concatimage" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${getText('upload')}</button>
-						<#if config.cssClasses?seq_contains('concatsnapshot')>
-						<button class="btn concatsnapshot" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${getText('snapshot')}</button>
-						</#if>
-						</div>
-						<div id="${id}-image" style="text-align:center;min-height:100px;border:1px solid #ccc;">
-							<#if value?has_content><img src="${value}" title="${getText('drag.image.file')}"/><#else>${getText('drag.image.file')}</#if>
-						</div>
+					<div style="margin-bottom:5px;">
+					<button id="${id}-upload-button" class="btn concatimage" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${getText('upload')}</button>
+					<#if config.cssClasses?seq_contains('concatsnapshot')>
+					<button class="btn concatsnapshot" type="button" data-target="${id}-image" data-field="${id}" data-maximum="1">${getText('snapshot')}</button>
+					</#if>
 					</div>
-				</div>
+					<div id="${id}-image" style="text-align:center;min-height:100px;border:1px solid #ccc;">
+						<#if value?has_content><img src="${value}" title="${getText('drag.image.file')}"/><#else>${getText('drag.image.file')}</#if>
+					</div>
+				</@controlGroup>
 			<#else>
-				<@controlGroup id=id group=group/>
+				<@controlGroup id=id group=group label=label description=description>
 					<@s.hidden id=id name=name class=config.cssClass+" nocheck" maxlength=(config.maxlength gt 0)?then(config.maxlength,'') dynamicAttributes=dynamicAttributes/>
-					<@controlLabel label=label description=description/>
-					<div class="controls">
-						<span>
-						<#if value?has_content><img src="${value}" title="${getText('drag.image.file')}"/></#if>
-						</span>
-					</div>
-				</div>
+					<span>
+					<#if value?has_content><img src="${value}" title="${getText('drag.image.file')}"/></#if>
+					</span>
+				</@controlGroup>
 			</#if>
-		<#elseif config.type=='embedded'&&config.embeddedUiConfigs??>
-			<#list config.embeddedUiConfigs as nestedKey,config>
-				<@renderField key=key nestedKey=nestedKey config=config/>
+		<#elseif config.type=='embedded'&&config.embeddedUiConfigs??&&nestedKey==''>
+			<#list config.embeddedUiConfigs as nestedKey,nestedConfig>
+				<@renderControlGroup key=key config=config nestedKey=nestedKey nestedConfig=nestedConfig/>
 			</#list>
 		<#elseif config.type=='collection'&&config.embeddedUiConfigs??>
-			<@controlGroup id=id group=group/>
+			<@controlGroup id=id group=group label=label description=description>
 				<input type="hidden" name="__datagrid_${entityName}.${key}"/>
-				<@controlLabel label=label description=description/>
-				<div class="controls">
-					<table class="table table-bordered table-fixed middle datagrid adaptive ${config.cssClass}">
-					<thead>
-						<tr>
-							<#list config.embeddedUiConfigs as nestedKey,config>
-							<#local hidden=config.hiddenInInput.value>
-							<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
-							<#if !hidden>
-							<#local label=(config.alias?has_content)?then(config.alias,nestedKey)><#local label=getText(label)>
-							<#local description=getText(config.description)>
-							<th<#if config.width?has_content> style="width:${config.width};"</#if>>${label}<#if description?has_content> <span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span></#if></th>
-							</#if>
-							</#list>
-							<th class="manipulate"></th>
-						</tr>
-					</thead>
-					<tbody>
-					<#list 0..((value?is_collection&&value?size gt 0)?then(value?size-1,0)) as index>
-						<tr>
-							<#list config.embeddedUiConfigs as nestedKey,config>
-							<#local hidden=config.hiddenInInput.value>
-							<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
-							<#if !hidden>
-							<td>
-							<#local name=entityName+'.'+key+'['+index+'].'+nestedKey>
-							<#local value=(entity[key][index][nestedKey])!>
-							<#local readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
-							<#local templateName><@config.templateName?interpret/></#local><#local templateName=templateName?markup_string/>
-							<#local pickUrl><@config.pickUrl?interpret/></#local><#local pickUrl=pickUrl?markup_string/>
-							<#local dynamicAttributes=mergeDynAttrs(config)/>
-							<#if config.inputTemplate?has_content>
-								<@config.inputTemplate?interpret/>
-							<#elseif config.type=='textarea'>
-								<@s.textarea readonly=readonly id="" theme="simple" name=name class=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
-							<#elseif config.type=='checkbox'>
-								<@s.checkbox readonly=readonly id="" theme="simple" name=name class=config.cssClass+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes/>
-							<#elseif config.type=='enum'>
-								<#if !config.multiple>
-									<#if readonly><@s.hidden name=name value="${(value.name())!}"/></#if>
-									<@s.select disabled=readonly id="" theme="simple" name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
-								<#else>
-									<#if readonly><#if value?has_content><#list value as en><@s.hidden id="" name=name value=en.name()/></#list></#if></#if>
-									<@s.checkboxlist disabled=readonly id="" theme="simple" name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
-								</#if>
-							<#elseif config.type=='select'>
-								<#if readonly><@s.hidden name=name/></#if>
-								<@s.select disabled=readonly id="" theme="simple" name=name class=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
-							<#elseif config.type=='multiselect'>
-								<#if readonly><@s.hidden name=name/></#if>
-								<@s.select disabled=readonly id="" theme="simple" name=name class=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
-							<#elseif config.type=='dictionary'&&selectDictionary??>
-								<#if !config.multiple>
-									<#if readonly><@s.hidden name=name/></#if>
-									<@selectDictionary disabled=readonly id="" dictionaryName=templateName name=name required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
-								<#else>
-									<#if readonly><#if value?has_content><#list value as en><@s.hidden id="" name=name value=en.name()/></#list></#if></#if>
-									<@checkDictionary disabled=readonly id="" dictionaryName=templateName name=name required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
-								</#if>
-							<#elseif config.type=='listpick'||config.type=='treeselect'>
-									<div class="<#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}">
-									<#if config.multiple&&value?has_content&&value?is_enumerable>
-										<#local arr=[]><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list>
-										<@s.hidden name=name value=arr?join(',') class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
-									<#else>
-										<@s.hidden name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
-									</#if>
-									<span class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></span>
-									</div>
+				<table class="table table-bordered table-fixed middle datagrid adaptive ${config.cssClass}">
+				<thead>
+					<tr>
+						<#list config.embeddedUiConfigs as nestedKey,config>
+						<#local hidden=config.hiddenInInput.value>
+						<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
+						<#if !hidden>
+						<#local label=(config.alias?has_content)?then(config.alias,nestedKey)><#local label=getText(label)>
+						<#local description=getText(config.description)>
+						<th<#if config.width?has_content> style="width:${config.width};"</#if>>${label}<#if description?has_content> <span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span></#if></th>
+						</#if>
+						</#list>
+						<th class="manipulate"></th>
+					</tr>
+				</thead>
+				<tbody>
+				<#list 0..((value?is_collection&&value?size gt 0)?then(value?size-1,0)) as index>
+					<tr>
+						<#list config.embeddedUiConfigs as nestedKey,config>
+						<#local hidden=config.hiddenInInput.value>
+						<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
+						<#if !hidden>
+						<td>
+						<#local name=entityName+'.'+key+'['+index+'].'+nestedKey>
+						<#local value=(entity[key][index][nestedKey])!>
+						<#local readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
+						<#local templateName><@config.templateName?interpret/></#local><#local templateName=templateName?markup_string/>
+						<#local pickUrl><@config.pickUrl?interpret/></#local><#local pickUrl=pickUrl?markup_string/>
+						<#local dynamicAttributes=mergeDynAttrs(config)/>
+						<#if config.inputTemplate?has_content>
+							<@config.inputTemplate?interpret/>
+						<#elseif config.type=='textarea'>
+							<@s.textarea readonly=readonly id="" theme="simple" name=name class=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
+						<#elseif config.type=='checkbox'>
+							<@s.checkbox readonly=readonly id="" theme="simple" name=name class=config.cssClass+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes/>
+						<#elseif config.type=='enum'>
+							<#if !config.multiple>
+								<#if readonly><@s.hidden name=name value="${(value.name())!}"/></#if>
+								<@s.select disabled=readonly id="" theme="simple" name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 							<#else>
-								<#if value?is_date_like>
-									<#if config.cssClass?contains('datetime')><#local value=value?datetime/><#elseif config.cssClass?contains('time')><#local value=value?time/><#else><#local value=value?date/></#if>
-									<@s.textfield id="" theme="simple" name=name type=config.inputType value=value?string class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
+								<#if readonly><#if value?has_content><#list value as en><@s.hidden id="" name=name value=en.name()/></#list></#if></#if>
+								<@s.checkboxlist disabled=readonly id="" theme="simple" name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+							</#if>
+						<#elseif config.type=='select'>
+							<#if readonly><@s.hidden name=name/></#if>
+							<@s.select disabled=readonly id="" theme="simple" name=name class=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+						<#elseif config.type=='multiselect'>
+							<#if readonly><@s.hidden name=name/></#if>
+							<@s.select disabled=readonly id="" theme="simple" name=name class=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
+						<#elseif config.type=='dictionary'&&selectDictionary??>
+							<#if !config.multiple>
+								<#if readonly><@s.hidden name=name/></#if>
+								<@selectDictionary disabled=readonly id="" dictionaryName=templateName name=name required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
+							<#else>
+								<#if readonly><#if value?has_content><#list value as en><@s.hidden id="" name=name value=en.name()/></#list></#if></#if>
+								<@checkDictionary disabled=readonly id="" dictionaryName=templateName name=name required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
+							</#if>
+						<#elseif config.type=='listpick'||config.type=='treeselect'>
+								<div class="<#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}">
+								<#if config.multiple&&value?has_content&&value?is_enumerable>
+									<#local arr=[]><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list>
+									<@s.hidden name=name value=arr?join(',') class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 								<#else>
-									<@s.textfield id="" theme="simple" name=name type=config.inputType class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
+									<@s.hidden name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 								</#if>
+								<span class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></span>
+								</div>
+						<#else>
+							<#if value?is_date_like>
+								<#if config.cssClass?contains('datetime')><#local value=value?datetime/><#elseif config.cssClass?contains('time')><#local value=value?time/><#else><#local value=value?date/></#if>
+								<@s.textfield id="" theme="simple" name=name type=config.inputType value=value?string class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
+							<#else>
+								<@s.textfield id="" theme="simple" name=name type=config.inputType class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
 							</#if>
-							</td>
-							</#if>
-							</#list>
-							<td class="manipulate"></td>
-						</tr>
-					</#list>
-					</tbody>
-					</table>
-				</div>
-			</div>				
+						</#if>
+						</td>
+						</#if>
+						</#list>
+						<td class="manipulate"></td>
+					</tr>
+				</#list>
+				</tbody>
+				</table>
+			</@controlGroup>	
 		<#else>
 			<#if value?is_date_like>
 				<#if config.cssClass?contains('datetime')><#local value=value?datetime/><#elseif config.cssClass?contains('time')><#local value=value?time/><#else><#local value=value?date/></#if>
@@ -270,7 +254,7 @@
 	</#if>
 	<#if versionPropertyName??><@s.hidden name=entityName+'.'+versionPropertyName class="version"/></#if>
 	<#list uiConfigs as key,config>
-		<@renderField key=key config=config/>
+		<@renderControlGroup key=key config=config/>
 	</#list>
 	<@s.submit label=getText('save') class="btn-primary"/>
 </@s.form>
