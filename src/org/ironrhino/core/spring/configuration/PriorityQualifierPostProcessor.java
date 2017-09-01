@@ -1,5 +1,8 @@
 package org.ironrhino.core.spring.configuration;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -17,6 +20,8 @@ public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFa
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private BeanFactory beanFactory;
+
+	private Map<String, Boolean> logged = new ConcurrentHashMap<>();
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -37,8 +42,11 @@ public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFa
 					}
 					if (typeMatched) {
 						field.set(bean, beanFactory.getBean(name));
-						logger.info("Injected @PrioritizedQualifier(\"{}\") for field[{}] of bean[{}]", name,
-								field.getName(), beanName);
+						if (logged.putIfAbsent(beanName + "." + field.getName(), true) == null) {
+							// remove duplicated log for prototype bean
+							logger.info("Injected @PrioritizedQualifier(\"{}\") for field[{}] of bean[{}]", name,
+									field.getName(), beanName);
+						}
 						break;
 					} else {
 						logger.warn("Ignored @PrioritizedQualifier(\"{}\") for {} because it is not type of {}, ", name,
