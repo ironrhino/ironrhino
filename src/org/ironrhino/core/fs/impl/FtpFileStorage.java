@@ -22,6 +22,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
@@ -105,7 +106,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 			@Override
 			public FTPClient create() throws Exception {
-				FTPClient ftpClient = new FTPClient();
+				FTPClient ftpClient = uri.getScheme().equals("ftps") ? new FTPSClient() : new FTPClient();
 				ftpClient.setControlEncoding(controlEncoding);
 				ftpClient.connect(uri.getHost(), uri.getPort() > 0 ? uri.getPort() : ftpClient.getDefaultPort());
 				if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
