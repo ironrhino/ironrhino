@@ -52,10 +52,10 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jericho-html-3.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jsoup-1.10.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/kafka-clients-0.10.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-api-2.8.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-core-2.8.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-jcl-2.8.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-slf4j-impl-2.8.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-api-2.9.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-core-2.9.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-jcl-2.9.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-slf4j-impl-2.9.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongo-java-driver-2.13.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.2.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-5.1.42.jar"/>
@@ -65,7 +65,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.12.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.16.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.7.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-4.3.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-core-3.0.7.jar"/>

@@ -1,6 +1,7 @@
 
 package org.ironrhino.core.log4j;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,6 +64,14 @@ public class SimpleMergeStrategy extends DefaultMergeStrategy {
 						Node loggerNode = new Node(targetChildNode, node.getName(), node.getType());
 						loggerNode.getAttributes().putAll(node.getAttributes());
 						loggerNode.getChildren().addAll(node.getChildren());
+						Iterator<Node> it = targetChildNode.getChildren().iterator();
+						while (it.hasNext()) {
+							Node n = it.next();
+							if (n.getName().equals(node.getName())) {
+								it.remove();
+								break;
+							}
+						}
 						targetChildNode.getChildren().add(loggerNode);
 					}
 					isMerged = true;

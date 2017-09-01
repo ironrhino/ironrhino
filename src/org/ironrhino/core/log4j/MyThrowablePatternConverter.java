@@ -1,6 +1,7 @@
 package org.ironrhino.core.log4j;
 
 import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.PatternConverter;
@@ -10,8 +11,8 @@ import org.apache.logging.log4j.core.pattern.ThrowablePatternConverter;
 @ConverterKeys({ "th" })
 public class MyThrowablePatternConverter extends ThrowablePatternConverter {
 
-	protected MyThrowablePatternConverter(String name, String style, String[] options) {
-		super(name, style, options);
+	protected MyThrowablePatternConverter(String name, String style, String[] options, Configuration config) {
+		super(name, style, options, config);
 	}
 
 	@Override
@@ -24,8 +25,8 @@ public class MyThrowablePatternConverter extends ThrowablePatternConverter {
 			buffer.append('\n');
 	}
 
-	public static MyThrowablePatternConverter newInstance(final String[] options) {
-		return new MyThrowablePatternConverter("Throwable", "throwable", options);
+	public static MyThrowablePatternConverter newInstance(Configuration config, String[] options) {
+		return new MyThrowablePatternConverter("Throwable", "throwable", options, config);
 	}
 
 }

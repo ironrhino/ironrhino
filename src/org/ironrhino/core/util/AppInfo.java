@@ -353,16 +353,15 @@ public class AppInfo {
 		}
 
 		// configure log4j2
-		StringBuilder configurationFiles = new StringBuilder("classpath:log4j2.xml");
-		if (AppInfo.class.getClassLoader().getResource("log4j2-app.xml") != null) {
-			configurationFiles.append(",classpath:log4j2-app.xml");
+		StringBuilder sb = new StringBuilder("classpath:log4j2.xml");
+		for (String file : new String[] { "log4j2." + AppInfo.getStage().name() + ".xml", "log4j2-app.xml",
+				"log4j2-app." + AppInfo.getStage().name() + ".xml" })
+			if (AppInfo.class.getClassLoader().getResource(file) != null)
+				sb.append(",classpath:" + file);
+		String configurationFile = sb.toString();
+		System.setProperty("log4j.configurationFile", configurationFile);
+		if (configurationFile.indexOf(',') > 0)
 			System.setProperty("log4j.mergeStrategy", SimpleMergeStrategy.class.getName());
-		}
-		if (AppInfo.class.getClassLoader().getResource("log4j2." + AppInfo.getStage().name() + ".xml") != null) {
-			configurationFiles.append(",classpath:log4j2." + AppInfo.getStage().name() + ".xml");
-			System.setProperty("log4j.mergeStrategy", SimpleMergeStrategy.class.getName());
-		}
-		System.setProperty("log4j.configurationFile", configurationFiles.toString());
 		System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
 		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
 			System.setProperty("AsyncLogger.RingBufferSize", "16384");
