@@ -230,20 +230,18 @@ function deleteFiles(file) {
 }
 function uploadFiles(files, filenames) {
 	if (files && files.length) {
-		var data = {
-			folder : $('#upload_form [name="folder"]').val(),
-			autorename : $('#upload_form [name="autorename"]').is(':checked')
-		};
+		var data = {};
 		if (filenames && filenames.length)
 			data.filename = filenames;
+		var f = $('#upload_form');
+		$.each($.formToArray(f[0]), function() {
+					data[this.name] = this.value;
+				});
 		return $.ajaxupload(files, ajaxOptions({
-							url : $('#upload_form').prop('action'),
-							name : $('#upload_form input[type="file"]')
-									.attr('name'),
+							url : f.prop('action'),
+							name : f.find('input[type="file"]').attr('name'),
 							data : data,
-							success : function() {
-								$('#files button.reload').trigger('click');
-							}
+							replacement : 'files'
 						}));
 	}
 }

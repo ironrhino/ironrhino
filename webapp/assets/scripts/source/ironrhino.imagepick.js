@@ -7,7 +7,7 @@
 					.addClass('poped')
 					.wrap('<div class="input-append listpick" data-options="{\'url\':\''
 							+ CONTEXT_PATH
-							+ '/common/upload/pick\',\'width\':400}"/>')
+							+ '/common/upload/pick\',\'width\':500}"/>')
 					.parent()
 					.append('<span class="add-on listpick-handle"><i class="glyphicon glyphicon-th-list"></i></span>');
 			if (t.val())

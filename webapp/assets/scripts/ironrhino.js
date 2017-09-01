@@ -33488,7 +33488,7 @@ DateUtils = {
 			traditional = $.ajaxSettings.traditional;
 		}
 
-		var a = formToArray(this[0]);
+		var a = $.formToArray(this[0]);
 
 		// give pre-submit callback an opportunity to abort the submit
 		if (options.beforeSubmit
@@ -33543,7 +33543,7 @@ DateUtils = {
 
 	};
 
-	formToArray = function(form) {
+	$.formToArray = function(form) {
 		var a = [];
 		var els = form.elements;
 		for (var i = 0; i < els.length; i++) {
@@ -35691,20 +35691,18 @@ function deleteFiles(file) {
 }
 function uploadFiles(files, filenames) {
 	if (files && files.length) {
-		var data = {
-			folder : $('#upload_form [name="folder"]').val(),
-			autorename : $('#upload_form [name="autorename"]').is(':checked')
-		};
+		var data = {};
 		if (filenames && filenames.length)
 			data.filename = filenames;
+		var f = $('#upload_form');
+		$.each($.formToArray(f[0]), function() {
+					data[this.name] = this.value;
+				});
 		return $.ajaxupload(files, ajaxOptions({
-							url : $('#upload_form').prop('action'),
-							name : $('#upload_form input[type="file"]')
-									.attr('name'),
+							url : f.prop('action'),
+							name : f.find('input[type="file"]').attr('name'),
 							data : data,
-							success : function() {
-								$('#files button.reload').trigger('click');
-							}
+							replacement : 'files'
 						}));
 	}
 }
@@ -39721,7 +39719,7 @@ Observation.listpick = function(container) {
 					.addClass('poped')
 					.wrap('<div class="input-append listpick" data-options="{\'url\':\''
 							+ CONTEXT_PATH
-							+ '/common/upload/pick\',\'width\':400}"/>')
+							+ '/common/upload/pick\',\'width\':500}"/>')
 					.parent()
 					.append('<span class="add-on listpick-handle"><i class="glyphicon glyphicon-th-list"></i></span>');
 			if (t.val())

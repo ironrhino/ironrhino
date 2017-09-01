@@ -30,7 +30,7 @@
 			traditional = $.ajaxSettings.traditional;
 		}
 
-		var a = formToArray(this[0]);
+		var a = $.formToArray(this[0]);
 
 		// give pre-submit callback an opportunity to abort the submit
 		if (options.beforeSubmit
@@ -85,7 +85,7 @@
 
 	};
 
-	formToArray = function(form) {
+	$.formToArray = function(form) {
 		var a = [];
 		var els = form.elements;
 		for (var i = 0; i < els.length; i++) {
