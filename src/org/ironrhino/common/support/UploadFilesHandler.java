@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.ironrhino.common.action.UploadAction;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.servlet.AccessHandler;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 public class UploadFilesHandler extends AccessHandler {
 
 	@Autowired
+	@PriorityQualifier("uploadFileStorage")
 	private FileStorage fileStorage;
 
 	@Autowired

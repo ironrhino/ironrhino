@@ -22,7 +22,6 @@ import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
-@Primary
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = { CLOUD, CLUSTER })
 public class MongoFileStorage extends AbstractFileStorage {

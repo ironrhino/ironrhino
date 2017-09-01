@@ -22,6 +22,7 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.FileUtils;
@@ -74,6 +75,7 @@ public class UploadAction extends BaseAction {
 	protected String fileStoragePath;
 
 	@Autowired
+	@PriorityQualifier("uploadFileStorage")
 	private FileStorage fileStorage;
 
 	@Autowired
