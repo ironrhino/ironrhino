@@ -38722,6 +38722,7 @@ if (window.FileReader)
 								url : CONTEXT_PATH + '/common/upload',
 								name : 'file',
 								data : data,
+								dataType: 'json',
 								success : function(data) {
 									appendAttachments(form, data);
 								}
