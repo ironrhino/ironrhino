@@ -158,7 +158,7 @@
 		<#assign url=attachment?keep_before_last('/')+'/'+filename?url />
 		<#assign att=attachment?lower_case />
 		<a href="${url}" target="_blank">
-		<#if att?ends_with('jpg')||att?ends_with('png')||att?ends_with('gif')||att?ends_with('bmp')||att?ends_with('webp')>
+		<#if ['jpg','gif','png','webp','bmp']?seq_contains(att?keep_after_last('.')?lower_case)>
 		<img style="display:block;" src="${url}"/>
 		<#else>
 		<div>${filename}</div>
