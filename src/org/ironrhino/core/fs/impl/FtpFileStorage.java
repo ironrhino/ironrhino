@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.input.ProxyInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
@@ -50,6 +51,11 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Setter
 	@Value("${fileStorage.uri:ftp://test:test@localhost}")
 	protected URI uri;
+
+	@Getter
+	@Setter
+	@Value("${ftp.workingDirectory:}")
+	protected String workingDirectory;
 
 	@Getter
 	@Setter
@@ -332,7 +338,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	private String getRealPath(String path, FTPClient ftpClient) throws IOException {
-		return FileUtils.normalizePath(ftpClient.printWorkingDirectory() + uri.getPath() + path);
+		String wd = StringUtils.isBlank(workingDirectory) ? ftpClient.printWorkingDirectory() : workingDirectory;
+		return FileUtils.normalizePath(wd + uri.getPath() + path);
 	}
 
 	public <T> T execute(Callback<T> callback) throws IOException {
