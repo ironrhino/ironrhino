@@ -209,11 +209,11 @@ public class ClassScanner {
 			packages.addAll(Arrays.asList(cs.value()));
 		}
 		packages.addAll(Arrays.asList(arr));
-		deduplicate(packages);
-		return packages.toArray(new String[0]);
+		return deduplicate(packages).toArray(new String[0]);
 	}
 
 	private static Collection<String> deduplicate(Collection<String> packages) {
+		List<String> newPackages = new ArrayList<>();
 		List<String> subPackages = new ArrayList<>();
 		loop: for (String s : packages) {
 			for (String s2 : packages) {
@@ -223,9 +223,10 @@ public class ClassScanner {
 				}
 			}
 		}
-		for (String subPackage : subPackages)
-			packages.remove(subPackage);
-		return packages;
+		for (String p : packages)
+			if (!subPackages.contains(p))
+				newPackages.add(p);
+		return Collections.unmodifiableCollection(newPackages);
 	}
 
 }
