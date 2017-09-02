@@ -91,7 +91,7 @@
 		for (var i = 0; i < els.length; i++) {
 			var el = els[i];
 			var n = el.name;
-			var v = $.fieldValue(el, true);
+			var v = $.fieldValue(el);
 			if (v && v.constructor == Array) {
 				for (var j = 0; j < v.length; j++) {
 					a.push({

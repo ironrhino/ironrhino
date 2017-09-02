@@ -1538,7 +1538,9 @@ Observation.common = function(container) {
 			data['id'] = hid.val();
 		$(':input.conjunct,input[type=hidden]:not(.nocheck)', f).each(
 				function() {
-					data[$(this).attr('name')] = $(this).val();
+					var t = $(this);
+					if (!t.is('[type="checkbox"]') || t.is(':checked'))
+						data[t.attr('name')] = t.val();
 				});
 		ajax({
 					global : t.data('global'),
