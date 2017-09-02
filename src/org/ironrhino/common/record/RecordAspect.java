@@ -20,7 +20,6 @@ import org.hibernate.id.ForeignGenerator;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.tuple.entity.EntityMetamodel;
 import org.hibernate.type.BagType;
-import org.hibernate.type.Type;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.Persistable;
@@ -118,9 +117,6 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 					boolean sep = false;
 					for (int i = 0; i < dirtyProperties.length; i++) {
 						String propertyName = propertyNames[dirtyProperties[i]];
-						Type type = em.getPropertyTypes()[dirtyProperties[i]];
-						if (type instanceof BagType)
-							continue;
 						IdentifierGenerator ig = em.getIdentifierProperty().getIdentifierGenerator();
 						if (ig instanceof ForeignGenerator) {
 							if (propertyName.equals(((ForeignGenerator) ig).getPropertyName()))
@@ -132,6 +128,22 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 							oldValue = ((Persistable<?>) oldValue).getId();
 						if (newValue instanceof Persistable)
 							newValue = ((Persistable<?>) newValue).getId();
+						if (em.getPropertyTypes()[dirtyProperties[i]] instanceof BagType) {
+							if (oldValue instanceof Collection) {
+								List<Object> list = new ArrayList<>();
+								for (Object o : (Collection<?>) oldValue)
+									list.add(o instanceof Persistable<?> ? ((Persistable<?>) o).getId()
+											: String.valueOf(o));
+								oldValue = list;
+							}
+							if (newValue instanceof Collection) {
+								List<Object> list = new ArrayList<>();
+								for (Object o : (Collection<?>) newValue)
+									list.add(o instanceof Persistable<?> ? ((Persistable<?>) o).getId()
+											: String.valueOf(o));
+								newValue = list;
+							}
+						}
 						if (Objects.equals(oldValue, newValue))
 							continue;
 						if (oldValue instanceof Collection && ((Collection<?>) oldValue).isEmpty() && newValue == null
