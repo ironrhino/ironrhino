@@ -24,6 +24,26 @@ public interface FileStorage {
 		}
 	}
 
+	public default void migrateTo(FileStorage target, String directory, boolean removeSourceFiles) throws IOException {
+		if (directory == null)
+			directory = "/";
+		if (!directory.endsWith("/"))
+			directory = directory + "/";
+		Map<String, Boolean> files = this.listFilesAndDirectory(directory);
+		for (Map.Entry<String, Boolean> entry : files.entrySet()) {
+			String path = directory + entry.getKey();
+			if (entry.getValue()) {
+				target.write(this.open(path), path);
+				if (removeSourceFiles)
+					this.delete(path);
+			} else {
+				migrateTo(target, path, removeSourceFiles);
+			}
+		}
+		if (removeSourceFiles && !directory.equals("/"))
+			this.delete(directory);
+	}
+
 	public void write(InputStream is, String path) throws IOException;
 
 	public InputStream open(String path) throws IOException;
