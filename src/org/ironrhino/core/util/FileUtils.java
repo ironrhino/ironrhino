@@ -19,7 +19,10 @@ import com.google.common.io.Files;
 public class FileUtils {
 
 	public static String normalizePath(String input) {
-		return Files.simplifyPath(input);
+		String normalPath = Files.simplifyPath(input);
+		if (input.endsWith("/") && !normalPath.endsWith("/"))
+			normalPath += "/";
+		return normalPath;
 	}
 
 	public static File zip(File file) throws Exception {

@@ -267,7 +267,11 @@ public class UploadAction extends BaseAction {
 				String url = doGetFileUrl(path);
 				if (url.startsWith("/"))
 					url = freemarkerConfigurer.getAssetsBase() + url;
-				files.put(new StringBuilder(url).append("/").append(s).toString(), true);
+				StringBuilder sb = new StringBuilder(url);
+				if (!url.endsWith("/"))
+					sb.append("/");
+				sb.append(s);
+				files.put(sb.toString(), true);
 			}
 		}
 		return JSON;
