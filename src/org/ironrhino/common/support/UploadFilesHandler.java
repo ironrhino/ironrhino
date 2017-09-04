@@ -17,6 +17,7 @@ import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 public class UploadFilesHandler extends AccessHandler {
 
 	@Autowired
+	@Qualifier("fileStorage")
 	@PriorityQualifier("uploadFileStorage")
 	private FileStorage fileStorage;
 
@@ -43,6 +45,8 @@ public class UploadFilesHandler extends AccessHandler {
 		long since = request.getDateHeader("If-Modified-Since");
 		String uri = RequestUtils.getRequestUri(request);
 		String path = uri.substring(uri.indexOf('/', 1));
+		if (fileStorage.isBucketBased() && path.startsWith(UploadAction.UPLOAD_DIR))
+			path = path.substring(UploadAction.UPLOAD_DIR.length());
 		try {
 			path = URLDecoder.decode(path, "UTF-8");
 			long lastModified = fileStorage.getLastModified(path);

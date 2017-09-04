@@ -27,6 +27,7 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -75,6 +76,7 @@ public class UploadAction extends BaseAction {
 	protected String fileStoragePath;
 
 	@Autowired
+	@Qualifier("fileStorage")
 	@PriorityQualifier("uploadFileStorage")
 	private FileStorage fileStorage;
 
@@ -86,7 +88,7 @@ public class UploadAction extends BaseAction {
 	private String suffix;
 
 	public String getUploadRootDir() {
-		return UPLOAD_DIR;
+		return fileStorage.isBucketBased() ? "" : UPLOAD_DIR;
 	}
 
 	public String getFolderEncoded() {

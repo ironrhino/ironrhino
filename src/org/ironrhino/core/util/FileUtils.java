@@ -14,11 +14,15 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.io.Files;
 
 public class FileUtils {
 
 	public static String normalizePath(String input) {
+		if (StringUtils.isBlank(input))
+			return input;
 		String normalPath = Files.simplifyPath(input);
 		if (input.endsWith("/") && !normalPath.endsWith("/"))
 			normalPath += "/";

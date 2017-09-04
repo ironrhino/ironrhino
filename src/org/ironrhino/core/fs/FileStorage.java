@@ -5,7 +5,24 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.ironrhino.core.util.ValueThenKeyComparator;
+
 public interface FileStorage {
+
+	ValueThenKeyComparator<String, Boolean> COMPARATOR = new ValueThenKeyComparator<String, Boolean>() {
+		@Override
+		protected int compareValue(Boolean a, Boolean b) {
+			return b.compareTo(a);
+		}
+	};
+
+	public default boolean isBucketBased() {
+		try {
+			return getClass().getMethod("getBucket") != null;
+		} catch (NoSuchMethodException | SecurityException e) {
+			return false;
+		}
+	}
 
 	public void write(InputStream is, String path) throws IOException;
 
