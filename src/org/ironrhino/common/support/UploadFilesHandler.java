@@ -6,24 +6,33 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.ironrhino.common.action.UploadAction;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Component
 @Order(2)
 public class UploadFilesHandler extends AccessHandler {
+
+	public static final String DEFAULT_PATH_PREFIX = "/assets";
+
+	public static final String DEFAULT_UPLOAD_DIR = "/upload";
 
 	@Autowired
 	@Qualifier("fileStorage")
@@ -33,7 +42,32 @@ public class UploadFilesHandler extends AccessHandler {
 	@Autowired
 	private ServletContext servletContext;
 
-	private String pattern = "/assets" + UploadAction.UPLOAD_DIR + "/*";
+	@Getter
+	@Setter
+	@Value("${uploadFilesHandler.pathPrefix:" + DEFAULT_PATH_PREFIX + "}")
+	protected String pathPrefix = DEFAULT_PATH_PREFIX;
+
+	@Getter
+	@Setter
+	@Value("${uploadFilesHandler.uploadDir:" + DEFAULT_UPLOAD_DIR + "}")
+	protected String uploadDir = DEFAULT_UPLOAD_DIR;
+
+	private String pattern;
+
+	@PostConstruct
+	private void init() {
+		pathPrefix = normalize(pathPrefix);
+		uploadDir = normalize(uploadDir);
+		if (fileStorage.isBucketBased()) {
+			uploadDir = "";
+			if (DEFAULT_PATH_PREFIX.equals(pathPrefix))
+				pattern = pathPrefix + DEFAULT_UPLOAD_DIR + "/*";
+			else
+				pattern = pathPrefix + "/*";
+		} else {
+			pattern = pathPrefix + uploadDir + "/*";
+		}
+	}
 
 	@Override
 	public String getPattern() {
@@ -44,9 +78,9 @@ public class UploadFilesHandler extends AccessHandler {
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		long since = request.getDateHeader("If-Modified-Since");
 		String uri = RequestUtils.getRequestUri(request);
-		String path = uri.substring(uri.indexOf('/', 1));
-		if (fileStorage.isBucketBased() && path.startsWith(UploadAction.UPLOAD_DIR))
-			path = path.substring(UploadAction.UPLOAD_DIR.length());
+		String path = uri.substring(pathPrefix.length());
+		if (fileStorage.isBucketBased() && DEFAULT_PATH_PREFIX.equals(pathPrefix))
+			path = path.substring(DEFAULT_UPLOAD_DIR.length());
 		try {
 			path = URLDecoder.decode(path, "UTF-8");
 			long lastModified = fileStorage.getLastModified(path);
@@ -71,6 +105,7 @@ public class UploadFilesHandler extends AccessHandler {
 				} catch (Exception e) {
 					// supress ClientAbortException
 				}
+				return true;
 			}
 		} catch (FileNotFoundException fne) {
 			try {
@@ -88,7 +123,19 @@ public class UploadFilesHandler extends AccessHandler {
 				e1.printStackTrace();
 			}
 		}
-		return true;
+		return false;
+	}
+
+	private static String normalize(String path) {
+		if (path != null && path.length() > 0) {
+			if (!path.startsWith("/"))
+				path = "/" + path;
+			if (path.endsWith("/"))
+				path = StringUtils.trimTrailingCharacter(path, '/');
+			if (path.equals("/"))
+				path = "";
+		}
+		return path;
 	}
 
 }

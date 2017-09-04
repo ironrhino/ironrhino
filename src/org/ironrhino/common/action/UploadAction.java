@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
+import org.ironrhino.common.support.UploadFilesHandler;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.metadata.Authorize;
@@ -39,8 +40,6 @@ import lombok.Setter;
 public class UploadAction extends BaseAction {
 
 	private static final long serialVersionUID = 625509291613761721L;
-
-	public static final String UPLOAD_DIR = "/upload";
 
 	@Setter
 	private File[] file;
@@ -72,8 +71,8 @@ public class UploadAction extends BaseAction {
 	@Value("${upload.excludeSuffix:jsp,jspx,php,asp,rb,py,sh}")
 	private String excludeSuffix;
 
-	@Value("${fileStorage.path:/assets}")
-	protected String fileStoragePath;
+	@Autowired
+	private UploadFilesHandler uploadFilesHandler;
 
 	@Autowired
 	@Qualifier("fileStorage")
@@ -86,10 +85,6 @@ public class UploadAction extends BaseAction {
 	@Getter
 	@Setter
 	private String suffix;
-
-	public String getUploadRootDir() {
-		return fileStorage.isBucketBased() ? "" : UPLOAD_DIR;
-	}
 
 	public String getFolderEncoded() {
 		if (folderEncoded == null) {
@@ -279,16 +274,20 @@ public class UploadAction extends BaseAction {
 		return JSON;
 	}
 
-	private String doGetFileUrl(String path) {
-		String url = fileStorage.getFileUrl(path);
-		if (url.indexOf("://") < 0)
-			url = fileStoragePath + url;
-		return url;
-	}
-
 	public String getFileUrl(String filename) {
 		String path = getUploadRootDir() + getFolderEncoded() + '/' + filename;
 		return doGetFileUrl(path);
+	}
+
+	private String doGetFileUrl(String path) {
+		String url = fileStorage.getFileUrl(path);
+		if (url.indexOf("://") < 0)
+			url = uploadFilesHandler.getPathPrefix() + url;
+		return url;
+	}
+
+	private String getUploadRootDir() {
+		return uploadFilesHandler.getUploadDir();
 	}
 
 	private String createPath(String filename, boolean autorename) throws IOException {
