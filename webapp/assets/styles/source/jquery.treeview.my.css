@@ -30,6 +30,7 @@
 .treeview li a {
 	position: relative;
 	top: -3px;
+	margin-left: 3px;
 }
 
 .treeview li.collapsable , .treeview li.expandable {
@@ -41,7 +42,7 @@
 }
 
 .treeview li.last {
-	background-position: 0 -1766px
+	background-position: 0 -1766px;
 }
 
 .treeview li.lastCollapsable , .treeview li.lastExpandable {
@@ -49,11 +50,11 @@
 }
 
 .treeview li.lastCollapsable {
-	background-position: 0 -111px
+	background-position: 0 -111px;
 }
 
 .treeview li.lastExpandable {
-	background-position: -32px -67px
+	background-position: -32px -67px;
 }
 
 .treeview div.lastCollapsable-hitarea , .treeview div.lastExpandable-hitarea {

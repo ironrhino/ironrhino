@@ -33201,7 +33201,7 @@ var Nav = {
 			nb = $('<ul id="nav-breadcrumb" class="breadcrumb"/>')
 					.prependTo($('#content'));
 		nb.append('<li>' + dropdown.children('a').text()
-				+ ' <span class="divider">/</span></li>')
+				+ '<span class="divider">/</span></li>')
 				.append('<li class="active">' + a.text() + '</li>');
 	}
 }

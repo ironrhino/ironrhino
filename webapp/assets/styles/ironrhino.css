@@ -963,6 +963,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .treeview li a {
 	position: relative;
 	top: -3px;
+	margin-left: 3px;
 }
 
 .treeview li.collapsable , .treeview li.expandable {
@@ -974,7 +975,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 }
 
 .treeview li.last {
-	background-position: 0 -1766px
+	background-position: 0 -1766px;
 }
 
 .treeview li.lastCollapsable , .treeview li.lastExpandable {
@@ -982,11 +983,11 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 }
 
 .treeview li.lastCollapsable {
-	background-position: 0 -111px
+	background-position: 0 -111px;
 }
 
 .treeview li.lastExpandable {
-	background-position: -32px -67px
+	background-position: -32px -67px;
 }
 
 .treeview div.lastCollapsable-hitarea , .treeview div.lastExpandable-hitarea {
@@ -2519,7 +2520,7 @@ pre code {
   vertical-align: baseline;
   white-space: nowrap;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #999999;
+  background-color: #838383;
 }
 .label {
   border-radius: 3px;
@@ -8543,7 +8544,7 @@ form.attachmentable ul.thumbnails li .remove {
 	margin-top: -50px;
 	margin-left: -50px;
 	opacity: 0;
-	background: radial-gradient(rgba(0, 0, 0, 0.2) 0, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.5) 60%, rgba(255, 255, 255, 0) 70%);
+	background: radial-gradient(rgba(63, 119, 187, 0.2) 0, rgba(63, 119, 187, 0.3) 40%, rgba(63, 119, 187, 0.4) 50%, rgba(63, 119, 187, 0.5) 60%, rgba(255, 255, 255, 0) 70%);
 	transition: all 0.5s ease-out;
 	transition-property: transform, opacity;
 	transform: scale(0) translate(0, 0);

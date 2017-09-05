@@ -11,7 +11,7 @@
 	margin-top: -50px;
 	margin-left: -50px;
 	opacity: 0;
-	background: radial-gradient(rgba(0, 0, 0, 0.2) 0, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.5) 60%, rgba(255, 255, 255, 0) 70%);
+	background: radial-gradient(rgba(63, 119, 187, 0.2) 0, rgba(63, 119, 187, 0.3) 40%, rgba(63, 119, 187, 0.4) 50%, rgba(63, 119, 187, 0.5) 60%, rgba(255, 255, 255, 0) 70%);
 	transition: all 0.5s ease-out;
 	transition-property: transform, opacity;
 	transform: scale(0) translate(0, 0);
