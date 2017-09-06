@@ -193,12 +193,7 @@ public class UserAction extends EntityAction<User> {
 			user.setLegiblePassword(password);
 		} else {
 			User temp = user;
-			if (temp.getId() != null) {
-				user = userManager.get(temp.getId());
-			}
-			if (temp.getUsername() != null) {
-				user = userManager.findByNaturalId(temp.getUsername());
-			}
+			user = userManager.get(temp.getId());
 			if (StringUtils.isNotBlank(temp.getEmail()) && !temp.getEmail().equals(user.getEmail())
 					&& userManager.existsOne("email", temp.getEmail())) {
 				addFieldError("user.email", getText("validation.already.exists"));
