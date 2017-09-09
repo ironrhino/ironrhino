@@ -22,12 +22,8 @@ public class StrutsSpringObjectFactory extends SpringObjectFactory {
 	@Inject
 	public StrutsSpringObjectFactory(
 			@Inject(value = StrutsConstants.STRUTS_OBJECTFACTORY_SPRING_AUTOWIRE, required = false) String autoWire,
-			@Inject(value = StrutsConstants.STRUTS_OBJECTFACTORY_SPRING_AUTOWIRE_ALWAYS_RESPECT, required = false) String alwaysAutoWire,
-			@Inject(value = StrutsConstants.STRUTS_OBJECTFACTORY_SPRING_USE_CLASS_CACHE, required = false) String useClassCacheStr,
-			@Inject ServletContext servletContext, @Inject(StrutsConstants.STRUTS_DEVMODE) String devMode,
-			@Inject Container container) {
+			@Inject ServletContext servletContext, @Inject Container container) {
 
-		boolean useClassCache = "true".equals(useClassCacheStr);
 		if (LOG.isInfoEnabled()) {
 			LOG.info("Initializing Struts-Spring integration...");
 		}
@@ -50,10 +46,6 @@ public class StrutsSpringObjectFactory extends SpringObjectFactory {
 			type = AutowireCapableBeanFactory.AUTOWIRE_NO;
 		}
 		this.setAutowireStrategy(type);
-
-		this.setUseClassCache(useClassCache);
-
-		this.setAlwaysRespectAutowireStrategy("true".equalsIgnoreCase(alwaysAutoWire));
 
 		if (LOG.isInfoEnabled()) {
 			LOG.info("... initialized Struts-Spring integration successfully");
