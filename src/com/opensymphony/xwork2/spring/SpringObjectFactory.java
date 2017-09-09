@@ -152,12 +152,12 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
         
         if (appContext.containsBean(beanName)) {
             o = appContext.getBean(beanName);
+            if (injectInternal) {
+                injectInternalBeans(o);
+            }
         } else {
             Class beanClazz = getClassInstance(beanName);
             o = buildBean(beanClazz, extraContext);
-        }
-        if (injectInternal) {
-            injectInternalBeans(o);
         }
         return o;
     }
@@ -183,7 +183,6 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
             } else if (enableAopSupport) {
                 bean = autoWiringFactory.createBean(clazz, AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR, false);
                 bean = autoWireBean(bean, autoWiringFactory);
-                bean = autoWiringFactory.initializeBean(bean, bean.getClass().getName());
                 return bean;
             } else {
                 bean = autoWiringFactory.autowire(clazz, AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR, false);
