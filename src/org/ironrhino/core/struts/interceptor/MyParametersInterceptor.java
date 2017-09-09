@@ -1,8 +1,12 @@
 package org.ironrhino.core.struts.interceptor;
 
 import java.util.Arrays;
+import java.util.Map;
+
+import org.ironrhino.core.util.ReflectionUtils;
 
 import com.opensymphony.xwork2.interceptor.ParametersInterceptor;
+import com.opensymphony.xwork2.util.ValueStack;
 
 public class MyParametersInterceptor extends ParametersInterceptor {
 
@@ -25,6 +29,12 @@ public class MyParametersInterceptor extends ParametersInterceptor {
 			if (paramName.startsWith(keyword + '.') || paramName.startsWith(keyword + '['))
 				return true;
 		return false;
+	}
+
+	@Override
+	protected void setParameters(Object action, ValueStack stack, Map<String, Object> parameters) {
+		action = ReflectionUtils.getTargetObject(action);
+		super.setParameters(action, stack, parameters);
 	}
 
 }

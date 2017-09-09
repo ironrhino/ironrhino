@@ -20,7 +20,7 @@ import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
 
-import org.springframework.aop.framework.Advised;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -220,13 +220,7 @@ public class SpringObjectFactory extends ObjectFactory implements ApplicationCon
 
     @Override
     protected Object injectInternalBeans(Object obj){
-    	if(obj instanceof Advised){
-    		try {
-				obj = ((Advised)obj).getTargetSource().getTarget();
-			} catch (Exception e) {
-				LOG.error(e.getMessage(), e);
-			} 
-    	}
+    	obj = ReflectionUtils.getTargetObject(obj);
     	return super.injectInternalBeans(obj);
     }
 

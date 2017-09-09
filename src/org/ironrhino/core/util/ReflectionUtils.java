@@ -205,7 +205,7 @@ public class ReflectionUtils {
 	public static Object getTargetObject(Object proxy) {
 		while (proxy instanceof Advised) {
 			try {
-				return getTargetObject(((Advised) proxy).getTargetSource().getTarget());
+				proxy = ((Advised) proxy).getTargetSource().getTarget();
 			} catch (Exception e) {
 				e.printStackTrace();
 				return proxy;
