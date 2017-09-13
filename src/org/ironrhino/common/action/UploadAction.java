@@ -36,7 +36,7 @@ import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 import lombok.Getter;
 import lombok.Setter;
 
-@AutoConfig(fileupload = "image/*,video/*,text/*,application/javascript,application/x-shockwave-flash,application/pdf,application/msword,application/vnd.ms-powerpoint,application/octet-stream,application/zip,application/x-rar-compressed")
+@AutoConfig(fileupload = "image/*,video/*,text/*,application/javascript,application/x-shockwave-flash,application/pdf,application/msword,application/vnd.ms-excel,application/vnd.ms-powerpoint,application/vnd.openxmlformats-*,application/font-*,application/octet-stream,application/zip,application/x-rar-compressed")
 public class UploadAction extends BaseAction {
 
 	private static final long serialVersionUID = 625509291613761721L;
