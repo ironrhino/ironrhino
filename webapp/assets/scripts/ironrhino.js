@@ -31068,6 +31068,15 @@ MessageBundle = {
 			return value.startsWith(suffix, value.length - suffix.length);
 		};
 	}
+	$.setClipboard = function(content) {
+		var input = document.createElement('textarea');
+		input.value = content;
+		input.setSelectionRange(0, -1);
+		document.body.appendChild(input);
+		input.focus();
+		document.execCommand('copy');
+		document.body.removeChild(input);
+	};
 	$$ = function(selector, container) {
 		if (!container)
 			return $(selector);
@@ -32021,7 +32030,12 @@ Initialization.common = function() {
 				$('.ui-dialog:visible').last()
 						.find('.ui-dialog-titlebar-close').click();
 		}
-	}).on('reset', 'form', function(e) {
+	}).on('click', '.set-clipboard', function(e) {
+				var content = $(this).data('content');
+				if (!content)
+					content = $(this).siblings('.clipboard-content').text();
+				$.setClipboard(content);
+			}).on('reset', 'form', function(e) {
 				var t = $(e.target);
 				t.find('.resetable').html('');
 				setTimeout(function() {

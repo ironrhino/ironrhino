@@ -41,7 +41,7 @@
 			<td class="checkbox"><#if key!='..'><input type="checkbox" name="id" value="${key+value?then('','/')}" class="custom"/></#if></td>
 			<td><#if value><span class="uploaditem filename" style="cursor:pointer;">${key}</span> <a href="<@url value="${action.getFileUrl(key?url)}"/>" target="_blank" download="${key}"><i class="glyphicon glyphicon-download-alt"></i></a><#else><a style="color:blue;" class="ajax view history" data-replacement="files" href="<#if key!='..'>${actionBaseUrl}/list${folderEncoded}/${key?url}<#else>${actionBaseUrl}/list${folderEncoded?keep_before_last('/')}</#if>">${key}</a></#if></td>
 			<td><#if value && ['jpg','gif','png','webp','bmp']?seq_contains(key?keep_after_last('.')?lower_case)><a href="<@url value="${action.getFileUrl(key?url)}"/>" target="_blank"><img class="uploaditem" src="<@url value="${action.getFileUrl(key?url)}"/>" style="height:50px;"/></a></#if></td>
-			<td><#if value><span style="word-break: break-all;"><@url value="${action.getFileUrl(key?url)}"/></span></#if></td>
+			<td><#if value><span class="clipboard-content" style="word-break: break-all;"><@url value="${action.getFileUrl(key?url)}"/></span> <i class="glyphicon glyphicon-copy clickable set-clipboard" title="${getText('copy')}"></i></#if></td>
 		</tr>
 		</#list>
 		</tbody>
