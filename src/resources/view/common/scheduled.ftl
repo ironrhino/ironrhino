@@ -26,7 +26,7 @@ $(function(){
 <body>
 
 <div id="scheduled">
-	<style scoped>
+	<style>
 	div.task{
 		text-align: right;
 		line-height: 30px;

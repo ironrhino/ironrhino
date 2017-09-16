@@ -85,7 +85,7 @@ $(function(){
 <#assign settings = beans['settingControl'].getAllBooleanSettings()>
 <#if settings?size gt 0>
 <div id="switch">
-	<style scoped>
+	<style>
 	div.key{
 		text-align: right;
 		line-height: 30px;

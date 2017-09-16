@@ -22,7 +22,7 @@
 	</#if>
 	<@s.hidden name="__datagrid_schema.fields"/>
 	<table class="datagrid adaptive nullable table table-condensed">
-		<style scoped>
+		<style>
 		tr.linkage{
 			background-color:#F5F5F5;
 		}
