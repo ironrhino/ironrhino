@@ -463,7 +463,7 @@ public class AppInfo {
 	}
 
 	public static enum Stage {
-		DEVELOPMENT, TEST, PREPARATION, PRODUCTION
+		DEVELOPMENT, TEST, PREPARATION, PRODUCTION, SANDBOX
 	}
 
 	public static enum RunLevel {
