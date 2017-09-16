@@ -61,7 +61,7 @@ public class ErrorAction extends BaseAction {
 				}
 			}
 			addActionError(getText(exception.getClass().getName()));
-			return "accountStatus";
+			return ERROR;
 		} else if (exception != null) {
 			if (exception instanceof LocalizedException || exception instanceof ErrorMessage)
 				logger.error(exception.getLocalizedMessage());
