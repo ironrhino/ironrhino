@@ -283,7 +283,7 @@ public class ApiDoc implements Serializable {
 							requestBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
 						}
 						requestBody = FieldObject.createList(requestBodyClass, requestFields, true);
-						if (requestFields != null) {
+						if (requestBody != null) {
 							Object requestSample = ApiDocHelper.generateSample(apiDocInstance, null, requestFields);
 							if (requestSample == null)
 								requestSample = ApiDocHelper.createSample(genericParameterType);

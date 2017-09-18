@@ -324,6 +324,8 @@ public class ApiDocHelper {
 			return "********";
 		if (fieldName.toLowerCase().endsWith("phone") || fieldName.toLowerCase().endsWith("mobile"))
 			return "13888888888";
+		if (fieldName.toLowerCase().endsWith("code"))
+			return "123456";
 		return fieldName.toUpperCase();
 	}
 
