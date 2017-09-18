@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
-import org.ironrhino.core.security.verfication.VerficationCodeGenerator;
+import org.ironrhino.core.security.verfication.VerificationCodeGenerator;
 import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
@@ -33,7 +33,7 @@ public class DefaultVerificationService implements VerificationService {
 	private ThrottleService throttleService;
 
 	@Autowired
-	private VerficationCodeGenerator verficationCodeGenerator;
+	private VerificationCodeGenerator verficationCodeGenerator;
 
 	@Autowired(required = false)
 	private List<VerificationCodeNotifier> verificationCodeNotifiers;
