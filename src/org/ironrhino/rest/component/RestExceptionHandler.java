@@ -11,6 +11,7 @@ import javax.validation.ConstraintViolationException;
 import org.ironrhino.rest.RestStatus;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -33,6 +34,13 @@ public class RestExceptionHandler {
 		Integer oldStatus = response.getStatus();
 		if (ex instanceof CompletionException) {
 			ex = ex.getCause();
+		}
+		if (ex instanceof BindException) {
+			BindException be = ((BindException) ex);
+			StringBuilder sb = new StringBuilder();
+			for (FieldError fe : be.getFieldErrors())
+				sb.append(fe.getField()).append(": ").append(fe.getDefaultMessage()).append("; ");
+			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
 		}
 		if (ex instanceof HttpMediaTypeNotAcceptableException) {
 			response.setContentType("text/plain");

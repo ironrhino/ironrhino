@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
@@ -186,6 +189,15 @@ public class FieldObject implements Serializable {
 							uic = f.getAnnotation(UiConfig.class);
 						if (uic != null && uic.required())
 							required = true;
+					}
+
+					if (!required) {
+						required = f.isAnnotationPresent(NotNull.class) || f.isAnnotationPresent(NotEmpty.class)
+								|| f.isAnnotationPresent(NotBlank.class);
+					}
+					
+					if (!required) {
+						required = f.getType().isPrimitive();
 					}
 				} catch (NoSuchFieldException e) {
 					continue;
