@@ -2,6 +2,7 @@ package org.ironrhino.core.struts;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -127,17 +128,20 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		this.configuration = configuration;
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 		String searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + GLOBAL_MESSAGES_PATTERN;
-		Map<String, String> messageBunldes = new HashMap<>();
+		Map<String, String> fileMessageBunldes = new HashMap<>();
+		Map<String, String> jarMessageBunldes = new HashMap<>();
 		try {
 			Resource[] resources = resourcePatternResolver.getResources(searchPath);
 			for (Resource res : resources) {
+				Map<String, String> messageBunldes = res.getURI().getScheme().equals("file") ? fileMessageBunldes
+						: jarMessageBunldes;
 				String name = res.getURI().toString();
 				String source = name.substring(0, name.indexOf("/resources/i18n/"));
 				name = name.substring(name.indexOf("resources/i18n/"));
 				name = org.ironrhino.core.util.StringUtils.trimLocale(name.substring(0, name.lastIndexOf('.')));
 				name = org.springframework.util.ClassUtils.convertResourcePathToClassName(name);
 				if (messageBunldes.containsKey(name) && !source.equals(messageBunldes.get(name))) {
-					logger.warn("Global messages " + name + " ignored from " + source + ",will load from "
+					logger.warn("Global messages " + name + " ignored from " + source + ", will load from "
 							+ messageBunldes.get(name));
 				} else {
 					messageBunldes.put(name, source);
@@ -146,7 +150,14 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		for (String name : messageBunldes.keySet()) {
+		List<String> messages = new ArrayList<>(jarMessageBunldes.keySet());
+		messages.sort((a, b) -> {
+			if (a.startsWith("resources.i18n.common."))
+				return -1;
+			return 0;
+		});
+		messages.addAll(fileMessageBunldes.keySet());
+		for (String name : messages) {
 			LocalizedTextUtil.addDefaultResourceBundle(name);
 			logger.info("Loading global messages from " + name);
 		}

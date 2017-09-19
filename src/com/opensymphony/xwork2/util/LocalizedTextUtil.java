@@ -205,6 +205,8 @@ public class LocalizedTextUtil {
 	                reloadBundles();
 	                try {
 	                	defaultText = bundle.getString(aTextName);
+	                	if(defaultText != null)
+	                		break;
 	                } catch (MissingResourceException e) {
 	                    // ignore and try others
 	                }
