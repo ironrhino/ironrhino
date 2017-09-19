@@ -34,7 +34,7 @@ public class Record extends BaseEntity {
 	private String entityId;
 
 	@UiConfig
-	@Column(length = 32767) // oracle 12c max size of varchar2
+	@Column(length = 10000)
 	private String entityToString;
 
 	@UiConfig(width = "80px")
