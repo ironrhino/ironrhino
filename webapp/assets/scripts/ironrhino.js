@@ -31436,7 +31436,7 @@ Message = {
 				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
 						+ msg
-						+ '<a class="remove pull-right" href="#">&times;</a></div><div>')
+						+ '<a class="remove pull-right" href="#">&times;</a></div></div>')
 						.insertAfter(field);
 				var promptTopPosition, promptleftPosition;
 				var fieldWidth = field.width();
@@ -31444,8 +31444,8 @@ Message = {
 				promptTopPosition = field.position().top + field.outerHeight()
 						+ 6;
 				var parentWidth = field.closest('.controls').width();
-				if (parentWidth
-						&& (parentWidth - fieldWidth) < (prompt.width() - 30)) {
+				if (!parentWidth
+						|| (parentWidth - fieldWidth) < (prompt.width() - 30)) {
 					promptleftPosition = field.position().left + fieldWidth
 							- (prompt.width() + 10);
 				} else {
@@ -31456,11 +31456,7 @@ Message = {
 					promptleftPosition = 0;
 				prompt.css({
 							"top" : promptTopPosition + "px",
-							"left" : promptleftPosition + "px",
-							"opacity" : 0.2
-						});
-				prompt.animate({
-							"opacity" : 0.8
+							"left" : promptleftPosition + "px"
 						});
 			} else if (field.is('[type="hidden"]')) {
 				var selector = '.listpick,.treeselect';
