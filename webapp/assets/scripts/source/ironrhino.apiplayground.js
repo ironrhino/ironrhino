@@ -1,10 +1,13 @@
 Initialization.apiplayground = function() {
 	$(document).on('submit', 'form.api-playground', function(e) {
+		if (!Form.validate(e.target))
+			return false;
 		var form = $(e.target);
 		var params = [];
 		form.find('table.requestParams tr').each(function(i, v) {
 			var row = $(this);
-			var name = row.find('input:eq(0)').val();
+			var name = row.find('input:eq(1)').attr('name')
+					|| row.find('input:eq(0)').val();
 			var value = row.find('input:eq(1)').val();
 			if (name)
 				params.push(encodeURIComponent(name) + '='
@@ -12,12 +15,13 @@ Initialization.apiplayground = function() {
 		});
 		var headers = {};
 		form.find('table.requestHeaders tr').each(function(i, v) {
-					var row = $(this);
-					var name = row.find('input:eq(0)').val();
-					var value = row.find('input:eq(1)').val();
-					if (name)
-						headers[name] = value;
-				});
+			var row = $(this);
+			var name = row.find('input:eq(1)').attr('name')
+					|| row.find('input:eq(0)').val();
+			var value = row.find('input:eq(1)').val();
+			if (name)
+				headers[name] = value;
+		});
 		var accessToken = form.find('[name="accessToken"]').val();
 		if (accessToken) {
 			headers['Authorization'] = 'Bearer ' + accessToken;
