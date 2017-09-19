@@ -12,6 +12,7 @@ import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanUtils;
 
 import com.opensymphony.xwork2.ActionInvocation;
@@ -23,7 +24,7 @@ public class JsonResult implements Result {
 	private static final long serialVersionUID = 5984356746581381755L;
 
 	private String generateJson(ActionInvocation invocation) {
-		Object action = invocation.getAction();
+		Object action = ReflectionUtils.getTargetObject(invocation.getAction());
 		Method method = BeanUtils.findDeclaredMethod(action.getClass(), invocation.getProxy().getMethod(),
 				new Class[0]);
 		if (method == null)
