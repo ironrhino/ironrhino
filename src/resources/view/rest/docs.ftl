@@ -26,7 +26,7 @@
 		<td>${field.type!} </td>
 		<td>${getText(field.required?string)} </td>
 		<td>${field.defaultValue!} </td>
-		<td>${field.description!}
+		<td><#if field.description?has_content>${getText(field.description)}</#if>
 			<#if field.values?has_content>
 			枚举值:
 			<ul class="unstyled">

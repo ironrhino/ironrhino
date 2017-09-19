@@ -159,12 +159,13 @@ public class FieldObject implements Serializable {
 				if (!forRequest
 						&& (pd.getReadMethod() == null || pd.getReadMethod().getAnnotation(JsonIgnore.class) != null))
 					continue;
+				Field fd = null;
 				boolean required = false;
 				try {
 					java.lang.reflect.Field f = pd.getReadMethod().getDeclaringClass().getDeclaredField(name);
 					if (f.getAnnotation(JsonIgnore.class) != null)
 						continue;
-
+					fd = f.getAnnotation(Field.class);
 					if (Persistable.class.isAssignableFrom(domainClass)) {
 						if (forRequest) {
 							if ("id".equals(name))
@@ -204,7 +205,7 @@ public class FieldObject implements Serializable {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				list.add(create(name, pd.getPropertyType(), required, null, null));
+				list.add(create(name, pd.getPropertyType(), required, null, fd));
 			}
 			Collections.sort(list, (o1, o2) -> {
 				return fieldNames.indexOf(o1.getName()) - fieldNames.indexOf(o2.getName());
