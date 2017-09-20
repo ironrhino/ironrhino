@@ -8,7 +8,7 @@
 >
 <#if parameters.headerKey?? && parameters.headerValue??>
     <option value="${parameters.headerKey?html}"<#rt/>
-    <#if tag.contains(parameters.nameValue, parameters.headerKey) || tag.contains(parameters.nameValue, parameters.headerValue)> selected="selected"<#rt/></#if>>${parameters.headerValue?html}</option>
+    <#if tag.contains(parameters.nameValue, parameters.headerKey) || tag.contains(parameters.nameValue, parameters.headerValue)> selected="selected"<#rt/></#if>>${parameters.headerValue?html}</option><#lt/>
 </#if>
 <#if parameters.emptyOption!false>
     <option value=""></option>
@@ -51,7 +51,7 @@
     >${itemValue?html}</option><#lt/>
 </@s.iterator>
 <#include "/${parameters.templateDir}/${parameters.expandTheme}/optgroup.ftl" />
-</select>
+</select><#rt/>
 <#if (parameters.multiple!false) && !(parameters.disabled!false) && parameters.name?has_content>
 <input type="hidden" name="__multiselect_${parameters.name?html}"/>
 </#if>
