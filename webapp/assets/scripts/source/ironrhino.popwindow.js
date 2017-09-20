@@ -4,7 +4,7 @@
 					var t = $(this);
 					var options = (new Function("return "
 							+ (t.data('windowoptions') || '{}')))();
-					var url = t.attr('href');
+					var url = t.prop('href');
 					var winid = window.open(url, options);
 					delete options.iframe;
 					for (var key in options)

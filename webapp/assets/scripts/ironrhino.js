@@ -32202,7 +32202,7 @@ Initialization.common = function() {
 		if (Form.validate(userinput)) {
 			ajax({
 						type : 'POST',
-						url : btn.data('url') || f.attr('action')
+						url : btn.data('url') || f.prop('action')
 								+ '/sendVerificationCode',
 						target : f[0],
 						data : data,
@@ -32802,7 +32802,7 @@ Observation.common = function(container) {
 			id += '_';
 		t.click(function(e) {
 			if (!$('#' + id).length) {
-				$.get(t.attr('href'), function(data) {
+				$.get(t.prop('href'), function(data) {
 					if (typeof data == 'object') {
 						if (data.actionErrors) {
 							Message.showActionError(data.actionErrors);
@@ -32833,12 +32833,12 @@ Observation.common = function(container) {
 										modal.modal('hide');
 									};
 								});
-						t.data('originalhref', t.attr('href')).attr('href',
+						t.data('originalhref', t.prop('href')).attr('href',
 								'#' + id).attr('data-toggle', 'modal');
 						modal.modal('show');
 						if (t.hasClass('nocache'))
 							modal.on('hidden', function() {
-										t.attr('href', t.data('originalhref'));
+										t.prop('href', t.data('originalhref'));
 										$(this).remove();
 									})
 					}
@@ -33474,7 +33474,7 @@ DateUtils = {
 	$.fn.ajaxsubmit = function(options) {
 
 		var url = this.find('.clicked:submit').attr('formaction')
-				|| this.attr('action') || window.location.pathname;
+				|| this.prop('action') || window.location.pathname;
 
 		options = $.extend(true, {
 					url : url,
@@ -37159,7 +37159,7 @@ $(function() {
 					var t = $(this);
 					var options = (new Function("return "
 							+ (t.data('windowoptions') || '{}')))();
-					var url = t.attr('href');
+					var url = t.prop('href');
 					var winid = window.open(url, options);
 					delete options.iframe;
 					for (var key in options)
@@ -37291,7 +37291,7 @@ Richtable = {
 			}
 		}
 		if (includeParams) {
-			var action = form.attr('action');
+			var action = form.prop('action');
 			var qs = '';
 			var index = action.indexOf('?');
 			if (index > -1)
@@ -37397,7 +37397,7 @@ Richtable = {
 								+ (pathname.indexOf('/') == (pathname.length - 1)
 										? ''
 										: '/') + action;
-						inputform.attr('action', action);
+						inputform.prop('action', action);
 					}
 					if (inputform.hasClass('view')
 							&& !(inputform.data('replacement')))
@@ -37607,7 +37607,7 @@ Richtable = {
 		} else {
 			var options = (new Function("return "
 					+ (btn.data('windowoptions') || '{}')))();
-			var url = btn.attr('href');
+			var url = btn.prop('href');
 			if (view) {
 				url = Richtable.getUrl(view, id, !id || options.includeParams,
 						form);
@@ -38000,7 +38000,7 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var form = t.next('form.richtable');
 		if (form.length) {
-			t.attr('action', form.attr('action')).attr('data-replacement',
+			t.prop('action', form.prop('action')).attr('data-replacement',
 					form.attr('id'));
 			$('input[type="reset"]', t).click(function(e) {
 						$('a.remove', t).click();
@@ -38014,9 +38014,9 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var form = t.prev('form.richtable');
 		var entity = Richtable.getEntityName(form);
-		t.attr('action', form.attr('action')).attr('data-replacement',
+		t.prop('action', form.prop('action')).attr('data-replacement',
 				form.attr('id'));
-		var qs = t.attr('action');
+		var qs = t.prop('action');
 		var index = qs.indexOf('?');
 		qs = index > -1 ? qs.substring(index + 1) : '';
 		if (qs) {
@@ -38254,7 +38254,7 @@ Observation._richtable = function(container) {
 		var maximum = t.data('maximum') || 10;
 		maxsize = maxsize ? parseInt(maxsize) : 15 * 1024 * 1024;
 		if (!url) {
-			var action = f.attr('action');
+			var action = f.prop('action');
 			var abu = f.data('actionbaseurl');
 			var i = action.indexOf('?');
 			if (abu) {

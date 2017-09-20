@@ -1156,7 +1156,7 @@ Initialization.common = function() {
 		if (Form.validate(userinput)) {
 			ajax({
 						type : 'POST',
-						url : btn.data('url') || f.attr('action')
+						url : btn.data('url') || f.prop('action')
 								+ '/sendVerificationCode',
 						target : f[0],
 						data : data,
@@ -1756,7 +1756,7 @@ Observation.common = function(container) {
 			id += '_';
 		t.click(function(e) {
 			if (!$('#' + id).length) {
-				$.get(t.attr('href'), function(data) {
+				$.get(t.prop('href'), function(data) {
 					if (typeof data == 'object') {
 						if (data.actionErrors) {
 							Message.showActionError(data.actionErrors);
@@ -1787,12 +1787,12 @@ Observation.common = function(container) {
 										modal.modal('hide');
 									};
 								});
-						t.data('originalhref', t.attr('href')).attr('href',
+						t.data('originalhref', t.prop('href')).attr('href',
 								'#' + id).attr('data-toggle', 'modal');
 						modal.modal('show');
 						if (t.hasClass('nocache'))
 							modal.on('hidden', function() {
-										t.attr('href', t.data('originalhref'));
+										t.prop('href', t.data('originalhref'));
 										$(this).remove();
 									})
 					}

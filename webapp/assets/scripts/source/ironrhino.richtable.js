@@ -43,7 +43,7 @@ Richtable = {
 			}
 		}
 		if (includeParams) {
-			var action = form.attr('action');
+			var action = form.prop('action');
 			var qs = '';
 			var index = action.indexOf('?');
 			if (index > -1)
@@ -149,7 +149,7 @@ Richtable = {
 								+ (pathname.indexOf('/') == (pathname.length - 1)
 										? ''
 										: '/') + action;
-						inputform.attr('action', action);
+						inputform.prop('action', action);
 					}
 					if (inputform.hasClass('view')
 							&& !(inputform.data('replacement')))
@@ -359,7 +359,7 @@ Richtable = {
 		} else {
 			var options = (new Function("return "
 					+ (btn.data('windowoptions') || '{}')))();
-			var url = btn.attr('href');
+			var url = btn.prop('href');
 			if (view) {
 				url = Richtable.getUrl(view, id, !id || options.includeParams,
 						form);
@@ -752,7 +752,7 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var form = t.next('form.richtable');
 		if (form.length) {
-			t.attr('action', form.attr('action')).attr('data-replacement',
+			t.prop('action', form.prop('action')).attr('data-replacement',
 					form.attr('id'));
 			$('input[type="reset"]', t).click(function(e) {
 						$('a.remove', t).click();
@@ -766,9 +766,9 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var form = t.prev('form.richtable');
 		var entity = Richtable.getEntityName(form);
-		t.attr('action', form.attr('action')).attr('data-replacement',
+		t.prop('action', form.prop('action')).attr('data-replacement',
 				form.attr('id'));
-		var qs = t.attr('action');
+		var qs = t.prop('action');
 		var index = qs.indexOf('?');
 		qs = index > -1 ? qs.substring(index + 1) : '';
 		if (qs) {
@@ -1006,7 +1006,7 @@ Observation._richtable = function(container) {
 		var maximum = t.data('maximum') || 10;
 		maxsize = maxsize ? parseInt(maxsize) : 15 * 1024 * 1024;
 		if (!url) {
-			var action = f.attr('action');
+			var action = f.prop('action');
 			var abu = f.data('actionbaseurl');
 			var i = action.indexOf('?');
 			if (abu) {
