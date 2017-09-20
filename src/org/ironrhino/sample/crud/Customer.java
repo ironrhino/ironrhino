@@ -13,7 +13,6 @@ import javax.persistence.Column;
 import javax.persistence.Converter;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -63,7 +62,6 @@ public class Customer extends BaseRecordableEntity {
 	private String name;
 
 	@UiConfig(width = "100px", cssClass = "conjunct", dynamicAttributes = "{\"data-replacement\":\"control-group-customer-age\"}")
-	@Enumerated
 	@Column(nullable = false)
 	private Gender gender;
 
@@ -77,7 +75,6 @@ public class Customer extends BaseRecordableEntity {
 	private Set<String> potentialCategories;
 
 	@UiConfig(width = "80px")
-	@Enumerated
 	@Column(nullable = false)
 	private CustomerRank rank = CustomerRank.BRONZE;
 

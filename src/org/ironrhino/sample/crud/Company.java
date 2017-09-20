@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -47,7 +46,6 @@ public class Company extends BaseEntity {
 	private String name;
 
 	@UiConfig(width = "100px", group = "baseInfo", shownInPick = true)
-	@Enumerated
 	@Column(nullable = false)
 	private CompanyType type;
 
