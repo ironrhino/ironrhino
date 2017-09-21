@@ -4,7 +4,7 @@
 <#assign _label=parameters.label>
 <#elseif parameters.name?has_content>
 <#assign _label=parameters.name>
-<#if _label?index_of('.') gt 0><#assign _label=_label?substring(_label?last_index_of('.')+1)></#if>
+<#if _label?index_of('.') gt 0><#assign _label=_label?keep_after_last('.')></#if>
 <#assign _label=getText(_label)>
 </#if>
 <#if _label?has_content>
