@@ -11,6 +11,7 @@ import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.security.event.LogoutEvent;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -53,6 +54,8 @@ public class DefaultLogoutSuccessHandler extends AbstractAuthenticationTargetUrl
 			if (StringUtils.hasText(temp))
 				targetUrl = temp;
 		}
+		if (targetUrl.startsWith("/"))
+			targetUrl = RequestUtils.getBaseUrl(request) + targetUrl;
 		return targetUrl;
 	}
 

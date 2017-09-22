@@ -22,23 +22,16 @@
 	<constant name="struts.freemarker.mru.max.strong.size" value="0" />
 	<package name="ironrhino-default" extends="struts-default">
 		<result-types>
-			<result-type name="autoconfig"
-				class="org.ironrhino.core.struts.result.AutoConfigResult" />
-			<result-type name="accessDenied"
-				class="org.ironrhino.core.struts.result.AccessDeniedResult" />
-			<result-type name="directTemplate"
-				class="org.ironrhino.core.struts.result.DirectTemplateResult" />
+			<result-type name="autoconfig" class="org.ironrhino.core.struts.result.AutoConfigResult" />
+			<result-type name="accessDenied" class="org.ironrhino.core.struts.result.AccessDeniedResult" />
+			<result-type name="directTemplate" class="org.ironrhino.core.struts.result.DirectTemplateResult" />
 			<result-type name="json" class="org.ironrhino.core.struts.result.JsonResult" />
-			<result-type name="referer"
-				class="org.ironrhino.core.struts.result.RefererResult" />
-			<result-type name="jasper"
-				class="org.ironrhino.core.struts.result.JasperReportsResult" />
-			<result-type name="jasperreports"
-				class="org.ironrhino.core.struts.result.JasperReportsResult" />
-			<result-type name="dynamicreports"
-				class="org.ironrhino.core.struts.result.DynamicReportsResult" />
-			<result-type name="qrcode"
-				class="org.ironrhino.core.struts.result.QRCodeResult" />
+			<result-type name="redirect" class="org.ironrhino.core.struts.result.RedirectResult"/>
+			<result-type name="referer" class="org.ironrhino.core.struts.result.RefererResult" />
+			<result-type name="jasper" class="org.ironrhino.core.struts.result.JasperReportsResult" />
+			<result-type name="jasperreports" class="org.ironrhino.core.struts.result.JasperReportsResult" />
+			<result-type name="dynamicreports" class="org.ironrhino.core.struts.result.DynamicReportsResult" />
+			<result-type name="qrcode" class="org.ironrhino.core.struts.result.QRCodeResult" />
 		</result-types>
 		<interceptors>
 			<interceptor name="params"
