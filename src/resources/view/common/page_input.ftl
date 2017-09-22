@@ -129,7 +129,7 @@ $(function() {
 	<div id="_page_base" class="tab-pane active">
 	<@s.textfield id="page_path" readonly=!page.new name="page.path" class="required checkavailable" style="width:600px;"/>
 	<@s.textfield name="page.displayOrder" type="number" class="integer"/>
-	<@s.textfield name="page.tags"  class="tags" data\-source="${actionBaseUrl}/suggest" style="width:600px;"/>
+	<@s.textfield name="page.tags" class="tags" data\-source="${actionBaseUrl}/suggest" style="width:600px;"/>
 	<@s.textfield name="page.title" style="width:600px;"/>
 	</div>
 	<div id="_page_content" class="tab-pane">

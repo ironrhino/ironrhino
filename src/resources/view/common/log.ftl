@@ -45,7 +45,7 @@
 <form class="form-inline">
 	<div class="control-group">
 		<input id="filename" type="text" class="span6"/>
-		<input id="tail" type="text"  class="span1" value="4096"/>
+		<input id="tail" type="text" class="span1" value="4096"/>
 		<button type="button" class="btn" id="view">${getText('view')}</button>
 		<button type="button" class="btn" id="clear">${getText('clear')}</button>
 		<button type="button" class="btn" id="download">${getText('download')}</button>

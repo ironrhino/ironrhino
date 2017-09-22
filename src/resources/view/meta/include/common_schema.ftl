@@ -1,4 +1,4 @@
-<#macro editAttributes schemaName merge=false attributes=[] parameterNamePrefix=""  headerKey="" headerValue="" ignoreIfNotFound=true dynamicAttributesMapping={}>
+<#macro editAttributes schemaName merge=false attributes=[] parameterNamePrefix="" headerKey="" headerValue="" ignoreIfNotFound=true dynamicAttributesMapping={}>
 	<#local schemaManager=beans['schemaManager']/>
 	<#if schemaName?is_string>
 		<#local schema=schemaManager.findOne(true,[schemaName])!>
