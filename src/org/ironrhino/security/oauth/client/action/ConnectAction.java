@@ -16,7 +16,6 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.RequestUtils;
-import org.ironrhino.security.action.SignupAction;
 import org.ironrhino.security.event.SignupEvent;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.client.model.Profile;
@@ -142,7 +141,6 @@ public class ConnectAction extends BaseAction {
 	}
 
 	private boolean isEnabled() {
-		return settingControl.getBooleanValue(SignupAction.SETTING_KEY_SIGNUP_ENABLED, false)
-				&& settingControl.getBooleanValue(SETTING_KEY_OAUTH_ENABLED, false);
+		return settingControl.getBooleanValue(SETTING_KEY_OAUTH_ENABLED, false);
 	}
 }

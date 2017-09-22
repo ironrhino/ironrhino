@@ -22,10 +22,6 @@
 	<property name="remoting-client-sources-jar.includes" value="org/ironrhino/core/remoting/client/**" />
 	<property name="hibernate-config-sources-jar.name" value="ironrhino-hibernate-config-${version}-sources.jar" />
 	<property name="hibernate-config-sources-jar.includes" value="resources/spring/applicationContext-hibernate.xml" />
-	<property name="mail-config-sources-jar.name" value="ironrhino-mail-config-${version}-sources.jar" />
-	<property name="mail-config-sources-jar.includes" value="resources/spring/applicationContext-mail.xml" />
-	<property name="sendmailqueue-config-sources-jar.name" value="ironrhino-sendmailqueue-config-${version}-sources.jar" />
-	<property name="sendmailqueue-config-sources-jar.includes" value="resources/spring/applicationContext-sendmailqueue.xml" />
 	<property name="mongodb-config-sources-jar.name" value="ironrhino-mongodb-config-${version}-sources.jar" />
 	<property name="mongodb-config-sources-jar.includes" value="resources/spring/applicationContext-mongodb.xml" />
 	<property name="rabbitmq-config-sources-jar.name" value="ironrhino-rabbitmq-config-${version}-sources.jar" />
@@ -63,8 +59,6 @@
 	<property name="security-config-base-sources-jar.includes" value="resources/spring/applicationContext-security-base.xml" />
 	<property name="security-config-http-sources-jar.name" value="ironrhino-security-config-http-${version}-sources.jar" />
 	<property name="security-config-http-sources-jar.includes" value="resources/spring/applicationContext-security-http.xml" />
-	<property name="security-signup-sources-jar.name" value="ironrhino-security-signup-${version}-sources.jar" />
-	<property name="security-signup-sources-jar.includes" value="org/ironrhino/security/action/SignupAction*,resources/view/signup*.ftl" />
 	<property name="security-loginrecord-sources-jar.name" value="ironrhino-security-loginrecord-${version}-sources.jar" />
 	<property name="security-loginrecord-sources-jar.includes" value="org/ironrhino/security/model/LoginRecord.java,org/ironrhino/security/component/Authentication**" />
 	<property name="security-oauth-client-sources-jar.name" value="ironrhino-security-oauth-client-${version}-sources.jar" />
@@ -146,8 +140,6 @@
 		<delete file="${target.dir}/${remoting-server-sources-jar.name}" />
 		<delete file="${target.dir}/${remoting-client-sources-jar.name}" />
 		<delete file="${target.dir}/${hibernate-config-sources-jar.name}" />
-		<delete file="${target.dir}/${mail-config-sources-jar.name}" />
-		<delete file="${target.dir}/${sendmailqueue-config-sources-jar.name}" />
 		<delete file="${target.dir}/${mongodb-config-sources-jar.name}" />
 		<delete file="${target.dir}/${rabbitmq-config-sources-jar.name}" />
 		<delete file="${target.dir}/${sitemesh-config-sources-jar.name}" />
@@ -249,28 +241,6 @@
 				<attribute name="Implementation-Vendor" value="ironrhino" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Id" value="ironrhino-hibernate-config" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				<attribute name="Build-Timestamp" value="${timestamp}" />
-				<attribute name="Build-Revision" value="${revision}" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${mail-config-sources-jar.name}" basedir="${src.dir}" includes="${mail-config-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-mail-config" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-mail-config" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				<attribute name="Build-Timestamp" value="${timestamp}" />
-				<attribute name="Build-Revision" value="${revision}" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${sendmailqueue-config-sources-jar.name}" basedir="${src.dir}" includes="${sendmailqueue-config-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-sendmailqueue-config" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-sendmailqueue-config" />
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 				<attribute name="Build-Timestamp" value="${timestamp}" />
 				<attribute name="Build-Revision" value="${revision}" />
@@ -441,7 +411,7 @@
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
 		</jar>
-		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/view/user_*.ftl,resources/view/signup*.ftl" excludes="${security-config-sources-jar.includes},${security-signup-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-remoting-provider-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
+		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/view/user_*.ftl" excludes="${security-config-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-remoting-provider-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
 			<manifest>
 				<attribute name="Implementation-Title" value="ironrhino-security" />
 				<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -481,17 +451,6 @@
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-config-http" />
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-				<attribute name="Build-Timestamp" value="${timestamp}" />
-				<attribute name="Build-Revision" value="${revision}" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${security-signup-sources-jar.name}" basedir="${src.dir}" includes="${security-signup-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-security-signup" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-signup" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-security" />
 				<attribute name="Build-Timestamp" value="${timestamp}" />
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
