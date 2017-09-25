@@ -9,11 +9,14 @@ import org.junit.Test;
 public class RSAUtilsTest {
 
 	public static final String PUBLIC_KEY = 
+			"-----BEGIN PUBLIC KEY-----\n"+
 			"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCyQUq3Kj6pJfPkAACsoF4laMzq\n" + 
 			"ZCej+2lIlW64ZKi1jVL8/xenrpCpnh2qBvP6y8Kx66WbwoS//8R8hKkRiHgRkEkx\n" + 
 			"8WRLYxfJiTIi/gWC08XbPUmQq3otFFHFnJ6dDoggn2ts3AeIu8Ag2iFv821bqc2y\n" + 
-			"QcOlUY7HFVOQfPcMoQIDAQAB";
+			"QcOlUY7HFVOQfPcMoQIDAQAB\n"+
+			"-----END PUBLIC KEY-----";
 	public static final String PRIVATE_KEY = 
+			"-----BEGIN PRIVATE KEY-----\n"+
 			"MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALJBSrcqPqkl8+QA\n" + 
 			"AKygXiVozOpkJ6P7aUiVbrhkqLWNUvz/F6eukKmeHaoG8/rLwrHrpZvChL//xHyE\n" + 
 			"qRGIeBGQSTHxZEtjF8mJMiL+BYLTxds9SZCrei0UUcWcnp0OiCCfa2zcB4i7wCDa\n" + 
@@ -27,7 +30,8 @@ public class RSAUtilsTest {
 			"yDzEs80wLXe1LstpqZ4OP4/fhP0pnQJAdo1SWS3ae+PyM/Euv+7STeqq18QnCWCf\n" + 
 			"zPdbxHkwmUBC5bVuTgnd5h5lkqlDnQWRP77WcAL37OTrabUfBdhmyQJAVWhO72t3\n" + 
 			"ISuLYaDhyQ98jnrJDhgYt1GCzwLrkkOlPhsOhfpX6NFgr3UrIZnAjKd9F3MCPmA1\n" + 
-			"AnVrwY9YU+ZqoQ==";
+			"AnVrwY9YU+ZqoQ==\n" + 
+			"-----END PRIVATE KEY-----";
 
 	@Test
 	public void testEncrypt() throws Exception {
