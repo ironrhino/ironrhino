@@ -25,3 +25,4 @@
 -struts2-jasperreports-plugin
 -struts2-sitemesh-plugin
 -javamail
++jaxb-api
