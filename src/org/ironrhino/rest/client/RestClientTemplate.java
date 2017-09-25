@@ -2,6 +2,7 @@ package org.ironrhino.rest.client;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResourceAccessException;
@@ -37,18 +39,14 @@ class RestClientTemplate extends RestTemplate {
 		super();
 		this.client = client;
 		setRequestFactory(new HttpComponentsClientHttpRequestFactory(client));
-		MappingJackson2HttpMessageConverter jackson2 = null;
-		for (HttpMessageConverter<?> hmc : getMessageConverters()) {
-			if (hmc instanceof MappingJackson2HttpMessageConverter) {
-				jackson2 = (MappingJackson2HttpMessageConverter) hmc;
-				break;
-			}
+		Iterator<HttpMessageConverter<?>> it = getMessageConverters().iterator();
+		while (it.hasNext()) {
+			HttpMessageConverter<?> mc = it.next();
+			if (mc instanceof MappingJackson2XmlHttpMessageConverter)
+				it.remove();
+			else if (mc instanceof MappingJackson2HttpMessageConverter)
+				((MappingJackson2HttpMessageConverter) mc).setObjectMapper(JsonUtils.createNewObjectMapper());
 		}
-		if (jackson2 == null) {
-			jackson2 = new MappingJackson2HttpMessageConverter();
-			getMessageConverters().add(jackson2);
-		}
-		jackson2.setObjectMapper(JsonUtils.createNewObjectMapper());
 	}
 
 	public void setConnectTimeout(int connectTimeout) {

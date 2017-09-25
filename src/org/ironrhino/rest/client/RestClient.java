@@ -1,5 +1,6 @@
 package org.ironrhino.rest.client;
 
+import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -68,10 +71,15 @@ public class RestClient implements BeanNameAware {
 	protected String beanName;
 
 	public RestClient() {
-
+		Iterator<HttpMessageConverter<?>> it = internalRestTemplate.getMessageConverters().iterator();
+		while (it.hasNext()) {
+			if (it.next() instanceof MappingJackson2XmlHttpMessageConverter)
+				it.remove();
+		}
 	}
 
 	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret) {
+		this();
 		Assert.notNull(accessTokenEndpoint, "accessTokenEndpoint shouldn't be null");
 		Assert.notNull(clientId, "clientId shouldn't be null");
 		Assert.notNull(clientSecret, "clientSecret shouldn't be null");
@@ -81,6 +89,7 @@ public class RestClient implements BeanNameAware {
 	}
 
 	public RestClient(String apiBaseUrl, String accessTokenEndpoint, String clientId, String clientSecret) {
+		this(accessTokenEndpoint, clientId, clientSecret);
 		Assert.notNull(apiBaseUrl, "apiBaseUrl shouldn't be null");
 		Assert.notNull(accessTokenEndpoint, "accessTokenEndpoint shouldn't be null");
 		Assert.notNull(clientId, "clientId shouldn't be null");
@@ -88,9 +97,6 @@ public class RestClient implements BeanNameAware {
 		this.apiBaseUrl = apiBaseUrl;
 		if (accessTokenEndpoint.indexOf("://") < 0 && apiBaseUrl != null)
 			accessTokenEndpoint = apiBaseUrl + accessTokenEndpoint;
-		this.accessTokenEndpoint = accessTokenEndpoint;
-		this.clientId = clientId;
-		this.clientSecret = clientSecret;
 	}
 
 	public String fetchAccessToken() {
