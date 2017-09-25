@@ -11,12 +11,29 @@ public class StageCondition extends SimpleCondition<StageConditional> {
 	}
 
 	public static boolean matches(Stage stage, boolean negated) {
-		boolean matched = AppInfo.getStage() == stage;
+		return matches(new Stage[] { stage }, negated);
+	}
+
+	public static boolean matches(String stage, boolean negated) {
+		return matches(Stage.valueOf(stage), negated);
+	}
+
+	public static boolean matches(Stage[] stages, boolean negated) {
+		boolean matched = false;
+		for (Stage s : stages) {
+			if (AppInfo.getStage() == s) {
+				matched = true;
+				break;
+			}
+		}
 		return matched && !negated || !matched && negated;
 	}
 
-	public static boolean matches(String s, boolean negated) {
-		return matches(Stage.valueOf(s), negated);
+	public static boolean matches(String[] stages, boolean negated) {
+		Stage[] s = new Stage[stages.length];
+		for (int i = 0; i < stages.length; i++)
+			s[i] = Stage.valueOf(stages[i]);
+		return matches(s, negated);
 	}
 
 }

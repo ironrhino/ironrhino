@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Conditional;
 @Conditional(StageCondition.class)
 public @interface StageConditional {
 
-	Stage value() default Stage.PRODUCTION;
+	Stage[] value() default Stage.PRODUCTION;
 
 	boolean negated() default false;
 
