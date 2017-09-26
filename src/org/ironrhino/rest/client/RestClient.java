@@ -89,7 +89,7 @@ public class RestClient implements BeanNameAware {
 	}
 
 	public RestClient(String apiBaseUrl, String accessTokenEndpoint, String clientId, String clientSecret) {
-		this(accessTokenEndpoint, clientId, clientSecret);
+		this();
 		Assert.notNull(apiBaseUrl, "apiBaseUrl shouldn't be null");
 		Assert.notNull(accessTokenEndpoint, "accessTokenEndpoint shouldn't be null");
 		Assert.notNull(clientId, "clientId shouldn't be null");
@@ -97,6 +97,9 @@ public class RestClient implements BeanNameAware {
 		this.apiBaseUrl = apiBaseUrl;
 		if (accessTokenEndpoint.indexOf("://") < 0 && apiBaseUrl != null)
 			accessTokenEndpoint = apiBaseUrl + accessTokenEndpoint;
+		this.accessTokenEndpoint = accessTokenEndpoint;
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
 	}
 
 	public String fetchAccessToken() {
