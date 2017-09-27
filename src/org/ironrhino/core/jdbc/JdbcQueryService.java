@@ -20,8 +20,9 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.SessionFactory;
 import org.ironrhino.core.model.ResultPage;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Component
-@ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@BeanPresentConditional(type = SessionFactory.class)
 public class JdbcQueryService {
 
 	@Autowired
