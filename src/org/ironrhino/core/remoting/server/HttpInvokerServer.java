@@ -67,6 +67,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		if (request instanceof ProxySupportHttpServletRequest) {
+			logger.error("Forbidden for Proxy");
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return;
 		}

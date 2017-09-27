@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
 	public static final String SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED = "proxy.request.disabled";
+	public static final String SYSTEM_PROPERTY_PROXY_TRUSTED_ADDRESS = "proxy.trusted.address";
 
 	// proxy_set_header X-Real-IP $remote_addr;
 	public static final String HEADER_NAME_X_REAL_IP = "X-Real-IP";
@@ -35,6 +37,8 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
 	public static final String REQUEST_ATTRIBUTE_PROXY_ADDR = "X-Proxy-Addr";
 
+	private String remoteAddr;
+
 	public ProxySupportHttpServletRequest(HttpServletRequest request) {
 		super(request);
 		String certificate = request.getHeader(HEADER_NAME_X_CLIENT_CERTIFICATE);
@@ -55,19 +59,49 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public String getRemoteAddr() {
-		String addr = getHeader(HEADER_NAME_X_REAL_IP);
-		if (StringUtils.isBlank(addr)) {
-			addr = getHeader(HEADER_NAME_X_FORWARDED_FOR);
-			int index = 0;
-			if (StringUtils.isNotBlank(addr) && (index = addr.indexOf(',')) > 0)
-				addr = addr.substring(0, index);
+		if (remoteAddr == null) {
+			String superRemoteAddr = super.getRemoteAddr();
+			String realIp = getHeader(HEADER_NAME_X_REAL_IP);
+			String forwardedFor = getHeader(HEADER_NAME_X_FORWARDED_FOR);
+			String temp = null;
+			if (StringUtils.isNotBlank(realIp) && StringUtils.isNotBlank(forwardedFor)
+					&& !realIp.equals(forwardedFor)) {
+				String[] arr1 = forwardedFor.split("\\s*,\\s*");
+				boolean trustedForward = arr1[arr1.length - 1].equals(realIp)
+						&& isTrustedProxy(realIp, superRemoteAddr);
+				if (trustedForward) {
+					temp = forwardedFor;
+					int index = 0;
+					if ((index = temp.indexOf(',')) > 0)
+						temp = temp.substring(0, index).trim();
+				} else {
+					temp = realIp;
+				}
+			} else if (StringUtils.isNotBlank(realIp)) {
+				temp = realIp;
+			} else if (StringUtils.isNotBlank(forwardedFor)) {
+				temp = forwardedFor;
+				int index = 0;
+				if ((index = temp.indexOf(',')) > 0)
+					temp = temp.substring(0, index).trim();
+			}
+			if (StringUtils.isNotBlank(temp)) {
+				setAttribute(REQUEST_ATTRIBUTE_PROXY_ADDR, super.getRemoteAddr());
+			} else {
+				temp = superRemoteAddr;
+			}
+			remoteAddr = temp;
 		}
-		if (StringUtils.isNotBlank(addr)) {
-			setAttribute(REQUEST_ATTRIBUTE_PROXY_ADDR, super.getRemoteAddr());
-		} else {
-			addr = super.getRemoteAddr();
-		}
-		return addr;
+		return remoteAddr;
+	}
+
+	private static boolean isTrustedProxy(String realIp, String remoteAddr) {
+		String[] arr1 = realIp.split("\\.");
+		String[] arr2 = remoteAddr.split("\\.");
+		if (arr1.length == 4 && arr1.length == arr2.length && arr1[0].equals(arr2[0]) && arr1[1].equals(arr2[1]))
+			return true;
+		String trustedAddress = System.getProperty(SYSTEM_PROPERTY_PROXY_TRUSTED_ADDRESS);
+		return trustedAddress != null && Arrays.asList(trustedAddress.split(",")).contains(realIp);
 	}
 
 	@Override
