@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +36,6 @@ import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
-import lombok.Setter;
-
 public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	protected static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
@@ -49,16 +48,18 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private static ThreadLocal<Object> service = new ThreadLocal<>();
 
-	private Map<Class<?>, Object> proxies = new HashMap<>();
+	private Map<String, Object> exportedServices = Collections.emptyMap();
+
+	private Map<String, Class<?>> interfaces = Collections.emptyMap();
+
+	private Map<Class<?>, Object> proxies = Collections.emptyMap();
 
 	@Value("${httpInvoker.loggingPayload:true}")
 	private boolean loggingPayload;
 
-	@Setter
-	@Autowired(required = false)
+	@Autowired
 	private ServiceRegistry serviceRegistry;
 
-	@Setter
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
 
@@ -81,58 +82,56 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		}
 		String uri = request.getRequestURI();
 		String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
+		Class<?> clazz = interfaces.get(interfaceName);
+		if (clazz == null) {
+			logger.error("Service Not Found: " + interfaceName);
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		serviceInterface.set(clazz);
+		service.set(exportedServices.get(interfaceName));
+		Object proxy = getProxyForService();
 		try {
-			Class<?> clazz = Class.forName(interfaceName);
-			serviceInterface.set(clazz);
 			RemoteInvocation invocation = readRemoteInvocation(request);
-			Object proxy = getProxyForService();
-			if (proxy != null) {
-				List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
-				for (Class<?> cl : invocation.getParameterTypes())
-					parameterTypeList.add(cl.getSimpleName());
-				String method = new StringBuilder(invocation.getMethodName()).append("(")
-						.append(String.join(",", parameterTypeList)).append(")").toString();
-				MDC.put("role", "SERVER");
-				MDC.put("service", interfaceName + '.' + method);
-				if (loggingPayload)
-					remotingLogger.info("Request: {}",
-							JsonDesensitizer.DEFAULT_INSTANCE.toJson(invocation.getArguments()));
-				long time = System.currentTimeMillis();
-				RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
-				time = System.currentTimeMillis() - time;
-				writeRemoteInvocationResult(request, response, invocation, result);
-				if (serviceStats != null) {
-					serviceStats.serverSideEmit(interfaceName, method, time);
-				}
-				if (loggingPayload) {
-					if (!result.hasException()) {
-						Object value = result.getValue();
-						remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
-					} else {
-						Throwable throwable = result.getException();
-						if (throwable.getCause() != null)
-							throwable = throwable.getCause();
-						remotingLogger.error("Error:", throwable);
-					}
-				}
-				remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
-			} else {
-				logger.error("Service Not Found: " + interfaceName);
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
+			for (Class<?> cl : invocation.getParameterTypes())
+				parameterTypeList.add(cl.getSimpleName());
+			String method = new StringBuilder(invocation.getMethodName()).append("(")
+					.append(String.join(",", parameterTypeList)).append(")").toString();
+			MDC.put("role", "SERVER");
+			MDC.put("service", interfaceName + '.' + method);
+			if (loggingPayload)
+				remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(invocation.getArguments()));
+			long time = System.currentTimeMillis();
+			RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
+			time = System.currentTimeMillis() - time;
+			writeRemoteInvocationResult(request, response, invocation, result);
+			if (serviceStats != null) {
+				serviceStats.serverSideEmit(interfaceName, method, time);
 			}
+			if (loggingPayload) {
+				if (!result.hasException()) {
+					Object value = result.getValue();
+					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
+				} else {
+					Throwable throwable = result.getException();
+					if (throwable.getCause() != null)
+						throwable = throwable.getCause();
+					remotingLogger.error("Error:", throwable);
+				}
+			}
+			remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
 		} catch (SerializationFailedException sfe) {
 			logger.error(sfe.getMessage(), sfe);
 			RemoteInvocationResult result = new RemoteInvocationResult();
 			result.setException(sfe);
 			writeRemoteInvocationResult(request, response, result);
-		} catch (ClassNotFoundException e) {
-			logger.error("Class Not Found: {}", e.getMessage());
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			serviceInterface.remove();
+			service.remove();
 			RemotingContext.clear();
 			MDC.remove("role");
 			MDC.remove("service");
@@ -142,12 +141,16 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	public void prepare() {
 		if (serviceRegistry != null) {
-			for (Map.Entry<String, Object> entry : serviceRegistry.getExportedServices().entrySet()) {
+			exportedServices = serviceRegistry.getExportedServices();
+			proxies = new HashMap<>(exportedServices.size() * 3 / 2 + 1, 1f);
+			interfaces = new HashMap<>(exportedServices.size() * 3 / 2 + 1, 1f);
+			for (Map.Entry<String, Object> entry : exportedServices.entrySet()) {
 				try {
 					Class<?> intf = Class.forName(entry.getKey());
 					serviceInterface.set(intf);
 					service.set(entry.getValue());
 					proxies.put(intf, super.getProxyForService());
+					interfaces.put(entry.getKey(), intf);
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
