@@ -21,6 +21,7 @@ import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.servlet.ProxySupportHttpServletRequest;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -64,6 +65,10 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		if (request instanceof ProxySupportHttpServletRequest) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		}
 		RemotingContext.setRequestFrom(request.getHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM));
 		Enumeration<String> en = request.getHeaderNames();
 		while (en.hasMoreElements()) {
@@ -75,8 +80,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			}
 		}
 		String uri = request.getRequestURI();
+		String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
 		try {
-			String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
 			Class<?> clazz = Class.forName(interfaceName);
 			serviceInterface.set(clazz);
 			RemoteInvocation invocation = readRemoteInvocation(request);
@@ -112,18 +117,20 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 				}
 				remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
 			} else {
-				String msg = "No Service:" + getServiceInterface().getName();
-				logger.error("No Service:" + getServiceInterface());
-				response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
+				logger.error("Service Not Found: " + interfaceName);
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			}
 		} catch (SerializationFailedException sfe) {
 			logger.error(sfe.getMessage(), sfe);
 			RemoteInvocationResult result = new RemoteInvocationResult();
 			result.setException(sfe);
 			writeRemoteInvocationResult(request, response, result);
+		} catch (ClassNotFoundException e) {
+			logger.error("Class Not Found: {}", e.getMessage());
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			serviceInterface.remove();
 			RemotingContext.clear();
