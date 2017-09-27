@@ -52,7 +52,7 @@ public class OptimizeTrafficFilter implements Filter {
 				String previousToken = request.getHeader("If-None-Match");
 				if (previousToken != null && previousToken.equals(token)) {
 					response.setHeader("Last-Modified", request.getHeader("If-Modified-Since"));
-					response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+					response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 					notmodified = true;
 				} else {
 					Calendar cal = Calendar.getInstance();

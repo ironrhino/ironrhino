@@ -86,12 +86,12 @@ public class UploadFilesHandler extends AccessHandler {
 			long lastModified = fileStorage.getLastModified(path);
 			lastModified = lastModified / 1000 * 1000;
 			if (since > 0 && since == lastModified) {
-				response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+				response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 				return true;
 			}
 			try (InputStream is = fileStorage.open(path)) {
 				if (is == null) {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND);
+					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 					return true;
 				}
 				if (lastModified > 0)
@@ -108,22 +108,13 @@ public class UploadFilesHandler extends AccessHandler {
 				return true;
 			}
 		} catch (FileNotFoundException fne) {
-			try {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-				return true;
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				return true;
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return true;
 		}
-		return false;
 	}
 
 	private static String normalize(String path) {

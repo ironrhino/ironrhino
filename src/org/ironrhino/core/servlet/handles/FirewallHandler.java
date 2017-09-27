@@ -44,11 +44,7 @@ public class FirewallHandler extends AccessHandler {
 			}
 			return false;
 		} else if (!isAllowed(addr, allowedAddrPattern)) {
-			try {
-				response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 			return true;
 		} else {
 			return false;

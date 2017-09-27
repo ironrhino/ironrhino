@@ -30,7 +30,7 @@ public class AccessDeniedResult extends AutoConfigResult {
 					response.sendRedirect(response.encodeRedirectURL(
 							defaultLoginUrlAuthenticationEntryPoint.buildRedirectUrlToLoginPage(request)));
 				else
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} else {
 				String finalLocation = conditionalParse(location, invocation);
 				doExecute(finalLocation, invocation);
