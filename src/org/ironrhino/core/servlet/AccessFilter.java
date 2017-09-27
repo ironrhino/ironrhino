@@ -45,7 +45,6 @@ public class AccessFilter implements Filter {
 	public static final String MDC_KEY_REQUEST_CHAIN = "requestChain";
 	public static final String HTTP_HEADER_REQUEST_FROM = "X-Request-From";
 	public static final String MDC_KEY_REQUEST_FROM = "requestFrom";
-	public static final String SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED = "proxy.request.disabled";
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -93,9 +92,7 @@ public class AccessFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
 		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
-		HttpServletRequest request = "true".equals(System.getProperty(SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED))
-				? (HttpServletRequest) req
-				: new ProxySupportHttpServletRequest((HttpServletRequest) req);
+		HttpServletRequest request = ProxySupportHttpServletRequest.wrap((HttpServletRequest) req);
 		LocaleContextHolder.setLocale(request.getLocale(), true);
 		HttpServletResponse response = (HttpServletResponse) resp;
 		RequestContext.set(request, response);
@@ -108,7 +105,7 @@ public class AccessFilter implements Filter {
 
 			for (String pattern : excludePatternsList) {
 				if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pattern)) {
-					chain.doFilter(req, resp);
+					chain.doFilter(request, response);
 					return;
 				}
 			}

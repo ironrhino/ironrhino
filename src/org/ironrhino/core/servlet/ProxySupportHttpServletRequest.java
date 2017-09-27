@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
+	public static final String SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED = "proxy.request.disabled";
+
 	// proxy_set_header X-Real-IP $remote_addr;
 	public static final String HEADER_NAME_X_REAL_IP = "X-Real-IP";
 
@@ -137,6 +139,13 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	@Override
 	public boolean isSecure() {
 		return getScheme().equals("https") || super.isSecure();
+	}
+
+	public static HttpServletRequest wrap(HttpServletRequest request) {
+		boolean proxyable = !"true".equals(System.getProperty(SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED))
+				&& (request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_REAL_IP) != null
+						|| request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_FORWARDED_FOR) != null);
+		return proxyable ? new ProxySupportHttpServletRequest(request) : request;
 	}
 
 }
