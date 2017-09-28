@@ -116,7 +116,7 @@ public class RSAUtils {
 	private static int getMaxEncryptBlockSize(KeyFactory keyFactory, Key key) throws Exception {
 		int maxLength = 117;
 		try {
-			RSAPublicKeySpec publicKeySpec = (RSAPublicKeySpec) keyFactory.getKeySpec(key, RSAPublicKeySpec.class);
+			RSAPublicKeySpec publicKeySpec = keyFactory.getKeySpec(key, RSAPublicKeySpec.class);
 			int keyLength = publicKeySpec.getModulus().bitLength();
 			maxLength = keyLength / 8 - 11;
 		} catch (Exception e) {
@@ -128,7 +128,7 @@ public class RSAUtils {
 	private static int getMaxDecryptBlockSize(KeyFactory keyFactory, Key key) throws Exception {
 		int maxLength = 128;
 		try {
-			RSAPrivateKeySpec publicKeySpec = (RSAPrivateKeySpec) keyFactory.getKeySpec(key, RSAPrivateKeySpec.class);
+			RSAPrivateKeySpec publicKeySpec = keyFactory.getKeySpec(key, RSAPrivateKeySpec.class);
 			int keyLength = publicKeySpec.getModulus().bitLength();
 			maxLength = keyLength / 8;
 		} catch (Exception e) {

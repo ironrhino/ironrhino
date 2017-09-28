@@ -20,10 +20,12 @@ public class RedirectResult extends StrutsResultSupport {
 		super(location);
 	}
 
+	@Override
 	public void execute(ActionInvocation invocation) throws Exception {
 		super.execute(invocation);
 	}
 
+	@Override
 	protected void doExecute(String finalLocation, ActionInvocation invocation) throws Exception {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
