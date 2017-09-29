@@ -31,7 +31,7 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -216,7 +216,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 					setSerializationType(SerializationType.JAVA);
 					logger.error("downgrade serialization from FST to JAVA for service[{}]: {}",
 							getServiceInterface().getName(), throwable.getMessage());
-				} else if (throwable instanceof JsonMappingException
+				} else if (throwable instanceof JsonProcessingException
 						&& getSerializationType() == SerializationType.JSON) {
 					setSerializationType(SerializationType.JAVA);
 					logger.error("downgrade serialization from JSON to JAVA for service[{}]: {}",

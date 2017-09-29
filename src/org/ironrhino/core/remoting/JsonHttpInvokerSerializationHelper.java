@@ -6,12 +6,12 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,9 +24,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -84,9 +84,8 @@ public class JsonHttpInvokerSerializationHelper {
 		bytes = new byte[length];
 		is.read(bytes);
 		invocation.setGenericReturnType(new String(bytes, StandardCharsets.UTF_8));
-		JsonNode node = objectMapper.readTree(is);
-		if (node instanceof ObjectNode) {
-			ObjectNode on = (ObjectNode) node;
+		try {
+			ObjectNode on = objectMapper.readValue(is, ObjectNode.class);
 			List<String> genericParameterTypes = new ArrayList<>();
 			List<Class<?>> parameterTypes = new ArrayList<>();
 			List<Object> arguments = new ArrayList<>();
@@ -107,9 +106,8 @@ public class JsonHttpInvokerSerializationHelper {
 			invocation.setParameterTypes(parameterTypes.toArray(new Class[0]));
 			invocation.setArguments(arguments.toArray(new Object[0]));
 			return invocation;
-		} else {
-			throw new RemoteException(
-					"Deserialized object needs to be assignable to type [" + ObjectNode.class.getName() + "]: ");
+		} catch (JsonProcessingException e) {
+			throw new SerializationFailedException(e.getMessage(), e);
 		}
 	}
 
@@ -136,21 +134,25 @@ public class JsonHttpInvokerSerializationHelper {
 			throws IOException, ClassNotFoundException {
 		RemoteInvocationResult result = new RemoteInvocationResult();
 		int i = is.read();
-		if (i == 0) {
-			int length = is.read();
-			byte[] bytes = new byte[length];
-			is.read(bytes);
-			String type = new String(bytes, StandardCharsets.UTF_8);
-			if (!type.equals("void")) {
-				JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
-				result.setValue(objectMapper.readValue(is, jt));
+		try {
+			if (i == 0) {
+				int length = is.read();
+				byte[] bytes = new byte[length];
+				is.read(bytes);
+				String type = new String(bytes, StandardCharsets.UTF_8);
+				if (!type.equals("void")) {
+					JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
+					result.setValue(objectMapper.readValue(is, jt));
+				}
+				return result;
+			} else {
+				Throwable throwable = objectMapper.readValue(is, Throwable.class);
+				InvocationTargetException exception = new InvocationTargetException(throwable);
+				result.setException(exception);
+				return result;
 			}
-			return result;
-		} else {
-			Throwable throwable = objectMapper.readValue(is, Throwable.class);
-			InvocationTargetException exception = new InvocationTargetException(throwable);
-			result.setException(exception);
-			return result;
+		} catch (JsonProcessingException e) {
+			throw new SerializationFailedException(e.getMessage(), e);
 		}
 	}
 
