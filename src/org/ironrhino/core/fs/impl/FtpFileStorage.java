@@ -199,15 +199,15 @@ public class FtpFileStorage extends AbstractFileStorage {
 				workingDirectory = org.ironrhino.core.util.StringUtils.trimTailSlash(workingDirectory);
 				String relativePath = realPath.substring(workingDirectory.length() + 1);
 				String[] arr = relativePath.split("/");
-				StringBuilder sb = new StringBuilder(workingDirectory);
-				for (int i = 0; i < arr.length; i++) {
-					sb.append("/").append(arr[i]);
-					ftpClient.changeWorkingDirectory(sb.toString());
-					if (ftpClient.getReplyCode() == 550) {
-						ftpClient.makeDirectory(sb.toString());
+				if (arr.length > 1) {
+					StringBuilder sb = new StringBuilder(workingDirectory);
+					for (int i = 0; i < arr.length - 1; i++) {
+						sb.append("/").append(arr[i]);
+						ftpClient.changeWorkingDirectory(sb.toString());
+						if (ftpClient.getReplyCode() == 550) {
+							ftpClient.makeDirectory(sb.toString());
+						}
 					}
-					if (i == arr.length - 2)
-						break;
 				}
 				ftpClient.storeFile(realPath, ins);
 				return null;
