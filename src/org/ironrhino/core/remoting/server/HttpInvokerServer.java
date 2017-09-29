@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -101,8 +102,21 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 					.append(String.join(",", parameterTypeList)).append(")").toString();
 			MDC.put("role", "SERVER");
 			MDC.put("service", interfaceName + '.' + method);
-			if (loggingPayload)
-				remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(invocation.getArguments()));
+			if (loggingPayload) {
+				Object payload;
+				Object[] arguments = invocation.getArguments();
+				String[] parameterNames = ReflectionUtils
+						.getParameterNames(clazz.getMethod(invocation.getMethodName(), invocation.getParameterTypes()));
+				if (parameterNames != null) {
+					Map<String, Object> parameters = new LinkedHashMap<>();
+					for (int i = 0; i < parameterNames.length; i++)
+						parameters.put(parameterNames[i], arguments[i]);
+					payload = parameters;
+				} else {
+					payload = arguments;
+				}
+				remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(payload));
+			}
 			long time = System.currentTimeMillis();
 			RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
 			time = System.currentTimeMillis() - time;

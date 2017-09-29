@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -73,8 +74,8 @@ public class JsonDesensitizer {
 				}
 			}
 		}).setFailOnUnknownId(false);
-		objectWriter = JsonUtils.createNewObjectMapper().addMixIn(Object.class, DesensitizerMixIn.class)
-				.writer(filters);
+		objectWriter = JsonUtils.createNewObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+				.addMixIn(Object.class, DesensitizerMixIn.class).writer(filters);
 	}
 
 	public String toJson(Object value) {

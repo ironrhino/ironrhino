@@ -1,6 +1,8 @@
 package org.ironrhino.core.remoting.client;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +16,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -148,9 +151,20 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		}
 		MDC.put("role", "CLIENT");
 		MDC.put("service", getServiceInterface().getName() + '.' + stringify(methodInvocation));
-		if (loggingPayload)
-			remotingLogger.info("Request: {}",
-					JsonDesensitizer.DEFAULT_INSTANCE.toJson(methodInvocation.getArguments()));
+		if (loggingPayload) {
+			Object payload;
+			Object[] arguments = methodInvocation.getArguments();
+			String[] parameterNames = ReflectionUtils.getParameterNames(methodInvocation.getMethod());
+			if (parameterNames != null) {
+				Map<String, Object> parameters = new LinkedHashMap<>();
+				for (int i = 0; i < parameterNames.length; i++)
+					parameters.put(parameterNames[i], arguments[i]);
+				payload = parameters;
+			} else {
+				payload = arguments;
+			}
+			remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(payload));
+		}
 		long time = System.currentTimeMillis();
 		RemoteInvocationResult result;
 		try {
