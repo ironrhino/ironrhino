@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -67,7 +68,7 @@ public class RestApiTests {
 	@Test
 	public void testGetStream() throws IOException {
 		InputStream is = userClient.getStream();
-		List<String> lines = IOUtils.readLines(is);
+		List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
 		assertEquals(false, lines.isEmpty());
 	}
 

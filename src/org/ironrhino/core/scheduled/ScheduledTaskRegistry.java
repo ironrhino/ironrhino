@@ -2,66 +2,80 @@ package org.ironrhino.core.scheduled;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.config.CronTask;
-import org.springframework.scheduling.config.IntervalTask;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.scheduling.config.Task;
+import org.springframework.scheduling.config.FixedDelayTask;
+import org.springframework.scheduling.config.FixedRateTask;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.config.TriggerTask;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
-import lombok.Getter;
 
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE)
-public class ScheduledTaskRegistry implements SchedulingConfigurer {
+public class ScheduledTaskRegistry {
 
-	@Getter
-	private List<ScheduledTask> tasks = new ArrayList<>();
+	private List<ScheduledTask> tasks = null;
+
+	@Autowired(required = false)
+	private List<ScheduledTaskHolder> scheduledTaskHolders = Collections.emptyList();
 
 	@Autowired
-	private ConfigurableListableBeanFactory ctx;
+	private ApplicationContext ctx;
 
-	@Override
-	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-		tasks.addAll(build(taskRegistrar.getFixedRateTaskList(), ScheduledType.FIXEDRATE));
-		tasks.addAll(build(taskRegistrar.getCronTaskList(), ScheduledType.CRON));
-		tasks.addAll(build(taskRegistrar.getFixedDelayTaskList(), ScheduledType.FIXEDDELAY));
-		tasks.addAll(build(taskRegistrar.getTriggerTaskList(), ScheduledType.TRIGGER));
-		tasks.sort(Comparator.comparing(ScheduledTask::getName));
+	public List<ScheduledTask> getTasks() {
+		List<ScheduledTask> temp = tasks;
+		if (temp == null) {
+			synchronized (this) {
+				temp = tasks;
+				if (temp == null) {
+					temp = doGetTasks();
+					tasks = temp;
+				}
+			}
+		}
+		return tasks;
 	}
 
-	private List<ScheduledTask> build(final List<? extends Task> tasks, final ScheduledType type) {
-		return tasks.stream().map(task -> {
-			ScheduledTask scheduledTaskInformation = new ScheduledTask();
-			scheduledTaskInformation.setType(type);
-			scheduledTaskInformation.setName(getName(task.getRunnable()));
-			if (task instanceof IntervalTask) {
-				IntervalTask intervalTask = (IntervalTask) task;
-				scheduledTaskInformation.setInitialDelay(intervalTask.getInitialDelay());
-				scheduledTaskInformation.setInterval(intervalTask.getInterval());
-			}
-			if (task instanceof CronTask) {
-				CronTask cronTask = (CronTask) task;
-				scheduledTaskInformation.setExpression(cronTask.getExpression());
-			}
-			if (task instanceof TriggerTask) {
-				TriggerTask triggerTask = (TriggerTask) task;
-				scheduledTaskInformation.setTrigger(triggerTask.getTrigger().toString());
-			}
-			return scheduledTaskInformation;
-		}).filter(task -> task.getName() != null).collect(Collectors.toList());
+	private List<ScheduledTask> doGetTasks() {
+		List<ScheduledTask> list = new ArrayList<>();
+		for (ScheduledTaskHolder sth : scheduledTaskHolders) {
+			sth.getScheduledTasks().stream().map(st -> st.getTask()).forEach(task -> {
+				ScheduledTask st = new ScheduledTask();
+				st.setName(getName(task.getRunnable()));
+				if (st.getName() == null)
+					return;
+				if (task instanceof FixedRateTask) {
+					st.setType(ScheduledType.FIXEDRATE);
+					FixedRateTask fixedRateTask = (FixedRateTask) task;
+					st.setInitialDelay(fixedRateTask.getInitialDelay());
+					st.setInterval(fixedRateTask.getInterval());
+				} else if (task instanceof FixedDelayTask) {
+					st.setType(ScheduledType.FIXEDDELAY);
+					FixedDelayTask fixedDelayTask = (FixedDelayTask) task;
+					st.setInitialDelay(fixedDelayTask.getInitialDelay());
+					st.setInterval(fixedDelayTask.getInterval());
+				} else if (task instanceof CronTask) {
+					st.setType(ScheduledType.CRON);
+					CronTask cronTask = (CronTask) task;
+					st.setCron(cronTask.getExpression());
+				} else if (task instanceof TriggerTask) {
+					st.setType(ScheduledType.TRIGGER);
+					TriggerTask triggerTask = (TriggerTask) task;
+					st.setTrigger(triggerTask.getTrigger().toString());
+				}
+				list.add(st);
+			});
+		}
+		list.sort(Comparator.comparing(ScheduledTask::getName));
+		return list;
 	}
 
 	private String getName(Runnable runnable) {
@@ -83,13 +97,13 @@ public class ScheduledTaskRegistry implements SchedulingConfigurer {
 		private Long interval;
 		private Long initialDelay;
 		private String name;
-		private String expression;
+		private String cron;
 		private String trigger;
 
 		public String getDescription() {
 			switch (type) {
 			case CRON:
-				return expression;
+				return cron;
 			case FIXEDRATE:
 			case FIXEDDELAY:
 				StringBuilder sb = new StringBuilder();

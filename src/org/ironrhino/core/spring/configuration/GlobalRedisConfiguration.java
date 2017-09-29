@@ -1,5 +1,6 @@
 package org.ironrhino.core.spring.configuration;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -8,8 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -60,31 +65,50 @@ public class GlobalRedisConfiguration {
 	@Value("${global.redis.minIdle:1}")
 	private int minIdle;
 
+	@Value("${global.redis.connectTimeout:2000}")
+	private int connectTimeout = 2000;
+
+	@Value("${global.redis.readTimeout:5000}")
+	private int readTimeout = 5000;
+
+	@Value("${global.redis.useSsl:false}")
+	private boolean useSsl;
+
 	@Bean
 	public JedisConnectionFactory globalRedisConnectionFactory() {
-		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		poolConfig.setMaxTotal(maxTotal);
-		poolConfig.setMaxIdle(maxIdle);
-		poolConfig.setMinIdle(minIdle);
+		JedisClientConfigurationBuilder builder = JedisClientConfiguration.builder()
+				.connectTimeout(Duration.ofMillis(connectTimeout)).readTimeout(Duration.ofMillis(readTimeout));
+		if (useSsl)
+			builder.useSsl();
+		if (usePool) {
+			JedisPoolConfig poolConfig = new JedisPoolConfig();
+			poolConfig.setMaxTotal(maxTotal);
+			poolConfig.setMaxIdle(maxIdle);
+			poolConfig.setMinIdle(minIdle);
+			builder.usePooling().poolConfig(poolConfig);
+		}
+		JedisClientConfiguration clientConfiguration = builder.build();
 		JedisConnectionFactory jedisConnectionFactory;
 		if (sentinels != null) {
-			RedisSentinelConfiguration redisSentinelConfiguration = new RedisSentinelConfiguration(master, sentinels);
-			jedisConnectionFactory = usePool ? new JedisConnectionFactory(redisSentinelConfiguration, poolConfig)
-					: new JedisConnectionFactory(redisSentinelConfiguration);
+			RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration(master, sentinels);
+			sentinelConfiguration.setDatabase(database);
+			if (StringUtils.isNotBlank(password))
+				sentinelConfiguration.setPassword(RedisPassword.of(password));
+			jedisConnectionFactory = new JedisConnectionFactory(sentinelConfiguration, clientConfiguration);
 		} else if (clusterNodes != null) {
-			RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(clusterNodes);
-			jedisConnectionFactory = usePool ? new JedisConnectionFactory(redisClusterConfiguration, poolConfig)
-					: new JedisConnectionFactory(redisClusterConfiguration);
+			RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration(clusterNodes);
+			if (StringUtils.isNotBlank(password))
+				clusterConfiguration.setPassword(RedisPassword.of(password));
+			jedisConnectionFactory = new JedisConnectionFactory(clusterConfiguration, clientConfiguration);
 		} else {
-			jedisConnectionFactory = usePool ? new JedisConnectionFactory(poolConfig) : new JedisConnectionFactory();
 			if (StringUtils.isNotBlank(host))
 				hostName = host;
-			jedisConnectionFactory.setHostName(hostName);
-			jedisConnectionFactory.setPort(port);
+			RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(hostName, port);
+			standaloneConfiguration.setDatabase(database);
+			if (StringUtils.isNotBlank(password))
+				standaloneConfiguration.setPassword(RedisPassword.of(password));
+			jedisConnectionFactory = new JedisConnectionFactory(standaloneConfiguration, clientConfiguration);
 		}
-		jedisConnectionFactory.setUsePool(usePool);
-		jedisConnectionFactory.setDatabase(database);
-		jedisConnectionFactory.setPassword(password);
 		return jedisConnectionFactory;
 	}
 

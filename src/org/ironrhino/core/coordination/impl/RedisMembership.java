@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -70,7 +71,7 @@ public class RedisMembership implements Membership {
 						conn.connect();
 						if (conn.getResponseCode() == 200) {
 							InputStream is = conn.getInputStream();
-							List<String> lines = IOUtils.readLines(is);
+							List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
 							is.close();
 							if (lines.size() > 0) {
 								String value = lines.get(0).trim();

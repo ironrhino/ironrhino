@@ -7,11 +7,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.ironrhino.core.fs.FileStorage;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,7 +44,7 @@ public abstract class FileStorageTestBase {
 		assertTrue(fs.isDirectory("/test/test2/"));
 		assertNull(fs.open("/test/test2/"));
 		assertNull(fs.open("/test/test2/notexists.txt"));
-		List<String> lines = IOUtils.readLines(fs.open(path));
+		List<String> lines = IOUtils.readLines(fs.open(path), StandardCharsets.UTF_8);
 		assertTrue(fs.exists("/test/"));
 		assertTrue(fs.exists(path));
 		assertEquals(text, lines.get(0));

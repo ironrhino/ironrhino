@@ -318,12 +318,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		if (type == InputStream.class) {
 			return restTemplate.exchange(requestEntity, Resource.class).getBody().getInputStream();
 		} else {
-			return restTemplate.exchange(requestEntity, new ParameterizedTypeReference<Object>() {
-				@Override
-				public Type getType() {
-					return type;
-				}
-			}).getBody();
+			return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
 		}
 	}
 

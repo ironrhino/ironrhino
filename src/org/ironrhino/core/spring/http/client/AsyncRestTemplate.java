@@ -10,6 +10,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 
 @Component
+@SuppressWarnings("deprecation")
 public class AsyncRestTemplate extends org.springframework.web.client.AsyncRestTemplate {
 
 	@Value("${restTemplate.connectTimeout:5000}")

@@ -1,6 +1,7 @@
 package org.ironrhino.batch.component;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -54,7 +55,7 @@ public class BatchSchemaSetup {
 			try (InputStream is = Job.class.getResourceAsStream(file)) {
 				if (is == null)
 					throw new UnsupportedOperationException("Database " + dp.name() + " is not supported");
-				String[] arr = String.join("\n", IOUtils.readLines(is)).split(";");
+				String[] arr = String.join("\n", IOUtils.readLines(is, StandardCharsets.UTF_8)).split(";");
 				try (Statement stmt = conn.createStatement()) {
 					for (String sql : arr) {
 						if (!tablePrefix.equalsIgnoreCase("BATCH_")) {
