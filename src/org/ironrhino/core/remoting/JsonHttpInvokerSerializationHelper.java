@@ -10,19 +10,19 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.ironrhino.core.util.ExceptionUtils;
-import org.ironrhino.core.util.JsonUtils;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -39,9 +39,18 @@ public class JsonHttpInvokerSerializationHelper {
 			.enableDefaultTyping(ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).addMixIn(Throwable.class, ThrowableMixin.class)
 			.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
 			.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
+
+	@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
+	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+	@JsonIgnoreProperties(value = { "localizedMessage", "cause", "suppressed" }, ignoreUnknown = true)
+	public abstract class ThrowableMixin {
+		@JsonCreator
+		public ThrowableMixin(@JsonProperty("message") String message) {
+		}
+	}
 
 	public static void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
 		GenericRemoteInvocation invocation = (GenericRemoteInvocation) remoteInvocation;
@@ -119,10 +128,7 @@ public class JsonHttpInvokerSerializationHelper {
 		} else {
 			exception = ((InvocationTargetException) exception).getTargetException();
 			os.write(1);
-			Map<String, String> map = new LinkedHashMap<>();
-			map.put("type", exception.getClass().getName());
-			map.put("message", exception.getMessage());
-			objectMapper.writeValue(os, map);
+			objectMapper.writeValue(os, exception);
 		}
 	}
 
@@ -141,15 +147,7 @@ public class JsonHttpInvokerSerializationHelper {
 			}
 			return result;
 		} else {
-			Map<String, String> map = objectMapper.readValue(is, JsonUtils.STRING_MAP_TYPE);
-			Class<?> clz = Class.forName(map.get("type"));
-			Throwable throwable;
-			try {
-				throwable = (Throwable) clz.getConstructor(String.class).newInstance(map.get("message"));
-				ExceptionUtils.trimStackTrace(throwable, 0);
-			} catch (Exception e) {
-				throw new RemoteException(e.getMessage(), e);
-			}
+			Throwable throwable = objectMapper.readValue(is, Throwable.class);
 			InvocationTargetException exception = new InvocationTargetException(throwable);
 			result.setException(exception);
 			return result;
