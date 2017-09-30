@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<web-fragment xmlns="http://java.sun.com/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-	http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd"
-	version="3.0"
-	metadata-complete="true">  
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_1.xsd"
+	version="3.1" metadata-complete="true">
 	<name>ironrhino</name>
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -129,7 +126,7 @@
 		<filter-name>accessFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
-  		<dispatcher>ASYNC</dispatcher>
+		<dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>httpSessionFilter</filter-name>
