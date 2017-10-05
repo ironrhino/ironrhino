@@ -13,6 +13,7 @@
 	<constant name="struts.devMode" value="false" />
 	<constant name="struts.ognl.allowStaticMethodAccess" value="false" />
 	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<constant name="struts.disableRequestAttributeValueStackLookup" value="true" />
 	<constant name="struts.mapper.class" value="org.ironrhino.core.struts.mapper.DefaultActionMapper" />
 	<constant name="struts.url.includeParams" value="none" />
 	<constant name="struts.i18n.encoding" value="UTF-8" />
