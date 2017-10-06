@@ -716,6 +716,7 @@ Ajax = {
 	handleResponse : function(data, options, xhr) {
 		if (!data)
 			return;
+		var _title;
 		var hasError = false;
 		var target = options.target;
 		if (target && $(target).parents('div.ui-dialog').length)
@@ -728,6 +729,7 @@ Ajax = {
 			if (i >= 0 && data.indexOf('</title>') > 0) {
 				Ajax.title = data.substring(data.indexOf('<title>') + 7, data
 								.indexOf('</title>'));
+				_title = Ajax.title;
 				if (options.replaceTitle)
 					document.title = Ajax.title;
 				if (i == 0)
@@ -849,6 +851,8 @@ Ajax = {
 		if (options.oncomplete)
 			options.oncomplete.apply(window, [data, xhr]);
 		Ajax.fire(target, 'oncomplete', data);
+		if (Ajax.title == _title)
+			Ajax.title = '';
 	},
 	jsonResult : null,
 	title : ''
@@ -2179,7 +2183,8 @@ var Dialog = {
 			var datagridColumns = 0;
 			var hideCloseButton = false;
 			if (!iframe) {
-				$(d).dialog('option', 'title', Ajax.title);
+				if (Ajax.title)
+					$(d).dialog('option', 'title', Ajax.title);
 				hasRow = $('.row,.row-fluid', d).length > 0;
 				hasToolbarPagination = $(
 						'form.richtable div.toolbar select.pageSize', d).length > 0;
