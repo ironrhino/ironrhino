@@ -39,16 +39,16 @@ public class RedisConfiguration {
 	@Value("${redis.port:6379}")
 	private int port;
 
-	@Value("${redis.sentinels:}")
+	@Value("${redis.sentinels:#{null}}")
 	private Set<String> sentinels;
 
-	@Value("${redis.clusterNodes:}")
+	@Value("${redis.clusterNodes:#{null}}")
 	private Set<String> clusterNodes;
 
 	@Value("${redis.master:master}")
 	private String master;
 
-	@Value("${redis.password:}")
+	@Value("${redis.password:#{null}}")
 	private String password;
 
 	@Value("${redis.usePool:true}")
@@ -74,11 +74,11 @@ public class RedisConfiguration {
 		poolConfig.setMaxIdle(maxIdle);
 		poolConfig.setMinIdle(minIdle);
 		JedisConnectionFactory jedisConnectionFactory;
-		if (sentinels != null && !sentinels.isEmpty()) {
+		if (sentinels != null) {
 			RedisSentinelConfiguration redisSentinelConfiguration = new RedisSentinelConfiguration(master, sentinels);
 			jedisConnectionFactory = usePool ? new JedisConnectionFactory(redisSentinelConfiguration, poolConfig)
 					: new JedisConnectionFactory(redisSentinelConfiguration);
-		} else if (clusterNodes != null && !clusterNodes.isEmpty()) {
+		} else if (clusterNodes != null) {
 			RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(clusterNodes);
 			jedisConnectionFactory = usePool ? new JedisConnectionFactory(redisClusterConfiguration, poolConfig)
 					: new JedisConnectionFactory(redisClusterConfiguration);
