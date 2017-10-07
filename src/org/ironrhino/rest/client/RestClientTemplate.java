@@ -88,8 +88,7 @@ class RestClientTemplate extends RestTemplate {
 	protected <T> T doExecute(URI uri, HttpMethod method, RequestCallback requestCallback,
 			ResponseExtractor<T> responseExtractor, int attempts) throws RestClientException {
 		try {
-			T result = super.doExecute(uri, method, requestCallback, responseExtractor);
-			return result;
+			return super.doExecute(uri, method, requestCallback, responseExtractor);
 		} catch (ResourceAccessException e) {
 			logger.error(e.getMessage(), e);
 			if (--attempts < 1)

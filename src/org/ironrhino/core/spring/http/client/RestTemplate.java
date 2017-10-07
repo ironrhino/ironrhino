@@ -25,7 +25,7 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 
 	@Getter
 	@Setter
-	@Value("${restTemplate.readTimeout:5000}")
+	@Value("${restTemplate.readTimeout:10000}")
 	private int readTimeout;
 
 	@Getter

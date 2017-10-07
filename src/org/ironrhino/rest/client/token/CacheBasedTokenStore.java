@@ -27,10 +27,12 @@ public class CacheBasedTokenStore implements TokenStore {
 		if (token == null) {
 			cacheManager.delete(key, cacheNamespace);
 		} else {
-			int timeToLive = token.getExpiresIn();
+			int expiresIn = token.getExpiresIn();
+			int offset = expiresIn > 3600 ? expiresIn / 20 : 300;
+			expiresIn -= offset;
 			if (token.getRefreshToken() != null)
-				timeToLive += 36000;
-			cacheManager.put(key, token, timeToLive, TimeUnit.SECONDS, cacheNamespace);
+				expiresIn += 36000;
+			cacheManager.put(key, token, expiresIn, TimeUnit.SECONDS, cacheNamespace);
 		}
 	}
 

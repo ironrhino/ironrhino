@@ -9,7 +9,7 @@ public class SimpleClientHttpRequestFactory extends org.springframework.http.cli
 
 	public static final int DEFAULT_CONNECTTIMEOUT = 5000;
 
-	public static final int DEFAULT_READTIMEOUT = 5000;
+	public static final int DEFAULT_READTIMEOUT = 10000;
 
 	private RestClient client;
 

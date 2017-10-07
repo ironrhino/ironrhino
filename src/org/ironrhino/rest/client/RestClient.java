@@ -106,7 +106,7 @@ public class RestClient implements BeanNameAware {
 		return fetchToken().getAccessToken();
 	}
 
-	public String getTokenStoreKey() {
+	protected String getTokenStoreKey() {
 		return beanName == null ? getClientId() : beanName + ":" + getClientId();
 	}
 
