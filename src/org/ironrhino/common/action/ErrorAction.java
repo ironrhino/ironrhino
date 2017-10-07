@@ -7,14 +7,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
-import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.LocalizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
@@ -34,9 +32,6 @@ public class ErrorAction extends BaseAction {
 
 	@Value("${password.entryPoint:}")
 	private String passwordEntryPoint;
-
-	@Autowired(required = false)
-	private HttpErrorHandler httpErrorHandler;
 
 	@Override
 	public String execute() {
@@ -73,9 +68,6 @@ public class ErrorAction extends BaseAction {
 		} catch (Exception e) {
 
 		}
-		if (httpErrorHandler != null && httpErrorHandler.handle(request, response, errorcode,
-				exception != null ? exception.getMessage() : null))
-			return NONE;
 		String result;
 		switch (errorcode) {
 		case HttpServletResponse.SC_UNAUTHORIZED:

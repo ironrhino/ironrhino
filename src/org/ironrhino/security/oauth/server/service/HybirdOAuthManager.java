@@ -18,6 +18,7 @@ import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.security.oauth.server.domain.OAuthError;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.model.Authorization;
@@ -60,9 +61,9 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 	public Authorization grant(Client client, String deviceId, String deviceName) {
 		Client orig = findClientById(client.getClientId());
 		if (orig == null)
-			throw new IllegalArgumentException("client_id_not_exists");
+			throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_id_not_exists");
 		if (!orig.getSecret().equals(client.getSecret()))
-			throw new IllegalArgumentException("client_secret_mismatch");
+			throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_secret_mismatch");
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
@@ -131,7 +132,7 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 	@Override
 	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType) {
 		if (!client.supportsRedirectUri(redirectUri))
-			throw new IllegalArgumentException("redirect_uri_mismatch");
+			throw new OAuthError(OAuthError.INVALID_GRANT, "redirect_uri_mismatch");
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
@@ -168,7 +169,7 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth == null)
-			throw new IllegalArgumentException("bad_auth");
+			throw new OAuthError(OAuthError.INVALID_GRANT, "bad_auth");
 		auth.setGrantor(grantor);
 		try {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
@@ -201,7 +202,7 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 		String key = NAMESPACE_AUTHORIZATION + code;
 		String id = stringRedisTemplate.opsForValue().get(key);
 		if (id == null)
-			throw new IllegalArgumentException("code_invalid");
+			throw new OAuthError(OAuthError.INVALID_GRANT, "code_invalid");
 		Authorization auth = null;
 		try {
 			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
@@ -210,18 +211,18 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth == null)
-			throw new IllegalArgumentException("code_invalid");
+			throw new OAuthError(OAuthError.INVALID_GRANT, "code_invalid");
 		if (auth.isClientSide())
-			throw new IllegalArgumentException("not_server_side");
+			throw new OAuthError(OAuthError.INVALID_GRANT, "not_server_side");
 		if (auth.getGrantor() == null)
-			throw new IllegalArgumentException("user_not_granted");
+			throw new OAuthError(OAuthError.INVALID_GRANT, "user_not_granted");
 		Client orig = findClientById(auth.getClient());
 		if (!orig.getId().equals(client.getId()))
-			throw new IllegalArgumentException("client_id_mismatch");
+			throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_id_mismatch");
 		if (!orig.getSecret().equals(client.getSecret()))
-			throw new IllegalArgumentException("client_secret_mismatch");
+			throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_secret_mismatch");
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
-			throw new IllegalArgumentException("redirect_uri_mismatch");
+			throw new OAuthError(OAuthError.INVALID_GRANT, "redirect_uri_mismatch");
 		if (exclusive)
 			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
@@ -258,13 +259,13 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 	public Authorization refresh(Client client, String refreshToken) {
 		Client orig = findClientById(client.getClientId());
 		if (orig == null)
-			throw new IllegalArgumentException("client_id_not_exists");
+			throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_id_not_exists");
 		if (!orig.getSecret().equals(client.getSecret()))
-			throw new IllegalArgumentException("client_secret_mismatch");
+			throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_secret_mismatch");
 		String keyRefreshToken = NAMESPACE_AUTHORIZATION + refreshToken;
 		String id = stringRedisTemplate.opsForValue().get(keyRefreshToken);
 		if (id == null)
-			throw new IllegalArgumentException("invalid_token");
+			throw new OAuthError(OAuthError.INVALID_GRANT);
 		Authorization auth = null;
 		try {
 			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
@@ -273,7 +274,7 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth == null)
-			throw new IllegalArgumentException("invalid_token");
+			throw new OAuthError(OAuthError.INVALID_GRANT);
 		stringRedisTemplate.delete(keyRefreshToken);
 		stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + auth.getAccessToken());
 		auth.setAccessToken(CodecUtils.nextId());

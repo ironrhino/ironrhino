@@ -19,12 +19,13 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.security.verfication.VerificationManager;
-import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExceptionUtils;
+import org.ironrhino.security.oauth.server.component.OAuthErrorHandler;
+import org.ironrhino.security.oauth.server.domain.OAuthError;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
@@ -66,8 +67,8 @@ public class Oauth2Action extends BaseAction {
 	@Autowired
 	private OAuthManager oauthManager;
 
-	@Autowired(required = false)
-	private HttpErrorHandler httpErrorHandler;
+	@Autowired
+	private OAuthErrorHandler oauthErrorHandler;
 
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -158,7 +159,7 @@ public class Oauth2Action extends BaseAction {
 	public String auth() throws Exception {
 		client = oauthManager.findClientById(client_id);
 		if (client == null)
-			throw new IllegalArgumentException("CLIENT_ID_INVALID");
+			throw new IllegalArgumentException("client_id_invalid");
 		UserDetails grantor = AuthzUtils.getUserDetails();
 		if (!"force".equals(approval_prompt) && grantor != null) {
 			List<Authorization> auths = oauthManager.findAuthorizationsByGrantor(grantor.getUsername());
@@ -253,16 +254,24 @@ public class Oauth2Action extends BaseAction {
 	}
 
 	@JsonConfig(root = "tojson")
-	public String token() {
+	public String token() throws IOException {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
+		response.setHeader("Cache-Control", "no-store");
+		response.setHeader("Pragma", "no-store");
 		if (grant_type == GrantType.password) {
 			client = oauthManager.findClientById(client_id);
 			try {
-				if (client == null)
-					throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
-				if (!client.getSecret().equals(client_secret))
-					throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+				if (client == null) {
+					oauthErrorHandler.handle(request, response,
+							new OAuthError(OAuthError.INVALID_CLIENT, "client_id_not_exists"));
+					return NONE;
+				}
+				if (!client.getSecret().equals(client_secret)) {
+					oauthErrorHandler.handle(request, response,
+							new OAuthError(OAuthError.INVALID_CLIENT, "client_secret_mismatch"));
+					return NONE;
+				}
 				try {
 					Authentication authResult = authenticationManager
 							.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -287,14 +296,8 @@ public class Oauth2Action extends BaseAction {
 			} catch (Exception e) {
 				logger.error("Exchange token by password for \"{}\" failed with {}: {}", username,
 						e.getClass().getName(), e.getLocalizedMessage());
-				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
-					return NONE;
-				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
-					return NONE;
-				} catch (IOException e1) {
-				}
+				oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
+						: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
 				return NONE;
 			}
 			tojson = new LinkedHashMap<>();
@@ -313,14 +316,8 @@ public class Oauth2Action extends BaseAction {
 			} catch (Exception e) {
 				logger.error("Exchange token by client_credentials for \"{}\" failed with {}: {}", client_id,
 						e.getClass().getName(), e.getLocalizedMessage());
-				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
-					return NONE;
-				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
-					return NONE;
-				} catch (IOException e1) {
-				}
+				oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
+						: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
 				return NONE;
 			}
 			tojson = new LinkedHashMap<>();
@@ -341,27 +338,15 @@ public class Oauth2Action extends BaseAction {
 			} catch (Exception e) {
 				logger.error("Refresh token \"{}\" failed with {}: {}", refresh_token, e.getClass().getName(),
 						e.getLocalizedMessage());
-				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
-					return NONE;
-				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
-					return NONE;
-				} catch (IOException e1) {
-				}
+				oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
+						: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
 				return NONE;
 			}
 			return JSON;
 		} else {
 			if (grant_type != GrantType.authorization_code) {
 				String message = "grant_type must be authorization_code";
-				if (httpErrorHandler != null
-						&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, message))
-					return NONE;
-				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-				} catch (IOException e1) {
-				}
+				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.UNSUPPORTED_GRANT_TYPE, message));
 				return NONE;
 			}
 			client = new Client();
@@ -379,13 +364,8 @@ public class Oauth2Action extends BaseAction {
 			} catch (Exception e) {
 				logger.error("Exchange token by code for \"{}\" failed with {}: {}", code, e.getClass().getName(),
 						e.getLocalizedMessage());
-				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-						HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
-					return NONE;
-				try {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
-				} catch (IOException e1) {
-				}
+				oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
+						: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
 				return NONE;
 			}
 			return JSON;
@@ -393,7 +373,7 @@ public class Oauth2Action extends BaseAction {
 	}
 
 	@JsonConfig(root = "tojson")
-	public String info() {
+	public String info() throws IOException {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		if (access_token == null && token != null)
@@ -401,15 +381,11 @@ public class Oauth2Action extends BaseAction {
 		tojson = new LinkedHashMap<>();
 		authorization = oauthManager.retrieve(access_token);
 		if (authorization == null) {
-			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_UNAUTHORIZED, "invalid_token"))
-				return NONE;
-			tojson.put("error", "invalid_token");
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN));
+			return NONE;
 		} else if (authorization.getExpiresIn() < 0) {
-			if (httpErrorHandler != null
-					&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_UNAUTHORIZED, "expired_token"))
-				return NONE;
-			tojson.put("error", "expired_token");
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN, "expired_token"));
+			return NONE;
 		} else {
 			if (authorization.getClient() != null)
 				tojson.put("client_id", authorization.getClient());
@@ -422,21 +398,20 @@ public class Oauth2Action extends BaseAction {
 		return JSON;
 	}
 
-	public String revoke() {
+	public String revoke() throws IOException {
 		if (access_token == null && token != null)
 			access_token = token;
 		boolean revoked = oauthManager.revoke(access_token);
-		if (httpErrorHandler != null) {
+		if (!revoked) {
 			HttpServletRequest request = ServletActionContext.getRequest();
 			HttpServletResponse response = ServletActionContext.getResponse();
-			httpErrorHandler.handle(request, response,
-					revoked ? HttpServletResponse.SC_OK : HttpServletResponse.SC_NOT_FOUND, null);
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_REQUEST, "revoke_failed"));
 		}
 		return NONE;
 	}
 
 	@JsonConfig(root = "tojson")
-	public String sendVerificationCode() {
+	public String sendVerificationCode() throws IOException {
 		if (verificationManager == null) {
 			tojson = new LinkedHashMap<>();
 			tojson.put("code", "2");
@@ -448,9 +423,9 @@ public class Oauth2Action extends BaseAction {
 		try {
 			client = oauthManager.findClientById(client_id);
 			if (client == null)
-				throw new IllegalArgumentException("CLIENT_ID_NOT_EXISTS");
+				throw new IllegalArgumentException("client_id_not_exists");
 			if (!client.getSecret().equals(client_secret))
-				throw new IllegalArgumentException("CLIENT_SECRET_MISMATCH");
+				throw new IllegalArgumentException("client_secret_mismatch");
 			if (verificationManager != null && StringUtils.isNotBlank(username)) {
 				try {
 					verificationManager.send(username);
@@ -464,13 +439,8 @@ public class Oauth2Action extends BaseAction {
 		} catch (Exception e) {
 			logger.error("Send verification code to \"{}\" failed with {}: {}", username, e.getClass().getName(),
 					e.getLocalizedMessage());
-			if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
-					HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage()))
-				return NONE;
-			try {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getLocalizedMessage());
-			} catch (IOException e1) {
-			}
+			oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
+					: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
 			return NONE;
 		}
 		return JSON;

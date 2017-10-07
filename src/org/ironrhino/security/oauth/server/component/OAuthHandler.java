@@ -10,11 +10,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
-import org.ironrhino.core.servlet.HttpErrorHandler;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.core.util.UserAgent;
 import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
+import org.ironrhino.security.oauth.server.domain.OAuthError;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.service.OAuthAuthorizationService;
 import org.slf4j.Logger;
@@ -57,8 +57,8 @@ public class OAuthHandler extends AccessHandler {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	@Autowired(required = false)
-	private HttpErrorHandler httpErrorHandler;
+	@Autowired
+	private OAuthErrorHandler oauthErrorHandler;
 
 	@Autowired
 	private HttpSessionManager httpSessionManager;
@@ -74,7 +74,7 @@ public class OAuthHandler extends AccessHandler {
 	}
 
 	@Override
-	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, String> map = RequestUtils.parseParametersFromQueryString(request.getQueryString());
 		String token = map.get("oauth_token");
 		if (token == null)
@@ -98,8 +98,9 @@ public class OAuthHandler extends AccessHandler {
 						token = header.substring(0, header.indexOf("\""));
 					}
 				} else {
-					return handleError(request, response,
-							"invalid Authorization header, must starts with OAuth or Bearer");
+					oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_REQUEST,
+							"Invalid Authorization header, must starts with OAuth or Bearer"));
+					return true;
 				}
 			}
 		}
@@ -110,15 +111,20 @@ public class OAuthHandler extends AccessHandler {
 				if (StringUtils.isNotBlank(sessionTracker))
 					return false;
 			}
-			return handleError(request, response, "missing_token");
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN, "missing_token"));
+			return true;
 		}
 
 		OAuthAuthorization authorization = oauthAuthorizationService.get(token);
-		if (authorization == null)
-			return handleError(request, response, "invalid_token");
+		if (authorization == null) {
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN));
+			return true;
+		}
 
-		if (authorization.getExpiresIn() < 0)
-			return handleError(request, response, "expired_token");
+		if (authorization.getExpiresIn() < 0) {
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN, "expired_token"));
+			return true;
+		}
 
 		String[] scopes = null;
 		if (StringUtils.isNotBlank(authorization.getScope()))
@@ -133,14 +139,18 @@ public class OAuthHandler extends AccessHandler {
 				}
 			}
 		}
-		if (!scopeAuthorized)
-			return handleError(request, response, "unauthorized_scope");
+		if (!scopeAuthorized) {
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INSUFFICIENT_SCOPE));
+			return true;
+		}
 
 		String clientId = authorization.getClientId();
 		if (clientId != null) {
 			String clientName = authorization.getClientName();
-			if (clientName == null)
-				return handleError(request, response, "invalid_client");
+			if (clientName == null) {
+				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.UNAUTHORIZED_CLIENT));
+				return true;
+			}
 			UserAgent ua = new UserAgent(request.getHeader("User-Agent"));
 			ua.setAppId(clientId);
 			ua.setAppName(clientName);
@@ -155,15 +165,21 @@ public class OAuthHandler extends AccessHandler {
 			} catch (UsernameNotFoundException unf) {
 				logger.error(unf.getMessage(), unf);
 			}
+			if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
+				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.UNAUTHORIZED_CLIENT));
+				return true;
+			}
 		} else if (authorization.getGrantor() != null) {
 			try {
 				ud = userDetailsService.loadUserByUsername(authorization.getGrantor());
 			} catch (UsernameNotFoundException unf) {
 				logger.error(unf.getMessage(), unf);
 			}
+			if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
+				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_REQUEST, "invalid_user"));
+				return true;
+			}
 		}
-		if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked())
-			return handleError(request, response, "invalid_user");
 
 		SecurityContext sc = SecurityContextHolder.getContext();
 		Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
@@ -178,17 +194,4 @@ public class OAuthHandler extends AccessHandler {
 
 	}
 
-	protected boolean handleError(HttpServletRequest request, HttpServletResponse response, String errorMessage) {
-		if (httpErrorHandler != null
-				&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_UNAUTHORIZED, errorMessage))
-			return true;
-		try {
-			if (errorMessage != null)
-				response.getWriter().write(errorMessage);
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
-		return true;
-	}
 }

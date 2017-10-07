@@ -4,7 +4,7 @@
 <h4 class="center">OAuth2</h4>
 <ol>
 <li>获取access_token
-	<ul>
+	<ul class="unstyled">
 	<li>
 	<h5><em>client_credentials</em>方式,此方式获取的token代表的用户是client的所有者</h5>
 	<ol>
@@ -47,6 +47,31 @@
 	<div>
 	请求头名为Authorization:<br><code>curl -H "Authorization: Bearer {access_token}" ${apiBaseUrl}/user/@self</code>
 	</div>
+</li>
+<li>获取或使用access_token的错误响应
+	<ul>
+	<li>参见: 
+	<a href="https://tools.ietf.org/html/rfc6749#section-5.2" target="_blank">https://tools.ietf.org/html/rfc6749#section-5.2</a>  
+	<a href="https://tools.ietf.org/html/rfc6750#section-3.1" target="_blank">https://tools.ietf.org/html/rfc6750#section-3.1</a>
+	</li>
+	<li>
+	<div>响应消息体为json格式, 包含error字段和error_message(可选)字段.
+	示例: <code>{"error":"invalid_token","error_message":"expired_token"}</code>
+	</div>
+	</li>
+	<li>响应状态码列表
+	<ul>
+		<li>invalid_request:	400</li>
+		<li>invalid_client:	400</li>
+		<li>invalid_token:	401</li>
+		<li>invalid_grant:	400</li>
+		<li>invalid_scope:	400</li>
+		<li>insufficient_scope:	403</li>
+		<li>unauthorized_client:	401</li>
+		<li>unsupported_grant_type:	400</li>
+	</ul>
+	</li>
+	</ul>
 </li>
 </ol>
 
