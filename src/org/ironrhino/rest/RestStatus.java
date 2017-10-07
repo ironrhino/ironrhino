@@ -3,15 +3,20 @@ package org.ironrhino.rest;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.metadata.UiConfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties({ "localizedMessage", "cause", "stackTrace", "suppressed" })
 public class RestStatus extends RuntimeException {
 
@@ -41,22 +46,14 @@ public class RestStatus extends RuntimeException {
 	public static final RestStatus UNAUTHORIZED = valueOf(CODE_UNAUTHORIZED, null, 401);
 	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND, null, 404);
 
-	@Getter
-	@Setter
-	@UiConfig(required = true)
+	@NotNull
 	private String code;
 
-	@Getter
-	@Setter
-	@UiConfig(required = true)
+	@NotNull
 	private String status;
 
-	@Getter
-	@Setter
 	private String message;
 
-	@Getter
-	@Setter
 	@JsonIgnore
 	private Integer httpStatusCode;
 
