@@ -40,12 +40,14 @@ public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegist
 			String dataSourceBeanName = annotation.dataSource();
 			if (StringUtils.isBlank(dataSourceBeanName))
 				dataSourceBeanName = "dataSource";
+			String jdbcTemplate = annotation.jdbcTemplate();
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(JdbcRepositoryFactoryBean.class);
 			beanDefinition.setTargetType(jdbcRepositoryClass);
 			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
 			ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
 			constructorArgumentValues.addIndexedArgumentValue(0, jdbcRepositoryClass);
-			constructorArgumentValues.addIndexedArgumentValue(1, new RuntimeBeanReference(dataSourceBeanName));
+			constructorArgumentValues.addIndexedArgumentValue(1,
+					new RuntimeBeanReference(StringUtils.isNotBlank(jdbcTemplate) ? jdbcTemplate : dataSourceBeanName));
 			beanDefinition.setConstructorArgumentValues(constructorArgumentValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
 			logger.info("Register bean [{}] for @JdbcRepository [{}]", beanName, jdbcRepositoryClass.getName());

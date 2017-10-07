@@ -14,4 +14,6 @@ public @interface JdbcRepository {
 
 	String dataSource() default "dataSource";
 
+	String jdbcTemplate() default "";
+
 }

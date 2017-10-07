@@ -32,6 +32,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -43,13 +44,13 @@ public class JdbcRepositoryFactoryBean
 
 	private final Class<?> jdbcRepositoryClass;
 
-	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
 	private final DatabaseProduct databaseProduct;
 
 	private final int databaseMajorVersion;
 
 	private final int databaseMinorVersion;
+
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	private Object jdbcRepositoryBean;
 
@@ -59,16 +60,16 @@ public class JdbcRepositoryFactoryBean
 
 	private Partitioner defaultPartitioner;
 
-	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, DataSource dataSource) {
+	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, JdbcTemplate jdbcTemplate) {
 		Assert.notNull(jdbcRepositoryClass, "jdbcRepositoryClass shouldn't be null");
-		Assert.notNull(dataSource, "dataSource shouldn't be null");
+		Assert.notNull(jdbcTemplate, "jdbcTemplate shouldn't be null");
 		if (!jdbcRepositoryClass.isInterface())
 			throw new IllegalArgumentException(jdbcRepositoryClass.getName() + " should be interface");
 		this.jdbcRepositoryClass = jdbcRepositoryClass;
 		this.jdbcRepositoryBean = new ProxyFactory(jdbcRepositoryClass, this)
 				.getProxy(jdbcRepositoryClass.getClassLoader());
-		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		try (Connection c = dataSource.getConnection()) {
+		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+		try (Connection c = jdbcTemplate.getDataSource().getConnection()) {
 			DatabaseMetaData dmd = c.getMetaData();
 			databaseProduct = DatabaseProduct.parse(dmd.getDatabaseProductName());
 			databaseMajorVersion = dmd.getDatabaseMajorVersion();
@@ -76,6 +77,10 @@ public class JdbcRepositoryFactoryBean
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, DataSource dataSource) {
+		this(jdbcRepositoryClass, new JdbcTemplate(dataSource));
 	}
 
 	@Override
