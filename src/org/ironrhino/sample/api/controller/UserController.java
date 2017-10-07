@@ -1,5 +1,6 @@
 package org.ironrhino.sample.api.controller;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +43,13 @@ public class UserController {
 		if (loggedInUser == null)
 			throw RestStatus.NOT_FOUND;
 		return loggedInUser;
+	}
+
+	@Order(1)
+	@Api("获取所有用户信息")
+	@RequestMapping(value = "/@all", method = RequestMethod.GET)
+	public List<User> all() {
+		return userManager.findAll();
 	}
 
 	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)

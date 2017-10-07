@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="restClient" class="org.ironrhino.rest.client.RestClient"
+		  c:_0="http://localhost:8080/api"
+		  c:_1="http://localhost:8080/oauth/oauth2/token"
+		  c:_2="1IbhUczby8QGuxIcA3zUQF"
+		  c:_3="76IytucIQQgKWDG06xGPsA"
+		  />
+	<bean class="org.ironrhino.rest.client.RestApiRegistryPostProcessor"/>
+</beans>
