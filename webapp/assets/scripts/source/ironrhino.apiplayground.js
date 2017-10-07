@@ -126,3 +126,17 @@ Initialization.apiplayground = function() {
 				$.ajax(options);
 			});
 };
+Observation.formatJson = function(container) {
+	$$('code.json.block').each(function() {
+				var t = $(this);
+				if (t.text()) {
+					try {
+						t
+								.text(JSON.stringify(JSON.parse(t.text()),
+										null, '   '));
+					} catch (e) {
+
+					}
+				}
+			});
+}

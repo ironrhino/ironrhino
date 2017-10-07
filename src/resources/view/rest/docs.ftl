@@ -127,7 +127,7 @@
 					<#if apiDoc.requestHeaders?has_content><tr><td>请求头</td><td class="compact-horizontal"><@listFields fields=apiDoc.requestHeaders/></td></tr></#if>
 					<#if apiDoc.cookieValues?has_content><tr><td>请求Cookie</td><td class="compact-horizontal"><@listFields fields=apiDoc.cookieValues/></td></tr></#if>
 					<#if apiDoc.requestBody?has_content><tr><td>请求消息体<#if !apiDoc.requestBodyRequired><br/><span class="label label-info">可选</span></#if><#if apiDoc.requestBodyType?has_content><br/><span class="label label-warning">${getText(apiDoc.requestBodyType)}</span></#if></td><td class="compact-horizontal"><@listFields fields=apiDoc.requestBody/></td></tr></#if>
-					<#if apiDoc.requestBodySample?has_content><tr><td>请求消息体示例</td><td><code class="block">${apiDoc.requestBodySample?no_esc}</code></td></tr></#if>
+					<#if apiDoc.requestBodySample?has_content><tr><td>请求消息体示例</td><td><code class="block json">${apiDoc.requestBodySample?no_esc}</code></td></tr></#if>
 					<tr><td>响应状态</td><td class="compact-horizontal">
 						<table class="table">
 							<thead>
@@ -141,7 +141,7 @@
 						</table>
 					</td></tr>
 					<#if apiDoc.responseBody?has_content><tr><td>响应消息体<#if apiDoc.responseBodyType?has_content><br/><span class="label label-warning">${getText(apiDoc.responseBodyType)}</span></#if></td><td class="compact-horizontal"><@listFields fields=apiDoc.responseBody/></td></tr></#if>
-					<#if apiDoc.responseBodySample?has_content><tr><td>响应消息体示例</td><td><code class="block">${apiDoc.responseBodySample?no_esc}</code></td></tr></#if>
+					<#if apiDoc.responseBodySample?has_content><tr><td>响应消息体示例</td><td><code class="block json">${apiDoc.responseBodySample?no_esc}</code></td></tr></#if>
 					<tr><td>试玩一下</td><td class="compact-horizontal"><#include "playground.ftl"/></td></tr>
 				</tbody>
 			</table>

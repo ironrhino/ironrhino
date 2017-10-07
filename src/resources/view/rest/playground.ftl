@@ -45,7 +45,7 @@
 </td></tr>
 <#if apiDoc.requestBodySample?has_content>
 <tr><td>请求消息体</td><td>
-<code class="requestBody block" contenteditable>${apiDoc.requestBodySample}</code>
+<code class="requestBody block json" contenteditable>${apiDoc.requestBodySample}</code>
 </td></tr>
 </#if>
 <tr><td>响应状态</td><td>
@@ -55,7 +55,7 @@
 <p class="responseHeaders"></p>
 </td></tr>
 <tr><td>响应消息体</td><td>
-<code class="responseBody block" style="display:inline-block;box-sizing:border-box;min-width:100%;min-height:50px;"></code></td></tr>
+<code class="responseBody block json" style="display:inline-block;box-sizing:border-box;min-width:100%;min-height:50px;"></code></td></tr>
 </tbody>
 </table>
 <button type="submit" class="btn btn-primary btn-block">${getText('confirm')}</button>
