@@ -102,9 +102,9 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		if (classRequestMapping == null && methodRequestMapping == null)
 			throw new UnsupportedOperationException("@RequestMapping should be present");
 		StringBuilder url = new StringBuilder(apiBaseUrl);
-		if (classRequestMapping != null)
+		if (classRequestMapping != null && classRequestMapping.value().length > 0)
 			url.append(classRequestMapping.value()[0]);
-		if (methodRequestMapping != null)
+		if (methodRequestMapping != null && methodRequestMapping.value().length > 0)
 			url.append(methodRequestMapping.value()[0]);
 		RequestMethod[] requestMethods = methodRequestMapping != null ? methodRequestMapping.method()
 				: classRequestMapping.method();
