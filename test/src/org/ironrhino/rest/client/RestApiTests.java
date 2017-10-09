@@ -3,8 +3,13 @@ package org.ironrhino.rest.client;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.io.IOUtils;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.security.domain.User;
 import org.junit.Test;
@@ -13,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "ctx.xml" })
@@ -45,6 +51,19 @@ public class RestApiTests {
 	@Test(expected = HttpClientErrorException.class)
 	public void testThrows() {
 		userClient.get("usernamenotexists");
+	}
+
+	@Test(expected = HttpServerErrorException.class)
+	public void testPostStream() {
+		InputStream is = new ByteArrayInputStream("test".getBytes());
+		userClient.postStream(is);
+	}
+
+	@Test
+	public void testGetStream() throws IOException {
+		InputStream is = userClient.getStream();
+		List<String> lines = IOUtils.readLines(is);
+		assertEquals(false, lines.isEmpty());
 	}
 
 }

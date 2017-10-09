@@ -1,5 +1,6 @@
 package org.ironrhino.rest.client;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.ironrhino.rest.RestStatus;
@@ -26,18 +27,24 @@ public interface UserClient {
 	public RestStatus validatePassword(@RequestBody User user);
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
-	public User get(final @PathVariable String username);
+	public User get(String username);
 
 	@RequestMapping(method = RequestMethod.POST)
 	public void post(@RequestBody User user);
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.PATCH)
-	public void patch(@PathVariable String username, @RequestBody User user);
+	public void patch(String username, @RequestBody User user);
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
-	public void delete(@PathVariable String username);
+	public void delete(String username);
 
 	@RequestMapping(value = "/{username}/password", method = RequestMethod.PATCH)
 	public RestStatus validatePassword(@PathVariable String username, @RequestBody User user);
+
+	@RequestMapping(method = RequestMethod.POST)
+	public void postStream(InputStream is);
+
+	@RequestMapping(value = "/@self", method = RequestMethod.GET)
+	public InputStream getStream();
 
 }

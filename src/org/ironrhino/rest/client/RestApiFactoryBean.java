@@ -1,5 +1,6 @@
 package org.ironrhino.rest.client;
 
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -17,13 +18,16 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -118,26 +122,31 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		String[] parameterNames = ReflectionUtils.getParameterNames(method);
 		Object[] arguments = methodInvocation.getArguments();
 		Annotation[][] array = method.getParameterAnnotations();
+		InputStream is = null;
 		for (int i = 0; i < array.length; i++) {
 			Object argument = arguments[i];
 			if (argument == null)
 				continue;
-			// Put arguments to pathVariable even if @PathVariable not present
-			pathVariables.put(parameterNames[i], argument);
+			if (argument instanceof InputStream)
+				is = (InputStream) argument;
+			boolean annotationPresent = false;
 			for (Annotation anno : array[i]) {
 				if (anno instanceof PathVariable) {
+					annotationPresent = true;
 					String name = ((PathVariable) anno).value();
 					if (StringUtils.isBlank(name))
 						name = parameterNames[i];
 					pathVariables.put(name, argument);
 				}
 				if (anno instanceof RequestHeader) {
+					annotationPresent = true;
 					String name = ((RequestHeader) anno).value();
 					if (StringUtils.isBlank(name))
 						name = parameterNames[i];
 					headers.add(name, argument.toString());
 				}
 				if (anno instanceof RequestParam) {
+					annotationPresent = true;
 					String name = ((RequestParam) anno).value();
 					if (StringUtils.isBlank(name))
 						name = parameterNames[i];
@@ -146,6 +155,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 					requestParams.put(name, argument.toString());
 				}
 				if (anno instanceof CookieValue) {
+					annotationPresent = true;
 					String name = ((CookieValue) anno).value();
 					if (StringUtils.isBlank(name))
 						name = parameterNames[i];
@@ -154,38 +164,59 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 					cookieValues.put(name, argument.toString());
 				}
 				if (anno instanceof RequestBody) {
+					annotationPresent = true;
 					body = argument;
 				}
 			}
+			// Put arguments to pathVariable even if @PathVariable not present
+			if (!annotationPresent)
+				pathVariables.put(parameterNames[i], argument);
 		}
 		if (cookieValues != null) {
 			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<String, String> entry : cookieValues.entrySet())
 				sb.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(), "UTF-8")).append("; ");
 			sb.delete(sb.length() - 2, sb.length());
-			headers.add(HttpHeaders.COOKIE, sb.toString());
+			headers.set(HttpHeaders.COOKIE, sb.toString());
 		}
 		if (requestParams != null) {
-			for (Map.Entry<String, String> entry : requestParams.entrySet()) {
-				url.append(url.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
-						.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+			if (body == null && requestMethod.name().startsWith("P")) {
+				headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+				LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+				for (Map.Entry<String, String> entry : requestParams.entrySet()) {
+					map.add(entry.getKey(), entry.getValue());
+				}
+				body = map;
+			} else {
+				for (Map.Entry<String, String> entry : requestParams.entrySet()) {
+					url.append(url.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
+							.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+				}
 			}
+		}
+		if (requestMethod.name().startsWith("P")) {
+			if (body == null && is != null)
+				body = is;
+			if (body instanceof InputStream)
+				body = new InputStreamResource((InputStream) body);
 		}
 		RequestEntity<Object> requestEntity = new RequestEntity<>(body, headers,
 				HttpMethod.valueOf(requestMethod.name()),
 				restTemplate.getUriTemplateHandler().expand(url.toString(), pathVariables));
-		ResponseEntity<?> responseEntity;
 		Type grt = method.getGenericReturnType();
 		if (grt == Void.class || grt == Void.TYPE)
 			grt = null;
 		final Type type = grt;
-		responseEntity = restTemplate.exchange(requestEntity, new ParameterizedTypeReference<Object>() {
-			@Override
-			public Type getType() {
-				return type;
-			}
-		});
-		return responseEntity.getBody();
+		if (grt == InputStream.class) {
+			return restTemplate.exchange(requestEntity, Resource.class).getBody().getInputStream();
+		} else {
+			return restTemplate.exchange(requestEntity, new ParameterizedTypeReference<Object>() {
+				@Override
+				public Type getType() {
+					return type;
+				}
+			}).getBody();
+		}
 	}
 
 }
