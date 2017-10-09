@@ -43,7 +43,7 @@ public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegist
 			String jdbcTemplate = annotation.jdbcTemplate();
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(JdbcRepositoryFactoryBean.class);
 			beanDefinition.setTargetType(jdbcRepositoryClass);
-			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
+			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
 			ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
 			constructorArgumentValues.addIndexedArgumentValue(0, jdbcRepositoryClass);
 			constructorArgumentValues.addIndexedArgumentValue(1,

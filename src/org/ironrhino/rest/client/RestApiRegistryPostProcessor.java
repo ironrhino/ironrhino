@@ -39,7 +39,7 @@ public class RestApiRegistryPostProcessor implements BeanDefinitionRegistryPostP
 			}
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(RestApiFactoryBean.class);
 			beanDefinition.setTargetType(restApiClass);
-			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
+			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
 			ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
 			constructorArgumentValues.addIndexedArgumentValue(0, restApiClass);
 			if (StringUtils.isNotBlank(annotation.restTemplate()))

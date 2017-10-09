@@ -81,7 +81,7 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 			}
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(HttpInvokerClient.class);
 			beanDefinition.setTargetType(remotingService);
-			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
+			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
 			MutablePropertyValues propertyValues = new MutablePropertyValues();
 			propertyValues.addPropertyValue("serviceInterface", remotingService.getName());
 			beanDefinition.setPropertyValues(propertyValues);
