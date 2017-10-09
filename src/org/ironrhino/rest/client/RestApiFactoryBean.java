@@ -122,6 +122,8 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 			Object argument = arguments[i];
 			if (argument == null)
 				continue;
+			// Put arguments to pathVariable even if @PathVariable not present
+			pathVariables.put(parameterNames[i], argument);
 			for (Annotation anno : array[i]) {
 				if (anno instanceof PathVariable) {
 					String name = ((PathVariable) anno).value();
