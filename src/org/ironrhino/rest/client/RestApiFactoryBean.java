@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -105,11 +107,12 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		RequestMapping methodRequestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
 		if (classRequestMapping == null && methodRequestMapping == null)
 			throw new UnsupportedOperationException("@RequestMapping should be present");
-		StringBuilder url = new StringBuilder(apiBaseUrl);
+		StringBuilder sb = new StringBuilder(apiBaseUrl);
 		if (classRequestMapping != null && classRequestMapping.value().length > 0)
-			url.append(classRequestMapping.value()[0]);
+			sb.append(classRequestMapping.value()[0]);
 		if (methodRequestMapping != null && methodRequestMapping.value().length > 0)
-			url.append(methodRequestMapping.value()[0]);
+			sb.append(methodRequestMapping.value()[0]);
+		String url = sb.toString().trim();
 		RequestMethod[] requestMethods = methodRequestMapping != null ? methodRequestMapping.method()
 				: classRequestMapping.method();
 		RequestMethod requestMethod = requestMethods.length > 0 ? requestMethods[0] : RequestMethod.GET;
@@ -172,26 +175,41 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 			if (!annotationPresent)
 				pathVariables.put(parameterNames[i], argument);
 		}
+		while (url.contains("{")) {
+			int index = url.indexOf('{');
+			String prefix = url.substring(0, index);
+			if (!url.endsWith("}"))
+				prefix = null;
+			url = URLDecoder.decode(restTemplate.getUriTemplateHandler().expand(url, pathVariables).toString(),
+					"UTF-8");
+			if (url.indexOf("http://") > 0)
+				url = url.substring(url.indexOf("http://"));
+			else if (url.indexOf("https://") > 0)
+				url = url.substring(url.indexOf("https://"));
+			else if (prefix != null && prefix.length() > 0 && url.substring(index).startsWith(prefix))
+				url = url.substring(index);
+		}
 		if (cookieValues != null) {
-			StringBuilder sb = new StringBuilder();
+			StringBuilder cookie = new StringBuilder();
 			for (Map.Entry<String, String> entry : cookieValues.entrySet())
-				sb.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(), "UTF-8")).append("; ");
-			sb.delete(sb.length() - 2, sb.length());
-			headers.set(HttpHeaders.COOKIE, sb.toString());
+				cookie.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(), "UTF-8"))
+						.append("; ");
+			cookie.delete(cookie.length() - 2, cookie.length());
+			headers.set(HttpHeaders.COOKIE, cookie.toString());
 		}
 		if (requestParams != null) {
 			if (body == null && requestMethod.name().startsWith("P")) {
 				headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 				LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-				for (Map.Entry<String, String> entry : requestParams.entrySet()) {
+				for (Map.Entry<String, String> entry : requestParams.entrySet())
 					map.add(entry.getKey(), entry.getValue());
-				}
 				body = map;
 			} else {
-				for (Map.Entry<String, String> entry : requestParams.entrySet()) {
-					url.append(url.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
+				StringBuilder temp = new StringBuilder(url);
+				for (Map.Entry<String, String> entry : requestParams.entrySet())
+					temp.append(temp.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
 							.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-				}
+				url = temp.toString();
 			}
 		}
 		if (requestMethod.name().startsWith("P")) {
@@ -200,14 +218,11 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 			if (body instanceof InputStream)
 				body = new InputStreamResource((InputStream) body);
 		}
+
 		RequestEntity<Object> requestEntity = new RequestEntity<>(body, headers,
-				HttpMethod.valueOf(requestMethod.name()),
-				restTemplate.getUriTemplateHandler().expand(url.toString(), pathVariables));
-		Type grt = method.getGenericReturnType();
-		if (grt == Void.class || grt == Void.TYPE)
-			grt = null;
-		final Type type = grt;
-		if (grt == InputStream.class) {
+				HttpMethod.valueOf(requestMethod.name()), URI.create(url));
+		final Type type = method.getGenericReturnType() == Void.TYPE ? null : method.getGenericReturnType();
+		if (type == InputStream.class) {
 			return restTemplate.exchange(requestEntity, Resource.class).getBody().getInputStream();
 		} else {
 			return restTemplate.exchange(requestEntity, new ParameterizedTypeReference<Object>() {
