@@ -39,8 +39,6 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
-	protected static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
-
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Logger remotingLogger = LoggerFactory.getLogger("remoting");
@@ -48,6 +46,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<>();
 
 	private static ThreadLocal<Object> service = new ThreadLocal<>();
+
+	private static ThreadLocal<SerializationType> serializationType = new ThreadLocal<>();
 
 	private Map<String, Object> exportedServices = Collections.emptyMap();
 
@@ -94,6 +94,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		service.set(exportedServices.get(interfaceName));
 		Object proxy = getProxyForService();
 		try {
+			serializationType.set(SerializationType.parse(request.getHeader(RemotingContext.HTTP_HEADER_CONTENT_TYPE)));
 			RemoteInvocation invocation = readRemoteInvocation(request);
 			List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
 			for (Class<?> cl : invocation.getParameterTypes())
@@ -138,15 +139,15 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
 		} catch (SerializationFailedException sfe) {
 			logger.error(sfe.getMessage(), sfe);
-			RemoteInvocationResult result = new RemoteInvocationResult();
-			result.setException(sfe);
-			writeRemoteInvocationResult(request, response, result);
+			response.setHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE, sfe.getMessage());
+			response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			serviceInterface.remove();
 			service.remove();
+			serializationType.remove();
 			RemotingContext.clear();
 			MDC.remove("role");
 			MDC.remove("service");
@@ -191,11 +192,16 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	}
 
 	@Override
+	public String getContentType() {
+		return serializationType.get().getContentType();
+	}
+
+	@Override
 	protected RemoteInvocation readRemoteInvocation(HttpServletRequest request, InputStream is)
 			throws IOException, ClassNotFoundException {
-		SerializationType serializationType = SerializationType.parse(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
-		if (serializationType != SerializationType.JAVA)
-			return serializationType.readRemoteInvocation(decorateInputStream(request, is));
+		SerializationType st = serializationType.get();
+		if (st != SerializationType.JAVA)
+			return st.readRemoteInvocation(decorateInputStream(request, is));
 		else
 			return super.readRemoteInvocation(request, is);
 	}
@@ -210,10 +216,10 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			} catch (Exception ex) {
 			}
 		}
-		SerializationType serializationType = SerializationType.parse(request.getHeader(HTTP_HEADER_CONTENT_TYPE));
-		if (serializationType != SerializationType.JAVA) {
-			response.setContentType(serializationType.getContentType());
-			serializationType.writeRemoteInvocationResult(invocation, result,
+		SerializationType st = serializationType.get();
+		if (st != SerializationType.JAVA) {
+			response.setContentType(st.getContentType());
+			st.writeRemoteInvocationResult(invocation, result,
 					decorateOutputStream(request, response, response.getOutputStream()));
 		} else {
 			super.writeRemoteInvocationResult(request, response, result);

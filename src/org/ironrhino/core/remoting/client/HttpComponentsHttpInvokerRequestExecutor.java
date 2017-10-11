@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.StatusLine;
@@ -26,6 +27,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.httpinvoker.AbstractHttpInvokerRequestExecutor;
 import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -98,7 +100,10 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 		CloseableHttpResponse rsp = httpClient.execute(postMethod);
 		try {
 			StatusLine sl = rsp.getStatusLine();
-			if (sl.getStatusCode() >= 300) {
+			if (sl.getStatusCode() == RemotingContext.SC_SERIALIZATION_FAILED) {
+				Header h = rsp.getFirstHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE);
+				throw new SerializationFailedException(h != null ? h.getValue() : null);
+			} else if (sl.getStatusCode() >= 300) {
 				throw new IOException("Did not receive successful HTTP response: status code = " + sl.getStatusCode()
 						+ ", status message = [" + sl.getReasonPhrase() + "]");
 			}

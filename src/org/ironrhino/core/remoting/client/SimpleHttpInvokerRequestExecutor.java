@@ -12,6 +12,8 @@ import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
+import org.springframework.core.serializer.support.SerializationFailedException;
+import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
@@ -62,6 +64,13 @@ public class SimpleHttpInvokerRequestExecutor
 			return serializationType.readRemoteInvocationResult(decorateInputStream(is));
 		else
 			return super.readRemoteInvocationResult(is, codebaseUrl);
+	}
+
+	@Override
+	protected void validateResponse(HttpInvokerClientConfiguration config, HttpURLConnection con) throws IOException {
+		if (con.getResponseCode() == RemotingContext.SC_SERIALIZATION_FAILED)
+			throw new SerializationFailedException(con.getHeaderField(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE));
+		super.validateResponse(config, con);
 	}
 
 }

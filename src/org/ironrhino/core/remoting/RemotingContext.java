@@ -5,6 +5,12 @@ import java.util.Map;
 
 public class RemotingContext {
 
+	public static final int SC_SERIALIZATION_FAILED = 499;
+
+	public static final String HTTP_HEADER_EXCEPTION_MESSAGE = "X-Exception-Message";
+
+	public static final String HTTP_HEADER_CONTENT_TYPE = "Content-Type";
+
 	public final static String HTTP_HEADER_PREFIX = "x-rc-";
 
 	private static ThreadLocal<Map<String, String>> context = new ThreadLocal<>();
