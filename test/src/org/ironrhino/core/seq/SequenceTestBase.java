@@ -14,15 +14,10 @@ import org.ironrhino.core.util.DateUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@ContextConfiguration(locations = { "db.xml" })
-public class SequenceTest {
+public abstract class SequenceTestBase {
 
 	public static final int THREADS = 50;
 
@@ -73,8 +68,6 @@ public class SequenceTest {
 					for (int j = 0; j < LOOP; j++) {
 						try {
 							String id = seq.nextStringValue();
-							if (id.length() == 16 && id.endsWith("0001"))
-								System.out.println(id);
 							Long time2 = System.currentTimeMillis();
 							Long old = map.putIfAbsent(id, time2);
 							if (old != null)

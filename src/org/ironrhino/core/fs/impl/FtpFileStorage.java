@@ -61,42 +61,42 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Getter
 	@Setter
 	@Value("${ftp.controlEncoding:UTF-8}")
-	protected String controlEncoding;
+	protected String controlEncoding = "UTF-8";
 
 	@Getter
 	@Setter
 	@Value("${ftp.binaryMode:true}")
-	protected boolean binaryMode;
+	protected boolean binaryMode = true;
 
 	@Getter
 	@Setter
 	@Value("${ftp.passiveMode:true}")
-	protected boolean passiveMode;
+	protected boolean passiveMode = true;
 
 	@Getter
 	@Setter
 	@Value("${ftp.pool.maxTotal:20}")
-	protected int maxTotal;
+	protected int maxTotal = 20;
 
 	@Getter
 	@Setter
 	@Value("${ftp.pool.maxIdle:5}")
-	protected int maxIdle;
+	protected int maxIdle = 5;
 
 	@Getter
 	@Setter
 	@Value("${ftp.pool.minIdle:1}")
-	protected int minIdle;
+	protected int minIdle = 1;
 
 	@Getter
 	@Setter
 	@Value("${ftp.pool.maxWaitMillis:60000}")
-	protected int maxWaitMillis;
+	protected int maxWaitMillis = 60000;
 
 	@Getter
 	@Setter
 	@Value("${ftp.pool.minEvictableIdleTimeMillis:300000}")
-	protected int minEvictableIdleTimeMillis;
+	protected int minEvictableIdleTimeMillis = 300000;
 
 	private ObjectPool<FTPClient> pool;
 

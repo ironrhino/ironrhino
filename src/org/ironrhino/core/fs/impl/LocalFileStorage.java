@@ -45,7 +45,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 	private File directory;
 
 	@PostConstruct
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		Assert.notNull(uri, "uri shouldn't be null");
 		this.directory = new File(uri);
 		if (this.directory.isFile())
@@ -96,14 +96,21 @@ public class LocalFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public boolean rename(String fromPath, String toPath) {
-		fromPath = FileUtils.normalizePath(fromPath);
-		toPath = FileUtils.normalizePath(toPath);
-		String s1 = fromPath.substring(0, fromPath.lastIndexOf('/'));
-		String s2 = toPath.substring(0, fromPath.lastIndexOf('/'));
-		if (!s1.equals(s2))
-			return false;
-		return new File(directory, fromPath).renameTo(new File(directory, toPath));
+	public boolean rename(String fromPath, String toPath) throws IOException {
+		fromPath = FileUtils.normalizePath(directory.getPath() + "/" + fromPath);
+		toPath = FileUtils.normalizePath(directory.getPath() + "/" + toPath);
+		File source = new File(fromPath);
+		File target = new File(toPath);
+		if (source.getParent().equals(target.getParent())) {
+			return source.renameTo(target);
+		} else {
+			target.getParentFile().mkdirs();
+			try (FileInputStream fis = new FileInputStream(source);
+					FileOutputStream fos = new FileOutputStream(target)) {
+				IOUtils.copy(fis, fos);
+				return source.delete();
+			}
+		}
 	}
 
 	@Override
