@@ -6,13 +6,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-import org.springframework.remoting.httpinvoker.AbstractHttpInvokerRequestExecutor;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
 public enum SerializationType {
 
-	JAVA(AbstractHttpInvokerRequestExecutor.CONTENT_TYPE_SERIALIZED_OBJECT) {
+	JAVA(RemotingContext.CONTENT_TYPE_JAVA_SERIALIZED_OBJECT) {
 		@Override
 		public void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
 			ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -55,7 +54,7 @@ public enum SerializationType {
 			}
 		}
 	},
-	FST("application/x-fst-serialized-object") {
+	FST(RemotingContext.CONTENT_TYPE_FST_SERIALIZED_OBJECT) {
 		@Override
 		public void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
 			FstHttpInvokerSerializationHelper.writeRemoteInvocation(invocation, os);
@@ -78,7 +77,7 @@ public enum SerializationType {
 			return FstHttpInvokerSerializationHelper.readRemoteInvocationResult(is);
 		}
 	},
-	JSON("application/x-json-serialized-object") {
+	JSON(RemotingContext.CONTENT_TYPE_JSON_SERIALIZED_OBJECT) {
 		@Override
 		public void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
 			JsonHttpInvokerSerializationHelper.writeRemoteInvocation(invocation, os);
@@ -124,7 +123,7 @@ public enum SerializationType {
 
 	public static SerializationType parse(String contentType) {
 		for (SerializationType type : values())
-			if (type.getContentType().equalsIgnoreCase(contentType))
+			if (contentType != null && contentType.startsWith(type.getContentType()))
 				return type;
 		return JAVA;
 	}

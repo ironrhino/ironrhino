@@ -33,6 +33,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -47,7 +48,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private static ThreadLocal<Object> service = new ThreadLocal<>();
 
-	private static ThreadLocal<SerializationType> serializationType = new ThreadLocal<>();
+	private static ThreadLocal<SerializationType> serializationType = ThreadLocal
+			.withInitial(() -> SerializationType.JAVA);
 
 	private Map<String, Object> exportedServices = Collections.emptyMap();
 
@@ -94,7 +96,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		service.set(exportedServices.get(interfaceName));
 		Object proxy = getProxyForService();
 		try {
-			serializationType.set(SerializationType.parse(request.getHeader(RemotingContext.HTTP_HEADER_CONTENT_TYPE)));
+			serializationType.set(SerializationType.parse(request.getHeader(HttpHeaders.CONTENT_TYPE)));
 			RemoteInvocation invocation = readRemoteInvocation(request);
 			List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
 			for (Class<?> cl : invocation.getParameterTypes())
@@ -199,11 +201,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	protected RemoteInvocation readRemoteInvocation(HttpServletRequest request, InputStream is)
 			throws IOException, ClassNotFoundException {
-		SerializationType st = serializationType.get();
-		if (st != SerializationType.JAVA)
-			return st.readRemoteInvocation(decorateInputStream(request, is));
-		else
-			return super.readRemoteInvocation(request, is);
+		return serializationType.get().readRemoteInvocation(decorateInputStream(request, is));
 	}
 
 	protected void writeRemoteInvocationResult(HttpServletRequest request, HttpServletResponse response,
@@ -217,13 +215,9 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			}
 		}
 		SerializationType st = serializationType.get();
-		if (st != SerializationType.JAVA) {
-			response.setContentType(st.getContentType());
-			st.writeRemoteInvocationResult(invocation, result,
-					decorateOutputStream(request, response, response.getOutputStream()));
-		} else {
-			super.writeRemoteInvocationResult(request, response, result);
-		}
+		response.setContentType(st.getContentType());
+		st.writeRemoteInvocationResult(invocation, result,
+				decorateOutputStream(request, response, response.getOutputStream()));
 	}
 
 	protected Throwable translateAndTrim(Throwable throwable, int maxStackTraceElements) {

@@ -16,9 +16,11 @@ import org.ironrhino.sample.remoting.PersonRepository;
 import org.ironrhino.sample.remoting.TestService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Ignore
 public class RemoteServiceTestsBase {
 
 	public static final int THREADS = 100;

@@ -1,5 +1,6 @@
 package org.ironrhino.core.remoting.client;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +14,7 @@ import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 import org.springframework.core.serializer.support.SerializationFailedException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -51,19 +53,13 @@ public class SimpleHttpInvokerRequestExecutor
 
 	@Override
 	protected void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
-		if (serializationType != SerializationType.JAVA)
-			serializationType.writeRemoteInvocation(invocation, decorateOutputStream(os));
-		else
-			super.writeRemoteInvocation(invocation, os);
+		serializationType.writeRemoteInvocation(invocation, decorateOutputStream(os));
 	}
 
 	@Override
 	protected RemoteInvocationResult readRemoteInvocationResult(InputStream is, String codebaseUrl)
 			throws IOException, ClassNotFoundException {
-		if (serializationType != SerializationType.JAVA)
-			return serializationType.readRemoteInvocationResult(decorateInputStream(is));
-		else
-			return super.readRemoteInvocationResult(is, codebaseUrl);
+		return serializationType.readRemoteInvocationResult(decorateInputStream(is));
 	}
 
 	@Override
@@ -71,6 +67,18 @@ public class SimpleHttpInvokerRequestExecutor
 		if (con.getResponseCode() == RemotingContext.SC_SERIALIZATION_FAILED)
 			throw new SerializationFailedException(con.getHeaderField(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE));
 		super.validateResponse(config, con);
+	}
+
+	@Override
+	protected RemoteInvocationResult doExecuteRequest(HttpInvokerClientConfiguration config, ByteArrayOutputStream baos)
+			throws IOException, ClassNotFoundException {
+		HttpURLConnection con = openConnection(config);
+		prepareConnection(con, baos.size());
+		writeRequestBody(config, con, baos);
+		validateResponse(config, con);
+		InputStream responseBody = readResponseBody(config, con);
+		SerializationType serializationType = SerializationType.parse(con.getHeaderField(HttpHeaders.CONTENT_TYPE));
+		return serializationType.readRemoteInvocationResult(decorateInputStream(responseBody));
 	}
 
 }

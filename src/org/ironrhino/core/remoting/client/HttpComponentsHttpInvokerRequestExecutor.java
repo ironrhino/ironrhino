@@ -28,6 +28,7 @@ import org.slf4j.MDC;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.serializer.support.SerializationFailedException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.remoting.httpinvoker.AbstractHttpInvokerRequestExecutor;
 import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -109,7 +110,10 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 			}
 			HttpEntity entity = rsp.getEntity();
 			InputStream responseBody = entity.getContent();
-			return readRemoteInvocationResult(responseBody, config.getCodebaseUrl());
+			Header h = rsp.getFirstHeader(HttpHeaders.CONTENT_TYPE);
+			SerializationType serializationType = h != null ? SerializationType.parse(h.getValue())
+					: this.serializationType;
+			return serializationType.readRemoteInvocationResult(decorateInputStream(responseBody));
 		} finally {
 			rsp.close();
 			postMethod.releaseConnection();
@@ -133,19 +137,13 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 
 	@Override
 	protected void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
-		if (serializationType != SerializationType.JAVA)
-			serializationType.writeRemoteInvocation(invocation, decorateOutputStream(os));
-		else
-			super.writeRemoteInvocation(invocation, os);
+		serializationType.writeRemoteInvocation(invocation, decorateOutputStream(os));
 	}
 
 	@Override
 	protected RemoteInvocationResult readRemoteInvocationResult(InputStream is, String codebaseUrl)
 			throws IOException, ClassNotFoundException {
-		if (serializationType != SerializationType.JAVA)
-			return serializationType.readRemoteInvocationResult(decorateInputStream(is));
-		else
-			return super.readRemoteInvocationResult(is, codebaseUrl);
+		return serializationType.readRemoteInvocationResult(decorateInputStream(is));
 	}
 
 }
