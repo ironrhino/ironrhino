@@ -31,8 +31,6 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -202,7 +200,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				}
 				return result;
 			} catch (Exception e) {
-				remotingLogger.error("Exception:\n", e.getCause() != null ? e.getCause() : e);
+				remotingLogger.error("Exception:", e.getCause() != null ? e.getCause() : e);
 				remotingLogger.info("Invoked to {} fail in {}ms", discoveredHost, System.currentTimeMillis() - time);
 				if (serviceStats != null) {
 					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
@@ -210,17 +208,10 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				}
 				if (--attempts < 1)
 					throw e;
-				Throwable throwable = e.getCause();
-				if (throwable instanceof SerializationFailedException
-						&& getSerializationType() == SerializationType.FST) {
+				if ((e instanceof SerializationFailedException) && getSerializationType() != SerializationType.JAVA) {
+					logger.error("Downgrade service[{}] serialization from {} to {}: {}",
+							getServiceInterface().getName(), serializationType, SerializationType.JAVA, e.getMessage());
 					setSerializationType(SerializationType.JAVA);
-					logger.error("downgrade serialization from FST to JAVA for service[{}]: {}",
-							getServiceInterface().getName(), throwable.getMessage());
-				} else if (throwable instanceof JsonProcessingException
-						&& getSerializationType() == SerializationType.JSON) {
-					setSerializationType(SerializationType.JAVA);
-					logger.error("downgrade serialization from JSON to JAVA for service[{}]: {}",
-							getServiceInterface().getName(), throwable.getMessage());
 				} else {
 					if (urlFromDiscovery) {
 						if (discoveredHost != null) {
@@ -230,7 +221,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 						String serviceUrl = discoverServiceUrl();
 						if (!serviceUrl.equals(getServiceUrl())) {
 							setServiceUrl(serviceUrl);
-							logger.info("relocate service url " + serviceUrl);
+							logger.info("Relocate service url " + serviceUrl);
 						}
 					}
 				}
@@ -286,7 +277,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				sb.append(ho);
 				discoveredHost = ho;
 			} else {
-				logger.error("couldn't discover service " + serviceName);
+				logger.error("Couldn't discover service " + serviceName);
 				throw new ServiceNotFoundException(serviceName);
 			}
 		} else {

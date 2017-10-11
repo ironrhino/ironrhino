@@ -202,6 +202,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	protected void writeRemoteInvocationResult(HttpServletRequest request, HttpServletResponse response,
 			RemoteInvocation invocation, RemoteInvocationResult result) throws IOException {
+		response.setHeader("Keep-Alive", "timeout=30, max=600");
 		if (result.hasInvocationTargetException()) {
 			try {
 				InvocationTargetException ite = (InvocationTargetException) result.getException();

@@ -130,8 +130,7 @@ public class JsonHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static RemoteInvocationResult readRemoteInvocationResult(InputStream is)
-			throws IOException, ClassNotFoundException {
+	public static RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
 		RemoteInvocationResult result = new RemoteInvocationResult();
 		int i = is.read();
 		try {

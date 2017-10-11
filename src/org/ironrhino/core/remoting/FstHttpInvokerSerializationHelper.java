@@ -22,7 +22,7 @@ public class FstHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static RemoteInvocation readRemoteInvocation(InputStream is) throws IOException, ClassNotFoundException {
+	public static RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
 		FSTObjectInput in = new FSTObjectInput(is);
 		try {
 			Object obj = in.readObject();
@@ -31,7 +31,7 @@ public class FstHttpInvokerSerializationHelper {
 						+ RemoteInvocation.class.getName() + "]: " + obj);
 			}
 			return (RemoteInvocation) obj;
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			throw new SerializationFailedException(e.getMessage(), e);
 		} finally {
 			in.close();
@@ -48,8 +48,7 @@ public class FstHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static RemoteInvocationResult readRemoteInvocationResult(InputStream is)
-			throws IOException, ClassNotFoundException {
+	public static RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
 		FSTObjectInput in = new FSTObjectInput(is);
 		try {
 			Object obj = in.readObject();
@@ -58,7 +57,7 @@ public class FstHttpInvokerSerializationHelper {
 						+ RemoteInvocationResult.class.getName() + "]: " + obj);
 			}
 			return (RemoteInvocationResult) obj;
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			throw new SerializationFailedException(e.getMessage(), e);
 		} finally {
 			in.close();
