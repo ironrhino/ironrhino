@@ -21,14 +21,14 @@ public abstract class FileStorageTestBase {
 	public void testDirectory() throws IOException {
 		FileStorage fs = getFileStorage();
 		assertFalse(fs.isDirectory("/test"));
-		fs.mkdir("/test");
+		assertTrue(fs.mkdir("/test"));
 		assertTrue(fs.isDirectory("/test"));
-		fs.delete("/test");
+		assertTrue(fs.delete("/test"));
 		assertFalse(fs.isDirectory("/test/test2"));
-		fs.mkdir("/test/test2");
+		assertTrue(fs.mkdir("/test/test2"));
 		assertTrue(fs.isDirectory("/test/test2"));
-		fs.delete("/test/test2");
-		fs.delete("/test");
+		assertTrue(fs.delete("/test/test2"));
+		assertTrue(fs.delete("/test"));
 	}
 
 	@Test
@@ -58,16 +58,14 @@ public abstract class FileStorageTestBase {
 		FileStorage fs = getFileStorage();
 		String text = "test";
 		String path = "/test/test2/test.txt";
-		String path2 = "/test2/test.txt";
+		String path2 = "/test/test2/test2.txt";
 		writeToFile(fs, text, path);
 		assertTrue(fs.rename(path, path2));
 		assertFalse(fs.exists(path));
-		assertTrue(fs.exists("/test2/"));
 		assertTrue(fs.exists(path2));
 		fs.delete(path2);
 		fs.delete("/test/test2/");
 		fs.delete("/test/");
-		fs.delete("/test2/");
 	}
 
 	@Test

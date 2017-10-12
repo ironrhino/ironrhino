@@ -249,14 +249,29 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Override
 	public boolean mkdir(String path) throws IOException {
 		return execute(ftpClient -> {
-			return ftpClient.makeDirectory(getRealPath(path, ftpClient));
+			String realPath = getRealPath(path, ftpClient);
+			String workingDirectory = ftpClient.printWorkingDirectory();
+			workingDirectory = org.ironrhino.core.util.StringUtils.trimTailSlash(workingDirectory);
+			String relativePath = realPath.substring(workingDirectory.length() + 1);
+			String[] arr = relativePath.split("/");
+			StringBuilder sb = new StringBuilder(workingDirectory);
+			for (int i = 0; i < arr.length; i++) {
+				sb.append("/").append(arr[i]);
+				ftpClient.changeWorkingDirectory(sb.toString());
+				if (ftpClient.getReplyCode() == 550) {
+					if (!ftpClient.makeDirectory(sb.toString()))
+						return false;
+				}
+			}
+			return true;
 		});
 	}
 
 	@Override
 	public boolean delete(String path) throws IOException {
 		return execute(ftpClient -> {
-			return ftpClient.deleteFile(getRealPath(path, ftpClient));
+			String pathname = getRealPath(path, ftpClient);
+			return isDirectory(path) ? ftpClient.removeDirectory(pathname) : ftpClient.deleteFile(pathname);
 		});
 	}
 

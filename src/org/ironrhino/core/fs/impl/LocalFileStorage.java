@@ -104,12 +104,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 		if (source.getParent().equals(target.getParent())) {
 			return source.renameTo(target);
 		} else {
-			target.getParentFile().mkdirs();
-			try (FileInputStream fis = new FileInputStream(source);
-					FileOutputStream fos = new FileOutputStream(target)) {
-				IOUtils.copy(fis, fos);
-				return source.delete();
-			}
+			return false;
 		}
 	}
 
