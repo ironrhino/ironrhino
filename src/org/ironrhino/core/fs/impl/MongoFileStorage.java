@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
+import org.ironrhino.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -98,9 +99,10 @@ public class MongoFileStorage extends AbstractFileStorage {
 		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return true;
+		path = StringUtils.trimTailSlash(path);
 		File file = mongoTemplate.findById(path, File.class);
 		if (file != null)
-			return false;
+			return file.isDirectory();
 		int lastIndex = path.lastIndexOf('/');
 		if (lastIndex > 0) {
 			int index = 0;
@@ -133,6 +135,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return false;
+		path = StringUtils.trimTailSlash(path);
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null)
 			return false;
@@ -153,6 +156,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return -1;
+		path = StringUtils.trimTailSlash(path);
 		File file = mongoTemplate.findById(path, File.class);
 		return file != null ? file.getLastModified() : -1;
 	}
@@ -162,6 +166,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return true;
+		path = StringUtils.trimTailSlash(path);
 		return mongoTemplate.findById(path, File.class) != null;
 	}
 
@@ -195,6 +200,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
 			return true;
+		path = StringUtils.trimTailSlash(path);
 		File file = mongoTemplate.findById(path, File.class);
 		return file != null && file.isDirectory();
 	}
@@ -202,12 +208,14 @@ public class MongoFileStorage extends AbstractFileStorage {
 	@Override
 	public List<String> listFiles(String path) {
 		path = FileUtils.normalizePath(path);
-		File file = mongoTemplate.findById(path, File.class);
-		if (file == null || !file.isDirectory())
-			return null;
+		if (!"/".equals(path)) {
+			File file = mongoTemplate.findById(path, File.class);
+			if (file == null || !file.isDirectory())
+				return Collections.emptyList();
+		}
 		List<String> list = new ArrayList<>();
-		List<File> files = mongoTemplate
-				.find(new Query(where("path").regex("^" + path.replaceAll("\\.", "\\\\.") + "/[^/]*$")), File.class);
+		String regex = "^" + path.replaceAll("\\.", "\\\\.") + (path.endsWith("/") ? "" : "/") + "[^/]*$";
+		List<File> files = mongoTemplate.find(new Query(where("path").regex(regex)), File.class);
 		for (File f : files) {
 			if (f.isDirectory())
 				continue;
@@ -222,11 +230,13 @@ public class MongoFileStorage extends AbstractFileStorage {
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
 		path = FileUtils.normalizePath(path);
 		final Map<String, Boolean> map = new HashMap<>();
-		File file = mongoTemplate.findById(path, File.class);
-		if (file == null || !file.isDirectory())
-			return Collections.emptyMap();
-		List<File> files = mongoTemplate
-				.find(new Query(where("path").regex("^" + path.replaceAll("\\.", "\\\\.") + "/[^/]*$")), File.class);
+		if (!"/".equals(path)) {
+			File file = mongoTemplate.findById(path, File.class);
+			if (file == null || !file.isDirectory())
+				return Collections.emptyMap();
+		}
+		String regex = "^" + path.replaceAll("\\.", "\\\\.") + (path.endsWith("/") ? "" : "/") + "[^/]*$";
+		List<File> files = mongoTemplate.find(new Query(where("path").regex(regex)), File.class);
 		for (File f : files) {
 			String name = f.getPath();
 			map.put(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory());

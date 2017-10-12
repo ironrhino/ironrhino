@@ -12,7 +12,7 @@ public class FtpFileStorageTests extends FileStorageTestBase {
 	@BeforeClass
 	public static void init() {
 		fs = new FtpFileStorage();
-		fs.setUri(URI.create("ftp://admin:admin@localhost:2121"));
+		fs.setUri(URI.create("ftp://admin:admin@localhost:2121/temp"));
 		fs.init();
 	}
 
