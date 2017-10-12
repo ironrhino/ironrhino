@@ -207,11 +207,11 @@ public class RegionAction extends EntityAction<Region> {
 	public String markers() {
 		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		String[] array = southWest.split(",");
-		Double bottom = new Double(array[0]);
-		Double left = new Double(array[1]);
+		Double bottom = Double.valueOf(array[0]);
+		Double left = Double.valueOf(array[1]);
 		array = northEast.split(",");
-		Double top = new Double(array[0]);
-		Double right = new Double(array[1]);
+		Double top = Double.valueOf(array[0]);
+		Double right = Double.valueOf(array[1]);
 		Object[] levels = zoom2level(zoom);
 		Object[] ranks = zoom2rank(zoom);
 		DetachedCriteria dc = entityManager.detachedCriteria();

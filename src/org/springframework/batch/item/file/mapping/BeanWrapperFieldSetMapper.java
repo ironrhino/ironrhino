@@ -16,6 +16,16 @@
 
 package org.springframework.batch.item.file.mapping;
 
+import java.beans.PropertyEditor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
 import org.springframework.beans.BeanWrapperImpl;
@@ -32,15 +42,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
-
-import java.beans.PropertyEditor;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
@@ -235,12 +236,10 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			return (T) beanFactory.getBean(name);
 		}
 		try {
-			return type.newInstance();
+			return type.getConstructor().newInstance();
 		}
-		catch (InstantiationException e) {
-			ReflectionUtils.handleReflectionException(e);
-		}
-		catch (IllegalAccessException e) {
+		catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
+				| InvocationTargetException | IllegalArgumentException e) {
 			ReflectionUtils.handleReflectionException(e);
 		}
 		// should not happen
@@ -359,13 +358,11 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		Object nestedValue = wrapper.getPropertyValue(nestedName);
 		if (nestedValue == null) {
 			try {
-				nestedValue = wrapper.getPropertyType(nestedName).newInstance();
+				nestedValue = wrapper.getPropertyType(nestedName).getConstructor().newInstance();
 				wrapper.setPropertyValue(nestedName, nestedValue);
 			}
-			catch (InstantiationException e) {
-				ReflectionUtils.handleReflectionException(e);
-			}
-			catch (IllegalAccessException e) {
+			catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
+					| InvocationTargetException | IllegalArgumentException e) {
 				ReflectionUtils.handleReflectionException(e);
 			}
 		}

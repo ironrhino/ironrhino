@@ -283,7 +283,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected void tryFindEntity() {
 		BaseManager entityManager = getEntityManager(getEntityClass());
 		try {
-			BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().newInstance());
+			BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().getConstructor().newInstance());
 			bw.setConversionService(conversionService);
 			Set<String> naturalIds = getNaturalIds().keySet();
 			if (StringUtils.isNotBlank(getUid())) {
@@ -337,7 +337,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	@Override
 	public String execute() throws Exception {
-		BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().newInstance());
+		BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().getConstructor().newInstance());
 		bw.setConversionService(conversionService);
 		Richtable richtableConfig = getClass().getAnnotation(Richtable.class);
 		if (richtableConfig == null)
@@ -410,7 +410,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	protected DetachedCriteria detachedCriteria() throws Exception {
 		BaseManager entityManager = getEntityManager(getEntityClass());
-		BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().newInstance());
+		BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().getConstructor().newInstance());
 		Richtable richtableConfig = getClass().getAnnotation(Richtable.class);
 		if (richtableConfig == null)
 			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
@@ -596,7 +596,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		if (_entity == null)
-			_entity = getEntityClass().newInstance();
+			_entity = getEntityClass().getConstructor().newInstance();
 		BeanWrapperImpl bw = new BeanWrapperImpl(_entity);
 		bw.setConversionService(conversionService);
 		if (_entity != null && _entity.isNew()) {
@@ -643,7 +643,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				if (Persistable.class.isAssignableFrom(type)) {
 					BaseManager em = getEntityManager(type);
 					try {
-						BeanWrapperImpl bwt = new BeanWrapperImpl(type.newInstance());
+						BeanWrapperImpl bwt = new BeanWrapperImpl(type.getConstructor().newInstance());
 						bwt.setPropertyValue("id", parameterValue);
 						value = em.get((Serializable) bwt.getPropertyValue("id"));
 						if (value == null)
@@ -896,7 +896,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					if (isAttachmentable())
 						editedPropertyNames.add("attachments");
 				}
-				_entity = getEntityClass().newInstance();
+				_entity = getEntityClass().getConstructor().newInstance();
 				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 				bwp.setConversionService(conversionService);
 				for (String name : editedPropertyNames)
@@ -1134,7 +1134,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					String listKey = uiConfig.getListKey();
 					if (StringUtils.isBlank(listKey))
 						listKey = "id";
-					BeanWrapperImpl temp = new BeanWrapperImpl(type.newInstance());
+					BeanWrapperImpl temp = new BeanWrapperImpl(type.getConstructor().newInstance());
 					temp.setConversionService(conversionService);
 					temp.setPropertyValue(listKey, parameterValue);
 					BaseManager em = getEntityManager(type);
@@ -1293,7 +1293,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		String[] arr = getId();
 		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
 		try {
-			BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().newInstance());
+			BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().getConstructor().newInstance());
 			bw.setConversionService(conversionService);
 			for (int i = 0; i < id.length; i++) {
 				bw.setPropertyValue("id", arr[i]);
@@ -1551,7 +1551,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		String[] arr = getId();
 		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
 		try {
-			BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().newInstance());
+			BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().getConstructor().newInstance());
 			bw.setConversionService(conversionService);
 			for (int i = 0; i < id.length; i++) {
 				bw.setPropertyValue("id", arr[i]);
@@ -1777,7 +1777,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected Persistable constructEntity() {
 		Persistable entity = null;
 		try {
-			entity = getEntityClass().newInstance();
+			entity = getEntityClass().getConstructor().newInstance();
 			ValueStack temp = valueStackFactory.createValueStack();
 			temp.set(getEntityName(), entity);
 			Map<String, Object> context = temp.getContext();

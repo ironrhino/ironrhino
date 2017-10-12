@@ -193,8 +193,8 @@ public class EhCacheManager implements CacheManager {
 			return -1;
 		Cache cache = getCache(namespace, true);
 		if (cache != null) {
-			Element element = cache.putIfAbsent(new Element(key, new Long(delta), timeToLive <= 0 ? true : null, null,
-					(int) timeUnit.toSeconds(timeToLive)));
+			Element element = cache.putIfAbsent(new Element(key, Long.valueOf(delta), timeToLive <= 0 ? true : null,
+					null, (int) timeUnit.toSeconds(timeToLive)));
 			if (element == null) {
 				return delta;
 			} else {
@@ -203,12 +203,12 @@ public class EhCacheManager implements CacheManager {
 				try {
 					element = cache.get(key);
 					if (element == null) {
-						cache.put(new Element(key, new Long(delta), timeToLive <= 0 ? true : null, null,
+						cache.put(new Element(key, Long.valueOf(delta), timeToLive <= 0 ? true : null, null,
 								(int) timeUnit.toSeconds(timeToLive)));
 						return delta;
 					} else {
 						long value = ((long) element.getObjectValue()) + delta;
-						cache.put(new Element(key, new Long(value), timeToLive <= 0 ? true : null, null,
+						cache.put(new Element(key, Long.valueOf(value), timeToLive <= 0 ? true : null, null,
 								(int) timeUnit.toSeconds(timeToLive)));
 						return value;
 					}

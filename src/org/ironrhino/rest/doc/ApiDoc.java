@@ -92,7 +92,7 @@ public class ApiDoc implements Serializable {
 			clazz = apiDocClazz;
 			method = apiDocMethod;
 		}
-		Object apiDocInstance = apiDocClazz.newInstance();
+		Object apiDocInstance = apiDocClazz.getConstructor().newInstance();
 
 		Api api = apiDocMethod.getAnnotation(Api.class);
 		this.name = api.value();

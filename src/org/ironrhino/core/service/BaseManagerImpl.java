@@ -228,7 +228,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Class idtype = String.class;
 		BeanWrapperImpl bw = null;
 		try {
-			bw = new BeanWrapperImpl(getEntityClass().newInstance());
+			bw = new BeanWrapperImpl(getEntityClass().getConstructor().newInstance());
 			idtype = getEntityClass().getMethod("getId", new Class[0]).getReturnType();
 		} catch (Exception e) {
 		}
@@ -651,18 +651,17 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			throw new IllegalArgumentException(
 					"entityClass mustn't be null,and must extends class 'BaseTreeableEntity'");
 		try {
-			TE root = (TE) getEntityClass().newInstance();
+			TE root = (TE) getEntityClass().getConstructor().newInstance();
 			root.setId(0L);
 			root.setName("");
 			assemble(root, (List<TE>) findAll(Order.asc("level")));
 			return root;
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 
-	private <TE extends BaseTreeableEntity<TE>> void assemble(TE te, List<TE> list)
-			throws InstantiationException, IllegalAccessException {
+	private <TE extends BaseTreeableEntity<TE>> void assemble(TE te, List<TE> list) throws Exception {
 		List<TE> children = new ArrayList<>();
 		Iterator<TE> it = list.iterator();
 		while (it.hasNext()) {
@@ -693,7 +692,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			}
 			if (isChild) {
 				it.remove();
-				TE rr = (TE) te.getClass().newInstance();
+				TE rr = (TE) te.getClass().getConstructor().newInstance();
 				BeanUtils.copyProperties(r, rr);
 				children.add(rr);
 				rr.setParent(te);

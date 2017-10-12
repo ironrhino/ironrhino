@@ -273,7 +273,6 @@ public class LocationParser {
 
 	@Override
 	protected void finalize() throws Throwable {
-		super.finalize();
 		if (file != null)
 			file.close();
 	}

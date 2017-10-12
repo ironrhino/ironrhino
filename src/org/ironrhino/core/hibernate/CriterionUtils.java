@@ -118,7 +118,7 @@ public class CriterionUtils {
 		CriteriaState state = new CriteriaState();
 		try {
 			ConversionService conversionService = ApplicationContextUtils.getBean(ConversionService.class);
-			BeanWrapperImpl entityBeanWrapper = new BeanWrapperImpl(entityClass.newInstance());
+			BeanWrapperImpl entityBeanWrapper = new BeanWrapperImpl(entityClass.getConstructor().newInstance());
 			entityBeanWrapper.setConversionService(conversionService);
 			for (String parameterName : parameterMap.keySet()) {
 				String propertyName;
@@ -224,7 +224,7 @@ public class CriterionUtils {
 					if (Persistable.class.isAssignableFrom(type)) {
 						// @ManyToOne or @OneToOne
 						propertyName = pname;
-						BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(type.newInstance());
+						BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(type.getConstructor().newInstance());
 						subBeanWrapper.setConversionService(conversionService);
 						if (subPropertyName.equals("id")) {
 							if (config.isInverseRelation()) {

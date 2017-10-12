@@ -73,7 +73,7 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 			return bw.getPropertyValue("id");
 		}
 		try {
-			Object target = targetClass.newInstance();
+			Object target = targetClass.getConstructor().newInstance();
 			BeanUtils.copyProperties(source, target);
 			return target;
 		} catch (Exception e) {

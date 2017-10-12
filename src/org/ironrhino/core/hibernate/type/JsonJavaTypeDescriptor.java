@@ -1,6 +1,7 @@
 package org.ironrhino.core.hibernate.type;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,10 +32,11 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 			protected Object deepCopyNotNull(Object value) {
 				Object obj;
 				try {
-					obj = value.getClass().newInstance();
+					obj = value.getClass().getConstructor().newInstance();
 					BeanUtils.copyProperties(value, obj);
 					return obj;
-				} catch (InstantiationException | IllegalAccessException e) {
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 					throw new RuntimeException(e);
 				}
 

@@ -341,10 +341,10 @@ class FstTranscoder implements Transcoder<Object> {
 					rv = Byte.valueOf(this.transcoderUtils.decodeByte(data));
 					break;
 				case SPECIAL_FLOAT:
-					rv = new Float(Float.intBitsToFloat(this.transcoderUtils.decodeInt(data)));
+					rv = Float.valueOf(Float.intBitsToFloat(this.transcoderUtils.decodeInt(data)));
 					break;
 				case SPECIAL_DOUBLE:
-					rv = new Double(Double.longBitsToDouble(this.transcoderUtils.decodeLong(data)));
+					rv = Double.valueOf(Double.longBitsToDouble(this.transcoderUtils.decodeLong(data)));
 					break;
 				case SPECIAL_DATE:
 					rv = new Date(this.transcoderUtils.decodeLong(data));
