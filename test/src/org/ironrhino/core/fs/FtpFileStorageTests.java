@@ -1,24 +1,11 @@
 package org.ironrhino.core.fs;
 
-import java.net.URI;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import org.ironrhino.core.fs.impl.FtpFileStorage;
-import org.junit.BeforeClass;
-
+@RunWith(SpringRunner.class)
+@ContextConfiguration(locations = { "ftp.xml" })
 public class FtpFileStorageTests extends FileStorageTestBase {
-
-	static FtpFileStorage fs;
-
-	@BeforeClass
-	public static void init() {
-		fs = new FtpFileStorage();
-		fs.setUri(URI.create("ftp://admin:admin@localhost:2121/temp"));
-		fs.init();
-	}
-
-	@Override
-	public FileStorage getFileStorage() {
-		return fs;
-	}
 
 }

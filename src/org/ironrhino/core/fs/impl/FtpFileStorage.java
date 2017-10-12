@@ -34,7 +34,7 @@ import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.FileUtils;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -45,8 +45,7 @@ import lombok.Setter;
 @ServiceImplementationConditional(profiles = "ftp")
 public class FtpFileStorage extends AbstractFileStorage {
 
-	@Autowired
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Getter
 	@Setter

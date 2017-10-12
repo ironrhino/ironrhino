@@ -12,14 +12,16 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FileStorage;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FileStorageTestBase {
 
-	public abstract FileStorage getFileStorage();
+	@Autowired
+	private FileStorage fs;
+
 
 	@Test
 	public void testDirectory() throws IOException {
-		FileStorage fs = getFileStorage();
 		assertFalse(fs.isDirectory("/test"));
 		assertTrue(fs.mkdir("/test"));
 		assertTrue(fs.isDirectory("/test"));
@@ -33,7 +35,6 @@ public abstract class FileStorageTestBase {
 
 	@Test
 	public void testFile() throws IOException {
-		FileStorage fs = getFileStorage();
 		String text = "test";
 		String path = "/test/test2/test.txt";
 		String path2 = "/test/test2/test2.txt";
@@ -55,7 +56,6 @@ public abstract class FileStorageTestBase {
 
 	@Test
 	public void testRenmaeFile() throws IOException {
-		FileStorage fs = getFileStorage();
 		String text = "test";
 		String path = "/test/test2/test.txt";
 		String path2 = "/test/test2/test2.txt";
@@ -70,7 +70,6 @@ public abstract class FileStorageTestBase {
 
 	@Test
 	public void testListFiles() throws IOException {
-		FileStorage fs = getFileStorage();
 		fs.mkdir("/test");
 		List<String> files = fs.listFiles("/");
 		assertTrue(files.isEmpty());

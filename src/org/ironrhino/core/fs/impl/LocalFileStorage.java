@@ -22,7 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -34,8 +34,7 @@ import lombok.Setter;
 @ServiceImplementationConditional(profiles = { DEFAULT, DUAL })
 public class LocalFileStorage extends AbstractFileStorage {
 
-	@Autowired
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Getter
 	@Setter
