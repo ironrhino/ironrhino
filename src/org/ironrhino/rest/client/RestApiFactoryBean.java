@@ -1,5 +1,6 @@
 package org.ironrhino.rest.client;
 
+import java.beans.PropertyDescriptor;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -7,8 +8,11 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -17,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -97,6 +102,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		if (AopUtils.isToStringMethod(methodInvocation.getMethod()))
@@ -119,8 +125,9 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 
 		Map<String, Object> pathVariables = new HashMap<>(8);
 		MultiValueMap<String, String> headers = new HttpHeaders();
-		Map<String, String> requestParams = null;
+		MultiValueMap<String, String> requestParams = null;
 		Map<String, String> cookieValues = null;
+		List<Object> requestParamsObjectCandidates = new ArrayList<>(1);
 		Object body = null;
 		String[] parameterNames = ReflectionUtils.getParameterNames(method);
 		Object[] arguments = methodInvocation.getArguments();
@@ -146,7 +153,13 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 					String name = ((RequestHeader) anno).value();
 					if (StringUtils.isBlank(name))
 						name = parameterNames[i];
-					headers.add(name, argument.toString());
+					if (argument instanceof Collection) {
+						for (Object o : (Collection<Object>) argument)
+							if (o != null)
+								headers.add(name, o.toString());
+					} else {
+						headers.add(name, argument.toString());
+					}
 				}
 				if (anno instanceof RequestParam) {
 					annotationPresent = true;
@@ -154,8 +167,14 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 					if (StringUtils.isBlank(name))
 						name = parameterNames[i];
 					if (requestParams == null)
-						requestParams = new HashMap<>(8);
-					requestParams.put(name, argument.toString());
+						requestParams = new LinkedMultiValueMap<>(8);
+					if (argument instanceof Collection) {
+						for (Object o : (Collection<Object>) argument)
+							if (o != null)
+								requestParams.add(name, o.toString());
+					} else {
+						requestParams.add(name, argument.toString());
+					}
 				}
 				if (anno instanceof CookieValue) {
 					annotationPresent = true;
@@ -172,9 +191,36 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 				}
 			}
 			// Put arguments to pathVariable even if @PathVariable not present
-			if (!annotationPresent)
+			if (!annotationPresent) {
 				pathVariables.put(parameterNames[i], argument);
+				String clazz = argument.getClass().getName();
+				if (!argument.getClass().isEnum() && !clazz.startsWith("java.") && !clazz.startsWith("javax.")) {
+					requestParamsObjectCandidates.add(argument);
+				}
+			}
 		}
+		if (requestParamsObjectCandidates.size() == 1 && requestParams == null) {
+			requestParams = new LinkedMultiValueMap<>(8);
+			BeanWrapperImpl bw = new BeanWrapperImpl(requestParamsObjectCandidates.get(0));
+			for (PropertyDescriptor pd : bw.getPropertyDescriptors()) {
+				if (pd.getReadMethod() == null || pd.getWriteMethod() == null)
+					continue;
+				String name = pd.getName();
+				Object argument = bw.getPropertyValue(name);
+				if (argument == null)
+					continue;
+				if (requestParams == null)
+					requestParams = new LinkedMultiValueMap<>(8);
+				if (argument instanceof Collection) {
+					for (Object o : (Collection<Object>) argument)
+						if (o != null)
+							requestParams.add(name, o.toString());
+				} else {
+					requestParams.add(name, argument.toString());
+				}
+			}
+		}
+
 		while (url.contains("{")) {
 			int index = url.indexOf('{');
 			String prefix = url.substring(0, index);
@@ -200,15 +246,13 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		if (requestParams != null) {
 			if (body == null && requestMethod.name().startsWith("P")) {
 				headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-				LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-				for (Map.Entry<String, String> entry : requestParams.entrySet())
-					map.add(entry.getKey(), entry.getValue());
-				body = map;
+				body = requestParams;
 			} else {
 				StringBuilder temp = new StringBuilder(url);
-				for (Map.Entry<String, String> entry : requestParams.entrySet())
-					temp.append(temp.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
-							.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+				for (Map.Entry<String, List<String>> entry : requestParams.entrySet())
+					for (String value : entry.getValue())
+						temp.append(temp.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
+								.append(URLEncoder.encode(value, "UTF-8"));
 				url = temp.toString();
 			}
 		}
