@@ -20,12 +20,12 @@ public class AuthorizeAspect extends BaseAspect {
 	}
 
 	@Before("execution(public * *(..)) and @within(restController) and not @annotation(org.ironrhino.core.metadata.Authorize)")
-	public void authorizeClass(JoinPoint jp, RestController restController) throws Throwable {
+	public void authorizeClass(JoinPoint jp, RestController restController) {
 		authorize(jp.getTarget().getClass().getAnnotation(Authorize.class));
 	}
 
 	@Before("execution(public * *(..)) and @within(restController) and @annotation(authorize)")
-	public void authorizeMethod(JoinPoint jp, RestController restController, Authorize authorize) throws Throwable {
+	public void authorizeMethod(JoinPoint jp, RestController restController, Authorize authorize) {
 		authorize(authorize);
 	}
 

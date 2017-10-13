@@ -272,7 +272,7 @@ public class LocationParser {
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
+	protected void finalize() throws IOException {
 		if (file != null)
 			file.close();
 	}

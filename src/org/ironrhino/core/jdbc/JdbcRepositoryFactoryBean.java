@@ -161,7 +161,7 @@ public class JdbcRepositoryFactoryBean
 	}
 
 	@Override
-	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+	public Object invoke(MethodInvocation methodInvocation) {
 		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
 			return "JdbcRepository for  [" + getObjectType().getName() + "]";
 		}

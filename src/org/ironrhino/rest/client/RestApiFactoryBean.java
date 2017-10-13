@@ -1,6 +1,7 @@
 package org.ironrhino.rest.client;
 
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -104,7 +105,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+	public Object invoke(MethodInvocation methodInvocation) throws IOException {
 		if (AopUtils.isToStringMethod(methodInvocation.getMethod()))
 			return "RestApi for  [" + getObjectType().getName() + "]";
 		Method method = methodInvocation.getMethod();
