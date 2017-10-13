@@ -49,6 +49,21 @@
 	</div>
 </li>
 <li>获取或使用access_token的错误响应
+	<#if 'true'==properties['oauth.error.legacy']!>
+	<ul>
+	<li>
+	<div>响应消息体为json格式, 包含code和status字段和message(可选)字段.
+	示例: <code>{"code":"7","status":"UNAUTHORIZED","message":"invalid_token"}</code>
+	</div>
+	</li>
+	<li>响应状态码列表
+	<ul>
+		<li>BAD_REQUEST:		400</li>
+		<li>UNAUTHORIZED:	401</li>
+	</ul>
+	</li>
+	</ul>	
+	<#else>
 	<ul>
 	<li>参见: 
 	<a href="https://tools.ietf.org/html/rfc6749#section-5.2" target="_blank">https://tools.ietf.org/html/rfc6749#section-5.2</a>  
@@ -72,6 +87,7 @@
 	</ul>
 	</li>
 	</ul>
+	</#if>
 </li>
 </ol>
 
