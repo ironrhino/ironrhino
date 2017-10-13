@@ -25,6 +25,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.io.FileSystemResource;
@@ -37,6 +38,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -53,6 +55,9 @@ import lombok.Setter;
 
 public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object> {
 
+	private static final boolean resilience4jPresent = ClassUtils.isPresent(
+			"io.github.resilience4j.circuitbreaker.CircuitBreaker", RestApiFactoryBean.class.getClassLoader());
+
 	private final Class<?> restApiClass;
 
 	@Getter
@@ -64,6 +69,12 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 	private String apiBaseUrl;
 
 	private Object restApiBean;
+
+	@Value("${restApi.circuitBreakerEnabled:true}")
+	private boolean circuitBreakerEnabled = true;
+
+	@Getter
+	private Object circuitBreaker;
 
 	public RestApiFactoryBean(Class<?> restApiClass) {
 		this(restApiClass, null);
@@ -84,6 +95,11 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		this.restApiClass = restApiClass;
 		this.restTemplate = restTemplate;
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
+		if (circuitBreakerEnabled && resilience4jPresent) {
+			io.github.resilience4j.circuitbreaker.CircuitBreakerConfig config = io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
+					.custom().recordFailure(ex -> ex.getCause() instanceof IOException).build();
+			circuitBreaker = io.github.resilience4j.circuitbreaker.CircuitBreaker.of(restApiClass.getName(), config);
+		}
 	}
 
 	public void setRestClient(RestClient restClient) {
@@ -105,9 +121,17 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Object invoke(MethodInvocation methodInvocation) throws IOException {
+	public Object invoke(final MethodInvocation methodInvocation) throws Exception {
+		if (circuitBreaker == null)
+			return doInvoke(methodInvocation);
+		else
+			return ((io.github.resilience4j.circuitbreaker.CircuitBreaker) circuitBreaker)
+					.executeCallable(() -> doInvoke(methodInvocation));
+	}
+
+	@SuppressWarnings("unchecked")
+	public Object doInvoke(MethodInvocation methodInvocation) throws IOException {
 		if (AopUtils.isToStringMethod(methodInvocation.getMethod()))
 			return "RestApi for  [" + getObjectType().getName() + "]";
 		Method method = methodInvocation.getMethod();

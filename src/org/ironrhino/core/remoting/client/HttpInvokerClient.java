@@ -1,5 +1,6 @@
 package org.ironrhino.core.remoting.client;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,11 +31,15 @@ import org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import lombok.Getter;
 import lombok.Setter;
 
 public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
+
+	private static final boolean resilience4jPresent = ClassUtils.isPresent(
+			"io.github.resilience4j.circuitbreaker.CircuitBreaker", HttpInvokerClient.class.getClassLoader());
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
@@ -81,6 +86,12 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private Object serviceProxy;
 
+	@Value("${httpInvoker.circuitBreakerEnabled:true}")
+	private boolean circuitBreakerEnabled = true;
+
+	@Getter
+	private Object circuitBreaker;
+
 	@Override
 	public Object getObject() {
 		return this.serviceProxy;
@@ -123,6 +134,12 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		ProxyFactory pf = new ProxyFactory(getServiceInterface(), this);
 		pf.addInterface(RemotingClientProxy.class);
 		this.serviceProxy = pf.getProxy(getBeanClassLoader());
+		if (circuitBreakerEnabled && resilience4jPresent) {
+			io.github.resilience4j.circuitbreaker.CircuitBreakerConfig config = io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
+					.custom().recordFailure(ex -> ex instanceof IOException).build();
+			circuitBreaker = io.github.resilience4j.circuitbreaker.CircuitBreaker.of(getServiceInterface().getName(),
+					config);
+		}
 	}
 
 	@Override
@@ -134,6 +151,15 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	@Override
 	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
+			throws Exception {
+		if (circuitBreaker == null)
+			return doExecuteRequest(invocation, methodInvocation);
+		else
+			return ((io.github.resilience4j.circuitbreaker.CircuitBreaker) circuitBreaker)
+					.executeCallable(() -> doExecuteRequest(invocation, methodInvocation));
+	}
+
+	protected RemoteInvocationResult doExecuteRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
 			throws Exception {
 		if (!discovered) {
 			setServiceUrl(discoverServiceUrl());
@@ -166,7 +192,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		long time = System.currentTimeMillis();
 		RemoteInvocationResult result;
 		try {
-			result = executeRequest(invocation, methodInvocation, maxAttempts);
+			result = doExecuteRequest(invocation, methodInvocation, maxAttempts);
 			time = System.currentTimeMillis() - time;
 			if (loggingPayload) {
 				if (!result.hasInvocationTargetException())
@@ -184,7 +210,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return result;
 	}
 
-	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation,
+	protected RemoteInvocationResult doExecuteRequest(RemoteInvocation invocation, MethodInvocation methodInvocation,
 			int maxAttempts) throws Exception {
 		String method = null;
 		if (serviceStats != null)

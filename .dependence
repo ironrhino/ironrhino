@@ -33,3 +33,5 @@
 +cache2k-core
 -aopalliance
 -aspectjrt
++resilience4j-core
++resilience4j-circuitbreaker

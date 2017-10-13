@@ -63,6 +63,8 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/persistence-api-2.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/poi-3.12.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/resilience4j-circuitbreaker-0.11.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/resilience4j-core-0.11.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-1.7.0.jar"/>
