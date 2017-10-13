@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
 
+import javax.servlet.RequestDispatcher;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.LocalizedException;
@@ -33,6 +35,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 		try {
 			return invocation.invoke();
 		} catch (Throwable e) {
+			ServletActionContext.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
 			ExceptionUtils.trimStackTrace(e, 20);
 			if (e instanceof LocalizedException || e instanceof ErrorMessage)
 				logger.error(e.getLocalizedMessage());
