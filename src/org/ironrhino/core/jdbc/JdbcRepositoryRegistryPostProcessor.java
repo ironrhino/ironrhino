@@ -15,6 +15,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,13 +30,13 @@ public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegist
 		for (Class<?> jdbcRepositoryClass : jdbcRepositoryClasses) {
 			if (!jdbcRepositoryClass.isInterface())
 				continue;
-			JdbcRepository annotation = jdbcRepositoryClass.getAnnotation(JdbcRepository.class);
-			String beanName = annotation.value();
+			JdbcRepository annotation = AnnotatedElementUtils.getMergedAnnotation(jdbcRepositoryClass,
+					JdbcRepository.class);
+			String beanName = annotation.name();
 			if (StringUtils.isBlank(beanName)) {
 				beanName = NameGenerator.buildDefaultBeanName(jdbcRepositoryClass.getName());
-				if (registry.containsBeanDefinition(beanName)) {
+				if (registry.containsBeanDefinition(beanName))
 					beanName = jdbcRepositoryClass.getName();
-				}
 			}
 			String dataSourceBeanName = annotation.dataSource();
 			if (StringUtils.isBlank(dataSourceBeanName))

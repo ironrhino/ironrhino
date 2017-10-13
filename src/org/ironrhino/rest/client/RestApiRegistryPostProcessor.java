@@ -16,6 +16,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,13 +30,12 @@ public class RestApiRegistryPostProcessor implements BeanDefinitionRegistryPostP
 		for (Class<?> restApiClass : restApiClasses) {
 			if (!restApiClass.isInterface())
 				continue;
-			RestApi annotation = restApiClass.getAnnotation(RestApi.class);
-			String beanName = annotation.value();
+			RestApi annotation = AnnotatedElementUtils.getMergedAnnotation(restApiClass, RestApi.class);
+			String beanName = annotation.name();
 			if (StringUtils.isBlank(beanName)) {
 				beanName = NameGenerator.buildDefaultBeanName(restApiClass.getName());
-				if (registry.containsBeanDefinition(beanName)) {
+				if (registry.containsBeanDefinition(beanName))
 					beanName = restApiClass.getName();
-				}
 			}
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(RestApiFactoryBean.class);
 			beanDefinition.setTargetType(restApiClass);

@@ -29,6 +29,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 
@@ -139,9 +140,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	private void export(Class<?> clazz, String beanName, String beanClassName) {
 		if (!clazz.isInterface()) {
-			Remoting remoting = clazz.getAnnotation(Remoting.class);
+			Remoting remoting = AnnotatedElementUtils.getMergedAnnotation(clazz, Remoting.class);
 			if (remoting != null) {
-				Class<?>[] classes = remoting.value();
+				Class<?>[] classes = remoting.serviceInterfaces();
 				if (classes.length == 0) {
 					Class<?>[] interfaces = clazz.getInterfaces();
 					if (interfaces.length > 0)

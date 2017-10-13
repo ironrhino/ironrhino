@@ -6,11 +6,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.springframework.core.annotation.AliasFor;
+
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Remoting {
 
+	@AliasFor("serviceInterfaces")
 	Class<?>[] value() default {};
+
+	@AliasFor("value")
+	Class<?>[] serviceInterfaces() default {};
 
 	String description() default "";
 
