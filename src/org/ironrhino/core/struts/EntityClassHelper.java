@@ -76,6 +76,7 @@ import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.core.util.TypeUtils;
 import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
@@ -444,11 +445,8 @@ public class EntityClassHelper {
 							uci.setListTemplate("<#if value?has_content&&value.id?has_content><a href=\"" + url
 									+ "/view/${value.id}\" class=\"view\" rel=\"richtable\" title=\"${action.getText('view')}\">${value?html}</a></#if>");
 						}
-					} else if (collectionType == null && (returnType == Integer.TYPE || returnType == Short.TYPE
-							|| returnType == Long.TYPE || returnType == Double.TYPE || returnType == Float.TYPE
-							|| Number.class.isAssignableFrom(returnType))) {
-						if (returnType == Integer.TYPE || returnType == Integer.class || returnType == Short.TYPE
-								|| returnType == Short.class || returnType == Long.TYPE || returnType == Long.class) {
+					} else if (collectionType == null && TypeUtils.isNumeric(returnType)) {
+						if (TypeUtils.isIntegralNumeric(returnType)) {
 							uci.setInputType("number");
 							uci.addCssClass((returnType == Long.TYPE || returnType == Long.class) ? "long" : "integer");
 							Min min = findAnnotation(readMethod, declaredField, Min.class);
@@ -467,8 +465,7 @@ public class EntityClassHelper {
 										uci.getInternalDynamicAttributes().put("max", String.valueOf(range.max()));
 								}
 							}
-						} else if (returnType == Double.TYPE || returnType == Double.class || returnType == Float.TYPE
-								|| returnType == Float.class || returnType == BigDecimal.class) {
+						} else if (TypeUtils.isDecimalNumeric(returnType)) {
 							uci.setInputType("number");
 							uci.addCssClass("double");
 							int scale = column != null ? column.scale() : 2;
