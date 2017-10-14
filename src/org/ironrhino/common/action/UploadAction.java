@@ -286,7 +286,7 @@ public class UploadAction extends BaseAction {
 		return url;
 	}
 
-	private String getUploadRootDir() {
+	protected String getUploadRootDir() {
 		return uploadFilesHandler.getUploadDir();
 	}
 
