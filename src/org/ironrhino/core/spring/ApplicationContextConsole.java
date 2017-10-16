@@ -24,7 +24,6 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.mvel2.PropertyAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -91,30 +90,15 @@ public class ApplicationContextConsole {
 	public Map<String, Scope> getTriggers() {
 		if (triggers == null) {
 			Map<String, Scope> temp = new TreeMap<>();
-			// triggers.put("freemarkerConfiguration.clearTemplateCache()",
-			// Scope.APPLICATION);
-			String[] beanNames = ctx.getBeanDefinitionNames();
-			for (String beanName : beanNames) {
-				if (StringUtils.isAlphanumeric(beanName) && ctx.isSingleton(beanName)) {
-					try {
-						BeanDefinition bd = ctx.getBeanDefinition(beanName);
-						if (bd.isAbstract())
-							continue;
-						String beanClassName = bd.getBeanClassName();
-						Class<?> clz = beanClassName != null ? Class.forName(beanClassName)
-								: ReflectionUtils.getTargetObject(ctx.getBean(beanName)).getClass();
-						Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);
-						for (Method m : methods) {
-							if (m.getParameterCount() == 0) {
-								StringBuilder expression = new StringBuilder(beanName);
-								expression.append(".").append(m.getName()).append("()");
-								temp.put(expression.toString(), m.getAnnotation(Trigger.class).scope());
-							}
-						}
-					} catch (NoSuchBeanDefinitionException e) {
-						e.printStackTrace();
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+			temp.put("freemarkerConfiguration.clearTemplateCache()", Scope.APPLICATION);
+			for (Map.Entry<String, Object> entry : getBeans().entrySet()) {
+				Class<?> clz = ReflectionUtils.getTargetObject(entry.getValue()).getClass();
+				Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);
+				for (Method m : methods) {
+					if (m.getParameterCount() == 0) {
+						StringBuilder expression = new StringBuilder(entry.getKey());
+						expression.append(".").append(m.getName()).append("()");
+						temp.put(expression.toString(), m.getAnnotation(Trigger.class).scope());
 					}
 				}
 			}
