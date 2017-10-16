@@ -8,10 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.event.ExpressionEvent;
 import org.ironrhino.core.metadata.PostPropertiesReset;
@@ -45,9 +42,6 @@ public class ApplicationContextConsole {
 	@Autowired
 	private ConfigurableListableBeanFactory ctx;
 
-	@Autowired(required = false)
-	private ServletContext servletContext;
-
 	@Autowired
 	private EventPublisher eventPublisher;
 
@@ -60,9 +54,6 @@ public class ApplicationContextConsole {
 			synchronized (this) {
 				if (beans == null) {
 					Map<String, Object> temp = new HashMap<>();
-					if (servletContext != null)
-						temp.put("freemarkerConfiguration",
-								servletContext.getAttribute(FreemarkerManager.CONFIG_SERVLET_CONTEXT_KEY));
 					String[] beanNames = ctx.getBeanDefinitionNames();
 					for (String beanName : beanNames) {
 						if (!ctx.isSingleton(beanName))
@@ -90,7 +81,6 @@ public class ApplicationContextConsole {
 	public Map<String, Scope> getTriggers() {
 		if (triggers == null) {
 			Map<String, Scope> temp = new TreeMap<>();
-			temp.put("freemarkerConfiguration.clearTemplateCache()", Scope.APPLICATION);
 			for (Map.Entry<String, Object> entry : getBeans().entrySet()) {
 				Class<?> clz = ReflectionUtils.getTargetObject(entry.getValue()).getClass();
 				Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);

@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.slf4j.Logger;
@@ -104,6 +107,8 @@ public class FreemarkerConfigurer {
 	@Autowired(required = false)
 	private List<FallbackTemplateProvider> fallbackTemplateProviders;
 
+	private List<Configuration> configurations = new CopyOnWriteArrayList<>();
+
 	@PostConstruct
 	public void init() {
 		ftlLocation = org.ironrhino.core.util.StringUtils.trimTailSlash(ftlLocation);
@@ -165,7 +170,14 @@ public class FreemarkerConfigurer {
 						: (ex, env, writer) -> {
 							logger.error(ex.getMessage());
 						});
+		configurations.add(configuration);
 		return configuration;
+	}
+
+	@Trigger(scope = Scope.APPLICATION)
+	public void clearTemplateCache() {
+		for (Configuration configuration : configurations)
+			configuration.clearTemplateCache();
 	}
 
 	protected void setFormats(Configuration configuration) throws TemplateModelException {
