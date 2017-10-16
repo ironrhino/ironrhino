@@ -114,7 +114,7 @@ public class ApplicationContextConsole {
 				}
 			}
 			if (scope != null && scope != Scope.LOCAL)
-				eventPublisher.publish(new ExpressionEvent(expression), Scope.GLOBAL);
+				eventPublisher.publish(new ExpressionEvent(expression), scope);
 			return value;
 		} catch (NoSuchFieldException e) {
 			throw new IllegalArgumentException("NoSuchFieldException: " + e.getMessage());
