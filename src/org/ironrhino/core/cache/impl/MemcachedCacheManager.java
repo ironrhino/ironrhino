@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import lombok.Setter;
 import net.rubyeye.xmemcached.MemcachedClient;
 import net.rubyeye.xmemcached.MemcachedClientBuilder;
 import net.rubyeye.xmemcached.XMemcachedClientBuilder;
@@ -39,6 +40,7 @@ public class MemcachedCacheManager implements CacheManager {
 	@Value("${memcached.serverAddress:localhost:11211}")
 	private String serverAddress;
 
+	@Setter
 	@Value("${memcached.useFstSerialization:false}")
 	private boolean useFstSerialization;
 

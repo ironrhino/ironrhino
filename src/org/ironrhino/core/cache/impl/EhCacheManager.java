@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.util.concurrent.Striped;
 
+import lombok.Setter;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.ObjectExistsException;
@@ -30,9 +31,11 @@ public class EhCacheManager implements CacheManager {
 
 	private net.sf.ehcache.CacheManager ehCacheManager;
 
+	@Setter
 	@Value("${ehcache.configLocation:classpath:ehcache.xml}")
 	private Resource configLocation;
 
+	@Setter
 	@Value("${ehcache.lockStripes:0}")
 	private int lockStripes = 0;
 
