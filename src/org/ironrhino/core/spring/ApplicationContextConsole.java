@@ -77,6 +77,8 @@ public class ApplicationContextConsole {
 						for (String alias : aliases)
 							if (StringUtils.isAlphanumeric(alias.replaceAll("_", "")))
 								temp.put(alias, ctx.getBean(beanName));
+						if (ctx.containsBean("&" + beanName))
+							temp.put("__" + beanName + "__", ctx.getBean("&" + beanName));
 					}
 					beans = Collections.unmodifiableMap(temp);
 				}
