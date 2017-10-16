@@ -33,14 +33,14 @@ public class ExceptionUtils {
 
 	public static String getDetailMessage(Throwable t) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(t.getClass().getName()).append(":").append(t.getMessage());
+		sb.append(t.getClass().getName()).append(":").append(t.getLocalizedMessage());
 		int maxDepth = 10;
 		while (t.getCause() != null && maxDepth > 0) {
 			maxDepth--;
 			t = t.getCause();
 			sb.append("\n").append(t.getClass().getName());
-			if (t.getMessage() != null && sb.indexOf(t.getMessage()) < 0)
-				sb.append(":").append(t.getMessage());
+			if (t.getLocalizedMessage() != null && sb.indexOf(t.getLocalizedMessage()) < 0)
+				sb.append(":").append(t.getLocalizedMessage());
 		}
 		return sb.toString();
 	}
