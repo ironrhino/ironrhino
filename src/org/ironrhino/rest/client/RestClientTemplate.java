@@ -7,8 +7,6 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -26,8 +24,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 class RestClientTemplate extends RestTemplate {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private RestClient client;
 
@@ -90,7 +86,6 @@ class RestClientTemplate extends RestTemplate {
 		try {
 			return super.doExecute(uri, method, requestCallback, responseExtractor);
 		} catch (ResourceAccessException e) {
-			logger.error(e.getMessage(), e);
 			if (--attempts < 1)
 				throw e;
 			return doExecute(uri, method, requestCallback, responseExtractor, attempts);
