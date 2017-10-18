@@ -36,7 +36,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -46,7 +45,6 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	public ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
 		ApiDocHelper.objectMapper = objectMapper;
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
 	}
 

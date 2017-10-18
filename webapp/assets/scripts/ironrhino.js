@@ -40379,7 +40379,16 @@ Initialization.apiplayground = function() {
 						+ xhr.statusText + ' <span class="badge">'
 						+ (new Date().getTime() - startTime) + 'ms</span>');
 				form.find('.responseHeaders').text(xhr.getAllResponseHeaders());
-				form.find('.responseBody').text(xhr.responseText);
+				var responseText = xhr.responseText;
+				if (responseText) {
+					try {
+						responseText = JSON.stringify(JSON.parse(responseText),
+								null, '   ');
+					} catch (e) {
+
+					}
+				}
+				form.find('.responseBody').text(responseText);
 			}
 		};
 		if (form.find('.requestBody').length) {
@@ -40457,9 +40466,8 @@ Observation.formatJson = function(container) {
 				var t = $(this);
 				if (t.text()) {
 					try {
-						t
-								.text(JSON.stringify(JSON.parse(t.text()),
-										null, '   '));
+						t.text(JSON
+								.stringify(JSON.parse(t.text()), null, '   '));
 					} catch (e) {
 
 					}
