@@ -51,7 +51,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	}
 
 	@Bean
-	public PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+	public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
 		return new PropertySourcesPlaceholderConfigurer();
 	}
 
