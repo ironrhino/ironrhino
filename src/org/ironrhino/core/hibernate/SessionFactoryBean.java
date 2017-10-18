@@ -122,6 +122,13 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 
 	@Override
 	public void afterPropertiesSet() throws IOException {
+		DatabaseProduct databaseProduct = null;
+		try (Connection conn = dataSource.getConnection()) {
+			DatabaseMetaData dbmd = conn.getMetaData();
+			databaseProduct = DatabaseProduct.parse(dbmd.getDatabaseProductName());
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		}
 		Properties properties = getHibernateProperties();
 		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
 			properties.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
@@ -168,7 +175,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		if (physicalNamingStrategy != null)
 			setPhysicalNamingStrategy(physicalNamingStrategy);
 		if (multiTenantConnectionProvider != null) {
-			getHibernateProperties().put(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
+			properties.put(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
 			setMultiTenantConnectionProvider(multiTenantConnectionProvider);
 			if (currentTenantIdentifierResolver != null) {
 				setCurrentTenantIdentifierResolver(currentTenantIdentifierResolver);
@@ -176,28 +183,24 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		}
 		if (entityInterceptor != null)
 			setEntityInterceptor(entityInterceptor);
-		Properties props = getHibernateProperties();
-		String value = props.getProperty(AvailableSettings.BATCH_VERSIONED_DATA);
+		String value = properties.getProperty(AvailableSettings.BATCH_VERSIONED_DATA);
 		if ("true".equals(value)) {
-			try (Connection conn = dataSource.getConnection()) {
-				DatabaseMetaData dbmd = conn.getMetaData();
-				DatabaseProduct dp = DatabaseProduct.parse(dbmd.getDatabaseProductName());
-				if (dp == DatabaseProduct.ORACLE) {
-					props.put(AvailableSettings.BATCH_VERSIONED_DATA, "false");
-					logger.warn(
-							"Override {} to false because this driver returns incorrect row counts from executeBatch()",
-							AvailableSettings.BATCH_VERSIONED_DATA);
-				}
-			} catch (SQLException e) {
-				logger.error(e.getMessage(), e);
+			if (databaseProduct == DatabaseProduct.ORACLE) {
+				properties.put(AvailableSettings.BATCH_VERSIONED_DATA, "false");
+				logger.warn("Override {} to false because this driver returns incorrect row counts from executeBatch()",
+						AvailableSettings.BATCH_VERSIONED_DATA);
 			}
+		}
+		value = properties.getProperty(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS);
+		if (StringUtils.isBlank(value)) {
+			properties.put(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, databaseProduct != DatabaseProduct.MYSQL);
 		}
 		if (ClassUtils.isPresent("javax.validation.Configuration", getClass().getClassLoader())) {
 			final javax.validation.Configuration<?> configuration = javax.validation.Validation.byDefaultProvider()
 					.configure();
 			configuration.messageInterpolator(
 					new LocaleContextMessageInterpolator(configuration.getDefaultMessageInterpolator()));
-			props.put("javax.persistence.validation.factory", configuration.buildValidatorFactory());
+			properties.put("javax.persistence.validation.factory", configuration.buildValidatorFactory());
 		}
 		super.afterPropertiesSet();
 	}
