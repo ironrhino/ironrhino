@@ -3,7 +3,11 @@ package org.ironrhino.rest.client;
 import java.util.Iterator;
 import java.util.Locale;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.cache.CacheManager;
+import org.ironrhino.rest.client.token.CacheBasedTokenStore;
 import org.ironrhino.rest.client.token.DefaultToken;
 import org.ironrhino.rest.client.token.DefaultTokenStore;
 import org.ironrhino.rest.client.token.Token;
@@ -11,6 +15,7 @@ import org.ironrhino.rest.client.token.TokenStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -59,6 +64,9 @@ public class RestClient implements BeanNameAware {
 
 	protected RestTemplate internalRestTemplate = new RestTemplate();
 
+	@Autowired(required = false)
+	private CacheManager cacheManager;
+
 	@Getter
 	@Setter
 	protected TokenStore tokenStore = new DefaultTokenStore();
@@ -100,6 +108,12 @@ public class RestClient implements BeanNameAware {
 		this.accessTokenEndpoint = accessTokenEndpoint;
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
+	}
+
+	@PostConstruct
+	public void init() {
+		if (cacheManager != null)
+			this.tokenStore = new CacheBasedTokenStore(cacheManager);
 	}
 
 	public String fetchAccessToken() {

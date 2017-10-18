@@ -10,12 +10,15 @@ import lombok.Setter;
 public class CacheBasedTokenStore implements TokenStore {
 
 	@Getter
-	@Setter
-	private CacheManager cacheManager;
+	private final CacheManager cacheManager;
 
 	@Getter
 	@Setter
 	private String cacheNamespace = "Token";
+
+	public CacheBasedTokenStore(CacheManager cacheManager) {
+		this.cacheManager = cacheManager;
+	}
 
 	@Override
 	public Token getToken(String key) {
