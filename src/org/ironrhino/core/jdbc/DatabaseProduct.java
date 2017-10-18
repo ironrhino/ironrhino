@@ -5,8 +5,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum DatabaseProduct {
 
 	MYSQL {
+
 		@Override
 		public int getDefaultPort() {
 			return 3306;
@@ -22,6 +25,11 @@ public enum DatabaseProduct {
 		@Override
 		public String getDefaultDriverClass() {
 			return "com.mysql.jdbc.Driver";
+		}
+
+		@Override
+		protected String getRecommendedJdbcUrlQueryString() {
+			return "createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&cachePrepStmts=true&tinyInt1isBit=false&socketTimeout=60000&useSSL=false";
 		}
 
 	},
@@ -363,6 +371,36 @@ public enum DatabaseProduct {
 			sb.append(params);
 		}
 		return sb.toString();
+	}
+
+	public String polishJdbcUrl(String jdbcUrl) {
+		String qs = getRecommendedJdbcUrlQueryString();
+		if (qs == null)
+			return jdbcUrl;
+		int i = jdbcUrl.indexOf('?');
+		if (i > 0) {
+			String uri = jdbcUrl.substring(0, i);
+			String params = jdbcUrl.substring(i + 1);
+			Map<String, String> map = new LinkedHashMap<>();
+			for (String s : (qs + "&" + params).split("&")) {
+				String[] arr = s.split("=", 2);
+				if (arr.length == 2)
+					map.put(arr[0], arr[1]);
+			}
+			StringBuilder sb = new StringBuilder(uri);
+			if (map.size() > 0) {
+				for (Map.Entry<String, String> entry : map.entrySet())
+					sb.append(sb.indexOf("?") > 0 ? '&' : '?').append(entry.getKey()).append("=")
+							.append(entry.getValue());
+			}
+			return sb.toString();
+		} else {
+			return jdbcUrl + "?" + qs;
+		}
+	}
+
+	protected String getRecommendedJdbcUrlQueryString() {
+		return null;
 	}
 
 }

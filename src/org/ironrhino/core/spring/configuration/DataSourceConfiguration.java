@@ -31,7 +31,7 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.driverClassName:}")
 	private String driverClassName;
 
-	@Value("${jdbc.url:jdbc:mysql:///#{systemProperties['app.name'].replaceAll('-','_').replaceAll('\\.','_')}?createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&tinyInt1isBit=false&socketTimeout=60000&useSSL=false}")
+	@Value("${jdbc.url:jdbc:mysql:///#{systemProperties['app.name'].replaceAll('-','_').replaceAll('\\.','_')}}")
 	private String jdbcUrl;
 
 	@Value("${jdbc.username:root}")
@@ -106,7 +106,7 @@ public class DataSourceConfiguration {
 			ds.setDriverClassName(driverClassName);
 		else if (databaseProduct != null)
 			ds.setDriverClassName(databaseProduct.getDefaultDriverClass());
-		ds.setJdbcUrl(jdbcUrl);
+		ds.setJdbcUrl(databaseProduct != null ? databaseProduct.polishJdbcUrl(jdbcUrl) : jdbcUrl);
 		ds.setUsername(username);
 		ds.setPassword(password);
 		if (maxConnectionsPerPartition != null)
