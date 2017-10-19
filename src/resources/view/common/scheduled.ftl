@@ -27,18 +27,22 @@ $(function(){
 
 <div id="scheduled">
 	<style>
-	div.task{
-		text-align: right;
+	li.task{
+		margin-top: 50px;
 		line-height: 30px;
+	}
+	div.taskname{
+		text-align: right;
 		font-weight: bold;
 	}
 	</style>
 	<ul class="thumbnails">
 	<#list tasks as task>
-	<li class="span6">
+	<li class="span6 task">
 	<div class="row-fluid">
-	<div class="span7 task">${getText(task)}</div>
-	<div class="span5"><div class="switch" data-on-label="${getText('ON')}" data-off-label="${getText('OFF')}"><input type="checkbox" name="${task}"<#if !circuitBreaker??> disabled</#if><#if !circuitBreaker?? || !circuitBreaker.isShortCircuit(task)> checked="checked"</#if>></div></div>
+		<div class="span5 taskname">${getText(task.name)}</div>
+		<div class="span3"><div class="switch" data-on-label="${getText('ON')}" data-off-label="${getText('OFF')}"><input type="checkbox" name="${task.name}"<#if !circuitBreaker??> disabled</#if><#if !circuitBreaker?? || !circuitBreaker.isShortCircuit(task)> checked="checked"</#if>></div></div>
+		<div class="span4">${task.type}: ${task.description!}</div>
 	</div>
 	</li>
 	</#list>
