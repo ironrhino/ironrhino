@@ -51,6 +51,7 @@ public class BaseAction extends ActionSupport {
 	private static final String SESSION_KEY_CURRENT_PASSWORD_THRESHOLD = "c_p_t";
 	private static final String COOKIE_NAME_CSRF = "csrf";
 
+	public static final String HOME = "_";
 	public static final String LIST = "list";
 	public static final String VIEW = "view";
 	public static final String PICK = "pick";

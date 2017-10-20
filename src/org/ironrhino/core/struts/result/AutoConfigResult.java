@@ -160,7 +160,7 @@ public class AutoConfigResult extends FreemarkerResult {
 	private String getTemplateName(String namespace, String actionName, String result, boolean withStyle) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(namespace).append('/').append(actionName);
-		if (!result.equals(Action.SUCCESS))
+		if (!result.equals(Action.SUCCESS) && !result.equals(BaseAction.HOME))
 			sb.append('_').append(result);
 		if (withStyle && StringUtils.isNotBlank(styleHolder.get()))
 			sb.append(".").append(styleHolder.get());

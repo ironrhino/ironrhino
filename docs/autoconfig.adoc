@@ -27,23 +27,23 @@ Action的方法返回一个String类型的result, 框架需要将result转换成
 从头开始搜索FTL模板, 哪个先匹配就用哪一个模板,
 也可以利用这种规则在各自的应用工程里面去覆盖底层提供好的模板.
 
-当result不为 `success`:
+当result不为 `SUCCESS` 或 `HOME`:
 
 . /WEB-INF/view/ftl/{namespace}/{actionName}_{result}.ftl
 . classpath:resources/view/{namespace}/{actionName}_{result}.ftl
 . /WEB-INF/view/ftl/meta/result/{result}.ftl
 . classpath:resources/view/meta/result/{result}.ftl
 
-当result为 `success` 并且methodName为 `execute`:
+当result为 `SUCCESS` 并且methodName为 `execute`, 或者result为 `HOME` 并且方法不为 `execute`:
 
 . /WEB-INF/view/ftl/{namespace}/{actionName}.ftl
 . classpath:resources/view/{namespace}/{actionName}.ftl
 . /WEB-INF/view/ftl/meta/result/{result}.ftl
 . classpath:resources/view/meta/result/{result}.ftl
 
-当result为 `success` 并且methodName不为 `execute`,
+当result为 `SUCCESS` 并且methodName不为 `execute`,
 这种情况会重定向到 `/{namespace}/{actionName}` 也就是会调转到 `execute` ,
-比如对于一个典型的模块, `execute` 方法返回 `success` 作为主入口返回一个主页面, 其他方法执行某些操作后返回 `success` 重定向回主页面.
+比如对于一个典型的模块, `execute` 方法返回 `SUCCESS` 作为主入口返回一个主页面, 其他方法执行某些操作后返回 `SUCCESS` 重定向回主页面.
 增删改查尤其适用, `execute` 返回列表页面, 增删改之后还是回到列表页面.
 
 
