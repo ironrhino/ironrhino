@@ -40,12 +40,13 @@ public class AutoConfigResult extends FreemarkerResult {
 
 	@Override
 	public void execute(ActionInvocation invocation) throws Exception {
-		if (invocation.getResultCode().equals(Action.NONE))
+		String resultCode = invocation.getResultCode();
+		if (Action.NONE.equals(resultCode))
 			return;
 		ActionContext ctx = invocation.getInvocationContext();
 		HttpServletRequest request = (HttpServletRequest) ctx.get(StrutsStatics.HTTP_REQUEST);
 		HttpServletResponse response = (HttpServletResponse) ctx.get(StrutsStatics.HTTP_RESPONSE);
-		if (invocation.getResultCode().equals(Action.SUCCESS) && !invocation.getProxy().getMethod().equals("")
+		if (Action.SUCCESS.equals(resultCode) && !invocation.getProxy().getMethod().equals("")
 				&& !invocation.getProxy().getMethod().equals("execute")) {
 			String namespace = invocation.getProxy().getNamespace();
 			String url = namespace + (namespace.endsWith("/") ? "" : "/") + invocation.getProxy().getActionName();
@@ -53,9 +54,9 @@ public class AutoConfigResult extends FreemarkerResult {
 			return;
 		}
 		if (!"XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"))) {
-			if (invocation.getResultCode().equals(Action.ERROR))
+			if (Action.ERROR.equals(resultCode))
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			if (invocation.getResultCode().equals(BaseAction.NOTFOUND))
+			if (BaseAction.NOTFOUND.equals(resultCode))
 				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 		String finalLocation = conditionalParse(location, invocation);
@@ -66,8 +67,8 @@ public class AutoConfigResult extends FreemarkerResult {
 
 	@Override
 	protected String conditionalParse(String param, ActionInvocation invocation) {
-		String result = invocation.getResultCode();
-		if (result == null || !SourceVersion.isIdentifier(result))
+		String resultCode = invocation.getResultCode();
+		if (resultCode == null || !SourceVersion.isIdentifier(resultCode))
 			throw new IllegalArgumentException("Result code must be legal java identifier");
 		String namespace = invocation.getProxy().getNamespace();
 		String actionName = invocation.getInvocationContext().getName();
@@ -76,11 +77,11 @@ public class AutoConfigResult extends FreemarkerResult {
 		String templateName = null;
 		String location = null;
 		if (StringUtils.isNotBlank(styleHolder.get())) {
-			templateName = getTemplateName(namespace, actionName, result, true);
+			templateName = getTemplateName(namespace, actionName, resultCode, true);
 			location = getTemplateLocation(templateName);
 		}
 		if (location == null) {
-			templateName = getTemplateName(namespace, actionName, result, false);
+			templateName = getTemplateName(namespace, actionName, resultCode, false);
 			location = cache.get(templateName);
 			if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 				ServletContext servletContext = ServletActionContext.getServletContext();
@@ -93,7 +94,7 @@ public class AutoConfigResult extends FreemarkerResult {
 				location = getTemplateLocation(templateName);
 				if (location == null) {
 					if (StringUtils.isNotBlank(styleHolder.get())) {
-						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(result)
+						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(resultCode)
 								.append(".").append(styleHolder.get()).append(".ftl").toString();
 						try {
 							url = servletContext.getResource(location);
@@ -102,7 +103,7 @@ public class AutoConfigResult extends FreemarkerResult {
 						}
 					}
 					if (url == null) {
-						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(result)
+						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(resultCode)
 								.append(".ftl").toString();
 						try {
 							url = servletContext.getResource(location);
@@ -111,12 +112,12 @@ public class AutoConfigResult extends FreemarkerResult {
 						}
 					}
 					if (url == null && StringUtils.isNotBlank(styleHolder.get())) {
-						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(result)
+						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(resultCode)
 								.append(".").append(styleHolder.get()).append(".ftl").toString();
 						url = ClassLoaderUtil.getResource(location.substring(1), AutoConfigResult.class);
 					}
 					if (url == null)
-						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(result)
+						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(resultCode)
 								.append(".ftl").toString();
 				}
 				cache.put(templateName, location);
