@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.aop.AbstractMethodInterceptor;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.springframework.core.BridgeMethodResolver;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +19,13 @@ public class DataRouteInterceptor extends AbstractMethodInterceptor<DataRouteAsp
 		Method method = methodInvocation.getMethod();
 		if (method.isBridge())
 			method = BridgeMethodResolver.findBridgedMethod(method);
-		Transactional transactional = method.getAnnotation(Transactional.class);
+		Transactional transactional = AnnotationUtils.findAnnotation(method, Transactional.class);
 		if (transactional == null)
-			transactional = method.getDeclaringClass().getAnnotation(Transactional.class);
-		DataRoute dataRoute = method.getAnnotation(DataRoute.class);
+			transactional = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Transactional.class);
+		DataRoute dataRoute = AnnotationUtils.findAnnotation(method, DataRoute.class);
 		boolean routeOnClass = false;
 		if (dataRoute == null) {
-			dataRoute = method.getDeclaringClass().getAnnotation(DataRoute.class);
+			dataRoute = AnnotationUtils.findAnnotation(method.getDeclaringClass(), DataRoute.class);
 			routeOnClass = dataRoute != null;
 		}
 		boolean setReadonly = transactional != null

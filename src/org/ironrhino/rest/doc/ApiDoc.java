@@ -26,6 +26,7 @@ import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.rest.doc.annotation.Status;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
@@ -94,7 +95,7 @@ public class ApiDoc implements Serializable {
 		}
 		Object apiDocInstance = apiDocClazz.getConstructor().newInstance();
 
-		Api api = apiDocMethod.getAnnotation(Api.class);
+		Api api = AnnotationUtils.findAnnotation(apiDocMethod, Api.class);
 		this.name = api.value();
 		this.description = api.description();
 		this.statuses = new ArrayList<>(api.statuses().length + 1);
@@ -193,7 +194,7 @@ public class ApiDoc implements Serializable {
 			}
 		}
 
-		Fields responseFields = apiDocMethod.getAnnotation(Fields.class);
+		Fields responseFields = AnnotationUtils.findAnnotation(apiDocMethod, Fields.class);
 		responseBody = FieldObject.createList(responseBodyClass, responseFields, false);
 
 		Object responseSample = ApiDocHelper.generateSample(apiDocInstance, apiDocMethod, responseFields);

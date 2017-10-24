@@ -31,6 +31,7 @@ import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
@@ -53,7 +54,7 @@ public class ApiDocHelper {
 	public static List<Method> findApiMethods(Class<?> apiDocClass) throws Exception {
 		List<Method> methods = new ArrayList<>();
 		for (Method m : apiDocClass.getMethods()) {
-			if (m.getAnnotation(Api.class) == null)
+			if (AnnotationUtils.findAnnotation(m, Api.class) == null)
 				continue;
 			methods.add(m);
 		}
@@ -89,9 +90,9 @@ public class ApiDocHelper {
 			return line1 - line2;
 		});
 		Collections.sort(methods, (m1, m2) -> {
-			Order o1 = m1.getAnnotation(Order.class);
+			Order o1 = AnnotationUtils.findAnnotation(m1, Order.class);
 			int order1 = o1 != null ? o1.value() : methods.indexOf(m1) + 1;
-			Order o2 = m2.getAnnotation(Order.class);
+			Order o2 = AnnotationUtils.findAnnotation(m2, Order.class);
 			int order2 = o2 != null ? o2.value() : methods.indexOf(m2) + 1;
 			return order1 - order2;
 		});

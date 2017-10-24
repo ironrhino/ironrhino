@@ -33,6 +33,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -171,7 +172,7 @@ public class JdbcRepositoryFactoryBean
 		String methodName = method.getName();
 		String sql = sqls.get(methodName);
 		if (StringUtils.isBlank(sql)) {
-			Sql anno = method.getAnnotation(Sql.class);
+			Sql anno = AnnotationUtils.findAnnotation(method, Sql.class);
 			if (anno != null)
 				sql = anno.value();
 		}
@@ -180,9 +181,9 @@ public class JdbcRepositoryFactoryBean
 					"No sql found for method: " + jdbcRepositoryClass.getName() + "." + methodName + "()");
 		SqlVerb sqlVerb = SqlVerb.parseBySql(sql);
 		if (sqlVerb == null) {
-			Transactional transactional = method.getAnnotation(Transactional.class);
+			Transactional transactional = AnnotationUtils.findAnnotation(method, Transactional.class);
 			if (transactional == null)
-				transactional = method.getDeclaringClass().getAnnotation(Transactional.class);
+				transactional = AnnotationUtils.findAnnotation(jdbcRepositoryClass, Transactional.class);
 			if (transactional != null && transactional.readOnly()) {
 				sqlVerb = SqlVerb.SELECT;
 			}
@@ -240,10 +241,10 @@ public class JdbcRepositoryFactoryBean
 				sqlParameterSource.addValue(names[i], arg);
 			}
 		}
-		PartitionKey partitionKey = method.getAnnotation(PartitionKey.class);
+		PartitionKey partitionKey = AnnotationUtils.findAnnotation(method, PartitionKey.class);
 		if (partitionKey != null) {
 			Partitioner partitioner = defaultPartitioner;
-			Partition p = method.getAnnotation(Partition.class);
+			Partition p = AnnotationUtils.findAnnotation(method, Partition.class);
 			if (p != null)
 				partitioner = beanFactory.getBean(p.partitioner());
 			if (partitioner == null)

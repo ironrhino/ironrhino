@@ -164,10 +164,10 @@ public class SetupAction extends BaseAction {
 		Map<Method, Object> methods = new TreeMap<Method, Object>((m1, m2) -> {
 			int order1 = org.springframework.core.Ordered.LOWEST_PRECEDENCE,
 					order2 = org.springframework.core.Ordered.LOWEST_PRECEDENCE;
-			Order o = m1.getAnnotation(Order.class);
+			Order o = org.springframework.core.annotation.AnnotationUtils.findAnnotation(m1, Order.class);
 			if (o != null)
 				order1 = o.value();
-			o = m2.getAnnotation(Order.class);
+			o = org.springframework.core.annotation.AnnotationUtils.findAnnotation(m2, Order.class);
 			if (o != null)
 				order2 = o.value();
 			return order1 == order2 ? m1.toString().compareTo(m2.toString()) : order1 < order2 ? -1 : 1;

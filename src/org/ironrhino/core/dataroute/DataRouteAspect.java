@@ -7,6 +7,7 @@ import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractPointcutAdvisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.core.BridgeMethodResolver;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.Getter;
@@ -25,10 +26,10 @@ public class DataRouteAspect extends AbstractPointcutAdvisor {
 		public boolean matches(Method method, Class<?> targetClass) {
 			if (method.isBridge())
 				method = BridgeMethodResolver.findBridgedMethod(method);
-			return method.getAnnotation(Transactional.class) != null
-					|| targetClass.getAnnotation(Transactional.class) != null
-					|| method.getAnnotation(DataRoute.class) != null
-					|| targetClass.getAnnotation(DataRoute.class) != null;
+			return AnnotationUtils.findAnnotation(method, Transactional.class) != null
+					|| AnnotationUtils.findAnnotation(targetClass, Transactional.class) != null
+					|| AnnotationUtils.findAnnotation(method, DataRoute.class) != null
+					|| AnnotationUtils.findAnnotation(targetClass, DataRoute.class) != null;
 		}
 	};
 
