@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.properties"),
 		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.${STAGE}.properties") })
 @ComponentScan
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class ApiConfig extends ApiConfigBase {
 
 	@Bean
