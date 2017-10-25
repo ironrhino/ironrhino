@@ -86,14 +86,18 @@ public class ApiDoc implements Serializable {
 	public ApiDoc(Class<?> apiDocClazz, Method apiDocMethod, ObjectMapper objectMapper) throws Exception {
 		Class<?> clazz = apiDocClazz.getSuperclass();
 		Method method;
-		try {
-			method = clazz.getMethod(apiDocMethod.getName(), apiDocMethod.getParameterTypes());
-		} catch (NoSuchMethodException e) {
-			// @ApiModule on Controller directly
+		if (clazz != null) {
+			try {
+				method = clazz.getMethod(apiDocMethod.getName(), apiDocMethod.getParameterTypes());
+			} catch (NoSuchMethodException e) {
+				// @ApiModule on Controller directly
+				clazz = apiDocClazz;
+				method = apiDocMethod;
+			}
+		} else {
 			clazz = apiDocClazz;
 			method = apiDocMethod;
 		}
-		Object apiDocInstance = apiDocClazz.getConstructor().newInstance();
 
 		Api api = AnnotationUtils.findAnnotation(apiDocMethod, Api.class);
 		this.name = api.value();
@@ -197,7 +201,7 @@ public class ApiDoc implements Serializable {
 		Fields responseFields = AnnotationUtils.findAnnotation(apiDocMethod, Fields.class);
 		responseBody = FieldObject.createList(responseBodyClass, responseFields, false);
 
-		Object responseSample = ApiDocHelper.generateSample(apiDocInstance, apiDocMethod, responseFields);
+		Object responseSample = ApiDocHelper.generateSample(apiDocClazz, apiDocMethod, responseFields);
 		if (responseSample == null)
 			responseSample = ApiDocHelper.createSample(responseBodyGenericType);
 		if (responseSample instanceof String) {
@@ -283,15 +287,20 @@ public class ApiDoc implements Serializable {
 							ParameterizedType pt = (ParameterizedType) requestBodyClass.getGenericSuperclass();
 							requestBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
 						}
-						requestBody = FieldObject.createList(requestBodyClass, requestFields, true);
-						if (requestBody != null) {
-							Object requestSample = ApiDocHelper.generateSample(apiDocInstance, null, requestFields);
-							if (requestSample == null)
-								requestSample = ApiDocHelper.createSample(genericParameterType);
-							if (requestSample instanceof String) {
-								requestBodySample = (String) requestSample;
-							} else if (requestSample != null) {
-								requestBodySample = objectMapper.writeValueAsString(requestSample);
+						if (requestBodyClass == String.class) {
+							requestBodySample = objectMapper
+									.writeValueAsString(ApiDocHelper.createSample(String.class));
+						} else {
+							requestBody = FieldObject.createList(requestBodyClass, requestFields, true);
+							if (requestBody != null) {
+								Object requestSample = ApiDocHelper.generateSample(apiDocClazz, null, requestFields);
+								if (requestSample == null)
+									requestSample = ApiDocHelper.createSample(genericParameterType);
+								if (requestSample instanceof String) {
+									requestBodySample = (String) requestSample;
+								} else if (requestSample != null) {
+									requestBodySample = objectMapper.writeValueAsString(requestSample);
+								}
 							}
 						}
 					} else if (anno instanceof PathVariable) {

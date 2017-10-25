@@ -140,25 +140,24 @@ public class ApiDocHelper {
 		return map;
 	}
 
-	public static Object generateSample(Object apiDocInstance, Method apiDocMethod, Fields fields) throws Exception {
+	public static Object generateSample(Class<?> apiDocClazz, Method apiDocMethod, Fields fields) throws Exception {
 		if (fields != null) {
 			if (StringUtils.isNotBlank(fields.sample()))
 				return fields.sample();
 			String sampleFileName = fields.sampleFileName();
 			if (StringUtils.isNotBlank(sampleFileName)) {
-				try (InputStream is = apiDocInstance.getClass().getResourceAsStream(sampleFileName)) {
+				try (InputStream is = apiDocClazz.getResourceAsStream(sampleFileName)) {
 					if (is == null) {
-						throw new ErrorMessage(
-								sampleFileName + " with " + apiDocInstance.getClass().getName() + " is not found!");
+						throw new ErrorMessage(sampleFileName + " with " + apiDocClazz.getName() + " is not found!");
 					}
 					return String.join("\n", IOUtils.readLines(is, StandardCharsets.UTF_8));
 				}
 			}
 			String sampleMethodName = fields.sampleMethodName();
 			if (StringUtils.isNotBlank(sampleMethodName)) {
-				Method m = apiDocInstance.getClass().getDeclaredMethod(sampleMethodName, new Class[0]);
+				Method m = apiDocClazz.getDeclaredMethod(sampleMethodName, new Class[0]);
 				m.setAccessible(true);
-				return m.invoke(apiDocInstance, new Object[0]);
+				return m.invoke(apiDocClazz.getConstructor().newInstance(), new Object[0]);
 			}
 		}
 		if (apiDocMethod != null) {
@@ -179,8 +178,8 @@ public class ApiDocHelper {
 			}
 			Object obj;
 			try {
-				obj = apiDocMethod.invoke(apiDocInstance, args);
-			} catch (InvocationTargetException e) {
+				obj = apiDocMethod.invoke(apiDocClazz.getConstructor().newInstance(), args);
+			} catch (InvocationTargetException | NoSuchMethodException e) {
 				obj = null;
 			}
 			if (obj == null) {
