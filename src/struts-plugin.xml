@@ -4,7 +4,7 @@
 	"http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
 	<bean type="com.opensymphony.xwork2.config.PackageProvider" name="ironrhino-autoconfig" class="org.ironrhino.core.struts.AutoConfigPackageProvider" />
-	<bean class="org.ironrhino.core.struts.sitemesh.MyFreemarkerPageFilter" static="true" optional="true"/>
+	<bean class="org.ironrhino.core.struts.sitemesh.SitemeshFilter" static="true" optional="true"/>
 	<bean type="org.apache.struts2.views.freemarker.FreemarkerManager" name="ironrhino" class="org.ironrhino.core.struts.MyFreemarkerManager" />
 	<bean type="com.opensymphony.xwork2.conversion.impl.XWorkConverter" name="ironrhino" class="org.ironrhino.core.struts.converter.MyXWorkConverter" />
 	<bean type="com.opensymphony.xwork2.ActionProxyFactory" name="ironrhino" class="org.ironrhino.core.struts.CallableActionProxyFactory"/>

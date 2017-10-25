@@ -37,7 +37,7 @@ import com.opensymphony.xwork2.inject.Inject;
 
 @Component("sitemeshFilter")
 @ResourcePresentConditional("resources/sitemesh/sitemesh.xml")
-public class MyFreemarkerPageFilter implements Filter {
+public class SitemeshFilter implements Filter {
 
 	private static final String SITEMESH_FACTORY = "sitemesh.factory";
 
