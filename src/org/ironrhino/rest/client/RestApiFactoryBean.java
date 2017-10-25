@@ -244,6 +244,12 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 			cookie.delete(cookie.length() - 2, cookie.length());
 			headers.set(HttpHeaders.COOKIE, cookie.toString());
 		}
+		if (requestMethod.name().startsWith("P")) {
+			if (body == null && is != null)
+				body = is;
+			if (body instanceof InputStream)
+				body = new InputStreamResource((InputStream) body);
+		}
 		if (requestParams != null) {
 			if (body == null && requestMethod.name().startsWith("P")) {
 				headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
@@ -256,12 +262,6 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 								.append(URLEncoder.encode(value, "UTF-8"));
 				url = temp.toString();
 			}
-		}
-		if (requestMethod.name().startsWith("P")) {
-			if (body == null && is != null)
-				body = is;
-			if (body instanceof InputStream)
-				body = new InputStreamResource((InputStream) body);
 		}
 
 		RequestEntity<Object> requestEntity = new RequestEntity<>(body, headers,
