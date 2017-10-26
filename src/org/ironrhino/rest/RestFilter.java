@@ -72,13 +72,14 @@ public class RestFilter extends OncePerRequestFilter {
 
 		@Override
 		public String getContentType() {
-			return MediaType.APPLICATION_JSON_VALUE;
+			String contentType = super.getContentType();
+			return StringUtils.isNotBlank(contentType) ? contentType : MediaType.APPLICATION_JSON_VALUE;
 		}
 
 		@Override
 		public String getHeader(String name) {
 			if (StringUtils.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE, name)) {
-				return MediaType.APPLICATION_JSON_VALUE;
+				return getContentType();
 			}
 			return super.getHeader(name);
 		}
@@ -86,7 +87,7 @@ public class RestFilter extends OncePerRequestFilter {
 		@Override
 		public Enumeration<String> getHeaders(String name) {
 			if (StringUtils.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE, name)) {
-				return Collections.enumeration(Arrays.asList(MediaType.APPLICATION_JSON_VALUE));
+				return Collections.enumeration(Arrays.asList(getContentType()));
 			}
 			return super.getHeaders(name);
 		}
