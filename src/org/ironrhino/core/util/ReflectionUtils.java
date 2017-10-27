@@ -106,7 +106,8 @@ public class ReflectionUtils {
 	}
 
 	public static Class<?> getActualClass(Class<?> clazz) {
-		if (ProxyObject.class.isAssignableFrom(clazz) || SpringProxy.class.isAssignableFrom(clazz)) {
+		if (ProxyObject.class.isAssignableFrom(clazz) || SpringProxy.class.isAssignableFrom(clazz)
+				|| clazz.getName().endsWith("$$EnhancerBySpringCGLIB$$")) {
 			clazz = clazz.getSuperclass();
 			return getActualClass(clazz);
 		} else {
