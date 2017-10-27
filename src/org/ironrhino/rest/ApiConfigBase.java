@@ -13,7 +13,7 @@ import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
 import org.ironrhino.rest.component.JsonpAdvice;
 import org.ironrhino.rest.component.RestExceptionHandler;
-import org.ironrhino.rest.doc.ApiDocHelper;
+import org.ironrhino.rest.doc.ApiDocInspector;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.format.FormatterRegistry;
@@ -43,9 +43,13 @@ import freemarker.template.TemplateException;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class ApiConfigBase extends WebMvcConfigurationSupport {
 
-	public ObjectMapper createObjectMapper() {
+	public String getVersion() {
+		return "";
+	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
-		ApiDocHelper.objectMapper = objectMapper;
 		return objectMapper;
 	}
 
@@ -67,7 +71,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 			}
 
 		};
-		jackson2.setObjectMapper(createObjectMapper());
+		jackson2.setObjectMapper(objectMapper());
 		converters.add(jackson2);
 		StringHttpMessageConverter string = new StringHttpMessageConverter(StandardCharsets.UTF_8) {
 
@@ -154,6 +158,11 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Bean
 	protected AuthorizeAspect authorizeAspect() {
 		return new AuthorizeAspect();
+	}
+
+	@Bean
+	public ApiDocInspector apiDocInspector() {
+		return new ApiDocInspector();
 	}
 
 }

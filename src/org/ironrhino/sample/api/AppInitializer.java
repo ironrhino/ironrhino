@@ -11,6 +11,7 @@ import javax.servlet.ServletRegistration;
 import org.ironrhino.core.servlet.DelegatingFilter;
 import org.ironrhino.core.spring.servlet.InheritedDispatcherServlet;
 import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 public class AppInitializer implements WebApplicationInitializer {
@@ -19,8 +20,9 @@ public class AppInitializer implements WebApplicationInitializer {
 	public void onStartup(ServletContext servletContext) throws ServletException {
 
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet("api", InheritedDispatcherServlet.class);
-		dynamic.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
-		dynamic.setInitParameter("contextConfigLocation", ApiConfig.class.getName());
+		dynamic.setInitParameter(ContextLoader.CONTEXT_CLASS_PARAM,
+				AnnotationConfigWebApplicationContext.class.getName());
+		dynamic.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, ApiConfig.class.getName());
 		dynamic.addMapping("/api/*");
 		dynamic.setAsyncSupported(true);
 		dynamic.setLoadOnStartup(1);
