@@ -15,6 +15,7 @@ import org.ironrhino.rest.component.JsonpAdvice;
 import org.ironrhino.rest.component.RestExceptionHandler;
 import org.ironrhino.rest.doc.ApiDocHelper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -39,6 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	public ObjectMapper createObjectMapper() {
