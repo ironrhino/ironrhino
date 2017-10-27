@@ -15,7 +15,6 @@ import org.ironrhino.rest.component.JsonpAdvice;
 import org.ironrhino.rest.component.RestExceptionHandler;
 import org.ironrhino.rest.doc.ApiDocHelper;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -46,11 +45,6 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
 		ApiDocHelper.objectMapper = objectMapper;
 		return objectMapper;
-	}
-
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-		return new PropertySourcesPlaceholderConfigurer();
 	}
 
 	@Override
