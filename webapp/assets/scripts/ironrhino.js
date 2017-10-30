@@ -37301,13 +37301,18 @@ Richtable = {
 			var index = action.indexOf('?');
 			if (index > -1)
 				qs = action.substring(index + 1);
-			var data = $('input[type="hidden"],input[name="keyword"]', form)
-					.serialize();
-			if (data) {
-				if (qs)
-					qs += '&';
-				qs += data;
-			}
+			$('input[type="hidden"],input[name="keyword"]', form).each(
+					function() {
+						var name = this.name;
+						if (this.value
+								&& name
+								&& !name.endsWith('-op')
+								&& !form.find('[name="' + name + '-op"]').length) {
+							if (qs)
+								qs += '&';
+							qs += name + '=' + encodeURIComponent(this.value);
+						}
+					});
 			if (qs)
 				url += (url.indexOf('?') > 0 ? '&' : '?') + qs;
 		}
@@ -40385,7 +40390,6 @@ Initialization.apiplayground = function() {
 						responseText = JSON.stringify(JSON.parse(responseText),
 								null, '   ');
 					} catch (e) {
-
 					}
 				}
 				form.find('.responseBody').text(responseText);
@@ -40469,7 +40473,6 @@ Observation.formatJson = function(container) {
 						t.text(JSON
 								.stringify(JSON.parse(t.text()), null, '   '));
 					} catch (e) {
-
 					}
 				}
 			});
