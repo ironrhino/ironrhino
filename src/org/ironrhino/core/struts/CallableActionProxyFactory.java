@@ -2,10 +2,12 @@ package org.ironrhino.core.struts;
 
 import java.util.Map;
 
+import org.apache.struts2.impl.StrutsActionProxyFactory;
+
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ActionProxy;
 
-public class CallableActionProxyFactory extends org.apache.struts2.impl.StrutsActionProxyFactory {
+public class CallableActionProxyFactory extends StrutsActionProxyFactory {
 
 	@Override
 	public ActionProxy createActionProxy(String namespace, String actionName, String methodName,
