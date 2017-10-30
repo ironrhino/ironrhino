@@ -82,24 +82,22 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 	@Override
 	@Transactional
 	public Page saveDraft(Page page) {
-		Page p = get(page.getId());
-		boolean isnew = false;
-		if (p == null) {
-			isnew = true;
-			p = page;
-		}
-		p.setDraftDate(new Date());
 		Map<String, String> draft = new HashMap<>(8);
 		draft.put("path", page.getPath());
 		draft.put("title", page.getTitle());
 		draft.put("content", page.getContent());
-		p.setDraft(JsonUtils.toJson(draft));
-		if (isnew) {
-			p.setTitle("");
-			p.setContent("");
+		page.setDraftDate(new Date());
+		page.setDraft(JsonUtils.toJson(draft));
+		if (!exists(page.getId())) {
+			page.setTitle("");
+			page.setContent("");
+			super.save(page);
+		} else {
+			// do not increment version
+			executeUpdate("update Page p set p.draft=?1,p.draftDate=?2 where p.id=?3", page.getDraft(),
+					page.getDraftDate(), page.getId());
 		}
-		super.save(p);
-		return p;
+		return page;
 	}
 
 	@Override
