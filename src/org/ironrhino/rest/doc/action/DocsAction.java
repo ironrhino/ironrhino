@@ -42,6 +42,7 @@ public class DocsAction extends BaseAction {
 	@Value("${apiBaseUrl:}")
 	protected String apiBaseUrl;
 
+	@Getter
 	@Setter
 	protected String version;
 
@@ -87,7 +88,7 @@ public class DocsAction extends BaseAction {
 			if (ac.getVersion().equals(getVersion()))
 				return ac;
 		}
-		return !list.isEmpty() ? list.get(list.size() - 1) : null;
+		return version == null && !list.isEmpty() ? list.get(list.size() - 1) : null;
 	}
 
 	public String getApiBaseUrl() {
@@ -96,25 +97,19 @@ public class DocsAction extends BaseAction {
 		String path = "/api";
 		Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
 		ApiConfigBase ac = getApiConfig();
-		for (ServletRegistration sr : map.values()) {
-			if (ac != null && ReflectionUtils.getActualClass(ac).getName()
-					.equals(sr.getInitParameter(ContextLoader.CONFIG_LOCATION_PARAM))) {
-				String mapping = sr.getMappings().iterator().next();
-				if (mapping.endsWith("/*")) {
-					path = mapping.substring(0, mapping.lastIndexOf('/'));
-					break;
+		if (ac != null) {
+			for (ServletRegistration sr : map.values()) {
+				if (ac != null && ReflectionUtils.getActualClass(ac).getName()
+						.equals(sr.getInitParameter(ContextLoader.CONFIG_LOCATION_PARAM))) {
+					String mapping = sr.getMappings().iterator().next();
+					if (mapping.endsWith("/*")) {
+						path = mapping.substring(0, mapping.lastIndexOf('/'));
+						break;
+					}
 				}
 			}
 		}
 		return apiBaseUrl + path;
-	}
-
-	public String getVersion() {
-		List<ApiConfigBase> list = getApiConfigs();
-		if (version == null && !list.isEmpty()) {
-			version = list.get(list.size() - 1).getVersion();
-		}
-		return version;
 	}
 
 	public Map<String, List<ApiModuleObject>> getApiModules() {
@@ -136,6 +131,9 @@ public class DocsAction extends BaseAction {
 
 	@Override
 	public String execute() {
+		ApiConfigBase ac = getApiConfig();
+		if (ac == null)
+			return NOTFOUND;
 		if (StringUtils.isNotBlank(module) && StringUtils.isNotBlank(api)) {
 			List<ApiModuleObject> list = getApiModules().get(category);
 			if (list != null)
