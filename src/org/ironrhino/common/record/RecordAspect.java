@@ -20,6 +20,7 @@ import org.hibernate.id.ForeignGenerator;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.tuple.entity.EntityMetamodel;
 import org.hibernate.type.BagType;
+import org.hibernate.type.Type;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.Persistable;
@@ -86,10 +87,14 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 					PostInsertEvent pie = (PostInsertEvent) event;
 					entity = pie.getEntity();
 					action = EntityOperationType.CREATE;
-					String[] propertyNames = pie.getPersister().getEntityMetamodel().getPropertyNames();
+					EntityMetamodel em = pie.getPersister().getEntityMetamodel();
+					String[] propertyNames = em.getPropertyNames();
+					Type[] propertyTypes = em.getPropertyTypes();
 					StringBuilder sb = new StringBuilder();
 					boolean sep = false;
 					for (int i = 0; i < propertyNames.length; i++) {
+						if (propertyTypes[i].getName().toLowerCase().endsWith("lob"))
+							continue;
 						Object value = pie.getState()[i];
 						if (value == null || value instanceof Collection && ((Collection<?>) value).isEmpty()
 								|| value.getClass().isArray() && Array.getLength(value) == 0)
@@ -113,9 +118,12 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 						continue;
 					EntityMetamodel em = pue.getPersister().getEntityMetamodel();
 					String[] propertyNames = em.getPropertyNames();
+					Type[] propertyTypes = em.getPropertyTypes();
 					StringBuilder sb = new StringBuilder();
 					boolean sep = false;
 					for (int i = 0; i < dirtyProperties.length; i++) {
+						if (propertyTypes[dirtyProperties[i]].getName().toLowerCase().endsWith("lob"))
+							continue;
 						String propertyName = propertyNames[dirtyProperties[i]];
 						IdentifierGenerator ig = em.getIdentifierProperty().getIdentifierGenerator();
 						if (ig instanceof ForeignGenerator) {
