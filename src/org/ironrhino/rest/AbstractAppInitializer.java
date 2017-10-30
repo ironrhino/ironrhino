@@ -1,6 +1,8 @@
 package org.ironrhino.rest;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
@@ -12,7 +14,6 @@ import javax.servlet.ServletRegistration;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.DelegatingFilter;
 import org.ironrhino.core.spring.servlet.InheritedDispatcherServlet;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -23,11 +24,15 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 	private Class<T> apiConfigClass;
 
 	public AbstractAppInitializer() {
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
-		if (clazz != null)
-			apiConfigClass = clazz;
-		else
-			throw new IllegalArgumentException("apiConfigClass should not be null");
+		Type type = (ParameterizedType) getClass().getGenericSuperclass();
+		while (type != null) {
+			if (type instanceof ParameterizedType) {
+				apiConfigClass = (Class<T>) ((ParameterizedType) type).getActualTypeArguments()[0];
+				break;
+			} else if (type instanceof Class) {
+				type = ((Class<?>) type).getGenericSuperclass();
+			}
+		}
 	}
 
 	@Override
