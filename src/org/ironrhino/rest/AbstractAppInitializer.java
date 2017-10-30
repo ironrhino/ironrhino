@@ -18,11 +18,11 @@ import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 @SuppressWarnings("unchecked")
-public abstract class BaseApiInitializer<T extends ApiConfigBase> implements WebApplicationInitializer {
+public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements WebApplicationInitializer {
 
 	private Class<T> apiConfigClass;
 
-	public BaseApiInitializer() {
+	public AbstractAppInitializer() {
 		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
 		if (clazz != null)
 			apiConfigClass = clazz;

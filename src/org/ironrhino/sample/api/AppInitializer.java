@@ -1,7 +1,7 @@
 package org.ironrhino.sample.api;
 
-import org.ironrhino.rest.BaseApiInitializer;
+import org.ironrhino.rest.AbstractAppInitializer;
 
-public class AppInitializer extends BaseApiInitializer<ApiConfig> {
+public class AppInitializer extends AbstractAppInitializer<ApiConfig> {
 
 }

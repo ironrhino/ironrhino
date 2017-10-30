@@ -41,7 +41,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-public class ApiConfigBase extends WebMvcConfigurationSupport {
+public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	public String getVersion() {
 		return "";
