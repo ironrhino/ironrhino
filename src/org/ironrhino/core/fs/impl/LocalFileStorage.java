@@ -67,7 +67,10 @@ public class LocalFileStorage extends AbstractFileStorage {
 	@Override
 	public InputStream open(String path) throws IOException {
 		path = FileUtils.normalizePath(path);
-		return new FileInputStream(new File(directory, path));
+		File file = new File(directory, path);
+		if (!file.exists() || file.isDirectory())
+			return null;
+		return new FileInputStream(file);
 	}
 
 	@Override

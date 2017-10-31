@@ -85,12 +85,12 @@ public class MongoFileStorage extends AbstractFileStorage {
 	public InputStream open(String path) throws IOException {
 		path = FileUtils.normalizePath(path);
 		if (path.equals("/"))
-			throw new IOException("cannot direct access path /");
+			return null;
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null)
-			throw new IOException("path " + path + " doesn't exist");
+			return null;
 		if (file.isDirectory())
-			throw new IOException("path " + path + " is directory");
+			return null;
 		return new ByteArrayInputStream(file.getData());
 	}
 

@@ -2,6 +2,7 @@ package org.ironrhino.core.fs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -42,6 +43,8 @@ public abstract class FileStorageTestBase {
 		writeToFile(fs, text, path2);
 		assertTrue(fs.isDirectory("/test"));
 		assertTrue(fs.isDirectory("/test/test2/"));
+		assertNull(fs.open("/test/test2/"));
+		assertNull(fs.open("/test/test2/notexists.txt"));
 		List<String> lines = IOUtils.readLines(fs.open(path));
 		assertTrue(fs.exists("/test/"));
 		assertTrue(fs.exists(path));
