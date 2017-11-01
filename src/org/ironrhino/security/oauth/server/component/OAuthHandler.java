@@ -175,10 +175,10 @@ public class OAuthHandler extends AccessHandler {
 			} catch (UsernameNotFoundException unf) {
 				logger.error(unf.getMessage(), unf);
 			}
-			if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
-				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_REQUEST, "invalid_user"));
-				return true;
-			}
+		}
+		if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_REQUEST, "invalid_user"));
+			return true;
 		}
 
 		SecurityContext sc = SecurityContextHolder.getContext();

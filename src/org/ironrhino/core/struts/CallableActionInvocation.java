@@ -33,8 +33,6 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 
 	private static Logger logger = LoggerFactory.getLogger(CallableActionInvocation.class);
 
-	private static ExecutorService executorService;
-
 	protected Callable<String> callableResult;
 
 	public CallableActionInvocation(Map<String, Object> extraContext, boolean pushAction) {
@@ -49,21 +47,22 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 			SecurityContext sc = SecurityContextHolder.getContext();
 			HttpServletRequest request = ServletActionContext.getRequest();
 			HttpServletResponse response = ServletActionContext.getResponse();
-			if (executorService == null) {
-				try {
-					executorService = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext())
-							.getBean("executorService", ExecutorService.class);
-				} catch (NoSuchBeanDefinitionException e) {
-					logger.warn("No bean[executorService] defined, use ForkJoinPool.commonPool() as fallback");
-					executorService = ForkJoinPool.commonPool();
-				}
+			ExecutorService executorService = null;
+			try {
+				executorService = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext())
+						.getBean("executorService", ExecutorService.class);
+			} catch (NoSuchBeanDefinitionException e) {
+				logger.warn("No bean[executorService] defined, use ForkJoinPool.commonPool() as fallback");
 			}
+			if (executorService == null)
+				executorService = ForkJoinPool.commonPool();
+			final ExecutorService es = executorService;
 			AsyncContext asyncContext = request.startAsync();
 			@SuppressWarnings("serial")
 			Result result = new Result() {
 				@Override
 				public void execute(ActionInvocation actionInvocation) throws Exception {
-					executorService.submit(() -> {
+					es.submit(() -> {
 						try {
 							SecurityContextHolder.setContext(sc);
 							ServletActionContext.setContext(context);
