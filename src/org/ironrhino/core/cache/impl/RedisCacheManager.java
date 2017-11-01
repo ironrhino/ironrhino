@@ -6,10 +6,10 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import java.io.StreamCorruptedException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +19,7 @@ import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.serializer.support.SerializationFailedException;
@@ -35,8 +36,7 @@ import org.springframework.stereotype.Component;
 @ServiceImplementationConditional(profiles = { DUAL, CLOUD })
 public class RedisCacheManager implements CacheManager {
 
-	@Autowired
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	@PriorityQualifier("cacheRedisTemplate")
@@ -170,7 +170,7 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Map<String, Object> mget(Collection<String> keys, String namespace) {
+	public Map<String, Object> mget(Set<String> keys, String namespace) {
 		if (keys == null)
 			return null;
 		final List<byte[]> _keys = new ArrayList<>();
@@ -193,7 +193,7 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mdelete(final Collection<String> keys, final String namespace) {
+	public void mdelete(final Set<String> keys, final String namespace) {
 		if (keys == null)
 			return;
 		try {
@@ -212,18 +212,6 @@ public class RedisCacheManager implements CacheManager {
 			});
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public boolean containsKey(String key, String namespace) {
-		if (key == null)
-			return false;
-		try {
-			return redisTemplate.hasKey(generateKey(key, namespace));
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return false;
 		}
 	}
 
@@ -276,7 +264,6 @@ public class RedisCacheManager implements CacheManager {
 		return true;
 	}
 
-	@Override
 	public void invalidate(String namespace) {
 		RedisScript<Boolean> script = new DefaultRedisScript<>(
 				"local keys = redis.call('keys', ARGV[1]) \n for i=1,#keys,5000 do \n redis.call('del', unpack(keys, i, math.min(i+4999, #keys))) \n end \n return true",

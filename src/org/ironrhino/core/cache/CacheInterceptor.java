@@ -1,6 +1,7 @@
 package org.ironrhino.core.cache;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -46,7 +47,7 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 			String keyMutex = MUTEX + String.join("_", keys);
 			boolean mutexed = false;
 			if (CacheContext.isForceFlush()) {
-				cacheManager.mdelete(keys, namespace);
+				cacheManager.mdelete(new HashSet<>(keys), namespace);
 			} else {
 				int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
 				for (String key : keys) {
@@ -119,7 +120,7 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 				keys = ExpressionUtils.evalList(evictCache.key(), context);
 			if (isBypass() || keys == null || keys.size() == 0)
 				return retval;
-			cacheManager.mdelete(keys, namespace);
+			cacheManager.mdelete(new HashSet<>(keys), namespace);
 			ExpressionUtils.eval(evictCache.onEvict(), context);
 			if (StringUtils.isNotBlank(evictCache.renew())) {
 				Object value = ExpressionUtils.eval(evictCache.renew(), context);

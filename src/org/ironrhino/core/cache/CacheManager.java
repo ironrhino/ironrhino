@@ -1,7 +1,7 @@
 package org.ironrhino.core.cache;
 
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public interface CacheManager {
@@ -26,11 +26,9 @@ public interface CacheManager {
 
 	public void mput(Map<String, Object> map, int timeToLive, TimeUnit timeUnit, String namespace);
 
-	public Map<String, Object> mget(Collection<String> keys, String namespace);
+	public Map<String, Object> mget(Set<String> keys, String namespace);
 
-	public void mdelete(Collection<String> keys, String namespace);
-
-	public boolean containsKey(String key, String namespace);
+	public void mdelete(Set<String> keys, String namespace);
 
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace);
 
@@ -39,7 +37,5 @@ public interface CacheManager {
 	public boolean supportsTimeToIdle();
 
 	public boolean supportsUpdateTimeToLive();
-
-	public void invalidate(String namespace);
 
 }

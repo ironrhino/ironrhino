@@ -3,8 +3,8 @@ package org.ironrhino.core.cache.impl;
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -81,7 +81,7 @@ public class EhCacheManager implements CacheManager {
 		Cache cache = getCache(namespace, false);
 		if (cache == null)
 			return false;
-		return cache.isKeyInCache(key);
+		return cache.get(key) != null;
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class EhCacheManager implements CacheManager {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> mget(Collection<String> keys, String namespace) {
+	public Map<String, Object> mget(Set<String> keys, String namespace) {
 		if (keys == null)
 			return null;
 		Cache cache = getCache(namespace, false);
@@ -157,7 +157,7 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mdelete(Collection<String> keys, String namespace) {
+	public void mdelete(Set<String> keys, String namespace) {
 		if (keys == null)
 			return;
 		Cache cache = getCache(namespace, false);
@@ -165,17 +165,6 @@ public class EhCacheManager implements CacheManager {
 			for (String key : keys)
 				if (StringUtils.isNotBlank(key))
 					cache.remove(key);
-	}
-
-	@Override
-	public boolean containsKey(String key, String namespace) {
-		if (key == null)
-			return false;
-		Cache cache = getCache(namespace, false);
-		if (cache != null)
-			return cache.isKeyInCache(key);
-		else
-			return false;
 	}
 
 	@Override
@@ -233,7 +222,6 @@ public class EhCacheManager implements CacheManager {
 		return true;
 	}
 
-	@Override
 	public void invalidate(String namespace) {
 		Cache cache = ehCacheManager.getCache(namespace);
 		if (cache != null) {

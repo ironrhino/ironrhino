@@ -4,9 +4,10 @@ import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -17,7 +18,7 @@ import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.metadata.PostPropertiesReset;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -34,8 +35,7 @@ import net.rubyeye.xmemcached.utils.AddrUtil;
 @ServiceImplementationConditional(profiles = CLUSTER)
 public class MemcachedCacheManager implements CacheManager {
 
-	@Autowired
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Value("${memcached.serverAddress:localhost:11211}")
 	private String serverAddress;
@@ -173,14 +173,18 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Map<String, Object> mget(Collection<String> keys, String namespace) {
+	public Map<String, Object> mget(Set<String> keys, String namespace) {
 		if (keys == null)
 			return null;
 		List<String> list = new ArrayList<>();
 		for (String key : keys)
 			list.add(generateKey(key, namespace));
 		try {
-			return memcached.get(list);
+			Map<String, Object> map = memcached.get(list);
+			Map<String, Object> result = new LinkedHashMap<>();
+			for (String key : keys)
+				result.put(key, map.get(generateKey(key, namespace)));
+			return result;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return null;
@@ -188,24 +192,12 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mdelete(Collection<String> keys, String namespace) {
+	public void mdelete(Set<String> keys, String namespace) {
 		if (keys == null)
 			return;
 		for (String key : keys)
 			if (StringUtils.isNotBlank(key))
 				delete(key, namespace);
-	}
-
-	@Override
-	public boolean containsKey(String key, String namespace) {
-		if (key == null)
-			return false;
-		try {
-			return (memcached.get(generateKey(key, namespace)) != null);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		}
 	}
 
 	@Override
@@ -250,11 +242,6 @@ public class MemcachedCacheManager implements CacheManager {
 	@Override
 	public boolean supportsUpdateTimeToLive() {
 		return true;
-	}
-
-	@Override
-	public void invalidate(String namespace) {
-		throw new UnsupportedOperationException("memcached doesn't support evict by namespace");
 	}
 
 }
