@@ -24,6 +24,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Positive;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -66,6 +67,7 @@ public class Customer extends BaseRecordableEntity {
 	private Gender gender;
 
 	@UiConfig(width = "100px", hiddenInInput = @Hidden(expression = "entity.gender??&&entity.gender.name()=='FEMALE'"), description = "age.description", queryWithRange = true)
+	@Positive
 	private Integer age;
 
 	@UiConfig(width = "80px", type = "dictionary", templateName = "customer_category")

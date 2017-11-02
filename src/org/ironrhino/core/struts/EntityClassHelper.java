@@ -43,12 +43,15 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
@@ -496,6 +499,16 @@ public class EntityClassHelper {
 								uci.setTemplate(template.toString());
 							}
 						}
+						Positive positive = findAnnotation(readMethod, declaredField, Positive.class);
+						if (positive != null) {
+							uci.addCssClass("positive");
+						} else {
+							PositiveOrZero poz = findAnnotation(readMethod, declaredField, PositiveOrZero.class);
+							if (poz != null) {
+								uci.addCssClass("positive");
+								uci.addCssClass("zero");
+							}
+						}
 						Set<String> cssClasses = uci.getCssClasses();
 						if (cssClasses.contains("double") && !uci.getInternalDynamicAttributes().containsKey("step"))
 							uci.getInternalDynamicAttributes().put("step", "0.01");
@@ -541,8 +554,9 @@ public class EntityClassHelper {
 							uci.addCssClass("regex");
 							uci.getInternalDynamicAttributes().put("data-regex", pattern.regexp());
 						}
-						if (pd.getName().toLowerCase(Locale.ROOT).contains("email")
-								&& !pd.getName().contains("Password")) {
+						if (findAnnotation(readMethod, declaredField, Email.class) != null
+								|| pd.getName().toLowerCase(Locale.ROOT).contains("email")
+										&& !pd.getName().contains("Password")) {
 							uci.setInputType("email");
 							uci.addCssClass("email");
 						}
