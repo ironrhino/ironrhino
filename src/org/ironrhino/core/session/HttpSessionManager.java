@@ -32,6 +32,8 @@ public interface HttpSessionManager extends HttpSessionStore {
 
 	public String getSessionTracker(WrappedHttpSession session);
 
+	public String changeSessionId(WrappedHttpSession session);
+
 	public String getSessionTrackerName();
 
 	public String getLocaleCookieName();

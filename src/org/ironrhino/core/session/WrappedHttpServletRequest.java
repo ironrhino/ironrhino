@@ -57,6 +57,11 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 	}
 
 	@Override
+	public String changeSessionId() {
+		return session.getHttpSessionManager().changeSessionId(session);
+	}
+
+	@Override
 	public Locale getLocale() {
 		Locale locale = session.getHttpSessionManager().getLocale((HttpServletRequest) this.getRequest());
 		return locale;

@@ -108,6 +108,17 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	}
 
 	@Override
+	public String changeSessionId(WrappedHttpSession session) {
+		String sessionId = CodecUtils.nextId(SALT);
+		session.setNew(true);
+		session.setId(sessionId);
+		session.setSessionTracker(getSessionTracker(session));
+		RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
+				session.getSessionTracker(), globalCookie);
+		return sessionId;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public void initialize(WrappedHttpSession session) {
 

@@ -41,6 +41,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
@@ -78,6 +79,9 @@ public class LoginAction extends BaseAction {
 	private AuthenticationManager authenticationManager;
 
 	@Autowired
+	protected SessionAuthenticationStrategy sessionAuthenticationStrategy;
+
+	@Autowired
 	protected EventPublisher eventPublisher;
 
 	@Autowired(required = false)
@@ -97,6 +101,7 @@ public class LoginAction extends BaseAction {
 					"authenticationDetailsSource");
 			attempt.setDetails(wads.buildDetails(request));
 			authResult = authenticationManager.authenticate(attempt);
+			sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
 		} catch (InternalAuthenticationServiceException failed) {
 			Throwable cause = failed.getCause();
 			if (cause instanceof Exception) {
