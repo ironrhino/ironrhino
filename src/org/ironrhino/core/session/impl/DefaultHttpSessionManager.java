@@ -217,11 +217,10 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		session.setId(CodecUtils.nextId(SALT));
 		session.setCreationTime(session.getNow());
 		session.setLastAccessedTime(session.getNow());
-		session.setSessionTracker(this.getSessionTracker(session));
+		session.setSessionTracker(getSessionTracker(session));
 	}
 
-	@Override
-	public String getSessionTracker(WrappedHttpSession session) {
+	private String getSessionTracker(WrappedHttpSession session) {
 		String token = (String) session.getRequest().getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API);
 		if (token != null)
 			return token;

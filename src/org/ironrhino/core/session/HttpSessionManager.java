@@ -30,8 +30,6 @@ public interface HttpSessionManager extends HttpSessionStore {
 
 	public String getSessionId(HttpServletRequest request);
 
-	public String getSessionTracker(WrappedHttpSession session);
-
 	public String changeSessionId(WrappedHttpSession session);
 
 	public String getSessionTrackerName();
