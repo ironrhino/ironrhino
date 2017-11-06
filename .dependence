@@ -27,3 +27,6 @@
 -guava
 -javamail
 +jaxb-api
+-ehcache-core
++cache2k-api
++cache2k-core
