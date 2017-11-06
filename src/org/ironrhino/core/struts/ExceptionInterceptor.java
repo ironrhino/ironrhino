@@ -36,7 +36,6 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 			return invocation.invoke();
 		} catch (Throwable e) {
 			ServletActionContext.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
-			ExceptionUtils.trimStackTrace(e, 20);
 			if (e instanceof LocalizedException || e instanceof ErrorMessage)
 				logger.error(e.getLocalizedMessage());
 			else
