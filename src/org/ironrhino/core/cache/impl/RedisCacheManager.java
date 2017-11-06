@@ -54,13 +54,6 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
-		put(key, value, -1, timeToLive, timeUnit, namespace);
-	}
-
-	@Override
-	public void put(String key, Object value, int timeToIdle, int timeToLive, TimeUnit timeUnit, String namespace) {
-		if (key == null || value == null)
-			return;
 		try {
 			if (timeToLive > 0)
 				redisTemplate.opsForValue().set(generateKey(key, namespace), value, timeToLive, timeUnit);
@@ -69,6 +62,11 @@ public class RedisCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public void putWithTti(String key, Object value, int timeToIdle, TimeUnit timeUnit, String namespace) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -100,7 +98,7 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
+	public Object getWithTti(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
 		if (key == null)
 			return null;
 		String actualKey = generateKey(key, namespace);
@@ -127,6 +125,13 @@ public class RedisCacheManager implements CacheManager {
 		if (value == -2)
 			value = 0; // not exists
 		return value;
+	}
+
+	@Override
+	public void setTtl(String key, String namespace, int timeToLive, TimeUnit timeUnit) {
+		if (key == null)
+			return;
+		redisTemplate.expire(generateKey(key, namespace), timeToLive, timeUnit);
 	}
 
 	@Override
@@ -255,12 +260,17 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public boolean supportsTimeToIdle() {
+	public boolean supportsTti() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsUpdateTimeToLive() {
+	public boolean supportsGetTtl() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsUpdateTtl() {
 		return true;
 	}
 

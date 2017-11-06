@@ -52,8 +52,8 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 	public void initialize(WrappedHttpSession session) {
 		session.setCacheBased(true);
 		String sessionString;
-		if (!cacheManager.supportsTimeToIdle() && cacheManager.supportsUpdateTimeToLive())
-			sessionString = (String) cacheManager.get(session.getId(), CACHE_NAMESPACE,
+		if (!cacheManager.supportsTti() && cacheManager.supportsUpdateTtl())
+			sessionString = (String) cacheManager.getWithTti(session.getId(), CACHE_NAMESPACE,
 					session.getMaxInactiveInterval(), TimeUnit.SECONDS);
 		else
 			sessionString = (String) cacheManager.get(session.getId(), CACHE_NAMESPACE);
@@ -73,13 +73,13 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 			cacheManager.delete(session.getId(), CACHE_NAMESPACE);
 			return;
 		}
-		if (cacheManager.supportsTimeToIdle()) {
+		if (cacheManager.supportsTti()) {
 			if (session.isDirty())
-				cacheManager.put(session.getId(), sessionString, session.getMaxInactiveInterval(), -1, TimeUnit.SECONDS,
+				cacheManager.putWithTti(session.getId(), sessionString, session.getMaxInactiveInterval(), TimeUnit.SECONDS,
 						CACHE_NAMESPACE);
-		} else if (cacheManager.supportsUpdateTimeToLive()) {
+		} else if (cacheManager.supportsUpdateTtl()) {
 			if (session.isDirty())
-				cacheManager.put(session.getId(), sessionString, -1, session.getMaxInactiveInterval(), TimeUnit.SECONDS,
+				cacheManager.put(session.getId(), sessionString, session.getMaxInactiveInterval(), TimeUnit.SECONDS,
 						CACHE_NAMESPACE);
 		} else {
 			if (session.isDirty()

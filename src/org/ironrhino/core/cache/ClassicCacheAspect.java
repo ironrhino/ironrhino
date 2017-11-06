@@ -54,8 +54,8 @@ public class ClassicCacheAspect extends BaseAspect {
 		} else {
 			int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
 			for (String key : keys) {
-				Object value = (timeToIdle > 0 && !cacheManager.supportsTimeToIdle())
-						? cacheManager.get(key, namespace, timeToIdle, checkCache.timeUnit())
+				Object value = (timeToIdle > 0 && !cacheManager.supportsTti())
+						? cacheManager.getWithTti(key, namespace, timeToIdle, checkCache.timeUnit())
 						: cacheManager.get(key, namespace);
 				if (value != null) {
 					putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
@@ -94,7 +94,10 @@ public class ClassicCacheAspect extends BaseAspect {
 					int timeToLive = ExpressionUtils.evalInt(checkCache.timeToLive(), context, 0);
 					int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
 					for (String key : keys)
-						cacheManager.put(key, cacheResult, timeToIdle, timeToLive, checkCache.timeUnit(), namespace);
+						if (timeToIdle > 0 && cacheManager.supportsTti())
+							cacheManager.putWithTti(key, cacheResult, timeToIdle, checkCache.timeUnit(), namespace);
+						else
+							cacheManager.put(key, cacheResult, timeToLive, checkCache.timeUnit(), namespace);
 				}
 			}
 			if (result != null)

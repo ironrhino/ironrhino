@@ -96,18 +96,16 @@ public class MemcachedCacheManager implements CacheManager {
 
 	@Override
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
-		put(key, value, -1, timeToLive, timeUnit, namespace);
-	}
-
-	@Override
-	public void put(String key, Object value, int timeToIdle, int timeToLive, TimeUnit timeUnit, String namespace) {
-		if (key == null || value == null)
-			return;
 		try {
 			memcached.setWithNoReply(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive), value);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public void putWithTti(String key, Object value, int timeToIdle, TimeUnit timeUnit, String namespace) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -135,7 +133,7 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
+	public Object getWithTti(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
 		if (key == null)
 			return null;
 		if (timeToIdle <= 0)
@@ -151,6 +149,15 @@ public class MemcachedCacheManager implements CacheManager {
 	@Override
 	public long ttl(String key, String namespace) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setTtl(String key, String namespace, int timeToLive, TimeUnit timeUnit) {
+		try {
+			memcached.touch(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -235,12 +242,17 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	@Override
-	public boolean supportsTimeToIdle() {
+	public boolean supportsTti() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsUpdateTimeToLive() {
+	public boolean supportsGetTtl() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsUpdateTtl() {
 		return true;
 	}
 

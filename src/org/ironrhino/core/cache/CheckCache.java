@@ -20,10 +20,10 @@ public @interface CheckCache {
 	String when() default "true";
 
 	// mvel expression
-	String timeToLive() default CacheManager.DEFAULT_TIME_TO_LIVE;
+	String timeToLive() default "3600";
 
 	// mvel expression
-	String timeToIdle() default CacheManager.DEFAULT_TIME_TO_IDLE;
+	String timeToIdle() default "-1";
 
 	TimeUnit timeUnit() default TimeUnit.SECONDS;
 

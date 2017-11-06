@@ -32,12 +32,10 @@ public class DefaultThrottleService implements ThrottleService {
 		String dkey = key + KEY_SUFFIX_DELAY;
 		String ckey = key + KEY_SUFFIX_CONCURRENT;
 		long ttl = -1;
-		try {
+		if (cacheManager.supportsGetTtl())
 			ttl = cacheManager.ttl(dkey, NAMESPACE);
-		} catch (UnsupportedOperationException e) {
-			if (cacheManager.exists(dkey, NAMESPACE))
-				ttl = timeUnit.toMillis(interval);
-		}
+		else if (cacheManager.exists(dkey, NAMESPACE))
+			ttl = timeUnit.toMillis(interval);
 		if (ttl <= 0) {
 			if (!cacheManager.putIfAbsent(ckey, "",
 					(int) Math.max(TimeUnit.MILLISECONDS.convert(initialDelay, timeUnit), 500), TimeUnit.MILLISECONDS,

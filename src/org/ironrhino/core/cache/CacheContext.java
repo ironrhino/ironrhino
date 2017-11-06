@@ -83,8 +83,12 @@ public class CacheContext {
 			scope = eval(scope).toString();
 			int _timeToIdle = Integer.valueOf(eval(timeToIdle).toString());
 			int _timeToLive = Integer.valueOf(eval(timeToLive).toString());
-			getCacheManager().put(completeKey(key, scope), content, _timeToIdle, _timeToLive, TimeUnit.SECONDS,
-					NAMESPACE_PAGE_FRAGMENT);
+			if (_timeToIdle > 0)
+				getCacheManager().putWithTti(completeKey(key, scope), content, _timeToIdle, TimeUnit.SECONDS,
+						NAMESPACE_PAGE_FRAGMENT);
+			else
+				getCacheManager().put(completeKey(key, scope), content, _timeToLive, TimeUnit.SECONDS,
+						NAMESPACE_PAGE_FRAGMENT);
 		} catch (Throwable e) {
 		}
 	}

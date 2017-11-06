@@ -65,8 +65,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
 	public String getChallenge(HttpServletRequest request, String token) {
 		String challenge = String.valueOf(ThreadLocalRandom.current().nextInt(8999) + 1000);// width=60
 		String answer = answer(challenge);
-		cacheManager.put(CACHE_PREFIX_ANSWER + token, answer, -1, CACHE_ANSWER_TIME_TO_LIVE, TimeUnit.SECONDS,
-				KEY_CAPTCHA);
+		cacheManager.put(CACHE_PREFIX_ANSWER + token, answer, CACHE_ANSWER_TIME_TO_LIVE, TimeUnit.SECONDS, KEY_CAPTCHA);
 		if (CHINESE_FONT_PRESENT)
 			challenge = fuzzifyChallenge(challenge);
 		return challenge;
@@ -84,7 +83,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
 				threshold += 1;
 			else
 				threshold = 1;
-			cacheManager.put(key, threshold, -1, CACHE_THRESHOLD_TIME_TO_LIVE, TimeUnit.SECONDS, KEY_CAPTCHA);
+			cacheManager.put(key, threshold, CACHE_THRESHOLD_TIME_TO_LIVE, TimeUnit.SECONDS, KEY_CAPTCHA);
 			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED, true);
 		}
 

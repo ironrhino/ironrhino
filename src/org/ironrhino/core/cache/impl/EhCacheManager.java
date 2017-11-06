@@ -23,7 +23,6 @@ import com.google.common.util.concurrent.Striped;
 import lombok.Setter;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
-import net.sf.ehcache.ObjectExistsException;
 
 @Component("cacheManager")
 @ServiceImplementationConditional(profiles = DEFAULT)
@@ -60,18 +59,18 @@ public class EhCacheManager implements CacheManager {
 
 	@Override
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
-		put(key, value, -1, timeToLive, timeUnit, namespace);
-	}
-
-	@Override
-	public void put(String key, Object value, int timeToIdle, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (key == null || value == null)
 			return;
 		Cache cache = getCache(namespace, true);
-		if (cache != null)
-			cache.put(new Element(key, value, timeToLive <= 0 ? true : null,
-					timeToIdle > 0 ? (int) timeUnit.toSeconds(timeToIdle) : null,
-					timeToIdle <= 0 && timeToLive > 0 ? (int) timeUnit.toSeconds(timeToLive) : null));
+		cache.put(new Element(key, value, timeToLive <= 0 ? true : null, null, (int) timeUnit.toSeconds(timeToLive)));
+	}
+
+	@Override
+	public void putWithTti(String key, Object value, int timeToIdle, TimeUnit timeUnit, String namespace) {
+		if (key == null || value == null)
+			return;
+		Cache cache = getCache(namespace, true);
+		cache.put(new Element(key, value, null, (int) timeUnit.toSeconds(timeToIdle), null));
 	}
 
 	@Override
@@ -96,12 +95,14 @@ public class EhCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Object get(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
+	public Object getWithTti(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
 		if (key == null)
 			return null;
 		Cache cache = getCache(namespace, false);
 		if (cache == null)
 			return null;
+		if (timeToIdle <= 0)
+			return get(key, namespace);
 		Element element = cache.get(key);
 		if (element != null) {
 			if (element.getTimeToIdle() != timeToIdle) {
@@ -124,6 +125,17 @@ public class EhCacheManager implements CacheManager {
 		if (element != null)
 			return element.getExpirationTime() - System.currentTimeMillis();
 		return 0;
+	}
+
+	@Override
+	public void setTtl(String key, String namespace, int timeToLive, TimeUnit timeUnit) {
+		Cache cache = getCache(namespace, false);
+		if (cache == null)
+			return;
+		Element element = cache.get(key);
+		if (element != null)
+			cache.put(new Element(key, element.getObjectValue(), timeToLive <= 0 ? true : null, null,
+					(int) timeUnit.toSeconds(timeToLive)));
 	}
 
 	@Override
@@ -172,11 +184,8 @@ public class EhCacheManager implements CacheManager {
 		if (key == null || value == null)
 			return false;
 		Cache cache = getCache(namespace, true);
-		if (cache != null)
-			return cache.putIfAbsent(new Element(key, value, timeToLive <= 0 ? true : null, null,
-					(int) timeUnit.toSeconds(timeToLive))) == null;
-		else
-			return false;
+		return cache.putIfAbsent(new Element(key, value, timeToLive <= 0 ? true : null, null,
+				(int) timeUnit.toSeconds(timeToLive))) == null;
 	}
 
 	@Override
@@ -184,41 +193,43 @@ public class EhCacheManager implements CacheManager {
 		if (key == null || delta == 0)
 			return -1;
 		Cache cache = getCache(namespace, true);
-		if (cache != null) {
-			Element element = cache.putIfAbsent(new Element(key, Long.valueOf(delta), timeToLive <= 0 ? true : null,
-					null, (int) timeUnit.toSeconds(timeToLive)));
-			if (element == null) {
-				return delta;
-			} else {
-				Lock lock = stripedLocks.get(namespace + ':' + key);
-				lock.lock();
-				try {
-					element = cache.get(key);
-					if (element == null) {
-						cache.put(new Element(key, Long.valueOf(delta), timeToLive <= 0 ? true : null, null,
-								(int) timeUnit.toSeconds(timeToLive)));
-						return delta;
-					} else {
-						long value = ((long) element.getObjectValue()) + delta;
-						cache.put(new Element(key, Long.valueOf(value), timeToLive <= 0 ? true : null, null,
-								(int) timeUnit.toSeconds(timeToLive)));
-						return value;
-					}
-				} finally {
-					lock.unlock();
+		Element element = cache.putIfAbsent(new Element(key, Long.valueOf(delta), timeToLive <= 0 ? true : null, null,
+				(int) timeUnit.toSeconds(timeToLive)));
+		if (element == null) {
+			return delta;
+		} else {
+			Lock lock = stripedLocks.get(namespace + ':' + key);
+			lock.lock();
+			try {
+				element = cache.get(key);
+				if (element == null) {
+					cache.put(new Element(key, Long.valueOf(delta), timeToLive <= 0 ? true : null, null,
+							(int) timeUnit.toSeconds(timeToLive)));
+					return delta;
+				} else {
+					long value = ((long) element.getObjectValue()) + delta;
+					cache.put(new Element(key, Long.valueOf(value), timeToLive <= 0 ? true : null, null,
+							(int) timeUnit.toSeconds(timeToLive)));
+					return value;
 				}
+			} finally {
+				lock.unlock();
 			}
-		} else
-			return -1;
+		}
 	}
 
 	@Override
-	public boolean supportsTimeToIdle() {
+	public boolean supportsTti() {
 		return true;
 	}
 
 	@Override
-	public boolean supportsUpdateTimeToLive() {
+	public boolean supportsGetTtl() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsUpdateTtl() {
 		return true;
 	}
 
@@ -233,14 +244,16 @@ public class EhCacheManager implements CacheManager {
 		if (StringUtils.isBlank(namespace))
 			namespace = "_default";
 		Cache cache = ehCacheManager.getCache(namespace);
-		if (create && cache == null) {
-			try {
-				ehCacheManager.addCache(namespace);
-			} catch (ObjectExistsException e) {
-			} catch (Exception e) {
-				e.printStackTrace();
+		if (cache != null)
+			return cache;
+		if (create) {
+			synchronized (this) {
+				cache = ehCacheManager.getCache(namespace);
+				if (cache == null) {
+					ehCacheManager.addCache(namespace);
+					cache = ehCacheManager.getCache(namespace);
+				}
 			}
-			cache = ehCacheManager.getCache(namespace);
 		}
 		return cache;
 	}
