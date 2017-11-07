@@ -5,26 +5,27 @@ import java.util.Map;
 
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.security.role.UserRole;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
-@Controller
+@RestController
 @RequestMapping("/upload")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class UploadController {
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String form() {
-		return "sample/upload";
+	public ModelAndView form() {
+		return new ModelAndView("sample/upload");
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> upload(@RequestParam("name") String name, @RequestParam("file") MultipartFile file) {
+	public Map<String, Object> upload(@RequestParam String name, @RequestParam MultipartFile file) {
 		Map<String, Object> result = new HashMap<>();
 		result.put("name", name);
 		if (!file.isEmpty()) {

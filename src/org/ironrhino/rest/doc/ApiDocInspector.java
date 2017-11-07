@@ -21,7 +21,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -56,7 +56,7 @@ public class ApiDocInspector {
 		Map<String, List<ApiModuleObject>> map = new LinkedHashMap<>();
 		Collection<Class<?>> classes = ClassScanner.scanAnnotated(basePackages, ApiModule.class);
 		for (Class<?> clazz : classes) {
-			Class<?> controllerClass = (AnnotationUtils.getAnnotation(clazz, Controller.class) != null
+			Class<?> controllerClass = (AnnotationUtils.getAnnotation(clazz, RestController.class) != null
 					|| clazz.isInterface()) ? clazz : clazz.getSuperclass();
 			try {
 				ctx.getBean(controllerClass);
