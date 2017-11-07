@@ -24,7 +24,7 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 	private Class<T> apiConfigClass;
 
 	public AbstractAppInitializer() {
-		Type type = (ParameterizedType) getClass().getGenericSuperclass();
+		Type type = getClass().getGenericSuperclass();
 		while (type != null) {
 			if (type instanceof ParameterizedType) {
 				apiConfigClass = (Class<T>) ((ParameterizedType) type).getActualTypeArguments()[0];

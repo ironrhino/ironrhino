@@ -64,11 +64,13 @@ public class SitemeshFilter implements Filter {
 			sc.setAttribute(SITEMESH_FACTORY, new StrutsSiteMeshFactory(new Config(filterConfig)));
 	}
 
+	@Override
 	public void destroy() {
 		filterConfig = null;
 		containerTweaks = null;
 	}
 
+	@Override
 	public void doFilter(ServletRequest rq, ServletResponse rs, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) rq;

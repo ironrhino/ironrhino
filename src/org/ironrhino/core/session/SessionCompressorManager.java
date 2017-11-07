@@ -109,7 +109,8 @@ public class SessionCompressorManager {
 										throw new LockedException(username);
 									} else if (!ud.isCredentialsNonExpired()) {
 										boolean isPasswordEntryPoint = StringUtils.isNotBlank(passwordEntryPoint)
-												? uri.equals(passwordEntryPoint) : uri.endsWith("/password");
+												? uri.equals(passwordEntryPoint)
+												: uri.endsWith("/password");
 										if (!isPasswordEntryPoint && !uri.startsWith("/assets/"))
 											throw new CredentialsExpiredException(username);
 									}

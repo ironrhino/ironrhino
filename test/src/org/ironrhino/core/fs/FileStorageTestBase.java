@@ -20,7 +20,6 @@ public abstract class FileStorageTestBase {
 	@Autowired
 	private FileStorage fs;
 
-
 	@Test
 	public void testDirectory() throws IOException {
 		assertFalse(fs.isDirectory("/test"));

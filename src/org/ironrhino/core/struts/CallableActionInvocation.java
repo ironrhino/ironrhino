@@ -65,7 +65,7 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 					es.submit(() -> {
 						try {
 							SecurityContextHolder.setContext(sc);
-							ServletActionContext.setContext(context);
+							ActionContext.setContext(context);
 							String result = callable.call();
 							ActionConfig config = proxy.getConfig();
 							Map<String, ResultConfig> results = config.getResults();
@@ -97,7 +97,7 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 							}
 						} finally {
 							SecurityContextHolder.clearContext();
-							ServletActionContext.setContext(null);
+							ActionContext.setContext(null);
 							asyncContext.complete();
 						}
 					});

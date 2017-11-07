@@ -49,8 +49,8 @@ public abstract class Element implements Serializable {
 	}
 
 	/**
-	 * The Text is used to represent the Element in the legend. If text is null
-	 * the element will not appear in the legend
+	 * The Text is used to represent the Element in the legend. If text is null the
+	 * element will not appear in the legend
 	 */
 	public void setText(String text) {
 		this.text = text;
@@ -91,9 +91,9 @@ public abstract class Element implements Serializable {
 	}
 
 	/**
-	 * Set the Key on Click Funktion. e.g. "toggle-visibility". For a Link just
-	 * pass the URL toggle-visibility will enable you to click on your legend an
-	 * switch on and off individual elements
+	 * Set the Key on Click Funktion. e.g. "toggle-visibility". For a Link just pass
+	 * the URL toggle-visibility will enable you to click on your legend an switch
+	 * on and off individual elements
 	 */
 	public void setKey_on_click(String key_on_click) {
 		this.key_on_click = key_on_click;

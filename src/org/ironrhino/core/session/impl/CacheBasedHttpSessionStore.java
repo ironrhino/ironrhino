@@ -75,8 +75,8 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 		}
 		if (cacheManager.supportsTti()) {
 			if (session.isDirty())
-				cacheManager.putWithTti(session.getId(), sessionString, session.getMaxInactiveInterval(), TimeUnit.SECONDS,
-						CACHE_NAMESPACE);
+				cacheManager.putWithTti(session.getId(), sessionString, session.getMaxInactiveInterval(),
+						TimeUnit.SECONDS, CACHE_NAMESPACE);
 		} else if (cacheManager.supportsUpdateTtl()) {
 			if (session.isDirty())
 				cacheManager.put(session.getId(), sessionString, session.getMaxInactiveInterval(), TimeUnit.SECONDS,

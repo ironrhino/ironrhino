@@ -196,7 +196,7 @@ public class FieldObject implements Serializable {
 						required = f.isAnnotationPresent(NotNull.class) || f.isAnnotationPresent(NotEmpty.class)
 								|| f.isAnnotationPresent(NotBlank.class);
 					}
-					
+
 					if (!required) {
 						required = f.getType().isPrimitive();
 					}

@@ -111,7 +111,7 @@ public class RedisConfiguration {
 		template.setConnectionFactory(redisConnectionFactory());
 		return template;
 	}
-	
+
 	@Bean
 	public StringRedisTemplate pageViewStringRedisTemplate() {
 		StringRedisTemplate template = new StringRedisTemplate();
