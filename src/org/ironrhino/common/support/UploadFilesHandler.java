@@ -36,8 +36,8 @@ public class UploadFilesHandler extends AccessHandler {
 
 	@Autowired
 	@Qualifier("fileStorage")
-	@PriorityQualifier("uploadFileStorage")
-	private FileStorage fileStorage;
+	@PriorityQualifier
+	private FileStorage uploadFileStorage;
 
 	@Autowired
 	private ServletContext servletContext;
@@ -58,7 +58,7 @@ public class UploadFilesHandler extends AccessHandler {
 	private void init() {
 		pathPrefix = normalize(pathPrefix);
 		uploadDir = normalize(uploadDir);
-		if (fileStorage.isBucketBased()) {
+		if (uploadFileStorage.isBucketBased()) {
 			uploadDir = "";
 			if (DEFAULT_PATH_PREFIX.equals(pathPrefix))
 				pattern = pathPrefix + DEFAULT_UPLOAD_DIR + "/*";
@@ -79,17 +79,17 @@ public class UploadFilesHandler extends AccessHandler {
 		long since = request.getDateHeader("If-Modified-Since");
 		String uri = RequestUtils.getRequestUri(request);
 		String path = uri.substring(pathPrefix.length());
-		if (fileStorage.isBucketBased() && DEFAULT_PATH_PREFIX.equals(pathPrefix))
+		if (uploadFileStorage.isBucketBased() && DEFAULT_PATH_PREFIX.equals(pathPrefix))
 			path = path.substring(DEFAULT_UPLOAD_DIR.length());
 		try {
 			path = URLDecoder.decode(path, "UTF-8");
-			long lastModified = fileStorage.getLastModified(path);
+			long lastModified = uploadFileStorage.getLastModified(path);
 			lastModified = lastModified / 1000 * 1000;
 			if (since > 0 && since == lastModified) {
 				response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 				return true;
 			}
-			try (InputStream is = fileStorage.open(path)) {
+			try (InputStream is = uploadFileStorage.open(path)) {
 				if (is == null) {
 					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 					return true;

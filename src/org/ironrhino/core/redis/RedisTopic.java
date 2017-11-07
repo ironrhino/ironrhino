@@ -28,16 +28,16 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 
 	@Setter
 	@Autowired
-	@PriorityQualifier("mqRedisTemplate")
-	private RedisTemplate redisTemplate;
+	@PriorityQualifier
+	private RedisTemplate mqRedisTemplate;
 
 	@Autowired(required = false)
 	@Qualifier("globalRedisTemplate")
 	private RedisTemplate globalRedisTemplate;
 
 	@Autowired
-	@PriorityQualifier("mqRedisMessageListenerContainer")
-	private RedisMessageListenerContainer messageListenerContainer;
+	@PriorityQualifier
+	private RedisMessageListenerContainer mqRedisMessageListenerContainer;
 
 	@Autowired(required = false)
 	@Qualifier("globalRedisMessageListenerContainer")
@@ -66,9 +66,9 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 						throw e;
 				}
 			}, Arrays.asList(globalTopic));
-			messageListenerContainer.addMessageListener((message, pattern) -> {
+			mqRedisMessageListenerContainer.addMessageListener((message, pattern) -> {
 				try {
-					subscribe((T) redisTemplate.getValueSerializer().deserialize(message.getBody()));
+					subscribe((T) mqRedisTemplate.getValueSerializer().deserialize(message.getBody()));
 				} catch (SerializationException e) {
 					// message from other app
 					if (!(e.getCause() instanceof ClassNotFoundException))
@@ -76,9 +76,9 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 				}
 			}, Arrays.asList(applicationTopic));
 		} else {
-			messageListenerContainer.addMessageListener((message, pattern) -> {
+			mqRedisMessageListenerContainer.addMessageListener((message, pattern) -> {
 				try {
-					subscribe((T) redisTemplate.getValueSerializer().deserialize(message.getBody()));
+					subscribe((T) mqRedisTemplate.getValueSerializer().deserialize(message.getBody()));
 				} catch (SerializationException e) {
 					// message from other app
 					if (!(e.getCause() instanceof ClassNotFoundException))
@@ -111,7 +111,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 			if (globalRedisTemplate != null && scope == Scope.GLOBAL)
 				globalRedisTemplate.convertAndSend(getChannelName(scope), message);
 			else
-				redisTemplate.convertAndSend(getChannelName(scope), message);
+				mqRedisTemplate.convertAndSend(getChannelName(scope), message);
 		}
 	}
 

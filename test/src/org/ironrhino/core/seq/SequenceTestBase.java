@@ -15,7 +15,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 public abstract class SequenceTestBase {
 
@@ -26,11 +25,9 @@ public abstract class SequenceTestBase {
 	private static ExecutorService executorService;
 
 	@Autowired
-	@Qualifier("sample1Sequence")
 	private Sequence sample1Sequence;
 
 	@Autowired
-	@Qualifier("sample2Sequence")
 	private Sequence sample2Sequence;
 
 	@BeforeClass

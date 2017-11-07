@@ -76,8 +76,8 @@ public class UploadAction extends BaseAction {
 
 	@Autowired
 	@Qualifier("fileStorage")
-	@PriorityQualifier("uploadFileStorage")
-	private FileStorage fileStorage;
+	@PriorityQualifier
+	private FileStorage uploadFileStorage;
 
 	@Autowired
 	private FreemarkerConfigurer freemarkerConfigurer;
@@ -136,7 +136,7 @@ public class UploadAction extends BaseAction {
 						if (url.startsWith("/"))
 							url = freemarkerConfigurer.getAssetsBase() + url;
 						array[i] = url;
-						fileStorage.write(new FileInputStream(f), path);
+						uploadFileStorage.write(new FileInputStream(f), path);
 					} catch (IOException e) {
 						e.printStackTrace();
 						throw new ErrorMessage(e.getMessage());
@@ -150,7 +150,7 @@ public class UploadAction extends BaseAction {
 				requestBody = requestBody.substring(requestBody.indexOf(',') + 1);
 			InputStream is = new ByteArrayInputStream(Base64.getDecoder().decode(requestBody));
 			try {
-				fileStorage.write(is, createPath(filename[0], autorename));
+				uploadFileStorage.write(is, createPath(filename[0], autorename));
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new ErrorMessage(e.getMessage());
@@ -182,7 +182,7 @@ public class UploadAction extends BaseAction {
 		files = new LinkedHashMap<>();
 		if (StringUtils.isNotBlank(folder))
 			files.put("..", Boolean.FALSE);
-		files.putAll(fileStorage.listFilesAndDirectory(FileUtils.normalizePath(getUploadRootDir() + folder)));
+		files.putAll(uploadFileStorage.listFilesAndDirectory(FileUtils.normalizePath(getUploadRootDir() + folder)));
 		return ServletActionContext.getRequest().getParameter("pick") != null ? "pick" : LIST;
 	}
 
@@ -198,7 +198,7 @@ public class UploadAction extends BaseAction {
 		String[] paths = getId();
 		if (paths != null) {
 			for (String path : paths) {
-				if (!fileStorage.delete(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + path)))
+				if (!uploadFileStorage.delete(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + path)))
 					addActionError(getText("delete.forbidden", new String[] { path }));
 			}
 		}
@@ -211,7 +211,7 @@ public class UploadAction extends BaseAction {
 			if (!path.startsWith("/"))
 				path = '/' + path;
 			folder = path;
-			fileStorage
+			uploadFileStorage
 					.mkdir(FileUtils.normalizePath(getUploadRootDir() + (folder.startsWith("/") ? "" : "/") + folder));
 		}
 		return list();
@@ -227,15 +227,15 @@ public class UploadAction extends BaseAction {
 		String newName = filename[0];
 		if (oldName.equals(newName))
 			return list();
-		if (!fileStorage.exists(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + oldName))) {
+		if (!uploadFileStorage.exists(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + oldName))) {
 			addActionError(getText("validation.not.exists"));
 			return list();
 		}
-		if (fileStorage.exists(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + newName))) {
+		if (uploadFileStorage.exists(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + newName))) {
 			addActionError(getText("validation.already.exists"));
 			return list();
 		}
-		fileStorage.rename(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + oldName),
+		uploadFileStorage.rename(FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + oldName),
 				FileUtils.normalizePath(getUploadRootDir() + '/' + folder + '/' + newName));
 		return list();
 	}
@@ -243,7 +243,7 @@ public class UploadAction extends BaseAction {
 	@JsonConfig(root = "files")
 	public String files() throws IOException {
 		String path = FileUtils.normalizePath(getUploadRootDir() + '/' + folder);
-		Map<String, Boolean> map = fileStorage.listFilesAndDirectory(path);
+		Map<String, Boolean> map = uploadFileStorage.listFilesAndDirectory(path);
 		files = new LinkedHashMap<>();
 		String[] suffixes = null;
 		if (StringUtils.isNotBlank(suffix))
@@ -280,7 +280,7 @@ public class UploadAction extends BaseAction {
 	}
 
 	private String doGetFileUrl(String path) {
-		String url = fileStorage.getFileUrl(path);
+		String url = uploadFileStorage.getFileUrl(path);
 		if (url.indexOf("://") < 0)
 			url = uploadFilesHandler.getPathPrefix() + url;
 		return url;
@@ -296,11 +296,11 @@ public class UploadAction extends BaseAction {
 			dir = dir + folder + "/";
 		String path = dir + filename;
 		if (autorename) {
-			boolean exists = fileStorage.exists(FileUtils.normalizePath(path));
+			boolean exists = uploadFileStorage.exists(FileUtils.normalizePath(path));
 			int i = 2;
 			while (exists) {
 				path = dir + '(' + (i++) + ')' + filename;
-				exists = fileStorage.exists(FileUtils.normalizePath(path));
+				exists = uploadFileStorage.exists(FileUtils.normalizePath(path));
 			}
 		}
 		path = FileUtils.normalizePath(path);

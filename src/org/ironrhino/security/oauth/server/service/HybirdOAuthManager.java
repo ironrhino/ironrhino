@@ -25,8 +25,7 @@ import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -41,8 +40,7 @@ public class HybirdOAuthManager extends AbstractOAuthManager {
 	private ClientManager clientManager;
 
 	@Autowired
-	@Qualifier("stringRedisTemplate")
-	private RedisTemplate<String, String> stringRedisTemplate;
+	private StringRedisTemplate stringRedisTemplate;
 
 	private static final String NAMESPACE_AUTHORIZATION = "oauth:authorization:";
 	private static final String NAMESPACE_AUTHORIZATION_GRANTOR = "oauth:authorization:grantor:";

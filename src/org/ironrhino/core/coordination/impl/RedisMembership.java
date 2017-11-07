@@ -23,7 +23,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
@@ -43,8 +43,8 @@ public class RedisMembership implements Membership {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PriorityQualifier("coordinationStringRedisTemplate")
-	private RedisTemplate<String, String> stringRedisTemplate;
+	@PriorityQualifier
+	private StringRedisTemplate coordinationStringRedisTemplate;
 
 	@PostConstruct
 	public void afterPropertiesSet() {
@@ -53,7 +53,7 @@ public class RedisMembership implements Membership {
 				List<String> members = getMembers(group);
 				String self = AppInfo.getInstanceId();
 				if (!members.contains(self))
-					stringRedisTemplate.opsForList().rightPush(NAMESPACE + group, self);
+					coordinationStringRedisTemplate.opsForList().rightPush(NAMESPACE + group, self);
 				for (String member : members) {
 					if (member.equals(self))
 						continue;
@@ -80,7 +80,8 @@ public class RedisMembership implements Membership {
 									if (!members.contains(value) && value.length() <= 100
 											&& value.matches("[\\w-]+@[\\w.:]+")) {
 										if (AppInfo.getAppName().equals(value.substring(0, value.lastIndexOf('-')))) {
-											stringRedisTemplate.opsForList().rightPush(NAMESPACE + group, value);
+											coordinationStringRedisTemplate.opsForList().rightPush(NAMESPACE + group,
+													value);
 										} else {
 											// multiple virtual host
 											alive = true;
@@ -93,7 +94,7 @@ public class RedisMembership implements Membership {
 					} catch (IOException e) {
 					}
 					if (!alive)
-						stringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, member);
+						coordinationStringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, member);
 				}
 			}
 		}, heartbeat);
@@ -101,13 +102,13 @@ public class RedisMembership implements Membership {
 
 	@Override
 	public void join(final String group) {
-		stringRedisTemplate.opsForList().leftPush(NAMESPACE + group, AppInfo.getInstanceId());
+		coordinationStringRedisTemplate.opsForList().leftPush(NAMESPACE + group, AppInfo.getInstanceId());
 		groups.add(group);
 	}
 
 	@Override
 	public void leave(final String group) {
-		stringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, AppInfo.getInstanceId());
+		coordinationStringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, AppInfo.getInstanceId());
 		groups.remove(group);
 	}
 
@@ -126,13 +127,13 @@ public class RedisMembership implements Membership {
 
 	@Override
 	public List<String> getMembers(String group) {
-		return stringRedisTemplate.opsForList().range(NAMESPACE + group, 0, -1);
+		return coordinationStringRedisTemplate.opsForList().range(NAMESPACE + group, 0, -1);
 	}
 
 	@PreDestroy
 	public void destroy() {
 		for (String group : groups)
-			stringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, AppInfo.getInstanceId());
+			coordinationStringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, AppInfo.getInstanceId());
 	}
 
 }

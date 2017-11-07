@@ -33,7 +33,10 @@ public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFa
 		ReflectionUtils.doWithFields(bean.getClass(), field -> {
 			ReflectionUtils.makeAccessible(field);
 			PriorityQualifier pq = field.getAnnotation(PriorityQualifier.class);
-			for (String name : pq.value()) {
+			String[] candidates = pq.value();
+			if (candidates.length == 0)
+				candidates = new String[] { field.getName() };
+			for (String name : candidates) {
 				if (beanFactory.containsBean(name)) {
 					ResolvableType rt = ResolvableType.forField(field);
 					boolean typeMatched = beanFactory.isTypeMatch(name, rt);

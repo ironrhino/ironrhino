@@ -35,7 +35,7 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 	@Setter
 	@Autowired
 	@PriorityQualifier({ "mqRedisTemplate", "globalRedisTemplate" })
-	private RedisTemplate<String, T> redisTemplate;
+	private RedisTemplate<String, T> mqRedisTemplate;
 
 	protected BlockingDeque<T> queue;
 
@@ -46,7 +46,7 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 
 	@PostConstruct
 	public void afterPropertiesSet() {
-		queue = new DefaultRedisList<>(queueName, redisTemplate);
+		queue = new DefaultRedisList<>(queueName, mqRedisTemplate);
 		if (consuming) {
 			Runnable task = () -> {
 				while (!stopConsuming) {

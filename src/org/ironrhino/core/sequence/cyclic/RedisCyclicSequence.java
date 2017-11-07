@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.Assert;
 
 public class RedisCyclicSequence extends AbstractCyclicSequence {
@@ -22,8 +22,8 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
-	@PriorityQualifier("sequenceStringRedisTemplate")
-	private RedisTemplate<String, String> stringRedisTemplate;
+	@PriorityQualifier
+	private StringRedisTemplate sequenceStringRedisTemplate;
 
 	private BoundValueOperations<String, String> boundValueOperations;
 
@@ -33,13 +33,13 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 		Assert.isTrue(getPaddingLength() > 0, "paddingLength should large than 0");
 		int maxlength = String.valueOf(Long.MAX_VALUE).length() - getCycleType().getPattern().length();
 		Assert.isTrue(getPaddingLength() <= maxlength, "paddingLength should not large than " + maxlength);
-		boundValueOperations = stringRedisTemplate.boundValueOps(KEY_SEQUENCE + getSequenceName());
+		boundValueOperations = sequenceStringRedisTemplate.boundValueOps(KEY_SEQUENCE + getSequenceName());
 		boundValueOperations.setIfAbsent(getStringValue(now(), getPaddingLength(), 0));
 	}
 
 	@Override
 	public String nextStringValue() {
-		List<Object> results = stringRedisTemplate.executePipelined((RedisConnection connection) -> {
+		List<Object> results = sequenceStringRedisTemplate.executePipelined((RedisConnection connection) -> {
 			connection.incr(boundValueOperations.getKey().getBytes());
 			connection.time();
 			return null;
@@ -71,7 +71,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			}
 		}
 		final String restart = getStringValue(now, getPaddingLength(), 1);
-		boolean success = stringRedisTemplate.execute(new SessionCallback<Boolean>() {
+		boolean success = sequenceStringRedisTemplate.execute(new SessionCallback<Boolean>() {
 			@Override
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Boolean execute(RedisOperations operations) {
@@ -97,7 +97,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	protected Date now() {
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(stringRedisTemplate.execute((RedisConnection connection) -> connection.time()));
+		cal.setTimeInMillis(sequenceStringRedisTemplate.execute((RedisConnection connection) -> connection.time()));
 		return cal.getTime();
 	}
 

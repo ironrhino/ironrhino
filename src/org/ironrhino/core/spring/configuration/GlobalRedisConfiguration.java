@@ -98,7 +98,7 @@ public class GlobalRedisConfiguration {
 	}
 
 	@Bean
-	public RedisTemplate<String, ?> globalStringRedisTemplate() {
+	public StringRedisTemplate globalStringRedisTemplate() {
 		StringRedisTemplate template = new StringRedisTemplate();
 		template.setConnectionFactory(globalRedisConnectionFactory());
 		return template;

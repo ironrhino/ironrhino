@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.BoundZSetOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -78,15 +78,15 @@ public class RedisServiceStats implements ServiceStats {
 	@Autowired
 	@Qualifier("stringRedisTemplate")
 	@PriorityQualifier({ "remotingStringRedisTemplate", "globalStringRedisTemplate" })
-	private RedisTemplate<String, String> stringRedisTemplate;
+	private StringRedisTemplate remotingStringRedisTemplate;
 
 	private BoundZSetOperations<String, String> hotspotsOperations;
 	private BoundListOperations<String, String> warningsOperations;
 
 	@PostConstruct
 	public void afterPropertiesSet() {
-		hotspotsOperations = stringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
-		warningsOperations = stringRedisTemplate.boundListOps(KEY_WARNINGS);
+		hotspotsOperations = remotingStringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
+		warningsOperations = remotingStringRedisTemplate.boundListOps(KEY_WARNINGS);
 	}
 
 	@Override
@@ -113,10 +113,10 @@ public class RedisServiceStats implements ServiceStats {
 	@Override
 	public Map<String, Set<String>> getServices() {
 		Map<String, Set<String>> map = new TreeMap<>();
-		Set<String> serviceKeys = stringRedisTemplate.keys(NAMESPACE_SERVICES + "*");
+		Set<String> serviceKeys = remotingStringRedisTemplate.keys(NAMESPACE_SERVICES + "*");
 		for (String serviceKey : serviceKeys) {
 			String serviceName = serviceKey.substring(NAMESPACE_SERVICES.length());
-			Set<String> methods = stringRedisTemplate.opsForSet().members(serviceKey);
+			Set<String> methods = remotingStringRedisTemplate.opsForSet().members(serviceKey);
 			map.put(serviceName, new TreeSet<>(methods));
 		}
 		return map;
@@ -129,19 +129,19 @@ public class RedisServiceStats implements ServiceStats {
 		if (key != null) {
 			sb.append(":").append(key);
 			String prefix = sb.toString();
-			String value = stringRedisTemplate.opsForValue().get(prefix);
+			String value = remotingStringRedisTemplate.opsForValue().get(prefix);
 			if (value != null) {
 				return Long.valueOf(value);
 			} else {
-				Set<String> keys = stringRedisTemplate.keys(prefix + "*");
-				List<String> results = stringRedisTemplate.opsForValue().multiGet(keys);
+				Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
+				List<String> results = remotingStringRedisTemplate.opsForValue().multiGet(keys);
 				long count = 0;
 				for (String str : results)
 					count += Long.valueOf(str);
 				return count;
 			}
 		} else {
-			String value = stringRedisTemplate.opsForValue().get(sb.toString());
+			String value = remotingStringRedisTemplate.opsForValue().get(sb.toString());
 			if (value != null)
 				return Long.valueOf(value);
 			return 0;
@@ -151,7 +151,7 @@ public class RedisServiceStats implements ServiceStats {
 	@Override
 	public Tuple<String, Long> getMaxCount(String service, StatsType type) {
 		String key = getNameSpace(type) + "max";
-		String str = (String) stringRedisTemplate.opsForHash().get(key, service);
+		String str = (String) remotingStringRedisTemplate.opsForHash().get(key, service);
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split(",");
 			return new Tuple<>(arr[0], Long.valueOf(arr[1]));
@@ -188,7 +188,7 @@ public class RedisServiceStats implements ServiceStats {
 
 	@Override
 	public List<InvocationSample> getSamples(String service, StatsType type) {
-		List<String> list = stringRedisTemplate.opsForList()
+		List<String> list = remotingStringRedisTemplate.opsForList()
 				.range(NAMESPACE_SAMPLES + type.getNamespace() + ':' + service, 0, -1);
 		List<InvocationSample> results = new ArrayList<>(list.size());
 		try {
@@ -215,10 +215,10 @@ public class RedisServiceStats implements ServiceStats {
 				InvocationSample sample = entry.getValue().peekAndReset();
 				if (sample.getCount() > 0) {
 					String key = NAMESPACE_SAMPLES + type.getNamespace() + ':' + entry.getKey();
-					stringRedisTemplate.opsForList().leftPush(key, JsonUtils.toJson(sample));
-					long size = stringRedisTemplate.opsForList().size(key);
+					remotingStringRedisTemplate.opsForList().leftPush(key, JsonUtils.toJson(sample));
+					long size = remotingStringRedisTemplate.opsForList().size(key);
 					if (size > maxSamplesSize)
-						stringRedisTemplate.opsForList().trim(key, 0, maxSamplesSize - 1);
+						remotingStringRedisTemplate.opsForList().trim(key, 0, maxSamplesSize - 1);
 				}
 			}
 		}
@@ -229,7 +229,7 @@ public class RedisServiceStats implements ServiceStats {
 	private void flush(StatsType type) {
 		ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> buffer = type.getCountBuffer();
 		for (Map.Entry<String, ConcurrentHashMap<String, AtomicInteger>> entry : buffer.entrySet()) {
-			stringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + entry.getKey(),
+			remotingStringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + entry.getKey(),
 					entry.getValue().keySet().toArray(new String[0]));
 			for (Map.Entry<String, AtomicInteger> entry2 : entry.getValue().entrySet()) {
 				AtomicInteger ai = entry2.getValue();
@@ -246,10 +246,10 @@ public class RedisServiceStats implements ServiceStats {
 		Date date = new Date();
 		StringBuilder sb = new StringBuilder(getNameSpace(type));
 		sb.append(serviceName).append(".").append(method);
-		stringRedisTemplate.opsForValue().increment(sb.toString(), count);
+		remotingStringRedisTemplate.opsForValue().increment(sb.toString(), count);
 		sb.append(":");
 		sb.append(DateUtils.format(date, "yyyyMMddHH"));
-		stringRedisTemplate.opsForValue().increment(sb.toString(), count);
+		remotingStringRedisTemplate.opsForValue().increment(sb.toString(), count);
 		if (type == StatsType.SERVER_SIDE)
 			hotspotsOperations.incrementScore(serviceName + '.' + method, count);
 	}
@@ -258,10 +258,10 @@ public class RedisServiceStats implements ServiceStats {
 	@Scheduled(cron = "${serviceStats.archive.cron:0 1 0 * * ?}")
 	public void archive() {
 		String lockName = "lock:serviceStats.archive()";
-		if (stringRedisTemplate.opsForValue().setIfAbsent(lockName, ""))
+		if (remotingStringRedisTemplate.opsForValue().setIfAbsent(lockName, ""))
 			try {
-				stringRedisTemplate.expire(lockName, 5, TimeUnit.MINUTES);
-				stringRedisTemplate.delete(KEY_HOTSPOTS);
+				remotingStringRedisTemplate.expire(lockName, 5, TimeUnit.MINUTES);
+				remotingStringRedisTemplate.delete(KEY_HOTSPOTS);
 				Calendar cal = Calendar.getInstance();
 				cal.add(Calendar.DAY_OF_YEAR, -days);
 				Date date = cal.getTime();
@@ -276,7 +276,7 @@ public class RedisServiceStats implements ServiceStats {
 					}
 				}
 			} finally {
-				stringRedisTemplate.delete(lockName);
+				remotingStringRedisTemplate.delete(lockName);
 			}
 	}
 
@@ -285,16 +285,16 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(serviceName).append(".").append(method);
 		sb.append(":").append(day);
 		String prefix = sb.toString();
-		Set<String> keys = stringRedisTemplate.keys(prefix + "*");
+		Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
 		if (!keys.isEmpty()) {
-			List<String> results = stringRedisTemplate.opsForValue().multiGet(keys);
-			stringRedisTemplate.delete(keys);
+			List<String> results = remotingStringRedisTemplate.opsForValue().multiGet(keys);
+			remotingStringRedisTemplate.delete(keys);
 			long count = 0;
 			for (String str : results)
 				if (StringUtils.isNumeric(str))
 					count += Long.valueOf(str);
 			if (count > 0)
-				stringRedisTemplate.opsForValue().set(prefix, String.valueOf(count));
+				remotingStringRedisTemplate.opsForValue().set(prefix, String.valueOf(count));
 		}
 	}
 
@@ -306,21 +306,21 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(serviceName).append(".").append(method);
 		sb.append(":").append(yesterday);
 		String prefix = sb.toString();
-		Set<String> keys = stringRedisTemplate.keys(prefix + "*");
-		List<String> results = stringRedisTemplate.opsForValue().multiGet(keys);
+		Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
+		List<String> results = remotingStringRedisTemplate.opsForValue().multiGet(keys);
 		long count = 0;
 		for (String str : results)
 			count += Long.valueOf(str);
 		if (count > 0) {
 			String key = getNameSpace(type) + "max";
 			String service = serviceName + '.' + method;
-			String str = (String) stringRedisTemplate.opsForHash().get(key, service);
+			String str = (String) remotingStringRedisTemplate.opsForHash().get(key, service);
 			if (StringUtils.isNotBlank(str)) {
 				String[] arr = str.split(",");
 				if (Long.valueOf(arr[1]) < count)
-					stringRedisTemplate.opsForHash().put(key, service, yesterday + ',' + count);
+					remotingStringRedisTemplate.opsForHash().put(key, service, yesterday + ',' + count);
 			} else {
-				stringRedisTemplate.opsForHash().put(key, service, yesterday + ',' + count);
+				remotingStringRedisTemplate.opsForHash().put(key, service, yesterday + ',' + count);
 			}
 		}
 	}

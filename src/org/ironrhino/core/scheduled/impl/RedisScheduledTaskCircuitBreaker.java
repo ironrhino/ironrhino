@@ -7,8 +7,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import org.ironrhino.core.scheduled.ScheduledTaskCircuitBreaker;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component("scheduledTaskCircuitBreaker")
@@ -18,8 +17,7 @@ public class RedisScheduledTaskCircuitBreaker implements ScheduledTaskCircuitBre
 	private static final String NAMESPACE_SHORT_CIRCUIT = "ShortCircuit:";
 
 	@Autowired
-	@Qualifier("stringRedisTemplate")
-	private RedisTemplate<String, String> stringRedisTemplate;
+	private StringRedisTemplate stringRedisTemplate;
 
 	@Override
 	public boolean isShortCircuit(String task) {
