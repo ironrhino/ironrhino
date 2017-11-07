@@ -7,6 +7,7 @@ import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
@@ -43,14 +44,15 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 		}
-		String servletName = "api" + (StringUtils.isNotBlank(version) ? version : "");
-		String servletMapping = "/api" + (StringUtils.isNotBlank(version) ? "/" + version : "") + "/*";
+		String servletName = getServletName(version);
+		String servletMapping = getServletMapping(version);
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet(servletName, InheritedDispatcherServlet.class);
 		dynamic.setInitParameter(ContextLoader.CONTEXT_CLASS_PARAM,
 				AnnotationConfigWebApplicationContext.class.getName());
 		dynamic.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, apiConfigClass.getName());
 		dynamic.addMapping(servletMapping);
 		dynamic.setAsyncSupported(true);
+		dynamic.setMultipartConfig(createMultipartConfig());
 		dynamic.setLoadOnStartup(1);
 		String filterName = "restFilter";
 		FilterRegistration filterRegistration = servletContext.getFilterRegistration(filterName);
@@ -61,5 +63,18 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 		} else {
 			filterRegistration.addMappingForServletNames(EnumSet.of(DispatcherType.REQUEST), true, servletName);
 		}
+	}
+
+	protected String getServletName(String version) {
+		return "api" + (StringUtils.isNotBlank(version) ? "-" + version : "");
+	}
+
+	protected String getServletMapping(String version) {
+		return "/api" + (StringUtils.isNotBlank(version) ? "/" + version : "") + "/*";
+	}
+
+	protected MultipartConfigElement createMultipartConfig() {
+		return new MultipartConfigElement(System.getProperty("java.io.tmpdir", "/tmp"), 4 * 1024 * 1024,
+				16 * 1024 * 1024, 0);
 	}
 }
