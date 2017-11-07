@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
@@ -26,6 +28,9 @@ public class RestApiTests {
 
 	@Autowired
 	private UserClient userClient;
+
+	@Autowired
+	private UploadClient uploadClient;
 
 	@Test
 	public void testGetAndPatch() {
@@ -64,6 +69,13 @@ public class RestApiTests {
 		InputStream is = userClient.getStream();
 		List<String> lines = IOUtils.readLines(is);
 		assertEquals(false, lines.isEmpty());
+	}
+
+	@Test
+	public void testUpload() throws IOException {
+		Map<String, String> result = uploadClient.upload("test", new File("build.xml"));
+		assertEquals("test", result.get("name"));
+		assertEquals("build.xml", result.get("originalFilename"));
 	}
 
 }

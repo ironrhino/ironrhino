@@ -1,6 +1,7 @@
 package org.ironrhino.rest.client;
 
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -26,6 +27,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -126,7 +128,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 
 		Map<String, Object> pathVariables = new HashMap<>(8);
 		MultiValueMap<String, String> headers = new HttpHeaders();
-		MultiValueMap<String, String> requestParams = null;
+		MultiValueMap<String, Object> requestParams = null;
 		Map<String, String> cookieValues = null;
 		List<Object> requestParamsObjectCandidates = new ArrayList<>(1);
 		Object body = null;
@@ -134,6 +136,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		Object[] arguments = methodInvocation.getArguments();
 		Annotation[][] array = method.getParameterAnnotations();
 		InputStream is = null;
+		boolean multipart = false;
 		for (int i = 0; i < array.length; i++) {
 			Object argument = arguments[i];
 			if (argument == null)
@@ -171,10 +174,28 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 						requestParams = new LinkedMultiValueMap<>(8);
 					if (argument instanceof Collection) {
 						for (Object o : (Collection<Object>) argument)
-							if (o != null)
-								requestParams.add(name, o.toString());
+							if (o != null) {
+								if (o instanceof File)
+									o = new FileSystemResource((File) o);
+								else if (o instanceof InputStream)
+									o = new InputStreamResource((InputStream) o);
+								if (o instanceof Resource)
+									multipart = true;
+								else
+									o = o.toString();
+								requestParams.add(name, o);
+							}
 					} else {
-						requestParams.add(name, argument.toString());
+						Object o = argument;
+						if (o instanceof File)
+							o = new FileSystemResource((File) o);
+						else if (o instanceof InputStream)
+							o = new InputStreamResource((InputStream) o);
+						if (o instanceof Resource)
+							multipart = true;
+						else
+							o = o.toString();
+						requestParams.add(name, o);
 					}
 				}
 				if (anno instanceof CookieValue) {
@@ -252,14 +273,17 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		}
 		if (requestParams != null) {
 			if (body == null && requestMethod.name().startsWith("P")) {
-				headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+				if (!headers.containsKey(HttpHeaders.CONTENT_TYPE))
+					headers.set(HttpHeaders.CONTENT_TYPE, multipart ? MediaType.MULTIPART_FORM_DATA_VALUE
+							: MediaType.APPLICATION_FORM_URLENCODED_VALUE);
 				body = requestParams;
 			} else {
 				StringBuilder temp = new StringBuilder(url);
-				for (Map.Entry<String, List<String>> entry : requestParams.entrySet())
-					for (String value : entry.getValue())
-						temp.append(temp.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
-								.append(URLEncoder.encode(value, "UTF-8"));
+				for (Map.Entry<String, List<Object>> entry : requestParams.entrySet())
+					for (Object value : entry.getValue())
+						if (value instanceof String)
+							temp.append(temp.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
+									.append(URLEncoder.encode(value.toString(), "UTF-8"));
 				url = temp.toString();
 			}
 		}
