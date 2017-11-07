@@ -353,6 +353,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	private String getRealPath(String path, FTPClient ftpClient) throws IOException {
+		if (!path.startsWith("/"))
+			path = "/" + path;
 		String wd = StringUtils.isBlank(workingDirectory) ? ftpClient.printWorkingDirectory() : workingDirectory;
 		return FileUtils.normalizePath(wd + uri.getPath() + path);
 	}

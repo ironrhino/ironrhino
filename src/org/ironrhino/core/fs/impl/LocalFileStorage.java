@@ -56,7 +56,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public void write(InputStream is, String path) throws IOException {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		File dest = new File(directory, path);
 		dest.getParentFile().mkdirs();
 		try (InputStream ins = is; FileOutputStream os = new FileOutputStream(dest)) {
@@ -66,7 +66,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public InputStream open(String path) throws IOException {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		File file = new File(directory, path);
 		if (!file.exists() || file.isDirectory())
 			return null;
@@ -75,32 +75,32 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean mkdir(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		return new File(directory, path).mkdirs();
 	}
 
 	@Override
 	public boolean delete(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		return new File(directory, path).delete();
 	}
 
 	@Override
 	public long getLastModified(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		return new File(directory, path).lastModified();
 	}
 
 	@Override
 	public boolean exists(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		return new File(directory, path).exists();
 	}
 
 	@Override
 	public boolean rename(String fromPath, String toPath) throws IOException {
-		fromPath = FileUtils.normalizePath(directory.getPath() + "/" + fromPath);
-		toPath = FileUtils.normalizePath(directory.getPath() + "/" + toPath);
+		fromPath = normalizePath(directory.getPath() + "/" + fromPath);
+		toPath = normalizePath(directory.getPath() + "/" + toPath);
 		File source = new File(fromPath);
 		File target = new File(toPath);
 		if (source.getParent().equals(target.getParent())) {
@@ -112,13 +112,13 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		return new File(directory, path).isDirectory();
 	}
 
 	@Override
 	public List<String> listFiles(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		final List<String> list = new ArrayList<>();
 		new File(directory, path).listFiles(f -> {
 			if (f.isFile()) {
@@ -131,7 +131,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		final Map<String, Boolean> map = new HashMap<>();
 		new File(directory, path).listFiles(f -> {
 			map.put(f.getName(), f.isFile());
@@ -143,6 +143,12 @@ public class LocalFileStorage extends AbstractFileStorage {
 		for (Map.Entry<String, Boolean> entry : list)
 			sortedMap.put(entry.getKey(), entry.getValue());
 		return sortedMap;
+	}
+
+	private String normalizePath(String path) {
+		if (!path.startsWith("/"))
+			path = "/" + path;
+		return FileUtils.normalizePath(path);
 	}
 
 }

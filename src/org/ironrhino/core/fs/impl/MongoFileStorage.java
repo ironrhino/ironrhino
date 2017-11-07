@@ -45,7 +45,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public void write(InputStream is, String path) throws IOException {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		if (path.equals("/"))
 			throw new IOException("cannot direct access path /");
 		File file = mongoTemplate.findById(path, File.class);
@@ -83,7 +83,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public InputStream open(String path) throws IOException {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		if (path.equals("/"))
 			return null;
 		File file = mongoTemplate.findById(path, File.class);
@@ -96,7 +96,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean mkdir(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		if (path.equals("/"))
 			return true;
 		path = StringUtils.trimTailSlash(path);
@@ -132,7 +132,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean delete(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		if (path.equals("/"))
 			return false;
 		path = StringUtils.trimTailSlash(path);
@@ -153,7 +153,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public long getLastModified(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		if (path.equals("/"))
 			return -1;
 		path = StringUtils.trimTailSlash(path);
@@ -163,7 +163,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean exists(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		if (path.equals("/"))
 			return true;
 		path = StringUtils.trimTailSlash(path);
@@ -172,8 +172,8 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean rename(String fromPath, String toPath) {
-		fromPath = FileUtils.normalizePath(fromPath);
-		toPath = FileUtils.normalizePath(toPath);
+		fromPath = normalizePath(fromPath);
+		toPath = normalizePath(toPath);
 		if (fromPath.equals("/") || toPath.equals("/"))
 			return false;
 		String s1 = fromPath.substring(0, fromPath.lastIndexOf('/'));
@@ -197,7 +197,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		if (path.equals("/"))
 			return true;
 		path = StringUtils.trimTailSlash(path);
@@ -207,7 +207,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public List<String> listFiles(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		if (!"/".equals(path)) {
 			File file = mongoTemplate.findById(path, File.class);
 			if (file == null || !file.isDirectory())
@@ -228,7 +228,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public Map<String, Boolean> listFilesAndDirectory(String path) {
-		path = FileUtils.normalizePath(path);
+		path = normalizePath(path);
 		final Map<String, Boolean> map = new HashMap<>();
 		if (!"/".equals(path)) {
 			File file = mongoTemplate.findById(path, File.class);
@@ -247,6 +247,12 @@ public class MongoFileStorage extends AbstractFileStorage {
 		for (Map.Entry<String, Boolean> entry : list)
 			sortedMap.put(entry.getKey(), entry.getValue());
 		return sortedMap;
+	}
+
+	private String normalizePath(String path) {
+		if (!path.startsWith("/"))
+			path = "/" + path;
+		return FileUtils.normalizePath(path);
 	}
 
 	@Data
