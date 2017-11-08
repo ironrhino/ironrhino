@@ -3,6 +3,8 @@ package org.ironrhino.rest.doc;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,6 +46,8 @@ public class FieldObject implements Serializable {
 
 	private boolean required;
 
+	private boolean multiple;
+
 	private String label;
 
 	private String description;
@@ -66,7 +70,41 @@ public class FieldObject implements Serializable {
 		this.required = required;
 	}
 
+	public FieldObject(String name, String type, boolean required, boolean multiple) {
+		this(name, type, required);
+		this.multiple = multiple;
+	}
+
+	public static FieldObject create(String name, Type type, boolean required, String defaultValue, Field fd) {
+		if (type instanceof Class)
+			return create(name, (Class<?>) type, required, defaultValue, fd);
+		else if (type instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) type;
+			Type rawtype = pt.getRawType();
+			if (rawtype instanceof Class) {
+				Class<?> cls = (Class<?>) rawtype;
+				if (Collection.class.isAssignableFrom(cls) && pt.getActualTypeArguments().length > 0
+						&& pt.getActualTypeArguments()[0] instanceof Class) {
+					return create(name, (Class<?>) (pt.getActualTypeArguments()[0]), required, true, defaultValue, fd);
+				} else {
+					return create(name, cls, required, defaultValue, fd);
+				}
+			}
+		}
+		return null;
+	}
+
 	public static FieldObject create(String name, Class<?> cls, boolean required, String defaultValue, Field fd) {
+		boolean multiple = false;
+		if (cls.isArray()) {
+			multiple = true;
+			cls = cls.getComponentType();
+		}
+		return create(name, cls, required, multiple, defaultValue, fd);
+	}
+
+	private static FieldObject create(String name, Class<?> cls, boolean required, boolean multiple,
+			String defaultValue, Field fd) {
 		String type = null;
 		Map<String, String> values = null;
 		if (cls.isEnum()) {
@@ -102,7 +140,7 @@ public class FieldObject implements Serializable {
 			else
 				type = "object";
 		}
-		FieldObject field = new FieldObject(name, type, required);
+		FieldObject field = new FieldObject(name, type, required, multiple);
 		if (StringUtils.isNotBlank(defaultValue) && !ValueConstants.DEFAULT_NONE.equals(defaultValue))
 			field.setDefaultValue(defaultValue);
 		if (values != null)

@@ -320,44 +320,53 @@ public class ApiDoc implements Serializable {
 						RequestParam ann = (RequestParam) anno;
 						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
 						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
-						Class<?> fieldType = parameterType;
+						Type fieldType = genericParameterType;
 						boolean fieldRequired = ann.required();
 						if (parameterType == Optional.class) {
-							fieldType = (Class<?>) ((ParameterizedType) genericParameterType)
-									.getActualTypeArguments()[0];
+							fieldType = ((ParameterizedType) genericParameterType).getActualTypeArguments()[0];
 							fieldRequired = false;
 						}
-						if (!Map.class.isAssignableFrom(fieldType))
-							requestParams.add(
-									FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(), fd));
+						if (!Map.class.isAssignableFrom(parameterType)) {
+							FieldObject fo = FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(),
+									fd);
+							if (fo != null)
+								requestParams.add(fo);
+						}
 					} else if (anno instanceof RequestHeader) {
 						RequestHeader ann = (RequestHeader) anno;
 						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
 						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
-						Class<?> fieldType = parameterType;
+						Type fieldType = genericParameterType;
 						boolean fieldRequired = ann.required();
 						if (parameterType == Optional.class) {
-							fieldType = (Class<?>) ((ParameterizedType) genericParameterType)
-									.getActualTypeArguments()[0];
+							fieldType = ((ParameterizedType) genericParameterType).getActualTypeArguments()[0];
 							fieldRequired = false;
 						}
-						if (!Map.class.isAssignableFrom(fieldType))
-							requestHeaders.add(
-									FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(), fd));
+						if (!Map.class.isAssignableFrom(parameterType)) {
+							FieldObject fo = FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(),
+									fd);
+							if (fo != null)
+								requestHeaders.add(FieldObject.create(fieldName, fieldType, fieldRequired,
+										ann.defaultValue(), fd));
+						}
 					} else if (anno instanceof CookieValue) {
 						CookieValue ann = (CookieValue) anno;
 						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
 						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
-						Class<?> fieldType = parameterType;
+						Type fieldType = genericParameterType;
 						boolean fieldRequired = ann.required();
 						if (parameterType == Optional.class) {
 							fieldType = (Class<?>) ((ParameterizedType) genericParameterType)
 									.getActualTypeArguments()[0];
 							fieldRequired = false;
 						}
-						if (!Map.class.isAssignableFrom(fieldType))
-							cookieValues.add(
-									FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(), fd));
+						if (!Map.class.isAssignableFrom(parameterType)) {
+							FieldObject fo = FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(),
+									fd);
+							if (fo != null)
+								cookieValues.add(FieldObject.create(fieldName, fieldType, fieldRequired,
+										ann.defaultValue(), fd));
+						}
 					}
 				}
 				if (!bindAnnotationPresent && Arrays.asList(methods).contains("GET")) {

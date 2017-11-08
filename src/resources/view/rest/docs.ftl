@@ -23,9 +23,9 @@
 		</#if>
 		<#if label!=field.name> <span class="label pull-right">${label}</span></#if>
 		</td>
-		<td>${field.type!} </td>
-		<td>${getText(field.required?string)} </td>
-		<td>${field.defaultValue!} </td>
+		<td>${field.type!}<#if field.multiple> <span class="label pull-right">多值</span></#if></td>
+		<td>${getText(field.required?string)}</td>
+		<td>${field.defaultValue!}</td>
 		<td><#if field.description?has_content>${getText(field.description)}</#if>
 			<#if field.values?has_content>
 			枚举值:
