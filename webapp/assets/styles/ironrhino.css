@@ -7559,7 +7559,7 @@ body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 10001;
+	z-index: 100000;
 	opacity: 0;
 	transition: opacity 0.4s linear 0.4s;
 }
@@ -7570,7 +7570,7 @@ body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 	left: 0;
 	z-index: 10001;
 	width: 0;
-	height: 2px;
+	height: 3px;
 	background: #77b6ff;
 	box-shadow: 0 0 10px rgba(119, 182, 255, 0.7);
 	transition: width 0.4s ease;
