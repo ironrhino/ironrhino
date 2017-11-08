@@ -27,7 +27,7 @@
 	<table class="requestParams table datagrid adaptive"><tbody>
 	<#if apiDoc.requestParams?has_content>
 	<#list apiDoc.requestParams as param>
-	<tr><td><input type="text" value="${param.name}" placeholder="名字" readonly></td><td class="center middle"> = </td><td><input type="text" name="${param.name}" value="${param.defaultValue!}" placeholder="值"<#if param.required> class="required"</#if>></td><td class="manipulate"></td></tr>
+	<tr><td><input type="text" value="${param.name}" placeholder="名字" readonly></td><td class="center middle"> = </td><td><input type="<#if param.type=='file'>file<#else>text</#if>" name="${param.name}" value="${param.defaultValue!}" placeholder="值"<#if param.required> class="required"</#if>></td><td class="manipulate"></td></tr>
 	</#list>
 	</#if>
 	<tr><td><input type="text" placeholder="名字"></td><td class="center middle"> = </td><td><input type="text" placeholder="值"></td><td class="manipulate"></td></tr>

@@ -3,16 +3,6 @@ Initialization.apiplayground = function() {
 		if (!Form.validate(e.target))
 			return false;
 		var form = $(e.target);
-		var params = [];
-		form.find('table.requestParams tr').each(function(i, v) {
-			var row = $(this);
-			var name = row.find('input:eq(1)').attr('name')
-					|| row.find('input:eq(0)').val();
-			var value = row.find('input:eq(1)').val();
-			if (name)
-				params.push(encodeURIComponent(name) + '='
-						+ encodeURIComponent(value));
-		});
 		var headers = {};
 		form.find('table.requestHeaders tr').each(function(i, v) {
 			var row = $(this);
@@ -28,13 +18,63 @@ Initialization.apiplayground = function() {
 			localStorage.setItem('accessToken', accessToken);
 		}
 		var url = form.find('.url').text();
-		if (params.length)
-			url += '?' + params.join('&');
+		var method = form.attr('method');
+		var data;
+		var contentType = false;
+		var processData = true;
+		if (form.find('table.requestParams input[type="file"]').length) {
+			var formdata = new FormData();
+			form.find('table.requestParams tr').each(function(i, v) {
+						var row = $(this);
+						var input = row.find('input:eq(1)');
+						var name = input.attr('name')
+								|| row.find('input:eq(0)').val();
+						if (!name)
+							return;
+						if (input.attr('type') == 'file') {
+							var files = input[0].files;
+							for (var n = 0; n < files.length; n++)
+								formdata.append(name, files[n]);
+						} else {
+							formdata.append(name, input.val());
+						}
+
+					});
+			data = formdata;
+			processData = false;
+		} else {
+			if (form.find('.requestBody').length) {
+				data = form.find('.requestBody').text();
+				contentType = 'application/json; charset=UTF-8';
+			}
+			var params = [];
+			form.find('table.requestParams tr').each(function(i, v) {
+				var row = $(this);
+				var name = row.find('input:eq(1)').attr('name')
+						|| row.find('input:eq(0)').val();
+				var value = row.find('input:eq(1)').val();
+				if (name)
+					params.push(encodeURIComponent(name) + '='
+							+ encodeURIComponent(value));
+			});
+			params = params.join('&');
+			if (params.length) {
+				if (!data && method.indexOf('P') == 0) {
+					data = params;
+					contentType = 'application/x-www-form-urlencoded; charset=UTF-8';
+				} else {
+					url += (url.indexOf('?') > 0 ? '&' : '?') + params;
+				}
+			}
+		}
 		var startTime = new Date().getTime();
 		var options = {
 			global : false,
 			url : url,
-			method : form.attr('method'),
+			data : data,
+			contentType : contentType,
+			processData : processData,
+			method : method,
 			headers : headers,
 			dataType : 'text',
 			beforeSend : function() {
@@ -64,10 +104,7 @@ Initialization.apiplayground = function() {
 				form.find('.responseBody').text(responseText);
 			}
 		};
-		if (form.find('.requestBody').length) {
-			options.data = form.find('.requestBody').text();
-			options.contentType = 'application/json; charset=UTF-8';
-		}
+
 		$.ajax(options);
 		return false;
 	}).on('click', 'form.api-playground .last-accessToken', function() {

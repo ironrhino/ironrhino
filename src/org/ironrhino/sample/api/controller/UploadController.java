@@ -8,7 +8,6 @@ import org.ironrhino.core.security.role.UserRole;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,7 +23,6 @@ public class UploadController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	@ResponseBody
 	public Map<String, Object> upload(@RequestParam String name, @RequestParam MultipartFile file) {
 		Map<String, Object> result = new HashMap<>();
 		result.put("name", name);
