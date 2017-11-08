@@ -7,13 +7,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
+
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.spring.converter.DateConverter;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
 import org.ironrhino.rest.component.JsonpAdvice;
 import org.ironrhino.rest.component.RestExceptionHandler;
 import org.ironrhino.rest.doc.ApiDocInspector;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.format.FormatterRegistry;
@@ -25,6 +32,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.util.ClassUtils;
+import org.springframework.web.context.ContextLoader;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
@@ -42,6 +50,28 @@ import freemarker.template.TemplateException;
 
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
+
+	@Autowired
+	private ServletContext servletContext;
+
+	@PostConstruct
+	private void init() {
+		Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
+		for (ServletRegistration sr : map.values()) {
+			if (ReflectionUtils.getActualClass(this).getName()
+					.equals(sr.getInitParameter(ContextLoader.CONFIG_LOCATION_PARAM))) {
+				String mapping = getServletMapping();
+				if (!sr.getMappings().contains(mapping))
+					sr.addMapping(mapping);
+				break;
+			}
+		}
+	}
+
+	protected String getServletMapping() {
+		String version = getVersion();
+		return "/api" + (StringUtils.isNotBlank(version) ? "/" + version : "") + "/*";
+	}
 
 	public String getVersion() {
 		return "";

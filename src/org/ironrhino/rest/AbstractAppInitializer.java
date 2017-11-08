@@ -1,6 +1,5 @@
 package org.ironrhino.rest;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.EnumSet;
@@ -12,8 +11,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.DelegatingFilter;
+import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.spring.servlet.InheritedDispatcherServlet;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoader;
@@ -38,23 +37,15 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
-		String version = "";
-		try {
-			version = apiConfigClass.getConstructor().newInstance().getVersion();
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-		}
-		String servletName = getServletName(version);
-		String servletMapping = getServletMapping(version);
+		String servletName = getServletName(apiConfigClass);
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet(servletName, InheritedDispatcherServlet.class);
 		dynamic.setInitParameter(ContextLoader.CONTEXT_CLASS_PARAM,
 				AnnotationConfigWebApplicationContext.class.getName());
 		dynamic.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, apiConfigClass.getName());
-		dynamic.addMapping(servletMapping);
 		dynamic.setAsyncSupported(true);
 		dynamic.setMultipartConfig(createMultipartConfig());
 		dynamic.setLoadOnStartup(1);
-		String filterName = "restFilter";
+		String filterName = NameGenerator.buildDefaultBeanName(RestFilter.class.getName());
 		FilterRegistration filterRegistration = servletContext.getFilterRegistration(filterName);
 		if (filterRegistration == null) {
 			FilterRegistration.Dynamic dynamicFilter = servletContext.addFilter("restFilter", DelegatingFilter.class);
@@ -65,16 +56,12 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 		}
 	}
 
-	protected String getServletName(String version) {
-		return "api" + (StringUtils.isNotBlank(version) ? "-" + version : "");
-	}
-
-	protected String getServletMapping(String version) {
-		return "/api" + (StringUtils.isNotBlank(version) ? "/" + version : "") + "/*";
+	protected String getServletName(Class<?> apiConfigClass) {
+		return apiConfigClass.getName();
 	}
 
 	protected MultipartConfigElement createMultipartConfig() {
 		return new MultipartConfigElement(System.getProperty("java.io.tmpdir", "/tmp"), 4 * 1024 * 1024,
-				16 * 1024 * 1024, 0);
+				5 * 1024 * 1024, 0);
 	}
 }
