@@ -113,13 +113,6 @@ public class RedisConfiguration {
 	}
 
 	@Bean
-	public StringRedisTemplate pageViewStringRedisTemplate() {
-		StringRedisTemplate template = new StringRedisTemplate();
-		template.setConnectionFactory(redisConnectionFactory());
-		return template;
-	}
-
-	@Bean
 	@Primary
 	public RedisMessageListenerContainer redisMessageListenerContainer(ExecutorService executorService) {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
