@@ -5,7 +5,6 @@
 <form class="api-playground" method="${method}">
 <table class="table">
 <tbody>
-<tr><td style="width:100px;">URL</td><td><div class="url">${url?no_esc}</div></td></tr>
 <@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">
 <tr><td>Access Token</td><td><input type="text" name="accessToken" class="input-xlarge" placeholder="不填会默认使用当前用户"> <button type="button" class="btn last-accessToken">最近使用</button> <button type="button" class="btn fetch-accessToken">重新获取</button>
 	<#if !base?has_content>
@@ -23,9 +22,10 @@
 	</div>
 </td></tr>
 </@classPresentConditional>
+<tr><td style="width:100px;"><span class="label label-info">${method}</span></td><td><div class="url">${url?no_esc}</div></td></tr>
+<#if apiDoc.requestParams?has_content>
 <tr><td>请求参数</td><td class="compact-horizontal">
 	<table class="requestParams table datagrid adaptive"><tbody>
-	<#if apiDoc.requestParams?has_content>
 	<#list apiDoc.requestParams as param>
 	<tr>
 	<td><input type="text" value="${param.name}" placeholder="名字" readonly></td><td class="center middle"> = </td>
@@ -41,16 +41,14 @@
 	<input name="${param.name}"<#if param.type=='file'> type="file"<#if param.multiple> multiple</#if><#else> type="text" value="${param.defaultValue!}" placeholder="值"</#if><#if param.required> class="required"</#if>>
 	</#if>
 	</td>
-	<td class="manipulate"></td>
 	</tr>
 	</#list>
-	</#if>
-	<tr><td><input type="text" placeholder="名字"></td><td class="center middle"> = </td><td><input type="text" placeholder="值"></td><td class="manipulate"></td></tr>
 	</tbody></table>
 </td></tr>
+</#if>
+<#if apiDoc.requestHeaders?has_content>
 <tr><td>请求头</td><td class="compact-horizontal">
 	<table class="requestHeaders table datagrid adaptive"><tbody>
-	<#if apiDoc.requestHeaders?has_content>
 	<#list apiDoc.requestHeaders as header>
 	<tr>
 	<td><input type="text" value="${header.name}" placeholder="名字" readonly></td><td class="center middle"> = </td>
@@ -66,13 +64,11 @@
 	<input type="text" name="${header.name}" value="${header.defaultValue!}" placeholder="值"<#if header.required> class="required"</#if>>
 	</#if>
 	</td>
-	<td class="manipulate"></td>
 	</tr>
 	</#list>
-	</#if>
-	<tr><td><input type="text" placeholder="名字"></td><td class="center middle"> = </td><td><input type="text" placeholder="值"></td><td class="manipulate"></td></tr>
 	</tbody></table>
 </td></tr>
+</#if>
 <#if apiDoc.requestBodySample?has_content>
 <tr><td>请求消息体</td><td>
 <code class="requestBody block json" contenteditable>${apiDoc.requestBodySample}</code>

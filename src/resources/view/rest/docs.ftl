@@ -142,7 +142,7 @@
 					</td></tr>
 					<#if apiDoc.responseBody?has_content><tr><td>响应消息体<#if apiDoc.responseBodyType?has_content><br/><span class="label label-warning">${getText(apiDoc.responseBodyType)}</span></#if></td><td class="compact-horizontal"><@listFields fields=apiDoc.responseBody/></td></tr></#if>
 					<#if apiDoc.responseBodySample?has_content><tr><td>响应消息体示例</td><td><code class="block json">${apiDoc.responseBodySample?no_esc}</code></td></tr></#if>
-					<tr><td>试玩一下</td><td class="compact-horizontal"><#include "playground.ftl"/></td></tr>
+					<tr><td><h4>试玩一下</h4></td><td class="compact-horizontal"><#include "playground.ftl"/></td></tr>
 				</tbody>
 			</table>
 		<#elseif partial?has_content>
