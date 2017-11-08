@@ -6,9 +6,9 @@ Initialization.apiplayground = function() {
 		var headers = {};
 		form.find('table.requestHeaders tr').each(function(i, v) {
 			var row = $(this);
-			var name = row.find('input:eq(1)').attr('name')
+			var name = row.find(':input:eq(1)').attr('name')
 					|| row.find('input:eq(0)').val();
-			var value = row.find('input:eq(1)').val();
+			var value = row.find(':input:eq(1)').val();
 			if (name)
 				headers[name] = value;
 		});
@@ -26,7 +26,7 @@ Initialization.apiplayground = function() {
 			var formdata = new FormData();
 			form.find('table.requestParams tr').each(function(i, v) {
 						var row = $(this);
-						var input = row.find('input:eq(1)');
+						var input = row.find(':input:eq(1)');
 						var name = input.attr('name')
 								|| row.find('input:eq(0)').val();
 						if (!name)
@@ -50,9 +50,9 @@ Initialization.apiplayground = function() {
 			var params = [];
 			form.find('table.requestParams tr').each(function(i, v) {
 				var row = $(this);
-				var name = row.find('input:eq(1)').attr('name')
+				var name = row.find(':input:eq(1)').attr('name')
 						|| row.find('input:eq(0)').val();
-				var value = row.find('input:eq(1)').val();
+				var value = row.find(':input:eq(1)').val();
 				if (name)
 					params.push(encodeURIComponent(name) + '='
 							+ encodeURIComponent(value));

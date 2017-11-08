@@ -1,6 +1,7 @@
 package org.ironrhino.rest.doc;
 
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -63,13 +64,13 @@ public class ApiDocHelper {
 					else if (type == Byte.TYPE)
 						args[i] = (byte) 0;
 				} else {
-					args[i] = null;
+					args[i] = createSample(type);
 				}
 			}
 			Object obj;
 			try {
 				obj = apiDocMethod.invoke(apiDocClazz.getConstructor().newInstance(), args);
-			} catch (InvocationTargetException | NoSuchMethodException e) {
+			} catch (InvocationTargetException | IllegalArgumentException | NoSuchMethodException e) {
 				obj = null;
 			}
 			if (obj == null) {
@@ -111,7 +112,10 @@ public class ApiDocHelper {
 
 	private static Object createSample(Class<?> clazz) {
 		if (clazz.isArray()) {
-			return new Object[] { createObject(clazz.getComponentType()) };
+			Class<?> cls = clazz.getComponentType();
+			Object array = Array.newInstance(cls, 1);
+			Array.set(array, 0, createObject(cls));
+			return array;
 		} else {
 			return createObject(clazz);
 		}

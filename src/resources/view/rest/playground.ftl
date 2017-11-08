@@ -27,7 +27,22 @@
 	<table class="requestParams table datagrid adaptive"><tbody>
 	<#if apiDoc.requestParams?has_content>
 	<#list apiDoc.requestParams as param>
-	<tr><td><input type="text" value="${param.name}" placeholder="名字" readonly></td><td class="center middle"> = </td><td><input name="${param.name}"<#if param.type=='file'> type="file"<#if param.multiple> multiple</#if><#else> type="text" value="${param.defaultValue!}" placeholder="值"</#if><#if param.required> class="required"</#if>></td><td class="manipulate"></td></tr>
+	<tr>
+	<td><input type="text" value="${param.name}" placeholder="名字" readonly></td><td class="center middle"> = </td>
+	<td>
+	<#if param.values?has_content>
+	<select name="${param.name}"<#if param.required> class="required"</#if><#if param.multiple> multiple</#if>>
+		<option value=""></option>
+		<#list param.values as key,value>
+		<option value="${key}">${value}</option>
+		</#list>
+	</select>
+	<#else>
+	<input name="${param.name}"<#if param.type=='file'> type="file"<#if param.multiple> multiple</#if><#else> type="text" value="${param.defaultValue!}" placeholder="值"</#if><#if param.required> class="required"</#if>>
+	</#if>
+	</td>
+	<td class="manipulate"></td>
+	</tr>
 	</#list>
 	</#if>
 	<tr><td><input type="text" placeholder="名字"></td><td class="center middle"> = </td><td><input type="text" placeholder="值"></td><td class="manipulate"></td></tr>
@@ -37,7 +52,22 @@
 	<table class="requestHeaders table datagrid adaptive"><tbody>
 	<#if apiDoc.requestHeaders?has_content>
 	<#list apiDoc.requestHeaders as header>
-	<tr><td><input type="text" value="${header.name}" placeholder="名字" readonly></td><td class="center middle"> = </td><td><input type="text" name="${header.name}" value="${header.defaultValue!}" placeholder="值"<#if header.required> class="required"</#if>></td><td class="manipulate"></td></tr>
+	<tr>
+	<td><input type="text" value="${header.name}" placeholder="名字" readonly></td><td class="center middle"> = </td>
+	<td>
+	<#if param.values?has_content>
+	<select name="${param.name}"<#if param.required> class="required"</#if><#if param.multiple> multiple</#if>>
+		<option value=""></option>
+		<#list param.values as key,value>
+		<option value="${key}">${value}</option>
+		</#list>
+	</select>
+	<#else>
+	<input type="text" name="${header.name}" value="${header.defaultValue!}" placeholder="值"<#if header.required> class="required"</#if>>
+	</#if>
+	</td>
+	<td class="manipulate"></td>
+	</tr>
 	</#list>
 	</#if>
 	<tr><td><input type="text" placeholder="名字"></td><td class="center middle"> = </td><td><input type="text" placeholder="值"></td><td class="manipulate"></td></tr>

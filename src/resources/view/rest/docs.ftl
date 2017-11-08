@@ -4,7 +4,7 @@
 <thead>
 	<tr>
 		<th style="width:250px;">名字</th>
-		<th style="width:60px;">类型</th>
+		<th style="width:100px;">类型</th>
 		<th style="width:60px;">必填</th>
 		<th style="width:80px;">默认值</th>
 		<th>备注</th>
