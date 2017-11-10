@@ -137,6 +137,13 @@ public class BaseAction extends ActionSupport {
 		return actionBaseUrl;
 	}
 
+	public String getActionNamespace() {
+		String namespace = ActionContext.getContext().getActionInvocation().getProxy().getNamespace();
+		if (namespace == null || namespace.equals("/"))
+			namespace = "";
+		return namespace;
+	}
+
 	public String getUid() {
 		if (id != null && id.length > 0)
 			return id[0];
