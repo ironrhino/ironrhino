@@ -41,6 +41,14 @@ public class TemplateProvider {
 		return configuration;
 	}
 
+	public boolean isTemplatePresent(String name) {
+		try {
+			return getConfiguration().getTemplate(name) != null;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
 	public Template getTemplate(String name) throws IOException {
 		Locale loc = getConfiguration().getLocale();
 		return getTemplate(name, loc, getConfiguration().getEncoding(loc), true);

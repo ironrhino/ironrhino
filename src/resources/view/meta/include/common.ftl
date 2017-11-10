@@ -145,3 +145,13 @@ ${getUrl(value,includeContextPath,includeQueryString,secure)}<#t>
 </#if>
 <#list value as attr,val><#if attr=='dynamicAttributes'><#list val as attr2,val2><#if !exclude?seq_contains(attr2)&&!attr2?starts_with('_internal_')> ${attr2}="${val2?html}"</#if></#list><#else><#if !exclude?seq_contains(attr)&&!attr?starts_with('_internal_')> ${attr}="${val?html}"</#if></#if></#list><#t>
 </#macro>
+
+<#function isTemplatePresent value>
+<#if value?starts_with('./')>
+	<#local value=value?keep_after('/')>
+</#if>
+<#if !value?starts_with('/')>
+	<#local value='/'+.main_template_name?keep_before_last('/')+'/'+value>
+</#if>
+<#return beans['templateProvider'].isTemplatePresent(value)>
+</#function>
