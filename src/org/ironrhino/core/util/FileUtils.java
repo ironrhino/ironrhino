@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -16,17 +18,42 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.io.Files;
-
 public class FileUtils {
 
 	public static String normalizePath(String input) {
 		if (StringUtils.isBlank(input))
 			return input;
-		String normalPath = Files.simplifyPath(input);
-		if (input.endsWith("/") && !normalPath.endsWith("/"))
-			normalPath += "/";
-		return normalPath;
+		List<String> list = new ArrayList<>();
+		for (String s : input.split("/")) {
+			if (s.isEmpty())
+				continue;
+			switch (s) {
+			case ".":
+				continue;
+			case "..":
+				if (list.size() > 0 && !list.get(list.size() - 1).equals("..")) {
+					list.remove(list.size() - 1);
+				} else {
+					list.add("..");
+				}
+				break;
+			default:
+				list.add(s);
+				break;
+			}
+		}
+		String path = StringUtils.join(list, '/');
+		if (input.charAt(0) == '/')
+			path = '/' + path;
+		if (path.startsWith("../"))
+			path = path.substring(2);
+		while (path.startsWith("/../"))
+			path = path.substring(3);
+		if (path.equals("/.."))
+			path = "/";
+		if (input.charAt(input.length() - 1) == '/' && path.charAt(path.length() - 1) != '/')
+			path = path + '/';
+		return path;
 	}
 
 	public static File zip(File file) throws Exception {

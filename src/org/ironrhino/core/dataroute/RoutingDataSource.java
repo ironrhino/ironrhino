@@ -1,6 +1,5 @@
 package org.ironrhino.core.dataroute;
 
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,8 +17,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.util.Assert;
-
-import com.google.common.hash.Hashing;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -110,8 +107,7 @@ public class RoutingDataSource extends AbstractDataSource implements Initializin
 
 		@Override
 		public int route(List<String> nodes, Object routingKey) {
-			int i = Hashing.consistentHash(
-					Hashing.murmur3_32().hashString(routingKey.toString(), Charset.defaultCharset()), nodes.size());
+			int i = routingKey.hashCode() % nodes.size();
 			return i;
 		}
 

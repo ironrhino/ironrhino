@@ -18,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.net.InternetDomainName;
-
 public class RequestUtils {
 
 	public static boolean isInternalTesting(HttpServletRequest request) {
@@ -260,15 +258,25 @@ public class RequestUtils {
 	private static String parseGlobalDomain(String host) {
 		if (host.matches("^(\\d+\\.){3}\\d+$") || host.indexOf('.') < 0)
 			return host;
-		InternetDomainName domainName = InternetDomainName.from(host);
-		if (domainName.isUnderPublicSuffix())
-			return domainName.topPrivateDomain().toString();
+		int length = 2;
+		for (String tld : TLDS) {
+			if (host.endsWith(tld)) {
+				length = 3;
+				break;
+			}
+		}
 		String[] array = host.split("\\.");
 		StringBuilder sb = new StringBuilder();
-		sb.append(array[array.length - 2]);
-		sb.append('.');
-		sb.append(array[array.length - 1]);
+		for (int i = length; i > 0; i--) {
+			if (array.length - i < 0)
+				continue;
+			sb.append(array[array.length - i]);
+			if (i > 1)
+				sb.append('.');
+		}
 		return sb.toString();
 	}
+
+	private static String[] TLDS = "com.cn,net.cn,org.cn".split(",");
 
 }

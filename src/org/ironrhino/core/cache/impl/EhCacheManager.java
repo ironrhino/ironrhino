@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -17,8 +16,6 @@ import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-
-import com.google.common.util.concurrent.Striped;
 
 import lombok.Setter;
 import net.sf.ehcache.Cache;
@@ -34,12 +31,6 @@ public class EhCacheManager implements CacheManager {
 	@Value("${ehcache.configLocation:classpath:ehcache.xml}")
 	private Resource configLocation;
 
-	@Setter
-	@Value("${ehcache.lockStripes:0}")
-	private int lockStripes = 0;
-
-	private Striped<Lock> stripedLocks;
-
 	@PostConstruct
 	public void init() {
 		try {
@@ -47,9 +38,6 @@ public class EhCacheManager implements CacheManager {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		if (lockStripes <= 0)
-			lockStripes = Runtime.getRuntime().availableProcessors() * 4;
-		stripedLocks = Striped.lazyWeakLock(lockStripes);
 	}
 
 	@PreDestroy
@@ -198,9 +186,7 @@ public class EhCacheManager implements CacheManager {
 		if (element == null) {
 			return delta;
 		} else {
-			Lock lock = stripedLocks.get(namespace + ':' + key);
-			lock.lock();
-			try {
+			synchronized (cache) {
 				element = cache.get(key);
 				if (element == null) {
 					cache.put(new Element(key, Long.valueOf(delta), timeToLive <= 0 ? true : null, null,
@@ -212,8 +198,6 @@ public class EhCacheManager implements CacheManager {
 							(int) timeUnit.toSeconds(timeToLive)));
 					return value;
 				}
-			} finally {
-				lock.unlock();
 			}
 		}
 	}

@@ -40,8 +40,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -51,7 +49,7 @@ public class RegionSetup {
 
 	private Map<String, String> regionAreacodeMap;
 
-	private ListMultimap<String, String> regionCoordinateMap;
+	private Map<String, List<String>> regionCoordinateMap;
 
 	private Map<String, List<Rgn>> rgnMap;
 
@@ -95,30 +93,31 @@ public class RegionSetup {
 		}
 		if (regionCoordinateMap != null) {
 			List<String> coordinateAndParentName = regionCoordinateMap.get(region.getName());
-			if (coordinateAndParentName.isEmpty())
+			if (coordinateAndParentName == null)
 				coordinateAndParentName = regionCoordinateMap.get(shortName);
-			for (String s : coordinateAndParentName) {
-				String[] arr = s.split("\\s");
-				String coordinate = arr[0];
-				String parentName = arr[1];
-				if (region.getParent() != null) {
-					if (parentName.length() >= 2 && region.getParent().getName().length() > 2
-							&& parentName.contains(region.getParent().getName().substring(0, 2))) {
+			if (coordinateAndParentName != null)
+				for (String s : coordinateAndParentName) {
+					String[] arr = s.split("\\s");
+					String coordinate = arr[0];
+					String parentName = arr[1];
+					if (region.getParent() != null) {
+						if (parentName.length() >= 2 && region.getParent().getName().length() > 2
+								&& parentName.contains(region.getParent().getName().substring(0, 2))) {
+							String[] arr2 = coordinate.split(",");
+							Coordinate c = new Coordinate();
+							c.setLatitude(NumberUtils.round(Double.valueOf(arr2[1]), 6));
+							c.setLongitude(NumberUtils.round(Double.valueOf(arr2[0]), 6));
+							region.setCoordinate(c);
+							break;
+						}
+					} else {
 						String[] arr2 = coordinate.split(",");
 						Coordinate c = new Coordinate();
 						c.setLatitude(NumberUtils.round(Double.valueOf(arr2[1]), 6));
 						c.setLongitude(NumberUtils.round(Double.valueOf(arr2[0]), 6));
 						region.setCoordinate(c);
-						break;
 					}
-				} else {
-					String[] arr2 = coordinate.split(",");
-					Coordinate c = new Coordinate();
-					c.setLatitude(NumberUtils.round(Double.valueOf(arr2[1]), 6));
-					c.setLongitude(NumberUtils.round(Double.valueOf(arr2[0]), 6));
-					region.setCoordinate(c);
 				}
-			}
 
 		}
 		if (rank1cities.contains(shortName)) {
@@ -253,7 +252,7 @@ public class RegionSetup {
 		return map;
 	}
 
-	private static ListMultimap<String, String> regionCoordinateMap() {
+	private static Map<String, List<String>> regionCoordinateMap() {
 		// http://www.williamlong.info/google/archives/27.html
 		NodeList nodeList = null;
 		NamespaceContext nsContext = new NamespaceContext() {
@@ -292,7 +291,7 @@ public class RegionSetup {
 						Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/data/region.kml"),
 						StandardCharsets.UTF_8),
 				nsContext);
-		ListMultimap<String, String> map = LinkedListMultimap.create();
+		Map<String, List<String>> map = new HashMap<>();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Element element = (Element) nodeList.item(i);
 
@@ -328,7 +327,12 @@ public class RegionSetup {
 				}
 			}
 			if (name != null) {
-				map.put(name, coordinate + ' ' + parentName);
+				List<String> list = map.get(name);
+				if (list == null) {
+					list = new ArrayList<>();
+					map.put(name, list);
+				}
+				list.add(coordinate + ' ' + parentName);
 			}
 		}
 		return map;
