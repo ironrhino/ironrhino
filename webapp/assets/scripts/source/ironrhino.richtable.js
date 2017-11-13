@@ -123,7 +123,8 @@ Richtable = {
 									if (!inputform.hasClass('nodirty'))
 										inputform.addClass('dirty');
 								});
-						$(inputform).addClass('dontreload');
+						if (!$(inputform).hasClass('forcereload'))
+							$(inputform).addClass('dontreload');
 						var create = url.lastIndexOf('input') == url.length - 5;
 						if (create) {
 							if ($('input[type="hidden"][name="id"]', inputform)
