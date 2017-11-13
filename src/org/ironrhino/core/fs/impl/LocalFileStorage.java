@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -138,7 +137,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 			return false;
 		});
 		List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
-		Collections.sort(list, COMPARATOR);
+		list.sort(COMPARATOR);
 		Map<String, Boolean> sortedMap = new LinkedHashMap<>();
 		for (Map.Entry<String, Boolean> entry : list)
 			sortedMap.put(entry.getKey(), entry.getValue());

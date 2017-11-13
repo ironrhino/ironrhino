@@ -85,7 +85,7 @@ public class ClassScanner {
 		List<Class<?>> classes = new ArrayList<>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));
-		Collections.sort(classes, ClassComparator.INSTANCE);
+		classes.sort(ClassComparator.INSTANCE);
 		return classes;
 	}
 
@@ -99,7 +99,7 @@ public class ClassScanner {
 		List<Class<?>> classes = new ArrayList<>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));
-		Collections.sort(classes, ClassComparator.INSTANCE);
+		classes.sort(ClassComparator.INSTANCE);
 		return classes;
 	}
 
@@ -109,7 +109,7 @@ public class ClassScanner {
 			cs.addIncludeFilter(new AssignableTypeFilter(clz));
 		List<Class<?>> list = new ArrayList<>();
 		list.addAll(cs.doScan(basePackage));
-		Collections.sort(list, ClassComparator.INSTANCE);
+		list.sort(ClassComparator.INSTANCE);
 		return list;
 	}
 
@@ -121,7 +121,7 @@ public class ClassScanner {
 		List<Class<?>> list = new ArrayList<>();
 		for (String s : basePackages)
 			list.addAll(cs.doScan(s));
-		Collections.sort(list, ClassComparator.INSTANCE);
+		list.sort(ClassComparator.INSTANCE);
 		return list;
 	}
 
@@ -172,7 +172,7 @@ public class ClassScanner {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		Collections.sort(classes, ClassComparator.INSTANCE);
+		classes.sort(ClassComparator.INSTANCE);
 		return classes;
 	}
 

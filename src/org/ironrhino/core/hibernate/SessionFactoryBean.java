@@ -6,7 +6,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +164,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 					classes.add(clz);
 			}
 		}
-		Collections.sort(classes, (a, b) -> a.getName().compareTo(b.getName()));
+		classes.sort(Comparator.comparing(Class::getName));
 		annotatedClasses = classes.toArray(new Class<?>[0]);
 		logger.info("annotatedClasses: ");
 		for (Class<?> clz : annotatedClasses)

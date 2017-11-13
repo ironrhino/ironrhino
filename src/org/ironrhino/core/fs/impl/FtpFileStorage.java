@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -344,7 +343,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 				map.put(f.getName(), f.isFile());
 			}
 			List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
-			Collections.sort(list, COMPARATOR);
+			list.sort(COMPARATOR);
 			Map<String, Boolean> sortedMap = new LinkedHashMap<>();
 			for (Map.Entry<String, Boolean> entry : list)
 				sortedMap.put(entry.getKey(), entry.getValue());

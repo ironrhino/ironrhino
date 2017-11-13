@@ -5,7 +5,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -153,7 +152,7 @@ public class SetupAction extends BaseAction {
 					}
 				}
 			}
-			Collections.sort(setupParameters);
+			setupParameters.sort(null);
 		}
 		return setupParameters;
 	}

@@ -2,6 +2,7 @@ package org.ironrhino.rest.doc.action;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class DocsAction extends BaseAction {
 					}
 				}
 			}
-			Collections.sort(temp, (o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
+			temp.sort(Comparator.comparing(ApiConfigBase::getVersion));
 			apiConfigs = temp;
 		}
 		return apiConfigs;

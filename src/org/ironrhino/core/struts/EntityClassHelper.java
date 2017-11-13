@@ -629,7 +629,7 @@ public class EntityClassHelper {
 					map.put(propertyName, uci);
 				}
 				List<Map.Entry<String, UiConfigImpl>> list = new ArrayList<>(map.entrySet());
-				Collections.sort(list, comparator);
+				list.sort(comparator);
 				Map<String, UiConfigImpl> sortedMap = new LinkedHashMap<>();
 				for (Map.Entry<String, UiConfigImpl> entry : list)
 					sortedMap.put(entry.getKey(), entry.getValue());

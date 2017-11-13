@@ -5,7 +5,6 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +132,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 			for (Map.Entry<String, String> entry : map.entrySet())
 				if (entry.getValue().equals(host))
 					consumers.add(entry.getKey());
-			Collections.sort(consumers);
+			consumers.sort(null);
 			result.put(host, consumers);
 		}
 		return result;
@@ -165,7 +164,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		List<String> appNames = new ArrayList<>(keys.size());
 		for (String s : keys)
 			appNames.add(s.substring(NAMESPACE_APPS.length()));
-		Collections.sort(appNames);
+		appNames.sort(null);
 		return appNames;
 	}
 

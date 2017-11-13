@@ -86,7 +86,7 @@ public class AnnotationUtils {
 				e.printStackTrace();
 			}
 			List<Map.Entry<Method, Integer>> list = new ArrayList<Map.Entry<Method, Integer>>(map.entrySet());
-			Collections.sort(list, comparator);
+			list.sort(comparator);
 			methods = new LinkedHashSet<>();
 			for (Map.Entry<Method, Integer> entry : list)
 				methods.add(entry.getKey());

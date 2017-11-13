@@ -21,7 +21,7 @@ public class OAuthProviderManager {
 		for (OAuthProvider p : providers)
 			if (p.isEnabled())
 				list.add(p);
-		Collections.sort(list);
+		list.sort(null);
 		return list;
 	}
 

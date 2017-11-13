@@ -1,7 +1,6 @@
 package org.ironrhino.core.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.ironrhino.core.event.EntityOperationEvent;
@@ -81,7 +80,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 			t.setParent(parent);
 			parent.getChildren().add(t);
 			if (parent.getChildren() instanceof List)
-				Collections.sort((List) parent.getChildren());
+				((List) parent.getChildren()).sort(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -116,7 +115,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 		}
 		BeanUtils.copyProperties(treeNode, t, new String[] { "parent", "children" });
 		if (needsort && t.getParent().getChildren() instanceof List)
-			Collections.sort((List) t.getParent().getChildren());
+			((List) t.getParent().getChildren()).sort(null);
 	}
 
 	private void resetChildren(T treeNode) {

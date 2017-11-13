@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -73,7 +72,6 @@ public class RegionSetup {
 		rgnMap = null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void save(Region region) {
 		String shortName = LocationUtils.shortenName(region.getName());
 		String areacode = null;
@@ -135,7 +133,7 @@ public class RegionSetup {
 		List<Region> list = new ArrayList<>();
 		for (Region child : region.getChildren())
 			list.add(child);
-		Collections.sort(list);
+		list.sort(null);
 		for (Region child : list)
 			save(child);
 	}

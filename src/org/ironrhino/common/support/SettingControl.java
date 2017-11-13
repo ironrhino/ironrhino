@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -139,7 +140,7 @@ public class SettingControl {
 			if ("true".equals(value) || "false".equals(value))
 				list.add(s);
 		}
-		Collections.sort(list, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+		list.sort(Comparator.comparing(Setting::getKey));
 		return Collections.unmodifiableList(list);
 	}
 

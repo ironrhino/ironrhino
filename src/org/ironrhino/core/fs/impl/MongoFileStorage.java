@@ -222,7 +222,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 			String name = f.getPath();
 			list.add(name.substring(name.lastIndexOf('/') + 1));
 		}
-		Collections.sort(list);
+		list.sort(null);
 		return list;
 	}
 
@@ -242,7 +242,7 @@ public class MongoFileStorage extends AbstractFileStorage {
 			map.put(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory());
 		}
 		List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
-		Collections.sort(list, COMPARATOR);
+		list.sort(COMPARATOR);
 		Map<String, Boolean> sortedMap = new LinkedHashMap<>();
 		for (Map.Entry<String, Boolean> entry : list)
 			sortedMap.put(entry.getKey(), entry.getValue());

@@ -698,7 +698,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				rr.setParent(te);
 			}
 		}
-		Collections.sort(children);
+		children.sort(null);
 		te.setChildren(children);
 		for (TE r : children)
 			assemble(r, list);

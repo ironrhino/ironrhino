@@ -2,6 +2,7 @@ package org.ironrhino.core.scheduled;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class ScheduledTaskRegistry implements SchedulingConfigurer {
 		tasks.addAll(build(taskRegistrar.getCronTaskList(), ScheduledType.CRON));
 		tasks.addAll(build(taskRegistrar.getFixedDelayTaskList(), ScheduledType.FIXEDDELAY));
 		tasks.addAll(build(taskRegistrar.getTriggerTaskList(), ScheduledType.TRIGGER));
-		tasks.sort((t1, t2) -> t1.getName().compareTo(t2.getName()));
+		tasks.sort(Comparator.comparing(ScheduledTask::getName));
 	}
 
 	private List<ScheduledTask> build(final List<? extends Task> tasks, final ScheduledType type) {

@@ -2,6 +2,7 @@ package org.ironrhino.security.oauth.server.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -385,7 +386,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		for (String id : ids)
 			keys.add(NAMESPACE_CLIENT + id);
 		List<Client> list = clientRedisTemplate.opsForValue().multiGet(keys);
-		Collections.sort(list, (o1, o2) -> o1.getCreateDate().compareTo(o2.getCreateDate()));
+		list.sort(Comparator.comparing(Client::getCreateDate));
 		return list;
 	}
 

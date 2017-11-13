@@ -2,7 +2,7 @@ package org.ironrhino.core.stat.analysis;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -90,7 +90,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 							node.setValue(v);
 						}
 						List<TreeNode> children = node.getChildren();
-						Collections.sort(children, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+						children.sort(Comparator.comparing(TreeNode::getKey));
 						for (TreeNode n : children) {
 							n.setParent(node);
 							v.accumulate(n.getValue());
@@ -114,7 +114,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 						n.setDoublePercent(NumberUtils
 								.formatPercent(n.getValue().getDoubleValue() / node.getValue().getDoubleValue(), 2));
 				}
-				Collections.sort(node.getChildren(), (t1, t2) -> {
+				node.getChildren().sort((t1, t2) -> {
 					long v1 = t1.getValue().getLongValue();
 					long v2 = t2.getValue().getLongValue();
 					if (v1 > 0 && v2 > 0)

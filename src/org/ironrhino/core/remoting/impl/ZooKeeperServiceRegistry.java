@@ -149,7 +149,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 				for (Map.Entry<String, String> entry : map.entrySet())
 					if (entry.getValue().equals(host))
 						consumers.add(entry.getKey());
-				Collections.sort(consumers);
+				consumers.sort(null);
 				result.put(host, consumers);
 			}
 			return result;
@@ -203,7 +203,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 			List<String> list = curatorFramework.getChildren().forPath(appsParentPath);
 			List<String> services = new ArrayList<>(list.size());
 			services.addAll(list);
-			Collections.sort(services);
+			services.sort(null);
 			return services;
 		} catch (NoNodeException e) {
 			return Collections.emptyList();

@@ -3,7 +3,6 @@ package org.ironrhino.rest.doc;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +104,7 @@ public class ApiDocInspector {
 		}
 		classPool.insertClassPath(new ClassClassPath(apiDocClass));
 		final CtClass cc = classPool.get(apiDocClass.getName());
-		Collections.sort(methods, (m1, m2) -> {
+		methods.sort((m1, m2) -> {
 			int line1 = 0;
 			int line2 = 1;
 			try {
@@ -134,7 +133,7 @@ public class ApiDocInspector {
 			}
 			return line1 - line2;
 		});
-		Collections.sort(methods, (m1, m2) -> {
+		methods.sort((m1, m2) -> {
 			Order o1 = AnnotationUtils.findAnnotation(m1, Order.class);
 			int order1 = o1 != null ? o1.value() : methods.indexOf(m1) + 1;
 			Order o2 = AnnotationUtils.findAnnotation(m2, Order.class);
