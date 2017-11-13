@@ -40,8 +40,6 @@ public class FreemarkerConfigurer {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public static final String DEFAULT_FTL_LOCATION = "/WEB-INF/view/ftl";
-
 	public static final String DEFAULT_FTL_CLASSPATH = "/resources/view";
 
 	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_26;
@@ -59,10 +57,6 @@ public class FreemarkerConfigurer {
 	public static final String KEY_SIDEBAR_LAYOUT = "sidebarLayout";
 	public static final String KEY_FROZEN_LAYOUT = "frozenLayout";
 	public static final String KEY_MODERN_BROWSER = "modernBrowser";
-
-	@Getter
-	@Value("${freemarker.ftl.location:" + DEFAULT_FTL_LOCATION + "}")
-	private String ftlLocation = DEFAULT_FTL_LOCATION;
 
 	@Getter
 	@Value("${freemarker.ftl.classpath:" + DEFAULT_FTL_CLASSPATH + "}")
@@ -111,7 +105,6 @@ public class FreemarkerConfigurer {
 
 	@PostConstruct
 	public void init() {
-		ftlLocation = org.ironrhino.core.util.StringUtils.trimTailSlash(ftlLocation);
 		ftlClasspath = org.ironrhino.core.util.StringUtils.trimTailSlash(ftlClasspath);
 		if (StringUtils.isNotBlank(base))
 			base = org.ironrhino.core.util.StringUtils.trimTailSlash(base);

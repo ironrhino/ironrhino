@@ -1,7 +1,5 @@
 package org.ironrhino.core.struts.sitemesh;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
@@ -36,16 +34,7 @@ public class RequestDecoratorMapper extends AbstractDecoratorMapper {
 			String decorator = (String) attr;
 			result = getNamedDecorator(request, decorator);
 			if (result == null) {
-				String location = "/WEB-INF/view/ftl/decorator/" + decorator + ".ftl";
-				URL url = null;
-				try {
-					url = config.getServletContext().getResource(location);
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				}
-				if (url == null) {
-					location = "/resources/view/decorator/" + decorator + ".ftl";
-				}
+				String location = "/resources/view/decorator/" + decorator + ".ftl";
 				result = new DefaultDecorator(decorator, location, null);
 			}
 		}

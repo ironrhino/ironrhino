@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.web.context.support.ServletContextResourcePatternResolver;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.util.LocalizedTextUtil;
@@ -54,14 +53,11 @@ public class MyFreemarkerManager extends FreemarkerManager {
 				.getBean(FreemarkerConfigurer.class);
 		Configuration configuration = freemarkerConfigurer.createConfiguration();
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-		ServletContextResourcePatternResolver servletContextResourcePatternResolver = new ServletContextResourcePatternResolver(
-				servletContext);
 		Resource[] resources;
 		String searchPath;
 		String location;
 		String namespace;
 		String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
-		String ftlLocation = freemarkerConfigurer.getFtlLocation();
 		try {
 			searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ftlClasspath + "/meta/import/*.ftl";
 			resources = resourcePatternResolver.getResources(searchPath);
@@ -75,33 +71,11 @@ public class MyFreemarkerManager extends FreemarkerManager {
 			logger.debug(e.getMessage());
 		}
 		try {
-			searchPath = ftlLocation + "/meta/import/*.ftl";
-			resources = servletContextResourcePatternResolver.getResources(searchPath);
-			for (Resource r : resources) {
-				location = r.getURL().toString();
-				namespace = location.substring(location.lastIndexOf('/') + 1);
-				namespace = namespace.substring(0, namespace.indexOf('.'));
-				configuration.addAutoImport(namespace, location.substring(location.indexOf(ftlLocation)));
-			}
-		} catch (IOException e) {
-			logger.debug(e.getMessage());
-		}
-		try {
 			searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ftlClasspath + "/meta/include/*.ftl";
 			resources = resourcePatternResolver.getResources(searchPath);
 			for (Resource r : resources) {
 				location = r.getURL().toString();
 				configuration.addAutoInclude(location.substring(location.indexOf(ftlClasspath)));
-			}
-		} catch (IOException e) {
-			logger.debug(e.getMessage());
-		}
-		try {
-			searchPath = ftlLocation + "/meta/include/*.ftl";
-			resources = servletContextResourcePatternResolver.getResources(searchPath);
-			for (Resource r : resources) {
-				location = r.getURL().toString();
-				configuration.addAutoInclude(location.substring(location.indexOf(ftlLocation)));
 			}
 		} catch (IOException e) {
 			logger.debug(e.getMessage());

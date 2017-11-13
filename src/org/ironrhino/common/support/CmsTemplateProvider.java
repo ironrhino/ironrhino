@@ -36,12 +36,9 @@ public class CmsTemplateProvider implements FallbackTemplateProvider {
 		if (!name.startsWith("/"))
 			name = '/' + name;
 		String path = null;
-		String ftlLocation = freemarkerConfigurer.getFtlLocation();
 		String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
 		if (name.startsWith(ftlClasspath))
 			path = name.substring(ftlClasspath.length());
-		if (name.startsWith(ftlLocation))
-			path = name.substring(ftlLocation.length());
 		if (path != null) {
 			Page page = pageManager.getByPath(path);
 			if (page != null && StringUtils.isNotBlank(page.getContent()))

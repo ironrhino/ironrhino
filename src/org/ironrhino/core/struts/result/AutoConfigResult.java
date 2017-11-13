@@ -1,6 +1,5 @@
 package org.ironrhino.core.struts.result;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,30 +87,11 @@ public class AutoConfigResult extends FreemarkerResult {
 				if (freemarkerConfigurer == null)
 					freemarkerConfigurer = WebApplicationContextUtils.getWebApplicationContext(servletContext)
 							.getBean(FreemarkerConfigurer.class);
-				String ftlLocation = freemarkerConfigurer.getFtlLocation();
 				String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
 				URL url = null;
 				location = getTemplateLocation(templateName);
 				if (location == null) {
 					if (StringUtils.isNotBlank(styleHolder.get())) {
-						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(resultCode)
-								.append(".").append(styleHolder.get()).append(".ftl").toString();
-						try {
-							url = servletContext.getResource(location);
-						} catch (MalformedURLException e) {
-							e.printStackTrace();
-						}
-					}
-					if (url == null) {
-						location = new StringBuilder().append(ftlLocation).append("/meta/result/").append(resultCode)
-								.append(".ftl").toString();
-						try {
-							url = servletContext.getResource(location);
-						} catch (MalformedURLException e) {
-							e.printStackTrace();
-						}
-					}
-					if (url == null && StringUtils.isNotBlank(styleHolder.get())) {
 						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(resultCode)
 								.append(".").append(styleHolder.get()).append(".ftl").toString();
 						url = ClassLoaderUtil.getResource(location.substring(1), AutoConfigResult.class);
@@ -137,19 +117,10 @@ public class AutoConfigResult extends FreemarkerResult {
 			if (freemarkerConfigurer == null)
 				freemarkerConfigurer = WebApplicationContextUtils.getWebApplicationContext(servletContext)
 						.getBean(FreemarkerConfigurer.class);
-			String ftlLocation = freemarkerConfigurer.getFtlLocation();
 			String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
 			URL url = null;
-			location = new StringBuilder().append(ftlLocation).append(templateName).append(".ftl").toString();
-			try {
-				url = servletContext.getResource(location);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
-			if (url == null) {
-				location = new StringBuilder().append(ftlClasspath).append(templateName).append(".ftl").toString();
-				url = ClassLoaderUtil.getResource(location.substring(1), AutoConfigResult.class);
-			}
+			location = new StringBuilder().append(ftlClasspath).append(templateName).append(".ftl").toString();
+			url = ClassLoaderUtil.getResource(location.substring(1), AutoConfigResult.class);
 			if (url == null)
 				location = "";
 			cache.put(templateName, location);

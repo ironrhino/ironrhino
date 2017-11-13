@@ -1,6 +1,5 @@
 package org.ironrhino.core.freemarker;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -67,21 +66,11 @@ public class TemplateProvider {
 	}
 
 	public Template getTemplate(String name, Locale locale, String encoding, boolean parse) throws IOException {
-		String ftlLocation = freemarkerConfigurer.getFtlLocation();
 		String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
-		if (name.startsWith(ftlLocation) || name.startsWith(ftlClasspath))
+		if (name.startsWith(ftlClasspath))
 			return getConfiguration().getTemplate(name, locale, encoding, parse);
-		String templateName = ftlLocation + (name.indexOf('/') != 0 ? "/" : "") + name;
-		Template t = null;
-		try {
-			t = getConfiguration().getTemplate(templateName, locale, encoding, parse);
-		} catch (FileNotFoundException e) {
-			if (t == null) {
-				templateName = ftlClasspath + (name.indexOf('/') != 0 ? "/" : "") + name;
-				t = getConfiguration().getTemplate(templateName, locale, encoding, parse);
-			}
-		}
-		return t;
+		String templateName = ftlClasspath + (name.indexOf('/') != 0 ? "/" : "") + name;
+		return getConfiguration().getTemplate(templateName, locale, encoding, parse);
 	}
 
 }
