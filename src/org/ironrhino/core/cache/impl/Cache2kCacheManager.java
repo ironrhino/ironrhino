@@ -5,7 +5,6 @@ import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -151,14 +150,14 @@ public class Cache2kCacheManager implements CacheManager {
 		Cache<String, Object> cache = getCache(namespace, true);
 		CacheEntry<String, Object> ce = cache.invoke(key, e -> {
 			if (e.exists()) {
-				((AtomicLong) e.getValue()).addAndGet(delta);
+				e.setValue((Long) e.getValue() + delta);
 			} else {
-				e.setValue(new AtomicLong(delta));
+				e.setValue(delta);
 			}
 			e.setExpiry(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
 			return e;
 		});
-		return ((AtomicLong) ce.getValue()).get();
+		return (Long) ce.getValue();
 	}
 
 	@Override
