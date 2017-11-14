@@ -11,6 +11,12 @@
 .form-horizontal .controls {
     margin-left: 180px;
 }
+.form-horizontal .form-actions {
+    padding-left: 180px;
+}
+.table th, .table td {
+    vertical-align: middle;
+}
 </style>
 <script>
 $(function(){
@@ -149,7 +155,7 @@ $(function(){
 			<tr>
 				<td><button type="button" class="btn">${getText('view')}</button></td>
 				<#list row as key,value>
-				<td>${(value?string)!}</td>
+				<td><#if value??><#if value.class.simpleName=='byte[]'>[...]<#else>${value?string}</#if></#if></td>
 				</#list>
 			</tr>
 			</#list>
@@ -218,5 +224,3 @@ $(function(){
 </@s.form>
 </body>
 </html>
-
-
