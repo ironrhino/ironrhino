@@ -224,10 +224,10 @@ public class RedisCacheManager implements CacheManager {
 	@Override
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
-			String actrualkey = generateKey(key, namespace);
-			boolean success = cacheRedisTemplate.opsForValue().setIfAbsent(actrualkey, value);
+			String actualkey = generateKey(key, namespace);
+			boolean success = cacheRedisTemplate.opsForValue().setIfAbsent(actualkey, value);
 			if (success && timeToLive > 0)
-				cacheRedisTemplate.expire(actrualkey, timeToLive, timeUnit);
+				cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
 			return success;
 		} catch (Exception e) {
 			return false;
@@ -237,10 +237,10 @@ public class RedisCacheManager implements CacheManager {
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
-			String actrualkey = generateKey(key, namespace);
-			long result = cacheRedisTemplate.opsForValue().increment(actrualkey, delta);
+			String actualkey = generateKey(key, namespace);
+			long result = cacheRedisTemplate.opsForValue().increment(actualkey, delta);
 			if (timeToLive > 0)
-				cacheRedisTemplate.expire(actrualkey, timeToLive, timeUnit);
+				cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
 			return result;
 		} catch (Exception e) {
 			return -1;
