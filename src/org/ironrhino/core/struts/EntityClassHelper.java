@@ -560,8 +560,12 @@ public class EntityClassHelper {
 							uci.setInputType("email");
 							uci.addCssClass("email");
 						}
-					} else if (returnType == Boolean.TYPE || returnType == Boolean.class) {
+					} else if (returnType == Boolean.TYPE) {
 						uci.setType("checkbox");
+					} else if (returnType == Boolean.class) {
+						uci.setType("select");
+						uci.setListOptions(
+								"{'true':'" + I18N.getText("true") + "','false':'" + I18N.getText("false") + "'}");
 					} else if (returnType == File.class) {
 						uci.setInputType("file");
 						uci.addCssClass("custom");

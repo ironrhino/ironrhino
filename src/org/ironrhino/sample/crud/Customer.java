@@ -69,6 +69,9 @@ public class Customer extends BaseRecordableEntity {
 	@UiConfig(width = "100px", hiddenInInput = @Hidden(expression = "entity.gender??&&entity.gender.name()=='FEMALE'"), description = "age.description", queryWithRange = true)
 	@Positive
 	private Integer age;
+	
+	@UiConfig(width = "100px")
+	private boolean enabled;
 
 	@UiConfig(width = "80px", type = "dictionary", templateName = "customer_category")
 	private String category;

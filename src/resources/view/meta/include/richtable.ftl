@@ -477,7 +477,7 @@ ${formFooter!}
 			<@s.hidden name=key+'-op' value="CONTAINS"/>
 		</#if>
 		<#if config.type=='checkbox'>
-			<@s.checkbox disabled=disabled id=id label=label name=key checked=('true'==(Parameters[key]!)) class=cssClass+cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes />
+			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=cssClass list={'true':getText('true'),'false':getText('false')} headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='enum'>
 			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='select'>
