@@ -1,5 +1,6 @@
 .text-core {
   position: relative;
+  line-height: 20px;
 }
 .text-core .text-wrap {
   background: #fff;

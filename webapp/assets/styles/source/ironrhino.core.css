@@ -473,15 +473,6 @@ a.remove:hover , a.remove:focus {
 	filter: alpha(opacity=40);
 }
 
-.treeselect .control-label , .listpick .control-label {
-	cursor: pointer;
-}
-
-.treeselect .controls span , .listpick .controls span {
-	display: inline-block;
-	margin: 5px 0;
-}
-
 .loading {
 	pointer-events: none;
 }

@@ -27,6 +27,7 @@ select.input-xxlarge {
 
 .form-horizontal .controls {
 	margin-left: 120px;
+	line-height: 28px;
 }
 
 .form-horizontal .span2 .control-label , .form-horizontal .span1 .control-label {
@@ -70,11 +71,6 @@ div.form-horizontal .control-label {
 	cursor: text;
 }
 
-div.form-horizontal .controls , .controls.text {
-	padding-top: 5px;
-	padding-bottom: 5px;
-}
-
 .form-horizontal .form-actions {
 	padding-left: 120px;
 }
@@ -89,11 +85,6 @@ div.form-horizontal .controls , .controls.text {
 
 .form-actions {
 	padding: 10px 20px 10px;
-}
-
-.form-horizontal .controls .filepick{
-	padding-top: 5px;
-    padding-bottom: 5px;
 }
 
 .filepick .filepick-handle{
@@ -250,6 +241,12 @@ input.error:focus, select.error:focus, textarea.error:focus {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
 }
 
+.control-group span.tip {
+	margin-left: 10px;
+	opacity: 0.7;
+	font-style: italic;
+}
+
 strong.force-override {
 	cursor: pointer;
 }
@@ -335,7 +332,6 @@ input[type="checkbox"].custom + label.custom {
 	display: inline-block;
 	vertical-align: middle;
 	margin-bottom: 0;
-	margin-right: 5px;
 	position: relative;
 }
 
@@ -373,7 +369,6 @@ input[type="radio"].custom + label.custom {
 	display: inline-block;
 	vertical-align: middle;
 	margin-bottom: 0;
-	margin-right: 5px;
 	position: relative;
 }
 
@@ -407,18 +402,23 @@ input[type="radio"].custom:checked + label.custom:after {
 	font-size: 32px;
 }
 
-.controls > label.custom {
-	margin: 6px 0;
-}
-
 .controls label.checkbox label.custom , .controls label.radio label.custom {
 	margin-left: -20px;
 }
 
 .inline > label.custom {
 	margin-top: -3px;
+	margin-right: 5px;
+}
+/* override bootstraps start */
+.controls > .radio:first-child,.controls > .checkbox:first-child {
+	padding-top: 0;
 }
 
+.radio.inline, .checkbox.inline {
+	padding-top: 0;
+}
+/* override bootstraps end */
 .radio.inline:first-child , .checkbox.inline:first-child {
 	margin-right: 20px;
 }
@@ -426,14 +426,6 @@ input[type="radio"].custom:checked + label.custom:after {
 .radio.inline + .radio.inline , .checkbox.inline + .checkbox.inline {
 	margin-left: 0;
 	margin-right: 20px;
-}
-
-[class *= "span"] .radio.inline , [class *= "span"] .checkbox.inline {
-	padding-top: 0;
-}
-
-[class *= "span"] .controls .radio.inline , [class *= "span"] .controls .checkbox.inline {
-	padding-top: 5px;
 }
 
 select {
@@ -536,3 +528,10 @@ form.attachmentable ul.thumbnails li .remove {
 	margin-right: 10px;
 }
 
+.treeselect .control-label , .listpick .control-label {
+	cursor: pointer;
+}
+
+.treeselect .controls span , .listpick .controls span {
+	display: inline-block;
+}
