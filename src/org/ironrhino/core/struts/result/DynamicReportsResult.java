@@ -22,6 +22,10 @@ public class DynamicReportsResult extends StrutsResultSupport {
 
 	private static final long serialVersionUID = -2433174799621182907L;
 
+	public static final String FORMAT_PDF = "pdf";
+	public static final String FORMAT_XLS = "xls";
+	public static final String FORMAT_XLSX = "xlsx";
+
 	@Setter
 	protected String format;
 	@Setter
@@ -38,7 +42,13 @@ public class DynamicReportsResult extends StrutsResultSupport {
 				.get(StrutsStatics.HTTP_REQUEST);
 		HttpServletResponse response = (HttpServletResponse) invocation.getInvocationContext()
 				.get(StrutsStatics.HTTP_RESPONSE);
-
+		if (format == null) {
+			format = request.getParameter("format");
+			if (format != null)
+				format = format.toLowerCase(Locale.ROOT);
+		}
+		if (format == null)
+			format = FORMAT_PDF;
 		// Handle IE special case: it sends a "contype" request first.
 		if ("contype".equals(request.getHeader("User-Agent"))) {
 			try {
@@ -73,12 +83,15 @@ public class DynamicReportsResult extends StrutsResultSupport {
 			response.setHeader("Content-disposition", tmp.toString());
 		}
 
-		if (format.equalsIgnoreCase("PDF")) {
+		if (format.equals(FORMAT_PDF)) {
 			response.setContentType("application/pdf");
 			jrb.toPdf(response.getOutputStream());
-		} else if (format.equalsIgnoreCase("XLS")) {
+		} else if (format.equals(FORMAT_XLS)) {
 			response.setContentType("application/vnd.ms-excel");
 			jrb.toXls(response.getOutputStream());
+		} else if (format.equals(FORMAT_XLSX)) {
+			response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			jrb.toXlsx(response.getOutputStream());
 		} else {
 			throw new ServletException("Unknown report format: " + format);
 		}
@@ -86,11 +99,6 @@ public class DynamicReportsResult extends StrutsResultSupport {
 
 	private void initializeProperties(ActionInvocation invocation) throws Exception {
 		ValueStack stack = invocation.getStack();
-		format = conditionalParse(format, invocation);
-		if (StringUtils.isEmpty(format))
-			format = (String) stack.findValue("format");
-		if (StringUtils.isEmpty(format))
-			format = "PDF";
 
 		if (contentDisposition != null)
 			contentDisposition = conditionalParse(contentDisposition, invocation);

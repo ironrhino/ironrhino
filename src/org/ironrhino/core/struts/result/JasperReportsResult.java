@@ -52,13 +52,13 @@ import net.sf.jasperreports.export.SimpleXmlExporterOutput;
 
 public class JasperReportsResult extends StrutsResultSupport {
 
-	public static final String FORMAT_PDF = "PDF";
-	public static final String FORMAT_XLS = "XLS";
-	public static final String FORMAT_XLSX = "XLSX";
-	public static final String FORMAT_HTML = "HTML";
-	public static final String FORMAT_XML = "XML";
-	public static final String FORMAT_CSV = "CSV";
-	public static final String FORMAT_RTF = "RTF";
+	public static final String FORMAT_PDF = "pdf";
+	public static final String FORMAT_XLS = "xls";
+	public static final String FORMAT_XLSX = "xlsx";
+	public static final String FORMAT_HTML = "html";
+	public static final String FORMAT_XML = "xml";
+	public static final String FORMAT_CSV = "csv";
+	public static final String FORMAT_RTF = "rtf";
 
 	private static final long serialVersionUID = -2523174799621182907L;
 
@@ -98,6 +98,13 @@ public class JasperReportsResult extends StrutsResultSupport {
 
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
+		if (format == null) {
+			format = request.getParameter("format");
+			if (format != null)
+				format = format.toLowerCase(Locale.ROOT);
+		}
+		if (format == null)
+			format = FORMAT_PDF;
 
 		// Handle IE special case: it sends a "contype" request first.
 		if ("contype".equals(request.getHeader("User-Agent"))) {
@@ -181,7 +188,7 @@ public class JasperReportsResult extends StrutsResultSupport {
 			}
 
 			Exporter exporter;
-			format = format.toUpperCase(Locale.ROOT);
+			format = format.toLowerCase(Locale.ROOT);
 			switch (format) {
 			case FORMAT_PDF:
 				response.setContentType("application/pdf");
