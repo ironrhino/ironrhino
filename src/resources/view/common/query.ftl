@@ -4,20 +4,6 @@
 <html>
 <head>
 <title>${getText('query')}</title>
-<style>
-.form-horizontal .control-label {
-    width: 150px;
-}
-.form-horizontal .controls {
-    margin-left: 180px;
-}
-.form-horizontal .form-actions {
-    padding-left: 180px;
-}
-.table th, .table td {
-    vertical-align: middle;
-}
-</style>
 <script>
 $(function(){
 	$(document).on('click','#result tbody .btn',function(){
@@ -98,7 +84,7 @@ $(function(){
 </script>
 </head>
 <body>
-<@s.form id="query-form" action="${actionBaseUrl}" method="post" class="form-horizontal ajax view history">
+<@s.form id="query-form" action="${actionBaseUrl}" method="post" class="form-horizontal label-large ajax view history">
 	<#list Parameters as name,value>
 	<#if name=='view'||name?ends_with('-type')>
 	<input type="hidden" name="${name}" value="${value}" />
@@ -141,7 +127,7 @@ $(function(){
 	<#if resultPage.result?size gt 0>
 	<#assign map=resultPage.result[0]/>
 	<div id="result">
-		<table class="pin table table-hover table-striped table-bordered sortable filtercolumn resizable" style="white-space: nowrap;">
+		<table class="pin table table-hover table-striped table-bordered sortable filtercolumn resizable middle" style="white-space: nowrap;">
 			<thead>
 			<tr>
 				<th class="nosort filtercolumn" style="width:50px;"></th>
