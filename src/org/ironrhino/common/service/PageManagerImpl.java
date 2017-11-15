@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.common.model.Page;
@@ -286,7 +285,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 		} else {
 			final Map<String, Integer> map = new HashMap<>();
 			DetachedCriteria dc = detachedCriteria();
-			dc.add(Restrictions.like("tags", keyword, MatchMode.ANYWHERE));
+			dc.add(CriterionUtils.matchTag("tags", keyword));
 			List<Page> list = findListByCriteria(dc);
 			for (Page p : list) {
 				for (String tag : p.getTags()) {
