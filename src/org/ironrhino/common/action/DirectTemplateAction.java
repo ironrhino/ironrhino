@@ -1,6 +1,7 @@
 package org.ironrhino.common.action;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -14,6 +15,20 @@ public class DirectTemplateAction extends ActionSupport {
 
 	public static final String NAMESPACE = "/";
 	public static final String ACTION_NAME = "_direct_template_";
+
+	public String getActionBaseUrl() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String uri = request.getRequestURI();
+		if (uri.endsWith("/"))
+			uri += "index";
+		return uri;
+	}
+
+	public String getActionNamespace() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String uri = request.getRequestURI();
+		return uri.substring(0, uri.lastIndexOf('/'));
+	}
 
 	@Override
 	public String execute() {

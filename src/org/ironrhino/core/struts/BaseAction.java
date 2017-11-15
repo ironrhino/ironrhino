@@ -99,8 +99,6 @@ public class BaseAction extends ActionSupport {
 	@Getter
 	protected boolean csrfRequired;
 
-	private String actionBaseUrl;
-
 	@Autowired(required = false)
 	protected CaptchaManager captchaManager;
 
@@ -127,21 +125,14 @@ public class BaseAction extends ActionSupport {
 	}
 
 	public String getActionBaseUrl() {
-		if (actionBaseUrl == null) {
-			ActionProxy proxy = ActionContext.getContext().getActionInvocation().getProxy();
-			String namespace = proxy.getNamespace();
-			StringBuilder sb = new StringBuilder(ServletActionContext.getRequest().getContextPath()).append(namespace)
-					.append(namespace.endsWith("/") ? "" : "/").append(proxy.getActionName());
-			actionBaseUrl = sb.toString();
-		}
-		return actionBaseUrl;
+		return getActionNamespace() + "/" + ActionContext.getContext().getActionInvocation().getProxy().getActionName();
 	}
 
 	public String getActionNamespace() {
 		String namespace = ActionContext.getContext().getActionInvocation().getProxy().getNamespace();
 		if (namespace == null || namespace.equals("/"))
 			namespace = "";
-		return namespace;
+		return ServletActionContext.getRequest().getContextPath() + namespace;
 	}
 
 	public String getUid() {
