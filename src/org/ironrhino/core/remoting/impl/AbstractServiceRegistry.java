@@ -224,6 +224,10 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	public String discover(String serviceName, boolean polling) {
 		String host = null;
 		List<String> candidates = importedServiceCandidates.get(serviceName);
+		if (candidates == null || candidates.size() == 0) {
+			lookup(serviceName);
+			candidates = importedServiceCandidates.get(serviceName);
+		}
 		boolean loadBalancing = !polling && (candidates != null && candidates.size() <= lbNodesThreshold);
 		if (loadBalancing) {
 			try {

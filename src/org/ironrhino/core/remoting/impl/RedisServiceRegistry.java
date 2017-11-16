@@ -66,14 +66,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public String discover(String serviceName, boolean polling) {
-		List<String> hosts = importedServiceCandidates.get(serviceName);
-		if (hosts == null || hosts.size() == 0)
-			lookup(serviceName);
-		return super.discover(serviceName, polling);
-	}
-
-	@Override
 	protected void lookup(String serviceName) {
 		List<String> list = remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + serviceName, 0, -1);
 		if (list != null && list.size() > 0)
