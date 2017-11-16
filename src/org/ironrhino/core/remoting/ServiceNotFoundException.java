@@ -1,4 +1,4 @@
-package org.ironrhino.core.remoting.client;
+package org.ironrhino.core.remoting;
 
 import org.ironrhino.core.util.LocalizedException;
 

@@ -271,15 +271,10 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isBlank(host)) {
 			String ho = serviceRegistry.discover(serviceName, polling);
-			if (ho != null) {
-				if (ho.indexOf("://") < 0)
-					sb.append("http://");
-				sb.append(ho);
-				discoveredHost = ho;
-			} else {
-				logger.error("Couldn't discover service " + serviceName);
-				throw new ServiceNotFoundException(serviceName);
-			}
+			if (ho.indexOf("://") < 0)
+				sb.append("http://");
+			sb.append(ho);
+			discoveredHost = ho;
 		} else {
 			sb.append("http://");
 			sb.append(host);

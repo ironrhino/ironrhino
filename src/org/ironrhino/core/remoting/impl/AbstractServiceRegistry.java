@@ -18,6 +18,7 @@ import org.ironrhino.core.event.InstanceShutdownEvent;
 import org.ironrhino.core.event.InstanceStartupEvent;
 import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.remoting.Remoting;
+import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.AppInfo;
@@ -130,7 +131,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		onReady();
 	}
 
-	private static String trimAppName(String host) {
+	public static String normalizeHost(String host) {
 		int i = host.indexOf('@');
 		if (i < 0)
 			return host;
@@ -164,7 +165,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 							String key = inte.getName() + ".exported";
 							if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
 								logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false",
-										inte.getName(), beanClassName, beanName, trimAppName(localHost), key);
+										inte.getName(), beanClassName, beanName, normalizeHost(localHost), key);
 							} else {
 								exportedServices.put(inte.getName(), ctx.getBean(beanName));
 								String description = remoting.description();
@@ -172,7 +173,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 									description = I18N.getText(description);
 								exportedServiceDescriptions.put(inte.getName(), description);
 								logger.info("Exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
-										beanName, trimAppName(localHost));
+										beanName, normalizeHost(localHost));
 							}
 						}
 					}
@@ -190,7 +191,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				String key = clazz.getName() + ".exported";
 				if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
 					logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false", clazz.getName(),
-							beanClassName, beanName, trimAppName(localHost), key);
+							beanClassName, beanName, normalizeHost(localHost), key);
 				} else {
 					exportedServices.put(clazz.getName(), ctx.getBean(beanName));
 					String description = remoting.description();
@@ -198,7 +199,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 						description = I18N.getText(description);
 					exportedServiceDescriptions.put(clazz.getName(), description);
 					logger.info("Exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
-							trimAppName(localHost));
+							normalizeHost(localHost));
 				}
 			}
 			for (Class<?> c : clazz.getInterfaces())
@@ -212,7 +213,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			List<String> hosts = entry.getValue();
 			List<String> tobeRemoved = new ArrayList<>();
 			for (String s : hosts)
-				if (trimAppName(s).equals(host) || s.indexOf(host) > 0)
+				if (normalizeHost(s).equals(host) || s.indexOf(host) > 0)
 					tobeRemoved.add(s);
 			for (String s : tobeRemoved)
 				hosts.remove(s);
@@ -243,9 +244,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		}
 		if (host != null) {
 			onDiscover(serviceName, host);
-			return trimAppName(host);
+			return normalizeHost(host);
 		} else {
-			return null;
+			throw new ServiceNotFoundException(serviceName);
 		}
 	}
 
