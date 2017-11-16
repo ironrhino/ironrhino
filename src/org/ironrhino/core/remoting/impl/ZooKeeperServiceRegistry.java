@@ -96,8 +96,15 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	protected void unregister(String serviceName) {
-
+	public void unregister(String serviceName) {
+		String host = getLocalHost();
+		String path = new StringBuilder().append(servicesParentPath).append("/").append(serviceName).append("/")
+				.append(escapeSlash(host)).toString();
+		try {
+			curatorFramework.delete().forPath(path);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -250,7 +257,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		List<String> hosts = new ArrayList<>(children.size());
 		for (String host : children)
 			hosts.add(unescapeSlash(host));
-		importedServiceCandidates.put(serviceName, hosts);
+		importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<>(hosts));
 	}
 
 	@Override

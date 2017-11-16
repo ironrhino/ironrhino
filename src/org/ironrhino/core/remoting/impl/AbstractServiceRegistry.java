@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.PreDestroy;
@@ -102,7 +103,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				// remoting_client
 				String serviceName = (String) bd.getPropertyValues().getPropertyValue("serviceInterface").getValue();
 				if (IS_CLIENT_PRESENT)
-					importedServiceCandidates.put(serviceName, new ArrayList<String>());
+					importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<String>());
 			} else {
 				if (clazz != null && FactoryBean.class.isAssignableFrom(clazz) && bd instanceof RootBeanDefinition) {
 					clazz = ((RootBeanDefinition) bd).getTargetType();
@@ -251,10 +252,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	protected void onDiscover(String serviceName, String host) {
 		logger.info("Discovered " + serviceName + " from " + host);
 	}
-
-	protected abstract void register(String serviceName);
-
-	protected abstract void unregister(String serviceName);
 
 	protected abstract void onReady();
 
