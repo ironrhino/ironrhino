@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,7 +36,7 @@ public class QueryAction extends BaseAction {
 	protected String sql;
 
 	@Getter
-	protected Set<String> params;
+	protected Map<String, String> params;
 
 	@Getter
 	protected List<String> tables;
@@ -66,9 +65,9 @@ public class QueryAction extends BaseAction {
 		tables = jdbcQueryService.getTables();
 		if (StringUtils.isNotBlank(sql)) {
 			jdbcQueryService.validate(sql);
-			params = SqlUtils.extractParameters(sql);
+			params = SqlUtils.extractParametersWithType(sql);
 			if (params.size() > 0) {
-				for (String s : params) {
+				for (String s : params.keySet()) {
 					if (!paramMap.containsKey(s)) {
 						return SUCCESS;
 					}
@@ -90,9 +89,9 @@ public class QueryAction extends BaseAction {
 			return NOTFOUND;
 		if (StringUtils.isNotBlank(sql)) {
 			jdbcQueryService.validate(sql);
-			params = SqlUtils.extractParameters(sql);
+			params = SqlUtils.extractParametersWithType(sql);
 			if (params.size() > 0) {
-				for (String s : params) {
+				for (String s : params.keySet()) {
 					if (!paramMap.containsKey(s)) {
 						return SUCCESS;
 					}

@@ -54,31 +54,6 @@ $(function(){
 			},100);
 		}
 	});
-	$(document).on('blur','textarea[name="sql"]',function(){
-		var map = {};
-		$('input[name^="paramMap[\'"]').each(function(){
-			if(this.value)
-				map[this.name]=this.value;
-			$(this).closest('.control-group').remove();	
-		});
-		var params = $.sqleditor.extractParameters(this.value);
-		for(var i=params.length-1;i>=0;i--){
-			var param = params[i];
-			var name = "paramMap['"+param+"']";
-			if(!$('input[name="'+name+'"]').length)
-				input = $('<div class="control-group"><label class="control-label" for="query-form_paramMap_\''+param+'\'_">'+param+'</label><div class="controls"><input type="text" name="'+name+'" id="query-form_paramMap_\''+param+'\'_" autocomplete="off" maxlength="255"></div></div>')
-				.insertAfter($('textarea[name="sql"]').closest('.control-group')).find('input').val(map[name]);
-		}
-		
-		var paramMap = $('input[name^="paramMap[\'"]');
-		for(var i=0;i<paramMap.length;i++){
-			var input = paramMap[i];
-			if(!input.value){
-				setTimeout(function(){$(input).focus()},200);
-				break;
-			}
-		}
-	});
 	
 });
 </script>
@@ -94,7 +69,7 @@ $(function(){
 	<@s.hidden name="sql"/>
 	<#else>
 	<#assign readonly=(view=='brief')&&sql?has_content>
-	<@s.textarea name="sql" class="required span8 sqleditor codeblock" readonly=readonly placeholder="select username,name,email from user where username=:username">
+	<@s.textarea name="sql" class="required span8 sqleditor codeblock conjunct" data\-replacement="params" readonly=readonly placeholder="select username,name,email from user where username=:username and createDate>:createDate/*--datetime--*/">
 	<#if !readonly && tables?? && tables?size gt 0>
 	<@s.param name="after">
 	<div style="display:inline-block;vertical-align:top;margin-left:20px;">
@@ -104,24 +79,25 @@ $(function(){
 	</#if>
 	</@s.textarea>
 	</#if>
+	<div id="params">
 	<#if params??>
-	<#list params as var>
-	<#assign type=Parameters[var+'-type']!'text'/>
+	<#list params as var,type>
 	<#if type=='date'>
-	<@s.textfield id="param-"+var?index label="${var}" name="paramMap['${var}']" class="date"/>
+	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition date"/>
 	<#elseif type=='datetime'>
-	<@s.textfield id="param-"+var?index label="${var}" name="paramMap['${var}']" class="datetime"/>
+	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition datetime"/>
 	<#elseif type=='integer'||type=='long'>
-	<@s.textfield type="number" id="param-"+var?index label="${var}" name="paramMap['${var}']" class="${type}"/>
+	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition ${type}"/>
 	<#elseif type=='double'||type='decimal'>
-	<@s.textfield type="number" id="param-"+var?index label="${var}" name="paramMap['${var}']" class="double" step="0.01"/>
+	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition double" step="0.01"/>
 	<#elseif type=='textarea'>
-	<@s.textarea id="param-"+var?index label="${var}" name="paramMap['${var}']" class="input-xxlarge" style="height:50px;"/>
+	<@s.textarea id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition input-xxlarge" style="height:50px;"/>
 	<#else>
-	<@s.textfield id="param-"+var?index label="${var}" name="paramMap['${var}']"/>
+	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition"/>
 	</#if>
 	</#list>
 	</#if>
+	</div>
 	<@s.submit label=getText('submit') class="btn-primary"/>
 	<#if resultPage??>
 	<#if resultPage.result?size gt 0>

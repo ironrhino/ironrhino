@@ -4,21 +4,6 @@
 	var PARAMETER = new RegExp(
 			"(:(\\w|[^'\\)\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)", 'g');
 	$.sqleditor = {
-		extractParameters : function(sql) {
-			sql = $.sqleditor.clearComments(sql);
-			var params = [];
-			var result;
-			while ((result = PARAMETER.exec(sql))) {
-				var param = result[1].substring(1);
-				if ($.inArray(param, params) == -1)
-					params.push(param);
-			}
-			return params;
-		},
-		clearComments : function(sql) {
-			return $.trim(sql.replace(BLOCK_COMMENT, '').replace(LINE_COMMENT,
-					'\n'));
-		},
 		highlight : function(sql) {
 			return sql.replace(PARAMETER, '<strong>$1</strong>$3').replace(
 					/\?/g, '<strong>$&</strong>').replace(BLOCK_COMMENT,

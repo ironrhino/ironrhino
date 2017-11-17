@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -131,6 +133,24 @@ public class SqlUtils {
 		while (m.find())
 			names.add(m.group(1).substring(1));
 		return names;
+	}
+
+	public static Map<String, String> extractParametersWithType(String sql) {
+		Map<String, String> map = new LinkedHashMap<>();
+		for (String name : extractParameters(sql)) {
+			String param = ":" + name;
+			String type = "";
+			int index = sql.indexOf(param);
+			if (index > 0) {
+				String s = sql.substring(index + param.length()).trim();
+				int i = s.indexOf("/*--");
+				int j = s.indexOf("--*/");
+				if (i == 0 && j > i)
+					type = s.substring(i + 4, j).trim();
+			}
+			map.put(name, type);
+		}
+		return map;
 	}
 
 	public static Set<String> extractTables(String sql, String quoteString) {

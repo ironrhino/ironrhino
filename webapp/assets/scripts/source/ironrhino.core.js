@@ -1550,7 +1550,7 @@ Observation.common = function(container) {
 		var hid = $('input[type=hidden][name$=".id"]', f);
 		if (hid.val())
 			data['id'] = hid.val();
-		$(':input.conjunct,input[type=hidden]:not(.nocheck)', f).each(
+		$(':input.conjunct,:input.conjunct-addition,input[type=hidden]:not(.nocheck)', f).each(
 				function() {
 					var t = $(this);
 					if (!t.is('[type="checkbox"]') || t.is(':checked'))
