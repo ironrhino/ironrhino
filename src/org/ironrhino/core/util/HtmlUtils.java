@@ -12,7 +12,6 @@ import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.OutputDocument;
 import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.SourceCompactor;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
@@ -62,7 +61,7 @@ public class HtmlUtils {
 			Element element = it.next();
 			String tid = element.getAttributeValue("id");
 			if (tid != null && ids.contains(tid))
-				sb.append(new SourceCompactor(element).toString());
+				sb.append(element.toString());
 		}
 		return sb.toString();
 	}
