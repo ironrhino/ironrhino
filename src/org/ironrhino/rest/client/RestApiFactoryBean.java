@@ -72,7 +72,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 	public RestApiFactoryBean(Class<?> restApiClass, RestTemplate restTemplate) {
 		Assert.notNull(restApiClass, "restApiClass shouldn't be null");
 		if (restTemplate == null) {
-			restTemplate = new RestTemplate();
+			restTemplate = new org.ironrhino.core.spring.http.client.RestTemplate();
 			Iterator<HttpMessageConverter<?>> it = restTemplate.getMessageConverters().iterator();
 			while (it.hasNext()) {
 				if (it.next() instanceof MappingJackson2XmlHttpMessageConverter)

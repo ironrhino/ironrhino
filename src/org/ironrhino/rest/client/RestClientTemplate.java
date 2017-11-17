@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.spring.http.client.RestTemplate;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,6 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import lombok.Getter;
 import lombok.Setter;
