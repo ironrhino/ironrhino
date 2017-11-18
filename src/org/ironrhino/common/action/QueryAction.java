@@ -76,7 +76,7 @@ public class QueryAction extends BaseAction {
 			if (resultPage == null) {
 				resultPage = new ResultPage<>();
 			}
-			Map<String, String> copy = new HashMap<>();
+			Map<String, Object> copy = new HashMap<>();
 			copy.putAll(paramMap);
 			resultPage.setCriteria(new QueryCriteria(sql, copy));
 			resultPage = jdbcQueryService.query(resultPage);

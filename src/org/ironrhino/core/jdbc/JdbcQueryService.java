@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -154,10 +153,27 @@ public class JdbcQueryService {
 	@Transactional(readOnly = true)
 	public void validate(String sql) {
 		sql = SqlUtils.trim(sql);
-		Set<String> names = SqlUtils.extractParameters(sql);
+		Map<String, String> parameters = SqlUtils.extractParametersWithType(sql);
 		Map<String, Object> paramMap = new HashMap<>();
-		for (String name : names)
-			paramMap.put(name, "19700101");
+		for (Map.Entry<String, String> entry : parameters.entrySet()) {
+			String name = entry.getKey();
+			String type = entry.getValue();
+			Object value = "19700101";
+			if ("date".equals(type)) {
+				value = DateUtils.parseDate8("19700101");
+			} else if ("datetime".equals(type) || "timestamp".equals(type)) {
+				value = DateUtils.parseDatetime("1970-01-01 00:00:00");
+			} else if ("integer".equals(type) || "long".equals(type)) {
+				value = 19700101;
+			} else if ("double".equals(type)) {
+				value = 197001.01;
+			} else if ("decimal".equals(type)) {
+				value = new BigDecimal(197001.01);
+			} else if ("bit".equals(type) || "boolean".equals(type)) {
+				value = 0;
+			}
+			paramMap.put(name, value);
+		}
 		validateAndConvertTypes(sql, paramMap);
 		if (restricted) {
 			for (String table : SqlUtils.extractTables(sql, quoteString)) {
@@ -183,8 +199,7 @@ public class JdbcQueryService {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void validateAndConvertTypes(String sql, Map paramMap) {
+	private void validateAndConvertTypes(String sql, Map<String, Object> paramMap) {
 		try {
 			query(sql, paramMap, 1);
 		} catch (BadSqlGrammarException bse) {
@@ -408,7 +423,7 @@ public class JdbcQueryService {
 		int queryTimeout = jdbcTemplate.getQueryTimeout();
 		QueryCriteria criteria = resultPage.getCriteria();
 		String sql = criteria.getQuery();
-		Map<String, ?> paramMap = criteria.getParameters();
+		Map<String, Object> paramMap = criteria.getParameters();
 		sql = SqlUtils.trim(sql);
 		validateAndConvertTypes(sql, paramMap);
 		boolean hasLimit = hasLimit(sql);

@@ -84,12 +84,14 @@ $(function(){
 	<#list params as var,type>
 	<#if type=='date'>
 	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition date"/>
-	<#elseif type=='datetime'>
+	<#elseif type=='datetime'||type=='timestamp'>
 	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition datetime"/>
-	<#elseif type=='integer'||type=='long'>
+	<#elseif type=='int'||type=='integer'||type=='long'>
 	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition ${type}"/>
 	<#elseif type=='double'||type='decimal'>
 	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition double" step="0.01"/>
+	<#elseif type=='boolean'||type=='bit'>
+	<@s.select id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition" list={'1':getText('true'),'0':getText('false')}/>
 	<#elseif type=='textarea'>
 	<@s.textarea id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition input-xxlarge" style="height:50px;"/>
 	<#else>

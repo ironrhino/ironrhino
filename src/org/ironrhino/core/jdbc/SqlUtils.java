@@ -146,7 +146,7 @@ public class SqlUtils {
 				int i = s.indexOf("/*--");
 				int j = s.indexOf("--*/");
 				if (i == 0 && j > i)
-					type = s.substring(i + 4, j).trim();
+					type = s.substring(i + 4, j).trim().toLowerCase();
 			}
 			map.put(name, type);
 		}

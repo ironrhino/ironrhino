@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
@@ -104,10 +103,27 @@ public class JdbcUpdateService {
 	@Transactional
 	public void validate(String sql) {
 		sql = SqlUtils.trim(sql);
-		Set<String> names = SqlUtils.extractParameters(sql);
+		Map<String, String> parameters = SqlUtils.extractParametersWithType(sql);
 		Map<String, Object> paramMap = new HashMap<>();
-		for (String name : names)
-			paramMap.put(name, "0");
+		for (Map.Entry<String, String> entry : parameters.entrySet()) {
+			String name = entry.getKey();
+			String type = entry.getValue();
+			Object value = "0";
+			if ("date".equals(type)) {
+				value = DateUtils.parseDate8("19700101");
+			} else if ("datetime".equals(type) || "timestamp".equals(type)) {
+				value = DateUtils.parseDatetime("1970-01-01 00:00:00");
+			} else if ("integer".equals(type) || "long".equals(type)) {
+				value = 0;
+			} else if ("double".equals(type)) {
+				value = 0.00;
+			} else if ("decimal".equals(type)) {
+				value = new BigDecimal(0.00);
+			} else if ("bit".equals(type) || "boolean".equals(type)) {
+				value = 0;
+			}
+			paramMap.put(name, value);
+		}
 		validateAndConvertTypes(sql, paramMap);
 		if (restricted) {
 			for (String table : SqlUtils.extractTables(sql, quoteString, "update")) {
@@ -133,8 +149,7 @@ public class JdbcUpdateService {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void validateAndConvertTypes(String sql, Map paramMap) {
+	private void validateAndConvertTypes(String sql, Map<String, Object> paramMap) {
 		try {
 			update(appendFalseClause(sql), paramMap);
 		} catch (BadSqlGrammarException bse) {

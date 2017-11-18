@@ -16,6 +16,6 @@ public class QueryCriteria implements Serializable {
 
 	private String query;
 
-	private Map<String, ?> parameters;
+	private Map<String, Object> parameters;
 
 }
