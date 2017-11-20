@@ -164,8 +164,8 @@ Richtable = {
 							&& !inputform.hasClass('keepopen')) {
 						$('[type="submit"]', inputform).click(function(e) {
 							$(e.target).closest('form')[0].onsuccess = function() {
-								inputforms.removeClass('dirty');
-								inputforms.removeClass('dontreload');
+								inputform.removeClass('dirty');
+								inputform.removeClass('dontreload');
 								if (!$(e.target).closest('button')
 										.hasClass('sequential_create')) {
 									// setTimeout(function()
