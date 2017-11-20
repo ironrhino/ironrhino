@@ -18,7 +18,6 @@ import org.ironrhino.core.util.ErrorMessage;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -103,23 +102,25 @@ public class JdbcUpdateService {
 	@Transactional
 	public void validate(String sql) {
 		sql = SqlUtils.trim(sql);
-		Map<String, String> parameters = SqlUtils.extractParametersWithType(sql);
+		Map<String, String> parameters = SqlUtils.extractParametersWithType(sql, jdbcTemplate.getDataSource());
 		Map<String, Object> paramMap = new HashMap<>();
 		for (Map.Entry<String, String> entry : parameters.entrySet()) {
 			String name = entry.getKey();
 			String type = entry.getValue();
 			Object value = "0";
 			if ("date".equals(type)) {
-				value = DateUtils.parseDate8("19700101");
+				value = new java.sql.Date(DateUtils.parseDate8("19700101").getTime());
 			} else if ("datetime".equals(type) || "timestamp".equals(type)) {
-				value = DateUtils.parseDatetime("1970-01-01 00:00:00");
+				value = new java.sql.Timestamp(DateUtils.parseDatetime("1970-01-01 00:00:00").getTime());
 			} else if ("integer".equals(type) || "long".equals(type)) {
 				value = 0;
 			} else if ("double".equals(type)) {
 				value = 0.00;
 			} else if ("decimal".equals(type)) {
 				value = new BigDecimal(0.00);
-			} else if ("bit".equals(type) || "boolean".equals(type)) {
+			} else if ("boolean".equals(type)) {
+				value = false;
+			} else if ("bit".equals(type)) {
 				value = 0;
 			}
 			paramMap.put(name, value);
@@ -191,8 +192,6 @@ public class JdbcUpdateService {
 			if (t instanceof SQLException)
 				cause = t.getMessage();
 			throw new ErrorMessage("query.bad.sql.grammar", new Object[] { cause });
-		} catch (DataAccessException e) {
-			throw new ErrorMessage(e.getMessage());
 		}
 	}
 

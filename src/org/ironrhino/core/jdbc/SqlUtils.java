@@ -1,6 +1,13 @@
 package org.ironrhino.core.jdbc;
 
 import java.beans.PropertyDescriptor;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,8 +22,10 @@ import java.util.regex.Pattern;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
+import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
@@ -136,6 +145,18 @@ public class SqlUtils {
 	}
 
 	public static Map<String, String> extractParametersWithType(String sql) {
+		return extractParametersWithType(sql, (Connection) null);
+	}
+
+	public static Map<String, String> extractParametersWithType(String sql, DataSource ds) {
+		try (Connection con = ds.getConnection()) {
+			return extractParametersWithType(sql, con);
+		} catch (SQLException e) {
+			return extractParametersWithType(sql, (Connection) null);
+		}
+	}
+
+	public static Map<String, String> extractParametersWithType(String sql, Connection con) {
 		Map<String, String> map = new LinkedHashMap<>();
 		for (String name : extractParameters(sql)) {
 			String param = ":" + name;
@@ -150,7 +171,90 @@ public class SqlUtils {
 			}
 			map.put(name, type);
 		}
+		if (con != null) {
+			boolean untyped = false;
+			for (Map.Entry<String, String> entry : map.entrySet()) {
+				if (StringUtils.isBlank(entry.getValue())) {
+					untyped = true;
+					break;
+				}
+			}
+			if (untyped) {
+				sql = clearComments(sql);
+				Map<String, Integer> index = new LinkedHashMap<>();
+				for (String name : map.keySet()) {
+					String p = ":" + name;
+					int i = sql.indexOf(p);
+					index.put(name, StringUtils.countMatches(sql.substring(0, i), '?') + 1);
+					while (i > 0) {
+						sql = StringUtils.replace(sql, p, "?");
+						i = sql.indexOf(p);
+					}
+				}
+				try (PreparedStatement ps = con.prepareStatement(sql)) {
+					ParameterMetaData pmd = ps.getParameterMetaData();
+					for (Map.Entry<String, String> entry : map.entrySet())
+						if (StringUtils.isBlank(entry.getValue()))
+							map.put(entry.getKey(), convertType(pmd.getParameterClassName(index.get(entry.getKey()))));
+				} catch (SQLException e) {
+				}
+			}
+		}
 		return map;
+	}
+
+	private static String convertType(String className) {
+		if (className != null) {
+			try {
+				Class<?> clazz = Class.forName(className);
+				if (clazz == boolean.class || clazz == Boolean.class)
+					return "boolean";
+				else if (clazz == Timestamp.class || clazz == java.util.Date.class)
+					return "timestamp";
+				else if (clazz == Date.class)
+					return "date";
+				else if (clazz == int.class || clazz == short.class || clazz == Integer.class || clazz == Short.class)
+					return "integer";
+				else if (clazz == long.class || clazz == Long.class)
+					return "long";
+				else if (clazz == double.class || clazz == float.class || clazz == Double.class || clazz == Float.class)
+					return "double";
+				else if (clazz == BigDecimal.class)
+					return "decimal";
+			} catch (ClassNotFoundException e) {
+
+			}
+		}
+		return "";
+	}
+
+	public static Map<String, Object> convertParameters(Map<String, String> paramMap, Map<String, String> paramTypes) {
+		Map<String, Object> result = new LinkedHashMap<>();
+		for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+			String name = entry.getKey();
+			String value = entry.getValue();
+			if (value == null)
+				continue;
+			String type = paramTypes.get(name);
+			Object v = value;
+			if ("date".equals(type) || "datetime".equals(type) || "timestamp".equals(type)) {
+				v = DateUtils.parse(value.toString());
+			} else if ("int".equals(type) || "integer".equals(type)) {
+				v = Integer.valueOf(value.toString());
+			} else if ("long".equals(type)) {
+				v = Long.valueOf(value.toString());
+			} else if ("double".equals(type)) {
+				v = Double.valueOf(value.toString());
+			} else if ("decimal".equals(type)) {
+				v = new BigDecimal(value.toString());
+			} else if ("boolean".equals(type)) {
+				v = Boolean.valueOf(value.toString());
+			} else if ("bit".equals(type)) {
+				v = Integer.valueOf(value.toString());
+			}
+			result.put(name, v);
+		}
+		return result;
 	}
 
 	public static Set<String> extractTables(String sql, String quoteString) {

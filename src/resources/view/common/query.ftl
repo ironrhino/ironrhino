@@ -90,7 +90,9 @@ $(function(){
 	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition ${type}"/>
 	<#elseif type=='double'||type='decimal'>
 	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition double" step="0.01"/>
-	<#elseif type=='boolean'||type=='bit'>
+	<#elseif type=='boolean'>
+	<@s.select id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition" list={'true':getText('true'),'false':getText('false')}/>
+	<#elseif type=='bit'>
 	<@s.select id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition" list={'1':getText('true'),'0':getText('false')}/>
 	<#elseif type=='textarea'>
 	<@s.textarea id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition input-xxlarge" style="height:50px;"/>

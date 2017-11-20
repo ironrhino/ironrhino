@@ -65,8 +65,10 @@ public class QueryAction extends BaseAction {
 		tables = jdbcQueryService.getTables();
 		if (StringUtils.isNotBlank(sql)) {
 			jdbcQueryService.validate(sql);
-			params = SqlUtils.extractParametersWithType(sql);
+			params = SqlUtils.extractParametersWithType(sql, jdbcQueryService.getJdbcTemplate().getDataSource());
 			if (params.size() > 0) {
+				if (!ServletActionContext.getRequest().getMethod().equalsIgnoreCase("POST"))
+					return SUCCESS;
 				for (String s : params.keySet()) {
 					if (!paramMap.containsKey(s)) {
 						return SUCCESS;
@@ -76,9 +78,7 @@ public class QueryAction extends BaseAction {
 			if (resultPage == null) {
 				resultPage = new ResultPage<>();
 			}
-			Map<String, Object> copy = new HashMap<>();
-			copy.putAll(paramMap);
-			resultPage.setCriteria(new QueryCriteria(sql, copy));
+			resultPage.setCriteria(new QueryCriteria(sql, SqlUtils.convertParameters(paramMap, params)));
 			resultPage = jdbcQueryService.query(resultPage);
 		}
 		return SUCCESS;
@@ -89,7 +89,7 @@ public class QueryAction extends BaseAction {
 			return NOTFOUND;
 		if (StringUtils.isNotBlank(sql)) {
 			jdbcQueryService.validate(sql);
-			params = SqlUtils.extractParametersWithType(sql);
+			params = SqlUtils.extractParametersWithType(sql, jdbcQueryService.getJdbcTemplate().getDataSource());
 			if (params.size() > 0) {
 				for (String s : params.keySet()) {
 					if (!paramMap.containsKey(s)) {
@@ -97,7 +97,8 @@ public class QueryAction extends BaseAction {
 					}
 				}
 			}
-			long count = jdbcQueryService.count(sql, paramMap);
+			Map<String, Object> actualParams = SqlUtils.convertParameters(paramMap, params);
+			long count = jdbcQueryService.count(sql, actualParams);
 			if (count > resultMaxSize)
 				throw new ErrorMessage("query.result.size.exceed", new Object[] { resultMaxSize });
 			HttpServletResponse response = ServletActionContext.getResponse();
@@ -105,7 +106,7 @@ public class QueryAction extends BaseAction {
 			response.setHeader("Content-type", "text/csv");
 			response.setHeader("Content-disposition", "attachment;filename=data.csv");
 			final PrintWriter writer = response.getWriter();
-			jdbcQueryService.query(sql, paramMap, new LineHandler() {
+			jdbcQueryService.query(sql, actualParams, new LineHandler() {
 				@Override
 				public boolean isWithHeader() {
 					return true;
