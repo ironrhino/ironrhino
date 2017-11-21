@@ -92,12 +92,6 @@ public class DataSourceConfiguration {
 				jdbcUrl = newJdbcUrl;
 			}
 		}
-		DataSource ds = hikariDataSource();
-		logger.info("Using {} to connect {}", ds.getClass().getName(), jdbcUrl);
-		return ds;
-	}
-
-	private DataSource hikariDataSource() {
 		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
 		HikariDataSource ds = new HikariDataSource();
 		if (StringUtils.isNotBlank(driverClass))
@@ -127,6 +121,7 @@ public class DataSourceConfiguration {
 		ds.setIdleTimeout(idleTimeout);
 		ds.setMaxLifetime(maxLifetime);
 		ds.setRegisterMbeans(registerMbeans);
+		logger.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
 		return ds;
 	}
 
