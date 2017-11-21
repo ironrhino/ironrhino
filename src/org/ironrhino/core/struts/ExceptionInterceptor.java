@@ -38,7 +38,7 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 			ServletActionContext.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
 			if (e instanceof LocalizedException || e instanceof ErrorMessage)
 				logger.error(e.getLocalizedMessage());
-			else
+			else if (!(e instanceof ValidationException))
 				logger.error(e.getMessage(), e);
 			if (e instanceof MethodFailedException || e instanceof CompletionException)
 				e = e.getCause();
