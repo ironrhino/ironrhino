@@ -29,7 +29,6 @@ import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
-import org.hibernate.event.spi.FlushEntityEventListener;
 import org.hibernate.event.spi.PostDeleteEventListener;
 import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostLoadEventListener;
@@ -39,6 +38,16 @@ import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
+import org.ironrhino.core.hibernate.event.DeleteCallbackEventListener;
+import org.ironrhino.core.hibernate.event.FlushEntityCallbackEventListener;
+import org.ironrhino.core.hibernate.event.MergeCallbackEventListener;
+import org.ironrhino.core.hibernate.event.PersistCallbackEventListener;
+import org.ironrhino.core.hibernate.event.PostDeleteCallbackEventListener;
+import org.ironrhino.core.hibernate.event.PostInsertCallbackEventListener;
+import org.ironrhino.core.hibernate.event.PostLoadCallbackEventListener;
+import org.ironrhino.core.hibernate.event.PostUpdateCallbackEventListener;
+import org.ironrhino.core.hibernate.event.SaveCallbackEventListener;
+import org.ironrhino.core.hibernate.event.SaveOrUpdateCallbackEventListener;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
@@ -76,28 +85,25 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 	private Interceptor entityInterceptor;
 
 	@Autowired(required = false)
-	private List<PreInsertEventListener> preInsertEventListeners;
+	private PreInsertEventListener[] preInsertEventListeners = new PreInsertEventListener[0];
 
 	@Autowired(required = false)
-	private List<PreUpdateEventListener> preUpdateEventListeners;
+	private PreUpdateEventListener[] preUpdateEventListeners = new PreUpdateEventListener[0];
 
 	@Autowired(required = false)
-	private List<PreDeleteEventListener> preDeleteEventListeners;
+	private PreDeleteEventListener[] preDeleteEventListeners = new PreDeleteEventListener[0];
 
 	@Autowired(required = false)
-	private List<PostInsertEventListener> postInsertEventListeners;
+	private PostInsertEventListener[] postInsertEventListeners = new PostInsertEventListener[0];
 
 	@Autowired(required = false)
-	private List<PostUpdateEventListener> postUpdateEventListeners;
+	private PostUpdateEventListener[] postUpdateEventListeners = new PostUpdateEventListener[0];
 
 	@Autowired(required = false)
-	private List<PostDeleteEventListener> postDeleteEventListeners;
+	private PostDeleteEventListener[] postDeleteEventListeners = new PostDeleteEventListener[0];
 
 	@Autowired(required = false)
-	private List<PostLoadEventListener> postLoadEventListeners;
-
-	@Autowired(required = false)
-	private List<FlushEntityEventListener> flushEntityEventListeners;
+	private PostLoadEventListener[] postLoadEventListeners = new PostLoadEventListener[0];
 
 	private Class<?>[] annotatedClasses;
 
@@ -232,29 +238,23 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		SessionFactory sessionFactory = sfb.buildSessionFactory();
 		SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
 		EventListenerRegistry registry = sf.getServiceRegistry().getService(EventListenerRegistry.class);
-		if (preInsertEventListeners != null)
-			registry.appendListeners(EventType.PRE_INSERT,
-					preInsertEventListeners.toArray(new PreInsertEventListener[0]));
-		if (preUpdateEventListeners != null)
-			registry.appendListeners(EventType.PRE_UPDATE,
-					preUpdateEventListeners.toArray(new PreUpdateEventListener[0]));
-		if (preDeleteEventListeners != null)
-			registry.appendListeners(EventType.PRE_DELETE,
-					preDeleteEventListeners.toArray(new PreDeleteEventListener[0]));
-		if (postInsertEventListeners != null)
-			registry.appendListeners(EventType.POST_INSERT,
-					postInsertEventListeners.toArray(new PostInsertEventListener[0]));
-		if (postUpdateEventListeners != null)
-			registry.appendListeners(EventType.POST_UPDATE,
-					postUpdateEventListeners.toArray(new PostUpdateEventListener[0]));
-		if (postDeleteEventListeners != null)
-			registry.appendListeners(EventType.POST_DELETE,
-					postDeleteEventListeners.toArray(new PostDeleteEventListener[0]));
-		if (postLoadEventListeners != null)
-			registry.appendListeners(EventType.POST_LOAD, postLoadEventListeners.toArray(new PostLoadEventListener[0]));
-		if (flushEntityEventListeners != null)
-			registry.appendListeners(EventType.FLUSH_ENTITY,
-					flushEntityEventListeners.toArray(new FlushEntityEventListener[0]));
+		registry.setListeners(EventType.SAVE, new SaveCallbackEventListener());
+		registry.setListeners(EventType.PERSIST, new PersistCallbackEventListener());
+		registry.setListeners(EventType.MERGE, new MergeCallbackEventListener());
+		registry.setListeners(EventType.SAVE_UPDATE, new SaveOrUpdateCallbackEventListener());
+		registry.setListeners(EventType.FLUSH_ENTITY, new FlushEntityCallbackEventListener());
+		registry.setListeners(EventType.DELETE, new DeleteCallbackEventListener());
+		registry.appendListeners(EventType.POST_INSERT, new PostInsertCallbackEventListener());
+		registry.appendListeners(EventType.POST_UPDATE, new PostUpdateCallbackEventListener());
+		registry.appendListeners(EventType.POST_DELETE, new PostDeleteCallbackEventListener());
+		registry.appendListeners(EventType.POST_LOAD, new PostLoadCallbackEventListener());
+		registry.appendListeners(EventType.PRE_INSERT, preInsertEventListeners);
+		registry.appendListeners(EventType.PRE_UPDATE, preUpdateEventListeners);
+		registry.appendListeners(EventType.PRE_DELETE, preDeleteEventListeners);
+		registry.appendListeners(EventType.POST_INSERT, postInsertEventListeners);
+		registry.appendListeners(EventType.POST_UPDATE, postUpdateEventListeners);
+		registry.appendListeners(EventType.POST_DELETE, postDeleteEventListeners);
+		registry.appendListeners(EventType.POST_LOAD, postLoadEventListeners);
 		return sessionFactory;
 
 	}

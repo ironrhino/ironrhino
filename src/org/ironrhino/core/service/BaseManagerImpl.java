@@ -13,13 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
-import javax.persistence.PostUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -124,7 +117,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			if (appendOnly != null && !isnew)
 				throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		}
-		ReflectionUtils.processCallback(obj, isnew ? PrePersist.class : PreUpdate.class);
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
 			final BaseTreeableEntity entity = (BaseTreeableEntity) obj;
@@ -160,7 +152,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			else
 				session.update(obj);
 		}
-		ReflectionUtils.processCallback(obj, isnew ? PostPersist.class : PostUpdate.class);
 	}
 
 	@Override
@@ -175,9 +166,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		if (obj.isNew())
 			throw new IllegalArgumentException(obj + " must be persisted before update");
-		ReflectionUtils.processCallback(obj, PreUpdate.class);
 		sessionFactory.getCurrentSession().update(obj);
-		ReflectionUtils.processCallback(obj, PostUpdate.class);
 	}
 
 	@Override
@@ -191,9 +180,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		if (appendOnly != null)
 			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		checkDelete(obj);
-		ReflectionUtils.processCallback(obj, PreRemove.class);
 		sessionFactory.getCurrentSession().delete(obj);
-		ReflectionUtils.processCallback(obj, PostRemove.class);
 	}
 
 	protected void checkDelete(T obj) {
