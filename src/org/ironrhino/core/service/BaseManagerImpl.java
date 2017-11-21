@@ -26,7 +26,6 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
@@ -37,7 +36,6 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.transform.ResultTransformer;
-import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Ordered;
 import org.ironrhino.core.model.Persistable;
@@ -97,25 +95,14 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Transactional
 	public void save(T obj) {
 		Class<?> clazz = ReflectionUtils.getActualClass(obj);
-		Immutable immutable = clazz.getAnnotation(Immutable.class);
-		if (immutable != null)
-			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
 		boolean isnew = obj.isNew();
 		if (EntityClassHelper.isIdAssigned(clazz)) {
 			Serializable id = obj.getId();
 			if (id == null)
 				throw new IllegalArgumentException(obj + " must have an ID");
-			if (appendOnly == null) {
-				DetachedCriteria dc = detachedCriteria();
-				dc.add(Restrictions.eq("id", id));
-				isnew = countByCriteria(dc) == 0;
-			} else {
-				isnew = true;
-			}
-		} else {
-			if (appendOnly != null && !isnew)
-				throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
+			DetachedCriteria dc = detachedCriteria();
+			dc.add(Restrictions.eq("id", id));
+			isnew = countByCriteria(dc) == 0;
 		}
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
@@ -133,7 +120,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 						|| entity.getParent() != null && (entity.getLevel() - entity.getParent().getLevel() != 1
 								|| !entity.getFullId().startsWith(entity.getParent().getFullId())))
 						&& entity.isHasChildren();
-
 			}
 			String fullId = String.valueOf(entity.getId()) + ".";
 			if (entity.getParent() != null)
@@ -157,52 +143,23 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void update(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj);
-		Immutable immutable = clazz.getAnnotation(Immutable.class);
-		if (immutable != null)
-			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
-		if (appendOnly != null)
-			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
-		if (obj.isNew())
-			throw new IllegalArgumentException(obj + " must be persisted before update");
 		sessionFactory.getCurrentSession().update(obj);
 	}
 
 	@Override
 	@Transactional
 	public void delete(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj);
-		Immutable immutable = clazz.getAnnotation(Immutable.class);
-		if (immutable != null)
-			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
-		if (appendOnly != null)
-			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		checkDelete(obj);
 		sessionFactory.getCurrentSession().delete(obj);
 	}
 
 	protected void checkDelete(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj);
-		Immutable immutable = clazz.getAnnotation(Immutable.class);
-		if (immutable != null)
-			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
-		if (appendOnly != null)
-			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
 		deleteChecker.check(obj);
 	}
 
 	@Override
 	@Transactional
 	public List<T> delete(Serializable... id) {
-		Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
-		if (immutable != null)
-			throw new IllegalArgumentException(getEntityClass() + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = getEntityClass().getAnnotation(AppendOnly.class);
-		if (appendOnly != null)
-			throw new IllegalArgumentException(getEntityClass() + " is @" + AppendOnly.class.getSimpleName());
 		if (id == null || id.length == 0 || id.length == 1 && id[0] == null)
 			return null;
 		if (id.length == 1 && id[0].getClass().isArray()) {

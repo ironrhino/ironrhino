@@ -6,9 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Immutable;
+import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.metadata.AutoConfig;
-import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
@@ -17,10 +16,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @AutoConfig
-@Immutable
+@AppendOnly
 @Entity
 @Table(name = "common_record")
-@Richtable(order = "recordDate desc", readonly = @Readonly(value = true, deletable = true))
+@Richtable(order = "recordDate desc", bottomButtons = "<@btn class='reload'/> <@btn class='filter'/>")
 @Getter
 @Setter
 public class Record extends BaseEntity {
