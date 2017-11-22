@@ -36,7 +36,8 @@ public class CorsHandler extends AccessHandler {
 				if (openForAllOrigin
 						|| openForSameOrigin && RequestUtils.isSameOrigin(url, origin) && !url.startsWith(origin)) {
 					response.setHeader("Access-Control-Allow-Origin", origin);
-					response.setHeader("Access-Control-Allow-Credentials", "true");
+					if (!openForAllOrigin)
+						response.setHeader("Access-Control-Allow-Credentials", "true");
 					String requestMethod = request.getHeader("Access-Control-Request-Method");
 					String requestHeaders = request.getHeader("Access-Control-Request-Headers");
 					String method = request.getMethod();
