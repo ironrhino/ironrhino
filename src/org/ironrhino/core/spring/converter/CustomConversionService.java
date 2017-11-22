@@ -16,14 +16,17 @@ public class CustomConversionService extends DefaultConversionService {
 	}
 
 	public static CustomConversionService getSharedInstance() {
-		if (sharedInstance == null) {
+		CustomConversionService cs = sharedInstance;
+		if (cs == null) {
 			synchronized (DefaultConversionService.class) {
-				if (sharedInstance == null) {
-					sharedInstance = new CustomConversionService();
+				cs = sharedInstance;
+				if (cs == null) {
+					cs = new CustomConversionService();
+					sharedInstance = cs;
 				}
 			}
 		}
-		return sharedInstance;
+		return cs;
 	}
 
 }

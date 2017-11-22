@@ -50,10 +50,12 @@ public class ApplicationContextConsole {
 	private Map<String, Scope> triggers;
 
 	public Map<String, Object> getBeans() {
-		if (beans == null) {
+		Map<String, Object> temp = beans;
+		if (temp == null) {
 			synchronized (this) {
-				if (beans == null) {
-					Map<String, Object> temp = new HashMap<>();
+				temp = beans;
+				if (temp == null) {
+					temp = new HashMap<>();
 					String[] beanNames = ctx.getBeanDefinitionNames();
 					for (String beanName : beanNames) {
 						if (!ctx.isSingleton(beanName))
@@ -71,11 +73,12 @@ public class ApplicationContextConsole {
 						if (ctx.containsBean(factoryBeanName))
 							temp.put(factoryBeanName.replace('&', '$'), ctx.getBean(factoryBeanName));
 					}
-					beans = Collections.unmodifiableMap(temp);
+					temp = Collections.unmodifiableMap(temp);
+					beans = temp;
 				}
 			}
 		}
-		return beans;
+		return temp;
 	}
 
 	public Map<String, Scope> getTriggers() {

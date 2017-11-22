@@ -63,9 +63,11 @@ public class ApplicationContextInspector {
 	}
 
 	public Map<String, String> getDefaultProperties() throws Exception {
-		if (defaultProperties == null) {
+		Map<String, String> temp = defaultProperties;
+		if (temp == null) {
 			synchronized (this) {
-				if (defaultProperties == null) {
+				temp = defaultProperties;
+				if (temp == null) {
 					List<String> list = new ArrayList<>();
 					for (String s : ctx.getBeanDefinitionNames()) {
 						BeanDefinition bd = ctx.getBeanDefinition(s);
@@ -108,11 +110,12 @@ public class ApplicationContextInspector {
 								map.put(arr[0], arr[1]);
 						}
 					}
-					defaultProperties = Collections.unmodifiableMap(map);
+					temp = Collections.unmodifiableMap(map);
+					defaultProperties = temp;
 				}
 			}
 		}
-		return defaultProperties;
+		return temp;
 	}
 
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();

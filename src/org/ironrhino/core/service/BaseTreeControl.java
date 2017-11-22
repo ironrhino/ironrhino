@@ -28,23 +28,33 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 		entityClass = clazz;
 	}
 
-	public synchronized void buildTree() {
+	protected T buildTree() {
 		entityManager.setEntityClass(entityClass);
-		tree = entityManager.loadTree();
+		return entityManager.loadTree();
+	}
+
+	public synchronized void rebuild() {
+		tree = null;
+		getTree();
 	}
 
 	public T getTree() {
-		if (tree == null)
+		T temp = tree;
+		if (temp == null) {
 			synchronized (this) {
-				if (tree == null)
-					buildTree();
+				temp = tree;
+				if (temp == null) {
+					temp = buildTree();
+					tree = temp;
+				}
 			}
-		return tree;
+		}
+		return temp;
 	}
 
 	public T getTree(String name) {
 		T subtree = null;
-		for (T t : tree.getChildren())
+		for (T t : getTree().getChildren())
 			if (t.getName().equals(name)) {
 				addLevel(t, 1);
 				subtree = t;

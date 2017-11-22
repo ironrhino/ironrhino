@@ -58,10 +58,12 @@ public class CacheAspect extends AbstractPointcutAdvisor {
 
 	@Override
 	public Advice getAdvice() {
-		if (interceptor == null) {
+		CacheInterceptor temp = interceptor;
+		if (temp == null) {
 			synchronized (this) {
-				if (interceptor == null) {
-					CacheInterceptor temp = new CacheInterceptor();
+				temp = interceptor;
+				if (temp == null) {
+					temp = new CacheInterceptor();
 					CacheManager cacheManager = ctx.getBean(CacheManager.class);
 					temp.setCacheManager(cacheManager);
 					temp.setMutex(mutex);
@@ -70,7 +72,7 @@ public class CacheAspect extends AbstractPointcutAdvisor {
 				}
 			}
 		}
-		return interceptor;
+		return temp;
 	}
 
 }
