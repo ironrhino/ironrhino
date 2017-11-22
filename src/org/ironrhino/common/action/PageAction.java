@@ -154,7 +154,7 @@ public class PageAction extends EntityAction<Page> {
 		if (!page.isNew()) {
 			Page temp = page;
 			page = pageManager.get(page.getId());
-			if (temp.getVersion() > -1 && temp.getVersion() < page.getVersion()) {
+			if (temp.getVersion() > -1 && temp.getVersion() != page.getVersion()) {
 				addActionError(getText("validation.version.conflict"));
 				return INPUT;
 			}

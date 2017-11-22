@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.Version;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,12 +27,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.hibernate.Query;
+import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.metadata.ClassMetadata;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.AppendOnly;
@@ -125,6 +126,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	@Getter
 	protected BaseTreeableEntity parentEntity;
+
+	@Autowired
+	protected SessionFactory sessionFactory;
 
 	@Autowired(required = false)
 	protected SearchService<EN> searchService;
@@ -258,8 +262,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public String getVersionPropertyName() {
-		Set<String> names = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), Version.class);
-		return names.isEmpty() ? null : names.iterator().next();
+		ClassMetadata cm = sessionFactory.getClassMetadata(getEntityClass());
+		return cm.isVersioned() ? cm.getPropertyNames()[cm.getVersionProperty()] : null;
 	}
 
 	public boolean isNaturalIdMutable() {
@@ -734,18 +738,18 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		}
 		BaseManager<Persistable<?>> entityManager = getEntityManager(getEntityClass());
 		String versionPropertyName = getVersionPropertyName();
-		int previousVersion = 0;
+		Object previousVersion = null;
 		if (versionPropertyName != null) {
-			previousVersion = (Integer) bwp.getPropertyValue(versionPropertyName);
+			previousVersion = bwp.getPropertyValue(versionPropertyName);
 		}
 		beforeSave((EN) _entity);
 		entityManager.save(_entity);
 		afterSave((EN) _entity);
 		if (versionPropertyName != null) {
-			int currentVersion = (Integer) bwp.getPropertyValue(versionPropertyName);
-			if (currentVersion != previousVersion)
+			Object currentVersion = bwp.getPropertyValue(versionPropertyName);
+			if (!Objects.equals(previousVersion, currentVersion))
 				ServletActionContext.getResponse().addHeader("X-Postback",
-						getEntityName() + "." + versionPropertyName + "=" + currentVersion);
+						getEntityName() + "." + getVersionPropertyName() + "=" + currentVersion);
 		}
 		notify("save.success");
 		return SUCCESS;
@@ -955,15 +959,13 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			try {
 				String versionPropertyName = getVersionPropertyName();
 				if (versionPropertyName != null) {
-					int versionInDb = (Integer) bwp.getPropertyValue(versionPropertyName);
-					int versionInUi = (Integer) bw.getPropertyValue(versionPropertyName);
-					if (versionInUi > -1) {
-						if (versionInUi < versionInDb) {
-							addActionError(getText("validation.version.conflict"));
-							return false;
-						} else {
-							bwp.setPropertyValue(versionPropertyName, versionInUi);
-						}
+					Object versionInDb = bwp.getPropertyValue(versionPropertyName);
+					Object versionInUi = bw.getPropertyValue(versionPropertyName);
+					boolean forceOverride = versionInUi == null
+							|| versionInUi instanceof Number && ((Number) versionInUi).intValue() < 0;
+					if (!forceOverride && !Objects.equals(versionInDb, versionInUi)) {
+						addActionError(getText("validation.version.conflict"));
+						return false;
 					}
 				}
 

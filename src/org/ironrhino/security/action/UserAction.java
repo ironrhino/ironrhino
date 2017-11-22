@@ -204,13 +204,9 @@ public class UserAction extends EntityAction<User> {
 				user.setLegiblePassword(password);
 			int versionInDb = user.getVersion();
 			int versionInUi = temp.getVersion();
-			if (versionInUi > -1) {
-				if (versionInUi < versionInDb) {
-					addActionError(getText("validation.version.conflict"));
-					return false;
-				} else {
-					user.setVersion(versionInUi);
-				}
+			if (versionInUi > -1 && versionInUi != versionInDb) {
+				addActionError(getText("validation.version.conflict"));
+				return false;
 			}
 		}
 		try {
