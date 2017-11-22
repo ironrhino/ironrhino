@@ -197,25 +197,25 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public ReadonlyImpl getReadonly() {
 		if (_readonly == null) {
-			Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
-			if (immutable != null) {
-				_readonly = new ReadonlyImpl();
-				_readonly.setValue(true);
-				return _readonly;
-			}
-			if (isAppendOnly()) {
-				_readonly = new ReadonlyImpl();
-				_readonly.setValue(false);
-				_readonly.setExpression("!entity.new");
-				_readonly.setDeletable(false);
-				return _readonly;
-			}
 			Richtable rconfig = getClass().getAnnotation(Richtable.class);
 			if (rconfig == null)
 				rconfig = getEntityClass().getAnnotation(Richtable.class);
 			Readonly rc = null;
 			if (rconfig != null)
 				rc = rconfig.readonly();
+			Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
+			if (immutable != null) {
+				_readonly = new ReadonlyImpl();
+				_readonly.setValue(true);
+				return _readonly;
+			}
+			if (isAppendOnly() && rc == null) {
+				_readonly = new ReadonlyImpl();
+				_readonly.setValue(false);
+				_readonly.setExpression("!entity.new");
+				_readonly.setDeletable(false);
+				return _readonly;
+			}
 			Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 			if (ownerProperty != null) {
 				Owner owner = ownerProperty.getKey();

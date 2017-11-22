@@ -8,6 +8,7 @@ import javax.persistence.Table;
 
 import org.ironrhino.core.metadata.AppendOnly;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @AppendOnly
 @Entity
 @Table(name = "common_record")
-@Richtable(order = "recordDate desc", bottomButtons = "<@btn class='reload'/> <@btn class='filter'/>")
+@Richtable(order = "recordDate desc", readonly = @Readonly(value = true))
 @Getter
 @Setter
 public class Record extends BaseEntity {
