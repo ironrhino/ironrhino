@@ -745,6 +745,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		beforeSave((EN) _entity);
 		entityManager.save(_entity);
 		afterSave((EN) _entity);
+		if (isnew)
+			ServletActionContext.getResponse().addHeader("X-Postback", getEntityName() + ".id=" + _entity.getId());
 		if (versionPropertyName != null) {
 			Object currentVersion = bwp.getPropertyValue(versionPropertyName);
 			if (!Objects.equals(previousVersion, currentVersion))

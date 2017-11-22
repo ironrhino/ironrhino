@@ -32596,8 +32596,9 @@ Observation.common = function(container) {
 		var hid = $('input[type=hidden][name$=".id"]', f);
 		if (hid.val())
 			data['id'] = hid.val();
-		$(':input.conjunct,:input.conjunct-addition,input[type=hidden]:not(.nocheck)', f).each(
-				function() {
+		$(
+				':input.conjunct,:input.conjunct-addition,input[type=hidden]:not(.nocheck)',
+				f).each(function() {
 					var t = $(this);
 					if (!t.is('[type="checkbox"]') || t.is(':checked'))
 						data[t.attr('name')] = t.val();
@@ -33010,8 +33011,17 @@ Observation.common = function(container) {
 					if (postback)
 						$.each(postback.split(', '), function(i, v) {
 									var pair = v.split('=', 2);
-									$('[name="' + pair[0] + '"]', target)
-											.val(pair[1]);
+									var input = $('[name="' + pair[0] + '"]',
+											target);
+									if (!input.length) {
+										var con = $('fieldset', target);
+										if (!con.length)
+											con = $(target);
+										input = $('<input type="hidden" name="'
+												+ pair[0] + '">')
+												.prependTo(con);
+									}
+									input.val(pair[1]);
 								});
 					Ajax.handleResponse(data, _opt, xhr);
 				},
