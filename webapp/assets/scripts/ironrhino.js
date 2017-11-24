@@ -29363,7 +29363,7 @@ var swfobject = function() {
 !function ($) {
   "use strict";
 
-  $.fn['bootstrapSwitch'] = function (method) {
+  $.fn.bootstrapSwitch = function (method) {
     var methods = {
       init: function () {
         return this.each(function () {
@@ -29376,8 +29376,8 @@ var swfobject = function() {
               , classes = $element.attr('class')
               , color
               , moving
-              , onLabel = "ON"
-              , offLabel = "OFF"
+              , onLabel = MessageBundle.get("ON")
+              , offLabel = MessageBundle.get("OFF")
               , icon = false;
 
             $.each(['switch-mini', 'switch-small', 'switch-large'], function (i, el) {
@@ -29602,10 +29602,6 @@ var swfobject = function() {
       $.error('Method ' + method + ' does not exist!');
   };
 }(jQuery);
-
-$(function () {
-  $('.switch')['bootstrapSwitch']();
-});
 /**
  * license =========================================================
  *          bootstrap-datetimepicker.js
@@ -30792,7 +30788,9 @@ MessageBundle = {
 		'double.check' : '复核',
 		'double.check.username' : '复核用户',
 		'double.check.password' : '复核密码',
-		'current.password' : '当前密码'
+		'current.password' : '当前密码',
+		'ON' : '开',
+		'OFF' : '关'
 	},
 	get : function() {
 		var key = arguments[0];
@@ -32630,6 +32628,15 @@ Observation.common = function(container) {
 	// $$('input.date:not([readonly]):not([disabled])', container).datepicker({
 	// dateFormat : 'yy-mm-dd'
 	// });
+	if (typeof $.fn.bootstrapSwitch != 'undefined')
+		$$('.switch', container).each(function() {
+			var t = $(this);
+			if (t.is('input[type="checkbox"]')) {
+				t = t.wrap('<div class="switch"></div>').removeClass('switch')
+						.parent();
+			}
+			t.bootstrapSwitch();
+		});
 	if (typeof $.fn.datetimepicker != 'undefined')
 		$$('input.date,input.datetime,input.time', container).not('[readonly]')
 				.not('[disabled]').each(function() {

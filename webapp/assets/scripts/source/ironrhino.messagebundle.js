@@ -88,7 +88,9 @@ MessageBundle = {
 		'double.check' : '复核',
 		'double.check.username' : '复核用户',
 		'double.check.password' : '复核密码',
-		'current.password' : '当前密码'
+		'current.password' : '当前密码',
+		'ON' : '开',
+		'OFF' : '关'
 	},
 	get : function() {
 		var key = arguments[0];

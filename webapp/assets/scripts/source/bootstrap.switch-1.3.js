@@ -9,7 +9,7 @@
 !function ($) {
   "use strict";
 
-  $.fn['bootstrapSwitch'] = function (method) {
+  $.fn.bootstrapSwitch = function (method) {
     var methods = {
       init: function () {
         return this.each(function () {
@@ -22,8 +22,8 @@
               , classes = $element.attr('class')
               , color
               , moving
-              , onLabel = "ON"
-              , offLabel = "OFF"
+              , onLabel = MessageBundle.get("ON")
+              , offLabel = MessageBundle.get("OFF")
               , icon = false;
 
             $.each(['switch-mini', 'switch-small', 'switch-large'], function (i, el) {
@@ -248,7 +248,3 @@
       $.error('Method ' + method + ' does not exist!');
   };
 }(jQuery);
-
-$(function () {
-  $('.switch')['bootstrapSwitch']();
-});

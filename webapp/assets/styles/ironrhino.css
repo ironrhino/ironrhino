@@ -6830,11 +6830,11 @@ button.close {
  * http://www.apache.org/licenses/LICENSE-2.0
  * ============================================================ */
 .has-switch {
+  vertical-align: middle;
   display: inline-block;
   cursor: pointer;
-  border-radius: 5px;
-  border: 1px solid;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  border: 1px solid #ccc;
   position: relative;
   text-align: left;
   overflow: hidden;
@@ -6917,15 +6917,10 @@ button.close {
   margin-bottom: -1px;
   z-index: 100;
   width: 34%;
-  border-left: 1px solid #cccccc;
-  border-right: 1px solid #cccccc;
   color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #f5f5f5;
   background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
   background-repeat: repeat-x;
-  border-color: #e6e6e6 #e6e6e6 #bfbfbf;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 .has-switch label:hover,
 .has-switch label:focus,
@@ -6935,7 +6930,6 @@ button.close {
 .has-switch label[disabled] {
   color: #ffffff;
   background-color: #e6e6e6;
-  *background-color: #d9d9d9;
 }
 .has-switch label:active,
 .has-switch label.active {
@@ -6943,7 +6937,6 @@ button.close {
 }
 .has-switch label i {
   color: #000;
-  text-shadow: 0 1px 0 #fff;
   line-height: 18px;
   pointer-events: none;
 }
@@ -6953,17 +6946,14 @@ button.close {
   width: 33%;
 }
 .has-switch span.switch-left {
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 .has-switch span.switch-right {
   color: #333333;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
   background-color: #f0f0f0;
   background-image: linear-gradient(to bottom, #e6e6e6, #ffffff);
   background-repeat: repeat-x;
-  border-color: #ffffff #ffffff #d9d9d9;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 .has-switch span.switch-right:hover,
 .has-switch span.switch-right:focus,
@@ -6973,7 +6963,6 @@ button.close {
 .has-switch span.switch-right[disabled] {
   color: #333333;
   background-color: #ffffff;
-  *background-color: #f2f2f2;
 }
 .has-switch span.switch-right:active,
 .has-switch span.switch-right.active {
@@ -6982,12 +6971,9 @@ button.close {
 .has-switch span.switch-primary,
 .has-switch span.switch-left {
   color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #005fcc;
   background-image: linear-gradient(to bottom, #0044cc, #0088cc);
   background-repeat: repeat-x;
-  border-color: #0088cc #0088cc #005580;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 .has-switch span.switch-primary:hover,
 .has-switch span.switch-left:hover,
@@ -7003,7 +6989,6 @@ button.close {
 .has-switch span.switch-left[disabled] {
   color: #ffffff;
   background-color: #0088cc;
-  *background-color: #0077b3;
 }
 .has-switch span.switch-primary:active,
 .has-switch span.switch-left:active,
@@ -7013,12 +6998,9 @@ button.close {
 }
 .has-switch span.switch-info {
   color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #41a7c5;
   background-image: linear-gradient(to bottom, #2f96b4, #5bc0de);
   background-repeat: repeat-x;
-  border-color: #5bc0de #5bc0de #28a1c5;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 .has-switch span.switch-info:hover,
 .has-switch span.switch-info:focus,
@@ -7028,7 +7010,6 @@ button.close {
 .has-switch span.switch-info[disabled] {
   color: #ffffff;
   background-color: #5bc0de;
-  *background-color: #46b8da;
 }
 .has-switch span.switch-info:active,
 .has-switch span.switch-info.active {
@@ -7036,12 +7017,9 @@ button.close {
 }
 .has-switch span.switch-success {
   color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #58b058;
   background-image: linear-gradient(to bottom, #51a351, #62c462);
   background-repeat: repeat-x;
-  border-color: #62c462 #62c462 #3b9e3b;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 .has-switch span.switch-success:hover,
 .has-switch span.switch-success:focus,
@@ -7058,12 +7036,9 @@ button.close {
 }
 .has-switch span.switch-warning {
   color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #f9a123;
   background-image: linear-gradient(to bottom, #f89406, #fbb450);
   background-repeat: repeat-x;
-  border-color: #fbb450 #fbb450 #f89406;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 .has-switch span.switch-warning:hover,
 .has-switch span.switch-warning:focus,
@@ -7073,7 +7048,6 @@ button.close {
 .has-switch span.switch-warning[disabled] {
   color: #ffffff;
   background-color: #fbb450;
-  *background-color: #faa937;
 }
 .has-switch span.switch-warning:active,
 .has-switch span.switch-warning.active {
@@ -7081,12 +7055,9 @@ button.close {
 }
 .has-switch span.switch-danger {
   color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #d14641;
   background-image: linear-gradient(to bottom, #bd362f, #ee5f5b);
   background-repeat: repeat-x;
-  border-color: #ee5f5b #ee5f5b #e51d18;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 .has-switch span.switch-danger:hover,
 .has-switch span.switch-danger:focus,
