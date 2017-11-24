@@ -7935,6 +7935,13 @@ select.input-xxlarge {
 
 .form-horizontal .control-label {
 	width: 100px;
+	line-height: 30px;
+	padding: 0;
+	margin: 0;
+}
+
+div.form-horizontal .controls {
+	line-height: 30px;
 }
 
 .form-horizontal .controls {
@@ -8192,7 +8199,7 @@ strong.force-override {
 	min-width: 100px;
 	max-width: 300px;
 	border: 1px solid #b94a48;
-	padding: 4px 10px 4px 10px;
+	padding: 0 10px;
 	border-radius: 6px;
 	white-space: pre-wrap;
 }
@@ -8456,8 +8463,8 @@ form.attachmentable ul.thumbnails li .remove {
 	cursor: pointer;
 }
 
-.treeselect .controls span , .listpick .controls span {
-	display: inline-block;
+.treeselect .controls span.treeselect-name , .listpick .controls span.listpick-name {
+	line-height: 30px;
 }
 .datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
 	opacity: 0;
