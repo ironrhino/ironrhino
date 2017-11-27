@@ -1588,8 +1588,15 @@ Observation.common = function(container) {
 		$$('.switch', container).each(function() {
 			var t = $(this);
 			if (t.is('input[type="checkbox"]')) {
-				t = t.wrap('<div class="switch"></div>').removeClass('switch')
-						.parent();
+				var p = t.wrap('<div/>').parent();
+				$.each(	$.grep(t.attr('class').split(' '), function(v) {
+									return v == 'switch'
+											|| v.indexOf('switch-') == 0;
+								}), function(k, v) {
+							t.removeClass(v);
+							p.addClass(v);
+						});
+				t = p;
 			}
 			t.bootstrapSwitch();
 		});

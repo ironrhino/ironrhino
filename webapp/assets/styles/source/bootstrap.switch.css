@@ -145,107 +145,78 @@
 .has-switch span.switch-right.active {
   background-color: #e6e6e6 \9;
 }
-.has-switch span.switch-primary,
 .has-switch span.switch-left {
   color: #ffffff;
   background-color: #005fcc;
   background-image: linear-gradient(to bottom, #0044cc, #0088cc);
   background-repeat: repeat-x;
 }
-.has-switch span.switch-primary:hover,
 .has-switch span.switch-left:hover,
-.has-switch span.switch-primary:focus,
 .has-switch span.switch-left:focus,
-.has-switch span.switch-primary:active,
 .has-switch span.switch-left:active,
-.has-switch span.switch-primary.active,
 .has-switch span.switch-left.active,
-.has-switch span.switch-primary.disabled,
 .has-switch span.switch-left.disabled,
-.has-switch span.switch-primary[disabled],
 .has-switch span.switch-left[disabled] {
   color: #ffffff;
   background-color: #0088cc;
 }
-.has-switch span.switch-primary:active,
-.has-switch span.switch-left:active,
-.has-switch span.switch-primary.active,
-.has-switch span.switch-left.active {
-  background-color: #006699 \9;
-}
-.has-switch span.switch-info {
+.has-switch.switch-info span.switch-left {
   color: #ffffff;
   background-color: #41a7c5;
   background-image: linear-gradient(to bottom, #2f96b4, #5bc0de);
   background-repeat: repeat-x;
 }
-.has-switch span.switch-info:hover,
-.has-switch span.switch-info:focus,
-.has-switch span.switch-info:active,
-.has-switch span.switch-info.active,
-.has-switch span.switch-info.disabled,
-.has-switch span.switch-info[disabled] {
+.has-switch.switch-info span.switch-left:hover,
+.has-switch.switch-info span.switch-left:focus,
+.has-switch.switch-info span.switch-left:active,
+.has-switch.switch-info span.switch-left.active,
+.has-switch.switch-info span.switch-left.disabled,
+.has-switch.switch-info span.switch-left[disabled] {
   color: #ffffff;
   background-color: #5bc0de;
 }
-.has-switch span.switch-info:active,
-.has-switch span.switch-info.active {
-  background-color: #31b0d5 \9;
-}
-.has-switch span.switch-success {
+.has-switch.switch-success span.switch-left {
   color: #ffffff;
   background-color: #58b058;
   background-image: linear-gradient(to bottom, #51a351, #62c462);
   background-repeat: repeat-x;
 }
-.has-switch span.switch-success:hover,
-.has-switch span.switch-success:focus,
-.has-switch span.switch-success:active,
-.has-switch span.switch-success.active,
-.has-switch span.switch-success.disabled,
-.has-switch span.switch-success[disabled] {
+.has-switch.switch-success span.switch-left:hover,
+.has-switch.switch-success span.switch-left:focus,
+.has-switch.switch-success span.switch-left:active,
+.has-switch.switch-success span.switch-left.active,
+.has-switch.switch-success span.switch-left.disabled,
+.has-switch.switch-success span.switch-left[disabled] {
   color: #ffffff;
   background-color: #62c462;
 }
-.has-switch span.switch-success:active,
-.has-switch span.switch-success.active {
-  background-color: #42b142 \9;
-}
-.has-switch span.switch-warning {
+.has-switch.switch-warning span.switch-left {
   color: #ffffff;
   background-color: #f9a123;
   background-image: linear-gradient(to bottom, #f89406, #fbb450);
   background-repeat: repeat-x;
 }
-.has-switch span.switch-warning:hover,
-.has-switch span.switch-warning:focus,
-.has-switch span.switch-warning:active,
-.has-switch span.switch-warning.active,
-.has-switch span.switch-warning.disabled,
-.has-switch span.switch-warning[disabled] {
+.has-switch.switch-warning span.switch-left:hover,
+.has-switch.switch-warning span.switch-left:focus,
+.has-switch.switch-warning span.switch-left:active,
+.has-switch.switch-warning span.switch-left.active,
+.has-switch.switch-warning span.switch-left.disabled,
+.has-switch.switch-warning span.switch-left[disabled] {
   color: #ffffff;
   background-color: #fbb450;
 }
-.has-switch span.switch-warning:active,
-.has-switch span.switch-warning.active {
-  background-color: #fa9f1e \9;
-}
-.has-switch span.switch-danger {
+.has-switch.switch-danger span.switch-left {
   color: #ffffff;
   background-color: #d14641;
   background-image: linear-gradient(to bottom, #bd362f, #ee5f5b);
   background-repeat: repeat-x;
 }
-.has-switch span.switch-danger:hover,
-.has-switch span.switch-danger:focus,
-.has-switch span.switch-danger:active,
-.has-switch span.switch-danger.active,
-.has-switch span.switch-danger.disabled,
-.has-switch span.switch-danger[disabled] {
+.has-switch.switch-danger span.switch-left:hover,
+.has-switch.switch-danger span.switch-left:focus,
+.has-switch.switch-danger span.switch-left:active,
+.has-switch.switch-danger span.switch-left.active,
+.has-switch.switch-danger span.switch-left.disabled,
+.has-switch.switch-danger span.switch-left[disabled] {
   color: #ffffff;
   background-color: #ee5f5b;
-}
-.has-switch span.switch-danger:active,
-.has-switch span.switch-danger.active {
-  background-color: #e9322d \9;
 }
