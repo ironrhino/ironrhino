@@ -21,19 +21,14 @@ select.input-xxlarge {
     }
 }
 
-.form-horizontal .controls {
-	line-height: 28px;
+.form-horizontal label, .form-horizontal .controls {
+	line-height: 30px;
 }
 
 .form-horizontal .control-label {
 	width: 100px;
-	line-height: 30px;
 	padding: 0;
 	margin: 0;
-}
-
-div.form-horizontal .controls {
-	line-height: 30px;
 }
 
 .form-horizontal .controls {
@@ -291,7 +286,8 @@ strong.force-override {
 	min-width: 100px;
 	max-width: 300px;
 	border: 1px solid #b94a48;
-	padding: 0 10px;
+	padding: 4px 10px;
+	line-height: 20px;
 	border-radius: 6px;
 	white-space: pre-wrap;
 }
@@ -318,6 +314,15 @@ strong.force-override {
 	bottom: auto;
 	top: -6px;
 	left: 11px;
+}
+
+@-moz-document url-prefix() {
+	.field-error-content:before {
+		top: -27px;
+	}
+	.field-error-content:after {
+		top: -26px;
+	}
 }
 
 .input-append .field-error-content {
@@ -427,6 +432,7 @@ input[type="radio"].custom:checked + label.custom:after {
 
 .controls label.checkbox label.custom , .controls label.radio label.custom {
 	margin-left: -20px;
+	line-height: 20px;
 }
 
 .inline > label.custom {
@@ -440,6 +446,7 @@ input[type="radio"].custom:checked + label.custom:after {
 
 .radio.inline, .checkbox.inline {
 	padding-top: 0;
+	vertical-align: top;
 }
 /* override bootstraps end */
 .radio.inline:first-child , .checkbox.inline:first-child {
@@ -553,8 +560,4 @@ form.attachmentable ul.thumbnails li .remove {
 
 .treeselect .control-label , .listpick .control-label {
 	cursor: pointer;
-}
-
-.treeselect .controls span.treeselect-name , .listpick .controls span.listpick-name {
-	line-height: 30px;
 }

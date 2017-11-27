@@ -1749,7 +1749,7 @@ input.search-query {
 .form-horizontal .input-append {
   display: inline-block;
   margin-bottom: 0;
-  vertical-align: middle;
+  vertical-align: top;
 }
 .form-search .hide,
 .form-inline .hide,

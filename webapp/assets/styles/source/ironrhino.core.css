@@ -556,10 +556,6 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 	transition: visibility 0s linear .3s;
 }
 
-div.text-core {
-	display: inline-block;
-}
-
 .modal-close .close {
 	width: 20px;
 	font-family: Tahoma, 'Microsoft Yahei', sans-serif;

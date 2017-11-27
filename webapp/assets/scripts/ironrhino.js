@@ -18525,7 +18525,7 @@ ctrlr.prototype.setObjectValue=function(data){
 
 		input.outerWidth(width);
 		wrap.width(width).height(height);
-		container.height(input.height() + 1);
+		container.height(height);
 
 		self.trigger(EVENT_POST_INVALIDATE);
 	};
