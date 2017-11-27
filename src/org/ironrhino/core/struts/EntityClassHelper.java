@@ -562,6 +562,7 @@ public class EntityClassHelper {
 						}
 					} else if (returnType == Boolean.TYPE) {
 						uci.setType("checkbox");
+						uci.addCssClass("switch");
 					} else if (returnType == Boolean.class) {
 						uci.setType("select");
 						uci.setListOptions(

@@ -1591,7 +1591,9 @@ Observation.common = function(container) {
 				var p = t.wrap('<div/>').parent();
 				$.each(	$.grep(t.attr('class').split(' '), function(v) {
 									return v == 'switch'
-											|| v.indexOf('switch-') == 0;
+											|| v.indexOf('switch-') == 0
+											|| v.indexOf('input-') == 0
+											|| v.indexOf('span') == 0;
 								}), function(k, v) {
 							t.removeClass(v);
 							p.addClass(v);

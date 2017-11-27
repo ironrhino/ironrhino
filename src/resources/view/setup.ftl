@@ -20,7 +20,7 @@
 		<#if p.type=='enum'>
 		<@s.select label=getText(p.label?has_content?then(p.label,p.name)) name=p.name value=defaultValue! class="${p.cssClass}" list="@${p.parameterType.name}@values()" listKey="name" listValue="displayName" dynamicAttributes=p.dynamicAttributes/>
 		<#elseif p.type=='boolean'>
-		<@s.checkbox label=getText(p.label?has_content?then(p.label,p.name)) name=p.name class="${p.cssClass} custom" dynamicAttributes=p.dynamicAttributes/>
+		<@s.checkbox label=getText(p.label?has_content?then(p.label,p.name)) name=p.name class="${p.cssClass} switch" dynamicAttributes=p.dynamicAttributes/>
 		<#elseif p.type=='integer'>
 		<@s.textfield label=getText(p.label?has_content?then(p.label,p.name)) type="number" name=p.name value=defaultValue! placeholder=getText(p.placeholder!) class="${p.cssClass} integer" dynamicAttributes=p.dynamicAttributes/>
 		<#elseif p.type=='double'>

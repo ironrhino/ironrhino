@@ -42,7 +42,7 @@
 			<@s.param name="after"> <button type="button" class="btn sendVerificationCode" data-interval="${properties['verification.code.resend.interval']!'60'}">${getText('send')}</button></@s.param>
 		</@s.textfield>
 		<#else>
-		<@s.checkbox name="rememberme" class="custom"/>
+		<@s.checkbox name="rememberme" class="switch span2"/>
 		<@captcha/>
 		</#if>
 		<#if verificationCodeEnabled></div></#if>
@@ -51,13 +51,6 @@
 	</div>
 	</div>
 </div>
-<#if getSetting??&&'true'==getSetting('signup.enabled')&&'true'==getSetting('oauth.enabled')>
-<@resourcePresentConditional value="resources/view/oauth/connect.ftl">
-<div class="ajaxpanel" data-url="<@url value="/oauth/connect"/>">
-</div>
-</@resourcePresentConditional>
-</#if>
-
 <#else>
 <div class="modal">
 	<div class="modal-body">

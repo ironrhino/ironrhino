@@ -86,9 +86,11 @@ $(function(){
 <#if settings?size gt 0>
 <div id="switch">
 	<style>
+	li>div{
+		line-height: 30px;
+	}
 	div.key{
 		text-align: right;
-		line-height: 30px;
 		font-weight: bold;
 	}
 	</style>

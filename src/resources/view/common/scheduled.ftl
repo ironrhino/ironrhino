@@ -41,7 +41,7 @@ $(function(){
 	<li class="span6 task">
 	<div class="row-fluid">
 		<div class="span5 taskname">${getText(task.name)}</div>
-		<div class="span3"><div class="switch" data-on-label="${getText('ON')}" data-off-label="${getText('OFF')}"><input type="checkbox" name="${task.name}"<#if !circuitBreaker??> disabled</#if><#if !circuitBreaker?? || !circuitBreaker.isShortCircuit(task.name)> checked="checked"</#if>></div></div>
+		<div class="span3"><input type="checkbox" name="${task.name}"<#if !circuitBreaker??> disabled</#if><#if !circuitBreaker?? || !circuitBreaker.isShortCircuit(task.name)> checked="checked"</#if> class="switch"/></div>
 		<div class="span4">${task.type}: ${task.description!}</div>
 	</div>
 	</li>

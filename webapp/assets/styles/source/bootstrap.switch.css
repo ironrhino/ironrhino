@@ -7,6 +7,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  * ============================================================ */
 .has-switch {
+  box-sizing: border-box;
   vertical-align: middle;
   display: inline-block;
   cursor: pointer;
@@ -86,7 +87,7 @@
   padding-bottom: 9px;
   padding-top: 9px;
   font-size: 16px;
-  line-height: normal;
+  line-height: 24px;
 }
 .has-switch label {
   text-align: center;
@@ -219,4 +220,30 @@
 .has-switch.switch-danger span.switch-left[disabled] {
   color: #ffffff;
   background-color: #ee5f5b;
+}
+
+.has-switch[class*="span"] {
+    float: none;
+    margin-left: 0;
+}
+.has-switch.input-small {
+    width: 104px;
+}
+.has-switch.input-medium {
+    width: 164px;
+}
+.has-switch.input-large {
+    width: 224px;
+}
+.has-switch.input-xlarge {
+    width: 284px;
+}
+.has-switch.input-xxlarge {
+    width: 544px;
+}
+.controls > .has-switch:not([class*="span"]) {
+    width: 220px;
+}
+td > .has-switch {
+    min-width: 80px;
 }

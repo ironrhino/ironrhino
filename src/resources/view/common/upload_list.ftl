@@ -13,7 +13,7 @@
 	</div>
 	<div class="center" style="padding-top:30px;">
 	<@s.submit theme="simple" label="${getText('upload')}"/>
-	<label for="autorename">${getText('autorename')}:</label><@s.checkbox theme="simple" id="autorename" name="autorename" class="custom"/>
+	<label for="autorename">${getText('autorename')}:</label> <@s.checkbox theme="simple" id="autorename" name="autorename" class="switch"/>
 	</div>
 	<table id="files" class="checkboxgroup table table-striped middle" style="margin-top:50px;">
 		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>

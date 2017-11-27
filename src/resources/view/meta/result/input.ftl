@@ -42,7 +42,7 @@
 			<@s.textarea id=id label=label name=name class=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='checkbox'>
 			<#if readonly><@s.hidden name=name/></#if>
-			<@s.checkbox disabled=readonly id=id label=label name=name class=config.cssClass+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes/>
+			<@s.checkbox disabled=readonly id=id label=label name=name class=config.cssClass dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='enum'>
 			<#if !config.multiple>
 				<#if readonly><@s.hidden name=name value="${(value.name())!}"/></#if>
@@ -172,7 +172,7 @@
 						<#elseif config.type=='textarea'>
 							<@s.textarea readonly=readonly id="" theme="simple" name=name class=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 						<#elseif config.type=='checkbox'>
-							<@s.checkbox readonly=readonly id="" theme="simple" name=name class=config.cssClass+config.cssClass?has_content?then(' ','')+"custom" dynamicAttributes=dynamicAttributes/>
+							<@s.checkbox readonly=readonly id="" theme="simple" name=name class=config.cssClass dynamicAttributes=dynamicAttributes/>
 						<#elseif config.type=='enum'>
 							<#if !config.multiple>
 								<#if readonly><@s.hidden name=name value="${(value.name())!}"/></#if>

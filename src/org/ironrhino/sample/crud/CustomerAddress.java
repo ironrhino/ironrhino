@@ -30,5 +30,8 @@ public class CustomerAddress implements Serializable {
 
 	@UiConfig(cssClass = "input-xxlarge")
 	private String address;
+	
+	@UiConfig(width = "80px")
+	private boolean active;
 
 }
