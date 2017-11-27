@@ -8209,6 +8209,7 @@ strong.force-override {
 	bottom: auto;
 	top: -7px;
 	left: 10px;
+	height: 0;
 }
 
 .field-error-content:after {
@@ -8221,16 +8222,9 @@ strong.force-override {
 	bottom: auto;
 	top: -6px;
 	left: 11px;
+	height: 0;
 }
 
-@-moz-document url-prefix() {
-	.field-error-content:before {
-		top: -27px;
-	}
-	.field-error-content:after {
-		top: -26px;
-	}
-}
 
 .input-append .field-error-content {
 	font-size: 13px;
