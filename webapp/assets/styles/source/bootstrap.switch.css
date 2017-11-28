@@ -8,7 +8,7 @@
  * ============================================================ */
 .has-switch {
   box-sizing: border-box;
-  vertical-align: middle;
+  vertical-align: top;
   display: inline-block;
   cursor: pointer;
   border-radius: 4px;
@@ -57,7 +57,7 @@
   display: none;
 }
 .has-switch span,
-.has-switch label {
+.has-switch .switch-animate label {
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
@@ -66,7 +66,7 @@
   padding-bottom: 4px;
   padding-top: 4px;
   font-size: 14px;
-  line-height: 20px !important;
+  line-height: 20px;
 }
 .has-switch span.switch-mini,
 .has-switch label.switch-mini {
@@ -223,9 +223,6 @@
   border-radius: 40px;
 }
 
-.form-horizontal .has-switch{
-	vertical-align: top;
-}
 .has-switch[class*="span"] {
     float: none;
     margin-left: 0;

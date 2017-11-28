@@ -72,7 +72,7 @@ $(function(){
 	<@s.textarea name="sql" class="required span8 sqleditor codeblock conjunct" data\-replacement="params" readonly=readonly placeholder="select username,name,email from user where username=:username and createDate>:createDate/*--datetime--*/">
 	<#if !readonly && tables?? && tables?size gt 0>
 	<@s.param name="after">
-	<div style="display:inline-block;vertical-align:top;margin-left:20px;">
+	<div style="display:inline-block;margin-left:20px;">
 	<@s.select id="tables" theme="simple" class="chosen input-medium" list="tables" headerKey="" headerValue=""/>
 	</div>
 	</@s.param>
