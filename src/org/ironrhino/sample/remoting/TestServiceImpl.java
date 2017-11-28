@@ -6,8 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.security.domain.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -60,9 +59,7 @@ public class TestServiceImpl implements TestService {
 			return null;
 		User user = new User();
 		user.setUsername(username);
-		List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority("test"));
-		user.setAuthorities(authorities);
+		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
 		return user;
 	}
 

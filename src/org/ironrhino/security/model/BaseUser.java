@@ -1,6 +1,7 @@
 package org.ironrhino.security.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -30,6 +31,7 @@ import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -97,7 +99,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@JsonIgnore
 	@Transient
 	@UiConfig(hidden = true)
-	private Collection<? extends GrantedAuthority> authorities;
+	private Collection<? extends GrantedAuthority> authorities = Collections.emptyList();
 
 	@SearchableProperty
 	@Column(length = 4000)
@@ -148,19 +150,12 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@Override
 	@JsonIgnore
 	public Set<String> getRoles() {
-		if (roles == null)
-			roles = new LinkedHashSet<>();
 		return roles;
 	}
 
 	@JsonProperty("roles")
 	public Set<String> getRolesForApi() {
-		if (authorities == null)
-			return null;
-		Set<String> roles = new LinkedHashSet<>();
-		for (GrantedAuthority ga : authorities)
-			roles.add(ga.getAuthority());
-		return roles;
+		return AuthorityUtils.authorityListToSet(authorities);
 	}
 
 	@JsonSetter

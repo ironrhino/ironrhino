@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +27,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -141,12 +142,10 @@ public class SsoHandler extends AccessHandler {
 	protected UserDetails map(User userFromApi) {
 		UserDetails user = userDetailsService.loadUserByUsername(userFromApi.getUsername());
 		Collection authorities = user.getAuthorities();
-		if (userFromApi.getRoles() != null) {
-			for (String role : userFromApi.getRoles()) {
-				GrantedAuthority ga = new SimpleGrantedAuthority(role);
-				if (!authorities.contains(ga))
-					authorities.add(ga);
-			}
+		List<GrantedAuthority> list = AuthorityUtils.createAuthorityList(userFromApi.getRoles().toArray(new String[0]));
+		for (GrantedAuthority ga : list) {
+			if (!authorities.contains(ga))
+				authorities.add(ga);
 		}
 		return user;
 	}

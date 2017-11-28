@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -101,8 +102,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 	private void populateAuthorities(User user) {
 		List<GrantedAuthority> auths = new ArrayList<>();
 		auths.add(new SimpleGrantedAuthority(UserRole.ROLE_BUILTIN_USER));
-		for (String role : user.getRoles())
-			auths.add(new SimpleGrantedAuthority(role));
+		auths.addAll(AuthorityUtils.createAuthorityList(user.getRoles().toArray(new String[0])));
 		user.setAuthorities(auths);
 		if (userRoleMappers != null)
 			for (UserRoleMapper mapper : userRoleMappers) {

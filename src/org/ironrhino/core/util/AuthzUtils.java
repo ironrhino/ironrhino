@@ -1,8 +1,7 @@
 package org.ironrhino.core.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Secured;
@@ -15,7 +14,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,7 +62,7 @@ public class AuthzUtils {
 		return authorizeRoles(getRoleNamesFromUserDetails(user), ifAllGranted, ifAnyGranted, ifNotGranted);
 	}
 
-	public static boolean authorizeRoles(List<String> roles, String ifAllGranted, String ifAnyGranted,
+	public static boolean authorizeRoles(Collection<String> roles, String ifAllGranted, String ifAnyGranted,
 			String ifNotGranted) {
 		if (StringUtils.isNotBlank(ifAllGranted)) {
 			String[] arr = ifAllGranted.split("\\s*,\\s*");
@@ -90,7 +89,7 @@ public class AuthzUtils {
 		return false;
 	}
 
-	public static boolean authorizeRoles(List<String> roles, String[] ifAllGranted, String[] ifAnyGranted,
+	public static boolean authorizeRoles(Collection<String> roles, String[] ifAllGranted, String[] ifAnyGranted,
 			String[] ifNotGranted) {
 		if (ifAllGranted != null && ifAllGranted.length > 0) {
 			for (String s : ifAllGranted) {
@@ -123,27 +122,16 @@ public class AuthzUtils {
 		return false;
 	}
 
-	public static List<String> getRoleNames() {
-		List<String> roleNames = new ArrayList<>();
+	public static Collection<String> getRoleNames() {
 		if (SecurityContextHolder.getContext().getAuthentication() != null) {
-			Collection<? extends GrantedAuthority> authz = SecurityContextHolder.getContext().getAuthentication()
-					.getAuthorities();
-			if (authz != null)
-				for (GrantedAuthority var : authz)
-					roleNames.add(var.getAuthority());
-		}
-		if (roleNames.isEmpty())
-			roleNames.add(UserRole.ROLE_BUILTIN_ANONYMOUS);
-		return roleNames;
+			return AuthorityUtils
+					.authorityListToSet(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+		} else
+			return Collections.singleton(UserRole.ROLE_BUILTIN_ANONYMOUS);
 	}
 
-	public static List<String> getRoleNamesFromUserDetails(UserDetails user) {
-		List<String> roleNames = new ArrayList<>();
-		Collection<? extends GrantedAuthority> authz = user.getAuthorities();
-		if (authz != null)
-			for (GrantedAuthority var : authz)
-				roleNames.add(var.getAuthority());
-		return roleNames;
+	public static Collection<String> getRoleNamesFromUserDetails(UserDetails user) {
+		return AuthorityUtils.authorityListToSet(user.getAuthorities());
 	}
 
 	public static boolean hasRole(String role) {
@@ -159,7 +147,7 @@ public class AuthzUtils {
 			return false;
 		if (entity.getRoles() == null || entity.getRoles().size() == 0)
 			return defaultWhenEmpty;
-		List<String> roleNames = getRoleNames();
+		Collection<String> roleNames = getRoleNames();
 		for (String s : entity.getRoles()) {
 			if (roleNames.contains(s))
 				return true;
