@@ -99,7 +99,7 @@ $(function(){
 	<li class="span4">
 	<div class="row-fluid">
 	<div class="span6 key"<#if setting.description?has_content> title="${setting.description}"</#if>>${getText(setting.key)}</div>
-	<div class="span6"><input type="checkbox" name="${setting.key}"<#if setting.value=='true'> checked="checked"</#if> class="switch"/></div>
+	<div class="span6"><input type="checkbox" name="${setting.key}"<#if setting.value=='true'> checked="checked"</#if> class="switch switch-round"/></div>
 	</div>
 	</li>
 	</#list>

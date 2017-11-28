@@ -7046,6 +7046,9 @@ button.close {
   color: #ffffff;
   background-color: #ee5f5b;
 }
+.has-switch.switch-round {
+  border-radius: 40px;
+}
 
 .form-horizontal .has-switch{
 	vertical-align: top;
