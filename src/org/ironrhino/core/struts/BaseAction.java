@@ -244,7 +244,8 @@ public class BaseAction extends ActionSupport {
 				authorized = dynamicAuthorizerManager.authorize(authorize.authorizer(), user, resource);
 			}
 			if (!authorized) {
-				addActionError(getText("access.denied"));
+				if (isAjax())
+					addActionError(getText("access.denied"));
 				return ACCESSDENIED;
 			}
 		}
