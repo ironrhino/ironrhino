@@ -69,11 +69,14 @@ public class RedisLockService implements LockService {
 	public void unlock(String name) {
 		String key = NAMESPACE + name;
 		String holder = holder();
-		String str = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return 0 end";
+		String str = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return redis.call(\"exists\",KEYS[1]) == 0 and 2 or 0 end";
 		RedisScript<Long> script = new DefaultRedisScript<>(str, Long.class);
 		Long ret = coordinationStringRedisTemplate.execute(script, Collections.singletonList(key), holder);
-		if (ret == 0)
+		if (ret == 0) {
 			throw new IllegalStateException("Lock[" + name + "] is not held by :" + holder);
+		} else if (ret == 2) {
+			// lock hold timeout
+		}
 	}
 
 	private String holder() {
