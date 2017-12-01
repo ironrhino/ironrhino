@@ -36,7 +36,7 @@ public class EventListenerForRecord
 
 	@Override
 	public boolean requiresPostCommitHanding(EntityPersister persister) {
-		return true;
+		return false;
 	}
 
 	private static boolean isAnnotated(Object entity) {
