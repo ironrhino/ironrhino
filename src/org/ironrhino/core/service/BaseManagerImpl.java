@@ -404,9 +404,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public T findByNaturalId(Serializable... objects) {
-		if (objects == null || objects.length == 0 || objects.length == 1 && objects[0] == null)
+		Criteria c = constructCriteria(true, objects);
+		if (c == null)
 			return null;
-		Criteria c = constructByNaturalId(objects);
 		c.setMaxResults(1);
 		return (T) c.uniqueResult();
 	}
@@ -414,47 +414,19 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public boolean existsNaturalId(Serializable... objects) {
-		if (objects == null || objects.length == 0 || objects.length == 1 && objects[0] == null)
+		Criteria c = constructCriteria(true, objects);
+		if (c == null)
 			return false;
-		Criteria c = constructByNaturalId(objects);
 		c.setProjection(Projections.rowCount());
 		return ((Long) c.uniqueResult()) > 0;
-	}
-
-	private Criteria constructByNaturalId(Serializable... objects) {
-		if (objects.length == 1 && objects[0].getClass().isArray()) {
-			Object[] objs = (Object[]) objects[0];
-			Serializable[] arr = new Serializable[objs.length];
-			for (int i = 0; i < objs.length; i++)
-				arr[i] = (Serializable) objs[i];
-			objects = arr;
-		}
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(getEntityClass());
-		if (objects.length == 1) {
-			Set<String> naturalIds = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), NaturalId.class);
-			if (naturalIds.size() != 1)
-				throw new IllegalArgumentException("@NaturalId must and only be one");
-			c.add(Restrictions.eq(naturalIds.iterator().next(), objects[0]));
-		} else {
-			if (objects.length == 0 || objects.length % 2 != 0)
-				throw new IllegalArgumentException("parameter size must be even");
-			int doubles = objects.length / 2;
-			for (int i = 0; i < doubles; i++)
-				c.add(Restrictions.eq(String.valueOf(objects[2 * i]), objects[2 * i + 1]));
-		}
-		return c;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public T findOne(Serializable... objects) {
-		if (objects == null || objects.length == 0 || objects.length == 1 && objects[0] == null)
+		Criteria c = constructCriteria(false, objects);
+		if (c == null)
 			return null;
-		for (Serializable ser : objects) {
-			if (ser == null || ser instanceof Persistable && ((Persistable) ser).isNew())
-				return null;
-		}
-		Criteria c = constructOne(objects);
 		c.setMaxResults(1);
 		return (T) c.uniqueResult();
 	}
@@ -462,39 +434,11 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public boolean existsOne(Serializable... objects) {
-		if (objects == null || objects.length == 0 || objects.length == 1 && objects[0] == null)
+		Criteria c = constructCriteria(false, objects);
+		if (c == null)
 			return false;
-		for (Serializable ser : objects) {
-			if (ser == null || ser instanceof Persistable && ((Persistable) ser).isNew())
-				return false;
-		}
-		Criteria c = constructOne(objects);
 		c.setProjection(Projections.rowCount());
 		return ((Long) c.uniqueResult()) > 0;
-	}
-
-	private Criteria constructOne(Serializable... objects) {
-		if (objects.length == 1 && objects[0].getClass().isArray()) {
-			Object[] objs = (Object[]) objects[0];
-			Serializable[] arr = new Serializable[objs.length];
-			for (int i = 0; i < objs.length; i++)
-				arr[i] = (Serializable) objs[i];
-			objects = arr;
-		}
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(getEntityClass());
-		if (objects.length == 1) {
-			Set<String> naturalIds = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), NaturalId.class);
-			if (naturalIds.size() != 1)
-				throw new IllegalArgumentException("@NaturalId must and only be one");
-			c.add(Restrictions.eq(naturalIds.iterator().next(), objects[0]));
-		} else {
-			if (objects.length == 0 || objects.length % 2 != 0)
-				throw new IllegalArgumentException("parameter size must be even");
-			int doubles = objects.length / 2;
-			for (int i = 0; i < doubles; i++)
-				c.add(Restrictions.eq(String.valueOf(objects[2 * i]), objects[2 * i + 1]));
-		}
-		return c;
 	}
 
 	@Override
@@ -502,34 +446,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public T findOne(boolean caseInsensitive, Serializable... objects) {
 		if (!caseInsensitive)
 			return findOne(objects);
-		for (Serializable ser : objects)
-			if (ser == null || ser instanceof Persistable && ((Persistable) ser).isNew())
-				return null;
-		String hql = "select entity from " + getEntityClass().getName() + " entity where ";
-		Query query;
-		if (objects.length == 1) {
-			Set<String> naturalIds = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), NaturalId.class);
-			if (naturalIds.size() != 1)
-				throw new IllegalArgumentException("@NaturalId must and only be one");
-			hql += "lower(entity." + naturalIds.iterator().next() + ")=lower(?1)";
-			query = sessionFactory.getCurrentSession().createQuery(hql);
-			query.setParameter("1", objects[0]);
-		} else {
-			if (objects.length == 0 || objects.length % 2 != 0)
-				throw new IllegalArgumentException("parameter size must be even");
-			int doubles = objects.length / 2;
-			if (doubles == 1) {
-				hql += "lower(entity." + String.valueOf(objects[0]) + ")=lower(?1)";
-			} else {
-				List<String> list = new ArrayList<>(doubles);
-				for (int i = 0; i < doubles; i++)
-					list.add("lower(entity." + String.valueOf(objects[2 * i]) + ")=lower(?" + (i + 1) + ")");
-				hql += String.join(" and ", list);
-			}
-			query = sessionFactory.getCurrentSession().createQuery(hql);
-			for (int i = 0; i < doubles; i++)
-				query.setParameter(String.valueOf(i + 1), objects[2 * i + 1]);
-		}
+		Query query = constructLowerQuery(false, objects);
+		if (query == null)
+			return null;
 		query.setMaxResults(1);
 		return (T) query.uniqueResult();
 	}
@@ -539,10 +458,62 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public boolean existsOne(boolean caseInsensitive, Serializable... objects) {
 		if (!caseInsensitive)
 			return existsOne(objects);
+		Query query = constructLowerQuery(true, objects);
+		if (query == null)
+			return false;
+		return (Long) query.uniqueResult() > 0;
+	}
+
+	private static Serializable[] transform(Serializable... objects) {
+		if (objects == null || objects.length == 0 || objects.length == 1 && objects[0] == null)
+			return null;
+		if (objects.length == 1 && objects[0].getClass().isArray()) {
+			Object[] objs = (Object[]) objects[0];
+			Serializable[] arr = new Serializable[objs.length];
+			for (int i = 0; i < objs.length; i++)
+				arr[i] = (Serializable) objs[i];
+			objects = arr;
+		}
 		for (Serializable ser : objects)
-			if (ser == null || ser instanceof Persistable && ((Persistable) ser).isNew())
-				return false;
-		String hql = "select count(entity) from " + getEntityClass().getName() + " entity where ";
+			if (ser instanceof Persistable && ((Persistable) ser).isNew())
+				return null;
+		return objects;
+	}
+
+	private Criteria constructCriteria(boolean checkNaturalId, Serializable... objects) {
+		objects = transform(objects);
+		if (objects == null)
+			return null;
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(getEntityClass());
+		Set<String> naturalIds = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), NaturalId.class);
+		if (objects.length == 1) {
+			if (naturalIds.size() != 1)
+				throw new IllegalArgumentException("@NaturalId must and only be one");
+			c.add(Restrictions.eq(naturalIds.iterator().next(), objects[0]));
+		} else {
+			if (objects.length == 0 || objects.length % 2 != 0)
+				throw new IllegalArgumentException("Parameter size must be even");
+			int doubles = objects.length / 2;
+			if (checkNaturalId && naturalIds.size() != doubles)
+				throw new IllegalArgumentException("Parameter pair size should equals to @NaturalId size");
+			for (int i = 0; i < doubles; i++) {
+				String name = String.valueOf(objects[2 * i]);
+				if (checkNaturalId && !naturalIds.contains(name))
+					throw new IllegalArgumentException(
+							getEntityClass().getName() + "." + name + " should annotate @NaturalId");
+				c.add(Restrictions.eq(name, objects[2 * i + 1]));
+			}
+		}
+		return c;
+	}
+
+	private Query constructLowerQuery(boolean count, Serializable... objects) {
+		objects = transform(objects);
+		if (objects == null)
+			return null;
+		String hql = "from " + getEntityClass().getName() + " entity where ";
+		if (count)
+			hql = "select count(entity) " + hql;
 		Query query;
 		if (objects.length == 1) {
 			Set<String> naturalIds = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), NaturalId.class);
@@ -567,7 +538,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			for (int i = 0; i < doubles; i++)
 				query.setParameter(String.valueOf(i + 1), objects[2 * i + 1]);
 		}
-		return (Long) query.uniqueResult() > 0;
+		return query;
 	}
 
 	@Override

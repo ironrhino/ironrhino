@@ -46,25 +46,57 @@ public class EntityManagerTest {
 	@Test
 	public void testCrud() {
 		entityManager.setEntityClass(Person.class);
+		assertNull(entityManager.get("notexistsid"));
+		assertNull(entityManager.findByNaturalId("notexistsid"));
+		assertNull(entityManager.findOne("notexistsid"));
 		Person person = new Person();
 		person.setName("test");
+		person.setCode("9527");
 		person.setGender(Gender.MALE);
 		person.setDateOfBirth(new Date());
 		entityManager.save(person);
+
 		Person person2 = entityManager.get(person.getId());
 		assertEquals(Gender.MALE, person2.getGender());
 		assertNotNull(person2.getCreateDate());
 		person.setGender(Gender.FEMALE);
 		entityManager.update(person);
+
 		assertTrue(entityManager.existsNaturalId("test"));
 		person2 = entityManager.findByNaturalId("test");
 		assertEquals(Gender.FEMALE, person2.getGender());
+		assertTrue(entityManager.existsNaturalId("name", "test"));
+		person2 = entityManager.findByNaturalId("name", "test");
+		assertEquals(Gender.FEMALE, person2.getGender());
+
+		try {
+			entityManager.existsNaturalId("code", "9527");
+		} catch (Exception e) {
+			assertTrue(e instanceof IllegalArgumentException);
+		}
+
+		try {
+			entityManager.findByNaturalId("code", "9527");
+		} catch (Exception e) {
+			assertTrue(e instanceof IllegalArgumentException);
+		}
+
 		person2 = entityManager.findOne("test");
+		assertEquals(Gender.FEMALE, person2.getGender());
+		person2 = entityManager.findOne(true, new Serializable[] { "name", "test" });
 		assertEquals(Gender.FEMALE, person2.getGender());
 		assertTrue(entityManager.existsOne("name", "test"));
 		assertTrue(entityManager.existsOne(true, new Serializable[] { "name", "Test" }));
 		person2 = entityManager.findOne("name", "test");
 		assertEquals(Gender.FEMALE, person2.getGender());
+
+		person2 = entityManager.findOne(true, new Serializable[] { "code", "9527" });
+		assertEquals(Gender.FEMALE, person2.getGender());
+		assertTrue(entityManager.existsOne("code", "9527"));
+		assertTrue(entityManager.existsOne(true, new Serializable[] { "code", "9527" }));
+		person2 = entityManager.findOne("code", "9527");
+		assertEquals(Gender.FEMALE, person2.getGender());
+
 		assertTrue(entityManager.exists(person.getId()));
 		entityManager.delete(person2);
 		assertFalse(entityManager.exists(person.getId()));
@@ -262,6 +294,7 @@ public class EntityManagerTest {
 		for (int i = 0; i < size; i++) {
 			Person person = new Person();
 			person.setName("test" + i);
+			person.setCode("code" + i);
 			person.setGender(i % 2 == 0 ? Gender.MALE : Gender.FEMALE);
 			person.setDateOfBirth(new Date());
 			entityManager.save(person);

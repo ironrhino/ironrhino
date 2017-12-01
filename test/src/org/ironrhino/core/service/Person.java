@@ -34,6 +34,9 @@ public class Person extends BaseEntity {
 	@NaturalId
 	private String name;
 
+	@Column(unique = true)
+	private String code;
+
 	private Gender gender;
 
 	@Temporal(TemporalType.DATE)
