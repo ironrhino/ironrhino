@@ -68,7 +68,7 @@ public class DeleteChecker {
 						list = new ArrayList<>();
 						mapping.put(referrer, list);
 					}
-					list.add(new Tuple<>(cm.getMappedClass(), name));
+					list.add(Tuple.of(cm.getMappedClass(), name));
 				} else if (type instanceof OneToOneType) {
 					OneToOneType otoType = (OneToOneType) type;
 					Class<?> referrer = otoType.getReturnedClass();
@@ -93,7 +93,7 @@ public class DeleteChecker {
 							list = new ArrayList<>();
 							mapping.put(referrer, list);
 						}
-						list.add(new Tuple<>(cm.getMappedClass(), name));
+						list.add(Tuple.of(cm.getMappedClass(), name));
 					}
 				} else if (type instanceof CollectionType) {
 					if (BaseTreeableEntity.class.isAssignableFrom(cm.getMappedClass()) && name.equals("children"))
@@ -115,7 +115,7 @@ public class DeleteChecker {
 										list = new ArrayList<>();
 										collectionMapping.put(referrer, list);
 									}
-									list.add(new Tuple<>(cm.getMappedClass(), new Tuple<>(name, f.getName())));
+									list.add(Tuple.of(cm.getMappedClass(), Tuple.of(name, f.getName())));
 								}
 							}
 						}
@@ -139,7 +139,7 @@ public class DeleteChecker {
 										list = new ArrayList<>();
 										componentMapping.put(referrer, list);
 									}
-									list.add(new Tuple<>(cm.getMappedClass(), new Tuple<>(name, f.getName())));
+									list.add(Tuple.of(cm.getMappedClass(), Tuple.of(name, f.getName())));
 								}
 							}
 						}

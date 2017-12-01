@@ -154,12 +154,12 @@ public class RedisServiceStats implements ServiceStats {
 		String str = (String) remotingStringRedisTemplate.opsForHash().get(key, service);
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split(",");
-			return new Tuple<>(arr[0], Long.valueOf(arr[1]));
+			return Tuple.of(arr[0], Long.valueOf(arr[1]));
 		} else {
 			String today = DateUtils.formatDate8(new Date());
 			long count = getCount(service, today, type);
 			if (count > 0)
-				return new Tuple<>(today, count);
+				return Tuple.of(today, count);
 		}
 		return null;
 	}

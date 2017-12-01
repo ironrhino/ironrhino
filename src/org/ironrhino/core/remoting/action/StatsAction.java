@@ -110,12 +110,12 @@ public class StatsAction extends BaseAction {
 			while (!date.after(to)) {
 				String key = DateUtils.formatDate8(date);
 				Long value = serviceStats.getCount(service, key, type);
-				dataList.add(new Tuple<>(date, value));
+				dataList.add(Tuple.of(date, value));
 				date = DateUtils.addDays(date, 1);
 			}
 			Tuple<String, Long> p = serviceStats.getMaxCount(service, type);
 			if (p != null)
-				max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
+				max = Tuple.of(DateUtils.parseDate8(p.getKey()), p.getValue());
 			long value = serviceStats.getCount(service, null, type);
 			if (value > 0)
 				total = value;
@@ -136,9 +136,9 @@ public class StatsAction extends BaseAction {
 					c.setTime(d);
 					c.set(Calendar.MINUTE, 30);
 					c.set(Calendar.SECOND, 30);
-					dataList.add(new Tuple<>(c.getTime(), value));
+					dataList.add(Tuple.of(c.getTime(), value));
 				} else {
-					dataList.add(new Tuple<>(cal.getTime(), 0L));
+					dataList.add(Tuple.of(cal.getTime(), 0L));
 				}
 			}
 			return "barchart";

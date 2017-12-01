@@ -3,23 +3,18 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
-import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Searchable(root = false)
 @Data
 @NoArgsConstructor
 public class LabelValue implements Serializable {
 
 	private static final long serialVersionUID = 7629652470042630809L;
 
-	@SearchableProperty(boost = 2)
 	private String label;
 
-	@SearchableProperty(boost = 2)
 	private String value;
 
 	private Boolean selected;

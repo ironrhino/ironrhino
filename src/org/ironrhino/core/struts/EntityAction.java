@@ -1211,7 +1211,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (!UserDetails.class.isAssignableFrom(type) && String.class != type)
 			throw new IllegalArgumentException("property " + propertyName + " of " + getEntityClass()
 					+ " is not String or instanceof " + UserDetails.class);
-		return new Tuple<>(owner, type);
+		return Tuple.of(owner, type);
 	}
 
 	@Override

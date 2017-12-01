@@ -340,7 +340,7 @@ public class PageViewServiceImpl implements PageViewService {
 		String str = (String) pageViewStringRedisTemplate.opsForHash().get(sb.toString(), type);
 		if (StringUtils.isNotBlank(str)) {
 			String[] arr = str.split(",");
-			return new Tuple<>(arr[0], Long.valueOf(arr[1]));
+			return Tuple.of(arr[0], Long.valueOf(arr[1]));
 		}
 		return null;
 	}

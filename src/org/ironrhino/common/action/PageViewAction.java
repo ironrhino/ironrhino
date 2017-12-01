@@ -73,12 +73,12 @@ public class PageViewAction extends BaseAction {
 			while (!date.after(to)) {
 				String key = DateUtils.formatDate8(date);
 				Long value = pageViewService.getPageView(key, domain);
-				dataList.add(new Tuple<>(date, value));
+				dataList.add(Tuple.of(date, value));
 				date = DateUtils.addDays(date, 1);
 			}
 			Tuple<String, Long> p = pageViewService.getMaxPageView(domain);
 			if (p != null)
-				max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
+				max = Tuple.of(DateUtils.parseDate8(p.getKey()), p.getValue());
 			long value = pageViewService.getPageView(null, domain);
 			if (value > 0)
 				total = value;
@@ -99,9 +99,9 @@ public class PageViewAction extends BaseAction {
 					c.setTime(d);
 					c.set(Calendar.MINUTE, 30);
 					c.set(Calendar.SECOND, 30);
-					dataList.add(new Tuple<>(c.getTime(), value));
+					dataList.add(Tuple.of(c.getTime(), value));
 				} else {
-					dataList.add(new Tuple<>(cal.getTime(), 0L));
+					dataList.add(Tuple.of(cal.getTime(), 0L));
 				}
 			}
 			return "barchart";
@@ -118,12 +118,12 @@ public class PageViewAction extends BaseAction {
 		while (!date.after(to)) {
 			String key = DateUtils.formatDate8(date);
 			Long value = pageViewService.getUniqueIp(key, domain);
-			dataList.add(new Tuple<>(date, value));
+			dataList.add(Tuple.of(date, value));
 			date = DateUtils.addDays(date, 1);
 		}
 		Tuple<String, Long> p = pageViewService.getMaxUniqueIp(domain);
 		if (p != null)
-			max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
+			max = Tuple.of(DateUtils.parseDate8(p.getKey()), p.getValue());
 		return "linechart";
 	}
 
@@ -137,12 +137,12 @@ public class PageViewAction extends BaseAction {
 		while (!date.after(to)) {
 			String key = DateUtils.formatDate8(date);
 			Long value = pageViewService.getUniqueSessionId(key, domain);
-			dataList.add(new Tuple<>(date, value));
+			dataList.add(Tuple.of(date, value));
 			date = DateUtils.addDays(date, 1);
 		}
 		Tuple<String, Long> p = pageViewService.getMaxUniqueSessionId(domain);
 		if (p != null)
-			max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
+			max = Tuple.of(DateUtils.parseDate8(p.getKey()), p.getValue());
 		return "linechart";
 	}
 
@@ -156,12 +156,12 @@ public class PageViewAction extends BaseAction {
 		while (!date.after(to)) {
 			String key = DateUtils.formatDate8(date);
 			Long value = pageViewService.getUniqueUsername(key, domain);
-			dataList.add(new Tuple<>(date, value));
+			dataList.add(Tuple.of(date, value));
 			date = DateUtils.addDays(date, 1);
 		}
 		Tuple<String, Long> p = pageViewService.getMaxUniqueUsername(domain);
 		if (p != null)
-			max = new Tuple<>(DateUtils.parseDate8(p.getKey()), p.getValue());
+			max = Tuple.of(DateUtils.parseDate8(p.getKey()), p.getValue());
 		return "linechart";
 	}
 
