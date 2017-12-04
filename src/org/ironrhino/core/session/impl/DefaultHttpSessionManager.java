@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
@@ -81,6 +82,17 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	private void init() {
 		if (alwaysUseCacheBased == null)
 			alwaysUseCacheBased = (AppInfo.getStage() == Stage.PRODUCTION);
+		if (StringUtils.isNotBlank(defaultLocaleName)) {
+			Locale defaultLocale = null;
+			for (Locale locale : Locale.getAvailableLocales()) {
+				if (defaultLocaleName.equalsIgnoreCase(locale.toString())) {
+					defaultLocale = locale;
+					break;
+				}
+			}
+			if (defaultLocale != null)
+				LocaleContextHolder.setDefaultLocale(defaultLocale);
+		}
 	}
 
 	@Override
