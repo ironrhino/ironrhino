@@ -7398,7 +7398,6 @@ td.compact-horizontal {
 
 .ui-icon.close {
 	opacity: 1;
-	filter: alpha(opacity=100);
 }
 
 .ui-dialog-titlebar-close , a.close , a.remove , .modal-close button.close {
@@ -7566,36 +7565,19 @@ body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 	width: 20px;
 	height: 20px;
 	content: "";
-	-webkit-border-radius: 10px;
 	border-radius: 10px;
 }
 
 .spinner:before {
 	left: 0;
 	background-color: #28aadc;
-	-webkit-animation: spinner-left 0.5s infinite ease;
 	animation: spinner-left 0.5s infinite ease;
 }
 
 .spinner:after {
 	right: 0;
 	background-color: #ff3c50;
-	-webkit-animation: spinner-right 0.5s infinite ease;
 	animation: spinner-right 0.5s infinite ease;
-}
-
-@-webkit-keyframes spinner-left {
-	0% {
-		-webkit-transform: scale(0.5);
-	}
-
-	50% {
-		-webkit-transform: scale(1);
-	}
-
-	100% {
-		-webkit-transform: scale(0.5);
-	}
 }
 
 @keyframes spinner-left {
@@ -7609,20 +7591,6 @@ body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 
 	100% {
 		transform: scale(0.5);
-	}
-}
-
-@-webkit-keyframes spinner-right {
-	0% {
-		-webkit-transform: scale(1);
-	}
-
-	50% {
-		-webkit-transform: scale(0.5);
-	}
-
-	100% {
-		-webkit-transform: scale(1);
 	}
 }
 
@@ -7724,13 +7692,11 @@ a.remove {
 	margin-left: 5px;
 	cursor: pointer;
 	opacity: 0.2;
-	filter: alpha(opacity=20);
 }
 
 a.remove:hover , a.remove:focus {
 	text-decoration: none;
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 }
 
 .loading {
@@ -7755,13 +7721,11 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 
 .clickable[class *= "glyphicon-"] {
 	opacity: 0.6;
-	filter: alpha(opacity=60);
 	cursor: pointer;
 }
 
 .clickable[class *= "glyphicon-"]:hover {
 	opacity: 1 ! important;
-	filter: alpha(opacity=1) ! important;
 }
 
 .unselectable {
@@ -7804,8 +7768,6 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 	left: -26px;
 	background: #a1a1a8;
 	padding: 5px 15px;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 	white-space: nowrap;
 	visibility: hidden;
@@ -7903,27 +7865,31 @@ body.sidebar .navbar .btn-navbar {
 .nav-sidebar-modal.visible {
 	opacity: .6;
 }
-select.input-medium{
+select.input-medium {
 	width: 164px;
 }
+
 select.input-large {
-  width: 224px;
+	width: 224px;
 }
+
 select.input-xlarge {
-  width: 284px;
+	width: 284px;
 }
+
 select.input-xxlarge {
-  width: 554px;
+	width: 554px;
 }
 
 .form-horizontal fieldset {
 	min-width: inherit;
 }
 
-@-moz-document url-prefix() {
+@-moz-document  url-prefix() {
     .form-horizontal fieldset {
-        display: table-cell;
-    }
+	display: table-cell;
+}
+
 }
 
 .form-horizontal label, .form-horizontal .controls {
@@ -8121,6 +8087,28 @@ button.plain {
 	margin-top: -2px;
 }
 
+button.loading{
+	position: relative;
+	color: transparent !important;
+}
+button.loading:before, button.loading:after{
+	position: absolute;
+	content: "";
+	top: 50%;
+	left: 50%;
+	margin: -.7em 0 0 -.7em;
+	width: 1em;
+	height: 1em;
+	border-radius: 500rem;
+	border: .2em solid rgba(0,0,0,.15);
+}
+button.loading:after{
+	animation: load .8s linear;
+	animation-iteration-count: infinite;
+	border-color: #fff transparent transparent;
+	box-shadow: 0 0 0 1px transparent;
+}
+
 input[type="file"] {
 	cursor: pointer;
 	width: 220px;
@@ -8177,9 +8165,6 @@ strong.force-override {
 .field-error-popover {
 	position: absolute;
 	z-index: 10;
-	/*
-	z-index: 100000;
-	*/
 }
 
 .field-error-popover .field-error-content {
@@ -8338,7 +8323,7 @@ input[type="radio"].custom:checked + label.custom:after {
 	margin-top: -3px;
 	margin-right: 5px;
 }
-/* override bootstraps start */
+
 .controls > .radio:first-child,.controls > .checkbox:first-child {
 	padding-top: 0;
 }
@@ -8347,7 +8332,7 @@ input[type="radio"].custom:checked + label.custom:after {
 	padding-top: 0;
 	vertical-align: top;
 }
-/* override bootstraps end */
+
 .radio.inline:first-child , .checkbox.inline:first-child {
 	margin-right: 20px;
 }
@@ -8657,7 +8642,6 @@ form.attachmentable ul.thumbnails li .remove {
 }
 
 .toolbar .pagination li.disabled a i {
-	filter: Alpha(Opacity=50);
 	opacity: 0.50;
 }
 
@@ -9210,34 +9194,6 @@ div.pattern div.dot {
 div.pattern div.dot.active {
 	cursor: crosshair;
 	background-color: orange;
-}
-
-@-webkit-keyframes load {
-	0%{
-		transform: rotate(0);
-	}
-
-	50%{
-		transform: rotate(160deg);
-	}
-
-	100%{
-		transform: rotate(360deg);
-	}
-}
-
-@-moz-keyframes load {
-	0%{
-		-moz-transform: rotate(0);
-	}
-
-	50%{
-		-moz-transform: rotate(160deg);
-	}
-
-	100%{
-		-moz-transform: rotate(360deg);
-	}
 }
 
 @keyframes load {

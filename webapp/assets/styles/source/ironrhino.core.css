@@ -138,7 +138,6 @@ td.compact-horizontal {
 
 .ui-icon.close {
 	opacity: 1;
-	filter: alpha(opacity=100);
 }
 
 .ui-dialog-titlebar-close , a.close , a.remove , .modal-close button.close {
@@ -306,36 +305,19 @@ body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 	width: 20px;
 	height: 20px;
 	content: "";
-	-webkit-border-radius: 10px;
 	border-radius: 10px;
 }
 
 .spinner:before {
 	left: 0;
 	background-color: #28aadc;
-	-webkit-animation: spinner-left 0.5s infinite ease;
 	animation: spinner-left 0.5s infinite ease;
 }
 
 .spinner:after {
 	right: 0;
 	background-color: #ff3c50;
-	-webkit-animation: spinner-right 0.5s infinite ease;
 	animation: spinner-right 0.5s infinite ease;
-}
-
-@-webkit-keyframes spinner-left {
-	0% {
-		-webkit-transform: scale(0.5);
-	}
-
-	50% {
-		-webkit-transform: scale(1);
-	}
-
-	100% {
-		-webkit-transform: scale(0.5);
-	}
 }
 
 @keyframes spinner-left {
@@ -349,20 +331,6 @@ body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 
 	100% {
 		transform: scale(0.5);
-	}
-}
-
-@-webkit-keyframes spinner-right {
-	0% {
-		-webkit-transform: scale(1);
-	}
-
-	50% {
-		-webkit-transform: scale(0.5);
-	}
-
-	100% {
-		-webkit-transform: scale(1);
 	}
 }
 
@@ -464,13 +432,11 @@ a.remove {
 	margin-left: 5px;
 	cursor: pointer;
 	opacity: 0.2;
-	filter: alpha(opacity=20);
 }
 
 a.remove:hover , a.remove:focus {
 	text-decoration: none;
 	opacity: 0.4;
-	filter: alpha(opacity=40);
 }
 
 .loading {
@@ -495,13 +461,11 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 
 .clickable[class *= "glyphicon-"] {
 	opacity: 0.6;
-	filter: alpha(opacity=60);
 	cursor: pointer;
 }
 
 .clickable[class *= "glyphicon-"]:hover {
 	opacity: 1 ! important;
-	filter: alpha(opacity=1) ! important;
 }
 
 .unselectable {
@@ -544,8 +508,6 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 	left: -26px;
 	background: #a1a1a8;
 	padding: 5px 15px;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
 	white-space: nowrap;
 	visibility: hidden;

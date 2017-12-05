@@ -121,7 +121,6 @@
 }
 
 .toolbar .pagination li.disabled a i {
-	filter: Alpha(Opacity=50);
 	opacity: 0.50;
 }
 

@@ -1,24 +1,28 @@
-select.input-medium{
+select.input-medium {
 	width: 164px;
 }
+
 select.input-large {
-  width: 224px;
+	width: 224px;
 }
+
 select.input-xlarge {
-  width: 284px;
+	width: 284px;
 }
+
 select.input-xxlarge {
-  width: 554px;
+	width: 554px;
 }
 
 .form-horizontal fieldset {
 	min-width: inherit;
 }
 
-@-moz-document url-prefix() {
+@-moz-document  url-prefix() {
     .form-horizontal fieldset {
-        display: table-cell;
-    }
+	display: table-cell;
+}
+
 }
 
 .form-horizontal label, .form-horizontal .controls {
@@ -216,6 +220,28 @@ button.plain {
 	margin-top: -2px;
 }
 
+button.loading{
+	position: relative;
+	color: transparent !important;
+}
+button.loading:before, button.loading:after{
+	position: absolute;
+	content: "";
+	top: 50%;
+	left: 50%;
+	margin: -.7em 0 0 -.7em;
+	width: 1em;
+	height: 1em;
+	border-radius: 500rem;
+	border: .2em solid rgba(0,0,0,.15);
+}
+button.loading:after{
+	animation: load .8s linear;
+	animation-iteration-count: infinite;
+	border-color: #fff transparent transparent;
+	box-shadow: 0 0 0 1px transparent;
+}
+
 input[type="file"] {
 	cursor: pointer;
 	width: 220px;
@@ -272,9 +298,6 @@ strong.force-override {
 .field-error-popover {
 	position: absolute;
 	z-index: 10;
-	/*
-	z-index: 100000;
-	*/
 }
 
 .field-error-popover .field-error-content {
@@ -433,7 +456,7 @@ input[type="radio"].custom:checked + label.custom:after {
 	margin-top: -3px;
 	margin-right: 5px;
 }
-/* override bootstraps start */
+
 .controls > .radio:first-child,.controls > .checkbox:first-child {
 	padding-top: 0;
 }
@@ -442,7 +465,7 @@ input[type="radio"].custom:checked + label.custom:after {
 	padding-top: 0;
 	vertical-align: top;
 }
-/* override bootstraps end */
+
 .radio.inline:first-child , .checkbox.inline:first-child {
 	margin-right: 20px;
 }
