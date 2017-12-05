@@ -71,6 +71,7 @@ sed -i  's/\s[3-4][a-x-]*manager.org.apache.juli.FileHandler,//g' logging.proper
 sed -i '/manager/d' logging.properties
 cat>>catalina.properties<<EOF
 tomcat.util.scan.StandardJarScanFilter.jarsToSkip=*.jar
+tomcat.util.scan.StandardJarScanFilter.jarsToScan=ironrhino-*.jar
 EOF
 cat>server.xml<<EOF
 <?xml version="1.0" encoding="utf-8"?>
