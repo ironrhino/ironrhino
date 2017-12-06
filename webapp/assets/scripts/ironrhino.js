@@ -22588,112 +22588,115 @@ ctrlr.prototype.setObjectValue=function(data){
 	function load(settings, root, child, container) {
 		if (root == 0)
 			fullname = settings.value;
-		$.getJSON(settings.url, {
-					parent : root
-				}, function(response) {
-					if (response.length == 0) {
-						var li = child.parent('li');
-						if (li.length) {
-							if (li.hasClass('lastExpandable')
-									|| li.hasClass('lastCollapsable'))
-								li.removeClass('lastExpandable')
-										.removeClass('lastCollapsable')
-										.addClass('last');
-							li.removeClass('collapsable')
-									.removeClass('expandable').find('.hitarea')
-									.remove();
-							child.remove();
-						}
-						return;
+		$.ajax({
+			url : settings.url,
+			data : {
+				parent : root
+			},
+			global : false,
+			success : function(response) {
+				if (response.length == 0) {
+					var li = child.parent('li');
+					if (li.length) {
+						if (li.hasClass('lastExpandable')
+								|| li.hasClass('lastCollapsable'))
+							li.removeClass('lastExpandable')
+									.removeClass('lastCollapsable')
+									.addClass('last');
+						li.removeClass('collapsable').removeClass('expandable')
+								.find('.hitarea').remove();
+						child.remove();
 					}
-					function createNode(parent, activeid) {
-						var parentTreenode = $(parent).parent('li')
-								.data('treenode');
-						this.parent = parentTreenode;
-						if (!this.fullname)
-							if (parentTreenode)
-								this.fullname = (parentTreenode.fullname || parentTreenode.name)
-										+ (settings.separator) + this.name;
-							else
-								this.fullname = this.name;
-						var template = settings.template;
-						var current = $("<li/>").data('treenode', this)
-								.appendTo(parent);
-						if (activeid == this.id)
-							current.addClass('active');
-						if (template) {
-							current.html($.tmpl(template, this));
-							_observe(current);
-						} else {
-							current.html("<a><span>" + (this.name)
-									+ "</span></a>");
+					return;
+				}
+				function createNode(parent, activeid) {
+					var parentTreenode = $(parent).parent('li')
+							.data('treenode');
+					this.parent = parentTreenode;
+					if (!this.fullname)
+						if (parentTreenode)
+							this.fullname = (parentTreenode.fullname || parentTreenode.name)
+									+ (settings.separator) + this.name;
+						else
+							this.fullname = this.name;
+					var template = settings.template;
+					var current = $("<li/>").data('treenode', this)
+							.appendTo(parent);
+					if (activeid == this.id)
+						current.addClass('active');
+					if (template) {
+						current.html($.tmpl(template, this));
+						_observe(current);
+					} else {
+						current.html("<a><span>" + (this.name) + "</span></a>");
+					}
+					$("a", current).click(function(e) {
+						var li = $(e.target).closest('li');
+						$('li,div.head', li.closest('.treeview'))
+								.removeClass('active');
+						li.addClass('active');
+					});
+					if (settings.click)
+						$("span", current).click(settings.click);
+					if (this.classes) {
+						current.children("span").addClass(this.classes);
+					}
+					if (this.expanded) {
+						current.addClass("open");
+					}
+					if (this.hasChildren || this.children
+							&& this.children.length) {
+						var branch = $("<ul/>").appendTo(current);
+						if (this.hasChildren) {
+							current.addClass("hasChildren");
+							createNode.call({
+										text : settings.placeholder
+												|| "placeholder",
+										id : "placeholder",
+										children : []
+									}, branch);
 						}
-						$("a", current).click(function(e) {
-							var li = $(e.target).closest('li');
-							$('li,div.head', li.closest('.treeview'))
-									.removeClass('active');
-							li.addClass('active');
+						if (this.children && this.children.length) {
+							$.each(this.children, function() {
+										createNode.apply(this, branch)
+									})
+						}
+					}
+				}
+				var activeid = container.data('activeid');
+				container.removeData('activeid');
+				$.each(response, function() {
+							createNode.apply(this, [child, activeid])
 						});
-						if (settings.click)
-							$("span", current).click(settings.click);
-						if (this.classes) {
-							current.children("span").addClass(this.classes);
-						}
-						if (this.expanded) {
-							current.addClass("open");
-						}
-						if (this.hasChildren || this.children
-								&& this.children.length) {
-							var branch = $("<ul/>").appendTo(current);
-							if (this.hasChildren) {
-								current.addClass("hasChildren");
-								createNode.call({
-											text : settings.placeholder
-													|| "placeholder",
-											id : "placeholder",
-											children : []
-										}, branch);
-							}
-							if (this.children && this.children.length) {
-								$.each(this.children, function() {
-											createNode.apply(this, branch)
-										})
-							}
+				$(container).treeview({
+							add : child
+						});
+				var list = child.children('li');
+				if (fullname) {
+					for (var i = 0; i < list.length; i++) {
+						var t = $(list.get(i));
+						var name = t.data('treenode').name;
+						if (name == fullname) {
+							setTimeout(function() {
+										t.children('a').click()
+									}, 200);
+							return;
+						} else if (name
+								&& fullname.indexOf(name + settings.separator) == 0) {
+							fullname = fullname.substring(name.length
+									+ settings.separator.length);
+							$('.hitarea', t).click();
+							return;
 						}
 					}
-					var activeid = container.data('activeid');
-					container.removeData('activeid');
-					$.each(response, function() {
-								createNode.apply(this, [child, activeid])
-							});
-					$(container).treeview({
-								add : child
-							});
-					var list = child.children('li');
-					if (fullname) {
-						for (var i = 0; i < list.length; i++) {
-							var t = $(list.get(i));
-							var name = t.data('treenode').name;
-							if (name == fullname) {
-								setTimeout(function() {
-											t.children('a').click()
-										}, 200);
-								return;
-							} else if (name
-									&& fullname.indexOf(name
-											+ settings.separator) == 0) {
-								fullname = fullname.substring(name.length
-										+ settings.separator.length);
-								$('.hitarea', t).click();
-								return;
-							}
-						}
-					}
-					if (child.hasClass('treeview') && list.length == 1) {
-						var t = $(list.get(0));
-						$('.hitarea', t).click();
-					}
-				});
+				}
+				if (child.hasClass('treeview') && list.length == 1) {
+					var t = $(list.get(0));
+					$('.hitarea', t).click();
+				}
+
+			}
+		});
 	}
 
 	var proxied = $.fn.treeview;
