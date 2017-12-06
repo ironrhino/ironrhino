@@ -850,7 +850,7 @@ Observation._richtable = function(container) {
 			var option = $('option:selected', property);
 			var size = parseInt($('option:selected', t).data('parameters'));
 			var td = $('td:eq(2)', t.closest('tr'));
-			$(':input,.removeonadd,label', td).remove();
+			$(':input,.removeonadd,.treeselect-inline,label', td).remove();
 			if (size > 0) {
 				if ('select' == option.data('type')) {
 					var select = $('<select name="' + property.val()
@@ -868,6 +868,10 @@ Observation._richtable = function(container) {
 								+ (arr[1] || arr[0]) + '</option>')
 								.appendTo(select);
 					}
+				} else if ('treeselect' == option.data('type')) {
+					$('<input name="' + property.val()
+							+ '" class="treeselect-inline required" data-url="'
+							+ option.data('pickurl') + '"/>').appendTo(td);
 				} else if ('listpick' == option.data('type')
 						|| 'treeselect' == option.data('type')) {
 					$('<input id="filter_' + property.val().replace(/\./g, '_')

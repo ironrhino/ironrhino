@@ -7,11 +7,10 @@
 <body>
 	<@s.form action="${actionBaseUrl}/move" method="post" class="ajax form-horizontal">
 	<@s.hidden name="id" />
-	<div class="control-group treeselect" data-options="{'url':'${actionBaseUrl}/children','cache':false,'type':'treeview','separator':'/','name':'#parent-control','id':'#parent'}">
-		<@s.hidden id="parent" name="parent"/>
+	<div class="control-group">
 		<label class="control-label" for="parent-control">${getText('parentNode')}</label>
 		<div class="controls">
-		<span id="parent-control"></span>
+		<input class="treeselect-inline" name="parent" data-url="${actionBaseUrl}/children" data-separator="/">
 		</div>
 	</div>
 	<@s.submit label=getText('save') class="btn-primary"/>

@@ -68,6 +68,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.groupable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treearea.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treeselect.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treeselect.inline.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.treeview.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.listpick.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.imagepick.js" />
@@ -112,6 +113,7 @@
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.richtable.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.filtercolumn.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.treearea.css" />
+				<file name="${webapp.dir}/assets/styles/source/ironrhino.treeselect.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pattern.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.icon.css" />
 				<file name="${webapp.dir}/assets/styles/source/bootstrap-responsive.css" />

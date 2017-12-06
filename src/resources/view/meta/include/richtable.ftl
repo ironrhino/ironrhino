@@ -482,6 +482,8 @@ ${formFooter!}
 			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='select'>
 			<@s.select disabled=disabled id=id label=label name=key value=(Parameters[key]!) class=cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+		<#elseif config.type=='treeselect' && !disabled>
+			<@s.textfield id=id label=label name=key value=(Parameters[key]!) class='treeselect-inline '+cssClass data\-url=pickUrl dynamicAttributes=dynamicAttributes/>
 		<#elseif (config.type=='listpick' || config.type=='treeselect') && !disabled>
 			<div id="control-group-${id}" class="control-group ${config.type}" data-options="{'url':'<@url value=pickUrl/>'}"<#if group?has_content> data-group="${group}"</#if>>
 				<@s.hidden id=id name=key class=config.type+"-id ${cssClass}" dynamicAttributes=dynamicAttributes/>

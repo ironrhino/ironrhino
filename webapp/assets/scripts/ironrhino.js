@@ -31398,8 +31398,7 @@ Message = {
 			if (!$('#message', parent).length)
 				$('<div id="message"></div>').prependTo(parent);
 			var msg = $('#message', parent);
-			if (type == 'error' && target
-					&& $(target).prop('tagName') == 'FORM') {
+			if (type == 'error' && target && $(target).is('form')) {
 				if (!$(target).attr('id'))
 					$(target).attr('id', 'form' + new Date().getTime());
 				var fid = $(target).attr('id');
@@ -31433,6 +31432,8 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
+			else if (field.parent('.treeselect-inline').length)
+				field = field.parent().addClass('error');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
@@ -31503,23 +31504,29 @@ Form = {
 		}
 	},
 	clearError : function(target) {
-		if ($(target).prop('tagName') == 'FORM') {
-			$('.control-group.error, .error:input', target)
-					.removeClass('error');
-			$('.field-error', target).fadeIn().remove();
-		} else if ($(target).prop('tagName') == 'DIV') {
-			$(target).removeClass('error');
+		if ($(target).is('form,div')) {
+			$$('.error', target).removeClass('error');
 			$('.field-error', target).fadeIn().remove();
 		} else {
 			var cg = Form.findControlGroup(target);
-			cg.length ? cg.removeClass('error') : $(target)
-					.removeClass('error');
-			$('.field-error', $(target).parent()).fadeIn().remove();
+			if (cg.length) {
+				$$('.error', cg).removeClass('error');
+				$('.field-error', cg).fadeIn().remove();
+			} else {
+				$(target).removeClass('error');
+			};
+			var p = $(target).parent();
+			if (p.is('.treeselect-inline'))
+				p = p.parent();
+			if (!p.is('form,fieldset')) {
+				$$('.error', p).removeClass('error');
+				$('.field-error', p).fadeIn().remove();
+			}
 		}
 	},
 	validate : function(target, evt) {
 		var t = $(target);
-		if (t.prop('tagName') != 'FORM') {
+		if (!t.is('form')) {
 			if (!t.is('[type="hidden"]') || !t.prevAll(':input').length)
 				Form.clearError(target);
 			if (t.is('input[type="radio"]')) {
@@ -31548,12 +31555,11 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.treeselect-inline > input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
-					Message.showFieldError(target, null,
-							t.prop('tagName') == 'SELECT'
+					Message.showFieldError(target, null, t.is('select')
 									|| t.is('[type="hidden"]')
 									|| t.is('.custom[type="file"]')
 									? 'selection.required'
@@ -31716,12 +31722,16 @@ Form = {
 	},
 	findControlGroup : function(target) {
 		var t = $(target);
-		if (t.parent('.input-append,.input-prepend').length)
+		if (t.parent('.input-append,.input-prepend,.treeselect-inline').length)
 			t = t.parent();
 		if (t.is('[type="hidden"]')) {
 			var cg = t.parent('.control-group');
 			if (cg.length)
 				return cg;
+		}
+		if (t.closest('.field-error').parent('.controls').length) {
+			return t.closest('.field-error').parent('.controls')
+					.parent('.control-group');
 		}
 		return t.parent('.controls').parent('.control-group');
 	}
@@ -31882,7 +31892,7 @@ Ajax = {
 				}
 			}
 		}
-		if ($(target).prop('tagName') == 'FORM' && !options.preflight) {
+		if ($(target).is('form') && !options.preflight) {
 			if (!hasError) {
 				if ($(target).hasClass('disposable'))
 					$(target).addClass('disposed').find(':input').prop(
@@ -31930,10 +31940,9 @@ function ajaxOptions(options) {
 			});
 	var target = $(options.target);
 	var replacement = {};
-	var entries = (options.replacement
-			|| $(options.target).data('replacement')
-			|| ($(options.target).prop('tagName') == 'FORM' ? $(target)
-					.attr('id') : null) || Ajax.defaultRepacement).split(',');
+	var entries = (options.replacement || $(options.target).data('replacement')
+			|| ($(options.target).is('form') ? $(target).attr('id') : null) || Ajax.defaultRepacement)
+			.split(',');
 	var arr = [];
 	for (var i = 0; i < entries.length; i++) {
 		var entry = entries[i];
@@ -32038,7 +32047,7 @@ Initialization.common = function() {
 				$.setClipboard(content);
 			}).on('reset', 'form', function(e) {
 				var t = $(e.target);
-				t.find('.resettable').html('');
+				t.find('.resettable').html('').val('');
 				setTimeout(function() {
 							t.find(':input').filter(function() {
 										return $(this).val()
@@ -32067,7 +32076,7 @@ Initialization.common = function() {
 		var t = $(e.target);
 		var cg = Form.findControlGroup(t);
 		Form.clearError(cg.length ? cg : t.closest('.field-error')
-				.prev(':input'));
+				.prev(':input,.treeselect-inline'));
 		t.closest('.field-error').remove();
 		return false;
 	}).on('validate', ':input', function(ev) {
@@ -32081,10 +32090,11 @@ Initialization.common = function() {
 						}
 						return true;
 					})).on('change', 'input,textarea', function(ev) {
-				if (!this.defaultValue || this.value != this.defaultValue)
-					Form.validate(this, 'change');
-				return true;
-			}).on('change', 'select', function() {
+		if (this.type == 'hidden' || !this.defaultValue
+				|| this.value != this.defaultValue)
+			Form.validate(this, 'change');
+		return true;
+	}).on('change', 'select', function() {
 				Form.validate(this, 'change');
 				return true;
 			}).on('dblclick', '.ui-dialog-titlebar', function() {
@@ -32428,9 +32438,10 @@ Observation.common = function(container) {
 				$(this).remove();
 				Message.showFieldError(field, text);
 			});
-	var ele = ($(container).prop('tagName') == 'FORM' && $(container)
-			.hasClass('focus')) ? container : $('.focus:eq(0)', container);
-	if (ele.prop('tagName') != 'FORM' && ele.attr('name')) {
+	var ele = ($(container).is('form') && $(container).hasClass('focus'))
+			? container
+			: $('.focus:eq(0)', container);
+	if (!ele.is('form') && ele.attr('name')) {
 		ele.focus();
 	} else {
 		var arr = $(':input:visible', ele).toArray();
@@ -38133,7 +38144,7 @@ Observation._richtable = function(container) {
 			var option = $('option:selected', property);
 			var size = parseInt($('option:selected', t).data('parameters'));
 			var td = $('td:eq(2)', t.closest('tr'));
-			$(':input,.removeonadd,label', td).remove();
+			$(':input,.removeonadd,.treeselect-inline,label', td).remove();
 			if (size > 0) {
 				if ('select' == option.data('type')) {
 					var select = $('<select name="' + property.val()
@@ -38151,6 +38162,10 @@ Observation._richtable = function(container) {
 								+ (arr[1] || arr[0]) + '</option>')
 								.appendTo(select);
 					}
+				} else if ('treeselect' == option.data('type')) {
+					$('<input name="' + property.val()
+							+ '" class="treeselect-inline required" data-url="'
+							+ option.data('pickurl') + '"/>').appendTo(td);
 				} else if ('listpick' == option.data('type')
 						|| 'treeselect' == option.data('type')) {
 					$('<input id="filter_' + property.val().replace(/\./g, '_')
@@ -39316,6 +39331,81 @@ Observation.treeselect = function(container) {
 		}
 	}
 };
+(function($) {
+	$.fn.treeselectinline = function() {
+		this.each(function() {
+			var t = $(this).attr('type', 'hidden')
+					.removeClass('.treeselect-inline').addClass('resettable')
+					.wrap('<div class="treeselect-inline"></div>');
+			var treeselect = t.parent();
+			if (t.prop('disabled'))
+				treeselect.addClass('disabled');
+			if (t.prop('readonly'))
+				treeselect.addClass('readonly');
+			var text = $('<div class="text resettable"/>').appendTo(treeselect);
+			if (t.data('text')) {
+				text.text(t.data('text'));
+				t.removeAttr('data-text');
+			}
+			$('<i class="glyphicon glyphicon-menu-down"/><i class="glyphicon glyphicon-remove"/><div class="options"/>')
+					.appendTo(treeselect);
+		});
+		return this;
+	};
+})(jQuery);
+
+$(function() {
+	$(document).on('click', '.treeselect-inline', function(e) {
+		var t = $(e.target).closest('.treeselect-inline');
+		var input = t.children('input');
+		var text = t.children('.text');
+		if (input.prop('disabled') || input.prop('readonly'))
+			return;
+		if ($(e.target).is('.glyphicon-remove')) {
+			input.val('').trigger('change');
+			text.text('');
+			return;
+		}
+		if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
+			return;
+		var treeselect = $(e.target).closest('.treeselect-inline');
+		treeselect.find('.glyphicon').toggleClass('glyphicon-menu-down')
+				.toggleClass('glyphicon-menu-up');
+		var options = treeselect.find('.options').toggle();
+		if (treeselect.find('.glyphicon-menu-up').length) {
+			if (input.data('url') && !options.html()) {
+				var treeview = $('<div class="treeview"/>').appendTo(options);
+				treeview.treeview({
+							url : input.data('url'),
+							click : function(e) {
+								var treeselect = $(e.target)
+										.closest('.treeselect-inline');
+								var input = treeselect.children('input');
+								var text = treeselect.children('.text');
+								var node = $(this).closest('li')
+										.data('treenode');
+								input.val(node.id).trigger('change');
+								text.text(node.fullname);
+								treeselect.click();
+							},
+							value : input.data('text'),
+							separator : input.data('separator')
+						});
+			}
+		}
+
+	});
+	$(document).click(function(e) {
+				var target = $(e.target);
+				if (!target.closest('.treeselect-inline').length)
+					$('.treeselect-inline .glyphicon-menu-up').parent().click();
+			});
+});
+
+Observation.treeselectinline = function(container) {
+	$$('input.treeselect-inline', container).treeselectinline();
+
+}
 Observation.treeview = function(container) {
 	$$('.treeview', container).each(function() {
 		var t = $(this);

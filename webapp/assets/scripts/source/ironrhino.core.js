@@ -351,8 +351,7 @@ Message = {
 			if (!$('#message', parent).length)
 				$('<div id="message"></div>').prependTo(parent);
 			var msg = $('#message', parent);
-			if (type == 'error' && target
-					&& $(target).prop('tagName') == 'FORM') {
+			if (type == 'error' && target && $(target).is('form')) {
 				if (!$(target).attr('id'))
 					$(target).attr('id', 'form' + new Date().getTime());
 				var fid = $(target).attr('id');
@@ -386,6 +385,8 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
+			else if (field.parent('.treeselect-inline').length)
+				field = field.parent().addClass('error');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
@@ -456,23 +457,29 @@ Form = {
 		}
 	},
 	clearError : function(target) {
-		if ($(target).prop('tagName') == 'FORM') {
-			$('.control-group.error, .error:input', target)
-					.removeClass('error');
-			$('.field-error', target).fadeIn().remove();
-		} else if ($(target).prop('tagName') == 'DIV') {
-			$(target).removeClass('error');
+		if ($(target).is('form,div')) {
+			$$('.error', target).removeClass('error');
 			$('.field-error', target).fadeIn().remove();
 		} else {
 			var cg = Form.findControlGroup(target);
-			cg.length ? cg.removeClass('error') : $(target)
-					.removeClass('error');
-			$('.field-error', $(target).parent()).fadeIn().remove();
+			if (cg.length) {
+				$$('.error', cg).removeClass('error');
+				$('.field-error', cg).fadeIn().remove();
+			} else {
+				$(target).removeClass('error');
+			};
+			var p = $(target).parent();
+			if (p.is('.treeselect-inline'))
+				p = p.parent();
+			if (!p.is('form,fieldset')) {
+				$$('.error', p).removeClass('error');
+				$('.field-error', p).fadeIn().remove();
+			}
 		}
 	},
 	validate : function(target, evt) {
 		var t = $(target);
-		if (t.prop('tagName') != 'FORM') {
+		if (!t.is('form')) {
 			if (!t.is('[type="hidden"]') || !t.prevAll(':input').length)
 				Form.clearError(target);
 			if (t.is('input[type="radio"]')) {
@@ -501,12 +508,11 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.treeselect-inline > input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
-					Message.showFieldError(target, null,
-							t.prop('tagName') == 'SELECT'
+					Message.showFieldError(target, null, t.is('select')
 									|| t.is('[type="hidden"]')
 									|| t.is('.custom[type="file"]')
 									? 'selection.required'
@@ -669,12 +675,16 @@ Form = {
 	},
 	findControlGroup : function(target) {
 		var t = $(target);
-		if (t.parent('.input-append,.input-prepend').length)
+		if (t.parent('.input-append,.input-prepend,.treeselect-inline').length)
 			t = t.parent();
 		if (t.is('[type="hidden"]')) {
 			var cg = t.parent('.control-group');
 			if (cg.length)
 				return cg;
+		}
+		if (t.closest('.field-error').parent('.controls').length) {
+			return t.closest('.field-error').parent('.controls')
+					.parent('.control-group');
 		}
 		return t.parent('.controls').parent('.control-group');
 	}
@@ -835,7 +845,7 @@ Ajax = {
 				}
 			}
 		}
-		if ($(target).prop('tagName') == 'FORM' && !options.preflight) {
+		if ($(target).is('form') && !options.preflight) {
 			if (!hasError) {
 				if ($(target).hasClass('disposable'))
 					$(target).addClass('disposed').find(':input').prop(
@@ -883,10 +893,9 @@ function ajaxOptions(options) {
 			});
 	var target = $(options.target);
 	var replacement = {};
-	var entries = (options.replacement
-			|| $(options.target).data('replacement')
-			|| ($(options.target).prop('tagName') == 'FORM' ? $(target)
-					.attr('id') : null) || Ajax.defaultRepacement).split(',');
+	var entries = (options.replacement || $(options.target).data('replacement')
+			|| ($(options.target).is('form') ? $(target).attr('id') : null) || Ajax.defaultRepacement)
+			.split(',');
 	var arr = [];
 	for (var i = 0; i < entries.length; i++) {
 		var entry = entries[i];
@@ -991,7 +1000,7 @@ Initialization.common = function() {
 				$.setClipboard(content);
 			}).on('reset', 'form', function(e) {
 				var t = $(e.target);
-				t.find('.resettable').html('');
+				t.find('.resettable').html('').val('');
 				setTimeout(function() {
 							t.find(':input').filter(function() {
 										return $(this).val()
@@ -1020,7 +1029,7 @@ Initialization.common = function() {
 		var t = $(e.target);
 		var cg = Form.findControlGroup(t);
 		Form.clearError(cg.length ? cg : t.closest('.field-error')
-				.prev(':input'));
+				.prev(':input,.treeselect-inline'));
 		t.closest('.field-error').remove();
 		return false;
 	}).on('validate', ':input', function(ev) {
@@ -1034,10 +1043,11 @@ Initialization.common = function() {
 						}
 						return true;
 					})).on('change', 'input,textarea', function(ev) {
-				if (!this.defaultValue || this.value != this.defaultValue)
-					Form.validate(this, 'change');
-				return true;
-			}).on('change', 'select', function() {
+		if (this.type == 'hidden' || !this.defaultValue
+				|| this.value != this.defaultValue)
+			Form.validate(this, 'change');
+		return true;
+	}).on('change', 'select', function() {
 				Form.validate(this, 'change');
 				return true;
 			}).on('dblclick', '.ui-dialog-titlebar', function() {
@@ -1381,9 +1391,10 @@ Observation.common = function(container) {
 				$(this).remove();
 				Message.showFieldError(field, text);
 			});
-	var ele = ($(container).prop('tagName') == 'FORM' && $(container)
-			.hasClass('focus')) ? container : $('.focus:eq(0)', container);
-	if (ele.prop('tagName') != 'FORM' && ele.attr('name')) {
+	var ele = ($(container).is('form') && $(container).hasClass('focus'))
+			? container
+			: $('.focus:eq(0)', container);
+	if (!ele.is('form') && ele.attr('name')) {
 		ele.focus();
 	} else {
 		var arr = $(':input:visible', ele).toArray();

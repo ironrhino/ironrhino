@@ -59,21 +59,17 @@
 <@richtable columns=columns actionColumnButtons=actionColumnButtons bottomButtons=bottomButtons/>
 <form id="move" action="${actionBaseUrl}/move" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${getText('confirm')}?');" onsuccess="$('#region_form').submit()">
 	<div class="center">
-	<input id="regionId1" type="hidden" name="id"/>
-	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId1','cache':false}"></span>
+	<input class="treeselect-inline" name="id" data-url="/region/children"/>
 	--&gt;
-	<input id="regionId2" type="hidden" name="id"/>
-	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId2','cache':false}"></span>
+	<input class="treeselect-inline" name="id" data-url="/region/children"/>
 	<@s.submit theme="simple" label=getText('confirm') />
 	</div>
 </form>
 <form id="merge" action="${actionBaseUrl}/merge" method="post" class="ajax reset" style="display:none;" onprepare="return confirm('${getText('confirm')}?');" onsuccess="$('#region_form').submit()">
 	<div class="center">
-	<input id="regionId3" type="hidden" name="id"/>
-	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId3','cache':false}"></span>
+	<input class="treeselect-inline" name="id" data-url="/region/children"/>
 	--&gt;
-	<input id="regionId4" type="hidden" name="id"/>
-	<span class="treeselect" data-options="{'url':'<@url value="/region/children"/>','name':'this','id':'#regionId4','cache':false}"></span>
+	<input class="treeselect-inline" name="id" data-url="/region/children"/>
 	<@s.submit theme="simple" label=getText('confirm') />
 	</div>
 </form>

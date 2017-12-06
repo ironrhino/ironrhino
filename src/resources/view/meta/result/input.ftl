@@ -67,6 +67,13 @@
 					<@checkDictionary disabled=readonly id=id dictionaryName=templateName name=name class=config.cssClass dynamicAttributes=dynamicAttributes/>
 				</#if>
 			</@controlGroup>
+		<#elseif config.type=='treeselect'&&!config.multiple>
+			<div id="control-group-${id}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+				<@controlLabel label=label description=description/>
+				<div class="controls">
+				<input class="treeselect-inline ${config.cssClass}"<#if readonly> readonly</#if> name="${name}"<#if value.id?has_content> value="${value.id}"</#if> data-url="${pickUrl}" data-text="<#if value.fullname??>${value.fullname!}<#else>${value!}</#if>">
+				</div>
+			</div>
 		<#elseif config.type=='listpick'||config.type=='treeselect'>
 			<div id="control-group-${id}" class="control-group <#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
 				<#if config.multiple&&value?has_content&&value?is_enumerable>
@@ -195,16 +202,18 @@
 								<#if readonly><#if value?has_content><#list value as en><@s.hidden id="" name=name value=en.name()/></#list></#if></#if>
 								<@checkDictionary disabled=readonly id="" dictionaryName=templateName name=name required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 							</#if>
+						<#elseif config.type=='treeselect'&&!config.multiple>
+							<input class="treeselect-inline ${config.cssClass}"<#if readonly> readonly</#if> name="${name}"<#if value.id?has_content> value="${value.id}"</#if> data-url="${pickUrl}" data-text="<#if value.fullname??>${value.fullname!}<#else>${value!}</#if>">
 						<#elseif config.type=='listpick'||config.type=='treeselect'>
-								<div class="<#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}">
-								<#if config.multiple&&value?has_content&&value?is_enumerable>
-									<#local arr=[]><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list>
-									<@s.hidden name=name value=arr?join(',') class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
-								<#else>
-									<@s.hidden name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
-								</#if>
-								<span class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></span>
-								</div>
+							<div class="<#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}">
+							<#if config.multiple&&value?has_content&&value?is_enumerable>
+								<#local arr=[]><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list>
+								<@s.hidden name=name value=arr?join(',') class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
+							<#else>
+								<@s.hidden name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
+							</#if>
+							<span class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></span>
+							</div>
 						<#else>
 							<#if value?is_date_like>
 								<#if config.cssClass?contains('datetime')><#local value=value?datetime/><#elseif config.cssClass?contains('time')><#local value=value?time/><#else><#local value=value?date/></#if>
