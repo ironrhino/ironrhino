@@ -28,7 +28,7 @@ public class I18N {
 	public static String getText(Class<?> clazz, String key, Object[] args) {
 		ActionContext context = ActionContext.getContext();
 		Locale locale = context != null ? context.getLocale() : LocaleContextHolder.getLocale();
-		ValueStack vs = context != null ? context.getValueStack() : new DummyValueStack();
+		ValueStack vs = context != null ? context.getValueStack() : DummyValueStack.INSTANCE;
 		try {
 			return LocalizedTextUtil.findText(clazz, key, locale, key, args, vs);
 		} catch (Exception e) {
@@ -38,6 +38,8 @@ public class I18N {
 
 	@SuppressWarnings("rawtypes")
 	private static class DummyValueStack implements ValueStack {
+
+		static final DummyValueStack INSTANCE = new DummyValueStack();
 
 		@Override
 		public Map<String, Object> getContext() {
