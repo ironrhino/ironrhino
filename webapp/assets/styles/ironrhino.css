@@ -8918,7 +8918,7 @@ table .resizeBar {
 	width: 200px;
 }
 
-table.richtable{
+table.richtable {
 	margin-bottom: 10px;
 }
 
@@ -9019,36 +9019,36 @@ form.query {
 	margin-bottom: 10px;
 }
 
-form.query div[class*="row"]{
+form.query div.row , form.query div.row-fluid {
 	border: 1px solid #ddd;
 	box-sizing: border-box;
 }
 
-form.query div.row, form.query div.row [class*="span"]{
+form.query div.row , form.query div.row [class *= "span"] {
 	margin-left: 0;
 }
 
-form.query.folded div[class*="row"]{
+form.query.folded div.row , form.query.folded div.row-fluid {
 	border-top-width: 0;
 	border-bottom-width: 0;
 }
 
-form.query.folded div[class*="row"]:first-of-type{
+form.query.folded div.row:first-of-type , form.query.folded div.row-fluid:first-of-type {
 	border-top-width: 1px;
 	padding-top: 10px;
 }
 
-form.query.folded .tab-pane.active div[class*="row"]:first-of-type{
+form.query.folded .tab-pane.active div.row:first-of-type , form.query.folded .tab-pane.active div.row-fluid:first-of-type {
 	border-top-width: 0;
 	margin-top: -20px;
 }
 
-form.query.folded .tab-pane.active div[class*="row"]:last-of-type{
+form.query.folded .tab-pane.active div.row:last-of-type , form.query.folded .tab-pane.active div.row-fluid:last-of-type {
 	border-bottom-width: 1px;
 	margin-bottom: 6px;
 }
 
-form.query:not(.folded) div[class*="row"]{
+form.query:not(.folded) div.row , form.query:not(.folded) div.row-fluid {
 	padding-top: 10px;
 	margin-bottom: 5px;
 }
@@ -9063,9 +9063,6 @@ form.query div.form-actions {
 }
 
 form.query div.fold {
-	/*
-	text-align: center;
-	*/
 	border-top: 1px solid #ddd;
 	margin-bottom: -25px;
 	transition: border-color .15s ease-in-out;
