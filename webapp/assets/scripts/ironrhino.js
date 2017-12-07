@@ -36429,6 +36429,7 @@ Observation.sortableTable = function(container) {
 			r.show().find('._disabled:input').removeClass('_disabled').prop(
 					'disabled', false);
 		$('*', r).removeAttr('id');
+		$('.resettable', r).html('');
 		$('span.info', r).html('');
 		$(':input[type!=checkbox][type!=radio]:not(.fixedvalue)', r).val('')
 				.change();

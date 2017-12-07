@@ -76,7 +76,7 @@
 					<@s.hidden id=id name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 				</#if>
 				<@controlLabel label=label description=description/>
-				<div class="controls<#if readonly> text</#if>">
+				<div class="controls">
 				<span class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if></#if></#if></span>
 				</div>
 			</div>

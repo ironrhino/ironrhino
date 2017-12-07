@@ -57,7 +57,7 @@
   display: none;
 }
 .has-switch span,
-.has-switch .switch-animate label {
+.has-switch > div > label {
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
