@@ -24,6 +24,7 @@
 .treeview li {
 	margin: 0;
 	padding: 3px 0pt 3px 16px;
+	text-align: left;
 	background: url(../images/treeview-default-line.gif) 0 0 no-repeat;
 }
 

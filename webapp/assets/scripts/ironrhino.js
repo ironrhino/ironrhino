@@ -22613,12 +22613,12 @@ ctrlr.prototype.setObjectValue=function(data){
 					var parentTreenode = $(parent).parent('li')
 							.data('treenode');
 					this.parent = parentTreenode;
-					if (!this.fullname)
-						if (parentTreenode)
-							this.fullname = (parentTreenode.fullname || parentTreenode.name)
-									+ (settings.separator) + this.name;
-						else
-							this.fullname = this.name;
+					// if (!this.fullname)
+					if (parentTreenode)
+						this.fullname = (parentTreenode.fullname || parentTreenode.name)
+								+ (settings.separator) + this.name;
+					else
+						this.fullname = this.name;
 					var template = settings.template;
 					var current = $("<li/>").data('treenode', this)
 							.appendTo(parent);
