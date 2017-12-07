@@ -134,6 +134,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 				String fullId = (t.getParent()).getFullId() + String.valueOf(t.getId()) + ".";
 				t.setFullId(fullId);
 				t.setLevel(fullId.split("\\.").length);
+				treeNode.setParent(treeNode.getParent());
 				resetChildren(t);
 			}
 	}

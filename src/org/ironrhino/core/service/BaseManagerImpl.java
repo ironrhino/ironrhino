@@ -126,6 +126,8 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				fullId = entity.getParent().getFullId() + fullId;
 			entity.setFullId(fullId);
 			entity.setLevel(fullId.split("\\.").length);
+			if (entity.getParent() != null)
+				entity.setParent(entity.getParent()); //recalculate fullname
 			session.saveOrUpdate(obj);
 			if (childrenNeedChange) {
 				for (Object c : entity.getChildren()) {
