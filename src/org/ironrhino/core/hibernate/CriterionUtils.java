@@ -215,6 +215,10 @@ public class CriterionUtils {
 					else
 						operator = CriterionOperator.EQ;
 				}
+				if (operator.getParametersSize() == 0) {
+					dc.add(operator.operator(propertyName));
+					return state;
+				}
 				if (parameterValues.length < operator.getParametersSize())
 					continue;
 				if (propertyName.indexOf('.') > 0) {
