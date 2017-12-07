@@ -991,7 +991,7 @@ Initialization.common = function() {
 				$.setClipboard(content);
 			}).on('reset', 'form', function(e) {
 				var t = $(e.target);
-				t.find('.resetable').html('');
+				t.find('.resettable').html('');
 				setTimeout(function() {
 							t.find(':input').filter(function() {
 										return $(this).val()

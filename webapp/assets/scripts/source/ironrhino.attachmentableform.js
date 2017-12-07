@@ -25,7 +25,7 @@
 			formactions.find('.btn[type="submit"]').addClass('btn-primary');
 			if (!$('ul.attachments.thumbnails', t).length)
 				formactions
-						.before('<div style="padding: 10px 50px;"><ul class="attachments resetable thumbnails" style="min-height:50px;"></ul></div>');
+						.before('<div style="padding: 10px 50px;"><ul class="attachments resettable thumbnails" style="min-height:50px;"></ul></div>');
 			t.find('button.upload').click(function() {
 				$('<input type="file" multiple />').appendTo(t).hide().change(
 						function() {

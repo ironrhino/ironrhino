@@ -32038,7 +32038,7 @@ Initialization.common = function() {
 				$.setClipboard(content);
 			}).on('reset', 'form', function(e) {
 				var t = $(e.target);
-				t.find('.resetable').html('');
+				t.find('.resettable').html('');
 				setTimeout(function() {
 							t.find(':input').filter(function() {
 										return $(this).val()
@@ -38695,7 +38695,7 @@ if (window.FileReader)
 			formactions.find('.btn[type="submit"]').addClass('btn-primary');
 			if (!$('ul.attachments.thumbnails', t).length)
 				formactions
-						.before('<div style="padding: 10px 50px;"><ul class="attachments resetable thumbnails" style="min-height:50px;"></ul></div>');
+						.before('<div style="padding: 10px 50px;"><ul class="attachments resettable thumbnails" style="min-height:50px;"></ul></div>');
 			t.find('button.upload').click(function() {
 				$('<input type="file" multiple />').appendTo(t).hide().change(
 						function() {
