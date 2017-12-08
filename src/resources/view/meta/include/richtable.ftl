@@ -320,10 +320,10 @@ ${formFooter!}
 </form>
 <#if filterable>
 <form method="post" class="ajax view criteria" style="display:none;">
-<table class="table datagrid criteria">
+<table class="table datagrid criteria center">
 	<tbody>
 		<tr>
-			<td style="width:30%;">
+			<td class="center" style="width:38%;">
 				<select class="decrease property">
 					<option value=""></option>
 					<#list propertyNamesInCriteria as key,value>
@@ -351,7 +351,7 @@ ${formFooter!}
 					</#list>
 				</select>
 			</td>
-			<td style="width:30%;text-align:right;">
+			<td class="center" style="width:24%;">
 			<select class="operator">
 			<#list statics['org.ironrhino.core.hibernate.CriterionOperator'].values() as op>
 			<option value="${op.name()}" data-parameters="${op.parametersSize}">${op}</option>
@@ -359,14 +359,14 @@ ${formFooter!}
 			</select>
 			</td>
 			<td class="center"></td>
-			<td class="manipulate"></td>
+			<td class="manipulate" style="width:5%;text-align:right;"></td>
 		</tr>
 	</tbody>
 </table>
 <table class="table datagrid ordering">
 	<tbody>
 		<tr>
-			<td style="width:30%;">
+			<td class="center" style="width:38%;">
 				<select class="decrease property">
 					<option value=""></option>
 					<#list propertyNamesInCriteria as key,value>
@@ -383,14 +383,14 @@ ${formFooter!}
 					</#list>
 				</select>
 			</td>
-			<td style="width:30%;text-align:right;">
+			<td class="center" style="width:24%;">
 			<select class="ordering">
 			<option value="asc">${getText('ascending')}</option>
 			<option value="desc">${getText('descending')}</option>
 			</select>
 			</td>
 			<td class="center"></td>
-			<td class="manipulate"></td>
+			<td class="manipulate" style="width:5%;text-align:right;"></td>
 		</tr>
 	</tbody>
 	<tfoot>
