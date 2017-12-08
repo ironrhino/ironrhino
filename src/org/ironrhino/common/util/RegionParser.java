@@ -17,36 +17,35 @@ public class RegionParser {
 	}
 
 	public static List<Region> parse(InputStream inputStream) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 		List<String> segments = new ArrayList<>();
-		String line;
-		boolean end = false;
-		StringBuilder sb = new StringBuilder();
-		while ((line = br.readLine()) != null) {
-			line = line.trim();
-			if ("".equals(line)) {
-				if (!end)
-					end = true;
-				else
-					continue;
-			} else {
-				if (line.charAt(0) == (char) 65279)
-					line = line.substring(1);
-				sb.append(line);
-				sb.append('\n');
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+			String line;
+			boolean end = false;
+			StringBuilder sb = new StringBuilder();
+			while ((line = br.readLine()) != null) {
+				line = line.trim();
+				if ("".equals(line)) {
+					if (!end)
+						end = true;
+					else
+						continue;
+				} else {
+					if (line.charAt(0) == (char) 65279)
+						line = line.substring(1);
+					sb.append(line);
+					sb.append('\n');
+				}
+				if (end) {
+					String s = sb.toString().trim();
+					if (!"".equals(s))
+						segments.add(s);
+					sb.delete(0, sb.length());
+					end = false;
+				}
 			}
-			if (end) {
-				String s = sb.toString().trim();
-				if (!"".equals(s))
-					segments.add(s);
-				sb.delete(0, sb.length());
-				end = false;
-			}
+			if (sb.length() > 0)
+				segments.add(sb.toString().trim());
 		}
-		if (sb.length() > 0)
-			segments.add(sb.toString().trim());
-
-		br.close();
 		List<Region> regions = new ArrayList<>();
 		for (int i = 0; i < segments.size(); i++) {
 			Region child = parseSegment(segments.get(i));
