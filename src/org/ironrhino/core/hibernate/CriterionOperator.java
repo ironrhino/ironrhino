@@ -64,7 +64,7 @@ public enum CriterionOperator implements Displayable {
 				return Restrictions.or(Restrictions.isNull(name), Restrictions.or(Restrictions.lt(name, value),
 						Restrictions.gt(name, DateUtils.endOfDay((Date) value))));
 			else
-				return Restrictions.ne(name, value);
+				return Restrictions.or(Restrictions.ne(name, value), Restrictions.isNull(name));
 		}
 	},
 	START(1) {
