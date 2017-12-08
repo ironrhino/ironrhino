@@ -25,9 +25,9 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.ironrhino.core.util.TypeUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -261,7 +261,7 @@ public class JdbcRepositoryFactoryBean
 		case SELECT:
 			if (returnType instanceof Class) {
 				Class<?> clz = (Class<?>) returnType;
-				if (TypeUtils.isSimple(clz)) {
+				if (BeanUtils.isSimpleValueType(clz)) {
 					return namedParameterJdbcTemplate.queryForObject(sql, sqlParameterSource, clz);
 				} else {
 					List<?> result = namedParameterJdbcTemplate.query(sql, sqlParameterSource,
@@ -276,7 +276,7 @@ public class JdbcRepositoryFactoryBean
 					Type type = pt.getActualTypeArguments()[0];
 					if (type instanceof Class) {
 						Class<?> clz = (Class<?>) type;
-						if (TypeUtils.isSimple(clz)) {
+						if (BeanUtils.isSimpleValueType(clz)) {
 							return namedParameterJdbcTemplate.queryForList(sql, sqlParameterSource, clz);
 						} else {
 							return namedParameterJdbcTemplate.query(sql, sqlParameterSource,

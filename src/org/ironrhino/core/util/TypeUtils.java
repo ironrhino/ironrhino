@@ -9,20 +9,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class TypeUtils {
 
-	public static boolean isSimple(Class<?> type) {
-		if (type.isEnum())
-			return true;
-		if (String.class == type)
-			return true;
-		if ((Boolean.TYPE == type) || Boolean.class == type)
-			return true;
-		if ((Byte.TYPE == type) || Byte.class == type)
-			return true;
-		if ((Character.TYPE == type) || Character.class == type)
-			return true;
-		return isNumeric(type) || isTemporal(type);
-	}
-
 	public static boolean isNumeric(Class<?> type) {
 		return Short.TYPE == type || Integer.TYPE == type || Long.TYPE == type || Float.TYPE == type
 				|| Double.TYPE == type || (Number.class.isAssignableFrom(type));

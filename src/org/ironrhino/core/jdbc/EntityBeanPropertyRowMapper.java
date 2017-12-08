@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.ironrhino.core.util.TypeUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -50,7 +49,7 @@ public class EntityBeanPropertyRowMapper<T> extends MyBeanPropertyRowMapper<T> {
 
 	@Override
 	protected Object getColumnValue(ResultSet rs, int index, PropertyDescriptor pd) throws SQLException {
-		if (!TypeUtils.isSimple(pd.getPropertyType()))
+		if (!org.springframework.beans.BeanUtils.isSimpleValueType(pd.getPropertyType()))
 			return JdbcUtils.getResultSetValue(rs, index, null);
 		return super.getColumnValue(rs, index, pd);
 	}
