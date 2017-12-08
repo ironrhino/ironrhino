@@ -147,7 +147,7 @@ public enum CriterionOperator implements Displayable {
 	CONTAINS(1) {
 		@Override
 		boolean supports(Class<?> clazz) {
-			return Collection.class.isAssignableFrom(clazz);
+			return Collection.class.isAssignableFrom(clazz) || clazz.isArray();
 		}
 
 		@Override
@@ -162,7 +162,7 @@ public enum CriterionOperator implements Displayable {
 	NOTCONTAINS(1) {
 		@Override
 		boolean supports(Class<?> clazz) {
-			return CONTAINS.supports(clazz);
+			return CONTAINS.supports(clazz) || clazz.isArray();
 		}
 
 		@Override

@@ -473,7 +473,7 @@ ${formFooter!}
 		<#local disabled=parameterNamesInQueryString?seq_contains(key)>
 		<#local cssClass=config.cssClass>
 		<#if !config.excludedFromQuery>
-		<#if config.collectionType??>
+		<#if config.multiple>
 			<@s.hidden name=key+'-op' value="CONTAINS"/>
 		</#if>
 		<#if config.type=='checkbox'>
