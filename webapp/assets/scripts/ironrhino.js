@@ -31440,7 +31440,7 @@ Message = {
 						+ '<a class="remove pull-right" href="#">&times;</a></div></div>')
 						.insertAfter(field);
 				var promptTopPosition, promptleftPosition;
-				var fieldWidth = field.width();
+				var fieldWidth = field.outerWidth();
 				var promptHeight = prompt.height();
 				promptTopPosition = field.position().top + field.outerHeight()
 						+ 6;
@@ -31451,7 +31451,7 @@ Message = {
 							- (prompt.width() + 10);
 				} else {
 					promptleftPosition = field.position().left + fieldWidth
-							- 30;
+							- 50;
 				}
 				if (promptleftPosition < 0)
 					promptleftPosition = 0;
