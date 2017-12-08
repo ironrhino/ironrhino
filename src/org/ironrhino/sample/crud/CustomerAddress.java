@@ -24,13 +24,13 @@ public class CustomerAddress implements Serializable {
 	private AddressType type;
 
 	@UiConfig(width = "250px", template = "<#if value?has_content>${value.fullname}</#if>", description = "region.description")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "region")
 	private Region region;
 
 	@UiConfig(cssClass = "input-xxlarge")
 	private String address;
-	
+
 	@UiConfig(width = "80px")
 	private boolean active;
 

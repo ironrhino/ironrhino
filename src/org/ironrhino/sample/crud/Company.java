@@ -54,7 +54,7 @@ public class Company extends BaseEntity {
 	private String organizationCode;
 
 	@UiConfig(width = "150px", template = "<#if value?has_content>${value.fullname}</#if>", group = "contactInfo")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "region")
 	private Region region;
 
