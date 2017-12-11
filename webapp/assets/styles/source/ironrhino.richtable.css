@@ -76,11 +76,10 @@ table.richtable tfoot td {
 .richtable tbody select {
 	width: 100%;
 	margin: 0;
-	padding-left: 0;
 }
 
 .richtable tr.selected td {
-	background-color: #FFC ! important;
+	background-color: #ffc ! important;
 }
 
 .richtable td.edited {
