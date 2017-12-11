@@ -75,15 +75,15 @@
 				</div>
 			</div>
 		<#elseif config.type=='listpick'||config.type=='treeselect'>
-			<div id="control-group-${id}" class="control-group <#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}"<#if group?has_content> data-group="${group}"</#if>>
+			<div id="control-group-${id}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
+				<@controlLabel label=label description=description/>
+				<div class="controls <#if readonly>_</#if>${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}">
 				<#if config.multiple&&value?has_content&&value?is_enumerable>
 					<#local arr=[]><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list>
 					<@s.hidden id=id name=name value=arr?join(',') class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 				<#else>
 					<@s.hidden id=id name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 				</#if>
-				<@controlLabel label=label description=description/>
-				<div class="controls">
 				<span class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if></#if></#if></span>
 				</div>
 			</div>
