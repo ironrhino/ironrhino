@@ -39349,6 +39349,15 @@ Observation.treeselect = function(container) {
 			}
 			$('<i class="glyphicon glyphicon-menu-down"/><i class="glyphicon glyphicon-remove"/><div class="options"/>')
 					.appendTo(treeselect);
+			treeselect.hover(function(e) {
+						var t = $(e.target).closest('.treeselect-inline');
+						var text = t.find('.text').text();
+						if (text)
+							t.attr('title', text);
+					}, function(e) {
+						var t = $(e.target).closest('.treeselect-inline');
+						t.removeAttr('title');
+					});
 		});
 		return this;
 	};
