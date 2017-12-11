@@ -84,7 +84,7 @@
 				<#else>
 					<@s.hidden id=id name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 				</#if>
-				<span class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if></#if></#if></span>
+				<div class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if></#if></#if></div>
 				</div>
 			</div>
 		<#elseif config.type=='attributes'>
@@ -212,7 +212,7 @@
 							<#else>
 								<@s.hidden name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 							</#if>
-							<span class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></span>
+							<div class="${config.type}-name"><#if config.multiple&&config.template?has_content><@config.template?interpret/><#else><#if value?has_content><#if value.fullname??>${value.fullname!}<#else>${value!}</#if><#else><i class="glyphicon glyphicon-list"></i></#if></#if></div>
 							</div>
 						<#else>
 							<#if value?is_date_like>
