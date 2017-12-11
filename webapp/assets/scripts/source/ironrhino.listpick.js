@@ -20,18 +20,21 @@
 			if (i < 0) {
 				var ele = expr == 'this' ? $(container) : $(expr, container);
 				ele.each(function() {
-							var t = $(this);
-							if (t.is(':input')) {
-								t.val(val).trigger('change')
-										.trigger('validate');
-							} else {
-								if (val === null && !t.is('td'))
-									t
-											.html('<i class="glyphicon glyphicon-list"></i>');
-								else
-									t.text(val);
-							}
-						});
+					var t = $(this);
+					if (t.is(':input')) {
+						t.val(val).trigger('change').trigger('validate');
+					} else {
+						if (t.is('.pseudo-input')) {
+							t.find('.text').text(val || '');
+						} else {
+							if (val === null && !t.is('td'))
+								t
+										.html('<i class="glyphicon glyphicon-list"></i>');
+							else
+								t.text(val);
+						}
+					}
+				});
 			} else if (i == 0) {
 				$(container).attr(expr.substring(i + 1), val);
 			} else {
@@ -78,7 +81,8 @@
 			for (var k in options.mapping)
 				val(k, current, null);
 		}
-		$(this).remove();
+		if (!$(this).is('.glyphicon-remove'))
+			$(this).remove();
 		event.stopPropagation();
 		return false;
 	}
@@ -98,27 +102,51 @@
 			if (options.name) {
 				var nametarget = find(options.name, current);
 				nametarget.attr('tabindex', '0');
-				var remove = nametarget.children('a.remove');
-				if (remove.length) {
-					remove.click(removeAction);
+				if (nametarget.is('.pseudo-input')) {
+					var text = nametarget.text();
+					nametarget
+							.addClass('listpick-handle')
+							.html('<span class="text resettable"></span>'
+									+ '<i class="indicator glyphicon glyphicon-list"/>'
+									+ '<i class="remove glyphicon glyphicon-remove"/>')
+							.find('.text').text(text);
+					var input = nametarget
+							.prev('input.listpick-id[type="hidden"]');
+					if (input.length) {
+						input.prependTo(nametarget);
+						if (input.prop('disabled'))
+							nametarget.addClass('disabled');
+						if (input.prop('readonly'))
+							nametarget.addClass('readonly');
+					}
 				} else {
-					var text = val(options.name, current);
-					var viewlink = current.find('a.view[rel="richtable"]');
-					if (current.is('td') && viewlink.length)
-						text = viewlink.text();
-					if (text) {
-						if (text.indexOf('...') < 0)
-							$('<a class="remove" href="#">&times;</a>')
-									.appendTo(nametarget).click(removeAction);
+					var remove = nametarget.children('a.remove');
+					if (remove.length) {
+						remove.click(removeAction);
 					} else {
-						val(options.name, current, null);
+						var text = val(options.name, current);
+						var viewlink = current.find('a.view[rel="richtable"]');
+						if (current.is('td') && viewlink.length)
+							text = viewlink.text();
+						if (text) {
+							if (text.indexOf('...') < 0)
+								$('<a class="remove" href="#">&times;</a>')
+										.appendTo(nametarget)
+										.click(removeAction);
+						} else {
+							val(options.name, current, null);
+						}
 					}
 				}
 			}
 			var func = function(event) {
-				if ($(event.target).is('a.view[rel="richtable"]'))
+				var t = $(event.target);
+				if (t.is('a.view[rel="richtable"]'))
 					return true;
-				var current = $(event.target).closest('.listpick');
+				var current = t.closest('.listpick');
+				if (current
+						.find('.listpick-name.disabled,.listpick-name.readonly').length)
+					return false;
 				var options = current.data('_options');
 				var winid = current.data('winid');
 				if (winid) {
@@ -178,11 +206,16 @@
 											name);
 								nametarget.each(function() {
 									var t = $(this);
-									if (!t.is(':input')
-											&& !t.find('a.remove').length)
-										$('<a class="remove" href="#">&times;</a>')
-												.appendTo(t)
-												.click(removeAction);
+									if (t.is('.pseudo-input')) {
+										t.find('.glyphicon-remove')
+												.click(removeAction);;
+									} else {
+										if (!t.is(':input')
+												&& !t.find('a.remove').length)
+											$('<a class="remove" href="#">&times;</a>')
+													.appendTo(t)
+													.click(removeAction);
+									}
 								});
 							}
 							if (options.id) {
