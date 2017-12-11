@@ -66,8 +66,12 @@
 	display: inline-block;
 	line-height: 28px;
 	margin: 0 5px 0 0;
-	color: #999;
+	opacity: .3;
 	float: right;
+}
+
+.treeselect-inline > .glyphicon:hover {
+	opacity: 1;
 }
 
 .treeselect-inline > .glyphicon-remove {
