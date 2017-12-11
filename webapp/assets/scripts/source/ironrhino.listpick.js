@@ -97,6 +97,7 @@
 			current.data('_options', options);
 			if (options.name) {
 				var nametarget = find(options.name, current);
+				nametarget.attr('tabindex', '0');
 				var remove = nametarget.children('a.remove');
 				if (remove.length) {
 					remove.click(removeAction);

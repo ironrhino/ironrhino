@@ -39336,7 +39336,7 @@ Observation.treeselect = function(container) {
 		this.each(function() {
 			var t = $(this).attr('type', 'hidden')
 					.removeClass('.treeselect-inline').addClass('resettable')
-					.wrap('<div class="treeselect-inline"></div>');
+					.wrap('<div class="treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
 			if (t.prop('disabled'))
 				treeselect.addClass('disabled');
@@ -39346,6 +39346,10 @@ Observation.treeselect = function(container) {
 			if (t.data('text')) {
 				text.text(t.data('text'));
 				t.removeAttr('data-text');
+			}
+			if (t.attr('id')) {
+				treeselect.attr('id', t.attr('id'));
+				t.removeAttr('id');
 			}
 			$('<i class="glyphicon glyphicon-menu-down"/><i class="glyphicon glyphicon-remove"/><div class="options"/>')
 					.appendTo(treeselect);
@@ -39559,6 +39563,7 @@ Observation.treeview = function(container) {
 			current.data('_options', options);
 			if (options.name) {
 				var nametarget = find(options.name, current);
+				nametarget.attr('tabindex', '0');
 				var remove = nametarget.children('a.remove');
 				if (remove.length) {
 					remove.click(removeAction);

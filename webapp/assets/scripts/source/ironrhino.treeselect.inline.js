@@ -3,7 +3,7 @@
 		this.each(function() {
 			var t = $(this).attr('type', 'hidden')
 					.removeClass('.treeselect-inline').addClass('resettable')
-					.wrap('<div class="treeselect-inline"></div>');
+					.wrap('<div class="treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
 			if (t.prop('disabled'))
 				treeselect.addClass('disabled');
@@ -13,6 +13,10 @@
 			if (t.data('text')) {
 				text.text(t.data('text'));
 				t.removeAttr('data-text');
+			}
+			if (t.attr('id')) {
+				treeselect.attr('id', t.attr('id'));
+				t.removeAttr('id');
 			}
 			$('<i class="glyphicon glyphicon-menu-down"/><i class="glyphicon glyphicon-remove"/><div class="options"/>')
 					.appendTo(treeselect);
