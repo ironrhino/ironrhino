@@ -37715,8 +37715,7 @@ Richtable = {
 					$.each(row.cells, function(i) {
 						var theadCell = $(theadCells[i]);
 						var name = theadCell.data('cellname');
-						if (!name || !$(this).hasClass('edited')
-								&& theadCell.hasClass('excludeIfNotEdited'))
+						if (!name || !$(this).hasClass('edited'))
 							return;
 						var value = $(this).data('cellvalue') || $(this).text();
 						params[name] = value;

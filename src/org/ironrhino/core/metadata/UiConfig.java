@@ -73,8 +73,6 @@ public @interface UiConfig {
 
 	String cellDynamicAttributes() default ""; // json map
 
-	boolean excludeIfNotEdited() default false;
-
 	String listKey() default "";
 
 	String listValue() default "";

@@ -64,7 +64,6 @@ public class AnnotationShadows {
 		private Map<String, String> internalDynamicAttributes = new HashMap<>(0);
 		private String dynamicAttributes = "";
 		private String cellDynamicAttributes = "";
-		private boolean excludeIfNotEdited;
 		private String listKey = "";
 		private String listValue = "";
 		private String listOptions = "";
@@ -116,7 +115,6 @@ public class AnnotationShadows {
 			this.dynamicAttributes = config.dynamicAttributes();
 			this.cellDynamicAttributes = config.cellDynamicAttributes();
 			this.cellEdit = config.cellEdit();
-			setExcludeIfNotEdited(config.excludeIfNotEdited());
 			if (StringUtils.isNotBlank(config.cssClass()))
 				this.cssClasses.addAll(Arrays.asList(config.cssClass().split("\\s")));
 			this.thCssClass = config.thCssClass();
@@ -183,15 +181,6 @@ public class AnnotationShadows {
 				this.listTemplate = this.template;
 			if (StringUtils.isEmpty(this.viewTemplate))
 				this.viewTemplate = this.template;
-		}
-
-		public void setExcludeIfNotEdited(boolean excludeIfNotEdited) {
-			this.excludeIfNotEdited = excludeIfNotEdited;
-			if (excludeIfNotEdited) {
-				cssClasses.add("excludeIfNotEdited");
-			} else {
-				cssClasses.remove("excludeIfNotEdited");
-			}
 		}
 
 		public boolean isReference() {

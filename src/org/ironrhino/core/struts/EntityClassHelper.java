@@ -242,7 +242,6 @@ public class EntityClassHelper {
 					}
 					if (collectionType != null) {
 						uci.setExcludedFromOrdering(true);
-						uci.setThCssClass("excludeIfNotEdited");
 						if (elementType == String.class
 								&& (StringUtils.isBlank(uci.getType()) || "input".equals(uci.getType()))) {
 							uci.addCssClass("tags");
@@ -338,7 +337,6 @@ public class EntityClassHelper {
 								uci.addCssClass("custom");
 							else if (!"dictionary".equals(uci.getType()))
 								uci.addCssClass("tags");
-							uci.setThCssClass("excludeIfNotEdited");
 						} else if (Number.class.isAssignableFrom(clazz)) {
 							uci.setMultiple(true);
 							uci.setPropertyType(returnType);
@@ -350,7 +348,6 @@ public class EntityClassHelper {
 						returnType = elementType;
 						uci.setPropertyType(returnType);
 						uci.addCssClass("custom");
-						uci.setThCssClass("excludeIfNotEdited");
 					}
 					if (uci.isMultiple() && StringUtils.isBlank(uci.getTemplate())) {
 						if (uci.getType().equals("dictionary")) {
@@ -420,7 +417,6 @@ public class EntityClassHelper {
 								uci.setReferencedColumnName(joinColumn.referencedColumnName());
 							}
 						}
-						uci.setExcludeIfNotEdited(true);
 						if (BaseTreeableEntity.class.isAssignableFrom(returnType)
 								&& uci.getType().equals(UiConfig.DEFAULT_TYPE)) {
 							if (uci.getType().equals(UiConfig.DEFAULT_TYPE))

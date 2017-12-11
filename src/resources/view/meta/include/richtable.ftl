@@ -9,7 +9,7 @@
 <#local size = columns?size>
 <#list columns as name,config>
 <#local cellname=((config['trimPrefix']??)?then('',entityName+'.'))+name>
-<@rttheadtd name=name alias=config['alias']! description=config['description']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit']!,'') readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable excludeIfNotEdited=config['excludeIfNotEdited']!false/>
+<@rttheadtd name=name alias=config['alias']! description=config['description']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit']!,'') readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable/>
 </#list>
 <#local showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
 <@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn/>
@@ -108,8 +108,8 @@ ${formHeader!}
 </#if>
 </#macro>
 
-<#macro rttheadtd name,alias='',description='',title='',cellname='',cellEdit='',class='',width='',readonly=false,resizable=true,excludeIfNotEdited=false>
-<th<#if title?has_content> title="${getText(title)}"</#if><#if excludeIfNotEdited||class?has_content> class="<#if excludeIfNotEdited> excludeIfNotEdited</#if><#if class?has_content> ${class}</#if>"</#if><#if width?has_content> style="width:${width};"</#if> data-cellname="${cellname}"<#if cellEdit?has_content> data-celledit="${cellEdit}"</#if>>
+<#macro rttheadtd name,alias='',description='',title='',cellname='',cellEdit='',class='',width='',readonly=false,resizable=true>
+<th<#if title?has_content> title="${getText(title)}"</#if><#if class?has_content> class="${class}"</#if><#if width?has_content> style="width:${width};"</#if> data-cellname="${cellname}"<#if cellEdit?has_content> data-celledit="${cellEdit}"</#if>>
 <#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?keep_after_last('.')/></#if></#if>${getText(alias)}<#if resizable></span><#if description?has_content> <span data-content="${getText(description)}" class="poped glyphicon glyphicon-question-sign"></span></#if><span class="resizeBar visible-desktop"></span></#if>
 </th>
 </#macro>
