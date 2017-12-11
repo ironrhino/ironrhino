@@ -1,9 +1,10 @@
 (function($) {
 	$.fn.treeselectinline = function() {
 		this.each(function() {
-			var t = $(this).attr('type', 'hidden')
-					.removeClass('.treeselect-inline').addClass('resettable')
-					.wrap('<div class="treeselect-inline" tabindex="0"></div>');
+			var t = $(this)
+					.attr('type', 'hidden')
+					.removeClass('.treeselect-inline')
+					.wrap('<div class="pseudo-input treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
 			if (t.prop('disabled'))
 				treeselect.addClass('disabled');
@@ -18,17 +19,8 @@
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
-			$('<i class="glyphicon glyphicon-menu-down"/><i class="glyphicon glyphicon-remove"/><div class="options"/>')
+			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove"/><div class="options"/>')
 					.appendTo(treeselect);
-			treeselect.hover(function(e) {
-						var t = $(e.target).closest('.treeselect-inline');
-						var text = t.find('.text').text();
-						if (text)
-							t.attr('title', text);
-					}, function(e) {
-						var t = $(e.target).closest('.treeselect-inline');
-						t.removeAttr('title');
-					});
 		});
 		return this;
 	};
@@ -41,11 +33,6 @@ $(function() {
 		var text = t.children('.text');
 		if (input.prop('disabled') || input.prop('readonly'))
 			return;
-		if ($(e.target).is('.glyphicon-remove')) {
-			input.val('').trigger('change');
-			text.text('');
-			return;
-		}
 		if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
 			return;
 		var treeselect = $(e.target).closest('.treeselect-inline');

@@ -385,7 +385,7 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
-			else if (field.parent('.treeselect-inline').length)
+			else if (field.parent('.pseudo-input').length)
 				field = field.parent().addClass('error');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
@@ -469,7 +469,7 @@ Form = {
 				$(target).removeClass('error');
 			};
 			var p = $(target).parent();
-			if (p.is('.treeselect-inline'))
+			if (p.is('.pseudo-input'))
 				p = p.parent();
 			if (!p.is('form,fieldset')) {
 				$$('.error', p).removeClass('error');
@@ -508,7 +508,7 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.treeselect-inline > input'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.pseudo-input > input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
@@ -675,7 +675,7 @@ Form = {
 	},
 	findControlGroup : function(target) {
 		var t = $(target);
-		if (t.parent('.input-append,.input-prepend,.treeselect-inline').length)
+		if (t.parent('.input-append,.input-prepend,.pseudo-input').length)
 			t = t.parent();
 		if (t.is('[type="hidden"]')) {
 			var cg = t.parent('.control-group');
@@ -1029,7 +1029,7 @@ Initialization.common = function() {
 		var t = $(e.target);
 		var cg = Form.findControlGroup(t);
 		Form.clearError(cg.length ? cg : t.closest('.field-error')
-				.prev(':input,.treeselect-inline'));
+				.prev(':input,.pseudo-input'));
 		t.closest('.field-error').remove();
 		return false;
 	}).on('validate', ':input', function(ev) {
@@ -1106,6 +1106,18 @@ Initialization.common = function() {
 					else
 						t.removeClass('empty');
 				}
+			}).on('mouseenter', '.pseudo-input', function(e) {
+				var t = $(e.target).closest('.pseudo-input');
+				var text = t.find('.text').text();
+				if (text)
+					t.attr('title', text);
+			}).on('mouseleave', '.pseudo-input', function(e) {
+				$(e.target).closest('.pseudo-input').removeAttr('title');
+			}).on('click', '.pseudo-input .remove', function(e) {
+				var t = $(e.target).closest('.pseudo-input');
+				t.find('input[type="hidden"]').val('').trigger('change');
+				t.find('.text').text('');
+				return false;
 			}).on('click', 'img.captcha', Captcha.refresh).on('focus',
 			'input.captcha', function() {
 				var t = $(this);

@@ -113,6 +113,7 @@
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.richtable.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.filtercolumn.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.treearea.css" />
+				<file name="${webapp.dir}/assets/styles/source/ironrhino.pseudoinput.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.treeselect.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pattern.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.icon.css" />

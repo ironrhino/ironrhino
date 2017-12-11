@@ -9148,7 +9148,7 @@ th.filtercolumn li.main li {
 	color: #ffc000;
 }
 
-.treeselect-inline {
+.pseudo-input {
 	display: inline-block;
 	border: 1px solid #cccccc;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -9164,43 +9164,43 @@ th.filtercolumn li.main li {
 	text-align: left;
 }
 
-.treeselect-inline:focus {
+.pseudo-input:focus {
 	border-color: rgba(82, 168, 236, 0.8);
 	outline: 0;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
 }
 
-.control-group.error .treeselect-inline , .treeselect-inline.error {
+.control-group.error .pseudo-input , .pseudo-input.error {
 	border-color: #b94a48;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
-.treeselect-inline.input-medium {
+.pseudo-input.input-medium {
 	width: 164px;
 }
 
-.treeselect-inline.input-large {
+.pseudo-input.input-large {
 	width: 224px;
 }
 
-.treeselect-inline.input-xlarge {
+.pseudo-input.input-xlarge {
 	width: 284px;
 }
 
-.treeselect-inline.input-xxlarge {
+.pseudo-input.input-xxlarge {
 	width: 554px;
 }
 
-.datagrided.adaptive td > .treeselect-inline {
+.datagrided.adaptive td > .pseudo-input {
 	width: 100%;
 }
 
-.treeselect-inline.readonly , .treeselect-inline.disabled {
+.pseudo-input.readonly , .pseudo-input.disabled {
 	cursor: not-allowed;
 	background-color: #eeeeee;
 }
 
-.treeselect-inline > .text {
+.pseudo-input > .text {
 	position: relative;
 	padding-left: 5px;
 	left: 0;
@@ -9212,7 +9212,7 @@ th.filtercolumn li.main li {
 	vertical-align: top;
 }
 
-.treeselect-inline > .glyphicon {
+.pseudo-input > .glyphicon {
 	display: inline-block;
 	line-height: 28px;
 	margin: 0 5px 0 0;
@@ -9220,19 +9220,19 @@ th.filtercolumn li.main li {
 	float: right;
 }
 
-.treeselect-inline > .glyphicon:hover {
+.pseudo-input:not(.readonly):not(.disabled) > .glyphicon:hover {
 	opacity: 1;
 }
 
-.treeselect-inline > .glyphicon-remove {
+.pseudo-input > .glyphicon-remove {
 	display: none;
 }
 
-.treeselect-inline:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon-remove {
+.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon-remove {
 	display: inline-block;
 }
 
-.treeselect-inline:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon-menu-down {
+.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.indicator {
 	display: none;
 }
 

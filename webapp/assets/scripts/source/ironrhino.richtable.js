@@ -760,7 +760,7 @@ Observation._richtable = function(container) {
 			t.prop('action', form.prop('action')).attr('data-replacement',
 					form.attr('id'));
 			$('input[type="reset"]', t).click(function(e) {
-						$('a.remove', t).click();
+						$('.remove', t).click();
 						setTimeout(function() {
 									t.submit();
 								}, 100);
@@ -849,7 +849,7 @@ Observation._richtable = function(container) {
 			var option = $('option:selected', property);
 			var size = parseInt($('option:selected', t).data('parameters'));
 			var td = $('td:eq(2)', t.closest('tr'));
-			$(':input,.removeonadd,.treeselect-inline,label', td).remove();
+			$(':input,.pseudo-input,.removeonadd,label', td).remove();
 			if (size > 0) {
 				if ('select' == option.data('type')) {
 					var select = $('<select name="' + property.val()

@@ -1,0 +1,88 @@
+.pseudo-input {
+	display: inline-block;
+	border: 1px solid #cccccc;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	line-height: 28px;
+	transition: box-shadow .1s ease, width .1s ease;
+	border-radius: 4px;
+	cursor: pointer;
+	position: relative;
+	color: rgba(0, 0, 0, .87);
+	width: 220px;
+	box-sizing: border-box;
+	user-select: none;
+	text-align: left;
+}
+
+.pseudo-input:focus {
+	border-color: rgba(82, 168, 236, 0.8);
+	outline: 0;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+}
+
+.control-group.error .pseudo-input , .pseudo-input.error {
+	border-color: #b94a48;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.pseudo-input.input-medium {
+	width: 164px;
+}
+
+.pseudo-input.input-large {
+	width: 224px;
+}
+
+.pseudo-input.input-xlarge {
+	width: 284px;
+}
+
+.pseudo-input.input-xxlarge {
+	width: 554px;
+}
+
+.datagrided.adaptive td > .pseudo-input {
+	width: 100%;
+}
+
+.pseudo-input.readonly , .pseudo-input.disabled {
+	cursor: not-allowed;
+	background-color: #eeeeee;
+}
+
+.pseudo-input > .text {
+	position: relative;
+	padding-left: 5px;
+	left: 0;
+	display: inline-block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: calc(100% - 30px);
+	overflow: hidden;
+	vertical-align: top;
+}
+
+.pseudo-input > .glyphicon {
+	display: inline-block;
+	line-height: 28px;
+	margin: 0 5px 0 0;
+	opacity: .3;
+	float: right;
+}
+
+.pseudo-input:not(.readonly):not(.disabled) > .glyphicon:hover {
+	opacity: 1;
+}
+
+.pseudo-input > .glyphicon-remove {
+	display: none;
+}
+
+.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon-remove {
+	display: inline-block;
+}
+
+.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.indicator {
+	display: none;
+}
+

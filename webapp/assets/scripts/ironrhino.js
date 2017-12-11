@@ -31432,7 +31432,7 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
-			else if (field.parent('.treeselect-inline').length)
+			else if (field.parent('.pseudo-input').length)
 				field = field.parent().addClass('error');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
@@ -31516,7 +31516,7 @@ Form = {
 				$(target).removeClass('error');
 			};
 			var p = $(target).parent();
-			if (p.is('.treeselect-inline'))
+			if (p.is('.pseudo-input'))
 				p = p.parent();
 			if (!p.is('form,fieldset')) {
 				$$('.error', p).removeClass('error');
@@ -31555,7 +31555,7 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.treeselect-inline > input'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.pseudo-input > input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
@@ -31722,7 +31722,7 @@ Form = {
 	},
 	findControlGroup : function(target) {
 		var t = $(target);
-		if (t.parent('.input-append,.input-prepend,.treeselect-inline').length)
+		if (t.parent('.input-append,.input-prepend,.pseudo-input').length)
 			t = t.parent();
 		if (t.is('[type="hidden"]')) {
 			var cg = t.parent('.control-group');
@@ -32076,7 +32076,7 @@ Initialization.common = function() {
 		var t = $(e.target);
 		var cg = Form.findControlGroup(t);
 		Form.clearError(cg.length ? cg : t.closest('.field-error')
-				.prev(':input,.treeselect-inline'));
+				.prev(':input,.pseudo-input'));
 		t.closest('.field-error').remove();
 		return false;
 	}).on('validate', ':input', function(ev) {
@@ -32153,6 +32153,18 @@ Initialization.common = function() {
 					else
 						t.removeClass('empty');
 				}
+			}).on('mouseenter', '.pseudo-input', function(e) {
+				var t = $(e.target).closest('.pseudo-input');
+				var text = t.find('.text').text();
+				if (text)
+					t.attr('title', text);
+			}).on('mouseleave', '.pseudo-input', function(e) {
+				$(e.target).closest('.pseudo-input').removeAttr('title');
+			}).on('click', '.pseudo-input .remove', function(e) {
+				var t = $(e.target).closest('.pseudo-input');
+				t.find('input[type="hidden"]').val('').trigger('change');
+				t.find('.text').text('');
+				return false;
 			}).on('click', 'img.captcha', Captcha.refresh).on('focus',
 			'input.captcha', function() {
 				var t = $(this);
@@ -38054,7 +38066,7 @@ Observation._richtable = function(container) {
 			t.prop('action', form.prop('action')).attr('data-replacement',
 					form.attr('id'));
 			$('input[type="reset"]', t).click(function(e) {
-						$('a.remove', t).click();
+						$('.remove', t).click();
 						setTimeout(function() {
 									t.submit();
 								}, 100);
@@ -38143,7 +38155,7 @@ Observation._richtable = function(container) {
 			var option = $('option:selected', property);
 			var size = parseInt($('option:selected', t).data('parameters'));
 			var td = $('td:eq(2)', t.closest('tr'));
-			$(':input,.removeonadd,.treeselect-inline,label', td).remove();
+			$(':input,.pseudo-input,.removeonadd,label', td).remove();
 			if (size > 0) {
 				if ('select' == option.data('type')) {
 					var select = $('<select name="' + property.val()
@@ -39333,9 +39345,10 @@ Observation.treeselect = function(container) {
 (function($) {
 	$.fn.treeselectinline = function() {
 		this.each(function() {
-			var t = $(this).attr('type', 'hidden')
-					.removeClass('.treeselect-inline').addClass('resettable')
-					.wrap('<div class="treeselect-inline" tabindex="0"></div>');
+			var t = $(this)
+					.attr('type', 'hidden')
+					.removeClass('.treeselect-inline')
+					.wrap('<div class="pseudo-input treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
 			if (t.prop('disabled'))
 				treeselect.addClass('disabled');
@@ -39350,17 +39363,8 @@ Observation.treeselect = function(container) {
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
-			$('<i class="glyphicon glyphicon-menu-down"/><i class="glyphicon glyphicon-remove"/><div class="options"/>')
+			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove"/><div class="options"/>')
 					.appendTo(treeselect);
-			treeselect.hover(function(e) {
-						var t = $(e.target).closest('.treeselect-inline');
-						var text = t.find('.text').text();
-						if (text)
-							t.attr('title', text);
-					}, function(e) {
-						var t = $(e.target).closest('.treeselect-inline');
-						t.removeAttr('title');
-					});
 		});
 		return this;
 	};
@@ -39373,11 +39377,6 @@ $(function() {
 		var text = t.children('.text');
 		if (input.prop('disabled') || input.prop('readonly'))
 			return;
-		if ($(e.target).is('.glyphicon-remove')) {
-			input.val('').trigger('change');
-			text.text('');
-			return;
-		}
 		if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
 			return;
 		var treeselect = $(e.target).closest('.treeselect-inline');
