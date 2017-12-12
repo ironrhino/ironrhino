@@ -23,6 +23,11 @@ public class CustomerAddress implements Serializable {
 	@Column(nullable = false)
 	private AddressType type;
 
+	@UiConfig(width = "150px")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "receiver")
+	private Employee receiver;
+
 	@UiConfig(width = "250px", template = "<#if value?has_content>${value.fullname}</#if>", description = "region.description")
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "region")
