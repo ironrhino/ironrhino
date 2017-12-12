@@ -307,10 +307,12 @@ ${formHeader!}
 ${totalResults}<span class="recordLabel"> ${getText('record')}</span>
 <#if downloadable && request.requestURI?ends_with(actionBaseUrl) && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
 <#local downloadUrl=actionBaseUrl+'/csv'>
-<#list Parameters as name,value>
+<#list request.parameterMap as name,values>
+<#list values as value>
 <#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&(name!='keyword'||value?has_content)>
 <#local downloadUrl+=downloadUrl?contains('?')?then('&','?')+name+'='+value?url>
 </#if>
+</#list>
 </#list>
 <a download="data.csv" href="${downloadUrl}" style="color:#666;padding-top:2px;"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
 </#if>
