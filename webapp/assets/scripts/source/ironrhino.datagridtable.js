@@ -207,8 +207,9 @@
 				$(this).remove();
 			}
 		});
-		$('.listpick-name,.treeselect-name', r)
-				.html('<i class="glyphicon glyphicon-list"></i>');
+		$(
+				'.listpick-name:not(.pseudo-input),.treeselect-name:not(.pseudo-input)',
+				r).html('<i class="glyphicon glyphicon-list"></i>');
 		$('.removeonadd,.field-error', r).remove();
 		$('.error', r).removeClass('error');
 		$('.hideonadd', r).hide();

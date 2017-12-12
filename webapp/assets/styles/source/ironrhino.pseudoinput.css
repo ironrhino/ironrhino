@@ -9,6 +9,7 @@
 	position: relative;
 	color: rgba(0, 0, 0, .87);
 	width: 220px;
+	min-height: 30px;
 	box-sizing: border-box;
 	user-select: none;
 	text-align: left;
@@ -41,7 +42,7 @@
 	width: 554px;
 }
 
-.datagrided.adaptive td > .pseudo-input {
+.datagrided.adaptive td > .pseudo-input , .datagrided.adaptive td > div:only-child > .pseudo-input {
 	width: 100%;
 }
 

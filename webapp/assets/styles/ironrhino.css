@@ -8450,11 +8450,11 @@ form.attachmentable ul.thumbnails li .remove {
 	margin-right: 10px;
 }
 
-div.listpick-name {
+div.listpick-name, div.treeselect-name {
 	display: inline-block;
 }
 
-div.listpick-name:focus {
+div.listpick-name:focus, div.treeselect-name:focus {
 	border-color: rgba(82, 168, 236, 0.8);
 	outline: 0;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
@@ -9165,6 +9165,7 @@ th.filtercolumn li.main li {
 	position: relative;
 	color: rgba(0, 0, 0, .87);
 	width: 220px;
+	min-height: 30px;
 	box-sizing: border-box;
 	user-select: none;
 	text-align: left;
@@ -9197,7 +9198,7 @@ th.filtercolumn li.main li {
 	width: 554px;
 }
 
-.datagrided.adaptive td > .pseudo-input {
+.datagrided.adaptive td > .pseudo-input , .datagrided.adaptive td > div:only-child > .pseudo-input {
 	width: 100%;
 }
 

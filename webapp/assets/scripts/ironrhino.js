@@ -36548,8 +36548,9 @@ Observation.sortableTable = function(container) {
 				$(this).remove();
 			}
 		});
-		$('.listpick-name,.treeselect-name', r)
-				.html('<i class="glyphicon glyphicon-list"></i>');
+		$(
+				'.listpick-name:not(.pseudo-input),.treeselect-name:not(.pseudo-input)',
+				r).html('<i class="glyphicon glyphicon-list"></i>');
 		$('.removeonadd,.field-error', r).remove();
 		$('.error', r).removeClass('error');
 		$('.hideonadd', r).hide();
@@ -38179,15 +38180,13 @@ Observation._richtable = function(container) {
 							+ option.data('pickurl') + '"/>').appendTo(td);
 				} else if ('listpick' == option.data('type')
 						|| 'treeselect' == option.data('type')) {
-					$('<input id="filter_' + property.val().replace(/\./g, '_')
-							+ '" type="hidden" name="' + property.val()
-							+ '" class="required"/><span class="'
-							+ option.data('type')
-							+ ' removeonadd" data-options="{\'url\':\''
-							+ option.data('pickurl')
-							+ '\',\'name\':\'this\',\'id\':\'#filter_'
-							+ property.val().replace(/\./g, '_')
-							+ '\'}"></span>').appendTo(td);
+					var type = option.data('type');
+					$('<div class="' + type + '" data-options="{\'url\':\''
+							+ option.data('pickurl') + '\'}"><input class="'
+							+ type + '-id required" type="hidden" name="'
+							+ property.val()
+							+ '" class="required"/><div class="' + type
+							+ '-name pseudo-input"></div></div>').appendTo(td);
 				} else {
 					$('<input type="' + (option.data('inputtype') || 'text')
 							+ '" name="' + property.val()
@@ -39083,18 +39082,21 @@ Observation.groupable = function(container) {
 			if (i < 0) {
 				var ele = expr == 'this' ? $(container) : $(expr, container);
 				ele.each(function() {
-							var t = $(this);
-							if (t.is(':input')) {
-								t.val(val).trigger('change')
-										.trigger('validate');
-							} else {
-								if (val === null && !t.is('td'))
-									t
-											.html('<i class="glyphicon glyphicon-list"></i>');
-								else
-									t.text(val);
-							}
-						});
+					var t = $(this);
+					if (t.is(':input')) {
+						t.val(val).trigger('change').trigger('validate');
+					} else {
+						if (t.is('.pseudo-input')) {
+							t.find('.text').text(val || '');
+						} else {
+							if (val === null && !t.is('td'))
+								t
+										.html('<i class="glyphicon glyphicon-list"></i>');
+							else
+								t.text(val);
+						}
+					}
+				});
 			} else if (i == 0) {
 				$(container).attr(expr.substring(i + 1), val);
 			} else {
@@ -39112,12 +39114,16 @@ Observation.groupable = function(container) {
 			var i = expr.indexOf('@');
 			if (i < 0) {
 				var ele = expr == 'this' ? $(container) : $(expr, container);
-				if (ele.is(':input'))
+				if (ele.is(':input')) {
 					return ele.val();
-				else
-					return ele.contents().filter(function() {
-								return this.nodeType == 3;
-							}).text();
+				} else {
+					if (ele.is('.pseudo-input'))
+						return ele.find('.text').text();
+					else
+						return ele.contents().filter(function() {
+									return this.nodeType == 3;
+								}).text();
+				}
 			} else if (i == 0) {
 				return $(container).attr(expr.substring(i + 1));
 			} else {
@@ -39141,7 +39147,8 @@ Observation.groupable = function(container) {
 			var idtarget = find(options.id);
 			idtarget.removeData('treenode');
 		}
-		$(this).remove();
+		if (!$(this).is('.glyphicon-remove'))
+			$(this).remove();
 		event.stopPropagation();
 		return false;
 
@@ -39162,27 +39169,59 @@ Observation.groupable = function(container) {
 			var nametarget = null;
 			if (options.name) {
 				nametarget = find(options.name, current);
-				var remove = nametarget.children('a.remove');
-				if (remove.length) {
-					remove.click(removeAction);
-				} else {
-					var text = val(options.name, current);
-					var viewlink = current.find('a.view[rel="richtable"]');
-					if (current.is('td') && viewlink.length)
-						text = viewlink.text();
-					if (text) {
-						if (text.indexOf('...') < 0)
-							$('<a class="remove" href="#">&times;</a>')
-									.appendTo(nametarget).click(removeAction);
+				nametarget.attr('tabindex', '0');
+				if (nametarget.is('.pseudo-input')) {
+					var text = nametarget.text();
+					nametarget
+							.addClass('treeselect-handle')
+							.html('<span class="text resettable"></span>'
+									+ '<i class="indicator glyphicon glyphicon-list"/>'
+									+ '<i class="remove glyphicon glyphicon-remove"/>')
+							.find('.text').text(text);
+					if (current.hasClass('disabled'))
+						nametarget.addClass('disabled');
+					if (current.hasClass('readonly'))
+						nametarget.addClass('readonly');
+					var input = nametarget
+							.prev('input.treeselect-id[type="hidden"]');
+					if (input.length) {
+						input.prependTo(nametarget).addClass('resettable');
+						if (input.prop('disabled'))
+							nametarget.addClass('disabled');
+						if (input.prop('readonly'))
+							nametarget.addClass('readonly');
+						nametarget.attr('id', input.attr('id'));
+						input.removeAttr('id');
+					}
+				} else if (!current.is('.readonly,.disabled')) {
+					var remove = nametarget.children('a.remove');
+					if (remove.length) {
+						remove.click(removeAction);
 					} else {
-						val(options.name, current, null);
+						var text = val(options.name, current);
+						var viewlink = current.find('a.view[rel="richtable"]');
+						if (current.is('td') && viewlink.length)
+							text = viewlink.text();
+						if (text) {
+							if (text.indexOf('...') < 0)
+								$('<a class="remove" href="#">&times;</a>')
+										.appendTo(nametarget)
+										.click(removeAction);
+						} else {
+							val(options.name, current, null);
+						}
 					}
 				}
 			}
 			var func = function(event) {
-				if ($(event.target).is('a.view[rel="richtable"]'))
+				var t = $(event.target);
+				if (t.is('.remove') || t.is('a.view[rel="richtable"]'))
 					return true;
-				var current = $(event.target).closest('.treeselect');
+				var current = t.closest('.treeselect');
+				if (current.is('.disabled,.readonly')
+						|| current.find('.treeselect-name')
+								.is('.disabled,.readonly'))
+					return false;
 				var winid = '_tree_window';
 				current.data('winid', winid);
 				$('#' + winid).remove();
@@ -39230,13 +39269,18 @@ Observation.groupable = function(container) {
 										var t = $(this);
 										val(options.name, current, names
 														.join(separator));
-										if (!t.is(':input')) {
-											if (!t.find('.remove').length)
-												$('<a class="remove" href="#">&times;</a>')
-														.appendTo(t)
-														.click(removeAction);
-											if (!names.length)
-												t.find('.remove').click();
+										if (t.is('.pseudo-input')) {
+											t.find('.glyphicon-remove')
+													.click(removeAction);;
+										} else {
+											if (!t.is(':input')) {
+												if (!t.find('.remove').length)
+													$('<a class="remove" href="#">&times;</a>')
+															.appendTo(t)
+															.click(removeAction);
+												if (!names.length)
+													t.find('.remove').click();
+											}
 										}
 									});
 								}
@@ -39277,13 +39321,14 @@ Observation.groupable = function(container) {
 			var handle = current.find('.treeselect-handle');
 			if (!handle.length)
 				handle = current;
-			handle.css('cursor', 'pointer').click(func).keydown(
-					function(event) {
-						if (event.keyCode == 13) {
-							func(event);
-							return false;
-						}
-					});
+			if (!current.is('.readonly,.disabled'))
+				handle.css('cursor', 'pointer').click(func).keydown(
+						function(event) {
+							if (event.keyCode == 13) {
+								func(event);
+								return false;
+							}
+						});
 		});
 		return this;
 	};
@@ -39304,11 +39349,12 @@ Observation.groupable = function(container) {
 							viewlink.text(name);
 							if (!viewlink.next('.remove').length)
 								$('<a class="remove" href="#">&times;</a>')
-										.insertAfter(viewlink).click(removeAction);
+										.insertAfter(viewlink)
+										.click(removeAction);
 						} else {
 							val(options.name, current, name);
 							var t = $(this);
-							if (!t.is(':input'))
+							if (!t.is(':input') && !t.find('.remove').length)
 								$('<a class="remove" href="#">&times;</a>')
 										.appendTo(t).click(removeAction);
 						}
@@ -39347,6 +39393,7 @@ Observation.treeselect = function(container) {
 		this.each(function() {
 			var t = $(this)
 					.attr('type', 'hidden')
+					.addClass('resettable')
 					.removeClass('.treeselect-inline')
 					.wrap('<div class="pseudo-input treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
@@ -39516,12 +39563,16 @@ Observation.treeview = function(container) {
 			var i = expr.indexOf('@');
 			if (i < 0) {
 				var ele = expr == 'this' ? $(container) : $(expr, container);
-				if (ele.is(':input'))
+				if (ele.is(':input')) {
 					return ele.val();
-				else
-					return ele.contents().filter(function() {
-								return this.nodeType == 3;
-							}).text();
+				} else {
+					if (ele.is('.pseudo-input'))
+						return ele.find('.text').text();
+					else
+						return ele.contents().filter(function() {
+									return this.nodeType == 3;
+								}).text();
+				}
 			} else if (i == 0) {
 				return $(container).attr(expr.substring(i + 1));
 			} else {
@@ -39574,16 +39625,22 @@ Observation.treeview = function(container) {
 									+ '<i class="indicator glyphicon glyphicon-list"/>'
 									+ '<i class="remove glyphicon glyphicon-remove"/>')
 							.find('.text').text(text);
+					if (current.hasClass('disabled'))
+						nametarget.addClass('disabled');
+					if (current.hasClass('readonly'))
+						nametarget.addClass('readonly');
 					var input = nametarget
 							.prev('input.listpick-id[type="hidden"]');
 					if (input.length) {
-						input.prependTo(nametarget);
+						input.prependTo(nametarget).addClass('resettable');
 						if (input.prop('disabled'))
 							nametarget.addClass('disabled');
 						if (input.prop('readonly'))
 							nametarget.addClass('readonly');
+						nametarget.attr('id', input.attr('id'));
+						input.removeAttr('id');
 					}
-				} else {
+				} else if (!current.is('.readonly,.disabled')) {
 					var remove = nametarget.children('a.remove');
 					if (remove.length) {
 						remove.click(removeAction);
@@ -39605,11 +39662,12 @@ Observation.treeview = function(container) {
 			}
 			var func = function(event) {
 				var t = $(event.target);
-				if (t.is('a.view[rel="richtable"]'))
+				if (t.is('.remove') || t.is('a.view[rel="richtable"]'))
 					return true;
 				var current = t.closest('.listpick');
-				if (current
-						.find('.listpick-name.disabled,.listpick-name.readonly').length)
+				if (current.is('.disabled,.readonly')
+						|| current.find('.listpick-name')
+								.is('.disabled,.readonly'))
 					return false;
 				var options = current.data('_options');
 				var winid = current.data('winid');
@@ -39849,13 +39907,14 @@ Observation.treeview = function(container) {
 			var handle = current.find('.listpick-handle');
 			if (!handle.length)
 				handle = current;
-			handle.css('cursor', 'pointer').click(func).keydown(
-					function(event) {
-						if (event.keyCode == 13) {
-							func(event);
-							return false;
-						}
-					});
+			if (!current.is('.readonly,.disabled'))
+				handle.css('cursor', 'pointer').click(func).keydown(
+						function(event) {
+							if (event.keyCode == 13) {
+								func(event);
+								return false;
+							}
+						});
 		});
 		return this;
 	};

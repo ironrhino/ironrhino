@@ -52,12 +52,16 @@
 			var i = expr.indexOf('@');
 			if (i < 0) {
 				var ele = expr == 'this' ? $(container) : $(expr, container);
-				if (ele.is(':input'))
+				if (ele.is(':input')) {
 					return ele.val();
-				else
-					return ele.contents().filter(function() {
-								return this.nodeType == 3;
-							}).text();
+				} else {
+					if (ele.is('.pseudo-input'))
+						return ele.find('.text').text();
+					else
+						return ele.contents().filter(function() {
+									return this.nodeType == 3;
+								}).text();
+				}
 			} else if (i == 0) {
 				return $(container).attr(expr.substring(i + 1));
 			} else {
@@ -110,16 +114,22 @@
 									+ '<i class="indicator glyphicon glyphicon-list"/>'
 									+ '<i class="remove glyphicon glyphicon-remove"/>')
 							.find('.text').text(text);
+					if (current.hasClass('disabled'))
+						nametarget.addClass('disabled');
+					if (current.hasClass('readonly'))
+						nametarget.addClass('readonly');
 					var input = nametarget
 							.prev('input.listpick-id[type="hidden"]');
 					if (input.length) {
-						input.prependTo(nametarget);
+						input.prependTo(nametarget).addClass('resettable');
 						if (input.prop('disabled'))
 							nametarget.addClass('disabled');
 						if (input.prop('readonly'))
 							nametarget.addClass('readonly');
+						nametarget.attr('id', input.attr('id'));
+						input.removeAttr('id');
 					}
-				} else {
+				} else if (!current.is('.readonly,.disabled')) {
 					var remove = nametarget.children('a.remove');
 					if (remove.length) {
 						remove.click(removeAction);
@@ -141,11 +151,12 @@
 			}
 			var func = function(event) {
 				var t = $(event.target);
-				if (t.is('a.view[rel="richtable"]'))
+				if (t.is('.remove') || t.is('a.view[rel="richtable"]'))
 					return true;
 				var current = t.closest('.listpick');
-				if (current
-						.find('.listpick-name.disabled,.listpick-name.readonly').length)
+				if (current.is('.disabled,.readonly')
+						|| current.find('.listpick-name')
+								.is('.disabled,.readonly'))
 					return false;
 				var options = current.data('_options');
 				var winid = current.data('winid');
@@ -385,13 +396,14 @@
 			var handle = current.find('.listpick-handle');
 			if (!handle.length)
 				handle = current;
-			handle.css('cursor', 'pointer').click(func).keydown(
-					function(event) {
-						if (event.keyCode == 13) {
-							func(event);
-							return false;
-						}
-					});
+			if (!current.is('.readonly,.disabled'))
+				handle.css('cursor', 'pointer').click(func).keydown(
+						function(event) {
+							if (event.keyCode == 13) {
+								func(event);
+								return false;
+							}
+						});
 		});
 		return this;
 	};

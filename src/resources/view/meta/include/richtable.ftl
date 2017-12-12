@@ -486,10 +486,10 @@ ${formFooter!}
 			<@s.textfield id=id label=label name=key value=(Parameters[key]!) class='treeselect-inline '+cssClass data\-url=pickUrl dynamicAttributes=dynamicAttributes/>
 		<#elseif (config.type=='listpick' || config.type=='treeselect') && !disabled>
 			<div id="control-group-${id}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
-				<@controlLabel label=label description=description/>
+				<@controlLabel label=label description=description for=id/>
 				<div class="controls ${config.type}" data-options="{'url':'<@url value=pickUrl/>'}">
 				<@s.hidden id=id name=key class=config.type+"-id ${cssClass}" dynamicAttributes=dynamicAttributes/>
-				<div class="${config.type}-name"></div>
+				<div class="${config.type}-name pseudo-input"></div>
 				</div>
 			</div>
 		<#elseif config.type=='dictionary' && selectDictionary??>

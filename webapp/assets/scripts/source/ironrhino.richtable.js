@@ -873,15 +873,13 @@ Observation._richtable = function(container) {
 							+ option.data('pickurl') + '"/>').appendTo(td);
 				} else if ('listpick' == option.data('type')
 						|| 'treeselect' == option.data('type')) {
-					$('<input id="filter_' + property.val().replace(/\./g, '_')
-							+ '" type="hidden" name="' + property.val()
-							+ '" class="required"/><span class="'
-							+ option.data('type')
-							+ ' removeonadd" data-options="{\'url\':\''
-							+ option.data('pickurl')
-							+ '\',\'name\':\'this\',\'id\':\'#filter_'
-							+ property.val().replace(/\./g, '_')
-							+ '\'}"></span>').appendTo(td);
+					var type = option.data('type');
+					$('<div class="' + type + '" data-options="{\'url\':\''
+							+ option.data('pickurl') + '\'}"><input class="'
+							+ type + '-id required" type="hidden" name="'
+							+ property.val()
+							+ '" class="required"/><div class="' + type
+							+ '-name pseudo-input"></div></div>').appendTo(td);
 				} else {
 					$('<input type="' + (option.data('inputtype') || 'text')
 							+ '" name="' + property.val()
