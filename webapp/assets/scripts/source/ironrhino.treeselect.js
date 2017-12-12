@@ -182,7 +182,7 @@
 					var treeviewoptions = {
 						url : options.url,
 						collapsed : true,
-						template : '<input type="checkbox" class="custom" value="{{id}}"/> <span>{{name}}</span>',
+						template : '<a><input type="checkbox" class="custom" value="{{id}}"/> <span>{{name}}</span></a>',
 						placeholder : MessageBundle.get('ajax.loading'),
 						unique : true,
 						separator : options.separator,

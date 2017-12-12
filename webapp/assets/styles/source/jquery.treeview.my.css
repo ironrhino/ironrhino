@@ -32,6 +32,7 @@
 	position: relative;
 	top: -3px;
 	margin-left: 3px;
+	text-decoration: none;
 }
 
 .treeview li.collapsable , .treeview li.expandable {
