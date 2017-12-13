@@ -2,7 +2,8 @@
 	background-color: #eee;
 }
 
-.treeview a span {
+.treeview a span, .treeview a label {
+	display: inline;
 	cursor: pointer;
 }
 
@@ -63,7 +64,7 @@
 	background-position: 0;
 }
 
-.treeview li.active > a , .treeview div.head.active > a {
+.treeview li.active > a > span , .treeview div.head.active > a > span {
 	background-color: #ccc;
 }
 

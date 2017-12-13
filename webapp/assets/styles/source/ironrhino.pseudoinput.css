@@ -75,11 +75,11 @@
 	opacity: 1;
 }
 
-.pseudo-input > .glyphicon-remove {
+.pseudo-input > .glyphicon.remove {
 	display: none;
 }
 
-.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon-remove {
+.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.remove {
 	display: inline-block;
 }
 

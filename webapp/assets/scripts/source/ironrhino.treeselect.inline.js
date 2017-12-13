@@ -20,7 +20,7 @@
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
-			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove"/><div class="options"/>')
+			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
 					.appendTo(treeselect);
 		});
 		return this;

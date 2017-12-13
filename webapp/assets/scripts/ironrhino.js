@@ -39147,7 +39147,7 @@ Observation.groupable = function(container) {
 			var idtarget = find(options.id);
 			idtarget.removeData('treenode');
 		}
-		if (!$(this).is('.glyphicon-remove'))
+		if (!$(this).is('.glyphicon'))
 			$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -39176,7 +39176,7 @@ Observation.groupable = function(container) {
 							.addClass('treeselect-handle')
 							.html('<span class="text resettable"></span>'
 									+ '<i class="indicator glyphicon glyphicon-list"/>'
-									+ '<i class="remove glyphicon glyphicon-remove"/>')
+									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
 							.find('.text').text(text);
 					if (current.hasClass('disabled'))
 						nametarget.addClass('disabled');
@@ -39244,7 +39244,7 @@ Observation.groupable = function(container) {
 					var treeviewoptions = {
 						url : options.url,
 						collapsed : true,
-						template : '<a><input type="checkbox" class="custom" value="{{id}}"/> <span>{{name}}</span></a>',
+						template : '<a><input id="cb-{{id}}" type="checkbox" class="custom" value="{{id}}"/> <label for="cb-{{id}}">{{name}}</label></a>',
 						placeholder : MessageBundle.get('ajax.loading'),
 						unique : true,
 						separator : options.separator,
@@ -39260,7 +39260,7 @@ Observation.groupable = function(container) {
 								$('input:checked', win).each(function() {
 									ids.push(this.value);
 									names.push($(this).closest('li')
-											.children('span').text());
+											.find('label[for]').text());
 								});
 								if (options.name) {
 									var separator = ', ';
@@ -39269,18 +39269,13 @@ Observation.groupable = function(container) {
 										var t = $(this);
 										val(options.name, current, names
 														.join(separator));
-										if (t.is('.pseudo-input')) {
-											t.find('.glyphicon-remove')
-													.click(removeAction);;
-										} else {
-											if (!t.is(':input')) {
-												if (!t.find('.remove').length)
-													$('<a class="remove" href="#">&times;</a>')
-															.appendTo(t)
-															.click(removeAction);
-												if (!names.length)
-													t.find('.remove').click();
-											}
+										if (!t.is(':input')) {
+											if (!t.find('.remove').length)
+												$('<a class="remove" href="#">&times;</a>')
+														.appendTo(t)
+														.click(removeAction);
+											if (!names.length)
+												t.find('.remove').click();
 										}
 									});
 								}
@@ -39410,7 +39405,7 @@ Observation.treeselect = function(container) {
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
-			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove"/><div class="options"/>')
+			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
 					.appendTo(treeselect);
 		});
 		return this;
@@ -39596,7 +39591,7 @@ Observation.treeview = function(container) {
 			for (var k in options.mapping)
 				val(k, current, null);
 		}
-		if (!$(this).is('.glyphicon-remove'))
+		if (!$(this).is('.glyphicon'))
 			$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -39623,7 +39618,7 @@ Observation.treeview = function(container) {
 							.addClass('listpick-handle')
 							.html('<span class="text resettable"></span>'
 									+ '<i class="indicator glyphicon glyphicon-list"/>'
-									+ '<i class="remove glyphicon glyphicon-remove"/>')
+									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
 							.find('.text').text(text);
 					if (current.hasClass('disabled'))
 						nametarget.addClass('disabled');
@@ -39728,16 +39723,11 @@ Observation.treeview = function(container) {
 											name);
 								nametarget.each(function() {
 									var t = $(this);
-									if (t.is('.pseudo-input')) {
-										t.find('.glyphicon-remove')
-												.click(removeAction);;
-									} else {
-										if (!t.is(':input')
-												&& !t.find('a.remove').length)
-											$('<a class="remove" href="#">&times;</a>')
-													.appendTo(t)
-													.click(removeAction);
-									}
+									if (!t.is(':input')
+											&& !t.find('.remove').length)
+										$('<a class="remove" href="#">&times;</a>')
+												.appendTo(t)
+												.click(removeAction);
 								});
 							}
 							if (options.id) {

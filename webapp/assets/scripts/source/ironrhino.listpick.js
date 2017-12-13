@@ -85,7 +85,7 @@
 			for (var k in options.mapping)
 				val(k, current, null);
 		}
-		if (!$(this).is('.glyphicon-remove'))
+		if (!$(this).is('.glyphicon'))
 			$(this).remove();
 		event.stopPropagation();
 		return false;
@@ -112,7 +112,7 @@
 							.addClass('listpick-handle')
 							.html('<span class="text resettable"></span>'
 									+ '<i class="indicator glyphicon glyphicon-list"/>'
-									+ '<i class="remove glyphicon glyphicon-remove"/>')
+									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
 							.find('.text').text(text);
 					if (current.hasClass('disabled'))
 						nametarget.addClass('disabled');
@@ -217,16 +217,11 @@
 											name);
 								nametarget.each(function() {
 									var t = $(this);
-									if (t.is('.pseudo-input')) {
-										t.find('.glyphicon-remove')
-												.click(removeAction);;
-									} else {
-										if (!t.is(':input')
-												&& !t.find('a.remove').length)
-											$('<a class="remove" href="#">&times;</a>')
-													.appendTo(t)
-													.click(removeAction);
-									}
+									if (!t.is(':input')
+											&& !t.find('.remove').length)
+										$('<a class="remove" href="#">&times;</a>')
+												.appendTo(t)
+												.click(removeAction);
 								});
 							}
 							if (options.id) {

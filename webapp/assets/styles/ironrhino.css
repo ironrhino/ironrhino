@@ -935,7 +935,8 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	background-color: #eee;
 }
 
-.treeview a span {
+.treeview a span, .treeview a label {
+	display: inline;
 	cursor: pointer;
 }
 
@@ -996,7 +997,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	background-position: 0;
 }
 
-.treeview li.active > a , .treeview div.head.active > a {
+.treeview li.active > a > span , .treeview div.head.active > a > span {
 	background-color: #ccc;
 }
 
@@ -9235,11 +9236,11 @@ th.filtercolumn li.main li {
 	opacity: 1;
 }
 
-.pseudo-input > .glyphicon-remove {
+.pseudo-input > .glyphicon.remove {
 	display: none;
 }
 
-.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon-remove {
+.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.remove {
 	display: inline-block;
 }
 
