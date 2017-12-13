@@ -32153,20 +32153,53 @@ Initialization.common = function() {
 					else
 						t.removeClass('empty');
 				}
-			}).on('mouseenter', '.pseudo-input', function(e) {
-				var t = $(e.target).closest('.pseudo-input');
-				var text = t.find('.text').text();
+			}).on('mouseenter', '.pseudo-input .text:not(.tags)', function(e) {
+				var t = $(this);
+				var text = t.text();
 				if (text)
 					t.attr('title', text);
-			}).on('mouseleave', '.pseudo-input', function(e) {
-				$(e.target).closest('.pseudo-input').removeAttr('title');
+			}).on('mouseleave', '.pseudo-input .text:not(.tags)', function(e) {
+				$(this).removeAttr('title');
 			}).on('click', '.pseudo-input .remove', function(e) {
 				var t = $(e.target).closest('.pseudo-input');
 				t.find('input[type="hidden"]').val('').trigger('change');
 				t.find('.text').text('');
 				return false;
-			}).on('click', 'img.captcha', Captcha.refresh).on('focus',
-			'input.captcha', function() {
+			}).on('click', '.pseudo-input .tag-remove', function(e) {
+				var t = $(e.target).closest('.pseudo-input');
+				var tag = $(e.target).closest('.tag');
+				var index = tag.parent().find('.tag').index(tag);
+				var input = t.find('input[type="hidden"]');
+				var value = input.val();
+				if (value) {
+					var arr = value.split(',');
+					arr.splice(index, 1);
+					input.val(arr.join(',')).trigger('change');
+				}
+				tag.remove();
+				return false;
+			}).on('val', '.pseudo-input', function(e, val) {
+		if (!val)
+			return;
+		var input = $(this).find('input[type="hidden"]');
+		var text = $(this).find('.text');
+		text.removeClass('tags').html('');
+		if (val.constructor === Array) {
+			text.addClass('tags');
+			var keys = [];
+			$.each(val, function(i, v) {
+				keys.push(v.key);
+				$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
+						.appendTo(text).find('.tag-label').text(v.value);
+			});
+			input.val(keys.join(',')).trigger('change');
+		} else {
+			text.text(val.value);
+			input.val(val.key).trigger('change');
+		}
+		return false;
+	}).on('click', 'img.captcha', Captcha.refresh).on('focus', 'input.captcha',
+			function() {
 				var t = $(this);
 				if (t.siblings('img.captcha').length)
 					return;
@@ -39115,14 +39148,27 @@ Observation.groupable = function(container) {
 			if (i < 0) {
 				var ele = expr == 'this' ? $(container) : $(expr, container);
 				if (ele.is(':input')) {
-					return ele.val();
+					var val = ele.val();
+					if (val == '[]')
+						val = '';
+					return val;
 				} else {
-					if (ele.is('.pseudo-input'))
-						return ele.find('.text').text();
-					else
+					if (ele.is('.pseudo-input')) {
+						ele = ele.find('.text');
+						if (ele.hasClass('tags')) {
+							var arr = [];
+							ele.find('.tag-label').each(function() {
+										arr.push($(this).text())
+									});
+							return arr.join(', ');
+						} else {
+							return ele.text();
+						}
+					} else {
 						return ele.contents().filter(function() {
 									return this.nodeType == 3;
 								}).text();
+					}
 				}
 			} else if (i == 0) {
 				return $(container).attr(expr.substring(i + 1));
@@ -39172,12 +39218,23 @@ Observation.groupable = function(container) {
 				nametarget.attr('tabindex', '0');
 				if (nametarget.is('.pseudo-input')) {
 					var text = nametarget.text();
-					nametarget
+					var txt = nametarget
 							.addClass('treeselect-handle')
-							.html('<span class="text resettable"></span>'
+							.html('<div class="text resettable"></div>'
 									+ '<i class="indicator glyphicon glyphicon-list"/>'
 									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
-							.find('.text').text(text);
+							.find('.text');
+					if (options.multiple) {
+						txt.addClass('tags');
+						if (text)
+							$.each(text.split(/\s*,\s*/), function(i, v) {
+								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
+										.appendTo(txt).find('.tag-label')
+										.text(v);
+							});
+					} else {
+						txt.text(text);
+					}
 					if (current.hasClass('disabled'))
 						nametarget.addClass('disabled');
 					if (current.hasClass('readonly'))
@@ -39215,7 +39272,8 @@ Observation.groupable = function(container) {
 			}
 			var func = function(event) {
 				var t = $(event.target);
-				if (t.is('.remove') || t.is('a.view[rel="richtable"]'))
+				if (t.is('.remove') || t.is('.tag-remove')
+						|| t.is('a.view[rel="richtable"]'))
 					return true;
 				var current = t.closest('.treeselect');
 				if (current.is('.disabled,.readonly')
@@ -39267,15 +39325,25 @@ Observation.groupable = function(container) {
 									var nametarget = find(options.name, current);
 									nametarget.each(function() {
 										var t = $(this);
-										val(options.name, current, names
-														.join(separator));
-										if (!t.is(':input')) {
-											if (!t.find('.remove').length)
-												$('<a class="remove" href="#">&times;</a>')
-														.appendTo(t)
-														.click(removeAction);
-											if (!names.length)
-												t.find('.remove').click();
+										if (t.is('.pseudo-input')) {
+											var arr = [];
+											for (var i = 0; i < ids.length; i++)
+												arr.push({
+															key : ids[i],
+															value : names[i]
+														});
+											t.trigger('val', [arr]);
+										} else {
+											val(options.name, current, names
+															.join(separator));
+											if (!t.is(':input')) {
+												if (!t.find('.remove').length)
+													$('<a class="remove" href="#">&times;</a>')
+															.appendTo(t)
+															.click(removeAction);
+												if (!names.length)
+													t.find('.remove').click();
+											}
 										}
 									});
 								}
@@ -39437,8 +39505,10 @@ $(function() {
 								var text = treeselect.children('.text');
 								var node = $(this).closest('li')
 										.data('treenode');
-								input.val(node.id).trigger('change');
-								text.text(node.fullname);
+								treeselect.trigger('val', [{
+													key : node.id,
+													value : node.fullname
+												}]);
 								treeselect.click();
 							},
 							value : input.data('text'),
@@ -39559,14 +39629,27 @@ Observation.treeview = function(container) {
 			if (i < 0) {
 				var ele = expr == 'this' ? $(container) : $(expr, container);
 				if (ele.is(':input')) {
-					return ele.val();
+					var val = ele.val();
+					if (val == '[]')
+						val = '';
+					return val;
 				} else {
-					if (ele.is('.pseudo-input'))
-						return ele.find('.text').text();
-					else
+					if (ele.is('.pseudo-input')) {
+						ele = ele.find('.text');
+						if (ele.hasClass('tags')) {
+							var arr = [];
+							ele.find('.tag-label').each(function() {
+										arr.push($(this).text())
+									});
+							return arr.join(', ');
+						} else {
+							return ele.text();
+						}
+					} else {
 						return ele.contents().filter(function() {
 									return this.nodeType == 3;
 								}).text();
+					}
 				}
 			} else if (i == 0) {
 				return $(container).attr(expr.substring(i + 1));
@@ -39614,12 +39697,23 @@ Observation.treeview = function(container) {
 				nametarget.attr('tabindex', '0');
 				if (nametarget.is('.pseudo-input')) {
 					var text = nametarget.text();
-					nametarget
+					var txt = nametarget
 							.addClass('listpick-handle')
-							.html('<span class="text resettable"></span>'
+							.html('<div class="text resettable"></div>'
 									+ '<i class="indicator glyphicon glyphicon-list"/>'
 									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
-							.find('.text').text(text);
+							.find('.text');
+					if (options.multiple) {
+						txt.addClass('tags');
+						if (text)
+							$.each(text.split(/\s*,\s*/), function(i, v) {
+								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
+										.appendTo(txt).find('.tag-label')
+										.text(v);
+							});
+					} else {
+						txt.text(text);
+					}
 					if (current.hasClass('disabled'))
 						nametarget.addClass('disabled');
 					if (current.hasClass('readonly'))
@@ -39657,7 +39751,8 @@ Observation.treeview = function(container) {
 			}
 			var func = function(event) {
 				var t = $(event.target);
-				if (t.is('.remove') || t.is('a.view[rel="richtable"]'))
+				if (t.is('.remove') || t.is('.tag-remove')
+						|| t.is('a.view[rel="richtable"]'))
 					return true;
 				var current = t.closest('.listpick');
 				if (current.is('.disabled,.readonly')
@@ -39853,25 +39948,35 @@ Observation.treeview = function(container) {
 									find(options.name, win.data('listpick'))
 											.each(function() {
 												var t = $(this);
-												if (selectedNames.length) {
-													val(
-															options.name,
-															win
-																	.data('listpick'),
-															selectedNames
-																	.join(nameSeparator));
-													if (!t.is(':input')
-															&& !t
-																	.find('.remove').length)
-														$('<a class="remove" href="#">&times;</a>')
-																.appendTo(t)
-																.click(removeAction);
+												if (t.is('.pseudo-input')) {
+													var arr = [];
+													for (var i = 0; i < selectedIds.length; i++)
+														arr.push({
+															key : selectedIds[i],
+															value : selectedNames[i]
+														});
+													t.trigger('val', [arr]);
 												} else {
-													if (!t.is(':input')) {
-														t.find('.remove')
-																.click();
+													if (selectedNames.length) {
+														val(
+																options.name,
+																win
+																		.data('listpick'),
+																selectedNames
+																		.join(nameSeparator));
+														if (!t.is(':input')
+																&& !t
+																		.find('.remove').length)
+															$('<a class="remove" href="#">&times;</a>')
+																	.appendTo(t)
+																	.click(removeAction);
 													} else {
-														t.val('');
+														if (!t.is(':input')) {
+															t.find('.remove')
+																	.click();
+														} else {
+															t.val('');
+														}
 													}
 												}
 											});

@@ -58,7 +58,7 @@
 	display: inline-block;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	width: calc(100% - 30px);
+	width: calc(100% - 25px);
 	overflow: hidden;
 	vertical-align: top;
 }
@@ -85,5 +85,39 @@
 
 .pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.indicator {
 	display: none;
+}
+
+.pseudo-input .tags {
+	padding: 2px 0 2px 3px;
+}
+
+.pseudo-input .tags .tag {
+	display: inline-block;
+	border-radius: 2px;
+	box-sizing: border-box;
+	position: relative;
+	float: left;
+	background: #e8e8e8;
+	padding: 0px 17px 0px 3px;
+	margin: 2px 2px 2px 0;
+	height: 20px;
+	line-height: 20px;
+}
+
+.pseudo-input .tag-remove {
+	cursor: pointer;
+	position: absolute;
+	right: 3px;
+	top: 2px;
+	display: block;
+	width: 10px;
+	height: 10px;
+	line-height: 10px;
+	font-weight: bolder;
+	opacity: .3;
+}
+
+.pseudo-input .tag-remove:hover {
+	opacity: .8;
 }
 

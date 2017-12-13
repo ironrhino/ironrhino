@@ -53,14 +53,27 @@
 			if (i < 0) {
 				var ele = expr == 'this' ? $(container) : $(expr, container);
 				if (ele.is(':input')) {
-					return ele.val();
+					var val = ele.val();
+					if (val == '[]')
+						val = '';
+					return val;
 				} else {
-					if (ele.is('.pseudo-input'))
-						return ele.find('.text').text();
-					else
+					if (ele.is('.pseudo-input')) {
+						ele = ele.find('.text');
+						if (ele.hasClass('tags')) {
+							var arr = [];
+							ele.find('.tag-label').each(function() {
+										arr.push($(this).text())
+									});
+							return arr.join(', ');
+						} else {
+							return ele.text();
+						}
+					} else {
 						return ele.contents().filter(function() {
 									return this.nodeType == 3;
 								}).text();
+					}
 				}
 			} else if (i == 0) {
 				return $(container).attr(expr.substring(i + 1));
@@ -110,12 +123,23 @@
 				nametarget.attr('tabindex', '0');
 				if (nametarget.is('.pseudo-input')) {
 					var text = nametarget.text();
-					nametarget
+					var txt = nametarget
 							.addClass('treeselect-handle')
-							.html('<span class="text resettable"></span>'
+							.html('<div class="text resettable"></div>'
 									+ '<i class="indicator glyphicon glyphicon-list"/>'
 									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
-							.find('.text').text(text);
+							.find('.text');
+					if (options.multiple) {
+						txt.addClass('tags');
+						if (text)
+							$.each(text.split(/\s*,\s*/), function(i, v) {
+								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
+										.appendTo(txt).find('.tag-label')
+										.text(v);
+							});
+					} else {
+						txt.text(text);
+					}
 					if (current.hasClass('disabled'))
 						nametarget.addClass('disabled');
 					if (current.hasClass('readonly'))
@@ -153,7 +177,8 @@
 			}
 			var func = function(event) {
 				var t = $(event.target);
-				if (t.is('.remove') || t.is('a.view[rel="richtable"]'))
+				if (t.is('.remove') || t.is('.tag-remove')
+						|| t.is('a.view[rel="richtable"]'))
 					return true;
 				var current = t.closest('.treeselect');
 				if (current.is('.disabled,.readonly')
@@ -205,15 +230,25 @@
 									var nametarget = find(options.name, current);
 									nametarget.each(function() {
 										var t = $(this);
-										val(options.name, current, names
-														.join(separator));
-										if (!t.is(':input')) {
-											if (!t.find('.remove').length)
-												$('<a class="remove" href="#">&times;</a>')
-														.appendTo(t)
-														.click(removeAction);
-											if (!names.length)
-												t.find('.remove').click();
+										if (t.is('.pseudo-input')) {
+											var arr = [];
+											for (var i = 0; i < ids.length; i++)
+												arr.push({
+															key : ids[i],
+															value : names[i]
+														});
+											t.trigger('val', [arr]);
+										} else {
+											val(options.name, current, names
+															.join(separator));
+											if (!t.is(':input')) {
+												if (!t.find('.remove').length)
+													$('<a class="remove" href="#">&times;</a>')
+															.appendTo(t)
+															.click(removeAction);
+												if (!names.length)
+													t.find('.remove').click();
+											}
 										}
 									});
 								}

@@ -1106,20 +1106,53 @@ Initialization.common = function() {
 					else
 						t.removeClass('empty');
 				}
-			}).on('mouseenter', '.pseudo-input', function(e) {
-				var t = $(e.target).closest('.pseudo-input');
-				var text = t.find('.text').text();
+			}).on('mouseenter', '.pseudo-input .text:not(.tags)', function(e) {
+				var t = $(this);
+				var text = t.text();
 				if (text)
 					t.attr('title', text);
-			}).on('mouseleave', '.pseudo-input', function(e) {
-				$(e.target).closest('.pseudo-input').removeAttr('title');
+			}).on('mouseleave', '.pseudo-input .text:not(.tags)', function(e) {
+				$(this).removeAttr('title');
 			}).on('click', '.pseudo-input .remove', function(e) {
 				var t = $(e.target).closest('.pseudo-input');
 				t.find('input[type="hidden"]').val('').trigger('change');
 				t.find('.text').text('');
 				return false;
-			}).on('click', 'img.captcha', Captcha.refresh).on('focus',
-			'input.captcha', function() {
+			}).on('click', '.pseudo-input .tag-remove', function(e) {
+				var t = $(e.target).closest('.pseudo-input');
+				var tag = $(e.target).closest('.tag');
+				var index = tag.parent().find('.tag').index(tag);
+				var input = t.find('input[type="hidden"]');
+				var value = input.val();
+				if (value) {
+					var arr = value.split(',');
+					arr.splice(index, 1);
+					input.val(arr.join(',')).trigger('change');
+				}
+				tag.remove();
+				return false;
+			}).on('val', '.pseudo-input', function(e, val) {
+		if (!val)
+			return;
+		var input = $(this).find('input[type="hidden"]');
+		var text = $(this).find('.text');
+		text.removeClass('tags').html('');
+		if (val.constructor === Array) {
+			text.addClass('tags');
+			var keys = [];
+			$.each(val, function(i, v) {
+				keys.push(v.key);
+				$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
+						.appendTo(text).find('.tag-label').text(v.value);
+			});
+			input.val(keys.join(',')).trigger('change');
+		} else {
+			text.text(val.value);
+			input.val(val.key).trigger('change');
+		}
+		return false;
+	}).on('click', 'img.captcha', Captcha.refresh).on('focus', 'input.captcha',
+			function() {
 				var t = $(this);
 				if (t.siblings('img.captcha').length)
 					return;

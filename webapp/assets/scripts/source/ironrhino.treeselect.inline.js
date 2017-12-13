@@ -52,8 +52,10 @@ $(function() {
 								var text = treeselect.children('.text');
 								var node = $(this).closest('li')
 										.data('treenode');
-								input.val(node.id).trigger('change');
-								text.text(node.fullname);
+								treeselect.trigger('val', [{
+													key : node.id,
+													value : node.fullname
+												}]);
 								treeselect.click();
 							},
 							value : input.data('text'),
