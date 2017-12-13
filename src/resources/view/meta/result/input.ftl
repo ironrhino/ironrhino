@@ -78,8 +78,8 @@
 			<div id="control-group-${id}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
 				<@controlLabel label=label description=description for=id/>
 				<div class="controls <#if readonly>readonly</#if> ${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}">
-				<#if config.multiple&&value?has_content&&value?is_enumerable>
-					<#local arr=[]><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list>
+				<#if config.multiple>
+					<#local arr=[]><#if value?has_content&&value?is_enumerable><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list></#if>
 					<@s.hidden id=id name=name value=arr?join(',') class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 				<#else>
 					<@s.hidden id=id name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
@@ -206,8 +206,8 @@
 							<input class="treeselect-inline ${config.cssClass}"<#if readonly> readonly</#if> name="${name}"<#if value.id?has_content> value="${value.id}"</#if> data-url="${pickUrl}" data-text="<#if value.fullname??>${value.fullname!}<#else>${value!}</#if>">
 						<#elseif config.type=='listpick'||config.type=='treeselect'>
 							<div class="<#if readonly>readonly</#if> ${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}">
-							<#if config.multiple&&value?has_content&&value?is_enumerable>
-								<#local arr=[]><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list>
+							<#if config.multiple>
+								<#local arr=[]><#if value?has_content&&value?is_enumerable><#list value as v><#local arr+=[config.reference?then(v.id!,v?string)]></#list></#if>
 								<@s.hidden name=name value=arr?join(',') class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
 							<#else>
 								<@s.hidden name=name class=config.type+"-id ${config.cssClass}" dynamicAttributes=dynamicAttributes/>
