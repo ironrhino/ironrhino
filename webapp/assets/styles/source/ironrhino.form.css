@@ -378,6 +378,7 @@ input[type="checkbox"].custom + label.custom {
 	vertical-align: middle;
 	margin-bottom: 0;
 	position: relative;
+	line-height: 20px;
 }
 
 th.checkbox input[type="checkbox"].custom + label.custom , td.checkbox input[type="checkbox"].custom + label.custom {
@@ -415,6 +416,7 @@ input[type="radio"].custom + label.custom {
 	vertical-align: middle;
 	margin-bottom: 0;
 	position: relative;
+	line-height: 20px;
 }
 
 td.radio input[type="radio"].custom + label.custom {
@@ -449,7 +451,6 @@ input[type="radio"].custom:checked + label.custom:after {
 
 .controls label.checkbox label.custom , .controls label.radio label.custom {
 	margin-left: -20px;
-	line-height: 20px;
 }
 
 .inline > label.custom {
