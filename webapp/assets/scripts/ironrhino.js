@@ -39239,8 +39239,8 @@ Observation.groupable = function(container) {
 						nametarget.addClass('disabled');
 					if (current.hasClass('readonly'))
 						nametarget.addClass('readonly');
-					var input = nametarget
-							.prev('input.treeselect-id[type="hidden"]');
+					var input = current
+							.find('input.treeselect-id[type="hidden"]');
 					if (input.length) {
 						input.prependTo(nametarget).addClass('resettable');
 						if (input.prop('disabled'))
@@ -39718,8 +39718,8 @@ Observation.treeview = function(container) {
 						nametarget.addClass('disabled');
 					if (current.hasClass('readonly'))
 						nametarget.addClass('readonly');
-					var input = nametarget
-							.prev('input.listpick-id[type="hidden"]');
+					var input = current
+							.find('input.listpick-id[type="hidden"]');
 					if (input.length) {
 						input.prependTo(nametarget).addClass('resettable');
 						if (input.prop('disabled'))
