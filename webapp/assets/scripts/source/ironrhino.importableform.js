@@ -130,7 +130,7 @@
 		if (typeof value != 'undefined') {
 			if (input.is('select[multiple]')) {
 				if (typeof value == 'string')
-					value = value.split(',');
+					value = value.split(/\s*,\s*/);
 				$('option', input).prop('selected', false).each(function() {
 							if ($.inArray($(this).attr('value'), value) > -1)
 								$(this).prop('selected', true);

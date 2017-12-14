@@ -446,7 +446,7 @@ Observation.listpick = function(container) {
 				var t = $(this);
 				var selected = t.closest('.window-listpick').data('selected');
 				if (selected) {
-					var arr = selected.split(',');
+					var arr = selected.split(/\s*,\s*/);
 					$('input[type="checkbox"]', t).each(function() {
 								if ($.inArray(this.value, arr) > -1)
 									$(this).click();

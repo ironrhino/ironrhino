@@ -583,7 +583,7 @@ Richtable = {
 							var cellEdit = $(this).data('celledit');
 							if (!cellEdit)
 								return;
-							var ar = cellEdit.split(',');
+							var ar = cellEdit.split(/\s*,\s*/);
 							var action = ar[0];
 							if (action == 'none')
 								return;

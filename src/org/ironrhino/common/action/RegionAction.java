@@ -206,10 +206,10 @@ public class RegionAction extends EntityAction<Region> {
 	@JsonConfig(root = "list")
 	public String markers() {
 		BaseManager<Region> entityManager = getEntityManager(Region.class);
-		String[] array = southWest.split(",");
+		String[] array = southWest.split("\\s*,\\s*");
 		Double bottom = Double.valueOf(array[0]);
 		Double left = Double.valueOf(array[1]);
-		array = northEast.split(",");
+		array = northEast.split("\\s*,\\s*");
 		Double top = Double.valueOf(array[0]);
 		Double right = Double.valueOf(array[1]);
 		Object[] levels = zoom2level(zoom);

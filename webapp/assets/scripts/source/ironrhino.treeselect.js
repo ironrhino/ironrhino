@@ -348,7 +348,7 @@ Observation.treeselect = function(container) {
 		var t = $(container);
 		var selected = t.closest('.tree').data('selected');
 		if (selected) {
-			var arr = selected.split(',');
+			var arr = selected.split(/\s*,\s*/);
 			$('input[type="checkbox"]', t).each(function() {
 						if ($.inArray(this.value, arr) > -1)
 							$(this).click();

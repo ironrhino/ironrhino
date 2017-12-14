@@ -45,6 +45,7 @@ class RestClientTemplate extends RestTemplate {
 		}
 	}
 
+	@Override
 	public void setConnectTimeout(int connectTimeout) {
 		ClientHttpRequestFactory chrf = getRequestFactory();
 		if (chrf instanceof org.springframework.http.client.SimpleClientHttpRequestFactory) {
@@ -56,6 +57,7 @@ class RestClientTemplate extends RestTemplate {
 		}
 	}
 
+	@Override
 	public void setReadTimeout(int readTimeout) {
 		ClientHttpRequestFactory chrf = getRequestFactory();
 		if (chrf instanceof org.springframework.http.client.SimpleClientHttpRequestFactory) {

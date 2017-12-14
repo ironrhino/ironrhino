@@ -378,7 +378,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				indexType = getEntityName();
 			criteria.setTypes(new String[] { indexType });
 			if (richtableConfig != null && StringUtils.isNotBlank(richtableConfig.order())) {
-				String[] ar = richtableConfig.order().split(",");
+				String[] ar = richtableConfig.order().split("\\s*,\\s*");
 				for (String s : ar) {
 					String[] arr = s.split("\\s+", 2);
 					String propertyName = arr[0];
@@ -528,7 +528,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		}
 		if (criteriaState.getOrderings().isEmpty()) {
 			if (richtableConfig != null && StringUtils.isNotBlank(richtableConfig.order())) {
-				String[] ar = richtableConfig.order().split(",");
+				String[] ar = richtableConfig.order().split("\\s*,\\s*");
 				for (String s : ar) {
 					String[] arr = s.trim().split("\\s+", 2);
 					String propertyName = arr[0];
@@ -1379,7 +1379,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		final Map<String, Number> sumColumns = new HashMap<>();
 		final Map<String, Template> csvTemplates = new HashMap<>();
 		if (StringUtils.isNotBlank(columns))
-			columnsList = Arrays.asList(columns.split(","));
+			columnsList = Arrays.asList(columns.split("\\s*,\\s*"));
 		for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 			String name = entry.getKey();
 			if (columnsList != null && !columnsList.contains(name))

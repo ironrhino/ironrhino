@@ -117,7 +117,7 @@ public class JdbcQueryService {
 			if (keywords.isEmpty()) {
 				str = dbmd.getSQLKeywords();
 				if (StringUtils.isNotBlank(str))
-					keywords.addAll(Arrays.asList(str.toUpperCase(Locale.ROOT).split(",")));
+					keywords.addAll(Arrays.asList(str.toUpperCase(Locale.ROOT).split("\\s*,\\s*")));
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);

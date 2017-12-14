@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.JsonDesensitizer;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.JsonDesensitizer;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 

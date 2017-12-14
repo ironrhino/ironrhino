@@ -28,7 +28,7 @@ public class Coordinate implements Serializable {
 			this.latitude = null;
 			this.longitude = null;
 		} else {
-			String[] arr = latLng.split(",");
+			String[] arr = latLng.split("\\s*,\\s*");
 			this.latitude = parseLatOrLong(arr[0]);
 			this.longitude = parseLatOrLong(arr[1]);
 		}

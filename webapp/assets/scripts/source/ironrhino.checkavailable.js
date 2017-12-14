@@ -11,7 +11,7 @@
 											return $(v).val() && (v != t[0])
 										}).add(t);
 						if (t.data('checkwith')) {
-							$.each(t.data('checkwith').split(','), function(i,
+							$.each(t.data('checkwith').split(/\s*,\s*/), function(i,
 											v) {
 										var ele = $(':input[name="' + v + '"]',
 												t.closest('form'));

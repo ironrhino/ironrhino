@@ -356,8 +356,7 @@ public class ApiDoc implements Serializable {
 						Type fieldType = genericParameterType;
 						boolean fieldRequired = ann.required();
 						if (parameterType == Optional.class) {
-							fieldType = (Class<?>) ((ParameterizedType) genericParameterType)
-									.getActualTypeArguments()[0];
+							fieldType = ((ParameterizedType) genericParameterType).getActualTypeArguments()[0];
 							fieldRequired = false;
 						}
 						if (!Map.class.isAssignableFrom(parameterType)) {

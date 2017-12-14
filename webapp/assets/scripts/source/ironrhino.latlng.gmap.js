@@ -110,7 +110,7 @@ function latlng_createOrMoveMarker(latLng) {
 	if (!latLng)
 		return;
 	if (typeof latLng == 'string') {
-		var arr = latLng.split(',');
+		var arr = latLng.split(/\s*,\s*/);
 		latLng = new google.maps.LatLng(parseFloat(arr[0]), parseFloat(arr[1]));
 	}
 	if (latlng_marker == null) {

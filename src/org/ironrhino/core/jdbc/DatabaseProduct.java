@@ -341,7 +341,7 @@ public enum DatabaseProduct {
 			for (String line : lines) {
 				if (line.startsWith(name() + "=")) {
 					String s = line.substring(line.indexOf("=") + 1);
-					return Arrays.asList(s.split(","));
+					return Arrays.asList(s.split("\\s*,\\s*"));
 				}
 			}
 		} catch (IOException e) {

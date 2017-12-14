@@ -52,7 +52,7 @@
 				var holder = $(t.data('staticmapselector'));
 				var value = $(t).val();
 				if (value) {
-					var arr = value.split(',');
+					var arr = value.split(/\s*,\s*/);
 					value = arr[1] + ',' + arr[0];
 					holder
 							.html('<img src="http://restapi.amap.com/v3/staticmap?location='
@@ -106,7 +106,7 @@ function latlng_createOrMoveMarker(latLng) {
 	if (!latLng)
 		return;
 	if (typeof latLng == 'string') {
-		var arr = latLng.split(',');
+		var arr = latLng.split(/\s*,\s*/);
 		latLng = new AMap.LngLat(parseFloat(arr[1]), parseFloat(arr[0]));
 	}
 	if (latlng_marker == null) {

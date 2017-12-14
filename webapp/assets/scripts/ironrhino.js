@@ -31800,7 +31800,7 @@ Ajax = {
 			if (typeof replacement == 'string'
 					|| typeof replacement == 'number') {
 				var map = {};
-				var entries = replacement.toString().split(',');
+				var entries = replacement.toString().split(/\s*,\s*/);
 				var arr = [];
 				for (var i = 0; i < entries.length; i++) {
 					var entry = entries[i];
@@ -31942,7 +31942,7 @@ function ajaxOptions(options) {
 	var replacement = {};
 	var entries = (options.replacement || $(options.target).data('replacement')
 			|| ($(options.target).is('form') ? $(target).attr('id') : null) || Ajax.defaultRepacement)
-			.split(',');
+			.split(/\s*,\s*/);
 	var arr = [];
 	for (var i = 0; i < entries.length; i++) {
 		var entry = entries[i];
@@ -32172,7 +32172,7 @@ Initialization.common = function() {
 				var input = t.find('input[type="hidden"]');
 				var value = input.val();
 				if (value) {
-					var arr = value.split(',');
+					var arr = value.split(/\s*,\s*/);
 					arr.splice(index, 1);
 					input.val(arr.join(',')).trigger('change');
 				}
@@ -32424,7 +32424,7 @@ if (HISTORY_ENABLED) {
 								if (typeof $.fn.mask != 'undefined') {
 									var replacement = event.state.replacement
 											|| Ajax.defaultRepacement;
-									$.each(replacement.split(','), function(i,
+									$.each(replacement.split(/\s*,\s*/), function(i,
 													v) {
 												if (v.indexOf(':') > -1)
 													v = v.substring(0,
@@ -32437,7 +32437,7 @@ if (HISTORY_ENABLED) {
 								if (typeof $.fn.mask != 'undefined') {
 									var replacement = event.state.replacement
 											|| Ajax.defaultRepacement;
-									$.each(replacement.split(','), function(i,
+									$.each(replacement.split(/\s*,\s*/), function(i,
 													v) {
 												if (v.indexOf(':') > -1)
 													v = v.substring(0,
@@ -33064,7 +33064,7 @@ Observation.common = function(container) {
 							&& !$(target).data('quiet')) {
 						var replacement = $(target).attr('data-replacement');
 						if (replacement) {
-							$.each(replacement.split(','), function(i, v) {
+							$.each(replacement.split(/\s*,\s*/), function(i, v) {
 										if (v.indexOf(':') > -1)
 											v = v.substring(0, v.indexOf(':'));
 										$('#' + v).mask();
@@ -33105,7 +33105,7 @@ Observation.common = function(container) {
 							&& !$(target).data('quiet')) {
 						var replacement = $(target).attr('data-replacement');
 						if (replacement) {
-							$.each(replacement.split(','), function(i, v) {
+							$.each(replacement.split(/\s*,\s*/), function(i, v) {
 										if (v.indexOf(':') > -1)
 											v = v.substring(0, v.indexOf(':'));
 										$('#' + v).unmask();
@@ -33208,7 +33208,7 @@ Observation.common = function(container) {
 								&& t.hasClass('view') && !t.data('quiet')) {
 							var replacement = t.attr('data-replacement')
 									|| Ajax.defaultRepacement;
-							$.each(replacement.split(','), function(i, v) {
+							$.each(replacement.split(/\s*,\s*/), function(i, v) {
 										if (v.indexOf(':') > -1)
 											v = v.substring(0, v.indexOf(':'));
 										$('#' + v).mask();
@@ -33227,7 +33227,7 @@ Observation.common = function(container) {
 								&& t.hasClass('view') && !t.data('quiet')) {
 							var replacement = t.attr('data-replacement')
 									|| Ajax.defaultRepacement;
-							$.each(replacement.split(','), function(i, v) {
+							$.each(replacement.split(/\s*,\s*/), function(i, v) {
 										$('#' + v).unmask();
 									});
 						}
@@ -33745,7 +33745,7 @@ DateUtils = {
 											return $(v).val() && (v != t[0])
 										}).add(t);
 						if (t.data('checkwith')) {
-							$.each(t.data('checkwith').split(','), function(i,
+							$.each(t.data('checkwith').split(/\s*,\s*/), function(i,
 											v) {
 										var ele = $(':input[name="' + v + '"]',
 												t.closest('form'));
@@ -37923,7 +37923,7 @@ Richtable = {
 							var cellEdit = $(this).data('celledit');
 							if (!cellEdit)
 								return;
-							var ar = cellEdit.split(',');
+							var ar = cellEdit.split(/\s*,\s*/);
 							var action = ar[0];
 							if (action == 'none')
 								return;
@@ -38693,7 +38693,7 @@ Observation.sqleditor = function(container) {
 		if (typeof value != 'undefined') {
 			if (input.is('select[multiple]')) {
 				if (typeof value == 'string')
-					value = value.split(',');
+					value = value.split(/\s*,\s*/);
 				$('option', input).prop('selected', false).each(function() {
 							if ($.inArray($(this).attr('value'), value) > -1)
 								$(this).prop('selected', true);
@@ -39443,7 +39443,7 @@ Observation.treeselect = function(container) {
 		var t = $(container);
 		var selected = t.closest('.tree').data('selected');
 		if (selected) {
-			var arr = selected.split(',');
+			var arr = selected.split(/\s*,\s*/);
 			$('input[type="checkbox"]', t).each(function() {
 						if ($.inArray(this.value, arr) > -1)
 							$(this).click();
@@ -40022,7 +40022,7 @@ Observation.listpick = function(container) {
 				var t = $(this);
 				var selected = t.closest('.window-listpick').data('selected');
 				if (selected) {
-					var arr = selected.split(',');
+					var arr = selected.split(/\s*,\s*/);
 					$('input[type="checkbox"]', t).each(function() {
 								if ($.inArray(this.value, arr) > -1)
 									$(this).click();
@@ -40121,7 +40121,7 @@ Observation._imagepick = function(container) {
 				var holder = $(t.data('staticmapselector'));
 				var value = $(t).val();
 				if (value) {
-					var arr = value.split(',');
+					var arr = value.split(/\s*,\s*/);
 					value = arr[1] + ',' + arr[0];
 					holder
 							.html('<img src="http://restapi.amap.com/v3/staticmap?location='
@@ -40175,7 +40175,7 @@ function latlng_createOrMoveMarker(latLng) {
 	if (!latLng)
 		return;
 	if (typeof latLng == 'string') {
-		var arr = latLng.split(',');
+		var arr = latLng.split(/\s*,\s*/);
 		latLng = new AMap.LngLat(parseFloat(arr[1]), parseFloat(arr[0]));
 	}
 	if (latlng_marker == null) {

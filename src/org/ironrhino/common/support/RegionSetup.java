@@ -101,7 +101,7 @@ public class RegionSetup {
 					if (region.getParent() != null) {
 						if (parentName.length() >= 2 && region.getParent().getName().length() > 2
 								&& parentName.contains(region.getParent().getName().substring(0, 2))) {
-							String[] arr2 = coordinate.split(",");
+							String[] arr2 = coordinate.split("\\s*,\\s*");
 							Coordinate c = new Coordinate();
 							c.setLatitude(NumberUtils.round(Double.valueOf(arr2[1]), 6));
 							c.setLongitude(NumberUtils.round(Double.valueOf(arr2[0]), 6));
@@ -109,7 +109,7 @@ public class RegionSetup {
 							break;
 						}
 					} else {
-						String[] arr2 = coordinate.split(",");
+						String[] arr2 = coordinate.split("\\s*,\\s*");
 						Coordinate c = new Coordinate();
 						c.setLatitude(NumberUtils.round(Double.valueOf(arr2[1]), 6));
 						c.setLongitude(NumberUtils.round(Double.valueOf(arr2[0]), 6));
