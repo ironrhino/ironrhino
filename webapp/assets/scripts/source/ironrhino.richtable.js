@@ -874,7 +874,8 @@ Observation._richtable = function(container) {
 				} else if ('listpick' == option.data('type')
 						|| 'treeselect' == option.data('type')) {
 					var type = option.data('type');
-					$('<div class="' + type + '" data-options="{\'url\':\''
+					$('<div class="' + type
+							+ ' removeonadd" data-options="{\'url\':\''
 							+ option.data('pickurl') + '\'}"><input class="'
 							+ type + '-id required" type="hidden" name="'
 							+ property.val()
