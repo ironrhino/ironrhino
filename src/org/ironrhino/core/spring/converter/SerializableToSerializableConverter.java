@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.Set;
 
+import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.util.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.InvalidPropertyException;
@@ -25,6 +26,8 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 		Class<?> targetClass = targetType.getType();
 		if (sourceClass == targetClass || targetClass.isAssignableFrom(sourceClass))
 			return false;
+		if (Persistable.class.isAssignableFrom(targetClass) && sourceClass == String.class)
+			return true;
 		try {
 			targetClass.getConstructor(sourceClass);
 			return true;
@@ -62,6 +65,15 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 		Class<?> targetClass = targetType.getType();
 		if (targetClass.isInstance(source))
 			return source;
+		if (Persistable.class.isAssignableFrom(targetClass) && sourceClass == String.class) {
+			try {
+				Object target = targetClass.getConstructor().newInstance();
+				BeanUtils.setPropertyValue(target, "id", source);
+				return target;
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 		try {
 			Constructor<?> ctor = targetClass.getConstructor(sourceClass);
 			return ctor.newInstance(source);

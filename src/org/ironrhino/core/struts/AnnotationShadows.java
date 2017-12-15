@@ -2,6 +2,8 @@ package org.ironrhino.core.struts;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ public class AnnotationShadows {
 	public static class UiConfigImpl implements Serializable {
 
 		private static final long serialVersionUID = -5963246979386241924L;
+		private Type genericPropertyType;
 		private Class<?> propertyType;
 		private Class<?> collectionType;
 		private Class<?> elementType;
@@ -83,8 +86,25 @@ public class AnnotationShadows {
 		private MatchMode queryMatchMode = MatchMode.ANYWHERE;
 		private boolean queryWithRange;
 
-		public UiConfigImpl(String propertyName, Class<?> propertyType, UiConfig config) {
-			this.propertyType = propertyType;
+		public UiConfigImpl(String propertyName, Type genericPropertyType, UiConfig config) {
+			this.genericPropertyType = genericPropertyType;
+			if (genericPropertyType instanceof ParameterizedType) {
+				ParameterizedType pt = (ParameterizedType) genericPropertyType;
+				if (pt.getRawType() instanceof Class)
+					this.propertyType = (Class<?>) pt.getRawType();
+				if (pt.getActualTypeArguments().length == 1) {
+					Type argType = pt.getActualTypeArguments()[0];
+					Type rawType = pt.getRawType();
+					if (rawType instanceof Class && argType instanceof Class) {
+						this.collectionType = (Class<?>) rawType;
+						this.elementType = (Class<?>) argType;
+					}
+				}
+			} else if (genericPropertyType instanceof Class) {
+				this.propertyType = (Class<?>) genericPropertyType;
+			} else {
+				throw new IllegalArgumentException("type of " + propertyName + " invalid: " + genericPropertyType);
+			}
 			if (config == null)
 				return;
 			if (StringUtils.isNotBlank(config.id()))

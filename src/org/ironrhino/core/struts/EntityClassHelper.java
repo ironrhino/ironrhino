@@ -6,12 +6,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -132,21 +129,11 @@ public class EntityClassHelper {
 							|| "class".equals(propertyName) || "fieldHandler".equals(propertyName)
 							|| hides.contains(propertyName))
 						continue;
-					Class<?> collectionType = null;
-					Class<?> elementType = null;
-					if (readMethod.getGenericReturnType() instanceof ParameterizedType) {
-						ParameterizedType pt = (ParameterizedType) readMethod.getGenericReturnType();
-						Type[] args = pt.getActualTypeArguments();
-						if (pt.getRawType() instanceof Class) {
-							collectionType = (Class<?>) pt.getRawType();
-							if (!Collection.class.isAssignableFrom(collectionType))
-								collectionType = null;
-						}
-						if (collectionType != null && args.length == 1 && args[0] instanceof Class)
-							elementType = (Class<?>) args[0];
-					}
 
-					UiConfigImpl uci = new UiConfigImpl(pd.getName(), pd.getPropertyType(), uiConfig);
+					UiConfigImpl uci = new UiConfigImpl(pd.getName(), pd.getReadMethod().getGenericReturnType(),
+							uiConfig);
+					Class<?> collectionType = uci.getCollectionType();
+					Class<?> elementType = uci.getElementType();
 					if (uiConfig == null || uiConfig.displayOrder() == Integer.MAX_VALUE) {
 						int index = fields.indexOf(pd.getName());
 						if (index == -1)
@@ -313,8 +300,6 @@ public class EntityClassHelper {
 					}
 
 					Class<?> returnType = pd.getPropertyType();
-					uci.setCollectionType(collectionType);
-					uci.setElementType(elementType);
 					if (collectionType != null && elementType != null) {
 						if (Persistable.class.isAssignableFrom(elementType)) {
 							uci.setMultiple(true);
@@ -608,8 +593,7 @@ public class EntityClassHelper {
 						// if (naturalIds.size() == 1)
 						uci.addCssClass("checkavailable");
 						if (naturalIds.size() > 1) {
-							if (uci.getPropertyType() != null
-									&& Persistable.class.isAssignableFrom(uci.getPropertyType())) {
+							if (Persistable.class.isAssignableFrom(uci.getPropertyType())) {
 								List<String> list = new ArrayList<>(naturalIds.size() - 1);
 								for (String name : naturalIds.keySet())
 									if (!name.equals(pd.getName()))
@@ -672,12 +656,12 @@ public class EntityClassHelper {
 				if ("embedded".equals(config.getType())) {
 					for (Map.Entry<String, UiConfigImpl> entry2 : config.getEmbeddedUiConfigs().entrySet()) {
 						UiConfigImpl config2 = entry2.getValue();
-						if (!config2.isExcludedFromCriteria()
-								&& !CriterionOperator.getSupportedOperators(config2.getPropertyType()).isEmpty()) {
+						if (!config2.isExcludedFromCriteria() && !CriterionOperator
+								.getSupportedOperators(config2.getGenericPropertyType()).isEmpty()) {
 							propertyNamesInCriterion.put(entry.getKey() + '.' + entry2.getKey(), clone(config2));
 						}
 					}
-				} else if (!CriterionOperator.getSupportedOperators(config.getPropertyType()).isEmpty()) {
+				} else if (!CriterionOperator.getSupportedOperators(config.getGenericPropertyType()).isEmpty()) {
 					propertyNamesInCriterion.put(entry.getKey(), clone(config));
 				}
 			}
