@@ -8,6 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
@@ -149,19 +151,20 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	@Override
 	@JsonIgnore
+	@Access(AccessType.PROPERTY)
 	public Set<String> getRoles() {
 		return roles;
-	}
-
-	@JsonProperty("roles")
-	public Set<String> getRolesForApi() {
-		return AuthorityUtils.authorityListToSet(authorities);
 	}
 
 	@JsonSetter
 	public void setRoles(Set<String> roles) {
 		if (roles != null)
 			this.roles = roles;
+	}
+
+	@JsonProperty("roles")
+	public Set<String> getRolesForApi() {
+		return AuthorityUtils.authorityListToSet(authorities);
 	}
 
 	@Override
