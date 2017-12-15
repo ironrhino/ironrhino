@@ -24,7 +24,8 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -67,7 +68,8 @@ public class Customer extends BaseRecordableEntity {
 	private Gender gender;
 
 	@UiConfig(width = "100px", hiddenInInput = @Hidden(expression = "entity.gender??&&entity.gender.name()=='FEMALE'"), description = "age.description", queryWithRange = true)
-	@Positive
+	@Min(1)
+	@Max(100)
 	private Integer age;
 
 	@UiConfig(width = "100px")
