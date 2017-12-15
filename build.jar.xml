@@ -237,6 +237,7 @@
 			</copy>
 		</target>
 		<target name="jar" depends="set-revision">
+			<delete dir="${target.dir}" />
 			<mkdir dir="${target.dir}" />
 			<delete file="${target.dir}/${assets-jar.name}" />
 			<delete file="${target.dir}/${core-jar.name}" />
