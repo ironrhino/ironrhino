@@ -131,11 +131,7 @@ public enum CriterionOperator implements Displayable {
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
 			String value = String.valueOf(values[0]);
-			if (name.endsWith("AsString")) {
-				return CriterionUtils.matchTag(name, value);
-			} else {
-				return Restrictions.like(name, value, MatchMode.ANYWHERE);
-			}
+			return Restrictions.like(name, value, MatchMode.ANYWHERE);
 		}
 	},
 	NOTINCLUDE(1) {

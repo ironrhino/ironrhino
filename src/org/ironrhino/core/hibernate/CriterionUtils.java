@@ -41,7 +41,7 @@ public class CriterionUtils {
 			field = value.substring(0, index);
 			String value2 = value.substring(index + 1);
 			for (String name : names) {
-				if (name.equals(field) || name.equals(field + "AsString")) {
+				if (name.equals(field)) {
 					if (field.equals("tags")) {
 						criterion = matchTag(name, value2);
 					} else {
@@ -67,7 +67,7 @@ public class CriterionUtils {
 			String value2 = value.substring(index + 1);
 			for (Map.Entry<String, MatchMode> entry : map.entrySet()) {
 				String name = entry.getKey();
-				if (name.equals(field) || name.equals(field + "AsString")) {
+				if (name.equals(field)) {
 					if (field.equals("tags")) {
 						criterion = matchTag(name, value2);
 					} else {
