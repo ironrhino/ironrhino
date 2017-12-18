@@ -433,10 +433,6 @@ Message = {
 						Message.showActionError(msg);
 					}
 				}
-			} else if (field.is('.custom[type="file"]')) {
-				$('<span class="field-error">' + msg + '</span>')
-						.insertAfter(field.next('.filepick')
-								.find('.filepick-handle'));
 			} else
 				Message.showActionError(msg);
 		} else
@@ -1142,10 +1138,10 @@ Initialization.common = function() {
 			var keys = [];
 			$.each(val, function(i, v) {
 						keys.push((typeof v == 'string') ? v : v.key);
-						$('<div class="tag"><span class="tag-label"></span>'
+						$('<div class="tag"><div class="tag-label"></div>'
 								+ (textOnly
 										? ''
-										: '<span class="tag-remove">×</span>')
+										: '<div class="tag-remove">×</div>')
 								+ '</div>').appendTo(text).find('.tag-label')
 								.html((typeof v == 'string') ? v : v.value);
 					});
@@ -1517,7 +1513,8 @@ Observation.common = function(container) {
 			});
 	$$('.custom[type="file"]', container).each(function() {
 		var t = $(this);
-		t.hide().change(function() {
+		t.hide().change(function(e) {
+			var t = $(this);
 			var names = [];
 			for (var i = 0; i < this.files.length; i++) {
 				var f = this.files[i];
@@ -1537,29 +1534,31 @@ Observation.common = function(container) {
 				} else {
 					size = size + ' KB';
 				}
-				names.push('<i class="tiped" title="' + size + '">' + f.name
-						+ '</i>');
+				names.push('<span class="tiped" title="' + size + '">' + f.name
+						+ '</span>');
 			}
-			var files = names.join(', ');
-			var fp = t.next('.filepick');
-			if (files) {
-				_observe(fp.find('.file-holder').html(files));
-				fp.find('.remove').show();
-				fp.find('.filepick-handle').hide();
-			} else {
-				fp.find('.file-holder').text('');
-				fp.find('.remove').hide();
-				fp.find('.filepick-handle').show();
-			}
+			t.closest('.filepick').trigger('val',
+					[!this.multiple && names.length ? names[0] : names, true]);
 		});
-		var fp = $('<div class="filepick"><span class="file-holder"></span><a class="remove" href="#" style="display:none;">&times;</a><span class="filepick-handle glyphicon glyphicon-list"></span></div>')
-				.insertAfter(t);
-		fp.find('.filepick-handle').click(function() {
-					t.click();
-					return false;
+		var fp = t
+				.wrap('<div class="filepick input-pseudo"/>')
+				.after('<div class="text resettable"></div>'
+						+ '<i class="indicator glyphicon glyphicon-list"/>'
+						+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
+				.parent();
+		$.each(	$.grep(t.attr('class').split(' '), function(v) {
+							return v.indexOf('input-') == 0
+									|| v.indexOf('span') == 0;
+						}), function(k, v) {
+					t.removeClass(v);
+					fp.addClass(v);
 				});
-		fp.find('a.remove').click(function() {
-					t.val(null).trigger('change');
+		fp.click(function(e) {
+					var t = $(e.target);
+					if (t.is('.remove') || t.is('.tag-remove')
+							|| t.is('input[type="file"]'))
+						return true;
+					t.closest('.filepick').find('input[type="file"]').click();
 					return false;
 				});
 	});

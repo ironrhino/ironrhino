@@ -5,22 +5,18 @@
 <title>${getText('upload')}</title>
 </head>
 <body>
-<@s.form id="upload_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="ajax view form-inline">
+<@s.form id="upload_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="ajax view form-horizontal">
 	<div class="row<#if fluidLayout>-fluid</#if>">
-	<#list 1..(Parameters.size!'4')?number as index>
-		<div class="span3"><@s.file theme="simple" id="" name="file" multiple="true"/></div>
-	</#list>
+		<div class="span5"><@s.file name="file" class="required custom input-xlarge" multiple="true"/></div>
+		<div class="span4"><@s.checkbox name="autorename" class="switch input-medium"/></div>
+		<div class="span3 center"><@s.submit theme="simple" class="btn-primary" label="${getText('upload')}"/></div>
 	</div>
-	<div class="center" style="padding-top:30px;">
-	<@s.submit theme="simple" label="${getText('upload')}"/>
-	<label for="autorename">${getText('autorename')}:</label> <@s.checkbox theme="simple" id="autorename" name="autorename" class="switch"/>
-	</div>
-	<table id="files" class="checkboxgroup table table-striped middle" style="margin-top:50px;">
+	<table id="files" class="checkboxgroup table table-striped middle">
 		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>
 		<thead>
-		<tr style="font-weight:bold;height:43px;">
-			<td style="width:30px" class="checkbox"><input type="checkbox" class="checkbox checkall custom"/></td>
-			<td style="width:300px;"><span style="line-height:28px;">${getText('name')}</span><input type="search" class="filter input-small pull-right"/></td>
+		<tr style="font-weight:bold;">
+			<td style="width:30px;" class="checkbox"><input type="checkbox" class="checkbox checkall custom"/></td>
+			<td style="width:300px;"><span style="line-height:30px;">${getText('name')}</span><input type="search" class="filter input-medium pull-right"/></td>
 			<td style="width:150px;">${getText('preview')}</td>
 			<td >${getText('path')}</td>
 		</tr>

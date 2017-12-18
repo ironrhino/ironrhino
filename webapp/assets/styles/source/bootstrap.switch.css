@@ -242,7 +242,7 @@
 .has-switch.input-xxlarge {
     width: 544px;
 }
-.controls > .has-switch:not([class*="span"]) {
+.controls > .has-switch:not([class*="span"]):not([class*="input-"]) {
     width: 220px;
 }
 td > .has-switch {
