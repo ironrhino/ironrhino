@@ -1166,7 +1166,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
   position: relative;
   float: left;
   background: #e8e8e8;
-  padding: 0px 17px 0px 3px;
+  padding: 0px 3px 0px 3px;
   margin: 0 2px 2px 0;
   height: 20px;
 }
@@ -1175,12 +1175,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 }
 .text-core .text-wrap .text-tags .text-tag .text-button .text-remove {
   cursor: pointer;
-  position: absolute;
-  right: 3px;
-  top: 2px;
-  display: block;
-  width: 10px;
-  height: 10px;
+  display: inline-block;
+  vertical-align: top;
+  margin: 2px 0 0 3px;
   line-height: 10px;
   font-weight: bolder;
   opacity: .3;
@@ -9260,7 +9257,7 @@ th.filtercolumn li.main li {
 	position: relative;
 	float: left;
 	background: #e8e8e8;
-	padding: 0px 17px 0px 3px;
+	padding: 0px 3px 0px 3px;
 	margin: 2px 2px 2px 0;
 	height: 20px;
 	line-height: 20px;
@@ -9268,12 +9265,9 @@ th.filtercolumn li.main li {
 
 .input-pseudo .tag-remove {
 	cursor: pointer;
-	position: absolute;
-	right: 3px;
-	top: 2px;
-	display: block;
-	width: 10px;
-	height: 10px;
+	display: inline-block;
+	vertical-align: top;
+	margin: 2px 0 0 3px;
 	line-height: 10px;
 	font-weight: bolder;
 	opacity: .3;
