@@ -1115,7 +1115,7 @@ Initialization.common = function() {
 				$(this).removeAttr('title');
 			}).on('click', '.input-pseudo .remove', function(e) {
 				var t = $(e.target).closest('.input-pseudo');
-				t.find('input[type="hidden"]').val('').trigger('change');
+				t.find('input[name]').val('').trigger('change');
 				t.find('.text').text('');
 				return false;
 			}).on('click', '.input-pseudo .tag-remove', function(e) {
@@ -1131,7 +1131,7 @@ Initialization.common = function() {
 				}
 				tag.remove();
 				return false;
-			}).on('val', '.input-pseudo', function(e, val) {
+			}).on('val', '.input-pseudo', function(e, val, textOnly) {
 		if (!val)
 			return;
 		var input = $(this).find('input[type="hidden"]');
@@ -1141,14 +1141,21 @@ Initialization.common = function() {
 			text.addClass('tags');
 			var keys = [];
 			$.each(val, function(i, v) {
-				keys.push(v.key);
-				$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
-						.appendTo(text).find('.tag-label').text(v.value);
-			});
-			input.val(keys.join(',')).trigger('change');
+						keys.push((typeof v == 'string') ? v : v.key);
+						$('<div class="tag"><span class="tag-label"></span>'
+								+ (textOnly
+										? ''
+										: '<span class="tag-remove">×</span>')
+								+ '</div>').appendTo(text).find('.tag-label')
+								.html((typeof v == 'string') ? v : v.value);
+					});
+			if (!textOnly)
+				input.val(keys.join(',')).trigger('change');
 		} else {
-			text.text(val.value);
-			input.val(val.key).trigger('change');
+			text.html((typeof val == 'string') ? val : val.value);
+			if (!textOnly)
+				input.val((typeof val == 'string') ? val : val.key)
+						.trigger('change');
 		}
 		return false;
 	}).on('click', 'img.captcha', Captcha.refresh).on('focus', 'input.captcha',
