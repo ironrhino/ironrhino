@@ -285,7 +285,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 		} else {
 			final Map<String, Integer> map = new HashMap<>();
 			DetachedCriteria dc = detachedCriteria();
-			dc.add(CriterionUtils.matchTag("tags", keyword));
+			dc.add(CriterionUtils.matchTagPrefix("tags", keyword));
 			List<Page> list = findListByCriteria(dc);
 			for (Page p : list) {
 				for (String tag : p.getTags()) {

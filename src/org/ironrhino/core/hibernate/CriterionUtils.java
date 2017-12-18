@@ -90,7 +90,11 @@ public class CriterionUtils {
 	}
 
 	public static Criterion matchTag(String tagFieldName, String tag) {
-		return new FindInSetCriterion(tagFieldName, tag.trim());
+		return new FindInSetCriterion(tagFieldName, tag);
+	}
+
+	public static Criterion matchTagPrefix(String tagFieldName, String tagPrefix) {
+		return new PrefixFindInSetCriterion(tagFieldName, tagPrefix);
 	}
 
 	public static CriteriaState filter(DetachedCriteria dc, Class<? extends Persistable<?>> entityClass) {
