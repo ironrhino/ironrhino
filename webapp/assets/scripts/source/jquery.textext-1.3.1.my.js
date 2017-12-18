@@ -458,7 +458,7 @@
 			ext : {},
 
 			html : {
-				wrap   : '<div class="text-core pseudo-input"><div class="text-wrap"/></div>',
+				wrap   : '<div class="text-core input-pseudo"><div class="text-wrap"/></div>',
 				hidden : '<input type="hidden" />'
 			},
 

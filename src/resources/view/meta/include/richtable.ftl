@@ -491,7 +491,7 @@ ${formFooter!}
 				<@controlLabel label=label description=description for=id/>
 				<div class="controls ${config.type}" data-options="{'url':'<@url value=pickUrl/>'}">
 				<@s.hidden id=id name=key class=config.type+"-id ${cssClass}" dynamicAttributes=dynamicAttributes/>
-				<div class="${config.type}-name pseudo-input"></div>
+				<div class="${config.type}-name input-pseudo"></div>
 				</div>
 			</div>
 		<#elseif config.type=='dictionary' && selectDictionary??>

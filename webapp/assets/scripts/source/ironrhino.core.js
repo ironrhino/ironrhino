@@ -385,7 +385,7 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
-			else if (field.parent('.pseudo-input').length)
+			else if (field.parent('.input-pseudo').length)
 				field = field.parent().addClass('error');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
@@ -469,7 +469,7 @@ Form = {
 				$(target).removeClass('error');
 			};
 			var p = $(target).parent();
-			if (p.is('.pseudo-input'))
+			if (p.is('.input-pseudo'))
 				p = p.parent();
 			if (!p.is('form,fieldset')) {
 				$$('.error', p).removeClass('error');
@@ -508,7 +508,7 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.pseudo-input > input'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.input-pseudo > input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
@@ -675,7 +675,7 @@ Form = {
 	},
 	findControlGroup : function(target) {
 		var t = $(target);
-		if (t.parent('.input-append,.input-prepend,.pseudo-input').length)
+		if (t.parent('.input-append,.input-prepend,.input-pseudo').length)
 			t = t.parent();
 		if (t.is('[type="hidden"]')) {
 			var cg = t.parent('.control-group');
@@ -1029,7 +1029,7 @@ Initialization.common = function() {
 		var t = $(e.target);
 		var cg = Form.findControlGroup(t);
 		Form.clearError(cg.length ? cg : t.closest('.field-error')
-				.prev(':input,.pseudo-input'));
+				.prev(':input,.input-pseudo'));
 		t.closest('.field-error').remove();
 		return false;
 	}).on('validate', ':input', function(ev) {
@@ -1106,20 +1106,20 @@ Initialization.common = function() {
 					else
 						t.removeClass('empty');
 				}
-			}).on('mouseenter', '.pseudo-input .text:not(.tags)', function(e) {
+			}).on('mouseenter', '.input-pseudo .text:not(.tags)', function(e) {
 				var t = $(this);
 				var text = t.text();
 				if (text)
 					t.attr('title', text);
-			}).on('mouseleave', '.pseudo-input .text:not(.tags)', function(e) {
+			}).on('mouseleave', '.input-pseudo .text:not(.tags)', function(e) {
 				$(this).removeAttr('title');
-			}).on('click', '.pseudo-input .remove', function(e) {
-				var t = $(e.target).closest('.pseudo-input');
+			}).on('click', '.input-pseudo .remove', function(e) {
+				var t = $(e.target).closest('.input-pseudo');
 				t.find('input[type="hidden"]').val('').trigger('change');
 				t.find('.text').text('');
 				return false;
-			}).on('click', '.pseudo-input .tag-remove', function(e) {
-				var t = $(e.target).closest('.pseudo-input');
+			}).on('click', '.input-pseudo .tag-remove', function(e) {
+				var t = $(e.target).closest('.input-pseudo');
 				var tag = $(e.target).closest('.tag');
 				var index = tag.parent().find('.tag').index(tag);
 				var input = t.find('input[type="hidden"]');
@@ -1131,7 +1131,7 @@ Initialization.common = function() {
 				}
 				tag.remove();
 				return false;
-			}).on('val', '.pseudo-input', function(e, val) {
+			}).on('val', '.input-pseudo', function(e, val) {
 		if (!val)
 			return;
 		var input = $(this).find('input[type="hidden"]');

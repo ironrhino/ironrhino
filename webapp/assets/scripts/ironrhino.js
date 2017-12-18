@@ -17996,7 +17996,7 @@ ctrlr.prototype.setObjectValue=function(data){
 			ext : {},
 
 			html : {
-				wrap   : '<div class="text-core pseudo-input"><div class="text-wrap"/></div>',
+				wrap   : '<div class="text-core input-pseudo"><div class="text-wrap"/></div>',
 				hidden : '<input type="hidden" />'
 			},
 
@@ -31436,7 +31436,7 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
-			else if (field.parent('.pseudo-input').length)
+			else if (field.parent('.input-pseudo').length)
 				field = field.parent().addClass('error');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
@@ -31520,7 +31520,7 @@ Form = {
 				$(target).removeClass('error');
 			};
 			var p = $(target).parent();
-			if (p.is('.pseudo-input'))
+			if (p.is('.input-pseudo'))
 				p = p.parent();
 			if (!p.is('form,fieldset')) {
 				$$('.error', p).removeClass('error');
@@ -31559,7 +31559,7 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.pseudo-input > input'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.input-pseudo > input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
@@ -31726,7 +31726,7 @@ Form = {
 	},
 	findControlGroup : function(target) {
 		var t = $(target);
-		if (t.parent('.input-append,.input-prepend,.pseudo-input').length)
+		if (t.parent('.input-append,.input-prepend,.input-pseudo').length)
 			t = t.parent();
 		if (t.is('[type="hidden"]')) {
 			var cg = t.parent('.control-group');
@@ -32080,7 +32080,7 @@ Initialization.common = function() {
 		var t = $(e.target);
 		var cg = Form.findControlGroup(t);
 		Form.clearError(cg.length ? cg : t.closest('.field-error')
-				.prev(':input,.pseudo-input'));
+				.prev(':input,.input-pseudo'));
 		t.closest('.field-error').remove();
 		return false;
 	}).on('validate', ':input', function(ev) {
@@ -32157,20 +32157,20 @@ Initialization.common = function() {
 					else
 						t.removeClass('empty');
 				}
-			}).on('mouseenter', '.pseudo-input .text:not(.tags)', function(e) {
+			}).on('mouseenter', '.input-pseudo .text:not(.tags)', function(e) {
 				var t = $(this);
 				var text = t.text();
 				if (text)
 					t.attr('title', text);
-			}).on('mouseleave', '.pseudo-input .text:not(.tags)', function(e) {
+			}).on('mouseleave', '.input-pseudo .text:not(.tags)', function(e) {
 				$(this).removeAttr('title');
-			}).on('click', '.pseudo-input .remove', function(e) {
-				var t = $(e.target).closest('.pseudo-input');
+			}).on('click', '.input-pseudo .remove', function(e) {
+				var t = $(e.target).closest('.input-pseudo');
 				t.find('input[type="hidden"]').val('').trigger('change');
 				t.find('.text').text('');
 				return false;
-			}).on('click', '.pseudo-input .tag-remove', function(e) {
-				var t = $(e.target).closest('.pseudo-input');
+			}).on('click', '.input-pseudo .tag-remove', function(e) {
+				var t = $(e.target).closest('.input-pseudo');
 				var tag = $(e.target).closest('.tag');
 				var index = tag.parent().find('.tag').index(tag);
 				var input = t.find('input[type="hidden"]');
@@ -32182,7 +32182,7 @@ Initialization.common = function() {
 				}
 				tag.remove();
 				return false;
-			}).on('val', '.pseudo-input', function(e, val) {
+			}).on('val', '.input-pseudo', function(e, val) {
 		if (!val)
 			return;
 		var input = $(this).find('input[type="hidden"]');
@@ -36590,7 +36590,7 @@ Observation.sortableTable = function(container) {
 			}
 		});
 		$(
-				'.listpick-name:not(.pseudo-input),.treeselect-name:not(.pseudo-input)',
+				'.listpick-name:not(.input-pseudo),.treeselect-name:not(.input-pseudo)',
 				r).html('<i class="glyphicon glyphicon-list"></i>');
 		$('.removeonadd,.field-error', r).remove();
 		$('.error', r).removeClass('error');
@@ -38197,7 +38197,7 @@ Observation._richtable = function(container) {
 			var option = $('option:selected', property);
 			var size = parseInt($('option:selected', t).data('parameters'));
 			var td = $('td:eq(2)', t.closest('tr'));
-			$(':input,.pseudo-input,.removeonadd,label', td).remove();
+			$(':input,.input-pseudo,.removeonadd,label', td).remove();
 			if (size > 0) {
 				if ('select' == option.data('type')) {
 					var select = $('<select name="' + property.val()
@@ -38228,7 +38228,7 @@ Observation._richtable = function(container) {
 							+ type + '-id required" type="hidden" name="'
 							+ property.val()
 							+ '" class="required"/><div class="' + type
-							+ '-name pseudo-input"></div></div>').appendTo(td);
+							+ '-name input-pseudo"></div></div>').appendTo(td);
 				} else {
 					$('<input type="' + (option.data('inputtype') || 'text')
 							+ '" name="' + property.val()
@@ -39128,7 +39128,7 @@ Observation.groupable = function(container) {
 					if (t.is(':input')) {
 						t.val(val).trigger('change').trigger('validate');
 					} else {
-						if (t.is('.pseudo-input')) {
+						if (t.is('.input-pseudo')) {
 							t.find('.text').text(val || '');
 						} else {
 							if (val === null && !t.is('td'))
@@ -39162,7 +39162,7 @@ Observation.groupable = function(container) {
 						val = '';
 					return val;
 				} else {
-					if (ele.is('.pseudo-input')) {
+					if (ele.is('.input-pseudo')) {
 						ele = ele.find('.text');
 						if (ele.hasClass('tags')) {
 							var arr = [];
@@ -39225,7 +39225,7 @@ Observation.groupable = function(container) {
 			if (options.name) {
 				nametarget = find(options.name, current);
 				nametarget.attr('tabindex', '0');
-				if (nametarget.is('.pseudo-input')) {
+				if (nametarget.is('.input-pseudo')) {
 					var text = nametarget.text();
 					var txt = nametarget
 							.addClass('treeselect-handle')
@@ -39334,7 +39334,7 @@ Observation.groupable = function(container) {
 									var nametarget = find(options.name, current);
 									nametarget.each(function() {
 										var t = $(this);
-										if (t.is('.pseudo-input')) {
+										if (t.is('.input-pseudo')) {
 											var arr = [];
 											for (var i = 0; i < ids.length; i++)
 												arr.push({
@@ -39467,7 +39467,7 @@ Observation.treeselect = function(container) {
 					.attr('type', 'hidden')
 					.addClass('resettable')
 					.removeClass('.treeselect-inline')
-					.wrap('<div class="pseudo-input treeselect-inline" tabindex="0"></div>');
+					.wrap('<div class="input-pseudo treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
 			if (t.prop('disabled'))
 				treeselect.addClass('disabled');
@@ -39609,7 +39609,7 @@ Observation.treeview = function(container) {
 					if (t.is(':input')) {
 						t.val(val).trigger('change').trigger('validate');
 					} else {
-						if (t.is('.pseudo-input')) {
+						if (t.is('.input-pseudo')) {
 							t.find('.text').text(val || '');
 						} else {
 							if (val === null && !t.is('td'))
@@ -39643,7 +39643,7 @@ Observation.treeview = function(container) {
 						val = '';
 					return val;
 				} else {
-					if (ele.is('.pseudo-input')) {
+					if (ele.is('.input-pseudo')) {
 						ele = ele.find('.text');
 						if (ele.hasClass('tags')) {
 							var arr = [];
@@ -39704,7 +39704,7 @@ Observation.treeview = function(container) {
 			if (options.name) {
 				var nametarget = find(options.name, current);
 				nametarget.attr('tabindex', '0');
-				if (nametarget.is('.pseudo-input')) {
+				if (nametarget.is('.input-pseudo')) {
 					var text = nametarget.text();
 					var txt = nametarget
 							.addClass('listpick-handle')
@@ -39957,7 +39957,7 @@ Observation.treeview = function(container) {
 									find(options.name, win.data('listpick'))
 											.each(function() {
 												var t = $(this);
-												if (t.is('.pseudo-input')) {
+												if (t.is('.input-pseudo')) {
 													var arr = [];
 													for (var i = 0; i < selectedIds.length; i++)
 														arr.push({

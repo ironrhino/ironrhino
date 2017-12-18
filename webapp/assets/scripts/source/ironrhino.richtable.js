@@ -849,7 +849,7 @@ Observation._richtable = function(container) {
 			var option = $('option:selected', property);
 			var size = parseInt($('option:selected', t).data('parameters'));
 			var td = $('td:eq(2)', t.closest('tr'));
-			$(':input,.pseudo-input,.removeonadd,label', td).remove();
+			$(':input,.input-pseudo,.removeonadd,label', td).remove();
 			if (size > 0) {
 				if ('select' == option.data('type')) {
 					var select = $('<select name="' + property.val()
@@ -880,7 +880,7 @@ Observation._richtable = function(container) {
 							+ type + '-id required" type="hidden" name="'
 							+ property.val()
 							+ '" class="required"/><div class="' + type
-							+ '-name pseudo-input"></div></div>').appendTo(td);
+							+ '-name input-pseudo"></div></div>').appendTo(td);
 				} else {
 					$('<input type="' + (option.data('inputtype') || 'text')
 							+ '" name="' + property.val()

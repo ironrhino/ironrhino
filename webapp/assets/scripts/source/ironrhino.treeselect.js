@@ -24,7 +24,7 @@
 					if (t.is(':input')) {
 						t.val(val).trigger('change').trigger('validate');
 					} else {
-						if (t.is('.pseudo-input')) {
+						if (t.is('.input-pseudo')) {
 							t.find('.text').text(val || '');
 						} else {
 							if (val === null && !t.is('td'))
@@ -58,7 +58,7 @@
 						val = '';
 					return val;
 				} else {
-					if (ele.is('.pseudo-input')) {
+					if (ele.is('.input-pseudo')) {
 						ele = ele.find('.text');
 						if (ele.hasClass('tags')) {
 							var arr = [];
@@ -121,7 +121,7 @@
 			if (options.name) {
 				nametarget = find(options.name, current);
 				nametarget.attr('tabindex', '0');
-				if (nametarget.is('.pseudo-input')) {
+				if (nametarget.is('.input-pseudo')) {
 					var text = nametarget.text();
 					var txt = nametarget
 							.addClass('treeselect-handle')
@@ -230,7 +230,7 @@
 									var nametarget = find(options.name, current);
 									nametarget.each(function() {
 										var t = $(this);
-										if (t.is('.pseudo-input')) {
+										if (t.is('.input-pseudo')) {
 											var arr = [];
 											for (var i = 0; i < ids.length; i++)
 												arr.push({

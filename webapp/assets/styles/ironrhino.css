@@ -9160,7 +9160,7 @@ th.filtercolumn li.main li {
 	color: #ffc000;
 }
 
-.pseudo-input {
+.input-pseudo {
 	display: inline-block;
 	border: 1px solid #cccccc;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -9177,43 +9177,43 @@ th.filtercolumn li.main li {
 	text-align: left;
 }
 
-.pseudo-input:focus {
+.input-pseudo:focus {
 	border-color: rgba(82, 168, 236, 0.8);
 	outline: 0;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
 }
 
-.control-group.error .pseudo-input , .pseudo-input.error {
+.control-group.error .input-pseudo , .input-pseudo.error {
 	border-color: #b94a48;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
-.pseudo-input.input-medium {
+.input-pseudo.input-medium {
 	width: 164px;
 }
 
-.pseudo-input.input-large {
+.input-pseudo.input-large {
 	width: 224px;
 }
 
-.pseudo-input.input-xlarge {
+.input-pseudo.input-xlarge {
 	width: 284px;
 }
 
-.pseudo-input.input-xxlarge {
+.input-pseudo.input-xxlarge {
 	width: 554px;
 }
 
-.datagrided.adaptive td > .pseudo-input , .datagrided.adaptive td > div:only-child > .pseudo-input {
+.datagrided.adaptive td > .input-pseudo , .datagrided.adaptive td > div:only-child > .input-pseudo {
 	width: 100%;
 }
 
-.pseudo-input.readonly , .pseudo-input.disabled {
+.input-pseudo.readonly , .input-pseudo.disabled {
 	cursor: not-allowed;
 	background-color: #eeeeee;
 }
 
-.pseudo-input > .text {
+.input-pseudo > .text {
 	position: relative;
 	padding-left: 5px;
 	left: 0;
@@ -9225,7 +9225,7 @@ th.filtercolumn li.main li {
 	vertical-align: top;
 }
 
-.pseudo-input > .glyphicon {
+.input-pseudo > .glyphicon {
 	display: inline-block;
 	line-height: 28px;
 	margin: 0 5px 0 0;
@@ -9233,27 +9233,27 @@ th.filtercolumn li.main li {
 	float: right;
 }
 
-.pseudo-input:not(.readonly):not(.disabled) > .glyphicon:hover {
+.input-pseudo:not(.readonly):not(.disabled) > .glyphicon:hover {
 	opacity: 1;
 }
 
-.pseudo-input > .glyphicon.remove {
+.input-pseudo > .glyphicon.remove {
 	display: none;
 }
 
-.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.remove {
+.input-pseudo:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.remove {
 	display: inline-block;
 }
 
-.pseudo-input:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.indicator {
+.input-pseudo:not(.readonly):not(.disabled):hover > .text:not(:empty) ~ .glyphicon.indicator {
 	display: none;
 }
 
-.pseudo-input .tags {
+.input-pseudo .tags {
 	padding: 2px 0 2px 3px;
 }
 
-.pseudo-input .tags .tag {
+.input-pseudo .tags .tag {
 	display: inline-block;
 	border-radius: 2px;
 	box-sizing: border-box;
@@ -9266,7 +9266,7 @@ th.filtercolumn li.main li {
 	line-height: 20px;
 }
 
-.pseudo-input .tag-remove {
+.input-pseudo .tag-remove {
 	cursor: pointer;
 	position: absolute;
 	right: 3px;
@@ -9279,7 +9279,7 @@ th.filtercolumn li.main li {
 	opacity: .3;
 }
 
-.pseudo-input .tag-remove:hover {
+.input-pseudo .tag-remove:hover {
 	opacity: .8;
 }
 
