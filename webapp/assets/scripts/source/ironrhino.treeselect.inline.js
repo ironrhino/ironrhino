@@ -20,6 +20,13 @@
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
+			$.each(	$.grep(t.attr('class').split(' '), function(v) {
+								return v.indexOf('input-') == 0
+										|| v.indexOf('span') == 0;
+							}), function(k, v) {
+						t.removeClass(v);
+						treeselect.addClass(v);
+					});
 			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
 					.appendTo(treeselect);
 		});

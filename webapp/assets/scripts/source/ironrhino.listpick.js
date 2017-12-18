@@ -152,6 +152,14 @@
 							nametarget.addClass('readonly');
 						nametarget.attr('id', input.attr('id'));
 						input.removeAttr('id');
+						$.each(	$.grep(input.attr('class').split(' '),
+										function(v) {
+											return v.indexOf('input-') == 0
+													|| v.indexOf('span') == 0;
+										}), function(k, v) {
+									input.removeClass(v);
+									nametarget.addClass(v);
+								});
 					}
 				} else if (!current.is('.readonly,.disabled')) {
 					var remove = nametarget.children('a.remove');

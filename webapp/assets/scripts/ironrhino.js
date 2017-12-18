@@ -39264,6 +39264,14 @@ Observation.groupable = function(container) {
 							nametarget.addClass('readonly');
 						nametarget.attr('id', input.attr('id'));
 						input.removeAttr('id');
+						$.each(	$.grep(input.attr('class').split(' '),
+										function(v) {
+											return v.indexOf('input-') == 0
+													|| v.indexOf('span') == 0;
+										}), function(k, v) {
+									input.removeClass(v);
+									nametarget.addClass(v);
+								});
 					}
 				} else if (!current.is('.readonly,.disabled')) {
 					var remove = nametarget.children('a.remove');
@@ -39488,6 +39496,13 @@ Observation.treeselect = function(container) {
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
+			$.each(	$.grep(t.attr('class').split(' '), function(v) {
+								return v.indexOf('input-') == 0
+										|| v.indexOf('span') == 0;
+							}), function(k, v) {
+						t.removeClass(v);
+						treeselect.addClass(v);
+					});
 			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
 					.appendTo(treeselect);
 		});
@@ -39743,6 +39758,14 @@ Observation.treeview = function(container) {
 							nametarget.addClass('readonly');
 						nametarget.attr('id', input.attr('id'));
 						input.removeAttr('id');
+						$.each(	$.grep(input.attr('class').split(' '),
+										function(v) {
+											return v.indexOf('input-') == 0
+													|| v.indexOf('span') == 0;
+										}), function(k, v) {
+									input.removeClass(v);
+									nametarget.addClass(v);
+								});
 					}
 				} else if (!current.is('.readonly,.disabled')) {
 					var remove = nametarget.children('a.remove');
