@@ -7710,25 +7710,17 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 	pointer-events: none;
 }
 
-.glyphicon-download-alt , .glyphicon-download {
-	opacity: 0.2;
-}
-
-.glyphicon-download-alt:hover , .glyphicon-download:hover {
-	opacity: 0.5;
-}
-
 .drophover {
 	border: 2px dashed #333 ! important;
 }
 
 .clickable[class *= "glyphicon-"] {
-	opacity: 0.6;
+	opacity: .2;
 	cursor: pointer;
 }
 
 .clickable[class *= "glyphicon-"]:hover {
-	opacity: 1 ! important;
+	opacity: .8 ! important;
 }
 
 .unselectable {
@@ -8462,6 +8454,10 @@ div.listpick-name:focus, div.treeselect-name:focus {
 	outline: 0;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
 }
+.table.datagrided th , .table.datagrided td {
+	padding: 5px;
+}
+
 .datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
 	opacity: 0;
 }
@@ -8470,29 +8466,30 @@ div.listpick-name:focus, div.treeselect-name:focus {
 	opacity: 0.6;
 }
 
-.datagrided td.manipulate, .datagrided th.manipulate{
-	width : 40px;
-	padding-left : 10px;
-	text-align : left;
+.datagrided td.manipulate , .datagrided th.manipulate {
+	width: 40px;
+	padding-left: 10px;
+	text-align: left;
 }
 
 .datagrided [class *= "glyphicon-"] {
 	margin: 3px;
 }
 
-.datagrided.adaptive td > select:only-of-type, .datagrided.adaptive td > .input-append:only-child, .datagrided.adaptive td > .input-prepend:only-child, .datagrided.adaptive td > table.datagrided{
+.datagrided.adaptive td > select:only-of-type , .datagrided.adaptive td > .input-append:only-child , .datagrided.adaptive td > .input-prepend:only-child , .datagrided.adaptive td > table.datagrided {
 	width: 100%;
 }
 
-.datagrided.adaptive td > input:only-of-type, .datagrided.adaptive td > textarea:only-of-type, .datagrided.adaptive td > .uneditable-input:only-child{
+.datagrided.adaptive td > input:only-of-type , .datagrided.adaptive td > textarea:only-of-type , .datagrided.adaptive td > .uneditable-input:only-child {
 	width: 92%;
 	width: calc(100% - 14px);
 }
 
-.datagrided.adaptive td > .input-append:only-child > input, .datagrided.adaptive td > .input-prepend:only-child > input {
+.datagrided.adaptive td > .input-append:only-child > input , .datagrided.adaptive td > .input-prepend:only-child > input {
 	width: 90%;
 	width: calc(100% - 44px);
 }
+
 .mask {
 	text-align: center;
 	z-index: 100;

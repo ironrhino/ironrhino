@@ -314,7 +314,7 @@ ${totalResults}<span class="recordLabel"> ${getText('record')}</span>
 </#if>
 </#list>
 </#list>
-<a download="data.csv" href="${downloadUrl}" style="color:#666;padding-top:2px;"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
+<a download="data.csv" href="${downloadUrl}"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
 </#if>
 </div>
 </div>

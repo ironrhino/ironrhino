@@ -447,25 +447,17 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 	pointer-events: none;
 }
 
-.glyphicon-download-alt , .glyphicon-download {
-	opacity: 0.2;
-}
-
-.glyphicon-download-alt:hover , .glyphicon-download:hover {
-	opacity: 0.5;
-}
-
 .drophover {
 	border: 2px dashed #333 ! important;
 }
 
 .clickable[class *= "glyphicon-"] {
-	opacity: 0.6;
+	opacity: .2;
 	cursor: pointer;
 }
 
 .clickable[class *= "glyphicon-"]:hover {
-	opacity: 1 ! important;
+	opacity: .8 ! important;
 }
 
 .unselectable {

@@ -1,3 +1,7 @@
+.table.datagrided th , .table.datagrided td {
+	padding: 5px;
+}
+
 .datagrided tbody > tr > td > .manipulate[class *= "glyphicon-"] {
 	opacity: 0;
 }
@@ -6,26 +10,27 @@
 	opacity: 0.6;
 }
 
-.datagrided td.manipulate, .datagrided th.manipulate{
-	width : 40px;
-	padding-left : 10px;
-	text-align : left;
+.datagrided td.manipulate , .datagrided th.manipulate {
+	width: 40px;
+	padding-left: 10px;
+	text-align: left;
 }
 
 .datagrided [class *= "glyphicon-"] {
 	margin: 3px;
 }
 
-.datagrided.adaptive td > select:only-of-type, .datagrided.adaptive td > .input-append:only-child, .datagrided.adaptive td > .input-prepend:only-child, .datagrided.adaptive td > table.datagrided{
+.datagrided.adaptive td > select:only-of-type , .datagrided.adaptive td > .input-append:only-child , .datagrided.adaptive td > .input-prepend:only-child , .datagrided.adaptive td > table.datagrided {
 	width: 100%;
 }
 
-.datagrided.adaptive td > input:only-of-type, .datagrided.adaptive td > textarea:only-of-type, .datagrided.adaptive td > .uneditable-input:only-child{
+.datagrided.adaptive td > input:only-of-type , .datagrided.adaptive td > textarea:only-of-type , .datagrided.adaptive td > .uneditable-input:only-child {
 	width: 92%;
 	width: calc(100% - 14px);
 }
 
-.datagrided.adaptive td > .input-append:only-child > input, .datagrided.adaptive td > .input-prepend:only-child > input {
+.datagrided.adaptive td > .input-append:only-child > input , .datagrided.adaptive td > .input-prepend:only-child > input {
 	width: 90%;
 	width: calc(100% - 44px);
 }
+
