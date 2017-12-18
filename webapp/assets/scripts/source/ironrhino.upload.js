@@ -58,29 +58,42 @@ Initialization.upload = function() {
 					Message.showMessage('no.selection');
 				else
 					deleteFiles()
-			}).on('keyup', '#files input.filter', function(event) {
-		var tbody = $('tbody', $(event.target).closest('table'));
-		var keyword = this.value.toLowerCase();
-		if (event.keyCode == 8) {
-			if (!keyword)
-				$('tr:hidden', tbody).show();
-			else
-				$('tr:hidden', tbody).each(function(i, v) {
+			}).on('keyup compositionstart compositionend',
+			'#files input.filter', function(event) {
+				if (event.type == 'compositionstart') {
+					$(this).data('ime', true);
+					return false;
+				}
+				if (event.type == 'compositionend') {
+					$(this).removeData('ime');
+					return false;
+				} else if ($(this).data('ime'))
+					return false;
+				var tbody = $('tbody', $(event.target).closest('table'));
+				var keyword = this.value.toLowerCase();
+				if (event.keyCode == 8) {
+					if (!keyword)
+						$('tr:hidden', tbody).show();
+					else
+						$('tr:hidden', tbody).each(function(i, v) {
 							var tr = $(v);
 							var filename = $('td:eq(1)', tr).text()
 									.toLowerCase();
 							if (filename.indexOf(keyword) >= 0)
 								tr.show();
 						});
-		} else {
-			$('tr:visible', tbody).each(function(i, v) {
-						var tr = $(v);
-						var filename = $('td:eq(1)', tr).text().toLowerCase();
-						if (filename.indexOf(keyword) < 0)
-							tr.hide();
-					});
-		}
-	});;
+				} else {
+					$('tr:visible', tbody).each(function(i, v) {
+								var tr = $(v);
+								var filename = $('td:eq(1)', tr).text()
+										.toLowerCase();
+								if (filename.indexOf(keyword) < 0)
+									tr.hide();
+								else
+									tr.show();
+							});
+				}
+			});
 }
 Observation.upload = function(container) {
 	var c = $(container);
