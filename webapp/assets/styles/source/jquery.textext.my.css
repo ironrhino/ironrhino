@@ -1,12 +1,13 @@
 .text-core {
   position: relative;
-  line-height: 20px;
   display: inline-block;
   vertical-align: top;
+  border: 0 !important;
 }
 .text-core .text-wrap {
   background: #fff;
   position: absolute;
+  line-height: 20px;
 }
 .text-core .text-wrap textarea, .text-core .text-wrap input {
   outline: none;

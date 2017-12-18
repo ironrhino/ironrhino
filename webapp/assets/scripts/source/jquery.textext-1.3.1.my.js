@@ -458,7 +458,7 @@
 			ext : {},
 
 			html : {
-				wrap   : '<div class="text-core"><div class="text-wrap"/></div>',
+				wrap   : '<div class="text-core pseudo-input"><div class="text-wrap"/></div>',
 				hidden : '<input type="hidden" />'
 			},
 
@@ -713,8 +713,12 @@
 		hiddenInput.attr('name', input.attr('name'));
 		// remove name attribute from the text input
 		input.attr('name', null);
+		// set the name of the hidden input to the text input's name
+		hiddenInput.attr('class', input.attr('class'));
+		// remove name attribute from the text input
+		input.attr('class', null);
 		// add hidden input to the DOM
-		hiddenInput.insertAfter(input);
+		hiddenInput.prependTo(input.closest('.text-core'));
 
 		$.extend(true, itemManager, self.opts(OPT_EXT + '.item.manager'));
 		$.extend(true, self, self.opts(OPT_EXT + '.*'), self.opts(OPT_EXT + '.core'));

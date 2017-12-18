@@ -17996,7 +17996,7 @@ ctrlr.prototype.setObjectValue=function(data){
 			ext : {},
 
 			html : {
-				wrap   : '<div class="text-core"><div class="text-wrap"/></div>',
+				wrap   : '<div class="text-core pseudo-input"><div class="text-wrap"/></div>',
 				hidden : '<input type="hidden" />'
 			},
 
@@ -18251,8 +18251,12 @@ ctrlr.prototype.setObjectValue=function(data){
 		hiddenInput.attr('name', input.attr('name'));
 		// remove name attribute from the text input
 		input.attr('name', null);
+		// set the name of the hidden input to the text input's name
+		hiddenInput.attr('class', input.attr('class'));
+		// remove name attribute from the text input
+		input.attr('class', null);
 		// add hidden input to the DOM
-		hiddenInput.insertAfter(input);
+		hiddenInput.prependTo(input.closest('.text-core'));
 
 		$.extend(true, itemManager, self.opts(OPT_EXT + '.item.manager'));
 		$.extend(true, self, self.opts(OPT_EXT + '.*'), self.opts(OPT_EXT + '.core'));
@@ -31432,8 +31436,6 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
-			else if (field.parent('.text-core .text-wrap').length)
-				field = field.parent().parent().addClass('error');
 			else if (field.parent('.pseudo-input').length)
 				field = field.parent().addClass('error');
 			if (field.is(':visible')) {
@@ -31520,8 +31522,6 @@ Form = {
 			var p = $(target).parent();
 			if (p.is('.pseudo-input'))
 				p = p.parent();
-			else if (p.is('.text-core .text-wrap'))
-				p = p.parent().parent();
 			if (!p.is('form,fieldset')) {
 				$$('.error', p).removeClass('error');
 				$('.field-error', p).fadeIn().remove();
@@ -31559,7 +31559,7 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.pseudo-input > input,.text-core .text-wrap > input'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.pseudo-input > input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
@@ -31728,8 +31728,6 @@ Form = {
 		var t = $(target);
 		if (t.parent('.input-append,.input-prepend,.pseudo-input').length)
 			t = t.parent();
-		else if (t.parent('.text-core .text-wrap').length)
-			t = t.parent().parent();
 		if (t.is('[type="hidden"]')) {
 			var cg = t.parent('.control-group');
 			if (cg.length)
