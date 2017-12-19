@@ -32,6 +32,7 @@ import org.ironrhino.core.model.Enableable;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.spring.configuration.BeanPresentConditional;
+import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -190,7 +191,9 @@ public class DeleteChecker {
 				c.setProjection(Projections.projectionList().add(Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
 				if (count > 0)
-					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.referrer");
+					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, I18N.getText(
+							"delete.forbidden.referrer",
+							new Object[] { I18N.getText(StringUtils.uncapitalize(tuple.getKey().getSimpleName())) }));
 			}
 		}
 		List<Tuple<Class<?>, Tuple<String, String>>> componentReferences = componentMapping
@@ -204,7 +207,9 @@ public class DeleteChecker {
 				c.setProjection(Projections.projectionList().add(Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
 				if (count > 0)
-					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.referrer");
+					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, I18N.getText(
+							"delete.forbidden.referrer",
+							new Object[] { I18N.getText(StringUtils.uncapitalize(tuple.getKey().getSimpleName())) }));
 			}
 		}
 		List<Tuple<Class<?>, Tuple<String, String>>> collectionReferences = collectionMapping
@@ -219,7 +224,9 @@ public class DeleteChecker {
 				c.setProjection(Projections.projectionList().add(Projections.rowCount()));
 				long count = (Long) c.uniqueResult();
 				if (count > 0)
-					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, "delete.forbidden.referrer");
+					throw new ErrorMessage("delete.forbidden", new Object[] { entity }, I18N.getText(
+							"delete.forbidden.referrer",
+							new Object[] { I18N.getText(StringUtils.uncapitalize(tuple.getKey().getSimpleName())) }));
 			}
 		}
 	}
