@@ -2,6 +2,7 @@ package org.ironrhino.core.hibernate;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Locale;
@@ -393,9 +394,8 @@ public class CriterionUtils {
 								if (v instanceof Collection) {
 									Collection<?> coll = (Collection<?>) v;
 									v = coll.size() > 0 ? ((Collection<?>) v).iterator().next() : null;
-								} else if (v instanceof Object[]) {
-									Object[] arr = (Object[]) v;
-									v = arr.length > 0 ? arr[0] : null;
+								} else if (v != null && v.getClass().isArray()) {
+									v = Array.getLength(v) > 0 ? Array.get(v, 0) : null;
 								}
 								if (v instanceof Enum) {
 									Enum<?> en = (Enum<?>) v;

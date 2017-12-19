@@ -66,6 +66,7 @@ import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
+import org.ironrhino.core.util.CompareUtils;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -1019,42 +1020,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				for (String name : editedPropertyNames) {
 					Object oldValue = bwp.getPropertyValue(name);
 					Object newValue = bw.getPropertyValue(name);
-					if (Objects.equals(oldValue, newValue))
+					if (CompareUtils.equals(oldValue, newValue))
 						continue;
-					if (oldValue instanceof Collection && ((Collection<?>) oldValue).isEmpty() && newValue == null
-							|| newValue instanceof Collection && ((Collection<?>) newValue).isEmpty()
-									&& oldValue == null)
-						continue;
-					if (oldValue != null && newValue != null) {
-						if (oldValue.getClass().isArray() && Arrays.equals((Object[]) oldValue, (Object[]) newValue))
-							continue;
-						UiConfigImpl uiConfig = uiConfigs.get(name);
-						if (uiConfig != null && uiConfig.isReference()) {
-							if (!uiConfig.isMultiple()) {
-								if (Objects.equals(((Persistable<?>) oldValue).getId(),
-										((Persistable<?>) newValue).getId()))
-									continue;
-							} else {
-								Collection<Persistable<?>> oldCollection = (Collection<Persistable<?>>) oldValue;
-								Collection<Persistable<?>> newCollection = (Collection<Persistable<?>>) newValue;
-								Iterator<Persistable<?>> it1 = oldCollection.iterator();
-								Iterator<Persistable<?>> it2 = newCollection.iterator();
-								boolean equals = oldCollection.size() == newCollection.size();
-								if (equals) {
-									while (it1.hasNext()) {
-										Persistable<?> p1 = it1.next();
-										Persistable<?> p2 = it2.next();
-										if (!Objects.equals(p1.getId(), p2.getId())) {
-											equals = false;
-											break;
-										}
-									}
-								}
-								if (equals)
-									continue;
-							}
-						}
-					}
 					bwp.setPropertyValue(name, newValue);
 				}
 				bw = bwp;
