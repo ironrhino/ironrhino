@@ -127,7 +127,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			entity.setFullId(fullId);
 			entity.setLevel(fullId.split("\\.").length);
 			if (entity.getParent() != null)
-				entity.setParent(entity.getParent()); //recalculate fullname
+				entity.setParent(entity.getParent()); // recalculate fullname
 			session.saveOrUpdate(obj);
 			if (childrenNeedChange) {
 				for (Object c : entity.getChildren()) {
@@ -151,7 +151,12 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void delete(T obj) {
-		checkDelete(obj);
+		delete(obj, false);
+	}
+
+	protected void delete(T obj, boolean skipCheck) {
+		if (!skipCheck)
+			checkDelete(obj);
 		sessionFactory.getCurrentSession().delete(obj);
 	}
 
@@ -202,7 +207,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			for (final T obj : list)
 				checkDelete(obj);
 			for (T obj : list)
-				delete(obj);
+				delete(obj, true);
 		}
 		return list;
 	}
