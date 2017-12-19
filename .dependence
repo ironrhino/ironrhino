@@ -30,3 +30,5 @@
 -ehcache-core
 +cache2k-api
 +cache2k-core
+-aopalliance
+-aspectjrt

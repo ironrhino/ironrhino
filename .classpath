@@ -5,8 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/amqp-client-4.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/antlr-runtime-3.5.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aopalliance-1.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjrt-1.8.9.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjweaver-1.8.9.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/batch-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/cache2k-api-1.0.1.jar"/>
