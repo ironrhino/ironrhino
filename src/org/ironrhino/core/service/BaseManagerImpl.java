@@ -183,14 +183,20 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void delete(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj);
-		Immutable immutable = clazz.getAnnotation(Immutable.class);
-		if (immutable != null)
-			throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
-		AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
-		if (appendOnly != null)
-			throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
-		checkDelete(obj);
+		delete(obj, false);
+	}
+
+	protected void delete(T obj, boolean skipCheck) {
+		if (!skipCheck) {
+			Class<?> clazz = ReflectionUtils.getActualClass(obj);
+			Immutable immutable = clazz.getAnnotation(Immutable.class);
+			if (immutable != null)
+				throw new IllegalArgumentException(clazz + " is @" + Immutable.class.getSimpleName());
+			AppendOnly appendOnly = clazz.getAnnotation(AppendOnly.class);
+			if (appendOnly != null)
+				throw new IllegalArgumentException(clazz + " is @" + AppendOnly.class.getSimpleName());
+			checkDelete(obj);
+		}
 		ReflectionUtils.processCallback(obj, PreRemove.class);
 		sessionFactory.getCurrentSession().delete(obj);
 		ReflectionUtils.processCallback(obj, PostRemove.class);
@@ -256,7 +262,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			for (final T obj : list)
 				checkDelete(obj);
 			for (T obj : list)
-				delete(obj);
+				delete(obj, true);
 		}
 		return list;
 	}

@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.Entity;
+import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -57,6 +58,10 @@ public class DeleteChecker {
 			ClassMetadata cm = entry.getValue();
 			String[] names = cm.getPropertyNames();
 			for (String name : names) {
+				if (name.startsWith("_") && name.lastIndexOf('_') > 0) {
+					// ignore additional _com_acme_entity_attributes
+					continue;
+				}
 				Type type = cm.getPropertyType(name);
 				if (type instanceof ManyToOneType) {
 					if (BaseTreeableEntity.class.isAssignableFrom(cm.getMappedClass()) && name.equals("parent"))
@@ -72,29 +77,35 @@ public class DeleteChecker {
 				} else if (type instanceof OneToOneType) {
 					OneToOneType otoType = (OneToOneType) type;
 					Class<?> referrer = otoType.getReturnedClass();
-					PrimaryKeyJoinColumn pkjc = null;
 					PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(cm.getMappedClass(), name);
 					if (pd != null) {
+						PrimaryKeyJoinColumn pkjc = null;
+						OneToOne oto = null;
 						Class<?> declaredClass = pd.getReadMethod() != null ? pd.getReadMethod().getDeclaringClass()
 								: cm.getMappedClass();
-						if (pd.getReadMethod() != null)
+						if (pd.getReadMethod() != null) {
 							pkjc = pd.getReadMethod().getAnnotation(PrimaryKeyJoinColumn.class);
+							oto = pd.getReadMethod().getAnnotation(OneToOne.class);
+						}
 						if (pkjc == null)
 							try {
 								Field f = declaredClass.getDeclaredField(name);
-								if (f != null)
+								if (f != null) {
 									pkjc = f.getAnnotation(PrimaryKeyJoinColumn.class);
+									oto = f.getAnnotation(OneToOne.class);
+								}
 							} catch (Exception e) {
 							}
-					}
-					if (pkjc == null) {
-						List<Tuple<Class<?>, String>> list = mapping.get(referrer);
-						if (list == null) {
-							list = new ArrayList<>();
-							mapping.put(referrer, list);
+						if (pkjc != null || oto != null && StringUtils.isNotBlank(oto.mappedBy())) {
+							continue;
 						}
-						list.add(new Tuple<>(cm.getMappedClass(), name));
 					}
+					List<Tuple<Class<?>, String>> list = mapping.get(referrer);
+					if (list == null) {
+						list = new ArrayList<>();
+						mapping.put(referrer, list);
+					}
+					list.add(new Tuple<>(cm.getMappedClass(), name));
 				} else if (type instanceof CollectionType) {
 					if (BaseTreeableEntity.class.isAssignableFrom(cm.getMappedClass()) && name.equals("children"))
 						continue;
@@ -102,13 +113,19 @@ public class DeleteChecker {
 					CollectionMetadata collectionMetadata = sessionFactory
 							.getCollectionMetadata(collectionType.getRole());
 					Class<?> componentClass = collectionMetadata.getElementType().getReturnedClass();
+					if (!componentClass.isAnnotationPresent(Embeddable.class)) {
+						// skip @OneToMany and @ManyToMany
+						continue;
+					}
 					try {
-						for (Class<?> superClass = componentClass; superClass.isAnnotationPresent(Entity.class)
-								|| superClass.isAnnotationPresent(MappedSuperclass.class); superClass = superClass
-										.getSuperclass()) {
-							for (Field f : superClass.getDeclaredFields()) {
+						Class<?> clz = componentClass;
+						while (true) {
+							for (Field f : clz.getDeclaredFields()) {
 								if (f.getAnnotation(ManyToOne.class) != null
 										|| f.getAnnotation(OneToOne.class) != null) {
+									OneToOne oneToOne = f.getAnnotation(OneToOne.class);
+									if (oneToOne != null && StringUtils.isNotBlank(oneToOne.mappedBy()))
+										continue;
 									Class<?> referrer = f.getType();
 									List<Tuple<Class<?>, Tuple<String, String>>> list = collectionMapping.get(referrer);
 									if (list == null) {
@@ -118,21 +135,25 @@ public class DeleteChecker {
 									list.add(new Tuple<>(cm.getMappedClass(), new Tuple<>(name, f.getName())));
 								}
 							}
+							clz = clz.getSuperclass();
+							if (clz.equals(Object.class) || clz.getAnnotation(MappedSuperclass.class) == null)
+								break;
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-
 				} else if (type instanceof ComponentType) {
 					ComponentType componentType = (ComponentType) type;
 					Class<?> componentClass = componentType.getReturnedClass();
 					try {
-						for (Class<?> superClass = componentClass; superClass.isAnnotationPresent(Entity.class)
-								|| superClass.isAnnotationPresent(MappedSuperclass.class); superClass = superClass
-										.getSuperclass()) {
-							for (Field f : superClass.getDeclaredFields()) {
+						Class<?> clz = componentClass;
+						while (true) {
+							for (Field f : clz.getDeclaredFields()) {
 								if (f.getAnnotation(ManyToOne.class) != null
 										|| f.getAnnotation(OneToOne.class) != null) {
+									OneToOne oneToOne = f.getAnnotation(OneToOne.class);
+									if (oneToOne != null && StringUtils.isNotBlank(oneToOne.mappedBy()))
+										continue;
 									Class<?> referrer = f.getType();
 									List<Tuple<Class<?>, Tuple<String, String>>> list = componentMapping.get(referrer);
 									if (list == null) {
@@ -142,16 +163,16 @@ public class DeleteChecker {
 									list.add(new Tuple<>(cm.getMappedClass(), new Tuple<>(name, f.getName())));
 								}
 							}
+							clz = clz.getSuperclass();
+							if (clz.equals(Object.class) || clz.getAnnotation(MappedSuperclass.class) == null)
+								break;
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-
 				}
 			}
-
 		}
-
 	}
 
 	public void check(Persistable<?> entity) {
