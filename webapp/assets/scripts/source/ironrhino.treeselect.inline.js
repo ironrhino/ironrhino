@@ -70,8 +70,12 @@ $(function() {
 						});
 			}
 		}
-
-	});
+	}).on('keydown', '.treeselect-inline', function(e) {
+				if (e.keyCode == 13) {
+					$(this).click();
+					return false;
+				}
+			});
 	$(document).click(function(e) {
 				var target = $(e.target);
 				if (!target.closest('.treeselect-inline').length)
