@@ -8217,6 +8217,12 @@ strong.force-override {
 	line-height: 20px;
 }
 
+.field-error-popover a.remove{
+	position: absolute;
+	top: 0;
+	right: 4px;
+}
+
 .input-error {
 	border-color: red ! important;
 }
