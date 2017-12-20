@@ -750,7 +750,41 @@ Initialization.richtable = function() {
 								next.focus();
 							}
 						}
-					});
+					}).on('click', 'strong.force-override', function(e) {
+				var t = $(e.target);
+				var popup = t.closest('#popup-container');
+				if (popup.length) {
+					var form = popup.data('target');
+					if (form) {
+						form = $(form);
+						$('input[type="hidden"].version', form).val('');
+						form.submit();
+						popup.find('.popup-ok').click();
+					} else {
+						var button = $('button[data-action="save"]:visible');
+						$('tr', button.closest('form')).filter(function() {
+									return $(this).find('td.edited').length;
+								}).removeData('version')
+								.removeAttr('data-version');
+						button.click();
+					}
+				} else {
+					var msgcontainer = t.closest('.message-container');
+					if (msgcontainer.length) {
+						var form = msgcontainer.next('form');
+						$('input[type="hidden"].version', form).val('');
+						msgcontainer.fadeOut().remove();
+						form.submit();
+					} else {
+						var button = $('button[data-action="save"]:visible');
+						$('tr', button.closest('form')).filter(function() {
+									return $(this).find('td.edited').length;
+								}).removeData('version')
+								.removeAttr('data-version');
+						button.click();
+					}
+				}
+			});
 }
 Observation._richtable = function(container) {
 	$('form.query', container).each(function() {
