@@ -103,6 +103,59 @@
 		});
 		return this;
 	}
+
+	$(function() {
+				$(document).on('change',
+						'table .checkbox input[type="checkbox"]', function() {
+							var rows = [];
+							if ($(this).hasClass('checkall')) {
+								if (this.checked)
+									$('tbody tr', $(this).closest('table'))
+											.each(function() {
+														rows.push(this);
+													});
+							} else {
+								$('tbody tr', $(this).closest('table')).each(
+										function() {
+											if ($(
+													'td:eq(0) input[type="checkbox"]',
+													this).is(':checked'))
+												rows.push(this);
+										});
+							}
+							var form = $(this).closest('form');
+							$('[data-shown]', form).each(function() {
+								var t = $(this);
+								var filter = t.data('filterselector');
+								var allmatch = t.data('allmatch');
+								if (allmatch == undefined)
+									allmatch = true;
+								var count = 0;
+								$.each(rows, function(i, v) {
+											var row = $(v);
+											try {
+												if (!filter || row.is(filter)
+														|| row.find(filter) > 0)
+													count++;
+											} catch (e) {
+
+											}
+										});
+								t.is('[data-shown="selected"]')
+										&& (!allmatch || count == rows.length)
+										&& count > 0
+										|| t
+												.is('[data-shown="singleselected"]')
+										&& (!allmatch || count == rows.length)
+										&& count == 1
+										|| t.is('[data-shown="multiselected"]')
+										&& (!allmatch || count == rows.length)
+										&& count > 1 ? t
+										.addClass('btn-primary').show() : t
+										.removeClass('btn-primary').hide();
+							});
+						});
+			});
 })(jQuery);
 
 Observation.checkbox = function(container) {

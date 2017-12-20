@@ -102,7 +102,7 @@ table.ordering tfoot {
 	background-color: transparent;
 }
 
-.toolbar .btn[data-shown] , .toolbar .btn[data-action="save"] {
+.toolbar .btn[data-action="save"] {
 	display: none;
 }
 

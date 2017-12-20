@@ -24,7 +24,7 @@
 		<tfoot>
 		<tr>
 			<td colspan="4" class="center">
-			<button type="button" class="btn delete">${getText('delete')}</button>
+			<button type="button" class="btn delete" data-shown="selected">${getText('delete')}</button>
 			<button type="button" class="btn mkdir">${getText('create.subfolder')}</button>
 			<button type="button" class="btn snapshot">${getText('snapshot')}</button>
 			<button type="button" class="btn reload">${getText('reload')}</button>

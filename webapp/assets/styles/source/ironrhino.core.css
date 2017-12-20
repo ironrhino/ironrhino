@@ -477,6 +477,10 @@ input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + 
 	overflow: hidden ! important;
 }
 
+[data-shown] {
+	display: none;
+}
+
 [data-tooltip] {
 	position: relative;
 }
