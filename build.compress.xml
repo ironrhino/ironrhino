@@ -51,6 +51,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.mask.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.wave.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.checkbox.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.form.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.pseudoinput.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.sortabletable.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.datagridtable.js" />
