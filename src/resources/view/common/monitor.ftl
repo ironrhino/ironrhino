@@ -39,7 +39,7 @@
 </div>
 <div id="result"<#if Parameters.live??> class="ajaxpanel" data-interval="${Parameters.interval!'60000'}" data-quiet="true"</#if>>
 <#list result as key,value>
-<table class="treeTable expanded table table-hover table-bordered" style="width:100%;">
+<table class="treeTable expanded table table-hover table-bordered">
   <#if key??>
   <caption><h3>${key}</h3></caption>
   </#if>

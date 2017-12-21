@@ -19,10 +19,10 @@
 <title>region table</title>
 </head>
 <body>
-<table class="treeTable checkboxgroup" style="width:100%;">
+<table class="treeTable table checkboxgroup">
   <thead>
     <tr>
-      <th style="width:10%"><input type="checkbox" class="checkall"/></th>
+      <th style="width:10%;text-align:left;padding-left:19px;"><input type="checkbox" class="checkall"/></th>
       <th style="width:20%;">${getText('name')}</th>
       <th style="width:70%;">${getText('fullname')}</th>
     </tr>
