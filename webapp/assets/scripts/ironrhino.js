@@ -35803,19 +35803,6 @@ Observation.form = function(container) {
 					}
 				}
 			});
-	$$('input[type="checkbox"].custom,input[type="radio"].custom', container)
-			.each(function(i) {
-				$(this).hide();
-				if (!this.id)
-					this.id = ('a' + (i + Math.random())).replace('.', '')
-							.substring(0, 9);
-				var label = $(this).next('label.custom');
-				if (!label.length)
-					$(this).after($('<label class="custom" for="' + this.id
-							+ '"></label>'));
-				else
-					label.attr('for', this.id);
-			});
 	$$('.custom[type="file"]', container).each(function() {
 		var t = $(this);
 		t.hide().change(function(e) {
@@ -36507,19 +36494,6 @@ Observation.sortableTable = function(container) {
 				.change();
 		$(':input', r).not('.readonly').prop('readonly', false)
 				.removeAttr('keyupValidate');
-		$('input[type="checkbox"].custom,input[type="radio"].custom', r).each(
-				function(i) {
-					$(this).hide();
-					if (!this.id)
-						this.id = ('a' + (i + Math.random())).replace('.', '')
-								.substring(0, 9);
-					var label = $(this).next('label.custom');
-					if (!label.length)
-						$(this).after($('<label class="custom" for="' + this.id
-								+ '"></label>'));
-					else
-						label.attr('for', this.id);
-				});
 		$('select.decrease', r).each(function() {
 			var selectedValues = $.map($('select.decrease', table), function(e,
 							i) {
@@ -38288,8 +38262,7 @@ Observation._richtable = function(container) {
 							+ arr[0]
 							+ '" id="'
 							+ cbid
-							+ '" class="custom" style="display: none;" /><label class="custom" for="'
-							+ cbid + '"></label>' + (arr[1] || arr[0])
+							+ '">' + (arr[1] || arr[0])
 							+ '</label>').appendTo(td);
 				}
 			}
@@ -39307,7 +39280,7 @@ Observation.groupable = function(container) {
 					var treeviewoptions = {
 						url : options.url,
 						collapsed : true,
-						template : '<a><input id="cb-{{id}}" type="checkbox" class="custom" value="{{id}}"/> <label for="cb-{{id}}">{{name}}</label></a>',
+						template : '<a><input id="cb-{{id}}" type="checkbox" value="{{id}}"/> <label for="cb-{{id}}">{{name}}</label></a>',
 						placeholder : MessageBundle.get('ajax.loading'),
 						unique : true,
 						separator : options.separator,

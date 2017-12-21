@@ -28,7 +28,7 @@
 		<tbody>
 		<#list files as key,value>
 		<tr>
-			<td class="radio"><#if value><input type="radio" name="id" value="<@url value="${action.getFileUrl(key?url)}"/>" class="custom"/></#if></td>
+			<td class="radio"><#if value><input type="radio" name="id" value="<@url value="${action.getFileUrl(key?url)}"/>"/></#if></td>
 			<td><#if value><span class="uploaditem filename" style="cursor:pointer;">${key}</span> <a href="<@url value="${action.getFileUrl(key?url)}"/>" target="_blank" download="${key}"><i class="glyphicon glyphicon-download-alt clickable"></i></a><#else><a style="color:blue;" class="ajax view" data-replacement="files" href="${actionBaseUrl}/pick${folderEncoded}/${key?replace('..','__')?url}">${key}</a></#if></td>
 			<td class="center"><#if value && ['jpg','gif','png','webp','bmp']?seq_contains(key?keep_after_last('.')?lower_case)><a href="<@url value="${action.getFileUrl(key?url)}"/>" target="_blank"><img class="uploaditem" src="<@url value="${action.getFileUrl(key?url)}"/>" style="height:50px;"/></a></#if></td>
 		</tr>

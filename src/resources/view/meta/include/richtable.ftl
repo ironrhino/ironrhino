@@ -104,7 +104,7 @@ ${formHeader!}
 <thead>
 <tr>
 <#if showCheckColumn>
-<th class="nosort <#if multipleCheck>checkbox<#else>radio</#if>"><#if multipleCheck><input type="checkbox" class="checkall custom"/></#if></th>
+<th class="nosort <#if multipleCheck>checkbox<#else>radio</#if>"><#if multipleCheck><input type="checkbox" class="checkall"/></#if></th>
 </#if>
 </#macro>
 
@@ -129,7 +129,7 @@ ${formHeader!}
 	<#local id><@rowid?interpret/></#local>
 </#if>
 <tr<#if entity.enabled??> data-enabled="${entity.enabled?string}"</#if><#if !showCheckColumn&&id?has_content> data-rowid="${id}"</#if><@dynAttrs value=dynamicAttributes/>>
-<#if showCheckColumn><td class="<#if multipleCheck>checkbox<#else>radio</#if>"><input type="<#if multipleCheck>checkbox<#else>radio</#if>"<#if id?has_content> value="${id}"</#if> class="custom"/></td></#if>
+<#if showCheckColumn><td class="<#if multipleCheck>checkbox<#else>radio</#if>"><input type="<#if multipleCheck>checkbox<#else>radio</#if>"<#if id?has_content> value="${id}"</#if>/></td></#if>
 </#macro>
 
 <#macro rttbodytd value,entity,celleditable=true,template='',cellDynamicAttributes='',dynamicAttributes...>

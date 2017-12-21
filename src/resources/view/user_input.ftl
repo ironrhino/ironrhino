@@ -21,7 +21,7 @@
 	<@s.textfield name="user.email" type="email" class="email checkavailable" data\-checkurl="${actionBaseUrl}/checkavailable"/>
 	<@s.textfield name="user.phone"/>
 	<@s.checkbox name="user.enabled" class="switch" />
-	<@s.checkboxlist name="user.roles" list="roles" listKey="value" listValue="label" class="custom">
+	<@s.checkboxlist name="user.roles" list="roles" listKey="value" listValue="label">
 	<#if hiddenRoles??&&hiddenRoles?size gt 0>
 	<@s.param name="after">
 		<#list hiddenRoles as role>

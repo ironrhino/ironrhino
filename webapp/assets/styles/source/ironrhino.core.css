@@ -443,10 +443,6 @@ a.remove:hover , a.remove:focus {
 	pointer-events: none;
 }
 
-input[type="checkbox"].disabled + label.custom , input[type="radio"].disabled + label.custom {
-	pointer-events: none;
-}
-
 .drophover {
 	border: 2px dashed #333 ! important;
 }

@@ -941,8 +941,7 @@ Observation._richtable = function(container) {
 							+ arr[0]
 							+ '" id="'
 							+ cbid
-							+ '" class="custom" style="display: none;" /><label class="custom" for="'
-							+ cbid + '"></label>' + (arr[1] || arr[0])
+							+ '">' + (arr[1] || arr[0])
 							+ '</label>').appendTo(td);
 				}
 			}
