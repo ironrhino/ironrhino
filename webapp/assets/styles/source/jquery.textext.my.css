@@ -90,7 +90,7 @@
   height: 100%;
   padding: 4px 35px 4px 4px;
   margin-top: 1px;
-  cursor: text;
+  cursor: default;
 }
 .text-core .text-wrap .text-tags.text-tags-on-top {
   z-index: 2;

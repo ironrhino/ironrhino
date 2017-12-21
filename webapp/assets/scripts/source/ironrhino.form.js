@@ -357,12 +357,17 @@ Observation.form = function(container) {
 						}
 					});
 				});
-	if (typeof $.fn.chosen != 'undefined')
-		$$('.chosen', container).chosen({
-					search_contains : true,
-					placeholder_text : MessageBundle.get('select'),
-					no_results_text : ' '
-				});
+	if (typeof $.fn.chosen != 'undefined') {
+		$$('.chosen', container).each(function() {
+			var t = $(this);
+			t.chosen({
+						search_contains : true,
+						placeholder_text : MessageBundle.get('select'),
+						no_results_text : ' '
+					}).prependTo(t.next('.chosen-container')).parent()
+					.addClass('input-pseudo');
+		});
+	}
 	if (typeof $.fn.htmlarea != 'undefined')
 		$$('textarea.htmlarea', container).htmlarea();
 	$$(':input[data-helpurl]', container).each(function() {
