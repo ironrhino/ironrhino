@@ -9,14 +9,14 @@
 	<div class="control-group">
 	<label class="control-label" for="client">${getText('client')}</label>
 	<div class="controls listpick" data-options="{'url':'<@url value="/oauth/client/pick?columns=name"/>'}">
-	<@s.hidden name="authorization.client" class="listpick-id"/>
+	<@s.hidden id="client" name="authorization.client" class="listpick-id"/>
 	<div class="listpick-name input-pseudo"></div>
 	</div>
 	</div>
 	<div class="control-group">
 	<label class="control-label" for="grantor">${getText('grantor')}</label>
 	<div class="controls listpick" data-options="{'url':'<@url value="/user/pick?columns=username,name&enabled=true"/>','idindex':1}">
-	<@s.hidden name="authorization.grantor" class="required listpick-id"/>
+	<@s.hidden id="grantor" name="authorization.grantor" class="required listpick-id"/>
 	<div class="listpick-name input-pseudo"></div>
 	</div>
 	</div>

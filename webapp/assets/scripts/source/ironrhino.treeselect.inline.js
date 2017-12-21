@@ -8,9 +8,9 @@
 					.wrap('<div class="input-pseudo treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
 			if (t.prop('disabled'))
-				treeselect.addClass('disabled');
+				treeselect.addClass('disabled').removeAttr('tabindex');
 			if (t.prop('readonly'))
-				treeselect.addClass('readonly');
+				treeselect.addClass('readonly').removeAttr('tabindex');
 			var text = $('<div class="text resettable"/>').appendTo(treeselect);
 			if (t.data('text')) {
 				text.text(t.data('text'));
@@ -39,7 +39,8 @@ $(function() {
 		var t = $(e.target).closest('.treeselect-inline');
 		var input = t.children('input');
 		var text = t.children('.text');
-		if (input.prop('disabled') || input.prop('readonly'))
+		if (input.prop('disabled') || input.prop('readonly')
+				|| t.hasClass('disabled') || t.hasClass('readonly'))
 			return;
 		if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
 			return;

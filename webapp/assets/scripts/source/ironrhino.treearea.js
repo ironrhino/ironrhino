@@ -106,7 +106,7 @@
 								expand(treeoptions,
 										target.closest('.treearea'), target,
 										callback);
-						});;
+						});
 				if (this.hasChildren)
 					span.addClass('hasChildren');
 

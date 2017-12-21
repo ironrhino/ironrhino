@@ -16,12 +16,13 @@
 				}).on('click', 'form.ajax :submit', function() {
 					$(this).addClass('clicked');
 				}).on('click', 'label[for]', function(event) {
-					var input = $(document.getElementById($(this).attr('for')));
-					if (input.prop('readonly'))
-						event.preventDefault();
-					else if (input.is('.input-pseudo'))
-						input.focus();
-				}).on('paste', 'input[type="text"]', function() {
+			var input = $(document.getElementById($(this).attr('for')));
+			if (input.prop('readonly') || input.prop('disabled')
+					|| input.hasClass('readonly') || input.hasClass('disabled'))
+				event.preventDefault();
+			else if (input.is('.input-pseudo'))
+				input.focus();
+		}).on('paste', 'input[type="text"]', function() {
 					var t = $(this);
 					setTimeout(function() {
 								t.val($.trim(t.val()));
@@ -185,11 +186,15 @@ Observation.form = function(container) {
 					[!this.multiple && names.length ? names[0] : names, true]);
 		});
 		var fp = t
-				.wrap('<div class="filepick input-pseudo"/>')
+				.wrap('<div class="filepick input-pseudo" tabindex="0"/>')
 				.after('<div class="text resettable"></div>'
 						+ '<i class="indicator glyphicon glyphicon-list"/>'
 						+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
 				.parent();
+		if (t.prop('disabled'))
+			fp.addClass('disabled').removeAttr('tabindex');
+		if (t.prop('readonly'))
+			fp.addClass('readonly').removeAttr('tabindex');
 		$.each(	$.grep(t.attr('class').split(' '), function(v) {
 							return v.indexOf('input-') == 0
 									|| v.indexOf('span') == 0;
@@ -198,13 +203,21 @@ Observation.form = function(container) {
 					fp.addClass(v);
 				});
 		fp.click(function(e) {
-					var t = $(e.target);
-					if (t.is('.remove') || t.is('.tag-remove')
-							|| t.is('input[type="file"]'))
-						return true;
-					t.closest('.filepick').find('input[type="file"]').click();
-					return false;
-				});
+			var t = $(e.target);
+			if (t.is('.remove') || t.is('.tag-remove')
+					|| t.is('input[type="file"]'))
+				return true;
+			var fp = t.closest('.filepick');
+			if (fp.is('.disabled,.readonly'))
+				return false;
+			fp.find('input[type="file"]').click();
+			return false;
+		}).keydown(function(e) {
+					if (e.keyCode == 13) {
+						$(this).click();
+						return false;
+					}
+				});;
 	});
 	$$('.linkage_switch', container).each(function() {
 		var c = $(this).closest('.linkage');

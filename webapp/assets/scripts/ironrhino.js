@@ -35676,12 +35676,13 @@ Observation.checkbox = function(container) {
 				}).on('click', 'form.ajax :submit', function() {
 					$(this).addClass('clicked');
 				}).on('click', 'label[for]', function(event) {
-					var input = $(document.getElementById($(this).attr('for')));
-					if (input.prop('readonly'))
-						event.preventDefault();
-					else if (input.is('.input-pseudo'))
-						input.focus();
-				}).on('paste', 'input[type="text"]', function() {
+			var input = $(document.getElementById($(this).attr('for')));
+			if (input.prop('readonly') || input.prop('disabled')
+					|| input.hasClass('readonly') || input.hasClass('disabled'))
+				event.preventDefault();
+			else if (input.is('.input-pseudo'))
+				input.focus();
+		}).on('paste', 'input[type="text"]', function() {
 					var t = $(this);
 					setTimeout(function() {
 								t.val($.trim(t.val()));
@@ -35845,11 +35846,15 @@ Observation.form = function(container) {
 					[!this.multiple && names.length ? names[0] : names, true]);
 		});
 		var fp = t
-				.wrap('<div class="filepick input-pseudo"/>')
+				.wrap('<div class="filepick input-pseudo" tabindex="0"/>')
 				.after('<div class="text resettable"></div>'
 						+ '<i class="indicator glyphicon glyphicon-list"/>'
 						+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
 				.parent();
+		if (t.prop('disabled'))
+			fp.addClass('disabled').removeAttr('tabindex');
+		if (t.prop('readonly'))
+			fp.addClass('readonly').removeAttr('tabindex');
 		$.each(	$.grep(t.attr('class').split(' '), function(v) {
 							return v.indexOf('input-') == 0
 									|| v.indexOf('span') == 0;
@@ -35858,13 +35863,21 @@ Observation.form = function(container) {
 					fp.addClass(v);
 				});
 		fp.click(function(e) {
-					var t = $(e.target);
-					if (t.is('.remove') || t.is('.tag-remove')
-							|| t.is('input[type="file"]'))
-						return true;
-					t.closest('.filepick').find('input[type="file"]').click();
-					return false;
-				});
+			var t = $(e.target);
+			if (t.is('.remove') || t.is('.tag-remove')
+					|| t.is('input[type="file"]'))
+				return true;
+			var fp = t.closest('.filepick');
+			if (fp.is('.disabled,.readonly'))
+				return false;
+			fp.find('input[type="file"]').click();
+			return false;
+		}).keydown(function(e) {
+					if (e.keyCode == 13) {
+						$(this).click();
+						return false;
+					}
+				});;
 	});
 	$$('.linkage_switch', container).each(function() {
 		var c = $(this).closest('.linkage');
@@ -39064,7 +39077,7 @@ Observation.groupable = function(container) {
 								expand(treeoptions,
 										target.closest('.treearea'), target,
 										callback);
-						});;
+						});
 				if (this.hasChildren)
 					span.addClass('hasChildren');
 
@@ -39218,17 +39231,19 @@ Observation.groupable = function(container) {
 						txt.text(text);
 					}
 					if (current.hasClass('disabled'))
-						nametarget.addClass('disabled');
+						nametarget.addClass('disabled').removeAttr('tabindex');
 					if (current.hasClass('readonly'))
-						nametarget.addClass('readonly');
+						nametarget.addClass('readonly').removeAttr('tabindex');
 					var input = current
 							.find('input.treeselect-id[type="hidden"]');
 					if (input.length) {
 						input.prependTo(nametarget).addClass('resettable');
 						if (input.prop('disabled'))
-							nametarget.addClass('disabled');
+							nametarget.addClass('disabled')
+									.removeAttr('tabindex');
 						if (input.prop('readonly'))
-							nametarget.addClass('readonly');
+							nametarget.addClass('readonly')
+									.removeAttr('tabindex');
 						nametarget.attr('id', input.attr('id'));
 						input.removeAttr('id');
 						$.each(	$.grep(input.attr('class').split(' '),
@@ -39451,9 +39466,9 @@ Observation.treeselect = function(container) {
 					.wrap('<div class="input-pseudo treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
 			if (t.prop('disabled'))
-				treeselect.addClass('disabled');
+				treeselect.addClass('disabled').removeAttr('tabindex');
 			if (t.prop('readonly'))
-				treeselect.addClass('readonly');
+				treeselect.addClass('readonly').removeAttr('tabindex');
 			var text = $('<div class="text resettable"/>').appendTo(treeselect);
 			if (t.data('text')) {
 				text.text(t.data('text'));
@@ -39482,7 +39497,8 @@ $(function() {
 		var t = $(e.target).closest('.treeselect-inline');
 		var input = t.children('input');
 		var text = t.children('.text');
-		if (input.prop('disabled') || input.prop('readonly'))
+		if (input.prop('disabled') || input.prop('readonly')
+				|| t.hasClass('disabled') || t.hasClass('readonly'))
 			return;
 		if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
 			return;
@@ -39716,17 +39732,19 @@ Observation.treeview = function(container) {
 						txt.text(text);
 					}
 					if (current.hasClass('disabled'))
-						nametarget.addClass('disabled');
+						nametarget.addClass('disabled').removeAttr('tabindex');
 					if (current.hasClass('readonly'))
-						nametarget.addClass('readonly');
+						nametarget.addClass('readonly').removeAttr('tabindex');
 					var input = current
 							.find('input.listpick-id[type="hidden"]');
 					if (input.length) {
 						input.prependTo(nametarget).addClass('resettable');
 						if (input.prop('disabled'))
-							nametarget.addClass('disabled');
+							nametarget.addClass('disabled')
+									.removeAttr('tabindex');
 						if (input.prop('readonly'))
-							nametarget.addClass('readonly');
+							nametarget.addClass('readonly')
+									.removeAttr('tabindex');
 						nametarget.attr('id', input.attr('id'));
 						input.removeAttr('id');
 						$.each(	$.grep(input.attr('class').split(' '),

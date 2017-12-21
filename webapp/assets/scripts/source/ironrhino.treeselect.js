@@ -141,17 +141,19 @@
 						txt.text(text);
 					}
 					if (current.hasClass('disabled'))
-						nametarget.addClass('disabled');
+						nametarget.addClass('disabled').removeAttr('tabindex');
 					if (current.hasClass('readonly'))
-						nametarget.addClass('readonly');
+						nametarget.addClass('readonly').removeAttr('tabindex');
 					var input = current
 							.find('input.treeselect-id[type="hidden"]');
 					if (input.length) {
 						input.prependTo(nametarget).addClass('resettable');
 						if (input.prop('disabled'))
-							nametarget.addClass('disabled');
+							nametarget.addClass('disabled')
+									.removeAttr('tabindex');
 						if (input.prop('readonly'))
-							nametarget.addClass('readonly');
+							nametarget.addClass('readonly')
+									.removeAttr('tabindex');
 						nametarget.attr('id', input.attr('id'));
 						input.removeAttr('id');
 						$.each(	$.grep(input.attr('class').split(' '),
