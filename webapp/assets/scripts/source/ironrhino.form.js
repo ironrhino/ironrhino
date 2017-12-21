@@ -204,7 +204,7 @@ Observation.form = function(container) {
 						$(this).click();
 						return false;
 					}
-				});;
+				});
 	});
 	$$('.linkage_switch', container).each(function() {
 		var c = $(this).closest('.linkage');
@@ -306,7 +306,13 @@ Observation.form = function(container) {
 						});
 				t = p;
 			}
-			t.bootstrapSwitch();
+			t.bootstrapSwitch().closest('.switch').addClass('input-pseudo')
+					.attr('tabindex', '0').keydown(function(e) {
+								if (e.keyCode == 13) {
+									$(this).find('.switch-left').click();
+									return false;
+								}
+							});
 		});
 	if (typeof $.fn.datetimepicker != 'undefined')
 		$$('input.date,input.datetime,input.time', container).not('[readonly]')

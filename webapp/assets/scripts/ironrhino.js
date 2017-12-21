@@ -31436,8 +31436,8 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
-			else if (field.parent('.input-pseudo').length)
-				field = field.parent().addClass('error');
+			else if (field.closest('.input-pseudo').length)
+				field = field.closest('.input-pseudo').addClass('error');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
@@ -31516,8 +31516,8 @@ Form = {
 				$(target).removeClass('error');
 			};
 			var p = $(target).parent();
-			if (p.is('.input-pseudo'))
-				p = p.parent();
+			if (p.closest('.input-pseudo').length)
+				p = p.closest('.input-pseudo').parent();
 			if (!p.is('form,fieldset')) {
 				$$('.error', p).removeClass('error');
 				$('.field-error', p).fadeIn().remove();
@@ -31555,7 +31555,7 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.input-pseudo > input'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.input-pseudo input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
@@ -35864,7 +35864,7 @@ Observation.form = function(container) {
 						$(this).click();
 						return false;
 					}
-				});;
+				});
 	});
 	$$('.linkage_switch', container).each(function() {
 		var c = $(this).closest('.linkage');
@@ -35966,7 +35966,13 @@ Observation.form = function(container) {
 						});
 				t = p;
 			}
-			t.bootstrapSwitch();
+			t.bootstrapSwitch().closest('.switch').addClass('input-pseudo')
+					.attr('tabindex', '0').keydown(function(e) {
+								if (e.keyCode == 13) {
+									$(this).find('.switch-left').click();
+									return false;
+								}
+							});
 		});
 	if (typeof $.fn.datetimepicker != 'undefined')
 		$$('input.date,input.datetime,input.time', container).not('[readonly]')

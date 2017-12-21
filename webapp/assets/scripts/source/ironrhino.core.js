@@ -385,8 +385,8 @@ Message = {
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');
-			else if (field.parent('.input-pseudo').length)
-				field = field.parent().addClass('error');
+			else if (field.closest('.input-pseudo').length)
+				field = field.closest('.input-pseudo').addClass('error');
 			if (field.is(':visible')) {
 				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
@@ -465,8 +465,8 @@ Form = {
 				$(target).removeClass('error');
 			};
 			var p = $(target).parent();
-			if (p.is('.input-pseudo'))
-				p = p.parent();
+			if (p.closest('.input-pseudo').length)
+				p = p.closest('.input-pseudo').parent();
 			if (!p.is('form,fieldset')) {
 				$$('.error', p).removeClass('error');
 				$('.field-error', p).fadeIn().remove();
@@ -504,7 +504,7 @@ Form = {
 									.siblings('.tab-pane.active')).length)
 				return;
 			if ((inhiddenpanel || t
-					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.input-pseudo > input'))
+					.is(':visible,[type="hidden"],.custom[type="file"],.sqleditor,.chzn-done,.input-pseudo input'))
 					&& !t.prop('disabled')) {
 				var value = t.val();
 				if (t.hasClass('required') && t.attr('name') && !value) {
