@@ -70,7 +70,7 @@
 
 	$(function() {
 		if (!$.browser.msie) {
-			var selector = '.waves-effect, table.richtable th:not(.filtercolumn), table.richtable td:not(.action), button, a:not(.nav-tabs > li > a)';
+			var selector = '.waves-effect, table.richtable th:not(.filtercolumn), table.richtable td:not(.action), button, a[href]:not(.nav-tabs > li > a)';
 			$(document).on('mousedown', selector, showWave).on(
 					'mouseup mouseleave', selector, hideWave);
 		}
