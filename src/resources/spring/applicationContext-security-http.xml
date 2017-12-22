@@ -21,7 +21,6 @@
 		<security:intercept-url pattern="/common/upload" access="hasRole('ROLE_BUILTIN_USER')" />
 		<security:intercept-url pattern="/common/**" access="hasRole('ROLE_ADMINISTRATOR')" />
 		<security:intercept-url pattern="/**" access="hasRole('ROLE_BUILTIN_USER')" />
-		<security:session-management session-fixation-protection="changeSessionId" />
 		<security:remember-me services-ref="rememberMeServices" />
 		<security:anonymous granted-authority="ROLE_BUILTIN_ANONYMOUS" username="anonymousUser" key="anonymous" />
 		<security:logout logout-url="/logout" invalidate-session="true" success-handler-ref="logoutSuccessHandler" />
