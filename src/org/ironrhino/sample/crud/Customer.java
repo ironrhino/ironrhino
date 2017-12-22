@@ -75,10 +75,10 @@ public class Customer extends BaseRecordableEntity {
 	@UiConfig(width = "100px")
 	private boolean enabled;
 
-	@UiConfig(width = "80px", type = "dictionary", templateName = "customer_category")
+	@UiConfig(width = "80px", type = "dictionary", cssClass = "chosen", templateName = "customer_category")
 	private String category;
 
-	@UiConfig(type = "dictionary", templateName = "customer_category", hiddenInList = @Hidden(true), description = "potentialCategories.description")
+	@UiConfig(type = "dictionary", cssClass = "chosen", templateName = "customer_category", hiddenInList = @Hidden(true), description = "potentialCategories.description")
 	private Set<String> potentialCategories;
 
 	@UiConfig(width = "80px")

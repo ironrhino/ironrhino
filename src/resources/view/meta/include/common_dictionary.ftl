@@ -1,16 +1,16 @@
-<#macro selectDictionary dictionaryName name="" value="" required=false disabled=false showHeader=true headerKey="" headerValue="" strict=true dynamicAttributes...>
+<#macro selectDictionary dictionaryName name="" value="" required=false disabled=false multiple=false showHeader=true headerKey="" headerValue="" strict=true dynamicAttributes...>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
-	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<@dynAttrs value=dynamicAttributes exclude='class'/>>
+	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#if multiple> multiple</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
 		<#if showHeader><option value="${headerKey}">${headerValue}</option></#if>
 		<#local exists=false>
 		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
-				<option value="${lv.value}"<#if value?string==lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
+				<option value="${lv.value}"<#if value?has_content&&(!value?is_sequence&&value?string==lv.value||value?is_sequence&&value?seq_contains(lv.value))><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
 				</#list>
 			<#else>
 				<#local group = ""/>
@@ -38,8 +38,14 @@
 				</#list>
 			</#if>
 		</#if>
-		<#if !exists && value?has_content>
+		<#if !exists&&value?has_content>
+		<#if value?is_sequence>
+			<#list value as v>
+			<option value="${v}"selected="selected">${v}</option>
+			</#list>
+		<#else>
 			<option value="${value}"selected="selected">${value}</option>
+		</#if>
 		</#if>
 	</select>
 </#macro>
