@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 
 @Component("oauthManager")
 @ServiceImplementationConditional(profiles = CLUSTER)
-public class HybirdOAuthManager extends AbstractOAuthManager {
+public class HybridOAuthManager extends AbstractOAuthManager {
 
 	@Autowired
 	private Logger logger;
