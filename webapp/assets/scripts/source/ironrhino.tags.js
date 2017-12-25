@@ -131,11 +131,10 @@
 						data.result = false;
 						break;
 					}
-			});
-			t.blur(function() {
+			}).blur(function() {
 						if (t.val())
 							t.trigger('enterKeyPress').val('').blur();
-					});
+					}).closest('.text-core').addClass('input-pseudo');
 		})
 		return this;
 	};

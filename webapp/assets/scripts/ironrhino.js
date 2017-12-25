@@ -17996,7 +17996,7 @@ ctrlr.prototype.setObjectValue=function(data){
 			ext : {},
 
 			html : {
-				wrap   : '<div class="text-core input-pseudo"><div class="text-wrap"/></div>',
+				wrap   : '<div class="text-core"><div class="text-wrap"/></div>',
 				hidden : '<input type="hidden" />'
 			},
 
@@ -18255,6 +18255,14 @@ ctrlr.prototype.setObjectValue=function(data){
 		hiddenInput.attr('class', input.attr('class'));
 		// remove name attribute from the text input
 		input.attr('class', null);
+		// copy width related class
+		$.each(	$.grep(hiddenInput.attr('class').split(' '), function(v) {
+								return v.indexOf('input-') == 0
+										|| v.indexOf('span') == 0;
+							}), function(k, v) {
+						hiddenInput.removeClass(v);
+						input.addClass(v);
+					});
 		// add hidden input to the DOM
 		hiddenInput.prependTo(input.closest('.text-core'));
 
@@ -37101,11 +37109,10 @@ Observation.combobox = function(container) {
 						data.result = false;
 						break;
 					}
-			});
-			t.blur(function() {
+			}).blur(function() {
 						if (t.val())
 							t.trigger('enterKeyPress').val('').blur();
-					});
+					}).closest('.text-core').addClass('input-pseudo');
 		})
 		return this;
 	};
