@@ -204,10 +204,10 @@
 	function maintainPosition(status) {
 		switch (status) {
 			case true :
-				$(topWindow).bind('resize', reposition);
+				$(topWindow).on('resize', reposition);
 				break;
 			case false :
-				$(topWindow).unbind('resize', reposition);
+				$(topWindow).off('resize', reposition);
 				break;
 		}
 	}

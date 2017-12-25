@@ -57,9 +57,9 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 				data = values.join('&');
 				if (data)
 					data += '&';
-				data += $.param(extra);
+				data += $.param(extra, $.ajaxSettings.traditional);
 			} else {
-				data = $.param(extra);
+				data = $.param(extra, $.ajaxSettings.traditional);
 			}
 			ajaxOptions.data = data;
 			ajaxOptions.type = 'POST';

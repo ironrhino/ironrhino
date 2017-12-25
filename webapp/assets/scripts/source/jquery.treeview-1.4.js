@@ -215,7 +215,7 @@
 				$(settings.control).show();
 			}
 			
-			return this.bind("add", function(event, branches) {
+			return this.on("add", function(event, branches) {
 				$(branches).prev()
 					.removeClass(CLASSES.last)
 					.removeClass(CLASSES.lastCollapsable)
@@ -223,7 +223,7 @@
 				.find(">.hitarea")
 					.removeClass(CLASSES.lastCollapsableHitarea)
 					.removeClass(CLASSES.lastExpandableHitarea);
-				$(branches).find("li").andSelf().prepareBranches(settings).applyClasses(settings, toggler);
+				$(branches).find("li").addBack().prepareBranches(settings).applyClasses(settings, toggler);
 			});
 		}
 	});

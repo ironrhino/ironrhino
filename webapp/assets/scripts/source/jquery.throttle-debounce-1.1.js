@@ -93,13 +93,13 @@
   // 
   // > var throttled = jQuery.throttle( delay, [ no_trailing, ] callback );
   // > 
-  // > jQuery('selector').bind( 'someevent', throttled );
-  // > jQuery('selector').unbind( 'someevent', throttled );
+  // > jQuery('selector').on( 'someevent', throttled );
+  // > jQuery('selector').off( 'someevent', throttled );
   // 
   // This also works in jQuery 1.4+:
   // 
-  // > jQuery('selector').bind( 'someevent', jQuery.throttle( delay, [ no_trailing, ] callback ) );
-  // > jQuery('selector').unbind( 'someevent', callback );
+  // > jQuery('selector').on( 'someevent', jQuery.throttle( delay, [ no_trailing, ] callback ) );
+  // > jQuery('selector').off( 'someevent', callback );
   // 
   // Arguments:
   // 
@@ -217,13 +217,13 @@
   // 
   // > var debounced = jQuery.debounce( delay, [ at_begin, ] callback );
   // > 
-  // > jQuery('selector').bind( 'someevent', debounced );
-  // > jQuery('selector').unbind( 'someevent', debounced );
+  // > jQuery('selector').on( 'someevent', debounced );
+  // > jQuery('selector').off( 'someevent', debounced );
   // 
   // This also works in jQuery 1.4+:
   // 
-  // > jQuery('selector').bind( 'someevent', jQuery.debounce( delay, [ at_begin, ] callback ) );
-  // > jQuery('selector').unbind( 'someevent', callback );
+  // > jQuery('selector').on( 'someevent', jQuery.debounce( delay, [ at_begin, ] callback ) );
+  // > jQuery('selector').off( 'someevent', callback );
   // 
   // Arguments:
   // 

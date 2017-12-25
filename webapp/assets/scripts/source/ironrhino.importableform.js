@@ -41,7 +41,7 @@
 			var data;
 			var json = e.target.result;
 			try {
-				var data = $.parseJSON(json);
+				var data = JSON.parse(json);
 			} catch (e) {
 				Message.showActionError(MessageBundle.get('data.invalid'));
 				return;

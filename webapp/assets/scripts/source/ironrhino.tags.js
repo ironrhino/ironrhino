@@ -67,7 +67,7 @@
 			var value = t.val();
 			if (value) {
 				if (value.indexOf('["') == 0)
-					options.tagsItems = $.parseJSON(value);
+					options.tagsItems = JSON.parse(value);
 				else {
 					if (value.indexOf('[') == 0)
 						value = value.substring(1, value.length - 1);

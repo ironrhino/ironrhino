@@ -524,7 +524,7 @@
 
 		function bind(event, handler)
 		{
-			target.bind(event, function()
+			target[target instanceof $ ? 'on': 'bind'](event, function()
 			{
 				// apply handler to our PLUGIN object, not the target
 				return handler.apply(self, arguments);
@@ -891,7 +891,7 @@
 	 */
 	p.bind = function(event, handler)
 	{
-		this.input().bind(event, handler);
+		this.input().on(event, handler);
 	};
 
 	/**
@@ -2066,7 +2066,7 @@
 
 		self._arrow = arrow = $(self.opts(OPT_HTML_ARROW));
 		self.core().wrapElement().append(arrow);
-		arrow.bind('click', function(e) { self.onArrowClick(e); });
+		arrow.on('click', function(e) { self.onArrowClick(e); });
 	};
 
 	//--------------------------------------------------------------------------------
@@ -3199,7 +3199,7 @@
 	 */
 	p.withinWrapElement = function(element) 
 	{
-		return this.core().wrapElement().find(element).size() > 0;
+		return this.core().wrapElement().find(element).length > 0;
 	}
 })(jQuery);
 ;/**

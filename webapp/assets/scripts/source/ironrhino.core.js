@@ -68,7 +68,7 @@
 			&& ($('meta[name="pe"]').attr('content') != 'false')) {
 		var temp = $.param;
 		$.param = function(a, traditional) {
-			if ($.isArray(a) || a.jquery) {
+			if (Array.isArray(a) || a.jquery) {
 				$.each(a, function() {
 					if (this.type == 'password') {
 						try {
@@ -729,7 +729,7 @@ Ajax = {
 			options.quiet = true;
 		if ((typeof data == 'string')
 				&& (data.indexOf('{') == 0 || data.indexOf('[') == 0))
-			data = $.parseJSON(data);
+			data = JSON.parse(data);
 		if (typeof data == 'string') {
 			var i = data.indexOf('<title>');
 			if (i >= 0 && data.indexOf('</title>') > 0) {
@@ -1474,7 +1474,8 @@ Observation.common = function(container) {
 													});
 
 									});
-							var param = $.param(realparams);
+							var param = $.param(realparams,
+									$.ajaxSettings.traditional);
 							if (param)
 								url += (url.indexOf('?') > 0 ? '&' : '?')
 										+ param;

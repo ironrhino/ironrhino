@@ -60,10 +60,10 @@
 						if (match)
 							level = index;
 					});
-		for (var i = areas.size() - 1; i > level; i--)
+		for (var i = areas.length - 1; i > level; i--)
 			areas.eq(i).fadeOut().remove();
 		areas = $('.area', treearea);
-		var area = level + 1 == areas.size()
+		var area = level + 1 == areas.length
 				? areas.eq(level).html('')
 				: $('<div/>').addClass('clearfix').addClass('area')
 						.appendTo(treearea);

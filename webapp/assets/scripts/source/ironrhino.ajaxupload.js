@@ -15,7 +15,7 @@
 		} else {
 			formdata = new FormData();
 		}
-		if ($.isArray(files)) {
+		if (Array.isArray(files)) {
 			// for $.fn.ajaxsubmit
 			$.each(files, function(i, v) {
 						if (v.name && v.value)

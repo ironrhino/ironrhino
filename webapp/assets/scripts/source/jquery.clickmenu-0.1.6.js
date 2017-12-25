@@ -70,7 +70,7 @@
 				div.timer = setTimeout(function()
 				{
 					//remove events
-					$(getAllChilds(getOneChild(div, 'UL'), 'LI')).unbind('mouseover', liHoverIn).unbind('mouseout', liHoverOut).unbind('click', settings.onClick);
+					$(getAllChilds(getOneChild(div, 'UL'), 'LI')).off('mouseover', liHoverIn).off('mouseout', liHoverOut).off('click', settings.onClick);
 					//hide it
 					$(div).hide();
 					div.isVisible = false;
@@ -303,7 +303,7 @@
 			{
 				hoverIn(this, settings.mainDelay);
 				shown = true;
-				$(document).bind('mousedown', checkMouse);
+				$(document).on('mousedown', checkMouse);
 			}
 			return false;
 		};
@@ -345,8 +345,8 @@
 			});
 			$('ul.clickMenu li').removeClass('hover');
 			//remove events
-			$('ul.clickMenu>li li').unbind('mouseover', liHoverIn).unbind('mouseout', liHoverOut).unbind('click', settings.onClick);
-			$(document).unbind('mousedown', checkMouse);
+			$('ul.clickMenu>li li').off('mouseover', liHoverIn).off('mouseout', liHoverOut).off('click', settings.onClick);
+			$(document).off('mousedown', checkMouse);
 			shown = false;
 		};
 
@@ -440,7 +440,7 @@
 			//add shadows
 			$('ul', this).shadowBox();
 			//assign events
-			$(this).bind('closemenu', function(){clean();}); //assign closemenu-event, through wich the menu can be closed from outside the plugin
+			$(this).on('closemenu', function(){clean();}); //assign closemenu-event, through wich the menu can be closed from outside the plugin
 			//add click event handling, if there are any elements inside the main menu
 			var liElems = getAllChilds(this, 'LI');
 			for ( var j = 0; j < liElems.length; j++ )
