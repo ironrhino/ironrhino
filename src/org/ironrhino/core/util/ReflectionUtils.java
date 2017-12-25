@@ -120,8 +120,7 @@ public class ReflectionUtils {
 	}
 
 	public static String[] getParameterNames(Method method) {
-		if (method.isBridge())
-			method = BridgeMethodResolver.findBridgedMethod(method);
+		method = BridgeMethodResolver.findBridgedMethod(method);
 		return doGetParameterNames(method);
 	}
 

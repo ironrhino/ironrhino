@@ -33,8 +33,7 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
-		if (method.isBridge())
-			method = BridgeMethodResolver.findBridgedMethod(method);
+		method = BridgeMethodResolver.findBridgedMethod(method);
 		CheckCache checkCache = method.getAnnotation(CheckCache.class);
 		if (checkCache != null) {
 			if (isBypass())

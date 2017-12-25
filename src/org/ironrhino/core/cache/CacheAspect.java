@@ -43,8 +43,7 @@ public class CacheAspect extends AbstractPointcutAdvisor {
 	private transient final StaticMethodMatcherPointcut pointcut = new StaticMethodMatcherPointcut() {
 		@Override
 		public boolean matches(Method method, Class<?> targetClass) {
-			if (method.isBridge())
-				method = BridgeMethodResolver.findBridgedMethod(method);
+			method = BridgeMethodResolver.findBridgedMethod(method);
 			return method.getAnnotation(CheckCache.class) != null || method.getAnnotation(EvictCache.class) != null;
 		}
 	};

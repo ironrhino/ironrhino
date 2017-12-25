@@ -17,8 +17,7 @@ public class DataRouteInterceptor extends AbstractMethodInterceptor<DataRouteAsp
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
-		if (method.isBridge())
-			method = BridgeMethodResolver.findBridgedMethod(method);
+		method = BridgeMethodResolver.findBridgedMethod(method);
 		Transactional transactional = AnnotationUtils.findAnnotation(method, Transactional.class);
 		if (transactional == null)
 			transactional = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Transactional.class);

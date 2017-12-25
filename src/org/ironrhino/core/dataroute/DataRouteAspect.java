@@ -24,8 +24,7 @@ public class DataRouteAspect extends AbstractPointcutAdvisor {
 	private transient final StaticMethodMatcherPointcut pointcut = new StaticMethodMatcherPointcut() {
 		@Override
 		public boolean matches(Method method, Class<?> targetClass) {
-			if (method.isBridge())
-				method = BridgeMethodResolver.findBridgedMethod(method);
+			method = BridgeMethodResolver.findBridgedMethod(method);
 			return AnnotationUtils.findAnnotation(method, Transactional.class) != null
 					|| AnnotationUtils.findAnnotation(targetClass, Transactional.class) != null
 					|| AnnotationUtils.findAnnotation(method, DataRoute.class) != null
