@@ -1841,6 +1841,9 @@ var Dialog = {
 						my : 'top',
 						at : 'top',
 						of : window
+					}).css({
+						width : '',
+						height : ''
 					});
 		}
 	}
