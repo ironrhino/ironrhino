@@ -45,7 +45,7 @@
 		<tbody>
 		<#if value?has_content>
 		<#list value as element>
-			<#if element?has_content>
+			<#if element??>
 			<tr>
 				<#list config.embeddedUiConfigs as nestedKey,config>
 				<#local value=element[nestedKey]!>
@@ -94,9 +94,9 @@
 			<#if printAttributes??><@printAttributes attributes=entity.attributes grouping=true/></#if>
 		<#elseif config.type=='imageupload'>
 			<#if value?has_content><img src="${value}"/></#if>
-		<#elseif value?has_content>
+		<#elseif value??>
 			<#if value?is_boolean>
-			${getText(value?string)}
+			${getText(value?c)}
 			<#elseif value?is_unknown_date_like>
 			${value?datetime}
 			<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
@@ -106,7 +106,7 @@
 			<#list value as item>
 				<li>
 				<#if item?is_boolean>
-					${getText(item?string)}
+					${getText(item?c)}
 				<#elseif item?is_unknown_date_like>
 					${item?datetime}
 				<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>

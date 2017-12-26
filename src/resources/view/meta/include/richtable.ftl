@@ -154,7 +154,7 @@ ${formHeader!}
 <#if !template?has_content>
 	<#if value??>
 		<#if value?is_boolean>
-		${getText(value?string)}<#t>
+		${getText(value?c)}<#t>
 		<#elseif value?is_unknown_date_like>
 		${value?datetime}<#t>
 		<#elseif value?is_enumerable>
