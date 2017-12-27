@@ -39967,7 +39967,7 @@ Observation.treeselect = function(container) {
 						t.removeClass(v);
 						treeselect.addClass(v);
 					});
-			$('<i class="indicator glyphicon glyphicon-menu-down"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
+			$('<i class="indicator glyphicon glyphicon-triangle-bottom"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
 					.appendTo(treeselect);
 		});
 		return this;
@@ -39985,10 +39985,10 @@ $(function() {
 		if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
 			return;
 		var treeselect = $(e.target).closest('.treeselect-inline');
-		treeselect.find('.glyphicon').toggleClass('glyphicon-menu-down')
-				.toggleClass('glyphicon-menu-up');
+		treeselect.find('.glyphicon').toggleClass('glyphicon-triangle-bottom')
+				.toggleClass('glyphicon-triangle-top');
 		var options = treeselect.find('.options').toggle();
-		if (treeselect.find('.glyphicon-menu-up').length) {
+		if (treeselect.find('.glyphicon-triangle-top').length) {
 			if (input.data('url') && !options.html()) {
 				var treeview = $('<div class="treeview"/>').appendTo(options);
 				treeview.treeview({
@@ -40020,7 +40020,7 @@ $(function() {
 	$(document).click(function(e) {
 				var target = $(e.target);
 				if (!target.closest('.treeselect-inline').length)
-					$('.treeselect-inline .glyphicon-menu-up').parent().click();
+					$('.treeselect-inline .glyphicon-triangle-top').parent().click();
 			});
 });
 
