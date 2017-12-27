@@ -1022,16 +1022,27 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
   zoom: 1; /* IE7 Hack */
 }
 
-.treeTable tr.collapsed td .expander,.treeTable tr.expanded td .expander,.treeTable tr.collapsed.selected td .expander,.treeTable tr.collapsed.accept td .expander,.treeTable tr.expanded.selected td .expander,.treeTable tr.expanded.accept td .expander {
-  background-image: url(../images/treeTable.png);
+.treeTable tr td .expander {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 19px;
+  text-align: center;
+  padding-left: 0!important;
+  opacity: .5;
 }
 
-.treeTable tr.collapsed td .expander {
-  background-position: 0px -32px;
+.treeTable tr.collapsed td .expander:before {
+  content: "\e250";
 }
-
-.treeTable tr.expanded td .expander {
-  background-position: 0px 0px;
+.treeTable tr.expanded td .expander:before {
+  content: "\e252";
 }
 
 /* jquery.treeTable.sortable
