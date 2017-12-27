@@ -118,13 +118,12 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Override
 	public String changeSessionId(WrappedHttpSession session) {
-		String sessionId = CodecUtils.nextId(SALT);
 		session.setNew(true);
-		session.setId(sessionId);
+		session.setId(CodecUtils.nextId(SALT));
 		session.setSessionTracker(getSessionTracker(session));
 		RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
 				session.getSessionTracker(), globalCookie);
-		return sessionId;
+		return session.getId();
 	}
 
 	@Override
@@ -219,14 +218,15 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	public void invalidate(WrappedHttpSession session) {
 		session.setInvalid(true);
 		session.getAttrMap().clear();
-		if (!session.isRequestedSessionIdFromURL() || alwaysUseCacheBased) {
-			RequestUtils.deleteCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(), true);
-		}
 		doInvalidate(session);
-		session.setId(CodecUtils.nextId(SALT));
-		session.setCreationTime(session.getNow());
-		session.setLastAccessedTime(session.getNow());
-		session.setSessionTracker(getSessionTracker(session));
+		if (session.isCacheBased()) {
+			changeSessionId(session);
+		} else {
+			session.setId(CodecUtils.nextId(SALT));
+			session.setSessionTracker(getSessionTracker(session));
+			session.setCreationTime(session.getNow());
+			session.setLastAccessedTime(session.getNow());
+		}
 	}
 
 	private String getSessionTracker(WrappedHttpSession session) {
