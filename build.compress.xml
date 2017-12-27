@@ -91,6 +91,7 @@
 	<target name="concatStyles">
 		<concat destfile="${webapp.dir}/assets/styles/ironrhino.css" encoding="utf-8" fixlastline="yes">
 			<filelist>
+				<file name="${webapp.dir}/assets/styles/source/font-awesome.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.ui.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.treeview.my.css" />
 				<file name="${webapp.dir}/assets/styles/source/jquery.treeTable.my.css" />
