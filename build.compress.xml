@@ -120,7 +120,6 @@
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pseudoinput.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.treeselect.css" />
 				<file name="${webapp.dir}/assets/styles/source/ironrhino.pattern.css" />
-				<file name="${webapp.dir}/assets/styles/source/ironrhino.icon.css" />
 				<file name="${webapp.dir}/assets/styles/source/bootstrap-responsive.css" />
 			</filelist>
 		</concat>

@@ -264,6 +264,10 @@ body.welcome[lang="zh"] .hero-unit button[type="submit"]:only-child {
 	border-radius: 0px 0px 5px 5px;
 }
 
+#indicator .fa {
+	color: #aaa;
+}
+
 #indicator.error {
 	background: #F00;
 }

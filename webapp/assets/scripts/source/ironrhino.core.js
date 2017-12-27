@@ -132,7 +132,7 @@ Indicator = {
 			ind.addClass('loading');
 		ind.html(Indicator.text || MessageBundle.get('ajax.loading'));
 		if (!iserror)
-			ind.prepend('<span class="icon-loading small"></span>');
+			ind.prepend('<span class="fa fa-circle-o-notch fa-pulse fa-fw"></span>');
 		ind.show();
 		Indicator.text = '';
 	},
