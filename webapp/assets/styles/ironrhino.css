@@ -9145,6 +9145,10 @@ th.filtercolumn li.main li {
 	line-height: 20px;
 }
 
+.input-pseudo .tag-label {
+	display: inline;
+}
+
 .input-pseudo .tag-remove {
 	cursor: pointer;
 	display: inline-block;

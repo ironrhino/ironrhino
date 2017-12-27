@@ -36590,10 +36590,10 @@ Observation.form = function(container) {
 				var keys = [];
 				$.each(val, function(i, v) {
 							keys.push((typeof v == 'string') ? v : v.key);
-							$('<div class="tag"><div class="tag-label"></div>'
+							$('<div class="tag"><span class="tag-label"></span>'
 									+ (textOnly
 											? ''
-											: '<div class="tag-remove">×</div>')
+											: '<span class="tag-remove">×</span>')
 									+ '</div>').appendTo(text)
 									.find('.tag-label')
 									.html((typeof v == 'string') ? v : v.value);
