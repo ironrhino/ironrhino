@@ -8,14 +8,14 @@
 $(function(){
 	$(document).on('click','#result tbody .btn',function(){
 		if(!$('#row-modal').length)
-			var modal = $('<div id="row-modal" class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div id="row-modal-body" class="modal-body" style="min-height:300px;"></div></div>')
+			var modal = $('<div id="row-modal" class="modal" style="width:800px;margin-left:-400px;z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div id="row-modal-body" class="modal-body" style="min-height:300px;max-height:initial;"></div></div>')
 									.appendTo(document.body).fadeIn().find('button.close').click(function() {
 						$(this).closest('.modal').fadeOut().remove();
 					});
 		var ths = $('th:not(:first-child)',$(this).closest('table'));
 		var tds = $('td:not(:first-child)',$(this).closest('tr'));
 		var arr = [];
-		arr.push('<div class="form-horizontal">');
+		arr.push('<div class="form-horizontal label-large">');
 		for(var i=0;i<ths.length;i++){
 			arr.push('<div class="control-group"><label class="control-label">');
 			arr.push(ths.eq(i).text());
