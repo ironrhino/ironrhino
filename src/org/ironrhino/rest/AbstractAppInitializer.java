@@ -45,6 +45,13 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 		dynamic.setAsyncSupported(true);
 		dynamic.setMultipartConfig(createMultipartConfig());
 		dynamic.setLoadOnStartup(1);
+		try {
+			// glassfish5 disallow add mapping after servlet context initialized
+			T ac = apiConfigClass.getConstructor().newInstance();
+			dynamic.addMapping(ac.getServletMapping());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		String filterName = NameGenerator.buildDefaultBeanName(RestFilter.class.getName());
 		FilterRegistration filterRegistration = servletContext.getFilterRegistration(filterName);
 		if (filterRegistration == null) {
