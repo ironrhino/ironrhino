@@ -234,7 +234,7 @@ public class EntityClassHelper {
 							uci.addCssClass("tags");
 							if (StringUtils.isBlank(uci.getTemplate()))
 								uci.setTemplate(
-										"<#if value?has_content><#list value as var><span class=\"label\">${var}</span><#if var_has_next> </#if></#list></#if>");
+										"<#if value?has_content><#list value as var><span class=\"label\">${var}</span><#sep> </#list></#if>");
 						}
 					}
 					if (pd.getWriteMethod() == null)
