@@ -150,7 +150,7 @@ ${formHeader!}
 </#if>
 <#local dynamicAttributes+=cellDynamicAttributes>
 <#local hasCellvalue=dynamicAttributes['data-cellvalue']??||dynamicAttributes['dynamicAttributes']??&&dynamicAttributes['dynamicAttributes']['data-cellvalue']??>
-<td<#if value??><#if !hasCellvalue&&template?has_content&&value?has_content||value?is_boolean> data-cellvalue="<#if value?is_unknown_date_like>${value?datetime?html}<#else>${value?string?html}</#if>"<#elseif (value.ordinal)!?is_method&&(value.name)!?is_method&&value.name()!=value> data-cellvalue="${value.name()}"</#if></#if><@dynAttrs value=dynamicAttributes/>><#rt>
+<td<#if value??&&celleditable><#if !hasCellvalue&&template?has_content&&value?has_content||value?is_boolean> data-cellvalue="<#if value?is_unknown_date_like>${value?datetime?html}<#else>${value?string?html}</#if>"<#elseif (value.ordinal)!?is_method&&(value.name)!?is_method&&value.name()!=value> data-cellvalue="${value.name()}"</#if></#if><@dynAttrs value=dynamicAttributes/>><#rt>
 <#if !template?has_content>
 	<#if value??>
 		<#if value?is_boolean>

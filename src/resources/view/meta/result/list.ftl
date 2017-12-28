@@ -147,6 +147,7 @@
 	<#if !hidden>
 		<#assign dynamicAttributes={}>
 		<#if (config.type=='listpick'||config.type=='treeselect')&&celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
+			<#if celleditable>
 			<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 			<#assign pickUrl=pickUrl?markup_string>
 			<#assign cellvalue=(value.id?string)!>
@@ -158,6 +159,7 @@
 				<#assign cellvalue=ids?join(',')>
 			</#if>
 			<#assign dynamicAttributes={"class":config.type,"data-cellvalue":cellvalue,"data-options":"{'url':'"+pickUrl+"','name':'this','id':'this@data-cellvalue','multiple':"+config.multiple?string+"}"}>
+			</#if>
 		</#if>
 		<#if config.readonly.expression?has_content && config.readonly.expression?eval>
 		<#assign dynamicAttributes+={'data-readonly':'true'}/>
@@ -165,6 +167,7 @@
 		<#assign value = entity[key]!>
 		<#if value?has_content>
 			<#if config.multiple>
+				<#if celleditable>
 				<#assign temp = []>
 				<#if config.type=='dictionary' && selectDictionary??><#assign templateName><@config.templateName?interpret /></#assign><#assign templateName=templateName?markup_string/></#if>
 				<#list value as v>
@@ -177,8 +180,11 @@
 				</#if>
 				</#list>
 				<#assign dynamicAttributes+={'data-cellvalue':temp?join(',')}/>
+				</#if>
 			<#elseif config.type=='dictionary' && selectDictionary??>
+				<#if celleditable>
 				<#assign dynamicAttributes+={'data-cellvalue':value}/>
+				</#if>
 				<#assign templateName><@config.templateName?interpret /></#assign>
 				<#assign templateName=templateName?markup_string/>
 				<#assign value=getDictionaryLabel(templateName,value)/>
