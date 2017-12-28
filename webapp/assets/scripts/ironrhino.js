@@ -23147,7 +23147,7 @@ ctrlr.prototype.setObjectValue=function(data){
 						if (this.hasChildren) {
 							current.addClass("hasChildren");
 							createNode.call({
-										text : settings.placeholder
+										name : settings.placeholder
 												|| "placeholder",
 										id : "placeholder",
 										children : []
@@ -23191,7 +23191,10 @@ ctrlr.prototype.setObjectValue=function(data){
 					var t = $(list.get(0));
 					$('.hitarea', t).click();
 				}
-
+			},
+			complete : function() {
+				if (child == container)
+					container.find('.fa-spin').parent().remove();
 			}
 		});
 	}
@@ -23203,6 +23206,8 @@ ctrlr.prototype.setObjectValue=function(data){
 		if (!settings.url)
 			return proxied.apply(this, arguments);
 		var container = this;
+		container
+				.append('<div style="text-align:center;min-height:50px;line-height:50px;"><span class="fa fa-spinner fa-spin"></span></div>');
 		this.on('reload', 'li', function() {
 					var t = $(this);
 					var hitarea = t.find('.hitarea');
@@ -39805,7 +39810,7 @@ Observation.groupable = function(container) {
 								$('input:checked', win).each(function() {
 									ids.push(this.value);
 									names.push($(this).closest('li')
-											.find('label[for]').text());
+											.find('label[for]:first').text());
 								});
 								if (options.name) {
 									var separator = ', ';
@@ -40033,23 +40038,6 @@ Observation.treeview = function(container) {
 		var t = $(this);
 		var head = t.data('head');
 		var template = $.trim(t.find('template').html());
-		t.treeview({
-					url : t.data('url'),
-					click : function() {
-						var click = t.data('click');
-						if (click) {
-							var func = function() {
-								eval(click);
-							};
-							func.apply($(this).closest('li').data('treenode'));
-						}
-					},
-					collapsed : t.data('collapsed'),
-					unique : t.data('unique'),
-					value : t.data('value'),
-					separator : t.data('separator'),
-					template : template
-				});
 		if (template)
 			t.html('');
 		if (head) {
@@ -40071,6 +40059,23 @@ Observation.treeview = function(container) {
 				t.text(head);
 			}
 		}
+		t.treeview({
+					url : t.data('url'),
+					click : function() {
+						var click = t.data('click');
+						if (click) {
+							var func = function() {
+								eval(click);
+							};
+							func.apply($(this).closest('li').data('treenode'));
+						}
+					},
+					collapsed : t.data('collapsed'),
+					unique : t.data('unique'),
+					value : t.data('value'),
+					separator : t.data('separator'),
+					template : template
+				});
 	});
 };
 (function($) {

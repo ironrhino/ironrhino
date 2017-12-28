@@ -79,7 +79,7 @@
 						if (this.hasChildren) {
 							current.addClass("hasChildren");
 							createNode.call({
-										text : settings.placeholder
+										name : settings.placeholder
 												|| "placeholder",
 										id : "placeholder",
 										children : []
@@ -123,7 +123,10 @@
 					var t = $(list.get(0));
 					$('.hitarea', t).click();
 				}
-
+			},
+			complete : function() {
+				if (child == container)
+					container.find('.fa-spin').parent().remove();
 			}
 		});
 	}
@@ -135,6 +138,8 @@
 		if (!settings.url)
 			return proxied.apply(this, arguments);
 		var container = this;
+		container
+				.append('<div style="text-align:center;min-height:50px;line-height:50px;"><span class="fa fa-spinner fa-spin"></span></div>');
 		this.on('reload', 'li', function() {
 					var t = $(this);
 					var hitarea = t.find('.hitarea');

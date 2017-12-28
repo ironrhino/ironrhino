@@ -3,23 +3,6 @@ Observation.treeview = function(container) {
 		var t = $(this);
 		var head = t.data('head');
 		var template = $.trim(t.find('template').html());
-		t.treeview({
-					url : t.data('url'),
-					click : function() {
-						var click = t.data('click');
-						if (click) {
-							var func = function() {
-								eval(click);
-							};
-							func.apply($(this).closest('li').data('treenode'));
-						}
-					},
-					collapsed : t.data('collapsed'),
-					unique : t.data('unique'),
-					value : t.data('value'),
-					separator : t.data('separator'),
-					template : template
-				});
 		if (template)
 			t.html('');
 		if (head) {
@@ -41,5 +24,22 @@ Observation.treeview = function(container) {
 				t.text(head);
 			}
 		}
+		t.treeview({
+					url : t.data('url'),
+					click : function() {
+						var click = t.data('click');
+						if (click) {
+							var func = function() {
+								eval(click);
+							};
+							func.apply($(this).closest('li').data('treenode'));
+						}
+					},
+					collapsed : t.data('collapsed'),
+					unique : t.data('unique'),
+					value : t.data('value'),
+					separator : t.data('separator'),
+					template : template
+				});
 	});
 };

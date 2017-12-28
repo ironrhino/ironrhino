@@ -233,7 +233,7 @@
 								$('input:checked', win).each(function() {
 									ids.push(this.value);
 									names.push($(this).closest('li')
-											.find('label[for]').text());
+											.find('label[for]:first').text());
 								});
 								if (options.name) {
 									var separator = ', ';
