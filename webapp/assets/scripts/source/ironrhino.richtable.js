@@ -578,6 +578,34 @@ Richtable = {
 		var theadCells = $('thead:eq(0) th', t);
 		$('tbody:eq(0) tr', t).each(function() {
 			var cells = this.cells;
+			$.each(cells, function(i, v) {
+				var cellvalue = $(v).data('cellvalue');
+				var labels = $(v).find('span.label');
+				if (cellvalue && labels.length) {
+					var newlabels = [];
+					labels.each(function() {
+						newlabels
+								.push('<div class="tag"><span class="tag-label">'
+										+ $(this).text()
+										+ '</span><span class="tag-remove">×</span></div>');
+					});
+					$(v).html(newlabels.join('')).on('click', '.tag-remove',
+							function(e) {
+								$(e.target).closest('td').addClass('edited');
+								var tag = $(e.target).closest('.tag');
+								var index = tag.parent().find('.tag')
+										.index(tag);
+								var arr = cellvalue.split(/\s*,\s*/);
+								arr.splice(index, 1);
+								Richtable.updateValue(
+										$(e.target).closest('td'), arr
+												.join(','));
+								tag.remove();
+								e.preventDefault();
+								return false;
+							});
+				}
+			});
 			if (!$(this).data('readonly'))
 				theadCells.each(function(i) {
 							var cellEdit = $(this).data('celledit');
@@ -936,13 +964,9 @@ Observation._richtable = function(container) {
 					$('<label for="'
 							+ cbid
 							+ '" class="checkbox inline"><input type="checkbox" name="'
-							+ property.val()
-							+ '" value="'
-							+ arr[0]
-							+ '" id="'
-							+ cbid
-							+ '">' + (arr[1] || arr[0])
-							+ '</label>').appendTo(td);
+							+ property.val() + '" value="' + arr[0] + '" id="'
+							+ cbid + '">' + (arr[1] || arr[0]) + '</label>')
+							.appendTo(td);
 				}
 			}
 		});

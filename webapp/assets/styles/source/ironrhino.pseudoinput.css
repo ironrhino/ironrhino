@@ -97,8 +97,9 @@
 	padding: 2px 0 2px 3px;
 }
 
-.input-pseudo .tags .tag {
+.tag {
 	display: inline-block;
+	overflow: hidden;
 	border-radius: 2px;
 	box-sizing: border-box;
 	position: relative;
@@ -110,11 +111,11 @@
 	line-height: 20px;
 }
 
-.input-pseudo .tag-label {
+.tag-label {
 	display: inline;
 }
 
-.input-pseudo .tag-remove {
+.tag-remove {
 	cursor: pointer;
 	display: inline-block;
 	vertical-align: top;
@@ -124,7 +125,6 @@
 	opacity: .3;
 }
 
-.input-pseudo .tag-remove:hover {
+.tag-remove:hover {
 	opacity: .8;
 }
-
