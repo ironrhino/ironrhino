@@ -68,12 +68,7 @@
 				</#if>
 			</@controlGroup>
 		<#elseif config.type=='treeselect'&&!config.multiple>
-			<div id="control-group-${id}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
-				<@controlLabel label=label description=description/>
-				<div class="controls">
-				<input class="treeselect-inline ${config.cssClass}"<#if readonly> readonly</#if> name="${name}"<#if value.id?has_content> value="${value.id}"</#if> data-url="${pickUrl}" data-text="<#if value.fullname??>${value.fullname!}<#else>${value!}</#if>">
-				</div>
-			</div>
+			<@s.textfield id=id label=label name=name class="treeselect-inline "+config.cssClass readonly=readonly data\-url=pickUrl data\-text=(value??&&value.fullname??)?then(value.fullname,value!) dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='listpick'||config.type=='treeselect'>
 			<div id="control-group-${id}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
 				<@controlLabel label=label description=description for=id/>
@@ -203,7 +198,7 @@
 								<@checkDictionary disabled=readonly id="" dictionaryName=templateName name=name required=config.required class=config.cssClass dynamicAttributes=dynamicAttributes/>
 							</#if>
 						<#elseif config.type=='treeselect'&&!config.multiple>
-							<input class="treeselect-inline ${config.cssClass}"<#if readonly> readonly</#if> name="${name}"<#if value.id?has_content> value="${value.id}"</#if> data-url="${pickUrl}" data-text="<#if value.fullname??>${value.fullname!}<#else>${value!}</#if>">
+							<@s.textfield id="" theme="simple" name=name class="treeselect-inline "+config.cssClass readonly=readonly data\-url=pickUrl data\-text=(value??&&value.fullname??)?then(value.fullname,value!) dynamicAttributes=dynamicAttributes/>
 						<#elseif config.type=='listpick'||config.type=='treeselect'>
 							<div class="<#if readonly>readonly</#if> ${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.multiple>,'multiple':true</#if>}">
 							<#if config.multiple>

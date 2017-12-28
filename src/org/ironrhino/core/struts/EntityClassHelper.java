@@ -412,6 +412,16 @@ public class EntityClassHelper {
 								sb.append("/children");
 								uci.setPickUrl(sb.toString());
 							}
+							if (!uci.getInternalDynamicAttributes().containsKey("data-separator")) {
+								try {
+									BaseTreeableEntity<?> te = (BaseTreeableEntity<?>) returnType.getConstructor()
+											.newInstance();
+									String separator = te.getFullnameSeperator();
+									if (StringUtils.isNotBlank(separator))
+										uci.getInternalDynamicAttributes().put("data-separator", separator);
+								} catch (Exception e) {
+								}
+							}
 						} else {
 							if (uci.getType().equals(UiConfig.DEFAULT_TYPE))
 								uci.setType("listpick");
