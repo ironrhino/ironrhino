@@ -388,7 +388,7 @@ input[type="checkbox"],input[type="radio"]{
 	appearance: none;
 }
 input[type="checkbox"]:hover,input[type="radio"]:hover{
-	background-color: #eaeaea;
+	border-color: #666;
 }
 input[type="checkbox"]{
 	border-radius: 3px;
@@ -401,19 +401,13 @@ input[type="checkbox"]:checked{
 	border: 1px solid #3b99fc;
 } 
 input[type="checkbox"]:checked:after{
-	content: '\2714';
+	content: '\F00C';
+	font: normal normal normal 14px/1 FontAwesome;
+	transform: scale(.8);
 	position: absolute;
-	top: -1px;
-	left: 2px;
 	color: #fff;
 } 
-@-moz-document  url-prefix() {
-	input[type="checkbox"]:checked:after{
-		top: -6px;
-		left: 2px;
-		font-size: 18px;
-	} 
-}
+
 input[type="radio"]:checked{
 	background: #fff;
 }

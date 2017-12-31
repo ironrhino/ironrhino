@@ -440,7 +440,7 @@ a.remove {
 
 a.remove:hover , a.remove:focus {
 	text-decoration: none;
-	opacity: 0.4;
+	opacity: .8;
 }
 
 .loading {
