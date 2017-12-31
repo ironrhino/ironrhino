@@ -38414,6 +38414,18 @@ Richtable = {
 		$('tbody:eq(0) tr', t).each(function() {
 			var cells = this.cells;
 			$.each(cells, function(i, v) {
+				$(v).on('click', '.tag-remove', function(e) {
+					var tag = $(e.target).closest('.tag');
+					var index = tag.parent().find('.tag').index(tag);
+					var arr = $(e.target).closest('td').addClass('edited')
+							.data('cellvalue').split(/\s*,\s*/);
+					arr.splice(index, 1);
+					Richtable.updateValue($(e.target).closest('td'), arr
+									.join(','));
+					tag.remove();
+					e.preventDefault();
+					return false;
+				});
 				var cellvalue = $(v).data('cellvalue');
 				var labels = $(v).find('span.label');
 				if (cellvalue && labels.length) {
@@ -38424,21 +38436,7 @@ Richtable = {
 										+ $(this).text()
 										+ '</span><span class="tag-remove">×</span></div>');
 					});
-					$(v).html(newlabels.join('')).on('click', '.tag-remove',
-							function(e) {
-								$(e.target).closest('td').addClass('edited');
-								var tag = $(e.target).closest('.tag');
-								var index = tag.parent().find('.tag')
-										.index(tag);
-								var arr = cellvalue.split(/\s*,\s*/);
-								arr.splice(index, 1);
-								Richtable.updateValue(
-										$(e.target).closest('td'), arr
-												.join(','));
-								tag.remove();
-								e.preventDefault();
-								return false;
-							});
+					$(v).html(newlabels.join(''));
 				}
 			});
 			if (!$(this).data('readonly'))
@@ -39623,16 +39621,32 @@ Observation.groupable = function(container) {
 				ele.each(function() {
 					var t = $(this);
 					if (t.is(':input')) {
+						if (Array.isArray(val))
+							val = val.join(',');
 						t.val(val).trigger('change').trigger('validate');
 					} else {
 						if (t.is('.input-pseudo')) {
 							t.find('.text').text(val || '');
 						} else {
-							if (val === null && !t.is('td'))
+							if (val === null && !t.is('td')) {
 								t
 										.html('<i class="glyphicon glyphicon-list"></i>');
-							else
+							} else if (Array.isArray(val)
+									&& t.is('td')
+									&& (!t.text() || t.find('.tag-label').length)) {
+								var newlabels = [];
+								$.each(val, function(i, v) {
+									newlabels
+											.push('<div class="tag"><span class="tag-label">'
+													+ v
+													+ '</span><span class="tag-remove">×</span></div>');
+								});
+								t.html(newlabels.join(''));
+							} else {
+								if (Array.isArray(val))
+									val = val.join(', ');
 								t.text(val);
+							}
 						}
 					}
 				});
@@ -39642,8 +39656,7 @@ Observation.groupable = function(container) {
 				var selector = expr.substring(0, i);
 				var ele = selector == 'this' ? $(container) : $(selector,
 						container);
-				if (ele.parents('.richtable').length
-						&& ele.prop('tagName') == 'TD'
+				if (ele.parents('.richtable').length && ele.is('td')
 						&& expr.indexOf('data-cellvalue') > -1)
 					Richtable.updateValue(ele, val);
 				else
@@ -39670,6 +39683,12 @@ Observation.groupable = function(container) {
 						} else {
 							return ele.text();
 						}
+					} else if (ele.is('td') && ele.find('.tag-label').length) {
+						var arr = [];
+						ele.find('.tag-label').each(function() {
+									arr.push($(this).text())
+								});
+						return arr.join(', ');
 					} else {
 						return ele.contents().filter(function() {
 									return this.nodeType == 3;
@@ -39724,6 +39743,14 @@ Observation.groupable = function(container) {
 				nametarget.attr('tabindex', '0');
 				if (nametarget.is('.input-pseudo')) {
 					var text = nametarget.text();
+					var textArr;
+					var labels = nametarget.find('.label, .tag-label');
+					if (labels.length) {
+						textArr = [];
+						labels.each(function() {
+									textArr.push($(this).text());
+								});
+					}
 					var txt = nametarget
 							.addClass('treeselect-handle')
 							.html('<div class="text resettable"></div>'
@@ -39731,9 +39758,11 @@ Observation.groupable = function(container) {
 									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
 							.find('.text');
 					if (options.multiple) {
+						if (!textArr)
+							textArr = text.split(/\s*,\s*/);
 						txt.addClass('tags');
 						if (text)
-							$.each(text.split(/\s*,\s*/), function(i, v) {
+							$.each(textArr, function(i, v) {
 								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
 										.appendTo(txt).find('.tag-label')
 										.text(v);
@@ -39767,21 +39796,25 @@ Observation.groupable = function(container) {
 								});
 					}
 				} else if (!current.is('.readonly,.disabled')) {
-					var remove = nametarget.children('a.remove');
-					if (remove.length) {
-						remove.click(removeAction);
-					} else {
-						var text = val(options.name, current);
-						var viewlink = current.find('a.view[rel="richtable"]');
-						if (current.is('td') && viewlink.length)
-							text = viewlink.text();
-						if (text) {
-							if (text.indexOf('...') < 0)
-								$('<a class="remove" href="#">&times;</a>')
-										.appendTo(nametarget)
-										.click(removeAction);
+					if (!current.is('td') || current.text()
+							&& !current.find('.tag-label').length) {
+						var remove = nametarget.children('a.remove');
+						if (remove.length) {
+							remove.click(removeAction);
 						} else {
-							val(options.name, current, null);
+							var text = val(options.name, current);
+							var viewlink = current
+									.find('a.view[rel="richtable"]');
+							if (current.is('td') && viewlink.length)
+								text = viewlink.text();
+							if (text) {
+								if (text.indexOf('...') < 0)
+									$('<a class="remove" href="#">&times;</a>')
+											.appendTo(nametarget)
+											.click(removeAction);
+							} else {
+								val(options.name, current, null);
+							}
 						}
 					}
 				}
@@ -39849,6 +39882,10 @@ Observation.groupable = function(container) {
 															value : names[i]
 														});
 											t.trigger('val', [arr]);
+										} else if (t.is('td')
+												&& (!t.text() || t
+														.find('.tag-label').length)) {
+											val(options.name, current, names);
 										} else {
 											val(options.name, current, names
 															.join(separator));
@@ -40126,16 +40163,32 @@ Observation.treeview = function(container) {
 				ele.each(function() {
 					var t = $(this);
 					if (t.is(':input')) {
+						if (Array.isArray(val))
+							val = val.join(',');
 						t.val(val).trigger('change').trigger('validate');
 					} else {
 						if (t.is('.input-pseudo')) {
 							t.find('.text').text(val || '');
 						} else {
-							if (val === null && !t.is('td'))
+							if (val === null && !t.is('td')) {
 								t
 										.html('<i class="glyphicon glyphicon-list"></i>');
-							else
+							} else if (Array.isArray(val)
+									&& t.is('td')
+									&& (!t.text() || t.find('.tag-label').length)) {
+								var newlabels = [];
+								$.each(val, function(i, v) {
+									newlabels
+											.push('<div class="tag"><span class="tag-label">'
+													+ v
+													+ '</span><span class="tag-remove">×</span></div>');
+								});
+								t.html(newlabels.join(''));
+							} else {
+								if (Array.isArray(val))
+									val = val.join(', ');
 								t.text(val);
+							}
 						}
 					}
 				});
@@ -40145,8 +40198,7 @@ Observation.treeview = function(container) {
 				var selector = expr.substring(0, i);
 				var ele = selector == 'this' ? $(container) : $(selector,
 						container);
-				if (ele.parents('.richtable').length
-						&& ele.prop('tagName') == 'TD'
+				if (ele.parents('.richtable').length && ele.is('td')
 						&& expr.indexOf('data-cellvalue') > -1)
 					Richtable.updateValue(ele, val);
 				else
@@ -40173,6 +40225,12 @@ Observation.treeview = function(container) {
 						} else {
 							return ele.text();
 						}
+					} else if (ele.is('td') && ele.find('.tag-label').length) {
+						var arr = [];
+						ele.find('.tag-label').each(function() {
+									arr.push($(this).text())
+								});
+						return arr.join(', ');
 					} else {
 						return ele.contents().filter(function() {
 									return this.nodeType == 3;
@@ -40225,6 +40283,14 @@ Observation.treeview = function(container) {
 				nametarget.attr('tabindex', '0');
 				if (nametarget.is('.input-pseudo')) {
 					var text = nametarget.text();
+					var textArr;
+					var labels = nametarget.find('.label, .tag-label');
+					if (labels.length) {
+						textArr = [];
+						labels.each(function() {
+									textArr.push($(this).text());
+								});
+					}
 					var txt = nametarget
 							.addClass('listpick-handle')
 							.html('<div class="text resettable"></div>'
@@ -40232,9 +40298,11 @@ Observation.treeview = function(container) {
 									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
 							.find('.text');
 					if (options.multiple) {
+						if (!textArr)
+							textArr = text.split(/\s*,\s*/);
 						txt.addClass('tags');
 						if (text)
-							$.each(text.split(/\s*,\s*/), function(i, v) {
+							$.each(textArr, function(i, v) {
 								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
 										.appendTo(txt).find('.tag-label')
 										.text(v);
@@ -40268,21 +40336,25 @@ Observation.treeview = function(container) {
 								});
 					}
 				} else if (!current.is('.readonly,.disabled')) {
-					var remove = nametarget.children('a.remove');
-					if (remove.length) {
-						remove.click(removeAction);
-					} else {
-						var text = val(options.name, current);
-						var viewlink = current.find('a.view[rel="richtable"]');
-						if (current.is('td') && viewlink.length)
-							text = viewlink.text();
-						if (text) {
-							if (text.indexOf('...') < 0)
-								$('<a class="remove" href="#">&times;</a>')
-										.appendTo(nametarget)
-										.click(removeAction);
+					if (!current.is('td') || current.text()
+							&& !current.find('.tag-label').length) {
+						var remove = nametarget.children('a.remove');
+						if (remove.length) {
+							remove.click(removeAction);
 						} else {
-							val(options.name, current, null);
+							var text = val(options.name, current);
+							var viewlink = current
+									.find('a.view[rel="richtable"]');
+							if (current.is('td') && viewlink.length)
+								text = viewlink.text();
+							if (text) {
+								if (text.indexOf('...') < 0)
+									$('<a class="remove" href="#">&times;</a>')
+											.appendTo(nametarget)
+											.click(removeAction);
+							} else {
+								val(options.name, current, null);
+							}
 						}
 					}
 				}
@@ -40494,6 +40566,14 @@ Observation.treeview = function(container) {
 															value : selectedNames[i]
 														});
 													t.trigger('val', [arr]);
+												} else if (t.is('td')
+														&& (!t.text() || t
+																.find('.tag-label').length)) {
+													val(
+															options.name,
+															win
+																	.data('listpick'),
+															selectedNames);
 												} else {
 													if (selectedNames.length) {
 														val(

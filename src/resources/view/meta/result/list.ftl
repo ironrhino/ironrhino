@@ -145,9 +145,13 @@
 	<#assign hidden=true/>
 	</#if>
 	<#if !hidden>
+		<#assign _celleditable=celleditable>
+		<#if config.inverseRelation||config.readonly.value>
+			<#assign _celleditable=false>
+		</#if>
 		<#assign dynamicAttributes={}>
 		<#if (config.type=='listpick'||config.type=='treeselect')&&celleditable&&!entityReadonly&&!(naturalIds?keys?seq_contains(key)&&!naturalIdMutable)&&!config.readonly.value&&!(config.readonly.expression?has_content&&config.readonly.expression?eval)>
-			<#if celleditable>
+			<#if _celleditable>
 			<#assign pickUrl><@config.pickUrl?interpret/></#assign>
 			<#assign pickUrl=pickUrl?markup_string>
 			<#assign cellvalue=(value.id?string)!>
@@ -167,7 +171,7 @@
 		<#assign value = entity[key]!>
 		<#if value?has_content>
 			<#if config.multiple>
-				<#if celleditable>
+				<#if _celleditable>
 				<#assign temp = []>
 				<#if config.type=='dictionary' && selectDictionary??><#assign templateName><@config.templateName?interpret /></#assign><#assign templateName=templateName?markup_string/></#if>
 				<#list value as v>
@@ -182,7 +186,7 @@
 				<#assign dynamicAttributes+={'data-cellvalue':temp?join(',')}/>
 				</#if>
 			<#elseif config.type=='dictionary' && selectDictionary??>
-				<#if celleditable>
+				<#if _celleditable>
 				<#assign dynamicAttributes+={'data-cellvalue':value}/>
 				</#if>
 				<#assign templateName><@config.templateName?interpret /></#assign>
@@ -194,7 +198,7 @@
 		<#list sumColumns as name,config>
 			<#if key==name && value?has_content><#assign sumColumns+={name:{"value":config.value+value,"template":template!}}></#if>
 		</#list>
-		<@rttbodytd entity=entity value=value celleditable=celleditable template=template cellDynamicAttributes=config.cellDynamicAttributes dynamicAttributes=dynamicAttributes/>
+		<@rttbodytd entity=entity value=value celleditable=_celleditable template=template cellDynamicAttributes=config.cellDynamicAttributes dynamicAttributes=dynamicAttributes/>
 	</#if>
 </#list>
 <@rttbodytrend entity=entity showActionColumn=showActionColumn buttons=richtableConfig.actionColumnButtons editable=!readonly.value viewable=viewable entityReadonly=entityReadonly inputWindowOptions=richtableConfig.inputWindowOptions! viewWindowOptions=richtableConfig.viewWindowOptions!/>

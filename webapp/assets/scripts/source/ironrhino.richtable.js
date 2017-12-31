@@ -579,6 +579,18 @@ Richtable = {
 		$('tbody:eq(0) tr', t).each(function() {
 			var cells = this.cells;
 			$.each(cells, function(i, v) {
+				$(v).on('click', '.tag-remove', function(e) {
+					var tag = $(e.target).closest('.tag');
+					var index = tag.parent().find('.tag').index(tag);
+					var arr = $(e.target).closest('td').addClass('edited')
+							.data('cellvalue').split(/\s*,\s*/);
+					arr.splice(index, 1);
+					Richtable.updateValue($(e.target).closest('td'), arr
+									.join(','));
+					tag.remove();
+					e.preventDefault();
+					return false;
+				});
 				var cellvalue = $(v).data('cellvalue');
 				var labels = $(v).find('span.label');
 				if (cellvalue && labels.length) {
@@ -589,21 +601,7 @@ Richtable = {
 										+ $(this).text()
 										+ '</span><span class="tag-remove">×</span></div>');
 					});
-					$(v).html(newlabels.join('')).on('click', '.tag-remove',
-							function(e) {
-								$(e.target).closest('td').addClass('edited');
-								var tag = $(e.target).closest('.tag');
-								var index = tag.parent().find('.tag')
-										.index(tag);
-								var arr = cellvalue.split(/\s*,\s*/);
-								arr.splice(index, 1);
-								Richtable.updateValue(
-										$(e.target).closest('td'), arr
-												.join(','));
-								tag.remove();
-								e.preventDefault();
-								return false;
-							});
+					$(v).html(newlabels.join(''));
 				}
 			});
 			if (!$(this).data('readonly'))

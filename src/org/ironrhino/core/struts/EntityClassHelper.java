@@ -303,9 +303,15 @@ public class EntityClassHelper {
 					if (collectionType != null && elementType != null) {
 						if (Persistable.class.isAssignableFrom(elementType)) {
 							uci.setMultiple(true);
-							if (oneToMany != null)
+							if (oneToMany != null) {
 								uci.setExcludedFromCriteria(true);
-							uci.setTemplate("<#if value?has_content><#list value as var>${var}<#sep>, </#list></#if>");
+								uci.setInverseRelation(true);
+								ReadonlyImpl rd = new ReadonlyImpl();
+								rd.setValue(true);
+								uci.setReadonly(rd);
+							}
+							uci.setTemplate(
+									"<#if value?has_content><#list value as var><span class=\"label\">${var}</span><#sep> </#list></#if>");
 							returnType = elementType;
 							uci.setPropertyType(returnType);
 						} else if (String.class == elementType || Number.class.isAssignableFrom(elementType)) {

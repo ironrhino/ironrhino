@@ -158,7 +158,7 @@ ${formHeader!}
 		<#elseif value?is_unknown_date_like>
 		${value?datetime}<#t>
 		<#elseif value?is_enumerable>
-		<#list value as var>${var?html}<#sep> </#list><#t>
+		<#list value as var><span class="label">${var?html}</span><#sep> </#list><#t>
 		<#else>
 		${value?html}<#t>
 		</#if>
