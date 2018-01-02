@@ -28,16 +28,12 @@
   cursor: pointer;
   z-index: 2;
 }
-.text-core .text-wrap .text-arrow:before {
-  content: "\e252";
-  font-family: 'Glyphicons Halflings';
-  font-style: normal;
-  font-weight: 400;
-  color: rgba(0,0,0,.3);
+.text-core .text-wrap .text-arrow {
+  color: rgba(0, 0, 0, .3);
   line-height: 30px;
 }
-.text-core .text-wrap .text-arrow:hover:before {
-  color: rgba(0,0,0,.8);
+.text-core .text-wrap .text-arrow:hover {
+  color: rgba(0, 0, 0, .8);
 }
 .text-core .text-wrap .text-dropdown {
   box-sizing: border-box;

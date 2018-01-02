@@ -2040,7 +2040,7 @@
 
 		DEFAULT_OPTS = {
 			html : {
-				arrow : '<div class="text-arrow"/>'
+				arrow : '<div class="text-arrow"><i class="glyphicon glyphicon-triangle-bottom"></i></div>'
 			}
 		}
 		;
