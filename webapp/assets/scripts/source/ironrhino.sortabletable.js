@@ -34,7 +34,7 @@
 		sort : function(table, index, order) {
 			var cell;
 			if (typeof index == 'number') {
-				if (!table || ($(table).prop('tagName') != "TABLE"))
+				if (!table || !$(table).is('table'))
 					return;
 				index = Math.min(table.rows[0].cells.length, index);
 				index = Math.max(1, index);
@@ -93,7 +93,7 @@
 				// string, so you can use it to order a column of various srings
 				// containing numbers.
 				var calc = function(v) {
-					v = parseFloat(v.replace(/,/g,'').replace(
+					v = parseFloat(v.replace(/,/g, '').replace(
 							/^.*?([-+]?[\d]*\.?[\d]+(?:[eE][-+]?[\d]+)?).*$/,
 							"$1"));
 					return isNaN(v) ? 0 : v;

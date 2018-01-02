@@ -31683,7 +31683,8 @@ Indicator = {
 			ind.addClass('loading');
 		ind.html(Indicator.text || MessageBundle.get('ajax.loading'));
 		if (!iserror)
-			ind.prepend('<span class="fa fa-circle-o-notch fa-pulse fa-fw"></span>');
+			ind
+					.prepend('<span class="fa fa-circle-o-notch fa-pulse fa-fw"></span>');
 		ind.show();
 		Indicator.text = '';
 	},
@@ -32973,9 +32974,9 @@ Observation.common = function(container) {
 	}
 	$$('a.ajax,form.ajax', container).each(function() {
 		var target = this;
-		if (this.tagName == 'FORM') {
+		if ($(target).is('form')) {
 			var _opt = ajaxOptions({
-						url : this.tagName == 'FORM' ? this.action : this.href,
+						url : this.action,
 						target : target
 					});
 			var options = {
@@ -36651,7 +36652,7 @@ Observation.form = function(container) {
 		sort : function(table, index, order) {
 			var cell;
 			if (typeof index == 'number') {
-				if (!table || ($(table).prop('tagName') != "TABLE"))
+				if (!table || !$(table).is('table'))
 					return;
 				index = Math.min(table.rows[0].cells.length, index);
 				index = Math.max(1, index);
@@ -36710,7 +36711,7 @@ Observation.form = function(container) {
 				// string, so you can use it to order a column of various srings
 				// containing numbers.
 				var calc = function(v) {
-					v = parseFloat(v.replace(/,/g,'').replace(
+					v = parseFloat(v.replace(/,/g, '').replace(
 							/^.*?([-+]?[\d]*\.?[\d]+(?:[eE][-+]?[\d]+)?).*$/,
 							"$1"));
 					return isNaN(v) ? 0 : v;
@@ -36926,7 +36927,7 @@ Observation.sortableTable = function(container) {
 			$('td.manipulate,th.manipulate', this).each(function() {
 				var t = $(this);
 				if (!t.html()) {
-					if (t.parent().parent().prop('tagName') == 'THEAD') {
+					if (t.parent().parent().is('thead')) {
 						t
 								.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i>');
 					} else {
@@ -37404,7 +37405,7 @@ Observation._portal = function(container) {
 	$.fn.combobox = function() {
 		$(this).each(function() {
 			var t = $(this);
-			if (t.prop('tagName') == 'SELECT') {
+			if (t.is('select')) {
 				var update = false;
 				var div = t.next('div.combobox');
 				if (!div.length) {
@@ -37424,10 +37425,10 @@ Observation._portal = function(container) {
 				}
 				var _menu = $('.combobox-menu', div);
 				t.children().each(function(i, v) {
-					if ($(v).prop('tagName') == 'OPTION' && $(v).attr('value')) {
+					if ($(v).is('option') && $(v).attr('value')) {
 						$('<li><a href="#">' + $(v).attr('value') + '</a></li>')
 								.appendTo(_menu);
-					} else if ($(v).prop('tagName') == 'OPTGROUP') {
+					} else if ($(v).is('optgroup')) {
 						var label = $(v).attr('label');
 						var group = $('<li class="group"><a href="#">' + label
 								+ '</a><ul></ul></li>').appendTo(_menu);
@@ -37950,7 +37951,7 @@ Richtable = {
 											|| $(this).hasClass('date')
 											|| $(this).hasClass('datetime')
 											|| $(this).hasClass('time') || $(this)
-											.prop('tagName') == 'BUTTON');
+											.is('button'));
 						}).eq(0).focus();
 					if (!inputform.hasClass('keepopen')
 							&& !inputform.hasClass('richtable')) {
@@ -38383,11 +38384,10 @@ Richtable = {
 		var cell = ce.parent();
 		var value = ce.val();
 		var label = value;
-		var editType = ce.prop('tagName');
-		if (editType == 'SELECT')
+		if (ce.is('select'))
 			label = $('option:selected', ce).text();
-		else if (editType == 'CHECKBOX' || editType == 'RADIO')
-			label = ce.next().text();
+		else if (ce.is('input[type="checkbox"],input[type="radio"]'))
+			label = ce.parent().text();
 		Richtable.updateValue(cell, value, label);
 	},
 	updateValue : function(cell, value, label) {

@@ -43,7 +43,7 @@
 			$('td.manipulate,th.manipulate', this).each(function() {
 				var t = $(this);
 				if (!t.html()) {
-					if (t.parent().parent().prop('tagName') == 'THEAD') {
+					if (t.parent().parent().is('thead')) {
 						t
 								.html('<i class="glyphicon glyphicon-plus manipulate add clickable"></i>');
 					} else {

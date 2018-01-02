@@ -36,7 +36,7 @@
 	$.fn.combobox = function() {
 		$(this).each(function() {
 			var t = $(this);
-			if (t.prop('tagName') == 'SELECT') {
+			if (t.is('select')) {
 				var update = false;
 				var div = t.next('div.combobox');
 				if (!div.length) {
@@ -56,10 +56,10 @@
 				}
 				var _menu = $('.combobox-menu', div);
 				t.children().each(function(i, v) {
-					if ($(v).prop('tagName') == 'OPTION' && $(v).attr('value')) {
+					if ($(v).is('option') && $(v).attr('value')) {
 						$('<li><a href="#">' + $(v).attr('value') + '</a></li>')
 								.appendTo(_menu);
-					} else if ($(v).prop('tagName') == 'OPTGROUP') {
+					} else if ($(v).is('optgroup')) {
 						var label = $(v).attr('label');
 						var group = $('<li class="group"><a href="#">' + label
 								+ '</a><ul></ul></li>').appendTo(_menu);

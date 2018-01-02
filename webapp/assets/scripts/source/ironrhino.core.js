@@ -132,7 +132,8 @@ Indicator = {
 			ind.addClass('loading');
 		ind.html(Indicator.text || MessageBundle.get('ajax.loading'));
 		if (!iserror)
-			ind.prepend('<span class="fa fa-circle-o-notch fa-pulse fa-fw"></span>');
+			ind
+					.prepend('<span class="fa fa-circle-o-notch fa-pulse fa-fw"></span>');
 		ind.show();
 		Indicator.text = '';
 	},
@@ -1422,9 +1423,9 @@ Observation.common = function(container) {
 	}
 	$$('a.ajax,form.ajax', container).each(function() {
 		var target = this;
-		if (this.tagName == 'FORM') {
+		if ($(target).is('form')) {
 			var _opt = ajaxOptions({
-						url : this.tagName == 'FORM' ? this.action : this.href,
+						url : this.action,
 						target : target
 					});
 			var options = {

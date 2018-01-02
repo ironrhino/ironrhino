@@ -115,7 +115,7 @@ Richtable = {
 											|| $(this).hasClass('date')
 											|| $(this).hasClass('datetime')
 											|| $(this).hasClass('time') || $(this)
-											.prop('tagName') == 'BUTTON');
+											.is('button'));
 						}).eq(0).focus();
 					if (!inputform.hasClass('keepopen')
 							&& !inputform.hasClass('richtable')) {
@@ -548,11 +548,10 @@ Richtable = {
 		var cell = ce.parent();
 		var value = ce.val();
 		var label = value;
-		var editType = ce.prop('tagName');
-		if (editType == 'SELECT')
+		if (ce.is('select'))
 			label = $('option:selected', ce).text();
-		else if (editType == 'CHECKBOX' || editType == 'RADIO')
-			label = ce.next().text();
+		else if (ce.is('input[type="checkbox"],input[type="radio"]'))
+			label = ce.parent().text();
 		Richtable.updateValue(cell, value, label);
 	},
 	updateValue : function(cell, value, label) {
