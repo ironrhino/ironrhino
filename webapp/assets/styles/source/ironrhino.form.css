@@ -503,6 +503,7 @@ div.preview {
 	overflow: auto;
 	white-space: pre-wrap;
 	word-break: break-all;
+	line-height: 20px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -523,6 +524,7 @@ div.preview span.comment {
 
 div.preview strong {
 	color: #0da4d3;
+	font-weight: normal;
 }
 
 div.sqleditor.preview {
