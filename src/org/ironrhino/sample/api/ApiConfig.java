@@ -5,11 +5,8 @@ import org.ironrhino.sample.api.interceptor.LoggingInteceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
-//only for exclude-filter of root ctx
-@ControllerAdvice
 @Configuration
 @ComponentScan
 public class ApiConfig extends ApiConfigBase {

@@ -8,5 +8,7 @@
 		<context:exclude-filter type="regex" expression="${app.excludeFilterRegex:}"/>
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+		<context:exclude-filter type="assignable" expression="org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport"/>
+		<context:exclude-filter type="assignable" expression="org.springframework.web.socket.config.annotation.WebSocketConfigurer"/>
 	</context:component-scan>
 </beans>
