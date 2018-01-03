@@ -125,7 +125,7 @@
 		<filter-name>accessFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
-  		<dispatcher>ASYNC</dispatcher>
+		<dispatcher>ASYNC</dispatcher>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>httpSessionFilter</filter-name>
@@ -171,23 +171,10 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 	<servlet>
-		<servlet-name>remoting</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>classpath:org/ironrhino/core/remoting/server/server.xml</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet>
 		<servlet-name>test</servlet-name>
 		<servlet-class>org.ironrhino.core.servlet.TestServlet</servlet-class>
 		<load-on-startup>100</load-on-startup>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>remoting</servlet-name>
-		<url-pattern>/remoting/*</url-pattern>
-	</servlet-mapping>
 	<error-page>
 		<error-code>500</error-code>
 		<location>/error/500</location>

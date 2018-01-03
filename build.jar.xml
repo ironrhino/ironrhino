@@ -347,9 +347,7 @@
 					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
-			<move file="${classes.dir}/META-INF/web-fragment.xml" todir="${classes.dir}" />
-			<move file="${classes.dir}/org/ironrhino/core/remoting/server/web-fragment.xml" todir="${classes.dir}/META-INF" />
-			<jar jarfile="${target.dir}/${remoting-server-jar.name}" basedir="${classes.dir}" includes="${remoting-server-jar.includes},META-INF/**">
+			<jar jarfile="${target.dir}/${remoting-server-jar.name}" basedir="${classes.dir}" includes="${remoting-server-jar.includes}">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-remoting-server" />
 					<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -360,8 +358,6 @@
 					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
-			<move file="${classes.dir}/META-INF/web-fragment.xml" todir="${classes.dir}/org/ironrhino/core/remoting/server" />
-			<move file="${classes.dir}/web-fragment.xml" todir="${classes.dir}/META-INF" />
 			<jar jarfile="${target.dir}/${remoting-client-jar.name}" basedir="${classes.dir}" includes="${remoting-client-jar.includes}">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-client" />
