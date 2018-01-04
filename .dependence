@@ -17,6 +17,7 @@
 +HikariCP
 -bonecp
 +spring-data-commons
++spring-data-keyvalue
 +spring-data-redis
 +jedis
 -ironrhino-redis-config
