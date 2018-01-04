@@ -35,8 +35,7 @@ public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandle
 			if (s.isOpen()) {
 				try {
 					if (roles.length == 0 || AuthzUtils.authorizeUserDetails(
-							userDetailsService.loadUserByUsername(s.getPrincipal().getName()), null,
-							String.join(",", roles), null))
+							userDetailsService.loadUserByUsername(s.getPrincipal().getName()), null, roles, null))
 						s.sendMessage(new TextMessage(message));
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
