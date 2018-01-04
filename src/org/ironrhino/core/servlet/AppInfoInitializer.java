@@ -1,13 +1,18 @@
 package org.ironrhino.core.servlet;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
 import java.util.TimeZone;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
@@ -16,6 +21,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.util.IntrospectorCleanupListener;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class AppInfoInitializer implements WebApplicationInitializer {
@@ -56,6 +62,7 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 				AppInfo.getAppName(), AppInfo.getAppVersion(), AppInfo.getInstanceId(), AppInfo.getStage().toString(),
 				AppInfo.getRunLevel().toString(), AppInfo.getAppHome(), AppInfo.getHostName(), AppInfo.getHostAddress(),
 				defaultProfiles != null ? defaultProfiles : "default");
+		configure(servletContext);
 	}
 
 	private void printVersion(ServletContext servletContext) {
@@ -76,5 +83,68 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 				break;
 			}
 		}
+	}
+
+	private void configure(ServletContext servletContext) {
+
+		FilterRegistration.Dynamic filterDynamic;
+
+		filterDynamic = servletContext.addFilter("characterEncodingFilter", CharacterEncodingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.setInitParameter("encoding", StandardCharsets.UTF_8.name());
+		filterDynamic.setInitParameter("forceEncoding", Boolean.toString(true));
+		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, "/*");
+
+		filterDynamic = servletContext.addFilter("captchaFilter", DelegatingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+
+		filterDynamic = servletContext.addFilter("accessFilter", DelegatingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC), true, "/*");
+
+		filterDynamic = servletContext.addFilter("httpSessionFilter", DelegatingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.setInitParameter("targetFilterLifecycle", Boolean.toString(true));
+		filterDynamic.setInitParameter("excludePatterns", "/assets/*,/remoting/*");
+		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+
+		filterDynamic = servletContext.addFilter("springSecurityFilterChain", DelegatingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.setInitParameter("excludePatterns", "/assets/*,/remoting/*");
+		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC), true, "/*");
+
+		filterDynamic = servletContext.addFilter("openSessionInViewFilter", DelegatingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.setInitParameter("targetFilterLifecycle", Boolean.toString(true));
+		filterDynamic.setInitParameter("excludePatterns", "/assets/*,/remoting/*");
+		filterDynamic.setInitParameter("singleSession", Boolean.toString(true));
+		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC), true, "/*");
+
+		filterDynamic = servletContext.addFilter("strutsPrepareFilter", DelegatingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.setInitParameter("targetFilterLifecycle", Boolean.toString(true));
+		filterDynamic.setInitParameter("excludePatterns", "/assets/*,/remoting/*,/api/*");
+		filterDynamic.addMappingForUrlPatterns(
+				EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ERROR), true, "/*");
+
+		filterDynamic = servletContext.addFilter("sitemeshFilter", DelegatingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.setInitParameter("targetFilterLifecycle", Boolean.toString(true));
+		filterDynamic.setInitParameter("excludePatterns", "/assets/*,/remoting/*,/api/*");
+		filterDynamic.setInitParameter("configFile", "resources/sitemesh/sitemesh.xml");
+		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR), true, "/*");
+
+		filterDynamic = servletContext.addFilter("strutsExecuteFilter", DelegatingFilter.class);
+		filterDynamic.setAsyncSupported(true);
+		filterDynamic.setInitParameter("targetFilterLifecycle", Boolean.toString(true));
+		filterDynamic.setInitParameter("excludePatterns", "/assets/*,/remoting/*,/api/*");
+		filterDynamic.addMappingForUrlPatterns(
+				EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ERROR), true, "/*");
+
+		ServletRegistration.Dynamic servletDynamic = servletContext.addServlet("test", TestServlet.class);
+		servletDynamic.setLoadOnStartup(100);
+
+		servletContext.addListener(IntrospectorCleanupListener.class);
 	}
 }

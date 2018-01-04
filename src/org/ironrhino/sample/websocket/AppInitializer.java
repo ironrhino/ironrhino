@@ -16,6 +16,7 @@ public class AppInitializer implements WebApplicationInitializer {
 		ctx.register(WebSocketConfig.class);
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet("websocket",
 				new InheritedDispatcherServlet(ctx));
+		dynamic.setAsyncSupported(true);
 		dynamic.addMapping("/websocket/*");
 		dynamic.setLoadOnStartup(1);
 	}
