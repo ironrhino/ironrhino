@@ -36533,8 +36533,6 @@ Observation.form = function(container) {
 					.addClass('input-pseudo');
 		});
 	}
-	if (typeof $.fn.htmlarea != 'undefined')
-		$$('textarea.htmlarea', container).htmlarea();
 	$$(':input[data-helpurl]', container).each(function() {
 		var t = $(this);
 		var href = '<a href="'
@@ -36555,6 +36553,12 @@ Observation.form = function(container) {
 									});
 						});
 			});
+};
+
+Observation.z_form = function(container) {
+	// LOWEST_PRECEDENCE
+	if (typeof $.fn.htmlarea != 'undefined')
+		$$('textarea.htmlarea', container).htmlarea();
 };
 (function($) {
 	$(function() {
@@ -39405,16 +39409,8 @@ Observation.attachmentableform = function(container) {
 				if (index == 0)
 					pane.addClass('active');
 				var cts = groups[key];
-				for (var i = 0; i < cts.length; i++) {
+				for (var i = 0; i < cts.length; i++)
 					$(cts[i]).appendTo(pane);
-					if (typeof $.fn.htmlarea != 'undefined') {
-						$('textarea.htmlarea', cts[i]).each(function() {
-									// rebuild htmlarea
-									jHtmlArea(this).dispose();
-									$(this).htmlarea();
-								});
-					}
-				}
 				index++;
 			}
 		});

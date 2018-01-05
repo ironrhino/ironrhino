@@ -368,8 +368,6 @@ Observation.form = function(container) {
 					.addClass('input-pseudo');
 		});
 	}
-	if (typeof $.fn.htmlarea != 'undefined')
-		$$('textarea.htmlarea', container).htmlarea();
 	$$(':input[data-helpurl]', container).each(function() {
 		var t = $(this);
 		var href = '<a href="'
@@ -390,4 +388,10 @@ Observation.form = function(container) {
 									});
 						});
 			});
+};
+
+Observation.z_form = function(container) {
+	// LOWEST_PRECEDENCE
+	if (typeof $.fn.htmlarea != 'undefined')
+		$$('textarea.htmlarea', container).htmlarea();
 };

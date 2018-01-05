@@ -37,16 +37,8 @@
 				if (index == 0)
 					pane.addClass('active');
 				var cts = groups[key];
-				for (var i = 0; i < cts.length; i++) {
+				for (var i = 0; i < cts.length; i++)
 					$(cts[i]).appendTo(pane);
-					if (typeof $.fn.htmlarea != 'undefined') {
-						$('textarea.htmlarea', cts[i]).each(function() {
-									// rebuild htmlarea
-									jHtmlArea(this).dispose();
-									$(this).htmlarea();
-								});
-					}
-				}
 				index++;
 			}
 		});
