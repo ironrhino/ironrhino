@@ -24828,7 +24828,7 @@ ctrlr.prototype.setObjectValue=function(data){
   };
   
 })(this);
-﻿﻿/*
+﻿﻿﻿/*
 * jHtmlArea 0.7.5 - WYSIWYG Html Editor jQuery Plugin
 * Copyright (c) 2012 Chris Pietschmann
 * http://jhtmlarea.codeplex.com
@@ -24867,13 +24867,13 @@ ctrlr.prototype.setObjectValue=function(data){
                 elem.jhtmlareaObject = this;
 
                 var textarea = this.textarea = $(elem);
-                var container = this.container = $("<div/>").addClass("jHtmlArea").width(textarea.width()).insertAfter(textarea);
+                var container = this.container = $("<div/>").addClass("jHtmlArea").width(textarea.outerWidth()).insertAfter(textarea);
 
                 var toolbar = this.toolbar = $("<div/>").addClass("ToolBar").appendTo(container);
                 priv.initToolBar.call(this, opts);
 
-                var iframe = this.iframe = $("<iframe/>").height(textarea.height());
-                iframe.width(textarea.width() - 4);
+                var iframe = this.iframe = $("<iframe/>").height(textarea.outerHeight());
+                iframe.width(textarea.outerWidth() - 2);
                 var htmlarea = this.htmlarea = $("<div/>").append(iframe);
 
                 container.append(htmlarea).append(textarea.hide());
