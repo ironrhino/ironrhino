@@ -24,7 +24,7 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.util.IntrospectorCleanupListener;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class AppInfoInitializer implements WebApplicationInitializer {
+public class MainAppInitializer implements WebApplicationInitializer {
 
 	public static ServletContext SERVLET_CONTEXT;
 
@@ -63,26 +63,6 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 				AppInfo.getRunLevel().toString(), AppInfo.getAppHome(), AppInfo.getHostName(), AppInfo.getHostAddress(),
 				defaultProfiles != null ? defaultProfiles : "default");
 		configure(servletContext);
-	}
-
-	private void printVersion(ServletContext servletContext) {
-		for (String path : servletContext.getResourcePaths("/WEB-INF/lib")) {
-			String filename = path.substring(path.lastIndexOf('/') + 1);
-			if (filename.startsWith("ironrhino-core-") && filename.endsWith(".jar")) {
-				try (JarInputStream jis = new JarInputStream(servletContext.getResourceAsStream(path))) {
-					Manifest mf = jis.getManifest();
-					if (mf != null) {
-						Attributes attr = mf.getMainAttributes();
-						String version = attr.getValue("Implementation-Version");
-						String revision = attr.getValue("Build-Revision");
-						logger.info("You are running with Ironrhino Core: version={}, revision={}", version, revision);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				break;
-			}
-		}
 	}
 
 	private void configure(ServletContext servletContext) {
@@ -146,5 +126,25 @@ public class AppInfoInitializer implements WebApplicationInitializer {
 		servletDynamic.setLoadOnStartup(100);
 
 		servletContext.addListener(IntrospectorCleanupListener.class);
+	}
+
+	private void printVersion(ServletContext servletContext) {
+		for (String path : servletContext.getResourcePaths("/WEB-INF/lib")) {
+			String filename = path.substring(path.lastIndexOf('/') + 1);
+			if (filename.startsWith("ironrhino-core-") && filename.endsWith(".jar")) {
+				try (JarInputStream jis = new JarInputStream(servletContext.getResourceAsStream(path))) {
+					Manifest mf = jis.getManifest();
+					if (mf != null) {
+						Attributes attr = mf.getMainAttributes();
+						String version = attr.getValue("Implementation-Version");
+						String revision = attr.getValue("Build-Revision");
+						logger.info("You are running with Ironrhino Core: version={}, revision={}", version, revision);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
+		}
 	}
 }
