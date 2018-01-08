@@ -14,8 +14,6 @@ import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -37,8 +35,6 @@ import lombok.Getter;
 
 @Component
 public class FreemarkerConfigurer {
-
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String DEFAULT_FTL_CLASSPATH = "/resources/view";
 
@@ -158,11 +154,7 @@ public class FreemarkerConfigurer {
 		setStorage(configuration);
 		setAllSharedVariables(configuration);
 		configuration.setObjectWrapper(DEFAULT_BEANS_WRAPPER);
-		configuration.setTemplateExceptionHandler(
-				AppInfo.getStage() == Stage.DEVELOPMENT ? TemplateExceptionHandler.HTML_DEBUG_HANDLER
-						: (ex, env, writer) -> {
-							logger.error(ex.getMessage());
-						});
+		configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 		configurations.add(configuration);
 		return configuration;
 	}

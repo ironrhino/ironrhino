@@ -31,6 +31,7 @@ import freemarker.ext.servlet.ServletContextHashModel;
 import freemarker.template.Configuration;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 
 public class MyFreemarkerManager extends FreemarkerManager {
 
@@ -42,6 +43,13 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private FreemarkerConfigurer freemarkerConfigurer;
+
+	@Override
+	public void init(ServletContext servletContext) throws TemplateException {
+		super.init(servletContext);
+		config.setLogTemplateExceptions(false);
+		config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+	}
 
 	@Override
 	protected freemarker.template.Configuration createConfiguration(ServletContext servletContext)

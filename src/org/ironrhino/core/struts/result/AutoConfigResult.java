@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsStatics;
-import org.apache.struts2.views.freemarker.FreemarkerResult;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AppInfo;

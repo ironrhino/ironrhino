@@ -1,5 +1,6 @@
 package org.ironrhino.common.action;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,14 +19,24 @@ import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.opensymphony.xwork2.ActionSupport;
+
 import lombok.Getter;
+import lombok.Setter;
 
 @AutoConfig(namespace = "/")
-public class ErrorAction extends BaseAction {
+public class ErrorAction extends ActionSupport {
 
 	private static final long serialVersionUID = 7684824080798968019L;
 
 	private static Logger logger = LoggerFactory.getLogger(ErrorAction.class);
+
+	@Getter
+	@Setter
+	private String[] id;
+
+	@Getter
+	private String targetUrl;
 
 	@Getter
 	private Throwable exception;
@@ -33,57 +44,66 @@ public class ErrorAction extends BaseAction {
 	@Value("${password.entryPoint:}")
 	private String passwordEntryPoint;
 
+	public String getUid() {
+		if (id != null && id.length > 0)
+			return id[0];
+		else
+			return null;
+	}
+
 	@Override
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
+		String result = BaseAction.NOTFOUND;
 		int errorcode = 404;
-		exception = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-		if (exception instanceof ErrorMessage) {
-			response.setStatus(HttpServletResponse.SC_OK);
-			addActionError(((ErrorMessage) exception).getLocalizedMessage());
-			request.removeAttribute(RequestDispatcher.ERROR_EXCEPTION);
-			return ERROR;
-		} else if (exception instanceof AccountStatusException) {
-			if (exception instanceof CredentialsExpiredException) {
-				UserDetails ud = AuthzUtils.getUserDetails();
-				if (ud != null) {
-					if (StringUtils.isNotBlank(passwordEntryPoint))
-						targetUrl = passwordEntryPoint;
-					else
-						targetUrl = '/' + StringUtils.uncapitalize(ud.getClass().getSimpleName()) + "/password";
-					return REDIRECT;
+		if (request.getDispatcherType() == DispatcherType.ERROR) {
+			exception = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+			if (exception instanceof ErrorMessage) {
+				response.setStatus(HttpServletResponse.SC_OK);
+				addActionError(((ErrorMessage) exception).getLocalizedMessage());
+				request.removeAttribute(RequestDispatcher.ERROR_EXCEPTION);
+				return ERROR;
+			} else if (exception instanceof AccountStatusException) {
+				if (exception instanceof CredentialsExpiredException) {
+					UserDetails ud = AuthzUtils.getUserDetails();
+					if (ud != null) {
+						if (StringUtils.isNotBlank(passwordEntryPoint))
+							targetUrl = passwordEntryPoint;
+						else
+							targetUrl = '/' + StringUtils.uncapitalize(ud.getClass().getSimpleName()) + "/password";
+						return BaseAction.REDIRECT;
+					}
 				}
+				addActionError(getText(exception.getClass().getName()));
+				return ERROR;
+			} else if (exception != null) {
+				if (exception instanceof LocalizedException || exception instanceof ErrorMessage)
+					logger.error(exception.getLocalizedMessage());
+				else
+					logger.error(exception.getMessage(), exception);
 			}
-			addActionError(getText(exception.getClass().getName()));
-			return ERROR;
-		} else if (exception != null) {
-			if (exception instanceof LocalizedException || exception instanceof ErrorMessage)
-				logger.error(exception.getLocalizedMessage());
-			else
-				logger.error(exception.getMessage(), exception);
-		}
-		try {
-			errorcode = Integer.valueOf(getUid());
-		} catch (Exception e) {
+			try {
+				errorcode = Integer.valueOf(getUid());
+			} catch (Exception e) {
 
-		}
-		String result;
-		switch (errorcode) {
-		case HttpServletResponse.SC_UNAUTHORIZED:
-			result = ACCESSDENIED;
-			break;
-		case HttpServletResponse.SC_FORBIDDEN:
-			result = ERROR;
-			break;
-		case HttpServletResponse.SC_NOT_FOUND:
-			result = NOTFOUND;
-			break;
-		case 500:
-			result = "internalServerError";
-			break;
-		default:
-			result = NOTFOUND;
+			}
+			switch (errorcode) {
+			case HttpServletResponse.SC_UNAUTHORIZED:
+				result = BaseAction.ACCESSDENIED;
+				break;
+			case HttpServletResponse.SC_FORBIDDEN:
+				result = ERROR;
+				break;
+			case HttpServletResponse.SC_NOT_FOUND:
+				result = BaseAction.NOTFOUND;
+				break;
+			case 500:
+				result = "internalServerError";
+				break;
+			default:
+				result = BaseAction.NOTFOUND;
+			}
 		}
 		response.setStatus(errorcode);
 		response.setCharacterEncoding("utf-8"); // fix for jetty
