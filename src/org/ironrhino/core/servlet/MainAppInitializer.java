@@ -1,6 +1,7 @@
 package org.ironrhino.core.servlet;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 import java.util.TimeZone;
@@ -15,11 +16,14 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.util.IntrospectorCleanupListener;
 
@@ -126,6 +130,8 @@ public class MainAppInitializer implements WebApplicationInitializer {
 		servletDynamic.setLoadOnStartup(100);
 
 		servletContext.addListener(IntrospectorCleanupListener.class);
+
+		addErrorPages(servletContext);
 	}
 
 	private void printVersion(ServletContext servletContext) {
@@ -145,6 +151,48 @@ public class MainAppInitializer implements WebApplicationInitializer {
 				}
 				break;
 			}
+		}
+	}
+
+	private void addErrorPages(ServletContext servletContext) {
+		try {
+			// No standard servletContext::addErrorPage
+			Class<?> servletContextClass = servletContext.getClass();
+			ClassLoader cl = servletContextClass.getClass().getClassLoader();
+			if (cl == null)
+				cl = servletContext.getClassLoader();
+			if (cl == null)
+				cl = Thread.currentThread().getContextClassLoader();
+			if (servletContextClass.getName().startsWith("org.apache.catalina.")) {
+				Object standardContext = ReflectionUtils.getFieldValue(servletContext, "context");
+				standardContext = ReflectionUtils.getFieldValue(standardContext, "context");
+				String errorPageClassName = "org.apache.tomcat.util.descriptor.web.ErrorPage";
+				if (!ClassUtils.isPresent(errorPageClassName, cl))
+					errorPageClassName = "org.apache.catalina.deploy.ErrorPage";
+				Class<?> errorPageClass = cl != null ? cl.loadClass(errorPageClassName)
+						: Class.forName(errorPageClassName);
+				Method m = standardContext.getClass().getMethod("addErrorPage", errorPageClass);
+				for (String errorCode : "500,404,403,401".split(",")) {
+					Object errorPage = errorPageClass.getConstructor().newInstance();
+					BeanWrapperImpl bw = new BeanWrapperImpl(errorPage);
+					bw.setPropertyValue("errorCode", errorCode);
+					bw.setPropertyValue("location", "/error/" + errorCode);
+					m.invoke(standardContext, errorPage);
+				}
+			} else if (servletContextClass.getName().startsWith("io.undertow.servlet.")) {
+				Object deploymentInfo = ReflectionUtils.getFieldValue(servletContext, "deploymentInfo");
+				String errorPageClassName = "io.undertow.servlet.api.ErrorPage";
+				Class<?> errorPageClass = cl != null ? cl.loadClass(errorPageClassName)
+						: Class.forName(errorPageClassName);
+				Method m = deploymentInfo.getClass().getMethod("addErrorPage", errorPageClass);
+				for (String errorCode : "500,404,403,401".split(",")) {
+					Object errorPage = errorPageClass.getConstructor(String.class, int.class)
+							.newInstance("/error/" + errorCode, Integer.valueOf(errorCode));
+					m.invoke(deploymentInfo, errorPage);
+				}
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 	}
 }

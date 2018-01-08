@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URL;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ErrorHandler;
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletHandler.Default404Servlet;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -35,6 +37,12 @@ public class JettyLauncher {
 		context.setTempDirectory(tempDir);
 		context.setServer(server);
 		context.addServlet(Default404Servlet.class, "*.class");
+		ErrorHandler errorHandler = context.getErrorHandler();
+		if (errorHandler instanceof ErrorPageErrorHandler) {
+			ErrorPageErrorHandler handler = (ErrorPageErrorHandler) errorHandler;
+			for (String errorCode : "500,404,403,401".split(","))
+				handler.addErrorPage(errorCode, "/error/" + errorCode);
+		}
 
 		System.out.println("War - " + warUrl.getPath());
 		System.setProperty("executable-war", warUrl.getPath());

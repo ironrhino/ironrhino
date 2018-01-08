@@ -19,7 +19,7 @@ public class ContainerDetector {
 	@SuppressWarnings("unchecked")
 	public static int detectHttpPort(ServletContext servletContext, boolean ssl) {
 		String className = servletContext.getClass().getName();
-		if (className.startsWith("org.apache.catalina")) {
+		if (className.startsWith("org.apache.catalina.")) {
 			// tomcat or glassfish
 			try {
 				// detect via jmx
@@ -64,7 +64,7 @@ public class ContainerDetector {
 				}
 			} catch (Throwable e) {
 			}
-		} else if (className.startsWith("org.eclipse.jetty")) {
+		} else if (className.startsWith("org.eclipse.jetty.")) {
 			// jetty
 			try {
 				if (ssl) {
@@ -95,7 +95,7 @@ public class ContainerDetector {
 				}
 			} catch (Throwable e) {
 			}
-		} else if (className.startsWith("io.undertow.servlet")) {
+		} else if (className.startsWith("io.undertow.servlet.")) {
 			// wildfly
 			try {
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -104,7 +104,7 @@ public class ContainerDetector {
 						"boundPort");
 			} catch (Throwable e) {
 			}
-		} else if (className.startsWith("com.caucho.server")) {
+		} else if (className.startsWith("com.caucho.server.")) {
 			// resin
 			try {
 				Class<?> configClass = servletContext.getClassLoader().loadClass("com.caucho.config.Config");
@@ -112,7 +112,7 @@ public class ContainerDetector {
 				return (Integer) server.getClass().getMethod(ssl ? "getHttpsPort" : "getHttpPort").invoke(server);
 			} catch (Throwable e) {
 			}
-		} else if (className.startsWith("weblogic.servlet")) {
+		} else if (className.startsWith("weblogic.servlet.")) {
 			// weblogic
 			try {
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -125,7 +125,7 @@ public class ContainerDetector {
 				}
 			} catch (Throwable e) {
 			}
-		} else if (className.startsWith("com.ibm.ws")) {
+		} else if (className.startsWith("com.ibm.ws.")) {
 			// websphere
 			try {
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
