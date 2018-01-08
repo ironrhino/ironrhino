@@ -11385,7 +11385,6 @@ th.filtercolumn li.main li {
 	cursor: pointer;
 	position: relative;
 	color: rgba(0, 0, 0, .87);
-	width: 220px;
 	min-height: 30px;
 	box-sizing: border-box;
 	user-select: none;
@@ -11401,6 +11400,10 @@ th.filtercolumn li.main li {
 .control-group.error .input-pseudo , .input-pseudo.error {
 	border-color: #b94a48;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.input-pseudo:not([class*="span"]) {
+	width: 220px;
 }
 
 .input-pseudo.input-medium {
