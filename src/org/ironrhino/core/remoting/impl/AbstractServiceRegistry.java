@@ -46,6 +46,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Value("${serviceRegistry.skipExport:false}")
+	private boolean skipExport;
+
 	@Value("${serviceRegistry.useHttps:false}")
 	private boolean useHttps;
 
@@ -112,7 +115,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 						continue;
 					beanClassName = clazz.getName();
 				}
-				if (IS_SERVER_PRESENT)
+				if (IS_SERVER_PRESENT && !skipExport)
 					export(clazz, beanName, beanClassName);
 			}
 		}
