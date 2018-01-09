@@ -3,6 +3,7 @@ package org.ironrhino.core.servlet;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.AttributeNotFoundException;
@@ -13,8 +14,9 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.beans.BeanWrapperImpl;
 
-public class ContainerDetector {
+public class ServletContainerHelper {
 
 	@SuppressWarnings("unchecked")
 	public static int detectHttpPort(ServletContext servletContext, boolean ssl) {
@@ -141,6 +143,63 @@ public class ContainerDetector {
 			}
 		}
 		return 0;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static void addErrorPages(ServletContext servletContext, Map<Integer, String> errorPages) {
+		try {
+			String className = servletContext.getClass().getName();
+			if (className.startsWith("org.apache.catalina.")) {
+				Object ctx = ReflectionUtils.getFieldValue(servletContext, "context");
+				Method m = ctx.getClass().getDeclaredMethod("getContext");
+				m.setAccessible(true);
+				Object standardContext = m.invoke(ctx);
+				Class<?> errorPageClass = standardContext.getClass().getMethod("findErrorPage", int.class)
+						.getReturnType();
+				m = standardContext.getClass().getMethod("addErrorPage", errorPageClass);
+				for (Map.Entry<Integer, String> entry : errorPages.entrySet()) {
+					Object errorPage = errorPageClass.getConstructor().newInstance();
+					BeanWrapperImpl bw = new BeanWrapperImpl(errorPage);
+					bw.setPropertyValue("errorCode", entry.getKey());
+					bw.setPropertyValue("location", entry.getValue());
+					m.invoke(standardContext, errorPage);
+				}
+			} else if (className.startsWith("org.eclipse.jetty.")) {
+				Object ctx = ReflectionUtils.getFieldValue(servletContext, "this$0");
+				Object errorHandler = ctx.getClass().getMethod("getErrorHandler").invoke(ctx);
+				Method m = errorHandler.getClass().getMethod("addErrorPage", int.class, String.class);
+				for (Map.Entry<Integer, String> entry : errorPages.entrySet())
+					m.invoke(errorHandler, entry.getKey(), entry.getValue());
+			} else if (className.startsWith("io.undertow.servlet.")) {
+				Object deployment = servletContext.getClass().getMethod("getDeployment").invoke(servletContext);
+				Object deploymentInfo = deployment.getClass().getMethod("getDeploymentInfo").invoke(deployment);
+				for (Method m : deploymentInfo.getClass().getMethods()) {
+					if (m.getName().equals("addErrorPage")) {
+						Class<?> errorPageClass = m.getParameterTypes()[0];
+						for (Map.Entry<Integer, String> entry : errorPages.entrySet())
+							m.invoke(deploymentInfo, errorPageClass.getConstructor(String.class, int.class)
+									.newInstance(entry.getValue(), entry.getKey()));
+						break;
+					}
+				}
+			} else if (className.startsWith("weblogic.servlet.")) {
+				Object errorManager = servletContext.getClass().getMethod("getErrorManager").invoke(servletContext);
+				Method m = errorManager.getClass().getDeclaredMethod("registerError", int.class, String.class);
+				m.setAccessible(true);
+				for (Map.Entry<Integer, String> entry : errorPages.entrySet())
+					m.invoke(errorManager, entry.getKey(), entry.getValue());
+			} else if (className.startsWith("com.ibm.ws.")) {
+				Object webAppConfig = ReflectionUtils.getFieldValue(servletContext, "webAppConfig");
+				Map codeErrorPages = (Map) webAppConfig.getClass().getMethod("getCodeErrorPages").invoke(webAppConfig);
+				Class<?> errorPageClass = webAppConfig.getClass().getMethod("getErrorPageByErrorCode", Integer.class)
+						.getReturnType();
+				for (Map.Entry<Integer, String> entry : errorPages.entrySet())
+					codeErrorPages.put(entry.getKey(),
+							errorPageClass.getConstructor(String.class).newInstance(entry.getValue()));
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 }
