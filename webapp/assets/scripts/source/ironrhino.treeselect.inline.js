@@ -2,8 +2,6 @@
 	$.fn.treeselectinline = function() {
 		this.each(function() {
 			var t = $(this)
-					.attr('type', 'hidden')
-					.addClass('resettable')
 					.removeClass('.treeselect-inline')
 					.wrap('<div class="input-pseudo treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();

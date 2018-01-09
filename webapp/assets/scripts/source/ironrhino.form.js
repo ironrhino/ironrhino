@@ -2,7 +2,7 @@
 	$(function() {
 		$(document).on('reset', 'form', function(e) {
 					var t = $(e.target);
-					t.find('.resettable').html('').val('');
+					t.find('.resettable').html('');
 					setTimeout(function() {
 								t.find(':input').filter(function() {
 											return $(this).val()
@@ -145,7 +145,7 @@ Observation.form = function(container) {
 			});
 	$$('.custom[type="file"]', container).each(function() {
 		var t = $(this);
-		t.hide().change(function(e) {
+		t.change(function(e) {
 			var t = $(this);
 			var names = [];
 			for (var i = 0; i < this.files.length; i++) {

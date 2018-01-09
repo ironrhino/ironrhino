@@ -176,7 +176,7 @@
 					var input = current
 							.find('input.listpick-id[type="hidden"]');
 					if (input.length) {
-						input.prependTo(nametarget).addClass('resettable');
+						input.prependTo(nametarget);
 						if (input.prop('disabled'))
 							nametarget.addClass('disabled')
 									.removeAttr('tabindex');

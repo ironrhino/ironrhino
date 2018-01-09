@@ -11397,12 +11397,13 @@ th.filtercolumn li.main li {
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
 }
 
-.control-group.error .input-pseudo , .input-pseudo.error {
+.control-group.error .input-pseudo , .input-pseudo.error , .input-pseudo.error input {
 	border-color: #b94a48;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	color: #b94a48;
 }
 
-.input-pseudo:not([class*="span"]) {
+.input-pseudo:not([class *= "span"]) {
 	width: 220px;
 }
 
@@ -11426,7 +11427,7 @@ th.filtercolumn li.main li {
 	width: 100%;
 }
 
-.input-pseudo[class*="span"], .row-fluid .input-pseudo[class*="span"]{
+.input-pseudo[class *= "span"] , .row-fluid .input-pseudo[class *= "span"] {
 	float: none;
 	margin-left: 0;
 }
@@ -11434,6 +11435,15 @@ th.filtercolumn li.main li {
 .input-pseudo.readonly , .input-pseudo.disabled {
 	cursor: not-allowed;
 	background-color: #eeeeee;
+}
+
+.input-pseudo > input , .input-pseudo > select {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+	padding: 0;
+	border: 0;
 }
 
 .input-pseudo > .text {
@@ -11507,6 +11517,7 @@ th.filtercolumn li.main li {
 .tag-remove:hover {
 	opacity: .8;
 }
+
 .treeselect-inline > .options {
 	display: none;
 	box-shadow: 0 1px 5px rgba(0, 0, 0, .2);

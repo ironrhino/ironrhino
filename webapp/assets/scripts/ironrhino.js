@@ -36167,7 +36167,7 @@ Observation.checkbox = function(container) {
 	$(function() {
 		$(document).on('reset', 'form', function(e) {
 					var t = $(e.target);
-					t.find('.resettable').html('').val('');
+					t.find('.resettable').html('');
 					setTimeout(function() {
 								t.find(':input').filter(function() {
 											return $(this).val()
@@ -36310,7 +36310,7 @@ Observation.form = function(container) {
 			});
 	$$('.custom[type="file"]', container).each(function() {
 		var t = $(this);
-		t.hide().change(function(e) {
+		t.change(function(e) {
 			var t = $(this);
 			var names = [];
 			for (var i = 0; i < this.files.length; i++) {
@@ -36580,7 +36580,7 @@ Observation.z_form = function(container) {
 					var t = $(e.target).closest('.input-pseudo');
 					var tag = $(e.target).closest('.tag');
 					var index = tag.parent().find('.tag').index(tag);
-					var input = t.find('input[type="hidden"]');
+					var input = t.find('> input');
 					var value = input.val();
 					if (value) {
 						var arr = value.split(/\s*,\s*/);
@@ -36592,7 +36592,7 @@ Observation.z_form = function(container) {
 				}).on('val', '.input-pseudo', function(e, val, textOnly) {
 			if (!val)
 				return;
-			var input = $(this).find('input[type="hidden"]');
+			var input = $(this).find('> input');
 			var text = $(this).find('.text');
 			text.removeClass('tags').html('');
 			if (val.constructor === Array) {
@@ -39773,7 +39773,7 @@ Observation.groupable = function(container) {
 					var input = current
 							.find('input.treeselect-id[type="hidden"]');
 					if (input.length) {
-						input.prependTo(nametarget).addClass('resettable');
+						input.prependTo(nametarget);
 						if (input.prop('disabled'))
 							nametarget.addClass('disabled')
 									.removeAttr('tabindex');
@@ -40004,8 +40004,6 @@ Observation.treeselect = function(container) {
 	$.fn.treeselectinline = function() {
 		this.each(function() {
 			var t = $(this)
-					.attr('type', 'hidden')
-					.addClass('resettable')
 					.removeClass('.treeselect-inline')
 					.wrap('<div class="input-pseudo treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
@@ -40313,7 +40311,7 @@ Observation.treeview = function(container) {
 					var input = current
 							.find('input.listpick-id[type="hidden"]');
 					if (input.length) {
-						input.prependTo(nametarget).addClass('resettable');
+						input.prependTo(nametarget);
 						if (input.prop('disabled'))
 							nametarget.addClass('disabled')
 									.removeAttr('tabindex');

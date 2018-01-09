@@ -18,7 +18,7 @@
 					var t = $(e.target).closest('.input-pseudo');
 					var tag = $(e.target).closest('.tag');
 					var index = tag.parent().find('.tag').index(tag);
-					var input = t.find('input[type="hidden"]');
+					var input = t.find('> input');
 					var value = input.val();
 					if (value) {
 						var arr = value.split(/\s*,\s*/);
@@ -30,7 +30,7 @@
 				}).on('val', '.input-pseudo', function(e, val, textOnly) {
 			if (!val)
 				return;
-			var input = $(this).find('input[type="hidden"]');
+			var input = $(this).find('> input');
 			var text = $(this).find('.text');
 			text.removeClass('tags').html('');
 			if (val.constructor === Array) {
