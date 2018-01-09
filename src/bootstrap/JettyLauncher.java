@@ -27,8 +27,11 @@ public class JettyLauncher {
 		String webappDir = System.getProperty("webapp.dir");
 		if (webappDir != null) {
 			context.setWar(webappDir);
-		} else {
+			System.out.println("Webapp - " + webappDir);
+		} else if (warUrl != null) {
 			context.setWar(warUrl.toExternalForm());
+			System.out.println("War - " + warUrl.getPath());
+			System.setProperty("executable-war", warUrl.getPath());
 		}
 		File tempDir = new File(new File(System.getProperty("user.home")), ".jetty" + port);
 		tempDir.mkdirs();
@@ -36,8 +39,6 @@ public class JettyLauncher {
 		context.setServer(server);
 		context.addServlet(Default404Servlet.class, "*.class");
 
-		System.out.println("War - " + warUrl.getPath());
-		System.setProperty("executable-war", warUrl.getPath());
 		server.setHandler(context);
 		server.setStopAtShutdown(true);
 		server.start();

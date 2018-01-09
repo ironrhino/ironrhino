@@ -40,8 +40,8 @@ public class Main {
 		List<URL> jarUrls = extractJettyJarsFromWar(warUrl.getPath());
 		ClassLoader urlClassLoader = new URLClassLoader(jarUrls.toArray(new URL[jarUrls.size()]));
 		Thread.currentThread().setContextClassLoader(urlClassLoader);
-		Class<?> jettyUtil = urlClassLoader.loadClass("bootstrap.JettyLauncher");
-		Method mainMethod = jettyUtil.getMethod("start", new Class[] { URL.class });
+		Class<?> jettyLauncher = urlClassLoader.loadClass("bootstrap.JettyLauncher");
+		Method mainMethod = jettyLauncher.getMethod("start", new Class[] { URL.class });
 		mainMethod.invoke(null, new Object[] { warUrl });
 	}
 
