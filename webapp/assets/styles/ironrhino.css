@@ -9564,6 +9564,11 @@ td.compact-horizontal {
 	background-image: none;
 }
 
+.nav-tabs > .active > a {
+	font-weight: bolder;
+	font-size: 1.1em;
+}
+
 .well .nav-tabs > .active > a , .well .nav-tabs > .active > a:hover , .well .nav-tabs > .active > a:focus {
 	background-color: #f5f5f5;
 }
