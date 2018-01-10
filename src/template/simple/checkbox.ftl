@@ -1,4 +1,4 @@
-<input type="checkbox"
+<input type="checkbox"<#rt/>
 <#include "/${parameters.templateDir}/${parameters.expandTheme}/basic-attributes.ftl" />
  value="${parameters.fieldValue?html}"<#rt/>
 <#if parameters.nameValue?has_content && parameters.nameValue>

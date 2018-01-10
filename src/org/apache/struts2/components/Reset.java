@@ -35,22 +35,22 @@ import com.opensymphony.xwork2.util.logging.LoggerFactory;
 
 /**
  * <!-- START SNIPPET: javadoc -->
- * Render a submit button. The submit tag is used together with the form tag to provide asynchronous form submissions.
+ * Render a reset button. The reset tag is used together with the form tag.
  * <!-- END SNIPPET: javadoc -->
  */
 @StrutsTag(
-    name="submit",
-    tldTagClass="org.apache.struts2.views.jsp.ui.SubmitTag",
-    description="Render a submit button",
+    name="reset",
+    tldTagClass="org.apache.struts2.views.jsp.ui.ResetTag",
+    description="Render a reset button",
     allowDynamicAttributes=true)
-public class Submit extends FormButton {
+public class Reset extends FormButton {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Submit.class);
-    final public static String OPEN_TEMPLATE = "submit";
-    final public static String TEMPLATE = "submit-close";
+    private static final Logger LOG = LoggerFactory.getLogger(Reset.class);
+    final public static String OPEN_TEMPLATE = "reset";
+    final public static String TEMPLATE = "reset-close";
     protected String src;
 
-    public Submit(ValueStack stack, HttpServletRequest request, HttpServletResponse response) {
+    public Reset(ValueStack stack, HttpServletRequest request, HttpServletResponse response) {
         super(stack, request, response);
     }
 
@@ -86,7 +86,7 @@ public class Submit extends FormButton {
         return true;
     }
 
-    @StrutsTagAttribute(description="Supply an image src for <i>image</i> type submit button. Will have no effect for types <i>input</i> and <i>button</i>.")
+    @StrutsTagAttribute(description="Supply an image src for <i>image</i> type reset button. Will have no effect for types <i>input</i> and <i>button</i>.")
     public void setSrc(String src) {
         this.src = src;
     }

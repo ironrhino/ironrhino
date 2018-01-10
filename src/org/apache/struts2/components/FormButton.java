@@ -21,6 +21,8 @@
 
 package org.apache.struts2.components;
 
+import java.util.Arrays;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,11 +56,11 @@ public abstract class FormButton extends ClosingUIBean {
         String cssClass = (String)getParameters().get("cssClass");
         if(cssClass == null)
         		cssClass = "btn";
-        else
+        else if(!Arrays.asList(cssClass.split("\\s")).contains("btn"))
         		cssClass = "btn " + cssClass;
         addParameter("cssClass", cssClass);
 
-        String submitType = BUTTONTYPE_INPUT;
+        String submitType = BUTTONTYPE_BUTTON;
         if (type != null && (BUTTONTYPE_BUTTON.equalsIgnoreCase(type) || (supportsImageType() && BUTTONTYPE_IMAGE.equalsIgnoreCase(type))))
         {
             submitType = type;

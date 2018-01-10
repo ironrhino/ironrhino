@@ -1,3 +1,1 @@
-<#include "/${parameters.templateDir}/simple/submit-close.ftl" />
-${parameters.after!}
-</div>
+<#include "/${parameters.templateDir}/simple/submit-close.ftl" />${parameters.after!}</div>

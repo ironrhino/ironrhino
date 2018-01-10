@@ -13,17 +13,17 @@
             <#assign itemValue = stack.findString('top')/>
     </#if>
     <#assign itemKeyStr=itemKey.toString() />
-    <label for="${parameters.id?html}-${itemCount}" class="checkbox inline"><#rt/>
+<label for="${parameters.id?html}-${itemCount}" class="checkbox inline"><#rt/>
 <input type="checkbox" name="${parameters.name?html}" value="${itemKeyStr?html}"<#rt/>
-       id="${parameters.id?html}-${itemCount}"<#rt/>
+ id="${parameters.id?html}-${itemCount}"<#rt/>
     <#if tag.contains(parameters.nameValue, itemKey) || tag.contains(parameters.nameValue, itemValue)>
-       checked="checked"<#rt/>
+ checked="checked"<#rt/>
     </#if>
     <#if parameters.readonly!false>
-       readonly="readonly"<#rt/>
+ readonly="readonly"<#rt/>
     </#if>
     <#if parameters.disabled!false>
-       disabled="disabled"<#rt/>
+ disabled="disabled"<#rt/>
     </#if>
     <#include "/${parameters.templateDir}/${parameters.expandTheme}/css.ftl" />
 	<#include "/${parameters.templateDir}/${parameters.expandTheme}/dynamic-attributes.ftl" />
