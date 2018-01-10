@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 
 import org.ironrhino.common.model.Region;
 import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.validation.constraints.MobilePhoneNumber;
 
 import lombok.Data;
 
@@ -27,6 +28,11 @@ public class CustomerAddress implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "receiver")
 	private Employee receiver;
+
+	@MobilePhoneNumber
+	@UiConfig(width = "100px")
+	@Column(length = 11)
+	private String mobile;
 
 	@UiConfig(width = "250px", template = "<#if value?has_content>${value.fullname}</#if>", description = "region.description")
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

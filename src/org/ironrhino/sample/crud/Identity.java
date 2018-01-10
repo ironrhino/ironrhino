@@ -6,6 +6,7 @@ import javax.persistence.Embeddable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.UiConfig;
+import org.ironrhino.core.validation.constraints.CitizenIdentificationNumber;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class Identity implements Serializable {
 	@UiConfig(type = "dictionary", description = "identityType.description")
 	private String identityType;
 
+	@CitizenIdentificationNumber
 	private String identityNo;
 
 	public Identity(String str) {

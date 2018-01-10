@@ -25,6 +25,8 @@ import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
+import org.ironrhino.core.validation.constraints.OrganizationCode;
+import org.ironrhino.core.validation.constraints.SocialCreditIdentifier;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -49,9 +51,15 @@ public class Company extends BaseEntity {
 	@Column(nullable = false)
 	private CompanyType type;
 
-	@UiConfig(width = "100px", regex = "\\w{9}", group = "baseInfo", shownInPick = true)
+	@OrganizationCode
+	@UiConfig(width = "100px", group = "baseInfo", shownInPick = true)
 	@Column(nullable = false, unique = true, length = 9)
 	private String organizationCode;
+
+	@SocialCreditIdentifier
+	@UiConfig(width = "100px", group = "baseInfo", hiddenInList = @Hidden(true), shownInPick = true)
+	@Column(unique = true, length = 18)
+	private String socialCreditIdentifier;
 
 	@UiConfig(width = "150px", template = "<#if value?has_content>${value.fullname}</#if>", group = "contactInfo")
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

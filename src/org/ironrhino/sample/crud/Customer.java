@@ -22,6 +22,7 @@ import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Max;
@@ -111,6 +112,7 @@ public class Customer extends BaseRecordableEntity {
 	@JoinTable(name = "sample_company_related_customer", joinColumns = @JoinColumn(name = "customer"), inverseJoinColumns = @JoinColumn(name = "company"))
 	private Collection<Company> relatedCompanies;
 
+	@Valid
 	@UiConfig(cssClass = "nullable", description = "addresses.description")
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "sample_customer_address", joinColumns = @JoinColumn(name = "customer"))

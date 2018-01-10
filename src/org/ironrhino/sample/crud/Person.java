@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.common.model.Region;
@@ -32,6 +33,7 @@ public class Person extends AbstractEntity<Identity> {
 
 	static final String FILE_MIME_TYPE = "text/csv";
 
+	@Valid
 	@EmbeddedId
 	@UiConfig(alias = "identity")
 	private Identity id;
