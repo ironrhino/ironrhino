@@ -23,6 +23,9 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticat
 
 	static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
 
+	@Value("${login.ignoreSavedRequest:false}")
+	private boolean ignoreSavedRequest;
+
 	@Setter
 	@Value("${ssoServerBase:}")
 	private String ssoServerBase;
@@ -45,35 +48,37 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticat
 		String redirectUrl = null;
 		SavedRequest savedRequest = (SavedRequest) request.getSession().getAttribute(SAVED_REQUEST);
 		request.getSession().removeAttribute(SAVED_REQUEST);
-		if (savedRequest != null) {
-			if (savedRequest instanceof DefaultSavedRequest) {
-				DefaultSavedRequest dsr = (DefaultSavedRequest) savedRequest;
-				String queryString = dsr.getQueryString();
-				// remove jquery ajax parameter
-				if (StringUtils.isNotBlank(queryString))
-					queryString = queryString.replaceFirst("&?_=\\d{13}", "");
-				if (StringUtils.isBlank(queryString)) {
-					targetUrl = dsr.getRequestURL();
-				} else {
-					targetUrl = new StringBuilder(dsr.getRequestURL()).append("?").append(queryString).toString();
-				}
-			} else
-				targetUrl = savedRequest.getRedirectUrl();
-		} else {
-			String queryString = request.getQueryString();
-			if (StringUtils.isBlank(queryString)) {
-				targetUrl = request.getRequestURL().toString();
+		if (!ignoreSavedRequest) {
+			if (savedRequest != null) {
+				if (savedRequest instanceof DefaultSavedRequest) {
+					DefaultSavedRequest dsr = (DefaultSavedRequest) savedRequest;
+					String queryString = dsr.getQueryString();
+					// remove jquery ajax parameter
+					if (StringUtils.isNotBlank(queryString))
+						queryString = queryString.replaceFirst("&?_=\\d{13}", "");
+					if (StringUtils.isBlank(queryString)) {
+						targetUrl = dsr.getRequestURL();
+					} else {
+						targetUrl = new StringBuilder(dsr.getRequestURL()).append("?").append(queryString).toString();
+					}
+				} else
+					targetUrl = savedRequest.getRedirectUrl();
 			} else {
-				targetUrl = new StringBuilder(request.getRequestURL()).append("?").append(queryString).toString();
+				String queryString = request.getQueryString();
+				if (StringUtils.isBlank(queryString)) {
+					targetUrl = request.getRequestURL().toString();
+				} else {
+					targetUrl = new StringBuilder(request.getRequestURL()).append("?").append(queryString).toString();
+				}
 			}
-		}
-		if (StringUtils.isBlank(ssoServerBase)) {
-			String baseUrl = RequestUtils.getBaseUrl(request);
-			targetUrl = RequestUtils.trimPathParameter(targetUrl);
-			if (StringUtils.isNotBlank(targetUrl) && targetUrl.startsWith(baseUrl)) {
-				targetUrl = targetUrl.substring(baseUrl.length());
-				if (targetUrl.equals("/"))
-					targetUrl = "";
+			if (StringUtils.isBlank(ssoServerBase)) {
+				String baseUrl = RequestUtils.getBaseUrl(request);
+				targetUrl = RequestUtils.trimPathParameter(targetUrl);
+				if (StringUtils.isNotBlank(targetUrl) && targetUrl.startsWith(baseUrl)) {
+					targetUrl = targetUrl.substring(baseUrl.length());
+					if (targetUrl.equals("/"))
+						targetUrl = "";
+				}
 			}
 		}
 
