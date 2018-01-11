@@ -10337,8 +10337,7 @@ button.loading:before, button.loading:after{
 	border: .2em solid rgba(0,0,0,.15);
 }
 button.loading:after{
-	animation: load .8s linear;
-	animation-iteration-count: infinite;
+	animation: fa-spin 1s infinite steps(8);
 	border-color: #fff transparent transparent;
 	box-shadow: 0 0 0 1px transparent;
 }
@@ -10378,12 +10377,13 @@ span.checkboxgroup {
 }
 
 input.error, select.error, textarea.error {
-  border-color: #b94a48;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	border-color: #b94a48;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	color: #b94a48;
 }
 input.error:focus, select.error:focus, textarea.error:focus {
-  border-color: #953b39;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
+	border-color: #953b39;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
 }
 
 .control-group span.tip {
@@ -10410,7 +10410,7 @@ strong.force-override {
 	min-width: 100px;
 	max-width: 300px;
 	border: 1px solid #b94a48;
-	padding: 4px 10px;
+	padding: 4px 15px 4px 10px;
 	line-height: 20px;
 	border-radius: 6px;
 	white-space: pre-wrap;
