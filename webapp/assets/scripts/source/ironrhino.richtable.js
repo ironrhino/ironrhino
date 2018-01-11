@@ -106,9 +106,7 @@ Richtable = {
 				var inputforms = $('#' + winid + ' form.ajax');
 				inputforms.each(function() {
 					var inputform = $(this);
-					if (!$(	'input[type="hidden"][name="'
-									+ Richtable.getEntityName(form) + '.id"]',
-							inputform).length)
+					if (!$('input[type="hidden"].id', inputform).length)
 						$(':input:visible', inputform).filter(function(i) {
 							return $(this).attr('name')
 									&& !($(this).val()
@@ -131,9 +129,7 @@ Richtable = {
 									.val())
 								create = false;
 							if ($(
-									'input[type="hidden"][name="'
-											+ Richtable.getEntityName(form)
-											+ '.id"]', inputform).val())
+									'input[type="hidden"].id', inputform).val())
 								create = false;
 						}
 						if (create && inputform.hasClass('sequential_create')) {

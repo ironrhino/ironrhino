@@ -33730,14 +33730,14 @@ DateUtils = {
 					t.on('checkavailable', function() {
 						if (!t.val())
 							return;
-						var inputs = $('input[type=hidden]', t.closest('form'))
-								.not('[name^="__"]').not('.nocheck').filter(
-										function(i, v) {
+						var inputs = $('input[type=hidden],:input.id:not(:disabled)',
+								t.closest('form')).not('[name^="__"]')
+								.not('.nocheck').filter(function(i, v) {
 											return $(v).val() && (v != t[0])
 										}).add(t);
 						if (t.data('checkwith')) {
-							$.each(t.data('checkwith').split(/\s*,\s*/), function(i,
-											v) {
+							$.each(t.data('checkwith').split(/\s*,\s*/),
+									function(i, v) {
 										var ele = $(':input[name="' + v + '"]',
 												t.closest('form'));
 										inputs = inputs.add(ele);
@@ -36418,7 +36418,7 @@ Observation.form = function(container) {
 				url = url.substring(0, url.lastIndexOf('/')) + '/input';
 		} else if (url == 'save')
 			url = 'input';
-		var hid = $('input[type=hidden][name$=".id"]', f);
+		var hid = $('input[type=hidden][name$=".id"],:input.id:not(:disabled)', f);
 		if (hid.val())
 			data['id'] = hid.val();
 		$(
@@ -37946,9 +37946,7 @@ Richtable = {
 				var inputforms = $('#' + winid + ' form.ajax');
 				inputforms.each(function() {
 					var inputform = $(this);
-					if (!$(	'input[type="hidden"][name="'
-									+ Richtable.getEntityName(form) + '.id"]',
-							inputform).length)
+					if (!$('input[type="hidden"].id', inputform).length)
 						$(':input:visible', inputform).filter(function(i) {
 							return $(this).attr('name')
 									&& !($(this).val()
@@ -37971,9 +37969,7 @@ Richtable = {
 									.val())
 								create = false;
 							if ($(
-									'input[type="hidden"][name="'
-											+ Richtable.getEntityName(form)
-											+ '.id"]', inputform).val())
+									'input[type="hidden"].id', inputform).val())
 								create = false;
 						}
 						if (create && inputform.hasClass('sequential_create')) {

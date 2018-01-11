@@ -8,7 +8,7 @@
 <body>
 <@s.form id="dictionary_input" action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?then('',' importable')}">
 	<#if !dictionary.new>
-		<@s.hidden name="dictionary.id" />
+		<@s.hidden name="dictionary.id" class="id"/>
 	</#if>
 	<@s.hidden name="dictionary.version" class="version"/>
 	<#if view=='embedded'>

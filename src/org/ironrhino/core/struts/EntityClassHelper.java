@@ -205,6 +205,7 @@ public class EntityClassHelper {
 								ui.setGroup(uci.getGroup());
 							if (embeddedId != null) {
 								ui.addCssClass("required");
+								ui.addCssClass("id");
 								ReadonlyImpl ri = new ReadonlyImpl();
 								ri.setExpression("!entity.new");
 								ui.setReadonly(ri);

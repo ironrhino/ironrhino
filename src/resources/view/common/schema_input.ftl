@@ -8,9 +8,9 @@
 <body>
 <@s.form id="schema_input" action="${actionBaseUrl}/save" method="post" class="form-horizontal ajax${view?has_content?then('',' importable')}">
 	<#if !schema.new>
-		<@s.hidden name="schema.id" />
+		<@s.hidden name="schema.id" class="id"/>
 	</#if>
-	<@s.hidden name="schema.version" class="version" />
+	<@s.hidden name="schema.version" class="version"/>
 	<#if view=='embedded'>
 	<@s.hidden name="schema.name"/>
 	<@s.hidden name="schema.description"/>

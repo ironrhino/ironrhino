@@ -7,8 +7,8 @@
 <body>
 <@s.form id="user_input" action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal sequential_create">
 	<#if !user.new>
-		<@s.hidden name="user.id" />
-		<@s.hidden name="user.version" class="version" />
+		<@s.hidden name="user.id" class="id"/>
+		<@s.hidden name="user.version" class="version"/>
 		<@s.textfield name="user.username" readonly="true"/>
 		<@s.password name="password" class="sha"/>
 		<@s.password name="confirmPassword" class="sha"/>

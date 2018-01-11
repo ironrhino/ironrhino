@@ -253,7 +253,7 @@ Observation.form = function(container) {
 				url = url.substring(0, url.lastIndexOf('/')) + '/input';
 		} else if (url == 'save')
 			url = 'input';
-		var hid = $('input[type=hidden][name$=".id"]', f);
+		var hid = $('input[type=hidden][name$=".id"],:input.id:not(:disabled)', f);
 		if (hid.val())
 			data['id'] = hid.val();
 		$(

@@ -5,14 +5,14 @@
 					t.on('checkavailable', function() {
 						if (!t.val())
 							return;
-						var inputs = $('input[type=hidden]', t.closest('form'))
-								.not('[name^="__"]').not('.nocheck').filter(
-										function(i, v) {
+						var inputs = $('input[type=hidden],:input.id:not(:disabled)',
+								t.closest('form')).not('[name^="__"]')
+								.not('.nocheck').filter(function(i, v) {
 											return $(v).val() && (v != t[0])
 										}).add(t);
 						if (t.data('checkwith')) {
-							$.each(t.data('checkwith').split(/\s*,\s*/), function(i,
-											v) {
+							$.each(t.data('checkwith').split(/\s*,\s*/),
+									function(i, v) {
 										var ele = $(':input[name="' + v + '"]',
 												t.closest('form'));
 										inputs = inputs.add(ele);

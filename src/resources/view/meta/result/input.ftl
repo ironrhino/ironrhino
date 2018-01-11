@@ -251,7 +251,7 @@
 </#if>
 <@s.form id="${entityName}_input" action="${actionBaseUrl}/save" method="post" class="ajax form-horizontal${richtableConfig.importable?then(' importable','')}${attachmentable?then(' attachmentable','')}${doubleCheck?then(' double-check','')} groupable ${richtableConfig.inputFormCssClass}" autocomplete="off" dynamicAttributes=formDynamicAttributes>
 	<#if !isnew>
-		<#if !idAssigned><@s.hidden name="${entityName}.id"/></#if>
+		<#if !idAssigned><@s.hidden name="${entityName}.id" class="id"/></#if>
 	<#else>
 		<#if idAssigned><input type="hidden" name="_isnew" value="true"/></#if>
 		<#if treeable??&&treeable><@s.hidden name="parent"/></#if>
