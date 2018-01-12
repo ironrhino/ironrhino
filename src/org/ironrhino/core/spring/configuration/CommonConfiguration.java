@@ -1,5 +1,7 @@
 package org.ironrhino.core.spring.configuration;
 
+import javax.validation.ValidatorFactory;
+
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Order(0)
 @Configuration
@@ -33,6 +36,11 @@ public class CommonConfiguration {
 	@Bean
 	public ConversionService conversionService() {
 		return new CustomConversionService();
+	}
+
+	@Bean
+	public ValidatorFactory validatorFactory() {
+		return new LocalValidatorFactoryBean();
 	}
 
 	@Bean

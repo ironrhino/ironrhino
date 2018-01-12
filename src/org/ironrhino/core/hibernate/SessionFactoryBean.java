@@ -16,6 +16,7 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import javax.persistence.Entity;
 import javax.sql.DataSource;
+import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Interceptor;
@@ -55,8 +56,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ClassUtils;
-import org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
@@ -104,6 +103,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 
 	@Autowired(required = false)
 	private PostLoadEventListener[] postLoadEventListeners = new PostLoadEventListener[0];
+
+	@Autowired
+	private ValidatorFactory validatorFactory;
 
 	private Class<?>[] annotatedClasses;
 
@@ -201,13 +203,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		if (StringUtils.isBlank(value)) {
 			properties.put(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, databaseProduct != DatabaseProduct.MYSQL);
 		}
-		if (ClassUtils.isPresent("javax.validation.Configuration", getClass().getClassLoader())) {
-			final javax.validation.Configuration<?> configuration = javax.validation.Validation.byDefaultProvider()
-					.configure();
-			configuration.messageInterpolator(
-					new LocaleContextMessageInterpolator(configuration.getDefaultMessageInterpolator()));
-			properties.put("javax.persistence.validation.factory", configuration.buildValidatorFactory());
-		}
+		properties.put("javax.persistence.validation.factory", validatorFactory);
 		super.afterPropertiesSet();
 	}
 
