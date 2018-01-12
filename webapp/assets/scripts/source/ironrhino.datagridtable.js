@@ -172,6 +172,9 @@
 		if (!skipRename)
 			rename(row.closest('tbody'));
 		if (typeof $.fn.chosen != 'undefined') {
+			$('.chosen', r).each(function() {
+						$(this).insertBefore($(this).parent());
+					});
 			$('.chosen-container', r).remove();
 			$('.chosen', r).show().data('chosen', false).chosen({
 						search_contains : true,
