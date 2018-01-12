@@ -71,7 +71,14 @@ public class RestExceptionHandler {
 			ConstraintViolationException cve = (ConstraintViolationException) ex;
 			StringBuilder sb = new StringBuilder();
 			for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
-				sb.append(cv.getPropertyPath()).append(": ").append(cv.getMessage()).append("; ");
+				String path = cv.getPropertyPath().toString();
+				if (cv.getExecutableParameters() != null) {
+					// method parameter
+					int index = path.indexOf('.');
+					if (index > 0)
+						path = path.substring(index + 1);
+				}
+				sb.append(path).append(": ").append(cv.getMessage()).append("; ");
 			}
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
 		}
