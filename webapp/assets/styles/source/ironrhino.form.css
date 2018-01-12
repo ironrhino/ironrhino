@@ -18,6 +18,11 @@ select.input-xxlarge {
 	width: 554px;
 }
 
+.form-inline button {
+	vertical-align: top;
+	border-radius: 4px;
+}
+
 .form-horizontal fieldset {
 	min-width: inherit;
 }
