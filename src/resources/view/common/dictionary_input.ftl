@@ -50,7 +50,7 @@
 				<#if !(view=='embedded'||view=='brief')>
 				<td><select class="linkage_switch required">
 						<option value="option">${getText('option')}</option>
-						<option value="group"<#if dictionary.items[index]?? && dictionary.items[index].value?? && !dictionary.items[index].value?has_content>selected="selected"</#if>>${getText('group')}</option>
+						<option value="group"<#if dictionary.items[index]?? && !(dictionary.items[index].value)?has_content>selected="selected"</#if>>${getText('group')}</option>
 					</select></td>
 				</#if>
 				<td class="manipulate"></td>
