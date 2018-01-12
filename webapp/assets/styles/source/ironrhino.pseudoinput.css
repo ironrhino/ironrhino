@@ -31,6 +31,10 @@
 	width: 220px;
 }
 
+.input-pseudo.input-small {
+	width: 90px;
+}
+
 .input-pseudo.input-medium {
 	width: 164px;
 }
