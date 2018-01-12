@@ -18,6 +18,11 @@
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
+			var style = t.attr('style');
+			if (style) {
+				t.removeAttr('style');
+				treeselect.attr('style', style);
+			}
 			$.each(	$.grep(t.attr('class').split(' '), function(v) {
 								return v.indexOf('input-') == 0
 										|| v.indexOf('span') == 0;
@@ -33,54 +38,58 @@
 })(jQuery);
 
 $(function() {
-	$(document).on('click', '.treeselect-inline', function(e) {
-		var t = $(e.target).closest('.treeselect-inline');
-		var input = t.children('input');
-		var text = t.children('.text');
-		if (input.prop('disabled') || input.prop('readonly')
-				|| t.hasClass('disabled') || t.hasClass('readonly'))
-			return;
-		if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
-			return;
-		var treeselect = $(e.target).closest('.treeselect-inline');
-		treeselect.find('.glyphicon').toggleClass('glyphicon-triangle-bottom')
-				.toggleClass('glyphicon-triangle-top');
-		var options = treeselect.find('.options').toggle();
-		if (treeselect.find('.glyphicon-triangle-top').length) {
-			if (input.data('url') && !options.html()) {
-				var treeview = $('<div class="treeview"/>').appendTo(options);
-				treeview.treeview({
-							url : input.data('url'),
-							click : function(e) {
-								var treeselect = $(e.target)
-										.closest('.treeselect-inline');
-								var input = treeselect.children('input');
-								var text = treeselect.children('.text');
-								var node = $(this).closest('li')
-										.data('treenode');
-								treeselect.trigger('val', [{
-													key : node.id,
-													value : node.fullname
-												}]);
-								treeselect.click();
-							},
-							value : input.data('text'),
-							separator : input.data('separator')
-						});
-			}
-		}
-	}).on('keydown', '.treeselect-inline', function(e) {
-				if (e.keyCode == 13) {
-					$(this).click();
-					return false;
+			$(document).on('click', '.treeselect-inline', function(e) {
+				var t = $(e.target).closest('.treeselect-inline');
+				var input = t.children('input');
+				var text = t.children('.text');
+				if (input.prop('disabled') || input.prop('readonly')
+						|| t.hasClass('disabled') || t.hasClass('readonly'))
+					return;
+				if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
+					return;
+				var treeselect = $(e.target).closest('.treeselect-inline');
+				treeselect.find('.glyphicon')
+						.toggleClass('glyphicon-triangle-bottom')
+						.toggleClass('glyphicon-triangle-top');
+				var options = treeselect.find('.options').toggle();
+				if (treeselect.find('.glyphicon-triangle-top').length) {
+					if (input.data('url') && !options.html()) {
+						var treeview = $('<div class="treeview"/>')
+								.appendTo(options);
+						treeview.treeview({
+									url : input.data('url'),
+									click : function(e) {
+										var treeselect = $(e.target)
+												.closest('.treeselect-inline');
+										var input = treeselect
+												.children('input');
+										var text = treeselect.children('.text');
+										var node = $(this).closest('li')
+												.data('treenode');
+										treeselect.trigger('val', [{
+															key : node.id,
+															value : node.fullname
+														}]);
+										treeselect.click();
+									},
+									value : input.data('text'),
+									separator : input.data('separator')
+								});
+					}
 				}
-			});
-	$(document).click(function(e) {
+			}).on('keydown', '.treeselect-inline', function(e) {
+						if (e.keyCode == 13) {
+							$(this).click();
+							return false;
+						}
+					});
+			$(document).click(function(e) {
 				var target = $(e.target);
 				if (!target.closest('.treeselect-inline').length)
-					$('.treeselect-inline .glyphicon-triangle-top').parent().click();
+					$('.treeselect-inline .glyphicon-triangle-top').parent()
+							.click();
 			});
-});
+		});
 
 Observation.treeselectinline = function(container) {
 	$$('input.treeselect-inline', container).treeselectinline();

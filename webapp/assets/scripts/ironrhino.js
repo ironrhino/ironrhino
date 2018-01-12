@@ -36311,32 +36311,34 @@ Observation.form = function(container) {
 	$$('.custom[type="file"]', container).each(function() {
 		var t = $(this);
 		t.change(function(e) {
-			var t = $(this);
-			var names = [];
-			for (var i = 0; i < this.files.length; i++) {
-				var f = this.files[i];
-				var size = f.size;
-				size = size / 1024;
-				size = Math.round(size * 100) / 100;
-				if (size >= 1024) {
-					size = size / 1024;
-					size = Math.round(size * 100) / 100;
-					if (size >= 1024) {
+					var t = $(this);
+					var names = [];
+					for (var i = 0; i < this.files.length; i++) {
+						var f = this.files[i];
+						var size = f.size;
 						size = size / 1024;
 						size = Math.round(size * 100) / 100;
-						size = size + ' GB';
-					} else {
-						size = size + ' MB';
+						if (size >= 1024) {
+							size = size / 1024;
+							size = Math.round(size * 100) / 100;
+							if (size >= 1024) {
+								size = size / 1024;
+								size = Math.round(size * 100) / 100;
+								size = size + ' GB';
+							} else {
+								size = size + ' MB';
+							}
+						} else {
+							size = size + ' KB';
+						}
+						names.push('<span class="tiped" title="' + size + '">'
+								+ f.name + '</span>');
 					}
-				} else {
-					size = size + ' KB';
-				}
-				names.push('<span class="tiped" title="' + size + '">' + f.name
-						+ '</span>');
-			}
-			t.closest('.filepick').trigger('val',
-					[!this.multiple && names.length ? names[0] : names, true]);
-		});
+					t.closest('.filepick').trigger(
+							'val',
+							[!this.multiple && names.length ? names[0] : names,
+									true]);
+				});
 		var fp = t
 				.wrap('<div class="filepick input-pseudo" tabindex="0"/>')
 				.after('<div class="text resettable"></div>'
@@ -36347,6 +36349,11 @@ Observation.form = function(container) {
 			fp.addClass('disabled').removeAttr('tabindex');
 		if (t.prop('readonly'))
 			fp.addClass('readonly').removeAttr('tabindex');
+		var style = t.attr('style');
+		if (style) {
+			t.removeAttr('style');
+			fp.attr('style', style);
+		}
 		$.each(	$.grep(t.attr('class').split(' '), function(v) {
 							return v.indexOf('input-') == 0
 									|| v.indexOf('span') == 0;
@@ -36418,7 +36425,8 @@ Observation.form = function(container) {
 				url = url.substring(0, url.lastIndexOf('/')) + '/input';
 		} else if (url == 'save')
 			url = 'input';
-		var hid = $('input[type=hidden][name$=".id"],:input.id:not(:disabled)', f);
+		var hid = $('input[type=hidden][name$=".id"],:input.id:not(:disabled)',
+				f);
 		if (hid.val())
 			data['id'] = hid.val();
 		$(
@@ -40016,6 +40024,11 @@ Observation.treeselect = function(container) {
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
+			var style = t.attr('style');
+			if (style) {
+				t.removeAttr('style');
+				treeselect.attr('style', style);
+			}
 			$.each(	$.grep(t.attr('class').split(' '), function(v) {
 								return v.indexOf('input-') == 0
 										|| v.indexOf('span') == 0;
@@ -40031,54 +40044,58 @@ Observation.treeselect = function(container) {
 })(jQuery);
 
 $(function() {
-	$(document).on('click', '.treeselect-inline', function(e) {
-		var t = $(e.target).closest('.treeselect-inline');
-		var input = t.children('input');
-		var text = t.children('.text');
-		if (input.prop('disabled') || input.prop('readonly')
-				|| t.hasClass('disabled') || t.hasClass('readonly'))
-			return;
-		if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
-			return;
-		var treeselect = $(e.target).closest('.treeselect-inline');
-		treeselect.find('.glyphicon').toggleClass('glyphicon-triangle-bottom')
-				.toggleClass('glyphicon-triangle-top');
-		var options = treeselect.find('.options').toggle();
-		if (treeselect.find('.glyphicon-triangle-top').length) {
-			if (input.data('url') && !options.html()) {
-				var treeview = $('<div class="treeview"/>').appendTo(options);
-				treeview.treeview({
-							url : input.data('url'),
-							click : function(e) {
-								var treeselect = $(e.target)
-										.closest('.treeselect-inline');
-								var input = treeselect.children('input');
-								var text = treeselect.children('.text');
-								var node = $(this).closest('li')
-										.data('treenode');
-								treeselect.trigger('val', [{
-													key : node.id,
-													value : node.fullname
-												}]);
-								treeselect.click();
-							},
-							value : input.data('text'),
-							separator : input.data('separator')
-						});
-			}
-		}
-	}).on('keydown', '.treeselect-inline', function(e) {
-				if (e.keyCode == 13) {
-					$(this).click();
-					return false;
+			$(document).on('click', '.treeselect-inline', function(e) {
+				var t = $(e.target).closest('.treeselect-inline');
+				var input = t.children('input');
+				var text = t.children('.text');
+				if (input.prop('disabled') || input.prop('readonly')
+						|| t.hasClass('disabled') || t.hasClass('readonly'))
+					return;
+				if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
+					return;
+				var treeselect = $(e.target).closest('.treeselect-inline');
+				treeselect.find('.glyphicon')
+						.toggleClass('glyphicon-triangle-bottom')
+						.toggleClass('glyphicon-triangle-top');
+				var options = treeselect.find('.options').toggle();
+				if (treeselect.find('.glyphicon-triangle-top').length) {
+					if (input.data('url') && !options.html()) {
+						var treeview = $('<div class="treeview"/>')
+								.appendTo(options);
+						treeview.treeview({
+									url : input.data('url'),
+									click : function(e) {
+										var treeselect = $(e.target)
+												.closest('.treeselect-inline');
+										var input = treeselect
+												.children('input');
+										var text = treeselect.children('.text');
+										var node = $(this).closest('li')
+												.data('treenode');
+										treeselect.trigger('val', [{
+															key : node.id,
+															value : node.fullname
+														}]);
+										treeselect.click();
+									},
+									value : input.data('text'),
+									separator : input.data('separator')
+								});
+					}
 				}
-			});
-	$(document).click(function(e) {
+			}).on('keydown', '.treeselect-inline', function(e) {
+						if (e.keyCode == 13) {
+							$(this).click();
+							return false;
+						}
+					});
+			$(document).click(function(e) {
 				var target = $(e.target);
 				if (!target.closest('.treeselect-inline').length)
-					$('.treeselect-inline .glyphicon-triangle-top').parent().click();
+					$('.treeselect-inline .glyphicon-triangle-top').parent()
+							.click();
 			});
-});
+		});
 
 Observation.treeselectinline = function(container) {
 	$$('input.treeselect-inline', container).treeselectinline();
