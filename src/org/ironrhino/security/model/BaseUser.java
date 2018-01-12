@@ -14,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
+import javax.validation.constraints.Email;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -32,6 +33,7 @@ import org.ironrhino.core.security.role.RoledUserDetails;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
+import org.ironrhino.core.validation.constraints.MobilePhoneNumber;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.util.ClassUtils;
@@ -69,10 +71,12 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@SearchableProperty(boost = 3)
 	private String name;
 
+	@Email
 	@SearchableProperty(boost = 3)
 	@Column(unique = true)
 	private String email;
 
+	@MobilePhoneNumber
 	@SearchableProperty
 	private String phone;
 

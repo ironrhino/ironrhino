@@ -21,6 +21,7 @@ import org.ironrhino.rest.component.JsonpAdvice;
 import org.ironrhino.rest.component.RestExceptionHandler;
 import org.ironrhino.rest.doc.ApiDocInspector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.format.FormatterRegistry;
@@ -32,6 +33,9 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.util.ClassUtils;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
@@ -53,6 +57,9 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	@Autowired
 	private ServletContext servletContext;
+
+	@Autowired
+	private SpringValidatorAdapter validator;
 
 	@PostConstruct
 	private void init() {
@@ -176,6 +183,16 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 					.add(new org.ironrhino.security.oauth.server.component.OAuthAuthorizationArgumentResolver());
 		}
 		super.addArgumentResolvers(argumentResolvers);
+	}
+
+	@Override
+	public Validator getValidator() {
+		return this.validator;
+	}
+
+	@Bean
+	protected BeanPostProcessor methodValidationPostProcessor() {
+		return new MethodValidationPostProcessor();
 	}
 
 	@Bean
