@@ -20,20 +20,18 @@
 				color: white;
 				color: rgba(255, 255, 255, 0.98);
 				width: 50%;
-				text-align: right;
-				margin-top: 5%;
+				text-align: center;
 				text-shadow: 5px 5px hsl(0, 0%, 25%);
 				float: left;
 			}
 			.error-occur{
 				width: 47%;
 				float: right;
-				margin-top: 5%;
 				font-size: 30px;
 				color: white;
 				text-shadow: 2px 2px 5px hsl(0, 0%, 61%);
 				padding-top: 70px;
-				padding-right: 10px;
+				padding-right: 20px;
 				word-break: break-all;				
 			}
 			.clear{
@@ -46,6 +44,9 @@
 			}
 			pre{
 				text-align:left;
+				padding: 20px;
+				white-space: pre-wrap;
+				word-wrap: break-word;
 			}
 			input[type=text]{
 				border: hsl(247, 89%, 72%) solid 1px;
