@@ -87,11 +87,11 @@
 }
 
 .input-pseudo > .glyphicon {
-	display: inline-block;
+	position: absolute;
+	top: 0;
+	right: 5px;
 	line-height: 28px;
-	margin: 0 5px 0 0;
-	opacity: .3;
-	float: right;
+	color: rgba(0, 0, 0, .3);
 }
 
 .input-pseudo:not(.readonly):not(.disabled) > .glyphicon:hover {

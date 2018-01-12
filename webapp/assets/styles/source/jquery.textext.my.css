@@ -22,13 +22,9 @@
   box-sizing: border-box;
   position: absolute;
   top: 0;
-  right: 0;
-  width: 20px;
-  height: 100%;
+  right: 5px;
   cursor: pointer;
   z-index: 2;
-}
-.text-core .text-wrap .text-arrow {
   color: rgba(0, 0, 0, .3);
   line-height: 30px;
 }
@@ -36,7 +32,6 @@
   color: rgba(0, 0, 0, .8);
 }
 .text-core .text-wrap .text-dropdown {
-  box-sizing: border-box;
   position: absolute;
   z-index: 3;
   background: #fff;

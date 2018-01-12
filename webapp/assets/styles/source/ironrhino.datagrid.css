@@ -16,7 +16,7 @@
 	text-align: left;
 }
 
-.datagrided [class *= "glyphicon-"] {
+.datagrided .manipulate[class *= "glyphicon-"] {
 	margin: 3px;
 }
 
