@@ -14,9 +14,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.validation.GroupSequence;
 
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.validator.constraints.Length;
 import org.ironrhino.common.model.Region;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
@@ -27,10 +29,13 @@ import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.validation.constraints.OrganizationCode;
 import org.ironrhino.core.validation.constraints.SocialCreditIdentifier;
+import org.ironrhino.core.validation.groups.Steps.Step1;
+import org.ironrhino.core.validation.groups.Steps.Step2;
 
 import lombok.Getter;
 import lombok.Setter;
 
+@GroupSequence({ Step1.class, Step2.class, Company.class })
 @Searchable
 @AutoConfig
 @Table(name = "sample_company")
@@ -42,6 +47,7 @@ public class Company extends BaseEntity {
 
 	private static final long serialVersionUID = -2413944328894923968L;
 
+	@Length(min = 2, max = 50)
 	@SearchableProperty
 	@UiConfig(group = "baseInfo", queryMatchMode = MatchMode.EXACT)
 	@NaturalId(mutable = true)
@@ -51,12 +57,12 @@ public class Company extends BaseEntity {
 	@Column(nullable = false)
 	private CompanyType type;
 
-	@OrganizationCode
+	@OrganizationCode(groups = Step1.class)
 	@UiConfig(width = "100px", group = "baseInfo", shownInPick = true)
 	@Column(nullable = false, unique = true, length = 9)
 	private String organizationCode;
 
-	@SocialCreditIdentifier
+	@SocialCreditIdentifier(groups = Step2.class)
 	@UiConfig(width = "100px", group = "baseInfo", hiddenInList = @Hidden(true), shownInPick = true)
 	@Column(unique = true, length = 18)
 	private String socialCreditIdentifier;
