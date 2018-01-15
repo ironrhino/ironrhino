@@ -6,7 +6,6 @@ import javax.persistence.Embeddable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.validation.constraints.CitizenIdentificationNumber;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@IdentityCheck
 public class Identity implements Serializable {
 
 	private static final long serialVersionUID = 3472143402158894620L;
@@ -23,7 +23,6 @@ public class Identity implements Serializable {
 	@UiConfig(type = "dictionary", description = "identityType.description")
 	private String identityType;
 
-	@CitizenIdentificationNumber
 	private String identityNo;
 
 	public Identity(String str) {
