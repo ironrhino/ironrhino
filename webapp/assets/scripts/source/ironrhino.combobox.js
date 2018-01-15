@@ -1,5 +1,5 @@
 (function($) {
-	$(document).on('click', '.combobox .add-on', function(e) {
+	$(document).on('click', '.combobox .clickable', function(e) {
 		var input = $('input', $(e.target).closest('.combobox'));
 		var menu = $('.combobox-menu', $(e.target).closest('.combobox'));
 		var val = input.val();
@@ -44,7 +44,7 @@
 							+ t.attr('name')
 							+ '" value="'
 							+ t.val()
-							+ '"/><span class="add-on"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
+							+ '"/><span class="add-on clickable"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
 							.insertAfter(t);
 					var input = $('input', div);
 					input.width(t.width() - 27);
@@ -93,7 +93,6 @@
 						'display' : 'inline-block',
 						'position' : 'relative'
 					});
-			$('.add-on', t).css('cursor', 'pointer');
 		});
 		return this;
 	}

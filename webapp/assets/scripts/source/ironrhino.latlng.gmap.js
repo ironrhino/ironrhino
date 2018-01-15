@@ -3,20 +3,15 @@
 		var t = $(this);
 		var anchor;
 		if (t.is('[type="hidden"]')) {
-			anchor = $('<i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i>')
+			anchor = $('<i class="glyphicon glyphicon-map-marker clickable"></i>')
 					.insertAfter(t);
 		} else {
 			if (!t.parent('.input-append').length)
 				t
 						.wrap('<div class="input-append"></div>')
-						.after('<span class="add-on"><i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i></span>');
-			anchor = $(
-					'<i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i>',
-					t.next());
+						.after('<span class="add-on clickable"><i class="glyphicon glyphicon-map-marker"></i></span>');
+			anchor = $('.clickable', t.parent());
 		}
-		if (t.closest('.control-group').length)
-			anchor = $('.control-label,.glyphicon-map-marker', t
-							.closest('.control-group'));
 		anchor.click(function() {
 			window.latlng_input = t;
 			if (!$('#_maps_window').length) {

@@ -32622,7 +32622,7 @@ Initialization.common = function() {
 		});
 	}
 	if ($(document.body).hasClass('render-location-qrcode')) {
-		$('<div id="render-location-qrcode" class="hidden-phone hidden-tablet" style="width:15px;position:fixed;bottom:0;right:0;cursor:pointer;"><i class="glyphicon glyphicon-qrcode"></i></div>')
+		$('<div id="render-location-qrcode" class="hidden-phone hidden-tablet clickable" style="width:15px;position:fixed;bottom:0;right:0;"><i class="glyphicon glyphicon-qrcode"></i></div>')
 				.appendTo(document.body);
 		$('#render-location-qrcode').click(function() {
 			var _this = $(this);
@@ -37385,7 +37385,7 @@ Observation._portal = function(container) {
 	$$('.portal', container).portal();
 };
 (function($) {
-	$(document).on('click', '.combobox .add-on', function(e) {
+	$(document).on('click', '.combobox .clickable', function(e) {
 		var input = $('input', $(e.target).closest('.combobox'));
 		var menu = $('.combobox-menu', $(e.target).closest('.combobox'));
 		var val = input.val();
@@ -37430,7 +37430,7 @@ Observation._portal = function(container) {
 							+ t.attr('name')
 							+ '" value="'
 							+ t.val()
-							+ '"/><span class="add-on"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
+							+ '"/><span class="add-on clickable"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
 							.insertAfter(t);
 					var input = $('input', div);
 					input.width(t.width() - 27);
@@ -37479,7 +37479,6 @@ Observation._portal = function(container) {
 						'display' : 'inline-block',
 						'position' : 'relative'
 					});
-			$('.add-on', t).css('cursor', 'pointer');
 		});
 		return this;
 	}
@@ -40711,20 +40710,15 @@ Observation._imagepick = function(container) {
 		var t = $(this);
 		var anchor;
 		if (t.is('[type="hidden"]')) {
-			anchor = $('<i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i>')
+			anchor = $('<i class="glyphicon glyphicon-map-marker clickable"></i>')
 					.insertAfter(t);
 		} else {
 			if (!t.parent('.input-append').length)
 				t
 						.wrap('<div class="input-append"></div>')
-						.after('<span class="add-on"><i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i></span>');
-			anchor = $(
-					'<i class="glyphicon glyphicon-map-marker" style="cursor:pointer;"></i>',
-					t.next());
+						.after('<span class="add-on clickable"><i class="glyphicon glyphicon-map-marker"></i></span>');
+			anchor = $('.clickable', t.parent());
 		}
-		if (t.closest('.control-group').length)
-			anchor = $('.control-label,.glyphicon-map-marker', t
-							.closest('.control-group'));
 		anchor.click(function() {
 			window.latlng_input = t;
 			if (!$('#_maps_window').length) {
@@ -41138,8 +41132,8 @@ Observation.filtercolumn = function(container) {
 			t
 					.wrap('<div class="input-append"/>')
 					.parent()
-					.append('<span class="add-on" style="cursor:pointer;"><i class="glyphicon glyphicon-lock clickable"></i></span>');
-			t.next('.add-on').click(function() {
+					.append('<span class="add-on clickable"><i class="glyphicon glyphicon-lock"></i></span>');
+			t.next('.clickable').click(function() {
 				$('#pattern-modal').remove();
 				var modal = $('<div id="pattern-modal" class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div class="modal-body" style="max-height:600px;"><div class="message" style="height: 38px;"></div><div class="pattern" style="margin-top: -38px;"></div></div></div>')
 						.appendTo(topDocument.body);

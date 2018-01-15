@@ -456,12 +456,15 @@ a.remove:hover , a.remove:focus {
 	border: 2px dashed #333 ! important;
 }
 
-.clickable[class *= "glyphicon-"] {
-	opacity: .2;
+.clickable {
 	cursor: pointer;
 }
 
-.clickable[class *= "glyphicon-"]:hover {
+.clickable[class *= "glyphicon-"] , .clickable > [class *= "glyphicon-"] {
+	opacity: .3;
+}
+
+.clickable[class *= "glyphicon-"]:hover , .clickable:hover > [class *= "glyphicon-"] {
 	opacity: .8 ! important;
 }
 
