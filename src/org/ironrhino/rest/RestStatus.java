@@ -2,6 +2,10 @@ package org.ironrhino.rest;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -47,12 +51,14 @@ public class RestStatus extends RuntimeException {
 	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND, null, 404);
 
 	@NotNull
-	private String code;
+	private final String code;
 
 	@NotNull
-	private String status;
+	private final String status;
 
 	private String message;
+
+	private Map<String, List<String>> fieldErrors;
 
 	@JsonIgnore
 	private Integer httpStatusCode;
@@ -76,6 +82,19 @@ public class RestStatus extends RuntimeException {
 		this.status = status;
 		this.message = message;
 		this.httpStatusCode = httpStatusCode;
+	}
+
+	public void addFieldError(String field, String error) {
+		if (!this.code.equals(CODE_FIELD_INVALID))
+			throw new IllegalStateException("Status should be FIELD_INVALID");
+		if (fieldErrors == null)
+			fieldErrors = new LinkedHashMap<>();
+		List<String> errors = fieldErrors.get(field);
+		if (errors == null) {
+			errors = new ArrayList<>();
+			fieldErrors.put(field, errors);
+		}
+		errors.add(error);
 	}
 
 	public static RestStatus valueOf(String code) {

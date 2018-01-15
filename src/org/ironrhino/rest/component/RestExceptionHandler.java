@@ -1,6 +1,9 @@
 package org.ironrhino.rest.component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletionException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,13 +39,6 @@ public class RestExceptionHandler {
 		if (ex instanceof CompletionException) {
 			ex = ex.getCause();
 		}
-		if (ex instanceof BindException) {
-			BindException be = ((BindException) ex);
-			StringBuilder sb = new StringBuilder();
-			for (FieldError fe : be.getFieldErrors())
-				sb.append(fe.getField()).append(": ").append(fe.getDefaultMessage()).append("; ");
-			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
-		}
 		if (ex instanceof HttpMediaTypeNotAcceptableException) {
 			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -51,39 +48,48 @@ public class RestExceptionHandler {
 				e.printStackTrace();
 			}
 			return null;
-		}
-		if (ex instanceof HttpRequestMethodNotSupportedException) {
+		} else if (ex instanceof HttpRequestMethodNotSupportedException) {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			return RestStatus.valueOf(RestStatus.CODE_FORBIDDEN, ex.getMessage());
-		}
-		if (ex instanceof MethodArgumentNotValidException) {
+		} else if (ex instanceof MethodArgumentTypeMismatchException || ex instanceof IllegalArgumentException) {
+			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, ex.getMessage());
+		} else if (ex instanceof BindException || ex instanceof MethodArgumentNotValidException) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			MethodArgumentNotValidException me = (MethodArgumentNotValidException) ex;
-			BindingResult bindingResult = me.getBindingResult();
-			StringBuilder sb = new StringBuilder();
-			for (FieldError fe : bindingResult.getFieldErrors()) {
-				sb.append(fe.getField()).append(": ").append(fe.getDefaultMessage()).append("; ");
-			}
-			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
-		}
-		if (ex instanceof ConstraintViolationException) {
+			RestStatus rs = RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID);
+			BindingResult bindingResult = ex instanceof BindException ? (BindException) ex
+					: ((MethodArgumentNotValidException) ex).getBindingResult();
+			List<String> messages = new ArrayList<>();
+			if (bindingResult.hasGlobalErrors())
+				for (ObjectError oe : bindingResult.getGlobalErrors()) {
+					messages.add(oe.getDefaultMessage());
+					rs.addFieldError(oe.getObjectName(), oe.getDefaultMessage());
+				}
+			if (bindingResult.hasFieldErrors())
+				for (FieldError fe : bindingResult.getFieldErrors()) {
+					messages.add(fe.getDefaultMessage());
+					rs.addFieldError(fe.getField(), fe.getDefaultMessage());
+				}
+			rs.setMessage(String.join("\n", messages));
+			return rs;
+		} else if (ex instanceof ConstraintViolationException) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			RestStatus rs = RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID);
 			ConstraintViolationException cve = (ConstraintViolationException) ex;
-			StringBuilder sb = new StringBuilder();
-			for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
-				String path = cv.getPropertyPath().toString();
+			Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+			List<String> messages = new ArrayList<>(constraintViolations.size());
+			for (ConstraintViolation<?> cv : constraintViolations) {
+				String field = cv.getPropertyPath().toString();
 				if (cv.getExecutableParameters() != null) {
 					// method parameter
-					int index = path.indexOf('.');
+					int index = field.indexOf('.');
 					if (index > 0)
-						path = path.substring(index + 1);
+						field = field.substring(index + 1);
 				}
-				sb.append(path).append(": ").append(cv.getMessage()).append("; ");
+				messages.add(cv.getMessage());
+				rs.addFieldError(field, cv.getMessage());
 			}
-			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
-		}
-		if (ex instanceof MethodArgumentTypeMismatchException || ex instanceof IllegalArgumentException) {
-			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, ex.getMessage());
+			rs.setMessage(String.join("\n", messages));
+			return rs;
 		}
 		if (ex.getCause() instanceof RestStatus)
 			ex = ex.getCause();
