@@ -24,7 +24,7 @@ public class MobilePhoneNumberValidator implements ConstraintValidator<MobilePho
 			return false;
 		if (input.startsWith("+86"))
 			input = input.substring(3);
-		if (!StringUtils.isNumeric(input))
+		if (!StringUtils.isNumeric(input) || input.length() != 11)
 			return false;
 		for (Carrier car : Carrier.values())
 			for (String prefix : car.getNumberPrefixes())
