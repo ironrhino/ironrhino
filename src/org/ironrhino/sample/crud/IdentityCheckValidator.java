@@ -16,27 +16,22 @@ public class IdentityCheckValidator implements ConstraintValidator<IdentityCheck
 		String identityNo = input.getIdentityNo();
 		if (identityType == null || identityNo == null)
 			return true;
+		boolean valid;
 		if (identityType.equals("A")) {
-			boolean valid = CitizenIdentificationNumberValidator.isValid(identityNo);
-			if (!valid) {
-				constraintValidatorContext.disableDefaultConstraintViolation();
-				constraintValidatorContext
-						.buildConstraintViolationWithTemplate(
-								constraintValidatorContext.getDefaultConstraintMessageTemplate())
-						.addPropertyNode("identityNo").addConstraintViolation();
-			}
-			return valid;
+			valid = CitizenIdentificationNumberValidator.isValid(identityNo);
 		} else if (identityType.equals("B")) {
-			boolean valid = identityNo.length() == 8 && StringUtils.isNumeric(identityNo);
-			if (!valid) {
-				constraintValidatorContext.disableDefaultConstraintViolation();
-				constraintValidatorContext.buildConstraintViolationWithTemplate("不是正确的军官证")
-						.addPropertyNode("identityNo").addConstraintViolation();
-			}
-			return valid;
+			valid = identityNo.length() == 8 && StringUtils.isNumeric(identityNo);
 		} else {
-			return true;
+			valid = true;
 		}
+		if (!valid) {
+			constraintValidatorContext.disableDefaultConstraintViolation();
+			constraintValidatorContext
+					.buildConstraintViolationWithTemplate(
+							"{" + IdentityCheck.class.getName() + "." + identityType + ".message}")
+					.addPropertyNode("identityNo").addConstraintViolation();
+		}
+		return valid;
 	}
 
 }

@@ -1,9 +1,9 @@
 package org.ironrhino.core.struts;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.model.Persistable;
@@ -21,10 +23,10 @@ import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.ClassUtils;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ObjectFactory;
@@ -61,6 +63,9 @@ public class AutoConfigPackageProvider implements PackageProvider {
 
 	@Inject
 	private ObjectFactory objectFactory;
+
+	@Inject
+	private ServletContext servletContext;
 
 	protected Map<String, Set<String>> configPackages() {
 		Map<String, Set<String>> packages = new HashMap<>();
@@ -126,41 +131,18 @@ public class AutoConfigPackageProvider implements PackageProvider {
 	@Override
 	public void init(Configuration configuration) throws ConfigurationException {
 		this.configuration = configuration;
-		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-		String searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + GLOBAL_MESSAGES_PATTERN;
-		Map<String, String> fileMessageBunldes = new HashMap<>();
-		Map<String, String> jarMessageBunldes = new HashMap<>();
-		try {
-			Resource[] resources = resourcePatternResolver.getResources(searchPath);
-			for (Resource res : resources) {
-				Map<String, String> messageBunldes = res.getURI().getScheme().equals("file") ? fileMessageBunldes
-						: jarMessageBunldes;
-				String name = res.getURI().toString();
-				String source = name.substring(0, name.indexOf("/resources/i18n/"));
-				name = name.substring(name.indexOf("resources/i18n/"));
-				name = org.ironrhino.core.util.StringUtils.trimLocale(name.substring(0, name.lastIndexOf('.')));
-				name = org.springframework.util.ClassUtils.convertResourcePathToClassName(name);
-				if (messageBunldes.containsKey(name) && !source.equals(messageBunldes.get(name))) {
-					logger.warn("Global messages " + name + " ignored from " + source + ", will load from "
-							+ messageBunldes.get(name));
-				} else {
-					messageBunldes.put(name, source);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		List<String> messages = new ArrayList<>(jarMessageBunldes.keySet());
-		messages.sort((a, b) -> {
-			if (a.startsWith("resources.i18n.common."))
-				return -1;
-			return 0;
-		});
-		messages.addAll(fileMessageBunldes.keySet());
-		for (String name : messages) {
+		ReloadableResourceBundleMessageSource messageSource = WebApplicationContextUtils
+				.getRequiredWebApplicationContext(servletContext).getBean(ReloadableResourceBundleMessageSource.class);
+		List<String> basenames = new ArrayList<>(messageSource.getBasenameSet());
+		Collections.reverse(basenames);
+		basenames.stream().forEach(name -> {
+			if (name.startsWith(ResourcePatternResolver.CLASSPATH_URL_PREFIX))
+				name = name.substring(ResourcePatternResolver.CLASSPATH_URL_PREFIX.length());
+			name = org.springframework.util.ClassUtils.convertResourcePathToClassName(name);
 			LocalizedTextUtil.addDefaultResourceBundle(name);
 			logger.info("Loading global messages from " + name);
-		}
+		});
+
 	}
 
 	@Override

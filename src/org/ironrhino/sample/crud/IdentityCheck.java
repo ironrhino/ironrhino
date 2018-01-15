@@ -14,7 +14,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy = { IdentityCheckValidator.class })
 public @interface IdentityCheck {
 
-	String message() default "{org.ironrhino.core.validation.validators.constraints.CitizenIdentificationNumber.message}";
+	String message() default "{org.ironrhino.sample.crud.IdentityCheck.message}";
 
 	Class<?>[] groups() default {};
 
