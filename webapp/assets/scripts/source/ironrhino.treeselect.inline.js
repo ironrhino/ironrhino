@@ -1,7 +1,9 @@
 (function($) {
 	$.fn.treeselectinline = function() {
 		this.each(function() {
-			var t = $(this)
+			var t = $(this);
+			var width = t.outerWidth();
+			t
 					.removeClass('.treeselect-inline')
 					.wrap('<div class="input-pseudo treeselect-inline" tabindex="0"></div>');
 			var treeselect = t.parent();
@@ -18,18 +20,20 @@
 				treeselect.attr('id', t.attr('id'));
 				t.removeAttr('id');
 			}
-			var style = t.attr('style');
-			if (style) {
-				t.removeAttr('style');
-				treeselect.attr('style', style);
-			}
+			var hasWidthClass = false;
 			$.each(	$.grep(t.attr('class').split(' '), function(v) {
-								return v.indexOf('input-') == 0
+								var b = v.indexOf('input-') == 0
 										|| v.indexOf('span') == 0;
+								if (b)
+									hasWidthClass = true;
+								return b;
 							}), function(k, v) {
 						t.removeClass(v);
 						treeselect.addClass(v);
 					});
+			if (width > 0 && !hasWidthClass)
+				treeselect.outerWidth(width);
+
 			$('<i class="indicator glyphicon glyphicon-triangle-bottom"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
 					.appendTo(treeselect);
 		});

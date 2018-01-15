@@ -5162,20 +5162,6 @@ input[type="checkbox"] {
   margin: 4px 0 0;
   line-height: normal;
 }
-input[type="file"],
-input[type="image"],
-input[type="submit"],
-input[type="reset"],
-input[type="button"],
-input[type="radio"],
-input[type="checkbox"] {
-  width: auto;
-}
-select,
-input[type="file"] {
-  height: 30px; /*IE*/
-  line-height: 30px;
-}
 select {
   width: 220px;
   border: 1px solid #cccccc;
@@ -10093,8 +10079,53 @@ body.sidebar .navbar .btn-navbar {
 .nav-sidebar-modal.visible {
 	opacity: .6;
 }
-select , input[type="text"] , input[type="password"] , input[type="datetime"] , input[type="datetime-local"] , input[type="date"] , input[type="month"] , input[type="time"] , input[type="week"] , input[type="number"] , input[type="email"] , input[type="url"] , input[type="search"] , input[type="tel"] , input[type="color"] , .uneditable-input {
+select , input[type="text"] , input[type="password"] , input[type="file"] , input[type="datetime"] , input[type="datetime-local"] , input[type="date"] , input[type="month"] , input[type="time"] , input[type="week"] , input[type="number"] , input[type="email"] , input[type="url"] , input[type="search"] , input[type="tel"] , input[type="color"] , .uneditable-input {
 	line-height: 1em;
+}
+
+input[type="file"] {
+	cursor: pointer;
+	padding: 1px 7px;
+	height: 28px;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+	cursor: pointer;
+	border: 1px solid #aaaaaa;
+	border-radius: 4px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background: linear-gradient(to bottom, efefef, #dedede, #efefef);
+}
+
+select {
+	height: 30px;
+	text-indent: 0.01px;
+	text-overflow: '';
+	padding-right: 16px;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50px' height='50px'><polyline points='46.139,15.518 25.166,36.49 4.193,15.519' fill='rgba(0,0,0,.3)'/></svg>");
+	background-size: 15px;
+	background-position: calc(100% - 5px);
+	background-repeat: no-repeat;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+select:focus {
+	border-color: rgba(82, 168, 236, 0.8);
+	outline: 0;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
+}
+
+select:-moz-focusring {
+	color: transparent;
+	text-shadow: 0 0 0 #000;
+}
+
+::-ms-expand {
+	display: none;
 }
 
 select.input-medium {
@@ -10338,20 +10369,6 @@ button.loading:after {
 	box-shadow: 0 0 0 1px transparent;
 }
 
-input[type="file"] {
-	cursor: pointer;
-	width: 220px;
-}
-
-input[type="file"]::-webkit-file-upload-button {
-	cursor: pointer;
-	border: 1px solid #aaaaaa;
-	border-radius: 4px;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	background: linear-gradient(to bottom, efefef, #dedede, #efefef);
-}
-
 span.checkboxgroup {
 	display: inline-block;
 	margin: 0 20px;
@@ -10412,6 +10429,7 @@ strong.force-override {
 	line-height: 20px;
 	border-radius: 6px;
 	white-space: pre-wrap;
+	word-break: break-all;
 }
 
 .field-error-content:before {
@@ -10555,35 +10573,6 @@ input[type="radio"]:checked:after {
 .radio.inline input[type="radio"] , .checkbox.inline input[type="checkbox"] {
 	float: none;
 	margin-right: 5px;
-}
-
-select {
-	text-indent: 0.01px;
-	text-overflow: '';
-	padding-right: 16px;
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50px' height='50px'><polyline points='46.139,15.518 25.166,36.49 4.193,15.519' fill='rgba(0,0,0,.3)'/></svg>");
-	background-size: 15px;
-	background-position: calc(100% - 5px);
-	background-repeat: no-repeat;
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-}
-
-select:focus {
-	border-color: rgba(82, 168, 236, 0.8);
-	outline: 0;
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
-}
-
-select:-moz-focusring {
-	color: transparent;
-	text-shadow: 0 0 0 #000;
-}
-
-::-ms-expand {
-	display: none;
 }
 
 .input-append.search input {
@@ -11445,7 +11434,7 @@ th.filtercolumn li.main li {
 }
 
 .input-pseudo.input-xxlarge {
-	width: 554px;
+	width: 544px;
 }
 
 .datagrided.adaptive td > .input-pseudo , .datagrided.adaptive td > div:only-child > .input-pseudo {
