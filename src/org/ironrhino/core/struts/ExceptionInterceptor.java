@@ -34,14 +34,15 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 	public String intercept(ActionInvocation invocation) throws Exception {
 		try {
 			return invocation.invoke();
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			ServletActionContext.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
 			if (e instanceof LocalizedException || e instanceof ErrorMessage)
 				logger.error(e.getLocalizedMessage());
-			else if (!(e instanceof ValidationException))
+			else if (!(e instanceof ValidationException) && !(e instanceof javax.validation.ValidationException))
 				logger.error(e.getMessage(), e);
-			if (e instanceof MethodFailedException || e instanceof CompletionException)
-				e = e.getCause();
+			if ((e instanceof MethodFailedException || e instanceof CompletionException)
+					&& e.getCause() instanceof Exception)
+				e = (Exception) e.getCause();
 			if (e instanceof NoSuchMethodException)
 				return BaseAction.NOTFOUND;
 			Object action = invocation.getAction();
