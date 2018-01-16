@@ -186,7 +186,8 @@ public class PageAction extends EntityAction<Page> {
 	@Validations(requiredStrings = {
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "page.path", trim = true, key = "validation.required") })
 	public String checkavailable() {
-		return makeEntityValid() ? NONE : INPUT;
+		makeEntityValid();
+		return JSON;
 	}
 
 	@Override

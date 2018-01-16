@@ -759,7 +759,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public String checkavailable() {
-		return makeEntityValid() ? NONE : INPUT;
+		makeEntityValid();
+		return JSON;
 	}
 
 	protected boolean makeEntityValid() {
