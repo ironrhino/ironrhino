@@ -91,7 +91,7 @@
 				${value!}
 			</#if>
 		<#elseif config.type=='schema'>
-			<#if printAttributes??><@printAttributes attributes=entity.attributes grouping=true/></#if>
+			<#if printAttributes??&&entity.attributes??><@printAttributes attributes=entity.attributes grouping=true/></#if>
 		<#elseif config.type=='imageupload'>
 			<#if value?has_content><img src="${value}"/></#if>
 		<#elseif value??>
