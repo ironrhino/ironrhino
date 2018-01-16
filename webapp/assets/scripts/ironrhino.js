@@ -36187,11 +36187,19 @@ Observation.checkbox = function(container) {
 				event.preventDefault();
 			else if (input.is('.input-pseudo'))
 				input.focus();
-		}).on('paste', 'input[type="text"]', function() {
+		}).on('focus', 'input', function() {
+					// move cursor to the end
+					try {
+						this.selectionStart = this.selectionEnd = this.value.length;
+					} catch (e) {
+					}
+				}).on('paste',
+				'input:not([type="password"]):not([type="number"])',
+				function() {
 					var t = $(this);
 					setTimeout(function() {
 								t.val($.trim(t.val()));
-							}, 50);
+							}, 0);
 				}).on('validate', ':input', function(ev) {
 					Form.validate(this, 'validate');
 				}).on('keyup', 'input,textarea', $.debounce(200, function(ev) {
