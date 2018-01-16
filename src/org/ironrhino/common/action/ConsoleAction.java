@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -19,9 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
-import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
-import com.opensymphony.xwork2.validator.annotations.Validations;
-import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +34,7 @@ public class ConsoleAction extends BaseAction {
 
 	private static Logger logger = LoggerFactory.getLogger(ConsoleAction.class);
 
+	@NotEmpty
 	@Getter
 	@Setter
 	private String expression;
@@ -49,9 +50,8 @@ public class ConsoleAction extends BaseAction {
 	private ApplicationContextConsole applicationContextConsole;
 
 	@Override
-	@InputConfig(resultName = "success")
-	@Validations(requiredStrings = {
-			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "expression", trim = true, key = "validation.required") })
+	@Valid
+	@InputConfig(resultName = SUCCESS)
 	public String execute() throws Exception {
 		try {
 			result = applicationContextConsole.execute(expression, scope);
@@ -62,19 +62,16 @@ public class ConsoleAction extends BaseAction {
 				throwable = ((InvocationTargetException) throwable).getTargetException();
 			if (throwable.getCause() instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable.getCause()).getTargetException();
-			logger.error(throwable.getMessage(), throwable);
 			String msg = throwable.getLocalizedMessage();
+			logger.error(msg);
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
-			Map<String, Collection<String>> map = new HashMap<>();
-			map.put("actionErrors", getActionErrors());
 			return ERROR;
 
 		}
 	}
 
-	@InputConfig(resultName = "success")
-	@Validations(requiredStrings = {
-			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "expression", trim = true, key = "validation.required") })
+	@Valid
+	@InputConfig(resultName = SUCCESS)
 	@JsonConfig(root = "result")
 	public String executeJson() {
 		try {
@@ -82,9 +79,9 @@ public class ConsoleAction extends BaseAction {
 		} catch (Throwable throwable) {
 			if (throwable instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable).getTargetException();
-			logger.error(throwable.getMessage(), throwable);
-			String msg = throwable.getMessage();
-			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + throwable.getMessage()) : ""));
+			String msg = throwable.getLocalizedMessage();
+			logger.error(msg);
+			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			Map<String, Collection<String>> map = new HashMap<>();
 			map.put("actionErrors", getActionErrors());
 			result = map;

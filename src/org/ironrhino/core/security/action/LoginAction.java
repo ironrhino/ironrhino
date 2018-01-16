@@ -2,6 +2,8 @@ package org.ironrhino.core.security.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
@@ -59,10 +61,12 @@ public class LoginAction extends BaseAction {
 
 	@Getter
 	@Setter
+	@NotBlank
 	protected String password;
 
 	@Getter
 	@Setter
+	@NotBlank
 	protected String username;
 
 	@Value("${login.defaultTargetUrl:/}")
@@ -87,6 +91,7 @@ public class LoginAction extends BaseAction {
 	protected VerificationManager verificationManager;
 
 	@Override
+	@Valid
 	@Redirect
 	@InputConfig(methodName = INPUT)
 	@Captcha(threshold = 3)

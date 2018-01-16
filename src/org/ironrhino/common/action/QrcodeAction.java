@@ -53,7 +53,7 @@ public class QrcodeAction extends BaseAction {
 	private int height = 400;
 
 	@Override
-	@InputConfig(resultName = "success")
+	@InputConfig(resultName = SUCCESS)
 	@JsonConfig(root = "content")
 	public String execute() {
 		try {

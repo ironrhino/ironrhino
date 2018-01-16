@@ -40,12 +40,10 @@
 			<result-type name="qrcode" class="org.ironrhino.core.struts.result.QRCodeResult" />
 		</result-types>
 		<interceptors>
-			<interceptor name="params"
-				class="org.ironrhino.core.struts.interceptor.MyParametersInterceptor" />
-			<interceptor name="exception"
-				class="org.ironrhino.core.struts.ExceptionInterceptor" />
-			<interceptor name="annotationWorkflow"
-				class="com.opensymphony.xwork2.interceptor.annotations.AnnotationWorkflowInterceptor" />
+			<interceptor name="params" class="org.ironrhino.core.struts.interceptor.MyParametersInterceptor" />
+			<interceptor name="exception" class="org.ironrhino.core.struts.ExceptionInterceptor" />
+			<interceptor name="beanValidation" class="org.ironrhino.core.struts.BeanValidationInterceptor"/>
+			<interceptor name="annotationWorkflow" class="com.opensymphony.xwork2.interceptor.annotations.AnnotationWorkflowInterceptor" />
 			<interceptor-stack name="annotationDefaultStack">
 				<interceptor-ref name="exception" />
 				<interceptor-ref name="checkbox" />
@@ -56,6 +54,7 @@
 				</interceptor-ref>
 				<interceptor-ref name="conversionError" />
 				<interceptor-ref name="annotationWorkflow" />
+				<interceptor-ref name="beanValidation" />
 				<interceptor-ref name="validation">
 					<param name="validateAnnotatedMethodOnly">true</param>
 				</interceptor-ref>
