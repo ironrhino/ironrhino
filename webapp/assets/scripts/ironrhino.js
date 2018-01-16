@@ -40049,7 +40049,8 @@ Observation.treeselect = function(container) {
 						t.removeClass(v);
 						treeselect.addClass(v);
 					});
-			if (width > 0 && !hasWidthClass)
+			if (width > 0 && !hasWidthClass
+					&& !treeselect.closest('.datagrided').length)
 				treeselect.outerWidth(width);
 
 			$('<i class="indicator glyphicon glyphicon-triangle-bottom"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
@@ -40689,7 +40690,7 @@ Observation.listpick = function(container) {
 							+ CONTEXT_PATH
 							+ '/common/upload/pick\',\'width\':500}"/>')
 					.parent()
-					.append('<span class="add-on listpick-handle"><i class="glyphicon glyphicon-th-list"></i></span>');
+					.append('<span class="add-on listpick-handle clickable"><i class="glyphicon glyphicon-th-list"></i></span>');
 			if (t.val())
 				t.attr('data-content', '<img src="' + t.val() + '"/>');
 			t.change(function() {

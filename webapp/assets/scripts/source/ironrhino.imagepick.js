@@ -9,7 +9,7 @@
 							+ CONTEXT_PATH
 							+ '/common/upload/pick\',\'width\':500}"/>')
 					.parent()
-					.append('<span class="add-on listpick-handle"><i class="glyphicon glyphicon-th-list"></i></span>');
+					.append('<span class="add-on listpick-handle clickable"><i class="glyphicon glyphicon-th-list"></i></span>');
 			if (t.val())
 				t.attr('data-content', '<img src="' + t.val() + '"/>');
 			t.change(function() {

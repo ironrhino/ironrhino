@@ -31,7 +31,8 @@
 						t.removeClass(v);
 						treeselect.addClass(v);
 					});
-			if (width > 0 && !hasWidthClass)
+			if (width > 0 && !hasWidthClass
+					&& !treeselect.closest('.datagrided').length)
 				treeselect.outerWidth(width);
 
 			$('<i class="indicator glyphicon glyphicon-triangle-bottom"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
