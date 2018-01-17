@@ -25,16 +25,20 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.transform.Transformers;
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.service.BaseManager.IterateCallback;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import lombok.Data;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(locations = { "ctx.xml" })
@@ -223,17 +227,57 @@ public class EntityManagerTest {
 		clearData();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testResultTransformer() {
+		prepareData();
+		String hql = "select p.name as name,p.code as code,p.gender as gender from Person p where p.gender=:gender order by p.name";
+		List<PersonDTO> males = entityManager.executeFind(session -> {
+			return session.createQuery(hql).setResultTransformer(Transformers.aliasToBean(PersonDTO.class))
+					.setParameter("gender", Gender.MALE).list();
+		});
+		assertEquals(5, males.size());
+		assertEquals("test0", males.get(0).getName());
+		assertEquals("code0", males.get(0).getCode());
+		assertEquals(Gender.MALE, males.get(0).getGender());
+		List<Map<String, Object>> males2 = entityManager.executeFind(session -> {
+			return session.createQuery(hql).setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE)
+					.setParameter("gender", Gender.MALE).list();
+		});
+		assertEquals(5, males2.size());
+		assertEquals("test0", males2.get(0).get("name"));
+		assertEquals("code0", males2.get(0).get("code"));
+		assertEquals(Gender.MALE, males2.get(0).get("gender"));
+		List<Object[]> males3 = entityManager.executeFind(session -> {
+			return session.createQuery(hql).setParameter("gender", Gender.MALE).list();
+		});
+		assertEquals(5, males3.size());
+		assertEquals("test0", males3.get(0)[0]);
+		assertEquals("code0", males3.get(0)[1]);
+		assertEquals(Gender.MALE, males3.get(0)[2]);
+		List<PersonDTO> males4 = entityManager.executeFind(session -> {
+			DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
+			dc.setProjection(Projections.projectionList().add(Projections.property("name"), "name")
+					.add(Projections.property("code"), "code").add(Projections.property("gender"), "gender"))
+					.setResultTransformer(Transformers.aliasToBean(PersonDTO.class));
+			dc.add(Restrictions.eq("gender", Gender.MALE));
+			return dc.getExecutableCriteria(session).list();
+		});
+		assertEquals(5, males4.size());
+		assertEquals("test0", males4.get(0).getName());
+		assertEquals("code0", males4.get(0).getCode());
+		assertEquals(Gender.MALE, males4.get(0).getGender());
+		clearData();
+	}
+
 	@Test
 	public void testCallback() {
 		prepareData();
-		Person person = entityManager.executeFind(new HibernateCallback<Person>() {
-			@Override
-			public Person doInHibernate(Session session) {
-				Query q = session.createQuery("from Person p where p.name=:name");
-				q.setString("name", "test0");
-				q.setMaxResults(1);
-				return (Person) q.uniqueResult();
-			}
+		Person person = entityManager.executeFind(session -> {
+			Query q = session.createQuery("from Person p where p.name=:name");
+			q.setString("name", "test0");
+			q.setMaxResults(1);
+			return (Person) q.uniqueResult();
 		});
 		assertEquals("test0", person.getName());
 		clearData();
@@ -303,6 +347,17 @@ public class EntityManagerTest {
 
 	private void clearData() {
 		entityManager.executeUpdate("delete from Person p");
+	}
+
+	@Data
+	public static class PersonDTO {
+
+		private String name;
+
+		private String code;
+
+		private Gender gender;
+
 	}
 
 }
