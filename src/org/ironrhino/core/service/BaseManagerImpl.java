@@ -36,6 +36,7 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.transform.ResultTransformer;
+import org.ironrhino.core.hibernate.IgnoreCaseSimpleExpression;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Ordered;
 import org.ironrhino.core.model.Persistable;
@@ -411,7 +412,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public T findByNaturalId(Serializable... objects) {
-		Criteria c = constructCriteria(true, objects);
+		Criteria c = constructCriteria(true, false, objects);
 		if (c == null)
 			return null;
 		c.setMaxResults(1);
@@ -451,24 +452,21 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public T findOne(boolean caseInsensitive, Serializable... objects) {
-		if (!caseInsensitive)
-			return findOne(objects);
-		Query query = constructLowerQuery(false, objects);
-		if (query == null)
+		Criteria c = constructCriteria(false, caseInsensitive, objects);
+		if (c == null)
 			return null;
-		query.setMaxResults(1);
-		return (T) query.uniqueResult();
+		c.setMaxResults(1);
+		return (T) c.uniqueResult();
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public boolean existsOne(boolean caseInsensitive, Serializable... objects) {
-		if (!caseInsensitive)
-			return existsOne(objects);
-		Query query = constructLowerQuery(true, objects);
-		if (query == null)
+		Criteria c = constructCriteria(false, caseInsensitive, objects);
+		if (c == null)
 			return false;
-		return (Long) query.uniqueResult() > 0;
+		c.setProjection(Projections.rowCount());
+		return ((Long) c.uniqueResult()) > 0;
 	}
 
 	private static Serializable[] transform(Serializable... objects) {
@@ -488,15 +486,20 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	private Criteria constructCriteria(boolean checkNaturalId, Serializable... objects) {
+		return constructCriteria(checkNaturalId, false, objects);
+	}
+
+	private Criteria constructCriteria(boolean checkNaturalId, boolean ignoreCase, Serializable... objects) {
 		objects = transform(objects);
 		if (objects == null)
 			return null;
-		Criteria c = sessionFactory.getCurrentSession().createCriteria(getEntityClass());
+		DetachedCriteria dc = detachedCriteria();
 		Set<String> naturalIds = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), NaturalId.class);
 		if (objects.length == 1) {
 			if (naturalIds.size() != 1)
 				throw new IllegalArgumentException("@NaturalId must and only be one");
-			c.add(Restrictions.eq(naturalIds.iterator().next(), objects[0]));
+			dc.add(ignoreCase ? new IgnoreCaseSimpleExpression(naturalIds.iterator().next(), objects[0], "=")
+					: Restrictions.eq(naturalIds.iterator().next(), objects[0]));
 		} else {
 			if (objects.length == 0 || objects.length % 2 != 0)
 				throw new IllegalArgumentException("Parameter size must be even");
@@ -508,44 +511,11 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				if (checkNaturalId && !naturalIds.contains(name))
 					throw new IllegalArgumentException(
 							getEntityClass().getName() + "." + name + " should annotate @NaturalId");
-				c.add(Restrictions.eq(name, objects[2 * i + 1]));
+				dc.add(ignoreCase ? new IgnoreCaseSimpleExpression(name, objects[2 * i + 1], "=")
+						: Restrictions.eq(name, objects[2 * i + 1]));
 			}
 		}
-		return c;
-	}
-
-	private Query constructLowerQuery(boolean count, Serializable... objects) {
-		objects = transform(objects);
-		if (objects == null)
-			return null;
-		String hql = "from " + getEntityClass().getName() + " entity where ";
-		if (count)
-			hql = "select count(entity) " + hql;
-		Query query;
-		if (objects.length == 1) {
-			Set<String> naturalIds = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), NaturalId.class);
-			if (naturalIds.size() != 1)
-				throw new IllegalArgumentException("@NaturalId must and only be one");
-			hql += "lower(entity." + naturalIds.iterator().next() + ")=lower(?1)";
-			query = sessionFactory.getCurrentSession().createQuery(hql);
-			query.setParameter("1", objects[0]);
-		} else {
-			if (objects.length == 0 || objects.length % 2 != 0)
-				throw new IllegalArgumentException("parameter size must be even");
-			int doubles = objects.length / 2;
-			if (doubles == 1) {
-				hql += "lower(entity." + String.valueOf(objects[0]) + ")=lower(?1)";
-			} else {
-				List<String> list = new ArrayList<>(doubles);
-				for (int i = 0; i < doubles; i++)
-					list.add("lower(entity." + String.valueOf(objects[2 * i]) + ")=lower(?" + (i + 1) + ")");
-				hql += String.join(" and ", list);
-			}
-			query = sessionFactory.getCurrentSession().createQuery(hql);
-			for (int i = 0; i < doubles; i++)
-				query.setParameter(String.valueOf(i + 1), objects[2 * i + 1]);
-		}
-		return query;
+		return dc.getExecutableCriteria(sessionFactory.getCurrentSession());
 	}
 
 	@Override

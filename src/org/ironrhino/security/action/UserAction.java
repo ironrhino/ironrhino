@@ -1,6 +1,7 @@
 package org.ironrhino.security.action;
 
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -182,12 +183,13 @@ public class UserAction extends EntityAction<User> {
 		if (user.isNew()) {
 			if (StringUtils.isNotBlank(user.getUsername())) {
 				user.setUsername(user.getUsername().toLowerCase(Locale.ROOT));
-				if (userManager.existsNaturalId(user.getUsername())) {
+				if (userManager.existsOne(true, new Serializable[] { "username", user.getUsername() })) {
 					addFieldError("user.username", getText("validation.already.exists"));
 					return false;
 				}
 			}
-			if (StringUtils.isNotBlank(user.getEmail()) && userManager.existsOne("email", user.getEmail())) {
+			if (StringUtils.isNotBlank(user.getEmail())
+					&& userManager.existsOne(true, new Serializable[] { "email", user.getEmail() })) {
 				addFieldError("user.email", getText("validation.already.exists"));
 				return false;
 			}
@@ -196,7 +198,7 @@ public class UserAction extends EntityAction<User> {
 			User temp = user;
 			user = userManager.get(temp.getId());
 			if (StringUtils.isNotBlank(temp.getEmail()) && !temp.getEmail().equals(user.getEmail())
-					&& userManager.existsOne("email", temp.getEmail())) {
+					&& userManager.existsOne(true, new Serializable[] { "email", temp.getEmail() })) {
 				addFieldError("user.email", getText("validation.already.exists"));
 				return false;
 			}
@@ -283,7 +285,7 @@ public class UserAction extends EntityAction<User> {
 		User temp = user;
 		User user = AuthzUtils.getUserDetails();
 		if (StringUtils.isNotBlank(temp.getEmail()) && !temp.getEmail().equals(user.getEmail())
-				&& userManager.existsOne("email", temp.getEmail())) {
+				&& userManager.existsOne(true, new Serializable[] { "email", temp.getEmail() })) {
 			addFieldError("user.email", getText("validation.already.exists"));
 			return inputprofile();
 		}

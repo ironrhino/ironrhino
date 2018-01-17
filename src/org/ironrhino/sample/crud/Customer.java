@@ -35,6 +35,7 @@ import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.hibernate.convert.EnumArrayConverter;
 import org.ironrhino.core.hibernate.convert.EnumSetConverter;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
@@ -61,6 +62,7 @@ public class Customer extends BaseRecordableEntity {
 
 	@SearchableProperty
 	@UiConfig(width = "100px")
+	@CaseInsensitive
 	@NaturalId(mutable = true)
 	private String name;
 
