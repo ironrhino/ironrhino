@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.core.util.XmlUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -48,19 +47,7 @@ public class LocationUtils {
 			return null;
 		Location loc = null;
 		if (value.split("\\.").length == 4) {
-			try {
-				loc = LocationParser.parseLocal(value);
-				if (loc != null && StringUtils.isBlank(loc.getSecondArea())) {
-					if (specialAdministrativeRegions.contains(loc.getFirstArea())
-							|| municipalities.contains(loc.getFirstArea()))
-						loc.setSecondArea(loc.getFirstArea());
-					else
-						loc = null;
-				}
-			} catch (Throwable e) {
-				if (!(e instanceof NullPointerException))
-					e.printStackTrace();
-			}
+			loc = LocationParser.parse(value);
 			if (loc == null || loc.getFirstArea() == null) {
 				try {
 					String json = HttpClientUtils
@@ -70,33 +57,14 @@ public class LocationUtils {
 						node = node.get("data");
 						if (StringUtils.isNotBlank(node.get("region").asText())) {
 							loc = new Location();
-							loc.setFirstArea(node.get("region").asText());
-							loc.setSecondArea(node.get("city").asText());
-							loc.setThirdArea(node.get("county").asText());
+							loc.setFirstArea(LocationUtils.shortenName(node.get("region").asText()));
+							loc.setSecondArea(LocationUtils.shortenName(node.get("city").asText()));
+							loc.setThirdArea(LocationUtils.shortenName(node.get("county").asText()));
 						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
-		} else if (StringUtils.isNumeric(value)) {
-			try {
-				String xml = HttpClientUtils.getResponseText("http://www.youdao.com/smartresult-xml/search.s?type="
-						+ (value.length() == 18 ? "id" : "mobile") + "&q=" + value);
-				String location = XmlUtils.eval("/smartresult/product/location", xml);
-				if (StringUtils.isNotBlank(location)) {
-					loc = new Location();
-					loc.setLocation(location.trim());
-					String[] arr = loc.getLocation().split("\\s+");
-					if (arr.length > 1) {
-						loc.setSecondArea(arr[1]);
-						loc.setFirstArea(arr[0]);
-					} else {
-						value = location.trim();
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 		if (value.length() >= 2) {
@@ -204,6 +172,8 @@ public class LocationUtils {
 	}
 
 	public static String shortenAddress(String address) {
+		if (address == null)
+			return null;
 		for (Map.Entry<String, String> entry : mapping.entrySet())
 			address = address.replace(entry.getKey(), entry.getValue());
 		int loop = 0;
@@ -218,7 +188,7 @@ public class LocationUtils {
 	}
 
 	public static String shortenName(String name) {
-		if (name.length() < 3 || sameNames.contains(name))
+		if (name == null || name.length() < 3 || sameNames.contains(name))
 			return name;
 		for (Map.Entry<String, String> entry : mapping.entrySet())
 			name = name.replace(entry.getKey(), entry.getValue());
