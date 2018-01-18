@@ -12,7 +12,7 @@
         <#else>
             <#assign itemValue = stack.findString('top')/>
     </#if>
-    <#assign itemKeyStr=itemKey.toString() />
+    <#assign itemKeyStr=itemKey?string />
 <label for="${parameters.id?html}-${itemCount}" class="checkbox inline"><#rt/>
 <input type="checkbox" name="${parameters.name?html}" value="${itemKeyStr?html}"<#rt/>
  id="${parameters.id?html}-${itemCount}"<#rt/>

@@ -111,7 +111,7 @@ $(function(){
 			<thead>
 			<tr>
 				<th class="nosort filtercolumn" style="width:50px;"></th>
-				<#list map.keySet() as name>
+				<#list map?keys as name>
 				<th>${name}</th>
 				</#list>
 			</tr>

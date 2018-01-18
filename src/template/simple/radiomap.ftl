@@ -4,7 +4,7 @@
     <#else>
         <#assign itemKey = stack.findValue('top')/>
     </#if>
-    <#assign itemKeyStr = itemKey.toString() />
+    <#assign itemKeyStr = itemKey?string />
     <#if parameters.listValue?has_content>
         <#assign itemValue = stack.findString(parameters.listValue)/>
     <#else>
