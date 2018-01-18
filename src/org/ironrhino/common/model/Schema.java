@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
-import javax.persistence.Converter;
 import javax.persistence.Entity;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -15,7 +14,7 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
-import org.ironrhino.core.hibernate.convert.JsonConverter;
+import org.hibernate.annotations.Type;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
@@ -60,6 +59,7 @@ public class Schema extends BaseRecordableEntity {
 	private boolean strict;
 
 	// @Lob
+	@Type(type = "json")
 	@Column(length = 4000)
 	@SearchableComponent
 	@UiConfig(hiddenInList = @Hidden(true), excludedFromCriteria = true)
@@ -147,11 +147,6 @@ public class Schema extends BaseRecordableEntity {
 				fields.add(f);
 			}
 		}
-	}
-
-	@Converter(autoApply = true)
-	public static class FieldsConverter extends JsonConverter<List<SchemaField>> {
-
 	}
 
 }
