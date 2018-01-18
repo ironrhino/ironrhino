@@ -1,10 +1,13 @@
 package org.ironrhino.core.hibernate.type;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.annotations.common.reflection.java.JavaXMember;
 import org.hibernate.type.descriptor.WrapperOptions;
 import org.hibernate.type.descriptor.java.AbstractTypeDescriptor;
 import org.hibernate.type.descriptor.java.MutableMutabilityPlan;
@@ -16,11 +19,30 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 
 	private static final long serialVersionUID = -6335930102166043485L;
 
-	private Class<?> clazz;
+	private static final Method getJavaTypeMethod;
+	static {
+		try {
+			getJavaTypeMethod = JavaXMember.class.getDeclaredMethod("getJavaType");
+			getJavaTypeMethod.setAccessible(true);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Type type;
 
 	@Override
 	public void setParameterValues(Properties parameters) {
-		clazz = ((ParameterType) parameters.get(PARAMETER_TYPE)).getReturnedClass();
+		final XProperty xProperty = (XProperty) parameters.get(DynamicParameterizedType.XPROPERTY);
+		if (xProperty instanceof JavaXMember) {
+			try {
+				type = (Type) getJavaTypeMethod.invoke(xProperty);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			type = ((ParameterType) parameters.get(PARAMETER_TYPE)).getReturnedClass();
+		}
 	}
 
 	public JsonJavaTypeDescriptor() {
@@ -35,8 +57,7 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 					obj = value.getClass().getConstructor().newInstance();
 					BeanUtils.copyProperties(value, obj);
 					return obj;
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 
@@ -63,7 +84,7 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 		if (StringUtils.isBlank(string))
 			return null;
 		try {
-			return JsonUtils.fromJson(string, clazz);
+			return JsonUtils.fromJson(string, type);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

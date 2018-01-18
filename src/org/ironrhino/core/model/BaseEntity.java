@@ -6,11 +6,15 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
+import org.ironrhino.core.hibernate.type.JsonType;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableId;
 
 import lombok.Getter;
 import lombok.Setter;
 
+@TypeDefs({ @TypeDef(name = "json", typeClass = JsonType.class) })
 @MappedSuperclass
 @Getter
 @Setter
