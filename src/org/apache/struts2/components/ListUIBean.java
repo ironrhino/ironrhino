@@ -96,6 +96,8 @@ public abstract class ListUIBean extends UIBean {
             addParameter("listKey", listKey);
         } else if (value instanceof Map) {
             addParameter("listKey", "key");
+        } else {
+            addParameter("listKey", "top");
         }
 
         if (StringUtils.isNotBlank(listValue)) {
@@ -103,6 +105,8 @@ public abstract class ListUIBean extends UIBean {
             addParameter("listValue", listValue);
         } else if (value instanceof Map) {
             addParameter("listValue", "value");
+        } else {
+            addParameter("listValue", "top");
         }
 
     }

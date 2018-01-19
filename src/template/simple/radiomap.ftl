@@ -1,26 +1,20 @@
+<#assign itemCount = 0/>
 <@s.iterator value="parameters.list">
-    <#if parameters.listKey?has_content>
-        <#assign itemKey = stack.findValue(parameters.listKey)/>
-    <#else>
-        <#assign itemKey = stack.findValue('top')/>
-    </#if>
+    <#assign itemCount = itemCount + 1/>
+    <#assign itemKey = stack.findValue(parameters.listKey)/>
     <#assign itemKeyStr = itemKey?string />
-    <#if parameters.listValue?has_content>
-        <#assign itemValue = stack.findString(parameters.listValue)/>
-    <#else>
-        <#assign itemValue = stack.findString('top')/>
-    </#if>
-<label for="${parameters.id?html}-${itemKeyStr?html}" class="radio inline"><#rt/>    
+    <#assign itemValue = stack.findString(parameters.listValue)!""/>
+<label for="${parameters.name?html}-${itemCount}" class="radio inline"><#rt/>
 <input type="radio"<#rt/>
+ id="${parameters.name?html}-${itemCount}"<#rt/>
 <#if parameters.name?has_content>
  name="${parameters.name?html}"<#rt/>
 </#if>
- id="${parameters.id?html}-${itemKeyStr?html}"<#rt/>
-<#if tag.contains(parameters.nameValue!'', itemKeyStr) || tag.contains(parameters.nameValue!'', itemValue)>
- checked="checked"<#rt/>
-</#if>
 <#if itemKey?has_content>
  value="${itemKeyStr?html}"<#rt/>
+</#if>
+<#if tag.contains(parameters.nameValue!"", itemKeyStr) || tag.contains(parameters.nameValue!"", itemValue)>
+ checked="checked"<#rt/>
 </#if>
 <#if parameters.readonly!false>
  readonly="readonly"<#rt/>
@@ -30,6 +24,5 @@
 </#if>
 <#include "/${parameters.templateDir}/${parameters.expandTheme}/css.ftl" />
 <#include "/${parameters.templateDir}/${parameters.expandTheme}/dynamic-attributes.ftl" />
-/>${itemValue}<#t/>
-</label>
+/>${itemValue?html}</label>
 </@s.iterator>

@@ -3,14 +3,14 @@
 	<#if !value?has_content&&name?has_content>
 	<#local value=stack.findValue(name)!/>
 	</#if>
-	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#if multiple> multiple</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
-		<#if showHeader><option value="${headerKey}">${headerValue}</option></#if>
+	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#if multiple> multiple</#if><@dynAttrs value=dynamicAttributes exclude='class'/>><#lt>
+		<#if showHeader><option value="${headerKey}">${headerValue}</option><#lt></#if>
 		<#local exists=false>
 		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
-				<option value="${lv.value}"<#if value?has_content&&(!value?is_sequence&&value?string==lv.value||value?is_sequence&&value?seq_contains(lv.value))><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
+				<option value="${lv.value}"<#if value?has_content&&(!value?is_sequence&&value?string==lv.value||value?is_sequence&&value?seq_contains(lv.value))><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option><#lt>
 				</#list>
 			<#else>
 				<#local group = ""/>
@@ -19,20 +19,20 @@
 						<#local label = lv.label/>
 						<#if (!label?has_content) && group?has_content>
 							<#local group = ""/>
-							</optgroup>
+							</optgroup><#lt>
 						<#else>
 							<#if group?has_content>
-								</optgroup>
+								</optgroup><#lt>
 							</#if>
 							<#local group = label/>
 							<#if group?has_content>
-								<optgroup label="${group}">
+								<optgroup label="${group}"><#lt>
 							</#if>
 						</#if>
 					<#else>
-						<option value="${lv.value}"<#if value?string==lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option>
+						<option value="${lv.value}"<#if value?string==lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option><#lt>
 						<#if group?has_content && !lv?has_next>
-						</optgroup>
+						</optgroup><#lt>
 						</#if>
 					</#if>
 				</#list>
@@ -41,13 +41,13 @@
 		<#if !exists&&value?has_content>
 		<#if value?is_sequence>
 			<#list value as v>
-			<option value="${v}"selected="selected">${v}</option>
+			<option value="${v}"selected="selected">${v}</option><#lt>
 			</#list>
 		<#else>
-			<option value="${value}"selected="selected">${value}</option>
+			<option value="${value}"selected="selected">${value}</option><#lt>
 		</#if>
 		</#if>
-	</select>
+	</select><#lt>
 </#macro>
 
 <#function getDictionaryLabel dictionaryName value="">
