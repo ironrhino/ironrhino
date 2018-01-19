@@ -8,12 +8,16 @@ import freemarker.core.CollectionAndSequence;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.MapModel;
 import freemarker.ext.util.ModelFactory;
+import freemarker.template.MapKeyValuePairIterator;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleSequence;
 import freemarker.template.TemplateCollectionModel;
+import freemarker.template.TemplateHashModelEx;
+import freemarker.template.TemplateHashModelEx2;
 import freemarker.template.TemplateModel;
+import freemarker.template.TemplateModelException;
 
-public class FriendlyMapModel extends MapModel {
+public class FriendlyMapModel extends MapModel implements TemplateHashModelEx, TemplateHashModelEx2 {
 	static final ModelFactory FACTORY = new ModelFactory() {
 
 		@Override
@@ -39,5 +43,10 @@ public class FriendlyMapModel extends MapModel {
 	@Override
 	public TemplateCollectionModel values() {
 		return new CollectionAndSequence(new SimpleSequence(((Map<?, ?>) object).values(), wrapper));
+	}
+
+	@Override
+	public KeyValuePairIterator keyValuePairIterator() throws TemplateModelException {
+		return new MapKeyValuePairIterator(((Map<?, ?>) object), wrapper);
 	}
 }
