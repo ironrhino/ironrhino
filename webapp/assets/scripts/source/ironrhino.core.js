@@ -291,8 +291,8 @@ UrlUtils = {
 Message = {
 	compose : function(message, className) {
 		return '<div class="' + className
-				+ '"><a class="close" data-dismiss="alert"/>'
-				+ message + '</div>';
+				+ '"><a class="close" data-dismiss="alert"/>' + message
+				+ '</div>';
 	},
 	showMessage : function() {
 		Message.showActionMessage(MessageBundle.get.apply(this, arguments));
@@ -382,7 +382,8 @@ Message = {
 			var cgroup = Form.findControlGroup(field);
 			cgroup.length ? cgroup.addClass('error') : field.addClass('error');
 			$('.field-error', field.parent()).remove();
-			if (field.hasClass('sqleditor'))
+			if (field.hasClass('sqleditor') && !field.is(':visible')
+					&& !field.next('.preview').is(':visible'))
 				field = field.next('.preview');
 			else if (field.hasClass('chzn-done'))
 				field = field.next('.chzn-container');

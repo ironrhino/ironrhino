@@ -534,6 +534,11 @@ code.block {
 	white-space: pre-wrap;
 }
 
+.error div.preview {
+	border-color: #b94a48;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
 div.preview span.comment {
 	font-style: italic;
 	color: #999;

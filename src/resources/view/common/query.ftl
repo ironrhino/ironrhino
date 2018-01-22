@@ -68,16 +68,17 @@ $(function(){
 	<#if view=='embedded'>
 	<@s.hidden name="sql"/>
 	<#else>
+	<div class="row<#if fluidLayout>-fluid</#if>">
 	<#assign readonly=(view=='brief')&&sql?has_content>
-	<@s.textarea name="sql" class="required span8 sqleditor codeblock conjunct" data\-replacement="params" readonly=readonly placeholder="select username,name,email from user where username=:username and createDate>:createDate/*--datetime--*/">
+	<div class="span10">
+	<@s.textarea name="sql" class="required sqleditor codeblock conjunct" style="width:750px;" data\-replacement="params" readonly=readonly placeholder="select username,name,email from user where username=:username and createDate>:createDate/*--datetime--*/"/>
+	</div>
+	<div class="span2">
 	<#if !readonly && tables?? && tables?size gt 0>
-	<@s.param name="after">
-	<div style="display:inline-block;margin-left:20px;">
 	<@s.select id="tables" theme="simple" class="chosen input-medium" list="tables" headerKey="" headerValue=""/>
 	</div>
-	</@s.param>
+	</div>
 	</#if>
-	</@s.textarea>
 	</#if>
 	<div id="params">
 	<#if params??>
