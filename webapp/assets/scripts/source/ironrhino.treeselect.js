@@ -210,7 +210,7 @@
 								text = viewlink.text();
 							if (text) {
 								if (text.indexOf('...') < 0)
-									$('<a class="remove" href="#">&times;</a>')
+									$('<a class="remove" href="#"/>')
 											.appendTo(nametarget)
 											.click(removeAction);
 							} else {
@@ -292,7 +292,7 @@
 															.join(separator));
 											if (!t.is(':input')) {
 												if (!t.find('.remove').length)
-													$('<a class="remove" href="#">&times;</a>')
+													$('<a class="remove" href="#"/>')
 															.appendTo(t)
 															.click(removeAction);
 												if (!names.length)
@@ -365,14 +365,14 @@
 											+ treenode.id);
 							viewlink.text(name);
 							if (!viewlink.next('.remove').length)
-								$('<a class="remove" href="#">&times;</a>')
+								$('<a class="remove" href="#"/>')
 										.insertAfter(viewlink)
 										.click(removeAction);
 						} else {
 							val(options.name, current, name);
 							var t = $(this);
 							if (!t.is(':input') && !t.find('.remove').length)
-								$('<a class="remove" href="#">&times;</a>')
+								$('<a class="remove" href="#"/>')
 										.appendTo(t).click(removeAction);
 						}
 					});

@@ -13,9 +13,9 @@
 					.append('<span class="add-on clickable"><i class="glyphicon glyphicon-lock"></i></span>');
 			t.next('.clickable').click(function() {
 				$('#pattern-modal').remove();
-				var modal = $('<div id="pattern-modal" class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div class="modal-body" style="max-height:600px;"><div class="message" style="height: 38px;"></div><div class="pattern" style="margin-top: -38px;"></div></div></div>')
+				var modal = $('<div id="pattern-modal" class="modal" style="z-index:10000;"><div class="modal-close"><a class="close" data-dismiss="modal" aria-hidden="true"/></div><div class="modal-body" style="max-height:600px;"><div class="message" style="height: 38px;"></div><div class="pattern" style="margin-top: -38px;"></div></div></div>')
 						.appendTo(topDocument.body);
-				modal.find('button.close').click(function() {
+				modal.find('.close').click(function() {
 							modal.remove();
 						});
 				options.oncomplete = function(coords) {

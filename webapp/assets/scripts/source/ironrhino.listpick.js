@@ -208,7 +208,7 @@
 								text = viewlink.text();
 							if (text) {
 								if (text.indexOf('...') < 0)
-									$('<a class="remove" href="#">&times;</a>')
+									$('<a class="remove" href="#"/>')
 											.appendTo(nametarget)
 											.click(removeAction);
 							} else {
@@ -289,7 +289,7 @@
 									var t = $(this);
 									if (!t.is(':input')
 											&& !t.find('.remove').length)
-										$('<a class="remove" href="#">&times;</a>')
+										$('<a class="remove" href="#"/>')
 												.appendTo(t)
 												.click(removeAction);
 								});
@@ -444,7 +444,7 @@
 														if (!t.is(':input')
 																&& !t
 																		.find('.remove').length)
-															$('<a class="remove" href="#">&times;</a>')
+															$('<a class="remove" href="#"/>')
 																	.appendTo(t)
 																	.click(removeAction);
 													} else {

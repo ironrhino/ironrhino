@@ -8,8 +8,8 @@
 $(function(){
 	$(document).on('click','#result tbody .btn',function(){
 		if(!$('#row-modal').length)
-			var modal = $('<div id="row-modal" class="modal" style="width:800px;margin-left:-400px;z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div id="row-modal-body" class="modal-body" style="min-height:300px;max-height:initial;"></div></div>')
-									.appendTo(document.body).fadeIn().find('button.close').click(function() {
+			var modal = $('<div id="row-modal" class="modal" style="width:800px;margin-left:-400px;z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true"/></div><div id="row-modal-body" class="modal-body" style="min-height:300px;max-height:initial;"></div></div>')
+									.appendTo(document.body).fadeIn().find('.close').click(function() {
 						$(this).closest('.modal').fadeOut().remove();
 					});
 		var ths = $('th:not(:first-child)',$(this).closest('table'));
@@ -182,7 +182,7 @@ $(function(){
 	</div>
 	<#elseif resultPage.executed>
 	<div class="alert">
-	  <button type="button" class="close" data-dismiss="alert">&times;</button>
+	  <a class="close" data-dismiss="alert"></a>
 	  <strong>${getText('query.result.empty')}</strong>
 	</div>
 	</#if>

@@ -31953,7 +31953,7 @@ UrlUtils = {
 Message = {
 	compose : function(message, className) {
 		return '<div class="' + className
-				+ '"><a class="close" data-dismiss="alert">&times;</a>'
+				+ '"><a class="close" data-dismiss="alert"/>'
 				+ message + '</div>';
 	},
 	showMessage : function() {
@@ -32054,7 +32054,7 @@ Message = {
 				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
 						+ msg
-						+ '<a class="remove pull-right" href="#">&times;</a></div></div>')
+						+ '<a class="remove pull-right" href="#"/></div></div>')
 						.insertAfter(field);
 				var promptTopPosition, promptleftPosition;
 				var fieldWidth = field.outerWidth();
@@ -32738,11 +32738,11 @@ Initialization.common = function() {
 		$('#render-location-qrcode').click(function() {
 			var _this = $(this);
 			_this.hide();
-			var modal = $('<div class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div class="modal-body" style="max-height:600px;"><div class="location-qrcode">'
+			var modal = $('<div class="modal" style="z-index:10000;"><div class="modal-close"><a class="close" data-dismiss="modal" aria-hidden="true"/></div><div class="modal-body" style="max-height:600px;"><div class="location-qrcode">'
 					+ document.location.href + '</div></div></div>')
 					.appendTo(document.body);
 			$('.location-qrcode', modal).encodeqrcode();
-			$('button.close', modal).click(function() {
+			$('.close', modal).click(function() {
 						modal.remove();
 						_this.show();
 					});
@@ -33000,7 +33000,7 @@ Observation.common = function(container) {
 						if (!modal.find('.custom-dialog-close').length)
 							modal
 									.find('.modal-header')
-									.prepend('<a class="close" data-dismiss="modal">&times;</a>');
+									.prepend('<a class="close" data-dismiss="modal"/>');
 						_observe(modal);
 						$('form', modal).each(function() {
 									this.onsuccess = function() {
@@ -33919,9 +33919,9 @@ Observation.checkavailable = function(container) {
 							var container = options.container;
 							if (!container) {
 								var modal = $(
-										'<div id="snapshot-modal" class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div id="snapshot-modal-body" class="modal-body" style="max-height:600px;"></div></div>')
+										'<div id="snapshot-modal" class="modal" style="z-index:10000;"><div class="modal-close"><a class="close" data-dismiss="modal" aria-hidden="true"/></div><div id="snapshot-modal-body" class="modal-body" style="max-height:600px;"></div></div>')
 										.appendTo(document.body).find(
-												'button.close').click(
+												'.close').click(
 												function() {
 													destroy();
 												});
@@ -36104,7 +36104,7 @@ Observation.ajaxpanel = function(container) {
 
 	$(function() {
 		if (!$.browser.msie) {
-			var selector = '.waves-effect, table.richtable th:not(.filtercolumn), table.richtable td:not(.action), button, a[href]:not(.nav-tabs > li > a)';
+			var selector = '.waves-effect, table.richtable th:not(.filtercolumn), table.richtable td:not(.action), button:not(:empty), a[href]:not(:empty):not(.nav-tabs > li > a)';
 			$(document).on('mousedown', selector, showWave).on(
 					'mouseup mouseleave', selector, hideWave);
 		}
@@ -39484,7 +39484,7 @@ if (window.FileReader)
 							|| suffix == 'gif' || suffix == 'bmp'
 							|| suffix == 'webp';
 				}
-				$('<li class="span2"><a class="remove" href="#">&times;</a><input type="hidden" name="'
+				$('<li class="span2"><a class="remove" href="#"/><input type="hidden" name="'
 						+ form.data('attachmentsfield')
 						+ '" value="'
 						+ path
@@ -39937,7 +39937,7 @@ Observation.groupable = function(container) {
 								text = viewlink.text();
 							if (text) {
 								if (text.indexOf('...') < 0)
-									$('<a class="remove" href="#">&times;</a>')
+									$('<a class="remove" href="#"/>')
 											.appendTo(nametarget)
 											.click(removeAction);
 							} else {
@@ -40019,7 +40019,7 @@ Observation.groupable = function(container) {
 															.join(separator));
 											if (!t.is(':input')) {
 												if (!t.find('.remove').length)
-													$('<a class="remove" href="#">&times;</a>')
+													$('<a class="remove" href="#"/>')
 															.appendTo(t)
 															.click(removeAction);
 												if (!names.length)
@@ -40092,14 +40092,14 @@ Observation.groupable = function(container) {
 											+ treenode.id);
 							viewlink.text(name);
 							if (!viewlink.next('.remove').length)
-								$('<a class="remove" href="#">&times;</a>')
+								$('<a class="remove" href="#"/>')
 										.insertAfter(viewlink)
 										.click(removeAction);
 						} else {
 							val(options.name, current, name);
 							var t = $(this);
 							if (!t.is(':input') && !t.find('.remove').length)
-								$('<a class="remove" href="#">&times;</a>')
+								$('<a class="remove" href="#"/>')
 										.appendTo(t).click(removeAction);
 						}
 					});
@@ -40489,7 +40489,7 @@ Observation.treeview = function(container) {
 								text = viewlink.text();
 							if (text) {
 								if (text.indexOf('...') < 0)
-									$('<a class="remove" href="#">&times;</a>')
+									$('<a class="remove" href="#"/>')
 											.appendTo(nametarget)
 											.click(removeAction);
 							} else {
@@ -40570,7 +40570,7 @@ Observation.treeview = function(container) {
 									var t = $(this);
 									if (!t.is(':input')
 											&& !t.find('.remove').length)
-										$('<a class="remove" href="#">&times;</a>')
+										$('<a class="remove" href="#"/>')
 												.appendTo(t)
 												.click(removeAction);
 								});
@@ -40725,7 +40725,7 @@ Observation.treeview = function(container) {
 														if (!t.is(':input')
 																&& !t
 																		.find('.remove').length)
-															$('<a class="remove" href="#">&times;</a>')
+															$('<a class="remove" href="#"/>')
 																	.appendTo(t)
 																	.click(removeAction);
 													} else {
@@ -41260,9 +41260,9 @@ Observation.filtercolumn = function(container) {
 					.append('<span class="add-on clickable"><i class="glyphicon glyphicon-lock"></i></span>');
 			t.next('.clickable').click(function() {
 				$('#pattern-modal').remove();
-				var modal = $('<div id="pattern-modal" class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div class="modal-body" style="max-height:600px;"><div class="message" style="height: 38px;"></div><div class="pattern" style="margin-top: -38px;"></div></div></div>')
+				var modal = $('<div id="pattern-modal" class="modal" style="z-index:10000;"><div class="modal-close"><a class="close" data-dismiss="modal" aria-hidden="true"/></div><div class="modal-body" style="max-height:600px;"><div class="message" style="height: 38px;"></div><div class="pattern" style="margin-top: -38px;"></div></div></div>')
 						.appendTo(topDocument.body);
-				modal.find('button.close').click(function() {
+				modal.find('.close').click(function() {
 							modal.remove();
 						});
 				options.oncomplete = function(coords) {
@@ -41388,7 +41388,7 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 	if (xhr.getResponseHeader('X-Double-Check')
 			|| xhr.getResponseHeader('X-Current-Password')) {
 		var dc = xhr.getResponseHeader('X-Double-Check');
-		var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal">×</a><h3 style="text-align:center;">'
+		var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal"/><h3 style="text-align:center;">'
 				+ MessageBundle.get(dc ? 'double.check' : '&nbsp;')
 				+ '</h3></div><div class="modal-body"><form class="form-horizontal"><fieldset><div class="form-actions"><button type="submit" class="btn btn-primary">'
 				+ MessageBundle.get('confirm')

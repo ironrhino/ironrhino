@@ -115,7 +115,7 @@
 							|| suffix == 'gif' || suffix == 'bmp'
 							|| suffix == 'webp';
 				}
-				$('<li class="span2"><a class="remove" href="#">&times;</a><input type="hidden" name="'
+				$('<li class="span2"><a class="remove" href="#"/><input type="hidden" name="'
 						+ form.data('attachmentsfield')
 						+ '" value="'
 						+ path

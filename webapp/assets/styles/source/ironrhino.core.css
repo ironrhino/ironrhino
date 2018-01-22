@@ -145,14 +145,6 @@ td.compact-horizontal {
 	opacity: 1;
 }
 
-.ui-dialog-titlebar-close , a.close , a.remove , .modal-close button.close {
-	transition: all 0.5s ease;
-}
-
-.ui-dialog-titlebar-close:hover , a.close:hover , a.remove:hover , .modal-close button.close:hover {
-	transform: rotate(360deg);
-}
-
 body.welcome {
 	padding-top: 10%;
 	background-color: #dedede;
@@ -446,6 +438,14 @@ a.remove {
 a.remove:hover , a.remove:focus {
 	text-decoration: none;
 	opacity: .8;
+}
+
+.remove , .close {
+	outline: 0;
+}
+
+.remove:empty:after , .close:empty:after {
+	content: '×';
 }
 
 .loading {

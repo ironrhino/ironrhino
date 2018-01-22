@@ -291,7 +291,7 @@ UrlUtils = {
 Message = {
 	compose : function(message, className) {
 		return '<div class="' + className
-				+ '"><a class="close" data-dismiss="alert">&times;</a>'
+				+ '"><a class="close" data-dismiss="alert"/>'
 				+ message + '</div>';
 	},
 	showMessage : function() {
@@ -392,7 +392,7 @@ Message = {
 				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
 						+ msg
-						+ '<a class="remove pull-right" href="#">&times;</a></div></div>')
+						+ '<a class="remove pull-right" href="#"/></div></div>')
 						.insertAfter(field);
 				var promptTopPosition, promptleftPosition;
 				var fieldWidth = field.outerWidth();
@@ -1076,11 +1076,11 @@ Initialization.common = function() {
 		$('#render-location-qrcode').click(function() {
 			var _this = $(this);
 			_this.hide();
-			var modal = $('<div class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div class="modal-body" style="max-height:600px;"><div class="location-qrcode">'
+			var modal = $('<div class="modal" style="z-index:10000;"><div class="modal-close"><a class="close" data-dismiss="modal" aria-hidden="true"/></div><div class="modal-body" style="max-height:600px;"><div class="location-qrcode">'
 					+ document.location.href + '</div></div></div>')
 					.appendTo(document.body);
 			$('.location-qrcode', modal).encodeqrcode();
-			$('button.close', modal).click(function() {
+			$('.close', modal).click(function() {
 						modal.remove();
 						_this.show();
 					});
@@ -1338,7 +1338,7 @@ Observation.common = function(container) {
 						if (!modal.find('.custom-dialog-close').length)
 							modal
 									.find('.modal-header')
-									.prepend('<a class="close" data-dismiss="modal">&times;</a>');
+									.prepend('<a class="close" data-dismiss="modal"/>');
 						_observe(modal);
 						$('form', modal).each(function() {
 									this.onsuccess = function() {

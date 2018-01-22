@@ -5,6 +5,6 @@
 <title>${getText('warnings')}</title>
 </head>
 <body>
- <div class="alert alert-warning"><a class="close" data-dismiss="alert">&times;</a>${getText('template.not.found')}</div>
+ <div class="alert alert-warning"><a class="close" data-dismiss="alert"></a>${getText('template.not.found')}</div>
 </body>
 </html>

@@ -9053,14 +9053,14 @@ a.thumbnail:focus {
   line-height: 20px;
   color: #000000;
   text-shadow: 0 1px 0 #ffffff;
-  opacity: 0.2;
+  opacity: .3;
 }
 .close:hover,
 .close:focus {
   color: #000000;
   text-decoration: none;
   cursor: pointer;
-  opacity: 0.4;
+  opacity: .8;
 }
 button.close {
   padding: 0;
@@ -9685,14 +9685,6 @@ td.compact-horizontal {
 	opacity: 1;
 }
 
-.ui-dialog-titlebar-close , a.close , a.remove , .modal-close button.close {
-	transition: all 0.5s ease;
-}
-
-.ui-dialog-titlebar-close:hover , a.close:hover , a.remove:hover , .modal-close button.close:hover {
-	transform: rotate(360deg);
-}
-
 body.welcome {
 	padding-top: 10%;
 	background-color: #dedede;
@@ -9986,6 +9978,14 @@ a.remove {
 a.remove:hover , a.remove:focus {
 	text-decoration: none;
 	opacity: .8;
+}
+
+.remove , .close {
+	outline: 0;
+}
+
+.remove:empty:after , .close:empty:after {
+	content: '×';
 }
 
 .loading {
@@ -11356,7 +11356,7 @@ form.query.folded .tab-pane.active div.row:first-of-type , form.query.folded .ta
 form.query.folded .tab-pane.active div.row:last-of-type , form.query.folded .tab-pane.active div.row-fluid:last-of-type {
 	border-bottom-width: 1px;
 	margin-bottom: 6px;
-	border-radius: 0 0 4px 4px;	
+	border-radius: 0 0 4px 4px;
 }
 
 form.query:not(.folded) div.row , form.query:not(.folded) div.row-fluid {
@@ -11397,11 +11397,6 @@ form.query div.fold:hover span {
 	color: #888;
 }
 
-/*
-form.query div.fold ~ div.form-actions {
-	text-align: right;
-}
-*/
 th.filtercolumn li.selecton {
 	color: green;
 	font-weight: bold;

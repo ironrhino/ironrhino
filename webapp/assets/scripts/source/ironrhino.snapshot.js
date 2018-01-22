@@ -29,9 +29,9 @@
 							var container = options.container;
 							if (!container) {
 								var modal = $(
-										'<div id="snapshot-modal" class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div id="snapshot-modal-body" class="modal-body" style="max-height:600px;"></div></div>')
+										'<div id="snapshot-modal" class="modal" style="z-index:10000;"><div class="modal-close"><a class="close" data-dismiss="modal" aria-hidden="true"/></div><div id="snapshot-modal-body" class="modal-body" style="max-height:600px;"></div></div>')
 										.appendTo(document.body).find(
-												'button.close').click(
+												'.close').click(
 												function() {
 													destroy();
 												});
