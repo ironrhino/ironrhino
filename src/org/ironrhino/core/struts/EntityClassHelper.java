@@ -325,8 +325,7 @@ public class EntityClassHelper {
 							uci.setMultiple(true);
 							returnType = clazz;
 							uci.setPropertyType(returnType);
-							if (!(clazz.isEnum() || "dictionary".equals(uci.getType()))
-									&& !"dictionary".equals(uci.getType()))
+							if (!clazz.isEnum() && !"dictionary".equals(uci.getType()))
 								uci.addCssClass("tags");
 						} else if (Number.class.isAssignableFrom(clazz)) {
 							uci.setMultiple(true);
