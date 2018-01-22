@@ -7,7 +7,7 @@
 }
 
 .datagrided tbody > tr:hover > td > .manipulate[class *= "glyphicon-"] {
-	opacity: 0.6;
+	opacity: .8;
 }
 
 .datagrided td.manipulate , .datagrided th.manipulate {

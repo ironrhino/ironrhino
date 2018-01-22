@@ -440,7 +440,7 @@ a.remove {
 	color: #000;
 	margin-left: 5px;
 	cursor: pointer;
-	opacity: 0.2;
+	opacity: .3;
 }
 
 a.remove:hover , a.remove:focus {

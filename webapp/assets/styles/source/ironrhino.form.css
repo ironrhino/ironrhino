@@ -322,7 +322,7 @@ input.error:focus , select.error:focus , textarea.error:focus {
 
 .control-group span.tip {
 	margin-left: 10px;
-	opacity: 0.7;
+	opacity: .7;
 	font-style: italic;
 }
 

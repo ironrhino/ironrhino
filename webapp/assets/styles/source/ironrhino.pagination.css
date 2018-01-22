@@ -121,7 +121,7 @@
 }
 
 .toolbar .pagination li.disabled a i {
-	opacity: 0.50;
+	opacity: .5;
 }
 
 .toolbar .pagination li.firstPage a {

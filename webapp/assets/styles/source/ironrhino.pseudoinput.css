@@ -91,11 +91,12 @@
 	top: 0;
 	right: 5px;
 	line-height: 28px;
-	color: rgba(0, 0, 0, .3);
+	color: #000;
+	opacity: .3;
 }
 
 .input-pseudo:not(.readonly):not(.disabled) > .glyphicon:hover {
-	opacity: 1;
+	opacity: .8;
 }
 
 .input-pseudo > .glyphicon.remove {
