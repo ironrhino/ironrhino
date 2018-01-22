@@ -41,7 +41,7 @@
 							$('<div class="tag"><span class="tag-label"></span>'
 									+ (textOnly
 											? ''
-											: '<span class="tag-remove">×</span>')
+											: '<span class="tag-remove"/>')
 									+ '</div>').appendTo(text)
 									.find('.tag-label')
 									.html((typeof v == 'string') ? v : v.value);

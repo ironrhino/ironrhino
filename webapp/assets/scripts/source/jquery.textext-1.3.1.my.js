@@ -4269,7 +4269,7 @@
 
 			html : {
 				tags : '<div class="text-tags"/>',
-				tag  : '<div class="text-tag"><div class="text-button"><span class="text-label"/><span class="text-remove">×</span></div></div>'
+				tag  : '<div class="text-tag"><div class="text-button"><span class="text-label"/><span class="text-remove"/></div></div>'
 			}
 		}
 		;

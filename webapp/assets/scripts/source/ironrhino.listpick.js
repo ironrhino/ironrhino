@@ -40,7 +40,7 @@
 									newlabels
 											.push('<div class="tag"><span class="tag-label">'
 													+ v
-													+ '</span><span class="tag-remove">×</span></div>');
+													+ '</span><span class="tag-remove"/></div>');
 								});
 								t.html(newlabels.join(''));
 							} else {
@@ -162,7 +162,7 @@
 						txt.addClass('tags');
 						if (text)
 							$.each(textArr, function(i, v) {
-								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
+								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"/></div>')
 										.appendTo(txt).find('.tag-label')
 										.text(v);
 							});

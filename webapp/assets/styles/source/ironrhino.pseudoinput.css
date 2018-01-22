@@ -62,7 +62,7 @@
 
 .input-pseudo.readonly , .input-pseudo.disabled {
 	cursor: not-allowed;
-	background-color: #eeeeee;
+	background-color: #eee;
 }
 
 .input-pseudo > input , .input-pseudo > select {
@@ -129,6 +129,14 @@
 	line-height: 20px;
 }
 
+.tag:hover {
+	background: rgba(0, 0, 0, .15);
+}
+
+.input-pseudo.readonly .tag , .input-pseudo.disabled .tag {
+	background-color: #ccc;
+}
+
 .tag-label {
 	display: inline;
 }
@@ -145,5 +153,13 @@
 
 .tag-remove:hover {
 	opacity: .8;
+}
+
+.tag-remove:after {
+	content: '×';
+}
+
+.readonly .tag-remove , .disabled .tag-remove {
+	display: none;
 }
 

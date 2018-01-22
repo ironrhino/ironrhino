@@ -594,7 +594,7 @@ Richtable = {
 						newlabels
 								.push('<div class="tag"><span class="tag-label">'
 										+ $(this).text()
-										+ '</span><span class="tag-remove">×</span></div>');
+										+ '</span><span class="tag-remove"/></div>');
 					});
 					$(v).html(newlabels.join(''));
 				}

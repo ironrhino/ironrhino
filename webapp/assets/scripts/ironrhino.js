@@ -22403,7 +22403,7 @@ ctrlr.prototype.setObjectValue=function(data){
 
 			html : {
 				tags : '<div class="text-tags"/>',
-				tag  : '<div class="text-tag"><div class="text-button"><span class="text-label"/><span class="text-remove">×</span></div></div>'
+				tag  : '<div class="text-tag"><div class="text-button"><span class="text-label"/><span class="text-remove"/></div></div>'
 			}
 		}
 		;
@@ -36732,7 +36732,7 @@ Observation.z_form = function(container) {
 							$('<div class="tag"><span class="tag-label"></span>'
 									+ (textOnly
 											? ''
-											: '<span class="tag-remove">×</span>')
+											: '<span class="tag-remove"/>')
 									+ '</div>').appendTo(text)
 									.find('.tag-label')
 									.html((typeof v == 'string') ? v : v.value);
@@ -37742,7 +37742,12 @@ Observation.combobox = function(container) {
 			}).blur(function() {
 						if (t.val())
 							t.trigger('enterKeyPress').val('').blur();
-					}).closest('.text-core').addClass('input-pseudo');
+					});
+			var pseudo = t.closest('.text-core').addClass('input-pseudo');
+			if (t.prop('readonly'))
+				pseudo.addClass('readonly');
+			if (t.prop('disabled'))
+				pseudo.addClass('disabled');
 		})
 		return this;
 	};
@@ -38565,7 +38570,7 @@ Richtable = {
 						newlabels
 								.push('<div class="tag"><span class="tag-label">'
 										+ $(this).text()
-										+ '</span><span class="tag-remove">×</span></div>');
+										+ '</span><span class="tag-remove"/></div>');
 					});
 					$(v).html(newlabels.join(''));
 				}
@@ -39762,7 +39767,7 @@ Observation.groupable = function(container) {
 									newlabels
 											.push('<div class="tag"><span class="tag-label">'
 													+ v
-													+ '</span><span class="tag-remove">×</span></div>');
+													+ '</span><span class="tag-remove"/></div>');
 								});
 								t.html(newlabels.join(''));
 							} else {
@@ -39886,7 +39891,7 @@ Observation.groupable = function(container) {
 						txt.addClass('tags');
 						if (text)
 							$.each(textArr, function(i, v) {
-								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
+								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"/></div>')
 										.appendTo(txt).find('.tag-label')
 										.text(v);
 							});
@@ -40316,7 +40321,7 @@ Observation.treeview = function(container) {
 									newlabels
 											.push('<div class="tag"><span class="tag-label">'
 													+ v
-													+ '</span><span class="tag-remove">×</span></div>');
+													+ '</span><span class="tag-remove"/></div>');
 								});
 								t.html(newlabels.join(''));
 							} else {
@@ -40438,7 +40443,7 @@ Observation.treeview = function(container) {
 						txt.addClass('tags');
 						if (text)
 							$.each(textArr, function(i, v) {
-								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove">×</span></div>')
+								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"/></div>')
 										.appendTo(txt).find('.tag-label')
 										.text(v);
 							});

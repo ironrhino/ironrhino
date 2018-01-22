@@ -134,7 +134,12 @@
 			}).blur(function() {
 						if (t.val())
 							t.trigger('enterKeyPress').val('').blur();
-					}).closest('.text-core').addClass('input-pseudo');
+					});
+			var pseudo = t.closest('.text-core').addClass('input-pseudo');
+			if (t.prop('readonly'))
+				pseudo.addClass('readonly');
+			if (t.prop('disabled'))
+				pseudo.addClass('disabled');
 		})
 		return this;
 	};
