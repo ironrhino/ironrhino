@@ -40,6 +40,19 @@ table.richtable th.checkbox , table.richtable th.radio {
 table.richtable td {
 	word-wrap: break-all;
 	white-space: pre-wrap;
+	position: relative;
+}
+
+table.richtable td a.remove {
+	display: none;
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	line-height: 1em;
+}
+
+table.richtable td:hover a.remove {
+	display: block;
 }
 
 table.richtable tfoot td {

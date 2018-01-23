@@ -9982,6 +9982,7 @@ a.remove:hover , a.remove:focus {
 
 .remove , .close {
 	outline: 0;
+	font-family: serif;
 }
 
 .remove:empty:after , .close:empty:after {
@@ -10062,9 +10063,13 @@ a.remove:hover , a.remove:focus {
 	transition: visibility 0s linear .3s;
 }
 
-.modal-close .close {
-	width: 20px;
-	font-family: Tahoma, 'Microsoft Yahei', sans-serif;
+.modal-header .close:hover , .modal-close .close:hover {
+	border-radius: 100%;
+	height: 1em;
+	width: 1em;
+	text-align: center;
+	color: #fff;
+	background-color: #faa732;
 }
 
 .modal-close ~ .modal-body {
@@ -11262,6 +11267,19 @@ table.richtable th.checkbox , table.richtable th.radio {
 table.richtable td {
 	word-wrap: break-all;
 	white-space: pre-wrap;
+	position: relative;
+}
+
+table.richtable td a.remove {
+	display: none;
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	line-height: 1em;
+}
+
+table.richtable td:hover a.remove {
+	display: block;
 }
 
 table.richtable tfoot td {

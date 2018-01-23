@@ -39176,8 +39176,21 @@ $(function() {
 									.focus();
 						});
 		}
-		p.width(t.width()).css('height', t.height() + 'px').html($.sqleditor
-				.highlight(t.val())).show();
+		var width = t.width();
+		var hasWidthClass = false;
+		$.each(	$.grep(t.attr('class').split(' '), function(v) {
+							var b = v.indexOf('input-') == 0
+									|| v.indexOf('span') == 0;
+							if (b)
+								hasWidthClass = true;
+							return b;
+						}), function(k, v) {
+					p.addClass(v);
+				});
+		if (width > 0 && !hasWidthClass)
+			p.width(width);
+		p.css('height', t.height() + 'px').html($.sqleditor.highlight(t.val()))
+				.show();
 
 	}
 	$.fn.sqleditor = function() {
