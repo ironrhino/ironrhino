@@ -5,10 +5,10 @@
 <title>${getText('upload')}</title>
 </head>
 <body>
-<@s.form id="upload_form" action="${actionBaseUrl}" method="post" class="ajax view form-inline" data\-replacement="files">
+<@s.form id="upload_form" action="${actionBaseUrl}" method="post" class="ajax view" data\-replacement="files">
 	<input type="hidden" name="pick" value="true"/>
 	<table id="files" class="table table-striped middle" style="margin-top:50px;">
-		<caption style="font-size:120%;font-weight:bold;"><@s.hidden id="folder" name="folder"/>${getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>
+		<caption style="font-size:120%;font-weight:bold;line-height:30px;"><@s.hidden id="folder" name="folder"/>${getText('current.location')}:<span id="current_folder" style="margin-left:10px;">${folder}<#if !folder?ends_with('/')>/</#if></span></caption>
 		<thead>
 		<tr style="font-weight:bold;height:43px;">
 			<td style="width:50px" class="radio"></td>

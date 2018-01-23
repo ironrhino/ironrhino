@@ -99,7 +99,7 @@
 			${getText(value?c)}
 			<#elseif value?is_unknown_date_like>
 			${value?datetime}
-			<#elseif ((value.class.simpleName)!)=='String'||value?is_number||value?is_date_like>
+			<#elseif value?is_string||value?is_number||value?is_date_like>
 			${value?string}
 			<#elseif value?is_enumerable>
 			<ol class="unstyled">
@@ -109,7 +109,7 @@
 					${getText(item?c)}
 				<#elseif item?is_unknown_date_like>
 					${item?datetime}
-				<#elseif ((item.class.simpleName)!)=='String'||item?is_number||item?is_date_like>
+				<#elseif item?is_string||item?is_number||item?is_date_like>
 					${item?string}
 				<#elseif item?is_enumerable>
 						<ol class="unstyled">
