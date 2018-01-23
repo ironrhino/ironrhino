@@ -751,6 +751,8 @@ public abstract class UIBean extends Component {
         		tryId = "";
         } else {
             tryId = "";
+        	if( !"simple".equals(theme) )
+            tryId = "c" + String.valueOf(System.nanoTime()).substring(6, 12);
         }
         addParameter("id", tryId);
         addParameter("escapedId", escape(tryId));
