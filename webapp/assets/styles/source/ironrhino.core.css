@@ -66,6 +66,10 @@ td.compact-horizontal {
 	border-top: solid 2px #ccc;
 }
 
+.btn-group > .dropdown-menu {
+	border-radius: 2px 2px 4px 4px;
+}
+
 .dropdown-menu .btn-group .btn {
 	background-image: none;
 }

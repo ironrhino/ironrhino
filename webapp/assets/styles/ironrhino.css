@@ -9606,6 +9606,10 @@ td.compact-horizontal {
 	border-top: solid 2px #ccc;
 }
 
+.btn-group > .dropdown-menu {
+	border-radius: 2px 2px 4px 4px;
+}
+
 .dropdown-menu .btn-group .btn {
 	background-image: none;
 }
@@ -10217,6 +10221,10 @@ select.input-xlarge {
 
 select.input-xxlarge {
 	width: 554px;
+}
+
+.form-inline {
+	line-height: 30px;
 }
 
 .form-inline button {
@@ -11298,8 +11306,8 @@ table.richtable tfoot td {
 	min-width: 100px;
 }
 
-.richtable table td.action ul.dropdown-menu li {
-	cursor: pointer;
+.richtable table td.action .btn-group:last-child ul.dropdown-menu {
+	left: -73px;
 }
 
 .richtable tbody input.text , .richtable tbody textarea.text {

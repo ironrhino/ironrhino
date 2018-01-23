@@ -71,8 +71,8 @@ table.richtable tfoot td {
 	min-width: 100px;
 }
 
-.richtable table td.action ul.dropdown-menu li {
-	cursor: pointer;
+.richtable table td.action .btn-group:last-child ul.dropdown-menu {
+	left: -73px;
 }
 
 .richtable tbody input.text , .richtable tbody textarea.text {
