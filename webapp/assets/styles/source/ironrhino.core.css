@@ -440,12 +440,12 @@ a.remove:hover , a.remove:focus {
 	opacity: .8;
 }
 
-.remove , .close {
+a.remove , .close {
 	outline: 0;
 	font-family: serif;
 }
 
-.remove:empty:after , .close:empty:after {
+a.remove:empty:after , .close:empty:after {
 	content: '×';
 }
 
