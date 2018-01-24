@@ -1,6 +1,8 @@
 package org.ironrhino.core.hibernate.type;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Properties;
@@ -19,15 +21,17 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 
 	private static final long serialVersionUID = -6335930102166043485L;
 
-	private static final Method getJavaTypeMethod;
+	private static final MethodHandle GET_JAVA_TYPE_METHOD;
+
 	static {
 		try {
-			getJavaTypeMethod = JavaXMember.class.getDeclaredMethod("getJavaType");
-			getJavaTypeMethod.setAccessible(true);
+			Method m = JavaXMember.class.getDeclaredMethod("getJavaType");
+			m.setAccessible(true);
+			GET_JAVA_TYPE_METHOD = MethodHandles.lookup().unreflect(m);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException(e.getMessage(), e);
 		}
-	}
+	};
 
 	private Type type;
 
@@ -36,8 +40,8 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 		final XProperty xProperty = (XProperty) parameters.get(DynamicParameterizedType.XPROPERTY);
 		if (xProperty instanceof JavaXMember) {
 			try {
-				type = (Type) getJavaTypeMethod.invoke(xProperty);
-			} catch (Exception e) {
+				type = (Type) GET_JAVA_TYPE_METHOD.invoke(xProperty);
+			} catch (Throwable e) {
 				throw new RuntimeException(e);
 			}
 		} else {
