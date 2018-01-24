@@ -1,9 +1,10 @@
 #!/bin/bash
 
 ANT_VERSION=1.10.1
-TOMCAT_VERSION=8.0.46
+TOMCAT_VERSION=8.0.48
 
 #must run with sudo
+#useradd app -m -s /bin/bash && su - app
 if [ ! -n "$SUDO_USER" ];then
 echo please run sudo $0
 exit 1
@@ -27,6 +28,7 @@ apt-get --force-yes --yes install openjdk-8-jdk mysql-server-5.7 subversion git 
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi
+grep "password" /var/log/mysqld.log
 
 
 #install simsun font

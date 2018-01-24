@@ -1,9 +1,10 @@
 #!/bin/bash
 
 ANT_VERSION=1.10.1
-TOMCAT_VERSION=8.0.46
+TOMCAT_VERSION=8.0.48
 
 #must run with sudo
+#useradd app -m -s /bin/bash && su - app
 if [ ! -n "$SUDO_USER" ];then
 echo please run sudo $0
 exit 1
@@ -19,9 +20,9 @@ wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-
 yum makecache
 
 cat>/etc/yum.repos.d/mysql-community.repo<<EOF
-[mysql56-community]
+[mysql57-community]
 name=MySQL 5.7 Community Server
-baseurl=http://repo.mysql.com/yum/mysql-5.7-community/el/6/\$basearch/
+baseurl=http://repo.mysql.com/yum/mysql-5.7-community/el/\$releasever/\$basearch/
 gpgcheck=0
 enabled=1
 EOF
@@ -37,7 +38,7 @@ EOF
 
 #install packages
 yum -y install java-1.8.0-openjdk-devel mysql-server subversion git nginx chkconfig zip unzip wget make gcc telnet
-
+grep "password" /var/log/mysqld.log
 
 #install ant
 if [ ! -f /usr/bin/ant ];then
