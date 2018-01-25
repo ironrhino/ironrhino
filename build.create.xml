@@ -93,8 +93,6 @@
 						excludes+='mongo-java-driver-*.jar,spring-data-mongodb-*.jar,';
 					if(features.indexOf('zookeeper')<0)
 						excludes+='zookeeper-*.jar,curator-*.jar,';
-					if(features.indexOf('jasperreports')<0)
-						excludes+='jasperreports-*.jar,commons-beanutils-*.jar,commons-collections-*.jar,commons-digester-*.jar,dynamicreports-core-*.jar,poi-*.jar,itext*.jar,';
 					if(features.indexOf('zxing')<0)
 						excludes+='zxing-*.jar,';
 					if(features.indexOf('batch')<0)

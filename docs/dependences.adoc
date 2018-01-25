@@ -23,9 +23,6 @@
 |zookeeper
 |zookeeper-\*.jar curator-*.jar
 
-|报表
-|jasperreports-\*.jar commons-digester-*.jar commons-beanutils-\*.jar commons-collections-\*.jar dynamicreports-core-*.jar poi-\*.jar itext\*.jar
-
 |二维码
 |zxing-*.jar
 
