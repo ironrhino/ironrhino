@@ -1,0 +1,15 @@
+= 版本变化
+
+== 3.0.0
+- 升级spring等大量第三方包, 支持java9
+- 彻底移除了web.xml, 全部使用WebApplicationInitializer为配置入口
+- validation增强, 增加了身份证等validator, struts2 action 和 spring mvc 支持加javax.validation的注解
+- 升级到hibernate 5.2, 兼容性影响不大, 但是需要检查是否有警告调用了废弃的api
+- 升级freemarker <#for>循环里面支持<#continue>
+- struts2的action支持返回Callable<String> 来异步处理, 增加新的内置的result HOME, 非execute方法返回HOME跟execute方法返回SUCCESS一样使用以action名字命名的ftl
+- 引入resilience4j来做断路器, 请求远程服务失败超过一定比例的时候直接返回错误而不是继续请求, 等待一段时间之后再去尝试请求如果成功了则关闭断路
+- cache重构, 使用cache2k取代ehcache
+- Rest API 改进, 大大简化启动配置, 支持多版本并行
+- web前端升级jquery到3.3, 引入了 fontawesome, 界面也做了很多优化
+- 不支持将ftl放到 /WEB-INF/view/ftl里面, 强制要求放到classpath的resources/view里面去, 这里打破了兼容性
+- 移除了guava依赖, 有需要的请在自己的工程里面添加
