@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.RestStatus;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @ControllerAdvice
 public class RestExceptionHandler {
@@ -90,6 +94,29 @@ public class RestExceptionHandler {
 			}
 			rs.setMessage(String.join("\n", messages));
 			return rs;
+		} else if (ex instanceof HttpClientErrorException) {
+			HttpClientErrorException hce = (HttpClientErrorException) ex;
+			response.setStatus(hce.getRawStatusCode());
+			String errorBody = hce.getResponseBodyAsString();
+			if (JsonUtils.isValidJson(errorBody)) {
+				try {
+					JsonNode node = JsonUtils.fromJson(errorBody, JsonNode.class);
+					if (node.has("code") && node.has("status"))
+						return JsonUtils.fromJson(errorBody, RestStatus.class);
+				} catch (IOException e) {
+
+				}
+			}
+			switch (hce.getStatusCode()) {
+			case UNAUTHORIZED:
+				return RestStatus.UNAUTHORIZED;
+			case FORBIDDEN:
+				return RestStatus.FORBIDDEN;
+			case NOT_FOUND:
+				return RestStatus.NOT_FOUND;
+			default:
+				return RestStatus.valueOf(RestStatus.CODE_BAD_REQUEST, hce.getLocalizedMessage());
+			}
 		}
 		if (ex.getCause() instanceof RestStatus)
 			ex = ex.getCause();
