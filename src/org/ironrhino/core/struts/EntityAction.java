@@ -1620,11 +1620,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		BaseTreeControl baseTreeControl = null;
 		Collection<BaseTreeControl> baseTreeControls = ApplicationContextUtils.getBeansOfType(BaseTreeControl.class)
 				.values();
-		for (BaseTreeControl btc : baseTreeControls)
-			if (btc.getTree().getClass().equals(getEntityClass())) {
+		for (BaseTreeControl btc : baseTreeControls) {
+			if (ReflectionUtils.getGenericClass(btc.getClass()) == getEntityClass()) {
 				baseTreeControl = btc;
 				break;
 			}
+		}
 		if (baseTreeControl != null) {
 			if (parent == null || parent < 1) {
 				if (tree != null && tree > 0) {
