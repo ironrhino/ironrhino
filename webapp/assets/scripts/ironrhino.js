@@ -31661,6 +31661,18 @@ MessageBundle = {
 
 })(jQuery);
 (function() {
+	var d = document.domain;
+	if (!d.match(/^(\d+\.){3}\d+$/)) {
+		d = d.split('.');
+		try {
+			if (d.length > 2)
+				document.domain = d[d.length - 2] + '.' + d[d.length - 1];
+		} catch (e) {
+			if (d.length > 3)
+				document.domain = d[d.length - 3] + '.' + d[d.length - 2] + '.'
+						+ d[d.length - 1];
+		}
+	}
 	try {
 		if (window.self !== window.top) {
 			window.topWindow = window.top;
@@ -31701,18 +31713,6 @@ MessageBundle = {
 		if (container.is(selector))
 			result = result.addBack();
 		return result;
-	}
-	var d = document.domain;
-	if (!d.match(/^(\d+\.){3}\d+$/)) {
-		d = d.split('.');
-		try {
-			if (d.length > 2)
-				document.domain = d[d.length - 2] + '.' + d[d.length - 1];
-		} catch (e) {
-			if (d.length > 3)
-				document.domain = d[d.length - 3] + '.' + d[d.length - 2] + '.'
-						+ d[d.length - 1];
-		}
 	}
 	$.ajaxSettings.traditional = true;
 	var $ajax = $.ajax;
