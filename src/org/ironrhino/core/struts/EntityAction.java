@@ -109,7 +109,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	private Map<String, UiConfigImpl> _uiConfigs;
 
-	private Persistable _entity;
+	private EN _entity;
 
 	private String _entityName;
 
@@ -188,7 +188,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return EntityClassHelper.isIdAssigned(getEntityClass());
 	}
 
-	public Persistable getEntity() {
+	public EN getEntity() {
 		return _entity;
 	}
 
@@ -284,12 +284,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return ApplicationContextUtils.getEntityManager(entityClass);
 	}
 
-	protected void setEntity(Persistable<?> entity) {
+	protected void setEntity(EN entity) {
 		this._entity = entity;
 	}
 
 	protected void tryFindEntity() {
-		BaseManager entityManager = getEntityManager(getEntityClass());
+		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
 		try {
 			BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().getConstructor().newInstance());
 			bw.setConversionService(conversionService);
@@ -740,7 +740,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				return INPUT;
 			}
 		}
-		BaseManager<Persistable<?>> entityManager = getEntityManager(getEntityClass());
+		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
 		String versionPropertyName = getVersionPropertyName();
 		Object previousVersion = null;
 		if (versionPropertyName != null) {
@@ -772,7 +772,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		boolean idAssigned = isIdAssigned();
 		boolean fromList = "cell".equalsIgnoreCase(request.getHeader("X-Edit"));
 		Map<String, UiConfigImpl> uiConfigs = getUiConfigs();
-		BaseManager<Persistable<?>> entityManager = getEntityManager(getEntityClass());
+		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
 		_entity = constructEntity();
 		BeanWrapperImpl bw = new BeanWrapperImpl(_entity);
 		bw.setConversionService(conversionService);
@@ -917,7 +917,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				logger.error(e.getMessage(), e);
 			}
 		} else {
-			Persistable persisted = entityManager.get((Serializable) bw.getPropertyValue("id"));
+			EN persisted = entityManager.get((Serializable) bw.getPropertyValue("id"));
 			if (persisted == null) {
 				addFieldError("id", getText("validation.not.exists"));
 				return false;
@@ -1051,7 +1051,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				BaseTreeableEntity sibling = (BaseTreeableEntity) o;
 				if (!treeEntity.isNew() && sibling.getId().equals(treeEntity.getId()))
 					continue;
-				entityManager.evict(sibling);
+				entityManager.evict((EN) sibling);
 				String name = sibling.getName();
 				if (name.equals(treeEntity.getName()) || AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), CaseInsensitive.class)
@@ -1137,7 +1137,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	}
 
-	private boolean checkEntityReadonly(String expression, Persistable<?> entity) throws Exception {
+	private boolean checkEntityReadonly(String expression, EN entity) throws Exception {
 		if (StringUtils.isNotBlank(expression)) {
 			Template template = new Template(null, "${(" + expression + ")?string!}", freemarkerManager.getConfig());
 			StringWriter sw = new StringWriter();
@@ -1149,7 +1149,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return false;
 	}
 
-	private boolean evalBoolean(String expression, Persistable<?> entity, Object value) {
+	private boolean evalBoolean(String expression, EN entity, Object value) {
 		if (StringUtils.isNotBlank(expression)) {
 			try {
 				Template template = new Template(null, "${(" + expression + ")?string!}",
@@ -1264,7 +1264,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	protected String doDelete() throws Exception {
-		BaseManager<Persistable<?>> entityManager = getEntityManager(getEntityClass());
+		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
 		String[] arr = getId();
 		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
 		try {
@@ -1296,7 +1296,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			String expression = getReadonly().getExpression();
 			if (ownerProperty != null || StringUtils.isNotBlank(expression)) {
 				for (Serializable uid : id) {
-					Persistable<?> en = entityManager.get(uid);
+					EN en = entityManager.get(uid);
 					if (en == null)
 						continue;
 					if (ownerProperty != null) {
@@ -1333,7 +1333,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 			}
 			if (deletable) {
-				List<Persistable<?>> list = entityManager.delete(id);
+				List<EN> list = entityManager.delete(id);
 				if (list.size() > 0)
 					notify("delete.success");
 			}
@@ -1522,7 +1522,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	protected String updateEnabled(boolean enabled) throws Exception {
-		BaseManager<Persistable<?>> em = getEntityManager(getEntityClass());
+		BaseManager<EN> em = getEntityManager(getEntityClass());
 		String[] arr = getId();
 		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
 		try {
@@ -1573,10 +1573,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					}
 				}
 				String expression = getReadonly().getExpression();
-				if (StringUtils.isNotBlank(expression) && checkEntityReadonly(expression, (Persistable<?>) en))
+				if (StringUtils.isNotBlank(expression) && checkEntityReadonly(expression, (EN) en))
 					continue;
 				en.setEnabled(enabled);
-				em.save((Persistable) en);
+				em.save((EN) en);
 			}
 			notify("operate.success");
 		}
@@ -1630,7 +1630,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (parent == null || parent < 1) {
 				if (tree != null && tree > 0) {
 					children = new ArrayList<>();
-					children.add(baseTreeControl.getTree().getDescendantOrSelfById(tree));
+					children.add((EN) baseTreeControl.getTree().getDescendantOrSelfById(tree));
 					return JSON;
 				} else {
 					parentEntity = baseTreeControl.getTree();
@@ -1645,7 +1645,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (parent == null || parent < 1) {
 				if (tree != null && tree > 0) {
 					children = new ArrayList<>();
-					children.add(entityManager.get(tree));
+					children.add((EN) entityManager.get(tree));
 				} else {
 					DetachedCriteria dc = entityManager.detachedCriteria();
 					dc.add(Restrictions.isNull("parent")).addOrder(Order.asc("displayOrder"))
@@ -1658,6 +1658,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					children = parentEntity.getChildren();
 			}
 		}
+		children = CriterionUtils.filter(children);
 		return JSON;
 	}
 
@@ -1673,9 +1674,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return "treeview";
 	}
 
-	private Collection<Persistable> children;
+	private Collection<EN> children;
 
-	public Collection<Persistable> getChildren() {
+	public Collection<EN> getChildren() {
 		return children;
 	}
 
@@ -1730,19 +1731,19 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	// need call once before view
-	protected Class<Persistable<?>> getEntityClass() {
+	protected Class<EN> getEntityClass() {
 		if (entityClass == null)
-			entityClass = (Class<Persistable<?>>) ReflectionUtils.getGenericClass(getClass());
+			entityClass = (Class<EN>) ReflectionUtils.getGenericClass(getClass());
 		if (entityClass == null) {
 			ActionProxy proxy = ActionContext.getContext().getActionInvocation().getProxy();
 			String actionName = getEntityName();
 			String namespace = proxy.getNamespace();
-			entityClass = (Class<Persistable<?>>) AutoConfigPackageProvider.getEntityClass(namespace, actionName);
+			entityClass = (Class<EN>) AutoConfigPackageProvider.getEntityClass(namespace, actionName);
 		}
 		return entityClass;
 	}
 
-	private Class<Persistable<?>> entityClass;
+	private Class<EN> entityClass;
 
 	private void putEntityToValueStack(Persistable entity) {
 		ValueStack vs = ActionContext.getContext().getValueStack();
@@ -1750,7 +1751,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			vs.set(getEntityName(), entity);
 	}
 
-	protected Persistable constructEntity() {
+	protected EN constructEntity() {
 		Persistable entity = null;
 		try {
 			entity = getEntityClass().getConstructor().newInstance();
@@ -1784,7 +1785,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		return entity;
+		return (EN) entity;
 	}
 
 	private boolean hasOwnership(Persistable<?> entity) {

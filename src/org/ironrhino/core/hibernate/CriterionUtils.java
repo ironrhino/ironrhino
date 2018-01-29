@@ -5,9 +5,13 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
@@ -25,6 +29,7 @@ import org.ironrhino.core.struts.EntityClassHelper;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.BeanUtils;
+import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 
@@ -418,6 +423,159 @@ public class CriterionUtils {
 		return state;
 	}
 
+	public static <EN extends Persistable<?>> Collection<EN> filter(Collection<EN> result) {
+		if (result == null || result.isEmpty())
+			return result;
+		Class<?> entityClass = result.iterator().next().getClass();
+		Map<String, String[]> parameterMap = RequestContext.getRequest().getParameterMap();
+		String entityName = StringUtils.uncapitalize(entityClass.getSimpleName());
+		Comparator<EN> comparator = (o1, o2) -> 0;
+		Predicate<EN> predicate = en -> true;
+		try {
+			ConversionService conversionService = ApplicationContextUtils.getBean(ConversionService.class);
+			BeanWrapperImpl entityBeanWrapper = new BeanWrapperImpl(entityClass.getConstructor().newInstance());
+			entityBeanWrapper.setConversionService(conversionService);
+			for (String parameterName : parameterMap.keySet()) {
+				String propertyName;
+				String[] parameterValues;
+				String operatorValue;
+				if (parameterName.endsWith(CRITERION_ORDER_SUFFIX)) {
+					// ordering
+					propertyName = parameterName.substring(0, parameterName.length() - CRITERION_ORDER_SUFFIX.length());
+					propertyName = trimEntityNamePrefixAndIdSuffix(propertyName, entityName);
+					if (entityBeanWrapper.isReadableProperty(propertyName)) {
+						final String pname = propertyName;
+						Comparator<EN> c = (o1, o2) -> {
+							Object value1 = new BeanWrapperImpl(o1).getPropertyValue(pname);
+							Object value2 = new BeanWrapperImpl(o2).getPropertyValue(pname);
+							return DEFAULT_COMPARATOR.compare(value1, value2);
+						};
+						comparator = comparator.thenComparing(
+								"desc".equalsIgnoreCase(parameterMap.get(parameterName)[0]) ? c.reversed() : c);
+					}
+					continue;
+				}
+				if (parameterName.endsWith(CRITERION_OPERATOR_SUFFIX)) {
+					propertyName = parameterName.substring(0,
+							parameterName.length() - CRITERION_OPERATOR_SUFFIX.length());
+					if (parameterMap.containsKey(propertyName))
+						continue;
+					parameterValues = new String[0];
+					operatorValue = parameterMap.get(parameterName)[0];
+				} else {
+					propertyName = parameterName;
+					parameterValues = parameterMap.get(parameterName);
+					operatorValue = RequestContext.getRequest().getParameter(parameterName + CRITERION_OPERATOR_SUFFIX);
+				}
+				propertyName = trimEntityNamePrefixAndIdSuffix(propertyName, entityName);
+				if (!entityBeanWrapper.isReadableProperty(propertyName)
+						|| !entityBeanWrapper.isWritableProperty(propertyName))
+					continue;
+				CriterionOperator operator = null;
+				if (StringUtils.isNotBlank(operatorValue))
+					try {
+						operator = CriterionOperator.valueOf(operatorValue.toUpperCase(Locale.ROOT));
+					} catch (IllegalArgumentException e) {
+
+					}
+				if (operator == null) {
+					if (parameterValues.length == 1 && StringUtils.isEmpty(parameterValues[0]))
+						continue;
+					else
+						operator = CriterionOperator.EQ;
+				}
+				if (parameterValues.length < operator.getParametersSize())
+					continue;
+				Object[] values = new Object[parameterValues.length];
+				for (int i = 0; i < parameterValues.length; i++) {
+					entityBeanWrapper.setPropertyValue(propertyName, parameterValues[i]);
+					values[i] = entityBeanWrapper.getPropertyValue(propertyName);
+					if (i == parameterValues.length - 1 && values[i] instanceof Date) {
+						values[i] = DateUtils.endOfDay((Date) values[i]);
+					}
+				}
+				final String pname = propertyName;
+				final Class<?> ptype = entityBeanWrapper.getPropertyType(pname);
+				if (Persistable.class.isAssignableFrom(ptype))
+					continue;
+				final CriterionOperator op = operator;
+				Predicate<EN> p = en -> {
+					Object value = new BeanWrapperImpl(en).getPropertyValue(pname);
+					switch (op) {
+					case EQ:
+						return value != null && value.equals(values[0]);
+					case NEQ:
+						return !(value != null && value.equals(values[0]));
+					case START:
+						if (ptype != String.class)
+							return true;
+						return value != null && value.toString().startsWith(values[0].toString());
+					case NOTSTART:
+						if (ptype != String.class)
+							return true;
+						return !(value != null && value.toString().startsWith(values[0].toString()));
+					case END:
+						if (ptype != String.class)
+							return true;
+						return value != null && value.toString().endsWith(values[0].toString());
+					case NOTEND:
+						if (ptype != String.class)
+							return true;
+						return !(value != null && value.toString().endsWith(values[0].toString()));
+					case INCLUDE:
+						if (ptype != String.class)
+							return true;
+						return value != null && value.toString().contains(values[0].toString());
+					case NOTINCLUDE:
+						if (ptype != String.class)
+							return true;
+						return !(value != null && value.toString().contains(values[0].toString()));
+					case LT:
+						return DEFAULT_COMPARATOR.compare(value, values[0]) < 0;
+					case LE:
+						return DEFAULT_COMPARATOR.compare(value, values[0]) <= 0;
+					case GT:
+						return DEFAULT_COMPARATOR.compare(value, values[0]) > 0;
+					case GE:
+						return DEFAULT_COMPARATOR.compare(value, values[0]) >= 0;
+					case BETWEEN:
+						return (values[0] == null || DEFAULT_COMPARATOR.compare(value, values[0]) >= 0)
+								&& (values[1] == null || DEFAULT_COMPARATOR.compare(value, values[1]) <= 0);
+					case NOTBETWEEN:
+						return !((values[0] == null || DEFAULT_COMPARATOR.compare(value, values[0]) >= 0)
+								&& (values[1] == null || DEFAULT_COMPARATOR.compare(value, values[1]) <= 0));
+					case ISNULL:
+						return value == null;
+					case ISNOTNULL:
+						return value != null;
+					case ISEMPTY:
+						if (ptype != String.class)
+							return true;
+						return value == null || value.toString().isEmpty();
+					case ISNOTEMPTY:
+						if (ptype != String.class)
+							return true;
+						return !(value == null || value.toString().isEmpty());
+					case ISTRUE:
+						if (ptype != Boolean.class)
+							return true;
+						return value != null && (Boolean) value;
+					case ISFALSE:
+						if (ptype != Boolean.class)
+							return true;
+						return value != null && !(Boolean) value;
+					default:
+						return true;
+					}
+				};
+				predicate = predicate.and(p);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result.stream().filter(predicate).sorted(comparator).collect(Collectors.toList());
+	}
+
 	private static String trimEntityNamePrefixAndIdSuffix(String propertyName, String entityName) {
 		if (propertyName.startsWith(entityName + "."))
 			propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
@@ -430,5 +588,25 @@ public class CriterionUtils {
 		int i = propertyName.indexOf('.');
 		return (i > 0) ? propertyName.substring(0, i) : propertyName;
 	}
+
+	static Comparator<Object> DEFAULT_COMPARATOR = (value1, value2) -> {
+		if (value1 != null && value2 != null) {
+			if (value1 instanceof Number) {
+				double d = ((Number) value1).doubleValue() - ((Number) value2).doubleValue();
+				return d == 0 ? 0 : d > 0 ? 1 : -1;
+			} else if (value1 instanceof Date) {
+				return ((Date) value1).compareTo((Date) value2);
+			} else if (value1 instanceof Enum) {
+				return ((Enum<?>) value1).ordinal() - ((Enum<?>) value2).ordinal();
+			} else {
+				return (value1.toString()).compareTo(value2.toString());
+			}
+		} else if (value1 == null && value2 != null) {
+			return -1;
+		} else if (value1 != null && value2 == null) {
+			return 1;
+		}
+		return 0;
+	};
 
 }

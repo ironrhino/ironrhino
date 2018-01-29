@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.ironrhino.common.model.Region;
+import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.service.BaseTreeControl;
@@ -53,6 +54,7 @@ public class RegionTreeAction extends BaseAction {
 		}
 		if (region != null)
 			children = region.getChildren();
+		children = CriterionUtils.filter(children);
 		return JSON;
 	}
 
@@ -66,6 +68,7 @@ public class RegionTreeAction extends BaseAction {
 				region = regionTreeControl.getTree().getDescendantOrSelfById(parent);
 			children = region.getChildren();
 		}
+		children = CriterionUtils.filter(children);
 		return SUCCESS;
 	}
 
