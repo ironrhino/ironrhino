@@ -1,6 +1,5 @@
 package org.ironrhino.core.struts;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.struts.result.AutoConfigResult;
+import org.ironrhino.core.struts.result.ResultProvider;
 import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -195,6 +195,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 						logger.info("Mapping " + ac.getClassName() + " to " + packageConfig.getNamespace()
 								+ (packageConfig.getNamespace().endsWith("/") ? "" : "/") + ac.getName());
 				} else {
+					// merge package
 					Map<String, ActionConfig> actionConfigs = new LinkedHashMap<>(pc.getActionConfigs());
 					for (String actionName : packageConfig.getActionConfigs().keySet()) {
 						if (actionConfigs.containsKey(actionName)) {
@@ -210,18 +211,13 @@ public class AutoConfigPackageProvider implements PackageProvider {
 						logger.info("Mapping " + ac.getClassName() + " to " + pc.getNamespace()
 								+ (pc.getNamespace().endsWith("/") ? "" : "/") + ac.getName());
 					}
-					// this is a trick
-					try {
-						Field field = PackageConfig.class.getDeclaredField("actionConfigs");
-						field.setAccessible(true);
-						field.set(pc, actionConfigs);
-					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
-					}
+					ReflectionUtils.setFieldValue(pc, "actionConfigs", actionConfigs);
 				}
-
 			}
 		}
+		PackageConfig parentPackageConfig = configuration.getPackageConfigs().get(parentPackage);
+		WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext).getBeansOfType(ResultProvider.class)
+				.values().stream().forEach(rp -> rp.registerResults(parentPackageConfig));
 		initialized = true;
 	}
 
