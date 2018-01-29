@@ -1,8 +1,16 @@
 package org.ironrhino.core.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import javax.persistence.Table;
+
+import org.hibernate.dialect.function.SQLFunction;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.query.Query;
+import org.hibernate.type.StringType;
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.BaseTreeableEntity;
@@ -10,6 +18,7 @@ import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.transaction.annotation.Transactional;
 
 public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 
@@ -67,6 +76,36 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 		treeNode.setLevel(treeNode.getLevel() + delta);
 		for (T t : treeNode.getChildren())
 			addLevel(t, delta);
+	}
+
+	@Transactional
+	public synchronized void updateFullIdAndLevel() {
+		entityManager.execute(session -> {
+			String tableName = entityClass.getSimpleName();
+			if (entityClass.isAnnotationPresent(Table.class))
+				tableName = entityClass.getAnnotation(Table.class).name();
+			SessionFactoryImplementor sf = ((SessionFactoryImplementor) session.getSessionFactory());
+			SQLFunction concat = sf.getServiceRegistry().getService(JdbcServices.class).getDialect().getFunctions()
+					.get("concat");
+			Query<?> query = session.createNativeQuery("update " + tableName + " set fullId="
+					+ concat.render(StringType.INSTANCE, Arrays.asList("id", "'.'"), sf)
+					+ ",level=1 where parentId is null");
+			if (query.executeUpdate() > 0) {
+				query = session.createNativeQuery("update " + tableName + " t join (select a.id,"
+						+ concat.render(StringType.INSTANCE, Arrays.asList("b.fullId", "a.id", "'.'"), sf)
+						+ " as fullId,b.level+1 as level from " + tableName + " a join " + tableName
+						+ " b on a.parentId=b.id where b.level=:level) c on t.id=c.id set t.fullId=c.fullId,t.level=c.level");
+				int level = 1;
+				while (true) {
+					query.setParameter("level", level);
+					if (query.executeUpdate() == 0)
+						break;
+					level++;
+				}
+			}
+			return null;
+		});
+		tree = null;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
