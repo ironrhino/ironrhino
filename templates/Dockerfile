@@ -1,4 +1,4 @@
-FROM java:8u111-jdk-alpine
+FROM openjdk:8-jdk-alpine
 
 ARG user=ironrhino
 
