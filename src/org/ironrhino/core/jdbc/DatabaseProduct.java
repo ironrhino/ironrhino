@@ -166,6 +166,17 @@ public enum DatabaseProduct {
 			}
 			return sb.toString();
 		}
+
+		@Override
+		protected String getRecommendedJdbcUrlQueryString() {
+			return "sendStringParametersAsUnicode=true";
+		}
+
+		@Override
+		public String polishJdbcUrl(String jdbcUrl) {
+			return polishJdbcUrl(jdbcUrl, ";", ";");
+		}
+
 	},
 	SYBASE {
 		@Override
@@ -374,15 +385,19 @@ public enum DatabaseProduct {
 	}
 
 	public String polishJdbcUrl(String jdbcUrl) {
+		return polishJdbcUrl(jdbcUrl, "&", "?");
+	}
+
+	protected String polishJdbcUrl(String jdbcUrl, String separator, String delimiter) {
 		String qs = getRecommendedJdbcUrlQueryString();
 		if (qs == null)
 			return jdbcUrl;
-		int i = jdbcUrl.indexOf('?');
+		int i = jdbcUrl.indexOf(delimiter);
 		if (i > 0) {
 			String uri = jdbcUrl.substring(0, i);
 			String params = jdbcUrl.substring(i + 1);
 			Map<String, String> map = new LinkedHashMap<>();
-			for (String s : (qs + "&" + params).split("&")) {
+			for (String s : (qs + separator + params).split(separator)) {
 				String[] arr = s.split("=", 2);
 				if (arr.length == 2)
 					map.put(arr[0], arr[1]);
@@ -390,12 +405,12 @@ public enum DatabaseProduct {
 			StringBuilder sb = new StringBuilder(uri);
 			if (map.size() > 0) {
 				for (Map.Entry<String, String> entry : map.entrySet())
-					sb.append(sb.indexOf("?") > 0 ? '&' : '?').append(entry.getKey()).append("=")
+					sb.append(sb.indexOf(delimiter) > 0 ? separator : delimiter).append(entry.getKey()).append("=")
 							.append(entry.getValue());
 			}
 			return sb.toString();
 		} else {
-			return jdbcUrl + "?" + qs;
+			return jdbcUrl + delimiter + qs;
 		}
 	}
 
