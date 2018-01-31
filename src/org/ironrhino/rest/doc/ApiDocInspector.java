@@ -88,7 +88,7 @@ public class ApiDocInspector {
 				List<Method> methods = findApiMethods(clazz);
 				for (Method m : methods)
 					apiModuleObject.getApiDocs().add(new ApiDoc(clazz, m, apiConfig.objectMapper()));
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 		}
@@ -128,7 +128,7 @@ public class ApiDocInspector {
 				CtMethod method2 = cc.getMethod(m2.getName(),
 						Descriptor.ofMethod(classPool.get(m2.getReturnType().getName()), paramTypes));
 				line2 = method2.getMethodInfo().getLineNumber(0);
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 			return line1 - line2;

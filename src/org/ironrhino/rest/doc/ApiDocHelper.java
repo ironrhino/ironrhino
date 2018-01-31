@@ -122,11 +122,16 @@ public class ApiDocHelper {
 	}
 
 	private static Object createObject(Class<?> clazz) {
+		return createObject(clazz, new HashSet<>());
+	}
+
+	private static Object createObject(Class<?> clazz, Set<Class<?>> references) {
 		Object object = createValue(clazz, null, null);
 		if (object != null)
 			return object;
 		try {
 			final Object obj = BeanUtils.instantiateClass(clazz);
+			references.add(clazz);
 			ReflectionUtils.doWithFields(obj.getClass(), field -> {
 				ReflectionUtils.makeAccessible(field);
 				Object value;
@@ -135,9 +140,18 @@ public class ApiDocHelper {
 					if (!field.getType().isPrimitive() && field.get(obj) != null) {
 						return;
 					}
-					value = createValue(field.getType(), field.getName(), clazz);
-					if (value == null)
-						value = createObject(field.getType());
+					if (type == clazz) {
+						value = obj;
+					} else {
+						value = createValue(field.getType(), field.getName(), clazz);
+						if (value == null) {
+							if (!references.contains(clazz)) {
+								value = createObject(field.getType(), references);
+							} else {
+								return;
+							}
+						}
+					}
 				} else if (type instanceof ParameterizedType) {
 					ParameterizedType pt = (ParameterizedType) type;
 					if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1
@@ -147,11 +161,11 @@ public class ApiDocHelper {
 					Class<?> clazz2 = (Class<?>) pt.getActualTypeArguments()[0];
 					if (Set.class.isAssignableFrom(raw)) {
 						Set<Object> set = new HashSet<>();
-						set.add(createSample(clazz2));
+						set.add((clazz2 == clazz) ? obj : createSample(clazz2));
 						value = set;
 					} else if (Collection.class.isAssignableFrom(raw)) {
 						List<Object> list = new ArrayList<>();
-						list.add(createSample(clazz2));
+						list.add((clazz2 == clazz) ? obj : createSample(clazz2));
 						value = list;
 					} else {
 						return;
@@ -196,7 +210,7 @@ public class ApiDocHelper {
 		if (type.isEnum()) {
 			try {
 				return ((Object[]) type.getMethod("values").invoke(null))[0];
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 		}

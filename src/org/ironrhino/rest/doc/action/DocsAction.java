@@ -122,8 +122,8 @@ public class DocsAction extends BaseAction {
 				try {
 					ApiDocInspector adh = ctx.getBean(ApiDocInspector.class);
 					return adh.getApiModules();
-				} catch (NoSuchBeanDefinitionException e) {
-
+				} catch (Throwable e) {
+					e.printStackTrace();
 				}
 			}
 		}

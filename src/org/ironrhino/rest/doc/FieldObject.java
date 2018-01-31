@@ -239,7 +239,7 @@ public class FieldObject implements Serializable {
 					}
 				} catch (NoSuchFieldException e) {
 					continue;
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					e.printStackTrace();
 				}
 				list.add(create(name, pd.getPropertyType(), required, null, fd));
