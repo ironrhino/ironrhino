@@ -30,6 +30,7 @@ import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.hibernate.convert.EnumArrayConverter;
@@ -66,16 +67,16 @@ public class Customer extends BaseRecordableEntity {
 	@NaturalId(mutable = true)
 	private String name;
 
-	@UiConfig(width = "100px", cssClass = "conjunct", dynamicAttributes = "{\"data-replacement\":\"control-group-customer-age\"}")
+	@UiConfig(width = "60px", cssClass = "conjunct", dynamicAttributes = "{\"data-replacement\":\"control-group-customer-age\"}")
 	@Column(nullable = false)
 	private Gender gender;
 
-	@UiConfig(width = "100px", hiddenInInput = @Hidden(expression = "entity.gender??&&entity.gender.name()=='FEMALE'"), description = "age.description", queryWithRange = true)
+	@UiConfig(width = "60px", hiddenInInput = @Hidden(expression = "entity.gender??&&entity.gender.name()=='FEMALE'"), description = "age.description", queryWithRange = true)
 	@Min(1)
 	@Max(100)
 	private Integer age;
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "60px")
 	private boolean enabled;
 
 	@UiConfig(width = "80px", type = "dictionary", cssClass = "chosen", templateName = "customer_category")
@@ -97,19 +98,23 @@ public class Customer extends BaseRecordableEntity {
 	@DecimalMin("1.00")
 	private BigDecimal balance;
 
+	@UiConfig(width = "80px", template = "${(value*100)?string('0.0000')}%", description = "percentage.description")
+	@Formula("balance/(select sum(a.balance) from sample_customer a)")
+	private BigDecimal percentage;
+
 	@SearchableComponent
 	private Set<String> tags;
 
-	@UiConfig(type = "treeselect", width = "200px", description = "activeRegions.description", pickUrl = "/common/region/children", template = "<#if value?has_content><#list value as id><span class=\"label\">${beans['regionTreeControl'].tree.getDescendantOrSelfById(id).name}</span><#sep> </#list></#if>")
+	@UiConfig(type = "treeselect", width = "100px", description = "activeRegions.description", pickUrl = "/common/region/children", template = "<#if value?has_content><#list value as id><span class=\"label\">${beans['regionTreeControl'].tree.getDescendantOrSelfById(id).name}</span><#sep> </#list></#if>")
 	private Long[] activeRegions;
 
 	@SearchableComponent(nestSearchableProperties = "name")
-	@UiConfig(width = "150px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true", description = "company.description")
+	@UiConfig(width = "120px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true", description = "company.description")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company")
 	private Company company;
 
-	@UiConfig(width = "200px", description = "relatedCompanies.description")
+	@UiConfig(width = "120px", description = "relatedCompanies.description")
 	@ManyToMany
 	@JoinTable(name = "sample_company_related_customer", joinColumns = @JoinColumn(name = "customer"), inverseJoinColumns = @JoinColumn(name = "company"))
 	private Collection<Company> relatedCompanies;
