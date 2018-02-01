@@ -186,7 +186,7 @@ Observation.form = function(container) {
 		var fp = t
 				.wrap('<div class="filepick input-pseudo" tabindex="0"/>')
 				.after('<div class="text resettable"></div>'
-						+ '<i class="indicator glyphicon glyphicon-list"/>'
+						+ '<i class="indicator glyphicon glyphicon-folder-open"/>'
 						+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
 				.parent();
 		if (t.prop('disabled'))

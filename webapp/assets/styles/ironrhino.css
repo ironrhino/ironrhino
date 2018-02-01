@@ -9987,6 +9987,8 @@ a.remove:hover , a.remove:focus {
 a.remove , .close {
 	outline: 0;
 	font-family: serif;
+	font-size: 15px;
+	line-height: 15px;
 }
 
 a.remove:empty:after , .close:empty:after {
