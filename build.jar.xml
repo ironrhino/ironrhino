@@ -42,7 +42,7 @@
 	<property name="common-treenode-jar.name" value="ironrhino-common-treenode-${version}.jar" />
 	<property name="common-treenode-jar.includes" value="org/ironrhino/common/**/TreeNode*,resources/view/common/treeNode*" />
 	<property name="common-region-jar.name" value="ironrhino-common-region-${version}.jar" />
-	<property name="common-region-jar.includes" value="org/ironrhino/common/**/Region*,resources/view/**/region*,resources/data/region*" />
+	<property name="common-region-jar.includes" value="org/ironrhino/common/**/Region*,resources/view/**/region*,resources/data/*region*" />
 	<property name="common-stat-jar.name" value="ironrhino-common-stat-${version}.jar" />
 	<property name="common-stat-jar.includes" value="org/ironrhino/common/model/Stat.class,org/ironrhino/common/support/Stat*,org/ironrhino/common/**/Monitor*,resources/view/common/monitor*" />
 	<property name="common-record-jar.name" value="ironrhino-common-record-${version}.jar" />
