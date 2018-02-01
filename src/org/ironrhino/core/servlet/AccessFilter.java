@@ -21,7 +21,6 @@ import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
-import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.core.util.UserAgent;
 import org.slf4j.Logger;
@@ -222,16 +221,13 @@ public class AccessFilter implements Filter {
 			}
 		} finally {
 			RequestContext.reset();
+			LocaleContextHolder.resetLocaleContext();
 		}
 	}
 
 	@Override
 	public void destroy() {
-		try {
-			HttpClientUtils.getDefaultInstance().close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
 	}
 
 }
