@@ -222,7 +222,9 @@ public class AnnotationShadows {
 			if (config == null)
 				return;
 			this.value = config.value();
-			this.expression = config.expression();
+			this.expression = config.expression().trim();
+			if (expression.startsWith("${") && expression.endsWith("}"))
+				expression = expression.substring(2, expression.length() - 1).trim();
 			this.deletable = config.deletable();
 		}
 
@@ -244,7 +246,9 @@ public class AnnotationShadows {
 			if (config == null)
 				return;
 			this.value = config.value();
-			this.expression = config.expression();
+			this.expression = config.expression().trim();
+			if (expression.startsWith("${") && expression.endsWith("}"))
+				expression = expression.substring(2, expression.length() - 1).trim();
 			if (!this.value && config.hideWhenBlank())
 				if (StringUtils.isBlank(this.expression))
 					this.expression = "!(value?has_content)";
