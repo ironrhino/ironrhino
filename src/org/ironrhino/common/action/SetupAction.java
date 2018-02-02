@@ -3,6 +3,9 @@ package org.ironrhino.common.action;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -249,6 +252,12 @@ public class SetupAction extends BaseAction {
 					this.cssClasses.addAll(Arrays.asList(setupParameter.cssClass().split("\\s")));
 				if (Date.class.isAssignableFrom(parameterType))
 					this.cssClasses.add("date");
+				else if (parameterType == LocalDate.class)
+					this.cssClasses.add("date");
+				else if (parameterType == LocalDateTime.class)
+					this.cssClasses.add("datetime");
+				else if (parameterType == LocalTime.class)
+					this.cssClasses.add("time");
 				if (StringUtils.isNotBlank(setupParameter.dynamicAttributes()))
 					try {
 						this.dynamicAttributes = JsonUtils.fromJson(setupParameter.dynamicAttributes(),

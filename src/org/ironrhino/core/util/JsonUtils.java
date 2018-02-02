@@ -5,6 +5,11 @@ import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +27,7 @@ import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,9 +38,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -48,6 +57,99 @@ public class JsonUtils {
 
 	public static final TypeReference<Map<String, String>> STRING_MAP_TYPE = new TypeReference<Map<String, String>>() {
 	};
+
+	public static final Module MODULE_TEMPORAL = new SimpleModule()
+			.addDeserializer(Date.class, new JsonDeserializer<Date>() {
+				@Override
+				public Date deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+						throws IOException, JsonProcessingException {
+					String date = jsonparser.getText();
+					DateFormat df = deserializationcontext.getConfig().getDateFormat();
+					if (df != null) {
+						DateFormat clone = (DateFormat) df.clone();
+						try {
+							return clone.parse(date);
+						} catch (ParseException e) {
+						}
+					}
+					Date d = DateUtils.parse(date);
+					if (d == null)
+						throw new RuntimeException(date + " is not valid date");
+					return d;
+				}
+			}).addDeserializer(LocalDate.class, new JsonDeserializer<LocalDate>() {
+				@Override
+				public LocalDate deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+						throws IOException, JsonProcessingException {
+					String date = jsonparser.getText();
+					DateFormat df = deserializationcontext.getConfig().getDateFormat();
+					if (df != null) {
+						DateFormat clone = (DateFormat) df.clone();
+						try {
+							return clone.parse(date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+						} catch (ParseException e) {
+						}
+					}
+					Date d = DateUtils.parse(date);
+					if (d == null)
+						throw new RuntimeException(date + " is not valid date");
+					return d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+				}
+			}).addSerializer(LocalDate.class, new JsonSerializer<LocalDate>() {
+				@Override
+				public void serialize(LocalDate localDate, JsonGenerator jsonGenerator,
+						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+					jsonGenerator.writeString(localDate.toString());
+				}
+			}).addDeserializer(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
+				@Override
+				public LocalDateTime deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+						throws IOException, JsonProcessingException {
+					String date = jsonparser.getText();
+					DateFormat df = deserializationcontext.getConfig().getDateFormat();
+					if (df != null) {
+						DateFormat clone = (DateFormat) df.clone();
+						try {
+							return clone.parse(date).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+						} catch (ParseException e) {
+						}
+					}
+					Date d = DateUtils.parse(date);
+					if (d == null)
+						throw new RuntimeException(date + " is not valid date");
+					return d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+				}
+			}).addSerializer(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
+				@Override
+				public void serialize(LocalDateTime localDateTime, JsonGenerator jsonGenerator,
+						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+					jsonGenerator.writeString(localDateTime.toString());
+				}
+			}).addDeserializer(LocalTime.class, new JsonDeserializer<LocalTime>() {
+				@Override
+				public LocalTime deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+						throws IOException, JsonProcessingException {
+					return LocalTime.parse(jsonparser.getText());
+				}
+			}).addSerializer(LocalTime.class, new JsonSerializer<LocalTime>() {
+				@Override
+				public void serialize(LocalTime localTime, JsonGenerator jsonGenerator,
+						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+					jsonGenerator.writeString(localTime.toString());
+				}
+			}).addDeserializer(Duration.class, new JsonDeserializer<Duration>() {
+				@Override
+				public Duration deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+						throws IOException, JsonProcessingException {
+					return Duration.parse(jsonparser.getText());
+				}
+			}).addSerializer(Duration.class, new JsonSerializer<Duration>() {
+				@Override
+				public void serialize(Duration duration, JsonGenerator jsonGenerator,
+						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+					jsonGenerator.writeString(duration.toString());
+				}
+			});
 
 	private static Logger logger = LoggerFactory.getLogger(JsonUtils.class);
 
@@ -78,28 +180,11 @@ public class JsonUtils {
 		});
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		objectMapper.setTimeZone(TimeZone.getDefault());
 		objectMapper.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
 				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
-		objectMapper.registerModule(new SimpleModule().addDeserializer(Date.class, new JsonDeserializer<Date>() {
-			@Override
-			public Date deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-					throws IOException, JsonProcessingException {
-				String date = jsonparser.getText();
-				DateFormat df = objectMapper.getDeserializationConfig().getDateFormat();
-				if (df != null) {
-					DateFormat clone = (DateFormat) df.clone();
-					try {
-						return clone.parse(date);
-					} catch (ParseException e) {
-					}
-				}
-				Date d = DateUtils.parse(date);
-				if (d == null)
-					throw new RuntimeException(date + " is not valid date");
-				return d;
-			}
-		}));
+		objectMapper.registerModule(MODULE_TEMPORAL);
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;

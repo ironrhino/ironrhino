@@ -7,7 +7,11 @@ import java.sql.Date;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -209,10 +213,12 @@ public class SqlUtils {
 				Class<?> clazz = Class.forName(className);
 				if (clazz == boolean.class || clazz == Boolean.class)
 					return "boolean";
-				else if (clazz == Timestamp.class || clazz == java.util.Date.class)
-					return "timestamp";
-				else if (clazz == Date.class)
+				else if (clazz == Timestamp.class || clazz == java.util.Date.class || clazz == LocalDateTime.class)
+					return "datetime";
+				else if (clazz == Date.class || clazz == LocalDate.class)
 					return "date";
+				else if (clazz == Time.class || clazz == LocalTime.class)
+					return "time";
 				else if (clazz == int.class || clazz == short.class || clazz == Integer.class || clazz == Short.class)
 					return "integer";
 				else if (clazz == long.class || clazz == Long.class)

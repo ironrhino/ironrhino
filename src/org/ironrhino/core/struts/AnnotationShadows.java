@@ -4,6 +4,7 @@ import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.temporal.Temporal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -167,7 +168,7 @@ public class AnnotationShadows {
 			this.queryMatchMode = config.queryMatchMode();
 			if (Number.class.isAssignableFrom(propertyType)
 					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(propertyType))
-					|| Date.class.isAssignableFrom(propertyType))
+					|| Date.class.isAssignableFrom(propertyType) || Temporal.class.isAssignableFrom(propertyType))
 				this.queryWithRange = config.queryWithRange();
 		}
 

@@ -4,6 +4,7 @@ import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -490,8 +491,14 @@ public class CriterionUtils {
 				for (int i = 0; i < parameterValues.length; i++) {
 					entityBeanWrapper.setPropertyValue(propertyName, parameterValues[i]);
 					values[i] = entityBeanWrapper.getPropertyValue(propertyName);
-					if (i == parameterValues.length - 1 && values[i] instanceof Date) {
-						values[i] = DateUtils.endOfDay((Date) values[i]);
+					if (i == parameterValues.length - 1) {
+						if (values[i] instanceof Date) {
+							values[i] = DateUtils.endOfDay((Date) values[i]);
+						} else if (values[i] instanceof LocalDateTime) {
+							LocalDateTime datetime = ((LocalDateTime) values[i]);
+							datetime = datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999);
+							values[i] = datetime;
+						}
 					}
 				}
 				final String pname = propertyName;

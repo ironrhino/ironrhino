@@ -2,6 +2,8 @@ package org.ironrhino.core.hibernate;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,8 +31,8 @@ public enum CriterionOperator implements Displayable {
 			Class<?> clazz = (Class<?>) type;
 			return clazz == Boolean.class || clazz == String.class || Number.class.isAssignableFrom(clazz)
 					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(clazz))
-					|| Date.class.isAssignableFrom(clazz) || Persistable.class.isAssignableFrom(clazz)
-					|| clazz.isEnum();
+					|| Date.class.isAssignableFrom(clazz) || Temporal.class.isAssignableFrom(clazz)
+					|| Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
 		}
 
 		@Override
@@ -45,8 +47,15 @@ public enum CriterionOperator implements Displayable {
 				return null;
 			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
 				return Restrictions.between(name, value, DateUtils.endOfDay((Date) value));
-			else
-				return Restrictions.eq(name, value);
+			else if (value instanceof LocalDateTime) {
+				LocalDateTime datetime = ((LocalDateTime) value);
+				if (datetime.getHour() == 0 && datetime.getMinute() == 0 && datetime.getSecond() == 0
+						&& datetime.getNano() == 0) {
+					return Restrictions.between(name, datetime,
+							datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999));
+				}
+			}
+			return Restrictions.eq(name, value);
 		}
 	},
 	NEQ(1) {
@@ -69,8 +78,16 @@ public enum CriterionOperator implements Displayable {
 			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
 				return Restrictions.or(Restrictions.isNull(name), Restrictions.or(Restrictions.lt(name, value),
 						Restrictions.gt(name, DateUtils.endOfDay((Date) value))));
-			else
-				return Restrictions.or(Restrictions.ne(name, value), Restrictions.isNull(name));
+			else if (value instanceof LocalDateTime) {
+				LocalDateTime datetime = ((LocalDateTime) value);
+				if (datetime.getHour() == 0 && datetime.getMinute() == 0 && datetime.getSecond() == 0
+						&& datetime.getNano() == 0) {
+					return Restrictions.or(Restrictions.isNull(name),
+							Restrictions.or(Restrictions.lt(name, datetime), Restrictions.gt(name,
+									datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999))));
+				}
+			}
+			return Restrictions.or(Restrictions.ne(name, value), Restrictions.isNull(name));
 		}
 	},
 	START(1) {
@@ -182,7 +199,7 @@ public enum CriterionOperator implements Displayable {
 			Class<?> clazz = (Class<?>) type;
 			return clazz == String.class || Number.class.isAssignableFrom(clazz)
 					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(clazz))
-					|| Date.class.isAssignableFrom(clazz);
+					|| Date.class.isAssignableFrom(clazz) || Temporal.class.isAssignableFrom(clazz);
 		}
 
 		@Override
@@ -199,10 +216,16 @@ public enum CriterionOperator implements Displayable {
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
 			Object value = values[0];
-			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
+			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value)) {
 				return Restrictions.le(name, DateUtils.endOfDay((Date) value));
-			else
-				return Restrictions.le(name, value);
+			} else if (value instanceof LocalDateTime) {
+				LocalDateTime datetime = ((LocalDateTime) value);
+				if (datetime.getHour() == 0 && datetime.getMinute() == 0 && datetime.getSecond() == 0
+						&& datetime.getNano() == 0) {
+					return Restrictions.le(name, datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999));
+				}
+			}
+			return Restrictions.le(name, value);
 		}
 	},
 	GT(1) {
@@ -214,10 +237,16 @@ public enum CriterionOperator implements Displayable {
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
 			Object value = values[0];
-			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
+			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value)) {
 				return Restrictions.gt(name, DateUtils.endOfDay((Date) value));
-			else
-				return Restrictions.gt(name, value);
+			} else if (value instanceof LocalDateTime) {
+				LocalDateTime datetime = ((LocalDateTime) value);
+				if (datetime.getHour() == 0 && datetime.getMinute() == 0 && datetime.getSecond() == 0
+						&& datetime.getNano() == 0) {
+					return Restrictions.gt(name, datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999));
+				}
+			}
+			return Restrictions.gt(name, value);
 		}
 	},
 	GE(1) {
@@ -239,7 +268,7 @@ public enum CriterionOperator implements Displayable {
 			Class<?> clazz = (Class<?>) type;
 			return clazz == String.class || Number.class.isAssignableFrom(clazz)
 					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(clazz))
-					|| Date.class.isAssignableFrom(clazz);
+					|| Date.class.isAssignableFrom(clazz) || Temporal.class.isAssignableFrom(clazz);
 		}
 
 		@Override
@@ -248,6 +277,14 @@ public enum CriterionOperator implements Displayable {
 			Object value2 = values[1];
 			if (value2 instanceof Date && DateUtils.isBeginOfDay((Date) value2))
 				value2 = DateUtils.endOfDay((Date) value2);
+			else if (value2 instanceof LocalDateTime) {
+				LocalDateTime datetime = ((LocalDateTime) value2);
+				if (datetime.getHour() == 0 && datetime.getMinute() == 0 && datetime.getSecond() == 0
+						&& datetime.getNano() == 0) {
+					datetime = datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999);
+					value2 = datetime;
+				}
+			}
 			if (value1 != null && value2 != null)
 				return Restrictions.between(name, value1, value2);
 			else if (value1 != null)
@@ -270,6 +307,14 @@ public enum CriterionOperator implements Displayable {
 			Object value2 = values[1];
 			if (value2 instanceof Date && DateUtils.isBeginOfDay((Date) value2))
 				value2 = DateUtils.endOfDay((Date) value2);
+			else if (value2 instanceof LocalDateTime) {
+				LocalDateTime datetime = ((LocalDateTime) value2);
+				if (datetime.getHour() == 0 && datetime.getMinute() == 0 && datetime.getSecond() == 0
+						&& datetime.getNano() == 0) {
+					datetime = datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999);
+					value2 = datetime;
+				}
+			}
 			if (value1 != null && value2 != null)
 				return Restrictions.or(Restrictions.lt(name, value1), Restrictions.gt(name, value2));
 			else if (value1 != null)

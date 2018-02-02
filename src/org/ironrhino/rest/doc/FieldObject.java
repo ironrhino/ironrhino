@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -129,9 +133,17 @@ public class FieldObject implements Serializable {
 			else if (Collection.class.isAssignableFrom(cls))
 				type = "array";
 			else if (java.sql.Timestamp.class.isAssignableFrom(cls))
-				type = "timestamp";
+				type = "datetime";
 			else if (Date.class.isAssignableFrom(cls))
 				type = "date";
+			else if (cls == LocalDate.class)
+				type = "date";
+			else if (cls == LocalDateTime.class)
+				type = "datetime";
+			else if (cls == LocalTime.class)
+				type = "time";
+			else if (cls == Duration.class)
+				type = "duration";
 			else if (cls == String.class)
 				type = "string";
 			else if (File.class.isAssignableFrom(cls) || MultipartFile.class.isAssignableFrom(cls))

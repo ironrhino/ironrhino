@@ -1,5 +1,8 @@
 package org.ironrhino.sample.crud;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -46,6 +49,12 @@ public class Person extends AbstractEntity<Identity> {
 	@UiConfig(width = "200px")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Region region;
+
+	@UiConfig(width = "80px")
+	private LocalDate birthDate;
+
+	@UiConfig(width = "80px")
+	private LocalTime birthTime;
 
 	@Override
 	public boolean isNew() {

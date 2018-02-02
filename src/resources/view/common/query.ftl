@@ -83,10 +83,8 @@ $(function(){
 	<div id="params">
 	<#if params??>
 	<#list params as var,type>
-	<#if type=='date'>
-	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition date"/>
-	<#elseif type=='datetime'||type=='timestamp'>
-	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition datetime"/>
+	<#if type=='date'||type=='datetime'||type=='time'>
+	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition ${type}"/>
 	<#elseif type=='int'||type=='integer'||type=='long'>
 	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition ${type}"/>
 	<#elseif type=='double'||type='decimal'>

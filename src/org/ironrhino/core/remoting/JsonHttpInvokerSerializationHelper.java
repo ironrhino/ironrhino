@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.ironrhino.core.util.JsonUtils;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -41,7 +42,8 @@ public class JsonHttpInvokerSerializationHelper {
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).addMixIn(Throwable.class, ThrowableMixin.class)
 			.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
-			.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
+			.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
+			.registerModule(JsonUtils.MODULE_TEMPORAL);
 
 	@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
 	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)

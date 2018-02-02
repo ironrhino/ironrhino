@@ -162,6 +162,8 @@ public class JdbcQueryService {
 				value = new java.sql.Date(DateUtils.parseDate8("19700101").getTime());
 			} else if ("datetime".equals(type) || "timestamp".equals(type)) {
 				value = new java.sql.Timestamp(DateUtils.parseDatetime("1970-01-01 00:00:00").getTime());
+			} else if ("time".equals(type)) {
+				value = new java.sql.Time(DateUtils.parseDatetime("1970-01-01 00:00:00").getTime());
 			} else if ("integer".equals(type) || "long".equals(type)) {
 				value = 19700101;
 			} else if ("double".equals(type)) {

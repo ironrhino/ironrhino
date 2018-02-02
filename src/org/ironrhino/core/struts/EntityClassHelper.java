@@ -7,6 +7,9 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -525,6 +528,14 @@ public class EntityClassHelper {
 								temporalType = "datetime";
 							else if (temporal.value() == TemporalType.TIME)
 								temporalType = "time";
+						uci.addCssClass(temporalType);
+						// uci.setInputType(temporalType);
+						if (StringUtils.isBlank(uci.getCellEdit()))
+							uci.setCellEdit("click," + temporalType);
+					} else if (java.time.temporal.Temporal.class.isAssignableFrom(returnType)) {
+						String temporalType = returnType == Duration.class ? "duration"
+								: returnType == LocalTime.class ? "time"
+										: returnType == LocalDateTime.class ? "datetime" : "date";
 						uci.addCssClass(temporalType);
 						// uci.setInputType(temporalType);
 						if (StringUtils.isBlank(uci.getCellEdit()))

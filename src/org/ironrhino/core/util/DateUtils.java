@@ -30,11 +30,15 @@ public class DateUtils {
 
 	private static final FastDateFormat DATETIME_ISO_DF = FastDateFormat.getInstance(DATETIME_ISO);
 
+	public static final String TIMESTAMP_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+
+	private static final FastDateFormat TIMESTAMP_ISO_DF = FastDateFormat.getInstance(TIMESTAMP_ISO);
+
 	public static final String TIMESTAMP = "yyyy-MM-dd HH:mm:ss.SSS";
 
 	private static final FastDateFormat TIMESTAMP_DF = FastDateFormat.getInstance(TIMESTAMP);
 
-	public static final String[] ACCEPT_DATE_FORMATS = { "yyyy/MM/dd", DATETIME, DATETIME_ISO, DATE10 };
+	public static final String[] ACCEPT_DATE_FORMATS = { "yyyy/MM/dd", TIMESTAMP_ISO, DATETIME, DATETIME_ISO, DATE10 };
 
 	public static String formatDate10(Date date) {
 		return DATE10_DF.format(date);
@@ -137,6 +141,14 @@ public class DateUtils {
 	public static Date parseDatetimeISO(String string) {
 		try {
 			return DATETIME_ISO_DF.parse(string);
+		} catch (ParseException e) {
+			return null;
+		}
+	}
+
+	public static Date parseTimestampISO(String string) {
+		try {
+			return TIMESTAMP_ISO_DF.parse(string);
 		} catch (ParseException e) {
 			return null;
 		}

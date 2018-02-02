@@ -9,6 +9,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -207,6 +211,14 @@ public class ApiDocHelper {
 			return new BigDecimal("12.12");
 		if (Date.class.isAssignableFrom(type))
 			return new Date();
+		else if (type == LocalDate.class)
+			return LocalDate.now();
+		else if (type == LocalDateTime.class)
+			return LocalDateTime.now();
+		else if (type == LocalTime.class)
+			return LocalTime.now();
+		else if (type == Duration.class)
+			return Duration.ofSeconds(1);
 		if (type.isEnum()) {
 			try {
 				return ((Object[]) type.getMethod("values").invoke(null))[0];

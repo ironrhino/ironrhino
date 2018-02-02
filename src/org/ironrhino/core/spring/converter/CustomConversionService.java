@@ -9,6 +9,10 @@ public class CustomConversionService extends DefaultConversionService {
 	public CustomConversionService() {
 		super();
 		addConverter(new DateConverter());
+		addConverter(new LocalDateConverter());
+		addConverter(new LocalDateTimeConverter());
+		addConverter(new LocalTimeConverter());
+		addConverter(new DurationConverter());
 		addConverter(new EnumToEnumConverter());
 		addConverter(new SerializableToSerializableConverter());
 		addConverter(new StringToMapConverter());

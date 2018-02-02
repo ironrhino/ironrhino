@@ -4,6 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -60,6 +65,14 @@ public class JsonUtilsTest {
 			this.password = password;
 		}
 
+	}
+
+	@Data
+	static class TemporalObject {
+		private LocalDate date = LocalDate.now();
+		private LocalDateTime datetime = LocalDateTime.now();
+		private LocalTime time = LocalTime.now();
+		private Duration duration = Duration.ofMillis(1000);
 	}
 
 	@Test
@@ -153,6 +166,14 @@ public class JsonUtilsTest {
 		assertEquals(User.class, rp2.getResult().iterator().next().getClass());
 		String json2 = JsonUtils.toJson(rp2);
 		assertEquals(json, json2);
+	}
+
+	@Test
+	public void testTemporal() throws IOException {
+		TemporalObject to = new TemporalObject();
+		String s = JsonUtils.toJson(to);
+		TemporalObject to2 = JsonUtils.fromJson(s, TemporalObject.class);
+		assertEquals(to, to2);
 	}
 
 }
