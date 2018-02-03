@@ -2,7 +2,7 @@ package org.ironrhino.core.jdbc;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,7 +11,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import org.ironrhino.common.model.Gender;
-import org.ironrhino.core.util.DateUtils;
 
 import lombok.Data;
 
@@ -26,7 +25,7 @@ public class Person implements Serializable {
 	private Gender gender;
 
 	@Column(name = "F_DOB")
-	private Date dob;
+	private LocalDate dob;
 
 	private int age;
 
@@ -38,58 +37,6 @@ public class Person implements Serializable {
 
 	private PersonShadow shadow;
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + age;
-		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
-		result = prime * result + ((dob == null) ? 0 : dob.hashCode());
-		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Person other = (Person) obj;
-		if (age != other.age)
-			return false;
-		if (amount == null) {
-			if (other.amount != null)
-				return false;
-		} else if (amount.doubleValue() != amount.doubleValue())
-			return false;
-		if (dob == null) {
-			if (other.dob != null)
-				return false;
-		} else if (!DateUtils.formatDate10(dob).equals(DateUtils.formatDate10(other.dob))) {
-			return false;
-		}
-		if (gender != other.gender)
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (attributes == null) {
-			if (other.attributes != null)
-				return false;
-		} else if (!attributes.equals(other.attributes))
-			return false;
-		if (roles == null) {
-			if (other.roles != null)
-				return false;
-		} else if (!roles.equals(other.roles))
-			return false;
-		return true;
-	}
+	
 
 }

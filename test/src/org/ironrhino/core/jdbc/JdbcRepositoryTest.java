@@ -5,13 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.ironrhino.common.model.Gender;
-import org.ironrhino.core.util.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,10 +41,10 @@ public class JdbcRepositoryTest {
 	public void test() throws Exception {
 		Person p = new Person();
 		p.setName("test");
-		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setDob(LocalDate.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
-		p.setAmount(new BigDecimal(12));
+		p.setAmount(new BigDecimal("12.00"));
 		p.setAttributes(new HashMap<>());
 		p.getAttributes().put("key1", "value1");
 		p.getAttributes().put("key2", "value2");
@@ -78,10 +78,10 @@ public class JdbcRepositoryTest {
 	public void testInCondition() throws Exception {
 		Person p = new Person();
 		p.setName("test1");
-		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setDob(LocalDate.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
-		p.setAmount(new BigDecimal(12));
+		p.setAmount(new BigDecimal("12.00"));
 		personRepository.save(p);
 		p.setName("test2");
 		p.setGender(Gender.MALE);
@@ -102,10 +102,10 @@ public class JdbcRepositoryTest {
 	public void testConditionalSql() throws Exception {
 		Person p = new Person();
 		p.setName("test1");
-		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setDob(LocalDate.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
-		p.setAmount(new BigDecimal(12));
+		p.setAmount(new BigDecimal("12.00"));
 		personRepository.save(p);
 		p.setName("test2");
 		p.setGender(Gender.MALE);
@@ -123,10 +123,10 @@ public class JdbcRepositoryTest {
 	public void testNestedProperty() throws Exception {
 		Person p = new Person();
 		p.setName("test");
-		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setDob(LocalDate.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
-		p.setAmount(new BigDecimal(12));
+		p.setAmount(new BigDecimal("12.00"));
 		personRepository.save(p);
 		Person p2 = personRepository.getWithShadow(p.getName());
 		assertNotNull(p2.getShadow());
@@ -141,10 +141,10 @@ public class JdbcRepositoryTest {
 	public void testLimiting() throws Exception {
 		Person p = new Person();
 		p.setName("test1");
-		p.setDob(DateUtils.parseDate10("2000-12-12"));
+		p.setDob(LocalDate.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
-		p.setAmount(new BigDecimal(12));
+		p.setAmount(new BigDecimal("12.00"));
 		personRepository.save(p);
 		p.setName("test2");
 		p.setGender(Gender.MALE);
