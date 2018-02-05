@@ -66,29 +66,25 @@
 
 .toolbar .pagination .inputPage {
 	width: 25px;
-	height: 20px;
-	padding-top: 5px;
-	padding-bottom: 3px;
-	line-height: 29px;
 	text-align: right;
 }
 
 .toolbar .pagination .totalPage {
 	min-width: 25px;
-	height: 20px;
-	line-height: 20px;
 	text-align: left;
-	padding-top: 5px;
-	padding-bottom: 3px;
 	font-family: Arial;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
+	.toolbar .pagination .totalPage {
+		line-height: 21px;
+	}
 }
 
 .toolbar .pagination .pageSize {
 	border: 1px solid #ddd;
 	border-radius: 3px;
 	width: 60px;
-	height: 30px;
-	line-height: 20px;
 	margin: 0;
 }
 
@@ -134,7 +130,6 @@
 
 .toolbar .pagination span.input-append {
 	padding: 0 4px;
-	line-height: 20px;
 	background-color: transparent;
 	border: 0;
 	margin: 0px;
@@ -142,13 +137,5 @@
 
 .toolbar .pagination span.add-on {
 	float: none;
-}
-
-.toolbar .pagination span.divider {
-	float: none;
-	padding: 0;
-	line-height: 20px;
-	background-color: transparent;
-	border: 0;
 }
 

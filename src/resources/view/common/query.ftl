@@ -147,7 +147,7 @@ $(function(){
 				</#if>
 				<li>
 				<span class="input-append">
-				    <input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${getText('currentpage')}"/><span class="add-on totalPage"><span class="divider">/</span><strong title="${getText('totalpage')}">${resultPage.totalPage}</strong></span>
+				    <input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${getText('currentpage')}"/><span class="add-on totalPage"><strong title="${getText('totalpage')}">${resultPage.totalPage}</strong></span>
 				</span>
 				<li class="visible-desktop">
 				<select name="resultPage.pageSize" class="pageSize" title="${getText('pagesize')}">
