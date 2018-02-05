@@ -54,6 +54,8 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 			if (registry.containsBeanDefinition(beanName)) {
 				BeanDefinition bd = registry.getBeanDefinition(beanName);
 				String beanClassName = bd.getBeanClassName();
+				if (beanClassName == null)
+					continue;
 				if (beanClassName.startsWith("org.ironrhino.core.remoting.client.") && beanClassName.endsWith("Client")
 						&& remotingService.getName().equals(bd.getPropertyValues().get("serviceInterface")))
 					continue;

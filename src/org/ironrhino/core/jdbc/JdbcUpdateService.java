@@ -10,7 +10,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.DateUtils;
@@ -23,6 +25,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -68,12 +71,21 @@ public class JdbcUpdateService {
 
 	private boolean supportsBatchUpdates;
 
+	@Nonnull
+	public DataSource getDataSource() {
+		Assert.notNull(jdbcTemplate, "JdbcTemplate should be present");
+		DataSource dataSource = jdbcTemplate.getDataSource();
+		Assert.notNull(dataSource, "DataSource should be present");
+		return dataSource;
+	}
+
 	@PostConstruct
 	public void init() {
+		Assert.notNull(jdbcTemplate, "JdbcTemplate should be present");
 		if (queryTimeout > 0)
 			jdbcTemplate.setQueryTimeout(queryTimeout);
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		Connection con = DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
+		Connection con = DataSourceUtils.getConnection(getDataSource());
 		try {
 			catalog = con.getCatalog();
 			try {
@@ -102,7 +114,7 @@ public class JdbcUpdateService {
 	@Transactional
 	public void validate(String sql) {
 		sql = SqlUtils.trim(sql);
-		Map<String, String> parameters = SqlUtils.extractParametersWithType(sql, jdbcTemplate.getDataSource());
+		Map<String, String> parameters = SqlUtils.extractParametersWithType(sql, getDataSource());
 		Map<String, Object> paramMap = new HashMap<>();
 		for (Map.Entry<String, String> entry : parameters.entrySet()) {
 			String name = entry.getKey();

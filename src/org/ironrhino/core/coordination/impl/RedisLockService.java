@@ -36,7 +36,9 @@ public class RedisLockService implements LockService {
 	public boolean tryLock(String name) {
 		String key = NAMESPACE + name;
 		String holder = holder();
-		boolean success = coordinationStringRedisTemplate.opsForValue().setIfAbsent(key, holder);
+		Boolean success = coordinationStringRedisTemplate.opsForValue().setIfAbsent(key, holder);
+		if (success == null)
+			throw new RuntimeException("Unexpected null");
 		if (success)
 			coordinationStringRedisTemplate.expire(key, this.maxHoldTime, TimeUnit.SECONDS);
 		return success;
@@ -72,6 +74,8 @@ public class RedisLockService implements LockService {
 		String str = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return redis.call(\"exists\",KEYS[1]) == 0 and 2 or 0 end";
 		RedisScript<Long> script = new DefaultRedisScript<>(str, Long.class);
 		Long ret = coordinationStringRedisTemplate.execute(script, Collections.singletonList(key), holder);
+		if (ret == null)
+			throw new RuntimeException("Unexpected null");
 		if (ret == 0) {
 			throw new IllegalStateException("Lock[" + name + "] is not held by :" + holder);
 		} else if (ret == 2) {

@@ -249,7 +249,10 @@ public class PageViewServiceImpl implements PageViewService {
 		if (pageViewStringRedisTemplate == null)
 			return;
 		String lockName = "lock:pageViewService.archive()";
-		if (pageViewStringRedisTemplate.opsForValue().setIfAbsent(lockName, ""))
+		Boolean b = pageViewStringRedisTemplate.opsForValue().setIfAbsent(lockName, "");
+		if (b == null)
+			throw new RuntimeException("Unexpected null");
+		if (b)
 			try {
 				pageViewStringRedisTemplate.expire(lockName, 5, TimeUnit.MINUTES);
 				Calendar cal = Calendar.getInstance();
@@ -316,7 +319,11 @@ public class PageViewServiceImpl implements PageViewService {
 				return Long.valueOf(value);
 			} else {
 				Set<String> keys = pageViewStringRedisTemplate.keys(prefix + "*");
+				if (keys == null)
+					throw new RuntimeException("Unexpected null");
 				List<String> results = pageViewStringRedisTemplate.opsForValue().multiGet(keys);
+				if (results == null)
+					throw new RuntimeException("Unexpected null");
 				long count = 0;
 				for (String str : results)
 					count += Long.valueOf(str);
@@ -373,9 +380,15 @@ public class PageViewServiceImpl implements PageViewService {
 			sb.append(":").append(day);
 		String key = sb.toString();
 		Set<String> set = pageViewStringRedisTemplate.opsForZSet().reverseRange(key, 0, top - 1);
+		if (set == null)
+			throw new RuntimeException("Unexpected null");
 		Map<String, Long> map = new LinkedHashMap<>();
-		for (String member : set)
-			map.put(member, pageViewStringRedisTemplate.opsForZSet().score(key, member).longValue());
+		for (String member : set) {
+			Double score = pageViewStringRedisTemplate.opsForZSet().score(key, member);
+			if (score == null)
+				throw new RuntimeException("Unexpected null");
+			map.put(member, score.longValue());
+		}
 		return map;
 	}
 

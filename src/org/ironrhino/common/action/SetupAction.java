@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -193,12 +194,18 @@ public class SetupAction extends BaseAction {
 				m.invoke(entry.getValue(), new Object[0]);
 			} else {
 				String[] parameterNames = ReflectionUtils.parameterNameDiscoverer.getParameterNames(m);
+				if (parameterNames == null)
+					throw new RuntimeException("Unexpected null");
 				Class<?>[] parameterTypes = m.getParameterTypes();
 				Object[] value = new Object[parameterNames.length];
 				for (int i = 0; i < parameterNames.length; i++) {
 					String pvalue = ServletActionContext.getRequest().getParameter(parameterNames[i]);
 					Class<?> type = parameterTypes[i];
-					value[i] = ctx.getConversionService().convert(pvalue, type);
+					ConversionService cs = ctx.getConversionService();
+					if (cs != null)
+						value[i] = cs.convert(pvalue, type);
+					else
+						value[i] = pvalue;
 				}
 				Object o = m.invoke(entry.getValue(), value);
 				if (o instanceof UserDetails)

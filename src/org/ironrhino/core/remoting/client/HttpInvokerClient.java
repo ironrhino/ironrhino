@@ -197,11 +197,13 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			result = doExecuteRequest(invocation, methodInvocation, maxAttempts);
 			time = System.currentTimeMillis() - time;
 			if (loggingPayload) {
-				if (!result.hasInvocationTargetException())
+				if (!result.hasInvocationTargetException()) {
 					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(result.getValue()));
-				else
-					remotingLogger.error("Error:",
-							((InvocationTargetException) result.getException()).getTargetException());
+				} else {
+					InvocationTargetException ite = (InvocationTargetException) result.getException();
+					if (ite != null)
+						remotingLogger.error("Error:", ite.getTargetException());
+				}
 			}
 			remotingLogger.info("Invoked to {} success in {}ms", discoveredHost, time);
 		} finally {
@@ -261,9 +263,11 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Override
 	protected RemoteAccessException convertHttpInvokerAccessException(Throwable ex) {
 		RemoteAccessException rae = super.convertHttpInvokerAccessException(ex);
-		if (rae.getCause() != null)
-			ExceptionUtils.trimStackTrace(rae.getCause(), 20);
-		ExceptionUtils.trimStackTrace(rae, 10);
+		if (rae != null) {
+			if (rae.getCause() != null)
+				ExceptionUtils.trimStackTrace(rae.getCause(), 20);
+			ExceptionUtils.trimStackTrace(rae, 10);
+		}
 		return rae;
 	}
 

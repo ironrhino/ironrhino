@@ -1,6 +1,7 @@
 package org.ironrhino.core.websocket;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,9 +34,12 @@ public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandle
 	public void broadcast(String message, String... roles) {
 		for (WebSocketSession s : sessions)
 			if (s.isOpen()) {
+				Principal principal = s.getPrincipal();
+				if (principal == null)
+					continue;
 				try {
 					if (roles.length == 0 || AuthzUtils.authorizeUserDetails(
-							userDetailsService.loadUserByUsername(s.getPrincipal().getName()), null, roles, null))
+							userDetailsService.loadUserByUsername(principal.getName()), null, roles, null))
 						s.sendMessage(new TextMessage(message));
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
@@ -47,13 +51,17 @@ public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandle
 
 	public void broadcast(String message, Predicate<UserDetails> p) {
 		for (WebSocketSession s : sessions)
-			if (s.isOpen())
+			if (s.isOpen()) {
+				Principal principal = s.getPrincipal();
+				if (principal == null)
+					continue;
 				try {
-					if (p.test(userDetailsService.loadUserByUsername(s.getPrincipal().getName())))
+					if (p.test(userDetailsService.loadUserByUsername(principal.getName())))
 						s.sendMessage(new TextMessage(message));
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
 				}
+			}
 	}
 
 	@Override
@@ -64,8 +72,9 @@ public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandle
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-		String username = session.getPrincipal().getName();
-		if (username == null || !authorize(userDetailsService.loadUserByUsername(session.getPrincipal().getName()))) {
+		Principal principal = session.getPrincipal();
+		String username = principal != null ? principal.getName() : null;
+		if (username == null || !authorize(userDetailsService.loadUserByUsername(username))) {
 			String message = "anonymous user denied";
 			logger.warn(message);
 			session.sendMessage(new TextMessage(message));

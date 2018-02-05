@@ -71,7 +71,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			}
 		}
 		final String restart = getStringValue(now, getPaddingLength(), 1);
-		boolean success = sequenceStringRedisTemplate.execute(new SessionCallback<Boolean>() {
+		Boolean success = sequenceStringRedisTemplate.execute(new SessionCallback<Boolean>() {
 			@Override
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Boolean execute(RedisOperations operations) {
@@ -85,6 +85,8 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 				}
 			}
 		});
+		if (success == null)
+			throw new RuntimeException("Unexpected null");
 		if (success)
 			return restart;
 		try {
@@ -97,7 +99,10 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	protected Date now() {
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(sequenceStringRedisTemplate.execute((RedisConnection connection) -> connection.time()));
+		Long value = sequenceStringRedisTemplate.execute((RedisConnection connection) -> connection.time());
+		if (value == null)
+			throw new RuntimeException("Unexpected null");
+		cal.setTimeInMillis(value);
 		return cal.getTime();
 	}
 

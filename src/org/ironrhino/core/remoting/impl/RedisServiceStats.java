@@ -6,6 +6,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -87,6 +88,8 @@ public class RedisServiceStats implements ServiceStats {
 	public void afterPropertiesSet() {
 		hotspotsOperations = remotingStringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
 		warningsOperations = remotingStringRedisTemplate.boundListOps(KEY_WARNINGS);
+		if (hotspotsOperations == null || warningsOperations == null)
+			throw new RuntimeException("Unexpected null");
 	}
 
 	@Override
@@ -114,10 +117,13 @@ public class RedisServiceStats implements ServiceStats {
 	public Map<String, Set<String>> getServices() {
 		Map<String, Set<String>> map = new TreeMap<>();
 		Set<String> serviceKeys = remotingStringRedisTemplate.keys(NAMESPACE_SERVICES + "*");
+		if (serviceKeys == null)
+			return Collections.emptyMap();
 		for (String serviceKey : serviceKeys) {
 			String serviceName = serviceKey.substring(NAMESPACE_SERVICES.length());
 			Set<String> methods = remotingStringRedisTemplate.opsForSet().members(serviceKey);
-			map.put(serviceName, new TreeSet<>(methods));
+			if (methods != null)
+				map.put(serviceName, new TreeSet<>(methods));
 		}
 		return map;
 	}
@@ -134,7 +140,11 @@ public class RedisServiceStats implements ServiceStats {
 				return Long.valueOf(value);
 			} else {
 				Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
+				if (keys == null)
+					return 0;
 				List<String> results = remotingStringRedisTemplate.opsForValue().multiGet(keys);
+				if (results == null)
+					return 0;
 				long count = 0;
 				for (String str : results)
 					count += Long.valueOf(str);
@@ -167,15 +177,21 @@ public class RedisServiceStats implements ServiceStats {
 	@Override
 	public Map<String, Long> findHotspots(int limit) {
 		Set<TypedTuple<String>> result = hotspotsOperations.reverseRangeWithScores(0, limit - 1);
+		if (result == null)
+			return Collections.emptyMap();
 		Map<String, Long> map = new LinkedHashMap<>();
-		for (TypedTuple<String> tt : result)
-			map.put(tt.getValue(), tt.getScore().longValue());
+		for (TypedTuple<String> tt : result) {
+			Double score = tt.getScore();
+			map.put(tt.getValue(), score != null ? score.longValue() : 0);
+		}
 		return map;
 	}
 
 	@Override
 	public List<InvocationWarning> getWarnings() {
 		List<String> list = warningsOperations.range(0, -1);
+		if (list == null)
+			return Collections.emptyList();
 		List<InvocationWarning> results = new ArrayList<>(list.size());
 		try {
 			for (String str : list)
@@ -190,6 +206,8 @@ public class RedisServiceStats implements ServiceStats {
 	public List<InvocationSample> getSamples(String service, StatsType type) {
 		List<String> list = remotingStringRedisTemplate.opsForList()
 				.range(NAMESPACE_SAMPLES + type.getNamespace() + ':' + service, 0, -1);
+		if (list == null)
+			return Collections.emptyList();
 		List<InvocationSample> results = new ArrayList<>(list.size());
 		try {
 			for (String str : list)
@@ -206,8 +224,8 @@ public class RedisServiceStats implements ServiceStats {
 		if (!warningBuffer.isEmpty()) {
 			warningsOperations.leftPushAll(warningBuffer.toArray(new String[0]));
 			warningBuffer.clear();
-			long size = warningsOperations.size();
-			if (size > maxWarningsSize)
+			Long size = warningsOperations.size();
+			if (size != null && size > maxWarningsSize)
 				warningsOperations.trim(0, maxWarningsSize - 1);
 		}
 		for (StatsType type : StatsType.values()) {
@@ -216,8 +234,8 @@ public class RedisServiceStats implements ServiceStats {
 				if (sample.getCount() > 0) {
 					String key = NAMESPACE_SAMPLES + type.getNamespace() + ':' + entry.getKey();
 					remotingStringRedisTemplate.opsForList().leftPush(key, JsonUtils.toJson(sample));
-					long size = remotingStringRedisTemplate.opsForList().size(key);
-					if (size > maxSamplesSize)
+					Long size = remotingStringRedisTemplate.opsForList().size(key);
+					if (size != null && size > maxSamplesSize)
 						remotingStringRedisTemplate.opsForList().trim(key, 0, maxSamplesSize - 1);
 				}
 			}
@@ -258,7 +276,8 @@ public class RedisServiceStats implements ServiceStats {
 	@Scheduled(cron = "${serviceStats.archive.cron:0 1 0 * * ?}")
 	public void archive() {
 		String lockName = "lock:serviceStats.archive()";
-		if (remotingStringRedisTemplate.opsForValue().setIfAbsent(lockName, ""))
+		Boolean b = remotingStringRedisTemplate.opsForValue().setIfAbsent(lockName, "");
+		if (b != null && b)
 			try {
 				remotingStringRedisTemplate.expire(lockName, 5, TimeUnit.MINUTES);
 				remotingStringRedisTemplate.delete(KEY_HOTSPOTS);
@@ -286,9 +305,13 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(":").append(day);
 		String prefix = sb.toString();
 		Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
+		if (keys == null)
+			return;
 		if (!keys.isEmpty()) {
 			List<String> results = remotingStringRedisTemplate.opsForValue().multiGet(keys);
 			remotingStringRedisTemplate.delete(keys);
+			if (results == null)
+				return;
 			long count = 0;
 			for (String str : results)
 				if (StringUtils.isNumeric(str))
@@ -307,7 +330,11 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(":").append(yesterday);
 		String prefix = sb.toString();
 		Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
+		if (keys == null)
+			return;
 		List<String> results = remotingStringRedisTemplate.opsForValue().multiGet(keys);
+		if (results == null)
+			return;
 		long count = 0;
 		for (String str : results)
 			count += Long.valueOf(str);

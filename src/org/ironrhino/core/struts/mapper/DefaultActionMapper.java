@@ -116,7 +116,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		if (actionConfig == null) {
 			if (actionMappingMatchers == null)
 				actionMappingMatchers = WebApplicationContextUtils
-						.getWebApplicationContext(ServletActionContext.getServletContext())
+						.getRequiredWebApplicationContext(ServletActionContext.getServletContext())
 						.getBeansOfType(ActionMappingMatcher.class).values();
 			for (ActionMappingMatcher amm : actionMappingMatchers) {
 				mapping = amm.tryMatch(request, this);

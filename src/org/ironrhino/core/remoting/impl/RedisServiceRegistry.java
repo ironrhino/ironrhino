@@ -5,6 +5,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,10 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	public Map<String, Collection<String>> getExportedHostsForService(String service) {
 		Map<String, Collection<String>> result = new TreeMap<>();
 		Map<String, String> map = getImportedHostsForService(service);
-		for (String host : remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1)) {
+		List<String> hosts = remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1);
+		if (hosts == null)
+			return Collections.emptyMap();
+		for (String host : hosts) {
 			List<String> consumers = new ArrayList<>();
 			for (Map.Entry<String, String> entry : map.entrySet())
 				if (entry.getValue().equals(host))
@@ -133,7 +137,10 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public Map<String, String> getImportedHostsForService(String service) {
 		Map<String, String> result = new TreeMap<>();
-		for (String key : remotingStringRedisTemplate.keys(NAMESPACE_HOSTS + "*")) {
+		Set<String> hosts = remotingStringRedisTemplate.keys(NAMESPACE_HOSTS + "*");
+		if (hosts == null)
+			return Collections.emptyMap();
+		for (String key : hosts) {
 			Map<Object, Object> map = remotingStringRedisTemplate.opsForHash().entries(key);
 			if (map.containsKey(service))
 				result.put(key.substring(NAMESPACE_HOSTS.length()), (String) map.get(service));
@@ -153,6 +160,8 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public Collection<String> getAllAppNames() {
 		Set<String> keys = remotingStringRedisTemplate.keys(NAMESPACE_APPS + "*");
+		if (keys == null)
+			return Collections.emptyList();
 		List<String> appNames = new ArrayList<>(keys.size());
 		for (String s : keys)
 			appNames.add(s.substring(NAMESPACE_APPS.length()));

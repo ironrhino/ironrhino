@@ -295,6 +295,7 @@ public class BeanUtilsTest {
 		assertNotNull(team3.getCreateDate());
 
 		Team4 team4 = CustomConversionService.getSharedInstance().convert(team, Team4.class);
+		assertNotNull(team4);
 		assertEquals(team1.getOwner(), team4.getOwner());
 		assertEquals(team1.getCreateDate(), team4.getCreateDate());
 	}

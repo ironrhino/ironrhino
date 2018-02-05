@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -25,16 +26,20 @@ public class DelegatingFilter extends DelegatingFilterProxy {
 
 	@Override
 	protected Filter initDelegate(WebApplicationContext wac) throws ServletException {
-		String excludePatterns = getFilterConfig().getInitParameter("excludePatterns");
-		String str = wac.getEnvironment().getProperty(getTargetBeanName() + ".excludePatterns");
+		FilterConfig config = getFilterConfig();
+		String beanName = getTargetBeanName();
+		if (config == null || beanName == null)
+			throw new RuntimeException("Unexpected null");
+		String excludePatterns = config.getInitParameter("excludePatterns");
+		String str = wac.getEnvironment().getProperty(beanName + ".excludePatterns");
 		if (str != null)
 			excludePatterns = str;
 		if (StringUtils.isNotBlank(excludePatterns))
 			excludePatternsList = Arrays.asList(excludePatterns.split("\\s*,\\s*"));
 		try {
-			Filter delegate = wac.getBean(getTargetBeanName(), Filter.class);
+			Filter delegate = wac.getBean(beanName, Filter.class);
 			if (isTargetFilterLifecycle()) {
-				delegate.init(getFilterConfig());
+				delegate.init(config);
 			}
 			return delegate;
 		} catch (NoSuchBeanDefinitionException e) {

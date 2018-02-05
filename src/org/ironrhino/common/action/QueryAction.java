@@ -65,7 +65,7 @@ public class QueryAction extends BaseAction {
 		tables = jdbcQueryService.getTables();
 		if (StringUtils.isNotBlank(sql)) {
 			jdbcQueryService.validate(sql);
-			params = SqlUtils.extractParametersWithType(sql, jdbcQueryService.getJdbcTemplate().getDataSource());
+			params = SqlUtils.extractParametersWithType(sql, jdbcQueryService.getDataSource());
 			if (params.size() > 0) {
 				if (!ServletActionContext.getRequest().getMethod().equalsIgnoreCase("POST"))
 					return SUCCESS;
@@ -89,7 +89,7 @@ public class QueryAction extends BaseAction {
 			return NOTFOUND;
 		if (StringUtils.isNotBlank(sql)) {
 			jdbcQueryService.validate(sql);
-			params = SqlUtils.extractParametersWithType(sql, jdbcQueryService.getJdbcTemplate().getDataSource());
+			params = SqlUtils.extractParametersWithType(sql, jdbcQueryService.getDataSource());
 			if (params.size() > 0) {
 				for (String s : params.keySet()) {
 					if (!paramMap.containsKey(s)) {

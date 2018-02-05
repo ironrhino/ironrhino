@@ -76,7 +76,8 @@ public class RedisCacheManager implements CacheManager {
 		if (key == null)
 			return false;
 		try {
-			return cacheRedisTemplate.hasKey(generateKey(key, namespace));
+			Boolean b = cacheRedisTemplate.hasKey(generateKey(key, namespace));
+			return b != null && b;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return false;
@@ -123,9 +124,11 @@ public class RedisCacheManager implements CacheManager {
 		if (key == null)
 			return 0;
 		String actualKey = generateKey(key, namespace);
-		long value = cacheRedisTemplate.getExpire(actualKey, TimeUnit.MILLISECONDS);
+		Long value = cacheRedisTemplate.getExpire(actualKey, TimeUnit.MILLISECONDS);
+		if (value == null)
+			value = 0L;
 		if (value == -2)
-			value = 0; // not exists
+			value = 0L; // not exists
 		return value;
 	}
 
@@ -226,7 +229,9 @@ public class RedisCacheManager implements CacheManager {
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
 			String actualkey = generateKey(key, namespace);
-			boolean success = cacheRedisTemplate.opsForValue().setIfAbsent(actualkey, value);
+			Boolean success = cacheRedisTemplate.opsForValue().setIfAbsent(actualkey, value);
+			if (success == null)
+				return false;
 			if (success && timeToLive > 0)
 				cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
 			return success;
@@ -239,10 +244,10 @@ public class RedisCacheManager implements CacheManager {
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
 			String actualkey = generateKey(key, namespace);
-			long result = cacheRedisTemplate.opsForValue().increment(actualkey, delta);
+			Long result = cacheRedisTemplate.opsForValue().increment(actualkey, delta);
 			if (timeToLive > 0)
 				cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
-			return result;
+			return result != null ? result : -1;
 		} catch (Exception e) {
 			return -1;
 		}

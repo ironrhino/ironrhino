@@ -32,6 +32,8 @@ public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegist
 				continue;
 			JdbcRepository annotation = AnnotatedElementUtils.getMergedAnnotation(jdbcRepositoryClass,
 					JdbcRepository.class);
+			if (annotation == null)
+				continue;
 			String beanName = annotation.name();
 			if (StringUtils.isBlank(beanName)) {
 				beanName = NameGenerator.buildDefaultBeanName(jdbcRepositoryClass.getName());

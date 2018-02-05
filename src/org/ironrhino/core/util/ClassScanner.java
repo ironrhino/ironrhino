@@ -206,7 +206,8 @@ public class ClassScanner {
 		Collection<Class<?>> componentScans = scanAnnotated(arr, ComponentScan.class);
 		for (Class<?> c : componentScans) {
 			ComponentScan cs = AnnotatedElementUtils.getMergedAnnotation(c, ComponentScan.class);
-			packages.addAll(Arrays.asList(cs.value()));
+			if (cs != null)
+				packages.addAll(Arrays.asList(cs.value()));
 		}
 		packages.addAll(Arrays.asList(arr));
 		return deduplicate(packages).toArray(new String[0]);

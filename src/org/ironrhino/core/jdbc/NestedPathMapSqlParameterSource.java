@@ -79,6 +79,8 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			String top = paramName.substring(0, index3);
 			if (super.hasValue(top)) {
 				Object topValue = getValue(top);
+				if (topValue == null)
+					return false;
 				EntityBeanPropertySqlParameterSource source = new EntityBeanPropertySqlParameterSource(topValue);
 				return source.hasValue(paramName.substring(index3 + 1));
 			}
@@ -143,6 +145,8 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			String top = paramName.substring(0, index3);
 			if (super.hasValue(top)) {
 				Object topValue = getValue(top);
+				if (topValue == null)
+					return null;
 				EntityBeanPropertySqlParameterSource source = new EntityBeanPropertySqlParameterSource(topValue);
 				return source.getValue(paramName.substring(index3 + 1));
 			}

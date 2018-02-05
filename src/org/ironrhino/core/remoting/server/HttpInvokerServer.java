@@ -133,7 +133,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
 				} else {
 					Throwable throwable = result.getException();
-					if (throwable.getCause() != null)
+					if (throwable != null && throwable.getCause() != null)
 						throwable = throwable.getCause();
 					remotingLogger.error("Error:", throwable);
 				}
@@ -210,7 +210,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		if (result.hasInvocationTargetException()) {
 			try {
 				InvocationTargetException ite = (InvocationTargetException) result.getException();
-				ReflectionUtils.setFieldValue(ite, "target", translateAndTrim(ite.getTargetException(), 10));
+				if (ite != null)
+					ReflectionUtils.setFieldValue(ite, "target", translateAndTrim(ite.getTargetException(), 10));
 			} catch (Exception ex) {
 			}
 		}

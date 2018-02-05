@@ -329,6 +329,8 @@ public class HybridOAuthManager extends AbstractOAuthManager {
 		for (String token : tokens)
 			keys.add(NAMESPACE_AUTHORIZATION + token);
 		List<String> list = stringRedisTemplate.opsForValue().multiGet(keys);
+		if (list == null)
+			return Collections.emptyList();
 		List<Authorization> result = new ArrayList<>(list.size());
 		for (String json : list) {
 			try {

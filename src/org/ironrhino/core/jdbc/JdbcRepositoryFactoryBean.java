@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -65,13 +66,15 @@ public class JdbcRepositoryFactoryBean
 	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, JdbcTemplate jdbcTemplate) {
 		Assert.notNull(jdbcRepositoryClass, "jdbcRepositoryClass shouldn't be null");
 		Assert.notNull(jdbcTemplate, "jdbcTemplate shouldn't be null");
+		DataSource dataSource = jdbcTemplate.getDataSource();
+		Assert.notNull(dataSource, "dataSource shouldn't be null");
 		if (!jdbcRepositoryClass.isInterface())
 			throw new IllegalArgumentException(jdbcRepositoryClass.getName() + " should be interface");
 		this.jdbcRepositoryClass = jdbcRepositoryClass;
 		this.jdbcRepositoryBean = new ProxyFactory(jdbcRepositoryClass, this)
 				.getProxy(jdbcRepositoryClass.getClassLoader());
 		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		try (Connection c = jdbcTemplate.getDataSource().getConnection()) {
+		try (Connection c = dataSource.getConnection()) {
 			DatabaseMetaData dmd = c.getMetaData();
 			databaseProduct = DatabaseProduct.parse(dmd.getDatabaseProductName());
 			databaseMajorVersion = dmd.getDatabaseMajorVersion();
@@ -152,6 +155,7 @@ public class JdbcRepositoryFactoryBean
 	}
 
 	@Override
+	@Nonnull
 	public Class<?> getObjectType() {
 		return jdbcRepositoryClass;
 	}

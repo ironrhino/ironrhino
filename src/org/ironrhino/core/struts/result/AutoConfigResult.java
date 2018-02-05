@@ -84,7 +84,7 @@ public class AutoConfigResult extends FreemarkerResult {
 			if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 				ServletContext servletContext = ServletActionContext.getServletContext();
 				if (freemarkerConfigurer == null)
-					freemarkerConfigurer = WebApplicationContextUtils.getWebApplicationContext(servletContext)
+					freemarkerConfigurer = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
 							.getBean(FreemarkerConfigurer.class);
 				String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
 				URL url = null;
@@ -114,7 +114,7 @@ public class AutoConfigResult extends FreemarkerResult {
 		if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			ServletContext servletContext = ServletActionContext.getServletContext();
 			if (freemarkerConfigurer == null)
-				freemarkerConfigurer = WebApplicationContextUtils.getWebApplicationContext(servletContext)
+				freemarkerConfigurer = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
 						.getBean(FreemarkerConfigurer.class);
 			String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
 			URL url = null;

@@ -31,6 +31,8 @@ public class RestApiRegistryPostProcessor implements BeanDefinitionRegistryPostP
 			if (!restApiClass.isInterface())
 				continue;
 			RestApi annotation = AnnotatedElementUtils.getMergedAnnotation(restApiClass, RestApi.class);
+			if (annotation == null)
+				continue;
 			String beanName = annotation.name();
 			if (StringUtils.isBlank(beanName)) {
 				beanName = NameGenerator.buildDefaultBeanName(restApiClass.getName());

@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.PreDestroy;
+import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
@@ -24,6 +25,7 @@ import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,7 +86,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			localHost = "https://" + AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
 					+ (AppInfo.getHttpsPort() > 0 ? AppInfo.getHttpsPort() : DEFAULT_HTTPS_PORT);
 		if (ctx instanceof ConfigurableWebApplicationContext) {
-			String ctxPath = ((ConfigurableWebApplicationContext) ctx).getServletContext().getContextPath();
+			ServletContext servletContext = ((ConfigurableWebApplicationContext) ctx).getServletContext();
+			String ctxPath = servletContext != null ? servletContext.getContextPath() : "";
 			if (!ctxPath.isEmpty())
 				localHost += ctxPath;
 		}
@@ -105,7 +108,10 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			}
 			if (beanClassName.startsWith("org.ironrhino.core.remoting.client.") && beanClassName.endsWith("Client")) {
 				// remoting_client
-				String serviceName = (String) bd.getPropertyValues().getPropertyValue("serviceInterface").getValue();
+				PropertyValue pv = bd.getPropertyValues().getPropertyValue("serviceInterface");
+				if (pv == null)
+					continue;
+				String serviceName = (String) pv.getValue();
 				if (IS_CLIENT_PRESENT)
 					importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<String>());
 			} else {

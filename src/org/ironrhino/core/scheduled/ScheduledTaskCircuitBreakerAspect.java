@@ -30,7 +30,7 @@ public class ScheduledTaskCircuitBreakerAspect extends BaseAspect {
 		Class<?> beanClass = jp.getTarget().getClass();
 		String beanName = NameGenerator.buildDefaultBeanName(beanClass.getName());
 		Component comp = AnnotatedElementUtils.getMergedAnnotation(beanClass, Component.class);
-		if (StringUtils.isNotBlank(comp.value()))
+		if (comp != null && StringUtils.isNotBlank(comp.value()))
 			beanName = comp.value();
 		String task = sb.append(beanName).append('.').append(jp.getSignature().getName()).append('(').append(')')
 				.toString();

@@ -49,7 +49,8 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 			HttpServletResponse response = ServletActionContext.getResponse();
 			ExecutorService executorService = null;
 			try {
-				executorService = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext())
+				executorService = WebApplicationContextUtils
+						.getRequiredWebApplicationContext(request.getServletContext())
 						.getBean("executorService", ExecutorService.class);
 			} catch (NoSuchBeanDefinitionException e) {
 				logger.warn("No bean[executorService] defined, use ForkJoinPool.commonPool() as fallback");

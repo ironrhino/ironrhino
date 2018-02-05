@@ -100,6 +100,8 @@ public class ApiDoc implements Serializable {
 		}
 
 		Api api = AnnotationUtils.findAnnotation(apiDocMethod, Api.class);
+		if (api == null)
+			throw new IllegalArgumentException("@Api required");
 		this.name = api.value();
 		this.description = api.description();
 		this.statuses = new ArrayList<>(api.statuses().length + 1);

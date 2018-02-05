@@ -11,7 +11,10 @@ public class NameGenerator extends AnnotationBeanNameGenerator {
 
 	@Override
 	protected String buildDefaultBeanName(BeanDefinition definition) {
-		return buildDefaultBeanName(definition.getBeanClassName());
+		String className = definition.getBeanClassName();
+		if (className == null)
+			return super.buildDefaultBeanName(definition);
+		return buildDefaultBeanName(className);
 	}
 
 	public static String buildDefaultBeanName(String beanClassName) {

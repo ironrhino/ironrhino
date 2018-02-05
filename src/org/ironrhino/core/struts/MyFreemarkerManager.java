@@ -57,7 +57,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		boolean devMode = AppInfo.getStage() == Stage.DEVELOPMENT;
 		if (devMode)
 			LocalizedTextUtil.setReloadBundles(true);
-		freemarkerConfigurer = WebApplicationContextUtils.getWebApplicationContext(servletContext)
+		freemarkerConfigurer = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
 				.getBean(FreemarkerConfigurer.class);
 		Configuration configuration = freemarkerConfigurer.createConfiguration();
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
