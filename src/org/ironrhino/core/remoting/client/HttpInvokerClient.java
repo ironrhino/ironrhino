@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.GenericRemoteInvocation;
@@ -279,6 +281,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	}
 
 	@Override
+	@Nullable
 	public String getServiceUrl() {
 		String serviceUrl = super.getServiceUrl();
 		if (serviceUrl == null && StringUtils.isNotBlank(host)) {

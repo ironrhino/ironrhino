@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
@@ -112,6 +114,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 	}
 
 	@Override
+	@Nonnull
 	public Class<?> getObjectType() {
 		return restApiClass;
 	}
@@ -314,9 +317,15 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 
 		RequestEntity<Object> requestEntity = new RequestEntity<>(body, headers,
 				HttpMethod.valueOf(requestMethod.name()), URI.create(url));
-		final Type type = method.getGenericReturnType() == Void.TYPE ? null : method.getGenericReturnType();
+		Type type = method.getGenericReturnType();
 		if (type == InputStream.class) {
-			return restTemplate.exchange(requestEntity, Resource.class).getBody().getInputStream();
+			Resource resource = restTemplate.exchange(requestEntity, Resource.class).getBody();
+			if (resource == null)
+				return null;
+			return resource.getInputStream();
+		} else if (type == Void.TYPE) {
+			restTemplate.exchange(requestEntity, Resource.class);
+			return null;
 		} else {
 			return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
 		}

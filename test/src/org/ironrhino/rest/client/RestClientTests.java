@@ -42,8 +42,10 @@ public class RestClientTests {
 	public void testRestTemplate() {
 		RestTemplate rt = restClient.getRestTemplate();
 		User u = rt.getForObject("/user/@self", User.class);
+		assertNotNull(u);
 		assertNotNull(u.getUsername());
 		u = rt.getForObject("/user/admin", User.class);
+		assertNotNull(u);
 		assertEquals("admin", u.getUsername());
 	}
 

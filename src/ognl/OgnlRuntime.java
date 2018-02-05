@@ -72,7 +72,7 @@ public class OgnlRuntime {
     /**
      * Token returned by TypeConverter for no conversion possible
      */
-    public static final Object NoConversionPossible = "ognl.NoConversionPossible";
+    public static final Object NoConversionPossible = new Object();
 
     /**
      * Not an indexed property
@@ -1693,9 +1693,9 @@ public class OgnlRuntime {
             throws OgnlException, IllegalAccessException, NoSuchMethodException, IntrospectionException
     {
         Object result = null;
-        Method m = getGetMethod(context, (target == null) ? null : target.getClass() , propertyName);
+        Method m = getGetMethod(context, target.getClass() , propertyName);
         if (m == null)
-            m = getReadMethod((target == null) ? null : target.getClass(), propertyName, null);
+            m = getReadMethod(target.getClass(), propertyName, null);
 
         if (checkAccessAndExistence)
         {
@@ -1733,7 +1733,7 @@ public class OgnlRuntime {
             throws OgnlException, IllegalAccessException, NoSuchMethodException, IntrospectionException
     {
         boolean result = true;
-        Method m = getSetMethod(context, (target == null) ? null : target.getClass(), propertyName);
+        Method m = getSetMethod(context, target.getClass(), propertyName);
 
         if (checkAccessAndExistence)
         {
@@ -2324,7 +2324,7 @@ public class OgnlRuntime {
     public static final boolean hasGetProperty(OgnlContext context, Object target, Object oname)
             throws IntrospectionException, OgnlException
     {
-        Class targetClass = (target == null) ? null : target.getClass();
+        Class targetClass = target.getClass();
         String name = oname.toString();
 
         return hasGetMethod(context, target, targetClass, name) || hasField(context, target, targetClass, name);
@@ -2333,7 +2333,7 @@ public class OgnlRuntime {
     public static final boolean hasSetProperty(OgnlContext context, Object target, Object oname)
             throws IntrospectionException, OgnlException
     {
-        Class targetClass = (target == null) ? null : target.getClass();
+        Class targetClass = target.getClass();
         String name = oname.toString();
 
         return hasSetMethod(context, target, targetClass, name) || hasField(context, target, targetClass, name);
@@ -3312,12 +3312,7 @@ public class OgnlRuntime {
         Method get(Class clazz, String propertyName)
         {
             ConcurrentHashMap<String,Method> methodsByPropertyName = this.cache.get(clazz);
-            if (methodsByPropertyName == null)
-            {
-                methodsByPropertyName = new ConcurrentHashMap<String, Method>();
-                this.cache.put(clazz, methodsByPropertyName);
-            }
-            Method method = methodsByPropertyName.get(propertyName);
+            Method method = methodsByPropertyName !=null ? methodsByPropertyName.get(propertyName) : null;
             if (method == NULL_REPLACEMENT)
                 return null;
             return method;
@@ -3325,12 +3320,7 @@ public class OgnlRuntime {
 
         void put(Class clazz, String propertyName, Method method)
         {
-            ConcurrentHashMap<String,Method> methodsByPropertyName = this.cache.get(clazz);
-            if (methodsByPropertyName == null)
-            {
-                methodsByPropertyName = new ConcurrentHashMap<String, Method>();
-                this.cache.put(clazz, methodsByPropertyName);
-            }
+            ConcurrentHashMap<String,Method> methodsByPropertyName = this.cache.computeIfAbsent(clazz, key -> new ConcurrentHashMap<String, Method>());
             methodsByPropertyName.put(propertyName, (method == null? NULL_REPLACEMENT : method));
         }
 

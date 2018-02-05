@@ -6,6 +6,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import java.io.StreamCorruptedException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -279,7 +280,7 @@ public class RedisCacheManager implements CacheManager {
 		RedisScript<Boolean> script = new DefaultRedisScript<>(
 				"local keys = redis.call('keys', ARGV[1]) \n for i=1,#keys,5000 do \n redis.call('del', unpack(keys, i, math.min(i+4999, #keys))) \n end \n return true",
 				Boolean.class);
-		cacheStringRedisTemplate.execute(script, null, namespace + ":*");
+		cacheStringRedisTemplate.execute(script, Collections.emptyList(), namespace + ":*");
 	}
 
 	private static class FallbackToStringSerializer extends JdkSerializationRedisSerializer {

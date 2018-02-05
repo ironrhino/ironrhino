@@ -109,7 +109,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	private Map<String, UiConfigImpl> _uiConfigs;
 
-	private EN _entity;
+	private volatile EN _entity;
 
 	private String _entityName;
 

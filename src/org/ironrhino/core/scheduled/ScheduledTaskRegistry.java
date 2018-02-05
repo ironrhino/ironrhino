@@ -22,7 +22,7 @@ import lombok.Data;
 @Component
 public class ScheduledTaskRegistry {
 
-	private List<ScheduledTask> tasks = null;
+	private volatile List<ScheduledTask> tasks = null;
 
 	@Autowired(required = false)
 	private List<ScheduledTaskHolder> scheduledTaskHolders = Collections.emptyList();
@@ -41,7 +41,7 @@ public class ScheduledTaskRegistry {
 				}
 			}
 		}
-		return tasks;
+		return temp;
 	}
 
 	private List<ScheduledTask> doGetTasks() {

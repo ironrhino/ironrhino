@@ -103,7 +103,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 			StatusLine sl = rsp.getStatusLine();
 			if (sl.getStatusCode() == RemotingContext.SC_SERIALIZATION_FAILED) {
 				Header h = rsp.getFirstHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE);
-				throw new SerializationFailedException(h != null ? h.getValue() : null);
+				throw new SerializationFailedException(h != null ? h.getValue() : "");
 			} else if (sl.getStatusCode() >= 300) {
 				throw new IOException("Did not receive successful HTTP response: status code = " + sl.getStatusCode()
 						+ ", status message = [" + sl.getReasonPhrase() + "]");

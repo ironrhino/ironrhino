@@ -206,8 +206,8 @@ public class JdbcRepositoryFactoryBean
 				throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
 			for (int i = 0; i < names.length; i++) {
 				Object arg = arguments[i];
-				context.put(names[i], arg);
 				if (arg != null) {
+					context.put(names[i], arg);
 					if (arg instanceof Limiting) {
 						sql = SqlUtils.appendLimitingClause(databaseProduct, databaseMajorVersion, databaseMinorVersion,
 								sql, names[i], (Limiting) arg);
@@ -237,8 +237,8 @@ public class JdbcRepositoryFactoryBean
 					if (arg instanceof Enum) {
 						arg = JdbcHelper.convertEnum(arg, methodInvocation.getMethod().getParameterAnnotations()[i]);
 					}
+					sqlParameterSource.addValue(names[i], arg);
 				}
-				sqlParameterSource.addValue(names[i], arg);
 			}
 		}
 		PartitionKey partitionKey = AnnotationUtils.findAnnotation(method, PartitionKey.class);
