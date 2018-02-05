@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,8 +71,8 @@ public class JsonUtilsTest {
 	@Data
 	static class TemporalObject {
 		private LocalDate date = LocalDate.now();
-		private LocalDateTime datetime = LocalDateTime.now();
-		private LocalTime time = LocalTime.now();
+		private LocalDateTime datetime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+		private LocalTime time = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
 		private Duration duration = Duration.ofMillis(1000);
 	}
 

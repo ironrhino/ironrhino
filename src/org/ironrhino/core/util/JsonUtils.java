@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,11 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 public class JsonUtils {
 
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+
+	private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter
+			.ofPattern(DEFAULT_DATE_FORMAT);
+	private static final DateTimeFormatter DEFAULT_TIME_FORMATTER = DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT);
 
 	public static final TypeReference<List<String>> STRING_LIST_TYPE = new TypeReference<List<String>>() {
 	};
@@ -123,7 +129,7 @@ public class JsonUtils {
 				@Override
 				public void serialize(LocalDateTime localDateTime, JsonGenerator jsonGenerator,
 						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-					jsonGenerator.writeString(localDateTime.toString());
+					jsonGenerator.writeString(DEFAULT_DATETIME_FORMATTER.format(localDateTime));
 				}
 			}).addDeserializer(LocalTime.class, new JsonDeserializer<LocalTime>() {
 				@Override
@@ -135,7 +141,7 @@ public class JsonUtils {
 				@Override
 				public void serialize(LocalTime localTime, JsonGenerator jsonGenerator,
 						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-					jsonGenerator.writeString(localTime.toString());
+					jsonGenerator.writeString(DEFAULT_TIME_FORMATTER.format(localTime));
 				}
 			}).addDeserializer(Duration.class, new JsonDeserializer<Duration>() {
 				@Override
