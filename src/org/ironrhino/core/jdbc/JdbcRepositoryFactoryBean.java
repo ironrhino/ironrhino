@@ -210,8 +210,8 @@ public class JdbcRepositoryFactoryBean
 				throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
 			for (int i = 0; i < names.length; i++) {
 				Object arg = arguments[i];
+				context.put(names[i], arg);
 				if (arg != null) {
-					context.put(names[i], arg);
 					if (arg instanceof Limiting) {
 						sql = SqlUtils.appendLimitingClause(databaseProduct, databaseMajorVersion, databaseMinorVersion,
 								sql, names[i], (Limiting) arg);
