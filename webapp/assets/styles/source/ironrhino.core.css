@@ -449,6 +449,8 @@ a.remove , .close {
 	font-family: serif;
 	font-size: 15px;
 	line-height: 15px;
+	width: 15px;
+	text-align: center;
 }
 
 a.remove:empty:after , .close:empty:after {
@@ -533,7 +535,6 @@ a.remove:empty:after , .close:empty:after {
 	border-radius: 100%;
 	height: 1em;
 	width: 1em;
-	text-align: center;
 	color: #fff;
 	background-color: #faa732;
 }
