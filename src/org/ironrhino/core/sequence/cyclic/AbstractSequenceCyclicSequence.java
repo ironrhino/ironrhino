@@ -81,12 +81,17 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			boolean tableExists = false;
 			con.setAutoCommit(true);
 			DatabaseMetaData dbmd = con.getMetaData();
-			try (ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "TABLE" })) {
-				while (rs.next()) {
-					if (tableName.equalsIgnoreCase(rs.getString(3))) {
-						tableExists = true;
-						break;
-					}
+			try (ResultSet rs = dbmd.getTables(null, null, tableName, new String[] { "TABLE" })) {
+				tableExists = rs.next();
+			}
+			if (!tableExists) {
+				try (ResultSet rs = dbmd.getTables(null, null, tableName.toUpperCase(), new String[] { "TABLE" })) {
+					tableExists = rs.next();
+				}
+			}
+			if (!tableExists) {
+				try (ResultSet rs = dbmd.getTables(null, null, tableName.toUpperCase(), new String[] { "TABLE" })) {
+					tableExists = rs.next();
 				}
 			}
 			if (tableExists) {

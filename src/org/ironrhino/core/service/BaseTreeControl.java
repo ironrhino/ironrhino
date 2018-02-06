@@ -97,7 +97,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 			Query<?> query = session.createNativeQuery("update " + tableName + " set fullId="
 					+ concat.render(StringType.INSTANCE,
 							Arrays.asList(str.render(StringType.INSTANCE, Arrays.asList("id"), sf), "'.'"), sf)
-					+ ",level=1 where parentId is null");
+					+ "," + dialect.quote("`level`") + "=1 where parentId is null");
 			if (query.executeUpdate() > 0) {
 				String sql;
 				if (dialect instanceof MySQLDialect) {
@@ -111,9 +111,9 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 							+ tableName + " a join " + tableName
 							+ " b on a.parentId=b.id where b.level=:level) c where t.id=c.id";
 				} else if (dialect instanceof Oracle8iDialect) {
-					sql = "update (select a.fullId,a.level,b.fullId||a.id||'.' as newFullId,b.level+1 as newLevel from "
+					sql = "update (select a.fullId,a.\"level\",b.fullId||a.id||'.' as newFullId,b.\"level\"+1 as newLevel from "
 							+ tableName + " a join " + tableName
-							+ " b on a.parentId=b.id where b.level=:level) t set t.fullId=t.newFullId,t.level=t.newLevel";
+							+ " b on a.parentId=b.id where b.\"level\"=:level) t set t.fullId=t.newFullId,t.\"level\"=t.newLevel";
 				} else if (dialect instanceof SQLServerDialect || dialect instanceof SybaseDialect) {
 					sql = "update a set fullId=(b.fullId+str(a.id)+'.'),level=b.level+1 from " + tableName + " a join "
 							+ tableName + " b on a.parentId=b.id where b.level=:level";

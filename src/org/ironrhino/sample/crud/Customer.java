@@ -116,7 +116,7 @@ public class Customer extends BaseRecordableEntity {
 
 	@UiConfig(width = "120px", description = "relatedCompanies.description")
 	@ManyToMany
-	@JoinTable(name = "sample_company_related_customer", joinColumns = @JoinColumn(name = "customer"), inverseJoinColumns = @JoinColumn(name = "company"))
+	@JoinTable(name = "sample_company_customer", joinColumns = @JoinColumn(name = "customer"), inverseJoinColumns = @JoinColumn(name = "company"))
 	private Collection<Company> relatedCompanies;
 
 	@Valid

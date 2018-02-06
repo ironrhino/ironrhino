@@ -35,7 +35,7 @@ public class BatchSchemaSetup {
 		try (Connection conn = dataSource.getConnection()) {
 			DatabaseMetaData dbmd = conn.getMetaData();
 			String tableName = tablePrefix + "JOB_EXECUTION";
-			ResultSet rs = dbmd.getTables(null, null, "%", null);
+			ResultSet rs = dbmd.getTables(null, null, tablePrefix + "%", new String[] { "TABLE" });
 			while (rs.next()) {
 				if (tableName.equalsIgnoreCase(rs.getString(3))) {
 					return;

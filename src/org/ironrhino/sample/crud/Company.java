@@ -89,7 +89,7 @@ public class Company extends BaseEntity {
 
 	@UiConfig(width = "150px", description = "relatedCustomers.description", group = "customer")
 	@ManyToMany
-	@JoinTable(name = "sample_company_related_customer", joinColumns = @JoinColumn(name = "company"), inverseJoinColumns = @JoinColumn(name = "customer"))
+	@JoinTable(name = "sample_company_customer", joinColumns = @JoinColumn(name = "company"), inverseJoinColumns = @JoinColumn(name = "customer"))
 	private Collection<Customer> relatedCustomers;
 
 	@UiConfig(width = "80px", group = "contactInfo", description = "一对一关系")
