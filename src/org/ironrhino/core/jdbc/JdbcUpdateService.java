@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
@@ -24,6 +23,7 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -71,7 +71,7 @@ public class JdbcUpdateService {
 
 	private boolean supportsBatchUpdates;
 
-	@Nonnull
+	@NonNull
 	public DataSource getDataSource() {
 		Assert.notNull(jdbcTemplate, "JdbcTemplate should be present");
 		DataSource dataSource = jdbcTemplate.getDataSource();
