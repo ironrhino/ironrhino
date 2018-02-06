@@ -2,10 +2,6 @@
 	padding-top: 20px;
 }
 
-.window-richtable form:first-child textarea.input-xxlarge , .window-richtable form input.input-xxlarge {
-	width: 515px;
-}
-
 .window-listpick form.criteria select {
 	width: 200px;
 }
