@@ -111,7 +111,13 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 			DatabaseMetaData dbmd = conn.getMetaData();
 			DatabaseProduct dp = DatabaseProduct.parse(dbmd.getDatabaseProductName());
 			Map<String, String> foreignKeys = new HashMap<String, String>();
-			ResultSet tables = dbmd.getTables(conn.getCatalog(), conn.getSchema(), "%", new String[] { "TABLE" });
+			String catalog = conn.getCatalog();
+			String schema = null;
+			try {
+				schema = conn.getSchema();
+			} catch (Throwable t) {
+			}
+			ResultSet tables = dbmd.getTables(catalog, schema, "%", new String[] { "TABLE" });
 			while (tables.next()) {
 				String table = tables.getString(3);
 				try (ResultSet importedKeys = dbmd.getImportedKeys(conn.getCatalog(), conn.getSchema(), table)) {

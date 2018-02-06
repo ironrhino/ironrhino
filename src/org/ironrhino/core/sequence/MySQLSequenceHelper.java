@@ -16,21 +16,22 @@ public class MySQLSequenceHelper {
 
 	public static void createOrUpgradeTable(DataSource dataSrouce, String tableName, String sequenceName)
 			throws SQLException {
-		try (Connection con = dataSrouce.getConnection(); Statement stmt = con.createStatement()) {
+		try (Connection conn = dataSrouce.getConnection(); Statement stmt = conn.createStatement()) {
 			boolean tableExists = false;
-			con.setAutoCommit(true);
-			DatabaseMetaData dbmd = con.getMetaData();
-			try (ResultSet rs = dbmd.getTables(null, null, tableName, new String[] { "TABLE" })) {
-				tableExists = rs.next();
+			conn.setAutoCommit(true);
+			DatabaseMetaData dbmd = conn.getMetaData();
+			String catalog = conn.getCatalog();
+			String schema = null;
+			try {
+				schema = conn.getSchema();
+			} catch (Throwable t) {
 			}
-			if (!tableExists) {
-				try (ResultSet rs = dbmd.getTables(null, null, tableName.toUpperCase(), new String[] { "TABLE" })) {
-					tableExists = rs.next();
-				}
-			}
-			if (!tableExists) {
-				try (ResultSet rs = dbmd.getTables(null, null, tableName.toUpperCase(), new String[] { "TABLE" })) {
-					tableExists = rs.next();
+			for (String table : new String[] { tableName, tableName.toLowerCase(), tableName.toUpperCase() }) {
+				try (ResultSet rs = dbmd.getTables(catalog, schema, table, new String[] { "TABLE" })) {
+					if (rs.next()) {
+						tableExists = true;
+						break;
+					}
 				}
 			}
 			if (tableExists) {
@@ -55,7 +56,7 @@ public class MySQLSequenceHelper {
 					stmt.execute("DROP TABLE `" + tableName + "`");
 					stmt.execute("CREATE TABLE `" + tableName
 							+ "` (NAME VARCHAR(50) PRIMARY KEY, VALUE INT NOT NULL DEFAULT 0, LAST_UPDATED BIGINT) ");
-					try (PreparedStatement ps = con.prepareStatement("INSERT INTO " + tableName + " VALUES(?,?,?)")) {
+					try (PreparedStatement ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES(?,?,?)")) {
 						for (Map.Entry<String, Object> entry : map.entrySet()) {
 							if (!entry.getKey().endsWith("_TIMESTAMP")) {
 								Object timestamp = map.get(entry.getKey() + "_TIMESTAMP");

@@ -76,22 +76,23 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 	}
 
 	protected void createOrUpgradeTable() throws SQLException {
-		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
+		try (Connection conn = getDataSource().getConnection(); Statement stmt = conn.createStatement()) {
 			String tableName = getTableName();
 			boolean tableExists = false;
-			con.setAutoCommit(true);
-			DatabaseMetaData dbmd = con.getMetaData();
-			try (ResultSet rs = dbmd.getTables(null, null, tableName, new String[] { "TABLE" })) {
-				tableExists = rs.next();
+			conn.setAutoCommit(true);
+			DatabaseMetaData dbmd = conn.getMetaData();
+			String catalog = conn.getCatalog();
+			String schema = null;
+			try {
+				schema = conn.getSchema();
+			} catch (Throwable t) {
 			}
-			if (!tableExists) {
-				try (ResultSet rs = dbmd.getTables(null, null, tableName.toUpperCase(), new String[] { "TABLE" })) {
-					tableExists = rs.next();
-				}
-			}
-			if (!tableExists) {
-				try (ResultSet rs = dbmd.getTables(null, null, tableName.toUpperCase(), new String[] { "TABLE" })) {
-					tableExists = rs.next();
+			for (String table : new String[] { tableName, tableName.toLowerCase(), tableName.toUpperCase() }) {
+				try (ResultSet rs = dbmd.getTables(catalog, schema, table, new String[] { "TABLE" })) {
+					if (rs.next()) {
+						tableExists = true;
+						break;
+					}
 				}
 			}
 			if (tableExists) {
@@ -115,7 +116,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 				if (map != null) {
 					stmt.execute("DROP TABLE " + tableName);
 					stmt.execute(getCreateTableStatement());
-					try (PreparedStatement ps = con.prepareStatement("INSERT INTO " + tableName + " VALUES(?,?)")) {
+					try (PreparedStatement ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES(?,?)")) {
 						for (Map.Entry<String, Object> entry : map.entrySet()) {
 							if (entry.getKey().toUpperCase().endsWith("_TIMESTAMP")) {
 								String sequenceName = entry.getKey();

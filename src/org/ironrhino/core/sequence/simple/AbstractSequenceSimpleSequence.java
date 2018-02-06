@@ -29,13 +29,21 @@ public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSim
 
 	@Override
 	public void afterPropertiesSet() {
-		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
-			con.setAutoCommit(true);
-			DatabaseMetaData dbmd = con.getMetaData();
+		try (Connection conn = getDataSource().getConnection(); Statement stmt = conn.createStatement()) {
+			conn.setAutoCommit(true);
+			DatabaseMetaData dbmd = conn.getMetaData();
 			boolean sequenceExists = false;
-			try (ResultSet rs = dbmd.getTables(null, null, "%", new String[] { "SEQUENCE" })) {
-				while (rs.next()) {
-					if (getActualSequenceName().equalsIgnoreCase(rs.getString(3))) {
+			String sequenceName = getActualSequenceName();
+			String catalog = conn.getCatalog();
+			String schema = null;
+			try {
+				schema = conn.getSchema();
+			} catch (Throwable t) {
+			}
+			for (String sequence : new String[] { sequenceName, sequenceName.toLowerCase(),
+					sequenceName.toUpperCase() }) {
+				try (ResultSet rs = dbmd.getTables(catalog, schema, sequence, new String[] { "TABLE" })) {
+					if (rs.next()) {
 						sequenceExists = true;
 						break;
 					}
