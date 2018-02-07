@@ -14,6 +14,9 @@ import javax.servlet.ServletRegistration;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.spring.converter.DateConverter;
+import org.ironrhino.core.spring.converter.LocalDateConverter;
+import org.ironrhino.core.spring.converter.LocalDateTimeConverter;
+import org.ironrhino.core.spring.converter.LocalTimeConverter;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
@@ -115,7 +118,10 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 			@Override
 			protected void writeInternal(String str, HttpOutputMessage outputMessage) throws IOException {
 				super.writeInternal(str, outputMessage);
-				outputMessage.getBody().close();
+				if (!outputMessage.getClass().getSimpleName().toLowerCase().contains("streaming")) {
+					// don't close event stream
+					outputMessage.getBody().close();
+				}
 			}
 
 		};
@@ -134,6 +140,9 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Override
 	public void addFormatters(FormatterRegistry formatterRegistry) {
 		formatterRegistry.addConverter(new DateConverter());
+		formatterRegistry.addConverter(new LocalDateConverter());
+		formatterRegistry.addConverter(new LocalDateTimeConverter());
+		formatterRegistry.addConverter(new LocalTimeConverter());
 	}
 
 	@Override

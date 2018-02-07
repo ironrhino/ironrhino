@@ -44,8 +44,9 @@ public class RestFilter extends OncePerRequestFilter {
 				|| request.getContentType() != null && request.getContentType().startsWith(MediaType.TEXT_PLAIN_VALUE))
 			request = new WrappedHttpServletRequest(request,
 					StringUtils.isNotBlank(method) ? method.toUpperCase(Locale.ROOT).trim() : request.getMethod());
-		if (loggingBody && (request.getContentType() == null
-				|| request.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE))) {
+		if (loggingBody && !MediaType.TEXT_EVENT_STREAM_VALUE.equals(request.getHeader(HttpHeaders.ACCEPT))
+				&& (request.getContentType() == null
+						|| request.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE))) {
 			if (request.getMethod().equalsIgnoreCase("GET")) {
 				logger.info("");
 			} else {
