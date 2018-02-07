@@ -6,7 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -14,9 +17,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.Index;
+import org.hibernate.mapping.KeyValue;
+import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.Table;
 import org.hibernate.mapping.Table.ForeignKeyKey;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
@@ -84,22 +90,61 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 				}
 
 				private void convertForeignKeyToIndex(Database database) {
-					for (Namespace namespace : database.getNamespaces()) {
-						for (Table table : namespace.getTables()) {
-							Map<ForeignKeyKey, ForeignKey> foreignKeys = ReflectionUtils.getFieldValue(table,
-									"foreignKeys");
-							for (ForeignKey foreignKey : foreignKeys.values()) {
-								Index index = new Index();
-								index.setTable(foreignKey.getTable());
-								for (Column col : foreignKey.getColumns())
-									index.addColumn(col);
-								if (foreignKey.getName() != null) {
-									index.setName(foreignKey.getName());
-									table.addIndex(index);
+					Dialect dialect = database.getJdbcEnvironment().getDialect();
+					try (Connection conn = dataSource.getConnection()) {
+						DatabaseMetaData dbmd = conn.getMetaData();
+						for (Namespace namespace : database.getNamespaces()) {
+							for (Table table : namespace.getTables()) {
+								Set<String> existedIndexes = new HashSet<>();
+								for (String tableName : new String[] { table.getName(), table.getName().toUpperCase(),
+										table.getName().toLowerCase() }) {
+									try (ResultSet rs = dbmd.getIndexInfo(conn.getCatalog(), conn.getSchema(),
+											dialect.openQuote() + tableName + dialect.closeQuote(), false, false)) {
+										boolean tableFound = false;
+										while (rs.next()) {
+											tableFound = true;
+											String indexName = rs.getString("INDEX_NAME");
+											if (indexName != null)
+												existedIndexes.add(indexName);
+										}
+										if (tableFound)
+											break;
+									} catch (SQLException e) {
+									}
 								}
+								Map<ForeignKeyKey, ForeignKey> foreignKeys = ReflectionUtils.getFieldValue(table,
+										"foreignKeys");
+								loop: for (ForeignKey foreignKey : foreignKeys.values()) {
+									for (String existedIndex : existedIndexes) {
+										if (foreignKey.getName().equalsIgnoreCase(existedIndex))
+											continue loop;
+									}
+									List<Column> columns = foreignKey.getColumns();
+									if (columns.size() == 1) {
+										// test @MapsId
+										KeyValue id = foreignKey.getTable().getIdentifierValue();
+										if (id instanceof SimpleValue) {
+											SimpleValue simpleId = (SimpleValue) id;
+											if (columns.get(0).getName()
+													.equalsIgnoreCase(simpleId.getColumnIterator().next().getText()))
+												continue;
+										}
+									}
+
+									Index index = new Index();
+									index.setTable(foreignKey.getTable());
+									for (Column col : columns)
+										index.addColumn(col);
+									if (foreignKey.getName() != null) {
+										index.setName(foreignKey.getName());
+										table.addIndex(index);
+									}
+								}
+								foreignKeys.clear();
 							}
-							foreignKeys.clear();
 						}
+					} catch (SQLException ex) {
+						ex.printStackTrace();
 					}
 				}
 			};
