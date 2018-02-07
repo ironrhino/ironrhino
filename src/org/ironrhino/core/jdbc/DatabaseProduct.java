@@ -74,7 +74,7 @@ public enum DatabaseProduct {
 	DB2 {
 		@Override
 		public int getDefaultPort() {
-			return 446;
+			return 50000;
 		}
 
 		@Override
@@ -92,11 +92,18 @@ public enum DatabaseProduct {
 			sb.append("/").append(databaseName);
 			if (StringUtils.isNotBlank(params)) {
 				params = params.replaceAll("&", ";");
-				if (!params.startsWith(";"))
-					sb.append(";");
+				if (!params.startsWith(":"))
+					sb.append(":");
 				sb.append(params);
+				if (!params.endsWith(";"))
+					sb.append(";");
 			}
 			return sb.toString();
+		}
+
+		@Override
+		public String polishJdbcUrl(String jdbcUrl) {
+			return polishJdbcUrl(jdbcUrl, ":", ";") + ";";
 		}
 
 		@Override
@@ -385,14 +392,14 @@ public enum DatabaseProduct {
 	}
 
 	public String polishJdbcUrl(String jdbcUrl) {
-		return polishJdbcUrl(jdbcUrl, "&", "?");
+		return polishJdbcUrl(jdbcUrl, "?", "&");
 	}
 
-	protected String polishJdbcUrl(String jdbcUrl, String separator, String delimiter) {
+	protected String polishJdbcUrl(String jdbcUrl, String delimiter, String separator) {
 		String qs = getRecommendedJdbcUrlQueryString();
 		if (qs == null)
 			return jdbcUrl;
-		int i = jdbcUrl.indexOf(delimiter);
+		int i = jdbcUrl.indexOf(delimiter, jdbcUrl.lastIndexOf('/'));
 		if (i > 0) {
 			String uri = jdbcUrl.substring(0, i);
 			String params = jdbcUrl.substring(i + 1);
@@ -402,13 +409,13 @@ public enum DatabaseProduct {
 				if (arr.length == 2)
 					map.put(arr[0], arr[1]);
 			}
-			StringBuilder sb = new StringBuilder(uri);
+			StringBuilder sb = new StringBuilder();
 			if (map.size() > 0) {
 				for (Map.Entry<String, String> entry : map.entrySet())
-					sb.append(sb.indexOf(delimiter) > 0 ? separator : delimiter).append(entry.getKey()).append("=")
-							.append(entry.getValue());
+					sb.append(entry.getKey()).append("=").append(entry.getValue()).append(separator);
+				sb.deleteCharAt(sb.length() - 1);
 			}
-			return sb.toString();
+			return uri + delimiter + sb.toString();
 		} else {
 			return jdbcUrl + delimiter + qs;
 		}
