@@ -303,10 +303,6 @@ public class AppInfo {
 
 	public static void initialize() {
 
-		if (System.getProperty("java.security.egd") == null
-				&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows")))
-			System.setProperty("java.security.egd", "file:/dev/urandom");
-
 		if (System.getProperty("http.maxConnections") == null)
 			System.setProperty("http.maxConnections", "100");
 		System.setProperty("sun.net.http.errorstream.enableBuffering", "true");
