@@ -5,8 +5,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,10 +98,11 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 						for (Namespace namespace : database.getNamespaces()) {
 							for (Table table : namespace.getTables()) {
 								Set<String> existedIndexes = new HashSet<>();
-								for (String tableName : new String[] { table.getName(), table.getName().toUpperCase(),
-										table.getName().toLowerCase() }) {
+								String tableName = table.getName();
+								for (String name : new LinkedHashSet<>(
+										Arrays.asList(tableName.toUpperCase(), tableName, tableName.toLowerCase()))) {
 									try (ResultSet rs = dbmd.getIndexInfo(conn.getCatalog(), conn.getSchema(),
-											dialect.openQuote() + tableName + dialect.closeQuote(), false, false)) {
+											dialect.openQuote() + name + dialect.closeQuote(), false, false)) {
 										boolean tableFound = false;
 										while (rs.next()) {
 											tableFound = true;

@@ -8,8 +8,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
@@ -87,7 +89,8 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 				schema = conn.getSchema();
 			} catch (Throwable t) {
 			}
-			for (String table : new String[] { tableName, tableName.toLowerCase(), tableName.toUpperCase() }) {
+			for (String table : new LinkedHashSet<>(
+					Arrays.asList(tableName.toUpperCase(), tableName, tableName.toLowerCase()))) {
 				try (ResultSet rs = dbmd.getTables(catalog, schema, table, new String[] { "TABLE" })) {
 					if (rs.next()) {
 						tableExists = true;

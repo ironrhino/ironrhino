@@ -5,6 +5,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -40,8 +42,8 @@ public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSim
 				schema = conn.getSchema();
 			} catch (Throwable t) {
 			}
-			for (String sequence : new String[] { sequenceName, sequenceName.toLowerCase(),
-					sequenceName.toUpperCase() }) {
+			for (String sequence : new LinkedHashSet<>(
+					Arrays.asList(sequenceName.toUpperCase(), sequenceName, sequenceName.toLowerCase()))) {
 				try (ResultSet rs = dbmd.getTables(catalog, schema, sequence, new String[] { "TABLE" })) {
 					if (rs.next()) {
 						sequenceExists = true;

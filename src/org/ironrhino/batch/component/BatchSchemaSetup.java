@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 
 import javax.sql.DataSource;
@@ -41,7 +43,8 @@ public class BatchSchemaSetup {
 				schema = conn.getSchema();
 			} catch (Throwable t) {
 			}
-			for (String table : new String[] { tableName, tableName.toLowerCase(), tableName.toUpperCase() }) {
+			for (String table : new LinkedHashSet<>(
+					Arrays.asList(tableName.toUpperCase(), tableName, tableName.toLowerCase()))) {
 				try (ResultSet rs = dbmd.getTables(catalog, schema, table, new String[] { "TABLE" })) {
 					if (rs.next())
 						return;
