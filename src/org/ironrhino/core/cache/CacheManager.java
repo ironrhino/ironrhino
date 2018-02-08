@@ -10,6 +10,10 @@ public interface CacheManager {
 
 	public void putWithTti(String key, Object value, int timeToIdle, TimeUnit timeUnit, String namespace);
 
+	public default boolean containsKey(String key, String namespace) {
+		return exists(key, namespace);
+	}
+
 	public boolean exists(String key, String namespace);
 
 	public Object get(String key, String namespace);
