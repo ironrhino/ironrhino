@@ -28,12 +28,15 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.util.ClassUtils;
 import org.springframework.validation.Validator;
@@ -116,10 +119,21 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 		StringHttpMessageConverter string = new StringHttpMessageConverter(StandardCharsets.UTF_8) {
 
 			@Override
+			protected String readInternal(Class<? extends String> clazz, HttpInputMessage inputMessage)
+					throws IOException {
+				try {
+					return super.readInternal(clazz, inputMessage);
+				} finally {
+					inputMessage.getBody().close();
+				}
+			}
+
+			@Override
 			protected void writeInternal(String str, HttpOutputMessage outputMessage) throws IOException {
 				super.writeInternal(str, outputMessage);
-				if (!outputMessage.getClass().getSimpleName().toLowerCase().contains("streaming")) {
-					// don't close event stream
+				if (!(outputMessage instanceof ServerHttpResponse)
+						|| outputMessage instanceof ServletServerHttpResponse) {
+					// don't close MediaType.TEXT_EVENT_STREAM
 					outputMessage.getBody().close();
 				}
 			}

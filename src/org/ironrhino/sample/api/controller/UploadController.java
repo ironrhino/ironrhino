@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.security.role.UserRole;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +24,12 @@ public class UploadController {
 		return new ModelAndView("sample/upload");
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+	public String upload(@RequestBody String string) {
+		return string;
+	}
+
+	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Map<String, Object> upload(@RequestParam String name, @RequestParam MultipartFile file) {
 		Map<String, Object> result = new HashMap<>();
 		result.put("name", name);

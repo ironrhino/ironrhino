@@ -38,7 +38,7 @@
 		</#list>
 	</select>
 	<#else>
-	<input name="${param.name}"<#if param.type=='file'> type="file"<#if param.multiple> multiple</#if><#else> type="text" value="${param.defaultValue!}" placeholder="值"</#if><#if param.required> class="required"</#if>>
+	<input name="${param.name}"<#if param.type=='file'> type="file" class="custom"<#if param.multiple> multiple</#if><#else> type="text" value="${param.defaultValue!}" placeholder="值"</#if><#if param.required> class="required"</#if>>
 	</#if>
 	</td>
 	</tr>
