@@ -99,7 +99,7 @@ public class Customer extends BaseRecordableEntity {
 	private BigDecimal balance;
 
 	@UiConfig(width = "80px", template = "${(value*100)?string('0.0000')}%", description = "percentage.description")
-	@Formula("balance/(select sum(a.balance) from sample_customer a where a.gender=gender)")
+	@Formula("balance/(select sum(a.balance) from sample_customer a where a.gender={alias}.gender)")
 	private BigDecimal percentage;
 
 	@SearchableComponent

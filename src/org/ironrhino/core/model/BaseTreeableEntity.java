@@ -15,7 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-import javax.persistence.SequenceGenerator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.CaseInsensitive;
@@ -42,7 +41,6 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	@Id
 	@SearchableId
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "treeable_entity_seq")
-	@SequenceGenerator(name = "treeable_entity_seq", sequenceName = "treeable_entity_seq", allocationSize = 1)
 	protected Long id;
 
 	@Column(unique = true)
