@@ -61,15 +61,22 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 				.toString();
 	}
 
+	protected String getQueryTimestampForUpdateStatement() {
+		return new StringBuilder("SELECT ").append(getCurrentTimestamp()).append(",LAST_UPDATED").append(" FROM ")
+				.append(getTableName()).append(" WHERE NAME='").append(getSequenceName()).append("' FOR UPDATE")
+				.toString();
+	}
+
+	protected String getUpdateTimestampStatement() {
+		return new StringBuilder("UPDATE ").append(getTableName()).append(" SET LAST_UPDATED = ? WHERE NAME='")
+				.append(getSequenceName()).append("' AND LAST_UPDATED < ?").toString();
+	}
+
 	@Override
 	public void afterPropertiesSet() {
 		querySequenceStatement = getQuerySequenceStatement();
-		queryTimestampForUpdateStatement = new StringBuilder("SELECT ").append(getCurrentTimestamp())
-				.append(",LAST_UPDATED").append(" FROM ").append(getTableName()).append(" WHERE NAME='")
-				.append(getSequenceName()).append("' FOR UPDATE").toString();
-		updateTimestampStatement = new StringBuilder("UPDATE ").append(getTableName())
-				.append(" SET LAST_UPDATED = ? WHERE NAME='").append(getSequenceName()).append("' AND LAST_UPDATED < ?")
-				.toString();
+		queryTimestampForUpdateStatement = getQueryTimestampForUpdateStatement();
+		updateTimestampStatement = getUpdateTimestampStatement();
 		try {
 			createOrUpgradeTable();
 		} catch (SQLException e) {
@@ -173,11 +180,11 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 							result = queryTimestampWithSequence(con, stmt);
 							return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
 						}
+						con.commit();
 					} catch (Exception e) {
 						con.rollback();
-						con.setAutoCommit(true);
+						throw new DataAccessResourceFailureException(e.getMessage(), e);
 					} finally {
-						con.commit();
 						con.setAutoCommit(true);
 					}
 				}
