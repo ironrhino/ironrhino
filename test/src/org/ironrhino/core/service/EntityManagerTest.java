@@ -91,6 +91,7 @@ public class EntityManagerTest {
 		assertEquals(Gender.FEMALE, person2.getGender());
 		assertTrue(entityManager.existsOne("name", "test"));
 		assertTrue(entityManager.existsOne(true, new Serializable[] { "name", "Test" }));
+		assertFalse(entityManager.existsOne(true, new Serializable[] { "name", null }));
 		person2 = entityManager.findOne("name", "test");
 		assertEquals(Gender.FEMALE, person2.getGender());
 

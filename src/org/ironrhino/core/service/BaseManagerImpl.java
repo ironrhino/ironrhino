@@ -512,8 +512,11 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		if (objects.length == 1) {
 			if (naturalIds.size() != 1)
 				throw new IllegalArgumentException("@NaturalId must and only be one");
-			dc.add(ignoreCase ? new IgnoreCaseSimpleExpression(naturalIds.iterator().next(), objects[0], "=")
-					: Restrictions.eq(naturalIds.iterator().next(), objects[0]));
+			String propertyName = naturalIds.iterator().next();
+			Serializable value = objects[0];
+			dc.add(value == null ? Restrictions.isNull(propertyName)
+					: ignoreCase ? new IgnoreCaseSimpleExpression(propertyName, value, "=")
+							: Restrictions.eq(propertyName, value));
 		} else {
 			if (objects.length == 0 || objects.length % 2 != 0)
 				throw new IllegalArgumentException("Parameter size must be even");
@@ -521,12 +524,14 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			if (checkNaturalId && naturalIds.size() != doubles)
 				throw new IllegalArgumentException("Parameter pair size should equals to @NaturalId size");
 			for (int i = 0; i < doubles; i++) {
-				String name = String.valueOf(objects[2 * i]);
-				if (checkNaturalId && !naturalIds.contains(name))
+				String propertyName = String.valueOf(objects[2 * i]);
+				Serializable value = objects[2 * i + 1];
+				if (checkNaturalId && !naturalIds.contains(propertyName))
 					throw new IllegalArgumentException(
-							getEntityClass().getName() + "." + name + " should annotate @NaturalId");
-				dc.add(ignoreCase ? new IgnoreCaseSimpleExpression(name, objects[2 * i + 1], "=")
-						: Restrictions.eq(name, objects[2 * i + 1]));
+							getEntityClass().getName() + "." + propertyName + " should annotate @NaturalId");
+				dc.add(value == null ? Restrictions.isNull(propertyName)
+						: ignoreCase ? new IgnoreCaseSimpleExpression(propertyName, value, "=")
+								: Restrictions.eq(propertyName, value));
 			}
 		}
 		return dc.getExecutableCriteria(sessionFactory.getCurrentSession());
