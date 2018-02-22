@@ -3,6 +3,7 @@ package org.ironrhino.core.cache.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.io.ObjectStreamConstants;
 import java.io.StreamCorruptedException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -302,7 +303,7 @@ public class RedisCacheManager implements CacheManager {
 			try {
 				return super.deserialize(bytes);
 			} catch (SerializationException se) {
-				if (se.getCause() instanceof SerializationFailedException
+				if (!isJavaSerialized(bytes) && se.getCause() instanceof SerializationFailedException
 						&& se.getCause().getCause() instanceof StreamCorruptedException
 						&& org.ironrhino.core.util.StringUtils.isUtf8(bytes))
 					return new String(bytes, StandardCharsets.UTF_8);
@@ -310,6 +311,13 @@ public class RedisCacheManager implements CacheManager {
 			}
 		}
 
+		private static boolean isJavaSerialized(byte[] bytes) {
+			if (bytes.length > 2) {
+				short magic = (short) ((bytes[1] & 0xFF) + (bytes[0] << 8));
+				return magic == ObjectStreamConstants.STREAM_MAGIC;
+			}
+			return false;
+		}
 	}
 
 }
