@@ -86,8 +86,11 @@ public class ApiDocInspector {
 			}
 			try {
 				List<Method> methods = findApiMethods(clazz);
-				for (Method m : methods)
-					apiModuleObject.getApiDocs().add(new ApiDoc(clazz, m, apiConfig.objectMapper()));
+				for (Method m : methods) {
+					ApiDoc ad = new ApiDoc(clazz, m, apiConfig.objectMapper());
+					ad.setUrl(ctx.getEnvironment().resolvePlaceholders(ad.getUrl()));
+					apiModuleObject.getApiDocs().add(ad);
+				}
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}

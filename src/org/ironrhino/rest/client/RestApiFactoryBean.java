@@ -25,7 +25,9 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.io.FileSystemResource;
@@ -60,6 +62,9 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 			"io.github.resilience4j.circuitbreaker.CircuitBreaker", RestApiFactoryBean.class.getClassLoader());
 
 	private final Class<?> restApiClass;
+
+	@Autowired
+	private ApplicationContext ctx;
 
 	@Getter
 	@Setter
@@ -147,7 +152,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 			sb.append(classRequestMapping.value()[0]);
 		if (methodRequestMapping != null && methodRequestMapping.value().length > 0)
 			sb.append(methodRequestMapping.value()[0]);
-		String url = sb.toString().trim();
+		String url = ctx.getEnvironment().resolvePlaceholders(sb.toString().trim());
 		RequestMethod[] requestMethods = methodRequestMapping != null ? methodRequestMapping.method()
 				: classRequestMapping.method();
 		RequestMethod requestMethod = requestMethods.length > 0 ? requestMethods[0] : RequestMethod.GET;
