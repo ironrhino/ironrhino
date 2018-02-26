@@ -28,6 +28,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 public class SampleObjectCreator {
 
 	private static final SampleObjectCreator defaultInstance = new SampleObjectCreator();
@@ -54,7 +57,11 @@ public class SampleObjectCreator {
 				return null;
 			Class<?> raw = (Class<?>) pt.getRawType();
 			Class<?> clazz = (Class<?>) pt.getActualTypeArguments()[0];
-			if (DeferredResult.class.isAssignableFrom(raw) || Future.class.isAssignableFrom(raw)
+			if (Flux.class.isAssignableFrom(raw)) {
+				return Flux.just(createSample(clazz));
+			} else if (Mono.class.isAssignableFrom(raw)) {
+				return Mono.just(createSample(clazz));
+			} else if (DeferredResult.class.isAssignableFrom(raw) || Future.class.isAssignableFrom(raw)
 					|| Callable.class.isAssignableFrom(raw) || ResponseEntity.class.isAssignableFrom(raw)) {
 				return createSample(clazz);
 			} else if (Set.class.isAssignableFrom(raw)) {

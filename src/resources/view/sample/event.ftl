@@ -10,7 +10,7 @@
 </style>
 <script>
 	document.addEventListener('DOMContentLoaded',function(event){
-		var url = '/api/sse/event';
+		var url = '/api/sse/reactiveEvent';
 		var source = new EventSource(url);
 		var result = document.getElementById('result');
 		source.addEventListener('remove',function(event){

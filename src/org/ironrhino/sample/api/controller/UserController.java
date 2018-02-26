@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @RestController
 @RequestMapping("/user")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
@@ -156,6 +159,18 @@ public class UserController {
 			throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, "username invalid");
 		boolean valid = AuthzUtils.isPasswordValid(u, user.getPassword());
 		return valid ? RestStatus.OK : RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, "password invalid");
+	}
+
+	@Api("flux示例")
+	@GetMapping(value = "/flux")
+	public Flux<User> flux() {
+		return Flux.just(AuthzUtils.getUserDetails());
+	}
+
+	@Api("mono示例")
+	@GetMapping(value = "/mono")
+	public Mono<User> mono() {
+		return Mono.just(AuthzUtils.getUserDetails());
 	}
 
 }

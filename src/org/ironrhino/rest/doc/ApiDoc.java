@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Data;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Data
 public class ApiDoc implements Serializable {
@@ -175,9 +178,11 @@ public class ApiDoc implements Serializable {
 			responseBodyType = "collection";
 		} else if (ResultPage.class.isAssignableFrom(responseBodyClass)) {
 			responseBodyType = "resultPage";
+		} else if (Flux.class.isAssignableFrom(responseBodyClass)) {
+			responseBodyType = "collection";
 		}
-		if (method.getGenericReturnType() instanceof ParameterizedType) {
-			ParameterizedType pt = (ParameterizedType) method.getGenericReturnType();
+		if (responseBodyGenericType instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) responseBodyGenericType;
 			Type type = pt.getActualTypeArguments()[0];
 			if (type instanceof Class) {
 				responseBodyClass = (Class<?>) type;
@@ -216,7 +221,11 @@ public class ApiDoc implements Serializable {
 			responseBodySample = (String) responseSample;
 		} else if (responseSample != null) {
 			Class<?> view = null;
-			if (responseSample instanceof DeferredResult)
+			if (responseSample instanceof Flux) {
+				responseSample = Collections.singletonList(((Flux<?>) responseSample).blockFirst());
+			} else if (responseSample instanceof Mono) {
+				responseSample = ((Mono<?>) responseSample).block();
+			} else if (responseSample instanceof DeferredResult)
 				responseSample = ((DeferredResult<?>) responseSample).getResult();
 			else if (responseSample instanceof Future)
 				responseSample = ((Future<?>) responseSample).get();
