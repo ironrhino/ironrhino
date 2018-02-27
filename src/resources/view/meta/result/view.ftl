@@ -92,6 +92,14 @@
 			</#if>
 		<#elseif config.type=='schema'>
 			<#if printAttributes??&&entity.attributes??><@printAttributes attributes=entity.attributes grouping=true/></#if>
+		<#elseif config.type=='attributes'>
+			<div>
+			<#if value?has_content>
+			<#list value as var>
+			<span class="label tiped" title="${var.name}">${var.value}</span>
+			</#list>
+			</#if>
+			</div>
 		<#elseif config.type=='imageupload'>
 			<#if value?has_content><img src="${value}"/></#if>
 		<#elseif value??>

@@ -84,6 +84,7 @@
 			</div>
 		<#elseif config.type=='attributes'>
 			<@controlGroup id=id group=group label=label description=description>
+			<input type="hidden" name="__datagrid_${entityName}.attributes"/>
 			<table class="datagrid adaptive table table-condensed nullable">
 				<thead>
 					<tr>
