@@ -2,7 +2,6 @@ package org.ironrhino.core.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -69,7 +68,7 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "parent")
 	@OrderBy("displayOrder,name")
-	protected Collection<T> children = new HashSet<>(0);
+	protected Collection<T> children = new ArrayList<>(0);
 
 	@JsonIgnore
 	public String getFullId() {
