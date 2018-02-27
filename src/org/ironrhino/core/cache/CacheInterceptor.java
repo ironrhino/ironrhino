@@ -53,6 +53,10 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 					Object value = (timeToIdle > 0 && !cacheManager.supportsTti())
 							? cacheManager.getWithTti(key, namespace, timeToIdle, checkCache.timeUnit())
 							: cacheManager.get(key, namespace);
+					if (value != null && !(value instanceof NullObject)
+							&& !methodInvocation.getMethod().getReturnType().isAssignableFrom(value.getClass())) {
+						value = null;
+					}
 					if (value != null) {
 						putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
 						ExpressionUtils.eval(checkCache.onHit(), context);
@@ -68,6 +72,10 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 						Thread.sleep(mutexWait);
 						for (String key : keys) {
 							Object value = cacheManager.get(key, namespace);
+							if (value != null && !(value instanceof NullObject) && !methodInvocation.getMethod()
+									.getReturnType().isAssignableFrom(value.getClass())) {
+								value = null;
+							}
 							if (value != null) {
 								putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
 								ExpressionUtils.eval(checkCache.onHit(), context);
