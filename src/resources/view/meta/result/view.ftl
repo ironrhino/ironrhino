@@ -103,28 +103,22 @@
 		<#elseif config.type=='imageupload'>
 			<#if value?has_content><img src="${value}"/></#if>
 		<#elseif value??>
-			<#if value?is_boolean>
-			${getText(value?c)}
-			<#elseif value?is_unknown_date_like>
-			${value?datetime}
-			<#elseif value?is_string||value?is_number||value?is_date_like>
-			${value?string}
-			<#elseif value?is_enumerable>
+			<#if value?is_enumerable>
 			<ol class="unstyled">
 			<#list value as item>
 				<li>
-				<#if item?is_boolean>
-					${getText(item?c)}
-				<#elseif item?is_unknown_date_like>
-					${item?datetime}
-				<#elseif item?is_string||item?is_number||item?is_date_like>
-					${item?string}
-				<#elseif item?is_enumerable>
+				<#if item?is_enumerable>
 						<ol class="unstyled">
 						<#list item as it>
 							<li>${it}</li>
 						</#list>
 						</ol>
+				<#elseif item?is_boolean>
+					${getText(item?c)}
+				<#elseif item?is_unknown_date_like>
+					${item?datetime}	
+				<#elseif item?is_string||item?is_number||item?is_date_like>
+					${item?string}
 				<#elseif item?is_hash_ex>
 						<#if item.isNew?? && item.getId??>
 							${item}
@@ -143,6 +137,10 @@
 				</li>
 			</#list>
 			</ol>
+			<#elseif value?is_boolean>
+			${getText(value?c)}
+			<#elseif value?is_unknown_date_like>
+			${value?datetime}
 			<#else>
 			${value?string!}
 			</#if>
