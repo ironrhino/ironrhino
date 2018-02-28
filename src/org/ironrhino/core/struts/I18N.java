@@ -1,6 +1,7 @@
 package org.ironrhino.core.struts;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class I18N {
 
 		@Override
 		public Map<String, Object> getContext() {
-			return Collections.emptyMap();
+			return new HashMap<>();
 		}
 
 		@Override
