@@ -6,6 +6,14 @@
 			var t = $(this);
 			if (!$('[data-group]', t).length)
 				return;
+			$(':input[data-group]', t).each(function() {
+						var t = $(this);
+						var cg = t.closest('.control-group');
+						if (cg.length) {
+							cg.attr('data-group', t.attr('data-group'));
+							t.removeAttr('data-group');
+						}
+					});
 			var groups = {};
 			$('[data-group],.control-group', t).each(function() {
 						var ct = $(this);
