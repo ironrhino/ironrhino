@@ -17,7 +17,7 @@
 	<span class="pull-right" style="margin:0 10px;">${getText('total')}:<strong>${total?string}</strong></span>
 	</#if>
 </div>
-<ul class="unstyled flotlinechart" style="height:300px;" data-format="<#if date??>%H(%m-%d)<#else>%m-%d</#if>">
+<ul class="unstyled flotlinechart" style="height:300px;" data-timeformat="<#if date??>%H(%m-%d)<#else>%m-%d</#if>">
 	<#if dataList??>
 	<#list dataList as var>
 	<li style="float:left;width:200px;padding:10px;">

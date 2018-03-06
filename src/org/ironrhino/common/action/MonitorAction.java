@@ -1,5 +1,7 @@
 package org.ironrhino.common.action;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,10 +10,10 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.support.StatControl;
-import org.ironrhino.core.chart.openflashchart.Chart;
 import org.ironrhino.core.metadata.AutoConfig;
-import org.ironrhino.core.metadata.JsonConfig;
+import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.stat.Key;
+import org.ironrhino.core.stat.Value;
 import org.ironrhino.core.stat.analysis.TreeNode;
 import org.ironrhino.core.struts.BaseAction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +66,7 @@ public class MonitorAction extends BaseAction {
 	private TreeNode treeNode;
 
 	@Getter
-	private Chart chart;
+	private List<Tuple<Date, Number>> dataList;
 
 	@Autowired
 	private StatControl statControl;
@@ -112,16 +114,23 @@ public class MonitorAction extends BaseAction {
 		Date today = new Date();
 		if (date == null || date.after(today))
 			date = today;
+		dataList = new ArrayList<Tuple<Date, Number>>();
+		boolean isdouble = "d".equalsIgnoreCase(vtype);
+		boolean isline = "line".equalsIgnoreCase(ctype);
+		List<Value> list = statControl.getPeriodResult(Key.fromString(id), date, isline, localhost);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		for (int i = 0; i < 24; i++) {
+			Value val = list.get(i);
+			cal.set(Calendar.HOUR_OF_DAY, i);
+			Date d = cal.getTime();
+			Calendar c = Calendar.getInstance();
+			c.setTime(d);
+			c.set(Calendar.MINUTE, 30);
+			c.set(Calendar.SECOND, 30);
+			dataList.add(Tuple.of(c.getTime(), isdouble ? val.getDoubleValue() : val.getLongValue()));
+		}
 		return "chart";
-	}
-
-	@JsonConfig(root = "chart")
-	public String data() {
-		String id = getUid();
-		if (StringUtils.isBlank(id))
-			return NOTFOUND;
-		chart = statControl.getChart(Key.fromString(id), date, vtype, ctype, localhost);
-		return JSON;
 	}
 
 	public String pie() {

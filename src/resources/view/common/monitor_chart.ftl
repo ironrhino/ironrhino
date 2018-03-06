@@ -3,6 +3,9 @@
 <html>
 <head>
 <title>${getText('monitor')}</title>
+<script src="<@url value="/assets/components/flot/jquery.flot.js"/>" type="text/javascript"></script>
+<script src="<@url value="/assets/components/flot/jquery.flot.time.js"/>" type="text/javascript"></script>
+<script src="<@url value="/assets/components/flot/ironrhino.flot.js"/>" type="text/javascript"></script>
 </head>
 <body>
 <div class="row<#if fluidLayout>-fluid</#if>">
@@ -27,14 +30,15 @@
 </form>
 </div>
 </div>
-<#assign dataurl='${actionBaseUrl}/data'/>
-<#if uid??>
-<#assign dataurl+='/'+uid>
-</#if>
-<#if request.queryString??>
-<#assign dataurl+='?'+request.queryString>
-</#if>
-<div id="chart" class="chart" data-url="${dataurl}" style="height:600px;"<#if Parameters.live??> data-interval="${Parameters.interval!'60000'}" data-quiet="true"</#if>>
-</div>
+<ul class="unstyled flotbarchart" style="height:600px;"<#if Parameters.live??> data-interval="${Parameters.interval!'60000'}" data-quiet="true"</#if>>
+	<#if dataList??>
+	<#list dataList as var>
+	<li style="float:left;width:200px;padding:10px;">
+	<span>${var.key?string('HH')}</span>
+	<strong class="pull-right" style="margin-right:10px;">${var.value?string}</strong>
+	</li>
+	</#list>
+	</#if>
+</ul>
 </body>
 </html>
