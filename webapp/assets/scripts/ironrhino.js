@@ -36411,6 +36411,8 @@ Observation.form = function(container) {
 							t.attr('maxlength', '19');
 						else if (t.hasClass('time'))
 							t.attr('maxlength', '8');
+						else if (t.hasClass('yearmonth'))
+							t.attr('maxlength', '7');
 						else if (t.hasClass('integer'))
 							t.attr('maxlength', t.hasClass('positive')
 											? '9'
@@ -36610,8 +36612,8 @@ Observation.form = function(container) {
 							});
 		});
 	if (typeof $.fn.datetimepicker != 'undefined')
-		$$('input.date,input.datetime,input.time', container).not('[readonly]')
-				.not('[disabled]').each(function() {
+		$$('input.date,input.datetime,input.time,input.yearmonth', container)
+				.not('[readonly]').not('[disabled]').each(function() {
 					var t = $(this);
 					var option = {
 						language : MessageBundle.lang().replace('_', '-')
@@ -36622,6 +36624,9 @@ Observation.form = function(container) {
 					} else if (t.hasClass('time')) {
 						option.format = t.data('format') || 'HH:mm:ss';
 						option.pickDate = false;
+					} else if (t.hasClass('yearmonth')) {
+						option.format = t.data('format') || 'yyyy-MM';
+						option.pickTime = false;
 					} else {
 						option.format = t.data('format') || 'yyyy-MM-dd';
 						option.pickTime = false;
@@ -38089,7 +38094,8 @@ Richtable = {
 									&& !($(this).val()
 											|| $(this).hasClass('date')
 											|| $(this).hasClass('datetime')
-											|| $(this).hasClass('time') || $(this)
+											|| $(this).hasClass('time')
+											|| $(this).hasClass('yearmonth') || $(this)
 											.is('button'));
 						}).eq(0).focus();
 					if (!inputform.hasClass('keepopen')
@@ -38105,8 +38111,7 @@ Richtable = {
 							if ($('input[type="hidden"][name="id"]', inputform)
 									.val())
 								create = false;
-							if ($(
-									'input[type="hidden"].id', inputform).val())
+							if ($('input[type="hidden"].id', inputform).val())
 								create = false;
 						}
 						if (create && inputform.hasClass('sequential_create')) {
@@ -38494,10 +38499,11 @@ Richtable = {
 		}
 		cell.html(template);
 		var input = $(':input', cell).val(value).blur(function() {
-					if (!$(this).is('.date,.datetime,.time'))
+					if (!$(this).is('.date,.datetime,.time,.yearmonth'))
 						Richtable.updateCell(this);
 				});
-		if (type == 'date' || type == 'datetime' || type == 'time') {
+		if (type == 'date' || type == 'datetime' || type == 'time'
+				|| type == 'yearmonth') {
 			var option = {
 				language : MessageBundle.lang().replace('_', '-')
 			};
@@ -38506,6 +38512,9 @@ Richtable = {
 			} else if (type == 'time') {
 				option.format = input.data('format') || 'HH:mm:ss';
 				option.pickDate = false;
+			} else if (type == 'yearmonth') {
+				option.format = input.data('format') || 'yyyy-MM';
+				option.pickTime = false;
 			} else {
 				option.format = input.data('format') || 'yyyy-MM-dd';
 				option.pickTime = false;

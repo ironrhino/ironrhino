@@ -3,6 +3,7 @@ package org.ironrhino.core.jdbc;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +28,8 @@ public class Person implements Serializable {
 	@Column(name = "F_DOB")
 	private LocalDate dob;
 
+	private YearMonth since;
+
 	private int age;
 
 	private BigDecimal amount;
@@ -36,7 +39,5 @@ public class Person implements Serializable {
 	private Set<String> roles;
 
 	private PersonShadow shadow;
-
-	
 
 }

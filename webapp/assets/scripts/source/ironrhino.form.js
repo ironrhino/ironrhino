@@ -134,6 +134,8 @@ Observation.form = function(container) {
 							t.attr('maxlength', '19');
 						else if (t.hasClass('time'))
 							t.attr('maxlength', '8');
+						else if (t.hasClass('yearmonth'))
+							t.attr('maxlength', '7');
 						else if (t.hasClass('integer'))
 							t.attr('maxlength', t.hasClass('positive')
 											? '9'
@@ -333,8 +335,8 @@ Observation.form = function(container) {
 							});
 		});
 	if (typeof $.fn.datetimepicker != 'undefined')
-		$$('input.date,input.datetime,input.time', container).not('[readonly]')
-				.not('[disabled]').each(function() {
+		$$('input.date,input.datetime,input.time,input.yearmonth', container)
+				.not('[readonly]').not('[disabled]').each(function() {
 					var t = $(this);
 					var option = {
 						language : MessageBundle.lang().replace('_', '-')
@@ -345,6 +347,9 @@ Observation.form = function(container) {
 					} else if (t.hasClass('time')) {
 						option.format = t.data('format') || 'HH:mm:ss';
 						option.pickDate = false;
+					} else if (t.hasClass('yearmonth')) {
+						option.format = t.data('format') || 'yyyy-MM';
+						option.pickTime = false;
 					} else {
 						option.format = t.data('format') || 'yyyy-MM-dd';
 						option.pickTime = false;

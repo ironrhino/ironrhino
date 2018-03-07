@@ -1,5 +1,7 @@
 package org.ironrhino.sample.crud;
 
+import java.time.YearMonth;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -42,6 +44,10 @@ public class Employee implements Persistable<String> {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company")
 	private Company company;
+
+	@UiConfig(width = "80px", alias = "入职年月")
+	@Column(length = 7)
+	private YearMonth since;
 
 	@Lob
 	@UiConfig(type = "textarea")

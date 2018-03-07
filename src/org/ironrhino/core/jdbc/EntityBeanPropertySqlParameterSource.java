@@ -2,6 +2,7 @@ package org.ironrhino.core.jdbc;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.time.YearMonth;
 import java.util.Collection;
 import java.util.Map;
 
@@ -108,6 +109,8 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 			return StringUtils.join((Object[]) value, ",");
 		else if (value instanceof Map)
 			return JsonUtils.toJson(value);
+		else if (value instanceof YearMonth)
+			return value.toString();
 		return value;
 	}
 

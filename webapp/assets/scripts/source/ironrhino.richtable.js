@@ -112,7 +112,8 @@ Richtable = {
 									&& !($(this).val()
 											|| $(this).hasClass('date')
 											|| $(this).hasClass('datetime')
-											|| $(this).hasClass('time') || $(this)
+											|| $(this).hasClass('time')
+											|| $(this).hasClass('yearmonth') || $(this)
 											.is('button'));
 						}).eq(0).focus();
 					if (!inputform.hasClass('keepopen')
@@ -128,8 +129,7 @@ Richtable = {
 							if ($('input[type="hidden"][name="id"]', inputform)
 									.val())
 								create = false;
-							if ($(
-									'input[type="hidden"].id', inputform).val())
+							if ($('input[type="hidden"].id', inputform).val())
 								create = false;
 						}
 						if (create && inputform.hasClass('sequential_create')) {
@@ -517,10 +517,11 @@ Richtable = {
 		}
 		cell.html(template);
 		var input = $(':input', cell).val(value).blur(function() {
-					if (!$(this).is('.date,.datetime,.time'))
+					if (!$(this).is('.date,.datetime,.time,.yearmonth'))
 						Richtable.updateCell(this);
 				});
-		if (type == 'date' || type == 'datetime' || type == 'time') {
+		if (type == 'date' || type == 'datetime' || type == 'time'
+				|| type == 'yearmonth') {
 			var option = {
 				language : MessageBundle.lang().replace('_', '-')
 			};
@@ -529,6 +530,9 @@ Richtable = {
 			} else if (type == 'time') {
 				option.format = input.data('format') || 'HH:mm:ss';
 				option.pickDate = false;
+			} else if (type == 'yearmonth') {
+				option.format = input.data('format') || 'yyyy-MM';
+				option.pickTime = false;
 			} else {
 				option.format = input.data('format') || 'yyyy-MM-dd';
 				option.pickTime = false;

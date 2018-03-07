@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,6 +74,7 @@ public class JsonUtilsTest {
 		private LocalDate date = LocalDate.now();
 		private LocalDateTime datetime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 		private LocalTime time = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+		private YearMonth month = YearMonth.now();
 		private Duration duration = Duration.ofMillis(1000);
 	}
 

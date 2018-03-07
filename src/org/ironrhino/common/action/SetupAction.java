@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -265,6 +266,8 @@ public class SetupAction extends BaseAction {
 					this.cssClasses.add("datetime");
 				else if (parameterType == LocalTime.class)
 					this.cssClasses.add("time");
+				else if (parameterType == YearMonth.class)
+					this.cssClasses.add("yearmonth");
 				if (StringUtils.isNotBlank(setupParameter.dynamicAttributes()))
 					try {
 						this.dynamicAttributes = JsonUtils.fromJson(setupParameter.dynamicAttributes(),

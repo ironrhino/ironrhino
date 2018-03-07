@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -88,6 +89,18 @@ public class JsonHttpInvokerSerializationHelper {
 				public void serialize(LocalTime localTime, JsonGenerator jsonGenerator,
 						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
 					jsonGenerator.writeString(localTime.toString());
+				}
+			}).addDeserializer(YearMonth.class, new JsonDeserializer<YearMonth>() {
+				@Override
+				public YearMonth deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+						throws IOException, JsonProcessingException {
+					return YearMonth.parse(jsonparser.getText());
+				}
+			}).addSerializer(YearMonth.class, new JsonSerializer<YearMonth>() {
+				@Override
+				public void serialize(YearMonth yearMonth, JsonGenerator jsonGenerator,
+						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+					jsonGenerator.writeString(yearMonth.toString());
 				}
 			}).addDeserializer(Duration.class, new JsonDeserializer<Duration>() {
 				@Override

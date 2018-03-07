@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -142,6 +143,8 @@ public class FieldObject implements Serializable {
 				type = "datetime";
 			else if (cls == LocalTime.class)
 				type = "time";
+			else if (cls == YearMonth.class)
+				type = "yearmonth";
 			else if (cls == Duration.class)
 				type = "duration";
 			else if (cls == String.class)

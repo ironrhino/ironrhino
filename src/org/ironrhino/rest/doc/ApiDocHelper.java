@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -217,6 +218,8 @@ public class ApiDocHelper {
 			return LocalDateTime.now();
 		else if (type == LocalTime.class)
 			return LocalTime.now();
+		else if (type == YearMonth.class)
+			return YearMonth.now();
 		else if (type == Duration.class)
 			return Duration.ofSeconds(1);
 		if (type.isEnum()) {

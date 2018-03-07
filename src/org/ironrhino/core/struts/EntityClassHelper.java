@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -535,7 +536,8 @@ public class EntityClassHelper {
 					} else if (java.time.temporal.Temporal.class.isAssignableFrom(returnType)) {
 						String temporalType = returnType == Duration.class ? "duration"
 								: returnType == LocalTime.class ? "time"
-										: returnType == LocalDateTime.class ? "datetime" : "date";
+										: returnType == LocalDateTime.class ? "datetime"
+												: returnType == YearMonth.class ? "yearmonth" : "date";
 						uci.addCssClass(temporalType);
 						// uci.setInputType(temporalType);
 						if (StringUtils.isBlank(uci.getCellEdit()))
@@ -663,6 +665,8 @@ public class EntityClassHelper {
 			cssClasses.add("datetime");
 		} else if (config.getCssClasses().contains("time")) {
 			cssClasses.add("time");
+		} else if (config.getCssClasses().contains("yearmonth")) {
+			cssClasses.add("yearmonth");
 		} else if (config.getCssClasses().contains("integer")) {
 			cssClasses.add("integer");
 		} else if (config.getCssClasses().contains("long")) {

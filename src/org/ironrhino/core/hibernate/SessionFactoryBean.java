@@ -49,6 +49,7 @@ import org.ironrhino.core.hibernate.event.PostLoadCallbackEventListener;
 import org.ironrhino.core.hibernate.event.PostUpdateCallbackEventListener;
 import org.ironrhino.core.hibernate.event.SaveCallbackEventListener;
 import org.ironrhino.core.hibernate.event.SaveOrUpdateCallbackEventListener;
+import org.ironrhino.core.hibernate.type.YearMonthType;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
@@ -234,6 +235,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 				logger.info(ac.getClass().getName());
 			}
 		}
+		sfb.registerTypeOverride(YearMonthType.INSTANCE);
 		SessionFactory sessionFactory = sfb.buildSessionFactory();
 		SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
 		EventListenerRegistry registry = sf.getServiceRegistry().getService(EventListenerRegistry.class);

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -42,6 +43,7 @@ public class JdbcRepositoryTest {
 		Person p = new Person();
 		p.setName("test");
 		p.setDob(LocalDate.now());
+		p.setSince(YearMonth.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
 		p.setAmount(new BigDecimal("12.00"));
@@ -79,6 +81,7 @@ public class JdbcRepositoryTest {
 		Person p = new Person();
 		p.setName("test1");
 		p.setDob(LocalDate.now());
+		p.setSince(YearMonth.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
 		p.setAmount(new BigDecimal("12.00"));
@@ -103,6 +106,7 @@ public class JdbcRepositoryTest {
 		Person p = new Person();
 		p.setName("test1");
 		p.setDob(LocalDate.now());
+		p.setSince(YearMonth.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
 		p.setAmount(new BigDecimal("12.00"));
@@ -124,6 +128,7 @@ public class JdbcRepositoryTest {
 		Person p = new Person();
 		p.setName("test");
 		p.setDob(LocalDate.now());
+		p.setSince(YearMonth.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
 		p.setAmount(new BigDecimal("12.00"));
@@ -142,6 +147,7 @@ public class JdbcRepositoryTest {
 		Person p = new Person();
 		p.setName("test1");
 		p.setDob(LocalDate.now());
+		p.setSince(YearMonth.now());
 		p.setAge(11);
 		p.setGender(Gender.FEMALE);
 		p.setAmount(new BigDecimal("12.00"));
