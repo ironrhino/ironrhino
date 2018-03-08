@@ -166,11 +166,13 @@ public class ApiDocHelper {
 					Class<?> clazz2 = (Class<?>) pt.getActualTypeArguments()[0];
 					if (Set.class.isAssignableFrom(raw)) {
 						Set<Object> set = new HashSet<>();
-						set.add((clazz2 == clazz) ? obj : createSample(clazz2));
+						if (!references.contains(clazz2))
+							set.add((clazz2 == clazz) ? obj : createObject(clazz2, references));
 						value = set;
 					} else if (Collection.class.isAssignableFrom(raw)) {
 						List<Object> list = new ArrayList<>();
-						list.add((clazz2 == clazz) ? obj : createSample(clazz2));
+						if (!references.contains(clazz2))
+							list.add((clazz2 == clazz) ? obj : createObject(clazz2, references));
 						value = list;
 					} else {
 						return;
