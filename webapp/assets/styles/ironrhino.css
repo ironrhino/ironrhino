@@ -10380,19 +10380,15 @@ input.long {
 }
 
 input.date {
-	width: 75px ! important;
+	width: 70px ! important;
 }
 
 input.datetime {
 	width: 125px ! important;
 }
 
-input.time {
-	width: 60px ! important;
-}
-
-input.yearmonth {
-	width: 60px ! important;
+input.time, input.yearmonth {
+	width: 50px ! important;
 }
 
 input.latlng {
