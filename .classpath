@@ -20,7 +20,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-4.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-4.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-4.0.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/disruptor-3.3.7.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/disruptor-3.4.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dom4j-2.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/freemarker-2.3.27.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/fst-2.53.jar"/>
