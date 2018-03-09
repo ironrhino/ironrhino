@@ -5,12 +5,13 @@ import java.util.Comparator;
 
 import org.hibernate.type.descriptor.WrapperOptions;
 import org.hibernate.type.descriptor.java.AbstractTypeDescriptor;
+import org.hibernate.type.descriptor.java.ImmutableMutabilityPlan;
 
-public class YearMonthTypeDescriptor extends AbstractTypeDescriptor<YearMonth> {
+public class YearMonthJavaTypeDescriptor extends AbstractTypeDescriptor<YearMonth> {
 
 	private static final long serialVersionUID = -2439159016195930125L;
 
-	public static final YearMonthTypeDescriptor INSTANCE = new YearMonthTypeDescriptor();
+	public static final YearMonthJavaTypeDescriptor INSTANCE = new YearMonthJavaTypeDescriptor();
 
 	public static class YearMonthComparator implements Comparator<YearMonth> {
 		public static final YearMonthComparator INSTANCE = new YearMonthComparator();
@@ -20,8 +21,9 @@ public class YearMonthTypeDescriptor extends AbstractTypeDescriptor<YearMonth> {
 		}
 	}
 
-	public YearMonthTypeDescriptor() {
-		super(YearMonth.class);
+	@SuppressWarnings("unchecked")
+	public YearMonthJavaTypeDescriptor() {
+		super(YearMonth.class, ImmutableMutabilityPlan.INSTANCE);
 	}
 
 	@Override

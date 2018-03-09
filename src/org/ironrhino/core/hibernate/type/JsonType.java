@@ -4,6 +4,7 @@ package org.ironrhino.core.hibernate.type;
 import java.util.Properties;
 
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
+import org.hibernate.type.descriptor.sql.VarcharTypeDescriptor;
 import org.hibernate.usertype.DynamicParameterizedType;
 
 public class JsonType extends AbstractSingleColumnStandardBasicType<Object> implements DynamicParameterizedType {
@@ -11,7 +12,7 @@ public class JsonType extends AbstractSingleColumnStandardBasicType<Object> impl
 	private static final long serialVersionUID = -6106597335909896629L;
 
 	public JsonType() {
-		super(JsonSqlTypeDescriptor.INSTANCE, new JsonJavaTypeDescriptor());
+		super(VarcharTypeDescriptor.INSTANCE, new JsonJavaTypeDescriptor());
 	}
 
 	@Override

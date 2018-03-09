@@ -14,7 +14,7 @@ public class YearMonthType extends AbstractSingleColumnStandardBasicType<YearMon
 	public static final YearMonthType INSTANCE = new YearMonthType();
 
 	public YearMonthType() {
-		super(VarcharTypeDescriptor.INSTANCE, YearMonthTypeDescriptor.INSTANCE);
+		super(VarcharTypeDescriptor.INSTANCE, YearMonthJavaTypeDescriptor.INSTANCE);
 	}
 
 	public String getName() {
