@@ -10,7 +10,7 @@
 	<Appenders>
 		<Console name="CONSOLE" target="SYSTEM_OUT">
 			<ThresholdFilter level="${sys:console.logger.level}"/>
-			<PatternLayout pattern="%d %c %p %m%n"/>
+			<PatternLayout pattern="%style{%d %25.25t %60.60c{1.}}{cyan} %highlight{%p %m%n}" noConsoleNoAnsi="true"/>
 		</Console>
 		<File name="DEBUG" fileName="${sys:app.home}/logs/${sys:port.http}/application-debug.log">
 			<PatternLayout pattern="%d %c %t%X{request}%X{url} %p %m%n%th{10}" charset="UTF-8"/>
