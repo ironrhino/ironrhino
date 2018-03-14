@@ -38,7 +38,7 @@ public class FreemarkerConfigurer {
 
 	public static final String DEFAULT_FTL_CLASSPATH = "/resources/view";
 
-	public static final Version DEFAULT_VERSION = Configuration.VERSION_2_3_27;
+	public static final Version DEFAULT_VERSION = Configuration.getVersion();
 
 	public static final BeansWrapper DEFAULT_BEANS_WRAPPER = new FriendlyBeansWrapperBuilder(DEFAULT_VERSION).build();
 
