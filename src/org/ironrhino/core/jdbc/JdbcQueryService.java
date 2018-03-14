@@ -305,12 +305,13 @@ public class JdbcQueryService {
 			return namedParameterJdbcTemplate.queryForList(sb.toString(), paramMap);
 		}
 
-		if (databaseProduct == DatabaseProduct.SQLSERVER && databaseMajorVersion >= 11
-				&& sql.toLowerCase(Locale.ROOT).matches(".+\\s+order\\s+by\\s+.+")) {
+		if (databaseProduct == DatabaseProduct.SQLSERVER && databaseMajorVersion >= 11) {
 			// https://technet.microsoft.com/en-us/library/gg699618(v=sql.110).aspx
 			// OFFSET-FETCH can be used only with the ORDER BY clause.
 			StringBuilder sb = new StringBuilder(sql.length() + 45);
 			sb.append(sql);
+			if (!sql.trim().toLowerCase(Locale.ROOT).matches(".+\\s+order\\s+by\\s+.+"))
+				sb.append(" order by (select 0)");
 			sb.append(" offset ").append(offset).append(" rows fetch ").append(offset > 0 ? "next " : "first ");
 			sb.append(limit).append(" rows only");
 			return namedParameterJdbcTemplate.queryForList(sb.toString(), paramMap);
