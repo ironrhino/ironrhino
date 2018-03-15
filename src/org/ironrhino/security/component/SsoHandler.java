@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,6 +22,7 @@ import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.User;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
@@ -68,6 +70,20 @@ public class SsoHandler extends AccessHandler {
 
 	@Autowired
 	protected RestTemplate restTemplate;
+
+	@Autowired(required = false)
+	@Qualifier("oauthHandler")
+	private AccessHandler oauthHandler;
+
+	@PostConstruct
+	private void init() {
+		if (oauthHandler != null) {
+			String apiPattern = ((org.ironrhino.security.oauth.server.component.OAuthHandler) oauthHandler)
+					.getPattern();
+			if (StringUtils.isNotBlank(apiPattern))
+				excludePattern = StringUtils.isBlank(excludePattern) ? apiPattern : excludePattern + "," + apiPattern;
+		}
+	}
 
 	@Override
 	public String getPattern() {

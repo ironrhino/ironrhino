@@ -32,7 +32,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("oauthHandler")
 @Order(0)
 public class OAuthHandler extends AccessHandler {
 
