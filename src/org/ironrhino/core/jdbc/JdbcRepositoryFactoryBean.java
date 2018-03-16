@@ -294,8 +294,11 @@ public class JdbcRepositoryFactoryBean
 			int rows = namedParameterJdbcTemplate.update(sql, sqlParameterSource);
 			if (returnType == void.class) {
 				return null;
-			} else if (returnType == int.class) {
+			} else if (returnType == int.class || returnType == Integer.class || returnType == long.class
+					|| returnType == Long.class) {
 				return rows;
+			} else if (returnType == boolean.class || returnType == Boolean.class) {
+				return rows > 0;
 			} else {
 				throw new UnsupportedOperationException("Unsupported return type: " + returnType.getTypeName());
 			}

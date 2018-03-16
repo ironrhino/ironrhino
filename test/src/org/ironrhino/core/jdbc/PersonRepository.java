@@ -1,5 +1,6 @@
 package org.ironrhino.core.jdbc;
 
+import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -22,6 +23,10 @@ public interface PersonRepository {
 
 	@Transactional
 	int delete(String name);
+
+	@Transactional
+	@Sql("update t_person set amount=:newAmount where name=:name and amount=:oldAmount")
+	boolean updateAmount(String name, BigDecimal oldAmount, BigDecimal newAmount);
 
 	@Transactional(readOnly = true)
 	Person get(String name);

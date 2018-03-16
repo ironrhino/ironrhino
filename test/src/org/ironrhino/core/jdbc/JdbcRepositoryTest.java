@@ -1,6 +1,7 @@
 package org.ironrhino.core.jdbc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -39,7 +40,7 @@ public class JdbcRepositoryTest {
 	}
 
 	@Test
-	public void test() throws Exception {
+	public void testCrud() throws Exception {
 		Person p = new Person();
 		p.setName("test");
 		p.setDob(LocalDate.now());
@@ -70,6 +71,10 @@ public class JdbcRepositoryTest {
 		assertEquals(1, personRepository.listNames().size());
 		assertEquals(1, personRepository.listGenders().size());
 		assertEquals(1, personRepository.listAges().size());
+		assertFalse(personRepository.updateAmount("test", new BigDecimal("11.00"), new BigDecimal("120.00")));
+		assertTrue(personRepository.updateAmount("test", new BigDecimal("12.00"), new BigDecimal("120.00")));
+		Person p3 = personRepository.get("test");
+		assertEquals(new BigDecimal("120.00"), p3.getAmount());
 		int rows = personRepository.delete("test");
 		assertEquals(1, rows);
 		all = personRepository.list();
