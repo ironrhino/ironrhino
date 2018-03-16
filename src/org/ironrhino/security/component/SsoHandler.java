@@ -82,6 +82,7 @@ public class SsoHandler extends AccessHandler {
 					.getPattern();
 			if (StringUtils.isNotBlank(apiPattern))
 				excludePattern = StringUtils.isBlank(excludePattern) ? apiPattern : excludePattern + "," + apiPattern;
+			excludePattern = StringUtils.isBlank(excludePattern) ? "/oauth/*" : excludePattern + "," + "/oauth/*";
 		}
 	}
 
