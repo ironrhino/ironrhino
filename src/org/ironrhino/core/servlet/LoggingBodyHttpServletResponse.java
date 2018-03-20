@@ -29,12 +29,13 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
-
 		final ServletOutputStream os = super.getOutputStream();
-		if (streamOutputStream == null) {
+		ServletOutputStream temp = streamOutputStream;
+		if (temp == null) {
 			synchronized (this) {
-				if (streamOutputStream == null) {
-					streamOutputStream = new ServletOutputStream() {
+				temp = streamOutputStream;
+				if (temp == null) {
+					streamOutputStream = temp = new ServletOutputStream() {
 
 						@Override
 						public boolean isReady() {
@@ -81,7 +82,7 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 				}
 			}
 		}
-		return streamOutputStream;
+		return temp;
 
 	}
 

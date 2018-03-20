@@ -35,10 +35,8 @@ public class ScheduledTaskRegistry {
 		if (temp == null) {
 			synchronized (this) {
 				temp = tasks;
-				if (temp == null) {
-					temp = doGetTasks();
-					tasks = temp;
-				}
+				if (temp == null)
+					tasks = temp = doGetTasks();
 			}
 		}
 		return temp;

@@ -110,8 +110,7 @@ public class ApplicationContextInspector {
 								map.put(arr[0], arr[1]);
 						}
 					}
-					temp = Collections.unmodifiableMap(map);
-					defaultProperties = temp;
+					defaultProperties = temp = Collections.unmodifiableMap(map);
 				}
 			}
 		}

@@ -32,24 +32,28 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 	public ServletOutputStream getOutputStream() {
 		if (committed)
 			throw new IllegalStateException("Response Already Committed");
-		if (buffer == null)
+		Buffer temp = buffer;
+		if (temp == null)
 			synchronized (this) {
-				if (buffer == null)
-					buffer = new Buffer(getCharacterEncoding());
+				temp = buffer;
+				if (temp == null)
+					buffer = temp = new Buffer(getCharacterEncoding());
 			}
-		return buffer.getOutputStream();
+		return temp.getOutputStream();
 	}
 
 	@Override
 	public PrintWriter getWriter() {
 		if (committed)
 			throw new IllegalStateException("Response Already Committed");
-		if (buffer == null)
+		Buffer temp = buffer;
+		if (temp == null)
 			synchronized (this) {
-				if (buffer == null)
-					buffer = new Buffer(getCharacterEncoding());
+				temp = buffer;
+				if (temp == null)
+					buffer = temp = new Buffer(getCharacterEncoding());
 			}
-		return buffer.getWriter();
+		return temp.getWriter();
 	}
 
 	@Override

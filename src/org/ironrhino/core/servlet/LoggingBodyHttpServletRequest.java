@@ -29,10 +29,12 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		final ServletInputStream is = super.getInputStream();
-		if (servletInputStream == null) {
+		ServletInputStream temp = servletInputStream;
+		if (temp == null) {
 			synchronized (this) {
-				if (servletInputStream == null) {
-					servletInputStream = new ServletInputStream() {
+				temp = servletInputStream;
+				if (temp == null) {
+					servletInputStream = temp = new ServletInputStream() {
 
 						@Override
 						public int read() throws IOException {
@@ -77,7 +79,7 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 				}
 			}
 		}
-		return servletInputStream;
+		return temp;
 	}
 
 }

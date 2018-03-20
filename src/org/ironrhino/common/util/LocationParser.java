@@ -109,10 +109,8 @@ public class LocationParser {
 		if (temp == null) {
 			synchronized (LocationParser.class) {
 				temp = sharedInstance;
-				if (temp == null) {
-					temp = new LocationParser();
-					sharedInstance = temp;
-				}
+				if (temp == null)
+					sharedInstance = temp = new LocationParser();
 			}
 		}
 		return temp;

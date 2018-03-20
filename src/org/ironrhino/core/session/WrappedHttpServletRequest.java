@@ -75,9 +75,11 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public Map<String, String[]> getParameterMap() {
-		if (parameterMap == null) {
+		Map<String, String[]> temp = parameterMap;
+		if (temp == null) {
 			synchronized (this) {
-				if (parameterMap == null) {
+				temp = parameterMap;
+				if (temp == null) {
 					Map<String, String[]> map = super.getParameterMap();
 					for (Map.Entry<String, String[]> entry : map.entrySet()) {
 						String name = entry.getKey();
@@ -85,11 +87,11 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 						for (int i = 0; i < value.length; i++)
 							value[i] = decryptIfNecessary(name, value[i]);
 					}
-					parameterMap = map;
+					parameterMap = temp = map;
 				}
 			}
 		}
-		return parameterMap;
+		return temp;
 	}
 
 	@Override

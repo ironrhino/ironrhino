@@ -73,8 +73,7 @@ public class ApplicationContextConsole {
 						if (ctx.containsBean(factoryBeanName))
 							temp.put(factoryBeanName.replace('&', '$'), ctx.getBean(factoryBeanName));
 					}
-					temp = Collections.unmodifiableMap(temp);
-					beans = temp;
+					beans = temp = Collections.unmodifiableMap(temp);
 				}
 			}
 		}
