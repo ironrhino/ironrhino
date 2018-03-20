@@ -44,6 +44,10 @@ public class MemcachedCacheManager implements CacheManager {
 	@Value("${memcached.useFstSerialization:false}")
 	private boolean useFstSerialization;
 
+	@Setter
+	@Value("${memcached.timeout:2000}")
+	private long timeout = 2000;
+
 	private volatile MemcachedClient memcached;
 
 	private volatile boolean rebuild; // reserve last set
@@ -210,21 +214,21 @@ public class MemcachedCacheManager implements CacheManager {
 	@Override
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
-			return memcached.add(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive), value);
+			return memcached.add(generateKey(key, namespace),
+					timeToLive > 0 ? (int) timeUnit.toSeconds(timeToLive) : Integer.MAX_VALUE, value);
+
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return false;
+			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
-			return memcached.incr(generateKey(key, namespace), delta, delta, 2000,
-					(int) timeUnit.toSeconds(timeToLive));
+			return memcached.incr(generateKey(key, namespace), delta, delta, this.timeout,
+					timeToLive > 0 ? (int) timeUnit.toSeconds(timeToLive) : Integer.MAX_VALUE);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return -1;
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -228,30 +228,22 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
-		try {
-			String actualkey = generateKey(key, namespace);
-			Boolean success = cacheRedisTemplate.opsForValue().setIfAbsent(actualkey, value);
-			if (success == null)
-				return false;
-			if (success && timeToLive > 0)
-				cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
-			return success;
-		} catch (Exception e) {
+		String actualkey = generateKey(key, namespace);
+		Boolean success = cacheRedisTemplate.opsForValue().setIfAbsent(actualkey, value);
+		if (success == null)
 			return false;
-		}
+		if (success && timeToLive > 0)
+			cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
+		return success;
 	}
 
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
-		try {
-			String actualkey = generateKey(key, namespace);
-			Long result = cacheRedisTemplate.opsForValue().increment(actualkey, delta);
-			if (timeToLive > 0)
-				cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
-			return result != null ? result : -1;
-		} catch (Exception e) {
-			return -1;
-		}
+		String actualkey = generateKey(key, namespace);
+		Long result = cacheRedisTemplate.opsForValue().increment(actualkey, delta);
+		if (timeToLive > 0)
+			cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
+		return result;
 	}
 
 	private String generateKey(String key, String namespace) {

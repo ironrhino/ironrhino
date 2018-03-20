@@ -139,7 +139,8 @@ public class Cache2kCacheManager implements CacheManager {
 		Cache<String, Object> cache = getCache(namespace, true);
 		boolean b = cache.putIfAbsent(key, value);
 		if (b)
-			cache.expireAt(key, System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+			cache.expireAt(key,
+					System.currentTimeMillis() + (timeToLive > 0 ? timeUnit.toMillis(timeToLive) : Integer.MAX_VALUE));
 		return b;
 	}
 
@@ -154,7 +155,8 @@ public class Cache2kCacheManager implements CacheManager {
 			} else {
 				e.setValue(delta);
 			}
-			e.setExpiry(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+			e.setExpiry(
+					System.currentTimeMillis() + (timeToLive > 0 ? timeUnit.toMillis(timeToLive) : Integer.MAX_VALUE));
 			return e;
 		});
 		return (Long) ce.getValue();
