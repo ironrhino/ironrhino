@@ -603,9 +603,20 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				return ACCESSDENIED;
 			}
 		}
-		if (_entity == null)
+		BeanWrapperImpl bw;
+		if (_entity == null) {
 			_entity = getEntityClass().getConstructor().newInstance();
-		BeanWrapperImpl bw = new BeanWrapperImpl(_entity);
+			bw = new BeanWrapperImpl(_entity);
+			String versionPropertyName = getVersionPropertyName();
+			if (versionPropertyName != null) {
+				Object version = bw.getPropertyValue(versionPropertyName);
+				if (version.equals(0)) {
+					bw.setPropertyValue(versionPropertyName, -1);
+				}
+			}
+		} else {
+			bw = new BeanWrapperImpl(_entity);
+		}
 		bw.setConversionService(conversionService);
 		if (_entity != null && _entity.isNew()) {
 			Set<String> naturalIds = getNaturalIds().keySet();
@@ -686,7 +697,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		bwp.setConversionService(conversionService);
 		Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
 		boolean isnew = _entity.isNew();
-		if (isIdAssigned())
+		boolean idAssigned = isIdAssigned();
+		if (idAssigned)
 			isnew = "true".equals(ServletActionContext.getRequest().getParameter("_isnew"));
 		if (!isnew) {
 			if (ownerProperty != null) {
@@ -749,7 +761,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		beforeSave((EN) _entity);
 		entityManager.save(_entity);
 		afterSave((EN) _entity);
-		if (isnew)
+		if (isnew && !idAssigned)
 			ServletActionContext.getResponse().addHeader("X-Postback", getEntityName() + ".id=" + _entity.getId());
 		if (versionPropertyName != null) {
 			Object currentVersion = bwp.getPropertyValue(versionPropertyName);
@@ -910,6 +922,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				_entity = getEntityClass().getConstructor().newInstance();
 				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 				bwp.setConversionService(conversionService);
+				String versionPropertyName = getVersionPropertyName();
+				if (versionPropertyName != null)
+					editedPropertyNames.add(versionPropertyName);
 				for (String name : editedPropertyNames)
 					bwp.setPropertyValue(name, bw.getPropertyValue(name));
 				bw = bwp;
