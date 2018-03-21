@@ -38800,7 +38800,7 @@ Observation._richtable = function(container) {
 		if (form.length) {
 			t.prop('action', form.prop('action')).attr('data-replacement',
 					form.attr('id'));
-			$('input[type="reset"]', t).click(function(e) {
+			$(':reset', t).click(function(e) {
 						$('.remove', t).click();
 						setTimeout(function() {
 									t.submit();
