@@ -137,6 +137,8 @@ public class EntityClassHelper {
 
 					UiConfigImpl uci = new UiConfigImpl(pd.getName(), pd.getReadMethod().getGenericReturnType(),
 							uiConfig);
+					if ("id".equals(pd.getName()))
+						uci.addCssClass("readonly-on-success");
 					Class<?> collectionType = uci.getCollectionType();
 					Class<?> elementType = uci.getElementType();
 					if (uiConfig == null || uiConfig.displayOrder() == Integer.MAX_VALUE) {
@@ -622,6 +624,8 @@ public class EntityClassHelper {
 						uci.setRequired(true);
 						// if (naturalIds.size() == 1)
 						uci.addCssClass("checkavailable");
+						if (!naturalIds.get(pd.getName()).mutable())
+							uci.addCssClass("readonly-on-success");
 						if (naturalIds.size() > 1) {
 							if (Persistable.class.isAssignableFrom(uci.getPropertyType())) {
 								List<String> list = new ArrayList<>(naturalIds.size() - 1);

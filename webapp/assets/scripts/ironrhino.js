@@ -33179,6 +33179,11 @@ Observation.common = function(container) {
 					Ajax.fire(target, 'onerror');
 				},
 				success : function(data, textStatus, xhr) {
+					$('.remove-on-success', target).remove();
+					$(':input.readonly-on-success', target).prop('readonly',
+							true);
+					$(':input.disabled-on-success', target).prop('disabled',
+							true);
 					var postback = xhr.getResponseHeader('X-Postback');
 					if (postback)
 						$.each(postback.split(', '), function(i, v) {
