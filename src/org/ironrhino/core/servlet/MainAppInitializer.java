@@ -36,7 +36,8 @@ public class MainAppInitializer implements WebApplicationInitializer {
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		AppInfo.initialize();
 		SERVLET_CONTEXT = servletContext;
-		String context = SERVLET_CONTEXT.getRealPath("/");
+		AppInfo.setContextPath(servletContext.getContextPath());
+		String context = servletContext.getRealPath("/");
 		if (context == null)
 			context = "";
 		System.setProperty("app.context", context);

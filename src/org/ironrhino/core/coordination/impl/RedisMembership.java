@@ -49,6 +49,8 @@ public class RedisMembership implements Membership {
 
 	@PostConstruct
 	public void afterPropertiesSet() {
+		if (AppInfo.getContextPath() == null) // not in servlet container
+			return;
 		taskScheduler.scheduleAtFixedRate(() -> {
 			for (String group : groups) {
 				List<String> members = getMembers(group);

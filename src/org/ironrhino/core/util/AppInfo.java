@@ -69,6 +69,8 @@ public class AppInfo {
 
 	private static int httpsPort = 0;
 
+	private static String contextPath = null;
+
 	private static final Stage STAGE;
 
 	private static final RunLevel RUNLEVEL;
@@ -223,6 +225,10 @@ public class AppInfo {
 		AppInfo.httpsPort = httpsPort;
 	}
 
+	public static void setContextPath(String contextPath) {
+		AppInfo.contextPath = contextPath;
+	}
+
 	public static Stage getStage() {
 		return STAGE;
 	}
@@ -248,6 +254,9 @@ public class AppInfo {
 		int httpPort = getHttpPort();
 		if (httpPort > 0)
 			sb.append(':').append(httpPort);
+		String contextPath = getContextPath();
+		if (StringUtils.isNotBlank(contextPath))
+			sb.append(contextPath);
 		return sb.toString();
 	}
 
@@ -295,6 +304,10 @@ public class AppInfo {
 
 	public static int getHttpsPort() {
 		return httpsPort;
+	}
+
+	public static String getContextPath() {
+		return contextPath;
 	}
 
 	public static String getNodePath() {
