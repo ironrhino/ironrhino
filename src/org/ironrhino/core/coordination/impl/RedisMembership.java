@@ -72,22 +72,23 @@ public class RedisMembership implements Membership {
 						conn.setUseCaches(false);
 						conn.connect();
 						if (conn.getResponseCode() == 200) {
-							InputStream is = conn.getInputStream();
-							List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
-							is.close();
-							if (lines.size() > 0) {
-								String value = lines.get(0).trim();
-								if (value.equals(member)) {
-									alive = true;
-								} else {
-									if (!members.contains(value) && value.length() <= 100
-											&& value.matches("[\\w-]+@[\\w.:]+")) {
-										if (AppInfo.getAppName().equals(value.substring(0, value.lastIndexOf('-')))) {
-											coordinationStringRedisTemplate.opsForList().rightPush(NAMESPACE + group,
-													value);
-										} else {
-											// multiple virtual host
-											alive = true;
+							try (InputStream is = conn.getInputStream()) {
+								List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
+								if (lines.size() > 0) {
+									String value = lines.get(0).trim();
+									if (value.equals(member)) {
+										alive = true;
+									} else {
+										if (!members.contains(value) && value.length() <= 100
+												&& value.matches("[\\w-]+@[\\w.:]+")) {
+											if (AppInfo.getAppName()
+													.equals(value.substring(0, value.lastIndexOf('-')))) {
+												coordinationStringRedisTemplate.opsForList()
+														.rightPush(NAMESPACE + group, value);
+											} else {
+												// multiple virtual host
+												alive = true;
+											}
 										}
 									}
 								}

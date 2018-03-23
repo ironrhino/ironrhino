@@ -69,13 +69,13 @@ public class RedisLockService implements LockService {
 				conn.setUseCaches(false);
 				conn.connect();
 				if (conn.getResponseCode() == 200) {
-					InputStream is = conn.getInputStream();
-					List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
-					is.close();
-					if (lines.size() > 0) {
-						String value = lines.get(0).trim();
-						if (value.equals(currentHolderInstanceId)) {
-							alive = true;
+					try (InputStream is = conn.getInputStream()) {
+						List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
+						if (lines.size() > 0) {
+							String value = lines.get(0).trim();
+							if (value.equals(currentHolderInstanceId)) {
+								alive = true;
+							}
 						}
 					}
 				}
