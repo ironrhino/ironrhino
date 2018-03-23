@@ -3,9 +3,16 @@ package org.ironrhino.core.coordination.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
@@ -24,8 +31,8 @@ public class RedisLockService implements LockService {
 
 	private static final String NAMESPACE = "lock:";
 
-	@Value("${lockService.maxHoldTime:3600}")
-	private int maxHoldTime = 3600;
+	@Value("${lockService.maxHoldTime:18000}")
+	private int maxHoldTime = 18000;
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
@@ -39,9 +46,48 @@ public class RedisLockService implements LockService {
 		Boolean success = coordinationStringRedisTemplate.opsForValue().setIfAbsent(key, holder);
 		if (success == null)
 			throw new RuntimeException("Unexpected null");
-		if (success)
+		if (success) {
 			coordinationStringRedisTemplate.expire(key, this.maxHoldTime, TimeUnit.SECONDS);
-		return success;
+			return true;
+		} else {
+			if (AppInfo.getContextPath() == null) // not in servlet container
+				return false;
+			String currentHolder = coordinationStringRedisTemplate.opsForValue().get(key);
+			if (currentHolder == null || currentHolder.startsWith(AppInfo.getInstanceId())) // self
+				return false;
+			String currentHolderInstanceId = currentHolder.substring(0, currentHolder.lastIndexOf('$'));
+			String url = new StringBuilder("http://")
+					.append(currentHolderInstanceId.substring(currentHolderInstanceId.lastIndexOf('@') + 1))
+					.append("/_ping?_internal_testing_").toString();
+			boolean alive = false;
+			try {
+				HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+				conn.setConnectTimeout(3000);
+				conn.setReadTimeout(2000);
+				conn.setInstanceFollowRedirects(false);
+				conn.setDoOutput(false);
+				conn.setUseCaches(false);
+				conn.connect();
+				if (conn.getResponseCode() == 200) {
+					InputStream is = conn.getInputStream();
+					List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
+					is.close();
+					if (lines.size() > 0) {
+						String value = lines.get(0).trim();
+						if (value.equals(currentHolderInstanceId)) {
+							alive = true;
+						}
+					}
+				}
+				conn.disconnect();
+			} catch (IOException e) {
+			}
+			if (!alive) {
+				coordinationStringRedisTemplate.delete(key);
+				return tryLock(name);
+			}
+			return false;
+		}
 	}
 
 	@Override
