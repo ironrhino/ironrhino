@@ -113,6 +113,8 @@ public class BalanceQueryService {
 
 	@Scheduled(fixedDelay = 5000)
 	public void dequeue() {
+		if (executorService.isShutdown())
+			return;
 		for (int i = 0; i < threads; i++)
 			executorService.submit(this::process);
 	}
