@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -647,17 +648,28 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	@Override
-	public long iterate(int fetchSize, IterateCallback callback) {
+	public long iterate(int fetchSize, IterateCallback<T> callback) {
 		return iterate(fetchSize, callback, null);
 	}
 
 	@Override
-	public long iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc) {
+	public long iterate(int fetchSize, IterateCallback<T> callback, DetachedCriteria dc) {
 		return iterate(fetchSize, callback, dc, false);
 	}
 
 	@Override
-	public long iterate(int fetchSize, IterateCallback callback, DetachedCriteria dc, boolean commitPerFetch) {
+	public long iterate(int fetchSize, IterateCallback<T> callback, DetachedCriteria dc, boolean commitPerFetch) {
+		return iterate(fetchSize, callback, null, dc, commitPerFetch);
+	}
+
+	@Override
+	public long iterate(int fetchSize, IterateCallback<T> callback, Consumer<T[]> afterCommitConsumer,
+			DetachedCriteria dc) {
+		return iterate(fetchSize, callback, afterCommitConsumer, dc, true);
+	}
+
+	protected long iterate(int fetchSize, IterateCallback<T> callback, Consumer<T[]> afterCommitConsumer,
+			DetachedCriteria dc, boolean commitPerFetch) {
 		Session iterateSession = sessionFactory.openSession();
 		iterateSession.setCacheMode(CacheMode.IGNORE);
 		Session callbackSession = commitPerFetch ? sessionFactory.openSession() : iterateSession;
@@ -693,20 +705,26 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 					// session
 					// in the flush process
 					buffer.put(prev);
-					count += buffer.flush();
+					T[] entities = buffer.flush();
+					count += entities.length;
 					prev = null;
 					if (commitPerFetch) {
 						transaction.commit();
 						transaction = callbackSession.beginTransaction();
 					}
+					if (afterCommitConsumer != null)
+						afterCommitConsumer.accept(entities);
 				}
 			}
 			if (prev != null) {
 				buffer.put(prev);
 			}
-			count += buffer.close();
+			T[] entities = buffer.close();
+			count += entities.length;
 			cursor.close();
 			transaction.commit();
+			if (afterCommitConsumer != null)
+				afterCommitConsumer.accept(entities);
 			return count;
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
@@ -732,39 +750,39 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		private T[] buffer;
 		private int currentIndex;
 		private Session hibernateSession;
-		private IterateCallback callback;
+		private IterateCallback<T> callback;
 
-		RowBuffer(Session hibernateSession, int fetchSize, IterateCallback callback) {
+		RowBuffer(Session hibernateSession, int fetchSize, IterateCallback<T> callback) {
 			this.hibernateSession = hibernateSession;
 			this.buffer = (T[]) Array.newInstance(getEntityClass(), fetchSize);
 			this.callback = callback;
 		}
 
-		public void put(T row) {
+		void put(T row) {
 			buffer[currentIndex] = row;
 			currentIndex++;
 		}
 
-		public boolean shouldFlush() {
+		boolean shouldFlush() {
 			return currentIndex >= buffer.length - 1;
 		}
 
-		public int close() {
-			int i = flush();
+		T[] close() {
+			T[] entities = flush();
 			buffer = null;
-			return i;
+			return entities;
 		}
 
-		private int flush() {
+		T[] flush() {
 			if (currentIndex == 0)
-				return -1;
-			callback.process(Arrays.copyOfRange(buffer, 0, currentIndex), hibernateSession);
+				return (T[]) Array.newInstance(getEntityClass(), 0);
+			T[] entities = Arrays.copyOfRange(buffer, 0, currentIndex);
+			callback.process(entities, hibernateSession);
 			Arrays.fill(buffer, null);
 			hibernateSession.flush();
 			hibernateSession.clear();
-			int result = currentIndex;
 			currentIndex = 0;
-			return result;
+			return entities;
 		}
 	}
 

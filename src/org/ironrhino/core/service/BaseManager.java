@@ -3,6 +3,7 @@ package org.ironrhino.core.service;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
@@ -86,6 +87,9 @@ public interface BaseManager<T extends Persistable<?>> {
 	public long iterate(int fetchSize, IterateCallback<T> callback, DetachedCriteria dc);
 
 	public long iterate(int fetchSize, IterateCallback<T> callback, DetachedCriteria dc, boolean commitPerFetch);
+
+	public long iterate(int fetchSize, IterateCallback<T> callback, Consumer<T[]> afterCommitConsumer,
+			DetachedCriteria dc);
 
 	@FunctionalInterface
 	public static interface IterateCallback<T> {

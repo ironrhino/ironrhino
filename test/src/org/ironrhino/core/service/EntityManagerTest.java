@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -21,7 +22,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
-import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -31,7 +31,6 @@ import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.model.ResultPage;
-import org.ironrhino.core.service.BaseManager.IterateCallback;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -290,44 +289,36 @@ public class EntityManagerTest {
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
-		long count = entityManager.iterate(2, new IterateCallback<Person>() {
-			@Override
-			public void process(Person[] entityArray, Session session) {
-				for (Person p : entityArray) {
-					if (p.getGender() == Gender.MALE) {
-						p.setGender(Gender.FEMALE);
-						session.update(p);
-					}
+		final AtomicInteger ai = new AtomicInteger();
+		long count = entityManager.iterate(2, (entities, session) -> {
+			for (Person p : entities) {
+				if (p.getGender() == Gender.MALE) {
+					p.setGender(Gender.FEMALE);
+					session.update(p);
 				}
 			}
-		}, dc, true);
+		}, people -> ai.getAndAdd(people.length), dc);
 		assertEquals(5, count);
+		assertEquals(5, ai.get());
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.FEMALE));
 		dc.addOrder(Order.asc("name"));
 		List<Person> males = new ArrayList<>();
-		count = entityManager.iterate(2, new IterateCallback<Person>() {
-			@Override
-			public void process(Person[] entityArray, Session session) {
-				for (Person p : entityArray) {
-					if (p.getGender() == Gender.FEMALE) {
-						p.setGender(Gender.MALE);
-						males.add(p);
-						session.update(p);
-					}
+		count = entityManager.iterate(2, (entities, session) -> {
+			for (Person p : entities) {
+				if (p.getGender() == Gender.FEMALE) {
+					p.setGender(Gender.MALE);
+					males.add(p);
+					session.update(p);
 				}
 			}
-		}, dc, false);
+		}, dc);
 		assertEquals(9, count);
 		assertEquals(9, males.size());
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
-		count = entityManager.iterate(2, new IterateCallback<Person>() {
-			@Override
-			public void process(Person[] entityArray, Session session) {
-
-			}
+		count = entityManager.iterate(2, (entities, session) -> {
 		}, dc, true);
 		assertEquals(9, count);
 		clearData();
