@@ -53,10 +53,10 @@
 	<tr>
 	<td><input type="text" value="${header.name}" placeholder="名字" readonly></td><td class="center middle"> = </td>
 	<td>
-	<#if param.values?has_content>
-	<select name="${param.name}"<#if param.required> class="required"</#if><#if param.multiple> multiple</#if>>
+	<#if header.values?has_content>
+	<select name="${header.name}"<#if header.required> class="required"</#if><#if header.multiple> multiple</#if>>
 		<option value=""></option>
-		<#list param.values as key,value>
+		<#list header.values as key,value>
 		<option value="${key}">${value}</option>
 		</#list>
 	</select>
