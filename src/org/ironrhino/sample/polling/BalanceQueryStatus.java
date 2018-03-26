@@ -4,7 +4,7 @@ import org.ironrhino.core.model.Displayable;
 
 public enum BalanceQueryStatus implements Displayable {
 
-	INITIALIZED, PROCESSING, SUCCESSFUL, FAILED;
+	INITIALIZED, PROCESSING, TEMPORARY_ERROR, SUCCESSFUL, FAILED;
 
 	@Override
 	public String toString() {

@@ -52,4 +52,7 @@ public class BalanceQuery extends BaseEntity {
 	@Column(insertable = false)
 	private String errorInfo;
 
+	@UiConfig(width = "80px", alias = "尝试次数")
+	private int attempts;
+
 }
