@@ -22,8 +22,8 @@ public class TradeArchiveTask {
 	private JdbcTemplate jdbcTemplate;
 
 	@Transactional
-	public void execute(Date workdate) throws Exception {
-		Date date = DateUtils.addDays(workdate, -offset);
+	public void execute() throws Exception {
+		Date date = DateUtils.addDays(new Date(), -offset);
 		int insertedRows = jdbcTemplate.update(
 				"insert into sample_historical_trade select * from sample_current_trade where workdate < ?", date);
 		int deletedRows = jdbcTemplate.update("delete from sample_current_trade where workdate < ?", date);
