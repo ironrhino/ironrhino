@@ -1,8 +1,8 @@
-package org.ironrhino.sample.polling;
+package org.ironrhino.common.model;
 
 import org.ironrhino.core.model.Displayable;
 
-public enum BalanceQueryStatus implements Displayable {
+public enum PollingStatus implements Displayable {
 
 	INITIALIZED, PROCESSING, TEMPORARY_ERROR, SUCCESSFUL, FAILED;
 
