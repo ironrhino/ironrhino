@@ -93,7 +93,9 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 				+ " t set t.status=?3,t.modifyDate=?4,t.errorInfo=?5,t.attempts=t.attempts+1 where t.id=?1 and t.status=?2";
 		enqueueLockName = StringUtils.uncapitalize(getClass().getSimpleName()) + ".enqueue()";
 		threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreads() + 1,
-				new NameableThreadFactory(StringUtils.uncapitalize(getClass().getSimpleName())));
+				new NameableThreadFactory(StringUtils.uncapitalize(getClass().getSimpleName()), (t, e) -> {
+					logger.error(e.getMessage(), e);
+				}));
 	}
 
 	@PreDestroy
@@ -105,7 +107,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 	public void enqueue() {
 		if (threadPoolExecutor.isShutdown())
 			return;
-		threadPoolExecutor.submit(() -> {
+		threadPoolExecutor.execute(() -> {
 			if (lockService.tryLock(enqueueLockName)) {
 				try {
 					doEnqueue();
@@ -172,7 +174,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 		if (threadPoolExecutor.isShutdown())
 			return;
 		for (int i = 0; i < getThreads() - threadPoolExecutor.getActiveCount(); i++)
-			threadPoolExecutor.submit(this::doDequeue);
+			threadPoolExecutor.execute(this::doDequeue);
 	}
 
 	protected void doDequeue() {

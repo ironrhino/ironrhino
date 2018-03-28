@@ -1,22 +1,38 @@
 package org.ironrhino.core.util;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NameableThreadFactory implements ThreadFactory {
-	private final ThreadGroup group;
+
+	private static final Logger logger = LoggerFactory.getLogger(NameableThreadFactory.class);
+
 	private final AtomicInteger threadNumber = new AtomicInteger(1);
+	private final ThreadGroup group;
 	private final String namePrefix;
+	private final UncaughtExceptionHandler uncaughtExceptionHandler;
 
 	public NameableThreadFactory(String poolName) {
-		this(poolName, null);
+		this(poolName, null, null);
 	}
 
 	public NameableThreadFactory(String poolName, String threadGroupName) {
+		this(poolName, threadGroupName, null);
+	}
+
+	public NameableThreadFactory(String poolName, UncaughtExceptionHandler uncaughtExceptionHandler) {
+		this(poolName, null, uncaughtExceptionHandler);
+	}
+
+	public NameableThreadFactory(String poolName, String threadGroupName,
+			UncaughtExceptionHandler uncaughtExceptionHandler) {
 		SecurityManager s = System.getSecurityManager();
-		group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+		this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isNotBlank(poolName)) {
 			sb.append(poolName);
@@ -26,7 +42,10 @@ public class NameableThreadFactory implements ThreadFactory {
 			sb.append(threadGroupName);
 			sb.append("-");
 		}
-		namePrefix = sb.toString();
+		this.namePrefix = sb.toString();
+		this.uncaughtExceptionHandler = uncaughtExceptionHandler != null ? uncaughtExceptionHandler : (t, e) -> {
+			logger.error(e.getMessage(), e);
+		};
 	}
 
 	@Override
@@ -36,6 +55,8 @@ public class NameableThreadFactory implements ThreadFactory {
 			t.setDaemon(false);
 		if (t.getPriority() != Thread.NORM_PRIORITY)
 			t.setPriority(Thread.NORM_PRIORITY);
+		if (uncaughtExceptionHandler != null)
+			t.setUncaughtExceptionHandler(uncaughtExceptionHandler);
 		return t;
 	}
 }

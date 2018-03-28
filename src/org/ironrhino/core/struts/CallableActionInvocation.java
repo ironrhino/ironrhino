@@ -63,7 +63,7 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 			Result result = new Result() {
 				@Override
 				public void execute(ActionInvocation actionInvocation) throws Exception {
-					es.submit(() -> {
+					es.execute(() -> {
 						try {
 							SecurityContextHolder.setContext(sc);
 							ActionContext.setContext(context);

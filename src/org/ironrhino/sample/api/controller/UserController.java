@@ -75,7 +75,7 @@ public class UserController {
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
 	public DeferredResult<User> get(final @Length(min = 3, max = 20) @PathVariable String username) {
 		final DeferredResult<User> dr = new DeferredResult<>(5000L, RestStatus.REQUEST_TIMEOUT);
-		executorService.submit(() -> {
+		executorService.execute(() -> {
 			User u = (User) userManager.loadUserByUsername(username);
 			if (u == null)
 				dr.setErrorResult(RestStatus.NOT_FOUND);
@@ -130,7 +130,8 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/{username}/password", method = RequestMethod.PATCH)
-	public RestStatus validatePassword(@Length(min = 3, max = 20) @PathVariable String username, @RequestBody User user) {
+	public RestStatus validatePassword(@Length(min = 3, max = 20) @PathVariable String username,
+			@RequestBody User user) {
 		User u = (User) userManager.loadUserByUsername(username);
 		if (u == null)
 			throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, "username invalid");
