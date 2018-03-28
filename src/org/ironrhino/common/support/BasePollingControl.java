@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -56,6 +57,8 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 	private int _resubmitIntervalInSeconds = 600;
 
 	private ThreadPoolExecutor threadPoolExecutor;
+
+	private BoundListOperations<String, String> boundListOperations;
 
 	private Class<T> entityClass;
 
@@ -96,6 +99,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 				new NameableThreadFactory(StringUtils.uncapitalize(getClass().getSimpleName()), (t, e) -> {
 					logger.error(e.getMessage(), e);
 				}));
+		boundListOperations = stringRedisTemplate.boundListOps(getQueueName());
 	}
 
 	@PreDestroy
@@ -132,7 +136,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 		}, entities -> {
 			// enqueue after commit status change
 			for (BasePollingEntity entity : entities) {
-				push(entity.getId());
+				push(entity.getId(), false);
 				logger.info("enqueue {}", entity);
 			}
 		}, dc);
@@ -148,7 +152,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 			dc.add(Restrictions.lt("modifyDate", cal.getTime()));
 			entityManager.iterate(10, (entities, session) -> {
 				for (T entity : entities) {
-					push(entity.getId());
+					push(entity.getId(), true);
 					logger.info("enqueue {} retried", entity);
 				}
 			}, dc);
@@ -163,8 +167,8 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 		dc.addOrder(Order.asc("createDate"));
 		entityManager.iterate(batchSize, (entities, session) -> {
 			for (T entity : entities) {
-				push(entity.getId());
-				logger.info("enqueue {} repeated", entity);
+				push(entity.getId(), true);
+				logger.info("enqueue {} resubmitted", entity);
 			}
 		}, dc);
 	}
@@ -249,26 +253,25 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 		return entityClass.getName();
 	}
 
-	protected void push(String id) {
-		if (isIdempotent())
-			stringRedisTemplate.opsForList().leftPush(getQueueName(), id);
-		else
-			stringRedisTemplate.opsForSet().add(getQueueName(), id);
+	public long getQueueDepth() {
+		return boundListOperations.size();
+	}
+
+	protected void push(String id, boolean deduplication) {
+		if (deduplication && boundListOperations.remove(1, id) > 0) {
+			logger.warn("cutting {}", id);
+			boundListOperations.rightPush(id);
+			return;
+		}
+		boundListOperations.leftPush(id);
 	}
 
 	protected String pop() {
-		if (isIdempotent())
-			return stringRedisTemplate.opsForList().rightPop(getQueueName());
-		else
-			return stringRedisTemplate.opsForSet().pop(getQueueName());
+		return boundListOperations.rightPop();
 	}
 
 	protected boolean isTemporaryError(Exception e) {
 		return e instanceof IOException || e.getCause() instanceof IOException;
-	}
-
-	protected boolean isIdempotent() {
-		return true;
 	}
 
 	protected void afterUpdated(Session session, T entity) {
