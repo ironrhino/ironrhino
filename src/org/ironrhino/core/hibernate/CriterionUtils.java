@@ -150,6 +150,11 @@ public class CriterionUtils {
 						continue;
 					}
 					UiConfigImpl config = uiConfigs.get(topPropertyName);
+					if (topPropertyName.equals("id") && config == null) {
+						config = new UiConfigImpl("id",
+								entityBeanWrapper.getPropertyDescriptor("id").getReadMethod().getGenericReturnType(),
+								null);
+					}
 					if (config != null && !config.isExcludedFromOrdering()) {
 						int index;
 						if ((index = propertyName.indexOf('.')) > 0) {
@@ -210,6 +215,10 @@ public class CriterionUtils {
 				propertyName = trimEntityNamePrefixAndIdSuffix(propertyName, entityName);
 				String topPropertyName = getTopPropertyName(propertyName);
 				UiConfigImpl config = uiConfigs.get(topPropertyName);
+				if (topPropertyName.equals("id") && config == null) {
+					config = new UiConfigImpl("id",
+							entityBeanWrapper.getPropertyDescriptor("id").getReadMethod().getGenericReturnType(), null);
+				}
 				if (config == null || config.isExcludedFromCriteria())
 					continue;
 				CriterionOperator operator = null;
