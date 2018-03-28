@@ -388,10 +388,10 @@ public class CriterionUtils {
 							e.printStackTrace();
 						}
 					} else {
-						if (!operator.isEffective(type, parameterValues))
-							if (!("dictionary".equals(config.getType())
-									&& (operator == CriterionOperator.IN || operator == CriterionOperator.NOTIN)))
+						if (!operator.isEffective(type, parameterValues)) {
+							if (operator != CriterionOperator.IN && operator != CriterionOperator.NOTIN)
 								continue;
+						}
 						values = new Object[parameterValues.length];
 						for (int n = 0; n < values.length; n++) {
 							entityBeanWrapper.setPropertyValue(propertyName, parameterValues[n]);
