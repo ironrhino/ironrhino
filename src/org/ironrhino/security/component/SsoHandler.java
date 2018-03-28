@@ -44,7 +44,7 @@ import org.springframework.web.client.RestTemplate;
 @Component("org.ironrhino.security.component.SsoHandler")
 public class SsoHandler extends AccessHandler {
 
-	private static final String EXCLUDED_PATTERN = "/setup,/oauth/*,/assets/*,/remoting/*";
+	private static final String EXCLUDED_PATTERN = "/setup,/oauth/oauth2/*,/assets/*,/remoting/*";
 
 	@Value("${ssoHandler.pattern:}")
 	protected String pattern;
