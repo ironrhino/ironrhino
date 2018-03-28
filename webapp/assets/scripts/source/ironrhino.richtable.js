@@ -891,6 +891,7 @@ Observation._richtable = function(container) {
 										+ '" data-parameters="' + v.parameters
 										+ '">' + v.label + '</option>');
 						});
+				$('td:eq(2)', t.closest('tr')).html('');
 				operator.change();
 			} else {
 				operator.removeAttr('name');
@@ -908,6 +909,8 @@ Observation._richtable = function(container) {
 			var option = $('option:selected', property);
 			var size = parseInt($('option:selected', t).data('parameters'));
 			var td = $('td:eq(2)', t.closest('tr'));
+			if (size == $(':input', td).length)
+				return;
 			$(':input,.input-pseudo,.removeonadd,label', td).remove();
 			if (size > 0) {
 				if ('select' == option.data('type')) {
