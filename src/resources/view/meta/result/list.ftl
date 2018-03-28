@@ -72,9 +72,11 @@
 		<#if !hidden && config.hiddenInList.expression?has_content>
 		<#assign hidden=config.hiddenInList.expression?eval>
 		</#if>
-		<#if !hidden && parameterNamesInQueryString?seq_contains(key) && !Parameters[key+'-op']?has_content>
+		<#--
+		<#if !hidden && parameterNamesInQueryString?seq_contains(key) && !Parameters[key+'-op']?has_content && request.getParameterValues(key)?size==1>
 		<#assign hidden=true/>
 		</#if>
+		-->
 		<#if !hidden>
 			<#assign columns+=[key]>
 			<#if resultPage.result?size gt 0 && config['showSum']>
@@ -141,9 +143,11 @@
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval>
 	</#if>
+	<#--
 	<#if !hidden && parameterNamesInQueryString?seq_contains(key) && !Parameters[key+'-op']?has_content>
 	<#assign hidden=true/>
 	</#if>
+	-->
 	<#if !hidden>
 		<#assign _celleditable=celleditable>
 		<#if config.inverseRelation||config.readonly.value>
@@ -211,9 +215,11 @@
 	<#if !hidden && config.hiddenInList.expression?has_content>
 	<#assign hidden=config.hiddenInList.expression?eval/>
 	</#if>
+	<#--
 	<#if !hidden && parameterNamesInQueryString?seq_contains(key) && !Parameters[key+'-op']?has_content>
 	<#assign hidden=true/>
 	</#if>
+	-->
 	<#if !hidden>
 		<#if config.type=='enum'>
 		<template id="rt_select_template_${key}">
