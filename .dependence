@@ -23,7 +23,9 @@
 +spring-data-commons
 +spring-data-keyvalue
 +spring-data-redis
-+jedis
+-jedis
++lettuce-core
++netty-all
 -xmemcached
 -ironrhino-redis-config
 -eaxy
