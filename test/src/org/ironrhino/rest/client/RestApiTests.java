@@ -24,7 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = { "ctx.xml" })
+@ContextConfiguration(classes = RestClientConfiguration.class)
 public class RestApiTests {
 
 	@Autowired

@@ -7,7 +7,6 @@ import org.ironrhino.core.sequence.cyclic.RedisCyclicSequence;
 import org.ironrhino.core.sequence.simple.RedisSimpleSequence;
 import org.ironrhino.core.spring.configuration.RedisConfiguration;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,12 +19,12 @@ public class RedisSequenceTests extends SequenceTestBase {
 	@Configuration
 	static class RedisSequenceConfiguration extends RedisConfiguration {
 
-		@Bean(autowire = Autowire.BY_NAME)
+		@Bean
 		public Sequence sample1Sequence() {
 			return new RedisSimpleSequence();
 		}
 
-		@Bean(autowire = Autowire.BY_NAME)
+		@Bean
 		public Sequence sample2Sequence() {
 			RedisCyclicSequence cs = new RedisCyclicSequence();
 			cs.setCycleType(CycleType.MINUTE);

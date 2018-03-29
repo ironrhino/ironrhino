@@ -40,7 +40,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import lombok.Data;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = { "ctx.xml" })
+@ContextConfiguration(classes = HibernateConfiguration.class)
 public class EntityManagerTest {
 
 	@Autowired

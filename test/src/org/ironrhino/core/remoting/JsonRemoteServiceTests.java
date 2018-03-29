@@ -2,9 +2,12 @@ package org.ironrhino.core.remoting;
 
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = { "json.xml" })
+@ContextConfiguration(classes = RemotingConfiguration.class)
+@TestPropertySource(properties = "serializationType=JSON")
 public class JsonRemoteServiceTests extends RemoteServiceTestsBase {
+
 }

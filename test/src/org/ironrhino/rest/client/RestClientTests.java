@@ -7,27 +7,27 @@ import java.io.IOException;
 
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.domain.User;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = RestClientConfiguration.class)
 public class RestClientTests {
 
-	private static RestClient restClient;
-
-	@BeforeClass
-	public static void setup() {
-		restClient = new RestClient("http://localhost:8080/api", "http://localhost:8080/oauth/oauth2/token",
-				"1IbhUczby8QGuxIcA3zUQF", "76IytucIQQgKWDG06xGPsA");
-	}
+	@Autowired
+	private RestClient restClient;
 
 	@Test
 	public void testFetchAccessToken() {
