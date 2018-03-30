@@ -20,7 +20,7 @@ import lombok.Setter;
 @ClassPresentConditional("org.springframework.data.redis.connection.RedisConnectionFactory")
 @Getter
 @Setter
-public class GlobalRedisConfiguration extends RedisConfigurationBase {
+public class GlobalRedisConfiguration extends RedisConfiguration {
 
 	// alias for hostName
 	@Value("${global.redis.host:}")
@@ -68,25 +68,25 @@ public class GlobalRedisConfiguration extends RedisConfigurationBase {
 	@Value("${global.redis.useSsl:false}")
 	private boolean useSsl;
 
-	@Bean
-	public RedisConnectionFactory globalRedisConnectionFactory() {
-		return super.createRedisConnectionFactory();
+	@Bean(name = "globalRedisConnectionFactory")
+	public RedisConnectionFactory redisConnectionFactory() {
+		return super.redisConnectionFactory();
 	}
 
-	@Bean
-	public RedisTemplate<String, ?> globalRedisTemplate() {
-		return super.createRedisTemplate(globalRedisConnectionFactory());
+	@Bean(name = "globalRedisTemplate")
+	public RedisTemplate<String, ?> redisTemplate() {
+		return super.redisTemplate();
 	}
 
-	@Bean
-	public StringRedisTemplate globalStringRedisTemplate() {
-		return super.createStringRedisTemplate(globalRedisConnectionFactory());
+	@Bean(name = "globalStringRedisTemplate")
+	public StringRedisTemplate stringRedisTemplate() {
+		return super.stringRedisTemplate();
 	}
 
-	@Bean
-	public RedisMessageListenerContainer globalRedisMessageListenerContainer(
+	@Bean(name = "globalRedisMessageListenerContainer")
+	public RedisMessageListenerContainer redisMessageListenerContainer(
 			@Autowired(required = false) ExecutorService executorService) {
-		return super.createRedisMessageListenerContainer(globalRedisConnectionFactory(), executorService);
+		return super.redisMessageListenerContainer(executorService);
 	}
 
 }
