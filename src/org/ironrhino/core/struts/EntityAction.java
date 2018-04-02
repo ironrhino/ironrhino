@@ -610,7 +610,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			String versionPropertyName = getVersionPropertyName();
 			if (versionPropertyName != null) {
 				Object version = bw.getPropertyValue(versionPropertyName);
-				if (version.equals(0)) {
+				if (version instanceof Number && ((Number) version).intValue() == 0) {
 					bw.setPropertyValue(versionPropertyName, -1);
 				}
 			}

@@ -242,6 +242,8 @@ public class RedisCacheManager implements CacheManager {
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		String actualkey = generateKey(key, namespace);
 		Long result = cacheRedisTemplate.opsForValue().increment(actualkey, delta);
+		if (result == null)
+			throw new RuntimeException("Unexpected null");
 		if (timeToLive > 0)
 			cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
 		return result;

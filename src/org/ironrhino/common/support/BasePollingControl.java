@@ -254,14 +254,18 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 	}
 
 	public long getQueueDepth() {
-		return boundListOperations.size();
+		Long size = boundListOperations.size();
+		return size != null ? size : 0;
 	}
 
 	protected void push(String id, boolean deduplication) {
-		if (deduplication && boundListOperations.remove(1, id) > 0) {
-			logger.warn("cutting {}", id);
-			boundListOperations.rightPush(id);
-			return;
+		if (deduplication) {
+			Long removed = boundListOperations.remove(1, id);
+			if (removed != null && removed > 0) {
+				logger.warn("cutting {}", id);
+				boundListOperations.rightPush(id);
+				return;
+			}
 		}
 		boundListOperations.leftPush(id);
 	}
