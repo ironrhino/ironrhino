@@ -15,7 +15,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
@@ -36,7 +35,7 @@ import org.hibernate.tool.schema.spi.SchemaMigrator;
 import org.hibernate.tool.schema.spi.SourceDescriptor;
 import org.hibernate.tool.schema.spi.TargetDescriptor;
 import org.ironrhino.core.jdbc.DatabaseProduct;
-import org.ironrhino.core.spring.configuration.BeanPresentConditional;
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +43,7 @@ import org.springframework.stereotype.Component;
 
 @SuppressWarnings("rawtypes")
 @Component
-@BeanPresentConditional(type = SessionFactory.class)
+@ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.internal.SchemaManagementToolInitiator {
 
 	@Autowired

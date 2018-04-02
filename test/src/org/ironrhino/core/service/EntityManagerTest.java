@@ -35,12 +35,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.Data;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = HibernateConfiguration.class)
+@TestPropertySource(properties = "annotatedClasses=org.ironrhino.core.service.Person")
 public class EntityManagerTest {
 
 	@Autowired
