@@ -111,7 +111,7 @@ public class AppInfo {
 		if (address == null)
 			try {
 				Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-				while (e.hasMoreElements()) {
+				loop: while (e.hasMoreElements()) {
 					NetworkInterface n = e.nextElement();
 					Enumeration<InetAddress> ee = n.getInetAddresses();
 					while (ee.hasMoreElements()) {
@@ -120,7 +120,7 @@ public class AppInfo {
 						if (ip.equals("127.0.0.1") || ip.split("\\.").length != 4 || ip.startsWith("169.254."))
 							continue;
 						address = ip;
-						break;
+						break loop;
 					}
 				}
 			} catch (SocketException e) {
