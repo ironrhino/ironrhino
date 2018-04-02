@@ -1,5 +1,7 @@
 package org.ironrhino.security.component;
 
+import static org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional.ANY;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
-import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.User;
 import org.slf4j.MDC;
@@ -39,9 +40,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-@BeanPresentConditional(name = "ssoHandler", negated = true)
-@ApplicationContextPropertiesConditional(key = "portal.baseUrl", value = ApplicationContextPropertiesConditional.ANY)
-@Component("org.ironrhino.security.component.SsoHandler")
+@ApplicationContextPropertiesConditional(key = "portal.baseUrl", value = ANY)
+@Component
 public class SsoHandler extends AccessHandler {
 
 	private static final String EXCLUDED_PATTERN = "/setup,/oauth/oauth2/*,/assets/*,/remoting/*";

@@ -1,5 +1,7 @@
 package org.ironrhino.core.servlet.handles;
 
+import static org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional.ANY;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -9,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@ApplicationContextPropertiesConditional(key = "sitemesh.decorator.default", value = ApplicationContextPropertiesConditional.ANY)
+@ApplicationContextPropertiesConditional(key = "sitemesh.decorator.default", value = ANY)
 public class SitemeshHandler extends AccessHandler {
 
 	@Value("${sitemesh.decorator.default:}")
