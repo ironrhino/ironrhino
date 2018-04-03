@@ -7,13 +7,13 @@ import java.io.EOFException;
 import java.io.ObjectStreamConstants;
 import java.io.StreamCorruptedException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.serializer.support.SerializationFailedException;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -157,25 +156,10 @@ public class RedisCacheManager implements CacheManager {
 		if (map == null)
 			return;
 		try {
-			final Map<byte[], byte[]> actualMap = new HashMap<>();
-			for (Map.Entry<String, Object> entry : map.entrySet())
-				actualMap.put(cacheRedisTemplate.getKeySerializer().serialize(generateKey(entry.getKey(), namespace)),
-						cacheRedisTemplate.getValueSerializer().serialize(entry.getValue()));
-			cacheRedisTemplate.execute((RedisConnection conn) -> {
-				conn.multi();
-				try {
-					conn.mSet(actualMap);
-					if (timeToLive > 0)
-						for (byte[] k : actualMap.keySet())
-							conn.expire(k, timeToLive);
-					conn.exec();
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-					conn.discard();
-				}
-				return null;
-			});
-
+			Map<String, Object> temp = new HashMap<>();
+			map.forEach((key, value) -> temp.put(generateKey(key, namespace), value));
+			cacheRedisTemplate.opsForValue().multiSet(temp);
+			temp.keySet().forEach(key -> cacheRedisTemplate.expire(key, timeToLive, timeUnit));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -185,19 +169,16 @@ public class RedisCacheManager implements CacheManager {
 	public Map<String, Object> mget(Set<String> keys, String namespace) {
 		if (keys == null)
 			return null;
-		final List<byte[]> _keys = new ArrayList<>();
-		for (String key : keys)
-			_keys.add(cacheRedisTemplate.getKeySerializer().serialize(generateKey(key, namespace)));
 		try {
-			List<byte[]> values = (List<byte[]>) cacheRedisTemplate
-					.execute((RedisConnection conn) -> conn.mGet(_keys.toArray(new byte[0][0])));
-			Map<String, Object> map = new HashMap<>();
+			List<Object> list = cacheRedisTemplate.opsForValue()
+					.multiGet(keys.stream().map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
+			Map<String, Object> result = new HashMap<>();
 			int i = 0;
 			for (String key : keys) {
-				map.put(key, cacheRedisTemplate.getValueSerializer().deserialize(values.get(i)));
+				result.put(key, list.get(i));
 				i++;
 			}
-			return map;
+			return result;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return null;
@@ -209,19 +190,8 @@ public class RedisCacheManager implements CacheManager {
 		if (keys == null)
 			return;
 		try {
-			cacheRedisTemplate.execute((RedisConnection conn) -> {
-				conn.multi();
-				try {
-					for (String key : keys)
-						if (StringUtils.isNotBlank(key))
-							conn.del(cacheRedisTemplate.getKeySerializer().serialize(generateKey(key, namespace)));
-					conn.exec();
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-					conn.discard();
-				}
-				return null;
-			});
+			cacheRedisTemplate
+					.delete(keys.stream().map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

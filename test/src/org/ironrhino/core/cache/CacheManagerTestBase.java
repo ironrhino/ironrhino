@@ -58,8 +58,8 @@ public abstract class CacheManagerTestBase {
 	@Test
 	public void testMulti() {
 		Map<String, Object> map = new HashMap<>();
-		map.put("test1", "value1");
-		map.put("test2", "value2");
+		for (int i = 0; i < 10; i++)
+			map.put("test" + i, "value" + i);
 		cacheManager.mput(map, 2, TimeUnit.SECONDS, NAMESPACE);
 		assertEquals(map, cacheManager.mget(map.keySet(), NAMESPACE));
 		try {
