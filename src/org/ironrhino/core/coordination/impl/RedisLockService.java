@@ -39,6 +39,10 @@ public class RedisLockService implements LockService {
 	@PriorityQualifier
 	private StringRedisTemplate coordinationStringRedisTemplate;
 
+	private RedisScript<Long> compareAndDeleteScript = new DefaultRedisScript<>(
+			"if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return redis.call(\"exists\",KEYS[1]) == 0 and 2 or 0 end",
+			Long.class);
+
 	@Override
 	public boolean tryLock(String name) {
 		String key = NAMESPACE + name;
@@ -117,9 +121,8 @@ public class RedisLockService implements LockService {
 	public void unlock(String name) {
 		String key = NAMESPACE + name;
 		String holder = holder();
-		String str = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return redis.call(\"exists\",KEYS[1]) == 0 and 2 or 0 end";
-		RedisScript<Long> script = new DefaultRedisScript<>(str, Long.class);
-		Long ret = coordinationStringRedisTemplate.execute(script, Collections.singletonList(key), holder);
+		Long ret = coordinationStringRedisTemplate.execute(compareAndDeleteScript, Collections.singletonList(key),
+				holder);
 		if (ret == null)
 			throw new RuntimeException("Unexpected null");
 		if (ret == 0) {
