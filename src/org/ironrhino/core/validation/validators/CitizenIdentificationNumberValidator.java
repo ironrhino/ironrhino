@@ -51,7 +51,7 @@ public class CitizenIdentificationNumberValidator implements ConstraintValidator
 	private static int getPowerSum(char[] bits) {
 		int sum = 0;
 		for (int i = 0; i < bits.length; i++) {
-			int bit = (int) bits[i] - '0';
+			int bit = bits[i] - '0';
 			sum += bit * power[i];
 		}
 		return sum;
@@ -59,7 +59,7 @@ public class CitizenIdentificationNumberValidator implements ConstraintValidator
 
 	private static char getCheckBit(int sum) {
 		int modulus = sum % 11;
-		return modulus == 0 ? '1' : modulus == 1 ? '0' : modulus == 2 ? 'X' : (char) ((int) '0' + (12 - modulus));
+		return modulus == 0 ? '1' : modulus == 1 ? '0' : modulus == 2 ? 'X' : (char) ('0' + (12 - modulus));
 	}
 
 	private static final List<String> provinces = Arrays.asList(new String[] { "11", "12", "13", "14", "15", "21", "22",

@@ -32,6 +32,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -146,7 +147,7 @@ public class CommonConfiguration {
 					basenames.add(name);
 		}
 		Collections.reverse(basenames);
-		return basenames.stream().map(s -> ResourcePatternResolver.CLASSPATH_URL_PREFIX + s)
+		return basenames.stream().map(s -> ResourceLoader.CLASSPATH_URL_PREFIX + s)
 				.collect(Collectors.toList()).toArray(new String[0]);
 	}
 

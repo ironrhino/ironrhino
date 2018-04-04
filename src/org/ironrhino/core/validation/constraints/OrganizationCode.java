@@ -15,7 +15,7 @@ import org.ironrhino.core.validation.validators.OrganizationCodeValidator;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = { OrganizationCodeValidator.class })
 public @interface OrganizationCode {
-	
+
 	String message() default "{org.ironrhino.core.validation.validators.constraints.OrganizationCode.message}";
 
 	Class<?>[] groups() default {};

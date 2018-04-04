@@ -17,6 +17,7 @@ public class YearMonthType extends AbstractSingleColumnStandardBasicType<YearMon
 		super(VarcharTypeDescriptor.INSTANCE, YearMonthJavaTypeDescriptor.INSTANCE);
 	}
 
+	@Override
 	public String getName() {
 		return YearMonth.class.getSimpleName();
 	}
@@ -26,6 +27,7 @@ public class YearMonthType extends AbstractSingleColumnStandardBasicType<YearMon
 		return true;
 	}
 
+	@Override
 	public String objectToSQLString(YearMonth value, Dialect dialect) throws Exception {
 		return String.valueOf(value);
 	}

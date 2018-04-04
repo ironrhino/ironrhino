@@ -29,6 +29,7 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 
 	public static final String CONFIG_LOCATION = "classpath*:resources/spring/applicationContext-*.xml";
 
+	@Override
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc) {
 		sc.setInitParameter(CONFIG_LOCATION_PARAM, CONFIG_LOCATION);
 		super.configureAndRefreshWebApplicationContext(wac, sc);

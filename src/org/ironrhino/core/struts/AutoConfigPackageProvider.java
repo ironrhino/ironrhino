@@ -24,7 +24,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -136,8 +136,8 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		List<String> basenames = new ArrayList<>(messageSource.getBasenameSet());
 		Collections.reverse(basenames);
 		basenames.stream().forEach(name -> {
-			if (name.startsWith(ResourcePatternResolver.CLASSPATH_URL_PREFIX))
-				name = name.substring(ResourcePatternResolver.CLASSPATH_URL_PREFIX.length());
+			if (name.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX))
+				name = name.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length());
 			name = org.springframework.util.ClassUtils.convertResourcePathToClassName(name);
 			LocalizedTextUtil.addDefaultResourceBundle(name);
 			logger.info("Loading global messages from " + name);

@@ -16,6 +16,7 @@ public class YearMonthJavaTypeDescriptor extends AbstractTypeDescriptor<YearMont
 	public static class YearMonthComparator implements Comparator<YearMonth> {
 		public static final YearMonthComparator INSTANCE = new YearMonthComparator();
 
+		@Override
 		public int compare(YearMonth o1, YearMonth o2) {
 			return o1.toString().compareTo(o2.toString());
 		}
@@ -31,10 +32,12 @@ public class YearMonthJavaTypeDescriptor extends AbstractTypeDescriptor<YearMont
 		return YearMonthComparator.INSTANCE;
 	}
 
+	@Override
 	public String toString(YearMonth value) {
 		return value.toString();
 	}
 
+	@Override
 	public YearMonth fromString(String string) {
 		if (string == null || string.isEmpty()) {
 			return null;
@@ -42,6 +45,7 @@ public class YearMonthJavaTypeDescriptor extends AbstractTypeDescriptor<YearMont
 		return YearMonth.parse(string);
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked" })
 	public <X> X unwrap(YearMonth value, Class<X> type, WrapperOptions options) {
 		if (value == null) {
@@ -53,6 +57,7 @@ public class YearMonthJavaTypeDescriptor extends AbstractTypeDescriptor<YearMont
 		throw unknownUnwrap(type);
 	}
 
+	@Override
 	public <X> YearMonth wrap(X value, WrapperOptions options) {
 		if (value == null) {
 			return null;

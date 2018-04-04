@@ -45,7 +45,7 @@ public class SocialCreditIdentifierValidator implements ConstraintValidator<Soci
 		int sum = 0;
 		for (int i = 0; i < bits.length; i++) {
 			char ch = bits[i];
-			int bit = Character.isDigit(ch) ? (int) bits[i] - '0' : characters.indexOf(ch) + 10;
+			int bit = Character.isDigit(ch) ? bits[i] - '0' : characters.indexOf(ch) + 10;
 			sum += bit * power[i];
 		}
 		return sum;

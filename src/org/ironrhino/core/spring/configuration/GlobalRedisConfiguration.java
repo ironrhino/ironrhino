@@ -68,21 +68,25 @@ public class GlobalRedisConfiguration extends RedisConfiguration {
 	@Value("${global.redis.useSsl:false}")
 	private boolean useSsl;
 
+	@Override
 	@Bean(name = "globalRedisConnectionFactory")
 	public RedisConnectionFactory redisConnectionFactory() {
 		return super.redisConnectionFactory();
 	}
 
+	@Override
 	@Bean(name = "globalRedisTemplate")
 	public RedisTemplate<String, ?> redisTemplate() {
 		return super.redisTemplate();
 	}
 
+	@Override
 	@Bean(name = "globalStringRedisTemplate")
 	public StringRedisTemplate stringRedisTemplate() {
 		return super.stringRedisTemplate();
 	}
 
+	@Override
 	@Bean(name = "globalRedisMessageListenerContainer")
 	public RedisMessageListenerContainer redisMessageListenerContainer(
 			@Autowired(required = false) ExecutorService executorService) {

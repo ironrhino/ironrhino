@@ -32,7 +32,7 @@ public class OrganizationCodeValidator implements ConstraintValidator<Organizati
 		int sum = 0;
 		for (int i = 0; i < bits.length; i++) {
 			char ch = bits[i];
-			int bit = ch > '9' ? (ch - 'A' + 10) : (int) bits[i] - '0';
+			int bit = ch > '9' ? (ch - 'A' + 10) : bits[i] - '0';
 			sum += bit * power[i];
 		}
 		return sum;

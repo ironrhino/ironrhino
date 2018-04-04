@@ -17,8 +17,8 @@ public class SqlServerCyclicSequence extends AbstractSequenceCyclicSequence {
 	@Override
 	protected String getQueryTimestampForUpdateStatement() {
 		return new StringBuilder("SELECT ").append(getCurrentTimestamp()).append(",LAST_UPDATED").append(" FROM ")
-				.append(getTableName()).append(" WITH(UPDLOCK,ROWLOCK) WHERE NAME='").append(getSequenceName()).append("'")
-				.toString();
+				.append(getTableName()).append(" WITH(UPDLOCK,ROWLOCK) WHERE NAME='").append(getSequenceName())
+				.append("'").toString();
 	}
 
 }

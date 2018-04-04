@@ -26,6 +26,7 @@ public class BaseBalanceQuery extends BasePollingEntity {
 	@UiConfig(width = "80px", readonly = @Readonly(true))
 	private BigDecimal balance;
 
+	@Override
 	public String toString() {
 		return String.format("%s#%s", getId(), getAccountNo());
 	}

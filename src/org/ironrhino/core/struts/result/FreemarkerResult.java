@@ -156,6 +156,7 @@ public class FreemarkerResult extends StrutsResultSupport {
 	 * the provided hooks. It them implements the template processing workflow by
 	 * calling the hooks for preTemplateProcess and postTemplateProcess
 	 */
+	@Override
 	public void doExecute(String locationArg, ActionInvocation invocation) throws IOException, TemplateException {
 		this.location = locationArg;
 		this.invocation = invocation;
@@ -163,7 +164,7 @@ public class FreemarkerResult extends StrutsResultSupport {
 		this.wrapper = getObjectWrapper();
 
 		ActionContext ctx = invocation.getInvocationContext();
-		HttpServletRequest req = (HttpServletRequest) ctx.get(ServletActionContext.HTTP_REQUEST);
+		HttpServletRequest req = (HttpServletRequest) ctx.get(StrutsStatics.HTTP_REQUEST);
 
 		String absoluteLocation;
 		if (location.startsWith("/")) {
@@ -285,7 +286,7 @@ public class FreemarkerResult extends StrutsResultSupport {
 		ServletContext servletContext = ServletActionContext.getServletContext();
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
-		ValueStack stack = ServletActionContext.getContext().getValueStack();
+		ValueStack stack = ActionContext.getContext().getValueStack();
 
 		Object action = null;
 		if (invocation != null)
