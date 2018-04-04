@@ -20,7 +20,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.DefaultActionInvocation;
 import com.opensymphony.xwork2.Result;
 import com.opensymphony.xwork2.XWorkException;
@@ -59,50 +58,46 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 				executorService = ForkJoinPool.commonPool();
 			final ExecutorService es = executorService;
 			AsyncContext asyncContext = request.startAsync();
-			@SuppressWarnings("serial")
-			Result result = new Result() {
-				@Override
-				public void execute(ActionInvocation actionInvocation) throws Exception {
-					es.execute(() -> {
-						try {
-							SecurityContextHolder.setContext(sc);
-							ActionContext.setContext(context);
-							String result = callable.call();
-							ActionConfig config = proxy.getConfig();
-							Map<String, ResultConfig> results = config.getResults();
-							ResultConfig resultConfig = results.get(result);
-							if (resultConfig == null) {
-								resultConfig = results.get("*");
-							}
-							Result re = null;
-							if (resultConfig != null) {
-								try {
-									re = objectFactory.buildResult(resultConfig, invocationContext.getContextMap());
-								} catch (Exception e) {
-									throw new XWorkException(e, resultConfig);
-								}
-							} else if (result != null && !Action.NONE.equals(result)
-									&& unknownHandlerManager.hasUnknownHandlers()) {
-								re = unknownHandlerManager.handleUnknownResult(invocationContext, proxy.getActionName(),
-										proxy.getConfig(), result);
-							}
-							((CallableActionInvocation) actionInvocation).reset();
-							actionInvocation.setResultCode(result);
-							re.execute(actionInvocation);
-						} catch (Exception e) {
-							logger.error(e.getMessage(), e);
-							try {
-								response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-							} catch (IOException ex) {
-								logger.error(ex.getMessage(), ex);
-							}
-						} finally {
-							SecurityContextHolder.clearContext();
-							ActionContext.setContext(null);
-							asyncContext.complete();
+			Result result = actionInvocation -> {
+				es.execute(() -> {
+					try {
+						SecurityContextHolder.setContext(sc);
+						ActionContext.setContext(context);
+						String rst = callable.call();
+						ActionConfig config = proxy.getConfig();
+						Map<String, ResultConfig> results = config.getResults();
+						ResultConfig resultConfig = results.get(rst);
+						if (resultConfig == null) {
+							resultConfig = results.get("*");
 						}
-					});
-				}
+						Result re = null;
+						if (resultConfig != null) {
+							try {
+								re = objectFactory.buildResult(resultConfig, invocationContext.getContextMap());
+							} catch (Exception e) {
+								throw new XWorkException(e, resultConfig);
+							}
+						} else if (rst != null && !Action.NONE.equals(rst)
+								&& unknownHandlerManager.hasUnknownHandlers()) {
+							re = unknownHandlerManager.handleUnknownResult(invocationContext, proxy.getActionName(),
+									proxy.getConfig(), rst);
+						}
+						((CallableActionInvocation) actionInvocation).reset();
+						actionInvocation.setResultCode(rst);
+						re.execute(actionInvocation);
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+						try {
+							response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+						} catch (IOException ex) {
+							logger.error(ex.getMessage(), ex);
+						}
+					} finally {
+						SecurityContextHolder.clearContext();
+						ActionContext.setContext(null);
+						asyncContext.complete();
+					}
+				});
 			};
 			callableResult = null;
 			return result;

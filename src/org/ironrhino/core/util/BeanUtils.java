@@ -264,43 +264,37 @@ public class BeanUtils {
 	}
 
 	public static <T> Function<Object, T> forCopy(Class<T> targetClass) {
-		Function<Object, T> func = new Function<Object, T>() {
-			@Override
-			public T apply(Object t) {
-				if (t == null)
-					return null;
-				try {
-					T target = targetClass.getConstructor().newInstance();
-					copyProperties(t, target, false);
-					return target;
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					throw new RuntimeException(e);
-				}
+		Function<Object, T> func = t -> {
+			if (t == null)
+				return null;
+			try {
+				T target = targetClass.getConstructor().newInstance();
+				copyProperties(t, target, false);
+				return target;
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				throw new RuntimeException(e);
 			}
 		};
 		return func;
 	}
 
 	public static <T> Function<List<?>, List<T>> forCopyList(Class<T> targetClass) {
-		Function<List<?>, List<T>> func = new Function<List<?>, List<T>>() {
-			@Override
-			public List<T> apply(List<?> t) {
-				if (t == null)
-					return null;
-				List<T> list = new ArrayList<>(t.size());
-				t.forEach(e -> {
-					try {
-						T target = targetClass.getConstructor().newInstance();
-						copyProperties(e, target, false);
-						list.add(target);
-					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-						throw new RuntimeException(ex);
-					}
-				});
-				return list;
-			}
+		Function<List<?>, List<T>> func = t -> {
+			if (t == null)
+				return null;
+			List<T> list = new ArrayList<>(t.size());
+			t.forEach(e -> {
+				try {
+					T target = targetClass.getConstructor().newInstance();
+					copyProperties(e, target, false);
+					list.add(target);
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+					throw new RuntimeException(ex);
+				}
+			});
+			return list;
 		};
 		return func;
 	}

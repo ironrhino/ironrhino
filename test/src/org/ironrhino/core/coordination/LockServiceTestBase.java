@@ -43,36 +43,32 @@ public abstract class LockServiceTestBase {
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < THREADS; i++) {
 
-			executorService.execute(new Runnable() {
-
-				@Override
-				public void run() {
-					for (int j = 0; j < LOOP; j++) {
-						try {
-							String lockName = "lock" + System.currentTimeMillis() % 10;
-							if (lockService.tryLock(lockName))
+			executorService.execute(() -> {
+				for (int j = 0; j < LOOP; j++) {
+					try {
+						String lockName = "lock" + System.currentTimeMillis() % 10;
+						if (lockService.tryLock(lockName))
+							try {
 								try {
-									try {
-										Thread.sleep(1);
-										if (map.putIfAbsent(lockName, lockName) != null)
-											error.incrementAndGet();
-										if (!map.remove(lockName, lockName))
-											error.incrementAndGet();
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-								} finally {
-									lockService.unlock(lockName);
+									Thread.sleep(1);
+									if (map.putIfAbsent(lockName, lockName) != null)
+										error.incrementAndGet();
+									if (!map.remove(lockName, lockName))
+										error.incrementAndGet();
+								} catch (InterruptedException e) {
+									e.printStackTrace();
 								}
-							count.incrementAndGet();
-						} catch (Exception e) {
-							error.incrementAndGet();
-							e.printStackTrace();
-						}
-
+							} finally {
+								lockService.unlock(lockName);
+							}
+						count.incrementAndGet();
+					} catch (Exception e) {
+						error.incrementAndGet();
+						e.printStackTrace();
 					}
-					cdl.countDown();
+
 				}
+				cdl.countDown();
 			});
 		}
 		cdl.await();
@@ -91,36 +87,32 @@ public abstract class LockServiceTestBase {
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < THREADS; i++) {
 
-			executorService.execute(new Runnable() {
-
-				@Override
-				public void run() {
-					for (int j = 0; j < LOOP / THREADS; j++) {
+			executorService.execute(() -> {
+				for (int j = 0; j < LOOP / THREADS; j++) {
+					try {
+						String lockName = "lock" + System.currentTimeMillis() % 10;
+						lockService.lock(lockName);
 						try {
-							String lockName = "lock" + System.currentTimeMillis() % 10;
-							lockService.lock(lockName);
 							try {
-								try {
-									Thread.sleep(1);
-									if (map.putIfAbsent(lockName, lockName) != null)
-										error.incrementAndGet();
-									if (!map.remove(lockName, lockName))
-										error.incrementAndGet();
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-							} finally {
-								lockService.unlock(lockName);
+								Thread.sleep(1);
+								if (map.putIfAbsent(lockName, lockName) != null)
+									error.incrementAndGet();
+								if (!map.remove(lockName, lockName))
+									error.incrementAndGet();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
 							}
-							count.incrementAndGet();
-						} catch (Exception e) {
-							error.incrementAndGet();
-							e.printStackTrace();
+						} finally {
+							lockService.unlock(lockName);
 						}
-
+						count.incrementAndGet();
+					} catch (Exception e) {
+						error.incrementAndGet();
+						e.printStackTrace();
 					}
-					cdl.countDown();
+
 				}
+				cdl.countDown();
 			});
 		}
 		cdl.await();

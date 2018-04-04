@@ -15,7 +15,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.hibernate.boot.Metadata;
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
 import org.hibernate.dialect.Dialect;
@@ -28,12 +27,9 @@ import org.hibernate.mapping.Table;
 import org.hibernate.mapping.Table.ForeignKeyKey;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool;
-import org.hibernate.tool.schema.spi.ExecutionOptions;
 import org.hibernate.tool.schema.spi.SchemaCreator;
 import org.hibernate.tool.schema.spi.SchemaManagementTool;
 import org.hibernate.tool.schema.spi.SchemaMigrator;
-import org.hibernate.tool.schema.spi.SourceDescriptor;
-import org.hibernate.tool.schema.spi.TargetDescriptor;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -64,29 +60,18 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 				@Override
 				public SchemaMigrator getSchemaMigrator(Map options) {
 					SchemaMigrator sm = super.getSchemaMigrator(options);
-					return new SchemaMigrator() {
-
-						@Override
-						public void doMigration(Metadata metadata, ExecutionOptions executionOptions,
-								TargetDescriptor targetDescriptor) {
-							convertForeignKeyToIndex(metadata.getDatabase());
-							sm.doMigration(metadata, executionOptions, targetDescriptor);
-						}
+					return (metadata, executionOptions, targetDescriptor) -> {
+						convertForeignKeyToIndex(metadata.getDatabase());
+						sm.doMigration(metadata, executionOptions, targetDescriptor);
 					};
-
 				}
 
 				@Override
 				public SchemaCreator getSchemaCreator(Map options) {
 					SchemaCreator sc = super.getSchemaCreator(options);
-					return new SchemaCreator() {
-
-						@Override
-						public void doCreation(Metadata metadata, ExecutionOptions executionOptions,
-								SourceDescriptor sourceDescriptor, TargetDescriptor targetDescriptor) {
-							convertForeignKeyToIndex(metadata.getDatabase());
-							sc.doCreation(metadata, executionOptions, sourceDescriptor, targetDescriptor);
-						}
+					return (metadata, executionOptions, sourceDescriptor, targetDescriptor) -> {
+						convertForeignKeyToIndex(metadata.getDatabase());
+						sc.doCreation(metadata, executionOptions, sourceDescriptor, targetDescriptor);
 					};
 				}
 

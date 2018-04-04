@@ -86,15 +86,12 @@ public abstract class RemoteServiceTestsBase {
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < THREADS; i++) {
 
-			executorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					for (int j = 0; j < LOOP; j++) {
-						assertEquals("test" + j, testService.echo("test" + j));
-						count.incrementAndGet();
-					}
-					cdl.countDown();
+			executorService.execute(() -> {
+				for (int j = 0; j < LOOP; j++) {
+					assertEquals("test" + j, testService.echo("test" + j));
+					count.incrementAndGet();
 				}
+				cdl.countDown();
 			});
 		}
 		cdl.await();

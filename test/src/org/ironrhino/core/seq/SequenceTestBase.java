@@ -57,28 +57,24 @@ public abstract class SequenceTestBase {
 		final Sequence seq = cyclic ? sample2Sequence : sample1Sequence;
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < THREADS; i++) {
-			executorService.execute(new Runnable() {
+			executorService.execute(() -> {
 
-				@Override
-				public void run() {
-
-					for (int j = 0; j < LOOP; j++) {
-						try {
-							String id = seq.nextStringValue();
-							Long time2 = System.currentTimeMillis();
-							Long old = map.putIfAbsent(id, time2);
-							if (old != null)
-								System.out.println(id + " , old=" + DateUtils.formatTimestamp(new Date(old)) + " , new="
-										+ DateUtils.formatTimestamp(new Date(time2)));
-							else
-								count.incrementAndGet();
-						} catch (Throwable e) {
-							e.printStackTrace();
-						}
-
+				for (int j = 0; j < LOOP; j++) {
+					try {
+						String id = seq.nextStringValue();
+						Long time2 = System.currentTimeMillis();
+						Long old = map.putIfAbsent(id, time2);
+						if (old != null)
+							System.out.println(id + " , old=" + DateUtils.formatTimestamp(new Date(old)) + " , new="
+									+ DateUtils.formatTimestamp(new Date(time2)));
+						else
+							count.incrementAndGet();
+					} catch (Throwable e) {
+						e.printStackTrace();
 					}
-					cdl.countDown();
+
 				}
+				cdl.countDown();
 			});
 		}
 		cdl.await();
