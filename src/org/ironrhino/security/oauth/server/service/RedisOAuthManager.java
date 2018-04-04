@@ -22,9 +22,11 @@ import org.ironrhino.security.oauth.server.model.Client;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class RedisOAuthManager extends AbstractOAuthManager {
 
 	@Autowired
@@ -75,12 +77,17 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {
 		}
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
-				expireTime, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
+		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+			redisOperations.multi();
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
+					expireTime, TimeUnit.SECONDS);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+					auth.getExpiresIn(), TimeUnit.SECONDS);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+					auth.getExpiresIn(), TimeUnit.SECONDS);
+			return redisOperations.exec();
+		});
+
 		return auth;
 	}
 
@@ -114,13 +121,17 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {
 		}
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
-				expireTime, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), auth.getId());
+		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+			redisOperations.multi();
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
+					expireTime, TimeUnit.SECONDS);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+					auth.getExpiresIn(), TimeUnit.SECONDS);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+					auth.getExpiresIn(), TimeUnit.SECONDS);
+			redisOperations.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), auth.getId());
+			return redisOperations.exec();
+		});
 		return auth;
 	}
 
@@ -147,10 +158,14 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		auth.setCode(CodecUtils.nextId());
 		auth.setModifyDate(new Date());
 		auth.setLifetime(Authorization.DEFAULT_LIFETIME);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
-				expireTime, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(), expireTime,
-				TimeUnit.SECONDS);
+		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+			redisOperations.multi();
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
+					expireTime, TimeUnit.SECONDS);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(), expireTime,
+					TimeUnit.SECONDS);
+			return redisOperations.exec();
+		});
 		return auth;
 	}
 
@@ -171,19 +186,31 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		} catch (NullPointerException npe) {
 		}
 		auth.setModifyDate(new Date());
+		final Authorization auth2 = auth;
 		if (auth.isClientSide()) {
-			stringRedisTemplate.delete(key);
-			stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
-					auth.getExpiresIn(), TimeUnit.SECONDS);
-			stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
-					auth.getExpiresIn(), TimeUnit.SECONDS);
+			stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+				redisOperations.multi();
+				redisOperations.delete(key);
+				redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getAccessToken(), auth2.getId(),
+						auth2.getExpiresIn(), TimeUnit.SECONDS);
+				redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getRefreshToken(), auth2.getId(),
+						auth2.getExpiresIn(), TimeUnit.SECONDS);
+				redisOperations.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth2.getGrantor(),
+						auth2.getId());
+				return redisOperations.exec();
+			});
 		} else {
 			auth.setCode(CodecUtils.nextId());
-			stringRedisTemplate.delete(key);
-			stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(), expireTime,
-					TimeUnit.SECONDS);
+			stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+				redisOperations.multi();
+				redisOperations.delete(key);
+				redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getCode(), auth2.getId(), expireTime,
+						TimeUnit.SECONDS);
+				redisOperations.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth2.getGrantor(),
+						auth2.getId());
+				return redisOperations.exec();
+			});
 		}
-		stringRedisTemplate.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), auth.getId());
 		return auth;
 	}
 
@@ -224,11 +251,16 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setGrantType(GrantType.authorization_code);
 		auth.setModifyDate(new Date());
-		stringRedisTemplate.delete(key);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(),
-				NAMESPACE_AUTHORIZATION + auth.getId(), auth.getExpiresIn(), TimeUnit.SECONDS);
+		final Authorization auth2 = auth;
+		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+			redisOperations.multi();
+			redisOperations.delete(key);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getId(), JsonUtils.toJson(auth2),
+					auth2.getExpiresIn(), TimeUnit.SECONDS);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getRefreshToken(),
+					NAMESPACE_AUTHORIZATION + auth2.getId(), auth2.getExpiresIn(), TimeUnit.SECONDS);
+			return redisOperations.exec();
+		});
 		return auth;
 	}
 
@@ -270,15 +302,20 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		}
 		if (auth == null)
 			throw new OAuthError(OAuthError.INVALID_GRANT);
-		stringRedisTemplate.delete(keyRefreshToken);
-		stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + auth.getAccessToken());
-		auth.setAccessToken(CodecUtils.nextId());
-		auth.setRefreshToken(CodecUtils.nextId());
-		auth.setModifyDate(new Date());
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
+		final Authorization auth2 = auth;
+		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+			redisOperations.multi();
+			redisOperations.delete(keyRefreshToken);
+			redisOperations.delete(NAMESPACE_AUTHORIZATION + auth2.getAccessToken());
+			auth2.setAccessToken(CodecUtils.nextId());
+			auth2.setRefreshToken(CodecUtils.nextId());
+			auth2.setModifyDate(new Date());
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getAccessToken(), auth2.getId(),
+					auth2.getExpiresIn(), TimeUnit.SECONDS);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getRefreshToken(), auth2.getId(),
+					auth2.getExpiresIn(), TimeUnit.SECONDS);
+			return redisOperations.exec();
+		});
 		return auth;
 	}
 
@@ -296,11 +333,16 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth != null) {
-			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + auth.getId());
-			stringRedisTemplate.delete(key);
-			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + auth.getRefreshToken());
-			stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), 0,
-					auth.getId());
+			final Authorization auth2 = auth;
+			stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+				redisOperations.multi();
+				redisOperations.delete(NAMESPACE_AUTHORIZATION + auth2.getId());
+				redisOperations.delete(key);
+				redisOperations.delete(NAMESPACE_AUTHORIZATION + auth2.getRefreshToken());
+				redisOperations.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + auth2.getGrantor(), 0,
+						auth2.getId());
+				return redisOperations.exec();
+			});
 			return true;
 		} else {
 			return false;
@@ -309,11 +351,15 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 
 	@Override
 	public void create(Authorization auth) {
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
-				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), auth.getId());
+		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+			redisOperations.multi();
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+					auth.getExpiresIn(), TimeUnit.SECONDS);
+			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+					auth.getExpiresIn(), TimeUnit.SECONDS);
+			redisOperations.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), auth.getId());
+			return redisOperations.exec();
+		});
 	}
 
 	@Override
@@ -345,11 +391,15 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		for (Authorization authorization : list)
 			if ((client == null || client.equals(authorization.getClient()))
 					&& (grantType == null || grantType == authorization.getGrantType())) {
-				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getId());
-				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getAccessToken());
-				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getRefreshToken());
-				stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor, 0,
-						authorization.getId());
+				stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+					redisOperations.multi();
+					redisOperations.delete(NAMESPACE_AUTHORIZATION + authorization.getId());
+					redisOperations.delete(NAMESPACE_AUTHORIZATION + authorization.getAccessToken());
+					redisOperations.delete(NAMESPACE_AUTHORIZATION + authorization.getRefreshToken());
+					redisOperations.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor, 0,
+							authorization.getId());
+					return redisOperations.exec();
+				});
 			}
 	}
 
