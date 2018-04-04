@@ -1,11 +1,15 @@
 package org.ironrhino.common.support;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -29,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundListOperations;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -135,10 +140,10 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 			}
 		}, entities -> {
 			// enqueue after commit status change
-			for (BasePollingEntity entity : entities) {
-				push(entity.getId(), false);
+			push(Arrays.stream(entities).map(entity -> {
 				logger.info("enqueue {}", entity);
-			}
+				return entity.getId();
+			}).collect(Collectors.toList()), false);
 		}, dc);
 
 		// attempt retryable polling
@@ -151,10 +156,10 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 			cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * attempts);
 			dc.add(Restrictions.lt("modifyDate", cal.getTime()));
 			entityManager.iterate(10, (entities, session) -> {
-				for (T entity : entities) {
-					push(entity.getId(), true);
+				push(Arrays.stream(entities).map(entity -> {
 					logger.info("enqueue {} retried", entity);
-				}
+					return entity.getId();
+				}).collect(Collectors.toList()), true);
 			}, dc);
 		}
 
@@ -166,10 +171,10 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 		dc.add(Restrictions.lt("modifyDate", cal.getTime()));
 		dc.addOrder(Order.asc("createDate"));
 		entityManager.iterate(batchSize, (entities, session) -> {
-			for (T entity : entities) {
-				push(entity.getId(), true);
+			push(Arrays.stream(entities).map(entity -> {
 				logger.info("enqueue {} resubmitted", entity);
-			}
+				return entity.getId();
+			}).collect(Collectors.toList()), true);
 		}, dc);
 	}
 
@@ -258,16 +263,35 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 		return size != null ? size : 0;
 	}
 
-	protected void push(String id, boolean deduplication) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void push(List<String> ids, boolean deduplication) {
+		if (ids.isEmpty())
+			return;
 		if (deduplication) {
-			Long removed = boundListOperations.remove(1, id);
-			if (removed != null && removed > 0) {
-				logger.warn("cutting {}", id);
-				boundListOperations.rightPush(id);
-				return;
+			List<String> prepend = new ArrayList<String>();
+			List<String> append = new ArrayList<String>();
+			List results = stringRedisTemplate.executePipelined((SessionCallback) redisOperations -> {
+				for (String id : ids)
+					redisOperations.opsForList().remove(boundListOperations.getKey(), 1, id);
+				return null;
+			});
+			for (int i = 0; i < ids.size(); i++) {
+				String id = ids.get(i);
+				Long removed = (Long) results.get(i);
+				if (removed != null && removed > 0) {
+					prepend.add(id);
+					logger.warn("cutting {}", id);
+				} else {
+					append.add(id);
+				}
 			}
+			if (prepend.size() > 0)
+				boundListOperations.rightPushAll(prepend.toArray(new String[0]));
+			if (append.size() > 0)
+				boundListOperations.leftPushAll(append.toArray(new String[0]));
+		} else {
+			boundListOperations.leftPushAll(ids.toArray(new String[0]));
 		}
-		boundListOperations.leftPush(id);
 	}
 
 	protected String pop() {
