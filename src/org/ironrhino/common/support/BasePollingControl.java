@@ -112,7 +112,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 		threadPoolExecutor.shutdownNow();
 	}
 
-	@Scheduled(fixedRateString = "${abstractPollingControl.enqueue.fixedRate:10000}")
+	@Scheduled(fixedRateString = "${basePollingControl.enqueue.fixedRate:10000}")
 	public void enqueue() {
 		if (threadPoolExecutor.isShutdown())
 			return;
@@ -178,7 +178,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 		}, dc);
 	}
 
-	@Scheduled(fixedDelayString = "${abstractPollingControl.dequeue.fixedDelay:10000}")
+	@Scheduled(fixedDelayString = "${basePollingControl.dequeue.fixedDelay:10000}")
 	public void dequeue() {
 		if (threadPoolExecutor.isShutdown())
 			return;
