@@ -88,8 +88,6 @@ public class RedisServiceStats implements ServiceStats {
 	public void afterPropertiesSet() {
 		hotspotsOperations = remotingStringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
 		warningsOperations = remotingStringRedisTemplate.boundListOps(KEY_WARNINGS);
-		if (hotspotsOperations == null || warningsOperations == null)
-			throw new RuntimeException("Unexpected null");
 	}
 
 	@Override

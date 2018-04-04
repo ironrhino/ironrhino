@@ -29,7 +29,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 	private BoundValueOperations<String, String> boundValueOperations;
 
 	private RedisScript<Boolean> compareAndSetScript = new DefaultRedisScript<>(
-			"if redis.call(\"get\",KEYS[1]) == ARGV[1] then redis.call(\"set\",KEYS[1],ARGV[2]) return true else return false end",
+			"if redis.call('get',KEYS[1]) == ARGV[1] then redis.call('set',KEYS[1],ARGV[2]) return true else return false end",
 			Boolean.class);
 
 	@Override

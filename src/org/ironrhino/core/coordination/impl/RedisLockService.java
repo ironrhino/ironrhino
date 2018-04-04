@@ -40,7 +40,7 @@ public class RedisLockService implements LockService {
 	private StringRedisTemplate coordinationStringRedisTemplate;
 
 	private RedisScript<Long> compareAndDeleteScript = new DefaultRedisScript<>(
-			"if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return redis.call(\"exists\",KEYS[1]) == 0 and 2 or 0 end",
+			"if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return redis.call('exists',KEYS[1]) == 0 and 2 or 0 end",
 			Long.class);
 
 	@Override
