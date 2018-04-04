@@ -28,6 +28,7 @@ public class RedisSequenceTests extends SequenceTestBase {
 		public Sequence sample2Sequence() {
 			RedisCyclicSequence cs = new RedisCyclicSequence();
 			cs.setCycleType(CycleType.MINUTE);
+			cs.setPaddingLength(7);
 			return cs;
 		}
 	}

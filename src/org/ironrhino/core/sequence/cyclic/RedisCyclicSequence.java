@@ -11,9 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.BoundValueOperations;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.util.Assert;
 
 public class RedisCyclicSequence extends AbstractCyclicSequence {
@@ -27,6 +28,10 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	private BoundValueOperations<String, String> boundValueOperations;
 
+	private RedisScript<Boolean> compareAndSetScript = new DefaultRedisScript<>(
+			"if redis.call(\"get\",KEYS[1]) == ARGV[1] then redis.call(\"set\",KEYS[1],ARGV[2]) return true else return false end",
+			Boolean.class);
+
 	@Override
 	public void afterPropertiesSet() {
 		Assert.hasText(getSequenceName(), "sequenceName shouldn't be blank");
@@ -39,8 +44,11 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 
 	@Override
 	public String nextStringValue() {
+		@SuppressWarnings("unchecked")
+		byte[] key = ((RedisSerializer<String>) sequenceStringRedisTemplate.getKeySerializer())
+				.serialize(boundValueOperations.getKey());
 		List<Object> results = sequenceStringRedisTemplate.executePipelined((RedisConnection connection) -> {
-			connection.incr(boundValueOperations.getKey().getBytes());
+			connection.incr(key);
 			connection.time();
 			return null;
 		});
@@ -70,21 +78,9 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 				return DateUtils.format(now, cycleType.getPattern()) + next;
 			}
 		}
-		final String restart = getStringValue(now, getPaddingLength(), 1);
-		Boolean success = sequenceStringRedisTemplate.execute(new SessionCallback<Boolean>() {
-			@Override
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			public Boolean execute(RedisOperations operations) {
-				operations.watch(Collections.singleton(boundValueOperations.getKey()));
-				if (stringValue.equals(boundValueOperations.get())) {
-					operations.multi();
-					boundValueOperations.set(restart);
-					return operations.exec() != null;
-				} else {
-					return false;
-				}
-			}
-		});
+		String restart = getStringValue(now, getPaddingLength(), 1);
+		Boolean success = sequenceStringRedisTemplate.execute(compareAndSetScript,
+				Collections.singletonList(boundValueOperations.getKey()), stringValue, restart);
 		if (success == null)
 			throw new RuntimeException("Unexpected null");
 		if (success)
