@@ -121,6 +121,7 @@ public class DataSourceConfiguration {
 		ds.setIdleTimeout(idleTimeout);
 		ds.setMaxLifetime(maxLifetime);
 		ds.setRegisterMbeans(registerMbeans);
+		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
 		logger.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
 		return ds;
 	}
