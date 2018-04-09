@@ -15,16 +15,15 @@ import org.ironrhino.core.session.SessionCompressorManager;
 import org.ironrhino.core.session.WrappedHttpSession;
 import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.util.RequestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component("cookieBased")
-public class CookieBasedHttpSessionStore implements HttpSessionStore {
+import lombok.extern.slf4j.Slf4j;
 
-	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+@Component("cookieBased")
+@Slf4j
+public class CookieBasedHttpSessionStore implements HttpSessionStore {
 
 	public static final int SINGLE_COOKIE_SIZE = 2 * 1024;
 
@@ -88,7 +87,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 					try {
 						cookieMap.put(cookie.getName(), URLDecoder.decode(cookie.getValue(), "UTF-8"));
 					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 					}
 		}
 		StringBuilder sb = new StringBuilder();

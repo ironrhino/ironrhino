@@ -34,6 +34,9 @@ import com.opensymphony.xwork2.config.entities.ActionConfig;
 import com.opensymphony.xwork2.config.entities.PackageConfig;
 import com.opensymphony.xwork2.inject.Inject;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class DefaultActionMapper extends AbstractActionMapper {
 
 	public final static String DEFAULT_ACTION_NAME = "index";
@@ -66,7 +69,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			if (method != null && params != null && params.containsKey(ID))
 				sb.append("/" + URLEncoder.encode((String) params.get(ID), getEncoding()));
 		} catch (UnsupportedEncodingException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		return sb.toString();
 	}

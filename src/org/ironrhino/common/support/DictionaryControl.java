@@ -23,17 +23,16 @@ import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.BeanUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-@Component
-public class DictionaryControl {
+import lombok.extern.slf4j.Slf4j;
 
-	@Autowired
-	private Logger logger;
+@Component
+@Slf4j
+public class DictionaryControl {
 
 	@Autowired
 	private EntityManager<Dictionary> entityManager;
@@ -179,7 +178,7 @@ public class DictionaryControl {
 				items = null;
 			}
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 }

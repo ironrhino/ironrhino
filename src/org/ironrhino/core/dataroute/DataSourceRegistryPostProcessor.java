@@ -8,8 +8,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -22,7 +20,9 @@ import org.springframework.util.Assert;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
 	public static final String KEY_SHARDING_HOSTS = "routingDataSource.shardingHosts";
@@ -32,8 +32,6 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 	public static final String KEY_SHARDING_VERSION = "routingDataSource.shardingGeneration";
 
 	public static final String KEY_JDBC_URL_FORMAT = "routingDataSource.jdbcUrlFormat";
-
-	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Getter
 	@Setter
@@ -109,7 +107,7 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 			beanDefinition.setPropertyValues(propertyValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
 		}
-		logger.info("Register dataSources:\n\n{}", dataSourceMapping.toString());
+		log.info("Register dataSources:\n\n{}", dataSourceMapping.toString());
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(RoutingDataSource.class);
 		MutablePropertyValues propertyValues = new MutablePropertyValues();
 		if (StringUtils.isNotBlank(defaultRouterName))

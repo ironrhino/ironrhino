@@ -32,19 +32,17 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = "ftp")
+@Slf4j
 public class FtpFileStorage extends AbstractFileStorage {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Getter
 	@Setter
@@ -157,7 +155,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 						// Ignore
 					} catch (IOException e) {
 						if (!e.getMessage().equals("Broken pipe"))
-							logger.error(e.getMessage(), e);
+							log.error(e.getMessage(), e);
 					} finally {
 						try {
 							ftpClient.disconnect();
@@ -165,7 +163,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 							// Ignore
 						} catch (IOException e) {
 							if (!e.getMessage().equals("Broken pipe"))
-								logger.error(e.getMessage(), e);
+								log.error(e.getMessage(), e);
 						}
 					}
 				}
@@ -237,7 +235,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 					try {
 						pool.returnObject(ftpClient);
 					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 					}
 				}
 			};
@@ -282,7 +280,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 					Date d = DateUtils.parse(modificationTime, "yyyyMMddHHmmss");
 					return d.getTime() + TimeZone.getDefault().getRawOffset();
 				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 				}
 			return -1L;
 		});
@@ -376,7 +374,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 				try {
 					pool.invalidateObject(ftpClient);
 				} catch (Exception ex) {
-					logger.error(ex.getMessage(), ex);
+					log.error(ex.getMessage(), ex);
 				}
 			throw e;
 		} catch (Exception e) {
@@ -386,7 +384,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 				try {
 					pool.returnObject(ftpClient);
 				} catch (Exception ex) {
-					logger.error(ex.getMessage(), ex);
+					log.error(ex.getMessage(), ex);
 				}
 		}
 	}

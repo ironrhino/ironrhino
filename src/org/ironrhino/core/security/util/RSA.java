@@ -28,11 +28,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RSA {
-	private static Logger logger = LoggerFactory.getLogger(RSA.class);
 
 	public static final String DEFAULT_KEY_LOCATION = "/resources/key/rsa";
 	public static final String KEY_DIRECTORY = "/key/";
@@ -55,46 +55,46 @@ public class RSA {
 		File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rsa");
 		if (file.exists()) {
 			defaultKeystoreURI = file.toURI();
-			logger.info("using file " + file.getAbsolutePath());
+			log.info("using file " + file.getAbsolutePath());
 		} else {
 			if (AppInfo.getStage() == Stage.PRODUCTION)
-				logger.warn("file " + file.getAbsolutePath()
+				log.warn("file " + file.getAbsolutePath()
 						+ " doesn't exists, please use your own keystore in production!");
 			if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 				try {
 					defaultKeystoreURI = RSA.class.getResource(DEFAULT_KEY_LOCATION).toURI();
-					logger.info("using classpath resource " + RSA.class.getResource(DEFAULT_KEY_LOCATION).toString()
+					log.info("using classpath resource " + RSA.class.getResource(DEFAULT_KEY_LOCATION).toString()
 							+ " as default keystore");
 				} catch (URISyntaxException e) {
-					logger.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 				}
 			}
 		}
 		String s = System.getProperty(AppInfo.getAppName() + ".rsa.password");
 		if (StringUtils.isNotBlank(s)) {
 			defaultPassword = s;
-			logger.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
+			log.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
 		} else {
 			try {
 				file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rsa.password");
 				if (file.exists()) {
 					defaultPassword = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-					logger.info("using file " + file.getAbsolutePath());
+					log.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						logger.warn("file " + file.getAbsolutePath()
+						log.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream pis = RSA.class.getResourceAsStream(DEFAULT_KEY_LOCATION + ".password")) {
 							defaultPassword = IOUtils.toString(pis, StandardCharsets.UTF_8);
-							logger.info("using classpath resource "
+							log.info("using classpath resource "
 									+ RSA.class.getResource(DEFAULT_KEY_LOCATION + ".password").toString()
 									+ " as default key");
 						}
 					}
 				}
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 
@@ -164,7 +164,7 @@ public class RSA {
 					Base64.getEncoder().withoutPadding().encode(encrypt(str.getBytes(StandardCharsets.UTF_8))),
 					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
-			logger.error("encrypt exception!", ex);
+			log.error("encrypt exception!", ex);
 			return "";
 		}
 	}
@@ -176,7 +176,7 @@ public class RSA {
 			return new String(decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))),
 					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
-			logger.error("decrypt exception!", ex);
+			log.error("decrypt exception!", ex);
 			return "";
 		}
 	}
@@ -188,7 +188,7 @@ public class RSA {
 			return new String(Base64.getEncoder().withoutPadding().encode(sign(str.getBytes(StandardCharsets.UTF_8))),
 					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
-			logger.error("encrypt exception!", ex);
+			log.error("encrypt exception!", ex);
 			return "";
 		}
 	}
@@ -199,7 +199,7 @@ public class RSA {
 		try {
 			return verify(str.getBytes(StandardCharsets.UTF_8), signature.getBytes(StandardCharsets.UTF_8));
 		} catch (Exception ex) {
-			logger.error("encrypt exception!", ex);
+			log.error("encrypt exception!", ex);
 			return false;
 		}
 	}

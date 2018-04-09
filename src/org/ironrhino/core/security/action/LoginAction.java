@@ -24,8 +24,6 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.RequestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountExpiredException;
@@ -48,16 +46,16 @@ import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @AutoConfig
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@Slf4j
 public class LoginAction extends BaseAction {
 
 	public final static String COOKIE_NAME_LOGIN_USER = "U";
 
 	private static final long serialVersionUID = 2783386542815083811L;
-
-	protected static Logger logger = LoggerFactory.getLogger(LoginAction.class);
 
 	@Getter
 	@Setter
@@ -111,7 +109,7 @@ public class LoginAction extends BaseAction {
 			if (cause instanceof Exception) {
 				throw (Exception) cause;
 			} else {
-				logger.error(failed.getMessage(), failed);
+				log.error(failed.getMessage(), failed);
 				addActionError(ExceptionUtils.getRootMessage(failed));
 			}
 		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
@@ -145,7 +143,7 @@ public class LoginAction extends BaseAction {
 							new LoginEvent(((UserDetails) principal).getUsername(), request.getRemoteAddr()),
 							Scope.LOCAL);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		if (StringUtils.isBlank(targetUrl))
 			targetUrl = defaultTargetUrl;

@@ -9,16 +9,14 @@ import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.HtmlUtils;
 import org.ironrhino.core.util.HtmlUtils.Replacer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionContext;
 
+import lombok.extern.slf4j.Slf4j;
 import ognl.OgnlContext;
 
+@Slf4j
 public class CacheContext {
-
-	private static Logger logger = LoggerFactory.getLogger(CacheContext.class);
 
 	public static final String FORCE_FLUSH_PARAM_NAME = "_ff_";
 
@@ -59,7 +57,7 @@ public class CacheContext {
 			}
 			return null;
 		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}

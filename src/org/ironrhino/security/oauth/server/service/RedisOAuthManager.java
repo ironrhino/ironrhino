@@ -19,18 +19,17 @@ import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
-public class RedisOAuthManager extends AbstractOAuthManager {
+import lombok.extern.slf4j.Slf4j;
 
-	@Autowired
-	private Logger logger;
+@SuppressWarnings({ "unchecked", "rawtypes" })
+@Slf4j
+public class RedisOAuthManager extends AbstractOAuthManager {
 
 	@Autowired
 	private RedisTemplate<String, Client> clientRedisTemplate;
@@ -176,7 +175,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		try {
 			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(key), Authorization.class);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		if (auth == null)
 			throw new OAuthError(OAuthError.INVALID_GRANT, "bad_auth");
@@ -230,7 +229,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
 					Authorization.class);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		if (auth == null)
 			throw new OAuthError(OAuthError.INVALID_GRANT, "code_invalid");
@@ -275,7 +274,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
 					Authorization.class);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		if (auth != null && auth.getExpiresIn() < 0)
 			return null;
@@ -298,7 +297,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
 					Authorization.class);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		if (auth == null)
 			throw new OAuthError(OAuthError.INVALID_GRANT);
@@ -330,7 +329,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
 					Authorization.class);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		if (auth != null) {
 			final Authorization auth2 = auth;
@@ -379,7 +378,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			try {
 				result.add(JsonUtils.fromJson(json, Authorization.class));
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		return result;

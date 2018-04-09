@@ -38,9 +38,10 @@ import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
-public class HttpInvokerServer extends HttpInvokerServiceExporter {
+import lombok.extern.slf4j.Slf4j;
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+@Slf4j
+public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private Logger remotingLogger = LoggerFactory.getLogger("remoting");
 
@@ -70,7 +71,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		if (request instanceof ProxySupportHttpServletRequest) {
-			logger.error("Forbidden for Proxy");
+			log.error("Forbidden for Proxy");
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return;
 		}
@@ -88,7 +89,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
 		Class<?> clazz = interfaces.get(interfaceName);
 		if (clazz == null) {
-			logger.error("Service Not Found: " + interfaceName);
+			log.error("Service Not Found: " + interfaceName);
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
@@ -140,11 +141,11 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			}
 			remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
 		} catch (SerializationFailedException sfe) {
-			logger.error(sfe.getMessage(), sfe);
+			log.error(sfe.getMessage(), sfe);
 			response.setHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE, sfe.getMessage());
 			response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
 		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
+			log.error(ex.getMessage(), ex);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			serviceInterface.remove();

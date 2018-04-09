@@ -3,8 +3,6 @@ package org.ironrhino.core.spring.configuration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -14,10 +12,11 @@ import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
-@Component
-public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFactoryAware {
+import lombok.extern.slf4j.Slf4j;
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+@Component
+@Slf4j
+public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 
 	private BeanFactory beanFactory;
 
@@ -47,12 +46,12 @@ public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFa
 						field.set(bean, beanFactory.getBean(name));
 						if (logged.putIfAbsent(beanName + "." + field.getName(), true) == null) {
 							// remove duplicated log for prototype bean
-							logger.info("Injected @PrioritizedQualifier(\"{}\") for field[{}] of bean[{}]", name,
+							log.info("Injected @PrioritizedQualifier(\"{}\") for field[{}] of bean[{}]", name,
 									field.getName(), beanName);
 						}
 						break;
 					} else {
-						logger.warn("Ignored @PrioritizedQualifier(\"{}\") for {} because it is not type of {}, ", name,
+						log.warn("Ignored @PrioritizedQualifier(\"{}\") for {} because it is not type of {}, ", name,
 								beanName, rt);
 					}
 				}

@@ -28,17 +28,16 @@ import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CompositeIterator;
 import org.ironrhino.core.util.DateUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @SuppressWarnings("rawtypes")
+@Slf4j
 public class StatControl {
-
-	@Autowired
-	private Logger logger;
 
 	@Autowired
 	private EntityManager<Stat> entityManager;
@@ -148,7 +147,7 @@ public class StatControl {
 				};
 				analyzer.analyze();
 			} catch (FileNotFoundException e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				throw new RuntimeException(e);
 			}
 		}
@@ -183,7 +182,7 @@ public class StatControl {
 				analyzer = new CumulativeAnalyzer(from, to, localhost);
 			} catch (Exception e) {
 				e.printStackTrace();
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		} else {
 			Calendar cal = Calendar.getInstance();
@@ -225,7 +224,7 @@ public class StatControl {
 					}
 				}
 			} catch (FileNotFoundException e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				throw new RuntimeException(e);
 			}
 		}

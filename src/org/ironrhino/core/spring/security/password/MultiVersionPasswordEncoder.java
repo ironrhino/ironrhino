@@ -6,16 +6,14 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MultiVersionPasswordEncoder implements PasswordEncoder {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private SortedMap<Integer, VersionedPasswordEncoder> map;
 
@@ -26,7 +24,7 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 	@PostConstruct
 	public void afterPropertiesSet() {
 		if (versions == null || versions.size() == 0) {
-			logger.error("no PasswordDigester found");
+			log.error("no PasswordDigester found");
 			return;
 		}
 		map = new TreeMap<>();
@@ -56,7 +54,7 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 		VersionedPasswordEncoder pd = map.get(version);
 		if (pd == null) {
 			pd = map.get(map.lastKey());
-			logger.warn("no PasswordDigester of version {}, use version {} instead ", version, map.lastKey());
+			log.warn("no PasswordDigester of version {}, use version {} instead ", version, map.lastKey());
 		}
 		return pd.matches(rawPassword, encodedPassword);
 	}

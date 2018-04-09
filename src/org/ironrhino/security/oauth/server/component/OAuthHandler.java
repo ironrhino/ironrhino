@@ -17,7 +17,6 @@ import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
 import org.ironrhino.security.oauth.server.domain.OAuthError;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.service.OAuthAuthorizationService;
-import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,15 +31,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component("oauthHandler")
 @Order(0)
+@Slf4j
 public class OAuthHandler extends AccessHandler {
 
 	public static final String REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION = "_OAUTH_AUTHORIZATION";
 	public static final String SESSION_ID_PREFIX = "tk_";
-
-	@Autowired
-	private Logger logger;
 
 	@Value("${oauth.api.pattern:/user/self,/oauth2/tokeninfo,/oauth2/revoketoken,/api/*}")
 	private String apiPattern;
@@ -163,7 +162,7 @@ public class OAuthHandler extends AccessHandler {
 			try {
 				ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
 			} catch (UsernameNotFoundException unf) {
-				logger.error(unf.getMessage(), unf);
+				log.error(unf.getMessage(), unf);
 			}
 			if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
 				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.UNAUTHORIZED_CLIENT));
@@ -173,7 +172,7 @@ public class OAuthHandler extends AccessHandler {
 			try {
 				ud = userDetailsService.loadUserByUsername(authorization.getGrantor());
 			} catch (UsernameNotFoundException unf) {
-				logger.error(unf.getMessage(), unf);
+				log.error(unf.getMessage(), unf);
 			}
 		}
 		if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {

@@ -38,6 +38,8 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MessageSourceResourceBundleLocator;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Order(0)
 @Configuration
 @PropertySources({
@@ -46,11 +48,10 @@ import org.springframework.validation.beanvalidation.MessageSourceResourceBundle
 		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.properties"),
 		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.${STAGE}.properties") })
 @EnableAspectJAutoProxy(proxyTargetClass = true)
+@Slf4j
 public class CommonConfiguration {
 
 	public static final String GLOBAL_MESSAGES_PATTERN = "resources/i18n/**/*.properties";
-
-	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Bean
 	@Scope(BeanDefinition.SCOPE_PROTOTYPE)
@@ -89,7 +90,7 @@ public class CommonConfiguration {
 		messageSource.setCacheSeconds(caching ? -1 : 0);
 		messageSource.setDefaultEncoding(StandardCharsets.UTF_8.name());
 		messageSource.setBasenames(getMessageSourceBasenames(forValidation));
-		logger.info("Loading {} messages from {}", forValidation ? "validation" : "global",
+		log.info("Loading {} messages from {}", forValidation ? "validation" : "global",
 				messageSource.getBasenameSet());
 		return messageSource;
 	}
@@ -113,7 +114,7 @@ public class CommonConfiguration {
 				name = name.substring(name.indexOf("resources/i18n/"));
 				name = org.ironrhino.core.util.StringUtils.trimLocale(name.substring(0, name.lastIndexOf('.')));
 				if (messageBunldes.containsKey(name) && !source.equals(messageBunldes.get(name))) {
-					logger.warn("Global messages " + name + " ignored from " + source + ", will load from "
+					log.warn("Global messages " + name + " ignored from " + source + ", will load from "
 							+ messageBunldes.get(name));
 				} else {
 					messageBunldes.put(name, source);
@@ -147,8 +148,8 @@ public class CommonConfiguration {
 					basenames.add(name);
 		}
 		Collections.reverse(basenames);
-		return basenames.stream().map(s -> ResourceLoader.CLASSPATH_URL_PREFIX + s)
-				.collect(Collectors.toList()).toArray(new String[0]);
+		return basenames.stream().map(s -> ResourceLoader.CLASSPATH_URL_PREFIX + s).collect(Collectors.toList())
+				.toArray(new String[0]);
 	}
 
 }

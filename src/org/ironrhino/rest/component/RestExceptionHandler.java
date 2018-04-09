@@ -13,8 +13,6 @@ import javax.validation.ConstraintViolationException;
 
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.RestStatus;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -30,11 +28,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-@ControllerAdvice
-public class RestExceptionHandler {
+import lombok.extern.slf4j.Slf4j;
 
-	@Autowired
-	private Logger logger;
+@ControllerAdvice
+@Slf4j
+public class RestExceptionHandler {
 
 	@ExceptionHandler(Throwable.class)
 	@ResponseBody
@@ -128,7 +126,7 @@ public class RestExceptionHandler {
 			}
 			return rs;
 		}
-		logger.error(ex.getMessage(), ex);
+		log.error(ex.getMessage(), ex);
 		if (oldStatus == HttpServletResponse.SC_OK)
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		return RestStatus.valueOf(RestStatus.CODE_INTERNAL_SERVER_ERROR, ex.getMessage());

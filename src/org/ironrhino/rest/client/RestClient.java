@@ -12,8 +12,6 @@ import org.ironrhino.rest.client.token.DefaultToken;
 import org.ironrhino.rest.client.token.DefaultTokenStore;
 import org.ironrhino.rest.client.token.Token;
 import org.ironrhino.rest.client.token.TokenStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -30,10 +28,10 @@ import org.springframework.web.client.RestTemplate;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class RestClient implements BeanNameAware {
-
-	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Getter
 	@Setter
@@ -178,7 +176,7 @@ public class RestClient implements BeanNameAware {
 		try {
 			return internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
 		} catch (HttpClientErrorException e) {
-			logger.error(e.getResponseBodyAsString());
+			log.error(e.getResponseBodyAsString());
 			throw e;
 		}
 	}

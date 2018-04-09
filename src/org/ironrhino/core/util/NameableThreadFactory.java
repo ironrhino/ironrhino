@@ -5,12 +5,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class NameableThreadFactory implements ThreadFactory {
-
-	private static final Logger logger = LoggerFactory.getLogger(NameableThreadFactory.class);
 
 	private final AtomicInteger threadNumber = new AtomicInteger(1);
 	private final ThreadGroup group;
@@ -44,7 +43,7 @@ public class NameableThreadFactory implements ThreadFactory {
 		}
 		this.namePrefix = sb.toString();
 		this.uncaughtExceptionHandler = uncaughtExceptionHandler != null ? uncaughtExceptionHandler : (t, e) -> {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		};
 	}
 

@@ -19,8 +19,6 @@ import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.mvel2.PropertyAccessException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -28,7 +26,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class ApplicationContextConsole {
 
 	private static final String PROPERTY_EXPRESSION_PATTERN = "[a-zA-Z][a-zA-Z0-9_\\-]*\\.[a-zA-Z][a-zA-Z0-9_]*";
@@ -36,8 +37,6 @@ public class ApplicationContextConsole {
 	private static final String GET_PROPERTY_EXPRESSION_PATTERN = "^" + PROPERTY_EXPRESSION_PATTERN + "$";
 
 	private static final String SET_PROPERTY_EXPRESSION_PATTERN = "^" + PROPERTY_EXPRESSION_PATTERN + "\\s*=\\s*.+$";
-
-	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private ConfigurableListableBeanFactory ctx;
@@ -170,7 +169,7 @@ public class ApplicationContextConsole {
 		try {
 			execute(expression, Scope.LOCAL);
 		} catch (Throwable e) {
-			logger.error("execute '" + expression + "' error", e);
+			log.error("execute '" + expression + "' error", e);
 		}
 	}
 

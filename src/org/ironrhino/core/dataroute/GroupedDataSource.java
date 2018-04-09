@@ -14,8 +14,6 @@ import javax.sql.DataSource;
 import org.ironrhino.core.stat.Key;
 import org.ironrhino.core.stat.StatLog;
 import org.ironrhino.core.util.RoundRobin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -26,10 +24,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class GroupedDataSource extends AbstractDataSource implements InitializingBean, BeanFactoryAware, BeanNameAware {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private BeanFactory beanFactory;
 
@@ -136,7 +134,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 			StatLog.add(new Key("dataroute", true, groupName, dbname, "success"));
 			return conn;
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			if (--attempts < 1)
 				throw e;
 			Integer failureTimes = failureCount.get(ds);
@@ -147,8 +145,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 			if (failureTimes == deadFailureThreshold) {
 				failureCount.remove(ds);
 				deadDataSources.add(ds);
-				logger.error(
-						"dataSource[" + groupName + ':' + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				log.error("dataSource[" + groupName + ':' + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				StatLog.add(new Key("dataroute", false, groupName, dbname, "down"));
 			} else {
 				failureCount.put(ds, failureTimes);
@@ -187,9 +184,9 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 							break;
 						}
 					}
-				logger.warn("dataSource[" + groupName + ':' + dbname + "] recovered");
+				log.warn("dataSource[" + groupName + ':' + dbname + "] recovered");
 			} catch (Exception e) {
-				logger.debug(e.getMessage(), e);
+				log.debug(e.getMessage(), e);
 			}
 		}
 	}

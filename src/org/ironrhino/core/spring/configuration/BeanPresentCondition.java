@@ -2,8 +2,6 @@ package org.ironrhino.core.spring.configuration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AnnotationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.ConfigurationCondition;
@@ -12,10 +10,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.ClassMetadata;
 
-@Order(Ordered.LOWEST_PRECEDENCE)
-class BeanPresentCondition implements ConfigurationCondition {
+import lombok.extern.slf4j.Slf4j;
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+@Order(Ordered.LOWEST_PRECEDENCE)
+@Slf4j
+class BeanPresentCondition implements ConfigurationCondition {
 
 	@Override
 	public boolean matches(ConditionContext ctx, AnnotatedTypeMetadata metadata) {
@@ -35,7 +34,7 @@ class BeanPresentCondition implements ConfigurationCondition {
 			matched = !matched;
 		if (!matched && (metadata instanceof ClassMetadata)) {
 			ClassMetadata cm = (ClassMetadata) metadata;
-			logger.info("Bean[" + cm.getClassName() + "] is skipped registry");
+			log.info("Bean[" + cm.getClassName() + "] is skipped registry");
 		}
 		return matched;
 	}

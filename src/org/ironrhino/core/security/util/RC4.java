@@ -12,11 +12,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.CodecUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RC4 {
-	private static Logger logger = LoggerFactory.getLogger(RC4.class);
 
 	public static final String DEFAULT_KEY_LOCATION = "/resources/key/rc4";
 	public static final String KEY_DIRECTORY = "/key/";
@@ -34,27 +34,27 @@ public class RC4 {
 		String s = System.getProperty(AppInfo.getAppName() + ".rc4");
 		if (StringUtils.isNotBlank(s)) {
 			defaultKey = s;
-			logger.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
+			log.info("using system property " + AppInfo.getAppName() + ".rc4 as default key");
 		} else {
 			try {
 				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rc4");
 				if (file.exists()) {
 					defaultKey = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-					logger.info("using file " + file.getAbsolutePath());
+					log.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						logger.warn("file " + file.getAbsolutePath()
+						log.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RC4.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream is = RC4.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
 							defaultKey = IOUtils.toString(is, StandardCharsets.UTF_8);
-							logger.info("using classpath resource "
+							log.info("using classpath resource "
 									+ RC4.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
 					}
 				}
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		if (defaultKey == null)

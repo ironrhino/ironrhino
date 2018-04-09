@@ -13,8 +13,6 @@ import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.LocalizedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 import com.opensymphony.xwork2.ActionContext;
@@ -23,12 +21,13 @@ import com.opensymphony.xwork2.ValidationAware;
 import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
 import com.opensymphony.xwork2.util.LocalizedTextUtil;
 
+import lombok.extern.slf4j.Slf4j;
 import ognl.MethodFailedException;
 
+@Slf4j
 public class ExceptionInterceptor extends AbstractInterceptor {
 
 	private static final long serialVersionUID = 6419734583295725844L;
-	protected static final Logger logger = LoggerFactory.getLogger(ExceptionInterceptor.class);
 
 	@Override
 	public String intercept(ActionInvocation invocation) throws Exception {
@@ -37,9 +36,9 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 		} catch (Exception e) {
 			ServletActionContext.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
 			if (e instanceof LocalizedException || e instanceof ErrorMessage)
-				logger.error(e.getLocalizedMessage());
+				log.error(e.getLocalizedMessage());
 			else if (!(e instanceof ValidationException) && !(e instanceof javax.validation.ValidationException))
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			if ((e instanceof MethodFailedException || e instanceof CompletionException)
 					&& e.getCause() instanceof Exception)
 				e = (Exception) e.getCause();

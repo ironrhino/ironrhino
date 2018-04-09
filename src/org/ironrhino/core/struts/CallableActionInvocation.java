@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.ServletActionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,11 +24,12 @@ import com.opensymphony.xwork2.XWorkException;
 import com.opensymphony.xwork2.config.entities.ActionConfig;
 import com.opensymphony.xwork2.config.entities.ResultConfig;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class CallableActionInvocation extends DefaultActionInvocation {
 
 	private static final long serialVersionUID = -4310552665942898360L;
-
-	private static Logger logger = LoggerFactory.getLogger(CallableActionInvocation.class);
 
 	protected Callable<String> callableResult;
 
@@ -52,7 +51,7 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 						.getRequiredWebApplicationContext(request.getServletContext())
 						.getBean("executorService", ExecutorService.class);
 			} catch (NoSuchBeanDefinitionException e) {
-				logger.warn("No bean[executorService] defined, use ForkJoinPool.commonPool() as fallback");
+				log.warn("No bean[executorService] defined, use ForkJoinPool.commonPool() as fallback");
 			}
 			if (executorService == null)
 				executorService = ForkJoinPool.commonPool();
@@ -86,11 +85,11 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 						actionInvocation.setResultCode(rst);
 						re.execute(actionInvocation);
 					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
+						log.error(e.getMessage(), e);
 						try {
 							response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 						} catch (IOException ex) {
-							logger.error(ex.getMessage(), ex);
+							log.error(ex.getMessage(), ex);
 						}
 					} finally {
 						SecurityContextHolder.clearContext();

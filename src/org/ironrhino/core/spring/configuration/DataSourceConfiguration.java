@@ -6,8 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,12 +16,12 @@ import org.springframework.util.ClassUtils;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@Slf4j
 public class DataSourceConfiguration {
-
-	@Autowired
-	private Logger logger;
 
 	@Value("${jdbc.driverClass:}")
 	private String driverClass;
@@ -88,7 +86,7 @@ public class DataSourceConfiguration {
 			boolean available = AddressAvailabilityCondition.check(jdbcUrl, 5000);
 			if (!available && ClassUtils.isPresent("org.h2.Driver", getClass().getClassLoader())) {
 				String newJdbcUrl = "jdbc:h2:" + AppInfo.getAppHome() + "/db/h2";
-				logger.warn("Default jdbcUrl {} is not available, switch to {}", jdbcUrl, newJdbcUrl);
+				log.warn("Default jdbcUrl {} is not available, switch to {}", jdbcUrl, newJdbcUrl);
 				jdbcUrl = newJdbcUrl;
 			}
 		}
@@ -122,7 +120,7 @@ public class DataSourceConfiguration {
 		ds.setMaxLifetime(maxLifetime);
 		ds.setRegisterMbeans(registerMbeans);
 		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
-		logger.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
+		log.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
 		return ds;
 	}
 

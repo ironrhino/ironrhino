@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.throttle.ThrottleService;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,12 +18,12 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@Slf4j
 public class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandler {
-
-	@Autowired
-	private Logger logger;
 
 	@Autowired
 	private UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
@@ -40,7 +39,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
 			AuthenticationException e) throws IOException, ServletException {
 		request.getSession().removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
 		String username = request.getParameter(usernamePasswordAuthenticationFilter.getUsernameParameter());
-		logger.warn("Authenticate \"{}\" failed with {}: {}", username, e.getClass().getSimpleName(), e.getMessage());
+		log.warn("Authenticate \"{}\" failed with {}: {}", username, e.getClass().getSimpleName(), e.getMessage());
 		if (e instanceof BadCredentialsException) {
 			if (username != null)
 				throttleService.delay("username:" + username, delayInterval, TimeUnit.SECONDS, delayInterval / 2);

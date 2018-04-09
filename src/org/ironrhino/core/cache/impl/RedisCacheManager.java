@@ -21,8 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.serializer.support.SerializationFailedException;
@@ -34,12 +32,13 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @Component("cacheManager")
 @ServiceImplementationConditional(profiles = { DUAL, CLOUD })
+@Slf4j
 public class RedisCacheManager implements CacheManager {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	@PriorityQualifier
@@ -63,7 +62,7 @@ public class RedisCacheManager implements CacheManager {
 			else
 				cacheRedisTemplate.opsForValue().set(generateKey(key, namespace), value);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -80,7 +79,7 @@ public class RedisCacheManager implements CacheManager {
 			Boolean b = cacheRedisTemplate.hasKey(generateKey(key, namespace));
 			return b != null && b;
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -92,11 +91,11 @@ public class RedisCacheManager implements CacheManager {
 		try {
 			return cacheRedisTemplate.opsForValue().get(generateKey(key, namespace));
 		} catch (SerializationFailedException e) {
-			logger.warn(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 			delete(key, namespace);
 			return null;
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -111,11 +110,11 @@ public class RedisCacheManager implements CacheManager {
 				cacheRedisTemplate.expire(actualKey, timeToIdle, timeUnit);
 			return cacheRedisTemplate.opsForValue().get(actualKey);
 		} catch (SerializationFailedException e) {
-			logger.warn(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 			delete(key, namespace);
 			return null;
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -147,7 +146,7 @@ public class RedisCacheManager implements CacheManager {
 		try {
 			cacheRedisTemplate.delete(generateKey(key, namespace));
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -161,7 +160,7 @@ public class RedisCacheManager implements CacheManager {
 			cacheRedisTemplate.opsForValue().multiSet(temp);
 			temp.keySet().forEach(key -> cacheRedisTemplate.expire(key, timeToLive, timeUnit));
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -180,7 +179,7 @@ public class RedisCacheManager implements CacheManager {
 			}
 			return result;
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -193,7 +192,7 @@ public class RedisCacheManager implements CacheManager {
 			cacheRedisTemplate
 					.delete(keys.stream().map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 

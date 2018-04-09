@@ -4,16 +4,15 @@ import java.lang.annotation.Annotation;
 
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.ClassMetadata;
 
-public abstract class SimpleCondition<T extends Annotation> implements Condition {
+import lombok.extern.slf4j.Slf4j;
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+@Slf4j
+public abstract class SimpleCondition<T extends Annotation> implements Condition {
 
 	private Class<T> annotationClass;
 
@@ -31,7 +30,7 @@ public abstract class SimpleCondition<T extends Annotation> implements Condition
 		boolean matched = matches(metadata);
 		if (!matched && (metadata instanceof ClassMetadata)) {
 			ClassMetadata cm = (ClassMetadata) metadata;
-			logger.info("Bean[" + cm.getClassName() + "] is skipped registry");
+			log.info("Bean[" + cm.getClassName() + "] is skipped registry");
 		}
 		return matched;
 	}

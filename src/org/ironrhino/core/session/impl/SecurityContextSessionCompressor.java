@@ -6,8 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.SessionCompressor;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.CodecUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,11 +19,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@Slf4j
 public class SecurityContextSessionCompressor implements SessionCompressor<SecurityContext> {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -82,10 +81,10 @@ public class SecurityContextSessionCompressor implements SessionCompressor<Secur
 					sc.setAuthentication(auth);
 					MDC.put("username", auth.getName());
 				} else {
-					logger.info("invalidate SecurityContext of \"{}\" because password changed", username);
+					log.info("invalidate SecurityContext of \"{}\" because password changed", username);
 				}
 			} catch (UsernameNotFoundException e) {
-				logger.warn(e.getMessage());
+				log.warn(e.getMessage());
 			}
 		return sc;
 	}

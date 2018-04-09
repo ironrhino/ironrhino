@@ -21,8 +21,6 @@ import javax.persistence.Lob;
 
 import org.ironrhino.core.model.Displayable;
 import org.ironrhino.core.util.AppInfo.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
@@ -50,6 +48,9 @@ import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class JsonUtils {
 
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -170,8 +171,6 @@ public class JsonUtils {
 				}
 			});
 
-	private static Logger logger = LoggerFactory.getLogger(JsonUtils.class);
-
 	private static final ObjectMapper sharedObjectMapper = createNewObjectMapper();
 
 	public static ObjectMapper getObjectMapper() {
@@ -213,7 +212,7 @@ public class JsonUtils {
 		try {
 			return sharedObjectMapper.writeValueAsString(object);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -222,7 +221,7 @@ public class JsonUtils {
 		try {
 			return sharedObjectMapper.writerWithView(serializationView).writeValueAsString(object);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}

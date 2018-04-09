@@ -8,8 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.impl.DefaultSessionCompressor;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.RequestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountExpiredException;
@@ -22,11 +20,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @SuppressWarnings({ "unchecked", "rawtypes" })
+@Slf4j
 public class SessionCompressorManager {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Value("${password.entryPoint:}")
 	private String passwordEntryPoint;
@@ -58,7 +57,7 @@ public class SessionCompressorManager {
 				if (s != null)
 					compressedMap.put(key, s);
 			} catch (Exception e) {
-				logger.error("compress error for " + key + ",it won't be saved", e);
+				log.error("compress error for " + key + ",it won't be saved", e);
 			}
 		}
 		return compressedMap.isEmpty() ? null : JsonUtils.toJson(compressedMap);
@@ -72,7 +71,7 @@ public class SessionCompressorManager {
 			try {
 				compressedMap = JsonUtils.fromJson(str, JsonUtils.STRING_MAP_TYPE);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				session.invalidate();
 				return;
 			}
@@ -122,7 +121,7 @@ public class SessionCompressorManager {
 					} catch (AccountStatusException e) {
 						throw e;
 					} catch (Exception e) {
-						logger.error("uncompress error for " + key + ",it won't be restored", e);
+						log.error("uncompress error for " + key + ",it won't be restored", e);
 					}
 				}
 		}

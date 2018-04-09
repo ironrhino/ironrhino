@@ -10,21 +10,20 @@ import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.throttle.ThrottleService;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @ApplicationContextPropertiesConditional(key = "verification.code.enabled", value = "true")
 @Component("verificationService")
+@Slf4j
 public class DefaultVerificationService implements VerificationService {
 
 	private static final String CACHE_NAMESPACE = "verification";
 	private static final String SUFFIX_RESEND = "$$resend";
 	private static final String SUFFIX_THRESHOLD = "$$threshold";
-
-	@Autowired
-	private Logger logger;
 
 	@Autowired
 	private CacheManager cacheManager;
@@ -62,7 +61,7 @@ public class DefaultVerificationService implements VerificationService {
 		if (verficationCode == null) {
 			codeToSend = (String) cacheManager.get(receiver, CACHE_NAMESPACE);
 			if (codeToSend != null && cacheManager.exists(receiver + SUFFIX_RESEND, CACHE_NAMESPACE)) {
-				logger.warn("{} is trying resend within cooldown time", receiver);
+				log.warn("{} is trying resend within cooldown time", receiver);
 				return;
 			}
 		} else {

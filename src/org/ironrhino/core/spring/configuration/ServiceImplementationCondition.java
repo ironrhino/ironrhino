@@ -8,8 +8,6 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -18,10 +16,10 @@ import org.springframework.core.type.classreading.AnnotationMetadataReadingVisit
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 class ServiceImplementationCondition implements Condition {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static Set<String> set = new HashSet<>();
 
@@ -54,7 +52,7 @@ class ServiceImplementationCondition implements Condition {
 					if (matched) {
 						String key = serviceInterfaceName + '=' + implementationClassName;
 						if (!set.contains(key)) {
-							logger.info("Select implementation {} for service {}", implementationClassName,
+							log.info("Select implementation {} for service {}", implementationClassName,
 									serviceInterfaceName);
 							set.add(key);
 						}

@@ -18,12 +18,8 @@ import org.ironrhino.core.stat.StatLogSettings;
 import org.ironrhino.core.stat.Value;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.TextFileIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
-
-	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected Iterator<? extends KeyValuePair> iterator;
 

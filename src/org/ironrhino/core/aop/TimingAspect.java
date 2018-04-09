@@ -7,17 +7,15 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.util.ExpressionUtils;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Aspect
 @Component
+@Slf4j
 public class TimingAspect extends BaseAspect {
-
-	@Autowired
-	private Logger logger;
 
 	public TimingAspect() {
 		order = Ordered.HIGHEST_PRECEDENCE + 2;
@@ -35,7 +33,7 @@ public class TimingAspect extends BaseAspect {
 		}
 		time = System.currentTimeMillis() - time;
 		String method = jp.getStaticPart().getSignature().toLongString();
-		logger.info("method[ {} ] tooks {} ms and {}", method, time, throwable == null ? "success" : "fail");
+		log.info("method[ {} ] tooks {} ms and {}", method, time, throwable == null ? "success" : "fail");
 		if (StringUtils.isNotBlank(timing.value())) {
 			Map<String, Object> context = buildContext(jp);
 			context.put("method", method);

@@ -15,8 +15,6 @@ import org.ironrhino.core.session.WrappedHttpSession;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -25,15 +23,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component("cacheBased")
+@Slf4j
 public class CacheBasedHttpSessionStore implements HttpSessionStore {
 
 	public static final String CACHE_NAMESPACE = "session";
 
 	private static final String SESSION_KEY_KICKED_OUT_FROM = "_KICKED_OUT_FROM";
 	private static final String SESSION_KEY_KICKED_OUT_DATE = "_KICKED_OUT_DATE";
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private CacheManager cacheManager;
 
@@ -91,7 +90,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 			try {
 				kickoutOtherSession(session);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 	}
@@ -133,10 +132,10 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 							map.put(SESSION_KEY_KICKED_OUT_DATE, DateUtils.formatDatetime(new Date()));
 							cacheManager.put(id, JsonUtils.toJson(map), session.getMaxInactiveInterval(),
 									TimeUnit.SECONDS, CACHE_NAMESPACE);
-							logger.info("user[{}] session[{}] is kicked out by session[{}] from {}", username, id,
+							log.info("user[{}] session[{}] is kicked out by session[{}] from {}", username, id,
 									session.getId(), ip);
 						} catch (Exception e) {
-							logger.error(e.getMessage(), e);
+							log.error(e.getMessage(), e);
 						}
 					}
 					list = list.subList(list.size() - maximumSessions, list.size());

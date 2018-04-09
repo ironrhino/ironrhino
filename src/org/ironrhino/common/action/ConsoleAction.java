@@ -17,22 +17,20 @@ import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.spring.ApplicationContextConsole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
+@Slf4j
 public class ConsoleAction extends BaseAction {
 
 	private static final long serialVersionUID = 8180265410790553918L;
-
-	private static Logger logger = LoggerFactory.getLogger(ConsoleAction.class);
 
 	@NotEmpty
 	@Getter
@@ -63,7 +61,7 @@ public class ConsoleAction extends BaseAction {
 			if (throwable.getCause() instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable.getCause()).getTargetException();
 			String msg = throwable.getLocalizedMessage();
-			logger.error(msg);
+			log.error(msg);
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			return ERROR;
 
@@ -80,7 +78,7 @@ public class ConsoleAction extends BaseAction {
 			if (throwable instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable).getTargetException();
 			String msg = throwable.getLocalizedMessage();
-			logger.error(msg);
+			log.error(msg);
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			Map<String, Collection<String>> map = new HashMap<>();
 			map.put("actionErrors", getActionErrors());

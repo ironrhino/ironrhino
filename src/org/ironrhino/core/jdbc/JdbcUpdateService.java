@@ -16,7 +16,6 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -29,11 +28,10 @@ import org.springframework.util.Assert;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class JdbcUpdateService {
-
-	@Autowired
-	private Logger logger;
 
 	@Getter
 	@Setter
@@ -105,7 +103,7 @@ public class JdbcUpdateService {
 			if (StringUtils.isNotBlank(str))
 				quoteString = str.trim().substring(0, 1);
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		} finally {
 			DataSourceUtils.releaseConnection(con, jdbcTemplate.getDataSource());
 		}

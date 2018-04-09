@@ -20,20 +20,18 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component("fileStorage")
 @ServiceImplementationConditional(profiles = { DEFAULT, DUAL })
+@Slf4j
 public class LocalFileStorage extends AbstractFileStorage {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Getter
 	@Setter
@@ -50,7 +48,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 			throw new IllegalStateException(directory + " is not directory");
 		if (!this.directory.exists())
 			if (!this.directory.mkdirs())
-				logger.error("mkdirs error:" + directory.getAbsolutePath());
+				log.error("mkdirs error:" + directory.getAbsolutePath());
 	}
 
 	@Override

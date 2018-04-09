@@ -3,17 +3,16 @@ package org.ironrhino.core.security.dynauth;
 import java.util.List;
 
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@Slf4j
 public class DynamicAuthorizerManager {
-
-	@Autowired
-	private Logger logger;
 
 	@Autowired(required = false)
 	private List<DynamicAuthorizer> authorizers;
@@ -28,7 +27,7 @@ public class DynamicAuthorizerManager {
 				if (entry.getClass().getName().equals(authorizer))
 					return entry.authorize(user, resource);
 			}
-			logger.error("not found authorizer [{}] in spring applicationContext", authorizer);
+			log.error("not found authorizer [{}] in spring applicationContext", authorizer);
 		}
 		return false;
 	}

@@ -5,8 +5,6 @@ import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.ClassScanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -18,10 +16,11 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
 
-@Component
-public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
+import lombok.extern.slf4j.Slf4j;
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+@Component
+@Slf4j
+public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
@@ -53,7 +52,7 @@ public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegist
 					new RuntimeBeanReference(StringUtils.isNotBlank(jdbcTemplate) ? jdbcTemplate : dataSourceBeanName));
 			beanDefinition.setConstructorArgumentValues(constructorArgumentValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
-			logger.info("Register bean [{}] for @JdbcRepository [{}]", beanName, jdbcRepositoryClass.getName());
+			log.info("Register bean [{}] for @JdbcRepository [{}]", beanName, jdbcRepositoryClass.getName());
 		}
 	}
 

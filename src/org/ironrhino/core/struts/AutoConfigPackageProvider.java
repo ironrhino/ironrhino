@@ -21,8 +21,6 @@ import org.ironrhino.core.struts.result.AutoConfigResult;
 import org.ironrhino.core.struts.result.ResultProvider;
 import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ClassUtils;
@@ -41,11 +39,12 @@ import com.opensymphony.xwork2.config.providers.InterceptorBuilder;
 import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.LocalizedTextUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class AutoConfigPackageProvider implements PackageProvider {
 
 	public static final String GLOBAL_MESSAGES_PATTERN = "resources/i18n/**/*.properties";
-
-	private static final Logger logger = LoggerFactory.getLogger(AutoConfigPackageProvider.class);
 
 	@Inject(value = "ironrhino.autoconfig.parent.package", required = false)
 	private String parentPackage = "ironrhino-default";
@@ -82,7 +81,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			String packageName = name.substring(0, name.lastIndexOf('.'));
 			AutoConfig ac = packageInfo.getAnnotation(AutoConfig.class);
 			if (ac != null) {
-				logger.info("Loading autoconfig from " + name);
+				log.info("Loading autoconfig from " + name);
 				String defaultNamespace = ac.namespace();
 				if (defaultNamespace.equals(""))
 					defaultNamespace = '/' + packageName.substring(packageName.lastIndexOf('.') + 1);
@@ -117,7 +116,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 					for (Map.Entry<String, Set<String>> entry : packages.entrySet()) {
 						if (entry.getValue().contains(p)) {
 							entry.getValue().remove(p);
-							logger.warn("package {} have been overriden from {} to {} in struts.xml", p, entry.getKey(),
+							log.warn("package {} have been overriden from {} to {} in struts.xml", p, entry.getKey(),
 									defaultNamespace);
 						}
 					}
@@ -140,7 +139,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 				name = name.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length());
 			name = org.springframework.util.ClassUtils.convertResourcePathToClassName(name);
 			LocalizedTextUtil.addDefaultResourceBundle(name);
-			logger.info("Loading global messages from " + name);
+			log.info("Loading global messages from " + name);
 		});
 
 	}
@@ -192,7 +191,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 					// add package
 					configuration.addPackageConfig(packageConfig.getName(), packageConfig);
 					for (ActionConfig ac : packageConfig.getActionConfigs().values())
-						logger.info("Mapping " + ac.getClassName() + " to " + packageConfig.getNamespace()
+						log.info("Mapping " + ac.getClassName() + " to " + packageConfig.getNamespace()
 								+ (packageConfig.getNamespace().endsWith("/") ? "" : "/") + ac.getName());
 				} else {
 					// merge package
@@ -200,7 +199,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 					for (String actionName : packageConfig.getActionConfigs().keySet()) {
 						if (actionConfigs.containsKey(actionName)) {
 							// ignore if action already exists
-							logger.warn(actionConfigs.get(actionName) + " exists for action class '"
+							log.warn(actionConfigs.get(actionName) + " exists for action class '"
 									+ actionConfigs.get(actionName).getClassName()
 									+ "', ignore autoconfig on action class '"
 									+ packageConfig.getActionConfigs().get(actionName).getClassName() + "'");
@@ -208,7 +207,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 						}
 						ActionConfig ac = packageConfig.getActionConfigs().get(actionName);
 						actionConfigs.put(actionName, ac);
-						logger.info("Mapping " + ac.getClassName() + " to " + pc.getNamespace()
+						log.info("Mapping " + ac.getClassName() + " to " + pc.getNamespace()
 								+ (pc.getNamespace().endsWith("/") ? "" : "/") + ac.getName());
 					}
 					ReflectionUtils.setFieldValue(pc, "actionConfigs", actionConfigs);
@@ -239,12 +238,12 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			PackageConfig packageConfig = ReflectionUtils.getFieldValue(pkgConfig, "target");
 			ActionConfig existsConfig = packageConfig.getActionConfigs().get(actionName);
 			if (existsConfig != null) {
-				logger.info("Replace {} with {} for {}", cls.getName(), existsConfig.getClassName(),
+				log.info("Replace {} with {} for {}", cls.getName(), existsConfig.getClassName(),
 						(namespace.endsWith("/") ? namespace : namespace + "/") + actionName);
 				return;
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		ResultConfig autoCofigResult = new ResultConfig.Builder("*", AutoConfigResult.class.getName()).build();
 		ActionConfig.Builder builder = new ActionConfig.Builder(packageName, actionName, actionClass)
@@ -278,7 +277,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			if (parent != null) {
 				pkgConfig.addParent(parent);
 			} else {
-				logger.error("Unable to locate parent package: " + parentPackage);
+				log.error("Unable to locate parent package: " + parentPackage);
 			}
 			packageLoader.registerPackage(pkgConfig);
 		} else if (pkgConfig.getNamespace() == null) {

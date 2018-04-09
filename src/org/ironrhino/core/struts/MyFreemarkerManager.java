@@ -14,8 +14,6 @@ import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.RequestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -32,15 +30,15 @@ import freemarker.template.Configuration;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MyFreemarkerManager extends FreemarkerManager {
 
 	private static final String ATTR_APPLICATION_MODEL = ".freemarker.Application";
 	private static final String ATTR_SESSION_MODEL = ".freemarker.Session";
 	private static final String ATTR_REQUEST_MODEL = ".freemarker.Request";
 	private static final String ATTR_REQUEST_PARAMETERS_MODEL = ".freemarker.RequestParameters";
-
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private FreemarkerConfigurer freemarkerConfigurer;
 
@@ -76,7 +74,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 				configuration.addAutoImport(namespace, location.substring(location.indexOf(ftlClasspath)));
 			}
 		} catch (IOException e) {
-			logger.debug(e.getMessage());
+			log.debug(e.getMessage());
 		}
 		try {
 			searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ftlClasspath + "/meta/include/*.ftl";
@@ -86,7 +84,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 				configuration.addAutoInclude(location.substring(location.indexOf(ftlClasspath)));
 			}
 		} catch (IOException e) {
-			logger.debug(e.getMessage());
+			log.debug(e.getMessage());
 		}
 		return configuration;
 	}

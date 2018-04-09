@@ -3,9 +3,10 @@ package org.ironrhino.core.stat;
 import java.io.File;
 
 import org.ironrhino.core.util.AppInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class StatLogSettings {
 
 	public static final String WRITETHREAD_NAME = "STATLOG-WRITE";
@@ -22,8 +23,6 @@ public class StatLogSettings {
 
 	public static final String STAT_LOG_FILE_NAME = "stat.log";
 
-	private static final Logger logger = LoggerFactory.getLogger(StatLogSettings.class);
-
 	private static int intervalUnit = 60; // senconds
 
 	public static int getIntervalUnit() {
@@ -38,7 +37,7 @@ public class StatLogSettings {
 	public static File getLogFileDirectory() {
 		File dir = new File(AppInfo.getAppHome() + FILE_DIRECTORY);
 		if (!dir.exists() && dir.mkdirs())
-			logger.error("mkdir error:" + dir.getAbsolutePath());
+			log.error("mkdir error:" + dir.getAbsolutePath());
 		return dir;
 	}
 

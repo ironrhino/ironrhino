@@ -17,13 +17,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.metadata.PostPropertiesReset;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.rubyeye.xmemcached.MemcachedClient;
 import net.rubyeye.xmemcached.MemcachedClientBuilder;
 import net.rubyeye.xmemcached.XMemcachedClientBuilder;
@@ -33,9 +32,8 @@ import net.rubyeye.xmemcached.utils.AddrUtil;
 
 @Component("cacheManager")
 @ServiceImplementationConditional(profiles = CLUSTER)
+@Slf4j
 public class MemcachedCacheManager implements CacheManager {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Value("${memcached.serverAddress:localhost:11211}")
 	private String serverAddress;
@@ -63,7 +61,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			memcached = build(serverAddress);
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -84,7 +82,7 @@ public class MemcachedCacheManager implements CacheManager {
 			try {
 				memcached.shutdown();
 			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 	}
 
@@ -103,7 +101,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			memcached.setWithNoReply(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive), value);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -119,7 +117,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return memcached.get(generateKey(key, namespace)) != null;
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -131,7 +129,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return memcached.get(generateKey(key, namespace));
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -145,7 +143,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			return memcached.getAndTouch(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToIdle));
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -160,7 +158,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			memcached.touch(generateKey(key, namespace), (int) timeUnit.toSeconds(timeToLive));
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -171,7 +169,7 @@ public class MemcachedCacheManager implements CacheManager {
 		try {
 			memcached.deleteWithNoReply(generateKey(key, namespace));
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -197,7 +195,7 @@ public class MemcachedCacheManager implements CacheManager {
 				result.put(key, map.get(generateKey(key, namespace)));
 			return result;
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}

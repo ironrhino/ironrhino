@@ -2,14 +2,10 @@ package org.ironrhino.core.struts.mapper;
 
 import org.apache.struts2.dispatcher.mapper.ActionMapper;
 import org.apache.struts2.dispatcher.mapper.ActionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractActionMapper implements ActionMapper {
 
 	public static final String ID = "id";
-
-	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public ActionMapping getMappingFromActionName(String actionName) {

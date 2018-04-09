@@ -28,7 +28,6 @@ import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.StringUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,16 +38,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Aspect
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@Slf4j
 public class RecordAspect extends TransactionSynchronizationAdapter implements Ordered {
 
 	private static final String HIBERNATE_EVENTS = "HIBERNATE_EVENTS_FOR_RECORD";
-
-	@Autowired
-	private Logger logger;
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -190,7 +188,7 @@ public class RecordAspect extends TransactionSynchronizationAdapter implements O
 				record.setRecordDate(new Date());
 				session.save(record);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		session.flush();

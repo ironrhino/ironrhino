@@ -32,8 +32,6 @@ import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -53,13 +51,13 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @AutoConfig
+@Slf4j
 public class Oauth2Action extends BaseAction {
 
 	private static final long serialVersionUID = 8175470892708878896L;
-
-	protected static Logger logger = LoggerFactory.getLogger(Oauth2Action.class);
 
 	@Autowired
 	protected EventPublisher eventPublisher;
@@ -204,7 +202,7 @@ public class Oauth2Action extends BaseAction {
 				captchaManager.addCaptchaCount(request);
 				return INPUT;
 			} catch (InternalAuthenticationServiceException failed) {
-				logger.error(failed.getMessage(), failed);
+				log.error(failed.getMessage(), failed);
 				addActionError(ExceptionUtils.getRootMessage(failed));
 				return INPUT;
 			}
@@ -294,8 +292,8 @@ public class Oauth2Action extends BaseAction {
 				UserDetails u = userDetailsService.loadUserByUsername(username);
 				authorization = oauthManager.grant(client, u.getUsername(), device_id, device_name);
 			} catch (Exception e) {
-				logger.error("Exchange token by password for \"{}\" failed with {}: {}", username,
-						e.getClass().getName(), e.getLocalizedMessage());
+				log.error("Exchange token by password for \"{}\" failed with {}: {}", username, e.getClass().getName(),
+						e.getLocalizedMessage());
 				oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
 						: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
 				return NONE;
@@ -314,7 +312,7 @@ public class Oauth2Action extends BaseAction {
 			try {
 				authorization = oauthManager.grant(client, device_id, device_name);
 			} catch (Exception e) {
-				logger.error("Exchange token by client_credentials for \"{}\" failed with {}: {}", client_id,
+				log.error("Exchange token by client_credentials for \"{}\" failed with {}: {}", client_id,
 						e.getClass().getName(), e.getLocalizedMessage());
 				oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
 						: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
@@ -336,7 +334,7 @@ public class Oauth2Action extends BaseAction {
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
 			} catch (Exception e) {
-				logger.error("Refresh token \"{}\" failed with {}: {}", refresh_token, e.getClass().getName(),
+				log.error("Refresh token \"{}\" failed with {}: {}", refresh_token, e.getClass().getName(),
 						e.getLocalizedMessage());
 				oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
 						: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
@@ -362,7 +360,7 @@ public class Oauth2Action extends BaseAction {
 				eventPublisher.publish(new AuthorizeEvent(authorization.getGrantor(), request.getRemoteAddr(),
 						client.getName(), grant_type.name()), Scope.LOCAL);
 			} catch (Exception e) {
-				logger.error("Exchange token by code for \"{}\" failed with {}: {}", code, e.getClass().getName(),
+				log.error("Exchange token by code for \"{}\" failed with {}: {}", code, e.getClass().getName(),
 						e.getLocalizedMessage());
 				oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
 						: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));
@@ -437,7 +435,7 @@ public class Oauth2Action extends BaseAction {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Send verification code to \"{}\" failed with {}: {}", username, e.getClass().getName(),
+			log.error("Send verification code to \"{}\" failed with {}: {}", username, e.getClass().getName(),
 					e.getLocalizedMessage());
 			oauthErrorHandler.handle(request, response, e instanceof OAuthError ? (OAuthError) e
 					: new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage()));

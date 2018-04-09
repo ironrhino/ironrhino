@@ -36,15 +36,15 @@ import org.springframework.util.ClassUtils;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
 
 	private static final boolean resilience4jPresent = ClassUtils.isPresent(
 			"io.github.resilience4j.circuitbreaker.CircuitBreaker", HttpInvokerClient.class.getClassLoader());
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
-
-	private static Logger logger = LoggerFactory.getLogger(HttpInvokerClient.class);
 
 	private static Logger remotingLogger = LoggerFactory.getLogger("remoting");
 
@@ -238,8 +238,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				if (--attempts < 1)
 					throw e;
 				if ((e instanceof SerializationFailedException) && getSerializationType() != SerializationType.JAVA) {
-					logger.error("Downgrade service[{}] serialization from {} to {}: {}",
-							getServiceInterface().getName(), serializationType, SerializationType.JAVA, e.getMessage());
+					log.error("Downgrade service[{}] serialization from {} to {}: {}", getServiceInterface().getName(),
+							serializationType, SerializationType.JAVA, e.getMessage());
 					setSerializationType(SerializationType.JAVA);
 				} else {
 					if (urlFromDiscovery) {
@@ -250,7 +250,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 						String serviceUrl = discoverServiceUrl();
 						if (!serviceUrl.equals(getServiceUrl())) {
 							setServiceUrl(serviceUrl);
-							logger.info("Relocate service url " + serviceUrl);
+							log.info("Relocate service url " + serviceUrl);
 						}
 					}
 				}

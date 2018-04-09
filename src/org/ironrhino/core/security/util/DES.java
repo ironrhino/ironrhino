@@ -19,11 +19,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.CodecUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class DES {
-	private static Logger logger = LoggerFactory.getLogger(DES.class);
 
 	public static final String DEFAULT_KEY_LOCATION = "/resources/key/des";
 	public static final String KEY_DIRECTORY = "/key/";
@@ -47,27 +47,27 @@ public class DES {
 		String s = System.getProperty(AppInfo.getAppName() + ".des");
 		if (StringUtils.isNotBlank(s)) {
 			defaultKey = s;
-			logger.info("using system property " + AppInfo.getAppName() + ".des as default key");
+			log.info("using system property " + AppInfo.getAppName() + ".des as default key");
 		} else {
 			try {
 				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "des");
 				if (file.exists()) {
 					defaultKey = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-					logger.info("using file " + file.getAbsolutePath());
+					log.info("using file " + file.getAbsolutePath());
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
-						logger.warn("file " + file.getAbsolutePath()
+						log.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (DES.class.getResource(DEFAULT_KEY_LOCATION) != null) {
 						try (InputStream is = DES.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
 							defaultKey = IOUtils.toString(is, StandardCharsets.UTF_8);
-							logger.info("using classpath resource "
+							log.info("using classpath resource "
 									+ DES.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}
 					}
 				}
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		if (defaultKey == null)
@@ -89,7 +89,7 @@ public class DES {
 			enCipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
 			deCipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 		} catch (Exception e) {
-			logger.error("[BlowfishEncrypter]", e);
+			log.error("[BlowfishEncrypter]", e);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class DES {
 					Base64.getEncoder().withoutPadding().encode(encrypt(str.getBytes(StandardCharsets.UTF_8))),
 					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
-			logger.error("encrypt exception!", ex);
+			log.error("encrypt exception!", ex);
 			return "";
 		}
 	}
@@ -129,7 +129,7 @@ public class DES {
 			return new String(decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))),
 					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
-			logger.error("decrypt exception!", ex);
+			log.error("decrypt exception!", ex);
 			return "";
 		}
 	}
@@ -152,7 +152,7 @@ public class DES {
 					Base64.getEncoder().withoutPadding().encode(des.encrypt(str.getBytes(StandardCharsets.UTF_8))),
 					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
-			logger.error("encrypt exception!", ex);
+			log.error("encrypt exception!", ex);
 			return "";
 		}
 	}
@@ -163,7 +163,7 @@ public class DES {
 			return new String(des.decrypt(Base64.getDecoder().decode(str.getBytes(StandardCharsets.UTF_8))),
 					StandardCharsets.UTF_8);
 		} catch (Exception ex) {
-			logger.error("decrypt exception!", ex);
+			log.error("decrypt exception!", ex);
 			return "";
 		}
 	}

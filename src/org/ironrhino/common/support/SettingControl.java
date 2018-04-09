@@ -24,21 +24,20 @@ import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.DateUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class SettingControl {
 
 	public static final String SETTING_KEY_SETUP_DATETIME = "setup.datetime";
 	public static final String SETTING_KEY_SETUP_TIMESTAMP = "setup.timestamp";
-
-	@Autowired
-	private Logger logger;
 
 	@Autowired
 	private EntityManager<Setting> entityManager;
@@ -229,7 +228,7 @@ public class SettingControl {
 				entityManager.save(setting);
 			}
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 	}
 

@@ -17,8 +17,6 @@ import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -39,15 +37,15 @@ import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @SuppressWarnings({ "unchecked", "rawtypes" })
+@Slf4j
 public class JobAction extends BaseAction {
 
 	private static final long serialVersionUID = 3379095323379034989L;
-
-	private static Logger logger = LoggerFactory.getLogger(JobAction.class);
 
 	@Autowired
 	private JobRegistry jobRegistry;
@@ -157,29 +155,29 @@ public class JobAction extends BaseAction {
 			}
 			JobParameters jobParameters = jobParametersBuilder.toJobParameters();
 			String jobParametersString = JobParameterHelper.toString(jobParameters);
-			logger.info("Try launch job {} with {}", jobName, jobParametersString);
+			log.info("Try launch job {} with {}", jobName, jobParametersString);
 			try {
 				JobExecution je = jobLauncher.run(job, jobParameters);
 				String message = getText("launch.job", new String[] { getText(jobName),
 						DateUtils.formatDatetime(je.getCreateTime()), jobParametersString });
-				logger.info(message);
+				log.info(message);
 				addActionMessage(message);
 			} catch (JobExecutionException e) {
 				addActionError(getText(e.getClass().getName()));
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		} else {
-			logger.info("Try launch job {} with parameters incrementer {}", jobName, jobParametersIncrementer);
+			log.info("Try launch job {} with parameters incrementer {}", jobName, jobParametersIncrementer);
 			try {
 				JobExecution je = jobExplorer.getJobExecution(jobOperator.startNextInstance(jobName));
 				String jobParametersString = JobParameterHelper.toString(je.getJobParameters());
 				String message = getText("launch.job", new String[] { getText(jobName),
 						DateUtils.formatDatetime(je.getCreateTime()), jobParametersString });
-				logger.info(message);
+				log.info(message);
 				addActionMessage(message);
 			} catch (JobExecutionException e) {
 				addActionError(getText(e.getClass().getName()));
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		return SUCCESS;

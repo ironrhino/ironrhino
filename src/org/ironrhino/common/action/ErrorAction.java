@@ -12,8 +12,6 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.LocalizedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
@@ -23,13 +21,13 @@ import com.opensymphony.xwork2.ActionSupport;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @AutoConfig(namespace = "/")
+@Slf4j
 public class ErrorAction extends ActionSupport {
 
 	private static final long serialVersionUID = 7684824080798968019L;
-
-	private static Logger logger = LoggerFactory.getLogger(ErrorAction.class);
 
 	@Getter
 	@Setter
@@ -79,9 +77,9 @@ public class ErrorAction extends ActionSupport {
 				return ERROR;
 			} else if (exception != null) {
 				if (exception instanceof LocalizedException || exception instanceof ErrorMessage)
-					logger.error(exception.getLocalizedMessage());
+					log.error(exception.getLocalizedMessage());
 				else
-					logger.error(exception.getMessage(), exception);
+					log.error(exception.getMessage(), exception);
 			}
 			try {
 				errorcode = Integer.valueOf(getUid());

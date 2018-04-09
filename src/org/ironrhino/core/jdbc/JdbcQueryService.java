@@ -24,7 +24,6 @@ import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -41,13 +40,12 @@ import org.springframework.util.Assert;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@Slf4j
 public class JdbcQueryService {
-
-	@Autowired
-	private Logger logger;
 
 	@Getter
 	@Setter
@@ -131,7 +129,7 @@ public class JdbcQueryService {
 					keywords.addAll(Arrays.asList(str.toUpperCase(Locale.ROOT).split("\\s*,\\s*")));
 			}
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		} finally {
 			DataSourceUtils.releaseConnection(con, jdbcTemplate.getDataSource());
 		}
@@ -153,7 +151,7 @@ public class JdbcQueryService {
 			}
 			rs.close();
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		} finally {
 			DataSourceUtils.releaseConnection(con, jdbcTemplate.getDataSource());
 		}

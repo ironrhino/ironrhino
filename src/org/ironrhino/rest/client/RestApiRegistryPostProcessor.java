@@ -5,8 +5,6 @@ import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.ClassScanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -19,10 +17,11 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
 
-@Component
-public class RestApiRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
+import lombok.extern.slf4j.Slf4j;
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+@Component
+@Slf4j
+public class RestApiRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
@@ -54,7 +53,7 @@ public class RestApiRegistryPostProcessor implements BeanDefinitionRegistryPostP
 				propertyValues.addPropertyValue("restClient", new RuntimeBeanReference(annotation.restClient()));
 			beanDefinition.setPropertyValues(propertyValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
-			logger.info("Register bean [{}] for @RestApi [{}]", beanName, restApiClass.getName());
+			log.info("Register bean [{}] for @RestApi [{}]", beanName, restApiClass.getName());
 		}
 	}
 

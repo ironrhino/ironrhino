@@ -33,8 +33,10 @@ import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class AccessFilter implements Filter {
 
 	public static final String HTTP_HEADER_INSTANCE_ID = "X-Instance-Id";
@@ -44,8 +46,6 @@ public class AccessFilter implements Filter {
 	public static final String MDC_KEY_REQUEST_CHAIN = "requestChain";
 	public static final String HTTP_HEADER_REQUEST_FROM = "X-Request-From";
 	public static final String MDC_KEY_REQUEST_FROM = "requestFrom";
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Logger accessLog = LoggerFactory.getLogger("access");
 
@@ -208,7 +208,7 @@ public class AccessFilter implements Filter {
 					accesWarnLog.warn(sb.toString());
 				}
 			} catch (ServletException e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				throw e;
 			} finally {
 				if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")

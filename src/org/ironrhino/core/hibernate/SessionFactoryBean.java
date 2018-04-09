@@ -52,16 +52,15 @@ import org.ironrhino.core.hibernate.event.SaveOrUpdateCallbackEventListener;
 import org.ironrhino.core.hibernate.type.YearMonthType;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.ClassScanner;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.stereotype.Component;
 
-public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
+import lombok.extern.slf4j.Slf4j;
 
-	@Autowired
-	private Logger logger;
+@Slf4j
+public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
 
 	@Autowired(required = false)
 	private List<StandardServiceInitiator<?>> standardServiceInitiators;
@@ -136,7 +135,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			DatabaseMetaData dbmd = conn.getMetaData();
 			databaseProduct = DatabaseProduct.parse(dbmd.getDatabaseProductName());
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 		}
 		Properties properties = getHibernateProperties();
 		// version 5.2 introduce ALLOW_UPDATE_OUTSIDE_TRANSACTION
@@ -178,9 +177,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		}
 		classes.sort(Comparator.comparing(Class::getName));
 		annotatedClasses = classes.toArray(new Class<?>[0]);
-		logger.info("annotatedClasses: ");
+		log.info("annotatedClasses: ");
 		for (Class<?> clz : annotatedClasses)
-			logger.info(clz.getName());
+			log.info(clz.getName());
 		super.setAnnotatedClasses(annotatedClasses);
 		if (implicitNamingStrategy != null)
 			setImplicitNamingStrategy(implicitNamingStrategy);
@@ -199,7 +198,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		if ("true".equals(value)) {
 			if (databaseProduct == DatabaseProduct.ORACLE) {
 				properties.put(AvailableSettings.BATCH_VERSIONED_DATA, "false");
-				logger.warn("Override {} to false because this driver returns incorrect row counts from executeBatch()",
+				log.warn("Override {} to false because this driver returns incorrect row counts from executeBatch()",
 						AvailableSettings.BATCH_VERSIONED_DATA);
 			}
 		}
@@ -219,20 +218,20 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 				sfb.getStandardServiceRegistryBuilder().addInitiator(s);
 		Collection<Class<?>> converters = ClassScanner.scanAssignable(ClassScanner.getAppPackages(),
 				AttributeConverter.class);
-		logger.info("annotatedConverters: ");
+		log.info("annotatedConverters: ");
 		for (Class<?> clz : converters) {
 			if (AnnotationUtils.getAnnotation(clz, Component.class) != null)
 				continue;
 			Converter c = clz.getAnnotation(Converter.class);
 			if (c != null && c.autoApply()) {
 				sfb.addAttributeConverter((Class<AttributeConverter<?, ?>>) clz);
-				logger.info(clz.getName());
+				log.info(clz.getName());
 			}
 		}
 		if (attributeConverters != null) {
 			for (AttributeConverter<?, ?> ac : attributeConverters) {
 				sfb.addAttributeConverter(ac);
-				logger.info(ac.getClass().getName());
+				log.info(ac.getClass().getName());
 			}
 		}
 		sfb.registerTypeOverride(YearMonthType.INSTANCE);

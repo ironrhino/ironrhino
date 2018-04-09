@@ -5,8 +5,6 @@ import java.util.Locale;
 
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +13,11 @@ import com.opensymphony.xwork2.inject.Container;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class TemplateProvider {
-
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private FreemarkerConfigurer freemarkerConfigurer;
@@ -34,7 +32,7 @@ public class TemplateProvider {
 						.getInstance(org.apache.struts2.views.freemarker.FreemarkerManager.class);
 				configuration = freemarkerManager.getConfiguration(ServletActionContext.getServletContext());
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		return configuration;
