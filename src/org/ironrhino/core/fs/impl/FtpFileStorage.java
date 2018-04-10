@@ -230,12 +230,20 @@ public class FtpFileStorage extends AbstractFileStorage {
 						}
 						closed = true;
 					}
-					super.close();
-					ftpClient.completePendingCommand();
 					try {
-						pool.returnObject(ftpClient);
-					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+						super.close();
+					} finally {
+						try {
+							ftpClient.completePendingCommand();
+							pool.returnObject(ftpClient);
+						} catch (Exception e) {
+							try {
+								pool.invalidateObject(ftpClient);
+							} catch (Exception e1) {
+								log.error(e1.getMessage(), e1);
+							}
+							log.error(e.getMessage(), e);
+						}
 					}
 				}
 			};
