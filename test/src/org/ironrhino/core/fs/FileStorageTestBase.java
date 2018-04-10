@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class FileStorageTestBase {
 
 	@Autowired
-	private FileStorage fs;
+	protected FileStorage fs;
 
 	@Test
 	public void testDirectory() throws IOException {
@@ -44,7 +45,10 @@ public abstract class FileStorageTestBase {
 		assertTrue(fs.isDirectory("/test/test2/"));
 		assertNull(fs.open("/test/test2/"));
 		assertNull(fs.open("/test/test2/notexists.txt"));
-		List<String> lines = IOUtils.readLines(fs.open(path), StandardCharsets.UTF_8);
+		List<String> lines;
+		try (InputStream is = fs.open(path)) {
+			lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
+		}
 		assertTrue(fs.exists("/test/"));
 		assertTrue(fs.exists(path));
 		assertEquals(text, lines.get(0));
