@@ -1,7 +1,7 @@
 package org.ironrhino.core.servlet;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -48,10 +48,11 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 					System.lineSeparator());
 			try {
 				X509Certificate x509Certificate = (X509Certificate) CertificateFactory.getInstance("X.509")
-						.generateCertificate(new ByteArrayInputStream(certificateContent.getBytes("ISO-8859-11")));
+						.generateCertificate(
+								new ByteArrayInputStream(certificateContent.getBytes(StandardCharsets.ISO_8859_1)));
 				request.setAttribute("javax.servlet.request.X509Certificate",
 						new X509Certificate[] { x509Certificate });
-			} catch (CertificateException | UnsupportedEncodingException e) {
+			} catch (CertificateException e) {
 				e.printStackTrace();
 			}
 		}

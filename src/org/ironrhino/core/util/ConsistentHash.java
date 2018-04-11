@@ -1,8 +1,8 @@
 package org.ironrhino.core.util;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -249,12 +249,7 @@ public class ConsistentHash<K, V> {
 
 		@Override
 		public long hash(String key) {
-			try {
-				return hash(key.getBytes("UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-				return 0;
-			}
+			return hash(key.getBytes(StandardCharsets.UTF_8));
 		}
 	}
 
