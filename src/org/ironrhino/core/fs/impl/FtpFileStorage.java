@@ -58,6 +58,11 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 	@Getter
 	@Setter
+	@Value("${ftp.dataTimeout:10000}")
+	protected int dataTimeout = 10000;
+
+	@Getter
+	@Setter
 	@Value("${ftp.controlEncoding:UTF-8}")
 	protected String controlEncoding = "UTF-8";
 
@@ -110,6 +115,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 			@Override
 			public FTPClient create() throws Exception {
 				FTPClient ftpClient = uri.getScheme().equals("ftps") ? new FTPSClient() : new FTPClient();
+				ftpClient.setDataTimeout(dataTimeout);
 				ftpClient.setControlEncoding(controlEncoding);
 				ftpClient.connect(uri.getHost(), uri.getPort() > 0 ? uri.getPort() : ftpClient.getDefaultPort());
 				if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
