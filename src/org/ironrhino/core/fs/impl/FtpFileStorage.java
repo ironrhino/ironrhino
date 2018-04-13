@@ -290,7 +290,13 @@ public class FtpFileStorage extends AbstractFileStorage {
 	public boolean delete(String path) throws IOException {
 		return execute(ftpClient -> {
 			String pathname = getPathname(path, ftpClient);
-			return isDirectory(path) ? ftpClient.removeDirectory(pathname) : ftpClient.deleteFile(pathname);
+			ftpClient.changeWorkingDirectory(pathname);
+			if (ftpClient.getReplyCode() != 550) {
+				ftpClient.changeToParentDirectory();
+				return ftpClient.removeDirectory(pathname);
+			} else {
+				return ftpClient.deleteFile(pathname);
+			}
 		});
 	}
 
@@ -396,6 +402,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 			if (ftpClient != null)
 				try {
 					pool.invalidateObject(ftpClient);
+					ftpClient = null;
 				} catch (Exception ex) {
 					log.error(ex.getMessage(), ex);
 				}
