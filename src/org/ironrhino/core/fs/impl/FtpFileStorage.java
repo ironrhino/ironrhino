@@ -1,5 +1,7 @@
 package org.ironrhino.core.fs.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -68,6 +70,11 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Setter
 	@Value("${ftp.passiveMode:true}")
 	protected boolean passiveMode = true;
+
+	@Getter
+	@Setter
+	@Value("${ftp.bufferThreshold:1048576}")
+	protected long bufferThreshold = 1048576;
 
 	@Getter
 	@Setter
@@ -190,10 +197,10 @@ public class FtpFileStorage extends AbstractFileStorage {
 	public void write(InputStream is, String path) throws IOException {
 		try (InputStream ins = is) {
 			execute(ftpClient -> {
-				String realPath = getRealPath(path, ftpClient);
+				String pathname = getPathname(path, ftpClient);
 				String workingDirectory = ftpClient.printWorkingDirectory();
 				workingDirectory = org.ironrhino.core.util.StringUtils.trimTailSlash(workingDirectory);
-				String relativePath = realPath.substring(workingDirectory.length() + 1);
+				String relativePath = pathname.substring(workingDirectory.length() + 1);
 				String[] arr = relativePath.split("/");
 				if (arr.length > 1) {
 					StringBuilder sb = new StringBuilder(workingDirectory);
@@ -205,7 +212,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 						}
 					}
 				}
-				ftpClient.storeFile(realPath, ins);
+				ftpClient.storeFile(pathname, ins);
 				return null;
 			});
 		}
@@ -214,10 +221,18 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Override
 	public InputStream open(String path) throws IOException {
 		return execute(ftpClient -> {
-			InputStream is = ftpClient.retrieveFileStream(getRealPath(path, ftpClient));
-			if (is == null)
+			String pathname = getPathname(path, ftpClient);
+			FTPFile[] files = ftpClient.listFiles(pathname);
+			if (files == null || files.length != 1 || !files[0].isFile())
 				return null;
-			return new ProxyInputStream(is) {
+			long size = files[0].getSize();
+			if (size <= bufferThreshold) {
+				// small file
+				ByteArrayOutputStream bos = new ByteArrayOutputStream((int) size);
+				ftpClient.retrieveFile(pathname, bos);
+				return new ByteArrayInputStream(bos.toByteArray());
+			}
+			return new ProxyInputStream(ftpClient.retrieveFileStream(pathname)) {
 
 				private final Object closeLock = new Object();
 				private volatile boolean closed = false;
@@ -253,10 +268,10 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Override
 	public boolean mkdir(String path) throws IOException {
 		return execute(ftpClient -> {
-			String realPath = getRealPath(path, ftpClient);
+			String pathname = getPathname(path, ftpClient);
 			String workingDirectory = ftpClient.printWorkingDirectory();
 			workingDirectory = org.ironrhino.core.util.StringUtils.trimTailSlash(workingDirectory);
-			String relativePath = realPath.substring(workingDirectory.length() + 1);
+			String relativePath = pathname.substring(workingDirectory.length() + 1);
 			String[] arr = relativePath.split("/");
 			StringBuilder sb = new StringBuilder(workingDirectory);
 			for (int i = 0; i < arr.length; i++) {
@@ -274,7 +289,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Override
 	public boolean delete(String path) throws IOException {
 		return execute(ftpClient -> {
-			String pathname = getRealPath(path, ftpClient);
+			String pathname = getPathname(path, ftpClient);
 			return isDirectory(path) ? ftpClient.removeDirectory(pathname) : ftpClient.deleteFile(pathname);
 		});
 	}
@@ -282,7 +297,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Override
 	public long getLastModified(String path) throws IOException {
 		return execute(ftpClient -> {
-			String modificationTime = ftpClient.getModificationTime(getRealPath(path, ftpClient));
+			String modificationTime = ftpClient.getModificationTime(getPathname(path, ftpClient));
 			if (modificationTime != null)
 				try {
 					Date d = DateUtils.parse(modificationTime, "yyyyMMddHHmmss");
@@ -298,7 +313,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Override
 	public boolean exists(String path) throws IOException {
 		boolean isFile = execute(ftpClient -> {
-			return ftpClient.getModificationTime(getRealPath(path, ftpClient)) != null;
+			return ftpClient.getModificationTime(getPathname(path, ftpClient)) != null;
 		});
 		return isFile || isDirectory(path);
 	}
@@ -306,8 +321,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Override
 	public boolean rename(String fromPath, String toPath) throws IOException {
 		return execute(ftpClient -> {
-			String _fromPath = getRealPath(fromPath, ftpClient);
-			String _toPath = getRealPath(toPath, ftpClient);
+			String _fromPath = getPathname(fromPath, ftpClient);
+			String _toPath = getPathname(toPath, ftpClient);
 			String s1 = _fromPath.substring(0, _fromPath.lastIndexOf('/'));
 			String s2 = _toPath.substring(0, _toPath.lastIndexOf('/'));
 			if (!s1.equals(s2))
@@ -323,7 +338,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 	@Override
 	public boolean isDirectory(String path) throws IOException {
 		return execute(ftpClient -> {
-			ftpClient.changeWorkingDirectory(getRealPath(path, ftpClient));
+			ftpClient.changeWorkingDirectory(getPathname(path, ftpClient));
 			return ftpClient.getReplyCode() != 550;
 		});
 	}
@@ -332,7 +347,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 	public List<String> listFiles(String path) throws IOException {
 		return execute(ftpClient -> {
 			List<String> list = new ArrayList<>();
-			for (FTPFile f : ftpClient.listFiles(getRealPath(path, ftpClient))) {
+			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
 				if (f.isFile())
 					list.add(f.getName());
 			}
@@ -345,7 +360,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 	public Map<String, Boolean> listFilesAndDirectory(String path) throws IOException {
 		return execute(ftpClient -> {
 			final Map<String, Boolean> map = new HashMap<>();
-			for (FTPFile f : ftpClient.listFiles(getRealPath(path, ftpClient))) {
+			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
 				map.put(f.getName(), f.isFile());
 			}
 			List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
@@ -357,7 +372,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 		});
 	}
 
-	private String getRealPath(String path, FTPClient ftpClient) throws IOException {
+	private String getPathname(String path, FTPClient ftpClient) throws IOException {
 		if (!path.startsWith("/"))
 			path = "/" + path;
 		String wd = StringUtils.isBlank(workingDirectory) ? ftpClient.printWorkingDirectory() : workingDirectory;
@@ -371,7 +386,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 			ftpClient = pool.borrowObject();
 			String workingDirectory = ftpClient.printWorkingDirectory();
 			T val = callback.doWithFTPClient(ftpClient);
-			if (!(val instanceof InputStream)) {
+			if (!(val instanceof ProxyInputStream)) {
 				ftpClient.changeWorkingDirectory(workingDirectory);
 			} else {
 				deferReturn = true;
