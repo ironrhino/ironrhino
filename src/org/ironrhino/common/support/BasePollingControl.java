@@ -67,7 +67,11 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 
 	private Class<T> entityClass;
 
-	private String updateStatusHql;
+	private String simpleUpdateStatusHql;
+
+	private String defaultUpdateStatusHql;
+
+	private String conditionalUpdateStatusHql;
 
 	private String enqueueLockName;
 
@@ -97,8 +101,12 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 
 	@PostConstruct
 	private void init() {
-		updateStatusHql = "update " + entityClass.getSimpleName()
+		simpleUpdateStatusHql = "update " + entityClass.getSimpleName()
+				+ " t set t.status=?3,t.modifyDate=?4,t.errorInfo=?5 where t.id=?1 and t.status=?2";
+		defaultUpdateStatusHql = "update " + entityClass.getSimpleName()
 				+ " t set t.status=?3,t.modifyDate=?4,t.errorInfo=?5,t.attempts=t.attempts+1 where t.id=?1 and t.status=?2";
+		conditionalUpdateStatusHql = "update " + entityClass.getSimpleName()
+				+ " t set t.status=case when t.attempts+1>=?3 then ?4 else ?5 end,t.modifyDate=?6,t.errorInfo=?7,t.attempts=t.attempts+1 where t.id=?1 and t.status=?2";
 		enqueueLockName = StringUtils.uncapitalize(getClass().getSimpleName()) + ".enqueue()";
 		threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreads() + 1,
 				new NameableThreadFactory(StringUtils.uncapitalize(getClass().getSimpleName()), (t, e) -> {
@@ -218,8 +226,8 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 			}
 			if (entity.getAttempts() >= getMaxAttempts()) {
 				logger.error("max attempts reached: {}", entity);
-				entityManager.executeUpdate(updateStatusHql, entity.getId(), entity.getStatus(), PollingStatus.FAILED,
-						new Date(), "max attempts reached");
+				entityManager.executeUpdate(simpleUpdateStatusHql, entity.getId(), entity.getStatus(),
+						PollingStatus.FAILED, new Date(), "max attempts reached");
 				continue;
 			}
 			try {
@@ -257,10 +265,15 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 				if (errorInfo.length() > 4000)
 					errorInfo = errorInfo.substring(0, 4000);
 				boolean retryable = isTemporaryError(e);
-				int result = entityManager.executeUpdate(updateStatusHql, entity.getId(), entity.getStatus(),
-						(!retryable || (entity.getAttempts() + 1) >= getMaxAttempts()) ? PollingStatus.FAILED
-								: PollingStatus.TEMPORARY_ERROR,
-						new Date(), errorInfo);
+				int result;
+				if (retryable) {
+					result = entityManager.executeUpdate(conditionalUpdateStatusHql, entity.getId(), entity.getStatus(),
+							getMaxAttempts(), PollingStatus.FAILED, PollingStatus.TEMPORARY_ERROR, new Date(),
+							errorInfo);
+				} else {
+					result = entityManager.executeUpdate(defaultUpdateStatusHql, entity.getId(), entity.getStatus(),
+							PollingStatus.FAILED, new Date(), errorInfo);
+				}
 				if (result == 1)
 					logger.info("process {} failed", entity);
 				else
