@@ -218,7 +218,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 					sb.append(",t.").append(field).append("=?").append(i++);
 				sb.append(" where t.id=?1 and t.status=?2");
 				final String hql = sb.toString();
-				int result = entityManager.execute(session -> {
+				entityManager.execute(session -> {
 					@SuppressWarnings("rawtypes")
 					Query query = session.createQuery(hql);
 					query.setParameter(String.valueOf(1), entity.getId());
@@ -228,14 +228,15 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 					int index = 5;
 					for (String field : fields.keySet())
 						query.setParameter(String.valueOf(index++), fields.get(field));
-					int ret = query.executeUpdate();
-					afterUpdated(session, entity);
-					return ret;
+					int result = query.executeUpdate();
+					if (result == 1) {
+						afterUpdated(session, entity);
+						logger.info("process {} successful", entity);
+					} else {
+						logger.warn("process {} successful but ignored", entity);
+					}
+					return result;
 				});
-				if (result == 1)
-					logger.info("process {} successful", entity);
-				else
-					logger.warn("process {} successful but ignored", entity);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				String errorInfo = ExceptionUtils.getDetailMessage(e);
