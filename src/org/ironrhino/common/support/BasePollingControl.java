@@ -162,11 +162,25 @@ public abstract class BasePollingControl<T extends BasePollingEntity> {
 				}).collect(Collectors.toList()), true);
 			}, dc);
 		}
+		// attempt abnormal retryable polling
+		dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
+		dc.add(Restrictions.le("attempts", getMaxAttempts()));
+		dc.addOrder(Order.asc("createDate"));
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * getMaxAttempts());
+		dc.add(Restrictions.lt("modifyDate", cal.getTime()));
+		entityManager.iterate(10, (entities, session) -> {
+			push(Arrays.stream(entities).map(entity -> {
+				logger.info("enqueue {} retried", entity);
+				return entity.getId();
+			}).collect(Collectors.toList()), true);
+		}, dc);
 
 		// resubmit entities which status are PROCESSING, maybe caused by jvm killed
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("status", PollingStatus.PROCESSING));
-		Calendar cal = Calendar.getInstance();
+		cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, -getResubmitIntervalInSeconds());
 		dc.add(Restrictions.lt("modifyDate", cal.getTime()));
 		dc.addOrder(Order.asc("createDate"));
