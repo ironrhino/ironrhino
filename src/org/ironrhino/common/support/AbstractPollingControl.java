@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -70,6 +71,8 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 
 	protected String conditionalUpdateStatusHql;
 
+	protected final AtomicInteger count = new AtomicInteger();
+
 	public AbstractPollingControl() {
 		@SuppressWarnings("unchecked")
 		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
@@ -120,6 +123,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 			return;
 		threadPoolExecutor.execute(() -> {
 			String enqueueLockName = getQueueName() + ".enqueue()";
+			count.incrementAndGet();
 			if (lockService.tryLock(enqueueLockName)) {
 				try {
 					doEnqueue();
@@ -131,7 +135,19 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 	}
 
 	protected void doEnqueue() {
+		int current = count.get();
 		entityManager.setEntityClass(entityClass);
+		doEnqueueNormal();
+		if (current % 5 == 1) {
+			doEnqueueRetryable();
+		}
+		if (current % 10 == 1) {
+			// resubmit entities which status are PROCESSING, maybe caused by jvm killed
+			doEnqueueResubmittable();
+		}
+	}
+
+	protected void doEnqueueNormal() {
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("status", PollingStatus.INITIALIZED));
 		dc.addOrder(Order.asc("createDate"));
@@ -148,10 +164,11 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 				return entity.getId();
 			}).collect(Collectors.toList()), false);
 		}, dc);
+	}
 
-		// attempt retryable polling
+	protected void doEnqueueRetryable() {
 		for (int attempts = 1; attempts < getMaxAttempts(); attempts++) {
-			dc = entityManager.detachedCriteria();
+			DetachedCriteria dc = entityManager.detachedCriteria();
 			dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
 			dc.add(Restrictions.eq("attempts", attempts));
 			dc.addOrder(Order.asc("createDate"));
@@ -165,10 +182,10 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 				}).collect(Collectors.toList()), true);
 			}, dc);
 		}
-		// attempt abnormal retryable polling
-		dc = entityManager.detachedCriteria();
+		// abnormal retryable polling
+		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
-		dc.add(Restrictions.le("attempts", getMaxAttempts()));
+		dc.add(Restrictions.ge("attempts", getMaxAttempts()));
 		dc.addOrder(Order.asc("createDate"));
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * getMaxAttempts());
@@ -179,11 +196,12 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 				return entity.getId();
 			}).collect(Collectors.toList()), true);
 		}, dc);
+	}
 
-		// resubmit entities which status are PROCESSING, maybe caused by jvm killed
-		dc = entityManager.detachedCriteria();
+	protected void doEnqueueResubmittable() {
+		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("status", PollingStatus.PROCESSING));
-		cal = Calendar.getInstance();
+		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, -getResubmitIntervalInSeconds());
 		dc.add(Restrictions.lt("modifyDate", cal.getTime()));
 		dc.addOrder(Order.asc("createDate"));
