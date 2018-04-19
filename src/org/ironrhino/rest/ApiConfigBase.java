@@ -111,7 +111,11 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 			protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
 					throws IOException, HttpMessageNotWritableException {
 				super.writeInternal(object, type, outputMessage);
-				outputMessage.getBody().close();
+				if (!(outputMessage instanceof ServerHttpResponse)
+						|| outputMessage instanceof ServletServerHttpResponse) {
+					// don't close MediaType.TEXT_EVENT_STREAM
+					outputMessage.getBody().close();
+				}
 			}
 
 		};

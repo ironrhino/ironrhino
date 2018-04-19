@@ -37,6 +37,8 @@ public class RestExceptionHandler {
 	@ExceptionHandler(Throwable.class)
 	@ResponseBody
 	public RestStatus handleException(HttpServletRequest req, HttpServletResponse response, Throwable ex) {
+		if (ex instanceof IOException && ("Broken pipe".equals(ex.getMessage())))
+			return null;
 		Integer oldStatus = response.getStatus();
 		if (ex instanceof CompletionException) {
 			ex = ex.getCause();
