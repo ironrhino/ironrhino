@@ -29,6 +29,9 @@ public class JdbcRepositoryTest {
 	@Autowired
 	private PersonRepository personRepository;
 
+	@Autowired
+	private DogRepository dogRepository;
+
 	@Before
 	public void setup() {
 		personRepository.createTable();
@@ -173,6 +176,30 @@ public class JdbcRepositoryTest {
 		list = personRepository.searchWithLimiting("test", Limiting.of(2, 2));
 		assertEquals(1, list.size());
 		assertEquals("test3", list.get(0).getName());
+	}
+
+	@Test
+	public void testGeneratedKey() throws Exception {
+		dogRepository.createTable();
+		int size = 10;
+		for (int i = 0; i < size; i++) {
+			Dog dog = new Dog();
+			dog.setName("dog" + i);
+			dogRepository.save(dog);
+			assertEquals(new Integer(i + 1), dog.getId());
+		}
+		for (int i = 0; i < size; i++) {
+			Dog dog = new Dog();
+			dog.setName("dog" + i);
+			dogRepository.insert(dog.getName(), id -> {
+				dog.setId(id);
+			});
+			assertEquals(new Integer(size + i + 1), dog.getId());
+		}
+		for (int i = 0; i < size * 2; i++) {
+			assertTrue(dogRepository.delete(i + 1));
+		}
+		dogRepository.dropTable();
 	}
 
 }

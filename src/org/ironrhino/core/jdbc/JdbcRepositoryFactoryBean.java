@@ -14,7 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.function.Consumer;
 
+import javax.persistence.Id;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -34,8 +37,11 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -165,6 +171,7 @@ public class JdbcRepositoryFactoryBean
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) {
 		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
@@ -291,7 +298,39 @@ public class JdbcRepositoryFactoryBean
 			}
 			throw new UnsupportedOperationException("Unsupported return type: " + returnType.getTypeName());
 		default:
-			int rows = namedParameterJdbcTemplate.update(sql, sqlParameterSource);
+			int rows;
+			if (sqlVerb == SqlVerb.INSERT) {
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+				rows = namedParameterJdbcTemplate.update(sql, sqlParameterSource, keyHolder);
+				try {
+					Number key = keyHolder.getKey();
+					if (key != null) {
+						Type[] types = methodInvocation.getMethod().getGenericParameterTypes();
+						for (int index = 0; index < arguments.length; index++) {
+							Object arg = arguments[index];
+							if (arg == null || BeanUtils.isSimpleValueType(arg.getClass()))
+								continue;
+							if (arg instanceof Consumer) {
+								Type t = types[index];
+								if (t instanceof ParameterizedType) {
+									t = ((ParameterizedType) t).getActualTypeArguments()[0];
+									if (t instanceof Class && Number.class.isAssignableFrom((Class<?>) t))
+										((Consumer<Number>) arg).accept(key);
+								}
+								continue;
+							}
+							Set<String> ids = org.ironrhino.core.util.AnnotationUtils
+									.getAnnotatedPropertyNames(arg.getClass(), Id.class);
+							if (ids.size() == 1) {
+								org.ironrhino.core.util.BeanUtils.setPropertyValue(arg, ids.iterator().next(), key);
+							}
+						}
+					}
+				} catch (DataAccessException e) {
+				}
+			} else {
+				rows = namedParameterJdbcTemplate.update(sql, sqlParameterSource);
+			}
 			if (returnType == void.class) {
 				return null;
 			} else if (returnType == int.class || returnType == Integer.class || returnType == long.class
