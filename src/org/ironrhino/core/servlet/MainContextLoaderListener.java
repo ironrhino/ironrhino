@@ -55,7 +55,7 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 	protected void cleanupJdbcDrivers() {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try {
-			String className = "com.mysql.jdbc.AbandonedConnectionCleanupThread";
+			String className = "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread";
 			String methodName = "checkedShutdown";
 			if (ClassUtils.isPresent(className, cl)) {
 				ClassUtils.forName(className, cl).getMethod(methodName).invoke(null);

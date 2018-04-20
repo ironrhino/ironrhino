@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,12 +26,13 @@ public enum DatabaseProduct {
 
 		@Override
 		public String getDefaultDriverClass() {
-			return "com.mysql.jdbc.Driver";
+			return "com.mysql.cj.jdbc.Driver";
 		}
 
 		@Override
 		protected String getRecommendedJdbcUrlQueryString() {
-			return "createDatabaseIfNotExist=true&autoReconnectForPools=true&useUnicode=true&characterEncoding=UTF-8&useServerPrepStmts=true&cachePrepStmts=true&tinyInt1isBit=false&socketTimeout=60000&useSSL=false";
+			return "createDatabaseIfNotExist=true&serverTimezone=" + TimeZone.getDefault().getID()
+					+ "&autoReconnectForPools=true&useUnicode=true&useServerPrepStmts=true&cachePrepStmts=true&tinyInt1isBit=false&socketTimeout=60000&sslMode=DISABLED";
 		}
 
 	},
