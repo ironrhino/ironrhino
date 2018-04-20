@@ -31726,29 +31726,6 @@ MessageBundle = {
 		return $ajax(options);
 	}
 
-	if (typeof $.rc4EncryptStr != 'undefined'
-			&& ($('meta[name="pe"]').attr('content') != 'false')) {
-		var temp = $.param;
-		$.param = function(a, traditional) {
-			if (Array.isArray(a) || a.jquery) {
-				$.each(a, function() {
-					if (this.type == 'password') {
-						try {
-							var key = $.cookie('T');
-							if (key && key.length > 10)
-								key = key
-										.substring(key.length - 10, key.length);
-							this.value = $.rc4EncryptStr(this.value + key, key);
-						} catch (e) {
-						}
-					}
-				});
-
-			}
-			return temp(a, traditional);
-		}
-	}
-
 	/* http://ejohn.org/blog/javascript-micro-templating/ */
 	var cache = {};
 	$.tmpl = function(str, data) {
@@ -33666,8 +33643,30 @@ DateUtils = {
 				}));
 	}
 })(jQuery);
-;
 (function($) {
+
+	if (typeof $.rc4EncryptStr != 'undefined'
+			&& ($('meta[name="pe"]').attr('content') != 'false')) {
+		var temp = $.param;
+		$.param = function(a, traditional) {
+			if (Array.isArray(a) || a.jquery) {
+				$.each(a, function() {
+					if (this.type == 'password') {
+						try {
+							var key = $.cookie('T');
+							if (key && key.length > 10)
+								key = key
+										.substring(key.length - 10, key.length);
+							this.value = $.rc4EncryptStr(this.value + key, key);
+						} catch (e) {
+						}
+					}
+				});
+
+			}
+			return temp(a, traditional);
+		}
+	}
 
 	$.fn.ajaxsubmit = function(options) {
 
