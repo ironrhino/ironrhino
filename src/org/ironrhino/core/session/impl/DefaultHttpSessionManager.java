@@ -117,10 +117,9 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Override
 	public String changeSessionId(WrappedHttpSession session) {
 		session.setNew(true);
-		session.setId(CodecUtils.nextId(SALT));
+		session.setId(nextSessionId());
 		session.setSessionTracker(getSessionTracker(session));
-		RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
-				session.getSessionTracker(), globalCookie);
+		saveSessionTracker(session);
 		return session.getId();
 	}
 
@@ -151,7 +150,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 					String[] array = sessionTracker.split(SESSION_TRACKER_SEPERATOR);
 					if (array.length == 1) {
 						session.setNew(true);
-						sessionId = CodecUtils.nextId(SALT);
+						sessionId = nextSessionId();
 					} else {
 						sessionId = array[0];
 						if (array.length > 1)
@@ -172,7 +171,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			}
 		} else {
 			session.setNew(true);
-			sessionId = CodecUtils.nextId(SALT);
+			sessionId = nextSessionId();
 		}
 		session.setId(sessionId);
 		session.setCreationTime(creationTime);
@@ -220,7 +219,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		if (session.isCacheBased()) {
 			changeSessionId(session);
 		} else {
-			session.setId(CodecUtils.nextId(SALT));
+			session.setId(nextSessionId());
 			session.setSessionTracker(getSessionTracker(session));
 			session.setCreationTime(session.getNow());
 			session.setLastAccessedTime(session.getNow());
@@ -246,8 +245,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		if (session.isRequestedSessionIdFromURL() || alwaysUseCacheBased) {
 			cacheBased.initialize(session);
 			if (session.isNew())
-				RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
-						session.getSessionTracker(), globalCookie);
+				saveSessionTracker(session);
 		} else
 			cookieBased.initialize(session);
 	}
@@ -270,8 +268,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			}
 			if (!session.isRequestedSessionIdFromURL() && sessionTrackerChanged) {
 				session.setSessionTracker(getSessionTracker(session));
-				RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
-						session.getSessionTracker(), globalCookie);
+				saveSessionTracker(session);
 			}
 			cookieBased.save(session);
 		}
@@ -297,6 +294,15 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 				if (localeName.equalsIgnoreCase(locale.toString()))
 					return locale;
 		return request.getLocale();
+	}
+
+	private void saveSessionTracker(WrappedHttpSession session) {
+		RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
+				session.getSessionTracker(), globalCookie, true);
+	}
+
+	private String nextSessionId() {
+		return CodecUtils.nextId(SALT);
 	}
 
 }

@@ -60,14 +60,14 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 		if (StringUtils.isNotBlank(sessionString)) {
 			String creationTime = NumberUtils.decimalToX(62, BigInteger.valueOf(session.getCreationTime()));
 			String cookie = creationTime + sessionString;
-			saveCookie(session, encrypt(cookie, session.getId()));
+			save(session, encrypt(cookie, session.getId()));
 		} else
-			clearCookie(session);
+			clear(session);
 	}
 
 	@Override
 	public void invalidate(WrappedHttpSession session) {
-		clearCookie(session);
+		clear(session);
 	}
 
 	protected String encrypt(String value, String salt) {
@@ -94,7 +94,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 		for (int i = 0; i < cookieMap.size(); i++) {
 			String s = i == 0 ? cookieMap.get(sessionCookieName) : cookieMap.get(sessionCookieName + (i - 1));
 			if (s == null) {
-				clearCookie(session);
+				clear(session);
 				return null;
 			}
 			sb.append(s);
@@ -102,8 +102,8 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 		return sb.toString();
 	}
 
-	private void saveCookie(WrappedHttpSession session, String value) {
-		clearCookie(session);
+	private void save(WrappedHttpSession session, String value) {
+		clear(session);
 		if (StringUtils.isNotBlank(value)) {
 			int pieces = value.length() / SINGLE_COOKIE_SIZE;
 			if (value.length() % SINGLE_COOKIE_SIZE != 0)
@@ -118,7 +118,7 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 		}
 	}
 
-	private void clearCookie(WrappedHttpSession session) {
+	private void clear(WrappedHttpSession session) {
 		Cookie[] cookies = session.getRequest().getCookies();
 		if (cookies != null)
 			for (Cookie cookie : cookies)

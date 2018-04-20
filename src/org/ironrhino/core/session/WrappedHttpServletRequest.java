@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.security.util.RC4;
+import org.ironrhino.core.util.RequestUtils;
 
 public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
@@ -81,12 +83,31 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 				temp = parameterMap;
 				if (temp == null) {
 					Map<String, String[]> map = super.getParameterMap();
+					String key = RequestUtils.getCookieValue(session.getRequest(), "X");
 					for (Map.Entry<String, String[]> entry : map.entrySet()) {
 						String name = entry.getKey();
 						String[] value = entry.getValue();
-						for (int i = 0; i < value.length; i++)
-							value[i] = decryptIfNecessary(name, value[i]);
+						if (StringUtils.isNotBlank(key) && name.toLowerCase(Locale.ROOT).endsWith("password")
+								&& value != null) {
+							for (int i = 0; i < value.length; i++) {
+								if (value[i].matches("\\p{XDigit}+")) {
+									try {
+										if (key.length() > 10)
+											key = key.substring(key.length() - 10, key.length());
+										String str = RC4.decryptWithKey(value[i], key);
+										if (str.endsWith(key))
+											value[i] = str.substring(0, str.length() - key.length());
+									} catch (IllegalArgumentException e) {
+										e.printStackTrace();
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+							}
+						}
 					}
+					if (key != null)
+						RequestUtils.deleteCookie(session.getRequest(), session.getResponse(), "X");
 					parameterMap = temp = map;
 				}
 			}
@@ -99,23 +120,4 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 		return getParameterMap().get(name);
 	}
 
-	private String decryptIfNecessary(String name, String value) {
-		if (value != null && name.toLowerCase(Locale.ROOT).endsWith("password") && value.length() >= 20) {
-			String key = session.getSessionTracker();
-			if (!isRequestedSessionIdFromCookie() || !value.matches("\\p{XDigit}+"))
-				return value;
-			try {
-				if (key.length() > 10)
-					key = key.substring(key.length() - 10, key.length());
-				String str = RC4.decryptWithKey(value, key);
-				if (str.endsWith(key))
-					value = str.substring(0, str.length() - key.length());
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return value;
-	}
 }

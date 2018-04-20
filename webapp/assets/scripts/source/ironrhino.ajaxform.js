@@ -1,28 +1,5 @@
 (function($) {
 
-	if (typeof $.rc4EncryptStr != 'undefined'
-			&& ($('meta[name="pe"]').attr('content') != 'false')) {
-		var temp = $.param;
-		$.param = function(a, traditional) {
-			if (Array.isArray(a) || a.jquery) {
-				$.each(a, function() {
-					if (this.type == 'password') {
-						try {
-							var key = $.cookie('T');
-							if (key && key.length > 10)
-								key = key
-										.substring(key.length - 10, key.length);
-							this.value = $.rc4EncryptStr(this.value + key, key);
-						} catch (e) {
-						}
-					}
-				});
-
-			}
-			return temp(a, traditional);
-		}
-	}
-
 	$.fn.ajaxsubmit = function(options) {
 
 		var url = this.find('.clicked:submit').attr('formaction')
@@ -183,13 +160,29 @@
 			if (ignoreBlank && !$t2.val())
 				return null;
 		}
-		if (value && t == 'password' && $t.hasClass('sha')
-				&& typeof sha1 != 'undefined')
-			try {
-				value = sha1(value);
-			} catch (e) {
-				console.log(e);
+		if (value && t == 'password') {
+			if ($t.hasClass('sha') && typeof sha1 != 'undefined') {
+				try {
+					value = sha1(value);
+				} catch (e) {
+					console.log(e);
+				}
 			}
+			if (n.toLowerCase().endsWith('password')
+					&& typeof $.rc4EncryptStr != 'undefined') {
+				try {
+					var key = $.cookie('X');
+					if (!key) {
+						key = '' + Math.random();
+						$.cookie('X', key);
+					}
+					if (key && key.length > 10)
+						key = key.substring(key.length - 10, key.length);
+					value = $.rc4EncryptStr(value + key, key);
+				} catch (e) {
+				}
+			}
+		}
 		return value;
 	};
 
