@@ -189,6 +189,10 @@ public class SqlUtils {
 				for (String name : map.keySet()) {
 					String p = ":" + name;
 					int i = sql.indexOf(p);
+					if (i < 0) {
+						p = ":{" + name + "}";
+						i = sql.indexOf(p);
+					}
 					index.put(name, StringUtils.countMatches(sql.substring(0, i), '?') + 1);
 					while (i > 0) {
 						sql = StringUtils.replace(sql, p, "?");
