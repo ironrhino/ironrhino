@@ -19,10 +19,12 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.NotInCopy;
-import org.ironrhino.core.model.BaseTreeableEntity;
+import org.ironrhino.core.model.Treeable;
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
+
+import com.google.common.base.Supplier;
 
 public class BeanUtils {
 
@@ -98,33 +100,42 @@ public class BeanUtils {
 		copyProperties(source, target, false, true, ignoreProperties);
 	}
 
-	public static <T extends BaseTreeableEntity<T>> T deepClone(T source, String... ignoreProperties) {
-		return deepClone(source, null, ignoreProperties);
+	@SuppressWarnings("unchecked")
+	public static <S extends Treeable<S>> S copyTree(S source, String... ignoreProperties) {
+		return (S) copyTree(source, () -> {
+			try {
+				return source.getClass().getConstructor().newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}, null, ignoreProperties);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T extends BaseTreeableEntity<T>> T deepClone(T source, Predicate<T> filter,
+	public static <S extends Treeable<S>, T extends Treeable<T>> T copyTree(S source, Supplier<T> supplier,
 			String... ignoreProperties) {
+		return copyTree(source, supplier, null, ignoreProperties);
+	}
+
+	public static <S extends Treeable<S>, T extends Treeable<T>> T copyTree(S source, Supplier<T> supplier,
+			Predicate<S> filter, String... ignoreProperties) {
 		if (filter != null && !filter.test(source))
 			throw new IllegalArgumentException("source object self must be accepted if you specify a filter");
-		T ret = null;
-		try {
-			ret = (T) source.getClass().getConstructor().newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		copyProperties(source, ret, ignoreProperties);
+		T ret = supplier.get();
+		Set<String> ignores = new HashSet<>();
+		ignores.addAll(Arrays.asList(ignoreProperties));
+		ignores.add("parent");
+		ignores.add("children");
+		copyProperties(source, ret, ignores.toArray(new String[0]));
 		List<T> children = new ArrayList<>();
-		for (T child : source.getChildren()) {
+		for (S child : source.getChildren()) {
 			if (filter == null || filter.test(child)) {
-				T t = deepClone(child, filter, ignoreProperties);
-				t.setParent(ret);
+				T t = copyTree(child, supplier, filter, ignoreProperties);
+				setPropertyValue(t, "parent", ret);
 				children.add(t);
 			}
 		}
-		ret.setChildren(children);
+		setPropertyValue(ret, "children", children);
 		return ret;
-
 	}
 
 	public static Object convert(Class<?> beanClass, String propertyName, String value) {

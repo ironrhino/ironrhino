@@ -18,11 +18,13 @@ import java.util.Set;
 
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.model.Treeable;
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.junit.Test;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public class BeanUtilsTest {
@@ -165,6 +167,54 @@ public class BeanUtilsTest {
 
 	private static class MyMap<K, V> extends HashMap<K, V> {
 		private static final long serialVersionUID = 1L;
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class TreeA implements Treeable<TreeA> {
+		private String name;
+		private TreeA parent;
+		private List<TreeA> children = new ArrayList<>();
+
+		public TreeA(String name) {
+			this.name = name;
+		}
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class TreeB implements Treeable<TreeB> {
+		private String name;
+		private TreeB parent;
+		private List<TreeB> children = new ArrayList<>();
+
+		public TreeB(String name) {
+			this.name = name;
+		}
+	}
+
+	@Test
+	public void testCopyTree() {
+		TreeA root = new TreeA("root");
+		TreeA leaf1 = new TreeA("leaf1");
+		leaf1.setParent(root);
+		root.getChildren().add(leaf1);
+		TreeA leaf2 = new TreeA("leaf2");
+		leaf2.setParent(root);
+		root.getChildren().add(leaf2);
+		assertEquals(1, root.getLevel());
+		assertEquals(2, leaf1.getLevel());
+		assertEquals(2, leaf2.getLevel());
+		TreeA rootCopy = BeanUtils.copyTree(root);
+		assertEquals(1, rootCopy.getLevel());
+		assertEquals(2, rootCopy.getChildren().size());
+		assertEquals("leaf1", rootCopy.getChildren().get(0).getName());
+		TreeB rootCopyB = BeanUtils.copyTree(root, TreeB::new);
+		assertEquals(1, rootCopyB.getLevel());
+		assertEquals(2, rootCopyB.getChildren().size());
+		assertEquals("leaf1", rootCopyB.getChildren().get(0).getName());
 	}
 
 	@Test
