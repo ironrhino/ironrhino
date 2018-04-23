@@ -2,9 +2,11 @@ package org.ironrhino.core.cache.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -120,6 +122,7 @@ public class Cache2kCacheManager implements CacheManager {
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache == null)
 			return null;
+		keys = keys.stream().filter(StringUtils::isNotBlank).collect(Collectors.toCollection(HashSet::new));
 		return cache.getAll(keys);
 	}
 
@@ -129,7 +132,8 @@ public class Cache2kCacheManager implements CacheManager {
 			return;
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache != null)
-			cache.removeAll(keys);
+			cache.removeAll(
+					keys.stream().filter(StringUtils::isNotBlank).collect(Collectors.toCollection(HashSet::new)));
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import java.io.StreamCorruptedException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -168,6 +169,7 @@ public class RedisCacheManager implements CacheManager {
 	public Map<String, Object> mget(Set<String> keys, String namespace) {
 		if (keys == null)
 			return null;
+		keys = keys.stream().filter(StringUtils::isNotBlank).collect(Collectors.toCollection(HashSet::new));
 		try {
 			List<Object> list = cacheRedisTemplate.opsForValue()
 					.multiGet(keys.stream().map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
@@ -189,8 +191,8 @@ public class RedisCacheManager implements CacheManager {
 		if (keys == null)
 			return;
 		try {
-			cacheRedisTemplate
-					.delete(keys.stream().map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
+			cacheRedisTemplate.delete(keys.stream().filter(StringUtils::isNotBlank)
+					.map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

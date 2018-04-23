@@ -3,12 +3,12 @@ package org.ironrhino.core.cache.impl;
 import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -185,11 +185,10 @@ public class MemcachedCacheManager implements CacheManager {
 	public Map<String, Object> mget(Set<String> keys, String namespace) {
 		if (keys == null)
 			return null;
-		List<String> list = new ArrayList<>();
-		for (String key : keys)
-			list.add(generateKey(key, namespace));
+		keys = keys.stream().filter(StringUtils::isNotBlank).collect(Collectors.toCollection(HashSet::new));
 		try {
-			Map<String, Object> map = memcached.get(list);
+			Map<String, Object> map = memcached
+					.get(keys.stream().map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
 			Map<String, Object> result = new LinkedHashMap<>();
 			for (String key : keys)
 				result.put(key, map.get(generateKey(key, namespace)));
