@@ -2,10 +2,17 @@ package org.ironrhino.core.model;
 
 import java.util.Collection;
 
-@SuppressWarnings("rawtypes")
-public interface Treeable<T extends Treeable> {
+public interface Treeable<T extends Treeable<T>> {
 
-	public int getLevel();
+	public default int getLevel() {
+		int level = 1;
+		T parent = getParent();
+		while (parent != null) {
+			level++;
+			parent = parent.getParent();
+		}
+		return level;
+	}
 
 	public T getParent();
 

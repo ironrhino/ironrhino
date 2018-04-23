@@ -30,12 +30,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings("unchecked")
 @MappedSuperclass
 @Getter
 @Setter
 public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends AbstractEntity<Long>
-		implements Treeable<T>, Ordered {
+		implements Treeable<T>, Ordered<T> {
 
 	private static final long serialVersionUID = 2462271646391940930L;
 
@@ -105,7 +105,7 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		if (name == null)
 			return null;
 		StringBuilder fullname = new StringBuilder(name);
-		BaseTreeableEntity e = this;
+		T e = (T) this;
 		while ((e = e.getParent()) != null) {
 			if (!(e.isRoot() && StringUtils.isBlank(e.getName())))
 				fullname.insert(0, e.getName() + seperator);
@@ -119,16 +119,6 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	@JsonIgnore
 	public int getDisplayOrder() {
 		return displayOrder;
-	}
-
-	@Override
-	public int compareTo(Object object) {
-		if (!(object instanceof Ordered))
-			return 0;
-		Ordered ordered = (Ordered) object;
-		if (this.getDisplayOrder() != ordered.getDisplayOrder())
-			return this.getDisplayOrder() - ordered.getDisplayOrder();
-		return this.toString().compareTo(ordered.toString());
 	}
 
 	@Override
@@ -199,8 +189,8 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	public List<T> getDescendants() {
 		List<T> ids = new ArrayList<>();
 		if (!this.isLeaf())
-			for (Object obj : this.getChildren()) {
-				collect((T) obj, ids);
+			for (T obj : this.getChildren()) {
+				collect(obj, ids);
 			}
 		return ids;
 	}
@@ -216,8 +206,8 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		coll.add(node);
 		if (node.isLeaf())
 			return;
-		for (Object obj : node.getChildren()) {
-			collect((T) obj, coll);
+		for (T obj : node.getChildren()) {
+			collect(obj, coll);
 		}
 	}
 
