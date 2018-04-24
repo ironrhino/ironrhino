@@ -116,6 +116,7 @@ public class BeanUtils {
 		return copyTree(source, supplier, null, ignoreProperties);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <S extends Treeable<S>, T extends Treeable<T>> T copyTree(S source, Supplier<T> supplier,
 			Predicate<S> filter, String... ignoreProperties) {
 		if (filter != null && !filter.test(source))
@@ -126,15 +127,10 @@ public class BeanUtils {
 		ignores.add("parent");
 		ignores.add("children");
 		copyProperties(source, ret, ignores.toArray(new String[0]));
-		List<T> children = new ArrayList<>();
 		for (S child : source.getChildren()) {
-			if (filter == null || filter.test(child)) {
-				T t = copyTree(child, supplier, filter, ignoreProperties);
-				setPropertyValue(t, "parent", ret);
-				children.add(t);
-			}
+			if (filter == null || filter.test(child))
+				ret.addChild(copyTree(child, supplier, filter, ignoreProperties));
 		}
-		setPropertyValue(ret, "children", children);
 		return ret;
 	}
 

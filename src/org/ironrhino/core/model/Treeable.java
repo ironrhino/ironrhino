@@ -16,5 +16,18 @@ public interface Treeable<T extends Treeable<T>> {
 
 	public T getParent();
 
+	public void setParent(T parent);
+
 	public Collection<T> getChildren();
+
+	public void setChildren(Collection<T> children);
+
+	@SuppressWarnings("unchecked")
+	public default void addChild(T... children) {
+		for (T child : children) {
+			child.setParent((T) this);
+			getChildren().add(child);
+		}
+	}
+
 }

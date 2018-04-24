@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -175,7 +176,7 @@ public class BeanUtilsTest {
 	public static class TreeA implements Treeable<TreeA> {
 		private String name;
 		private TreeA parent;
-		private List<TreeA> children = new ArrayList<>();
+		private Collection<TreeA> children = new ArrayList<>();
 
 		public TreeA(String name) {
 			this.name = name;
@@ -188,7 +189,7 @@ public class BeanUtilsTest {
 	public static class TreeB implements Treeable<TreeB> {
 		private String name;
 		private TreeB parent;
-		private List<TreeB> children = new ArrayList<>();
+		private Collection<TreeB> children = new ArrayList<>();
 
 		public TreeB(String name) {
 			this.name = name;
@@ -199,22 +200,27 @@ public class BeanUtilsTest {
 	public void testCopyTree() {
 		TreeA root = new TreeA("root");
 		TreeA leaf1 = new TreeA("leaf1");
-		leaf1.setParent(root);
-		root.getChildren().add(leaf1);
 		TreeA leaf2 = new TreeA("leaf2");
-		leaf2.setParent(root);
-		root.getChildren().add(leaf2);
+		leaf1.addChild(new TreeA("leaf3"), new TreeA("leaf4"));
+		leaf2.addChild(new TreeA("leaf5"), new TreeA("leaf6"));
+		root.addChild(leaf1, leaf2);
 		assertEquals(1, root.getLevel());
 		assertEquals(2, leaf1.getLevel());
 		assertEquals(2, leaf2.getLevel());
 		TreeA rootCopy = BeanUtils.copyTree(root);
 		assertEquals(1, rootCopy.getLevel());
 		assertEquals(2, rootCopy.getChildren().size());
-		assertEquals("leaf1", rootCopy.getChildren().get(0).getName());
+		TreeA leaf1Copy = rootCopy.getChildren().iterator().next();
+		assertEquals("leaf1", leaf1Copy.getName());
+		assertEquals(2, leaf1Copy.getLevel());
+		assertEquals(2, leaf1Copy.getChildren().size());
 		TreeB rootCopyB = BeanUtils.copyTree(root, TreeB::new);
 		assertEquals(1, rootCopyB.getLevel());
 		assertEquals(2, rootCopyB.getChildren().size());
-		assertEquals("leaf1", rootCopyB.getChildren().get(0).getName());
+		TreeB leaf1CopyB = rootCopyB.getChildren().iterator().next();
+		assertEquals("leaf1", leaf1CopyB.getName());
+		assertEquals(2, leaf1CopyB.getLevel());
+		assertEquals(2, leaf1CopyB.getChildren().size());
 	}
 
 	@Test
