@@ -34287,7 +34287,7 @@ Observation.concatsnapshot = function(container) {
 			var times = 4;
 			while (data.length > maxlength && times > 0) {
 				scale(canvas, 0.9);
-				data = image.toDataURL();
+				data = canvas.toDataURL();
 				times--;
 			}
 			if (data.length > maxlength) {
