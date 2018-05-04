@@ -123,14 +123,6 @@ public class SqlUtils {
 				.replaceAll("\n+", "\n").trim();
 	}
 
-	public static String highlight(String sql) {
-		if (StringUtils.isBlank(sql))
-			return sql;
-		return PARAMETER_PATTERN.matcher(LINE_COMMENTS_PATTERN
-				.matcher(BLOCK_COMMENTS_PATTERN.matcher(sql).replaceAll("<span class=\"comment\">$0</span>"))
-				.replaceAll("\n<span class=\"comment\">$1</span>\n")).replaceAll("<strong>$0</strong>");
-	}
-
 	public static Set<String> extractParameters(String sql) {
 		if (StringUtils.isBlank(sql))
 			return Collections.emptySet();
@@ -143,8 +135,12 @@ public class SqlUtils {
 		sql = clearComments(sql);
 		Set<String> names = new LinkedHashSet<>();
 		Matcher m = PARAMETER_PATTERN.matcher(sql);
-		while (m.find())
-			names.add(m.group(1).substring(1));
+		while (m.find()) {
+			String name = m.group(1).substring(1);
+			if (name.startsWith("{") && name.endsWith("}"))
+				name = name.substring(1, name.length() - 1);
+			names.add(name);
+		}
 		return names;
 	}
 
@@ -166,13 +162,17 @@ public class SqlUtils {
 			String param = ":" + name;
 			String type = "";
 			int index = sql.indexOf(param);
-			if (index > 0) {
-				String s = sql.substring(index + param.length()).trim();
-				int i = s.indexOf("/*--");
-				int j = s.indexOf("--*/");
-				if (i == 0 && j > i)
-					type = s.substring(i + 4, j).trim().toLowerCase();
+			String s;
+			if (index < 0) {
+				param = ":{" + name + "}";
+				index = sql.indexOf(param);
 			}
+			s = sql.substring(index + param.length()).trim();
+			int i = s.indexOf("/*--");
+			int j = s.indexOf("--*/");
+			if (i == 0 && j > i)
+				type = s.substring(i + 4, j).trim().toLowerCase();
+
 			map.put(name, type);
 		}
 		if (con != null) {
@@ -382,7 +382,7 @@ public class SqlUtils {
 	private static final Pattern ORDERBY_PATTERN = Pattern.compile("\\s+order\\s+by\\s+.+$", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern PARAMETER_PATTERN = Pattern
-			.compile("(:(\\w|[^'\\)\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)");
+			.compile("(:(\\{\\s*)?(\\w|[^'\\)\\sx00-xff])*(\\s*\\})?)(,|;|\\)|\\s|\\||\\+|$)");
 
 	private static final Pattern BLOCK_COMMENTS_PATTERN = Pattern.compile("/\\*(?:.|[\\n\\r])*?\\*/");
 

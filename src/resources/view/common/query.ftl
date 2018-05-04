@@ -83,20 +83,21 @@ $(function(){
 	<div id="params">
 	<#if params??>
 	<#list params as var,type>
+	<#assign label=var?trim>
 	<#if type=='date'||type=='datetime'||type=='time'>
-	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition ${type}"/>
+	<@s.textfield id="param-"+var?index label=label name="paramMap['${var}']" class="conjunct-addition ${type}"/>
 	<#elseif type=='int'||type=='integer'||type=='long'>
-	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition ${type}"/>
+	<@s.textfield type="number" id="param-"+var?index label=label name="paramMap['${var}']" class="conjunct-addition ${type}"/>
 	<#elseif type=='double'||type='decimal'>
-	<@s.textfield type="number" id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition double" step="0.01"/>
+	<@s.textfield type="number" id="param-"+var?index label=label name="paramMap['${var}']" class="conjunct-addition double" step="0.01"/>
 	<#elseif type=='boolean'>
-	<@s.select id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition" list={'true':getText('true'),'false':getText('false')}/>
+	<@s.select id="param-"+var?index label=label name="paramMap['${var}']" class="conjunct-addition" list={'true':getText('true'),'false':getText('false')}/>
 	<#elseif type=='bit'>
-	<@s.select id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition" list={'1':getText('true'),'0':getText('false')}/>
+	<@s.select id="param-"+var?index label=label name="paramMap['${var}']" class="conjunct-addition" list={'1':getText('true'),'0':getText('false')}/>
 	<#elseif type=='textarea'>
-	<@s.textarea id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition input-xxlarge" style="height:50px;"/>
+	<@s.textarea id="param-"+var?index label=label name="paramMap['${var}']" class="conjunct-addition input-xxlarge" style="height:50px;"/>
 	<#else>
-	<@s.textfield id="param-"+var?index label=var name="paramMap['${var}']" class="conjunct-addition"/>
+	<@s.textfield id="param-"+var?index label=label name="paramMap['${var}']" class="conjunct-addition"/>
 	</#if>
 	</#list>
 	</#if>

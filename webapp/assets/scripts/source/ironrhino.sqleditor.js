@@ -1,11 +1,10 @@
 (function($) {
-	var BLOCK_COMMENT = new RegExp('/\\*(?:.|[\\n\\r])*?\\*/', 'g');
-	var LINE_COMMENT = new RegExp('\r?\n?\\s*--.*\r?(\n|$)', 'g');
-	var PARAMETER = new RegExp(
-			"(:(\\w|[^'\\)\\sx00-xff])*)(,|;|\\)|\\s|\\||\\+|$)", 'g');
+	var BLOCK_COMMENT = /\/\*(?:.|[\n\r])*?\*\//g;
+	var LINE_COMMENT = /\r?\n?\s*--.*\r?(\n|$)/g;
+	var PARAMETER = /(:({\s*)?(\w|[^'\)\sx00-xff])*(\s*})?)(,|;|\)|\s|\||\+|$)/g;
 	$.sqleditor = {
 		highlight : function(sql) {
-			return sql.replace(PARAMETER, '<strong>$1</strong>$3').replace(
+			return sql.replace(PARAMETER, '<strong>$1</strong>$5').replace(
 					/\?/g, '<strong>$&</strong>').replace(BLOCK_COMMENT,
 					'<span class="comment">$&</span>').replace(LINE_COMMENT,
 					'<span class="comment">$&</span>');
