@@ -16,7 +16,6 @@ import org.springframework.core.BridgeMethodResolver;
 
 import lombok.Setter;
 
-@SuppressWarnings("unchecked")
 public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 
 	private final static String MUTEX = "_MUTEX_";

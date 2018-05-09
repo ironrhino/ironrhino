@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 
 @Aspect
-@SuppressWarnings("unchecked")
 public class ClassicCacheAspect extends BaseAspect {
 
 	private final static String MUTEX = "_MUTEX_";

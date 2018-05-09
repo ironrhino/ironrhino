@@ -102,7 +102,6 @@ public class ExpressionUtilsTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testEvalList() {
 		Map<String, Object> context = new HashMap<>();
 		context.put("string", "STRING");

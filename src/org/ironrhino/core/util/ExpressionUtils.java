@@ -104,14 +104,14 @@ public class ExpressionUtils {
 		return Double.parseDouble(obj.toString());
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static List evalList(String template, Map<String, ?> context) {
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> evalList(String template, Map<String, ?> context) {
 		Object obj = eval(template, context);
 		if (obj == null)
 			return null;
 		if (obj instanceof List)
-			return (List) obj;
-		return Arrays.asList(obj.toString().split("\\s*,\\s*"));
+			return (List<T>) obj;
+		return (List<T>) Arrays.asList(obj.toString().split("\\s*,\\s*"));
 	}
 
 }
