@@ -9,8 +9,8 @@
 	<packaging>jar</packaging>
 	<description>Core</description>
 	<properties>
-		<aspectj.version>1.8.13</aspectj.version>
-        <spring.version>5.0.3.RELEASE</spring.version>
+		<aspectj.version>1.9.1</aspectj.version>
+        <spring.version>5.0.7.RELEASE</spring.version>
         <spring.security.version>5.0.1.RELEASE</spring.security.version>
         <struts.version>2.3.16.3</struts.version>
         <jackson.version>2.9.4</jackson.version>

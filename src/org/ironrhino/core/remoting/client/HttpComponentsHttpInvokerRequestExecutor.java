@@ -33,7 +33,6 @@ import org.springframework.remoting.httpinvoker.AbstractHttpInvokerRequestExecut
 import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
-import org.springframework.util.StringUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -80,7 +79,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 		if (localeContext != null) {
 			Locale locale = localeContext.getLocale();
 			if (locale != null)
-				postMethod.setHeader(HTTP_HEADER_ACCEPT_LANGUAGE, StringUtils.toLanguageTag(locale));
+				postMethod.setHeader(HTTP_HEADER_ACCEPT_LANGUAGE, locale.toLanguageTag());
 		}
 		if (isAcceptGzipEncoding())
 			postMethod.setHeader(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);

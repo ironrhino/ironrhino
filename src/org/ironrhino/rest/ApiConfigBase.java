@@ -21,7 +21,6 @@ import org.ironrhino.core.spring.converter.YearMonthConverter;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
-import org.ironrhino.rest.component.JsonpAdvice;
 import org.ironrhino.rest.component.RestExceptionHandler;
 import org.ironrhino.rest.doc.ApiDocInspector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,11 +221,6 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Bean
 	protected BeanPostProcessor methodValidationPostProcessor() {
 		return new MethodValidationPostProcessor();
-	}
-
-	@Bean
-	protected JsonpAdvice jsonpAdvice() {
-		return new JsonpAdvice();
 	}
 
 	@Bean
