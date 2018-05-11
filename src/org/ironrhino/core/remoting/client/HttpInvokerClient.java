@@ -103,11 +103,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return getServiceInterface();
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 	public void setSerializationType(SerializationType serializationType) {
 		this.serializationType = serializationType;
 		SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor(serializationType);

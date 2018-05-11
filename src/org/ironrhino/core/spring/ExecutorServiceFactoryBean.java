@@ -34,8 +34,4 @@ public class ExecutorServiceFactoryBean implements FactoryBean<ExecutorService>,
 		return ExecutorService.class;
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
 }

@@ -166,11 +166,6 @@ public class JdbcRepositoryFactoryBean
 		return jdbcRepositoryClass;
 	}
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) {

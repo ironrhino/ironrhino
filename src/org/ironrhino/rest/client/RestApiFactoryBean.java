@@ -124,11 +124,6 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 	}
 
 	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
-	@Override
 	public Object invoke(final MethodInvocation methodInvocation) throws Exception {
 		if (circuitBreaker == null)
 			return doInvoke(methodInvocation);
