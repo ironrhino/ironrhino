@@ -372,11 +372,13 @@ public class ApiDoc implements Serializable {
 				}
 				if (!bindAnnotationPresent && Arrays.asList(methods).contains("GET")) {
 					// bind object not @RequestParam
-					String paramPackageName = parameterType.getPackage().getName();
-					if (!paramPackageName.startsWith("java.") && !paramPackageName.startsWith("javax.")
-							&& !paramPackageName.startsWith("org.springframework.")
-							&& Serializable.class.isAssignableFrom(parameterType)) {
-						requestParams.addAll(FieldObject.createList(parameterType, requestFields, true));
+					if (!parameterType.isPrimitive()) { // int.class
+						String paramPackageName = parameterType.getPackage().getName();
+						if (!paramPackageName.startsWith("java.") && !paramPackageName.startsWith("javax.")
+								&& !paramPackageName.startsWith("org.springframework.")
+								&& Serializable.class.isAssignableFrom(parameterType)) {
+							requestParams.addAll(FieldObject.createList(parameterType, requestFields, true));
+						}
 					}
 				}
 			}
