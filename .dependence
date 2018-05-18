@@ -35,3 +35,5 @@
 -aspectjrt
 +resilience4j-core
 +resilience4j-circuitbreaker
++micrometer-core
++micrometer-registry-influx

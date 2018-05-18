@@ -85,8 +85,6 @@
 					fs.setDir(new File(basedir+'/webapp/WEB-INF/lib'));
 					fs.setIncludes('*.jar');
 					var excludes = '';
-					if(features.indexOf('redis')<0)
-						excludes+='jedis-*.jar,commons-pool2-*.jar,spring-data-redis-*.jar,';
 					if(features.indexOf('rabbitmq')<0)
 						excludes+='amqp-client-*.jar,spring-rabbit-*.jar,spring-amqp-*.jar,';
 					if(features.indexOf('mongodb')<0)
@@ -96,7 +94,7 @@
 					if(features.indexOf('zxing')<0)
 						excludes+='zxing-*.jar,';
 					if(features.indexOf('batch')<0)
-						excludes+='javax.batch-api-*.jar,spring-batch-*.jar,';
+						excludes+='batch-api-*.jar,spring-batch-*.jar,';
 					if(excludes)
 					fs.setExcludes(excludes);
 					copy.addFileset(fs);
