@@ -11,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.ironrhino.core.stat.Key;
-import org.ironrhino.core.stat.StatLog;
 import org.ironrhino.core.util.RoundRobin;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -134,7 +132,6 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 			if (read)
 				conn.setReadOnly(true);
 			failureCount.remove(ds);
-			StatLog.add(new Key("dataroute", true, groupName, dbname, "success"));
 			return conn;
 		} catch (SQLException e) {
 			log.error(e.getMessage(), e);
@@ -149,11 +146,9 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 				failureCount.remove(ds);
 				deadDataSources.add(ds);
 				log.error("dataSource[" + groupName + ':' + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-				StatLog.add(new Key("dataroute", false, groupName, dbname, "down"));
 			} else {
 				failureCount.put(ds, failureTimes);
 			}
-			StatLog.add(new Key("dataroute", true, groupName, dbname, "failed"));
 			return getConnection(username, password, attempts);
 		}
 	}
