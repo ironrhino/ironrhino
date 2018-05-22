@@ -14,6 +14,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ClassUtils;
@@ -69,6 +70,11 @@ public class MetricsConfiguration {
 	@PreDestroy
 	public void destroy() {
 		Metrics.globalRegistry.getRegistries().forEach(MeterRegistry::close);
+	}
+
+	@Bean
+	public TimedAspect timedAspect() {
+		return new TimedAspect();
 	}
 
 	protected void instrument() {
