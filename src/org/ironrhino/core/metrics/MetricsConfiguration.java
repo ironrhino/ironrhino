@@ -8,38 +8,31 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
-import org.ironrhino.core.spring.configuration.AddressAvailabilityCondition;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.util.ClassUtils;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @ClassPresentConditional("io.micrometer.core.instrument.Metrics")
-@Slf4j
 public class MetricsConfiguration {
 
 	@Autowired(required = false)
 	private List<MeterBinder> meterBinders = Collections.emptyList();
 
-	@Autowired
-	private Environment environment;
+	@Autowired(required = false)
+	private List<MeterRegistryProvider> meterRegistryProviders = Collections.emptyList();
 
 	@Autowired(required = false)
 	private DataSource dataSource;
@@ -49,16 +42,7 @@ public class MetricsConfiguration {
 
 	@PostConstruct
 	public void init() {
-		if (ClassUtils.isPresent("io.micrometer.influx.InfluxMeterRegistry", MeterRegistry.class.getClassLoader())) {
-			io.micrometer.influx.InfluxConfig config = key -> environment.getProperty(key, (String) null);
-			if (AddressAvailabilityCondition.check(config.uri(), 2000)) {
-				Metrics.addRegistry(new io.micrometer.influx.InfluxMeterRegistry(config, Clock.SYSTEM,
-						new NameableThreadFactory("metrics")));
-				log.info("Add influx metrics {}", config.uri());
-			} else {
-				log.warn("Skip register influx metrics {}", config.uri());
-			}
-		}
+		meterRegistryProviders.forEach(p -> p.get().ifPresent(Metrics::addRegistry));
 		if (Metrics.globalRegistry.getRegistries().isEmpty())
 			Metrics.addRegistry(new SimpleMeterRegistry());
 		String instanceId = AppInfo.getInstanceId(true);
