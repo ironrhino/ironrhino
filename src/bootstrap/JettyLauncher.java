@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionIdManager;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.server.session.HouseKeeper;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletHandler.Default404Servlet;
@@ -46,7 +47,9 @@ public class JettyLauncher {
 		context.setServer(server);
 		context.addServlet(Default404Servlet.class, "*.class");
 
-		server.setHandler(context);
+		StatisticsHandler statisticsHandler = new StatisticsHandler();
+		statisticsHandler.setHandler(context);
+		server.setHandler(statisticsHandler);
 		server.setStopAtShutdown(true);
 		server.start();
 		server.join();

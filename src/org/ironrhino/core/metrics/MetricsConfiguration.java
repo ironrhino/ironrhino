@@ -9,6 +9,7 @@ import org.ironrhino.core.spring.configuration.AddressAvailabilityCondition;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.NameableThreadFactory;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -65,9 +66,22 @@ public class MetricsConfiguration {
 		if (dataSource instanceof HikariDataSource) {
 			((HikariDataSource) dataSource).setMetricRegistry(Metrics.globalRegistry);
 		}
-		String className = servletContext.getClass().getName();
-		if (className.startsWith("org.apache.catalina.")) {
-			TomcatMetrics.monitor(Metrics.globalRegistry);
+
+		if (servletContext != null) {
+			String className = servletContext.getClass().getName();
+			if (className.startsWith("org.apache.catalina.")) {
+				TomcatMetrics.monitor(Metrics.globalRegistry);
+			} else if (className.startsWith("org.eclipse.jetty.")) {
+				try {
+					Object webAppContext = ReflectionUtils.getFieldValue(servletContext, "this$0");
+					Object server = ReflectionUtils.getFieldValue(webAppContext, "_server");
+					Object handler = server.getClass().getMethod("getHandler").invoke(server);
+					if (handler.getClass().getSimpleName().equals("StatisticsHandler")) {
+						JettyMetrics.monitor(Metrics.globalRegistry, handler);
+					}
+				} catch (Throwable e) {
+				}
+			}
 		}
 	}
 
