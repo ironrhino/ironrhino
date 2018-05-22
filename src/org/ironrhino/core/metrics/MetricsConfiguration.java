@@ -1,5 +1,8 @@
 package org.ironrhino.core.metrics;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
@@ -20,6 +23,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.binder.MeterBinder;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 @ClassPresentConditional("io.micrometer.core.instrument.Metrics")
 @Slf4j
 public class MetricsConfiguration {
+
+	@Autowired(required = false)
+	private List<MeterBinder> meterBinders = Collections.emptyList();
 
 	@Autowired
 	private Environment environment;
@@ -63,21 +72,28 @@ public class MetricsConfiguration {
 	}
 
 	protected void instrument() {
+
+		MeterRegistry meterRegistry = Metrics.globalRegistry;
+
+		new JvmThreadMetrics().bindTo(meterRegistry);
+		new JvmMemoryMetrics().bindTo(meterRegistry);
+		meterBinders.forEach(mb -> mb.bindTo(meterRegistry));
+
 		if (dataSource instanceof HikariDataSource) {
-			((HikariDataSource) dataSource).setMetricRegistry(Metrics.globalRegistry);
+			((HikariDataSource) dataSource).setMetricRegistry(meterRegistry);
 		}
 
 		if (servletContext != null) {
 			String className = servletContext.getClass().getName();
 			if (className.startsWith("org.apache.catalina.")) {
-				TomcatMetrics.monitor(Metrics.globalRegistry);
+				TomcatMetrics.monitor(meterRegistry);
 			} else if (className.startsWith("org.eclipse.jetty.")) {
 				try {
 					Object webAppContext = ReflectionUtils.getFieldValue(servletContext, "this$0");
 					Object server = ReflectionUtils.getFieldValue(webAppContext, "_server");
 					Object handler = server.getClass().getMethod("getHandler").invoke(server);
 					if (handler.getClass().getSimpleName().equals("StatisticsHandler")) {
-						JettyMetrics.monitor(Metrics.globalRegistry, handler);
+						JettyMetrics.monitor(meterRegistry, handler);
 					}
 				} catch (Throwable e) {
 				}
