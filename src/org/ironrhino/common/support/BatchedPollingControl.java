@@ -47,7 +47,8 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 			if (entities.isEmpty())
 				break;
 			try {
-				Map<T, Result> results = handle(entities);
+				Map<T, Result> results = (timer == null) ? handle(entities)
+						: ((io.micrometer.core.instrument.Timer) timer).recordCallable(() -> handle(entities));
 				for (T entity : entities) {
 					Result obj = results.get(entity);
 					if (obj == null) {

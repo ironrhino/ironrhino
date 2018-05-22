@@ -34,6 +34,7 @@ import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.ClassUtils;
 
 public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 
@@ -73,6 +74,8 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 
 	protected final AtomicInteger count = new AtomicInteger();
 
+	protected Object timer;
+
 	public AbstractPollingControl() {
 		@SuppressWarnings("unchecked")
 		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
@@ -110,6 +113,10 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 					logger.error(e.getMessage(), e);
 				}));
 		boundListOperations = stringRedisTemplate.boundListOps(getQueueName());
+		if (ClassUtils.isPresent("io.micrometer.core.instrument.Metrics", getClass().getClassLoader())) {
+			timer = io.micrometer.core.instrument.Metrics.timer("polling." + entityClass.getName(), "batch",
+					String.valueOf(this instanceof BatchedPollingControl));
+		}
 	}
 
 	@PreDestroy
