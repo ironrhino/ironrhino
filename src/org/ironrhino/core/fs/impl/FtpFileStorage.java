@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -240,17 +241,12 @@ public class FtpFileStorage extends AbstractFileStorage {
 			}
 			return new ProxyInputStream(ftpClient.retrieveFileStream(pathname)) {
 
-				private final Object closeLock = new Object();
-				private volatile boolean closed = false;
+				private AtomicBoolean closed = new AtomicBoolean();
 
 				@Override
 				public void close() throws IOException {
-					synchronized (closeLock) {
-						if (closed) {
-							return;
-						}
-						closed = true;
-					}
+					if (!closed.compareAndSet(false, true))
+						return;
 					try {
 						super.close();
 					} finally {

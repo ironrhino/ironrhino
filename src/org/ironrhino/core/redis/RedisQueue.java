@@ -3,6 +3,7 @@ package org.ironrhino.core.redis;
 import java.io.Serializable;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -27,7 +28,9 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 	@Setter
 	protected boolean consuming;
 
-	private volatile boolean stopConsuming;
+	private AtomicBoolean stopConsuming = new AtomicBoolean();
+
+	private Thread worker;
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
@@ -49,7 +52,7 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 		queue = new DefaultRedisList<>(queueName, mqRedisTemplate);
 		if (consuming) {
 			Runnable task = () -> {
-				while (!stopConsuming) {
+				while (!stopConsuming.get()) {
 					try {
 						T message = queue.take();
 						consume(message);
@@ -58,16 +61,20 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 					}
 				}
 			};
-			if (executorService != null)
+			if (executorService != null) {
 				executorService.execute(task);
-			else
-				new Thread(task).start();
+			} else {
+				worker = new Thread(task);
+				worker.start();
+			}
 		}
 	}
 
 	@PreDestroy
 	public void stop() {
-		stopConsuming = true;
+		stopConsuming.set(true);
+		if (worker != null)
+			worker.interrupt();
 	}
 
 	@Override
