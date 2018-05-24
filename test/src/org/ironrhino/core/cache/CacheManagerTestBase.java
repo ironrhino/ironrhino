@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class CacheManagerTestBase {
 
-	private static final String NAMESPACE = "test";
+	private static final String NAMESPACE = "test:test";
 
 	@Autowired
 	private CacheManager cacheManager;

@@ -191,6 +191,7 @@ public class Cache2kCacheManager implements CacheManager {
 	private Cache<String, Object> getCache(String namespace, boolean create) {
 		if (StringUtils.isBlank(namespace))
 			namespace = "_default";
+		namespace = namespace.replaceAll(":", ".");
 		Cache<String, Object> cache = cache2kCacheManager.getCache(namespace);
 		if (cache != null)
 			return cache;
@@ -208,4 +209,5 @@ public class Cache2kCacheManager implements CacheManager {
 		}
 		return cache;
 	}
+
 }
