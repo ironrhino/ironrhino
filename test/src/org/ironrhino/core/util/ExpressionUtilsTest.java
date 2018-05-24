@@ -29,6 +29,20 @@ public class ExpressionUtilsTest {
 	}
 
 	@Test
+	public void testMathFunction() {
+		Map<String, Object> context = new HashMap<>();
+		context.put("number1", 1);
+		context.put("number2", 2);
+		context.put("number3", 3);
+		assertEquals(2, ExpressionUtils.evalExpression("min(number2,number3)", context));
+		assertEquals(1, ExpressionUtils.evalExpression("min(number1,number2,number3)", context));
+		assertEquals(2, ExpressionUtils.evalExpression("max(number1,number2)", context));
+		assertEquals(3, ExpressionUtils.evalExpression("max(number1,number2,number3)", context));
+		assertEquals(6, ExpressionUtils.evalExpression("sum(number1,number2,number3)", context));
+		assertEquals(2.0, ExpressionUtils.evalExpression("avg(number1,number2,number3)", context));
+	}
+
+	@Test
 	public void testEval() {
 		Map<String, Object> context = new HashMap<>();
 		context.put("string", "IAMSTRING");

@@ -22,6 +22,14 @@ public class ExpressionUtils {
 
 	private static ParserContext parserContext = new ParserContext();
 	static {
+		try {
+			parserContext.addImport("max", MathUtils.class.getMethod("max", Number[].class));
+			parserContext.addImport("min", MathUtils.class.getMethod("min", Number[].class));
+			parserContext.addImport("sum", MathUtils.class.getMethod("sum", Number[].class));
+			parserContext.addImport("avg", MathUtils.class.getMethod("avg", Number[].class));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		parserContext.addImport("java.lang.System", Object.class);
 		parserContext.addImport("System", Object.class);
 		parserContext.addImport("Runtime", Object.class);
