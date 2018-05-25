@@ -16,16 +16,22 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class JdbcRepositoryRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
+	@Getter
+	@Setter
+	private String[] packagesToScan;
+
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		Collection<Class<?>> jdbcRepositoryClasses = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(),
-				JdbcRepository.class);
+		Collection<Class<?>> jdbcRepositoryClasses = ClassScanner.scanAnnotated(
+				packagesToScan != null ? packagesToScan : ClassScanner.getAppPackages(), JdbcRepository.class);
 		for (Class<?> jdbcRepositoryClass : jdbcRepositoryClasses) {
 			if (!jdbcRepositoryClass.isInterface())
 				continue;

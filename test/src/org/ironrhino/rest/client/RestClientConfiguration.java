@@ -14,7 +14,9 @@ public class RestClientConfiguration {
 
 	@Bean
 	public RestApiRegistryPostProcessor restApiRegistryPostProcessor() {
-		return new RestApiRegistryPostProcessor();
+		RestApiRegistryPostProcessor obj = new RestApiRegistryPostProcessor();
+		obj.setPackagesToScan(new String[] { getClass().getPackage().getName() });
+		return obj;
 	}
 
 }

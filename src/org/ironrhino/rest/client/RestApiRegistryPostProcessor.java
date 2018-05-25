@@ -17,15 +17,22 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class RestApiRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
+	@Getter
+	@Setter
+	private String[] packagesToScan;
+
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		Collection<Class<?>> restApiClasses = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), RestApi.class);
+		Collection<Class<?>> restApiClasses = ClassScanner
+				.scanAnnotated(packagesToScan != null ? packagesToScan : ClassScanner.getAppPackages(), RestApi.class);
 		for (Class<?> restApiClass : restApiClasses) {
 			if (!restApiClass.isInterface())
 				continue;
