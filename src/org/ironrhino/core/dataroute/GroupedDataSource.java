@@ -21,12 +21,14 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+// must wrapped by LazyConnectionDataSourceProxy
 public class GroupedDataSource extends AbstractDataSource implements InitializingBean, BeanFactoryAware, BeanNameAware {
 
 	private BeanFactory beanFactory;
@@ -111,7 +113,8 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 		DataSource ds = null;
 		String dbname = null;
 		boolean read = false;
-		if (DataRouteContext.isReadonly() && getReadRoundRobin() != null) {
+		boolean readonly = TransactionSynchronizationManager.isCurrentTransactionReadOnly();
+		if (readonly && getReadRoundRobin() != null) {
 			read = true;
 			dbname = getReadRoundRobin().pick();
 			ds = readSlaves.get(dbname);
