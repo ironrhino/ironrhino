@@ -12,6 +12,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.ironrhino.common.model.Gender;
 import org.junit.After;
@@ -200,6 +201,28 @@ public class JdbcRepositoryTest {
 			assertTrue(dogRepository.delete(i + 1));
 		}
 		dogRepository.dropTable();
+	}
+
+	@Test
+	public void testOptional() throws Exception {
+		Person p = new Person();
+		p.setName("test");
+		p.setDob(LocalDate.now());
+		p.setSince(YearMonth.now());
+		p.setAge(11);
+		p.setGender(Gender.FEMALE);
+		p.setAmount(new BigDecimal("12.00"));
+		p.setAttributes(new HashMap<>());
+		p.getAttributes().put("key1", "value1");
+		p.getAttributes().put("key2", "value2");
+		p.setRoles(new LinkedHashSet<>());
+		p.getRoles().add("test1");
+		p.getRoles().add("test2");
+		personRepository.save(p);
+		Optional<Person> optional = personRepository.getOptional(p.getName());
+		assertTrue(optional.isPresent());
+		assertEquals(p, optional.get());
+		assertFalse(personRepository.getOptional("notexists").isPresent());
 	}
 
 }

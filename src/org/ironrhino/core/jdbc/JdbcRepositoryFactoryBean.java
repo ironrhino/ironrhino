@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -287,6 +288,22 @@ public class JdbcRepositoryFactoryBean
 						} else {
 							return namedParameterJdbcTemplate.query(sql, sqlParameterSource,
 									new EntityBeanPropertyRowMapper<>(clz));
+						}
+					}
+				} else if (pt.getRawType() == Optional.class) {
+					Type type = pt.getActualTypeArguments()[0];
+					if (type instanceof Class) {
+						Class<?> clz = (Class<?>) type;
+						if (BeanUtils.isSimpleValueType(clz)) {
+							return Optional.ofNullable(
+									namedParameterJdbcTemplate.queryForObject(sql, sqlParameterSource, clz));
+						} else {
+							List<?> result = namedParameterJdbcTemplate.query(sql, sqlParameterSource,
+									new EntityBeanPropertyRowMapper<>(clz));
+							if (result.size() > 1)
+								throw new RuntimeException(
+										"Incorrect result size: expected 1, actual " + result.size());
+							return Optional.ofNullable(result.isEmpty() ? null : result.get(0));
 						}
 					}
 				}

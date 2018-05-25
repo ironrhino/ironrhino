@@ -3,6 +3,7 @@ package org.ironrhino.core.jdbc;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EnumType;
 
@@ -30,6 +31,9 @@ public interface PersonRepository {
 
 	@Transactional(readOnly = true)
 	Person get(String name);
+
+	@Transactional(readOnly = true)
+	Optional<Person> getOptional(String name);
 
 	@Transactional(readOnly = true)
 	List<Person> list();
