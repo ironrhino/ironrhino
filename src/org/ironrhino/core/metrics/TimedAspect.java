@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.spring.NameGenerator;
+import org.ironrhino.core.util.ThrowableCallable;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -60,7 +61,7 @@ public class TimedAspect {
 		return timing(pjp, timed);
 	}
 
-	private Object recordThrowable(LongTaskTimer timer, ThrowableCallable f) throws Throwable {
+	private static Object recordThrowable(LongTaskTimer timer, ThrowableCallable f) throws Throwable {
 		LongTaskTimer.Sample timing = timer.start();
 		try {
 			return f.call();
@@ -69,7 +70,7 @@ public class TimedAspect {
 		}
 	}
 
-	private Object recordThrowable(Timer timer, ThrowableCallable f) throws Throwable {
+	private static Object recordThrowable(Timer timer, ThrowableCallable f) throws Throwable {
 		MeterRegistry registry = Metrics.globalRegistry;
 		long start = registry.config().clock().monotonicTime();
 		try {
@@ -79,7 +80,4 @@ public class TimedAspect {
 		}
 	}
 
-	private interface ThrowableCallable {
-		Object call() throws Throwable;
-	}
 }

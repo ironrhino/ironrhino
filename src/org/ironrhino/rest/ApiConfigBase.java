@@ -13,6 +13,7 @@ import javax.servlet.ServletRegistration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
+import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.spring.converter.DateConverter;
 import org.ironrhino.core.spring.converter.LocalDateConverter;
 import org.ironrhino.core.spring.converter.LocalDateTimeConverter;
@@ -21,6 +22,7 @@ import org.ironrhino.core.spring.converter.YearMonthConverter;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
+import org.ironrhino.rest.component.MetricsAspect;
 import org.ironrhino.rest.component.RestExceptionHandler;
 import org.ironrhino.rest.doc.ApiDocInspector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -226,6 +228,12 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Bean
 	protected AuthorizeAspect authorizeAspect() {
 		return new AuthorizeAspect();
+	}
+
+	@Bean
+	@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
+	protected MetricsAspect metricsAspect() {
+		return new MetricsAspect(getServletMapping());
 	}
 
 	@Bean
