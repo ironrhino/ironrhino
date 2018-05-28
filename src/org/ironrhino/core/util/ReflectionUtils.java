@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -131,7 +132,8 @@ public class ReflectionUtils {
 		MethodSignature sig = (MethodSignature) jp.getSignature();
 		Method method;
 		try {
-			method = clz.getDeclaredMethod(sig.getName(), sig.getParameterTypes());
+			method = Proxy.isProxyClass(clz) ? sig.getMethod()
+					: clz.getDeclaredMethod(sig.getName(), sig.getParameterTypes());
 			return getParameterNames(method);
 		} catch (Exception e) {
 			return null;
