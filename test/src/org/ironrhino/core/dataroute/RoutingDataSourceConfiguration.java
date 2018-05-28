@@ -27,8 +27,9 @@ public class RoutingDataSourceConfiguration {
 		ds.setJdbcUrl("jdbc:h2:mem:" + name + ";DB_CLOSE_DELAY=-1");
 		ds.setAutoCommit(false);
 		try (Connection c = ds.getConnection(); Statement stmt = c.createStatement()) {
-			// stmt.execute("drop table pet if exists");
 			stmt.execute("create table pet(name varchar(100) primary key)");
+			if (name.equals("sharding3"))
+				stmt.execute("create table ownership(name varchar(100), owner varchar(100))");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

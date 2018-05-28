@@ -31,7 +31,7 @@ public class RoutingDataSourceTest {
 	private ShardingsTemplateHolder shardingsTemplateHolder;
 
 	@Test
-	public void test() throws Exception {
+	public void testOnMethod() throws Exception {
 		String name = "test";
 		for (int i = 0; i < 10; i++) {
 			name += "0";
@@ -41,6 +41,16 @@ public class RoutingDataSourceTest {
 			assertEquals(p, petRepository.get(name));
 			verify(name);
 		}
+	}
+
+	@Test
+	public void testOnClass() throws Exception {
+		String name = "test";
+		for (int i = 0; i < 10; i++) {
+			petRepository.saveOwnership(name, "owner");
+		}
+		assertEquals(10, petRepository.findOwnership("owner").size());
+		verifyOwnership("owner");
 	}
 
 	private void verify(String name) throws SQLException {
@@ -56,6 +66,18 @@ public class RoutingDataSourceTest {
 		boolean exists = shardingsTemplateHolder.route(name).jdbc
 				.queryForObject("select count(*) from pet where name = ?", Long.class, name) > 0;
 		assertTrue(name + " doesn't exists", exists);
+	}
+
+	private void verifyOwnership(String owner) throws SQLException {
+		DataSource ds = beanFactory.getBean("sharding3", DataSource.class);
+		try (Connection conn = ds.getConnection();
+				PreparedStatement stmt = conn.prepareStatement("select count(*) from ownership where owner = ?")) {
+			stmt.setString(1, owner);
+			try (ResultSet rs = stmt.executeQuery()) {
+				assertTrue("owner doesn't exists in " + ds, rs.next());
+				assertEquals("owner doesn't exists in " + ds, 10, rs.getLong(1));
+			}
+		}
 	}
 
 }
