@@ -72,39 +72,22 @@ public class AutoConfigResult extends FreemarkerResult {
 		String actionName = invocation.getInvocationContext().getName();
 		if (namespace.equals("/"))
 			namespace = "";
-		String templateName = null;
 		String location = null;
-		if (StringUtils.isNotBlank(styleHolder.get())) {
-			templateName = getTemplateName(namespace, actionName, resultCode, true);
-			location = getTemplateLocation(templateName);
-		}
-		if (location == null) {
-			templateName = getTemplateName(namespace, actionName, resultCode, false);
-			location = cache.get(templateName);
-			if (location == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
-				ServletContext servletContext = ServletActionContext.getServletContext();
-				if (freemarkerConfigurer == null)
-					freemarkerConfigurer = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-							.getBean(FreemarkerConfigurer.class);
-				String ftlClasspath = freemarkerConfigurer.getFtlClasspath();
-				URL url = null;
-				location = getTemplateLocation(templateName);
-				if (location == null) {
-					if (StringUtils.isNotBlank(styleHolder.get())) {
-						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(resultCode)
-								.append(".").append(styleHolder.get()).append(".ftl").toString();
-						url = ClassLoaderUtil.getResource(location.substring(1), AutoConfigResult.class);
-					}
-					if (url == null)
-						location = new StringBuilder().append(ftlClasspath).append("/meta/result/").append(resultCode)
-								.append(".ftl").toString();
-				}
-				cache.put(templateName, location);
-			}
-		}
+		if (location == null && StringUtils.isNotBlank(styleHolder.get()))
+			location = getTemplateLocation(getTemplateName(namespace, actionName, resultCode, true));
+		if (location == null)
+			location = getTemplateLocation(getTemplateName(namespace, actionName, resultCode, false));
+		if (location == null && StringUtils.isNotBlank(styleHolder.get()))
+			location = getTemplateLocation(getTemplateName(namespace, resultCode, true));
+		if (location == null)
+			location = getTemplateLocation(getTemplateName(namespace, resultCode, false));
+		if (location == null && StringUtils.isNotBlank(styleHolder.get()))
+			location = getTemplateLocation(getTemplateName(resultCode, true));
+		if (location == null)
+			location = getTemplateLocation(getTemplateName(resultCode, false));
 		styleHolder.remove();
-		if (location.contains("./"))
-			throw new IllegalArgumentException("Location must be absolute");
+		if (location == null || location.contains("./"))
+			throw new IllegalArgumentException("Location not found:" + location);
 		return location;
 	}
 
@@ -127,11 +110,30 @@ public class AutoConfigResult extends FreemarkerResult {
 		return StringUtils.isEmpty(location) ? null : location;
 	}
 
+	// action level
 	private String getTemplateName(String namespace, String actionName, String result, boolean withStyle) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(namespace).append('/').append(actionName);
 		if (!result.equals(Action.SUCCESS) && !result.equals(BaseAction.HOME))
 			sb.append('_').append(result);
+		if (withStyle && StringUtils.isNotBlank(styleHolder.get()))
+			sb.append(".").append(styleHolder.get());
+		return sb.toString();
+	}
+
+	// namespace level
+	private String getTemplateName(String namespace, String result, boolean withStyle) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(namespace).append('/').append(result);
+		if (withStyle && StringUtils.isNotBlank(styleHolder.get()))
+			sb.append(".").append(styleHolder.get());
+		return sb.toString();
+	}
+
+	// application level
+	private String getTemplateName(String result, boolean withStyle) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("/meta/result/").append(result);
 		if (withStyle && StringUtils.isNotBlank(styleHolder.get()))
 			sb.append(".").append(styleHolder.get());
 		return sb.toString();

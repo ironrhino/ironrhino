@@ -30,11 +30,13 @@ Action的方法返回一个String类型的result, 框架需要将result转换成
 当result不为 `SUCCESS` 或 `HOME`:
 
 . classpath:resources/view/{namespace}/{actionName}_{result}.ftl
+. classpath:resources/view/{namespace}/{result}.ftl
 . classpath:resources/view/meta/result/{result}.ftl
 
 当result为 `SUCCESS` 并且methodName为 `execute`, 或者result为 `HOME` 并且方法不为 `execute`:
 
 . classpath:resources/view/{namespace}/{actionName}.ftl
+. classpath:resources/view/{namespace}/{result}.ftl
 . classpath:resources/view/meta/result/{result}.ftl
 
 当result为 `SUCCESS` 并且methodName不为 `execute`,
