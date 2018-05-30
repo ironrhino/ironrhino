@@ -63,8 +63,9 @@ public class RoutingDataSourceTest {
 				assertTrue(name + " doesn't exists in " + ds, rs.next());
 			}
 		}
-		boolean exists = shardingsTemplateHolder.route(name).jdbc
-				.queryForObject("select count(*) from pet where name = ?", Long.class, name) > 0;
+		Long count = shardingsTemplateHolder.route(name).jdbc.queryForObject("select count(*) from pet where name = ?",
+				Long.class, name);
+		boolean exists = count != null && count > 0;
 		assertTrue(name + " doesn't exists", exists);
 	}
 
