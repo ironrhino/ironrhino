@@ -49,6 +49,16 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	private static Logger remotingLogger = LoggerFactory.getLogger("remoting");
 
 	@Getter
+	@Setter
+	@Value("${httpInvoker.connectTimeout:5000}")
+	private int connectTimeout = 5000;
+
+	@Getter
+	@Setter
+	@Value("${httpInvoker.readTimeout:60000}")
+	private int readTimeout = 60000;
+
+	@Getter
 	@Value("${httpInvoker.serialization.type:JAVA}")
 	private volatile SerializationType serializationType = SerializationType.JAVA;
 
@@ -106,6 +116,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	public void setSerializationType(SerializationType serializationType) {
 		this.serializationType = serializationType;
 		SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor(serializationType);
+		executor.setConnectTimeout(connectTimeout);
+		executor.setReadTimeout(readTimeout);
 		executor.setBeanClassLoader(getBeanClassLoader());
 		super.setHttpInvokerRequestExecutor(executor);
 	}
