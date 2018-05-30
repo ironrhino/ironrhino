@@ -120,9 +120,12 @@ public class DocsAction extends BaseAction {
 			if (name.startsWith(FrameworkServlet.SERVLET_CONTEXT_PREFIX)) {
 				ApplicationContext ctx = (ApplicationContext) servletContext.getAttribute(name);
 				try {
+					if (ctx.getBean(ApiConfigBase.class) != getApiConfig())
+						continue;
 					ApiDocInspector adh = ctx.getBean(ApiDocInspector.class);
 					return adh.getApiModules();
 				} catch (NoSuchBeanDefinitionException e) {
+					continue;
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
