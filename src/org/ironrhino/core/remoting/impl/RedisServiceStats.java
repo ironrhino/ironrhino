@@ -46,6 +46,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 
 @Component("serviceStats")
 @ServiceImplementationConditional(profiles = { DUAL, CLUSTER, CLOUD })
@@ -84,6 +85,9 @@ public class RedisServiceStats implements ServiceStats {
 	private BoundZSetOperations<String, String> hotspotsOperations;
 	private BoundListOperations<String, String> warningsOperations;
 
+	private boolean micrometerPresent = ClassUtils.isPresent("io.micrometer.core.instrument.Metrics",
+			getClass().getClassLoader());
+
 	@PostConstruct
 	public void afterPropertiesSet() {
 		hotspotsOperations = remotingStringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
@@ -102,6 +106,16 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	protected void emit(String source, String target, String serviceName, String method, long time, StatsType type) {
+		if (micrometerPresent) {
+			String service = serviceName + "." + method;
+			if (type == StatsType.SERVER_SIDE) {
+				io.micrometer.core.instrument.Metrics.timer("remoting.server.calls", "service", service).record(time,
+						TimeUnit.MILLISECONDS);
+			} else {
+				io.micrometer.core.instrument.Metrics.timer("remoting.client.calls", "service", service, "failed",
+						String.valueOf(type == StatsType.CLIENT_FAILED)).record(time, TimeUnit.MILLISECONDS);
+			}
+		}
 		type.increaseCount(serviceName, method);
 		type.collectSample(serviceRegistry != null ? serviceRegistry.getLocalHost() : null, serviceName, method, time);
 		if (type == StatsType.CLIENT_FAILED || type == StatsType.CLIENT_SIDE && time > responseTimeThreshold) {
