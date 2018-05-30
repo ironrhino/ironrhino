@@ -23,10 +23,10 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	// proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 	public static final String HEADER_NAME_X_FORWARDED_FOR = "X-Forwarded-For";
 
-	// proxy_set_header X-Forwarded-For $scheme;
+	// proxy_set_header X-Forwarded-Proto $scheme;
 	public static final String HEADER_NAME_X_FORWARDED_PROTO = "X-Forwarded-Proto";
 
-	// proxy_set_header X-Forwarded-For $server_port;
+	// proxy_set_header X-Forwarded-Port $server_port;
 	public static final String HEADER_NAME_X_FORWARDED_PORT = "X-Forwarded-Port";
 
 	// proxy_set_header X-Url-Scheme $scheme;
