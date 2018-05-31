@@ -1,7 +1,6 @@
 package org.ironrhino.rest.doc.action;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
@@ -18,7 +17,6 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.rest.ApiConfigBase;
 import org.ironrhino.rest.doc.ApiDoc;
-import org.ironrhino.rest.doc.ApiDocInspector;
 import org.ironrhino.rest.doc.ApiModuleObject;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,24 +112,7 @@ public class DocsAction extends BaseAction {
 	}
 
 	public Map<String, List<ApiModuleObject>> getApiModules() {
-		Enumeration<String> names = servletContext.getAttributeNames();
-		while (names.hasMoreElements()) {
-			String name = names.nextElement();
-			if (name.startsWith(FrameworkServlet.SERVLET_CONTEXT_PREFIX)) {
-				ApplicationContext ctx = (ApplicationContext) servletContext.getAttribute(name);
-				try {
-					if (ctx.getBean(ApiConfigBase.class) != getApiConfig())
-						continue;
-					ApiDocInspector adh = ctx.getBean(ApiDocInspector.class);
-					return adh.getApiModules();
-				} catch (NoSuchBeanDefinitionException e) {
-					continue;
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return Collections.emptyMap();
+		return getApiConfig().apiDocInspector().getApiModules();
 	}
 
 	@Override
