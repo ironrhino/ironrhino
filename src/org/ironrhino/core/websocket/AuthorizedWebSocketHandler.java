@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import org.ironrhino.core.util.AuthzUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,7 +19,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
-public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandler {
+public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandler implements DisposableBean {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -91,6 +92,16 @@ public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandle
 		}
 		sessions.add(session);
 		super.afterConnectionEstablished(session);
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		for (WebSocketSession session : sessions)
+			if (session.isOpen())
+				try {
+					session.close(CloseStatus.NORMAL);
+				} catch (IOException e) {
+				}
 	}
 
 }
