@@ -281,7 +281,9 @@ public class UploadAction extends BaseAction {
 
 	private String doGetFileUrl(String path) {
 		String url = uploadFileStorage.getFileUrl(path);
-		if (url.indexOf("://") < 0)
+		if (url.indexOf("://") > 0 && uploadFileStorage.isRelativeProtocolAllowed())
+			url = url.substring(url.indexOf(':') + 1);
+		else if (url.indexOf("://") < 0 && url.indexOf("//") != 0)
 			url = uploadFilesHandler.getPathPrefix() + url;
 		return url;
 	}

@@ -138,7 +138,7 @@ function browse() {
 							});
 				}).click(function() {
 							$('#mce-browse-modal').fadeIn().remove();
-							$('.mce-combobox input.mce-textbox').val(this.src);
+							$('.mce-combobox input.mce-textbox').val($(this).attr('src'));
 							$('input.mce-textbox:eq(1)').focus();
 						});
 				$('a', panel).click(function() {
