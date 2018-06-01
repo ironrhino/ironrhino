@@ -151,9 +151,16 @@ public class ServletContainerHelper {
 			String className = servletContext.getClass().getName();
 			if (className.startsWith("org.apache.catalina.")) {
 				Object ctx = ReflectionUtils.getFieldValue(servletContext, "context");
-				Method m = ctx.getClass().getDeclaredMethod("getContext");
-				m.setAccessible(true);
-				Object standardContext = m.invoke(ctx);
+				Object standardContext;
+				Method m;
+				try {
+					m = ctx.getClass().getDeclaredMethod("getContext");
+					m.setAccessible(true);
+					standardContext = m.invoke(ctx);
+				} catch (NoSuchMethodException e) {
+					// tomcat7 or glassfish
+					standardContext = ReflectionUtils.getFieldValue(ctx, "context");
+				}
 				Class<?> errorPageClass = standardContext.getClass().getMethod("findErrorPage", int.class)
 						.getReturnType();
 				m = standardContext.getClass().getMethod("addErrorPage", errorPageClass);
