@@ -35,23 +35,38 @@ public abstract class AbstractEntity<PK extends Serializable> implements Persist
 				&& !object.getClass().isAssignableFrom(this.getClass()))
 			return false;
 		AbstractEntity that = (AbstractEntity) object;
-		return this.toIdentifiedString().equals(that.toIdentifiedString());
-	}
-
-	private String toIdentifiedString() {
-		Map<String, Object> map = AnnotationUtils.getAnnotatedPropertyNameAndValues(this, NaturalId.class);
-		if (map.size() == 1) {
-			return String.valueOf(map.values().iterator().next());
-		} else if (map.size() > 1) {
-			return map.toString();
-		} else {
-			return String.valueOf(getId());
+		if (this.getId() != null)
+			return this.getId().equals(that.getId());
+		if (that.getId() != null)
+			return that.getId().equals(this.getId());
+		Map<String, Object> thisNaturalIds = AnnotationUtils.getAnnotatedPropertyNameAndValues(this, NaturalId.class);
+		if (!thisNaturalIds.isEmpty()) {
+			Map<String, Object> thatNaturalIds = AnnotationUtils.getAnnotatedPropertyNameAndValues(that,
+					NaturalId.class);
+			for (Map.Entry<String, Object> entry : thisNaturalIds.entrySet()) {
+				Object thisValue = entry.getValue();
+				Object thatValue = thatNaturalIds.get(entry.getKey());
+				if (thisValue == null || thatValue == null || !thisValue.equals(thatValue))
+					return false;
+			}
+			return true;
 		}
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return toIdentifiedString();
+		Map<String, Object> map = AnnotationUtils.getAnnotatedPropertyNameAndValues(this, NaturalId.class);
+		if (map.size() == 1) {
+			Object naturalId = map.values().iterator().next();
+			if (naturalId != null)
+				return String.valueOf(naturalId);
+		} else if (map.size() > 1) {
+			for (Object v : map.values())
+				if (v != null)
+					return map.toString();
+		}
+		return String.valueOf(getId());
 	}
 
 }
