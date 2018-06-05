@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.aop.AbstractMethodInterceptor;
 import org.ironrhino.core.model.NullObject;
@@ -47,19 +48,22 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 			if (CacheContext.isForceFlush()) {
 				cacheManager.mdelete(new HashSet<>(keys), namespace);
 			} else {
+				Class<?> returnType = methodInvocation.getMethod().getReturnType();
 				int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
 				for (String key : keys) {
 					Object value = (timeToIdle > 0 && !cacheManager.supportsTti())
 							? cacheManager.getWithTti(key, namespace, timeToIdle, checkCache.timeUnit())
 							: cacheManager.get(key, namespace);
-					if (value != null && !(value instanceof NullObject)
-							&& !methodInvocation.getMethod().getReturnType().isAssignableFrom(value.getClass())) {
-						value = null;
-					}
-					if (value != null) {
-						putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
+					if (value instanceof NullObject) {
 						ExpressionUtils.eval(checkCache.onHit(), context);
-						return value instanceof NullObject ? null : value;
+						return null;
+					}
+					if (value != null && (returnType.isPrimitive()
+							&& value.getClass() == ClassUtils.primitiveToWrapper(returnType)
+							|| returnType.isAssignableFrom(value.getClass()))) {
+						putReturnValueIntoContext(context, value);
+						ExpressionUtils.eval(checkCache.onHit(), context);
+						return value;
 					}
 				}
 				if (mutex) {
@@ -71,14 +75,16 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 						Thread.sleep(mutexWait);
 						for (String key : keys) {
 							Object value = cacheManager.get(key, namespace);
-							if (value != null && !(value instanceof NullObject) && !methodInvocation.getMethod()
-									.getReturnType().isAssignableFrom(value.getClass())) {
-								value = null;
-							}
-							if (value != null) {
-								putReturnValueIntoContext(context, value instanceof NullObject ? null : value);
+							if (value instanceof NullObject) {
 								ExpressionUtils.eval(checkCache.onHit(), context);
-								return value instanceof NullObject ? null : value;
+								return null;
+							}
+							if (value != null && (returnType.isPrimitive()
+									&& value.getClass() == ClassUtils.primitiveToWrapper(returnType)
+									|| returnType.isAssignableFrom(value.getClass()))) {
+								putReturnValueIntoContext(context, value);
+								ExpressionUtils.eval(checkCache.onHit(), context);
+								return value;
 							}
 						}
 					}
