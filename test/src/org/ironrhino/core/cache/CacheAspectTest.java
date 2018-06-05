@@ -1,6 +1,7 @@
 package org.ironrhino.core.cache;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 
 import java.io.Serializable;
@@ -8,10 +9,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.aopalliance.intercept.MethodInterceptor;
 import org.ironrhino.core.cache.CacheAspectTest.CacheConfiguration;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +31,9 @@ public class CacheAspectTest {
 
 	@Autowired
 	private PersonRepository personRepository;
+
+	@Autowired
+	private TimeService timeService;
 
 	@Autowired
 	private CacheManager cacheManager;
@@ -48,7 +55,30 @@ public class CacheAspectTest {
 		}
 		personRepository.remove(person.getName());
 		assertNull(cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE));
-		assertNull(personRepository.get(person.getName()));
+		for (int i = 0; i < 10; i++) {
+			assertNull(personRepository.get("notexists"));
+			assertEquals(2 + i, personRepository.count());
+		}
+		for (int i = 0; i < 10; i++) {
+			assertNull(personRepository.getWithCacheNull("notexists"));
+			assertEquals(12, personRepository.count());
+		}
+	}
+
+	@Test
+	public void testJdkDynamicProxy() throws Exception {
+		long nanoTime = timeService.nanoTime();
+		for (int i = 0; i < 5; i++) {
+			Thread.sleep(10);
+			assertEquals(nanoTime, timeService.nanoTime());
+		}
+		cacheManager.delete(TimeService.CACHE_KEY, TimeService.CACHE_NAMESPACE);
+		assertNotEquals(nanoTime, timeService.nanoTime());
+		nanoTime = timeService.nanoTime();
+		for (int i = 0; i < 5; i++) {
+			Thread.sleep(10);
+			assertEquals(nanoTime, timeService.nanoTime());
+		}
 	}
 
 	@Data
@@ -79,6 +109,12 @@ public class CacheAspectTest {
 			return people.get(name);
 		}
 
+		@CheckCache(key = "${name}", cacheNull = true, namespace = CACHE_NAMESPACE)
+		public Person getWithCacheNull(String name) {
+			count.incrementAndGet();
+			return people.get(name);
+		}
+
 		@EvictCache(key = "${name}", namespace = CACHE_NAMESPACE)
 		public void remove(String name) {
 			people.remove(name);
@@ -87,6 +123,16 @@ public class CacheAspectTest {
 		protected int count() {
 			return count.get();
 		}
+
+	}
+
+	public static interface TimeService {
+
+		public static final String CACHE_NAMESPACE = "time";
+		public static final String CACHE_KEY = "nano";
+
+		@CheckCache(key = CACHE_KEY, namespace = CACHE_NAMESPACE)
+		public long nanoTime();
 
 	}
 
@@ -107,6 +153,25 @@ public class CacheAspectTest {
 		@Bean
 		public PersonRepository personRepository() {
 			return new PersonRepository();
+		}
+
+		@Bean
+		public FactoryBean<TimeService> accountService() {
+			return new FactoryBean<TimeService>() {
+
+				@Override
+				public TimeService getObject() throws Exception {
+					return (TimeService) new ProxyFactory(TimeService.class, (MethodInterceptor) (mi -> {
+						return System.nanoTime();
+					})).getProxy(TimeService.class.getClassLoader());
+				}
+
+				@Override
+				public Class<?> getObjectType() {
+					return TimeService.class;
+				}
+
+			};
 		}
 
 	}
