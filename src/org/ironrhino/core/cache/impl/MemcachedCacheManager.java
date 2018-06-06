@@ -222,8 +222,11 @@ public class MemcachedCacheManager implements CacheManager {
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		try {
-			return memcached.incr(generateKey(key, namespace), delta, delta, this.timeout,
-					timeToLive > 0 ? (int) timeUnit.toSeconds(timeToLive) : Integer.MAX_VALUE);
+			if (timeToLive == 0)
+				return memcached.incr(generateKey(key, namespace), delta);
+			else
+				return memcached.incr(generateKey(key, namespace), delta, delta, this.timeout,
+						timeToLive > 0 ? (int) timeUnit.toSeconds(timeToLive) : Integer.MAX_VALUE);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

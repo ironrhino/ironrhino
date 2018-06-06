@@ -34,6 +34,7 @@ public interface CacheManager {
 
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace);
 
+	// timeToLive = 0 not change expiration, timeToLive < 0 permanent
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace);
 
 	public boolean supportsTti();

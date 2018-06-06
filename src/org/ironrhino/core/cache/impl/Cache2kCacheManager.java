@@ -156,11 +156,13 @@ public class Cache2kCacheManager implements CacheManager {
 		CacheEntry<String, Object> ce = cache.invoke(key, e -> {
 			if (e.exists()) {
 				e.setValue((Long) e.getValue() + delta);
+				if (timeToLive > 0)
+					e.setExpiry(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
 			} else {
 				e.setValue(delta);
+				e.setExpiry(System.currentTimeMillis()
+						+ (timeToLive > 0 ? timeUnit.toMillis(timeToLive) : Integer.MAX_VALUE));
 			}
-			e.setExpiry(
-					System.currentTimeMillis() + (timeToLive > 0 ? timeUnit.toMillis(timeToLive) : Integer.MAX_VALUE));
 			return e;
 		});
 		return (Long) ce.getValue();

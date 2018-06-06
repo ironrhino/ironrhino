@@ -24,12 +24,6 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 	@Setter
 	private CacheManager cacheManager;
 
-	@Setter
-	private boolean mutex;
-
-	@Setter
-	private int mutexWait;
-
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
@@ -66,26 +60,29 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 						return value;
 					}
 				}
-				if (mutex) {
-					int throughPermits = checkCache.throughPermits();
-					if (cacheManager.increment(keyMutex, 1, Math.max(10000, mutexWait), TimeUnit.MILLISECONDS,
-							namespace) <= throughPermits) {
-						mutexed = true;
-					} else {
-						Thread.sleep(mutexWait);
-						for (String key : keys) {
-							Object value = cacheManager.get(key, namespace);
-							if (value instanceof NullObject) {
-								ExpressionUtils.eval(checkCache.onHit(), context);
-								return null;
-							}
-							if (value != null && (returnType.isPrimitive()
-									&& value.getClass() == ClassUtils.primitiveToWrapper(returnType)
-									|| returnType.isAssignableFrom(value.getClass()))) {
-								putReturnValueIntoContext(context, value);
-								ExpressionUtils.eval(checkCache.onHit(), context);
-								return value;
-							}
+				int throughPermits = checkCache.throughPermits();
+				int waitTimeout = checkCache.waitTimeout();
+				if (waitTimeout <= 0)
+					waitTimeout = 200;
+				else if (waitTimeout > 10000)
+					waitTimeout = 10000;
+				if (cacheManager.increment(keyMutex, 1, waitTimeout, TimeUnit.MILLISECONDS,
+						namespace) <= throughPermits) {
+					mutexed = true;
+				} else {
+					Thread.sleep(waitTimeout);
+					for (String key : keys) {
+						Object value = cacheManager.get(key, namespace);
+						if (value instanceof NullObject) {
+							ExpressionUtils.eval(checkCache.onHit(), context);
+							return null;
+						}
+						if (value != null && (returnType.isPrimitive()
+								&& value.getClass() == ClassUtils.primitiveToWrapper(returnType)
+								|| returnType.isAssignableFrom(value.getClass()))) {
+							putReturnValueIntoContext(context, value);
+							ExpressionUtils.eval(checkCache.onHit(), context);
+							return value;
 						}
 					}
 				}
@@ -113,7 +110,7 @@ public class CacheInterceptor extends AbstractMethodInterceptor<CacheAspect> {
 					ExpressionUtils.eval(checkCache.onPut(), context);
 			}
 			if (mutexed)
-				cacheManager.delete(keyMutex, namespace);
+				cacheManager.increment(keyMutex, -1, 0, TimeUnit.MILLISECONDS, namespace);
 			return result;
 
 		}

@@ -7,7 +7,6 @@ import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractPointcutAdvisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.Ordered;
@@ -21,20 +20,12 @@ public class CacheAspect extends AbstractPointcutAdvisor {
 
 	private static final long serialVersionUID = -9093221616339043624L;
 
-	private final static int DEFAULT_MUTEX_WAIT = 200;
-
 	@Autowired
 	private ApplicationContext ctx;
 
 	// lazy get CacheManager from ctx
 	// @Autowired
 	// private CacheManager cacheManager;
-
-	@Value("${cacheAspect.mutex:true}")
-	private boolean mutex;
-
-	@Value("${cacheAspect.mutexWait:" + DEFAULT_MUTEX_WAIT + "}")
-	private int mutexWait = DEFAULT_MUTEX_WAIT;
 
 	@Getter
 	@Setter
@@ -65,8 +56,6 @@ public class CacheAspect extends AbstractPointcutAdvisor {
 					temp = new CacheInterceptor();
 					CacheManager cacheManager = ctx.getBean(CacheManager.class);
 					temp.setCacheManager(cacheManager);
-					temp.setMutex(mutex);
-					temp.setMutexWait(mutexWait);
 					interceptor = temp;
 				}
 			}

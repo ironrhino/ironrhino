@@ -3,15 +3,21 @@ package org.ironrhino.core.cache;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.ironrhino.core.cache.CacheAspectTest.CacheConfiguration;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.aop.framework.ProxyFactory;
@@ -38,6 +44,18 @@ public class CacheAspectTest {
 	@Autowired
 	private CacheManager cacheManager;
 
+	@Before
+	public void init() {
+		personRepository.clearCount();
+	}
+
+	@After
+	public void destroy() {
+		cacheManager.delete("test", PersonRepository.CACHE_NAMESPACE);
+		cacheManager.delete("notexists", PersonRepository.CACHE_NAMESPACE);
+		cacheManager.delete("nano", TimeService.CACHE_NAMESPACE);
+	}
+
 	@Test
 	public void test() {
 		Person person = new Person();
@@ -55,14 +73,40 @@ public class CacheAspectTest {
 		}
 		personRepository.remove(person.getName());
 		assertNull(cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE));
+	}
+
+	@Test
+	public void testCacheNull() {
 		for (int i = 0; i < 10; i++) {
 			assertNull(personRepository.get("notexists"));
-			assertEquals(2 + i, personRepository.count());
+			assertEquals(i + 1, personRepository.count());
 		}
+		int current = personRepository.count();
 		for (int i = 0; i < 10; i++) {
 			assertNull(personRepository.getWithCacheNull("notexists"));
-			assertEquals(12, personRepository.count());
+			assertEquals(current + 1, personRepository.count());
 		}
+	}
+
+	@Test
+	public void testConcurrency() throws Exception {
+		Person person = new Person();
+		person.setName("test");
+		personRepository.save(person);
+		int THREADS = PersonRepository.THROUGH_PERMITS * 10;
+		ExecutorService es = Executors.newFixedThreadPool(THREADS);
+		CountDownLatch cdl = new CountDownLatch(THREADS);
+		for (int n = 0; n < THREADS; n++) {
+			es.execute(() -> {
+				for (int i = 0; i < 10; i++) {
+					personRepository.get(person.getName());
+				}
+				cdl.countDown();
+			});
+		}
+		cdl.await();
+		assertTrue(personRepository.count() <= PersonRepository.THROUGH_PERMITS);
+		es.shutdown();
 	}
 
 	@Test
@@ -93,6 +137,7 @@ public class CacheAspectTest {
 	public static class PersonRepository {
 
 		public static final String CACHE_NAMESPACE = "person";
+		public static final int THROUGH_PERMITS = 10;
 
 		public Map<String, Person> people = new ConcurrentHashMap<>();
 
@@ -103,7 +148,7 @@ public class CacheAspectTest {
 			people.put(person.getName(), person);
 		}
 
-		@CheckCache(key = "${name}", namespace = CACHE_NAMESPACE)
+		@CheckCache(key = "${name}", throughPermits = THROUGH_PERMITS, namespace = CACHE_NAMESPACE)
 		public Person get(String name) {
 			count.incrementAndGet();
 			return people.get(name);
@@ -122,6 +167,10 @@ public class CacheAspectTest {
 
 		protected int count() {
 			return count.get();
+		}
+
+		protected void clearCount() {
+			count.set(0);
 		}
 
 	}

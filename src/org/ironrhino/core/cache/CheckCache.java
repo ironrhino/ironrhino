@@ -33,6 +33,9 @@ public @interface CheckCache {
 
 	int throughPermits() default 5;
 
+	// TimeUnit.MILLISECONDS
+	int waitTimeout() default 200;
+
 	// mvel expression
 	String onHit() default "";
 
