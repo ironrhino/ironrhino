@@ -18,6 +18,7 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -115,11 +116,7 @@ public class HttpClientUtils {
 		if (headers != null && headers.size() > 0)
 			for (Map.Entry<String, String> entry : headers.entrySet())
 				httpRequest.addHeader(entry.getKey(), entry.getValue());
-		try {
-			return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
-		} finally {
-			httpRequest.releaseConnection();
-		}
+		return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
 	}
 
 	public static String postResponseText(String url, Map<String, String> params) throws IOException {
@@ -147,11 +144,7 @@ public class HttpClientUtils {
 		if (headers != null && headers.size() > 0)
 			for (Map.Entry<String, String> entry : headers.entrySet())
 				httpRequest.addHeader(entry.getKey(), entry.getValue());
-		try {
-			return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
-		} finally {
-			httpRequest.releaseConnection();
-		}
+		return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
 	}
 
 	public static String postResponseText(String url, String body, Map<String, String> headers, String charset)
@@ -161,11 +154,7 @@ public class HttpClientUtils {
 		if (headers != null && headers.size() > 0)
 			for (Map.Entry<String, String> entry : headers.entrySet())
 				httpRequest.addHeader(entry.getKey(), entry.getValue());
-		try {
-			return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
-		} finally {
-			httpRequest.releaseConnection();
-		}
+		return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
 	}
 
 	public static String post(String url, String entity) throws IOException {
@@ -208,12 +197,7 @@ public class HttpClientUtils {
 			httpRequest = new HttpDelete(url);
 		if (entity != null)
 			((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new StringEntity(entity, charset));
-		try {
-			return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
-		} finally {
-			if (httpRequest != null)
-				httpRequest.releaseConnection();
-		}
+		return getDefaultInstance().execute(httpRequest, new BasicResponseHandler(charset));
 	}
 
 	static class BasicResponseHandler implements ResponseHandler<String> {
@@ -234,13 +218,17 @@ public class HttpClientUtils {
 
 		@Override
 		public String handleResponse(final HttpResponse response) throws HttpResponseException, IOException {
-			final StatusLine statusLine = response.getStatusLine();
-			final HttpEntity entity = response.getEntity();
-			if (statusLine.getStatusCode() >= 300) {
-				EntityUtils.consume(entity);
-				throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
+			try {
+				StatusLine statusLine = response.getStatusLine();
+				HttpEntity entity = response.getEntity();
+				if (statusLine.getStatusCode() >= 300) {
+					EntityUtils.consume(entity);
+					throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
+				}
+				return entity == null ? null : EntityUtils.toString(entity, charset);
+			} finally {
+				((CloseableHttpResponse) response).close();
 			}
-			return entity == null ? null : EntityUtils.toString(entity, charset);
 		}
 
 	}
