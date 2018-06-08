@@ -78,8 +78,8 @@ ${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,s
 </#macro>
 
 <#macro captcha theme="">
-<#if captchaRequired!>
-	<@s.textfield name="captcha" class="required captcha" style="width:60px;" maxlength=4 data\-captcha="${base}/captcha.jpg?token=${session.id}"/>
+<#if captchaRequired!false>
+	<@s.textfield name="captcha" theme=theme class="required captcha" style="width:60px;" maxlength=4 data\-captcha="${base}/captcha.jpg?token=${session.id}"/>
 </#if>
 </#macro>
 

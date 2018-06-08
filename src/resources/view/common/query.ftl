@@ -59,7 +59,7 @@ $(function(){
 </script>
 </head>
 <body>
-<@s.form id="query-form" action="${actionBaseUrl}" method="post" class="form-horizontal label-large ajax view history">
+<@s.form id="query-form" action=actionBaseUrl method="post" class="form-horizontal label-large ajax view history">
 	<#list Parameters as name,value>
 	<#if name=='view'||name?ends_with('-type')>
 	<input type="hidden" name="${name}" value="${value}" />

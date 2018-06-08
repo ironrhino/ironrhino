@@ -54,7 +54,7 @@ $(function(){
 </script>
 </head>
 <body>
-<@s.form id="form" action="${actionBaseUrl}" method="post" class="form-horizontal ajax focus">
+<@s.form id="form" action=actionBaseUrl method="post" class="form-horizontal ajax focus">
 	<div class="row-fluid">
 	<div class="span8">
 	<@s.textarea name="expression" class="required" style="width:100%;height:100px;"/>

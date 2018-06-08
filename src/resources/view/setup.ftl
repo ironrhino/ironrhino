@@ -10,7 +10,7 @@
 	<div class="span6 offset3">
 	<h2 class="caption">${getText('setup')}</h2>
 	<div class="hero-unit">
-	<@s.form method="post" action="${actionBaseUrl}" class="ajax focus form-horizontal well">
+	<@s.form method="post" action=actionBaseUrl class="ajax focus form-horizontal well">
 		<#list setupParameters as p>
 		<#assign defaultValue = p.defaultValue!/>
 		<#if defaultValue?has_content>

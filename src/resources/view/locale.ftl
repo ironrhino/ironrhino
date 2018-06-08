@@ -5,7 +5,7 @@
 <title>${getText('locale')}</title>
 </head>
 <body>
-<form action="${actionBaseUrl}">
+<form action=actionBaseUrl>
 <@s.select theme="simple" name="lang" onchange="this.form.submit()" list="availableLocales" listValue="top.getDisplayName(top)" headerKey="" headerValue=""/>	
 </form>
 </body>

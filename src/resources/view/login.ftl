@@ -26,7 +26,7 @@
 		<#assign verificationCodeRequired = beans['verificationManager'].isVerificationRequired(username)>
 		<#assign passwordCodeRequired = beans['verificationManager'].isPasswordRequired(username)>
 	</#if>
-	<@s.form id="login" action="${actionBaseUrl}" method="post" class="ajax focus form-horizontal well">
+	<@s.form id="login" action=actionBaseUrl method="post" class="ajax focus form-horizontal well">
 		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
 		<#assign dynamicAttributes={}>
 		<#if verificationCodeEnabled>

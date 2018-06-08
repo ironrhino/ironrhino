@@ -5,7 +5,7 @@
 <title>${getText('upload')}</title>
 </head>
 <body>
-<@s.form id="upload_form" action="${actionBaseUrl}" method="post" enctype="multipart/form-data" class="ajax view form-horizontal">
+<@s.form id="upload_form" action=actionBaseUrl method="post" enctype="multipart/form-data" class="ajax view form-horizontal">
 	<div class="row<#if fluidLayout>-fluid</#if>">
 		<div class="span5"><@s.file name="file" class="required custom input-xlarge" multiple="true"/></div>
 		<div class="span4"><@s.checkbox name="autorename" class="switch input-medium"/></div>
