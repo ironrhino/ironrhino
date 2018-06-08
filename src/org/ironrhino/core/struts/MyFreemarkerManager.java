@@ -9,7 +9,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
-import org.apache.struts2.views.freemarker.ScopesHashModel;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
@@ -28,8 +27,11 @@ import freemarker.ext.servlet.HttpSessionHashModel;
 import freemarker.ext.servlet.ServletContextHashModel;
 import freemarker.template.Configuration;
 import freemarker.template.ObjectWrapper;
+import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import freemarker.template.TemplateModel;
+import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -95,9 +97,9 @@ public class MyFreemarkerManager extends FreemarkerManager {
 	}
 
 	@Override
-	public ScopesHashModel buildTemplateModel(ValueStack stack, Object action, ServletContext servletContext,
+	public SimpleHash buildTemplateModel(ValueStack stack, Object action, ServletContext servletContext,
 			HttpServletRequest request, HttpServletResponse response, ObjectWrapper wrapper) {
-		ScopesHashModel model = super.buildTemplateModel(stack, action, servletContext, request, response, wrapper);
+		SimpleHash model = super.buildTemplateModel(stack, action, servletContext, request, response, wrapper);
 		if (StringUtils.isNotBlank(freemarkerConfigurer.getBase()))
 			model.put(FreemarkerConfigurer.KEY_BASE, freemarkerConfigurer.getBase());
 		return model;
@@ -105,9 +107,9 @@ public class MyFreemarkerManager extends FreemarkerManager {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	protected ScopesHashModel buildScopesHashModel(ServletContext servletContext, HttpServletRequest request,
+	protected SimpleHash buildScopesHashModel(ServletContext servletContext, HttpServletRequest request,
 			HttpServletResponse response, ObjectWrapper wrapper, ValueStack stack) {
-		ScopesHashModel model = new ScopesHashModel(wrapper, servletContext, request, stack);
+		SimpleHash model = new ValueStackHashModel(wrapper, stack);
 		if (!freemarkerConfigurer.isFrozenLayout()) {
 			String value = RequestUtils.getCookieValue(request, FreemarkerConfigurer.KEY_FLUID_LAYOUT);
 			if ("true".equals(value)) {
@@ -155,6 +157,45 @@ public class MyFreemarkerManager extends FreemarkerManager {
 		}
 		model.put(KEY_REQUEST_PARAMETERS_STRUTS, reqParametersModel);
 		return model;
+	}
+
+	/**
+	 * @see org.apache.struts2.views.freemarker.ScopesHashModel
+	 *
+	 */
+	static class ValueStackHashModel extends SimpleHash {
+
+		private static final long serialVersionUID = 833089168175421490L;
+
+		private ValueStack stack;
+
+		public ValueStackHashModel(ObjectWrapper objectWrapper, ValueStack stack) {
+			super(objectWrapper);
+			this.stack = stack;
+		}
+
+		public TemplateModel get(String key) throws TemplateModelException {
+			// Lookup in default scope
+			TemplateModel model = super.get(key);
+			if (model != null) {
+				return model;
+			}
+
+			if (stack != null) {
+				Object obj = stack.findValue(key);
+				if (obj != null) {
+					return wrap(obj);
+				}
+
+				// ok, then try the context
+				obj = stack.getContext().get(key);
+				if (obj != null) {
+					return wrap(obj);
+				}
+			}
+			return null;
+		}
+
 	}
 
 }

@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.dispatcher.Dispatcher;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
-import org.apache.struts2.views.freemarker.ScopesHashModel;
 
 import com.opensymphony.module.sitemesh.Decorator;
 import com.opensymphony.module.sitemesh.HTMLPage;
@@ -100,7 +99,7 @@ public class OldDecorator2NewStrutsFreemarkerDecorator extends BaseWebAppDecorat
 					getLocale(ctx.getActionInvocation(), config)); // WW-1181
 
 			// get the main hash
-			ScopesHashModel model = (ScopesHashModel) request.getAttribute(FreemarkerManager.ATTR_TEMPLATE_MODEL);
+			SimpleHash model = (SimpleHash) request.getAttribute(FreemarkerManager.ATTR_TEMPLATE_MODEL);
 			if (model == null) {
 				model = freemarkerManager.buildTemplateModel(ctx.getValueStack(), ctx.getActionInvocation().getAction(),
 						servletContext, request, response, config.getObjectWrapper());
