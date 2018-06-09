@@ -10557,7 +10557,9 @@ strong.force-override {
 .field-error-popover a.remove {
 	position: absolute;
 	top: 0;
-	right: 4px;
+	right: 2px;
+	font-size: 12px;
+	width: 12px;
 }
 
 .input-error {
