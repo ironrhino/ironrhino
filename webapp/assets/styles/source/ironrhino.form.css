@@ -22,7 +22,7 @@ select {
 	text-indent: 0.01px;
 	text-overflow: '';
 	padding-right: 16px;
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50px' height='50px'><polyline points='46.139,15.518 25.166,36.49 4.193,15.519' fill='rgba(0,0,0,.3)'/></svg>");
+	background-image: url("data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='50px'%20height='50px'><polyline%20points='46.139,15.518 25.166,36.49 4.193,15.519'%20fill='rgba(0,0,0,.3)'/></svg>");
 	background-size: 15px;
 	background-position: calc(100% - 5px);
 	background-repeat: no-repeat;
@@ -232,7 +232,7 @@ input.latlng {
 }
 
 .error input.required:not(:disabled):not([type="radio"]):not([type="checkbox"]) , input.required:focus:not([type="radio"]):not([type="checkbox"]) , input.required:hover:not(:disabled):not([type="radio"]):not([type="checkbox"]) {
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6' viewBox='0 0 1000 1000'><path d='M990,430l-408.7,16.4L818.7,80L689.1,10L500,395L311.5,10L181.3,80l237.3,366.4L10,430v140l405.9-22L188.6,920L311,990l189-385l189,385l122.4-70L584.1,548L990,570L990,430z' fill='red'/></svg>");
+	background-image: url("data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='6'%20height='6'%20viewBox='0%200%201000%201000'><path%20d='M990,430l-408.7,16.4L818.7,80L689.1,10L500,395L311.5,10L181.3,80l237.3,366.4L10,430v140l405.9-22L188.6,920L311,990l189-385l189,385l122.4-70L584.1,548L990,570L990,430z'%20fill='red'/></svg>");
 	background-position: calc(100% - 2px);
 	background-repeat: no-repeat;
 }
