@@ -11,7 +11,7 @@ public class LocalizedException extends RuntimeException {
 	}
 
 	public LocalizedException(Throwable cause) {
-		super(null, cause);
+		super(cause.getMessage(), cause);
 	}
 
 	public LocalizedException(String message, Throwable cause) {

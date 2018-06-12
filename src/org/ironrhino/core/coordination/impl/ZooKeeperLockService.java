@@ -10,6 +10,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.ironrhino.core.util.LockFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -48,10 +49,14 @@ public class ZooKeeperLockService implements LockService {
 	}
 
 	@Override
-	public void lock(String name) throws Exception {
+	public void lock(String name) {
 		InterProcessMutex lock = locks.computeIfAbsent(name,
 				key -> new InterProcessMutex(curatorFramework, zooKeeperPath + '/' + key));
-		lock.acquire();
+		try {
+			lock.acquire();
+		} catch (Exception e) {
+			throw new LockFailedException(e);
+		}
 	}
 
 	@Override

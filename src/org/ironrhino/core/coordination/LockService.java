@@ -8,7 +8,7 @@ public interface LockService {
 
 	public boolean tryLock(String name, long timeout, TimeUnit unit);
 
-	public void lock(String name) throws Exception;
+	public void lock(String name);
 
 	public void unlock(String name);
 

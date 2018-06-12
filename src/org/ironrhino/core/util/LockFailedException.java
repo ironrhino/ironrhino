@@ -8,4 +8,8 @@ public class LockFailedException extends LocalizedException {
 		super(principal);
 	}
 
+	public LockFailedException(Exception cause) {
+		super(cause);
+	}
+
 }
