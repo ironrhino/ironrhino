@@ -3,7 +3,7 @@ package org.ironrhino.core.throttle;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ironrhino.core.throttle.CircuitBreakerTest.CircuitBreakerConfiguration;
+import org.ironrhino.core.throttle.CircuitBreakerAspectTest.CircuitBreakerConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = CircuitBreakerConfiguration.class)
-public class CircuitBreakerTest {
+public class CircuitBreakerAspectTest {
 
 	@Autowired
 	private EchoService echoService;

@@ -10,8 +10,8 @@ import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExpressionUtils;
+import org.ironrhino.core.util.LockFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
@@ -71,7 +71,7 @@ public class MutexAspect extends BaseAspect {
 				lockService.unlock(lockName);
 			}
 		} else {
-			throw new ErrorMessage("tryLock failed and skip execute [" + jp.getSignature() + "]");
+			throw new LockFailedException(jp.getSignature().toLongString());
 		}
 	}
 
