@@ -10186,7 +10186,7 @@ select {
 	text-indent: 0.01px;
 	text-overflow: '';
 	padding-right: 16px;
-	background-image: url("data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='50px'%20height='50px'><polyline%20points='46.139,15.518 25.166,36.49 4.193,15.519'%20fill='rgba(0,0,0,.3)'/></svg>");
+	background-image: url("data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='50px'%20height='50px'><polyline%20points='46.139,15.518%2025.166,36.49%204.193,15.519'%20fill='rgba(0,0,0,.3)'/></svg>");
 	background-size: 15px;
 	background-position: calc(100% - 5px);
 	background-repeat: no-repeat;
