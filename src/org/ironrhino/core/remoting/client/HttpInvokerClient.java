@@ -181,8 +181,9 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			MDC.put("requestId", requestId);
 			MDC.put("request", "request:" + requestId);
 		}
+		String service = ReflectionUtils.stringify(methodInvocation.getMethod());
 		MDC.put("role", "CLIENT");
-		MDC.put("service", getServiceInterface().getName() + '.' + stringify(methodInvocation));
+		MDC.put("service", service);
 		if (loggingPayload) {
 			Object payload;
 			Object[] arguments = methodInvocation.getArguments();
@@ -224,7 +225,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			int maxAttempts) throws Exception {
 		String method = null;
 		if (serviceStats != null)
-			method = stringify(methodInvocation);
+			method = ReflectionUtils.stringify(methodInvocation.getMethod(), false, true);
 		int attempts = maxAttempts;
 		while (attempts > 0) {
 			long time = System.currentTimeMillis();
@@ -329,15 +330,4 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return sb.toString();
 	}
 
-	private static String stringify(MethodInvocation methodInvocation) {
-		StringBuilder method = new StringBuilder(methodInvocation.getMethod().getName()).append("(");
-		Class<?>[] parameterTypes = methodInvocation.getMethod().getParameterTypes();
-		for (int i = 0; i < parameterTypes.length; i++) {
-			method.append(parameterTypes[i].getSimpleName());
-			if (i < parameterTypes.length - 1)
-				method.append(',');
-		}
-		method.append(")");
-		return method.toString();
-	}
 }

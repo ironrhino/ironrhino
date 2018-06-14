@@ -247,4 +247,25 @@ public class ReflectionUtils {
 		return Thread.currentThread().getStackTrace()[2].getMethodName();
 	}
 
+	public static String stringify(Method method) {
+		return stringify(method, false);
+	}
+
+	public static String stringify(Method method, boolean simpleParameterName) {
+		return stringify(method, false, false);
+	}
+
+	public static String stringify(Method method, boolean fullParameterName, boolean excludeDeclaringClass) {
+		StringBuilder sb = new StringBuilder(method.getDeclaringClass().getName()).append(".");
+		sb.append(method.getName()).append("(");
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		for (int i = 0; i < parameterTypes.length; i++) {
+			sb.append(fullParameterName ? parameterTypes[i].getName() : parameterTypes[i].getSimpleName());
+			if (i < parameterTypes.length - 1)
+				sb.append(',');
+		}
+		sb.append(")");
+		return sb.toString();
+	}
+
 }
