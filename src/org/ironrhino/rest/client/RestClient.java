@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
+import org.ironrhino.core.spring.http.client.RestTemplate;
 import org.ironrhino.rest.client.token.CacheBasedTokenStore;
 import org.ironrhino.rest.client.token.DefaultToken;
 import org.ironrhino.rest.client.token.DefaultTokenStore;
@@ -24,7 +25,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import lombok.Getter;
 import lombok.Setter;
