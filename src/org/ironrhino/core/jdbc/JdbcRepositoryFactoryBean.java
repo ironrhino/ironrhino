@@ -2,6 +2,11 @@ package org.ironrhino.core.jdbc;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -16,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import javax.persistence.Id;
@@ -46,6 +52,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -69,6 +76,8 @@ public class JdbcRepositoryFactoryBean
 	private BeanFactory beanFactory;
 
 	private Partitioner defaultPartitioner;
+
+	private Map<Method, MethodHandle> defaultMethods = new ConcurrentHashMap<>();
 
 	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, JdbcTemplate jdbcTemplate) {
 		Assert.notNull(jdbcRepositoryClass, "jdbcRepositoryClass shouldn't be null");
@@ -169,13 +178,33 @@ public class JdbcRepositoryFactoryBean
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object invoke(MethodInvocation methodInvocation) {
-		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
+	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+		Method method = methodInvocation.getMethod();
+		if (method.isDefault()) {
+			MethodHandle mh = defaultMethods.computeIfAbsent(method, m -> {
+				try {
+					if (ClassUtils.isPresent("java.lang.StackWalker", System.class.getClassLoader())) {
+						// jdk 9 and later
+						return MethodHandles.lookup().findSpecial(jdbcRepositoryClass, m.getName(),
+								MethodType.methodType(m.getReturnType(), m.getParameterTypes()), jdbcRepositoryClass)
+								.bindTo(jdbcRepositoryBean);
+					} else {
+						Constructor<Lookup> constructor = Lookup.class.getDeclaredConstructor(Class.class);
+						constructor.setAccessible(true);
+						return constructor.newInstance(jdbcRepositoryClass).in(jdbcRepositoryClass)
+								.unreflectSpecial(method, jdbcRepositoryClass).bindTo(jdbcRepositoryBean);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			});
+			return mh.invokeWithArguments(methodInvocation.getArguments());
+		}
+		if (AopUtils.isToStringMethod(method)) {
 			return "JdbcRepository for  [" + getObjectType().getName() + "]";
 		}
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			this.sqls = loadSqls();
-		Method method = methodInvocation.getMethod();
 		String methodName = method.getName();
 		String sql = sqls.get(methodName);
 		if (StringUtils.isBlank(sql)) {

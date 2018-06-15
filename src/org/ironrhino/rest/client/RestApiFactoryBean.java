@@ -5,6 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -16,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -76,6 +82,8 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 
 	private Object restApiBean;
 
+	private Map<Method, MethodHandle> defaultMethods = new ConcurrentHashMap<>();
+
 	@Value("${restApi.circuitBreakerEnabled:true}")
 	private boolean circuitBreakerEnabled = true;
 
@@ -133,10 +141,37 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object doInvoke(MethodInvocation methodInvocation) throws IOException {
+	public Object doInvoke(MethodInvocation methodInvocation) throws Exception {
+		Method method = methodInvocation.getMethod();
+		if (method.isDefault()) {
+			MethodHandle mh = defaultMethods.computeIfAbsent(method, m -> {
+				try {
+					if (ClassUtils.isPresent("java.lang.StackWalker", System.class.getClassLoader())) {
+						// jdk 9 and later
+						return MethodHandles.lookup()
+								.findSpecial(restApiClass, m.getName(),
+										MethodType.methodType(m.getReturnType(), m.getParameterTypes()), restApiClass)
+								.bindTo(restApiBean);
+					} else {
+						Constructor<Lookup> constructor = Lookup.class.getDeclaredConstructor(Class.class);
+						constructor.setAccessible(true);
+						return constructor.newInstance(restApiClass).in(restApiClass)
+								.unreflectSpecial(method, restApiClass).bindTo(restApiBean);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			});
+			try {
+				return mh.invokeWithArguments(methodInvocation.getArguments());
+			} catch (Exception e) {
+				throw e;
+			} catch (Throwable e) {
+				throw new RuntimeException(e);
+			}
+		}
 		if (AopUtils.isToStringMethod(methodInvocation.getMethod()))
 			return "RestApi for  [" + getObjectType().getName() + "]";
-		Method method = methodInvocation.getMethod();
 		RequestMapping classRequestMapping = AnnotatedElementUtils.findMergedAnnotation(restApiClass,
 				RequestMapping.class);
 		RequestMapping methodRequestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);

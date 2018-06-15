@@ -86,6 +86,24 @@ public class JdbcRepositoryTest {
 	}
 
 	@Test
+	public void testDefaultMethod() throws Exception {
+		Person p = new Person();
+		p.setName("test");
+		p.setDob(LocalDate.now());
+		p.setSince(YearMonth.now());
+		p.setAge(11);
+		p.setGender(Gender.FEMALE);
+		p.setAmount(new BigDecimal("12.00"));
+		personRepository.save(p);
+		p = personRepository.getAndChangeAge(p.getName(), 0);
+		assertEquals("test", p.getName());
+		assertEquals(0, p.getAge());
+		p = personRepository.getAndChangeGender(p.getName(), Gender.MALE);
+		assertEquals("test", p.getName());
+		assertEquals(Gender.MALE, p.getGender());
+	}
+
+	@Test
 	public void testInCondition() throws Exception {
 		Person p = new Person();
 		p.setName("test1");

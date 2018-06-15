@@ -32,6 +32,18 @@ public interface PersonRepository {
 	@Transactional(readOnly = true)
 	Person get(String name);
 
+	default Person getAndChangeAge(String name, int age) {
+		Person p = get(name);
+		p.setAge(age);
+		return p;
+	}
+
+	default Person getAndChangeGender(String name, Gender gender) {
+		Person p = get(name);
+		p.setGender(gender);
+		return p;
+	}
+
 	@Transactional(readOnly = true)
 	Optional<Person> getOptional(String name);
 
