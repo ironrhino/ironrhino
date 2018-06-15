@@ -246,11 +246,21 @@ public class AppInfo {
 	}
 
 	public static String getInstanceId(boolean lenient) {
+		return getInstanceId(lenient, false);
+	}
+
+	public static String getInstanceId(boolean lenient, boolean excludeAppName) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getAppName());
-		if (!lenient)
-			sb.append("-").append(_instanceId);
-		sb.append("@").append(getHostAddress());
+		if (!excludeAppName) {
+			sb.append(getAppName());
+			if (!lenient)
+				sb.append("-").append(_instanceId);
+			sb.append("@");
+		} else if (!lenient) {
+			sb.append(_instanceId);
+			sb.append("@");
+		}
+		sb.append(getHostAddress());
 		int httpPort = getHttpPort();
 		if (httpPort > 0)
 			sb.append(':').append(httpPort);

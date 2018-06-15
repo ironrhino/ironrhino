@@ -45,9 +45,8 @@ public class MetricsConfiguration {
 		meterRegistryProviders.forEach(p -> p.get().ifPresent(Metrics::addRegistry));
 		if (Metrics.globalRegistry.getRegistries().isEmpty())
 			Metrics.addRegistry(new SimpleMeterRegistry());
-		String instanceId = AppInfo.getInstanceId(true);
 		Metrics.globalRegistry.config().commonTags("app", AppInfo.getAppName(), "instance",
-				instanceId.substring(instanceId.indexOf('@') + 1));
+				AppInfo.getInstanceId(true, true));
 		instrument();
 	}
 
