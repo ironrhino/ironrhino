@@ -1,6 +1,7 @@
 package org.ironrhino.core.metrics;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,8 +9,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.spring.NameGenerator;
+import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ThrowableCallable;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,7 +26,11 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 
 @Aspect
-public class TimedAspect {
+public class TimedAspect extends BaseAspect {
+
+	public TimedAspect() {
+		order = Ordered.HIGHEST_PRECEDENCE + 1;
+	}
 
 	@Around("execution(* *.*(..)) and @annotation(timed)")
 	public Object timing(ProceedingJoinPoint pjp, Timed timed) throws Throwable {
@@ -38,11 +46,18 @@ public class TimedAspect {
 			sb.append(beanName).append('.').append(pjp.getSignature().getName()).append("()");
 			name = sb.toString();
 		}
+		String[] tags = timed.extraTags();
+		if (tags.length > 0) {
+			Map<String, Object> context = buildContext(pjp);
+			for (int i = 0; i < tags.length; i++)
+				if (i % 2 == 1)
+					tags[i] = ExpressionUtils.evalString(tags[i], context);
+		}
 		if (timed.longTask()) {
-			LongTaskTimer longTaskTimer = LongTaskTimer.builder(name).tags(timed.extraTags()).register(registry);
+			LongTaskTimer longTaskTimer = LongTaskTimer.builder(name).tags(tags).register(registry);
 			return recordThrowable(longTaskTimer, () -> recordThrowable(longTaskTimer, pjp::proceed));
 		} else {
-			Timer.Builder timerBuilder = Timer.builder(name).tags(timed.extraTags());
+			Timer.Builder timerBuilder = Timer.builder(name).tags(tags);
 			if (timed.histogram())
 				timerBuilder.publishPercentileHistogram();
 			if (timed.percentiles().length > 0)
