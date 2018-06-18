@@ -1,73 +1,92 @@
 package org.ironrhino.rest.client;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.http.client.RestTemplate;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestClientException;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.util.Assert;
 
 import lombok.Getter;
 import lombok.Setter;
 
 class RestClientTemplate extends RestTemplate {
 
-	private RestClient client;
-
 	@Getter
 	@Setter
 	private int maxAttempts = 2;
 
 	public RestClientTemplate(RestClient client) {
-		super(new HttpComponentsClientHttpRequestFactory(client));
-		this.client = client;
-		super.init();
-	}
+		super();
+		Assert.notNull(client, "client must not be null");
+		this.getInterceptors().add(new ClientHttpRequestInterceptor() {
+			@Override
+			public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+					throws IOException {
+				URI uri = request.getURI();
+				if (uri.getHost() == null && StringUtils.isNotBlank(client.getApiBaseUrl())) {
+					HttpRequest origin = request;
+					HttpRequest req = new HttpRequest() {
+						@Override
+						public HttpHeaders getHeaders() {
+							return origin.getHeaders();
+						}
 
-	@Override
-	protected <T> T doExecute(URI uri, HttpMethod method, RequestCallback requestCallback,
-			ResponseExtractor<T> responseExtractor) throws RestClientException {
-		if (uri.getHost() == null && StringUtils.isNotBlank(client.getApiBaseUrl())) {
-			String apiBaseUrl = client.getApiBaseUrl();
-			try {
-				uri = new URI(apiBaseUrl + uri.toString());
-			} catch (URISyntaxException e) {
-				throw new IllegalArgumentException("apiBaseUrl " + apiBaseUrl + " is not valid uri");
-			}
-		}
-		return doExecute(uri, method, requestCallback, responseExtractor, maxAttempts);
-	}
+						@Override
+						public String getMethodValue() {
+							return origin.getMethodValue();
+						}
 
-	protected <T> T doExecute(URI uri, HttpMethod method, RequestCallback requestCallback,
-			ResponseExtractor<T> responseExtractor, int attempts) throws RestClientException {
-		try {
-			return super.doExecute(uri, method, requestCallback, responseExtractor);
-		} catch (ResourceAccessException e) {
-			if (--attempts < 1)
-				throw e;
-			return doExecute(uri, method, requestCallback, responseExtractor, attempts);
-		} catch (HttpClientErrorException e) {
-			logger.error(e.getResponseBodyAsString(), e);
-			if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-				String response = e.getResponseBodyAsString().toLowerCase(Locale.ROOT);
-				if (response.contains("invalid_token")) {
-					client.getTokenStore().setToken(client.getTokenStoreKey(), null);
-				} else if (response.contains("expired_token")) {
-					client.getTokenStore().setToken(client.getTokenStoreKey(), null);
+						@Override
+						public URI getURI() {
+							String apiBaseUrl = client.getApiBaseUrl();
+							try {
+								return new URI(apiBaseUrl + uri.toString());
+							} catch (URISyntaxException e) {
+								throw new IllegalArgumentException("apiBaseUrl " + apiBaseUrl + " is not valid uri");
+							}
+						}
+					};
+					request = req;
 				}
-				if (--attempts < 1)
-					throw e;
-				return doExecute(uri, method, requestCallback, responseExtractor, attempts);
+				request.getHeaders().set("Authorization", client.getAuthorizationHeader());
+				int n = maxAttempts;
+				if (n < 0 || n > 10)
+					n = 1;
+				IOException ex = null;
+				for (int i = 0; i < n; i++) {
+					try {
+						ClientHttpResponse response = execution.execute(request, body);
+						if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+							String text = String.join("", IOUtils.readLines(response.getBody(), StandardCharsets.UTF_8))
+									.toLowerCase(Locale.ROOT);
+							if (text.contains("invalid_token")) {
+								client.getTokenStore().setToken(client.getTokenStoreKey(), null);
+							} else if (text.contains("expired_token")) {
+								client.getTokenStore().setToken(client.getTokenStoreKey(), null);
+							}
+							request.getHeaders().set("Authorization", client.getAuthorizationHeader());
+							return execution.execute(request, body);
+						}
+						return response;
+					} catch (SocketTimeoutException e) {
+						ex = e;
+					}
+				}
+				throw ex;
 			}
-			throw e;
-		}
+		});
 	}
 
 }
