@@ -6,6 +6,7 @@ import java.util.Map;
 import org.hibernate.query.Query;
 import org.ironrhino.common.model.BasePollingEntity;
 import org.ironrhino.common.model.PollingStatus;
+import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.util.ExceptionUtils;
 
 public abstract class BasePollingControl<T extends BasePollingEntity> extends AbstractPollingControl<T> {
@@ -34,8 +35,8 @@ public abstract class BasePollingControl<T extends BasePollingEntity> extends Ab
 				continue;
 			}
 			try {
-				Map<String, Object> fields = (timer == null) ? handle(entity)
-						: ((io.micrometer.core.instrument.Timer) timer).recordCallable(() -> handle(entity));
+				Map<String, Object> fields = Metrics.recordTimer("polling." + entityClass.getName(),
+						() -> handle(entity), "batch", "false");
 				StringBuilder sb = new StringBuilder("update ");
 				sb.append(entityClass.getSimpleName());
 				sb.append(" t set t.status=?3,t.modifyDate=?4,t.errorInfo=null,t.attempts=t.attempts+1");

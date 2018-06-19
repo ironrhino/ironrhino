@@ -12,6 +12,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.aop.BaseAspect;
+import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.mvel2.PropertyAccessException;
@@ -54,6 +55,7 @@ public class CacheAspect extends BaseAspect {
 						: cacheManager.get(key, namespace);
 				if (value instanceof NullObject) {
 					ExpressionUtils.eval(checkCache.onHit(), context);
+					Metrics.increment("cache." + namespace, "hit", "true");
 					return null;
 				}
 				if (value != null
@@ -61,6 +63,7 @@ public class CacheAspect extends BaseAspect {
 								|| returnType.isAssignableFrom(value.getClass()))) {
 					putReturnValueIntoContext(context, value);
 					ExpressionUtils.eval(checkCache.onHit(), context);
+					Metrics.increment("cache." + namespace, "hit", "true");
 					return value;
 				}
 			}
@@ -78,6 +81,7 @@ public class CacheAspect extends BaseAspect {
 					Object value = cacheManager.get(key, namespace);
 					if (value instanceof NullObject) {
 						ExpressionUtils.eval(checkCache.onHit(), context);
+						Metrics.increment("cache." + namespace, "hit", "true");
 						return null;
 					}
 					if (value != null && (returnType.isPrimitive()
@@ -85,11 +89,13 @@ public class CacheAspect extends BaseAspect {
 							|| returnType.isAssignableFrom(value.getClass()))) {
 						putReturnValueIntoContext(context, value);
 						ExpressionUtils.eval(checkCache.onHit(), context);
+						Metrics.increment("cache." + namespace, "hit", "true");
 						return value;
 					}
 				}
 			}
 			ExpressionUtils.eval(checkCache.onMiss(), context);
+			Metrics.increment("cache." + namespace, "hit", "false");
 		}
 		Object result = jp.proceed();
 		putReturnValueIntoContext(context, result);

@@ -1,7 +1,7 @@
 package org.ironrhino.core.util;
 
-public interface ThrowableCallable {
+public interface ThrowableCallable<T> {
 
-	Object call() throws Throwable;
+	T call() throws Throwable;
 
 }

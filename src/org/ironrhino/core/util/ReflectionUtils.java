@@ -256,7 +256,9 @@ public class ReflectionUtils {
 	}
 
 	public static String stringify(Method method, boolean fullParameterName, boolean excludeDeclaringClass) {
-		StringBuilder sb = new StringBuilder(method.getDeclaringClass().getName()).append(".");
+		StringBuilder sb = new StringBuilder();
+		if (!excludeDeclaringClass)
+			sb.append(method.getDeclaringClass().getName()).append(".");
 		sb.append(method.getName()).append("(");
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		for (int i = 0; i < parameterTypes.length; i++) {

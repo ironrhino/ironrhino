@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.hibernate.query.Query;
 import org.ironrhino.common.model.BasePollingEntity;
 import org.ironrhino.common.model.PollingStatus;
+import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.util.ExceptionUtils;
 
 public abstract class BatchedPollingControl<T extends BasePollingEntity> extends AbstractPollingControl<T> {
@@ -47,8 +48,8 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 			if (entities.isEmpty())
 				break;
 			try {
-				Map<T, Result> results = (timer == null) ? handle(entities)
-						: ((io.micrometer.core.instrument.Timer) timer).recordCallable(() -> handle(entities));
+				Map<T, Result> results = Metrics.recordTimer("polling." + entityClass.getName(),
+						() -> handle(entities), "batch", "true");
 				for (T entity : entities) {
 					Result obj = results.get(entity);
 					if (obj == null) {

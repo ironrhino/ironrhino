@@ -24,6 +24,7 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.remoting.InvocationSample;
 import org.ironrhino.core.remoting.InvocationSampler;
@@ -46,7 +47,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ClassUtils;
 
 @Component("serviceStats")
 @ServiceImplementationConditional(profiles = { DUAL, CLUSTER, CLOUD })
@@ -85,9 +85,6 @@ public class RedisServiceStats implements ServiceStats {
 	private BoundZSetOperations<String, String> hotspotsOperations;
 	private BoundListOperations<String, String> warningsOperations;
 
-	private boolean micrometerPresent = ClassUtils.isPresent("io.micrometer.core.instrument.Metrics",
-			getClass().getClassLoader());
-
 	@PostConstruct
 	public void afterPropertiesSet() {
 		hotspotsOperations = remotingStringRedisTemplate.boundZSetOps(KEY_HOTSPOTS);
@@ -106,20 +103,17 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	protected void emit(String source, String target, String serviceName, String method, long time, StatsType type) {
-		if (micrometerPresent) {
-			String service = serviceName + "." + method;
-			if (type == StatsType.SERVER_SIDE) {
-				io.micrometer.core.instrument.Metrics.timer("remoting.server.calls", "service", service).record(time,
-						TimeUnit.MILLISECONDS);
-			} else {
-				io.micrometer.core.instrument.Metrics.timer("remoting.client.calls", "service", service, "failed",
-						String.valueOf(type == StatsType.CLIENT_FAILED)).record(time, TimeUnit.MILLISECONDS);
-			}
+		String service = serviceName + "." + method;
+		if (type == StatsType.SERVER_SIDE) {
+			Metrics.recordTimer("remoting.server.calls", time, TimeUnit.MILLISECONDS, "service", service);
+		} else {
+			Metrics.recordTimer("remoting.client.calls", time, TimeUnit.MILLISECONDS, "service", service, "failed",
+					String.valueOf(type == StatsType.CLIENT_FAILED));
 		}
 		type.increaseCount(serviceName, method);
 		type.collectSample(serviceRegistry != null ? serviceRegistry.getLocalHost() : null, serviceName, method, time);
 		if (type == StatsType.CLIENT_FAILED || type == StatsType.CLIENT_SIDE && time > responseTimeThreshold) {
-			InvocationWarning warning = new InvocationWarning(source, target, serviceName + '.' + method, time,
+			InvocationWarning warning = new InvocationWarning(source, target, service, time,
 					type == StatsType.CLIENT_FAILED);
 			warningBuffer.add(JsonUtils.toJson(warning));
 		}
