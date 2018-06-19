@@ -94,13 +94,13 @@ public class AccessFilter implements Filter {
 		HttpServletRequest request = ProxySupportHttpServletRequest.wrap((HttpServletRequest) req);
 		LocaleContextHolder.setLocale(request.getLocale(), true);
 		HttpServletResponse response = (HttpServletResponse) resp;
+		String uri = request.getRequestURI();
+		uri = uri.substring(request.getContextPath().length());
+
 		RequestContext.set(request, response);
 		try {
 			if (isRequestDispatcher && RequestUtils.isInternalTesting(request))
 				response.addHeader(HTTP_HEADER_INSTANCE_ID, AppInfo.getInstanceId());
-
-			String uri = request.getRequestURI();
-			uri = uri.substring(request.getContextPath().length());
 
 			for (String pattern : excludePatternsList) {
 				if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pattern)) {
@@ -172,10 +172,10 @@ public class AccessFilter implements Filter {
 				requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
 				if (StringUtils.isBlank(requestId)) {
 					requestId = CodecUtils.nextId();
+					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 					requestChain = requestId.substring(14);
 					if (sessionId != null)
 						requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
-					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 				}
 				request.setAttribute(HTTP_HEADER_REQUEST_ID, requestId);
 				MDC.put(MDC_KEY_REQUEST_ID, requestId);
