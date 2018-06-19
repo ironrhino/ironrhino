@@ -23,6 +23,12 @@ public class Metrics {
 		return io.micrometer.core.instrument.Metrics.timer(name, tags).recordCallable(callable);
 	}
 
+	public static void recordTimer(String name, Runnable runnable, String... tags) {
+		if (!micrometerPresent)
+			runnable.run();
+		io.micrometer.core.instrument.Metrics.timer(name, tags).record(runnable);
+	}
+
 	public static <T> T recordThrowableCallable(String name, ThrowableCallable<T> callable, String... tags)
 			throws Throwable {
 		if (!micrometerPresent)
