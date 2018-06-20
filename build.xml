@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="ironrhino" default="jar" basedir=".">
 
+	<property file="build.properties" />
+
 	<property name="src.dir" location="${basedir}/src" />
 	<property name="webapp.dir" location="${basedir}/webapp" />
 	<property name="lib.dir" location="${basedir}/lib" />
@@ -11,7 +13,6 @@
 	<property name="test.classes.dir" location="${basedir}/test/classes" />
 	<property name="test.results.dir" location="${target.dir}/test/results" />
 	<property name="war.name" value="ironrhino.war" />
-	<property file="build.properties" />
 
 	<path id="lib.classpath">
 		<fileset dir="${webapp.dir}/WEB-INF/lib">
