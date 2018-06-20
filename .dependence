@@ -25,7 +25,6 @@
 -struts2-spring-plugin
 -struts2-jasperreports-plugin
 -struts2-sitemesh-plugin
--guava
 -javamail
 +jaxb-api
 -ehcache-core
