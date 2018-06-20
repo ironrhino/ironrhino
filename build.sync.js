@@ -64,6 +64,7 @@ function readClasspath(classpathfile) {
 	br = new BufferedReader(new InputStreamReader(is, 'utf-8'));
 	var paths = [];
 	var jarnames = [];
+	var line;
 	while ((line = br.readLine()) != null) {
 		if (line.indexOf('kind="lib"') < 0)
 			continue;
