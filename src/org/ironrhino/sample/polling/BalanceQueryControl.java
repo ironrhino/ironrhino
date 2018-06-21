@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Profile(Profiles.DUAL)
+@Profile(Profiles.SANDBOX)
 public class BalanceQueryControl extends BasePollingControl<BalanceQuery> {
 
 	// 可选代码--开始 作用是设置自己的配置参数
