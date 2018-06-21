@@ -11,6 +11,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.spring.NameGenerator;
+import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ThrowableCallable;
 import org.springframework.core.Ordered;
@@ -26,6 +27,7 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 
 @Aspect
+@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
 public class TimedAspect extends BaseAspect {
 
 	public TimedAspect() {
@@ -86,12 +88,11 @@ public class TimedAspect extends BaseAspect {
 	}
 
 	private static Object recordThrowable(Timer timer, ThrowableCallable<Object> f) throws Throwable {
-		MeterRegistry registry = Metrics.globalRegistry;
-		long start = registry.config().clock().monotonicTime();
+		long start = System.nanoTime();
 		try {
 			return f.call();
 		} finally {
-			timer.record(registry.config().clock().monotonicTime() - start, TimeUnit.NANOSECONDS);
+			timer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
 		}
 	}
 

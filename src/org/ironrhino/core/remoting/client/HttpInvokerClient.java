@@ -34,6 +34,8 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -143,10 +145,9 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		pf.addInterface(RemotingClientProxy.class);
 		this.serviceProxy = pf.getProxy(getBeanClassLoader());
 		if (circuitBreakerEnabled && resilience4jPresent) {
-			io.github.resilience4j.circuitbreaker.CircuitBreakerConfig config = io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
-					.custom().recordFailure(ex -> ex instanceof IOException).build();
-			circuitBreaker = io.github.resilience4j.circuitbreaker.CircuitBreaker.of(getServiceInterface().getName(),
-					config);
+			CircuitBreakerConfig config = CircuitBreakerConfig.custom().recordFailure(ex -> ex instanceof IOException)
+					.build();
+			circuitBreaker = CircuitBreaker.of(getServiceInterface().getName(), config);
 		}
 	}
 
@@ -163,7 +164,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		if (circuitBreaker == null)
 			return doExecuteRequest(invocation, methodInvocation);
 		else
-			return ((io.github.resilience4j.circuitbreaker.CircuitBreaker) circuitBreaker)
+			return ((CircuitBreaker) circuitBreaker)
 					.executeCallable(() -> doExecuteRequest(invocation, methodInvocation));
 	}
 

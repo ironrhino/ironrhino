@@ -59,6 +59,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -110,9 +112,9 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		this.restTemplate = restTemplate;
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
 		if (circuitBreakerEnabled && resilience4jPresent) {
-			io.github.resilience4j.circuitbreaker.CircuitBreakerConfig config = io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
-					.custom().recordFailure(ex -> ex.getCause() instanceof IOException).build();
-			circuitBreaker = io.github.resilience4j.circuitbreaker.CircuitBreaker.of(restApiClass.getName(), config);
+			CircuitBreakerConfig config = CircuitBreakerConfig.custom()
+					.recordFailure(ex -> ex.getCause() instanceof IOException).build();
+			circuitBreaker = CircuitBreaker.of(restApiClass.getName(), config);
 		}
 	}
 
@@ -136,8 +138,7 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		if (circuitBreaker == null)
 			return doInvoke(methodInvocation);
 		else
-			return ((io.github.resilience4j.circuitbreaker.CircuitBreaker) circuitBreaker)
-					.executeCallable(() -> doInvoke(methodInvocation));
+			return ((CircuitBreaker) circuitBreaker).executeCallable(() -> doInvoke(methodInvocation));
 	}
 
 	@SuppressWarnings("unchecked")

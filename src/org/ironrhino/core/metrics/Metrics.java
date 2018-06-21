@@ -35,13 +35,12 @@ public class Metrics {
 			throws Throwable {
 		if (!micrometerPresent)
 			return callable.call();
-		io.micrometer.core.instrument.MeterRegistry registry = io.micrometer.core.instrument.Metrics.globalRegistry;
 		io.micrometer.core.instrument.Timer timer = io.micrometer.core.instrument.Metrics.timer(name, tags);
-		long start = registry.config().clock().monotonicTime();
+		long start = System.nanoTime();
 		try {
 			return callable.call();
 		} finally {
-			timer.record(registry.config().clock().monotonicTime() - start, TimeUnit.NANOSECONDS);
+			timer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
 		}
 	}
 
