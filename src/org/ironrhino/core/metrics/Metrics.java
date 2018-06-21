@@ -24,8 +24,10 @@ public class Metrics {
 	}
 
 	public static void recordTimer(String name, Runnable runnable, String... tags) {
-		if (!micrometerPresent)
+		if (!micrometerPresent) {
 			runnable.run();
+			return;
+		}
 		io.micrometer.core.instrument.Metrics.timer(name, tags).record(runnable);
 	}
 
