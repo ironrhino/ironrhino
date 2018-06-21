@@ -6,14 +6,18 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionIdManager;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.server.session.HouseKeeper;
 import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletHandler.Default404Servlet;
 import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.webapp.WebInfConfiguration;
 
 public class JettyLauncher {
 
@@ -27,11 +31,15 @@ public class JettyLauncher {
 		Server server = new Server(port);
 		server.setSessionIdManager(new DummySessionIdManager());
 		Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
-		classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-				"org.eclipse.jetty.annotations.AnnotationConfiguration");
+		classlist.addBefore(JettyWebXmlConfiguration.class.getName(), AnnotationConfiguration.class.getName());
 		WebAppContext context = new WebAppContext();
+		String webInfoJarPattern = System.getProperty(WebInfConfiguration.WEBINF_JAR_PATTERN);
+		if (webInfoJarPattern == null)
+			webInfoJarPattern = ".*/ironrhino-[^/]*\\.jar$";
+		if (!webInfoJarPattern.isEmpty())
+			context.setAttribute(WebInfConfiguration.WEBINF_JAR_PATTERN, webInfoJarPattern);
 		context.setContextPath("/");
-		context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+		context.setInitParameter(DefaultServlet.CONTEXT_INIT + "dirAllowed", "false");
 		String webappDir = System.getProperty("webapp.dir");
 		if (webappDir != null) {
 			context.setWar(webappDir);
