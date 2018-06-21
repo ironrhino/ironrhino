@@ -24,6 +24,8 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public T get(Serializable id);
 
+	public T getReference(Serializable id);
+
 	public boolean exists(Serializable id);
 
 	public T get(Serializable id, LockOptions lockOptions);

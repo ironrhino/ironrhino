@@ -228,6 +228,14 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Override
 	@Transactional(readOnly = true)
+	public T getReference(Serializable id) {
+		if (id == null)
+			return null;
+		return sessionFactory.getCurrentSession().byId(getEntityClass()).getReference(id);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public boolean exists(Serializable id) {
 		if (id == null)
 			return false;
