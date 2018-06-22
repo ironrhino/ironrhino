@@ -1,6 +1,8 @@
 package org.ironrhino.core.session.impl;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.SessionCompressor;
@@ -11,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
@@ -39,24 +43,31 @@ public class SecurityContextSessionCompressor implements SessionCompressor<Secur
 
 	@Override
 	public String compress(SecurityContext sc) {
-		if (sc != null) {
-			Authentication auth = sc.getAuthentication();
-			if (auth != null) {
-				if (auth.getCredentials() instanceof X509Certificate)
-					return null;
-				if (auth.isAuthenticated()) {
-					Object principal = auth.getPrincipal();
-					if (principal instanceof UserDetails) {
-						UserDetails ud = (UserDetails) principal;
-						String username = ud.getUsername();
-						String password = ud.getPassword();
-						return password != null ? new StringBuilder(CodecUtils.md5Hex(ud.getPassword())).append(",")
-								.append(username).toString() : username;
-					}
-				}
+		if (sc == null || sc.getAuthentication() == null)
+			return null;
+		Authentication auth = sc.getAuthentication();
+		if (!auth.isAuthenticated() || auth.getCredentials() instanceof X509Certificate)
+			return null;
+		StringBuilder sb = new StringBuilder();
+		Object principal = auth.getPrincipal();
+		if (principal instanceof UserDetails) {
+			UserDetails ud = (UserDetails) principal;
+			String username = ud.getUsername();
+			String password = ud.getPassword();
+			if (password != null)
+				sb.append(CodecUtils.md5Hex(ud.getPassword())).append(",");
+			sb.append(username);
+		}
+		for (GrantedAuthority ga : auth.getAuthorities()) {
+			if (ga instanceof SwitchUserGrantedAuthority) {
+				SwitchUserGrantedAuthority suga = (SwitchUserGrantedAuthority) ga;
+				String role = suga.getAuthority();
+				String source = suga.getSource().getName();
+				sb.append("@suga(").append(role).append(",").append(source).append(")");
+				break;
 			}
 		}
-		return null;
+		return sb.toString();
 	}
 
 	@Override
@@ -73,11 +84,33 @@ public class SecurityContextSessionCompressor implements SessionCompressor<Secur
 					username = arr[0];
 					password = null;
 				}
+				String extraAuthorities = null;
+				int index = username.indexOf('@');
+				if (index > 0) {
+					extraAuthorities = username.substring(index + 1);
+					username = username.substring(0, index);
+				}
 				UserDetails ud = userDetailsService.loadUserByUsername(username);
 				if (!checkDirtyPassword || (ud.getPassword() == null && password == null
 						|| ud.getPassword() != null && CodecUtils.md5Hex(ud.getPassword()).equals(password))) {
-					Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(),
-							ud.getAuthorities());
+					List<GrantedAuthority> authorities = new ArrayList<>(ud.getAuthorities());
+					if (extraAuthorities != null) {
+						for (String s : extraAuthorities.split("@")) {
+							if (s.startsWith("suga(") && s.endsWith(")")) {
+								String[] arr2 = s.substring(5, s.length() - 1).split(",", 2);
+								try {
+									UserDetails source = userDetailsService.loadUserByUsername(arr2[1]);
+									SwitchUserGrantedAuthority ga = new SwitchUserGrantedAuthority(arr2[0],
+											new UsernamePasswordAuthenticationToken(source, source.getPassword(),
+													source.getAuthorities()));
+									authorities.add(ga);
+								} catch (UsernameNotFoundException e) {
+									log.warn(e.getMessage());
+								}
+							}
+						}
+					}
+					Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), authorities);
 					sc.setAuthentication(auth);
 					MDC.put("username", auth.getName());
 				} else {

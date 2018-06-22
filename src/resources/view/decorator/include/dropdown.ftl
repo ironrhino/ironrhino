@@ -27,6 +27,9 @@
 	<#if divider>
 	<li class="divider"></li>
 	</#if>
+	<@authorize ifAnyGranted="ROLE_PREVIOUS_ADMINISTRATOR">
+	<li><a href="<@url value="${ssoServerBase!}/switch/back"/>">${getText('back')}</a></li>
+	</@authorize>
 	<li><a href="<@url value="${ssoServerBase!}/logout"/>">${getText('logout')}</a></li>
 	</#if>
 </ul>

@@ -20,13 +20,13 @@
 		<security:intercept-url pattern="/signin*/**" access="permitAll" />
 		<security:intercept-url pattern="/common/upload" access="hasRole('ROLE_BUILTIN_USER')" />
 		<security:intercept-url pattern="/common/**" access="hasRole('ROLE_ADMINISTRATOR')" />
+		<security:intercept-url pattern="/switch/back" access="hasRole('ROLE_PREVIOUS_ADMINISTRATOR')"/> 
+		<security:intercept-url pattern="/switch" access="hasRole('ROLE_ADMINISTRATOR')"/> 
 		<security:intercept-url pattern="/**" access="hasRole('ROLE_BUILTIN_USER')" />
 		<security:remember-me services-ref="rememberMeServices" />
 		<security:anonymous granted-authority="ROLE_BUILTIN_ANONYMOUS" username="anonymousUser" key="anonymous" />
 		<security:logout logout-url="/logout" invalidate-session="true" success-handler-ref="logoutSuccessHandler" />
 		<security:custom-filter ref="authenticationFilter" position="FORM_LOGIN_FILTER" />
-		<!-- <security:intercept-url pattern="/switch" access="ROLE_ADMINISTRATOR"/> 
-			<security:intercept-url pattern="/exit" access="ROLE_PREVIOUS_ADMINISTRATOR"/> 
-			<security:custom-filter ref="switchUserProcessingFilter" position="SWITCH_USER_FILTER"/> -->
+		<security:custom-filter ref="switchUserFilter" position="SWITCH_USER_FILTER"/>
 	</security:http>
 </beans>
