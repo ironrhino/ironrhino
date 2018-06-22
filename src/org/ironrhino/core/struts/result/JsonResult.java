@@ -76,29 +76,17 @@ public class JsonResult implements Result {
 
 	@Override
 	public void execute(ActionInvocation invocation) throws Exception {
-		String jsonp = ServletActionContext.getRequest().getParameter("jsonp");
-		if (StringUtils.isBlank(jsonp))
-			jsonp = ServletActionContext.getRequest().getParameter("callback");
 		String json = generateJson(invocation);
 		HttpServletResponse response = ServletActionContext.getResponse();
 		String encoding = response.getCharacterEncoding();
-		if (StringUtils.isNotBlank(jsonp))
-			response.setContentType("application/javascript;charset=" + encoding);
-		else
-			response.setContentType("application/json;charset=" + encoding);
+		response.setContentType("application/json;charset=" + encoding);
 		if (!response.containsHeader("Cache-Control")) {
 			response.setHeader("Cache-Control", "no-cache");
 			response.setHeader("Pragma", "no-cache");
 			response.setDateHeader("Expires", 0);
 		}
 		PrintWriter out = response.getWriter();
-		if (StringUtils.isNotBlank(jsonp)) {
-			out.print(jsonp);
-			out.print('(');
-		}
 		out.print(json);
-		if (StringUtils.isNotBlank(jsonp))
-			out.print(')');
 		out.flush();
 		out.close();
 	}
