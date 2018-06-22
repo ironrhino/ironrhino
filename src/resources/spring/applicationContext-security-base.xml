@@ -52,12 +52,20 @@
 
 	<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MixedPasswordEncoder" />
 
-	<!-- <bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MultiVersionPasswordEncoder" 
-		> <property name="versions"> <list> <bean class="org.ironrhino.core.spring.security.password.V1PasswordEncoder"/> 
-		</list> </property> </bean> -->
+	<!--
+		<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MultiVersionPasswordEncoder"> 
+			<property name="versions"> 
+				<list> 
+					<bean class="org.ironrhino.core.spring.security.password.V1PasswordEncoder"/> 
+				</list> 
+			</property> 
+		</bean>
+	-->
 
-	<bean id="switchUserFilter" class="org.springframework.security.web.authentication.switchuser.SwitchUserFilter" 
-		p:userDetailsService-ref="userDetailsService" p:switchUserUrl="/switch" p:exitUserUrl="/switch/back" 
-		p:targetUrl="/" />
+	<!--
+		<bean id="switchUserFilter" class="org.springframework.security.web.authentication.switchuser.SwitchUserFilter" 
+			p:userDetailsService-ref="userDetailsService" p:switchUserUrl="/switch" p:exitUserUrl="/switch/back" 
+			p:targetUrl="/" />
+	-->
 
 </beans>
