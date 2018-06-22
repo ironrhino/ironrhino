@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -16,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.LoggingBodyHttpServletRequest;
 import org.ironrhino.core.servlet.LoggingBodyHttpServletResponse;
-import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,8 +25,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class RestFilter extends OncePerRequestFilter {
 
-	public static final String PARAMETER_NAME_METHOD = "_method";
-
 	private static final Logger logger = LoggerFactory.getLogger("rest");
 
 	@Value("${restFilter.loggingBody:true}")
@@ -38,12 +33,8 @@ public class RestFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		Map<String, String> map = RequestUtils.parseParametersFromQueryString(request.getQueryString());
-		String method = map.get(PARAMETER_NAME_METHOD);
-		if (StringUtils.isNotBlank(method)
-				|| request.getContentType() != null && request.getContentType().startsWith(MediaType.TEXT_PLAIN_VALUE))
-			request = new WrappedHttpServletRequest(request,
-					StringUtils.isNotBlank(method) ? method.toUpperCase(Locale.ROOT).trim() : request.getMethod());
+		if (StringUtils.isBlank(request.getContentType()))
+			request = new WrappedHttpServletRequest(request);
 		if (loggingBody && !MediaType.TEXT_EVENT_STREAM_VALUE.equals(request.getHeader(HttpHeaders.ACCEPT))
 				&& (request.getContentType() == null || request.getContentType().startsWith(MediaType.TEXT_PLAIN_VALUE)
 						|| request.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE))) {
@@ -59,16 +50,8 @@ public class RestFilter extends OncePerRequestFilter {
 
 	private static class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
-		private String method;
-
-		public WrappedHttpServletRequest(HttpServletRequest request, String method) {
+		public WrappedHttpServletRequest(HttpServletRequest request) {
 			super(request);
-			this.method = method;
-		}
-
-		@Override
-		public String getMethod() {
-			return method;
 		}
 
 		@Override
