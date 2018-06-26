@@ -78,7 +78,8 @@ public class TimedAspect extends BaseAspect {
 		return timing(pjp, timed);
 	}
 
-	private static Object recordThrowable(LongTaskTimer timer, ThrowableCallable<Object> f) throws Throwable {
+	private static Object recordThrowable(LongTaskTimer timer, ThrowableCallable<Object, Throwable> f)
+			throws Throwable {
 		LongTaskTimer.Sample timing = timer.start();
 		try {
 			return f.call();
@@ -87,7 +88,7 @@ public class TimedAspect extends BaseAspect {
 		}
 	}
 
-	private static Object recordThrowable(Timer timer, ThrowableCallable<Object> f) throws Throwable {
+	private static Object recordThrowable(Timer timer, ThrowableCallable<Object, Throwable> f) throws Throwable {
 		long start = System.nanoTime();
 		try {
 			return f.call();
