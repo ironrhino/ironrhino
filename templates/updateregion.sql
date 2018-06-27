@@ -40,8 +40,19 @@ drop table common_region_new;
 --rebuild search index;
 
 
--- update fullId and level
-update common_region set fullId=concat(id,"."),level=1 where parentId is null;
-update common_region t join (select a.id,concat(b.fullId,a.id,".") as fullId,b.level+1 as level from common_region a join common_region b on a.parentId=b.id where b.level=1) c on t.id=c.id set t.fullId=c.fullId,t.level=c.level;
-update common_region t join (select a.id,concat(b.fullId,a.id,".") as fullId,b.level+1 as level from common_region a join common_region b on a.parentId=b.id where b.level=2) c on t.id=c.id set t.fullId=c.fullId,t.level=c.level;
+-- update level,fullId,fullname
+update common_region set level=1,fullId=concat(id,"."),fullname=name where parentId is null;
+update common_region t join (select a.id,b.level+1 as level,concat(b.fullId,a.id,".") as fullId,concat(b.fullname,a.name) as fullname from common_region a join common_region b on a.parentId=b.id where b.level=1) c on t.id=c.id set t.level=c.level,t.fullId=c.fullId,t.fullname=c.fullname;
+update common_region t join (select a.id,b.level+1 as level,concat(b.fullId,a.id,".") as fullId,concat(b.fullname,a.name) as fullname from common_region a join common_region b on a.parentId=b.id where b.level=2) c on t.id=c.id set t.level=c.level,t.fullId=c.fullId,t.fullname=c.fullname;
 
+-- update level,fullId,fullname using recursive CTE
+update common_region t join 
+(
+with recursive region as (
+select id,parentId,name,1 as _level,concat(id,'.') as _fullId,name as _fullname from common_region where parentId is null
+union all
+select r.id,r.parentId,r.name,_level+1,concat(_fullId,r.id,'.'),concat(_fullname,r.name) from common_region r inner join region r2 on r2.id = r.parentId
+)
+select id,name,_level as level,_fullId as fullId,_fullname as fullname from region order by id
+) r on t.id=r.id 
+set t.level=r.level,t.fullId=r.fullId,t.fullname=r.fullname;
