@@ -136,7 +136,7 @@ public class UploadAction extends BaseAction {
 						if (url.startsWith("/"))
 							url = freemarkerConfigurer.getAssetsBase() + url;
 						array[i] = url;
-						uploadFileStorage.write(new FileInputStream(f), path);
+						uploadFileStorage.write(new FileInputStream(f), path, f.length());
 					} catch (IOException e) {
 						e.printStackTrace();
 						throw new ErrorMessage(e.getMessage());

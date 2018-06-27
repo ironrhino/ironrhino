@@ -111,8 +111,9 @@ public abstract class FileStorageTestBase {
 	}
 
 	protected static void writeToFile(FileStorage fs, String text, String path) throws IOException {
-		ByteArrayInputStream is = new ByteArrayInputStream(text.getBytes());
-		fs.write(is, path);
+		byte[] bytes = text.getBytes();
+		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+		fs.write(is, path, bytes.length);
 	}
 
 }

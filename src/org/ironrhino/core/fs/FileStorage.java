@@ -1,11 +1,16 @@
 package org.ironrhino.core.fs;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.ironrhino.core.util.ValueThenKeyComparator;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 
 public interface FileStorage {
 
@@ -46,6 +51,25 @@ public interface FileStorage {
 		}
 		if (removeSourceFiles && !directory.equals("/"))
 			this.delete(directory);
+	}
+
+	public default void write(File file, String path) throws IOException {
+		try (FileInputStream is = new FileInputStream(file)) {
+			write(is, path, file.length());
+		}
+	}
+
+	public default void write(InputStream is, String path, long contentLength) throws IOException {
+		String contentType = null;
+		int index = path.lastIndexOf('/');
+		Optional<MediaType> type = MediaTypeFactory.getMediaType(index >= 0 ? path.substring(index + 1) : path);
+		if (type.isPresent())
+			contentType = type.get().toString();
+		write(is, path, contentLength, contentType);
+	}
+
+	public default void write(InputStream is, String path, long contentLength, String contentType) throws IOException {
+		write(is, path);
 	}
 
 	public void write(InputStream is, String path) throws IOException;
