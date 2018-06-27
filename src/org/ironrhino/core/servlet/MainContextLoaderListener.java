@@ -58,7 +58,18 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 			String className = "com.mysql.jdbc.AbandonedConnectionCleanupThread";
 			String methodName = "checkedShutdown";
 			if (ClassUtils.isPresent(className, cl)) {
-				cl.loadClass(className).getMethod(methodName).invoke(null);
+				ClassUtils.forName(className, cl).getMethod(methodName).invoke(null);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
+			String className = "com.microsoft.sqlserver.jdbc.TimeoutTimer";
+			if (ClassUtils.isPresent(className, cl)) {
+				Field f = ClassUtils.forName(className, cl).getDeclaredField("executor");
+				f.setAccessible(true);
+				Object executor = f.get(null);
+				executor.getClass().getMethod("shutdown").invoke(executor);
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -85,9 +96,11 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 	}
 
 	private void cleanupThreadLocals(Thread thread) throws Exception {
-		Field threadLocalsField = Thread.class.getDeclaredField("threadLocals");
-		threadLocalsField.setAccessible(true);
-		threadLocalsField.set(thread, null);
+		for (String name : "threadLocals,inheritableThreadLocals".split(",")) {
+			Field f = Thread.class.getDeclaredField(name);
+			f.setAccessible(true);
+			f.set(thread, null);
+		}
 	}
 
 }
