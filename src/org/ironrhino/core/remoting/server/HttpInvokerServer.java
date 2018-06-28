@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -203,6 +204,25 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	protected RemoteInvocation readRemoteInvocation(HttpServletRequest request, InputStream is)
 			throws IOException, ClassNotFoundException {
 		return serializationType.get().readRemoteInvocation(decorateInputStream(request, is));
+	}
+
+	@Override
+	protected RemoteInvocationResult invokeAndCreateResult(RemoteInvocation invocation, Object targetObject) {
+		RemoteInvocationResult result = super.invokeAndCreateResult(invocation, targetObject);
+		result = transformResult(invocation, targetObject, result);
+		return result;
+	}
+
+	protected RemoteInvocationResult transformResult(RemoteInvocation invocation, Object targetObject,
+			RemoteInvocationResult result) {
+		if (!result.hasException()) {
+			Object value = result.getValue();
+			if (value instanceof Optional) {
+				Optional<?> optional = ((Optional<?>) value);
+				result.setValue(optional.isPresent() ? optional.get() : null);
+			}
+		}
+		return result;
 	}
 
 	protected void writeRemoteInvocationResult(HttpServletRequest request, HttpServletResponse response,

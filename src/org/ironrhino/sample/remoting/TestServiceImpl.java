@@ -3,6 +3,7 @@ package org.ironrhino.sample.remoting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.security.domain.User;
@@ -72,6 +73,18 @@ public class TestServiceImpl implements TestService {
 		List<UserDetails> list = new ArrayList<>();
 		list.add(loadUserByUsername(keyword));
 		return list;
+	}
+
+	@Override
+	public Optional<UserDetails> loadOptionalUserByUsername(String username) {
+		if (username == null)
+			throw new IllegalArgumentException("username shouldn't be null");
+		if (username.isEmpty())
+			return Optional.empty();
+		User user = new User();
+		user.setUsername(username);
+		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
+		return Optional.of(user);
 	}
 
 }

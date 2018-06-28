@@ -1,6 +1,7 @@
 package org.ironrhino.core.remoting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -77,6 +78,17 @@ public abstract class RemoteServiceTestsBase {
 	@Test(expected = IllegalArgumentException.class)
 	public void testOnException() throws Exception {
 		testService.throwException("this is a message");
+	}
+
+	@Test
+	public void testOptional() {
+		assertFalse(testService.loadOptionalUserByUsername("").isPresent());
+		assertEquals("username", testService.loadOptionalUserByUsername("username").get().getUsername());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testOptionalWithException() {
+		testService.loadOptionalUserByUsername(null);
 	}
 
 	@Test

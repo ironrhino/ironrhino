@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
@@ -203,6 +204,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		RemoteInvocationResult result;
 		try {
 			result = doExecuteRequest(invocation, methodInvocation, maxAttempts);
+			result = transformResult(invocation, methodInvocation, result);
 			time = System.currentTimeMillis() - time;
 			if (loggingPayload) {
 				if (!result.hasInvocationTargetException()) {
@@ -219,6 +221,16 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			MDC.remove("role");
 		}
 
+		return result;
+	}
+
+	protected RemoteInvocationResult transformResult(RemoteInvocation invocation, MethodInvocation methodInvocation,
+			RemoteInvocationResult result) {
+		if (!result.hasException()) {
+			if (methodInvocation.getMethod().getReturnType() == Optional.class) {
+				result.setValue(Optional.ofNullable(result.getValue()));
+			}
+		}
 		return result;
 	}
 
