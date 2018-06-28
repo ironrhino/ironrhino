@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,10 +30,10 @@ public abstract class RemoteServiceTestsBase {
 	private static ExecutorService executorService;
 
 	@Autowired
-	private TestService testService;
+	protected TestService testService;
 
 	@Autowired
-	private PersonRepository personRepository;
+	protected PersonRepository personRepository;
 
 	@BeforeClass
 	public static void setup() {
@@ -89,6 +90,23 @@ public abstract class RemoteServiceTestsBase {
 	@Test(expected = IllegalArgumentException.class)
 	public void testOptionalWithException() {
 		testService.loadOptionalUserByUsername(null);
+	}
+
+	@Test
+	public void testFuture() throws Exception {
+		assertEquals("username", testService.loadFutureUserByUsername("username").get().getUsername());
+	}
+
+	@Test
+	public void testFutureWithException() throws Exception {
+		boolean error = false;
+		try {
+			testService.loadFutureUserByUsername(null).get();
+		} catch (ExecutionException e) {
+			assertTrue(e.getCause() instanceof IllegalArgumentException);
+			error = true;
+		}
+		assertTrue(error);
 	}
 
 	@Test

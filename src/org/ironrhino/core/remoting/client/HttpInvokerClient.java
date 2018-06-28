@@ -5,6 +5,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +22,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
+import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +80,10 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Setter
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
+
+	@Setter
+	@Autowired(required = false)
+	private volatile ExecutorService executorService;
 
 	@Setter
 	private String host;
@@ -150,6 +159,34 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 					.build();
 			circuitBreaker = CircuitBreaker.of(getServiceInterface().getName(), config);
 		}
+	}
+
+	@Override
+	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+		if (methodInvocation.getMethod().getReturnType() == Future.class) {
+			ExecutorService es = executorService;
+			if (es == null) {
+				synchronized (this) {
+					es = executorService;
+					if (es == null)
+						executorService = es = Executors
+								.newCachedThreadPool(new NameableThreadFactory("httpInvokerClient"));
+				}
+			}
+			return es.submit(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					try {
+						return HttpInvokerClient.super.invoke(methodInvocation);
+					} catch (Exception e) {
+						throw e;
+					} catch (Throwable e) {
+						throw new InvocationTargetException(e);
+					}
+				}
+			});
+		}
+		return super.invoke(methodInvocation);
 	}
 
 	@Override

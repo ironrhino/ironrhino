@@ -2,6 +2,7 @@ package org.ironrhino.sample.remoting;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
 
 import org.ironrhino.core.remoting.Remoting;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,5 +31,7 @@ public interface TestService {
 	public List<UserDetails> search(String keyword);
 
 	public Optional<UserDetails> loadOptionalUserByUsername(String username);
+
+	public Future<UserDetails> loadFutureUserByUsername(String username);
 
 }

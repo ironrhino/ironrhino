@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.security.domain.User;
@@ -85,6 +87,16 @@ public class TestServiceImpl implements TestService {
 		user.setUsername(username);
 		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
 		return Optional.of(user);
+	}
+
+	@Override
+	public Future<UserDetails> loadFutureUserByUsername(String username) {
+		if (username == null)
+			throw new IllegalArgumentException("username shouldn't be null");
+		User user = new User();
+		user.setUsername(username);
+		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
+		return Executors.newCachedThreadPool().submit(() -> user);
 	}
 
 }

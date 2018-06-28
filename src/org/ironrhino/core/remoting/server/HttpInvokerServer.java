@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Future;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -220,6 +221,13 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			if (value instanceof Optional) {
 				Optional<?> optional = ((Optional<?>) value);
 				result.setValue(optional.isPresent() ? optional.get() : null);
+			} else if (value instanceof Future) {
+				try {
+					result.setValue((((Future<?>) value)).get());
+				} catch (Exception e) {
+					result.setValue(null);
+					result.setException(e);
+				}
 			}
 		}
 		return result;
