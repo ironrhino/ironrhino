@@ -28,6 +28,8 @@ class BeanPresentCondition implements ConfigurationCondition {
 		if (StringUtils.isBlank(name) && type == null)
 			return false;
 		ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
+		if (beanFactory == null)
+			return false;
 		boolean matched = type == null ? beanFactory.containsBean(name)
 				: beanFactory.getBeanNamesForType(type).length > 0;
 		if (annotation.negated())

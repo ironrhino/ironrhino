@@ -174,6 +174,7 @@ public class MyFreemarkerManager extends FreemarkerManager {
 			this.stack = stack;
 		}
 
+		@Override
 		public TemplateModel get(String key) throws TemplateModelException {
 			// Lookup in default scope
 			TemplateModel model = super.get(key);

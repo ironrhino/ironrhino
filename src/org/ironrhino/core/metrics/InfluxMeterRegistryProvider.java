@@ -25,6 +25,7 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 	@Autowired
 	private Environment environment;
 
+	@Override
 	public Optional<MeterRegistry> get() {
 		InfluxConfig config = key -> environment.getProperty(key, key.endsWith(".db") ? DEFAULT_DB : (String) null);
 		if (AddressAvailabilityCondition.check(config.uri(), 2000)) {

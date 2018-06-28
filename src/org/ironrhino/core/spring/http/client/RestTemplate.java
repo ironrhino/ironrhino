@@ -64,6 +64,7 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 		setReadTimeout(DEFAULT_READ_TIMEOUT);
 	}
 
+	@Override
 	public void setRequestFactory(ClientHttpRequestFactory requestFactory) {
 		super.setRequestFactory(requestFactory);
 		this.requestFactory = requestFactory;

@@ -51,9 +51,8 @@ public class TimedAspect extends BaseAspect {
 		String[] tags = timed.extraTags();
 		if (tags.length > 0) {
 			Map<String, Object> context = buildContext(pjp);
-			for (int i = 0; i < tags.length; i++)
-				if (i % 2 == 1)
-					tags[i] = ExpressionUtils.evalString(tags[i], context);
+			for (int i = 0; i < tags.length; i += 2)
+				tags[i + 1] = ExpressionUtils.evalString(tags[i + 1], context);
 		}
 		if (timed.longTask()) {
 			LongTaskTimer longTaskTimer = LongTaskTimer.builder(name).tags(tags).register(registry);

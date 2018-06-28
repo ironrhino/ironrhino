@@ -39,7 +39,7 @@ public class CircuitBreakerAspectTest {
 
 		@CircuitBreaker(include = IOException.class)
 		public String echo(String s) throws IOException {
-			if (count.getAndIncrement() % 2 == 1)
+			if (Math.abs(count.getAndIncrement()) % 2 == 1)
 				throw new IOException("for test");
 			return s;
 		}

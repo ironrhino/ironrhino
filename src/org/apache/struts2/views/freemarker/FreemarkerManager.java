@@ -66,7 +66,6 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import freemarker.template.TemplateModel;
 import freemarker.template.Version;
 import freemarker.template.utility.StringUtil;
 
@@ -393,7 +392,7 @@ public class FreemarkerManager {
             model.put(KEY_APPLICATION, servletContextModel);
             model.putUnlistedModel(KEY_APPLICATION_PRIVATE, servletContextModel);
         }
-        model.put(KEY_JSP_TAGLIBS, (TemplateModel) servletContext.getAttribute(ATTR_JSP_TAGLIBS_MODEL));
+        model.put(KEY_JSP_TAGLIBS, servletContext.getAttribute(ATTR_JSP_TAGLIBS_MODEL));
 
         // Create hash model wrapper for session
         HttpSession session = request.getSession(false);
@@ -487,12 +486,11 @@ public class FreemarkerManager {
 
                 for (Object o : p.keySet()) {
                     String name = (String) o;
-                    String value = (String) p.get(name);
-
                     if (name == null) {
                         throw new IOException(
                                 "init-param without param-name.  Maybe the freemarker.properties is not well-formed?");
                     }
+                    String value = (String) p.get(name);
                     if (value == null) {
                         throw new IOException(
                                 "init-param without param-value.  Maybe the freemarker.properties is not well-formed?");
