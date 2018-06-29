@@ -55,6 +55,9 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.maxLifetime:7200000}") // maxConnectionAgeInSeconds
 	private long maxLifetime;
 
+	@Value("${dataSource.autoCommit:false}")
+	private boolean autoCommit;
+
 	@Value("${dataSource.registerMbeans:false}") // disableJMX
 	private boolean registerMbeans;
 
@@ -118,6 +121,7 @@ public class DataSourceConfiguration {
 		ds.setConnectionTimeout(connectionTimeout);
 		ds.setIdleTimeout(idleTimeout);
 		ds.setMaxLifetime(maxLifetime);
+		ds.setAutoCommit(autoCommit);
 		ds.setRegisterMbeans(registerMbeans);
 		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
 		log.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
