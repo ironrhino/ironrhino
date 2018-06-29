@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Primary
@@ -20,7 +19,6 @@ public class UserServiceImpl implements UserService {
 	private List<ConcreteUserDetailsService> userDetailsServices;
 
 	@Override
-	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
