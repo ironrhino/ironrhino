@@ -1,16 +1,25 @@
 package org.ironrhino.core.metrics;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.function.ToDoubleFunction;
 
 import org.ironrhino.core.util.ThrowableCallable;
 import org.ironrhino.core.util.ThrowableRunnable;
 import org.springframework.util.ClassUtils;
 
+import io.micrometer.core.instrument.Tag;
+
 public class Metrics {
 
-	private static boolean micrometerPresent = ClassUtils.isPresent("io.micrometer.core.instrument.Metrics",
+	private static final boolean micrometerPresent = ClassUtils.isPresent("io.micrometer.core.instrument.Metrics",
 			Metrics.class.getClassLoader());
+
+	public static boolean isMicrometerPresent() {
+		return micrometerPresent;
+	}
 
 	public static void recordTimer(String name, long amount, TimeUnit unit, String... tags) {
 		if (!micrometerPresent)
@@ -76,6 +85,19 @@ public class Metrics {
 		if (!micrometerPresent)
 			return;
 		io.micrometer.core.instrument.Metrics.counter(name, tags).increment(amount);
+	}
+
+	public static <T> T gauge(String name, T obj, ToDoubleFunction<T> valueFunction, String... tags) {
+		if (!micrometerPresent)
+			return obj;
+		if (tags.length == 0) {
+			return io.micrometer.core.instrument.Metrics.gauge(name, obj, valueFunction);
+		} else {
+			List<Tag> list = new ArrayList<>();
+			for (int i = 0; i < tags.length; i += 2)
+				list.add(Tag.of(tags[i], tags[i + 1]));
+			return io.micrometer.core.instrument.Metrics.gauge(name, list, obj, valueFunction);
+		}
 	}
 
 }
