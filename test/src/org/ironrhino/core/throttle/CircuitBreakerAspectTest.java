@@ -1,6 +1,10 @@
 package org.ironrhino.core.throttle;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ironrhino.core.throttle.CircuitBreakerAspectTest.CircuitBreakerConfiguration;
@@ -22,26 +26,67 @@ public class CircuitBreakerAspectTest {
 	@Autowired
 	private EchoService echoService;
 
-	@Test(expected = CircuitBreakerOpenException.class)
+	@Test
 	public void test() throws Exception {
-		for (int i = 0; i < 10000; i++) {
-			try {
-				echoService.echo("test");
-			} catch (IOException e) {
-
+		boolean opened = false;
+		AtomicInteger success = new AtomicInteger();
+		AtomicInteger fail = new AtomicInteger();
+		try {
+			for (int i = 0; i < EchoService.SIZE_IN_CLOSED_STATE + 1; i++) {
+				try {
+					echoService.echo("test");
+					success.incrementAndGet();
+				} catch (IOException e) {
+					fail.incrementAndGet();
+				}
 			}
+		} catch (CircuitBreakerOpenException ex) {
+			opened = true;
 		}
+		assertEquals(EchoService.SIZE_IN_CLOSED_STATE / 2, success.get());
+		assertEquals(EchoService.SIZE_IN_CLOSED_STATE / 2, fail.get());
+		assertTrue(opened);
+		echoService.recover();
+		assertTrue(isOpen());
+		Thread.sleep(TimeUnit.SECONDS.toMillis(EchoService.WAIT_DURATION_IN_OPEN_STATE) / 2);
+		assertTrue(isOpen());
+		Thread.sleep(TimeUnit.SECONDS.toMillis(EchoService.WAIT_DURATION_IN_OPEN_STATE) / 2);
+		for (int i = 0; i < 100; i++) {
+			assertEquals("test", echoService.echo("test"));
+		}
+	}
+
+	private boolean isOpen() {
+		try {
+			echoService.echo("test");
+		} catch (CircuitBreakerOpenException ex) {
+			return true;
+		} catch (IOException ex) {
+			return false;
+		}
+		return false;
 	}
 
 	public static class EchoService {
 
+		public static final int SIZE_IN_CLOSED_STATE = 10;
+		public static final int WAIT_DURATION_IN_OPEN_STATE = 4;
+
 		public AtomicInteger count = new AtomicInteger();
 
-		@CircuitBreaker(include = IOException.class)
+		private volatile boolean recovered;
+
+		@CircuitBreaker(include = IOException.class, waitDurationInOpenState = WAIT_DURATION_IN_OPEN_STATE, ringBufferSizeInClosedState = SIZE_IN_CLOSED_STATE)
 		public String echo(String s) throws IOException {
+			if (recovered)
+				return s;
 			if (Math.abs(count.getAndIncrement()) % 2 == 1)
 				throw new IOException("for test");
 			return s;
+		}
+
+		public void recover() {
+			recovered = true;
 		}
 
 	}
