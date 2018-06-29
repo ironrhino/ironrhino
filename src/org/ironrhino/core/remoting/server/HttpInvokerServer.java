@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import javax.servlet.ServletException;
@@ -224,6 +225,13 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			} else if (value instanceof Future) {
 				try {
 					result.setValue((((Future<?>) value)).get());
+				} catch (Exception e) {
+					result.setValue(null);
+					result.setException(e);
+				}
+			} else if (value instanceof Callable) {
+				try {
+					result.setValue((((Callable<?>) value)).call());
 				} catch (Exception e) {
 					result.setValue(null);
 					result.setException(e);

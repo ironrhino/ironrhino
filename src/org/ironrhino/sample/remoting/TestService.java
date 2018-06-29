@@ -2,6 +2,7 @@ package org.ironrhino.sample.remoting;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import org.ironrhino.core.remoting.Remoting;
@@ -33,5 +34,7 @@ public interface TestService {
 	public Optional<UserDetails> loadOptionalUserByUsername(String username);
 
 	public Future<UserDetails> loadFutureUserByUsername(String username);
+	
+	public Callable<UserDetails> loadCallableUserByUsername(String username);
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -102,6 +103,16 @@ public class TestServiceImpl implements TestService {
 		user.setUsername(username);
 		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
 		return es.submit(() -> user);
+	}
+
+	@Override
+	public Callable<UserDetails> loadCallableUserByUsername(String username) {
+		if (username == null)
+			throw new IllegalArgumentException("username shouldn't be null");
+		User user = new User();
+		user.setUsername(username);
+		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
+		return () -> user;
 	}
 
 	@PreDestroy

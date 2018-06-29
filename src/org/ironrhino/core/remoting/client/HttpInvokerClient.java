@@ -147,7 +147,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		if (methodInvocation.getMethod().getReturnType() == Future.class) {
+		Class<?> returnType = methodInvocation.getMethod().getReturnType();
+		if (returnType == Future.class) {
 			ExecutorService es = executorService;
 			if (es == null) {
 				synchronized (this) {
@@ -169,6 +170,19 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 					}
 				}
 			});
+		} else if (returnType == Callable.class) {
+			return new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					try {
+						return HttpInvokerClient.super.invoke(methodInvocation);
+					} catch (Exception e) {
+						throw e;
+					} catch (Throwable e) {
+						throw new InvocationTargetException(e);
+					}
+				}
+			};
 		}
 		return super.invoke(methodInvocation);
 	}

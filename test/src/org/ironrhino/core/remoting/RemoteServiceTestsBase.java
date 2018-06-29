@@ -110,6 +110,16 @@ public abstract class RemoteServiceTestsBase {
 	}
 
 	@Test
+	public void testCallable() throws Exception {
+		assertEquals("username", testService.loadCallableUserByUsername("username").call().getUsername());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCallableWithException() throws Exception {
+		testService.loadCallableUserByUsername(null).call();
+	}
+
+	@Test
 	public void testConcurreny() throws InterruptedException {
 		final CountDownLatch cdl = new CountDownLatch(THREADS);
 		final AtomicInteger count = new AtomicInteger();
