@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.security.domain.User;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TestServiceImpl implements TestService {
+
+	private ExecutorService es = Executors.newCachedThreadPool();
 
 	@Override
 	public void ping() {
@@ -96,7 +101,12 @@ public class TestServiceImpl implements TestService {
 		User user = new User();
 		user.setUsername(username);
 		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
-		return Executors.newCachedThreadPool().submit(() -> user);
+		return es.submit(() -> user);
+	}
+
+	@PreDestroy
+	private void destroy() {
+		es.shutdown();
 	}
 
 }
