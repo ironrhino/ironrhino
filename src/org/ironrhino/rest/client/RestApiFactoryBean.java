@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.throttle.CircuitBreaking;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
@@ -59,15 +60,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import lombok.Getter;
 import lombok.Setter;
 
 public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object> {
-
-	private static final boolean resilience4jPresent = ClassUtils.isPresent(
-			"io.github.resilience4j.circuitbreaker.CircuitBreaker", RestApiFactoryBean.class.getClassLoader());
 
 	private final Class<?> restApiClass;
 
@@ -111,11 +107,6 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		this.restApiClass = restApiClass;
 		this.restTemplate = restTemplate;
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
-		if (circuitBreakerEnabled && resilience4jPresent) {
-			CircuitBreakerConfig config = CircuitBreakerConfig.custom()
-					.recordFailure(ex -> ex.getCause() instanceof IOException).build();
-			circuitBreaker = CircuitBreaker.of(restApiClass.getName(), config);
-		}
 	}
 
 	public void setRestClient(RestClient restClient) {
@@ -135,10 +126,8 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 
 	@Override
 	public Object invoke(final MethodInvocation methodInvocation) throws Exception {
-		if (circuitBreaker == null)
-			return doInvoke(methodInvocation);
-		else
-			return ((CircuitBreaker) circuitBreaker).executeCallable(() -> doInvoke(methodInvocation));
+		return CircuitBreaking.execute(restApiClass.getName(), ex -> ex.getCause() instanceof IOException,
+				() -> doInvoke(methodInvocation));
 	}
 
 	@SuppressWarnings("unchecked")

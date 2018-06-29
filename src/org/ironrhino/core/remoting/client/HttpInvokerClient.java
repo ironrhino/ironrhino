@@ -18,6 +18,7 @@ import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.spring.RemotingClientProxy;
+import org.ironrhino.core.throttle.CircuitBreaking;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ExceptionUtils;
@@ -38,19 +39,13 @@ import org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
-
-	private static final boolean resilience4jPresent = ClassUtils.isPresent(
-			"io.github.resilience4j.circuitbreaker.CircuitBreaker", HttpInvokerClient.class.getClassLoader());
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
@@ -109,12 +104,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private Object serviceProxy;
 
-	@Value("${httpInvoker.circuitBreakerEnabled:true}")
-	private boolean circuitBreakerEnabled = true;
-
-	@Getter
-	private Object circuitBreaker;
-
 	@Override
 	public Object getObject() {
 		return this.serviceProxy;
@@ -154,11 +143,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		ProxyFactory pf = new ProxyFactory(getServiceInterface(), this);
 		pf.addInterface(RemotingClientProxy.class);
 		this.serviceProxy = pf.getProxy(getBeanClassLoader());
-		if (circuitBreakerEnabled && resilience4jPresent) {
-			CircuitBreakerConfig config = CircuitBreakerConfig.custom().recordFailure(ex -> ex instanceof IOException)
-					.build();
-			circuitBreaker = CircuitBreaker.of(getServiceInterface().getName(), config);
-		}
 	}
 
 	@Override
@@ -199,11 +183,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Override
 	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
 			throws Exception {
-		if (circuitBreaker == null)
-			return doExecuteRequest(invocation, methodInvocation);
-		else
-			return ((CircuitBreaker) circuitBreaker)
-					.executeCallable(() -> doExecuteRequest(invocation, methodInvocation));
+		return CircuitBreaking.execute(getServiceInterface().getName(), ex -> ex instanceof IOException,
+				() -> doExecuteRequest(invocation, methodInvocation));
 	}
 
 	protected RemoteInvocationResult doExecuteRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
