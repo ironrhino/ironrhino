@@ -55,7 +55,7 @@ public class CacheAspect extends BaseAspect {
 						: cacheManager.get(key, namespace);
 				if (value instanceof NullObject) {
 					ExpressionUtils.eval(checkCache.onHit(), context);
-					Metrics.increment("cache." + namespace, "hit", "true");
+					instrument(namespace, true);
 					return null;
 				}
 				if (value != null
@@ -63,7 +63,7 @@ public class CacheAspect extends BaseAspect {
 								|| returnType.isAssignableFrom(value.getClass()))) {
 					putReturnValueIntoContext(context, value);
 					ExpressionUtils.eval(checkCache.onHit(), context);
-					Metrics.increment("cache." + namespace, "hit", "true");
+					instrument(namespace, true);
 					return value;
 				}
 			}
@@ -81,7 +81,7 @@ public class CacheAspect extends BaseAspect {
 					Object value = cacheManager.get(key, namespace);
 					if (value instanceof NullObject) {
 						ExpressionUtils.eval(checkCache.onHit(), context);
-						Metrics.increment("cache." + namespace, "hit", "true");
+						instrument(namespace, true);
 						return null;
 					}
 					if (value != null && (returnType.isPrimitive()
@@ -89,13 +89,13 @@ public class CacheAspect extends BaseAspect {
 							|| returnType.isAssignableFrom(value.getClass()))) {
 						putReturnValueIntoContext(context, value);
 						ExpressionUtils.eval(checkCache.onHit(), context);
-						Metrics.increment("cache." + namespace, "hit", "true");
+						instrument(namespace, true);
 						return value;
 					}
 				}
 			}
 			ExpressionUtils.eval(checkCache.onMiss(), context);
-			Metrics.increment("cache." + namespace, "hit", "false");
+			instrument(namespace, false);
 		}
 		Object result = jp.proceed();
 		putReturnValueIntoContext(context, result);
@@ -152,6 +152,10 @@ public class CacheAspect extends BaseAspect {
 					cacheManager.put(key.toString(), value, 0, TimeUnit.SECONDS, namespace);
 		}
 		return retval;
+	}
+
+	private static void instrument(String namespace, boolean hit) {
+		Metrics.increment("cache." + namespace, "hit", String.valueOf(hit));
 	}
 
 }
