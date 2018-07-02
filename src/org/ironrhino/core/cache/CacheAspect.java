@@ -119,7 +119,7 @@ public class CacheAspect extends BaseAspect {
 				ExpressionUtils.eval(checkCache.onPut(), context);
 		}
 		if (mutexed)
-			cacheManager.increment(keyMutex, -1, 0, TimeUnit.MILLISECONDS, namespace);
+			cacheManager.decrement(keyMutex, 1, 0, TimeUnit.MILLISECONDS, namespace);
 		return result;
 	}
 

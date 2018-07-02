@@ -146,6 +146,7 @@ public abstract class CacheManagerTestBase {
 		cacheManager.delete(key, NAMESPACE);
 		assertEquals(2, cacheManager.increment(key, 2, 2, TimeUnit.SECONDS, NAMESPACE));
 		assertEquals(5, cacheManager.increment(key, 3, 2, TimeUnit.SECONDS, NAMESPACE));
+		assertEquals(4, cacheManager.decrement(key, 1, 2, TimeUnit.SECONDS, NAMESPACE));
 		try {
 			TimeUnit.MILLISECONDS.sleep(2100);
 		} catch (InterruptedException e) {
@@ -171,6 +172,35 @@ public abstract class CacheManagerTestBase {
 			e.printStackTrace();
 		}
 		assertTrue(cacheManager.exists(key, NAMESPACE));
+		cacheManager.delete(key, NAMESPACE);
+	}
+
+	@Test
+	public void testDecrementAndReturnNonnegative() {
+		String key = "key";
+		boolean error = false;
+		try {
+			cacheManager.decrementAndReturnNonnegative(key, -2, -1, TimeUnit.SECONDS, NAMESPACE);
+		} catch (IllegalArgumentException e) {
+			error = true;
+		}
+		assertTrue(error);
+		error = false;
+		try {
+			cacheManager.decrementAndReturnNonnegative(key, 2, -1, TimeUnit.SECONDS, NAMESPACE);
+		} catch (IllegalStateException e) {
+			error = true;
+		}
+		assertTrue(error);
+		assertEquals(2, cacheManager.increment(key, 2, -1, TimeUnit.SECONDS, NAMESPACE));
+		assertEquals(1, cacheManager.decrementAndReturnNonnegative(key, 1, -1, TimeUnit.SECONDS, NAMESPACE));
+		error = false;
+		try {
+			cacheManager.decrementAndReturnNonnegative(key, 2, -1, TimeUnit.SECONDS, NAMESPACE);
+		} catch (IllegalStateException e) {
+			error = true;
+		}
+		assertEquals(0, cacheManager.decrementAndReturnNonnegative(key, 1, -1, TimeUnit.SECONDS, NAMESPACE));
 		cacheManager.delete(key, NAMESPACE);
 	}
 

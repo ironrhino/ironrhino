@@ -16,6 +16,7 @@ import org.cache2k.Cache;
 import org.cache2k.CacheEntry;
 import org.cache2k.configuration.Cache2kConfiguration;
 import org.cache2k.expiry.ExpiryTimeValues;
+import org.cache2k.processor.EntryProcessingException;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.springframework.stereotype.Component;
@@ -150,8 +151,10 @@ public class Cache2kCacheManager implements CacheManager {
 
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
-		if (key == null || delta == 0)
-			return -1;
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
+		if (delta == 0)
+			throw new IllegalArgumentException("delta should not be 0");
 		Cache<String, Object> cache = getCache(namespace, true);
 		CacheEntry<String, Object> ce = cache.invoke(key, e -> {
 			if (e.exists()) {
@@ -166,6 +169,35 @@ public class Cache2kCacheManager implements CacheManager {
 			return e;
 		});
 		return (Long) ce.getValue();
+	}
+
+	@Override
+	public long decrementAndReturnNonnegative(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
+		if (delta <= 0)
+			throw new IllegalArgumentException("delta should great than 0");
+		Cache<String, Object> cache = getCache(namespace, true);
+		try {
+			CacheEntry<String, Object> ce = cache.invoke(key, e -> {
+				if (e.exists()) {
+					if ((Long) e.getValue() < delta)
+						throw new IllegalStateException(
+								"namespace:" + namespace + ", key:" + key + " is less than " + delta);
+					e.setValue((Long) e.getValue() - delta);
+					if (timeToLive > 0)
+						e.setExpiry(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+				} else {
+					throw new IllegalStateException("namespace:" + namespace + ", key:" + key + " does not exist");
+				}
+				return e;
+			});
+			return (Long) ce.getValue();
+		} catch (EntryProcessingException e) {
+			if (e.getCause() instanceof IllegalStateException)
+				throw (IllegalStateException) e.getCause();
+			throw e;
+		}
 	}
 
 	@Override

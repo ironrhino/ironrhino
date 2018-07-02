@@ -221,6 +221,8 @@ public class MemcachedCacheManager implements CacheManager {
 
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
+		if (delta == 0)
+			throw new IllegalArgumentException("delta should not be 0");
 		try {
 			if (timeToLive == 0)
 				return memcached.incr(generateKey(key, namespace), delta);
@@ -233,6 +235,8 @@ public class MemcachedCacheManager implements CacheManager {
 	}
 
 	private String generateKey(String key, String namespace) {
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
 		if (StringUtils.isNotBlank(namespace)) {
 			StringBuilder sb = new StringBuilder(namespace.length() + key.length() + 1);
 			sb.append(namespace);

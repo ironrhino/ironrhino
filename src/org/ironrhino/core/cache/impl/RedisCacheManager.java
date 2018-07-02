@@ -50,6 +50,10 @@ public class RedisCacheManager implements CacheManager {
 	@PriorityQualifier
 	private StringRedisTemplate cacheStringRedisTemplate;
 
+	private RedisScript<Long> decrementPositiveScript = new DefaultRedisScript<>(
+			"if redis.call('exists',KEYS[1])==1 then local v=redis.call('decrby',KEYS[1],ARGV[1]) if v >= 0 then return v else redis.call('incrby',KEYS[1],ARGV[1]) return -2 end else return -1 end",
+			Long.class);
+
 	@PostConstruct
 	public void init() {
 		cacheRedisTemplate.setValueSerializer(new FallbackToStringSerializer());
@@ -211,6 +215,8 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
+		if (delta == 0)
+			throw new IllegalArgumentException("delta should not be 0");
 		String actualkey = generateKey(key, namespace);
 		Long result = cacheRedisTemplate.opsForValue().increment(actualkey, delta);
 		if (result == null)
@@ -220,7 +226,29 @@ public class RedisCacheManager implements CacheManager {
 		return result;
 	}
 
+	@Override
+	public long decrementAndReturnNonnegative(String key, long delta, int timeToLive, TimeUnit timeUnit,
+			String namespace) {
+		if (delta <= 0)
+			throw new IllegalArgumentException("delta should great than 0");
+		String actualkey = generateKey(key, namespace);
+		Long result = (Long) cacheRedisTemplate.execute(decrementPositiveScript,
+				cacheRedisTemplate.getStringSerializer(), null, Collections.singletonList(actualkey),
+				String.valueOf(delta));
+		if (result == null)
+			throw new RuntimeException("Unexpected null");
+		if (result == -1)
+			throw new IllegalStateException("namespace:" + namespace + ", key:" + key + " does not exist");
+		if (result == -2)
+			throw new IllegalStateException("namespace:" + namespace + ", key:" + key + " is less than " + delta);
+		if (timeToLive > 0)
+			cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
+		return result;
+	}
+
 	private String generateKey(String key, String namespace) {
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
 		if (StringUtils.isNotBlank(namespace)) {
 			StringBuilder sb = new StringBuilder(namespace.length() + key.length() + 1);
 			sb.append(namespace);
