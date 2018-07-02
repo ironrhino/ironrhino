@@ -25,6 +25,7 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.rest.RestStatus;
@@ -106,6 +107,13 @@ public class ApiDocHelper {
 				List<Object> list = new ArrayList<>();
 				list.add(createSample(clazz));
 				return list;
+			} else if (ResultPage.class.isAssignableFrom(raw)) {
+				ResultPage<Object> page = new ResultPage<>();
+				page.setTotalResults(1);
+				List<Object> list = new ArrayList<>();
+				list.add(createSample(clazz));
+				page.setResult(list);
+				return page;
 			}
 			return null;
 		} else if (returnType instanceof Class) {
