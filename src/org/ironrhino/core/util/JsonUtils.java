@@ -51,7 +51,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class JsonUtils {
+public abstract class JsonUtils {
 
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";

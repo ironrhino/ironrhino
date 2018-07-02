@@ -34,7 +34,7 @@ import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 
-public class CriterionUtils {
+public abstract class CriterionUtils {
 
 	public static final String CRITERION_OPERATOR_SUFFIX = "-op";
 

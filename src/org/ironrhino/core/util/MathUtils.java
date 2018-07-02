@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-public class MathUtils {
+public abstract class MathUtils {
 
 	@SafeVarargs
 	public static <T extends Number> T max(T... numbers) {

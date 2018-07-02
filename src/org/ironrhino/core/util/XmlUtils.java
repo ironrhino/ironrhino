@@ -20,7 +20,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-public class XmlUtils {
+public abstract class XmlUtils {
 
 	private static final XPath _xpath = XPathFactory.newInstance().newXPath();
 

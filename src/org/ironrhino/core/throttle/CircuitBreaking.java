@@ -21,7 +21,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.utils.CircuitBreakerUtils;
 
-public class CircuitBreaking {
+public abstract class CircuitBreaking {
 
 	private static final boolean resilience4jPresent = ClassUtils
 			.isPresent("io.github.resilience4j.circuitbreaker.CircuitBreaker", CircuitBreaking.class.getClassLoader());

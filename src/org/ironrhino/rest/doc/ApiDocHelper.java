@@ -35,7 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.context.request.async.DeferredResult;
 
-public class ApiDocHelper {
+public abstract class ApiDocHelper {
 
 	public static Object generateSample(Class<?> apiDocClazz, Method apiDocMethod, Fields fields) throws Exception {
 		if (fields != null) {

@@ -9,7 +9,7 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
-public class PinyinUtils {
+public abstract class PinyinUtils {
 
 	public static boolean matchesAutocomplete(String text, String pattern) {
 		text = text.toLowerCase(Locale.ROOT);

@@ -35,7 +35,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
 import org.springframework.jdbc.core.namedparam.ParsedSql;
 
-public class SqlUtils {
+public abstract class SqlUtils {
 
 	public static String buildInsertStatement(Class<?> beanClass) {
 		return buildInsertStatement(beanClass, null);

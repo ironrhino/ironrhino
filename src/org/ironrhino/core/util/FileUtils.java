@@ -18,7 +18,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class FileUtils {
+public abstract class FileUtils {
 
 	public static String normalizePath(String input) {
 		if (StringUtils.isBlank(input))

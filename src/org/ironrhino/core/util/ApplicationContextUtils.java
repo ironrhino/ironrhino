@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.ResolvableType;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class ApplicationContextUtils {
+public abstract class ApplicationContextUtils {
 
 	public static ApplicationContext getApplicationContext() {
 		return WebApplicationContextUtils.getWebApplicationContext(MainAppInitializer.SERVLET_CONTEXT);

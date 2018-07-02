@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
-public class CodecUtils {
+public abstract class CodecUtils {
 
 	public static final String DEFAULT_ENCODING = "UTF-8";
 

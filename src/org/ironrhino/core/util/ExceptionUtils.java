@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-public class ExceptionUtils {
+public abstract class ExceptionUtils {
 	public static String getStackTraceAsString(Throwable t) {
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();

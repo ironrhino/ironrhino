@@ -3,7 +3,7 @@ package org.ironrhino.core.remoting;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RemotingContext {
+public abstract class RemotingContext {
 
 	public static final int SC_SERIALIZATION_FAILED = 499;
 

@@ -14,7 +14,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-public class MySQLSequenceHelper {
+public abstract class MySQLSequenceHelper {
 
 	public static void createOrUpgradeTable(DataSource dataSrouce, String tableName, String sequenceName)
 			throws SQLException {

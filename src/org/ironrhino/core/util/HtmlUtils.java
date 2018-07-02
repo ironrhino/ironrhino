@@ -17,7 +17,7 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 
 @SuppressWarnings("rawtypes")
-public class HtmlUtils {
+public abstract class HtmlUtils {
 
 	public static String getTreeViewHtml(Collection children, boolean async) {
 		if (async || children == null || children.size() == 0)

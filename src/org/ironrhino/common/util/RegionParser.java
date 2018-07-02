@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.ironrhino.common.model.Region;
 
-public class RegionParser {
+public abstract class RegionParser {
 
 	public static List<Region> parse() throws IOException {
 		return parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/data/region.txt"));

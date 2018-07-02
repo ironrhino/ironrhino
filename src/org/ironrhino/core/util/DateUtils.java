@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
-public class DateUtils {
+public abstract class DateUtils {
 
 	public static final String DATE10 = "yyyy-MM-dd";
 

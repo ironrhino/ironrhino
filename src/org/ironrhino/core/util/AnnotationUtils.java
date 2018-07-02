@@ -25,7 +25,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @SuppressWarnings("unchecked")
-public class AnnotationUtils {
+public abstract class AnnotationUtils {
 
 	private static Map<String, Set<Method>> annotatedMethodsCache = new ConcurrentHashMap<>(64);
 	private static Map<String, Set<String>> annotatedPropertyNamesCache = new ConcurrentHashMap<>(64);

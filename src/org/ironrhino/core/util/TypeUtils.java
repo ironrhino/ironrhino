@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class TypeUtils {
+public abstract class TypeUtils {
 
 	public static boolean isNumeric(Class<?> type) {
 		return Short.TYPE == type || Integer.TYPE == type || Long.TYPE == type || Float.TYPE == type

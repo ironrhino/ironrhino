@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import ognl.OgnlContext;
 
 @Slf4j
-public class CacheContext {
+public abstract class CacheContext {
 
 	public static final String FORCE_FLUSH_PARAM_NAME = "_ff_";
 

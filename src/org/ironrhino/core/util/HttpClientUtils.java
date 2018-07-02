@@ -36,7 +36,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-public class HttpClientUtils {
+public abstract class HttpClientUtils {
 
 	private static Set<Header> DEFAULT_HEADERS = new HashSet<>();
 

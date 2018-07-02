@@ -17,7 +17,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
 
-public class JobParameterHelper {
+public abstract class JobParameterHelper {
 
 	public static List<SimpleJobParameter> parse(String jobParameters) {
 		if (StringUtils.isBlank(jobParameters))

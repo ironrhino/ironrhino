@@ -12,7 +12,7 @@ import org.springframework.util.ClassUtils;
 
 import io.micrometer.core.instrument.Tag;
 
-public class Metrics {
+public abstract class Metrics {
 
 	private static final boolean micrometerPresent = ClassUtils.isPresent("io.micrometer.core.instrument.Metrics",
 			Metrics.class.getClassLoader());

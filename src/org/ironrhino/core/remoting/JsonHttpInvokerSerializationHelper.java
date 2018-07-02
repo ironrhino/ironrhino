@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class JsonHttpInvokerSerializationHelper {
+public abstract class JsonHttpInvokerSerializationHelper {
 
 	private static final String SEPARATOR = "|";
 

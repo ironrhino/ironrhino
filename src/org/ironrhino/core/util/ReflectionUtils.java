@@ -31,7 +31,7 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.util.proxy.ProxyObject;
 
-public class ReflectionUtils {
+public abstract class ReflectionUtils {
 
 	public final static ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 

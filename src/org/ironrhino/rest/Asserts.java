@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.struts.I18N;
 import org.springframework.beans.BeanWrapperImpl;
 
-public class Asserts {
+public abstract class Asserts {
 
 	public static void notNull(Object domain, String... field) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(domain);

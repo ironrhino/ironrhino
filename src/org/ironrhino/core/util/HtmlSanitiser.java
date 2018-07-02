@@ -18,7 +18,7 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 
-public class HtmlSanitiser {
+public abstract class HtmlSanitiser {
 
 	private static final Set<String> VALID_ELEMENT_NAMES = new HashSet<>(Arrays.asList(new String[] {
 			HTMLElementName.DIV, HTMLElementName.SPAN, HTMLElementName.STRONG, HTMLElementName.EM, HTMLElementName.BR,

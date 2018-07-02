@@ -11,7 +11,7 @@ import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
-public class FstHttpInvokerSerializationHelper {
+public abstract class FstHttpInvokerSerializationHelper {
 
 	public static void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
 		FSTObjectOutput out = new FSTObjectOutput(os);

@@ -25,7 +25,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-public class AppInfo {
+public abstract class AppInfo {
 
 	public static final String KEY_STAGE = "STAGE";
 

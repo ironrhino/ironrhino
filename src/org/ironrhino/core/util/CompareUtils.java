@@ -12,7 +12,7 @@ import org.ironrhino.core.model.Persistable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 
-public class CompareUtils {
+public abstract class CompareUtils {
 
 	public static boolean equals(Object a, Object b) {
 		return equals(a, b, true);

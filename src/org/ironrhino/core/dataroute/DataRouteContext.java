@@ -1,6 +1,6 @@
 package org.ironrhino.core.dataroute;
 
-public class DataRouteContext {
+public abstract class DataRouteContext {
 
 	public static final int DEFAULT_DATASOURCE_WEIGHT = 1;
 

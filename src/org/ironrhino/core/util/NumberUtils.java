@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
-public class NumberUtils {
+public abstract class NumberUtils {
 
 	public static String formatAmount(BigDecimal value) {
 		return new DecimalFormat("#,##0.00").format(value);

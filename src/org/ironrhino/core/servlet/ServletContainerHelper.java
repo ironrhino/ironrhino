@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanWrapperImpl;
 
-public class ServletContainerHelper {
+public abstract class ServletContainerHelper {
 
 	@SuppressWarnings("unchecked")
 	public static int detectHttpPort(ServletContext servletContext, boolean ssl) {

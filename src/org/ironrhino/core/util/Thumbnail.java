@@ -4,7 +4,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class Thumbnail {
+public abstract class Thumbnail {
 
 	public static BufferedImage resize(Image image, int w, int h) throws IOException {
 		BufferedImage bufImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);

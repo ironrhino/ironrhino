@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.ironrhino.core.model.Displayable;
 
-public class EnumUtils {
+public abstract class EnumUtils {
 
 	public static <T extends Enum<T>> Map<String, String> enumToMap(Class<T> clazz) {
 		T[] enums = clazz.getEnumConstants();

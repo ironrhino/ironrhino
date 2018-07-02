@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class ConcurrentUtils {
+public abstract class ConcurrentUtils {
 
 	public static <T> CompletableFuture<T> anyOfFutures(List<? extends CompletableFuture<? extends T>> futures) {
 		CompletableFuture<T> cf = new CompletableFuture<>();
