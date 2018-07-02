@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 public @interface JsonPointer {
 
-	String value();
+	String value() default "";
+
+	Class<? extends JsonValidator> validator() default JsonValidator.class;
 
 }

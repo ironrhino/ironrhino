@@ -32,6 +32,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -368,7 +369,19 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 				}
 				if (jackson == null)
 					throw new RuntimeException("AbstractJackson2HttpMessageConverter not present");
-				JsonNode tree = restTemplate.exchange(requestEntity, JsonNode.class).getBody().at(pointer.value());
+				JsonNode tree = restTemplate.exchange(requestEntity, JsonNode.class).getBody();
+				Class<? extends JsonValidator> validatorClass = pointer.validator();
+				if (validatorClass != JsonValidator.class) {
+					JsonValidator validator;
+					try {
+						validator = ctx.getBean(validatorClass);
+					} catch (NoSuchBeanDefinitionException e) {
+						validator = validatorClass.getConstructor().newInstance();
+					}
+					validator.validate(tree);
+				}
+				if (!pointer.value().isEmpty())
+					tree = tree.at(pointer.value());
 				ObjectMapper mapper = jackson.getObjectMapper();
 				if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
 					return tree;

@@ -3,6 +3,8 @@ package org.ironrhino.rest.client;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 @Configuration
 public class RestClientConfiguration {
 
@@ -17,6 +19,22 @@ public class RestClientConfiguration {
 		RestApiRegistryPostProcessor obj = new RestApiRegistryPostProcessor();
 		obj.setPackagesToScan(new String[] { getClass().getPackage().getName() });
 		return obj;
+	}
+
+	@Bean
+	public MyJsonValidator myJsonValidator() {
+		return new MyJsonValidator();
+	}
+
+	public static class MyJsonValidator implements JsonValidator {
+
+		@Override
+		public void validate(JsonNode tree) {
+			if (tree.get("totalResults").asInt() > 0) {
+				throw new IllegalArgumentException("Just for test");
+			}
+		}
+
 	}
 
 }

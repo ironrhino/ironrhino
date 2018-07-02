@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.rest.RestStatus;
+import org.ironrhino.rest.client.RestClientConfiguration.MyJsonValidator;
 import org.ironrhino.security.domain.User;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,11 @@ public interface UserClient {
 	@JsonPointer("/result")
 	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
 	public List<User> pagedResult(@RequestParam(defaultValue = "1") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize);
+
+	@JsonPointer(value = "/result", validator = MyJsonValidator.class)
+	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
+	public List<User> pagedResultWithValidator(@RequestParam(defaultValue = "1") Integer pageNo,
 			@RequestParam(defaultValue = "10") Integer pageSize);
 
 	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)

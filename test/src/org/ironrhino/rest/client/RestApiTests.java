@@ -55,6 +55,11 @@ public class RestApiTests {
 		assertEquals(1, userClient.pagedResult(1, 1).size());
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testJsonPointerWithValidator() {
+		userClient.pagedResultWithValidator(1, 1);
+	}
+
 	@Test
 	public void testValidatePassword() {
 		User u = new User();
