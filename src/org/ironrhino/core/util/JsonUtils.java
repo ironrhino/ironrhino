@@ -241,13 +241,33 @@ public class JsonUtils {
 		return (T) sharedObjectMapper.readValue(json, type);
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T fromJson(JsonNode json, TypeReference<T> type)
+			throws JsonParseException, JsonMappingException, IOException {
+		return (T) sharedObjectMapper.readValue(sharedObjectMapper.treeAsTokens(json), type);
+	}
+
 	public static <T> T fromJson(String json, Class<T> cls)
 			throws JsonParseException, JsonMappingException, IOException {
 		return sharedObjectMapper.readValue(json, cls);
 	}
 
+	public static <T> T fromJson(JsonNode json, Class<T> cls)
+			throws JsonParseException, JsonMappingException, IOException {
+		return sharedObjectMapper.treeToValue(json, cls);
+	}
+
 	public static <T> T fromJson(String json, Type type) throws JsonParseException, JsonMappingException, IOException {
 		return sharedObjectMapper.readValue(json, sharedObjectMapper.getTypeFactory().constructType(type));
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T fromJson(JsonNode json, Type type)
+			throws JsonParseException, JsonMappingException, IOException {
+		if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
+			return (T) json;
+		return sharedObjectMapper.readValue(sharedObjectMapper.treeAsTokens(json),
+				sharedObjectMapper.getTypeFactory().constructType(type));
 	}
 
 	public static <T extends Enum<T>> String enumToJson(Class<T> clazz) {
