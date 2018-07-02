@@ -25,13 +25,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.support.RestGatewaySupport;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RestClient implements BeanNameAware {
+public class RestClient extends RestGatewaySupport implements BeanNameAware {
 
 	@Getter
 	@Setter
@@ -57,9 +58,6 @@ public class RestClient implements BeanNameAware {
 	@Setter
 	protected String apiBaseUrl;
 
-	@Getter
-	protected RestTemplate restTemplate = new RestClientTemplate(this);
-
 	protected RestTemplate internalRestTemplate = new RestTemplate();
 
 	@Autowired(required = false)
@@ -82,6 +80,7 @@ public class RestClient implements BeanNameAware {
 			if (it.next() instanceof MappingJackson2XmlHttpMessageConverter)
 				it.remove();
 		}
+		setRestTemplate(new RestClientTemplate(this));
 	}
 
 	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret) {
