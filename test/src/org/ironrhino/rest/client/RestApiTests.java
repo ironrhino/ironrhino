@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
+import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.security.domain.User;
 import org.junit.Test;
@@ -37,6 +38,10 @@ public class RestApiTests {
 	public void testGetAndPatch() {
 		assertEquals("admin", userClient.self().getUsername());
 		assertTrue(userClient.all().size() > 0);
+		ResultPage<User> page = userClient.paged(1, 1);
+		assertEquals(1, page.getPageNo());
+		assertEquals(1, page.getPageSize());
+		assertEquals(1, page.getResult().size());
 		assertEquals("admin", userClient.get("admin").getUsername());
 		User u = new User();
 		String newName = "admin" + new Random().nextInt(1000);

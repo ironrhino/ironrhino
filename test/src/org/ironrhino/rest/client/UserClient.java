@@ -3,12 +3,14 @@ package org.ironrhino.rest.client;
 import java.io.InputStream;
 import java.util.List;
 
+import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.security.domain.User;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestApi(restClient = "restClient")
 @RequestMapping("/user")
@@ -19,6 +21,10 @@ public interface UserClient {
 
 	@RequestMapping(value = "/@all", method = RequestMethod.GET)
 	public List<User> all();
+
+	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
+	public ResultPage<User> paged(@RequestParam(defaultValue = "1") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize);
 
 	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)
 	public void patch(@RequestBody User user);

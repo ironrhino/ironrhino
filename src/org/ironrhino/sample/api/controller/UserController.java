@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 import org.ironrhino.core.metadata.Authorize;
+import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -56,6 +58,19 @@ public class UserController {
 	@RequestMapping(value = "/@all", method = RequestMethod.GET)
 	public List<User> all() {
 		return userManager.findAll();
+	}
+
+	@Order(2)
+	@Api("分页获取所有用户信息")
+	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
+	public ResultPage<User> paged(@RequestParam(defaultValue = "1") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize) {
+		ResultPage<User> rp = new ResultPage<>();
+		if (pageNo != null && pageNo > 0)
+			rp.setPageNo(pageNo);
+		if (pageSize != null && pageSize > 0)
+			rp.setPageSize(pageSize);
+		return userManager.findByResultPage(rp);
 	}
 
 	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)
