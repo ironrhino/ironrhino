@@ -45,6 +45,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
@@ -59,6 +60,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -351,7 +355,25 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 			restTemplate.exchange(requestEntity, Resource.class);
 			return null;
 		} else {
-			return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
+			JsonPointer pointer = method.getAnnotation(JsonPointer.class);
+			if (pointer == null) {
+				return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
+			} else {
+				AbstractJackson2HttpMessageConverter jackson = null;
+				for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
+					if (mc instanceof AbstractJackson2HttpMessageConverter) {
+						jackson = (AbstractJackson2HttpMessageConverter) mc;
+						break;
+					}
+				}
+				if (jackson == null)
+					throw new RuntimeException("AbstractJackson2HttpMessageConverter not present");
+				JsonNode tree = restTemplate.exchange(requestEntity, JsonNode.class).getBody().at(pointer.value());
+				ObjectMapper mapper = jackson.getObjectMapper();
+				if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
+					return tree;
+				return mapper.readValue(mapper.treeAsTokens(tree), mapper.getTypeFactory().constructType(type));
+			}
 		}
 	}
 

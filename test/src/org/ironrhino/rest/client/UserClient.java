@@ -26,6 +26,11 @@ public interface UserClient {
 	public ResultPage<User> paged(@RequestParam(defaultValue = "1") Integer pageNo,
 			@RequestParam(defaultValue = "10") Integer pageSize);
 
+	@JsonPointer("/result")
+	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
+	public List<User> pagedResult(@RequestParam(defaultValue = "1") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize);
+
 	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)
 	public void patch(@RequestBody User user);
 

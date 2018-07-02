@@ -51,6 +51,11 @@ public class RestApiTests {
 	}
 
 	@Test
+	public void testJsonPointer() {
+		assertEquals(1, userClient.pagedResult(1, 1).size());
+	}
+
+	@Test
 	public void testValidatePassword() {
 		User u = new User();
 		u.setPassword("password");
