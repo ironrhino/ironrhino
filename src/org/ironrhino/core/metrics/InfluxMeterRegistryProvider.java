@@ -10,9 +10,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.lang.Nullable;
 import io.micrometer.influx.InfluxConfig;
 import io.micrometer.influx.InfluxMeterRegistry;
+import io.micrometer.influx.InfluxNamingConvention;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -30,7 +33,22 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 		InfluxConfig config = key -> environment.getProperty(key, key.endsWith(".db") ? DEFAULT_DB : (String) null);
 		if (AddressAvailabilityCondition.check(config.uri(), 2000)) {
 			log.info("Add influx metrics registry {} with db '{}'", config.uri(), config.db());
-			return Optional.of(new InfluxMeterRegistry(config, Clock.SYSTEM, new NameableThreadFactory("metrics")));
+			MeterRegistry meterRegistry = new InfluxMeterRegistry(config, Clock.SYSTEM,
+					new NameableThreadFactory("metrics"));
+			// revert https://github.com/micrometer-metrics/micrometer/issues/693
+			meterRegistry.config().namingConvention(new InfluxNamingConvention() {
+
+				@Override
+				public String name(String name, Meter.Type type, @Nullable String baseUnit) {
+					return format(name.replace("=", "_"));
+				}
+
+				private String format(String name) {
+					// https://docs.influxdata.com/influxdb/v1.3/write_protocols/line_protocol_reference/#special-characters
+					return name.replace(",", "\\,").replace(" ", "\\ ").replace("=", "\\=").replace("\"", "\\\"");
+				}
+			});
+			return Optional.of(meterRegistry);
 		} else {
 			log.warn("Skip influx metrics registry {} with db '{}'", config.uri(), config.db());
 			return Optional.empty();
