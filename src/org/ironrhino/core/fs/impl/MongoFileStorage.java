@@ -11,14 +11,12 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
+import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
 import org.ironrhino.core.util.StringUtils;
@@ -227,26 +225,22 @@ public class MongoFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public Map<String, Boolean> listFilesAndDirectory(String path) {
+	public List<FileInfo> listFilesAndDirectory(String path) {
 		path = normalizePath(path);
-		final Map<String, Boolean> map = new HashMap<>();
+		final List<FileInfo> list = new ArrayList<>();
 		if (!"/".equals(path)) {
 			File file = mongoTemplate.findById(path, File.class);
 			if (file == null || !file.isDirectory())
-				return Collections.emptyMap();
+				return Collections.emptyList();
 		}
 		String regex = "^" + path.replaceAll("\\.", "\\\\.") + (path.endsWith("/") ? "" : "/") + "[^/]*$";
 		List<File> files = mongoTemplate.find(new Query(where("path").regex(regex)), File.class);
 		for (File f : files) {
 			String name = f.getPath();
-			map.put(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory());
+			list.add(new FileInfo(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory()));
 		}
-		List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
 		list.sort(COMPARATOR);
-		Map<String, Boolean> sortedMap = new LinkedHashMap<>();
-		for (Map.Entry<String, Boolean> entry : list)
-			sortedMap.put(entry.getKey(), entry.getValue());
-		return sortedMap;
+		return list;
 	}
 
 	private String normalizePath(String path) {

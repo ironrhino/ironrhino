@@ -4,22 +4,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import org.ironrhino.core.util.ValueThenKeyComparator;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 
 public interface FileStorage {
 
-	ValueThenKeyComparator<String, Boolean> COMPARATOR = new ValueThenKeyComparator<String, Boolean>() {
-		@Override
-		protected int compareValue(Boolean a, Boolean b) {
-			return b.compareTo(a);
-		}
-	};
+	int DEFAULT_PAGE_SIZE = 20;
+
+	Comparator<FileInfo> COMPARATOR = Comparator.comparing(FileInfo::isFile).thenComparing(FileInfo::getName);
 
 	public default boolean isBucketBased() {
 		try {
@@ -38,15 +35,35 @@ public interface FileStorage {
 			directory = "/";
 		if (!directory.endsWith("/"))
 			directory = directory + "/";
-		Map<String, Boolean> files = this.listFilesAndDirectory(directory);
-		for (Map.Entry<String, Boolean> entry : files.entrySet()) {
-			String path = directory + entry.getKey();
-			if (entry.getValue()) {
-				target.write(this.open(path), path);
-				if (removeSourceFiles)
-					this.delete(path);
-			} else {
-				migrateTo(target, path, removeSourceFiles);
+		boolean paging = this.isBucketBased();
+		if (paging) {
+			String marker = null;
+			Paged<FileInfo> files = null;
+			do {
+				files = this.listFilesAndDirectory(directory, 100, marker);
+				for (FileInfo entry : files.getResult()) {
+					String path = directory + entry.getName();
+					if (entry.isFile()) {
+						target.write(this.open(path), path);
+						if (removeSourceFiles)
+							this.delete(path);
+					} else {
+						migrateTo(target, path, removeSourceFiles);
+					}
+				}
+				marker = files.getNextMarker();
+			} while (marker != null);
+		} else {
+			List<FileInfo> files = this.listFilesAndDirectory(directory);
+			for (FileInfo entry : files) {
+				String path = directory + entry.getName();
+				if (entry.isFile()) {
+					target.write(this.open(path), path);
+					if (removeSourceFiles)
+						this.delete(path);
+				} else {
+					migrateTo(target, path, removeSourceFiles);
+				}
 			}
 		}
 		if (removeSourceFiles && !directory.equals("/"))
@@ -90,7 +107,42 @@ public interface FileStorage {
 
 	public List<String> listFiles(String path) throws IOException;
 
-	public Map<String, Boolean> listFilesAndDirectory(String path) throws IOException;
+	public default Paged<String> listFiles(String path, int limit, String marker) throws IOException {
+		if (limit < 1 || limit > 1000)
+			limit = DEFAULT_PAGE_SIZE;
+		if (marker != null && marker.isEmpty())
+			marker = null;
+		List<String> files = listFiles(path);
+		int start = marker == null ? 0 : files.indexOf(marker);
+		if (start == -1)
+			return new Paged<>(marker, null, Collections.emptyList());
+		return new Paged<>(marker, start + limit < files.size() ? files.get(start + limit) : null,
+				files.subList(start, Math.min(start + limit, files.size())));
+	}
+
+	public List<FileInfo> listFilesAndDirectory(String path) throws IOException;
+
+	public default Paged<FileInfo> listFilesAndDirectory(String path, int limit, String marker) throws IOException {
+		if (limit < 1 || limit > 1000)
+			limit = 20;
+		if (marker != null && marker.isEmpty())
+			marker = null;
+		List<FileInfo> files = listFilesAndDirectory(path);
+		int start;
+		if (marker == null) {
+			start = 0;
+		} else {
+			start = -1;
+			for (int i = 0; i < files.size(); i++) {
+				if (files.get(i).getName().equals(marker))
+					start = i;
+			}
+			if (start == -1)
+				return new Paged<>(marker, null, Collections.emptyList());
+		}
+		return new Paged<>(marker, start + limit < files.size() ? files.get(start + limit).getName() : null,
+				files.subList(start, Math.min(start + limit, files.size())));
+	}
 
 	public String getFileUrl(String path);
 

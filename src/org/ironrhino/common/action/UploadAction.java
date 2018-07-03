@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -18,7 +19,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.common.support.UploadFilesHandler;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
+import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.fs.FileStorage;
+import org.ironrhino.core.fs.Paged;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
@@ -66,7 +69,25 @@ public class UploadAction extends BaseAction {
 	private boolean json;
 
 	@Getter
-	private Map<String, Boolean> files;
+	@Setter
+	private String marker;
+
+	@Getter
+	@Setter
+	private String previousMarker;
+
+	@Getter
+	@Setter
+	private Integer limit;
+
+	@Getter
+	private Paged<FileInfo> pagedFiles;
+
+	@Getter
+	private List<FileInfo> files;
+
+	@Getter
+	private Map<String, Boolean> fileMap; // for json output
 
 	@Value("${upload.excludeSuffix:jsp,jspx,php,asp,rb,py,sh}")
 	private String excludeSuffix;
@@ -179,10 +200,24 @@ public class UploadAction extends BaseAction {
 			if (folder.length() > 0 && !folder.startsWith("/"))
 				folder = '/' + folder;
 		}
-		files = new LinkedHashMap<>();
-		if (StringUtils.isNotBlank(folder))
-			files.put("..", Boolean.FALSE);
-		files.putAll(uploadFileStorage.listFilesAndDirectory(FileUtils.normalizePath(getUploadRootDir() + folder)));
+		String path = FileUtils.normalizePath(getUploadRootDir() + folder);
+		boolean paging = uploadFileStorage.isBucketBased() || marker != null || limit != null;
+		if (paging) {
+			int ps = FileStorage.DEFAULT_PAGE_SIZE;
+			if (limit != null)
+				ps = limit;
+			pagedFiles = uploadFileStorage.listFilesAndDirectory(path, ps, marker);
+			List<FileInfo> temp = new ArrayList<>();
+			if (StringUtils.isNotBlank(folder))
+				temp.add(new FileInfo("..", false));
+			temp.addAll(pagedFiles.getResult());
+			pagedFiles = new Paged<>(pagedFiles.getMarker(), pagedFiles.getNextMarker(), temp);
+		} else {
+			files = new ArrayList<>();
+			if (StringUtils.isNotBlank(folder))
+				files.add(new FileInfo("..", false));
+			files.addAll(uploadFileStorage.listFilesAndDirectory(path));
+		}
 		return ServletActionContext.getRequest().getParameter("pick") != null ? "pick" : LIST;
 	}
 
@@ -240,18 +275,18 @@ public class UploadAction extends BaseAction {
 		return list();
 	}
 
-	@JsonConfig(root = "files")
+	@JsonConfig(root = "fileMap")
 	public String files() throws IOException {
 		String path = FileUtils.normalizePath(getUploadRootDir() + '/' + folder);
-		Map<String, Boolean> map = uploadFileStorage.listFilesAndDirectory(path);
-		files = new LinkedHashMap<>();
+		List<FileInfo> list = uploadFileStorage.listFilesAndDirectory(path);
+		fileMap = new LinkedHashMap<>();
 		String[] suffixes = null;
 		if (StringUtils.isNotBlank(suffix))
 			suffixes = suffix.toLowerCase(Locale.ROOT).split("\\s*,\\s*");
-		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
-			String s = entry.getKey();
-			if (!entry.getValue()) {
-				files.put(FileUtils.normalizePath(folder + '/' + s) + "/", false);
+		for (FileInfo entry : list) {
+			String s = entry.getName();
+			if (!entry.isFile()) {
+				fileMap.put(FileUtils.normalizePath(folder + '/' + s) + "/", false);
 			} else {
 				if (suffixes != null) {
 					boolean matches = false;
@@ -268,7 +303,7 @@ public class UploadAction extends BaseAction {
 				if (!url.endsWith("/"))
 					sb.append("/");
 				sb.append(s);
-				files.put(sb.toString(), true);
+				fileMap.put(sb.toString(), true);
 			}
 		}
 		return JSON;

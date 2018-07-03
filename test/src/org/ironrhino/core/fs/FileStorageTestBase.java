@@ -2,6 +2,7 @@ package org.ironrhino.core.fs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -79,35 +79,77 @@ public abstract class FileStorageTestBase {
 		fs.mkdir("/test");
 		List<String> files = fs.listFiles("/");
 		assertTrue(files.isEmpty());
-		Map<String, Boolean> map = fs.listFilesAndDirectory("/");
-		assertTrue(map.size() == 1);
-		assertFalse(map.get("test"));
+		List<FileInfo> fileList = fs.listFilesAndDirectory("/");
+		assertTrue(fileList.size() == 1);
+		assertFalse(isFile(fileList, "test"));
 		writeToFile(fs, "test", "/test.txt");
 		files = fs.listFiles("/");
 		assertTrue(files.size() == 1);
-		map = fs.listFilesAndDirectory("/");
-		assertTrue(map.size() == 2);
-		assertTrue(map.get("test.txt"));
-		assertFalse(map.get("test"));
+		fileList = fs.listFilesAndDirectory("/");
+		assertTrue(fileList.size() == 2);
+		assertTrue(isFile(fileList, "test.txt"));
+		assertFalse(isFile(fileList, "test"));
 
 		fs.mkdir("/test/test2");
 		files = fs.listFiles("/test");
 		assertTrue(files.isEmpty());
-		map = fs.listFilesAndDirectory("/test");
-		assertTrue(map.size() == 1);
-		assertFalse(map.get("test2"));
+		fileList = fs.listFilesAndDirectory("/test");
+		assertTrue(fileList.size() == 1);
+		assertFalse(isFile(fileList, "test2"));
 		writeToFile(fs, "test", "/test/test.txt");
 		files = fs.listFiles("/test");
 		assertTrue(files.size() == 1);
-		map = fs.listFilesAndDirectory("/test");
-		assertTrue(map.size() == 2);
-		assertTrue(map.get("test.txt"));
-		assertFalse(map.get("test2"));
+		fileList = fs.listFilesAndDirectory("/test");
+		assertTrue(fileList.size() == 2);
+		assertTrue(isFile(fileList, "test.txt"));
+		assertFalse(isFile(fileList, "test2"));
 
 		fs.delete("/test/test2/");
 		fs.delete("/test/test.txt");
 		fs.delete("/test.txt");
 		fs.delete("/test");
+	}
+
+	@Test
+	public void testListFilesWithMarker() throws IOException {
+		String text = "test";
+		for (int i = 0; i < 5; i++)
+			fs.mkdir("/test/testdir" + i);
+		for (int i = 0; i < 5; i++)
+			writeToFile(fs, text, "/test/test" + i + ".txt");
+		Paged<String> paged = fs.listFiles("/test", 2, null);
+		assertNull(paged.getMarker());
+		assertNotNull(paged.getNextMarker());
+		assertEquals(2, paged.getResult().size());
+		paged = fs.listFiles("/test", 2, paged.getNextMarker());
+		assertNotNull(paged.getMarker());
+		assertNotNull(paged.getNextMarker());
+		assertEquals(2, paged.getResult().size());
+		paged = fs.listFiles("/test", 2, paged.getNextMarker());
+		assertNotNull(paged.getMarker());
+		// assertNull(paged.getNextMarker());
+		assertEquals(1, paged.getResult().size());
+		Paged<FileInfo> paged2 = fs.listFilesAndDirectory("/test", 5, null);
+		assertNull(paged2.getMarker());
+		assertNotNull(paged2.getNextMarker());
+		assertEquals(5, paged2.getResult().size());
+		paged2 = fs.listFilesAndDirectory("/test", 5, paged2.getNextMarker());
+		assertNotNull(paged2.getMarker());
+		assertNull(paged2.getNextMarker());
+		assertEquals(5, paged2.getResult().size());
+		for (int i = 0; i < 5; i++)
+			fs.delete("/test/test" + i + ".txt");
+		for (int i = 0; i < 5; i++)
+			fs.delete("/test/testdir" + i);
+		fs.delete("/test");
+	}
+
+	private static boolean isFile(List<FileInfo> files, String name) {
+		for (FileInfo file : files) {
+			if (file.getName().equals(name))
+				return file.isFile();
+		}
+		throw new IllegalArgumentException("file '" + name + "' not found");
 	}
 
 	protected static void writeToFile(FileStorage fs, String text, String path) throws IOException {

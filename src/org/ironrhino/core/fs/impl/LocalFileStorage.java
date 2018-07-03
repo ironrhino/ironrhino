@@ -10,14 +10,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
+import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -123,23 +121,20 @@ public class LocalFileStorage extends AbstractFileStorage {
 			}
 			return false;
 		});
+		list.sort(null);
 		return list;
 	}
 
 	@Override
-	public Map<String, Boolean> listFilesAndDirectory(String path) {
+	public List<FileInfo> listFilesAndDirectory(String path) {
 		path = normalizePath(path);
-		final Map<String, Boolean> map = new HashMap<>();
+		final List<FileInfo> list = new ArrayList<>();
 		new File(directory, path).listFiles(f -> {
-			map.put(f.getName(), f.isFile());
+			list.add(new FileInfo(f.getName(), f.isFile()));
 			return false;
 		});
-		List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
 		list.sort(COMPARATOR);
-		Map<String, Boolean> sortedMap = new LinkedHashMap<>();
-		for (Map.Entry<String, Boolean> entry : list)
-			sortedMap.put(entry.getKey(), entry.getValue());
-		return sortedMap;
+		return list;
 	}
 
 	private String normalizePath(String path) {

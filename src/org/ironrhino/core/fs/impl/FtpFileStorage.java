@@ -7,10 +7,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,6 +29,7 @@ import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.FileUtils;
@@ -353,30 +351,27 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 	@Override
 	public List<String> listFiles(String path) throws IOException {
-		return execute(ftpClient -> {
+		List<String> result = execute(ftpClient -> {
 			List<String> list = new ArrayList<>();
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
 				if (f.isFile())
 					list.add(f.getName());
 			}
+
 			return list;
 		});
-
+		result.sort(null);
+		return result;
 	}
 
 	@Override
-	public Map<String, Boolean> listFilesAndDirectory(String path) throws IOException {
+	public List<FileInfo> listFilesAndDirectory(String path) throws IOException {
 		return execute(ftpClient -> {
-			final Map<String, Boolean> map = new HashMap<>();
-			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
-				map.put(f.getName(), f.isFile());
-			}
-			List<Map.Entry<String, Boolean>> list = new ArrayList<>(map.entrySet());
+			final List<FileInfo> list = new ArrayList<>();
+			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient)))
+				list.add(new FileInfo(f.getName(), f.isFile()));
 			list.sort(COMPARATOR);
-			Map<String, Boolean> sortedMap = new LinkedHashMap<>();
-			for (Map.Entry<String, Boolean> entry : list)
-				sortedMap.put(entry.getKey(), entry.getValue());
-			return sortedMap;
+			return list;
 		});
 	}
 
