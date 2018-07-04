@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
+import org.ironrhino.core.util.LimitExceededException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -118,6 +119,8 @@ public class LocalFileStorage extends AbstractFileStorage {
 		new File(directory, path).listFiles(f -> {
 			if (f.isFile()) {
 				list.add(f.getName());
+				if (list.size() > MAX_PAGE_SIZE)
+					throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			}
 			return false;
 		});
@@ -131,6 +134,8 @@ public class LocalFileStorage extends AbstractFileStorage {
 		final List<FileInfo> list = new ArrayList<>();
 		new File(directory, path).listFiles(f -> {
 			list.add(new FileInfo(f.getName(), f.isFile()));
+			if (list.size() > MAX_PAGE_SIZE)
+				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			return false;
 		});
 		list.sort(COMPARATOR);

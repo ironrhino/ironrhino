@@ -33,6 +33,7 @@ import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.FileUtils;
+import org.ironrhino.core.util.LimitExceededException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -356,8 +357,9 @@ public class FtpFileStorage extends AbstractFileStorage {
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
 				if (f.isFile())
 					list.add(f.getName());
+				if (list.size() > MAX_PAGE_SIZE)
+					throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			}
-
 			return list;
 		});
 		result.sort(null);
@@ -366,13 +368,16 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 	@Override
 	public List<FileInfo> listFilesAndDirectory(String path) throws IOException {
-		return execute(ftpClient -> {
+		List<FileInfo> result = execute(ftpClient -> {
 			final List<FileInfo> list = new ArrayList<>();
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient)))
 				list.add(new FileInfo(f.getName(), f.isFile()));
-			list.sort(COMPARATOR);
+			if (list.size() > MAX_PAGE_SIZE)
+				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			return list;
 		});
+		result.sort(COMPARATOR);
+		return result;
 	}
 
 	private String getPathname(String path, FTPClient ftpClient) throws IOException {

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.fs.Paged;
+import org.ironrhino.core.util.LimitExceededException;
 
 public abstract class BucketFileStorage extends AbstractFileStorage {
 
@@ -50,6 +51,8 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 		do {
 			Paged<String> paged = listFiles(path, getBatchSize(), marker);
 			list.addAll(paged.getResult());
+			if (list.size() > MAX_PAGE_SIZE)
+				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			marker = paged.getNextMarker();
 		} while (marker != null);
 		Collections.sort(list);
@@ -79,6 +82,8 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 		do {
 			Paged<FileInfo> paged = listFilesAndDirectory(path, getBatchSize(), marker);
 			list.addAll(paged.getResult());
+			if (list.size() > MAX_PAGE_SIZE)
+				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			marker = paged.getNextMarker();
 		} while (marker != null);
 		list.sort(COMPARATOR);

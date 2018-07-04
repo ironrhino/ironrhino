@@ -19,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
+import org.ironrhino.core.util.LimitExceededException;
 import org.ironrhino.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
@@ -219,6 +220,8 @@ public class MongoFileStorage extends AbstractFileStorage {
 				continue;
 			String name = f.getPath();
 			list.add(name.substring(name.lastIndexOf('/') + 1));
+			if (list.size() > MAX_PAGE_SIZE)
+				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 		}
 		list.sort(null);
 		return list;
@@ -238,6 +241,8 @@ public class MongoFileStorage extends AbstractFileStorage {
 		for (File f : files) {
 			String name = f.getPath();
 			list.add(new FileInfo(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory()));
+			if (list.size() > MAX_PAGE_SIZE)
+				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 		}
 		list.sort(COMPARATOR);
 		return list;
