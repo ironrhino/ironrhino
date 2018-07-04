@@ -65,7 +65,15 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())
 			marker = null;
-		return doListFiles(path, limit, marker);
+		List<String> list = new ArrayList<>();
+		String nextMarker = marker;
+		do {
+			// result.size() < limit if mixed with directory
+			Paged<String> result = doListFiles(path, limit - list.size(), nextMarker);
+			list.addAll(result.getResult());
+			nextMarker = result.getNextMarker();
+		} while (list.size() < limit && nextMarker != null);
+		return new Paged<>(marker, nextMarker, list);
 	}
 
 	protected Paged<String> defaultListFiles(String path, int limit, String marker) throws IOException {
