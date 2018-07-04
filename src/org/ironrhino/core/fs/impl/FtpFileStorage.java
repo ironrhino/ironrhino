@@ -371,7 +371,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 		List<FileInfo> result = execute(ftpClient -> {
 			final List<FileInfo> list = new ArrayList<>();
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient)))
-				list.add(new FileInfo(f.getName(), f.isFile()));
+				list.add(new FileInfo(f.getName(), f.isFile(), f.getSize(), f.getTimestamp().getTimeInMillis()));
 			if (list.size() > MAX_PAGE_SIZE)
 				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			return list;

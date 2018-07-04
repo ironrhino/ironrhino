@@ -15,4 +15,12 @@ public class FileInfo implements Serializable {
 
 	private final boolean file;
 
+	private final long size;
+
+	private final long lastModified;
+
+	public FileInfo(String name, boolean file) {
+		this(name, file, 0, 0);
+	}
+
 }

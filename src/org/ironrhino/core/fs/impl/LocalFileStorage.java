@@ -133,7 +133,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 		path = normalizePath(path);
 		final List<FileInfo> list = new ArrayList<>();
 		new File(directory, path).listFiles(f -> {
-			list.add(new FileInfo(f.getName(), f.isFile()));
+			list.add(new FileInfo(f.getName(), f.isFile(), f.length(), f.lastModified()));
 			if (list.size() > MAX_PAGE_SIZE)
 				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			return false;

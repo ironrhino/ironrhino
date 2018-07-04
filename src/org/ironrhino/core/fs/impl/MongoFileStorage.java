@@ -240,7 +240,8 @@ public class MongoFileStorage extends AbstractFileStorage {
 		List<File> files = mongoTemplate.find(new Query(where("path").regex(regex)), File.class);
 		for (File f : files) {
 			String name = f.getPath();
-			list.add(new FileInfo(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory()));
+			list.add(new FileInfo(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory(), f.getData().length,
+					f.getLastModified()));
 			if (list.size() > MAX_PAGE_SIZE)
 				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 		}
