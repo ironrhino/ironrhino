@@ -14,7 +14,9 @@ import org.springframework.http.MediaTypeFactory;
 
 public interface FileStorage {
 
-	int DEFAULT_PAGE_SIZE = 20;
+	int DEFAULT_PAGE_SIZE = 100;
+
+	int MAX_PAGE_SIZE = 10000;
 
 	Comparator<FileInfo> COMPARATOR = Comparator.comparing(FileInfo::isFile).thenComparing(FileInfo::getName);
 
@@ -108,7 +110,7 @@ public interface FileStorage {
 	public List<String> listFiles(String path) throws IOException;
 
 	public default Paged<String> listFiles(String path, int limit, String marker) throws IOException {
-		if (limit < 1 || limit > 1000)
+		if (limit < 1 || limit > MAX_PAGE_SIZE)
 			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())
 			marker = null;
@@ -123,7 +125,7 @@ public interface FileStorage {
 	public List<FileInfo> listFilesAndDirectory(String path) throws IOException;
 
 	public default Paged<FileInfo> listFilesAndDirectory(String path, int limit, String marker) throws IOException {
-		if (limit < 1 || limit > 1000)
+		if (limit < 1 || limit > MAX_PAGE_SIZE)
 			limit = 20;
 		if (marker != null && marker.isEmpty())
 			marker = null;
