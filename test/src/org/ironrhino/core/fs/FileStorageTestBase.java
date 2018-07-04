@@ -77,7 +77,7 @@ public abstract class FileStorageTestBase {
 	@Test
 	public void testListFiles() throws IOException {
 		fs.mkdir("/test");
-		List<String> files = fs.listFiles("/");
+		List<FileInfo> files = fs.listFiles("/");
 		assertTrue(files.isEmpty());
 		List<FileInfo> fileList = fs.listFilesAndDirectory("/");
 		assertTrue(fileList.size() == 1);
@@ -117,7 +117,7 @@ public abstract class FileStorageTestBase {
 			fs.mkdir("/test/testdir" + i);
 		for (int i = 0; i < 5; i++)
 			writeToFile(fs, text, "/test/test" + i + ".txt");
-		Paged<String> paged = fs.listFiles("/test", 2, null);
+		Paged<FileInfo> paged = fs.listFiles("/test", 2, null);
 		assertNull(paged.getMarker());
 		assertNotNull(paged.getNextMarker());
 		assertEquals(2, paged.getResult().size());

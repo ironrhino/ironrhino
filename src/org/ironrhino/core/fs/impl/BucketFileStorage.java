@@ -2,8 +2,8 @@ package org.ironrhino.core.fs.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.fs.Paged;
@@ -45,43 +45,47 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public List<String> listFiles(String path) throws IOException {
-		List<String> list = new ArrayList<>();
+	public List<FileInfo> listFiles(String path) throws IOException {
+		List<FileInfo> list = new ArrayList<>();
 		String marker = null;
 		do {
-			Paged<String> paged = listFiles(path, getBatchSize(), marker);
+			Paged<FileInfo> paged = listFiles(path, getBatchSize(), marker);
 			list.addAll(paged.getResult());
 			if (list.size() > MAX_PAGE_SIZE)
 				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			marker = paged.getNextMarker();
 		} while (marker != null);
-		Collections.sort(list);
+		list.sort(COMPARATOR);
 		return list;
 	}
 
 	@Override
-	public Paged<String> listFiles(String path, int limit, String marker) throws IOException {
+	public Paged<FileInfo> listFiles(String path, int limit, String marker) throws IOException {
 		if (limit < 1 || limit > MAX_PAGE_SIZE)
 			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())
 			marker = null;
-		List<String> list = new ArrayList<>();
+		List<FileInfo> list = new ArrayList<>();
 		String nextMarker = marker;
 		do {
 			// result.size() < limit if mixed with directory
-			Paged<String> result = doListFiles(path, limit - list.size(), nextMarker);
+			Paged<FileInfo> result = doListFiles(path, limit - list.size(), nextMarker);
 			list.addAll(result.getResult());
 			nextMarker = result.getNextMarker();
 		} while (list.size() < limit && nextMarker != null);
 		return new Paged<>(marker, nextMarker, list);
 	}
 
-	protected Paged<String> defaultListFiles(String path, int limit, String marker) throws IOException {
+	protected Paged<FileInfo> defaultListFiles(String path, int limit, String marker) throws IOException {
 		// Some implementation doesn't support pagination
 		return super.listFiles(path, limit, marker);
 	}
 
-	protected abstract Paged<String> doListFiles(String path, int limit, String marker) throws IOException;
+	protected Paged<FileInfo> doListFiles(String path, int limit, String marker) throws IOException {
+		Paged<FileInfo> all = doListFilesAndDirectory(path, limit, marker);
+		return new Paged<>(all.getMarker(), all.getNextMarker(),
+				all.getResult().stream().filter(FileInfo::isFile).collect(Collectors.toList()));
+	}
 
 	@Override
 	public List<FileInfo> listFilesAndDirectory(String path) throws IOException {

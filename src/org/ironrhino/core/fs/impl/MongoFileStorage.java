@@ -205,25 +205,26 @@ public class MongoFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public List<String> listFiles(String path) {
+	public List<FileInfo> listFiles(String path) {
 		path = normalizePath(path);
 		if (!"/".equals(path)) {
 			File file = mongoTemplate.findById(path, File.class);
 			if (file == null || !file.isDirectory())
 				return Collections.emptyList();
 		}
-		List<String> list = new ArrayList<>();
+		List<FileInfo> list = new ArrayList<>();
 		String regex = "^" + path.replaceAll("\\.", "\\\\.") + (path.endsWith("/") ? "" : "/") + "[^/]*$";
 		List<File> files = mongoTemplate.find(new Query(where("path").regex(regex)), File.class);
 		for (File f : files) {
 			if (f.isDirectory())
 				continue;
 			String name = f.getPath();
-			list.add(name.substring(name.lastIndexOf('/') + 1));
+			list.add(new FileInfo(name.substring(name.lastIndexOf('/') + 1), true, f.getData().length,
+					f.getLastModified()));
 			if (list.size() > MAX_PAGE_SIZE)
 				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 		}
-		list.sort(null);
+		list.sort(COMPARATOR);
 		return list;
 	}
 

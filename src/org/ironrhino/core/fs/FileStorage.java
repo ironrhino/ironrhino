@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -107,43 +106,24 @@ public interface FileStorage {
 
 	public long getLastModified(String path) throws IOException;
 
-	public List<String> listFiles(String path) throws IOException;
+	public List<FileInfo> listFiles(String path) throws IOException;
 
-	public default Paged<String> listFiles(String path, int limit, String marker) throws IOException {
+	public default Paged<FileInfo> listFiles(String path, int limit, String marker) throws IOException {
 		if (limit < 1 || limit > MAX_PAGE_SIZE)
 			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())
 			marker = null;
-		List<String> files = listFiles(path);
-		int start = marker == null ? 0 : files.indexOf(marker);
-		if (start == -1)
-			return new Paged<>(marker, null, Collections.emptyList());
-		return new Paged<>(marker, start + limit < files.size() ? files.get(start + limit) : null,
-				files.subList(start, Math.min(start + limit, files.size())));
+		return Paged.from(listFiles(path), limit, marker, FileInfo::getName);
 	}
 
 	public List<FileInfo> listFilesAndDirectory(String path) throws IOException;
 
 	public default Paged<FileInfo> listFilesAndDirectory(String path, int limit, String marker) throws IOException {
 		if (limit < 1 || limit > MAX_PAGE_SIZE)
-			limit = 20;
+			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())
 			marker = null;
-		List<FileInfo> files = listFilesAndDirectory(path);
-		int start;
-		if (marker == null) {
-			start = 0;
-		} else {
-			start = -1;
-			for (int i = 0; i < files.size(); i++) {
-				if (files.get(i).getName().equals(marker))
-					start = i;
-			}
-			if (start == -1)
-				return new Paged<>(marker, null, Collections.emptyList());
-		}
-		return new Paged<>(marker, start + limit < files.size() ? files.get(start + limit).getName() : null,
-				files.subList(start, Math.min(start + limit, files.size())));
+		return Paged.from(listFilesAndDirectory(path), limit, marker, FileInfo::getName);
 	}
 
 	public String getFileUrl(String path);

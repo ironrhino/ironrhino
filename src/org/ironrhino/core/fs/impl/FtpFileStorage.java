@@ -351,18 +351,18 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public List<String> listFiles(String path) throws IOException {
-		List<String> result = execute(ftpClient -> {
-			List<String> list = new ArrayList<>();
+	public List<FileInfo> listFiles(String path) throws IOException {
+		List<FileInfo> result = execute(ftpClient -> {
+			List<FileInfo> list = new ArrayList<>();
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
 				if (f.isFile())
-					list.add(f.getName());
+					list.add(new FileInfo(f.getName(), true, f.getSize(), f.getTimestamp().getTimeInMillis()));
 				if (list.size() > MAX_PAGE_SIZE)
 					throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			}
 			return list;
 		});
-		result.sort(null);
+		result.sort(COMPARATOR);
 		return result;
 	}
 
