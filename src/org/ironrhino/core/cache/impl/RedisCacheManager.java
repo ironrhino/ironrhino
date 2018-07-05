@@ -233,8 +233,8 @@ public class RedisCacheManager implements CacheManager {
 			throw new IllegalArgumentException("delta should great than 0");
 		String actualkey = generateKey(key, namespace);
 		Long result = (Long) cacheRedisTemplate.execute(decrementPositiveScript,
-				cacheRedisTemplate.getStringSerializer(), null, Collections.singletonList(actualkey),
-				String.valueOf(delta));
+				cacheRedisTemplate.getStringSerializer(), cacheRedisTemplate.getValueSerializer(),
+				Collections.singletonList(actualkey), String.valueOf(delta));
 		if (result == null)
 			throw new RuntimeException("Unexpected null");
 		if (result == -1)
@@ -258,7 +258,6 @@ public class RedisCacheManager implements CacheManager {
 		} else {
 			return key;
 		}
-
 	}
 
 	@Override
