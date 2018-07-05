@@ -42,7 +42,7 @@ public class SettingControl {
 	public static final String SETTING_KEY_SETUP_TIMESTAMP = "setup.timestamp";
 
 	@Autowired
-	private EntityManager<Setting> entityManager;
+	private EntityManager<String, Setting> entityManager;
 
 	private volatile Map<String, Setting> settings;
 

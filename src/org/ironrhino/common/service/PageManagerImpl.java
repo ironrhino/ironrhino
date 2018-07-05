@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManager {
+public class PageManagerImpl extends BaseManagerImpl<String, Page> implements PageManager {
 
 	@Autowired(required = false)
 	private transient SearchService<Page> searchService;

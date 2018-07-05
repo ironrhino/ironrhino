@@ -34,7 +34,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 	private Class<T> entityClass;
 
 	@Autowired
-	private EntityManager<T> entityManager;
+	private EntityManager<Long, T> entityManager;
 
 	public BaseTreeControl() {
 		@SuppressWarnings("unchecked")

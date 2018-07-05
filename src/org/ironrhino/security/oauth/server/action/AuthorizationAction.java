@@ -17,7 +17,7 @@ import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 import lombok.Getter;
 import lombok.Setter;
 
-public class AuthorizationAction extends EntityAction<Authorization> {
+public class AuthorizationAction extends EntityAction<String, Authorization> {
 
 	private static final long serialVersionUID = 2920367147774798742L;
 

@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DictionaryControl {
 
 	@Autowired
-	private EntityManager<Dictionary> entityManager;
+	private EntityManager<String, Dictionary> entityManager;
 
 	private volatile Map<String, Dictionary> map;
 

@@ -329,10 +329,11 @@ public class CriterionUtils {
 							|| elementType != null && Persistable.class.isAssignableFrom(elementType)) {
 						// @ManyToOne or @OneToOne or @ManyToMany
 						@SuppressWarnings("unchecked")
-						Class<? extends Persistable<?>> enClass = (Class<? extends Persistable<?>>) (elementType != null
+						Class<Persistable<Serializable>> enClass = (Class<Persistable<Serializable>>) (elementType != null
 								? elementType
 								: type);
-						BaseManager<?> em = ApplicationContextUtils.getEntityManager(enClass);
+						BaseManager<Serializable, Persistable<Serializable>> em = ApplicationContextUtils
+								.getEntityManager(enClass);
 						try {
 							BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(enClass);
 							subBeanWrapper.setConversionService(conversionService);

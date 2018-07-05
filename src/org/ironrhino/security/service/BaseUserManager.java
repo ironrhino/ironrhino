@@ -11,7 +11,7 @@ import org.ironrhino.security.model.BaseUser;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface BaseUserManager<T extends BaseUser>
-		extends BaseManager<T>, PasswordMutator<T>, ConcreteUserDetailsService<T> {
+		extends BaseManager<String, T>, PasswordMutator<T>, ConcreteUserDetailsService<T> {
 
 	@Override
 	default boolean accepts(String username) {

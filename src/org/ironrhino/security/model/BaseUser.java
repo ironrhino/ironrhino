@@ -223,9 +223,9 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 			attributes.put(key, value);
 	}
 
-	public <T extends Persistable<?>> T getExtra(Class<T> clazz) {
+	public <T extends Persistable<String>> T getExtra(Class<T> clazz) {
 		T extra = null;
-		BaseManager<T> baseManager = ApplicationContextUtils.getEntityManager(clazz);
+		BaseManager<String, T> baseManager = ApplicationContextUtils.getEntityManager(clazz);
 		if (baseManager != null)
 			extra = baseManager.get(getId());
 		return extra;
@@ -241,7 +241,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 				throw new IllegalArgumentException(className + " not found");
 			}
 		}
-		return (clazz != null) ? getExtra(clazz) : null;
+		return (clazz != null) ? getExtra((Class<Persistable<String>>) clazz) : null;
 	}
 
 	@Override

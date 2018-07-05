@@ -7,7 +7,7 @@ import org.ironrhino.common.model.Page;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.service.BaseManager;
 
-public interface PageManager extends BaseManager<Page> {
+public interface PageManager extends BaseManager<String, Page> {
 
 	Page getByPath(String path);
 

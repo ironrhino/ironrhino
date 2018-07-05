@@ -39,7 +39,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-public class UserAction extends EntityAction<User> {
+public class UserAction extends EntityAction<String, User> {
 
 	private static final long serialVersionUID = -79191921685741502L;
 

@@ -6,7 +6,7 @@ import org.ironrhino.common.model.Setting;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.struts.EntityAction;
 
-public class SettingAction extends EntityAction<Setting> {
+public class SettingAction extends EntityAction<String, Setting> {
 
 	private static final long serialVersionUID = -9014704633958010335L;
 

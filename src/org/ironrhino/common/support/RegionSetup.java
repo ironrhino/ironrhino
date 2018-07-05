@@ -52,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RegionSetup {
 
 	@Autowired
-	private EntityManager<Region> entityManager;
+	private EntityManager<Long, Region> entityManager;
 
 	private AtomicInteger count = new AtomicInteger();
 

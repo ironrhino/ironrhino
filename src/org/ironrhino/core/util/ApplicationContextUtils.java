@@ -1,5 +1,6 @@
 package org.ironrhino.core.util;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,24 +60,31 @@ public class ApplicationContextUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Persistable<?>> BaseManager<T> getEntityManager(Class<T> entityClass) {
-		String[] beanNames = getApplicationContext()
-				.getBeanNamesForType(ResolvableType.forClassWithGenerics(BaseManager.class, entityClass));
-		if (beanNames.length == 1) {
-			return (BaseManager<T>) getApplicationContext().getBean(beanNames[0]);
-		} else if (beanNames.length > 1) {
+	public static <PK extends Serializable, T extends Persistable<PK>> BaseManager<PK, T> getEntityManager(
+			Class<T> entityClass) {
+		String[] beanNames;
+		try {
+			beanNames = getApplicationContext().getBeanNamesForType(ResolvableType.forClassWithGenerics(
+					BaseManager.class, entityClass.getMethod("getId").getReturnType(), entityClass));
+			if (beanNames.length == 1) {
+				return (BaseManager<PK, T>) getApplicationContext().getBean(beanNames[0]);
+			}
+		} catch (NoSuchMethodException e) {
+			beanNames = new String[0];
+		}
+		if (beanNames.length > 1) {
 			for (String beanName : beanNames) {
 				Object bean = getApplicationContext().getBean(beanName);
 				if (bean.getClass().isAnnotationPresent(Primary.class))
-					return (BaseManager<T>) bean;
+					return (BaseManager<PK, T>) bean;
 			}
 			for (String beanName : beanNames) {
 				if (beanName.equals(StringUtils.uncapitalize(entityClass.getSimpleName()) + "Manager"))
-					return (BaseManager<T>) getApplicationContext().getBean(beanName);
+					return (BaseManager<PK, T>) getApplicationContext().getBean(beanName);
 			}
-			return (BaseManager<T>) getApplicationContext().getBean(beanNames[0]);
+			return (BaseManager<PK, T>) getApplicationContext().getBean(beanNames[0]);
 		} else {
-			EntityManager<T> entityManager = getApplicationContext().getBean("entityManager", EntityManager.class);
+			EntityManager<PK, T> entityManager = getApplicationContext().getBean("entityManager", EntityManager.class);
 			entityManager.setEntityClass(entityClass);
 			return entityManager;
 		}

@@ -34,15 +34,15 @@ public class ApplicationContextUtilsTest {
 			ctx.register(EntityManagerConfig.class);
 			ctx.refresh();
 
-			BaseManager<Company> companyBaseManager = ApplicationContextUtils.getEntityManager(Company.class);
+			BaseManager<String, Company> companyBaseManager = ApplicationContextUtils.getEntityManager(Company.class);
 			assertThat(companyBaseManager, is(notNullValue()));
 			assertThat(companyBaseManager instanceof EntityManager, is(true));
 
-			BaseManager<Boss> bossManager = ApplicationContextUtils.getEntityManager(Boss.class);
+			BaseManager<String, Boss> bossManager = ApplicationContextUtils.getEntityManager(Boss.class);
 			assertThat(bossManager, is(notNullValue()));
 			assertThat(bossManager instanceof BossManagerImpl, is(true));
 
-			BaseManager<Customer> customerManager = ApplicationContextUtils.getEntityManager(Customer.class);
+			BaseManager<String, Customer> customerManager = ApplicationContextUtils.getEntityManager(Customer.class);
 			assertThat(customerManager, is(notNullValue()));
 			assertThat(customerManager instanceof PrimaryCustomerManagerImpl, is(true));
 		}
@@ -68,7 +68,7 @@ public class ApplicationContextUtilsTest {
 		}
 
 		@Bean
-		public EntityManager<?> entityManager() {
+		public EntityManager<?, ?> entityManager() {
 			return new EntityManagerImpl<>();
 		}
 
@@ -89,19 +89,19 @@ public class ApplicationContextUtilsTest {
 
 	}
 
-	interface BossManager extends BaseManager<Boss> {
+	interface BossManager extends BaseManager<String, Boss> {
 	}
 
-	static class BossManagerImpl extends BaseManagerImpl<Boss> implements BossManager {
+	static class BossManagerImpl extends BaseManagerImpl<String, Boss> implements BossManager {
 	}
 
-	interface CustomerManager extends BaseManager<Customer> {
+	interface CustomerManager extends BaseManager<String, Customer> {
 	}
 
-	static class CustomerManagerImpl extends BaseManagerImpl<Customer> implements CustomerManager {
+	static class CustomerManagerImpl extends BaseManagerImpl<String, Customer> implements CustomerManager {
 	}
 
 	@Primary
-	static class PrimaryCustomerManagerImpl extends BaseManagerImpl<Customer> implements CustomerManager {
+	static class PrimaryCustomerManagerImpl extends BaseManagerImpl<String, Customer> implements CustomerManager {
 	}
 }

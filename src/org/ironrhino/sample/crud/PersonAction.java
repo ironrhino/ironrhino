@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.Setter;
 
-public class PersonAction extends EntityAction<Person> {
+public class PersonAction extends EntityAction<Identity, Person> {
 
 	private static final long serialVersionUID = 7605233440758696630L;
 
 	@Autowired
-	private EntityManager<Person> personManager;
+	private EntityManager<Identity, Person> personManager;
 
 	@Setter
 	private File file;

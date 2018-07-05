@@ -28,7 +28,7 @@ import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 import lombok.Getter;
 import lombok.Setter;
 
-public class PageAction extends EntityAction<Page> {
+public class PageAction extends EntityAction<String, Page> {
 
 	private static final long serialVersionUID = 67252386921293136L;
 

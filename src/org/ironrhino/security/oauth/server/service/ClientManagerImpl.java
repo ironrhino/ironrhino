@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class ClientManagerImpl extends BaseManagerImpl<Client> implements ClientManager {
+public class ClientManagerImpl extends BaseManagerImpl<String, Client> implements ClientManager {
 
 	@Override
 	@Transactional(readOnly = true)
 	@CheckCache(namespace = "oauth:client", key = "${id}", timeToIdle = "3600")
-	public Client get(Serializable id) {
+	public Client get(String id) {
 		return super.get(id);
 	}
 

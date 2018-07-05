@@ -39,7 +39,7 @@ public class RegionTreeAction extends BaseAction {
 	private Long parent;
 
 	@Autowired
-	private EntityManager<Region> entityManager;
+	private EntityManager<Long, Region> entityManager;
 
 	@Autowired(required = false)
 	private BaseTreeControl<Region> regionTreeControl;

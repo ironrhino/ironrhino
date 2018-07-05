@@ -102,7 +102,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class EntityAction<EN extends Persistable<?>> extends BaseAction {
+public class EntityAction<PK extends Serializable, EN extends Persistable<PK>> extends BaseAction {
 
 	private static final long serialVersionUID = -8442983706126047413L;
 
@@ -289,7 +289,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return _uiConfigs;
 	}
 
-	protected <T extends Persistable<?>> BaseManager<T> getEntityManager(Class<T> entityClass) {
+	protected <_PK extends Serializable, T extends Persistable<_PK>> BaseManager<_PK, T> getEntityManager(
+			Class<T> entityClass) {
 		return ApplicationContextUtils.getEntityManager(entityClass);
 	}
 
@@ -298,7 +299,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	protected void tryFindEntity() {
-		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
+		BaseManager<PK, EN> entityManager = getEntityManager(getEntityClass());
 		try {
 			BeanWrapperImpl bw = new BeanWrapperImpl(newEntityInstance());
 			bw.setConversionService(conversionService);
@@ -307,16 +308,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				String uid = getUid();
 				if (uid.indexOf('.') > 0) {
 					safeSetPropertyValue(bw, "id", uid.substring(0, uid.indexOf('.')));
-					_entity = entityManager.get((Serializable) bw.getPropertyValue("id"));
-					if (_entity == null && naturalIds.size() == 1) {
-						String naturalIdName = naturalIds.iterator().next();
-						safeSetPropertyValue(bw, naturalIdName, uid.substring(0, uid.indexOf('.')));
-						_entity = entityManager.findByNaturalId((Serializable) bw.getPropertyValue(naturalIdName));
-					}
-				}
-				if (_entity == null) {
+					_entity = entityManager.get((PK) bw.getPropertyValue("id"));
+					bw.setPropertyValue("id", uid.substring(0, uid.indexOf('.')));
+					_entity = entityManager.get((PK) bw.getPropertyValue("id"));
 					safeSetPropertyValue(bw, "id", uid);
-					_entity = entityManager.get((Serializable) bw.getPropertyValue("id"));
+					_entity = entityManager.get((PK) bw.getPropertyValue("id"));
 					if (_entity == null && naturalIds.size() == 1) {
 						String naturalIdName = naturalIds.iterator().next();
 						safeSetPropertyValue(bw, naturalIdName, uid);
@@ -778,7 +774,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			if (isTreeable())
 				((BaseTreeableEntity) _entity)
-						.setParent((BaseTreeableEntity) getEntityManager(getEntityClass()).get(parent));
+						.setParent((BaseTreeableEntity) getEntityManager(getEntityClass()).get((PK) parent));
 		}
 
 		for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
@@ -794,7 +790,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				return INPUT;
 			}
 		}
-		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
+		BaseManager<PK, EN> entityManager = getEntityManager(getEntityClass());
 		String versionPropertyName = getVersionPropertyName();
 		Object previousVersion = null;
 		if (versionPropertyName != null) {
@@ -826,7 +822,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		boolean idAssigned = isIdAssigned();
 		boolean fromList = "cell".equalsIgnoreCase(request.getHeader("X-Edit"));
 		Map<String, UiConfigImpl> uiConfigs = getUiConfigs();
-		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
+		BaseManager<PK, EN> entityManager = getEntityManager(getEntityClass());
 		_entity = constructEntity();
 		BeanWrapperImpl bw = new BeanWrapperImpl(_entity);
 		bw.setConversionService(conversionService);
@@ -974,7 +970,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				logger.error(e.getMessage(), e);
 			}
 		} else {
-			EN persisted = entityManager.get((Serializable) bw.getPropertyValue("id"));
+			EN persisted = entityManager.get((PK) bw.getPropertyValue("id"));
 			if (persisted == null) {
 				addFieldError("id", getText("validation.not.exists"));
 				return false;
@@ -1098,7 +1094,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (isTreeable()) {
 			Collection siblings = null;
 			BaseTreeableEntity treeEntity = (BaseTreeableEntity) _entity;
-			BaseTreeableEntity parentEntity = (BaseTreeableEntity) entityManager.get(parent);
+			BaseTreeableEntity parentEntity = (BaseTreeableEntity) entityManager.get((PK) parent);
 			if (parentEntity == null) {
 				DetachedCriteria dc = entityManager.detachedCriteria();
 				dc.add(Restrictions.isNull("parent"));
@@ -1326,15 +1322,15 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	protected String doDelete() throws Exception {
-		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
+		BaseManager<PK, EN> entityManager = getEntityManager(getEntityClass());
 		String[] arr = getId();
-		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
+		PK[] id = (PK[]) ((arr != null) ? new Serializable[arr.length] : new Serializable[0]);
 		try {
 			BeanWrapperImpl bw = new BeanWrapperImpl(newEntityInstance());
 			bw.setConversionService(conversionService);
 			for (int i = 0; i < id.length; i++) {
 				bw.setPropertyValue("id", arr[i]);
-				id[i] = (Serializable) bw.getPropertyValue("id");
+				id[i] = (PK) bw.getPropertyValue("id");
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -1357,7 +1353,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			boolean deletable = true;
 			String expression = getReadonly().getExpression();
 			if (ownerProperty != null || StringUtils.isNotBlank(expression)) {
-				for (Serializable uid : id) {
+				for (PK uid : id) {
 					EN en = entityManager.get(uid);
 					if (en == null)
 						continue;
@@ -1584,15 +1580,15 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	protected String updateEnabled(boolean enabled) throws Exception {
-		BaseManager<EN> em = getEntityManager(getEntityClass());
+		BaseManager<PK, EN> em = getEntityManager(getEntityClass());
 		String[] arr = getId();
-		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
+		PK[] id = (PK[]) ((arr != null) ? new Serializable[arr.length] : new Serializable[0]);
 		try {
 			BeanWrapperImpl bw = new BeanWrapperImpl(newEntityInstance());
 			bw.setConversionService(conversionService);
 			for (int i = 0; i < id.length; i++) {
 				bw.setPropertyValue("id", arr[i]);
-				id[i] = (Serializable) bw.getPropertyValue("id");
+				id[i] = (PK) bw.getPropertyValue("id");
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -1611,7 +1607,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					}
 				}
 			}
-			for (Serializable s : id) {
+			for (PK s : id) {
 				Enableable en = (Enableable) em.get(s);
 				if (en == null || en.isEnabled() == enabled)
 					continue;
@@ -1728,7 +1724,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (!isTreeable())
 			return NOTFOUND;
 		if (parent != null && parent > 0) {
-			_entity = getEntityManager(getEntityClass()).get(parent);
+			_entity = getEntityManager(getEntityClass()).get((PK) parent);
 			if (_entity == null)
 				return NOTFOUND;
 			putEntityToValueStack(_entity);
@@ -1795,7 +1791,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	// need call once before view
 	protected Class<EN> getEntityClass() {
 		if (entityClass == null)
-			entityClass = (Class<EN>) ReflectionUtils.getGenericClass(getClass());
+			entityClass = (Class<EN>) ReflectionUtils.getGenericClass(getClass(), 1);
 		if (entityClass == null) {
 			ActionProxy proxy = ActionContext.getContext().getActionInvocation().getProxy();
 			String actionName = getEntityName();
