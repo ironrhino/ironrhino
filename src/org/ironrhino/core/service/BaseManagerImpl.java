@@ -551,7 +551,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public List<T> find(final String queryString, final Object... args) {
 		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
 		for (int i = 0; i < args.length; i++)
-			query.setParameter(String.valueOf(i + 1), args[i]);
+			query.setParameter(i + 1, args[i]);
 		return query.list();
 	}
 
@@ -629,7 +629,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public int executeUpdate(String queryString, Object... args) {
 		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
 		for (int i = 0; i < args.length; i++) {
-			query.setParameter(String.valueOf(i + 1), args[i]);
+			query.setParameter(i + 1, args[i]);
 		}
 		return query.executeUpdate();
 	}
