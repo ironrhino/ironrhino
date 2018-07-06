@@ -28,7 +28,8 @@
 +netty-all
 -xmemcached
 -ironrhino-redis-config
--eaxy
++byte-buddy
++mockito-core
 -struts2-spring-plugin
 -struts2-jasperreports-plugin
 -struts2-sitemesh-plugin
