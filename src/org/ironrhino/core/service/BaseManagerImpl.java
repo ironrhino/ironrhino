@@ -21,7 +21,6 @@ import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
-import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
 import org.hibernate.LockOptions;
 import org.hibernate.ObjectNotFoundException;
@@ -113,32 +112,29 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
 			final BaseTreeableEntity entity = (BaseTreeableEntity) obj;
-			boolean childrenNeedChange = false;
+			boolean positionChanged = false;
 			if (entity.isNew()) {
-				FlushMode mode = session.getHibernateFlushMode();
-				session.setHibernateFlushMode(FlushMode.MANUAL);
-				entity.setFullId("");
 				session.save(entity);
 				session.flush();
-				session.setHibernateFlushMode(mode);
+				positionChanged = true;
 			} else {
-				childrenNeedChange = (entity.getParent() == null && entity.getLevel() != 1
+				positionChanged = (entity.getParent() == null && entity.getLevel() != 1
 						|| entity.getParent() != null && (entity.getLevel() - entity.getParent().getLevel() != 1
-								|| !entity.getFullId().startsWith(entity.getParent().getFullId())))
-						&& entity.isHasChildren();
+								|| !entity.getFullId().startsWith(entity.getParent().getFullId())));
 			}
-			String fullId = String.valueOf(entity.getId()) + ".";
-			if (entity.getParent() != null)
-				fullId = entity.getParent().getFullId() + fullId;
-			entity.setFullId(fullId);
-			entity.setLevel(fullId.split("\\.").length);
-			if (entity.getParent() != null)
-				entity.setParent(entity.getParent()); // recalculate fullname
+			if (positionChanged) {
+				String fullId = String.valueOf(entity.getId()) + ".";
+				if (entity.getParent() != null)
+					fullId = entity.getParent().getFullId() + fullId;
+				entity.setFullId(fullId);
+				entity.setLevel(fullId.split("\\.").length);
+				if (entity.getParent() != null)
+					entity.setParent(entity.getParent()); // recalculate fullname
+			}
 			session.saveOrUpdate(obj);
-			if (childrenNeedChange) {
-				for (Object c : entity.getChildren()) {
+			if (positionChanged) {
+				for (Object c : entity.getChildren())
 					save((T) c);
-				}
 			}
 		} else {
 			if (isnew)
