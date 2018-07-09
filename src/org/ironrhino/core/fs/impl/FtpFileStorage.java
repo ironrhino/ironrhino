@@ -182,7 +182,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 				}
 			}
 		};
-		GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+		GenericObjectPoolConfig<FTPClient> poolConfig = new GenericObjectPoolConfig<>();
 		poolConfig.setMaxTotal(maxTotal);
 		poolConfig.setMaxIdle(maxIdle);
 		poolConfig.setMinIdle(minIdle);
