@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -267,8 +268,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public boolean mkdir(String path) throws IOException {
-		return execute(ftpClient -> {
+	public boolean mkdir(String path) {
+		return executeWrapped(ftpClient -> {
 			String pathname = getPathname(path, ftpClient);
 			String workingDirectory = ftpClient.printWorkingDirectory();
 			workingDirectory = org.ironrhino.core.util.StringUtils.trimTailSlash(workingDirectory);
@@ -288,8 +289,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public boolean delete(String path) throws IOException {
-		return execute(ftpClient -> {
+	public boolean delete(String path) {
+		return executeWrapped(ftpClient -> {
 			String pathname = getPathname(path, ftpClient);
 			ftpClient.changeWorkingDirectory(pathname);
 			if (ftpClient.getReplyCode() != 550) {
@@ -302,8 +303,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public long getLastModified(String path) throws IOException {
-		return execute(ftpClient -> {
+	public long getLastModified(String path) {
+		return executeWrapped(ftpClient -> {
 			String modificationTime = ftpClient.getModificationTime(getPathname(path, ftpClient));
 			if (modificationTime != null)
 				try {
@@ -312,22 +313,22 @@ public class FtpFileStorage extends AbstractFileStorage {
 				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}
-			return -1L;
+			return 0L;
 		});
 
 	}
 
 	@Override
-	public boolean exists(String path) throws IOException {
-		boolean isFile = execute(ftpClient -> {
+	public boolean exists(String path) {
+		boolean isFile = executeWrapped(ftpClient -> {
 			return ftpClient.getModificationTime(getPathname(path, ftpClient)) != null;
 		});
 		return isFile || isDirectory(path);
 	}
 
 	@Override
-	public boolean rename(String fromPath, String toPath) throws IOException {
-		return execute(ftpClient -> {
+	public boolean rename(String fromPath, String toPath) {
+		return executeWrapped(ftpClient -> {
 			String _fromPath = getPathname(fromPath, ftpClient);
 			String _toPath = getPathname(toPath, ftpClient);
 			String s1 = _fromPath.substring(0, _fromPath.lastIndexOf('/'));
@@ -343,16 +344,18 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public boolean isDirectory(String path) throws IOException {
-		return execute(ftpClient -> {
+	public boolean isDirectory(String path) {
+		if (path.equals("") || path.equals("/"))
+			return true;
+		return executeWrapped(ftpClient -> {
 			ftpClient.changeWorkingDirectory(getPathname(path, ftpClient));
 			return ftpClient.getReplyCode() != 550;
 		});
 	}
 
 	@Override
-	public List<FileInfo> listFiles(String path) throws IOException {
-		List<FileInfo> result = execute(ftpClient -> {
+	public List<FileInfo> listFiles(String path) {
+		List<FileInfo> result = executeWrapped(ftpClient -> {
 			List<FileInfo> list = new ArrayList<>();
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
 				if (f.isFile())
@@ -367,8 +370,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public List<FileInfo> listFilesAndDirectory(String path) throws IOException {
-		List<FileInfo> result = execute(ftpClient -> {
+	public List<FileInfo> listFilesAndDirectory(String path) {
+		List<FileInfo> result = executeWrapped(ftpClient -> {
 			final List<FileInfo> list = new ArrayList<>();
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient)))
 				list.add(new FileInfo(f.getName(), f.isFile(), f.getSize(), f.getTimestamp().getTimeInMillis()));
@@ -385,6 +388,14 @@ public class FtpFileStorage extends AbstractFileStorage {
 			path = "/" + path;
 		String wd = StringUtils.isBlank(workingDirectory) ? ftpClient.printWorkingDirectory() : workingDirectory;
 		return FileUtils.normalizePath(wd + uri.getPath() + path);
+	}
+
+	protected <T> T executeWrapped(Callback<T> callback) {
+		try {
+			return execute(callback);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	public <T> T execute(Callback<T> callback) throws IOException {

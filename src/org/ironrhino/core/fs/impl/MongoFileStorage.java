@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -18,14 +17,15 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.FileUtils;
 import org.ironrhino.core.util.LimitExceededException;
-import org.ironrhino.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import lombok.Data;
 
@@ -44,83 +44,59 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public void write(InputStream is, String path) throws IOException {
+		if (path.equals("") || path.endsWith("/"))
+			throw new ErrorMessage("path " + path + " is directory");
 		path = normalizePath(path);
-		if (path.equals("/"))
-			throw new IOException("cannot direct access path /");
-		File file = mongoTemplate.findById(path, File.class);
-		if (file == null) {
-			int lastIndex = path.lastIndexOf('/');
-			if (lastIndex > 0) {
-				int index = 0;
-				while (index < lastIndex) {
-					index = path.indexOf('/', index + 1);
-					if (index < 0)
-						break;
-					String parent = path.substring(0, index);
-					File parentFile = mongoTemplate.findById(parent, File.class);
-					if (parentFile == null) {
-						parentFile = new File();
-						parentFile.setPath(parent);
-						parentFile.setDirectory(true);
-						parentFile.setLastModified(System.currentTimeMillis());
-						mongoTemplate.save(parentFile);
-					} else if (!parentFile.isDirectory())
-						throw new IOException("parent " + parent + " is not directory while writing path " + path);
-				}
-			}
-			file = new File();
-			file.setPath(path);
-		} else if (file.isDirectory())
-			throw new IOException("path " + path + " is directory,can not be written");
+		int lastIndex = path.lastIndexOf('/');
+		if (lastIndex > 0)
+			mkdir(path.substring(0, lastIndex));
 		try (InputStream ins = is; ByteArrayOutputStream os = new ByteArrayOutputStream(512 * 1024)) {
 			IOUtils.copy(is, os);
+			File file = new File();
+			file.setPath(path);
 			file.setData(os.toByteArray());
 			file.setLastModified(System.currentTimeMillis());
+			mongoTemplate.save(file);
 		}
-		mongoTemplate.save(file);
 	}
 
 	@Override
 	public InputStream open(String path) throws IOException {
 		path = normalizePath(path);
-		if (path.equals("/"))
-			return null;
 		File file = mongoTemplate.findById(path, File.class);
-		if (file == null)
-			return null;
-		if (file.isDirectory())
+		if (file == null || file.isDirectory())
 			return null;
 		return new ByteArrayInputStream(file.getData());
 	}
 
 	@Override
 	public boolean mkdir(String path) {
-		path = normalizePath(path);
-		if (path.equals("/"))
+		if (path.equals("") || path.equals("/"))
 			return true;
-		path = StringUtils.trimTailSlash(path);
-		File file = mongoTemplate.findById(path, File.class);
-		if (file != null)
-			return file.isDirectory();
+		path = normalizePath(path);
 		int lastIndex = path.lastIndexOf('/');
 		if (lastIndex > 0) {
 			int index = 0;
-			while (index <= lastIndex) {
+			while (index < lastIndex) {
 				index = path.indexOf('/', index + 1);
 				if (index < 0)
 					break;
-				String parent = path.substring(0, index);
-				File parentFile = mongoTemplate.findById(parent, File.class);
-				if (parentFile == null) {
-					parentFile = new File();
-					parentFile.setPath(parent);
-					parentFile.setDirectory(true);
-					parentFile.setLastModified(System.currentTimeMillis());
-					mongoTemplate.save(parentFile);
-				} else if (!parentFile.isDirectory())
+				if (!doMkdir(path.substring(0, index)))
 					return false;
 			}
 		}
+		return doMkdir(path);
+	}
+
+	protected boolean doMkdir(String path) {
+		if (path.equals("") || path.equals("/"))
+			return true;
+		if (!path.endsWith("/"))
+			path += "/";
+		path = normalizePath(path);
+		File file = mongoTemplate.findById(path, File.class);
+		if (file != null)
+			return file.isDirectory();
 		file = new File();
 		file.setPath(path);
 		file.setDirectory(true);
@@ -131,41 +107,38 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean delete(String path) {
+		if (path.equals("") || path.equals("/"))
+			return false;
 		path = normalizePath(path);
-		if (path.equals("/"))
-			return false;
-		path = StringUtils.trimTailSlash(path);
-		File file = mongoTemplate.findById(path, File.class);
-		if (file == null)
-			return false;
-		if (file.isDirectory()) {
-			int size = mongoTemplate
-					.find(new Query(where("path").regex("^" + path.replaceAll("\\.", "\\\\.") + "/.*")).limit(1),
-							File.class)
-					.size();
-			if (size > 0)
+		if (path.lastIndexOf('.') <= path.lastIndexOf('/') && isDirectory(path)) {
+			if (!path.endsWith("/"))
+				path += "/";
+			if (listFilesAndDirectory(path).size() > 0)
 				return false;
+			mongoTemplate.remove(new Query(where("path").is(path)), File.class);
+			return true;
+		} else {
+			mongoTemplate.remove(new Query(where("path").is(path)), File.class);
+			return true;
 		}
-		mongoTemplate.remove(file);
-		return true;
 	}
 
 	@Override
 	public long getLastModified(String path) {
+		if (path.equals("") || path.equals("/"))
+			return 0;
 		path = normalizePath(path);
-		if (path.equals("/"))
-			return -1;
-		path = StringUtils.trimTailSlash(path);
 		File file = mongoTemplate.findById(path, File.class);
-		return file != null ? file.getLastModified() : -1;
+		return file != null ? file.getLastModified() : 0;
 	}
 
 	@Override
 	public boolean exists(String path) {
-		path = normalizePath(path);
-		if (path.equals("/"))
+		if (path.equals("") || path.equals("/"))
 			return true;
-		path = StringUtils.trimTailSlash(path);
+		if (path.endsWith("/"))
+			return isDirectory(path);
+		path = normalizePath(path);
 		return mongoTemplate.findById(path, File.class) != null;
 	}
 
@@ -196,31 +169,32 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
-		path = normalizePath(path);
-		if (path.equals("/"))
+		if (path.equals("") || path.equals("/"))
 			return true;
-		path = StringUtils.trimTailSlash(path);
+		if (!path.endsWith("/"))
+			path += '/';
+		path = normalizePath(path);
 		File file = mongoTemplate.findById(path, File.class);
 		return file != null && file.isDirectory();
 	}
 
 	@Override
 	public List<FileInfo> listFiles(String path) {
+		if (!path.endsWith("/"))
+			path += "/";
 		path = normalizePath(path);
-		if (!"/".equals(path)) {
-			File file = mongoTemplate.findById(path, File.class);
-			if (file == null || !file.isDirectory())
-				return Collections.emptyList();
-		}
 		List<FileInfo> list = new ArrayList<>();
-		String regex = "^" + path.replaceAll("\\.", "\\\\.") + (path.endsWith("/") ? "" : "/") + "[^/]*$";
+		String regex;
+		if ("".equals(path)) {
+			regex = "^[^/]+$";
+		} else {
+			regex = "^" + path.replaceAll("\\.", "\\\\.") + "[^/]+$";
+		}
 		List<File> files = mongoTemplate.find(new Query(where("path").regex(regex)), File.class);
 		for (File f : files) {
-			if (f.isDirectory())
-				continue;
 			String name = f.getPath();
-			list.add(new FileInfo(name.substring(name.lastIndexOf('/') + 1), true, f.getData().length,
-					f.getLastModified()));
+			name = name.substring(path.length());
+			list.add(new FileInfo(name, true, f.getData().length, f.getLastModified()));
 			if (list.size() > MAX_PAGE_SIZE)
 				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 		}
@@ -230,18 +204,23 @@ public class MongoFileStorage extends AbstractFileStorage {
 
 	@Override
 	public List<FileInfo> listFilesAndDirectory(String path) {
+		if (!path.endsWith("/"))
+			path += "/";
 		path = normalizePath(path);
-		final List<FileInfo> list = new ArrayList<>();
-		if (!"/".equals(path)) {
-			File file = mongoTemplate.findById(path, File.class);
-			if (file == null || !file.isDirectory())
-				return Collections.emptyList();
+		List<FileInfo> list = new ArrayList<>();
+		String regex;
+		if ("".equals(path)) {
+			regex = "^[^/]+\\/?$";
+		} else {
+			regex = "^" + path.replaceAll("\\.", "\\\\.") + "[^/]+\\/?$";
 		}
-		String regex = "^" + path.replaceAll("\\.", "\\\\.") + (path.endsWith("/") ? "" : "/") + "[^/]*$";
 		List<File> files = mongoTemplate.find(new Query(where("path").regex(regex)), File.class);
 		for (File f : files) {
 			String name = f.getPath();
-			list.add(new FileInfo(name.substring(name.lastIndexOf('/') + 1), !f.isDirectory(), f.getData().length,
+			name = name.substring(path.length());
+			if (f.isDirectory() && name.endsWith("/"))
+				name = name.substring(0, name.length() - 1);
+			list.add(new FileInfo(name, !f.isDirectory(), f.isDirectory() ? 0 : f.getData().length,
 					f.getLastModified()));
 			if (list.size() > MAX_PAGE_SIZE)
 				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
@@ -250,10 +229,8 @@ public class MongoFileStorage extends AbstractFileStorage {
 		return list;
 	}
 
-	private String normalizePath(String path) {
-		if (!path.startsWith("/"))
-			path = "/" + path;
-		return FileUtils.normalizePath(path);
+	protected String normalizePath(String path) {
+		return FileUtils.normalizePath(StringUtils.trimLeadingCharacter(path, '/'));
 	}
 
 	@Data

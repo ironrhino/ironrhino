@@ -94,21 +94,21 @@ public interface FileStorage {
 
 	public InputStream open(String path) throws IOException;
 
-	public boolean mkdir(String path) throws IOException;
+	public boolean mkdir(String path);
 
-	public boolean delete(String path) throws IOException;
+	public boolean delete(String path);
 
-	public boolean exists(String path) throws IOException;
+	public boolean exists(String path);
 
-	public boolean rename(String fromPath, String toPath) throws IOException;
+	public boolean rename(String fromPath, String toPath);
 
-	public boolean isDirectory(String path) throws IOException;
+	public boolean isDirectory(String path);
 
-	public long getLastModified(String path) throws IOException;
+	public long getLastModified(String path);
 
-	public List<FileInfo> listFiles(String path) throws IOException;
+	public List<FileInfo> listFiles(String path);
 
-	public default Paged<FileInfo> listFiles(String path, int limit, String marker) throws IOException {
+	public default Paged<FileInfo> listFiles(String path, int limit, String marker) {
 		if (limit < 1 || limit > MAX_PAGE_SIZE)
 			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())
@@ -116,9 +116,9 @@ public interface FileStorage {
 		return Paged.from(listFiles(path), limit, marker, FileInfo::getName);
 	}
 
-	public List<FileInfo> listFilesAndDirectory(String path) throws IOException;
+	public List<FileInfo> listFilesAndDirectory(String path);
 
-	public default Paged<FileInfo> listFilesAndDirectory(String path, int limit, String marker) throws IOException {
+	public default Paged<FileInfo> listFilesAndDirectory(String path, int limit, String marker) {
 		if (limit < 1 || limit > MAX_PAGE_SIZE)
 			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())

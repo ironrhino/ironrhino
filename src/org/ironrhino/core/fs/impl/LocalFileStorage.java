@@ -94,7 +94,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
-	public boolean rename(String fromPath, String toPath) throws IOException {
+	public boolean rename(String fromPath, String toPath) {
 		fromPath = normalizePath(directory.getPath() + "/" + fromPath);
 		toPath = normalizePath(directory.getPath() + "/" + toPath);
 		File source = new File(fromPath);
@@ -108,6 +108,8 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
+		if (path.equals("") || path.equals("/"))
+			return true;
 		path = normalizePath(path);
 		return new File(directory, path).isDirectory();
 	}

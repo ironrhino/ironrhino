@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +21,11 @@ public abstract class FileStorageTestBase {
 
 	@Autowired
 	protected FileStorage fs;
+
+	@Before
+	public void cleanup() {
+		//delete(fs, "/");
+	}
 
 	@Test
 	public void testDirectory() throws IOException {
@@ -156,6 +162,24 @@ public abstract class FileStorageTestBase {
 		byte[] bytes = text.getBytes();
 		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
 		fs.write(is, path, bytes.length);
+	}
+
+	protected static void delete(FileStorage fs, String directory) {
+		if (directory == null)
+			directory = "/";
+		if (!directory.endsWith("/"))
+			directory = directory + "/";
+		List<FileInfo> files = fs.listFilesAndDirectory(directory);
+		for (FileInfo entry : files) {
+			String path = directory + entry.getName();
+			if (entry.isFile()) {
+				fs.delete(path);
+			} else {
+				delete(fs, path);
+			}
+		}
+		if (!directory.equals("/"))
+			fs.delete(directory);
 	}
 
 }
