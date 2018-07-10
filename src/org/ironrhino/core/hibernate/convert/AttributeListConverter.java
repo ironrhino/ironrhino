@@ -12,6 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Attribute;
 import org.ironrhino.core.util.JsonUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+
 @Converter(autoApply = true)
 public class AttributeListConverter implements AttributeConverter<List<Attribute>, String> {
 
@@ -41,8 +44,19 @@ public class AttributeListConverter implements AttributeConverter<List<Attribute
 				attributes.add(new Attribute(entry.getKey(), entry.getValue()));
 			return attributes;
 		} catch (Exception e) {
-			throw new IllegalArgumentException(string + " is not valid json ", e);
+			if (e instanceof MismatchedInputException) {
+				// keep compatibility with legacy List<Attribute>
+				try {
+					return JsonUtils.fromJson(string, ATTRIBUTE_LIST);
+				} catch (Exception e2) {
+					throw new IllegalArgumentException(string + " is not valid json", e2);
+				}
+			}
+			throw new IllegalArgumentException(string + " is not valid json", e);
 		}
 	}
+
+	private static final TypeReference<List<Attribute>> ATTRIBUTE_LIST = new TypeReference<List<Attribute>>() {
+	};
 
 }
