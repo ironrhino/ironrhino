@@ -19,6 +19,10 @@ public interface FileStorage {
 
 	Comparator<FileInfo> COMPARATOR = Comparator.comparing(FileInfo::isFile).thenComparing(FileInfo::getName);
 
+	public default String getName() {
+		return "default";
+	}
+
 	public default boolean isBucketBased() {
 		try {
 			return getClass().getMethod("getBucket") != null;
