@@ -25,14 +25,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.support.RestGatewaySupport;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RestClient extends RestGatewaySupport implements BeanNameAware {
+public class RestClient implements BeanNameAware {
 
 	@Getter
 	@Setter
@@ -58,7 +57,10 @@ public class RestClient extends RestGatewaySupport implements BeanNameAware {
 	@Setter
 	protected String apiBaseUrl;
 
-	protected RestTemplate internalRestTemplate = new RestTemplate();
+	@Getter
+	protected final RestTemplate restTemplate = new RestClientTemplate(this);
+
+	protected final RestTemplate internalRestTemplate = new RestTemplate();
 
 	@Autowired(required = false)
 	private CacheManager cacheManager;
@@ -80,7 +82,6 @@ public class RestClient extends RestGatewaySupport implements BeanNameAware {
 			if (it.next() instanceof MappingJackson2XmlHttpMessageConverter)
 				it.remove();
 		}
-		setRestTemplate(new RestClientTemplate(this));
 	}
 
 	public RestClient(String accessTokenEndpoint, String clientId, String clientSecret) {
@@ -173,7 +174,10 @@ public class RestClient extends RestGatewaySupport implements BeanNameAware {
 			params.add("scope", getScope());
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 		try {
-			return internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
+			Token t = internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
+			if (t == null)
+				throw new RuntimeException(accessTokenEndpoint + " return no token");
+			return t;
 		} catch (HttpClientErrorException e) {
 			log.error(e.getResponseBodyAsString());
 			throw e;
