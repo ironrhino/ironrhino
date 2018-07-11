@@ -13,6 +13,8 @@ public abstract class RemotingContext {
 
 	public static final String CONTENT_TYPE_JSON_SERIALIZED_OBJECT = "application/x-json-serialized-object";
 
+	public static final String CONTENT_TYPE_SMILE_SERIALIZED_OBJECT = "application/x-smile-serialized-object";
+
 	public static final String HTTP_HEADER_EXCEPTION_MESSAGE = "X-Exception-Message";
 
 	public final static String HTTP_HEADER_PREFIX = "x-rc-";

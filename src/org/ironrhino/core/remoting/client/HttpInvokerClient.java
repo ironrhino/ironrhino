@@ -12,9 +12,9 @@ import java.util.concurrent.Future;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.remoting.GenericRemoteInvocation;
+import org.ironrhino.core.remoting.HttpInvokerSerializer;
+import org.ironrhino.core.remoting.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.RemotingContext;
-import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.spring.RemotingClientProxy;
@@ -62,8 +62,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	private int readTimeout = 60000;
 
 	@Getter
-	@Value("${httpInvoker.serialization.type:JAVA}")
-	private volatile SerializationType serializationType = SerializationType.JAVA;
+	private volatile HttpInvokerSerializer serializer;
 
 	@Value("${httpInvoker.loggingPayload:true}")
 	private boolean loggingPayload;
@@ -114,9 +113,10 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return getServiceInterface();
 	}
 
-	public void setSerializationType(SerializationType serializationType) {
-		this.serializationType = serializationType;
-		SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor(serializationType);
+	@Value("${httpInvoker.serialization.type:}")
+	public void setSerializationType(String serializationType) {
+		this.serializer = HttpInvokerSerializers.ofSerializationType(serializationType);
+		SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor(this.serializer);
 		executor.setConnectTimeout(connectTimeout);
 		executor.setReadTimeout(readTimeout);
 		executor.setBeanClassLoader(getBeanClassLoader());
@@ -138,7 +138,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			discovered = false;
 			urlFromDiscovery = true;
 		}
-		setSerializationType(getSerializationType());
 		super.afterPropertiesSet();
 		ProxyFactory pf = new ProxyFactory(getServiceInterface(), this);
 		pf.addInterface(RemotingClientProxy.class);
@@ -189,9 +188,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	@Override
 	protected RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
-		if (getSerializationType() == SerializationType.JSON)
-			return new GenericRemoteInvocation(methodInvocation);
-		return super.createRemoteInvocation(methodInvocation);
+		return serializer.createRemoteInvocation(methodInvocation);
 	}
 
 	@Override
@@ -259,8 +256,9 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	protected RemoteInvocationResult transformResult(RemoteInvocation invocation, MethodInvocation methodInvocation,
 			RemoteInvocationResult result) {
 		if (!result.hasException()) {
-			if (methodInvocation.getMethod().getReturnType() == Optional.class) {
-				result.setValue(Optional.ofNullable(result.getValue()));
+			Object value = result.getValue();
+			if (methodInvocation.getMethod().getReturnType() == Optional.class && !(value instanceof Optional)) {
+				result.setValue(Optional.ofNullable(value));
 			}
 		}
 		return result;
@@ -290,10 +288,16 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				}
 				if (--attempts < 1)
 					throw e;
-				if ((e instanceof SerializationFailedException) && getSerializationType() != SerializationType.JAVA) {
+				if ((e instanceof SerializationFailedException)
+						&& !serializer.equals(HttpInvokerSerializers.DEFAULT_SERIALIZER)) {
 					log.error("Downgrade service[{}] serialization from {} to {}: {}", getServiceInterface().getName(),
-							serializationType, SerializationType.JAVA, e.getMessage());
-					setSerializationType(SerializationType.JAVA);
+							serializer.getSerializationType(),
+							HttpInvokerSerializers.DEFAULT_SERIALIZER.getSerializationType(), e.getMessage());
+					setSerializationType(HttpInvokerSerializers.DEFAULT_SERIALIZER.getSerializationType());
+					RemoteInvocation newInvocation = HttpInvokerSerializers.DEFAULT_SERIALIZER
+							.createRemoteInvocation(methodInvocation);
+					newInvocation.setAttributes(invocation.getAttributes());
+					invocation = newInvocation;
 				} else {
 					if (urlFromDiscovery) {
 						if (discoveredHost != null) {

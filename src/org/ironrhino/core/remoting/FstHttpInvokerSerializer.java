@@ -11,9 +11,21 @@ import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
-public abstract class FstHttpInvokerSerializationHelper {
+public class FstHttpInvokerSerializer implements HttpInvokerSerializer {
 
-	public static void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
+	public static FstHttpInvokerSerializer INSTANCE = new FstHttpInvokerSerializer();
+
+	private FstHttpInvokerSerializer() {
+
+	}
+
+	@Override
+	public String getContentType() {
+		return RemotingContext.CONTENT_TYPE_FST_SERIALIZED_OBJECT;
+	}
+
+	@Override
+	public void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
 		FSTObjectOutput out = new FSTObjectOutput(os);
 		try {
 			out.writeObject(invocation);
@@ -22,7 +34,8 @@ public abstract class FstHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
+	@Override
+	public RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
 		FSTObjectInput in = new FSTObjectInput(is);
 		try {
 			Object obj = in.readObject();
@@ -38,8 +51,9 @@ public abstract class FstHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static void writeRemoteInvocationResult(RemoteInvocation invocation, RemoteInvocationResult result,
-			OutputStream os) throws IOException {
+	@Override
+	public void writeRemoteInvocationResult(RemoteInvocation invocation, RemoteInvocationResult result, OutputStream os)
+			throws IOException {
 		FSTObjectOutput out = new FSTObjectOutput(os);
 		try {
 			out.writeObject(result);
@@ -48,7 +62,8 @@ public abstract class FstHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
+	@Override
+	public RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
 		FSTObjectInput in = new FSTObjectInput(is);
 		try {
 			Object obj = in.readObject();

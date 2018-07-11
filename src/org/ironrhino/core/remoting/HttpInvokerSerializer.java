@@ -1,0 +1,35 @@
+package org.ironrhino.core.remoting;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.remoting.support.RemoteInvocation;
+import org.springframework.remoting.support.RemoteInvocationResult;
+
+public interface HttpInvokerSerializer {
+
+	public default String getSerializationType() {
+		String name = getClass().getSimpleName();
+		String suffix = HttpInvokerSerializer.class.getSimpleName();
+		if (name.endsWith(suffix))
+			name = name.substring(0, name.length() - suffix.length());
+		return name.toUpperCase();
+	}
+
+	public String getContentType();
+
+	public default RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
+		return new RemoteInvocation(methodInvocation);
+	}
+
+	public void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException;
+
+	public RemoteInvocation readRemoteInvocation(InputStream is) throws IOException;
+
+	public void writeRemoteInvocationResult(RemoteInvocation invocation, RemoteInvocationResult result, OutputStream os)
+			throws IOException;
+
+	public RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException;
+}

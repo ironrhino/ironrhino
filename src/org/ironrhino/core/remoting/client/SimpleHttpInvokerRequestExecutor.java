@@ -8,8 +8,9 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import org.ironrhino.core.remoting.HttpInvokerSerializer;
+import org.ironrhino.core.remoting.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.RemotingContext;
-import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
@@ -22,10 +23,10 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 public class SimpleHttpInvokerRequestExecutor
 		extends org.springframework.remoting.httpinvoker.SimpleHttpInvokerRequestExecutor {
 
-	private final SerializationType serializationType;
+	private final HttpInvokerSerializer serializer;
 
-	public SimpleHttpInvokerRequestExecutor(SerializationType serializationType) {
-		this.serializationType = serializationType;
+	public SimpleHttpInvokerRequestExecutor(HttpInvokerSerializer serializer) {
+		this.serializer = serializer;
 	}
 
 	@Override
@@ -48,18 +49,18 @@ public class SimpleHttpInvokerRequestExecutor
 
 	@Override
 	public String getContentType() {
-		return serializationType.getContentType();
+		return serializer.getContentType();
 	}
 
 	@Override
 	protected void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
-		serializationType.writeRemoteInvocation(invocation, decorateOutputStream(os));
+		serializer.writeRemoteInvocation(invocation, decorateOutputStream(os));
 	}
 
 	@Override
 	protected RemoteInvocationResult readRemoteInvocationResult(InputStream is, String codebaseUrl)
 			throws IOException, ClassNotFoundException {
-		return serializationType.readRemoteInvocationResult(decorateInputStream(is));
+		return serializer.readRemoteInvocationResult(decorateInputStream(is));
 	}
 
 	@Override
@@ -71,14 +72,15 @@ public class SimpleHttpInvokerRequestExecutor
 
 	@Override
 	protected RemoteInvocationResult doExecuteRequest(HttpInvokerClientConfiguration config, ByteArrayOutputStream baos)
-			throws IOException, ClassNotFoundException {
+			throws IOException {
 		HttpURLConnection con = openConnection(config);
 		prepareConnection(con, baos.size());
 		writeRequestBody(config, con, baos);
 		validateResponse(config, con);
 		InputStream responseBody = readResponseBody(config, con);
-		SerializationType serializationType = SerializationType.parse(con.getHeaderField(HttpHeaders.CONTENT_TYPE));
-		return serializationType.readRemoteInvocationResult(decorateInputStream(responseBody));
+		HttpInvokerSerializer serializer = HttpInvokerSerializers
+				.ofContentType(con.getHeaderField(HttpHeaders.CONTENT_TYPE));
+		return serializer.readRemoteInvocationResult(decorateInputStream(responseBody));
 	}
 
 }

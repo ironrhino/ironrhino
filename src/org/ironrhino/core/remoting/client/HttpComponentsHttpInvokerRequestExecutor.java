@@ -20,8 +20,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.ironrhino.core.remoting.HttpInvokerSerializer;
+import org.ironrhino.core.remoting.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.RemotingContext;
-import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
@@ -43,7 +44,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 
 	@Getter
 	@Setter
-	private SerializationType serializationType = SerializationType.JAVA;
+	private HttpInvokerSerializer serializer = HttpInvokerSerializers.DEFAULT_SERIALIZER;
 
 	@Getter
 	@Setter
@@ -72,7 +73,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 
 	@Override
 	protected RemoteInvocationResult doExecuteRequest(HttpInvokerClientConfiguration config, ByteArrayOutputStream baos)
-			throws IOException, ClassNotFoundException {
+			throws IOException {
 		HttpPost postMethod = new HttpPost(config.getServiceUrl());
 		postMethod.setHeader(HTTP_HEADER_CONTENT_TYPE, getContentType());
 		LocaleContext localeContext = LocaleContextHolder.getLocaleContext();
@@ -110,9 +111,9 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 			HttpEntity entity = rsp.getEntity();
 			InputStream responseBody = entity.getContent();
 			Header h = rsp.getFirstHeader(HttpHeaders.CONTENT_TYPE);
-			SerializationType serializationType = h != null ? SerializationType.parse(h.getValue())
-					: this.serializationType;
-			return serializationType.readRemoteInvocationResult(decorateInputStream(responseBody));
+			HttpInvokerSerializer serializer = h != null ? HttpInvokerSerializers.ofContentType(h.getValue())
+					: this.serializer;
+			return serializer.readRemoteInvocationResult(decorateInputStream(responseBody));
 		} finally {
 			rsp.close();
 			postMethod.releaseConnection();
@@ -131,18 +132,18 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 
 	@Override
 	public String getContentType() {
-		return serializationType.getContentType();
+		return serializer.getContentType();
 	}
 
 	@Override
 	protected void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
-		serializationType.writeRemoteInvocation(invocation, decorateOutputStream(os));
+		serializer.writeRemoteInvocation(invocation, decorateOutputStream(os));
 	}
 
 	@Override
 	protected RemoteInvocationResult readRemoteInvocationResult(InputStream is, String codebaseUrl)
 			throws IOException, ClassNotFoundException {
-		return serializationType.readRemoteInvocationResult(decorateInputStream(is));
+		return serializer.readRemoteInvocationResult(decorateInputStream(is));
 	}
 
 }

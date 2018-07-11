@@ -136,8 +136,8 @@ public abstract class RemoteServiceTestsBase {
 		}
 		cdl.await();
 		time = System.currentTimeMillis() - time;
-		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time
-				+ "ms (tps = " + (count.get() * 1000 / time) + ")");
+		System.out.println(getClass().getSimpleName() + " completed " + count.get() + " requests with concurrency("
+				+ THREADS + ") in " + time + "ms (tps = " + (count.get() * 1000 / time) + ")");
 		assertEquals(count.get(), THREADS * LOOP);
 	}
 

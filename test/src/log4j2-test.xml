@@ -2,7 +2,7 @@
 <Configuration>
 	<Appenders>
 		<Console name="CONSOLE" target="SYSTEM_OUT">
-			<ThresholdFilter level="${sys:console.logger.level}"/>
+			<ThresholdFilter level="WARN"/>
 			<PatternLayout pattern="%highlight{%d %c %p %m%n}" noConsoleNoAnsi="true"/>
 		</Console>
 	</Appenders>

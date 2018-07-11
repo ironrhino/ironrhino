@@ -21,8 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 
+import org.ironrhino.core.remoting.HttpInvokerSerializer;
+import org.ironrhino.core.remoting.HttpInvokerSerializers;
+import org.ironrhino.core.remoting.JavaHttpInvokerSerializer;
 import org.ironrhino.core.remoting.RemotingContext;
-import org.ironrhino.core.remoting.SerializationType;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.ServiceStats;
 import org.ironrhino.core.servlet.AccessFilter;
@@ -52,8 +54,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	private static ThreadLocal<Object> service = new ThreadLocal<>();
 
-	private static ThreadLocal<SerializationType> serializationType = ThreadLocal
-			.withInitial(() -> SerializationType.JAVA);
+	private static ThreadLocal<HttpInvokerSerializer> serializer = ThreadLocal
+			.withInitial(() -> JavaHttpInvokerSerializer.INSTANCE);
 
 	private Map<String, Object> exportedServices = Collections.emptyMap();
 
@@ -100,7 +102,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		service.set(exportedServices.get(interfaceName));
 		Object proxy = getProxyForService();
 		try {
-			serializationType.set(SerializationType.parse(request.getHeader(HttpHeaders.CONTENT_TYPE)));
+			serializer.set(HttpInvokerSerializers.ofContentType(request.getHeader(HttpHeaders.CONTENT_TYPE)));
 			RemoteInvocation invocation = readRemoteInvocation(request);
 			List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
 			for (Class<?> cl : invocation.getParameterTypes())
@@ -153,7 +155,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		} finally {
 			serviceInterface.remove();
 			service.remove();
-			serializationType.remove();
+			serializer.remove();
 			RemotingContext.clear();
 			MDC.remove("role");
 			MDC.remove("service");
@@ -199,13 +201,13 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 
 	@Override
 	public String getContentType() {
-		return serializationType.get().getContentType();
+		return serializer.get().getContentType();
 	}
 
 	@Override
 	protected RemoteInvocation readRemoteInvocation(HttpServletRequest request, InputStream is)
 			throws IOException, ClassNotFoundException {
-		return serializationType.get().readRemoteInvocation(decorateInputStream(request, is));
+		return serializer.get().readRemoteInvocation(decorateInputStream(request, is));
 	}
 
 	@Override
@@ -252,9 +254,8 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			} catch (Exception ex) {
 			}
 		}
-		SerializationType st = serializationType.get();
-		response.setContentType(st.getContentType());
-		st.writeRemoteInvocationResult(invocation, result,
+		response.setContentType(serializer.get().getContentType());
+		serializer.get().writeRemoteInvocationResult(invocation, result,
 				decorateOutputStream(request, response, response.getOutputStream()));
 	}
 

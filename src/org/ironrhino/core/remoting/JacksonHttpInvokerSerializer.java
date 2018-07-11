@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -15,7 +16,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -29,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,90 +47,104 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public abstract class JsonHttpInvokerSerializationHelper {
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSerializer {
 
 	private static final String SEPARATOR = "|";
 
-	private static ObjectMapper objectMapper = new ObjectMapper()
-			.enableDefaultTyping(ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
-			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).addMixIn(Throwable.class, ThrowableMixin.class)
-			.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
-			.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
-			.registerModule(new SimpleModule().addDeserializer(LocalDate.class, new JsonDeserializer<LocalDate>() {
-				@Override
-				public LocalDate deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-						throws IOException, JsonProcessingException {
-					return LocalDate.parse(jsonparser.getText());
-				}
-			}).addSerializer(LocalDate.class, new JsonSerializer<LocalDate>() {
-				@Override
-				public void serialize(LocalDate localDate, JsonGenerator jsonGenerator,
-						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-					jsonGenerator.writeString(localDate.toString());
-				}
-			}).addDeserializer(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
-				@Override
-				public LocalDateTime deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-						throws IOException, JsonProcessingException {
-					return LocalDateTime.parse(jsonparser.getText());
-				}
-			}).addSerializer(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
-				@Override
-				public void serialize(LocalDateTime localDateTime, JsonGenerator jsonGenerator,
-						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-					jsonGenerator.writeString(localDateTime.toString());
-				}
-			}).addDeserializer(LocalTime.class, new JsonDeserializer<LocalTime>() {
-				@Override
-				public LocalTime deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-						throws IOException, JsonProcessingException {
-					return LocalTime.parse(jsonparser.getText());
-				}
-			}).addSerializer(LocalTime.class, new JsonSerializer<LocalTime>() {
-				@Override
-				public void serialize(LocalTime localTime, JsonGenerator jsonGenerator,
-						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-					jsonGenerator.writeString(localTime.toString());
-				}
-			}).addDeserializer(YearMonth.class, new JsonDeserializer<YearMonth>() {
-				@Override
-				public YearMonth deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-						throws IOException, JsonProcessingException {
-					return YearMonth.parse(jsonparser.getText());
-				}
-			}).addSerializer(YearMonth.class, new JsonSerializer<YearMonth>() {
-				@Override
-				public void serialize(YearMonth yearMonth, JsonGenerator jsonGenerator,
-						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-					jsonGenerator.writeString(yearMonth.toString());
-				}
-			}).addDeserializer(Duration.class, new JsonDeserializer<Duration>() {
-				@Override
-				public Duration deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-						throws IOException, JsonProcessingException {
-					return Duration.parse(jsonparser.getText());
-				}
-			}).addSerializer(Duration.class, new JsonSerializer<Duration>() {
-				@Override
-				public void serialize(Duration duration, JsonGenerator jsonGenerator,
-						SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-					jsonGenerator.writeString(duration.toString());
-				}
-			}));
+	private final ObjectMapper objectMapper;
 
 	@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
 	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 	@JsonIgnoreProperties(value = { "localizedMessage", "cause", "suppressed" }, ignoreUnknown = true)
-	public abstract class ThrowableMixin {
+	public static abstract class ThrowableMixin {
 		@JsonCreator
 		public ThrowableMixin(@JsonProperty("message") String message) {
 		}
 	}
 
-	public static void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
-		GenericRemoteInvocation invocation = (GenericRemoteInvocation) remoteInvocation;
+	public JacksonHttpInvokerSerializer(JsonFactory jsonFactory) {
+		objectMapper = new ObjectMapper(jsonFactory)
+				.enableDefaultTyping(ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
+				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+				.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).addMixIn(Throwable.class, ThrowableMixin.class)
+				.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
+				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
+				.registerModule(new SimpleModule().addDeserializer(LocalDate.class, new JsonDeserializer<LocalDate>() {
+					@Override
+					public LocalDate deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+							throws IOException, JsonProcessingException {
+						return LocalDate.parse(jsonparser.getText());
+					}
+				}).addSerializer(LocalDate.class, new JsonSerializer<LocalDate>() {
+					@Override
+					public void serialize(LocalDate localDate, JsonGenerator jsonGenerator,
+							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+						jsonGenerator.writeString(localDate.toString());
+					}
+				}).addDeserializer(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
+					@Override
+					public LocalDateTime deserialize(JsonParser jsonparser,
+							DeserializationContext deserializationcontext) throws IOException, JsonProcessingException {
+						return LocalDateTime.parse(jsonparser.getText());
+					}
+				}).addSerializer(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
+					@Override
+					public void serialize(LocalDateTime localDateTime, JsonGenerator jsonGenerator,
+							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+						jsonGenerator.writeString(localDateTime.toString());
+					}
+				}).addDeserializer(LocalTime.class, new JsonDeserializer<LocalTime>() {
+					@Override
+					public LocalTime deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+							throws IOException, JsonProcessingException {
+						return LocalTime.parse(jsonparser.getText());
+					}
+				}).addSerializer(LocalTime.class, new JsonSerializer<LocalTime>() {
+					@Override
+					public void serialize(LocalTime localTime, JsonGenerator jsonGenerator,
+							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+						jsonGenerator.writeString(localTime.toString());
+					}
+				}).addDeserializer(YearMonth.class, new JsonDeserializer<YearMonth>() {
+					@Override
+					public YearMonth deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+							throws IOException, JsonProcessingException {
+						return YearMonth.parse(jsonparser.getText());
+					}
+				}).addSerializer(YearMonth.class, new JsonSerializer<YearMonth>() {
+					@Override
+					public void serialize(YearMonth yearMonth, JsonGenerator jsonGenerator,
+							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+						jsonGenerator.writeString(yearMonth.toString());
+					}
+				}).addDeserializer(Duration.class, new JsonDeserializer<Duration>() {
+					@Override
+					public Duration deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+							throws IOException, JsonProcessingException {
+						return Duration.parse(jsonparser.getText());
+					}
+				}).addSerializer(Duration.class, new JsonSerializer<Duration>() {
+					@Override
+					public void serialize(Duration duration, JsonGenerator jsonGenerator,
+							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+						jsonGenerator.writeString(duration.toString());
+					}
+				}));
+	}
+
+	@Override
+	public RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
+		return new JacksonRemoteInvocation(methodInvocation);
+	}
+
+	@Override
+	public void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
+		JacksonRemoteInvocation invocation = (JacksonRemoteInvocation) remoteInvocation;
 		String methodName = invocation.getMethodName();
 		String returnType = invocation.getGenericReturnType();
 		String[] types = invocation.getGenericParameterTypes();
@@ -147,8 +165,9 @@ public abstract class JsonHttpInvokerSerializationHelper {
 		objectMapper.writeValue(os, on);
 	}
 
-	public static RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
-		GenericRemoteInvocation invocation = new GenericRemoteInvocation();
+	@Override
+	public RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
+		JacksonRemoteInvocation invocation = new JacksonRemoteInvocation();
 		int length = is.read();
 		byte[] bytes = new byte[length];
 		is.read(bytes);
@@ -173,7 +192,7 @@ public abstract class JsonHttpInvokerSerializationHelper {
 				if (index > 0)
 					jt = objectMapper.getTypeFactory()
 							.constructFromCanonical(name.substring(index + SEPARATOR.length()));
-				arguments.add(objectMapper.readValue(on.get(type).toString(), jt));
+				arguments.add(objectMapper.readValue(objectMapper.treeAsTokens(on.get(type)), jt));
 			}
 			invocation.setGenericParameterTypes(genericParameterTypes.toArray(new String[0]));
 			invocation.setParameterTypes(parameterTypes.toArray(new Class[0]));
@@ -184,9 +203,10 @@ public abstract class JsonHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static void writeRemoteInvocationResult(RemoteInvocation remoteInvocation, RemoteInvocationResult result,
+	@Override
+	public void writeRemoteInvocationResult(RemoteInvocation remoteInvocation, RemoteInvocationResult result,
 			OutputStream os) throws IOException {
-		GenericRemoteInvocation invocation = (GenericRemoteInvocation) remoteInvocation;
+		JacksonRemoteInvocation invocation = (JacksonRemoteInvocation) remoteInvocation;
 		Throwable exception = result.getException();
 		if (exception == null) {
 			os.write(0);
@@ -203,7 +223,8 @@ public abstract class JsonHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
+	@Override
+	public RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
 		RemoteInvocationResult result = new RemoteInvocationResult();
 		int i = is.read();
 		try {
@@ -228,11 +249,18 @@ public abstract class JsonHttpInvokerSerializationHelper {
 		}
 	}
 
-	public static String toCanonical(Type type) {
+	protected String toCanonical(Type type) {
+		if (type instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) type;
+			Type rawType = pt.getRawType();
+			if (rawType.equals(Optional.class)) {
+				type = pt.getActualTypeArguments()[0];
+			}
+		}
 		return objectMapper.getTypeFactory().constructType(type).toCanonical();
 	}
 
-	private static String toConcrete(String type, Object argument) {
+	protected String toConcrete(String type, Object argument) {
 		JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
 		if (argument != null) {
 			if (!jt.isContainerType() && !jt.isConcrete()) {
@@ -248,6 +276,33 @@ public abstract class JsonHttpInvokerSerializationHelper {
 			}
 		}
 		return type;
+	}
+
+	@NoArgsConstructor
+	private class JacksonRemoteInvocation extends RemoteInvocation {
+
+		private static final long serialVersionUID = -2740913342844528055L;
+
+		@Getter
+		@Setter
+		private String[] genericParameterTypes;
+
+		@Getter
+		@Setter
+		private String genericReturnType;
+
+		JacksonRemoteInvocation(MethodInvocation methodInvocation) {
+			super(methodInvocation);
+			Type[] types = methodInvocation.getMethod().getGenericParameterTypes();
+			genericParameterTypes = new String[types.length];
+			for (int i = 0; i < types.length; i++) {
+				Type type = types[i];
+				genericParameterTypes[i] = toCanonical(type);
+			}
+			Type type = methodInvocation.getMethod().getGenericReturnType();
+			genericReturnType = toCanonical(type);
+		}
+
 	}
 
 }
