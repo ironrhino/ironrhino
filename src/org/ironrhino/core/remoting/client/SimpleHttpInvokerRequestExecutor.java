@@ -8,9 +8,9 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import org.ironrhino.core.remoting.HttpInvokerSerializer;
-import org.ironrhino.core.remoting.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.RemotingContext;
+import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
+import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;

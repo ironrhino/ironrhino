@@ -1,4 +1,4 @@
-package org.ironrhino.core.remoting;
+package org.ironrhino.core.remoting.stats;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -1,10 +1,11 @@
-package org.ironrhino.core.remoting;
+package org.ironrhino.core.remoting.serializer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
 
+import org.ironrhino.core.remoting.RemotingContext;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
 import org.springframework.core.serializer.support.SerializationFailedException;

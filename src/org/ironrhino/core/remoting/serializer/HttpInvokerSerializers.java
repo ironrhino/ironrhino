@@ -1,4 +1,4 @@
-package org.ironrhino.core.remoting;
+package org.ironrhino.core.remoting.serializer;
 
 import java.util.ArrayList;
 import java.util.List;

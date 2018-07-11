@@ -1,4 +1,4 @@
-package org.ironrhino.core.remoting;
+package org.ironrhino.core.remoting.stats;
 
 import java.util.List;
 import java.util.Map;
