@@ -77,9 +77,9 @@ public class RoutingDataSourceConfiguration {
 	}
 
 	@Bean
-	public JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
+	public static JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
 		JdbcRepositoryRegistryPostProcessor obj = new JdbcRepositoryRegistryPostProcessor();
-		obj.setPackagesToScan(new String[] { getClass().getPackage().getName() });
+		obj.setPackagesToScan(new String[] { RoutingDataSourceConfiguration.class.getPackage().getName() });
 		return obj;
 	}
 

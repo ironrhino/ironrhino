@@ -21,9 +21,9 @@ public class JdbcConfiguration {
 	}
 
 	@Bean
-	public JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
+	public static JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
 		JdbcRepositoryRegistryPostProcessor obj = new JdbcRepositoryRegistryPostProcessor();
-		obj.setPackagesToScan(new String[] { getClass().getPackage().getName() });
+		obj.setPackagesToScan(new String[] { JdbcConfiguration.class.getPackage().getName() });
 		return obj;
 	}
 

@@ -65,9 +65,9 @@ public class GroupedDataSourceConfiguration {
 	}
 
 	@Bean
-	public JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
+	public static JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
 		JdbcRepositoryRegistryPostProcessor obj = new JdbcRepositoryRegistryPostProcessor();
-		obj.setPackagesToScan(new String[] { getClass().getPackage().getName() });
+		obj.setPackagesToScan(new String[] { GroupedDataSourceConfiguration.class.getPackage().getName() });
 		return obj;
 	}
 
