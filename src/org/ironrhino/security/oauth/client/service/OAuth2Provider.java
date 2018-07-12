@@ -134,7 +134,7 @@ public abstract class OAuth2Provider extends AbstractOAuthProvider {
 			}
 			accessToken = new OAuth2Token(content);
 			if (accessToken.getAccess_token() == null)
-				logger.error("access_token is null,and content is {}" + content);
+				logger.error("access_token is null, and content is {}", content);
 			saveToken(request, accessToken);
 		}
 		return accessToken;

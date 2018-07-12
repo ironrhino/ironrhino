@@ -10,19 +10,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class Ironrhino extends OAuth2Provider {
 
-	@Value("${ironrhino.logo:http://localhost/assets/images/ironrhino-logo.jpg}")
+	@Value("${ironrhino.logo:http://localhost:8080/assets/images/ironrhino-logo.jpg}")
 	private String logo;
 
-	@Value("${ironrhino.authorizeUrl:http://localhost/oauth/oauth2/auth}")
+	@Value("${ironrhino.authorizeUrl:http://localhost:8080/oauth/auth}")
 	private String authorizeUrl;
 
-	@Value("${ironrhino.accessTokenEndpoint:http://localhost/oauth/oauth2/token}")
+	@Value("${ironrhino.accessTokenEndpoint:http://localhost:8080/oauth/oauth2/token}")
 	private String accessTokenEndpoint;
 
-	@Value("${ironrhino.scope:http://localhost/}")
+	@Value("${ironrhino.scope:http://localhost:8080/}")
 	private String scope;
 
-	@Value("${ironrhino.profileUrl:http://localhost/api/user/@self}")
+	@Value("${ironrhino.profileUrl:http://localhost:8080/api/user/@self}")
 	private String profileUrl;
 
 	@Override

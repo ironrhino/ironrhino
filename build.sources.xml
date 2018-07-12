@@ -62,7 +62,7 @@
 	<property name="security-oauth-client-sources-jar.name" value="ironrhino-security-oauth-client-${version}-sources.jar" />
 	<property name="security-oauth-client-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-sources-jar.name" value="ironrhino-security-oauth-server-${version}-sources.jar" />
-	<property name="security-oauth-server-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/oauth2**,resources/view/oauth/client**,resources/view/oauth/authorization**" />
+	<property name="security-oauth-server-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/auth**" />
 	<property name="security-remoting-provider-sources-jar.name" value="ironrhino-security-remoting-provider-sources-${version}.jar" />
 	<property name="security-remoting-provider-sources-jar.includes" value="org/ironrhino/security/domain/**,org/ironrhino/security/enums/**,org/ironrhino/security/exception/**,org/ironrhino/security/service/*Service*" />
 	<property name="security-remoting-sources-jar.name" value="ironrhino-security-remoting-${version}-sources.jar" />

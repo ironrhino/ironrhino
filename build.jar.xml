@@ -63,7 +63,7 @@
 	<property name="security-oauth-client-jar.name" value="ironrhino-security-oauth-client-${version}.jar" />
 	<property name="security-oauth-client-jar.includes" value="org/ironrhino/security/oauth/package-info.class,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-jar.name" value="ironrhino-security-oauth-server-${version}.jar" />
-	<property name="security-oauth-server-jar.includes" value="org/ironrhino/security/oauth/package-info.class,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/oauth2**,resources/view/oauth/client**,resources/view/oauth/authorization**" />
+	<property name="security-oauth-server-jar.includes" value="org/ironrhino/security/oauth/package-info.class,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/auth**" />
 	<property name="security-remoting-provider-jar.name" value="ironrhino-security-remoting-provider-${version}.jar" />
 	<property name="security-remoting-provider-jar.includes" value="org/ironrhino/security/domain/**,org/ironrhino/security/enums/**,org/ironrhino/security/exception/**,org/ironrhino/security/service/*Service*" />
 	<property name="security-remoting-jar.name" value="ironrhino-security-remoting-${version}.jar" />

@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.oauth.server.domain.OAuthError;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +25,6 @@ public class OAuthErrorHandler {
 		int status = determineHttpStatusCode(oauthError);
 		response.setStatus(status);
 		response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-		response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
-		response.setHeader(HttpHeaders.PRAGMA, "no-store");
 		if (!legacy) {
 			response.getWriter().write(JsonUtils.toJson(oauthError));
 		} else {
