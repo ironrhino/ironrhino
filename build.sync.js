@@ -26,12 +26,15 @@ if (!new File(basedir + '/../ironrhino').isDirectory()) {
 		replace.perform();
 	}
 
-	var dependence = resolveDependence();
+	var dependence = resolveDependence(['../ironrhino/.dependence',
+			'.dependence']);
 	var increment = dependence.increment;
 	var decrement = dependence.decrement;
 
 	label : for (var i = 0; i < increment.length; i++) {
 		var candidate = increment[i];
+		if (decrement.indexOf(candidate) > -1)
+			continue;
 		var j = candidate.indexOf('<-');
 		if (j > 0) {
 			var dependent = candidate.substring(j + 2);
@@ -82,21 +85,26 @@ function readClasspath(classpathfile) {
 	};
 }
 
-function resolveDependence() {
-	var is = new FileInputStream(new File(basedir + '/../ironrhino/.dependence'));
-	var br = new BufferedReader(new InputStreamReader(is, 'utf-8'));
+function resolveDependence(paths) {
 	var increment = [];
 	var decrement = [];
-	var line;
-	while (line = br.readLine()) {
-		if (line.indexOf('+') == 0) {
-			increment.push(line.substring(1));
-		} else if (line.indexOf('-') == 0) {
-			decrement.push(line.substring(1));
+	for (var i = 0; i < paths.length; i++) {
+		var file = new File(basedir + '/' + paths[i]);
+		if (file.exists()) {
+			var is = new FileInputStream(file);
+			var br = new BufferedReader(new InputStreamReader(is, 'utf-8'));
+			var line;
+			while (line = br.readLine()) {
+				if (line.indexOf('+') == 0) {
+					increment.push(line.substring(1));
+				} else if (line.indexOf('-') == 0) {
+					decrement.push(line.substring(1));
+				}
+			}
+			br.close();
+			is.close();
 		}
 	}
-	br.close();
-	is.close();
 	return {
 		increment : increment,
 		decrement : decrement
