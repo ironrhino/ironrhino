@@ -61,6 +61,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/resilience4j-core-0.13.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/snakeyaml-1.21.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-2.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-5.0.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-core-4.0.0.jar"/>

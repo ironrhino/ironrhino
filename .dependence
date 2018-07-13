@@ -32,6 +32,7 @@
 +cache2k-core
 -aopalliance
 -aspectjrt
++snakeyaml
 +jackson-dataformat-smile<-ironrhino-remoting-common
 +resilience4j-core
 +resilience4j-circuitbreaker

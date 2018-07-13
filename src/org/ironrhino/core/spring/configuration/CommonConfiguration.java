@@ -44,9 +44,13 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @PropertySources({
 		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.properties"),
+		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.yaml", factory = YamlPropertySourceFactory.class),
 		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.${STAGE}.properties"),
+		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.${STAGE}.yaml", factory = YamlPropertySourceFactory.class),
 		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.properties"),
-		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.${STAGE}.properties") })
+		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.yaml", factory = YamlPropertySourceFactory.class),
+		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.${STAGE}.properties"),
+		@PropertySource(ignoreResourceNotFound = true, value = "file:${app.home}/conf/applicationContext.${STAGE}.yaml", factory = YamlPropertySourceFactory.class) })
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @Slf4j
 public class CommonConfiguration {
