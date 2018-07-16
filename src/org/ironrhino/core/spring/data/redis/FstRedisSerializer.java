@@ -1,6 +1,6 @@
 package org.ironrhino.core.spring.data.redis;
 
-import java.io.Serializable;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import javax.annotation.PostConstruct;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ApplicationContextPropertiesConditional(key = "redisTemplate.useFstSerialization", value = "true")
 @BeanPresentConditional("redisTemplate")
-public class FstRedisSerializer implements RedisSerializer<Serializable> {
+public class FstRedisSerializer<T> implements RedisSerializer<T> {
 
 	private static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
 
@@ -33,7 +33,7 @@ public class FstRedisSerializer implements RedisSerializer<Serializable> {
 	}
 
 	@Override
-	public byte[] serialize(Serializable object) throws SerializationException {
+	public byte[] serialize(T object) throws SerializationException {
 		try {
 			return conf.asByteArray(object);
 		} catch (Exception e) {
@@ -42,14 +42,15 @@ public class FstRedisSerializer implements RedisSerializer<Serializable> {
 	}
 
 	@Override
-	public Serializable deserialize(byte[] bytes) throws SerializationException {
+	public T deserialize(byte[] bytes) throws SerializationException {
 		if (bytes == null || bytes.length == 0)
 			return null;
 		try {
-			return (Serializable) conf.asObject(bytes);
+			return (T) conf.asObject(bytes);
 		} catch (Exception e) {
-			if (org.ironrhino.core.util.StringUtils.isUtf8(bytes))
-				return new String(bytes, StandardCharsets.UTF_8);
+			if (e instanceof IOException && e.getCause() instanceof NullPointerException
+					&& org.ironrhino.core.util.StringUtils.isUtf8(bytes))
+				return (T) new String(bytes, StandardCharsets.UTF_8);
 			throw new SerializationException("Cannot deserialize", e);
 		}
 	}
