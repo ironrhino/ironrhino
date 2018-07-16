@@ -165,47 +165,48 @@ public class AccessFilter implements Filter {
 				sessionId = httpSessionManager.getSessionId(request);
 			}
 			String requestId = (String) request.getAttribute(HTTP_HEADER_REQUEST_ID);
+			String requestChain = null;
 			if (requestId == null) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(" request:");
-				String requestChain = null;
 				requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
 				if (StringUtils.isBlank(requestId)) {
-					requestId = CodecUtils.nextId();
+					requestId = generateRequestId();
 					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 					requestChain = requestId.substring(14);
-					if (sessionId != null)
-						requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
 				}
+				if (sessionId != null && !requestId.startsWith(sessionId + '.'))
+					requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
 				request.setAttribute(HTTP_HEADER_REQUEST_ID, requestId);
-				MDC.put(MDC_KEY_REQUEST_ID, requestId);
-				sb.append(requestId);
-				String originalChain = request.getHeader(HTTP_HEADER_REQUEST_CHAIN);
-				if (originalChain != null) {
-					requestChain = new StringBuilder(originalChain).append('.')
-							.append(requestChain != null ? requestChain : CodecUtils.nextId().substring(14)).toString();
-					sb.append(" chain:");
-					sb.append(requestChain);
-				}
-				MDC.put(MDC_KEY_REQUEST_CHAIN, requestChain);
-				String requestFrom = request.getHeader(HTTP_HEADER_REQUEST_FROM);
-				if (requestFrom != null) {
-					// sb.append(" from:");
-					// sb.append(requestFrom);
-					MDC.put(MDC_KEY_REQUEST_FROM, requestFrom);
-				}
-				MDC.put("request", sb.toString());
 			}
+			MDC.put(MDC_KEY_REQUEST_ID, requestId);
+			StringBuilder sb = new StringBuilder();
+			sb.append(" request:");
+			sb.append(requestId);
+			String originalChain = request.getHeader(HTTP_HEADER_REQUEST_CHAIN);
+			if (originalChain != null) {
+				requestChain = new StringBuilder(originalChain).append('.')
+						.append(requestChain != null ? requestChain : CodecUtils.nextId().substring(14)).toString();
+				sb.append(" chain:");
+				sb.append(requestChain);
+			}
+			MDC.put(MDC_KEY_REQUEST_CHAIN, requestChain);
+			String requestFrom = request.getHeader(HTTP_HEADER_REQUEST_FROM);
+			if (requestFrom != null) {
+				// sb.append(" from:");
+				// sb.append(requestFrom);
+				MDC.put(MDC_KEY_REQUEST_FROM, requestFrom);
+			}
+			MDC.put("request", sb.toString());
+
 			MDC.put("server", " server:" + AppInfo.getInstanceId(true));
 			long start = System.currentTimeMillis();
 			try {
 				chain.doFilter(request, response);
 				long responseTime = System.currentTimeMillis() - start;
 				if (isRequestDispatcher && responseTime > responseTimeThreshold) {
-					StringBuilder sb = new StringBuilder();
-					sb.append(RequestUtils.serializeData(request)).append(" response time:").append(responseTime)
+					StringBuilder msg = new StringBuilder();
+					msg.append(RequestUtils.serializeData(request)).append(" response time:").append(responseTime)
 							.append("ms");
-					accesWarnLog.warn(sb.toString());
+					accesWarnLog.warn(msg.toString());
 				}
 			} catch (ServletException e) {
 				log.error(e.getMessage(), e);
@@ -228,6 +229,10 @@ public class AccessFilter implements Filter {
 	@Override
 	public void destroy() {
 
+	}
+
+	private String generateRequestId() {
+		return CodecUtils.nextId();
 	}
 
 }
