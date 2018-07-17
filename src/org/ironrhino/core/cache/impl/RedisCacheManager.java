@@ -3,10 +3,6 @@ package org.ironrhino.core.cache.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
-import java.io.EOFException;
-import java.io.ObjectStreamConstants;
-import java.io.StreamCorruptedException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
+import org.ironrhino.core.spring.data.redis.FallbackToStringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.serializer.support.SerializationFailedException;
@@ -29,8 +26,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -282,37 +277,5 @@ public class RedisCacheManager implements CacheManager {
 		cacheStringRedisTemplate.execute(script, Collections.emptyList(), namespace + ":*");
 	}
 
-	private static class FallbackToStringSerializer extends JdkSerializationRedisSerializer {
-
-		@Override
-		public byte[] serialize(Object object) {
-			if (object instanceof String)
-				return ((String) object).getBytes(StandardCharsets.UTF_8);
-			return super.serialize(object);
-		}
-
-		@Override
-		public Object deserialize(byte[] bytes) {
-			try {
-				return super.deserialize(bytes);
-			} catch (SerializationException se) {
-				if (!isJavaSerialized(bytes) && se.getCause() instanceof SerializationFailedException) {
-					Throwable cause = se.getCause().getCause();
-					if ((cause instanceof StreamCorruptedException || cause instanceof EOFException)
-							&& org.ironrhino.core.util.StringUtils.isUtf8(bytes))
-						return new String(bytes, StandardCharsets.UTF_8);
-				}
-				throw se;
-			}
-		}
-
-		private static boolean isJavaSerialized(byte[] bytes) {
-			if (bytes.length > 2) {
-				short magic = (short) ((bytes[1] & 0xFF) + (bytes[0] << 8));
-				return magic == ObjectStreamConstants.STREAM_MAGIC;
-			}
-			return false;
-		}
-	}
 
 }
