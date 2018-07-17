@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -19,14 +20,18 @@ import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.spring.data.redis.FallbackToStringSerializer;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +40,10 @@ import lombok.extern.slf4j.Slf4j;
 @ServiceImplementationConditional(profiles = { DUAL, CLOUD })
 @Slf4j
 public class RedisCacheManager implements CacheManager {
+
+	public static final String DEFAULT_SERIALIZER = "cacheManager.redis.defaultSerializer";
+
+	public static final String SERIALIZERS_PREFIX = "cacheManager.redis.serializers.";
 
 	@Autowired
 	@PriorityQualifier
@@ -45,22 +54,34 @@ public class RedisCacheManager implements CacheManager {
 	@PriorityQualifier
 	private StringRedisTemplate cacheStringRedisTemplate;
 
+	@Autowired
+	private Environment env;
+
+	private Map<String, RedisTemplate> cache = new ConcurrentHashMap<>();
+
 	private RedisScript<Long> decrementPositiveScript = new DefaultRedisScript<>(
 			"if redis.call('exists',KEYS[1])==1 then local v=redis.call('decrby',KEYS[1],ARGV[1]) if v >= 0 then return v else redis.call('incrby',KEYS[1],ARGV[1]) return -2 end else return -1 end",
 			Long.class);
 
 	@PostConstruct
-	public void init() {
-		cacheRedisTemplate.setValueSerializer(new FallbackToStringSerializer());
+	public void init() throws Exception {
+		String defaultSerializerClass = env.getProperty(DEFAULT_SERIALIZER);
+		if (StringUtils.isNotBlank(defaultSerializerClass)) {
+			cacheRedisTemplate.setValueSerializer((RedisSerializer) BeanUtils.instantiateClass(
+					ClassUtils.forName(defaultSerializerClass, RedisCacheManager.class.getClassLoader())));
+		} else {
+			cacheRedisTemplate.setValueSerializer(new FallbackToStringSerializer());
+		}
 	}
 
 	@Override
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
+		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		try {
 			if (timeToLive > 0)
-				cacheRedisTemplate.opsForValue().set(generateKey(key, namespace), value, timeToLive, timeUnit);
+				redisTemplate.opsForValue().set(generateKey(key, namespace), value, timeToLive, timeUnit);
 			else
-				cacheRedisTemplate.opsForValue().set(generateKey(key, namespace), value);
+				redisTemplate.opsForValue().set(generateKey(key, namespace), value);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -76,7 +97,7 @@ public class RedisCacheManager implements CacheManager {
 		if (key == null)
 			return false;
 		try {
-			Boolean b = cacheRedisTemplate.hasKey(generateKey(key, namespace));
+			Boolean b = findRedisTemplate(namespace).hasKey(generateKey(key, namespace));
 			return b != null && b;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -89,7 +110,7 @@ public class RedisCacheManager implements CacheManager {
 		if (key == null)
 			return null;
 		try {
-			return cacheRedisTemplate.opsForValue().get(generateKey(key, namespace));
+			return findRedisTemplate(namespace).opsForValue().get(generateKey(key, namespace));
 		} catch (SerializationFailedException e) {
 			log.warn(e.getMessage(), e);
 			delete(key, namespace);
@@ -105,10 +126,11 @@ public class RedisCacheManager implements CacheManager {
 		if (key == null)
 			return null;
 		String actualKey = generateKey(key, namespace);
+		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		try {
 			if (timeToIdle > 0)
-				cacheRedisTemplate.expire(actualKey, timeToIdle, timeUnit);
-			return cacheRedisTemplate.opsForValue().get(actualKey);
+				redisTemplate.expire(actualKey, timeToIdle, timeUnit);
+			return redisTemplate.opsForValue().get(actualKey);
 		} catch (SerializationFailedException e) {
 			log.warn(e.getMessage(), e);
 			delete(key, namespace);
@@ -124,7 +146,7 @@ public class RedisCacheManager implements CacheManager {
 		if (key == null)
 			return 0;
 		String actualKey = generateKey(key, namespace);
-		Long value = cacheRedisTemplate.getExpire(actualKey, TimeUnit.MILLISECONDS);
+		Long value = findRedisTemplate(namespace).getExpire(actualKey, TimeUnit.MILLISECONDS);
 		if (value == null)
 			value = 0L;
 		if (value == -2)
@@ -136,7 +158,7 @@ public class RedisCacheManager implements CacheManager {
 	public void setTtl(String key, String namespace, int timeToLive, TimeUnit timeUnit) {
 		if (key == null)
 			return;
-		cacheRedisTemplate.expire(generateKey(key, namespace), timeToLive, timeUnit);
+		findRedisTemplate(namespace).expire(generateKey(key, namespace), timeToLive, timeUnit);
 	}
 
 	@Override
@@ -144,7 +166,7 @@ public class RedisCacheManager implements CacheManager {
 		if (StringUtils.isBlank(key))
 			return;
 		try {
-			cacheRedisTemplate.delete(generateKey(key, namespace));
+			findRedisTemplate(namespace).delete(generateKey(key, namespace));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -154,11 +176,12 @@ public class RedisCacheManager implements CacheManager {
 	public void mput(Map<String, Object> map, final int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (map == null)
 			return;
+		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		try {
 			Map<String, Object> temp = new HashMap<>();
 			map.forEach((key, value) -> temp.put(generateKey(key, namespace), value));
-			cacheRedisTemplate.opsForValue().multiSet(temp);
-			temp.keySet().forEach(key -> cacheRedisTemplate.expire(key, timeToLive, timeUnit));
+			redisTemplate.opsForValue().multiSet(temp);
+			temp.keySet().forEach(key -> redisTemplate.expire(key, timeToLive, timeUnit));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -170,7 +193,7 @@ public class RedisCacheManager implements CacheManager {
 			return null;
 		keys = keys.stream().filter(StringUtils::isNotBlank).collect(Collectors.toCollection(HashSet::new));
 		try {
-			List<Object> list = cacheRedisTemplate.opsForValue()
+			List<Object> list = findRedisTemplate(namespace).opsForValue()
 					.multiGet(keys.stream().map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
 			Map<String, Object> result = new HashMap<>();
 			int i = 0;
@@ -190,7 +213,7 @@ public class RedisCacheManager implements CacheManager {
 		if (keys == null)
 			return;
 		try {
-			cacheRedisTemplate.delete(keys.stream().filter(StringUtils::isNotBlank)
+			findRedisTemplate(namespace).delete(keys.stream().filter(StringUtils::isNotBlank)
 					.map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -200,11 +223,12 @@ public class RedisCacheManager implements CacheManager {
 	@Override
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		String actualkey = generateKey(key, namespace);
-		Boolean success = cacheRedisTemplate.opsForValue().setIfAbsent(actualkey, value);
+		RedisTemplate redisTemplate = findRedisTemplate(namespace);
+		Boolean success = redisTemplate.opsForValue().setIfAbsent(actualkey, value);
 		if (success == null)
 			return false;
 		if (success && timeToLive > 0)
-			cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
+			redisTemplate.expire(actualkey, timeToLive, timeUnit);
 		return success;
 	}
 
@@ -213,11 +237,12 @@ public class RedisCacheManager implements CacheManager {
 		if (delta == 0)
 			throw new IllegalArgumentException("delta should not be 0");
 		String actualkey = generateKey(key, namespace);
-		Long result = cacheRedisTemplate.opsForValue().increment(actualkey, delta);
+		RedisTemplate redisTemplate = findRedisTemplate(namespace);
+		Long result = redisTemplate.opsForValue().increment(actualkey, delta);
 		if (result == null)
 			throw new RuntimeException("Unexpected null");
 		if (timeToLive > 0)
-			cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
+			redisTemplate.expire(actualkey, timeToLive, timeUnit);
 		return result;
 	}
 
@@ -226,10 +251,10 @@ public class RedisCacheManager implements CacheManager {
 			String namespace) {
 		if (delta <= 0)
 			throw new IllegalArgumentException("delta should great than 0");
+		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		String actualkey = generateKey(key, namespace);
-		Long result = (Long) cacheRedisTemplate.execute(decrementPositiveScript,
-				cacheRedisTemplate.getStringSerializer(), cacheRedisTemplate.getValueSerializer(),
-				Collections.singletonList(actualkey), String.valueOf(delta));
+		Long result = (Long) redisTemplate.execute(decrementPositiveScript, redisTemplate.getStringSerializer(),
+				redisTemplate.getValueSerializer(), Collections.singletonList(actualkey), String.valueOf(delta));
 		if (result == null)
 			throw new RuntimeException("Unexpected null");
 		if (result == -1)
@@ -237,7 +262,7 @@ public class RedisCacheManager implements CacheManager {
 		if (result == -2)
 			throw new IllegalStateException("namespace:" + namespace + ", key:" + key + " is less than " + delta);
 		if (timeToLive > 0)
-			cacheRedisTemplate.expire(actualkey, timeToLive, timeUnit);
+			redisTemplate.expire(actualkey, timeToLive, timeUnit);
 		return result;
 	}
 
@@ -277,5 +302,24 @@ public class RedisCacheManager implements CacheManager {
 		cacheStringRedisTemplate.execute(script, Collections.emptyList(), namespace + ":*");
 	}
 
+	protected RedisTemplate findRedisTemplate(String namespace) {
+		if (StringUtils.isBlank(namespace))
+			return cacheRedisTemplate;
+		String serializerClass = env.getProperty(SERIALIZERS_PREFIX + namespace);
+		if (StringUtils.isBlank(serializerClass))
+			return cacheRedisTemplate;
+		return cache.computeIfAbsent(namespace, key -> {
+			RedisTemplate rt = new RedisTemplate();
+			BeanUtils.copyProperties(cacheRedisTemplate, rt);
+			try {
+				rt.setValueSerializer((RedisSerializer) BeanUtils.instantiateClass(
+						ClassUtils.forName(serializerClass, RedisCacheManager.class.getClassLoader())));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			rt.afterPropertiesSet();
+			return rt;
+		});
+	}
 
 }
