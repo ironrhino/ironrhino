@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -156,7 +157,13 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	public void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
 		JacksonRemoteInvocation invocation = (JacksonRemoteInvocation) remoteInvocation;
 		String methodName = invocation.getMethodName();
+		byte[] bytes = methodName.getBytes(StandardCharsets.UTF_8);
+		os.write(bytes.length);
+		os.write(bytes);
 		String returnType = invocation.getGenericReturnType();
+		bytes = returnType.getBytes(StandardCharsets.UTF_8);
+		os.write(bytes.length);
+		os.write(bytes);
 		String[] types = invocation.getGenericParameterTypes();
 		Object[] arguments = invocation.getArguments();
 		ObjectNode on = new ObjectNode(objectMapper.getNodeFactory());
@@ -166,12 +173,6 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 			String concreteType = toConcrete(type, argument);
 			on.putPOJO(concreteType.equals(type) ? type : type + SEPARATOR + concreteType, argument);
 		}
-		byte[] bytes = methodName.getBytes(StandardCharsets.UTF_8);
-		os.write(bytes.length);
-		os.write(bytes);
-		bytes = returnType.getBytes(StandardCharsets.UTF_8);
-		os.write(bytes.length);
-		os.write(bytes);
 		objectMapper.writeValue(os, on);
 	}
 
@@ -282,6 +283,20 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 					JavaType newJt = objectMapper.getTypeFactory().constructParametricType(jt.getRawClass(),
 							objectMapper.getTypeFactory().constructType(coll.iterator().next().getClass()));
 					return newJt.toCanonical();
+				}
+			} else if (jt.isMapLikeType() && (!jt.getKeyType().isConcrete() || !jt.getContentType().isConcrete())
+					&& argument instanceof Map) {
+				Map<?, ?> map = (Map<?, ?>) argument;
+				if (!map.isEmpty()) {
+					Map.Entry<?, ?> entry = map.entrySet().iterator().next();
+					Object key = entry.getKey();
+					Object value = entry.getValue();
+					if (key != null && value != null) {
+						JavaType newJt = objectMapper.getTypeFactory().constructParametricType(jt.getRawClass(),
+								objectMapper.getTypeFactory().constructType(key.getClass()),
+								objectMapper.getTypeFactory().constructType(value.getClass()));
+						return newJt.toCanonical();
+					}
 				}
 			}
 		}
