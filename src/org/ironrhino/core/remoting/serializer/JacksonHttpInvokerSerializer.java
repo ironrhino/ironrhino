@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -44,6 +45,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -134,7 +137,14 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
 						jsonGenerator.writeString(duration.toString());
 					}
-				}));
+				})).setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public boolean hasIgnoreMarker(final AnnotatedMember m) {
+						return Modifier.isTransient(m.getMember().getModifiers());
+					}
+				});
 	}
 
 	@Override
