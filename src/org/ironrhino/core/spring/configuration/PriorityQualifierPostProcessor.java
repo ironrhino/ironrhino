@@ -8,6 +8,8 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
@@ -16,11 +18,16 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class PriorityQualifierPostProcessor implements BeanPostProcessor, BeanFactoryAware {
+public class PriorityQualifierPostProcessor implements BeanPostProcessor, PriorityOrdered, BeanFactoryAware {
 
 	private BeanFactory beanFactory;
 
 	private Map<String, Boolean> logged = new ConcurrentHashMap<>();
+
+	@Override
+	public int getOrder() {
+		return Ordered.HIGHEST_PRECEDENCE + 1;
+	}
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
