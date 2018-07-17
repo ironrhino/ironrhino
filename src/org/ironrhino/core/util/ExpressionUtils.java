@@ -41,23 +41,16 @@ public abstract class ExpressionUtils {
 			return expression;
 		if (expression.contains("java.") || expression.contains("javax."))
 			throw new IllegalArgumentException("Illegal expression: " + expression);
-
-		CompiledExpression ce = expressionCache.get(expression);
-		if (ce == null) {
-			ce = new ExpressionCompiler(expression, parserContext).compile();
-			expressionCache.put(expression, ce);
-		}
+		CompiledExpression ce = expressionCache.computeIfAbsent(expression,
+				key -> new ExpressionCompiler(key, parserContext).compile());
 		return MVEL.executeExpression(ce, context);
 	}
 
 	public static Object eval(String template, Map<String, ?> context) {
 		if (StringUtils.isBlank(template))
 			return template;
-		CompiledTemplate ct = templateCache.get(template);
-		if (ct == null) {
-			ct = new TemplateCompiler(template).compile();
-			templateCache.put(template, ct);
-		}
+		CompiledTemplate ct = templateCache.computeIfAbsent(template,
+				key -> new TemplateCompiler(key, false, parserContext).compile());
 		return TemplateRuntime.execute(ct, context);
 	}
 
