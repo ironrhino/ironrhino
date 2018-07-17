@@ -3,34 +3,13 @@ package org.ironrhino.core.spring.data.redis;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import javax.annotation.PostConstruct;
-
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
-import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.nustaq.serialization.FSTConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
-import org.springframework.stereotype.Component;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
-@Component
-@ApplicationContextPropertiesConditional(key = "redisTemplate.useFstSerialization", value = "true")
-@BeanPresentConditional("redisTemplate")
 public class FstRedisSerializer<T> implements RedisSerializer<T> {
 
-	private static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
-
-	@Autowired
-	@Qualifier("redisTemplate")
-	private RedisTemplate redisTemplate;
-
-	@PostConstruct
-	public void init() {
-		redisTemplate.setValueSerializer(this);
-	}
+	private final FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
 
 	@Override
 	public byte[] serialize(T object) throws SerializationException {
@@ -41,6 +20,7 @@ public class FstRedisSerializer<T> implements RedisSerializer<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public T deserialize(byte[] bytes) throws SerializationException {
 		if (bytes == null || bytes.length == 0)
