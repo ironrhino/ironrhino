@@ -58,13 +58,16 @@ public class CacheAspect extends BaseAspect {
 					instrument(namespace, true);
 					return null;
 				}
-				if (value != null
-						&& (returnType.isPrimitive() && value.getClass() == ClassUtils.primitiveToWrapper(returnType)
-								|| returnType.isAssignableFrom(value.getClass()))) {
-					putReturnValueIntoContext(context, value);
-					ExpressionUtils.eval(checkCache.onHit(), context);
-					instrument(namespace, true);
-					return value;
+				if (value != null) {
+					if (returnType.isPrimitive() && value.getClass() == ClassUtils.primitiveToWrapper(returnType)
+							|| returnType.isAssignableFrom(value.getClass())) {
+						putReturnValueIntoContext(context, value);
+						ExpressionUtils.eval(checkCache.onHit(), context);
+						instrument(namespace, true);
+						return value;
+					} else {
+						cacheManager.delete(key, namespace);
+					}
 				}
 			}
 			int throughPermits = checkCache.throughPermits();
@@ -84,13 +87,16 @@ public class CacheAspect extends BaseAspect {
 						instrument(namespace, true);
 						return null;
 					}
-					if (value != null && (returnType.isPrimitive()
-							&& value.getClass() == ClassUtils.primitiveToWrapper(returnType)
-							|| returnType.isAssignableFrom(value.getClass()))) {
-						putReturnValueIntoContext(context, value);
-						ExpressionUtils.eval(checkCache.onHit(), context);
-						instrument(namespace, true);
-						return value;
+					if (value != null) {
+						if (returnType.isPrimitive() && value.getClass() == ClassUtils.primitiveToWrapper(returnType)
+								|| returnType.isAssignableFrom(value.getClass())) {
+							putReturnValueIntoContext(context, value);
+							ExpressionUtils.eval(checkCache.onHit(), context);
+							instrument(namespace, true);
+							return value;
+						} else {
+							cacheManager.delete(key, namespace);
+						}
 					}
 				}
 			}
