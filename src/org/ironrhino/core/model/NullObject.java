@@ -24,9 +24,20 @@ public class NullObject implements Serializable {
 	}
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
+
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException {
+
+	}
+
+	public boolean equals(Object obj) {
+		return this == obj || obj instanceof NullObject;
+	}
+
+	@Override
+	public int hashCode() {
+		return NullObject.class.hashCode();
 	}
 
 	@Override
