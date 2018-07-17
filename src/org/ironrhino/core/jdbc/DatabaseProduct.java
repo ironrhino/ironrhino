@@ -1,7 +1,8 @@
 package org.ironrhino.core.jdbc;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,8 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public enum DatabaseProduct {
@@ -354,8 +355,9 @@ public enum DatabaseProduct {
 	public abstract String getDefaultDriverClass();
 
 	public List<String> getKeywords() {
-		try (InputStream is = getClass().getResourceAsStream("keywords.txt")) {
-			List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(getClass().getResourceAsStream("keywords.txt"), StandardCharsets.UTF_8))) {
+			List<String> lines = br.lines().collect(Collectors.toList());
 			for (String line : lines) {
 				if (line.startsWith(name() + "=")) {
 					String s = line.substring(line.indexOf("=") + 1);

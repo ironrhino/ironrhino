@@ -1,13 +1,14 @@
 package org.ironrhino.core.security.util;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.lang.ref.SoftReference;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
@@ -39,15 +40,19 @@ public class RC4 {
 			try {
 				File file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rc4");
 				if (file.exists()) {
-					defaultKey = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-					log.info("using file " + file.getAbsolutePath());
+					try (BufferedReader br = new BufferedReader(
+							new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+						defaultKey = br.lines().collect(Collectors.joining("\n"));
+						log.info("using file " + file.getAbsolutePath());
+					}
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
 						log.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RC4.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-						try (InputStream is = RC4.class.getResourceAsStream(DEFAULT_KEY_LOCATION)) {
-							defaultKey = IOUtils.toString(is, StandardCharsets.UTF_8);
+						try (BufferedReader br = new BufferedReader(new InputStreamReader(
+								RC4.class.getResourceAsStream(DEFAULT_KEY_LOCATION), StandardCharsets.UTF_8))) {
+							defaultKey = br.lines().collect(Collectors.joining("\n"));
 							log.info("using classpath resource "
 									+ RC4.class.getResource(DEFAULT_KEY_LOCATION).toString() + " as default key");
 						}

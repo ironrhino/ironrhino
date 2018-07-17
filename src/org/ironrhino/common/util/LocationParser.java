@@ -5,8 +5,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.util.AppInfo;
+import org.springframework.util.StreamUtils;
 
 public class LocationParser {
 
@@ -32,8 +32,7 @@ public class LocationParser {
 				is = LocationParser.class.getClassLoader().getResourceAsStream("resources" + FILE_LOCATION);
 			}
 			if (is != null) {
-				bytes = new byte[is.available()];
-				IOUtils.readFully(is, bytes);
+				bytes = StreamUtils.copyToByteArray(is);
 				is.close();
 			} else {
 				bytes = null;

@@ -6,13 +6,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public abstract class FileStorageTestBase {
 
 	@Before
 	public void cleanup() {
-		//delete(fs, "/");
+		// delete(fs, "/");
 	}
 
 	@Test
@@ -51,13 +52,11 @@ public abstract class FileStorageTestBase {
 		assertTrue(fs.isDirectory("/test/test2/"));
 		assertNull(fs.open("/test/test2/"));
 		assertNull(fs.open("/test/test2/notexists.txt"));
-		List<String> lines;
-		try (InputStream is = fs.open(path)) {
-			lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(path), StandardCharsets.UTF_8))) {
+			assertEquals(text, br.lines().collect(Collectors.joining("\n")));
 		}
 		assertTrue(fs.exists("/test/"));
 		assertTrue(fs.exists(path));
-		assertEquals(text, lines.get(0));
 		assertFalse(fs.delete("/test/test2/"));
 		fs.delete(path);
 		assertFalse(fs.delete("/test/test2/"));

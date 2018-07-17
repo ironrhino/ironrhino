@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.FileUtils;
@@ -22,6 +21,7 @@ import org.ironrhino.core.util.LimitExceededException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.StreamUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -56,7 +56,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 		File dest = new File(directory, path);
 		dest.getParentFile().mkdirs();
 		try (InputStream ins = is; FileOutputStream os = new FileOutputStream(dest)) {
-			IOUtils.copy(ins, os);
+			StreamUtils.copy(ins, os);
 		}
 	}
 

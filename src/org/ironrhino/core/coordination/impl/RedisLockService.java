@@ -3,16 +3,16 @@ package org.ironrhino.core.coordination.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
@@ -73,13 +73,11 @@ public class RedisLockService implements LockService {
 				conn.setUseCaches(false);
 				conn.connect();
 				if (conn.getResponseCode() == 200) {
-					try (InputStream is = conn.getInputStream()) {
-						List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
-						if (lines.size() > 0) {
-							String value = lines.get(0).trim();
-							if (value.equals(currentHolderInstanceId)) {
-								alive = true;
-							}
+					try (BufferedReader br = new BufferedReader(
+							new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+						String value = br.lines().collect(Collectors.joining("\n"));
+						if (value.equals(currentHolderInstanceId)) {
+							alive = true;
 						}
 					}
 				}

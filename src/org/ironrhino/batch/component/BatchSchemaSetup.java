@@ -1,6 +1,8 @@
 package org.ironrhino.batch.component;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -9,10 +11,10 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -64,15 +66,17 @@ public class BatchSchemaSetup {
 			try (InputStream is = Job.class.getResourceAsStream(file)) {
 				if (is == null)
 					throw new UnsupportedOperationException("Database " + dp.name() + " is not supported");
-				String[] arr = String.join("\n", IOUtils.readLines(is, StandardCharsets.UTF_8)).split(";");
-				try (Statement stmt = conn.createStatement()) {
-					for (String sql : arr) {
-						if (!tablePrefix.equalsIgnoreCase("BATCH_")) {
-							sql = sql.replaceAll("BATCH_", tablePrefix);
+				try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+					String[] arr = br.lines().collect(Collectors.joining("\n")).split(";");
+					try (Statement stmt = conn.createStatement()) {
+						for (String sql : arr) {
+							if (!tablePrefix.equalsIgnoreCase("BATCH_")) {
+								sql = sql.replaceAll("BATCH_", tablePrefix);
+							}
+							if (maxVarCharLength != 2500)
+								sql = sql.replaceAll("2500", String.valueOf(maxVarCharLength));
+							stmt.execute(sql);
 						}
-						if (maxVarCharLength != 2500)
-							sql = sql.replaceAll("2500", String.valueOf(maxVarCharLength));
-						stmt.execute(sql);
 					}
 				}
 			}

@@ -1,7 +1,10 @@
 package org.ironrhino.core.security.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,14 +20,13 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Enumeration;
+import java.util.stream.Collectors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
@@ -78,15 +80,20 @@ public class RSA {
 			try {
 				file = new File(AppInfo.getAppHome() + KEY_DIRECTORY + "rsa.password");
 				if (file.exists()) {
-					defaultPassword = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-					log.info("using file " + file.getAbsolutePath());
+					try (BufferedReader br = new BufferedReader(
+							new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+						defaultPassword = br.lines().collect(Collectors.joining("\n"));
+						log.info("using file " + file.getAbsolutePath());
+					}
 				} else {
 					if (AppInfo.getStage() == Stage.PRODUCTION)
 						log.warn("file " + file.getAbsolutePath()
 								+ " doesn't exists, please use your own default key in production!");
 					if (RSA.class.getResource(DEFAULT_KEY_LOCATION) != null) {
-						try (InputStream pis = RSA.class.getResourceAsStream(DEFAULT_KEY_LOCATION + ".password")) {
-							defaultPassword = IOUtils.toString(pis, StandardCharsets.UTF_8);
+						try (BufferedReader br = new BufferedReader(
+								new InputStreamReader(RSA.class.getResourceAsStream(DEFAULT_KEY_LOCATION + ".password"),
+										StandardCharsets.UTF_8))) {
+							defaultPassword = br.lines().collect(Collectors.joining("\n"));
 							log.info("using classpath resource "
 									+ RSA.class.getResource(DEFAULT_KEY_LOCATION + ".password").toString()
 									+ " as default key");

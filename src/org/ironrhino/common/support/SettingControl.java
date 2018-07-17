@@ -1,7 +1,9 @@
 package org.ironrhino.common.support;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Order;
 import org.ironrhino.common.model.Setting;
@@ -207,25 +208,28 @@ public class SettingControl {
 				.getResourceAsStream("resources/data/setting.txt")) {
 			if (is == null)
 				return;
-			Setting temp;
-			for (String s : IOUtils.readLines(is, StandardCharsets.UTF_8)) {
-				if (StringUtils.isBlank(s) || s.trim().startsWith("#"))
-					continue;
-				String arr[] = s.trim().split("#", 2);
-				String description = null;
-				if (arr.length == 2)
-					description = arr[1].trim();
-				arr = arr[0].trim().split("\\s*=\\s*", 2);
-				if (arr.length < 2)
-					continue;
-				if ((temp = entityManager.findOne(arr[0])) != null)
-					if (AppInfo.getStage() == Stage.DEVELOPMENT)
-						entityManager.delete(temp);
-					else
-						continue;
-				Setting setting = new Setting(arr[0], arr[1]);
-				setting.setDescription(description);
-				entityManager.save(setting);
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+				br.lines().filter(s -> StringUtils.isNotBlank(s) && !s.trim().startsWith("#")).forEach(s -> {
+					String arr[] = s.trim().split("#", 2);
+					String description = null;
+					if (arr.length == 2)
+						description = arr[1].trim();
+					arr = arr[0].trim().split("\\s*=\\s*", 2);
+					if (arr.length > 1) {
+						Setting temp;
+						if ((temp = entityManager.findOne(arr[0])) != null) {
+							if (AppInfo.getStage() == Stage.DEVELOPMENT) {
+								entityManager.delete(temp);
+								temp = null;
+							}
+						}
+						if (temp == null) {
+							Setting setting = new Setting(arr[0], arr[1]);
+							setting.setDescription(description);
+							entityManager.save(setting);
+						}
+					}
+				});
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);

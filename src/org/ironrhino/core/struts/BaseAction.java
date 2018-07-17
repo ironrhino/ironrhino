@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -279,17 +280,8 @@ public class BaseAction extends ActionSupport {
 					contentType = contentType.substring(0, contentType.indexOf(';')).trim();
 				if ((contentType.contains("text") || contentType.contains("xml") || contentType.contains("json")
 						|| contentType.contains("javascript")))
-					try {
-						BufferedReader reader = request.getReader();
-						StringBuilder sb = new StringBuilder();
-						String line;
-						while ((line = reader.readLine()) != null)
-							sb.append(line).append("\n");
-						reader.close();
-						if (sb.length() > 0) {
-							sb.deleteCharAt(sb.length() - 1);
-							requestBody = sb.toString();
-						}
+					try (BufferedReader reader = request.getReader()) {
+						requestBody = reader.lines().collect(Collectors.joining("\n"));
 					} catch (IllegalStateException e) {
 
 					}

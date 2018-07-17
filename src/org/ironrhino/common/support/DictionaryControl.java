@@ -1,17 +1,19 @@
 package org.ironrhino.common.support;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Order;
 import org.ironrhino.common.model.Dictionary;
@@ -127,7 +129,11 @@ public class DictionaryControl {
 			String name = null;
 			String description = null;
 			List<LabelValue> items = null;
-			for (String s : IOUtils.readLines(is, StandardCharsets.UTF_8)) {
+			List<String> lines;
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+				lines = br.lines().collect(Collectors.toList());
+			}
+			for (String s : lines) {
 				if (StringUtils.isBlank(s) || s.trim().startsWith("#")) {
 					if (name != null && items != null) {
 						temp = entityManager.findOne(name);

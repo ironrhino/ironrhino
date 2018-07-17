@@ -11,7 +11,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
@@ -21,6 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
 import lombok.Getter;
@@ -101,7 +101,7 @@ public class UploadFilesHandler extends AccessHandler {
 				if (contentType != null)
 					response.setContentType(contentType);
 				try (OutputStream os = response.getOutputStream()) {
-					IOUtils.copy(is, os);
+					StreamUtils.copy(is, os);
 				} catch (Exception e) {
 					// supress ClientAbortException
 				}

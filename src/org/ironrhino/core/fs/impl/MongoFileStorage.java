@@ -5,7 +5,6 @@ import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -14,7 +13,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.ErrorMessage;
@@ -25,6 +23,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
 import lombok.Data;
@@ -50,11 +49,10 @@ public class MongoFileStorage extends AbstractFileStorage {
 		int lastIndex = path.lastIndexOf('/');
 		if (lastIndex > 0)
 			mkdir(path.substring(0, lastIndex));
-		try (InputStream ins = is; ByteArrayOutputStream os = new ByteArrayOutputStream(512 * 1024)) {
-			IOUtils.copy(is, os);
+		try (InputStream ins = is) {
 			File file = new File();
 			file.setPath(path);
-			file.setData(os.toByteArray());
+			file.setData(StreamUtils.copyToByteArray(is));
 			file.setLastModified(System.currentTimeMillis());
 			mongoTemplate.save(file);
 		}

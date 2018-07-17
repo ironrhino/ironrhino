@@ -1,11 +1,12 @@
 package org.ironrhino.sample.crud;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.struts.EntityAction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +28,16 @@ public class PersonAction extends EntityAction<Person> {
 	public String upload() throws IOException {
 		personManager.setEntityClass(Person.class);
 		if (file != null) {
-			IOUtils.readLines(new FileInputStream(file), StandardCharsets.UTF_8).stream().forEach(line -> {
-				String[] arr = line.split(",");
-				Person p = new Person();
-				p.setId(new Identity(arr[0], arr[1]));
-				p.setName(arr[2]);
-				personManager.save(p);
-			});
+			try (BufferedReader br = new BufferedReader(
+					new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+				br.lines().forEach(line -> {
+					String[] arr = line.split(",");
+					Person p = new Person();
+					p.setId(new Identity(arr[0], arr[1]));
+					p.setName(arr[2]);
+					personManager.save(p);
+				});
+			}
 		}
 		return SUCCESS;
 	}

@@ -3,8 +3,9 @@ package org.ironrhino.core.coordination.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -12,11 +13,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.coordination.Membership;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
@@ -72,23 +73,20 @@ public class RedisMembership implements Membership {
 						conn.setUseCaches(false);
 						conn.connect();
 						if (conn.getResponseCode() == 200) {
-							try (InputStream is = conn.getInputStream()) {
-								List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
-								if (lines.size() > 0) {
-									String value = lines.get(0).trim();
-									if (value.equals(member)) {
-										alive = true;
-									} else {
-										if (!members.contains(value) && value.length() <= 100
-												&& value.matches("[\\w-]+@[\\w.:]+")) {
-											if (AppInfo.getAppName()
-													.equals(value.substring(0, value.lastIndexOf('-')))) {
-												coordinationStringRedisTemplate.opsForList()
-														.rightPush(NAMESPACE + group, value);
-											} else {
-												// multiple virtual host
-												alive = true;
-											}
+							try (BufferedReader br = new BufferedReader(
+									new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+								String value = br.lines().collect(Collectors.joining("\n"));
+								if (value.equals(member)) {
+									alive = true;
+								} else {
+									if (!members.contains(value) && value.length() <= 100
+											&& value.matches("[\\w-]+@[\\w.:]+")) {
+										if (AppInfo.getAppName().equals(value.substring(0, value.lastIndexOf('-')))) {
+											coordinationStringRedisTemplate.opsForList().rightPush(NAMESPACE + group,
+													value);
+										} else {
+											// multiple virtual host
+											alive = true;
 										}
 									}
 								}

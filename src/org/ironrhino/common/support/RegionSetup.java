@@ -1,5 +1,6 @@
 package org.ironrhino.common.support;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,11 +15,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.common.model.Region;
@@ -34,6 +35,7 @@ import org.ironrhino.core.util.XmlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -198,7 +200,7 @@ public class RegionSetup {
 			// https://github.com/xixilive/chinese_regions_db
 			File tempZipFile = File.createTempFile("region", "zip");
 			try (OutputStream os = new FileOutputStream(tempZipFile)) {
-				IOUtils.copy(is, os);
+				StreamUtils.copy(is, os);
 			}
 			try (ZipFile zf = new ZipFile(tempZipFile)) {
 				zf.stream().filter(ze -> ze.getName().endsWith(".json")).forEach(ze -> {
@@ -222,9 +224,10 @@ public class RegionSetup {
 
 	private static Map<String, String> regionAreacodeMap() {
 		List<String> lines = new ArrayList<>();
-		try (InputStream is = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("resources/data/region_code.txt")) {
-			lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(
+				Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/data/region_code.txt"),
+				StandardCharsets.UTF_8))) {
+			lines = br.lines().collect(Collectors.toList());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

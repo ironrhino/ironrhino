@@ -1,13 +1,15 @@
 package org.ironrhino.rest.client;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.http.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
@@ -69,15 +71,17 @@ class RestClientTemplate extends RestTemplate {
 					try {
 						ClientHttpResponse response = execution.execute(request, body);
 						if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-							String text = String.join("", IOUtils.readLines(response.getBody(), StandardCharsets.UTF_8))
-									.toLowerCase(Locale.ROOT);
-							if (text.contains("invalid_token")) {
-								client.getTokenStore().setToken(client.getTokenStoreKey(), null);
-							} else if (text.contains("expired_token")) {
-								client.getTokenStore().setToken(client.getTokenStoreKey(), null);
+							try (BufferedReader br = new BufferedReader(
+									new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))) {
+								String text = br.lines().collect(Collectors.joining("\n")).toLowerCase(Locale.ROOT);
+								if (text.contains("invalid_token")) {
+									client.getTokenStore().setToken(client.getTokenStoreKey(), null);
+								} else if (text.contains("expired_token")) {
+									client.getTokenStore().setToken(client.getTokenStoreKey(), null);
+								}
+								request.getHeaders().set("Authorization", client.getAuthorizationHeader());
+								return execution.execute(request, body);
 							}
-							request.getHeaders().set("Authorization", client.getAuthorizationHeader());
-							return execution.execute(request, body);
 						}
 						return response;
 					} catch (SocketTimeoutException e) {

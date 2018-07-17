@@ -3,16 +3,18 @@ package org.ironrhino.rest.client;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.security.domain.User;
@@ -83,8 +85,10 @@ public class RestApiTests {
 	@Test
 	public void testGetStream() throws IOException {
 		InputStream is = userClient.getStream();
-		List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
-		assertEquals(false, lines.isEmpty());
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+			List<String> lines = br.lines().collect(Collectors.toList());
+			assertEquals(false, lines.isEmpty());
+		}
 	}
 
 	@Test

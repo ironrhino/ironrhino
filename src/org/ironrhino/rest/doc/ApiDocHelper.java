@@ -1,6 +1,8 @@
 package org.ironrhino.rest.doc;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.util.CodecUtils;
@@ -47,7 +49,9 @@ public abstract class ApiDocHelper {
 					if (is == null) {
 						throw new ErrorMessage(sampleFileName + " with " + apiDocClazz.getName() + " is not found!");
 					}
-					return String.join("\n", IOUtils.readLines(is, StandardCharsets.UTF_8));
+					try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+						return br.lines().collect(Collectors.joining("\n"));
+					}
 				}
 			}
 			String sampleMethodName = fields.sampleMethodName();

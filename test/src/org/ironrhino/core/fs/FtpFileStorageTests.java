@@ -2,15 +2,15 @@ package org.ironrhino.core.fs;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.fs.FtpFileStorageTests.FtpFileStorageConfiguration;
 import org.ironrhino.core.fs.impl.FtpFileStorage;
 import org.junit.Test;
@@ -43,9 +43,9 @@ public class FtpFileStorageTests extends FileStorageTestBase {
 					for (int k = 0; k < loop; k++) {
 						String text = "test" + j + "-" + k;
 						writeToFile(fs, text, path);
-						try (InputStream is = fs.open(path)) {
-							List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
-							if (!text.equals(String.join("\n", lines)))
+						try (BufferedReader br = new BufferedReader(
+								new InputStreamReader(fs.open(path), StandardCharsets.UTF_8))) {
+							if (!text.equals(br.lines().collect(Collectors.joining("\n"))))
 								errors.incrementAndGet();
 						}
 						fs.delete(path);
