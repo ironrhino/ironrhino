@@ -55,7 +55,7 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.maxLifetime:7200000}") // maxConnectionAgeInSeconds
 	private long maxLifetime;
 
-	@Value("${dataSource.autoCommit:false}")
+	@Value("${dataSource.autoCommit:true}")
 	private boolean autoCommit;
 
 	@Value("${dataSource.registerMbeans:false}") // disableJMX
