@@ -38,48 +38,26 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.password:}")
 	private String password;
 
-	// aliases for HikariDataSource
-
-	@Value("${dataSource.maximumPoolSize:500}") // maxActive
+	@Value("${dataSource.maximumPoolSize:500}")
 	private int maximumPoolSize;
 
-	@Value("${dataSource.minimumIdle:5}") // initialSize
+	@Value("${dataSource.minimumIdle:5}")
 	private int minimumIdle;
 
-	@Value("${dataSource.connectionTimeout:10000}") // connectionTimeoutInMs
+	@Value("${dataSource.connectionTimeout:10000}")
 	private long connectionTimeout;
 
-	@Value("${dataSource.idleTimeout:1800000}") // idleMaxAgeInMinutes
+	@Value("${dataSource.idleTimeout:1800000}")
 	private long idleTimeout;
 
-	@Value("${dataSource.maxLifetime:7200000}") // maxConnectionAgeInSeconds
+	@Value("${dataSource.maxLifetime:7200000}")
 	private long maxLifetime;
 
 	@Value("${dataSource.autoCommit:true}")
 	private boolean autoCommit;
 
-	@Value("${dataSource.registerMbeans:false}") // disableJMX
+	@Value("${dataSource.registerMbeans:false}")
 	private boolean registerMbeans;
-
-	// legacy alias from dbcp and bonecp
-
-	@Value("${dataSource.maxActive:}") // maximumPoolSize
-	private Integer maxConnectionsPerPartition;
-
-	@Value("${dataSource.initialSize:}") // minimumIdle
-	private Integer minConnectionsPerPartition;
-
-	@Value("${dataSource.connectionTimeoutInMs:}") // connectionTimeout
-	private Long connectionTimeoutInMs;
-
-	@Value("${dataSource.idleMaxAgeInMinutes:}") // idleTimeout
-	private Integer idleMaxAgeInMinutes;
-
-	@Value("${dataSource.maxConnectionAgeInSeconds:}") // maxLifetime
-	private Integer maxConnectionAgeInSeconds;
-
-	@Value("${dataSource.disableJMX:}") // registerMbeans
-	private Boolean disableJMX;
 
 	@Bean(destroyMethod = "close")
 	@Primary
@@ -104,18 +82,6 @@ public class DataSourceConfiguration {
 		ds.setJdbcUrl(databaseProduct != null ? databaseProduct.polishJdbcUrl(jdbcUrl) : jdbcUrl);
 		ds.setUsername(username);
 		ds.setPassword(password);
-		if (maxConnectionsPerPartition != null)
-			maximumPoolSize = maxConnectionsPerPartition;
-		if (minConnectionsPerPartition != null)
-			minimumIdle = minConnectionsPerPartition;
-		if (connectionTimeoutInMs != null)
-			connectionTimeout = connectionTimeoutInMs;
-		if (idleMaxAgeInMinutes != null)
-			idleTimeout = idleMaxAgeInMinutes * 60 * 1000;
-		if (maxConnectionAgeInSeconds != null)
-			maxLifetime = maxConnectionAgeInSeconds * 1000;
-		if (disableJMX != null)
-			registerMbeans = !disableJMX;
 		ds.setMaximumPoolSize(maximumPoolSize);
 		ds.setMinimumIdle(minimumIdle);
 		ds.setConnectionTimeout(connectionTimeout);
