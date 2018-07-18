@@ -20,14 +20,16 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		String javaVersion = System.getProperty("java.version");
-		StringTokenizer tokens = new StringTokenizer(javaVersion, ".-_");
-		int majorVersion = Integer.parseInt(tokens.nextToken());
-		int minorVersion = Integer.parseInt(tokens.nextToken());
-		if ((majorVersion < 2) && (minorVersion < 7)) {
-			System.err.println("requires Java 7 or later.");
-			System.err.println("Your java version is " + javaVersion);
-			System.err.println("Java Home:  " + System.getProperty("java.home"));
-			System.exit(0);
+		if (javaVersion.startsWith("1.")) {
+			StringTokenizer tokens = new StringTokenizer(javaVersion, ".-_");
+			int majorVersion = Integer.parseInt(tokens.nextToken());
+			int minorVersion = Integer.parseInt(tokens.nextToken());
+			if ((majorVersion < 2) && (minorVersion < 7)) {
+				System.err.println("requires Java 7 or later.");
+				System.err.println("Your java version is " + javaVersion);
+				System.err.println("Java Home:  " + System.getProperty("java.home"));
+				System.exit(0);
+			}
 		}
 		Main main = new Main();
 		main.launchJetty();
