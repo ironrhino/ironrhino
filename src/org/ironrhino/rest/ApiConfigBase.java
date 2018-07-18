@@ -25,10 +25,13 @@ import org.ironrhino.rest.component.AuthorizeAspect;
 import org.ironrhino.rest.component.MetricsAspect;
 import org.ironrhino.rest.component.RestExceptionHandler;
 import org.ironrhino.rest.doc.ApiDocInspector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -44,6 +47,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
@@ -63,6 +67,8 @@ import freemarker.template.TemplateException;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
 	@Autowired
 	private ServletContext servletContext;
 
@@ -71,6 +77,13 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	@PostConstruct
 	private void init() {
+		Class<?> clazz = ReflectionUtils.getActualClass(getClass());
+		if (clazz.isAnnotationPresent(PropertySources.class) || clazz.isAnnotationPresent(EnableAspectJAutoProxy.class)
+				|| clazz.isAnnotationPresent(ControllerAdvice.class)) {
+			logger.warn(
+					"It seems you are running with legacy code, please remove @PropertySources and @EnableAspectJAutoProxy and @ControllerAdvice from "
+							+ clazz.getName());
+		}
 		Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
 		for (ServletRegistration sr : map.values()) {
 			if (ReflectionUtils.getActualClass(this).getName()
