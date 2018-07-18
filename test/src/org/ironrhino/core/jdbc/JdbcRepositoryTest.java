@@ -205,7 +205,7 @@ public class JdbcRepositoryTest {
 			Dog dog = new Dog();
 			dog.setName("dog" + i);
 			dogRepository.save(dog);
-			assertEquals(new Integer(i + 1), dog.getId());
+			assertEquals(Integer.valueOf(i + 1), dog.getId());
 		}
 		for (int i = 0; i < size; i++) {
 			Dog dog = new Dog();
@@ -213,7 +213,7 @@ public class JdbcRepositoryTest {
 			dogRepository.insert(dog.getName(), id -> {
 				dog.setId(id);
 			});
-			assertEquals(new Integer(size + i + 1), dog.getId());
+			assertEquals(Integer.valueOf(size + i + 1), dog.getId());
 		}
 		for (int i = 0; i < size * 2; i++) {
 			assertTrue(dogRepository.delete(i + 1));
