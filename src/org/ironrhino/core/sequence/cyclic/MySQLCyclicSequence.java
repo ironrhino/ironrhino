@@ -39,8 +39,8 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 	public String nextStringValue() throws DataAccessException {
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
-			int maxAttempts = 3;
-			while (--maxAttempts > 0) {
+			int attempts = 3;
+			while (attempts-- > 0) {
 				stmt.execute(setVariableSql);
 				int rows = stmt.executeUpdate(incrementSql);
 				if (rows == 1)

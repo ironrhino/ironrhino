@@ -164,8 +164,8 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
 			CycleType ct = getCycleType();
-			int maxAttempts = 3;
-			while (--maxAttempts > 0) {
+			int attempts = 3;
+			while (attempts-- > 0) {
 				Result result = queryTimestampWithSequence(con, stmt);
 				Date now = result.currentTimestamp;
 				if (sameCycle(result)) {

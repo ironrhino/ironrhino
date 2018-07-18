@@ -107,7 +107,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 		return getConnection(username, password, maxAttempts);
 	}
 
-	public Connection getConnection(String username, String password, int attempts) throws SQLException {
+	public Connection getConnection(String username, String password, int maxAttempts) throws SQLException {
 		DataSource ds = null;
 		String dbname = null;
 		boolean read = false;
@@ -127,30 +127,33 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 		}
 		if (ds == null)
 			throw new IllegalStateException("No underlying DataSource found");
-		try {
-			Connection conn = username == null ? ds.getConnection() : ds.getConnection(username, password);
-			if (read)
-				conn.setReadOnly(true);
-			failureCount.remove(ds);
-			return conn;
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-			if (--attempts < 1)
-				throw e;
-			Integer failureTimes = failureCount.get(ds);
-			if (failureTimes == null)
-				failureTimes = 1;
-			else
-				failureTimes += 1;
-			if (failureTimes == deadFailureThreshold) {
+		int attempts = maxAttempts;
+		do {
+			try {
+				Connection conn = username == null ? ds.getConnection() : ds.getConnection(username, password);
+				if (read)
+					conn.setReadOnly(true);
 				failureCount.remove(ds);
-				deadDataSources.add(ds);
-				log.error("dataSource[" + groupName + ':' + dbname + "] down!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			} else {
-				failureCount.put(ds, failureTimes);
+				return conn;
+			} catch (SQLException e) {
+				log.error(e.getMessage(), e);
+				if (attempts <= 1)
+					throw e;
+				Integer failureTimes = failureCount.get(ds);
+				if (failureTimes == null)
+					failureTimes = 1;
+				else
+					failureTimes += 1;
+				if (failureTimes == deadFailureThreshold) {
+					failureCount.remove(ds);
+					deadDataSources.add(ds);
+					log.error("dataSource[" + groupName + ':' + dbname + "] down!");
+				} else {
+					failureCount.put(ds, failureTimes);
+				}
 			}
-			return getConnection(username, password, attempts);
-		}
+		} while (--attempts > 0);
+		throw new IllegalStateException("Should never happens");
 	}
 
 	@Override
@@ -163,26 +166,25 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 		Iterator<DataSource> it = deadDataSources.iterator();
 		while (it.hasNext()) {
 			DataSource ds = it.next();
-			try {
-				Connection conn = ds.getConnection();
-				conn.isValid(5);
-				conn.close();
-				it.remove();
-				String dbname = null;
-				for (Map.Entry<String, DataSource> entry : writeSlaves.entrySet()) {
-					if (entry.getValue() == ds) {
-						dbname = entry.getKey();
-						break;
-					}
-				}
-				if (dbname == null)
-					for (Map.Entry<String, DataSource> entry : readSlaves.entrySet()) {
+			try (Connection conn = ds.getConnection()) {
+				if (conn.isValid(5)) {
+					it.remove();
+					String dbname = null;
+					for (Map.Entry<String, DataSource> entry : writeSlaves.entrySet()) {
 						if (entry.getValue() == ds) {
 							dbname = entry.getKey();
 							break;
 						}
 					}
-				log.warn("dataSource[" + groupName + ':' + dbname + "] recovered");
+					if (dbname == null)
+						for (Map.Entry<String, DataSource> entry : readSlaves.entrySet()) {
+							if (entry.getValue() == ds) {
+								dbname = entry.getKey();
+								break;
+							}
+						}
+					log.warn("dataSource[" + groupName + ':' + dbname + "] recovered");
+				}
 			} catch (Exception e) {
 				log.debug(e.getMessage(), e);
 			}

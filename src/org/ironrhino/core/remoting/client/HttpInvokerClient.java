@@ -270,7 +270,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		if (serviceStats != null)
 			method = ReflectionUtils.stringify(methodInvocation.getMethod(), false, true);
 		int attempts = maxAttempts;
-		while (attempts > 0) {
+		do {
 			long time = System.currentTimeMillis();
 			try {
 				RemoteInvocationResult result = super.executeRequest(invocation);
@@ -286,7 +286,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
 							System.currentTimeMillis() - time, true);
 				}
-				if (--attempts < 1)
+				if (attempts <= 1)
 					throw e;
 				if ((e instanceof SerializationFailedException)
 						&& !serializer.equals(HttpInvokerSerializers.DEFAULT_SERIALIZER)) {
@@ -312,8 +312,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 					}
 				}
 			}
-		}
-		throw new IllegalArgumentException("maxAttempts should large than 0");
+		} while (--attempts > 0);
+		throw new IllegalStateException("Should never happens");
 	}
 
 	@Override

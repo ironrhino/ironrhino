@@ -63,11 +63,8 @@ class RestClientTemplate extends RestTemplate {
 					request = req;
 				}
 				request.getHeaders().set("Authorization", client.getAuthorizationHeader());
-				int n = maxAttempts;
-				if (n < 0 || n > 10)
-					n = 1;
-				IOException ex = null;
-				for (int i = 0; i < n; i++) {
+				int attempts = maxAttempts;
+				do {
 					try {
 						ClientHttpResponse response = execution.execute(request, body);
 						if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -85,10 +82,11 @@ class RestClientTemplate extends RestTemplate {
 						}
 						return response;
 					} catch (SocketTimeoutException e) {
-						ex = e;
+						if (attempts <= 1)
+							throw e;
 					}
-				}
-				throw ex;
+				} while (--attempts > 0);
+				throw new IllegalStateException("Should never happens");
 			}
 		});
 	}
