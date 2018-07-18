@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
@@ -48,18 +49,34 @@ public class ApplicationContextInspector {
 	private volatile Map<String, String> defaultProperties;
 
 	public Map<String, String> getOverridedProperties() {
-		if (overridedProperties == null) {
-			Map<String, String> properties = new TreeMap<>();
-			for (PropertySource<?> ps : env.getPropertySources()) {
-				if (ps instanceof ResourcePropertySource) {
-					ResourcePropertySource rps = (ResourcePropertySource) ps;
-					for (String s : rps.getPropertyNames())
-						properties.put(s, s.endsWith(".password") ? "********" : env.getProperty(s));
+		Map<String, String> temp = overridedProperties;
+		if (temp == null) {
+			synchronized (this) {
+				temp = overridedProperties;
+				if (temp == null) {
+					Map<String, String> map = new TreeMap<>();
+					for (PropertySource<?> ps : env.getPropertySources()) {
+						addOverridedProperties(map, ps);
+					}
+					overridedProperties = temp = Collections.unmodifiableMap(map);
 				}
 			}
-			overridedProperties = Collections.unmodifiableMap(properties);
 		}
-		return overridedProperties;
+		return temp;
+	}
+
+	private static void addOverridedProperties(Map<String, String> properties, PropertySource<?> propertySource) {
+		if (propertySource instanceof ResourcePropertySource) {
+			ResourcePropertySource rps = (ResourcePropertySource) propertySource;
+			for (String s : rps.getPropertyNames()) {
+				if (!properties.containsKey(s))
+					properties.put(s, s.endsWith(".password") ? "********" : String.valueOf(rps.getProperty(s)));
+			}
+		} else if (propertySource instanceof CompositePropertySource) {
+			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
+				addOverridedProperties(properties, ps);
+			}
+		}
 	}
 
 	public Map<String, String> getDefaultProperties() throws Exception {
