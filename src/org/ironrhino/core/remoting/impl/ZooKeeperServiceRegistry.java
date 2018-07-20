@@ -5,7 +5,6 @@ import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,10 +36,6 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	@Value("${serviceRegistry.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
-
-	private Map<String, String> discoveredServices = new HashMap<>();
-
-	private boolean ready;
 
 	private String servicesParentPath;
 
@@ -110,17 +105,17 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	protected void onDiscover(String serviceName, String host) {
 		super.onDiscover(serviceName, host);
-		discoveredServices.put(serviceName, host);
+		importedServices.put(serviceName, host);
 		if (ready)
 			writeDiscoveredServices();
 	}
 
 	protected void writeDiscoveredServices() {
-		if (discoveredServices.size() == 0)
+		if (importedServices.size() == 0)
 			return;
 		String path = new StringBuilder().append(hostsParentPath).append("/").append(escapeSlash(getLocalHost()))
 				.toString();
-		byte[] data = JsonUtils.toJson(discoveredServices).getBytes();
+		byte[] data = JsonUtils.toJson(importedServices).getBytes();
 		try {
 			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).inBackground()
 					.forPath(path, data);
@@ -188,6 +183,8 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	@Override
 	public Map<String, String> getImportedServices(String host) {
+		if (host.equals(getLocalHost()))
+			return importedServices;
 		try {
 			String path = new StringBuilder().append(hostsParentPath).append("/").append(escapeSlash(host)).toString();
 			byte[] data = curatorFramework.getData().forPath(path);

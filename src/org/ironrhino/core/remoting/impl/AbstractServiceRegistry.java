@@ -37,6 +37,8 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 
+import lombok.Getter;
+
 public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	private static final String CLASS_NAME_SERVER = "org.ironrhino.core.remoting.server.HttpInvokerServer";
@@ -60,23 +62,20 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Autowired
 	private ConfigurableApplicationContext ctx;
 
+	@Getter
 	protected Map<String, List<String>> importedServiceCandidates = new ConcurrentHashMap<>();
 
+	@Getter
 	protected Map<String, Object> exportedServices = new HashMap<>();
 
 	protected Map<String, String> exportedServiceDescriptions = new TreeMap<>();
 
+	protected Map<String, String> importedServices = new ConcurrentHashMap<>();
+
+	protected boolean ready;
+
+	@Getter
 	private String localHost;
-
-	@Override
-	public String getLocalHost() {
-		return localHost;
-	}
-
-	@Override
-	public Map<String, Object> getExportedServices() {
-		return exportedServices;
-	}
 
 	public void init() {
 		if (!useHttps)
@@ -140,7 +139,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		onReady();
 	}
 
-	public static String normalizeHost(String host) {
+	private static String normalizeHost(String host) {
 		int i = host.indexOf('@');
 		if (i < 0)
 			return host;

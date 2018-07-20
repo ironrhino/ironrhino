@@ -6,7 +6,6 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,10 +49,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
-	private Map<String, String> discoveredServices = new HashMap<>();
-
-	private boolean ready;
-
 	@Override
 	protected void onReady() {
 		Set<String> services = getExportedServices().keySet();
@@ -89,16 +84,16 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	protected void onDiscover(String serviceName, String host) {
 		super.onDiscover(serviceName, host);
-		discoveredServices.put(serviceName, host);
+		importedServices.put(serviceName, host);
 		if (ready)
 			writeDiscoveredServices();
 	}
 
 	protected void writeDiscoveredServices() {
-		if (discoveredServices.size() == 0)
+		if (importedServices.size() == 0)
 			return;
 		Runnable task = () -> remotingStringRedisTemplate.opsForHash().putAll(NAMESPACE_HOSTS + getLocalHost(),
-				discoveredServices);
+				importedServices);
 		if (executorService != null)
 			executorService.execute(task);
 		else
@@ -150,6 +145,8 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	public Map<String, String> getImportedServices(String host) {
+		if (host.equals(getLocalHost()))
+			return importedServices;
 		Map<Object, Object> map = remotingStringRedisTemplate.opsForHash().entries(NAMESPACE_HOSTS + host);
 		Map<String, String> services = new TreeMap<>();
 		for (Map.Entry<Object, Object> entry : map.entrySet())
