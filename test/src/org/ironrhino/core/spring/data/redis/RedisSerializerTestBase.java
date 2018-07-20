@@ -125,6 +125,10 @@ public abstract class RedisSerializerTestBase {
 			return status == Status.ACTIVE;
 		}
 
+		public User getSelf() {
+			return this;
+		}
+
 	}
 
 }

@@ -1,5 +1,6 @@
 package org.ironrhino.sample.api.controller;
 
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
@@ -9,7 +10,6 @@ import org.ironrhino.security.model.User;
 import org.springframework.core.annotation.Order;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ApiModule(value = "用户API")
@@ -58,13 +58,13 @@ public class UserControllerDoc extends UserController {
 	}
 
 	protected JsonNode createUserForPassword() {
-		ObjectNode jsonNode = new ObjectMapper().createObjectNode();
+		ObjectNode jsonNode = JsonUtils.getObjectMapper().createObjectNode();
 		jsonNode.put("password", "iampassword");
 		return jsonNode;
 	}
 
 	protected ObjectNode createUserForPost() {
-		ObjectNode jsonNode = new ObjectMapper().createObjectNode();
+		ObjectNode jsonNode = JsonUtils.getObjectMapper().createObjectNode();
 		jsonNode.put("username", "test123");
 		jsonNode.put("password", "newpassword");
 		jsonNode.put("name", "测试");
