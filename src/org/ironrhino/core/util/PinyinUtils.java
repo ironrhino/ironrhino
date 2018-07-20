@@ -88,6 +88,8 @@ public abstract class PinyinUtils {
 	}
 
 	public static String pinyin(String hanyu) {
+		if (hanyu == null)
+			return null;
 		StringBuilder sb = new StringBuilder();
 		char[] chars = hanyu.toCharArray();
 		for (char c : chars)
@@ -96,6 +98,8 @@ public abstract class PinyinUtils {
 	}
 
 	public static String pinyinAbbr(String hanyu) {
+		if (hanyu == null)
+			return null;
 		StringBuilder sb = new StringBuilder();
 		char[] chars = hanyu.toCharArray();
 		for (char c : chars)
