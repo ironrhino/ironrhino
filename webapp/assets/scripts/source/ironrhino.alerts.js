@@ -38,6 +38,8 @@
 			container.find(".popup-title").remove();
 		container.find(".popup-content").addClass(type);
 		popupMessage.html(message);
+		if (message.split('\n').length == 1)
+			popupMessage.addClass('center');
 
 		container.css({
 					minWidth : container.outerWidth(),
@@ -189,7 +191,8 @@
 
 	function reposition() {
 		var container = $('#popup-container', topDocument);
-		var top = (($(topWindow).height() / 2) - (container.outerHeight() / 2)) - 75;
+		var top = (($(topWindow).height() / 2) - (container.outerHeight() / 2))
+				- 75;
 		var left = (($(topWindow).width() / 2) - (container.outerWidth() / 2));
 		if (top < 0)
 			top = 0;
