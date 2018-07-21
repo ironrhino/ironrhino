@@ -139,8 +139,7 @@ public abstract class JsonSerializationUtils {
 		public boolean hasIgnoreMarker(AnnotatedMember m) {
 			Member member = m.getMember();
 			Class<?> declaringClass = member.getDeclaringClass();
-			if (GrantedAuthority.class.isAssignableFrom(declaringClass)
-					|| StackTraceElement.class.isAssignableFrom(declaringClass))
+			if (GrantedAuthority.class.isAssignableFrom(declaringClass) || declaringClass.getName().startsWith("java."))
 				return false;
 			return cache.computeIfAbsent(member, mem -> {
 				if (mem instanceof Method) {
@@ -151,8 +150,16 @@ public abstract class JsonSerializationUtils {
 						try {
 							declaringClass.getMethod(name, method.getReturnType());
 							return false;
-						} catch (Exception e) {
-							return true;
+						} catch (NoSuchMethodException e) {
+							boolean hasOtherSetter = false;
+							for (Method met : declaringClass.getMethods()) {
+								if (met.getName().startsWith("set") && met.getReturnType() == void.class
+										&& met.getParameterTypes().length == 1) {
+									hasOtherSetter = true;
+									break;
+								}
+							}
+							return hasOtherSetter;
 						}
 					}
 				}
