@@ -1,11 +1,11 @@
 <#ftl output_format='HTML'>
+<#assign service=uid!>
 <!DOCTYPE html>
 <html>
 <head>
-<title>${getText('playground')}</title>
+<title>${service}</title>
 </head>
 <body>
-<#assign service=uid!>
 <h3>${service}</h3>
 <div class="accordion" id="methods-accordion">
 <#list servicePlayground.getMethods(service!) as m>

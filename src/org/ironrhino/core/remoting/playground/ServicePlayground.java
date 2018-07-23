@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -164,7 +164,7 @@ public class ServicePlayground {
 		JavaType jt = objectMapper.getTypeFactory().constructType(type);
 		try {
 			return objectMapper.readValue(value, jt);
-		} catch (JsonParseException e) {
+		} catch (JsonProcessingException e) {
 			if (type == String.class)
 				return value;
 			else if (type instanceof Class<?>) {
