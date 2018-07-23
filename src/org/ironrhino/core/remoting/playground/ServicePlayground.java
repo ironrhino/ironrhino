@@ -53,6 +53,8 @@ public class ServicePlayground {
 			.enable(SerializationFeature.INDENT_OUTPUT).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 			.setDateFormat(new SimpleDateFormat(DateUtils.DATETIME));
 
+	private final ObjectMapper noDefaultTypingObjectMapper = new ObjectMapper();
+
 	public Collection<String> getServices() {
 		if (services.isEmpty()) {
 			synchronized (services) {
@@ -103,10 +105,14 @@ public class ServicePlayground {
 						pi.setName(parameterNames[i]);
 						Type type = parameterTypes[i];
 						pi.setType(type);
-						pi.setConcrete(objectMapper.getTypeFactory().constructType(type).isConcrete());
+						JavaType jt = objectMapper.getTypeFactory().constructType(type);
+						pi.setConcrete(jt.isConcrete() || jt.isCollectionLikeType() && jt.getContentType().isConcrete()
+								|| jt.isMapLikeType() && jt.getKeyType().isConcrete()
+										&& jt.getContentType().isConcrete());
 						try {
-							String sample = objectMapper
-									.writeValueAsString(SampleObjectCreator.getDefaultInstance().createSample(type));
+							Object sampleObject = SampleObjectCreator.getDefaultInstance().createSample(type);
+							String sample = (isCollectionOfArray(type) ? noDefaultTypingObjectMapper : objectMapper)
+									.writeValueAsString(sampleObject);
 							pi.setSample(sample);
 						} catch (Throwable t) {
 							t.printStackTrace();
@@ -137,7 +143,10 @@ public class ServicePlayground {
 			result = ((Callable<?>) result).call();
 		if (result instanceof Future)
 			result = ((Future<?>) result).get();
-		return mi.getMethod().getReturnType() != void.class ? objectMapper.writeValueAsString(result) : "";
+		return mi.getMethod().getReturnType() != void.class
+				? (isCollectionOfArray(mi.getReturnType()) ? noDefaultTypingObjectMapper : objectMapper)
+						.writeValueAsString(result)
+				: "";
 	}
 
 	protected Object[] convert(ParameterInfo[] parameters, Map<String, String> params) throws Exception {
@@ -165,6 +174,24 @@ public class ServicePlayground {
 			}
 			throw e;
 		}
+	}
+
+	private static boolean isCollectionOfArray(Type type) {
+		// jackson can not deserialize back with DefaultTyping
+		if (type instanceof ParameterizedType) {
+			ParameterizedType pt = ((ParameterizedType) type);
+			Type raw = pt.getRawType();
+			if (raw instanceof Class) {
+				Class<?> c = (Class<?>) raw;
+				if (Optional.class == c || Future.class.isAssignableFrom(c) || Callable.class.isAssignableFrom(c)) {
+					return isCollectionOfArray(pt.getActualTypeArguments()[0]);
+				} else if (Collection.class.isAssignableFrom(c)) {
+					Type t = pt.getActualTypeArguments()[0];
+					return t instanceof Class && ((Class<?>) t).isArray();
+				}
+			}
+		}
+		return false;
 	}
 
 }
