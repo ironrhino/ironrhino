@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -115,6 +116,7 @@ public class ServicePlayground {
 			} catch (ClassNotFoundException e) {
 				return Collections.emptyList();
 			}
+			list.sort(Comparator.comparing(MethodInfo::getName));
 			return list;
 		});
 	}
