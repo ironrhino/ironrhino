@@ -27,7 +27,7 @@
 			<@s.textfield label=p.name name="params['"+p.name+"']" value=p.sample!/>
 			</#if>
 		</#list>
-		<@s.submit label=getText('confirm') class="btn-primary"/>
+		<@s.submit label=getText('invoke') class="btn-primary"/>
 		</@s.form>
 		<#else>
 		Not concrete!
