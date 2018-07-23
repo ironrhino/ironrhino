@@ -54,7 +54,7 @@ public abstract class RemoteServiceTestsBase {
 	public void testEcho() {
 		testService.ping();
 		assertEquals("", testService.echo());
-		assertNull(testService.echo(null));
+		assertNull(testService.echo((String) null));
 		assertEquals("test", testService.echo("test"));
 		assertEquals(Collections.singletonList("list"), testService.echoList(Collections.singletonList("list")));
 		assertTrue(Arrays.equals(new String[] { "echoWithArrayList" },

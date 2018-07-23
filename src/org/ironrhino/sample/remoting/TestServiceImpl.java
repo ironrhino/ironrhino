@@ -2,6 +2,7 @@ package org.ironrhino.sample.remoting;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -12,6 +13,7 @@ import java.util.concurrent.Future;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.security.domain.User;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,6 +42,36 @@ public class TestServiceImpl implements TestService {
 	@Override
 	public String echo(String str) {
 		return str;
+	}
+
+	@Override
+	public boolean echo(boolean bool) {
+		return bool;
+	}
+
+	@Override
+	public int echo(int integer) {
+		return integer;
+	}
+
+	@Override
+	public Long echo(Long value) {
+		return value;
+	}
+
+	@Override
+	public Date echo(Date value) {
+		return value;
+	}
+
+	@Override
+	public Scope echo(Scope value) {
+		return value;
+	}
+
+	@Override
+	public User echo(User value) {
+		return value;
 	}
 
 	@Override

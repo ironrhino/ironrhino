@@ -1,11 +1,14 @@
 package org.ironrhino.sample.remoting;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.Remoting;
+import org.ironrhino.security.domain.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Remoting
@@ -17,7 +20,19 @@ public interface TestService {
 
 	public String echo();
 
-	public String echo(String str);
+	public String echo(String value);
+
+	public boolean echo(boolean value);
+
+	public int echo(int value);
+
+	public Long echo(Long value);
+
+	public Date echo(Date value);
+
+	public Scope echo(Scope value);
+
+	public User echo(User value);
 
 	public List<String> echoList(List<String> list);
 
@@ -34,7 +49,7 @@ public interface TestService {
 	public Optional<UserDetails> loadOptionalUserByUsername(String username);
 
 	public Future<UserDetails> loadFutureUserByUsername(String username);
-	
+
 	public Callable<UserDetails> loadCallableUserByUsername(String username);
 
 }

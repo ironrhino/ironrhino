@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import org.ironrhino.core.remoting.impl.AbstractServiceRegistry;
 import org.ironrhino.core.spring.configuration.StageConditional;
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonSerializationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.SampleObjectCreator;
@@ -48,7 +50,8 @@ public class ServicePlayground {
 	private Map<String, Collection<MethodInfo>> methods = new ConcurrentHashMap<>();
 
 	private final ObjectMapper objectMapper = JsonSerializationUtils.createNewObjectMapper()
-			.enable(SerializationFeature.INDENT_OUTPUT);
+			.enable(SerializationFeature.INDENT_OUTPUT).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+			.setDateFormat(new SimpleDateFormat(DateUtils.DATETIME));
 
 	public Collection<String> getServices() {
 		if (services.isEmpty()) {

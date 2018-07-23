@@ -23,6 +23,8 @@ import java.util.function.BiFunction;
 import org.ironrhino.core.model.ResultPage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -98,6 +100,8 @@ public class SampleObjectCreator {
 		Object object = createValue(clazz, null, null);
 		if (object != null)
 			return object;
+		if (clazz.isInterface())
+			return null;
 		try {
 			final Object obj = BeanUtils.instantiateClass(clazz);
 			references.add(clazz);
@@ -153,6 +157,7 @@ public class SampleObjectCreator {
 			});
 			return obj;
 		} catch (Exception e) {
+			System.err.println("SampleObjectCreator can not instantiate :" + clazz);
 			return null;
 		}
 	}
@@ -163,6 +168,8 @@ public class SampleObjectCreator {
 			if (value != null)
 				return value;
 		}
+		if (GrantedAuthority.class == type)
+			return new SimpleGrantedAuthority("role");
 		if (String.class == type)
 			return suggestStringValue(fieldName, sampleClass);
 		if ((Boolean.TYPE == type) || (Boolean.class == type))
