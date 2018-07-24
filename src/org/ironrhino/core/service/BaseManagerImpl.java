@@ -675,7 +675,13 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			DetachedCriteria dc, boolean commitPerFetch) {
 		Session iterateSession = sessionFactory.openSession();
 		iterateSession.setCacheMode(CacheMode.IGNORE);
-		Session callbackSession = commitPerFetch ? sessionFactory.openSession() : iterateSession;
+		Session callbackSession;
+		if (commitPerFetch) {
+			callbackSession = sessionFactory.openSession();
+			callbackSession.setJdbcBatchSize(fetchSize);
+		} else {
+			callbackSession = iterateSession;
+		}
 		if (dc == null) {
 			dc = detachedCriteria();
 			dc.addOrder(Order.asc("id"));
