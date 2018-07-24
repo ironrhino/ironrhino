@@ -24,11 +24,7 @@ public interface FileStorage {
 	}
 
 	public default boolean isBucketBased() {
-		try {
-			return getClass().getMethod("getBucket") != null;
-		} catch (NoSuchMethodException | SecurityException e) {
-			return false;
-		}
+		return false;
 	}
 
 	public default boolean isRelativeProtocolAllowed() {
