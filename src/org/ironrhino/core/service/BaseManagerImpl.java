@@ -38,7 +38,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.query.Query;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.transform.ResultTransformer;
 import org.ironrhino.core.hibernate.IgnoreCaseSimpleExpression;
 import org.ironrhino.core.model.BaseTreeableEntity;
@@ -684,10 +683,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Criteria c = dc.getExecutableCriteria(iterateSession);
 		c.setFetchSize(fetchSize);
 		ScrollableResults cursor = null;
-		Transaction transaction = null;
+		Transaction transaction = callbackSession.getTransaction();
 		long count = 0;
 		try {
-			transaction = callbackSession.beginTransaction();
+			transaction.begin();
 			cursor = c.scroll(ScrollMode.FORWARD_ONLY);
 			RowBuffer buffer = new RowBuffer(callbackSession, fetchSize, callback);
 			T prev = null;
@@ -714,7 +713,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 					prev = null;
 					if (commitPerFetch) {
 						transaction.commit();
-						transaction = callbackSession.beginTransaction();
+						transaction.begin();
 					}
 					if (afterCommitConsumer != null)
 						afterCommitConsumer.accept(entities);
@@ -732,7 +731,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			return count;
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
-			if (transaction != null && transaction.getStatus() == TransactionStatus.ACTIVE) {
+			if (transaction.isActive()) {
 				try {
 					transaction.rollback();
 				} catch (Exception e1) {

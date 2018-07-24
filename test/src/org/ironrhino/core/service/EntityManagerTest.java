@@ -288,10 +288,11 @@ public class EntityManagerTest {
 	@Test
 	public void testIterate() {
 		prepareData();
+
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
-		final AtomicInteger ai = new AtomicInteger();
+		AtomicInteger ai = new AtomicInteger();
 		long count = entityManager.iterate(2, (entities, session) -> {
 			for (Person p : entities) {
 				if (p.getGender() == Gender.MALE) {
@@ -302,6 +303,41 @@ public class EntityManagerTest {
 		}, people -> ai.getAndAdd(people.length), dc);
 		assertEquals(5, count);
 		assertEquals(5, ai.get());
+
+		dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("gender", Gender.FEMALE));
+		dc.addOrder(Order.asc("name"));
+		count = entityManager.iterate(2, (entities, session) -> {
+			for (Person p : entities) {
+				if (p.getGender() == Gender.FEMALE) {
+					p.setGender(Gender.MALE);
+					session.update(p);
+				}
+			}
+		}, dc, true);
+		assertEquals(9, count);
+
+		dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("gender", Gender.MALE));
+		dc.addOrder(Order.asc("name"));
+		try {
+			count = entityManager.iterate(2, (entities, session) -> {
+				for (Person p : entities) {
+					p.setGender(Gender.FEMALE);
+					session.update(p);
+					if (p.getName().equals("test5"))
+						throw new RuntimeException("for test");
+				}
+			}, dc, true);
+		} catch (RuntimeException e) {
+
+		}
+		dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("gender", Gender.FEMALE));
+		assertEquals(2 * 2, entityManager.countByCriteria(dc)); // first 2 batch
+
+		entityManager.executeUpdate("update Person set gender=?1", Gender.FEMALE);
+
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.FEMALE));
 		dc.addOrder(Order.asc("name"));
@@ -314,15 +350,17 @@ public class EntityManagerTest {
 					session.update(p);
 				}
 			}
-		}, dc);
+		}, dc, true);
 		assertEquals(9, count);
 		assertEquals(9, males.size());
+
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
 		count = entityManager.iterate(2, (entities, session) -> {
 		}, dc, true);
 		assertEquals(9, count);
+
 		clearData();
 	}
 
