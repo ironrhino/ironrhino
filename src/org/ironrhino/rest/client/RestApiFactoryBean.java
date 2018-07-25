@@ -5,11 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -21,17 +16,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.spring.MethodInterceptorFactoryBean;
 import org.ironrhino.core.throttle.CircuitBreaking;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -49,7 +41,6 @@ import org.springframework.http.converter.json.AbstractJackson2HttpMessageConver
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -64,7 +55,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object> {
+public class RestApiFactoryBean extends MethodInterceptorFactoryBean {
 
 	private final Class<?> restApiClass;
 
@@ -73,8 +64,6 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 	private final String apiBaseUrl;
 
 	private final Object restApiBean;
-
-	private final Map<Method, MethodHandle> defaultMethods = new ConcurrentHashMap<>();
 
 	@Autowired
 	private ApplicationContext ctx;
@@ -118,43 +107,14 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 	}
 
 	@Override
-	public Object invoke(final MethodInvocation methodInvocation) throws Exception {
+	protected Object doInvoke(MethodInvocation methodInvocation) throws Exception {
 		return CircuitBreaking.execute(restApiClass.getName(), ex -> ex.getCause() instanceof IOException,
-				() -> doInvoke(methodInvocation));
+				() -> actualInvoke(methodInvocation));
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object doInvoke(MethodInvocation methodInvocation) throws Exception {
+	private Object actualInvoke(MethodInvocation methodInvocation) throws Exception {
 		Method method = methodInvocation.getMethod();
-		if (method.isDefault()) {
-			MethodHandle mh = defaultMethods.computeIfAbsent(method, m -> {
-				try {
-					if (ClassUtils.isPresent("java.lang.StackWalker", System.class.getClassLoader())) {
-						// jdk 9 and later
-						return MethodHandles.lookup()
-								.findSpecial(restApiClass, m.getName(),
-										MethodType.methodType(m.getReturnType(), m.getParameterTypes()), restApiClass)
-								.bindTo(restApiBean);
-					} else {
-						Constructor<Lookup> constructor = Lookup.class.getDeclaredConstructor(Class.class);
-						constructor.setAccessible(true);
-						return constructor.newInstance(restApiClass).in(restApiClass)
-								.unreflectSpecial(method, restApiClass).bindTo(restApiBean);
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			});
-			try {
-				return mh.invokeWithArguments(methodInvocation.getArguments());
-			} catch (Exception e) {
-				throw e;
-			} catch (Throwable e) {
-				throw new RuntimeException(e);
-			}
-		}
-		if (AopUtils.isToStringMethod(methodInvocation.getMethod()))
-			return "RestApi for  [" + getObjectType().getName() + "]";
 		RequestMapping classRequestMapping = AnnotatedElementUtils.findMergedAnnotation(restApiClass,
 				RequestMapping.class);
 		RequestMapping methodRequestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
