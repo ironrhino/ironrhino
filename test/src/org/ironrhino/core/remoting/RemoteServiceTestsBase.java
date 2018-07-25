@@ -53,6 +53,7 @@ public abstract class RemoteServiceTestsBase {
 	@Test
 	public void testEcho() {
 		testService.ping();
+		assertEquals("test", testService.defaultEcho("test"));
 		assertEquals("", testService.echo());
 		assertNull(testService.echo((String) null));
 		assertEquals("test", testService.echo("test"));

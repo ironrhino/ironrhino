@@ -2,6 +2,7 @@ package org.ironrhino.core.remoting.client;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -146,7 +147,11 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		Class<?> returnType = methodInvocation.getMethod().getReturnType();
+		Method method = methodInvocation.getMethod();
+		if (method.isDefault()) {
+			return ReflectionUtils.invokeDefaultMethod(getObject(), method, methodInvocation.getArguments());
+		}
+		Class<?> returnType = method.getReturnType();
 		if (returnType == Future.class) {
 			ExecutorService es = executorService;
 			if (es == null) {

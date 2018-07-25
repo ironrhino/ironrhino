@@ -1,6 +1,10 @@
 package org.ironrhino.core.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
@@ -13,7 +17,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -24,12 +30,14 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.util.ClassUtils;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.util.proxy.ProxyObject;
+import lombok.Data;
 
 public abstract class ReflectionUtils {
 
@@ -269,5 +277,42 @@ public abstract class ReflectionUtils {
 		sb.append(")");
 		return sb.toString();
 	}
+
+	public static Object invokeDefaultMethod(Object object, Method method, Object[] arguments) throws Throwable {
+		if (!method.isDefault())
+			throw new IllegalArgumentException("Method is not default: " + method);
+		Class<?> objectType = method.getDeclaringClass();
+		MethodHandle mh = defaultMethods.computeIfAbsent(new MethodCacheKey(object, method), key -> {
+			try {
+				Object o = key.getObject();
+				Method m = key.getMethod();
+				if (ClassUtils.isPresent("java.lang.StackWalker", System.class.getClassLoader())) {
+					// jdk 9 and later
+					return MethodHandles.lookup()
+							.findSpecial(objectType, m.getName(),
+									MethodType.methodType(m.getReturnType(), m.getParameterTypes()), objectType)
+							.bindTo(o);
+				} else {
+					Constructor<Lookup> constructor = Lookup.class.getDeclaredConstructor(Class.class);
+					constructor.setAccessible(true);
+					return constructor.newInstance(objectType).in(objectType).unreflectSpecial(m, objectType).bindTo(o);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		return mh.invokeWithArguments(arguments);
+	}
+
+	@Data
+	private static class MethodCacheKey {
+
+		private final Object object;
+
+		private final Method method;
+
+	}
+
+	private static final Map<MethodCacheKey, MethodHandle> defaultMethods = new ConcurrentHashMap<>();
 
 }

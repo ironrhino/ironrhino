@@ -14,6 +14,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Remoting
 public interface TestService {
 
+	public default String defaultEcho(String value) {
+		return echo(value);
+	}
+
 	public void ping();
 
 	public void throwException(String message) throws Exception;
