@@ -34,7 +34,6 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -65,40 +64,36 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.Getter;
-import lombok.Setter;
-
 public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object> {
 
 	private final Class<?> restApiClass;
 
+	private final RestTemplate restTemplate;
+
+	private final String apiBaseUrl;
+
+	private final Object restApiBean;
+
+	private final Map<Method, MethodHandle> defaultMethods = new ConcurrentHashMap<>();
+
 	@Autowired
 	private ApplicationContext ctx;
 
-	@Getter
-	@Setter
-	private RestTemplate restTemplate;
-
-	@Getter
-	@Setter
-	private String apiBaseUrl;
-
-	private Object restApiBean;
-
-	private Map<Method, MethodHandle> defaultMethods = new ConcurrentHashMap<>();
-
-	@Value("${restApi.circuitBreakerEnabled:true}")
-	private boolean circuitBreakerEnabled = true;
-
-	@Getter
-	private Object circuitBreaker;
-
 	public RestApiFactoryBean(Class<?> restApiClass) {
-		this(restApiClass, null);
+		this(restApiClass, (RestTemplate) null);
+	}
+
+	public RestApiFactoryBean(Class<?> restApiClass, RestClient restClient) {
+		this(restApiClass, restClient.getRestTemplate());
 	}
 
 	public RestApiFactoryBean(Class<?> restApiClass, RestTemplate restTemplate) {
 		Assert.notNull(restApiClass, "restApiClass shouldn't be null");
+		if (!restApiClass.isInterface())
+			throw new IllegalArgumentException(restApiClass.getName() + " should be interface");
+		this.restApiClass = restApiClass;
+		RestApi annotation = restApiClass.getAnnotation(RestApi.class);
+		this.apiBaseUrl = (annotation != null) ? annotation.apiBaseUrl() : "";
 		if (restTemplate == null) {
 			restTemplate = new org.ironrhino.core.spring.http.client.RestTemplate();
 			Iterator<HttpMessageConverter<?>> it = restTemplate.getMessageConverters().iterator();
@@ -107,19 +102,12 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 					it.remove();
 			}
 		}
-		if (!restApiClass.isInterface())
-			throw new IllegalArgumentException(restApiClass.getName() + " should be interface");
-		this.restApiClass = restApiClass;
 		this.restTemplate = restTemplate;
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
 	}
 
-	public void setRestClient(RestClient restClient) {
-		this.restTemplate = restClient.getRestTemplate();
-	}
-
 	@Override
-	public Object getObject() throws Exception {
+	public Object getObject() {
 		return restApiBean;
 	}
 
@@ -177,7 +165,9 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 			sb.append(classRequestMapping.value()[0]);
 		if (methodRequestMapping != null && methodRequestMapping.value().length > 0)
 			sb.append(methodRequestMapping.value()[0]);
-		String url = ctx.getEnvironment().resolvePlaceholders(sb.toString().trim());
+		String url = sb.toString().trim();
+		if (ctx != null)
+			url = ctx.getEnvironment().resolvePlaceholders(url);
 		RequestMethod[] requestMethods = methodRequestMapping != null ? methodRequestMapping.method()
 				: classRequestMapping.method();
 		RequestMethod requestMethod = requestMethods.length > 0 ? requestMethods[0] : RequestMethod.GET;
@@ -372,12 +362,15 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 				JsonNode tree = restTemplate.exchange(requestEntity, JsonNode.class).getBody();
 				Class<? extends JsonValidator> validatorClass = pointer.validator();
 				if (validatorClass != JsonValidator.class) {
-					JsonValidator validator;
-					try {
-						validator = ctx.getBean(validatorClass);
-					} catch (NoSuchBeanDefinitionException e) {
+					JsonValidator validator = null;
+					if (ctx != null)
+						try {
+							validator = ctx.getBean(validatorClass);
+						} catch (NoSuchBeanDefinitionException e) {
+							// fallback
+						}
+					if (validator == null)
 						validator = validatorClass.getConstructor().newInstance();
-					}
 					validator.validate(tree);
 				}
 				if (!pointer.value().isEmpty())

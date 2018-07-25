@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.ClassScanner;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -50,15 +49,12 @@ public class RestApiRegistryPostProcessor implements BeanDefinitionRegistryPostP
 			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
 			ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
 			constructorArgumentValues.addIndexedArgumentValue(0, restApiClass);
-			if (StringUtils.isNotBlank(annotation.restTemplate()))
+			if (StringUtils.isNotBlank(annotation.restClient()))
+				constructorArgumentValues.addIndexedArgumentValue(1, new RuntimeBeanReference(annotation.restClient()));
+			else if (StringUtils.isNotBlank(annotation.restTemplate()))
 				constructorArgumentValues.addIndexedArgumentValue(1,
 						new RuntimeBeanReference(annotation.restTemplate()));
 			beanDefinition.setConstructorArgumentValues(constructorArgumentValues);
-			MutablePropertyValues propertyValues = new MutablePropertyValues();
-			propertyValues.addPropertyValue("apiBaseUrl", annotation.apiBaseUrl());
-			if (StringUtils.isNotBlank(annotation.restClient()))
-				propertyValues.addPropertyValue("restClient", new RuntimeBeanReference(annotation.restClient()));
-			beanDefinition.setPropertyValues(propertyValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
 			log.info("Register bean [{}] for @RestApi [{}]", beanName, restApiClass.getName());
 		}
