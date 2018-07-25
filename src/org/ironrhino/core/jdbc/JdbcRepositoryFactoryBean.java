@@ -67,9 +67,9 @@ public class JdbcRepositoryFactoryBean
 
 	private final int databaseMinorVersion;
 
-	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-	private Object jdbcRepositoryBean;
+	private final Object jdbcRepositoryBean;
 
 	private Map<String, String> sqls;
 
@@ -98,6 +98,7 @@ public class JdbcRepositoryFactoryBean
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		this.sqls = loadSqls();
 	}
 
 	public JdbcRepositoryFactoryBean(Class<?> jdbcRepositoryClass, DataSource dataSource) {
@@ -111,7 +112,6 @@ public class JdbcRepositoryFactoryBean
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.sqls = loadSqls();
 		Partition partition = jdbcRepositoryClass.getAnnotation(Partition.class);
 		if (partition != null)
 			defaultPartitioner = beanFactory.getBean(partition.partitioner());
@@ -166,7 +166,7 @@ public class JdbcRepositoryFactoryBean
 	}
 
 	@Override
-	public Object getObject() throws Exception {
+	public Object getObject() {
 		return jdbcRepositoryBean;
 	}
 
