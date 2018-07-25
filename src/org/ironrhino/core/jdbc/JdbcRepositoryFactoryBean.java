@@ -386,4 +386,9 @@ public class JdbcRepositoryFactoryBean
 
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T create(Class<T> jdbcRepositoryClass, DataSource dataSource) {
+		return (T) new JdbcRepositoryFactoryBean(jdbcRepositoryClass, dataSource).getObject();
+	}
+
 }

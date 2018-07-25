@@ -383,4 +383,14 @@ public class RestApiFactoryBean implements MethodInterceptor, FactoryBean<Object
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T create(Class<T> restApiClass) {
+		return (T) new RestApiFactoryBean(restApiClass).getObject();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T create(Class<T> restApiClass, RestTemplate restTemplate) {
+		return (T) new RestApiFactoryBean(restApiClass, restTemplate).getObject();
+	}
+
 }
