@@ -60,17 +60,17 @@ public class RedisServiceStats implements ServiceStats {
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
-	@Value("${serviceStats.archive.days:7}")
-	private int days = 7;
+	@Value("${serviceStats.archiveDays:7}")
+	private int archiveDays = 7;
 
 	@Value("${serviceStats.responseTimeThreshold:5000}")
-	public long responseTimeThreshold = 5000;
+	private long responseTimeThreshold = 5000;
 
 	@Value("${serviceStats.maxWarningsSize:100}")
-	public long maxWarningsSize = 100;
+	private long maxWarningsSize = 100;
 
 	@Value("${serviceStats.maxSamplesSize:20}")
-	public long maxSamplesSize = 20;
+	private long maxSamplesSize = 20;
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
@@ -283,7 +283,7 @@ public class RedisServiceStats implements ServiceStats {
 				remotingStringRedisTemplate.expire(lockName, 5, TimeUnit.MINUTES);
 				remotingStringRedisTemplate.delete(KEY_HOTSPOTS);
 				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.DAY_OF_YEAR, -days);
+				cal.add(Calendar.DAY_OF_YEAR, -archiveDays);
 				Date date = cal.getTime();
 				String day = DateUtils.formatDate8(date);
 				for (Map.Entry<String, Set<String>> entry : getServices().entrySet()) {

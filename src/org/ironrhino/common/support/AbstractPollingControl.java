@@ -17,7 +17,6 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -30,11 +29,13 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 
@@ -49,16 +50,25 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 	@Autowired
 	protected StringRedisTemplate stringRedisTemplate;
 
-	@Value("${" + AvailableSettings.STATEMENT_BATCH_SIZE + ":50}")
-	protected int batchSize = 50;
+	@Getter
+	@Setter
+	private int batchSize = 50;
 
-	private int _threads = 5;
+	@Getter
+	@Setter
+	private int threads = 5;
 
-	private int _maxAttempts = 3;
+	@Getter
+	@Setter
+	private int maxAttempts = 3;
 
-	private int _intervalFactorInSeconds = 60;
+	@Getter
+	@Setter
+	private int intervalFactorInSeconds = 60;
 
-	private int _resubmitIntervalInSeconds = 600;
+	@Getter
+	@Setter
+	private int resubmitIntervalInSeconds = 600;
 
 	private ThreadPoolExecutor threadPoolExecutor;
 
@@ -80,22 +90,6 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 		if (clazz == null)
 			throw new IllegalArgumentException("Generic type must be present");
 		entityClass = clazz;
-	}
-
-	public int getThreads() {
-		return _threads;
-	}
-
-	public int getMaxAttempts() {
-		return _maxAttempts;
-	}
-
-	public int getIntervalFactorInSeconds() {
-		return _intervalFactorInSeconds;
-	}
-
-	public int getResubmitIntervalInSeconds() {
-		return _resubmitIntervalInSeconds;
 	}
 
 	@PostConstruct

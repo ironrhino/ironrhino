@@ -26,12 +26,13 @@ public class BatchedBalanceQueryControl extends BatchedPollingControl<BalanceQue
 	public void initData(int size) {
 		String prefix = String.valueOf(System.currentTimeMillis());
 		entityManager.execute(session -> {
+			session.setJdbcBatchSize(getBatchSize());
 			for (int i = 0; i < size; i++) {
 				String accountNo = prefix + NumberUtils.format(i, 5);
 				BalanceQuery bq = new BalanceQuery();
 				bq.setAccountNo(accountNo);
 				session.save(bq);
-				if ((i + 1) % batchSize == 0) {
+				if ((i + 1) % getBatchSize() == 0) {
 					session.flush(); // 触发jdbc的statement.executeBatch()提交
 					session.clear(); // 清理session一级缓存防止大数据量下内存溢出
 				}
