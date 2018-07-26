@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -113,8 +114,9 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 	}
 
 	@PreDestroy
-	private void destroy() {
-		threadPoolExecutor.shutdownNow();
+	private void destroy() throws Exception {
+		threadPoolExecutor.shutdown();
+		threadPoolExecutor.awaitTermination(10, TimeUnit.SECONDS);
 	}
 
 	@Scheduled(fixedRateString = "${pollingControl.enqueue.fixedRate:10000}")

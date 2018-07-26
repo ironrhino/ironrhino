@@ -2,6 +2,7 @@ package org.ironrhino.core.spring;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -20,8 +21,9 @@ public class ExecutorServiceFactoryBean implements FactoryBean<ExecutorService>,
 	}
 
 	@Override
-	public void destroy() {
+	public void destroy() throws InterruptedException {
 		executorService.shutdown();
+		executorService.awaitTermination(10, TimeUnit.SECONDS);
 	}
 
 	@Override
