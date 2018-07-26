@@ -4,51 +4,27 @@ import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.oauth.client.model.Profile;
 import org.ironrhino.security.oauth.client.service.OAuth2Provider;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
+@ConfigurationProperties(prefix = "ironrhino")
+@Getter
+@Setter
 public class Ironrhino extends OAuth2Provider {
 
-	@Value("${ironrhino.logo:http://localhost:8080/assets/images/ironrhino-logo.jpg}")
-	private String logo;
+	private String logo = "http://localhost:8080/assets/images/ironrhino-logo.jpg";
 
-	@Value("${ironrhino.authorizeUrl:http://localhost:8080/oauth/auth}")
-	private String authorizeUrl;
+	private String authorizeUrl = "http://localhost:8080/oauth/auth";
 
-	@Value("${ironrhino.accessTokenEndpoint:http://localhost:8080/oauth/oauth2/token}")
-	private String accessTokenEndpoint;
+	private String accessTokenEndpoint = "http://localhost:8080/oauth/oauth2/token";
 
-	@Value("${ironrhino.scope:http://localhost:8080/}")
-	private String scope;
+	private String scope = "http://localhost:8080/";
 
-	@Value("${ironrhino.profileUrl:http://localhost:8080/api/user/@self}")
-	private String profileUrl;
-
-	@Override
-	public String getLogo() {
-		return logo;
-	}
-
-	@Override
-	public String getAuthorizeUrl() {
-		return authorizeUrl;
-	}
-
-	@Override
-	public String getAccessTokenEndpoint() {
-		return accessTokenEndpoint;
-	}
-
-	@Override
-	public String getScope() {
-		return scope;
-	}
-
-	@Override
-	public String getProfileUrl() {
-		return profileUrl;
-	}
+	private String profileUrl = "http://localhost:8080/api/user/@self";
 
 	@Override
 	public boolean isUseAuthorizationHeader() {

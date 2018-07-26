@@ -8,22 +8,24 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.RequestUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+
 @Component
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@Setter
+@ConfigurationProperties(prefix = "authentication-success-handler")
 public class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
 	public final static String COOKIE_NAME_LOGIN_USER = "U";
 
-	@Value("${authenticationSuccessHandler.usernameInCookie:true}")
-	private boolean usernameInCookie;
+	private boolean usernameInCookie = true;
 
-	@Value("${authenticationSuccessHandler.usernameInCookieMaxAge:31536000}")
-	private int usernameInCookieMaxAge;
+	private int usernameInCookieMaxAge = 31536000;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

@@ -9,7 +9,7 @@ import java.util.Random;
 import org.ironrhino.common.support.BasePollingControl;
 import org.ironrhino.core.metadata.Profiles;
 import org.ironrhino.core.util.NumberUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,32 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Profile(Profiles.SANDBOX)
+@ConfigurationProperties(prefix = "balance-query-control")
 public class BalanceQueryControl extends BasePollingControl<BalanceQuery> {
 
 	// 可选代码--开始 作用是设置自己的配置参数
-	@Value("${balanceQueryControl.threads:3}")
-	private int threads = 3;
-
-	@Value("${balanceQueryControl.maxAttempts:3}")
-	private int maxAttempts = 3;
-
-	@Value("${balanceQueryControl.intervalFactorInSeconds:60}")
-	private int intervalFactorInSeconds = 60;
-
-	@Override
-	public int getThreads() {
-		return threads;
-	}
-
-	@Override
-	public int getMaxAttempts() {
-		return maxAttempts;
-	}
-
-	@Override
-	public int getIntervalFactorInSeconds() {
-		return intervalFactorInSeconds;
-	}
 
 	@Override
 	@Scheduled(fixedRateString = "${balanceQueryControl.enqueue.fixedRate:5000}")

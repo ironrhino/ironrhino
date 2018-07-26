@@ -77,6 +77,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-core-4.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-infrastructure-4.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-5.1.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-boot-2.1.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-5.1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-5.1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-core-5.1.4.jar"/>

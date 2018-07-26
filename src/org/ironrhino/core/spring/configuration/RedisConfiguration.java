@@ -11,8 +11,8 @@ import java.util.concurrent.ExecutorService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -47,55 +47,40 @@ import lombok.Setter;
 @ClassPresentConditional("org.springframework.data.redis.connection.RedisConnectionFactory")
 @Getter
 @Setter
+@ConfigurationProperties(prefix = "redis")
 public class RedisConfiguration {
 
 	// alias for hostName
-	@Value("${redis.host:}")
 	private String host;
 
-	@Value("${redis.hostName:localhost}")
-	private String hostName;
+	private String hostName = "localhost";
 
-	@Value("${redis.port:6379}")
-	private int port;
+	private int port = 6379;
 
-	@Value("${redis.sentinels:#{null}}")
 	private Set<String> sentinels;
 
-	@Value("${redis.clusterNodes:#{null}}")
 	private Set<String> clusterNodes;
 
-	@Value("${redis.master:master}")
-	private String master;
+	private String master = "master";
 
-	@Value("${redis.password:#{null}}")
 	private String password;
 
-	@Value("${redis.usePool:true}")
-	private boolean usePool;
+	private boolean usePool = true;
 
-	@Value("${redis.database:0}")
-	private int database;
+	private int database = 0;
 
-	@Value("${redis.maxTotal:50}")
-	private int maxTotal;
+	private int maxTotal = 50;
 
-	@Value("${redis.maxIdle:10}")
-	private int maxIdle;
+	private int maxIdle = 10;
 
-	@Value("${redis.minIdle:1}")
-	private int minIdle;
+	private int minIdle = 1;
 
-	@Value("${redis.connectTimeout:5000}")
 	private int connectTimeout = 5000;
 
-	@Value("${redis.readTimeout:5000}")
 	private int readTimeout = 5000;
 
-	@Value("${redis.shutdownTimeout:100}")
 	private int shutdownTimeout = 100;
 
-	@Value("${redis.useSsl:false}")
 	private boolean useSsl;
 
 	@Bean

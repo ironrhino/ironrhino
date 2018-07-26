@@ -18,6 +18,7 @@ import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component("httpSessionManager")
 @Slf4j
+@ConfigurationProperties(prefix = "httpSessionManager")
 public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	private static final String SESSION_KEY_REMOTE_ADDR = "_REMOTE_ADDR";
@@ -34,16 +36,15 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	private static final String SESSION_TRACKER_SEPERATOR = "-";
 
 	@Getter
-	@Value("${httpSessionManager.sessionTrackerName:" + DEFAULT_SESSION_TRACKER_NAME + "}")
+	@Setter
 	private String sessionTrackerName = DEFAULT_SESSION_TRACKER_NAME;
 
 	@Getter
-	@Value("${httpSessionManager.localeCookieName:" + DEFAULT_COOKIE_NAME_LOCALE + "}")
+	@Setter
 	private String localeCookieName = DEFAULT_COOKIE_NAME_LOCALE;
 
 	@Getter
 	@Setter
-	@Value("${httpSessionManager.defaultLocaleName:}")
 	private String defaultLocaleName;
 
 	@Autowired
@@ -52,26 +53,27 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Autowired
 	private HttpSessionStore cacheBased;
 
-	@Value("${httpSessionManager.lifetime:" + DEFAULT_LIFETIME + "}")
-	private int lifetime;
+	@Getter
+	@Setter
+	private int lifetime = DEFAULT_LIFETIME;
 
 	@Getter
 	@Setter
-	@Value("${httpSessionManager.maxInactiveInterval:" + DEFAULT_MAXINACTIVEINTERVAL + "}")
-	private int maxInactiveInterval;
+	private int maxInactiveInterval = DEFAULT_MAXINACTIVEINTERVAL;
 
 	@Getter
 	@Setter
-	@Value("${httpSessionManager.minActiveInterval:" + DEFAULT_MINACTIVEINTERVAL + "}")
-	private int minActiveInterval;
+	private int minActiveInterval = DEFAULT_MINACTIVEINTERVAL;
 
-	@Value("${httpSessionManager.checkRemoteAddr:false}")
+	@Getter
+	@Setter
 	private boolean checkRemoteAddr;
 
 	@Value("${globalCookie:false}")
 	private boolean globalCookie;
 
-	@Value("${httpSessionManager.alwaysUseCacheBased:}")
+	@Getter
+	@Setter
 	private Boolean alwaysUseCacheBased;
 
 	@PostConstruct

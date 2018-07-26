@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@ConfigurationProperties(prefix = "access-filter")
 public class AccessFilter implements Filter {
 
 	public static final String HTTP_HEADER_INSTANCE_ID = "X-Instance-Id";
@@ -59,15 +60,12 @@ public class AccessFilter implements Filter {
 
 	@Getter
 	@Setter
-	@Value("${accessFilter.responseTimeThreshold:" + DEFAULT_RESPONSETIMETHRESHOLD + "}")
 	public long responseTimeThreshold = DEFAULT_RESPONSETIMETHRESHOLD;
 
 	@Setter
-	@Value("${accessFilter.print:" + DEFAULT_PRINT + "}")
 	private boolean print = DEFAULT_PRINT;
 
 	@Setter
-	@Value("${accessFilter.excludePatterns:}")
 	private String excludePatterns;
 
 	private List<String> excludePatternsList = Collections.emptyList();

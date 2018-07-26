@@ -10,6 +10,7 @@ import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,6 +25,7 @@ import org.springframework.util.ClassUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Order(0)
@@ -31,6 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 @Slf4j
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "data-source")
 public class DataSourceConfiguration {
 
 	@Autowired
@@ -51,35 +56,24 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.password:}")
 	private String password;
 
-	@Value("${dataSource.maximumPoolSize:500}")
-	private int maximumPoolSize;
+	private int maximumPoolSize = 500;
 
-	@Value("${dataSource.minimumIdle:5}")
-	private int minimumIdle;
+	private int minimumIdle = 5;
 
-	@Value("${dataSource.connectionTimeout:10000}")
-	private long connectionTimeout;
+	private long connectionTimeout = 10000;
 
-	@Value("${dataSource.idleTimeout:1800000}")
-	private long idleTimeout;
+	private long idleTimeout = 1800000;
 
-	@Value("${dataSource.maxLifetime:7200000}")
-	private long maxLifetime;
+	private long maxLifetime = 7200000;
 
-	@Value("${dataSource.autoCommit:true}")
-	private boolean autoCommit;
+	private boolean autoCommit = true;
 
-	@Value("${dataSource.registerMbeans:false}")
-	private boolean registerMbeans;
+	private boolean registerMbeans = false;
 
-	@Value("${dataSource.connectionTestQuery:}")
 	private String connectionTestQuery;
 
-	@Value("${dataSource.lazyConnect:false}")
 	private boolean lazyConnect;
 
-	@Value("${dataSource.enableMigrations:false}")
-	@Getter
 	private boolean enableMigrations;
 
 	protected DataSource createDataSource() {

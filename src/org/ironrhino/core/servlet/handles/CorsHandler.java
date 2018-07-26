@@ -6,22 +6,25 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.util.RequestUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "cors")
 public class CorsHandler extends AccessHandler {
 
-	@Value("${cors.openForAllOrigin:false}")
-	private boolean openForAllOrigin;
+	private boolean openForAllOrigin = false;
 
-	@Value("${cors.openForSameOrigin:true}")
-	private boolean openForSameOrigin;
+	private boolean openForSameOrigin = true;
 
-	@Value("${cors.xFrameOptions:SAMEORIGIN}")
 	private String xFrameOptions = "SAMEORIGIN";
 
 	@Override

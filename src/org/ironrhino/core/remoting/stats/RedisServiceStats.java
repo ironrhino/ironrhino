@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.BoundZSetOperations;
@@ -46,8 +46,11 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+
 @Component("serviceStats")
 @ServiceImplementationConditional(profiles = { DUAL, CLUSTER, CLOUD })
+@ConfigurationProperties(prefix = "service-stats")
 public class RedisServiceStats implements ServiceStats {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -63,16 +66,16 @@ public class RedisServiceStats implements ServiceStats {
 	@Autowired(required = false)
 	private ServiceRegistry serviceRegistry;
 
-	@Value("${serviceStats.archiveDays:7}")
+	@Setter
 	private int archiveDays = 7;
 
-	@Value("${serviceStats.responseTimeThreshold:5000}")
+	@Setter
 	private long responseTimeThreshold = 5000;
 
-	@Value("${serviceStats.maxWarningsSize:100}")
+	@Setter
 	private long maxWarningsSize = 100;
 
-	@Value("${serviceStats.maxSamplesSize:20}")
+	@Setter
 	private long maxSamplesSize = 20;
 
 	@Autowired

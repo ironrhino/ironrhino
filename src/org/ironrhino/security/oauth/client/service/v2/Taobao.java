@@ -15,48 +15,29 @@ import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.oauth.client.model.Profile;
 import org.ironrhino.security.oauth.client.service.OAuth2Provider;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
+@ConfigurationProperties(prefix = "taobao")
+@Getter
+@Setter
 public class Taobao extends OAuth2Provider {
 
-	@Value("${taobao.logo:http://img01.taobaocdn.com/tps/i1/T1T2RZXf8nXXXXXXXX-140-35.png}")
-	private String logo;
+	private String logo = "http://img01.taobaocdn.com/tps/i1/T1T2RZXf8nXXXXXXXX-140-35.png";
 
-	@Value("${taobao.authorizeUrl:https://oauth.taobao.com/authorize}")
-	private String authorizeUrl;
+	private String authorizeUrl = "https://oauth.taobao.com/authorize";
 
-	@Value("${taobao.accessTokenEndpoint:https://oauth.taobao.com/token}")
-	private String accessTokenEndpoint;
+	private String accessTokenEndpoint = "https://oauth.taobao.com/token";
 
-	@Value("${taobao.scope:}")
-	private String scope;
+	private String scope = "";
 
-	@Value("${taobao.profileUrl:http://gw.api.taobao.com/router/rest?method=taobao.user.buyer.get&fields=user_id,nick,sex}")
-	private String profileUrl;
-
-	@Override
-	public String getLogo() {
-		return logo;
-	}
-
-	@Override
-	public String getAuthorizeUrl() {
-		return authorizeUrl;
-	}
-
-	@Override
-	public String getAccessTokenEndpoint() {
-		return accessTokenEndpoint;
-	}
-
-	@Override
-	public String getScope() {
-		return scope;
-	}
+	private String profileUrl = "http://gw.api.taobao.com/router/rest?method=taobao.user.buyer.get&fields=user_id,nick,sex";
 
 	@Override
 	public String getProfileUrl() {

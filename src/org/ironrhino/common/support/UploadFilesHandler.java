@@ -17,7 +17,7 @@ import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
@@ -28,6 +28,7 @@ import lombok.Setter;
 
 @Component
 @Order(2)
+@ConfigurationProperties(prefix = "upload-files-handler")
 public class UploadFilesHandler extends AccessHandler {
 
 	public static final String DEFAULT_PATH_PREFIX = "/assets";
@@ -44,12 +45,10 @@ public class UploadFilesHandler extends AccessHandler {
 
 	@Getter
 	@Setter
-	@Value("${uploadFilesHandler.pathPrefix:" + DEFAULT_PATH_PREFIX + "}")
 	protected String pathPrefix = DEFAULT_PATH_PREFIX;
 
 	@Getter
 	@Setter
-	@Value("${uploadFilesHandler.uploadDir:" + DEFAULT_UPLOAD_DIR + "}")
 	protected String uploadDir = DEFAULT_UPLOAD_DIR;
 
 	private String pattern;

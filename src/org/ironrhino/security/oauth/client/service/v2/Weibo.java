@@ -3,53 +3,29 @@ package org.ironrhino.security.oauth.client.service.v2;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.oauth.client.model.Profile;
 import org.ironrhino.security.oauth.client.service.OAuth2Provider;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
+@ConfigurationProperties(prefix = "weibo")
+@Getter
+@Setter
 public class Weibo extends OAuth2Provider {
 
-	@Value("${weibo.logo:http://timg.sjs.sinajs.cn/t35/appstyle/opent/images/app/logo_zx.png}")
-	private String logo;
+	private String logo = "http://timg.sjs.sinajs.cn/t35/appstyle/opent/images/app/logo_zx.png";
 
-	@Value("${weibo.authorizeUrl:https://api.weibo.com/oauth2/authorize}")
-	private String authorizeUrl;
+	private String authorizeUrl = "https://api.weibo.com/oauth2/authorize";
 
-	@Value("${weibo.accessTokenEndpoint:https://api.weibo.com/oauth2/access_token}")
-	private String accessTokenEndpoint;
+	private String accessTokenEndpoint = "https://api.weibo.com/oauth2/access_token";
 
-	@Value("${weibo.scope:}")
-	private String scope;
+	private String scope = "";
 
-	@Value("${weibo.profileUrl:https://api.weibo.com/2/account/get_uid.json}")
-	private String profileUrl;
-
-	@Override
-	public String getLogo() {
-		return logo;
-	}
-
-	@Override
-	public String getAuthorizeUrl() {
-		return authorizeUrl;
-	}
-
-	@Override
-	public String getAccessTokenEndpoint() {
-		return accessTokenEndpoint;
-	}
-
-	@Override
-	public String getScope() {
-		return scope;
-	}
-
-	@Override
-	public String getProfileUrl() {
-		return profileUrl;
-	}
+	private String profileUrl = "https://api.weibo.com/2/account/get_uid.json";
 
 	@Override
 	public boolean isUseAuthorizationHeader() {

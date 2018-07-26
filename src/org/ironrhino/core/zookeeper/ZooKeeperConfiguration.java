@@ -10,29 +10,30 @@ import org.apache.curator.framework.api.UnhandledErrorListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Role;
-import org.springframework.core.annotation.Order;
 
-@Order(0)
+import lombok.Getter;
+import lombok.Setter;
+
 @Configuration
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @Profile({ CLUSTER, "zookeeper" })
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "zookeeper")
 public class ZooKeeperConfiguration {
 
-	@Value("${zooKeeper.connectString:localhost:2181}")
-	private String connectString;
+	private String connectString = "localhost:2181";
 
-	@Value("${zooKeeper.connectionTimeout:10000}")
-	private int connectionTimeout;
+	private int connectionTimeout = 10000;
 
-	@Value("${zooKeeper.sessionTimeout:60000}")
-	private int sessionTimeout;
+	private int sessionTimeout = 60000;
 
 	@Autowired(required = false)
 	private List<ConnectionStateListener> connectionStateListeners;

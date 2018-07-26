@@ -3,53 +3,29 @@ package org.ironrhino.security.oauth.client.service.v2;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.oauth.client.model.Profile;
 import org.ironrhino.security.oauth.client.service.OAuth2Provider;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Component
+@ConfigurationProperties(prefix = "github")
+@Getter
+@Setter
 public class Github extends OAuth2Provider {
 
-	@Value("${github.logo:https://a248.e.akamai.net/assets.github.com/images/modules/header/logov7@4x-hover.png}")
-	private String logo;
+	private String logo = "https://a248.e.akamai.net/assets.github.com/images/modules/header/logov7@4x-hover.png";
 
-	@Value("${github.authorizeUrl:https://github.com/login/oauth/authorize}")
-	private String authorizeUrl;
+	private String authorizeUrl = "https://github.com/login/oauth/authorize";
 
-	@Value("${github.accessTokenEndpoint:https://github.com/login/oauth/access_token}")
-	private String accessTokenEndpoint;
+	private String accessTokenEndpoint = "https://github.com/login/oauth/access_token";
 
-	@Value("${github.scope:user}")
-	private String scope;
+	private String scope = "user";
 
-	@Value("${github.profileUrl:https://api.github.com/user}")
-	private String profileUrl;
-
-	@Override
-	public String getLogo() {
-		return logo;
-	}
-
-	@Override
-	public String getAuthorizeUrl() {
-		return authorizeUrl;
-	}
-
-	@Override
-	public String getAccessTokenEndpoint() {
-		return accessTokenEndpoint;
-	}
-
-	@Override
-	public String getScope() {
-		return scope;
-	}
-
-	@Override
-	public String getProfileUrl() {
-		return profileUrl;
-	}
+	private String profileUrl = "https://api.github.com/user";
 
 	@Override
 	public boolean isUseAuthorizationHeader() {
