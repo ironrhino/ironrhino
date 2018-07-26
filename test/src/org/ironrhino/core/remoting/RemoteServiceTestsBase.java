@@ -69,6 +69,12 @@ public abstract class RemoteServiceTestsBase {
 	}
 
 	@Test
+	public void testEchoListWithArray() {
+		assertEquals("test",
+				testService.echoListWithArray(Collections.singletonList(new String[] { "test" })).get(0)[0]);
+	}
+
+	@Test
 	public void testUserDetails() {
 		assertNull(testService.loadUserByUsername(null));
 		assertEquals("username", testService.loadUserByUsername("username").getUsername());
