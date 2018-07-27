@@ -160,6 +160,16 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 				type = pt.getActualTypeArguments()[0];
 			}
 		}
+		if (type instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) type;
+			Type rawType = pt.getRawType();
+			Type[] argTypes = pt.getActualTypeArguments();
+			if (rawType instanceof Class && argTypes.length == 1 && argTypes[0] instanceof Class
+					&& ((Class<?>) argTypes[0]).isArray()) {
+				// https://github.com/FasterXML/jackson-databind/issues/2095
+				return ((Class<?>) rawType).getName() + "<java.lang.Object>";
+			}
+		}
 		return objectMapper.getTypeFactory().constructType(type).toCanonical();
 	}
 
