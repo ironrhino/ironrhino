@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -17,6 +19,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -107,6 +110,9 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 			if (requestChain != null)
 				request.getHeaders().set(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 			request.getHeaders().set(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
+			Locale locale = LocaleContextHolder.getLocale();
+			if (locale != null)
+				request.getHeaders().setAcceptLanguageAsLocales(Collections.singletonList(locale));
 			return execution.execute(request, body);
 		}
 
