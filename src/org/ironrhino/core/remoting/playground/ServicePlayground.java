@@ -74,17 +74,6 @@ public class ServicePlayground {
 		return services.keySet();
 	}
 
-	protected String toCanonical(Type type) {
-		if (type instanceof ParameterizedType) {
-			ParameterizedType pt = (ParameterizedType) type;
-			Type rawType = pt.getRawType();
-			if (rawType.equals(Optional.class)) {
-				type = pt.getActualTypeArguments()[0];
-			}
-		}
-		return objectMapper.getTypeFactory().constructType(type).toCanonical();
-	}
-
 	public Collection<MethodInfo> getMethods(String service) {
 		if (!getServices().contains(service))
 			return Collections.emptyList();

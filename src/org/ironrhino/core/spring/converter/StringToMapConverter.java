@@ -27,10 +27,11 @@ public class StringToMapConverter implements GenericConverter {
 		}
 		String string = (String) source;
 		try {
-			TypeFactory tf = JsonUtils.getObjectMapper().getTypeFactory();
+			TypeFactory typeFactory = TypeFactory.defaultInstance();
 			ResolvableType rt = targetType.getResolvableType();
-			JavaType jt = tf.constructParametricType(rt.getRawClass(), tf.constructType(rt.getGeneric(0).getRawClass()),
-					tf.constructType(rt.getGeneric(1).getRawClass()));
+			JavaType jt = typeFactory.constructParametricType(rt.getRawClass(),
+					typeFactory.constructType(rt.getGeneric(0).getRawClass()),
+					typeFactory.constructType(rt.getGeneric(1).getRawClass()));
 			return JsonUtils.fromJson(string, jt);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
