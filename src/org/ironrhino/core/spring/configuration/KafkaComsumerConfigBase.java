@@ -1,18 +1,27 @@
 package org.ironrhino.core.spring.configuration;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.errors.SerializationException;
+import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -37,18 +46,18 @@ public class KafkaComsumerConfigBase {
 	@Value("${kafka.autoOffsetReset:earliest}")
 	private String autoOffsetReset = "";
 
-	protected <T> ConcurrentKafkaListenerContainerFactory<String, T> createListenerContainerFactory(
-			Deserializer<T> valueDeserializer) {
-		ConsumerFactory<String, T> consumerFactory = createConsumerFactory(valueDeserializer, true);
+	@Bean
+	public <T> ConcurrentKafkaListenerContainerFactory<String, T> defaultListenerContainerFactory() {
+		ConsumerFactory<String, T> consumerFactory = createConsumerFactory(true);
 		ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
 		factory.setConcurrency(consumerConcurrency);
 		return factory;
 	}
 
-	protected <T> ConcurrentKafkaListenerContainerFactory<String, T> createManualAckBatchListenerContainerFactory(
-			Deserializer<T> valueDeserializer) {
-		ConsumerFactory<String, T> consumerFactory = createConsumerFactory(valueDeserializer, false);
+	@Bean
+	public <T> ConcurrentKafkaListenerContainerFactory<String, T> defaultManualAckBatchListenerContainerFactory() {
+		ConsumerFactory<String, T> consumerFactory = createConsumerFactory(false);
 		ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
 		factory.setConcurrency(consumerConcurrency);
@@ -57,8 +66,7 @@ public class KafkaComsumerConfigBase {
 		return factory;
 	}
 
-	protected <T> ConsumerFactory<String, T> createConsumerFactory(Deserializer<T> valueDeserializer,
-			boolean autoCommit) {
+	protected <T> ConsumerFactory<String, T> createConsumerFactory(boolean autoCommit) {
 		Map<String, Object> consumerConfigs = new HashMap<>();
 		consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 		consumerConfigs.put(ConsumerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true).replaceAll(":", "_"));
@@ -70,8 +78,59 @@ public class KafkaComsumerConfigBase {
 			consumerConfigs.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitIntervalMs);
 		DefaultKafkaConsumerFactory<String, T> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerConfigs);
 		consumerFactory.setKeyDeserializer(new StringDeserializer());
-		consumerFactory.setValueDeserializer(valueDeserializer);
+		consumerFactory.setValueDeserializer(new TopicNameBasedJsonDeserializer<>(JsonUtils.createNewObjectMapper()));
 		return consumerFactory;
 	}
 
+	@SuppressWarnings("unchecked")
+	private static class TopicNameBasedJsonDeserializer<T> extends JsonDeserializer<T> {
+
+		private Map<String, Class<?>> cache = new ConcurrentHashMap<>();
+
+		public TopicNameBasedJsonDeserializer(ObjectMapper objectMapper) {
+			super(objectMapper);
+		}
+
+		@Override
+		public T deserialize(String topic, Headers headers, byte[] data) {
+			if (data == null)
+				return null;
+			try {
+				Class<?> clazz = cache.computeIfAbsent(topic, cls -> {
+					try {
+						return (Class<T>) Class.forName(cls);
+					} catch (ClassNotFoundException e) {
+						return Object.class;
+					}
+				});
+				return clazz != Object.class ? (T) this.objectMapper.readValue(data, clazz)
+						: super.deserialize(topic, headers, data);
+			} catch (IOException e) {
+				throw new SerializationException(
+						"Can't deserialize data [" + Arrays.toString(data) + "] from topic [" + topic + "]", e);
+			}
+		}
+
+		@Override
+		public T deserialize(String topic, byte[] data) {
+			if (data == null)
+				return null;
+			try {
+				Class<?> clazz = cache.computeIfAbsent(topic, cls -> {
+					try {
+						return (Class<T>) Class.forName(cls);
+					} catch (ClassNotFoundException e) {
+						return Object.class;
+					}
+				});
+				return clazz != Object.class ? (T) this.objectMapper.readValue(data, clazz)
+						: super.deserialize(topic, data);
+			} catch (IOException e) {
+				throw new SerializationException(
+						"Can't deserialize data [" + Arrays.toString(data) + "] from topic [" + topic + "]", e);
+			}
+
+		}
+
+	}
 }

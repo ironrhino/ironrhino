@@ -15,12 +15,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AlertConsumer {
 
-//	@KafkaListener(topics = "#{alertTopic.name()}", containerFactory = "alertListenerContainerFactory")
+//	@KafkaListener(topics = "#{alertTopic.name()}", containerFactory = "defaultListenerContainerFactory")
 //	public void listen(ConsumerRecord<String, Alert> record) {
 //		System.out.println("received " + record.key() + " : " + JsonUtils.toJson(record.value()));
 //	}
 
-	@KafkaListener(topics = "#{alertTopic.name()}", containerFactory = "alertManualAckBatchListenerContainerFactory")
+	@KafkaListener(topics = "#{alertTopic.name()}", containerFactory = "defaultManualAckBatchListenerContainerFactory")
 	public void listenWithManualAck(List<ConsumerRecord<String, Alert>> records, Acknowledgment ack) {
 		for (ConsumerRecord<String, Alert> record : records) {
 			System.out.println("received " + record.key() + " with manual ack : " + JsonUtils.toJson(record.value()));
