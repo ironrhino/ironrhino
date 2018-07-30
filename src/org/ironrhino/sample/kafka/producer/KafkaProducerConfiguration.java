@@ -14,7 +14,7 @@ public class KafkaProducerConfiguration extends KafkaProducerConfigBase {
 
 	@Bean
 	public NewTopic alertTopic() {
-		return new NewTopic(Alert.class.getName(), numPartitions, replicationFactor);
+		return new NewTopic(Alert.class.getName(), getNumPartitions(), getReplicationFactor());
 	}
 
 }

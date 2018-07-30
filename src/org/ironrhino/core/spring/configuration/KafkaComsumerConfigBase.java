@@ -14,7 +14,12 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @EnableKafka
+@Getter
+@Setter
 public class KafkaComsumerConfigBase {
 
 	@Value("${kafka.bootstrap.servers:localhost:9092}")

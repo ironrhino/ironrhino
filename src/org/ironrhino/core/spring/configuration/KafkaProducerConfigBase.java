@@ -15,37 +15,42 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class KafkaProducerConfigBase {
 
 	@Value("${kafka.bootstrap.servers:localhost:9092}")
-	protected String bootstrapServers;
+	private String bootstrapServers;
 
 	@Value("${kafka.acks:all}")
-	protected String acks;
+	private String acks;
 
 	@Value("${kafka.retries:3}")
-	protected int retries;
+	private int retries;
 
 	@Value("${kafka.batchSize:16384}")
-	protected int batchSize;
+	private int batchSize;
 
 	@Value("${kafka.maxBlockMs:10000}")
-	protected int maxBlockMs;
+	private int maxBlockMs;
 
 	@Value("${kafka.lingerMs:1}")
-	protected int lingerMs;
+	private int lingerMs;
 
 	@Value("${kafka.bufferMemory:33554432}")
-	protected int bufferMemory;
+	private int bufferMemory;
 
 	@Value("${kafka.fatalIfBrokerNotAvailable:true}")
-	protected boolean fatalIfBrokerNotAvailable;
+	private boolean fatalIfBrokerNotAvailable;
 
 	@Value("${kafka.numPartitions:1}")
-	protected int numPartitions;
+	private int numPartitions;
 
 	@Value("${kafka.replicationFactor:1}")
-	protected short replicationFactor;
+	private short replicationFactor;
 
 	@Bean
 	public <T> ProducerFactory<String, T> kafkaProducerFactory() {
