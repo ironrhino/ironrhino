@@ -127,7 +127,7 @@ public class JdbcUpdateService {
 			} else if ("double".equals(type)) {
 				value = 0.00;
 			} else if ("decimal".equals(type)) {
-				value = new BigDecimal(0.00);
+				value = BigDecimal.ZERO;
 			} else if ("boolean".equals(type)) {
 				value = false;
 			} else if ("bit".equals(type)) {

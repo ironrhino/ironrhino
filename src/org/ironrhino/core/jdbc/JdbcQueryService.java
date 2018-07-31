@@ -178,7 +178,7 @@ public class JdbcQueryService {
 			} else if ("double".equals(type)) {
 				value = 197001.01;
 			} else if ("decimal".equals(type)) {
-				value = new BigDecimal(197001.01);
+				value = new BigDecimal("197001.01");
 			} else if ("boolean".equals(type)) {
 				value = false;
 			} else if ("bit".equals(type)) {

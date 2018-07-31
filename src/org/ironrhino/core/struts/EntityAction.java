@@ -1418,17 +1418,17 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						if (clazz == float.class || clazz == Float.class) {
 							BigDecimal old = (BigDecimal) sumColumns.get(name);
 							if (old == null)
-								old = new BigDecimal(0);
+								old = BigDecimal.ZERO;
 							sum = old.add(new BigDecimal((Float) value));
 						} else if (clazz == double.class || clazz == Double.class) {
 							BigDecimal old = (BigDecimal) sumColumns.get(name);
 							if (old == null)
-								old = new BigDecimal(0);
+								old = BigDecimal.ZERO;
 							sum = old.add(new BigDecimal((Double) value));
 						} else if (clazz == BigDecimal.class) {
 							BigDecimal old = (BigDecimal) sumColumns.get(name);
 							if (old == null)
-								old = new BigDecimal(0);
+								old = BigDecimal.ZERO;
 							sum = old.add((BigDecimal) value);
 						} else if (clazz == short.class || clazz == Short.class) {
 							Long old = (Long) sumColumns.get(name);

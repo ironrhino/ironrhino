@@ -264,8 +264,8 @@ public class OgnlRuntime {
         NUMERIC_DEFAULTS.put(Float.class, new Float(0.0f));
         NUMERIC_DEFAULTS.put(Double.class, new Double(0.0));
 
-        NUMERIC_DEFAULTS.put(BigInteger.class, new BigInteger("0"));
-        NUMERIC_DEFAULTS.put(BigDecimal.class, new BigDecimal(0.0));
+        NUMERIC_DEFAULTS.put(BigInteger.class, BigInteger.ZERO);
+        NUMERIC_DEFAULTS.put(BigDecimal.class, BigDecimal.ZERO);
     }
 
     static {
@@ -348,8 +348,8 @@ public class OgnlRuntime {
         _primitiveDefaults.put(Float.TYPE, new Float(0.0f));
         _primitiveDefaults.put(Double.TYPE, new Double(0.0));
 
-        _primitiveDefaults.put(BigInteger.class, new BigInteger("0"));
-        _primitiveDefaults.put(BigDecimal.class, new BigDecimal(0.0));
+        _primitiveDefaults.put(BigInteger.class, BigInteger.ZERO);
+        _primitiveDefaults.put(BigDecimal.class, BigDecimal.ZERO);
     }
 
     /**

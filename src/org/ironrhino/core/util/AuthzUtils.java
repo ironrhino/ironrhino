@@ -205,7 +205,7 @@ public abstract class AuthzUtils {
 
 	public static boolean isPasswordValid(String password) {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return principal instanceof UserDetails ? isPasswordValid((UserDetails) principal, password) : false;
+		return principal instanceof UserDetails && isPasswordValid((UserDetails) principal, password);
 	}
 
 	public static UserDetails getUserDetails(String username, String password) {
