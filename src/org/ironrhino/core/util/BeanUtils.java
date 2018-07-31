@@ -126,7 +126,7 @@ public abstract class BeanUtils {
 		ignores.addAll(Arrays.asList(ignoreProperties));
 		ignores.add("parent");
 		ignores.add("children");
-		copyProperties(source, ret, ignores.toArray(new String[0]));
+		copyProperties(source, ret, ignores.toArray(new String[ignores.size()]));
 		for (S child : source.getChildren()) {
 			if (filter == null || filter.test(child))
 				ret.addChild(copyTree(child, supplier, filter, ignoreProperties));

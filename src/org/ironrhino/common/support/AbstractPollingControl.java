@@ -251,11 +251,11 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 				}
 			}
 			if (prepend.size() > 0)
-				boundListOperations.rightPushAll(prepend.toArray(new String[0]));
+				boundListOperations.rightPushAll(prepend.toArray(new String[prepend.size()]));
 			if (append.size() > 0)
-				boundListOperations.leftPushAll(append.toArray(new String[0]));
+				boundListOperations.leftPushAll(append.toArray(new String[append.size()]));
 		} else {
-			boundListOperations.leftPushAll(ids.toArray(new String[0]));
+			boundListOperations.leftPushAll(ids.toArray(new String[ids.size()]));
 		}
 	}
 

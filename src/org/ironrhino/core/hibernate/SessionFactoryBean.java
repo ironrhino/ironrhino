@@ -176,7 +176,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			}
 		}
 		classes.sort(Comparator.comparing(Class::getName));
-		annotatedClasses = classes.toArray(new Class<?>[0]);
+		annotatedClasses = classes.toArray(new Class<?>[classes.size()]);
 		log.info("annotatedClasses: ");
 		for (Class<?> clz : annotatedClasses)
 			log.info(clz.getName());

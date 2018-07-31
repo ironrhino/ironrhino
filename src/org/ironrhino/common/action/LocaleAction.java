@@ -84,7 +84,7 @@ public class LocaleAction extends BaseAction {
 				if (_locales.contains(locale.toString()))
 					list.add(locale);
 			}
-			availableLocales = list.toArray(new Locale[0]);
+			availableLocales = list.toArray(new Locale[list.size()]);
 		}
 		return SUCCESS;
 	}

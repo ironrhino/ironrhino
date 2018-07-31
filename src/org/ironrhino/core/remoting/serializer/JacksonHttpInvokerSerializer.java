@@ -97,9 +97,10 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 							.constructFromCanonical(name.substring(index + SEPARATOR.length()));
 				arguments.add(objectMapper.readValue(objectMapper.treeAsTokens(on.get(type)), jt));
 			}
-			invocation.setGenericParameterTypes(genericParameterTypes.toArray(new String[0]));
-			invocation.setParameterTypes(parameterTypes.toArray(new Class[0]));
-			invocation.setArguments(arguments.toArray(new Object[0]));
+			invocation
+					.setGenericParameterTypes(genericParameterTypes.toArray(new String[genericParameterTypes.size()]));
+			invocation.setParameterTypes(parameterTypes.toArray(new Class[parameterTypes.size()]));
+			invocation.setArguments(arguments.toArray(new Object[arguments.size()]));
 			return invocation;
 		} catch (JsonProcessingException e) {
 			throw new SerializationFailedException(e.getMessage(), e);

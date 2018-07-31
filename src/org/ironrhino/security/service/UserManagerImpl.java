@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
@@ -102,7 +103,8 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 	private void populateAuthorities(User user) {
 		List<GrantedAuthority> auths = new ArrayList<>();
 		auths.add(new SimpleGrantedAuthority(UserRole.ROLE_BUILTIN_USER));
-		auths.addAll(AuthorityUtils.createAuthorityList(user.getRoles().toArray(new String[0])));
+		Set<String> set = user.getRoles();
+		auths.addAll(AuthorityUtils.createAuthorityList(set.toArray(new String[set.size()])));
 		user.setAuthorities(auths);
 		if (userRoleMappers != null)
 			for (UserRoleMapper mapper : userRoleMappers) {

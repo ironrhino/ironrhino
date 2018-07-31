@@ -135,7 +135,7 @@ public class ApiDoc implements Serializable {
 					for (String ss : arr)
 						set.add(ss);
 				}
-				requiredAuthorities = set.toArray(new String[0]);
+				requiredAuthorities = set.toArray(new String[set.size()]);
 			}
 		}
 

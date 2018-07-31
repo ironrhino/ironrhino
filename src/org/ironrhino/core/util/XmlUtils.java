@@ -89,7 +89,7 @@ public abstract class XmlUtils {
 	private static JAXBContext initContext() {
 		Collection<Class<?>> classes = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), XmlRootElement.class);
 		try {
-			return JAXBContext.newInstance(classes.toArray(new Class[0]));
+			return JAXBContext.newInstance(classes.toArray(new Class[classes.size()]));
 		} catch (JAXBException e) {
 			e.printStackTrace();
 			return null;

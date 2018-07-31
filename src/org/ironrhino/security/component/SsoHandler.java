@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -164,7 +165,8 @@ public class SsoHandler extends AccessHandler {
 	protected UserDetails map(User userFromApi) {
 		UserDetails user = userDetailsService.loadUserByUsername(userFromApi.getUsername());
 		Collection authorities = user.getAuthorities();
-		List<GrantedAuthority> list = AuthorityUtils.createAuthorityList(userFromApi.getRoles().toArray(new String[0]));
+		Set<String> roles = userFromApi.getRoles();
+		List<GrantedAuthority> list = AuthorityUtils.createAuthorityList(roles.toArray(new String[roles.size()]));
 		for (GrantedAuthority ga : list) {
 			if (!authorities.contains(ga))
 				authorities.add(ga);

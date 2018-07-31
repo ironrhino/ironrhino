@@ -152,8 +152,8 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		for (Map.Entry<String, Set<String>> entry : packages.entrySet()) {
 			String defaultNamespace = entry.getKey();
 			Set<String> currentPackages = entry.getValue();
-			Collection<Class<?>> classes = ClassScanner.scanAnnotated(currentPackages.toArray(new String[0]),
-					AutoConfig.class);
+			Collection<Class<?>> classes = ClassScanner
+					.scanAnnotated(currentPackages.toArray(new String[currentPackages.size()]), AutoConfig.class);
 			if (classes.size() == 0)
 				continue;
 			packageLoader = new PackageLoader();
