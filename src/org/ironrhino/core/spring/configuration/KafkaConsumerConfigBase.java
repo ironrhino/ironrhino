@@ -29,7 +29,7 @@ import lombok.Setter;
 @EnableKafka
 @Getter
 @Setter
-public class KafkaComsumerConfigBase {
+public class KafkaConsumerConfigBase {
 
 	@Value("${kafka.bootstrap.servers:localhost:9092}")
 	private String bootstrapServers;
