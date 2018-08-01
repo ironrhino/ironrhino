@@ -18,6 +18,7 @@ import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.stats.ServiceStats;
+import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.spring.RemotingClientProxy;
 import org.ironrhino.core.throttle.CircuitBreaking;
 import org.ironrhino.core.util.AppInfo;
@@ -211,11 +212,13 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		} else if (polling) {
 			setServiceUrl(discoverServiceUrl(true));
 		}
-		String requestId = MDC.get("requestId");
+		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
+		boolean requestIdGenerated = false;
 		if (requestId == null) {
-			requestId = CodecUtils.nextId();
-			MDC.put("requestId", requestId);
+			requestId = generateRequestId();
+			MDC.put(AccessFilter.MDC_KEY_REQUEST_ID, requestId);
 			MDC.put("request", "request:" + requestId);
+			requestIdGenerated = true;
 		}
 		String service = ReflectionUtils.stringify(methodInvocation.getMethod());
 		MDC.put("role", "CLIENT");
@@ -252,9 +255,12 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			remotingLogger.info("Invoked to {} success in {}ms", discoveredHost, time);
 		} finally {
 			RemotingContext.clear();
+			if (requestIdGenerated) {
+				MDC.remove(AccessFilter.MDC_KEY_REQUEST_ID);
+				MDC.remove("request");
+			}
 			MDC.remove("role");
 		}
-
 		return result;
 	}
 
@@ -382,6 +388,10 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		sb.append(SERVLET_PATH_PREFIX);
 		sb.append(serviceName);
 		return sb.toString();
+	}
+
+	private String generateRequestId() {
+		return CodecUtils.nextId();
 	}
 
 }
