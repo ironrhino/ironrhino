@@ -134,7 +134,14 @@ public class TestServiceImpl implements TestService {
 		User user = new User();
 		user.setUsername(username);
 		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
-		return es.submit(() -> user);
+		return es.submit(() -> {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return user;
+		});
 	}
 
 	@Override
@@ -144,7 +151,14 @@ public class TestServiceImpl implements TestService {
 		User user = new User();
 		user.setUsername(username);
 		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
-		return () -> user;
+		return () -> {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return user;
+		};
 	}
 
 	@PreDestroy
