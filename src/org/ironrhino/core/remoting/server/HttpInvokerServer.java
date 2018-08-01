@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -103,48 +103,13 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		Object proxy = getProxyForService();
 		try {
 			serializer.set(HttpInvokerSerializers.ofContentType(request.getHeader(HttpHeaders.CONTENT_TYPE)));
-			RemoteInvocation invocation = readRemoteInvocation(request);
-			List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
-			for (Class<?> cl : invocation.getParameterTypes())
-				parameterTypeList.add(cl.getSimpleName());
-			String method = new StringBuilder(invocation.getMethodName()).append("(")
-					.append(String.join(",", parameterTypeList)).append(")").toString();
-			MDC.put("role", "SERVER");
-			MDC.put("service", interfaceName + '.' + method);
-			if (loggingPayload) {
-				Object payload;
-				Object[] arguments = invocation.getArguments();
-				String[] parameterNames = ReflectionUtils
-						.getParameterNames(clazz.getMethod(invocation.getMethodName(), invocation.getParameterTypes()));
-				if (parameterNames != null) {
-					Map<String, Object> parameters = new LinkedHashMap<>();
-					for (int i = 0; i < parameterNames.length; i++)
-						parameters.put(parameterNames[i], arguments[i]);
-					payload = parameters;
-				} else {
-					payload = arguments;
-				}
-				remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(payload));
+			RemoteInvocation invocation = readRemoteInvocation(request, request.getInputStream());
+			RemoteInvocationResult result = call(() -> invokeAndCreateResult(request, invocation, proxy));
+			if (result == null) {
+				// async
+				return;
 			}
-			long time = System.currentTimeMillis();
-			RemoteInvocationResult result = invokeAndCreateResult(invocation, proxy);
-			time = System.currentTimeMillis() - time;
 			writeRemoteInvocationResult(request, response, invocation, result);
-			if (serviceStats != null) {
-				serviceStats.serverSideEmit(interfaceName, method, time);
-			}
-			if (loggingPayload) {
-				if (!result.hasException()) {
-					Object value = result.getValue();
-					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
-				} else {
-					Throwable throwable = result.getException();
-					if (throwable != null && throwable.getCause() != null)
-						throwable = throwable.getCause();
-					remotingLogger.error("Error:", throwable);
-				}
-			}
-			remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
 		} catch (SerializationFailedException sfe) {
 			log.error(sfe.getMessage(), sfe);
 			response.setHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE, sfe.getMessage());
@@ -207,38 +172,62 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 	@Override
 	protected RemoteInvocation readRemoteInvocation(HttpServletRequest request, InputStream is)
 			throws IOException, ClassNotFoundException {
-		return serializer.get().readRemoteInvocation(decorateInputStream(request, is));
+		RemoteInvocation invocation = serializer.get().readRemoteInvocation(decorateInputStream(request, is));
+		log(invocation);
+		return invocation;
 	}
 
-	@Override
-	protected RemoteInvocationResult invokeAndCreateResult(RemoteInvocation invocation, Object targetObject) {
-		RemoteInvocationResult result = super.invokeAndCreateResult(invocation, targetObject);
-		result = transformResult(invocation, targetObject, result);
+	protected RemoteInvocationResult invokeAndCreateResult(HttpServletRequest request, RemoteInvocation invocation,
+			Object targetObject) {
+		RemoteInvocationResult result;
+		try {
+			Object value = invoke(invocation, targetObject);
+			result = new RemoteInvocationResult(value);
+		} catch (Throwable ex) {
+			result = new RemoteInvocationResult(ex);
+		}
+		if (!result.hasException())
+			result = transformResult(request, invocation, targetObject, result);
 		return result;
 	}
 
-	protected RemoteInvocationResult transformResult(RemoteInvocation invocation, Object targetObject,
-			RemoteInvocationResult result) {
-		if (!result.hasException()) {
-			Object value = result.getValue();
-			if (value instanceof Optional) {
-				Optional<?> optional = ((Optional<?>) value);
-				result.setValue(optional.isPresent() ? optional.get() : null);
-			} else if (value instanceof Future) {
+	protected RemoteInvocationResult transformResult(HttpServletRequest request, RemoteInvocation invocation,
+			Object targetObject, RemoteInvocationResult result) {
+		Object value = result.getValue();
+		if (value instanceof Optional) {
+			Optional<?> optional = ((Optional<?>) value);
+			result.setValue(optional.isPresent() ? optional.get() : null);
+		} else if (value instanceof Callable || value instanceof Future) {
+			Map<String, String> contextMap = MDC.getCopyOfContextMap();
+			AsyncContext context = request.startAsync();
+			context.start(() -> {
+				MDC.setContextMap(contextMap);
+				HttpServletResponse response = (HttpServletResponse) context.getResponse();
 				try {
-					result.setValue((((Future<?>) value)).get());
-				} catch (Exception e) {
-					result.setValue(null);
-					result.setException(e);
+					RemoteInvocationResult remoteInvocationResult = call(() -> {
+						try {
+							result.setValue(value instanceof Callable ? (((Callable<?>) value)).call()
+									: (((Future<?>) value)).get());
+						} catch (Throwable e) {
+							result.setValue(null);
+							result.setException(e);
+						}
+						return result;
+					});
+					writeRemoteInvocationResult(request, response, remoteInvocationResult);
+				} catch (SerializationFailedException sfe) {
+					log.error(sfe.getMessage(), sfe);
+					response.setHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE, sfe.getMessage());
+					response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
+				} catch (Exception ex) {
+					log.error(ex.getMessage(), ex);
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				} finally {
+					context.complete();
+					MDC.clear();
 				}
-			} else if (value instanceof Callable) {
-				try {
-					result.setValue((((Callable<?>) value)).call());
-				} catch (Exception e) {
-					result.setValue(null);
-					result.setException(e);
-				}
-			}
+			});
+			return null;
 		}
 		return result;
 	}
@@ -267,6 +256,50 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		}
 		ExceptionUtils.trimStackTrace(throwable, maxStackTraceElements);
 		return throwable;
+	}
+
+	private void log(RemoteInvocation invocation) {
+		Class<?> clazz = getServiceInterface();
+		List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
+		for (Class<?> cl : invocation.getParameterTypes())
+			parameterTypeList.add(cl.getSimpleName());
+		String method = new StringBuilder(invocation.getMethodName()).append("(")
+				.append(String.join(",", parameterTypeList)).append(")").toString();
+		MDC.put("role", "SERVER");
+		MDC.put("service", clazz.getName() + '.' + method);
+		if (loggingPayload) {
+			Object[] args = invocation.getArguments();
+			remotingLogger.info("Request: {}",
+					JsonDesensitizer.DEFAULT_INSTANCE.toJson(args.length == 1 ? args[0] : invocation.getArguments()));
+		}
+	}
+
+	private RemoteInvocationResult call(Callable<RemoteInvocationResult> callable) throws Exception {
+		long time = System.currentTimeMillis();
+		RemoteInvocationResult result = callable.call();
+		if (result == null) {
+			// async
+			return null;
+		}
+		time = System.currentTimeMillis() - time;
+		if (serviceStats != null) {
+			String service = MDC.get("service");
+			int index = service.substring(0, service.indexOf('(')).lastIndexOf('.');
+			serviceStats.serverSideEmit(service.substring(0, index), service.substring(index + 1), time);
+		}
+		if (loggingPayload) {
+			if (!result.hasException()) {
+				Object value = result.getValue();
+				remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
+			} else {
+				Throwable throwable = result.getException();
+				if (throwable != null && throwable.getCause() != null)
+					throwable = throwable.getCause();
+				remotingLogger.error("Error:", throwable);
+			}
+		}
+		remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
+		return result;
 	}
 
 }

@@ -18,6 +18,7 @@ public class RemotingServerInitializer implements WebApplicationInitializer {
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet(servletName,
 				new InheritedDispatcherServlet(ctx));
 		dynamic.addMapping("/remoting/*");
+		dynamic.setAsyncSupported(true);
 		dynamic.setLoadOnStartup(1);
 	}
 
