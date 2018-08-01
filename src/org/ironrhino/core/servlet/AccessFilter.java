@@ -169,7 +169,7 @@ public class AccessFilter implements Filter {
 			if (requestId == null) {
 				requestId = request.getHeader(HTTP_HEADER_REQUEST_ID);
 				if (StringUtils.isBlank(requestId)) {
-					requestId = generateRequestId();
+					requestId = CodecUtils.generateRequestId();
 					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 					requestChain = requestId.substring(14);
 				}
@@ -229,10 +229,6 @@ public class AccessFilter implements Filter {
 	@Override
 	public void destroy() {
 
-	}
-
-	private String generateRequestId() {
-		return CodecUtils.nextId();
 	}
 
 }

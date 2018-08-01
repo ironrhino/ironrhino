@@ -286,6 +286,10 @@ public abstract class CodecUtils {
 		return StringUtils.leftPad(id, 22, '0');
 	}
 
+	public static String generateRequestId() {
+		return nextId();
+	}
+
 	public static String encodeBase62(String hex) {
 		char[] buf = new char[hex.length()];
 		int charPos = hex.length() - 1;
