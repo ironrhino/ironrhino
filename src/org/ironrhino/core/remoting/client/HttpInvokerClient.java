@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +48,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object> {
+public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object>, DisposableBean {
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
@@ -80,6 +81,8 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Setter
 	@Autowired(required = false)
 	private volatile ExecutorService executorService;
+
+	private volatile boolean executorServiceCreated;
 
 	@Setter
 	private String host;
@@ -147,6 +150,12 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	}
 
 	@Override
+	public void destroy() throws Exception {
+		if (executorServiceCreated)
+			executorService.shutdown();
+	}
+
+	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
 		if (method.isDefault()) {
@@ -158,9 +167,11 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			if (es == null) {
 				synchronized (this) {
 					es = executorService;
-					if (es == null)
+					if (es == null) {
 						executorService = es = Executors
 								.newCachedThreadPool(new NameableThreadFactory("httpInvokerClient"));
+						executorServiceCreated = true;
+					}
 				}
 			}
 			return es.submit(new Callable<Object>() {
