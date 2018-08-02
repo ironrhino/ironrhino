@@ -14,6 +14,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Remoting
 public interface TestService {
 
+	enum FutureType {
+		RUNNABLE, COMPLETABLE, LISTENABLE;
+	}
+
 	public default String defaultEcho(String value) {
 		return echo(value);
 	}
@@ -52,7 +56,7 @@ public interface TestService {
 
 	public Optional<UserDetails> loadOptionalUserByUsername(String username);
 
-	public Future<UserDetails> loadFutureUserByUsername(String username);
+	public Future<UserDetails> loadFutureUserByUsername(String username, FutureType futureType);
 
 	public Callable<UserDetails> loadCallableUserByUsername(String username);
 

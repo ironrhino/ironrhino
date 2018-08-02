@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ironrhino.sample.remoting.PersonRepository;
 import org.ironrhino.sample.remoting.TestService;
+import org.ironrhino.sample.remoting.TestService.FutureType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -101,19 +102,37 @@ public abstract class RemoteServiceTestsBase {
 
 	@Test
 	public void testFuture() throws Exception {
-		assertEquals("username", testService.loadFutureUserByUsername("username").get().getUsername());
+		for (FutureType futureType : FutureType.values()) {
+			assertEquals("username", testService.loadFutureUserByUsername("username", futureType).get().getUsername());
+		}
 	}
 
 	@Test
-	public void testFutureWithException() throws Exception {
-		boolean error = false;
-		try {
-			testService.loadFutureUserByUsername(null).get();
-		} catch (ExecutionException e) {
-			assertTrue(e.getCause() instanceof IllegalArgumentException);
-			error = true;
+	public void testFutureWithNullUsername() throws Exception {
+		for (FutureType futureType : FutureType.values()) {
+			boolean error = false;
+			try {
+				testService.loadFutureUserByUsername(null, futureType).get();
+			} catch (ExecutionException e) {
+				assertTrue(e.getCause() instanceof IllegalArgumentException);
+				error = true;
+			}
+			assertTrue(error);
 		}
-		assertTrue(error);
+	}
+
+	@Test
+	public void testFutureWithBlankUsername() throws Exception {
+		for (FutureType futureType : FutureType.values()) {
+			boolean error = false;
+			try {
+				testService.loadFutureUserByUsername("", futureType).get();
+			} catch (ExecutionException e) {
+				assertTrue(e.getCause() instanceof IllegalArgumentException);
+				error = true;
+			}
+			assertTrue(error);
+		}
 	}
 
 	@Test
@@ -122,8 +141,13 @@ public abstract class RemoteServiceTestsBase {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testCallableWithException() throws Exception {
+	public void testCallableWithNullUsername() throws Exception {
 		testService.loadCallableUserByUsername(null).call();
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCallableWithBlankUsername() throws Exception {
+		testService.loadCallableUserByUsername("").call();
 	}
 
 	@Test

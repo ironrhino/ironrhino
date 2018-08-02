@@ -6,9 +6,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 import javax.annotation.PreDestroy;
 
@@ -18,6 +20,7 @@ import org.ironrhino.security.domain.User;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.SettableListenableFuture;
 
 @Service
 public class TestServiceImpl implements TestService {
@@ -128,35 +131,52 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
-	public Future<UserDetails> loadFutureUserByUsername(String username) {
+	public Future<UserDetails> loadFutureUserByUsername(String username, FutureType futureType) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
-		User user = new User();
-		user.setUsername(username);
-		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
-		return es.submit(() -> {
+		Supplier<UserDetails> sup = () -> {
+			if (StringUtils.isBlank(username))
+				throw new IllegalArgumentException("username shouldn't be blank");
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			User user = new User();
+			user.setUsername(username);
+			user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
 			return user;
-		});
+		};
+		switch (futureType) {
+		case COMPLETABLE:
+			return CompletableFuture.supplyAsync(sup);
+		case LISTENABLE:
+			SettableListenableFuture<UserDetails> future = new SettableListenableFuture<>();
+			if (StringUtils.isBlank(username))
+				future.setException(new IllegalArgumentException("username shouldn't be blank"));
+			else
+				future.set(sup.get());
+			return future;
+		default:
+			return es.submit(sup::get);
+		}
 	}
 
 	@Override
 	public Callable<UserDetails> loadCallableUserByUsername(String username) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
-		User user = new User();
-		user.setUsername(username);
-		user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
 		return () -> {
+			if (StringUtils.isBlank(username))
+				throw new IllegalArgumentException("username shouldn't be blank");
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			User user = new User();
+			user.setUsername(username);
+			user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
 			return user;
 		};
 	}
