@@ -1,5 +1,6 @@
 package org.ironrhino.core.remoting.serializer;
 
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.NotSerializableException;
@@ -28,7 +29,7 @@ public class JavaHttpInvokerSerializer implements HttpInvokerSerializer {
 
 	@Override
 	public void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
-		try (ObjectOutputStream oos = new ObjectOutputStream(os)) {
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FlushGuardedOutputStream(os))) {
 			oos.writeObject(invocation);
 		} catch (NotSerializableException e) {
 			throw new SerializationFailedException(e.getMessage(), e);
@@ -47,7 +48,7 @@ public class JavaHttpInvokerSerializer implements HttpInvokerSerializer {
 	@Override
 	public void writeRemoteInvocationResult(RemoteInvocation invocation, RemoteInvocationResult result, OutputStream os)
 			throws IOException {
-		try (ObjectOutputStream oos = new ObjectOutputStream(os)) {
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FlushGuardedOutputStream(os))) {
 			oos.writeObject(result);
 		} catch (NotSerializableException e) {
 			throw new SerializationFailedException(e.getMessage(), e);
@@ -60,6 +61,29 @@ public class JavaHttpInvokerSerializer implements HttpInvokerSerializer {
 			return (RemoteInvocationResult) ois.readObject();
 		} catch (ObjectStreamException | ClassNotFoundException e) {
 			throw new SerializationFailedException(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Decorate an {@code OutputStream} to guard against {@code flush()} calls,
+	 * which are turned into no-ops.
+	 * <p>
+	 * Because {@link ObjectOutputStream#close()} will in fact flush/drain the
+	 * underlying stream twice, this {@link FilterOutputStream} will guard against
+	 * individual flush calls. Multiple flush calls can lead to performance issues,
+	 * since writes aren't gathered as they should be.
+	 * 
+	 * @see <a href="https://jira.spring.io/browse/SPR-14040">SPR-14040</a>
+	 */
+	private static class FlushGuardedOutputStream extends FilterOutputStream {
+
+		public FlushGuardedOutputStream(OutputStream out) {
+			super(out);
+		}
+
+		@Override
+		public void flush() throws IOException {
+			// Do nothing on flush
 		}
 	}
 }

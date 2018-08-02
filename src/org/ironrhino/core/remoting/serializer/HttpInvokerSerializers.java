@@ -3,7 +3,10 @@ package org.ironrhino.core.remoting.serializer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.ClassUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,10 @@ public final class HttpInvokerSerializers {
 		if (ClassUtils.isPresent("org.nustaq.serialization.FSTObjectInput",
 				HttpInvokerSerializers.class.getClassLoader()))
 			SERIALIZERS.add(FstHttpInvokerSerializer.INSTANCE);
+	}
+
+	public static HttpInvokerSerializer forRequest(HttpServletRequest request) {
+		return ofContentType(request.getHeader(HttpHeaders.CONTENT_TYPE));
 	}
 
 	public static HttpInvokerSerializer ofContentType(String contentType) {
