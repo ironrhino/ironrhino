@@ -3,16 +3,18 @@ package org.ironrhino.core.remoting.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -32,6 +34,7 @@ import org.ironrhino.core.servlet.ProxySupportHttpServletRequest;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.core.util.ThrowableFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -42,6 +45,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,16 +84,7 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return;
 		}
-		RemotingContext.setRequestFrom(request.getHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM));
-		Enumeration<String> en = request.getHeaderNames();
-		while (en.hasMoreElements()) {
-			String name = en.nextElement();
-			if (name.startsWith(RemotingContext.HTTP_HEADER_PREFIX)) {
-				String key = URLDecoder.decode(name.substring(RemotingContext.HTTP_HEADER_PREFIX.length()), "UTF-8");
-				String value = URLDecoder.decode(request.getHeader(name), "UTF-8");
-				RemotingContext.put(key, value);
-			}
-		}
+		MDC.put(AccessFilter.MDC_KEY_REQUEST_FROM, request.getHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM));
 		String uri = request.getRequestURI();
 		String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
 		Class<?> clazz = interfaces.get(interfaceName);
@@ -101,30 +96,15 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		serviceInterface.set(clazz);
 		service.set(exportedServices.get(interfaceName));
 		Object proxy = getProxyForService();
-		try {
-			serializer.set(HttpInvokerSerializers.ofContentType(request.getHeader(HttpHeaders.CONTENT_TYPE)));
-			RemoteInvocation invocation = readRemoteInvocation(request, request.getInputStream());
-			RemoteInvocationResult result = call(() -> invokeAndCreateResult(request, invocation, proxy));
-			if (result == null) {
-				// async
-				return;
-			}
-			writeRemoteInvocationResult(request, response, invocation, result);
-		} catch (SerializationFailedException sfe) {
-			log.error(sfe.getMessage(), sfe);
-			response.setHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE, sfe.getMessage());
-			response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
-		} catch (Exception ex) {
-			log.error(ex.getMessage(), ex);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} finally {
-			serviceInterface.remove();
-			service.remove();
-			serializer.remove();
-			RemotingContext.clear();
-			MDC.remove("role");
-			MDC.remove("service");
-		}
+		serializer.set(HttpInvokerSerializers.ofContentType(request.getHeader(HttpHeaders.CONTENT_TYPE)));
+		invokeAndWrite(request, response, req -> readRemoteInvocation(req, req.getInputStream()),
+				inv -> invokeAndCreateResult(request, inv, proxy), () -> {
+					serviceInterface.remove();
+					service.remove();
+					serializer.remove();
+					MDC.remove("role");
+					MDC.remove("service");
+				});
 	}
 
 	@Override
@@ -198,35 +178,42 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 			Optional<?> optional = ((Optional<?>) value);
 			result.setValue(optional.isPresent() ? optional.get() : null);
 		} else if (value instanceof Callable || value instanceof Future) {
-			Map<String, String> contextMap = MDC.getCopyOfContextMap();
 			AsyncContext context = request.startAsync();
-			context.start(() -> {
-				MDC.setContextMap(contextMap);
-				HttpServletResponse response = (HttpServletResponse) context.getResponse();
-				try {
-					RemoteInvocationResult remoteInvocationResult = call(() -> {
-						try {
-							result.setValue(value instanceof Callable ? (((Callable<?>) value)).call()
-									: (((Future<?>) value)).get());
-						} catch (Throwable e) {
-							result.setValue(null);
-							result.setException(e);
-						}
-						return result;
-					});
-					writeRemoteInvocationResult(request, response, remoteInvocationResult);
-				} catch (SerializationFailedException sfe) {
-					log.error(sfe.getMessage(), sfe);
-					response.setHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE, sfe.getMessage());
-					response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
-				} catch (Exception ex) {
-					log.error(ex.getMessage(), ex);
-					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} finally {
-					context.complete();
-					MDC.clear();
-				}
-			});
+			Map<String, String> contextMap = MDC.getCopyOfContextMap();
+			if (value instanceof CompletableFuture) {
+				((CompletableFuture<?>) value).whenComplete((obj, e) -> {
+					RemoteInvocationResult asyncResult = new RemoteInvocationResult();
+					if (e == null) {
+						asyncResult.setValue(obj);
+					} else {
+						Throwable ex = e;
+						if (ex instanceof CompletionException)
+							ex = e.getCause();
+						asyncResult.setException(new InvocationTargetException(ex));
+					}
+					invokeAndWriteWithAsync(context, contextMap, invocation, asyncResult);
+				});
+			} else if (value instanceof ListenableFuture) {
+				((ListenableFuture<?>) value).addCallback(obj -> {
+					RemoteInvocationResult asyncResult = new RemoteInvocationResult();
+					asyncResult.setValue(obj);
+					invokeAndWriteWithAsync(context, contextMap, invocation, asyncResult);
+				}, ex -> invokeAndWriteWithAsync(context, contextMap, invocation,
+						new RemoteInvocationResult(new InvocationTargetException(ex))));
+			} else {
+				context.start(() -> {
+					RemoteInvocationResult asyncResult = new RemoteInvocationResult();
+					try {
+						asyncResult.setValue(value instanceof Callable ? (((Callable<?>) value)).call()
+								: (((Future<?>) value)).get());
+					} catch (Throwable e) {
+						if (value instanceof Future && e instanceof ExecutionException)
+							e = e.getCause();
+						asyncResult.setException(new InvocationTargetException(e));
+					}
+					invokeAndWriteWithAsync(context, contextMap, invocation, asyncResult);
+				});
+			}
 			return null;
 		}
 		return result;
@@ -274,32 +261,55 @@ public class HttpInvokerServer extends HttpInvokerServiceExporter {
 		}
 	}
 
-	private RemoteInvocationResult call(Callable<RemoteInvocationResult> callable) throws Exception {
-		long time = System.currentTimeMillis();
-		RemoteInvocationResult result = callable.call();
-		if (result == null) {
-			// async
-			return null;
-		}
-		time = System.currentTimeMillis() - time;
-		if (serviceStats != null) {
-			String service = MDC.get("service");
-			int index = service.substring(0, service.indexOf('(')).lastIndexOf('.');
-			serviceStats.serverSideEmit(service.substring(0, index), service.substring(index + 1), time);
-		}
-		if (loggingPayload) {
-			if (!result.hasException()) {
-				Object value = result.getValue();
-				remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
-			} else {
-				Throwable throwable = result.getException();
-				if (throwable != null && throwable.getCause() != null)
-					throwable = throwable.getCause();
-				remotingLogger.error("Error:", throwable);
+	private void invokeAndWrite(HttpServletRequest request, HttpServletResponse response,
+			ThrowableFunction<HttpServletRequest, RemoteInvocation, Exception> invocationFunction,
+			Function<RemoteInvocation, RemoteInvocationResult> invocationResultFunction, Runnable completion) {
+		try {
+			RemoteInvocation invocation = invocationFunction.apply(request);
+			long time = System.currentTimeMillis();
+			RemoteInvocationResult result = invocationResultFunction.apply(invocation);
+			if (result == null) {
+				return; // async
 			}
+			time = System.currentTimeMillis() - time;
+			if (serviceStats != null) {
+				String service = MDC.get("service");
+				int index = service.substring(0, service.indexOf('(')).lastIndexOf('.');
+				serviceStats.serverSideEmit(service.substring(0, index), service.substring(index + 1), time);
+			}
+			if (loggingPayload) {
+				if (!result.hasException()) {
+					Object value = result.getValue();
+					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
+				} else {
+					Throwable throwable = result.getException();
+					if (throwable != null && throwable.getCause() != null)
+						throwable = throwable.getCause();
+					remotingLogger.error("Error:", throwable);
+				}
+			}
+			remotingLogger.info("Invoked from {} in {}ms", MDC.get(AccessFilter.MDC_KEY_REQUEST_FROM), time);
+			writeRemoteInvocationResult(request, response, invocation, result);
+		} catch (SerializationFailedException sfe) {
+			log.error(sfe.getMessage(), sfe);
+			response.setHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE, sfe.getMessage());
+			response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} finally {
+			completion.run();
 		}
-		remotingLogger.info("Invoked from {} in {}ms", RemotingContext.getRequestFrom(), time);
-		return result;
+	}
+
+	private void invokeAndWriteWithAsync(AsyncContext context, Map<String, String> contextMap,
+			RemoteInvocation invocation, RemoteInvocationResult result) {
+		MDC.setContextMap(contextMap);
+		invokeAndWrite((HttpServletRequest) context.getRequest(), (HttpServletResponse) context.getResponse(),
+				req -> invocation, inv -> result, () -> {
+					context.complete();
+					MDC.clear();
+				});
 	}
 
 }

@@ -4,9 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -91,12 +89,6 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 		if (requestChain != null)
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
-		Map<String, String> ctx = RemotingContext.getContext();
-		if (ctx != null) {
-			for (Map.Entry<String, String> entry : ctx.entrySet())
-				postMethod.addHeader(RemotingContext.HTTP_HEADER_PREFIX + URLEncoder.encode(entry.getKey(), "UTF-8"),
-						URLEncoder.encode(entry.getValue(), "UTF-8"));
-		}
 		postMethod.setEntity(new ByteArrayEntity(baos.toByteArray()));
 		CloseableHttpResponse rsp = httpClient.execute(postMethod);
 		try {

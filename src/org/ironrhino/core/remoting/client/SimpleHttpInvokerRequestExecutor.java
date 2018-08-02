@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.Map;
 
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
@@ -38,12 +36,6 @@ public class SimpleHttpInvokerRequestExecutor
 		if (requestChain != null)
 			con.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		con.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
-		Map<String, String> map = RemotingContext.getContext();
-		if (map != null) {
-			for (Map.Entry<String, String> entry : map.entrySet())
-				con.addRequestProperty(RemotingContext.HTTP_HEADER_PREFIX + URLEncoder.encode(entry.getKey(), "UTF-8"),
-						URLEncoder.encode(entry.getValue(), "UTF-8"));
-		}
 		super.prepareConnection(con, contentLength);
 	}
 

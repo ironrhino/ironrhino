@@ -13,7 +13,6 @@ import java.util.concurrent.Future;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
@@ -265,7 +264,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			}
 			remotingLogger.info("Invoked to {} success in {}ms", discoveredHost, time);
 		} finally {
-			RemotingContext.clear();
 			if (requestIdGenerated) {
 				MDC.remove(AccessFilter.MDC_KEY_REQUEST_ID);
 				MDC.remove("request");
