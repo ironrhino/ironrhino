@@ -1,8 +1,10 @@
 package org.ironrhino.core.remoting.client;
 
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
@@ -30,14 +33,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
-import org.springframework.lang.Nullable;
 import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.httpinvoker.HttpInvokerClientInterceptor;
+import org.springframework.remoting.RemoteConnectFailureException;
+import org.springframework.remoting.RemoteInvocationFailureException;
+import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
@@ -47,11 +53,24 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HttpInvokerClient extends HttpInvokerClientInterceptor implements FactoryBean<Object>, DisposableBean {
+public class HttpInvokerClient implements MethodInterceptor, HttpInvokerClientConfiguration, FactoryBean<Object>,
+		InitializingBean, DisposableBean {
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
 	private static Logger remotingLogger = LoggerFactory.getLogger("remoting");
+
+	@Getter
+	@Setter
+	private Class<?> serviceInterface;
+
+	@Getter
+	@Setter
+	private String serviceUrl;
+
+	private volatile SimpleHttpInvokerRequestExecutor httpInvokerRequestExecutor;
+
+	private volatile HttpInvokerSerializer serializer;
 
 	@Getter
 	@Setter
@@ -63,9 +82,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Value("${httpInvoker.readTimeout:60000}")
 	private int readTimeout = 60000;
 
-	@Getter
-	private volatile HttpInvokerSerializer serializer;
-
+	@Setter
 	@Value("${httpInvoker.loggingPayload:true}")
 	private boolean loggingPayload;
 
@@ -81,7 +98,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Autowired(required = false)
 	private volatile ExecutorService executorService;
 
-	private volatile boolean executorServiceCreated;
+	private boolean executorServiceCreated;
 
 	@Setter
 	private String host;
@@ -101,7 +118,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	private boolean urlFromDiscovery;
 
-	private boolean discovered; // for lazy discover from serviceRegistry
+	private volatile boolean discovered; // for lazy discover from serviceRegistry
 
 	private String discoveredHost;
 
@@ -114,7 +131,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	@Override
 	public Class<?> getObjectType() {
-		return getServiceInterface();
+		return this.serviceInterface;
 	}
 
 	@Value("${httpInvoker.serialization.type:}")
@@ -123,29 +140,39 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor(this.serializer);
 		executor.setConnectTimeout(connectTimeout);
 		executor.setReadTimeout(readTimeout);
-		executor.setBeanClassLoader(getBeanClassLoader());
-		super.setHttpInvokerRequestExecutor(executor);
+		this.httpInvokerRequestExecutor = executor;
+	}
+
+	@Override
+	public String getCodebaseUrl() {
+		return null;
 	}
 
 	@Override
 	public void afterPropertiesSet() {
+		Assert.notNull(serviceInterface, "'serviceInterface' must not be null");
+		Assert.isTrue(serviceInterface.isInterface(), "'serviceInterface' must be an interface");
+		Assert.notNull(httpInvokerRequestExecutor, "'httpInvokerRequestExecutor' must not be null");
+		httpInvokerRequestExecutor.setConnectTimeout(connectTimeout);
+		httpInvokerRequestExecutor.setReadTimeout(readTimeout);
 		if (StringUtils.isBlank(host))
-			Assert.notNull(serviceRegistry, "ServiceRegistry is missing");
+			Assert.notNull(serviceRegistry, "serviceRegistry is missing");
 		if (port <= 0)
 			port = AppInfo.getHttpPort();
 		if (port <= 0)
 			port = 8080;
-		String serviceUrl = getServiceUrl();
+		if (serviceUrl == null && StringUtils.isNotBlank(host)) {
+			serviceUrl = discoverServiceUrl();
+		}
 		if (serviceUrl == null) {
 			Assert.notNull(serviceRegistry, "serviceRegistry shouldn't be null");
 			setServiceUrl("http://fakehost/");
 			discovered = false;
 			urlFromDiscovery = true;
 		}
-		super.afterPropertiesSet();
-		ProxyFactory pf = new ProxyFactory(getServiceInterface(), this);
+		ProxyFactory pf = new ProxyFactory(serviceInterface, this);
 		pf.addInterface(RemotingClientProxy.class);
-		this.serviceProxy = pf.getProxy(getBeanClassLoader());
+		this.serviceProxy = pf.getProxy(serviceInterface.getClassLoader());
 	}
 
 	@Override
@@ -157,6 +184,9 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
+		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
+			return "HTTP invoker proxy for service URL [" + getServiceUrl() + "]";
+		}
 		if (method.isDefault()) {
 			return ReflectionUtils.invokeDefaultMethod(getObject(), method, methodInvocation.getArguments());
 		}
@@ -177,7 +207,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				@Override
 				public Object call() throws Exception {
 					try {
-						return HttpInvokerClient.super.invoke(methodInvocation);
+						return doInvoke(methodInvocation);
 					} catch (Exception e) {
 						throw e;
 					} catch (Throwable e) {
@@ -190,7 +220,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				@Override
 				public Object call() throws Exception {
 					try {
-						return HttpInvokerClient.super.invoke(methodInvocation);
+						return doInvoke(methodInvocation);
 					} catch (Exception e) {
 						throw e;
 					} catch (Throwable e) {
@@ -199,15 +229,30 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 				}
 			};
 		}
-		return super.invoke(methodInvocation);
+		return doInvoke(methodInvocation);
 	}
 
-	@Override
-	protected RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
-		return serializer.createRemoteInvocation(methodInvocation);
+	protected Object doInvoke(MethodInvocation methodInvocation) throws Throwable {
+		RemoteInvocation invocation = serializer.createRemoteInvocation(methodInvocation);
+		RemoteInvocationResult result;
+		try {
+			result = executeRequest(invocation, methodInvocation);
+		} catch (Throwable ex) {
+			RemoteAccessException rae = convertHttpInvokerAccessException(ex);
+			throw (rae != null ? rae : ex);
+		}
+		try {
+			return recreateRemoteInvocationResult(result);
+		} catch (Throwable ex) {
+			if (result.hasInvocationTargetException()) {
+				throw ex;
+			} else {
+				throw new RemoteInvocationFailureException("Invocation of method [" + methodInvocation.getMethod()
+						+ "] failed in HTTP invoker remote service at [" + getServiceUrl() + "]", ex);
+			}
+		}
 	}
 
-	@Override
 	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
 			throws Exception {
 		return CircuitBreaking.execute(getServiceInterface().getName(), ex -> ex instanceof IOException,
@@ -216,16 +261,10 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 
 	protected RemoteInvocationResult doExecuteRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
 			throws Exception {
-		if (!discovered) {
-			setServiceUrl(discoverServiceUrl());
-			discovered = true;
-		} else if (polling) {
-			setServiceUrl(discoverServiceUrl(true));
-		}
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		boolean requestIdGenerated = false;
 		if (requestId == null) {
-			requestId = generateRequestId();
+			requestId = CodecUtils.generateRequestId();
 			MDC.put(AccessFilter.MDC_KEY_REQUEST_ID, requestId);
 			MDC.put("request", "request:" + requestId);
 			requestIdGenerated = true;
@@ -273,17 +312,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return result;
 	}
 
-	protected RemoteInvocationResult transformResult(RemoteInvocation invocation, MethodInvocation methodInvocation,
-			RemoteInvocationResult result) {
-		if (!result.hasException()) {
-			Object value = result.getValue();
-			if (methodInvocation.getMethod().getReturnType() == Optional.class && !(value instanceof Optional)) {
-				result.setValue(Optional.ofNullable(value));
-			}
-		}
-		return result;
-	}
-
 	protected RemoteInvocationResult doExecuteRequest(RemoteInvocation invocation, MethodInvocation methodInvocation,
 			int maxAttempts) throws Exception {
 		String method = null;
@@ -291,9 +319,15 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 			method = ReflectionUtils.stringify(methodInvocation.getMethod(), false, true);
 		int attempts = maxAttempts;
 		do {
+			if (!discovered) {
+				setServiceUrl(discoverServiceUrl());
+				discovered = true;
+			} else if (polling) {
+				setServiceUrl(discoverServiceUrl(true));
+			}
 			long time = System.currentTimeMillis();
 			try {
-				RemoteInvocationResult result = super.executeRequest(invocation);
+				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(this, invocation);
 				if (serviceStats != null) {
 					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
 							System.currentTimeMillis() - time, false);
@@ -336,9 +370,19 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		throw new IllegalStateException("Should never happens");
 	}
 
-	@Override
 	protected RemoteAccessException convertHttpInvokerAccessException(Throwable ex) {
-		RemoteAccessException rae = super.convertHttpInvokerAccessException(ex);
+		RemoteAccessException rae = null;
+		if (ex instanceof ConnectException) {
+			rae = new RemoteConnectFailureException(
+					"Could not connect to HTTP invoker remote service at [" + getServiceUrl() + "]", ex);
+		} else if (ex instanceof ClassNotFoundException || ex instanceof NoClassDefFoundError
+				|| ex instanceof InvalidClassException) {
+			rae = new RemoteAccessException(
+					"Could not deserialize result from HTTP invoker remote service [" + getServiceUrl() + "]", ex);
+		} else if (ex instanceof Exception) {
+			rae = new RemoteAccessException("Could not access HTTP invoker remote service at [" + getServiceUrl() + "]",
+					ex);
+		}
 		if (rae != null) {
 			if (rae.getCause() != null)
 				ExceptionUtils.trimStackTrace(rae.getCause(), 20);
@@ -347,7 +391,17 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return rae;
 	}
 
-	@Override
+	protected RemoteInvocationResult transformResult(RemoteInvocation invocation, MethodInvocation methodInvocation,
+			RemoteInvocationResult result) {
+		if (!result.hasException()) {
+			Object value = result.getValue();
+			if (methodInvocation.getMethod().getReturnType() == Optional.class && !(value instanceof Optional)) {
+				result.setValue(Optional.ofNullable(value));
+			}
+		}
+		return result;
+	}
+
 	protected Object recreateRemoteInvocationResult(RemoteInvocationResult result) throws Throwable {
 		Throwable exception = result.getException();
 		if (exception != null) {
@@ -360,22 +414,11 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		return result.getValue();
 	}
 
-	@Override
-	@Nullable
-	public String getServiceUrl() {
-		String serviceUrl = super.getServiceUrl();
-		if (serviceUrl == null && StringUtils.isNotBlank(host)) {
-			serviceUrl = discoverServiceUrl();
-			setServiceUrl(serviceUrl);
-		}
-		return serviceUrl;
-	}
-
-	protected String discoverServiceUrl() {
+	private String discoverServiceUrl() {
 		return discoverServiceUrl(false);
 	}
 
-	protected String discoverServiceUrl(boolean polling) {
+	private String discoverServiceUrl(boolean polling) {
 		String serviceName = getServiceInterface().getName();
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isBlank(host)) {
@@ -397,10 +440,6 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 		sb.append(SERVLET_PATH_PREFIX);
 		sb.append(serviceName);
 		return sb.toString();
-	}
-
-	private String generateRequestId() {
-		return CodecUtils.nextId();
 	}
 
 }
