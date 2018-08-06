@@ -46,12 +46,6 @@ public class KafkaProducerConfigBase {
 	@Value("${kafka.fatalIfBrokerNotAvailable:true}")
 	private boolean fatalIfBrokerNotAvailable;
 
-	@Value("${kafka.numPartitions:1}")
-	private int numPartitions;
-
-	@Value("${kafka.replicationFactor:1}")
-	private short replicationFactor;
-
 	@Bean
 	public <T> ProducerFactory<String, T> kafkaProducerFactory() {
 		Map<String, Object> producerConfigs = new HashMap<>();
