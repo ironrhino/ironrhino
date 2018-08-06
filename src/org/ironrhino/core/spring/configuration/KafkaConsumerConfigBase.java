@@ -69,7 +69,7 @@ public class KafkaConsumerConfigBase {
 	protected <T> ConsumerFactory<String, T> createConsumerFactory(boolean autoCommit) {
 		Map<String, Object> consumerConfigs = new HashMap<>();
 		consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-		consumerConfigs.put(ConsumerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true).replaceAll(":", "_"));
+		consumerConfigs.put(ConsumerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true));
 		consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, AppInfo.getAppName());
 		consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
 		consumerConfigs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeoutMs);

@@ -56,7 +56,7 @@ public class KafkaProducerConfigBase {
 	public <T> ProducerFactory<String, T> kafkaProducerFactory() {
 		Map<String, Object> producerConfigs = new HashMap<>();
 		producerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-		producerConfigs.put(ProducerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true).replaceAll(":", "_"));
+		producerConfigs.put(ProducerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true));
 		producerConfigs.put(ProducerConfig.ACKS_CONFIG, acks);
 		producerConfigs.put(ProducerConfig.RETRIES_CONFIG, retries);
 		producerConfigs.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize);
