@@ -27,4 +27,17 @@ public class AlertProducer {
 		kafkaTemplate.send(alertTopic.name(), alert.getId(), alert);
 	}
 
+	public void sendTo(String to, String content) {
+		Alert alert = new Alert();
+		alert.setId(UUID.randomUUID().toString());
+		alert.setTo(to);
+		alert.setContent(content);
+		// assign partition base on "to" to guarantee order of message
+		kafkaTemplate.send(alertTopic.name(), partition(alert.getTo()), alert.getId(), alert);
+	}
+
+	private int partition(String key) {
+		return key.hashCode() % alertTopic.numPartitions();
+	}
+
 }

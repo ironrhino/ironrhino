@@ -10,6 +10,8 @@ public class Alert implements Serializable {
 	private static final long serialVersionUID = -5247602843673308841L;
 
 	private String id;
+	
+	private String to;
 
 	private String content;
 
