@@ -10,6 +10,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.ironrhino.core.metrics.KafkaConsumerMetrics;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +46,12 @@ public class KafkaConsumerConfigBase {
 
 	@Value("${kafka.autoOffsetReset:earliest}")
 	private String autoOffsetReset = "";
+
+	@Bean
+	@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
+	public KafkaConsumerMetrics kafkaConsumerMetrics() {
+		return new KafkaConsumerMetrics();
+	}
 
 	@Bean
 	public <T> ConcurrentKafkaListenerContainerFactory<String, T> defaultListenerContainerFactory() {
