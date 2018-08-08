@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.ironrhino.core.metrics.KafkaProducerMetrics;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +46,12 @@ public class KafkaProducerConfigBase {
 
 	@Value("${kafka.fatalIfBrokerNotAvailable:true}")
 	private boolean fatalIfBrokerNotAvailable;
+
+	@Bean
+	@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
+	public KafkaProducerMetrics kafkaProducerMetrics() {
+		return new KafkaProducerMetrics();
+	}
 
 	@Bean
 	public <T> ProducerFactory<String, T> kafkaProducerFactory() {
