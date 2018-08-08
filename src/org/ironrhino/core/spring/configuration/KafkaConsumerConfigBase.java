@@ -44,7 +44,7 @@ public class KafkaConsumerConfigBase {
 	@Value("${kafka.consumerConcurrency:1}")
 	private int consumerConcurrency = 1;
 
-	@Value("${kafka.autoOffsetReset:earliest}")
+	@Value("${kafka.autoOffsetReset:latest}")
 	private String autoOffsetReset = "";
 
 	@Bean
