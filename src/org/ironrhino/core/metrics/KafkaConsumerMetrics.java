@@ -62,9 +62,9 @@ public class KafkaConsumerMetrics extends JmxBasedMeterBinder {
 	}
 
 	private String toMetricName(String attributeName) {
-		if (attributeName.endsWith(".total"))
-			attributeName = attributeName.substring(0, attributeName.lastIndexOf('.'));
-		return "kafka." + attributeName.replaceAll("-", ".");
+		if (attributeName.endsWith("-total"))
+			attributeName = attributeName.substring(0, attributeName.lastIndexOf('-'));
+		return "kafka.consumer." + attributeName.replaceAll("-", ".");
 	}
 
 	@Override
