@@ -16,23 +16,11 @@ import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.MeterBinder;
 
 public abstract class JmxBasedMeterBinder implements MeterBinder {
 
-	protected final MBeanServer mBeanServer;
-
-	protected final Iterable<Tag> tags;
-
-	public JmxBasedMeterBinder() {
-		this(Collections.emptyList());
-	}
-
-	public JmxBasedMeterBinder(Iterable<Tag> tags) {
-		this.tags = tags;
-		this.mBeanServer = ManagementFactory.getPlatformMBeanServer();
-	}
+	protected final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 
 	/**
 	 * If the MBean already exists, register metrics immediately. Otherwise register
@@ -45,7 +33,7 @@ public abstract class JmxBasedMeterBinder implements MeterBinder {
 			Set<ObjectName> objs = mBeanServer.queryNames(new ObjectName(domain + ":type=" + type + ",*"), null);
 			if (!objs.isEmpty()) {
 				// MBean is present, so we can register metrics now.
-				objs.forEach(o -> perObject.accept(o, Tags.concat(tags, nameTag(o))));
+				objs.forEach(o -> perObject.accept(o, nameTag(o)));
 				return;
 			}
 		} catch (MalformedObjectNameException e) {
@@ -59,7 +47,7 @@ public abstract class JmxBasedMeterBinder implements MeterBinder {
 		NotificationListener notificationListener = (notification, handback) -> {
 			MBeanServerNotification mbs = (MBeanServerNotification) notification;
 			ObjectName obj = mbs.getMBeanName();
-			perObject.accept(obj, Tags.concat(tags, nameTag(obj)));
+			perObject.accept(obj, nameTag(obj));
 		};
 
 		NotificationFilter filter = (NotificationFilter) notification -> {

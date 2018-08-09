@@ -3,17 +3,7 @@ package org.ironrhino.core.metrics;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.micrometer.core.instrument.Tag;
-
 public class KafkaConsumerMetrics extends AbstractKafkaMetrics {
-
-	public KafkaConsumerMetrics() {
-		super();
-	}
-
-	public KafkaConsumerMetrics(Iterable<Tag> tags) {
-		super(tags);
-	}
 
 	@Override
 	protected String getDomain() {

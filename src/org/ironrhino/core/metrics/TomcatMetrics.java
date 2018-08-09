@@ -15,20 +15,8 @@ import io.micrometer.core.instrument.TimeGauge;
 
 public class TomcatMetrics extends JmxBasedMeterBinder {
 
-	public TomcatMetrics() {
-		super();
-	}
-
-	public TomcatMetrics(Iterable<Tag> tags) {
-		super(tags);
-	}
-
-	public static void monitor(MeterRegistry registry, String... tags) {
-		monitor(registry, Tags.of(tags));
-	}
-
-	public static void monitor(MeterRegistry registry, Iterable<Tag> tags) {
-		new TomcatMetrics(tags).bindTo(registry);
+	public static void monitor(MeterRegistry registry) {
+		new TomcatMetrics().bindTo(registry);
 	}
 
 	@Override

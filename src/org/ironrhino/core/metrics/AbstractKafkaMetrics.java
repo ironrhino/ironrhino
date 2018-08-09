@@ -14,14 +14,6 @@ import io.micrometer.core.instrument.Tags;
 
 public abstract class AbstractKafkaMetrics extends JmxBasedMeterBinder {
 
-	public AbstractKafkaMetrics() {
-		super();
-	}
-
-	public AbstractKafkaMetrics(Iterable<Tag> tags) {
-		super(tags);
-	}
-
 	@Override
 	public void bindTo(MeterRegistry registry) {
 		gaugeConfig().forEach((k, v) -> {
