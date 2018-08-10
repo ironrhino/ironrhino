@@ -60,7 +60,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	private Class<T> entityClass;
+	private final Class<T> entityClass;
 
 	@Autowired
 	protected SessionFactory sessionFactory;
@@ -81,9 +81,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	};
 
 	public BaseManagerImpl() {
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
-		if (clazz != null)
-			entityClass = clazz;
+		entityClass = (Class<T>) ReflectionUtils.getGenericClass(getClass());
 	}
 
 	public BaseManagerImpl(Class<T> clazz) {
@@ -736,7 +734,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				afterCommitConsumer.accept(entities);
 			return count;
 		} catch (RuntimeException e) {
-			logger.error(e.getMessage(), e);
 			if (transaction.isActive()) {
 				try {
 					transaction.rollback();
