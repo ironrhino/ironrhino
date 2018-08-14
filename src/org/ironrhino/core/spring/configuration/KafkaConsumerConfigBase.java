@@ -54,7 +54,7 @@ public class KafkaConsumerConfigBase {
 	}
 
 	@Bean
-	public <T> ConcurrentKafkaListenerContainerFactory<String, T> defaultListenerContainerFactory() {
+	public <T> ConcurrentKafkaListenerContainerFactory<String, T> kafkaListenerContainerFactory() {
 		ConsumerFactory<String, T> consumerFactory = createConsumerFactory(true);
 		ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
@@ -63,7 +63,7 @@ public class KafkaConsumerConfigBase {
 	}
 
 	@Bean
-	public <T> ConcurrentKafkaListenerContainerFactory<String, T> defaultManualAckBatchListenerContainerFactory() {
+	public <T> ConcurrentKafkaListenerContainerFactory<String, T> manualAckBatchKafkaListenerContainerFactory() {
 		ConsumerFactory<String, T> consumerFactory = createConsumerFactory(false);
 		ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);

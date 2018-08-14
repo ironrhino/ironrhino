@@ -20,12 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AlertConsumer {
 
-//	@KafkaListener(topics = "#{alertTopic.name()}", containerFactory = "defaultListenerContainerFactory")
+//	@KafkaListener(topics = "#{alertTopic.name()}", containerFactory = "kafkaListenerContainerFactory")
 //	public void listen(ConsumerRecord<String, Alert> record) {
 //		process(record);
 //	}
 
-	@KafkaListener(topics = "#{alertTopic.name()}", containerFactory = "defaultManualAckBatchListenerContainerFactory")
+	@KafkaListener(topics = "#{alertTopic.name()}", containerFactory = "manualAckBatchKafkaListenerContainerFactory")
 	public void listenWithManualAck(List<ConsumerRecord<String, Alert>> records, Acknowledgment ack) {
 		for (ConsumerRecord<String, Alert> record : records) {
 			process(record);
