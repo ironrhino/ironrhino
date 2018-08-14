@@ -3,6 +3,14 @@
 <html>
 <head>
 <title>${getText('console')}</title>
+<style>
+	li>div{
+		line-height: 30px;
+	}
+	div.key{
+		text-align: right;
+	}
+</style>
 <script>
 $(function(){
 		$('#trigger .btn').click(function(){
@@ -49,7 +57,6 @@ $(function(){
 								});
 		});
 		</#if>
-							
 });
 </script>
 </head>
@@ -67,7 +74,7 @@ $(function(){
 </@s.form>
 <hr/>
 
-<#assign triggers = beans['applicationContextConsole'].getTriggers()>
+<#assign triggers = beans['applicationContextConsole'].triggers>
 <#if triggers?size gt 0>
 <div id="trigger">
 	<ul class="thumbnails">
@@ -81,19 +88,32 @@ $(function(){
 <hr/>
 </#if>
 
+<#assign lifecycleBeans = beans['applicationContextConsole'].lifecycleBeans>
+<#if lifecycleBeans?size gt 0>
+<@s.form id="lifecycle-form" action=actionBaseUrl method="post" class="form-horizontal ajax view">
+<div>
+	<ul class="thumbnails">
+	<#list lifecycleBeans as key,value>
+	<li class="span4">
+	<div class="row-fluid">
+	<div class="key span7">${getText(key)}</div>
+	<div class="span5">
+	<button type="submit" class="btn confirm" name="expression" value="${key}.start()"<#if value.running> disabled</#if>>${getText('start')}</button>
+	<button type="submit" class="btn confirm" name="expression" value="${key}.stop()"<#if !value.running> disabled</#if>>${getText('stop')}</button>
+	</div>
+	</div>
+	</li>
+	</#list>
+	</ul>
+</div>
+</@s.form>
+<hr/>
+</#if>
+
 <#if printSetting??>
 <#assign settings = beans['settingControl'].getAllBooleanSettings()>
 <#if settings?size gt 0>
 <div id="switch">
-	<style>
-	li>div{
-		line-height: 30px;
-	}
-	div.key{
-		text-align: right;
-		font-weight: bold;
-	}
-	</style>
 	<ul class="thumbnails">
 	<#list settings as setting>
 	<li class="span4">

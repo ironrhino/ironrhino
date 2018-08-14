@@ -22,6 +22,7 @@ import org.mvel2.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.Lifecycle;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
@@ -96,6 +97,14 @@ public class ApplicationContextConsole {
 			triggers = Collections.unmodifiableMap(temp);
 		}
 		return triggers;
+	}
+
+	public Map<String, Lifecycle> getLifecycleBeans() {
+		Map<String, Lifecycle> map = new TreeMap<>();
+		for (Map.Entry<String, Object> entry : getBeans().entrySet())
+			if (entry.getValue() instanceof Lifecycle)
+				map.put(entry.getKey(), (Lifecycle) entry.getValue());
+		return map;
 	}
 
 	public Object execute(String expression, Scope scope) throws Exception {
