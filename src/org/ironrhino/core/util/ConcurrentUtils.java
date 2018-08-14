@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class ConcurrentUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ConcurrentUtils {
 
 	public static <T> CompletableFuture<T> anyOfFutures(List<? extends CompletableFuture<? extends T>> futures) {
 		CompletableFuture<T> cf = new CompletableFuture<>();

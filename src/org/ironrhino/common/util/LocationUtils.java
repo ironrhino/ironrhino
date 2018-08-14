@@ -11,7 +11,10 @@ import org.ironrhino.core.util.JsonUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public abstract class LocationUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class LocationUtils {
 
 	public static final String[] nations = "满族,蒙古族,回族,朝鲜族,达斡尔族,畲族,土家族,苗族,侗族,瑶族,壮族,各族,仫佬族,毛南族,黎族,羌族,彝族,藏族,仡佬族,布依族,水族,傣族,哈尼族,纳西族,傈僳族,拉祜族,佤族,白族,景颇族,独龙族,怒族,普米族,布朗族,哈萨克族,东乡族,裕固族,土族,保安族,撒拉族"
 			.split(",");

@@ -7,7 +7,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
-public abstract class StringUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class StringUtils {
 
 	private abstract static class WordTokenizer {
 		protected static final char UNDERSCORE = '_';

@@ -34,7 +34,10 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-public abstract class BarcodeUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class BarcodeUtils {
 
 	public static byte[] encodeQRCode(String content) throws WriterException, IOException {
 		return encodeQRCode(content, null, null, -1, -1);

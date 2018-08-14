@@ -11,8 +11,10 @@ import org.ironrhino.core.util.ThrowableRunnable;
 import org.springframework.util.ClassUtils;
 
 import io.micrometer.core.instrument.Tag;
+import lombok.experimental.UtilityClass;
 
-public abstract class Metrics {
+@UtilityClass
+public class Metrics {
 
 	private static final boolean micrometerPresent = ClassUtils.isPresent("io.micrometer.core.instrument.Metrics",
 			Metrics.class.getClassLoader());

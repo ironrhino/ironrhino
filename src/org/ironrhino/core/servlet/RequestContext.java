@@ -3,7 +3,10 @@ package org.ironrhino.core.servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public abstract class RequestContext {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class RequestContext {
 
 	private static ThreadLocal<HttpServletRequest> requestHolder = new ThreadLocal<>();
 

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.ironrhino.core.model.BaseTreeableEntity;
 
+import lombok.experimental.UtilityClass;
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Element;
@@ -17,7 +18,8 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 
 @SuppressWarnings("rawtypes")
-public abstract class HtmlUtils {
+@UtilityClass
+public class HtmlUtils {
 
 	public static String getTreeViewHtml(Collection children, boolean async) {
 		if (async || children == null || children.size() == 0)

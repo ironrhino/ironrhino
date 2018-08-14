@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-public abstract class ExceptionUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ExceptionUtils {
 	public static String getStackTraceAsString(Throwable t) {
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();

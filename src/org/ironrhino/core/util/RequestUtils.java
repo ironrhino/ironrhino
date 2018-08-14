@@ -18,7 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class RequestUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class RequestUtils {
 
 	public static boolean isInternalTesting(HttpServletRequest request) {
 		String qs = request.getQueryString();

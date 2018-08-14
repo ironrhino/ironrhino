@@ -14,7 +14,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-public abstract class MySQLSequenceHelper {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class MySQLSequenceHelper {
 
 	public static void createOrUpgradeTable(DataSource dataSrouce, String tableName, String sequenceName)
 			throws SQLException {

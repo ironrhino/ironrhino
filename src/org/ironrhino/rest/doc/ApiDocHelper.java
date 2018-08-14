@@ -15,7 +15,10 @@ import org.ironrhino.core.util.SampleObjectCreator;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Fields;
 
-public abstract class ApiDocHelper {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ApiDocHelper {
 
 	private static SampleObjectCreator creator = new SampleObjectCreator((type, name) -> {
 		if (type == RestStatus.class)

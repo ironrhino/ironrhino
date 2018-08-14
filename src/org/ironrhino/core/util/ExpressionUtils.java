@@ -14,7 +14,10 @@ import org.mvel2.templates.CompiledTemplate;
 import org.mvel2.templates.TemplateCompiler;
 import org.mvel2.templates.TemplateRuntime;
 
-public abstract class ExpressionUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ExpressionUtils {
 
 	private static Map<String, CompiledTemplate> templateCache = new ConcurrentHashMap<>();
 

@@ -1,6 +1,9 @@
 package org.ironrhino.core.dataroute;
 
-public abstract class DataRouteContext {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class DataRouteContext {
 
 	public static final int DEFAULT_DATASOURCE_WEIGHT = 1;
 

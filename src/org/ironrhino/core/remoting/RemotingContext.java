@@ -1,6 +1,9 @@
 package org.ironrhino.core.remoting;
 
-public abstract class RemotingContext {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class RemotingContext {
 
 	public static final int SC_SERIALIZATION_FAILED = 499;
 

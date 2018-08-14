@@ -5,7 +5,10 @@ import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-public abstract class MathUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class MathUtils {
 
 	@SafeVarargs
 	public static <T extends Number> T max(T... numbers) {

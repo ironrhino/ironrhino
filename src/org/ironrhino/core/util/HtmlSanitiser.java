@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.experimental.UtilityClass;
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
@@ -18,7 +19,8 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 
-public abstract class HtmlSanitiser {
+@UtilityClass
+public class HtmlSanitiser {
 
 	private static final Set<String> VALID_ELEMENT_NAMES = new HashSet<>(Arrays.asList(new String[] {
 			HTMLElementName.DIV, HTMLElementName.SPAN, HTMLElementName.STRONG, HTMLElementName.EM, HTMLElementName.BR,

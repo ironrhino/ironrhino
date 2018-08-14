@@ -36,7 +36,10 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-public abstract class HttpClientUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class HttpClientUtils {
 
 	private static Set<Header> DEFAULT_HEADERS = new HashSet<>();
 

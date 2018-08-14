@@ -2,6 +2,7 @@ package org.ironrhino.core.util;
 
 import java.util.Locale;
 
+import lombok.experimental.UtilityClass;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
@@ -9,7 +10,8 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
-public abstract class PinyinUtils {
+@UtilityClass
+public class PinyinUtils {
 
 	public static boolean matchesAutocomplete(String text, String pattern) {
 		text = text.toLowerCase(Locale.ROOT);

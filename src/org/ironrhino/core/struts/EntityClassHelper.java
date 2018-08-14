@@ -88,7 +88,10 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ClassUtils;
 
-public abstract class EntityClassHelper {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class EntityClassHelper {
 
 	private static Map<Class<?>, Map<String, UiConfigImpl>> uiConfigCache = new ConcurrentHashMap<>(64);
 	private static Map<Class<?>, Boolean> idAssignedCache = new ConcurrentHashMap<>(64);

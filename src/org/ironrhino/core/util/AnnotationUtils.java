@@ -24,8 +24,11 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
+import lombok.experimental.UtilityClass;
+
 @SuppressWarnings("unchecked")
-public abstract class AnnotationUtils {
+@UtilityClass
+public class AnnotationUtils {
 
 	private static Map<String, Set<Method>> annotatedMethodsCache = new ConcurrentHashMap<>(64);
 	private static Map<String, Set<String>> annotatedPropertyNamesCache = new ConcurrentHashMap<>(64);

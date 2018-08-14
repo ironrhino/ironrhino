@@ -26,7 +26,10 @@ import org.springframework.core.convert.ConversionService;
 
 import com.google.common.base.Supplier;
 
-public abstract class BeanUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class BeanUtils {
 
 	public static boolean hasProperty(Class<?> clazz, String name) {
 		if (org.springframework.beans.BeanUtils.getPropertyDescriptor(clazz, name) != null)

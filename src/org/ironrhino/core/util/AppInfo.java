@@ -25,7 +25,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-public abstract class AppInfo {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class AppInfo {
 
 	public static final String KEY_STAGE = "STAGE";
 

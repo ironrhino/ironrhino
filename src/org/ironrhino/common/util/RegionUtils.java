@@ -3,7 +3,10 @@ package org.ironrhino.common.util;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.model.Region;
 
-public abstract class RegionUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class RegionUtils {
 
 	public static Region parse(String value, Region regionTree) {
 		Location loc = LocationUtils.parse(value);

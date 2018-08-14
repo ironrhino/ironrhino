@@ -12,11 +12,13 @@ import org.ironrhino.core.util.HtmlUtils.Replacer;
 
 import com.opensymphony.xwork2.ActionContext;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import ognl.OgnlContext;
 
 @Slf4j
-public abstract class CacheContext {
+@UtilityClass
+public class CacheContext {
 
 	public static final String FORCE_FLUSH_PARAM_NAME = "_ff_";
 

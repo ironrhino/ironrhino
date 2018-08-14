@@ -38,8 +38,10 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.util.proxy.ProxyObject;
 import lombok.Data;
+import lombok.experimental.UtilityClass;
 
-public abstract class ReflectionUtils {
+@UtilityClass
+public class ReflectionUtils {
 
 	public final static ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 

@@ -21,7 +21,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public abstract class AuthzUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class AuthzUtils {
 
 	public static final ThreadLocal<UserDetails> DOUBLE_CHCKER_HOLDER = new ThreadLocal<>();
 

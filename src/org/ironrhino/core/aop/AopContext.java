@@ -3,7 +3,10 @@ package org.ironrhino.core.aop;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AopContext {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class AopContext {
 
 	public static final String CONTEXT_KEY_THIS = "$this";
 
