@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
@@ -29,6 +29,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -37,7 +38,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class AbstractPollingControl<T extends BasePollingEntity> {
+public abstract class AbstractPollingControl<T extends BasePollingEntity> implements SmartLifecycle {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -70,6 +71,8 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 	@Setter
 	private int resubmitIntervalInSeconds = 600;
 
+	private AtomicBoolean running = new AtomicBoolean();
+
 	private ThreadPoolExecutor threadPoolExecutor;
 
 	private BoundListOperations<String, String> boundListOperations;
@@ -100,22 +103,13 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 				+ " t set t.status=?3,t.modifyDate=?4,t.errorInfo=?5,t.attempts=t.attempts+1 where t.id=?1 and t.status=?2";
 		conditionalUpdateStatusHql = "update " + entityClass.getSimpleName()
 				+ " t set t.status=case when t.attempts+1>=?3 then ?4 else ?5 end,t.modifyDate=?6,t.errorInfo=?7,t.attempts=t.attempts+1 where t.id=?1 and t.status=?2";
-		threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreads() + 1,
-				new NameableThreadFactory(StringUtils.uncapitalize(getClass().getSimpleName()), (t, e) -> {
-					logger.error(e.getMessage(), e);
-				}));
-		boundListOperations = stringRedisTemplate.boundListOps(getQueueName());
-	}
 
-	@PreDestroy
-	private void destroy() throws Exception {
-		threadPoolExecutor.shutdown();
-		threadPoolExecutor.awaitTermination(10, TimeUnit.SECONDS);
+		boundListOperations = stringRedisTemplate.boundListOps(getQueueName());
 	}
 
 	@Scheduled(fixedRateString = "${pollingControl.enqueue.fixedRate:10000}")
 	public void enqueue() {
-		if (threadPoolExecutor.isShutdown())
+		if (!isRunning() || threadPoolExecutor.isShutdown())
 			return;
 		threadPoolExecutor.execute(() -> {
 			String enqueueLockName = getQueueName() + ".enqueue()";
@@ -211,7 +205,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 
 	@Scheduled(fixedDelayString = "${pollingControl.dequeue.fixedDelay:10000}")
 	public void dequeue() {
-		if (threadPoolExecutor.isShutdown())
+		if (!isRunning() || threadPoolExecutor.isShutdown())
 			return;
 		for (int i = 0; i < getThreads() - threadPoolExecutor.getActiveCount(); i++)
 			threadPoolExecutor.execute(this::doDequeue);
@@ -269,6 +263,55 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> {
 
 	protected void afterUpdated(Session session, T entity) {
 
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running.get();
+	}
+
+	@Override
+	public void start() {
+		if (running.compareAndSet(false, true)) {
+			threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreads() + 1,
+					new NameableThreadFactory(StringUtils.uncapitalize(getClass().getSimpleName()), (t, e) -> {
+						logger.error(e.getMessage(), e);
+					}));
+			logger.info("Created thread pool {}", threadPoolExecutor);
+		} else {
+			logger.error("{} is already running", this);
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (running.compareAndSet(true, false)) {
+			threadPoolExecutor.shutdown();
+			try {
+				threadPoolExecutor.awaitTermination(30, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage(), e);
+			}
+			logger.info("Shutdown thread pool {}", threadPoolExecutor);
+		} else {
+			logger.error("{} is not running", this);
+		}
+	}
+
+	@Override
+	public int getPhase() {
+		return 0;
+	}
+
+	@Override
+	public boolean isAutoStartup() {
+		return true;
+	}
+
+	@Override
+	public void stop(Runnable runnable) {
+		stop();
+		runnable.run();
 	}
 
 }
