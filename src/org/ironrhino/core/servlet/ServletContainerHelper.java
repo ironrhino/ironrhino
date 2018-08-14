@@ -29,13 +29,13 @@ public class ServletContainerHelper {
 			try {
 				// detect via jmx
 				MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-				Set<ObjectName> objs = mbs.queryNames(new ObjectName("*:type=Connector,*"),
+				Set<ObjectName> objs = mbs.queryNames(new ObjectName("*:type=Connector,port=*"),
 						Query.match(Query.attr("scheme"), Query.value(ssl ? "https" : "http")));
 				for (ObjectName on : objs) {
 					if (((String) mbs.getAttribute(on, "protocol")).toLowerCase().startsWith("http/"))
 						return (Integer) mbs.getAttribute(on, "port");
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 			}
 			try {
 				// detect via reflection
@@ -107,7 +107,7 @@ public class ServletContainerHelper {
 				return (Integer) mbs.getAttribute(new ObjectName(
 						"jboss.as:socket-binding-group=standard-sockets,socket-binding=" + (ssl ? "https" : "http")),
 						"boundPort");
-			} catch (Throwable e) {
+			} catch (Exception e) {
 			}
 		} else if (className.startsWith("com.caucho.server.")) {
 			// resin
@@ -128,7 +128,7 @@ public class ServletContainerHelper {
 					} catch (AttributeNotFoundException e) {
 					}
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 			}
 		} else if (className.startsWith("com.ibm.ws.")) {
 			// websphere
@@ -142,7 +142,7 @@ public class ServletContainerHelper {
 						return (Integer) mbs.getAttribute(on, "Port");
 					} catch (AttributeNotFoundException e) {
 					}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 			}
 		}
 		return 0;
