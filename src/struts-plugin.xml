@@ -33,7 +33,6 @@
 			<result-type name="json" class="org.ironrhino.core.struts.result.JsonResult" />
 			<result-type name="redirect" class="org.ironrhino.core.struts.result.RedirectResult"/>
 			<result-type name="referer" class="org.ironrhino.core.struts.result.RefererResult" />
-			<result-type name="qrcode" class="org.ironrhino.core.struts.result.QRCodeResult" />
 		</result-types>
 		<interceptors>
 			<interceptor name="params" class="org.ironrhino.core.struts.interceptor.MyParametersInterceptor" />
@@ -64,7 +63,6 @@
 			<result name="redirect" type="redirect">${targetUrl}</result>
 			<result name="accessDenied" type="accessDenied" />
 			<result name="directTemplate" type="directTemplate" />
-			<result name="qrcode" type="qrcode" />
 			<result name="error" type="autoconfig" />
 		</global-results>
 	</package>

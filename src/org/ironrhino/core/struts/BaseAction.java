@@ -59,7 +59,6 @@ public class BaseAction extends ActionSupport {
 	public static final String TABS = "tabs";
 	public static final String REFERER = "referer";
 	public static final String JSON = "json";
-	public static final String QRCODE = "qrcode";
 	public static final String REDIRECT = "redirect";
 	public static final String SUGGEST = "suggest";
 	public static final String ACCESSDENIED = "accessDenied";

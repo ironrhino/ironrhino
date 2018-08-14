@@ -47,8 +47,6 @@
 	<property name="common-record-jar.includes" value="org/ironrhino/common/record/*" />
 	<property name="common-upload-jar.name" value="ironrhino-common-upload-${version}.jar" />
 	<property name="common-upload-jar.includes" value="org/ironrhino/common/**/Upload*,resources/view/common/upload*" />
-	<property name="common-qrcode-jar.name" value="ironrhino-common-qrcode-${version}.jar" />
-	<property name="common-qrcode-jar.includes" value="org/ironrhino/common/action/Qrcode*,resources/view/common/qrcode*" />
 	<property name="common-audit-jar.name" value="ironrhino-common-audit-${version}.jar" />
 	<property name="common-audit-jar.includes" value="org/ironrhino/common/**/Audit*,resources/view/audit.ftl" />
 	<property name="security-jar.name" value="ironrhino-security-${version}.jar" />
@@ -256,7 +254,6 @@
 			<delete file="${target.dir}/${common-region-jar.name}" />
 			<delete file="${target.dir}/${common-record-jar.name}" />
 			<delete file="${target.dir}/${common-upload-jar.name}" />
-			<delete file="${target.dir}/${common-qrcode-jar.name}" />
 			<delete file="${target.dir}/${common-audit-jar.name}" />
 			<delete file="${target.dir}/${security-jar.name}" />
 			<delete file="${target.dir}/${security-config-jar.name}" />
@@ -299,7 +296,7 @@
 					<include name="*.xml" />
 				</fileset>
 			</copy>
-			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="${core-jar.includes}" excludes="${fs-jar.includes},${zookeeper-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-qrcode-jar.includes},${common-audit-jar.includes}">
+			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="${core-jar.includes}" excludes="${fs-jar.includes},${zookeeper-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-audit-jar.includes}">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-core" />
 					<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -505,17 +502,6 @@
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-upload" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-fs" />
-					<attribute name="Build-Timestamp" value="${timestamp}" />
-					<attribute name="Build-Revision" value="${revision}" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${common-qrcode-jar.name}" basedir="${classes.dir}" includes="${common-qrcode-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-common-qrcode" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-common-qrcode" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 					<attribute name="Build-Timestamp" value="${timestamp}" />
 					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
