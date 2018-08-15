@@ -108,6 +108,20 @@ public enum DatabaseProduct {
 		}
 
 		@Override
+		public String appendJdbcUrlProperties(String jdbcUrl, Map<String, String> properties) {
+			StringBuilder sb = new StringBuilder(jdbcUrl);
+			boolean hasDelimiter = jdbcUrl.endsWith(";");
+			for (Map.Entry<String, String> entry : properties.entrySet()) {
+				if (!hasDelimiter) {
+					sb.append(':');
+					hasDelimiter = true;
+				}
+				sb.append(entry.getKey()).append('=').append(entry.getValue()).append(";");
+			}
+			return sb.toString();
+		}
+
+		@Override
 		public String getValidationQuery() {
 			return "VALUES 1";
 		}
@@ -183,6 +197,20 @@ public enum DatabaseProduct {
 		@Override
 		public String polishJdbcUrl(String jdbcUrl) {
 			return polishJdbcUrl(jdbcUrl, ";", ";");
+		}
+
+		@Override
+		public String appendJdbcUrlProperties(String jdbcUrl, Map<String, String> properties) {
+			StringBuilder sb = new StringBuilder(jdbcUrl);
+			boolean hasDelimiter = jdbcUrl.endsWith(";");
+			for (Map.Entry<String, String> entry : properties.entrySet()) {
+				if (!hasDelimiter) {
+					sb.append(';');
+					hasDelimiter = true;
+				}
+				sb.append(entry.getKey()).append('=').append(entry.getValue()).append(";");
+			}
+			return sb.toString();
 		}
 
 	},
@@ -395,6 +423,21 @@ public enum DatabaseProduct {
 
 	public String polishJdbcUrl(String jdbcUrl) {
 		return polishJdbcUrl(jdbcUrl, "?", "&");
+	}
+
+	public String appendJdbcUrlProperties(String jdbcUrl, Map<String, String> properties) {
+		StringBuilder sb = new StringBuilder(jdbcUrl);
+		boolean hasDelimiter = jdbcUrl.indexOf('?') > 0;
+		for (Map.Entry<String, String> entry : properties.entrySet()) {
+			if (hasDelimiter) {
+				sb.append('&');
+			} else {
+				sb.append('?');
+				hasDelimiter = true;
+			}
+			sb.append(entry.getKey()).append('=').append(entry.getValue());
+		}
+		return sb.toString();
 	}
 
 	protected String polishJdbcUrl(String jdbcUrl, String delimiter, String separator) {
