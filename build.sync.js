@@ -39,7 +39,15 @@ if (!new File(basedir + '/../ironrhino').isDirectory()) {
 		if (j > 0) {
 			var dependent = candidate.substring(j + 2);
 			candidate = candidate.substring(0, j);
-			if (jarnames.indexOf(dependent) < 0) {
+			var dependents = dependent.split(',');
+			var satisfied = true;
+			for (var k = 0; k < dependents.length; k++) {
+				if (jarnames.indexOf(dependents[k]) < 0) {
+					satisfied = false;
+					break;
+				}
+			}
+			if (!satisfied) {
 				decrement.push(candidate);
 				continue label;
 			}
