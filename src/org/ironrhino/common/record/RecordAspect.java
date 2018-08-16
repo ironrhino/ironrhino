@@ -33,7 +33,7 @@ import org.springframework.core.Ordered;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import lombok.Getter;
@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 @Slf4j
-public class RecordAspect extends TransactionSynchronizationAdapter implements Ordered {
+public class RecordAspect implements TransactionSynchronization, Ordered {
 
 	private static final String HIBERNATE_EVENTS = "HIBERNATE_EVENTS_FOR_RECORD";
 

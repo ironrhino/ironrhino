@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import lombok.Getter;
@@ -29,7 +29,7 @@ import lombok.Setter;
 
 @Aspect
 @Component
-public class PublishAspect extends TransactionSynchronizationAdapter implements Ordered {
+public class PublishAspect implements TransactionSynchronization, Ordered {
 
 	private static final String HIBERNATE_EVENTS = "HIBERNATE_EVENTS_FOR_PUBLISH";
 
