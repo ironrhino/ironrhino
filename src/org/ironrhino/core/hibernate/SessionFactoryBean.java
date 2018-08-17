@@ -28,6 +28,7 @@ import org.hibernate.boot.registry.StandardServiceInitiator;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.PostDeleteEventListener;
@@ -37,7 +38,6 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.event.spi.PreDeleteEventListener;
 import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEventListener;
-import org.hibernate.internal.SessionFactoryImpl;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.hibernate.event.DeleteCallbackEventListener;
 import org.ironrhino.core.hibernate.event.FlushEntityCallbackEventListener;
@@ -235,9 +235,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			}
 		}
 		sfb.registerTypeOverride(YearMonthType.INSTANCE);
-		SessionFactory sessionFactory = sfb.buildSessionFactory();
-		SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
-		EventListenerRegistry registry = sf.getServiceRegistry().getService(EventListenerRegistry.class);
+		SessionFactory sessionFactory = super.buildSessionFactory(sfb);
+		EventListenerRegistry registry = ((SessionFactoryImplementor) sessionFactory).getServiceRegistry()
+				.getService(EventListenerRegistry.class);
 		registry.setListeners(EventType.SAVE, new SaveCallbackEventListener());
 		registry.setListeners(EventType.PERSIST, new PersistCallbackEventListener());
 		registry.setListeners(EventType.MERGE, new MergeCallbackEventListener());
