@@ -24,7 +24,7 @@ public class DefaultRemotingServiceRegistryPostProcessor extends RemotingService
 			appBasePackage = "org.ironrhino";
 		else
 			appBasePackage = "org.ironrhino," + appBasePackage;
-		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_IMPORT_BASE_PACKAGES);
+		String str = env.getProperty(KEY_IMPORT_BASE_PACKAGES);
 		if (StringUtils.isBlank(str))
 			str = appBasePackage;
 		else
@@ -34,7 +34,7 @@ public class DefaultRemotingServiceRegistryPostProcessor extends RemotingService
 
 	@Override
 	public Collection<Class<?>> getIncludeClasses() {
-		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_IMPORT_INCLUDE_CLASSES);
+		String str = env.getProperty(KEY_IMPORT_INCLUDE_CLASSES);
 		if (StringUtils.isNotBlank(str)) {
 			String arr[] = str.trim().split(",");
 			Collection<Class<?>> classes = new ArrayList<>(arr.length);
@@ -52,7 +52,7 @@ public class DefaultRemotingServiceRegistryPostProcessor extends RemotingService
 
 	@Override
 	public Collection<Class<?>> getExcludeClasses() {
-		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_IMPORT_EXCLUDE_CLASSES);
+		String str = env.getProperty(KEY_IMPORT_EXCLUDE_CLASSES);
 		if (StringUtils.isNotBlank(str)) {
 			String arr[] = str.trim().split(",");
 			Collection<Class<?>> classes = new ArrayList<>(arr.length);

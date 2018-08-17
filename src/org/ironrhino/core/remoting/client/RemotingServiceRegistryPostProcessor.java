@@ -6,7 +6,6 @@ import java.util.LinkedHashSet;
 
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.spring.NameGenerator;
-import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +18,18 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 
-public abstract class RemotingServiceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
+public abstract class RemotingServiceRegistryPostProcessor
+		implements BeanDefinitionRegistryPostProcessor, EnvironmentAware {
+
+	protected Environment env;
+
+	@Override
+	public void setEnvironment(Environment env) {
+		this.env = env;
+	}
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -46,7 +55,7 @@ public abstract class RemotingServiceRegistryPostProcessor implements BeanDefini
 			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))
 				continue;
 			String key = remotingService.getName() + ".imported";
-			if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
+			if ("false".equals(env.getProperty(key))) {
 				logger.info("Skipped import service [{}] because {}=false", remotingService.getName(), key);
 				continue;
 			}
