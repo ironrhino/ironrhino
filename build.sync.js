@@ -201,7 +201,7 @@ function removeDependence(classpathfile, jarname) {
 }
 
 function cleanup(classpathfile) {
-	var jarnames = readClasspath(classpathfile).jarnames;
+	var paths = readClasspath(classpathfile).paths;
 	var lib = new File(basedir, 'webapp/WEB-INF/lib');
 	var func = function() {
 		if (!lib.isDirectory())
@@ -209,8 +209,16 @@ function cleanup(classpathfile) {
 		var files = lib.listFiles();
 		for (var i = 0; i < files.length; i++) {
 			var f = files[i];
-			if (f.getName().endsWith('.jar')
-					&& jarnames.indexOf(getFileInfo(f.getName()).jarname) < 0) {
+			if (!f.getName().endsWith('.jar'))
+				continue;
+			var exists = false;
+			for (var j = 0; j < paths.length; j++) {
+				if (paths[j].indexOf(f.getName()) >= 0) {
+					exists = true;
+					break;
+				}
+			}
+			if (!exists) {
 				var del = project.createTask("delete");
 				del.setFile(f);
 				del.perform();
