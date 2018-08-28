@@ -1,7 +1,7 @@
 #!/bin/bash
 
-ANT_VERSION=1.10.1
-TOMCAT_VERSION=8.0.48
+ANT_VERSION=1.10.5
+TOMCAT_VERSION=9.0.11
 
 #must run with sudo
 #useradd app -m -s /bin/bash && su - app
@@ -68,7 +68,7 @@ tar xf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
 mv apache-tomcat-* tomcat
 cd tomcat && rm -rf bin/*.bat && rm -rf webapps/*
 cd conf
-sed -i  's/\s[3-4][a-x-]*manager.org.apache.juli.FileHandler,//g' logging.properties
+sed -i 's/\s[3-4][a-x-]*manager\.org\.apache\.juli\.\(Async\)\?FileHandler,//g' logging.properties
 sed -i '/manager/d' logging.properties
 cat>>catalina.properties<<EOF
 tomcat.util.scan.StandardJarScanFilter.jarsToSkip=*.jar
