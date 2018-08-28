@@ -91,13 +91,14 @@ $(function(){
 <#assign lifecycleBeans = beans['applicationContextConsole'].lifecycleBeans>
 <#if lifecycleBeans?size gt 0>
 <@s.form id="lifecycle-form" action=actionBaseUrl method="post" class="form-horizontal ajax view">
+<@s.hidden name="scope" value="APPLICATION"/>
 <div>
 	<ul class="thumbnails">
 	<#list lifecycleBeans as key,value>
 	<li class="span4">
 	<div class="row-fluid">
-	<div class="key span7">${getText(key)}</div>
-	<div class="span5">
+	<div class="key span8"><#if key?index_of('.') gt 0>${key?keep_after_last('.')}<#else>${key}</#if></div>
+	<div class="span4">
 	<button type="submit" class="btn confirm" name="expression" value="${key}.start()"<#if value.running> disabled</#if>>${getText('start')}</button>
 	<button type="submit" class="btn confirm" name="expression" value="${key}.stop()"<#if !value.running> disabled</#if>>${getText('stop')}</button>
 	</div>

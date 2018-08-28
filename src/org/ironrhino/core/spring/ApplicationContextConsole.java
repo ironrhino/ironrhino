@@ -18,6 +18,7 @@ import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.mvel2.CompileException;
 import org.mvel2.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -38,6 +39,8 @@ public class ApplicationContextConsole {
 	private static final String GET_PROPERTY_EXPRESSION_PATTERN = "^" + PROPERTY_EXPRESSION_PATTERN + "$";
 
 	private static final String SET_PROPERTY_EXPRESSION_PATTERN = "^" + PROPERTY_EXPRESSION_PATTERN + "\\s*=\\s*.+$";
+
+	private static final String LIFECYLE_BEAN_EXPRESSION_PATTERN = "^.+\\.(start|stop)\\(\\)$";
 
 	@Autowired
 	private ConfigurableListableBeanFactory ctx;
@@ -100,11 +103,9 @@ public class ApplicationContextConsole {
 	}
 
 	public Map<String, Lifecycle> getLifecycleBeans() {
-		Map<String, Lifecycle> map = new TreeMap<>();
-		for (Map.Entry<String, Object> entry : getBeans().entrySet())
-			if (entry.getValue() instanceof Lifecycle)
-				map.put(entry.getKey(), (Lifecycle) entry.getValue());
-		return map;
+		Map<String, Lifecycle> beans = new TreeMap<>(ctx.getBeansOfType(Lifecycle.class));
+		beans.remove("lifecycleProcessor");
+		return Collections.unmodifiableMap(beans);
 	}
 
 	public Object execute(String expression, Scope scope) throws Exception {
@@ -130,6 +131,19 @@ public class ApplicationContextConsole {
 			throw new IllegalArgumentException("NoSuchFieldException: " + e.getMessage());
 		} catch (NoSuchMethodException e) {
 			throw new IllegalArgumentException("NoSuchMethodException: " + e.getMessage());
+		} catch (CompileException e) {
+			if (expression.matches(LIFECYLE_BEAN_EXPRESSION_PATTERN)) {
+				int index = expression.lastIndexOf('.');
+				String beanName = expression.substring(0, index);
+				String methodName = expression.substring(index + 1, expression.lastIndexOf('('));
+				Lifecycle bean = (Lifecycle) ctx.getBean(beanName);
+				if (methodName.equals("start"))
+					bean.start();
+				else
+					bean.stop();
+				return null;
+			}
+			throw e;
 		}
 	}
 

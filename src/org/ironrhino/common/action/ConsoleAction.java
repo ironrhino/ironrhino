@@ -64,7 +64,6 @@ public class ConsoleAction extends BaseAction {
 			log.error(msg);
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			return ERROR;
-
 		}
 	}
 
