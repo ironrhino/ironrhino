@@ -22,7 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class RemoteServiceTestsBase {
+public abstract class RemotingServiceTestsBase {
 
 	public static final int THREADS = 100;
 
