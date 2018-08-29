@@ -1,14 +1,10 @@
 package org.ironrhino.core.remoting.client;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.ClassScanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.FactoryBean;
@@ -20,9 +16,19 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
-public abstract class RemotingServiceRegistryPostProcessor
-		implements BeanDefinitionRegistryPostProcessor, EnvironmentAware {
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
+@Component
+@Slf4j
+public class RemotingServiceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor, EnvironmentAware {
+
+	@Getter
+	@Setter
+	private String[] packagesToScan;
 
 	protected Environment env;
 
@@ -31,32 +37,16 @@ public abstract class RemotingServiceRegistryPostProcessor
 		this.env = env;
 	}
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
-
-	protected abstract String[] getBasePackages();
-
-	protected Collection<Class<?>> getIncludeClasses() {
-		return Collections.emptySet();
-	}
-
-	protected Collection<Class<?>> getExcludeClasses() {
-		return Collections.emptySet();
-	}
-
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		Collection<Class<?>> remotingServices = new LinkedHashSet<Class<?>>();
-		Collection<Class<?>> includeClasses = getIncludeClasses();
-		if (includeClasses != null)
-			remotingServices.addAll(includeClasses);
-		remotingServices.addAll(ClassScanner.scanAnnotated(getBasePackages(), Remoting.class));
-		Collection<Class<?>> excludeClasses = getExcludeClasses();
+		Collection<Class<?>> remotingServices = ClassScanner
+				.scanAnnotated(packagesToScan != null ? packagesToScan : ClassScanner.getAppPackages(), Remoting.class);
 		for (Class<?> remotingService : remotingServices) {
-			if (!remotingService.isInterface() || excludeClasses != null && excludeClasses.contains(remotingService))
+			if (!remotingService.isInterface())
 				continue;
 			String key = remotingService.getName() + ".imported";
 			if ("false".equals(env.getProperty(key))) {
-				logger.info("Skipped import service [{}] because {}=false", remotingService.getName(), key);
+				log.info("Skipped import service [{}] because {}=false", remotingService.getName(), key);
 				continue;
 			}
 			String beanName = NameGenerator.buildDefaultBeanName(remotingService.getName());
@@ -71,7 +61,7 @@ public abstract class RemotingServiceRegistryPostProcessor
 				try {
 					Class<?> beanClass = Class.forName(beanClassName);
 					if (remotingService.isAssignableFrom(beanClass)) {
-						logger.info("Skipped import service [{}] because bean[{}#{}] exists", remotingService.getName(),
+						log.info("Skipped import service [{}] because bean[{}#{}] exists", remotingService.getName(),
 								beanClassName, beanName);
 						continue;
 					}
@@ -79,13 +69,13 @@ public abstract class RemotingServiceRegistryPostProcessor
 						Class<?> targetType = ((RootBeanDefinition) bd).getTargetType();
 						if (remotingService.isAssignableFrom(targetType)) {
 							beanClassName = targetType.getName();
-							logger.info("Skipped import service [{}] because bean[{}#{}] exists",
+							log.info("Skipped import service [{}] because bean[{}#{}] exists",
 									remotingService.getName(), beanClassName, beanName);
 							continue;
 						}
 					}
 				} catch (ClassNotFoundException e) {
-					logger.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 					e.printStackTrace();
 				}
 				beanName = remotingService.getName();
@@ -97,7 +87,7 @@ public abstract class RemotingServiceRegistryPostProcessor
 			propertyValues.addPropertyValue("serviceInterface", remotingService.getName());
 			beanDefinition.setPropertyValues(propertyValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
-			logger.info("Imported service [{}] for bean [{}#{}]", remotingService.getName(),
+			log.info("Imported service [{}] for bean [{}#{}]", remotingService.getName(),
 					beanDefinition.getBeanClassName(), beanName);
 		}
 	}
