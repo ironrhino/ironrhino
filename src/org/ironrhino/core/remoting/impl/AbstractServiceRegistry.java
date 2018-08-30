@@ -105,7 +105,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				logger.error(e.getMessage(), e);
 				continue;
 			}
-			if (beanClassName.startsWith("org.ironrhino.core.remoting.client.") && beanClassName.endsWith("Client")) {
+			if (beanClassName.equals(CLASS_NAME_CLIENT)) {
 				// remoting_client
 				PropertyValue pv = bd.getPropertyValues().getPropertyValue("serviceInterface");
 				if (pv == null)
