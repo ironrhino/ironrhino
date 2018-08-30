@@ -14,7 +14,6 @@ public class RemotingServiceRegistryPostProcessor
 	@Override
 	public void processBeanDefinition(Remoting annotation, Class<?> annotatedClass, RootBeanDefinition beanDefinition)
 			throws BeansException {
-		beanDefinition.setPrimary(true);
 		MutablePropertyValues propertyValues = new MutablePropertyValues();
 		propertyValues.addPropertyValue("serviceInterface", annotatedClass.getName());
 		beanDefinition.setPropertyValues(propertyValues);

@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring.configuration;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
@@ -67,32 +68,12 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 			if (StringUtils.isBlank(beanName))
 				beanName = NameGenerator.buildDefaultBeanName(annotatedClass.getName());
 			if (registry.containsBeanDefinition(beanName)) {
-				BeanDefinition bd = registry.getBeanDefinition(beanName);
-				String beanClassName = bd.getBeanClassName();
-				if (beanClassName == null || beanClassName.equals(factoryBeanClass.getName()))
+				if (existsBean(beanName, annotatedClass, registry))
 					continue;
-				try {
-					Class<?> beanClass = Class.forName(beanClassName);
-					if (annotatedClass.isAssignableFrom(beanClass)) {
-						log.info("Skipped import interface [{}] because bean[{}#{}] exists", annotatedClass.getName(),
-								beanClassName, beanName);
-						continue;
-					}
-					if (bd instanceof RootBeanDefinition && FactoryBean.class.isAssignableFrom(beanClass)) {
-						Class<?> targetType = ((RootBeanDefinition) bd).getTargetType();
-						if (annotatedClass.isAssignableFrom(targetType)) {
-							beanClassName = targetType.getName();
-							log.info("Skipped import interface [{}] because bean[{}#{}] exists",
-									annotatedClass.getName(), beanClassName, beanName);
-							continue;
-						}
-					}
-				} catch (ClassNotFoundException e) {
-					log.error(e.getMessage(), e);
-				}
 				beanName = annotatedClass.getName();
 			}
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(factoryBeanClass);
+			beanDefinition.setPrimary(true);
 			beanDefinition.setTargetType(annotatedClass);
 			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
 			processBeanDefinition(annotation, annotatedClass, beanDefinition);
@@ -102,13 +83,63 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 		}
 	}
 
-	protected abstract void processBeanDefinition(A annotation, Class<?> annotatedClass,
-			RootBeanDefinition beanDefinition);
-
-	protected abstract String getExplicitBeanName(A annotation);
+	private boolean existsBean(String beanName, Class<?> annotatedClass, BeanDefinitionRegistry registry) {
+		BeanDefinition bd = registry.getBeanDefinition(beanName);
+		String beanClassName = bd.getBeanClassName();
+		Class<?> beanClass = null;
+		try {
+			if (beanClassName != null) {
+				beanClass = Class.forName(beanClassName);
+			} else if (bd instanceof RootBeanDefinition) {
+				RootBeanDefinition rbd = (RootBeanDefinition) bd;
+				String fbn = rbd.getFactoryBeanName();
+				if (fbn != null) {
+					BeanDefinition fbd = registry.getBeanDefinition(fbn);
+					String factoryBeanClassName = fbd.getBeanClassName();
+					if (factoryBeanClassName != null) {
+						Class<?> factoryBeanClass = Class.forName(factoryBeanClassName);
+						Method m = org.springframework.util.ReflectionUtils.findMethod(factoryBeanClass,
+								rbd.getFactoryMethodName());
+						if (m.isAnnotationPresent(Fallback.class))
+							return false;
+						beanClass = m.getReturnType();
+						beanClassName = beanClass.getName();
+					}
+				}
+			} else {
+				return false;
+			}
+		} catch (ClassNotFoundException e) {
+			log.error(e.getMessage(), e);
+		}
+		if (beanClass == null || beanClass.equals(annotatedClass) || beanClass.equals(factoryBeanClass))
+			return true;
+		if (!beanClass.isAnnotationPresent(Fallback.class)) {
+			if (annotatedClass.isAssignableFrom(beanClass)) {
+				log.info("Skipped import interface [{}] because bean[{}#{}] exists", annotatedClass.getName(),
+						beanClassName, beanName);
+				return true;
+			}
+			if (bd instanceof RootBeanDefinition && FactoryBean.class.isAssignableFrom(beanClass)) {
+				Class<?> targetType = ((RootBeanDefinition) bd).getTargetType();
+				if (annotatedClass.isAssignableFrom(targetType)) {
+					beanClassName = targetType.getName();
+					log.info("Skipped import interface [{}] because bean[{}#{}] exists", annotatedClass.getName(),
+							beanClassName, beanName);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
 	}
+
+	protected abstract void processBeanDefinition(A annotation, Class<?> annotatedClass,
+			RootBeanDefinition beanDefinition);
+
+	protected abstract String getExplicitBeanName(A annotation);
 }

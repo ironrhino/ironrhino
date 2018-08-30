@@ -14,7 +14,6 @@ public class RestApiRegistryPostProcessor
 	@Override
 	protected void processBeanDefinition(RestApi annotation, Class<?> annotatedClass,
 			RootBeanDefinition beanDefinition) {
-		beanDefinition.setPrimary(true);
 		ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
 		constructorArgumentValues.addIndexedArgumentValue(0, annotatedClass);
 		if (StringUtils.isNotBlank(annotation.restClient()))
