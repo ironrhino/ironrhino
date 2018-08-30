@@ -1,6 +1,10 @@
 package org.ironrhino.core.remoting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.lang.reflect.Proxy;
 
 import org.ironrhino.core.remoting.RemotingSerivceFallbackTest.RemotingFallbackConfiguration;
 import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
@@ -25,6 +29,8 @@ public class RemotingSerivceFallbackTest {
 
 	@Test
 	public void test() {
+		assertFalse(testService instanceof FallbackTestService);
+		assertTrue(Proxy.isProxyClass(testService.getClass()));
 		// ServiceNotFoundException
 		assertEquals("echo:test", testService.echo("test"));
 	}
@@ -35,7 +41,7 @@ public class RemotingSerivceFallbackTest {
 		@Bean
 		public static RemotingServiceRegistryPostProcessor remotingServiceRegistryPostProcessor() {
 			RemotingServiceRegistryPostProcessor obj = new RemotingServiceRegistryPostProcessor();
-			obj.setPackagesToScan(new String[] { RemotingFallbackConfiguration.class.getPackage().getName() });
+			obj.setPackagesToScan(new String[] { TestService.class.getPackage().getName() });
 			return obj;
 		}
 

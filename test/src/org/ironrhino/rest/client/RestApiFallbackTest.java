@@ -1,6 +1,10 @@
 package org.ironrhino.rest.client;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.lang.reflect.Proxy;
 
 import org.ironrhino.core.spring.configuration.Fallback;
 import org.ironrhino.rest.client.RestApiFallbackTest.RestApiConfiguration;
@@ -25,6 +29,8 @@ public class RestApiFallbackTest {
 
 	@Test
 	public void test() {
+		assertFalse(testClient instanceof FallbackTestClient);
+		assertTrue(Proxy.isProxyClass(testClient.getClass()));
 		int errorCount = 0;
 		for (int i = 0; i < 50; i++)
 			try {

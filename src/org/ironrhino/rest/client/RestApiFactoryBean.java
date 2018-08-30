@@ -19,16 +19,12 @@ import java.util.Map;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.spring.MethodInterceptorFactoryBean;
-import org.ironrhino.core.spring.configuration.Fallback;
+import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
 import org.ironrhino.core.throttle.CircuitBreaking;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -59,10 +55,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public class RestApiFactoryBean extends MethodInterceptorFactoryBean implements InitializingBean {
+public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryBean {
 
 	private final Class<?> restApiClass;
 
@@ -71,11 +65,6 @@ public class RestApiFactoryBean extends MethodInterceptorFactoryBean implements 
 	private final String apiBaseUrl;
 
 	private final Object restApiBean;
-
-	private Object fallback;
-
-	@Autowired
-	private ApplicationContext ctx;
 
 	public RestApiFactoryBean(Class<?> restApiClass) {
 		this(restApiClass, (RestTemplate) null);
@@ -105,19 +94,6 @@ public class RestApiFactoryBean extends MethodInterceptorFactoryBean implements 
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		for (String beanName : ctx.getBeanNamesForAnnotation(Fallback.class)) {
-			try {
-				this.fallback = ctx.getBean(beanName, restApiClass);
-				log.info("Pick bean {} as fallback of {}", beanName, restApiClass.getName());
-				break;
-			} catch (BeansException e) {
-				continue;
-			}
-		}
-	}
-
-	@Override
 	public Object getObject() {
 		return restApiBean;
 	}
@@ -129,17 +105,14 @@ public class RestApiFactoryBean extends MethodInterceptorFactoryBean implements 
 	}
 
 	@Override
+	protected boolean shouldFallBackFor(Throwable ex) {
+		return ex instanceof CircuitBreakerOpenException;
+	}
+
+	@Override
 	protected Object doInvoke(MethodInvocation methodInvocation) throws Exception {
-		try {
-			return CircuitBreaking.execute(restApiClass.getName(), ex -> ex.getCause() instanceof IOException,
-					() -> actualInvoke(methodInvocation));
-		} catch (CircuitBreakerOpenException ex) {
-			if (fallback != null) {
-				log.error("Fallback to " + fallback, ex);
-				return methodInvocation.getMethod().invoke(fallback, methodInvocation.getArguments());
-			}
-			throw ex;
-		}
+		return CircuitBreaking.execute(restApiClass.getName(), ex -> ex.getCause() instanceof IOException,
+				() -> actualInvoke(methodInvocation));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -156,6 +129,7 @@ public class RestApiFactoryBean extends MethodInterceptorFactoryBean implements 
 		if (methodRequestMapping != null && methodRequestMapping.value().length > 0)
 			sb.append(methodRequestMapping.value()[0]);
 		String url = sb.toString().trim();
+		ApplicationContext ctx = getApplicationContext();
 		if (ctx != null)
 			url = ctx.getEnvironment().resolvePlaceholders(url);
 		RequestMethod[] requestMethods = methodRequestMapping != null ? methodRequestMapping.method()

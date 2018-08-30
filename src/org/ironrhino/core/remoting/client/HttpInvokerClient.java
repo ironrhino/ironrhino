@@ -3,17 +3,11 @@ package org.ironrhino.core.remoting.client;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
@@ -22,27 +16,21 @@ import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.stats.ServiceStats;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
 import org.ironrhino.core.spring.RemotingClientProxy;
-import org.ironrhino.core.spring.configuration.Fallback;
 import org.ironrhino.core.throttle.CircuitBreaking;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
-import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -58,8 +46,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HttpInvokerClient implements MethodInterceptor, HttpInvokerClientConfiguration, FactoryBean<Object>,
-		InitializingBean, DisposableBean {
+public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean
+		implements HttpInvokerClientConfiguration, InitializingBean {
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
@@ -100,15 +88,6 @@ public class HttpInvokerClient implements MethodInterceptor, HttpInvokerClientCo
 	private ServiceStats serviceStats;
 
 	@Setter
-	@Autowired(required = false)
-	private volatile ExecutorService executorService;
-
-	@Autowired
-	private ApplicationContext ctx;
-
-	private boolean executorServiceCreated;
-
-	@Setter
 	private String host;
 
 	@Setter
@@ -131,8 +110,6 @@ public class HttpInvokerClient implements MethodInterceptor, HttpInvokerClientCo
 	private String discoveredHost;
 
 	private Object serviceProxy;
-
-	private Object serviceFallback;
 
 	@Override
 	public Object getObject() {
@@ -183,72 +160,15 @@ public class HttpInvokerClient implements MethodInterceptor, HttpInvokerClientCo
 		ProxyFactory pf = new ProxyFactory(serviceInterface, this);
 		pf.addInterface(RemotingClientProxy.class);
 		this.serviceProxy = pf.getProxy(serviceInterface.getClassLoader());
-		for (String beanName : ctx.getBeanNamesForAnnotation(Fallback.class)) {
-			try {
-				this.serviceFallback = ctx.getBean(beanName, serviceInterface);
-				log.info("Pick bean {} as fallback of {}", beanName, serviceInterface.getName());
-				break;
-			} catch (BeansException e) {
-				continue;
-			}
-		}
 	}
 
 	@Override
-	public void destroy() throws Exception {
-		if (executorServiceCreated)
-			executorService.shutdown();
-	}
-
-	@Override
-	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		Method method = methodInvocation.getMethod();
-		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
-			return "HTTP invoker proxy for service URL [" + getServiceUrl() + "]";
+	protected boolean shouldFallBackFor(Throwable ex) {
+		if (ex instanceof RemoteAccessException) {
+			ex = ex.getCause();
+			return ex instanceof CircuitBreakerOpenException || ex instanceof ServiceNotFoundException;
 		}
-		if (method.isDefault()) {
-			return ReflectionUtils.invokeDefaultMethod(getObject(), method, methodInvocation.getArguments());
-		}
-		Class<?> returnType = method.getReturnType();
-		if (returnType == Future.class) {
-			ExecutorService es = executorService;
-			if (es == null) {
-				synchronized (this) {
-					es = executorService;
-					if (es == null) {
-						executorService = es = Executors
-								.newCachedThreadPool(new NameableThreadFactory("httpInvokerClient"));
-						executorServiceCreated = true;
-					}
-				}
-			}
-			return es.submit(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					try {
-						return doInvoke(methodInvocation);
-					} catch (Exception e) {
-						throw e;
-					} catch (Throwable e) {
-						throw new InvocationTargetException(e);
-					}
-				}
-			});
-		} else if (returnType == Callable.class) {
-			return new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					try {
-						return doInvoke(methodInvocation);
-					} catch (Exception e) {
-						throw e;
-					} catch (Throwable e) {
-						throw new InvocationTargetException(e);
-					}
-				}
-			};
-		}
-		return doInvoke(methodInvocation);
+		return false;
 	}
 
 	protected Object doInvoke(MethodInvocation methodInvocation) throws Throwable {
@@ -256,14 +176,6 @@ public class HttpInvokerClient implements MethodInterceptor, HttpInvokerClientCo
 		RemoteInvocationResult result;
 		try {
 			result = executeRequest(invocation, methodInvocation);
-		} catch (ServiceNotFoundException | CircuitBreakerOpenException ex) {
-			if (serviceFallback != null) {
-				log.error("Fallback to " + serviceFallback, ex);
-				return methodInvocation.getMethod().invoke(serviceFallback, methodInvocation.getArguments());
-			} else {
-				RemoteAccessException rae = convertHttpInvokerAccessException(ex);
-				throw (rae != null ? rae : ex);
-			}
 		} catch (Throwable ex) {
 			RemoteAccessException rae = convertHttpInvokerAccessException(ex);
 			throw (rae != null ? rae : ex);
