@@ -56,7 +56,7 @@ public class RestApiFallbackTest {
 		@Bean
 		public static RestApiRegistryPostProcessor restApiRegistryPostProcessor() {
 			RestApiRegistryPostProcessor obj = new RestApiRegistryPostProcessor();
-			obj.setPackagesToScan(new String[] { RestApiConfiguration.class.getPackage().getName() });
+			obj.setAnnotatedClasses(new Class<?>[] { TestClient.class });
 			return obj;
 		}
 

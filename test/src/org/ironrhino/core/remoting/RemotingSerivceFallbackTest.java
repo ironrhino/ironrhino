@@ -41,7 +41,7 @@ public class RemotingSerivceFallbackTest {
 		@Bean
 		public static RemotingServiceRegistryPostProcessor remotingServiceRegistryPostProcessor() {
 			RemotingServiceRegistryPostProcessor obj = new RemotingServiceRegistryPostProcessor();
-			obj.setPackagesToScan(new String[] { TestService.class.getPackage().getName() });
+			obj.setAnnotatedClasses(new Class<?>[] { TestService.class });
 			return obj;
 		}
 
