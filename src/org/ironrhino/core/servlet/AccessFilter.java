@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.DispatcherType;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.util.AppInfo;
@@ -207,6 +209,7 @@ public class AccessFilter implements Filter {
 					msg.append(RequestUtils.serializeData(request)).append(" response time:").append(responseTime)
 							.append("ms");
 					accesWarnLog.warn(msg.toString());
+					Metrics.recordTimer("http.access.slow", responseTime, TimeUnit.MILLISECONDS, "uri", uri);
 				}
 			} catch (ServletException e) {
 				log.error(e.getMessage(), e);
@@ -217,6 +220,7 @@ public class AccessFilter implements Filter {
 					long responseTime = System.currentTimeMillis() - start;
 					MDC.put("responseTime", " responseTime:" + responseTime);
 					accessLog.info("");
+					Metrics.recordTimer("http.access", responseTime, TimeUnit.MILLISECONDS);
 				}
 				MDC.clear();
 			}
