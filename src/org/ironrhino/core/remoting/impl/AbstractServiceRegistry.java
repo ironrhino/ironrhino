@@ -14,10 +14,6 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.event.InstanceLifecycleEvent;
-import org.ironrhino.core.event.InstanceShutdownEvent;
-import org.ironrhino.core.event.InstanceStartupEvent;
-import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
@@ -32,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
@@ -277,33 +274,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	@EventListener
-	public void onApplicationEvent(InstanceLifecycleEvent event) {
-		if (handle(event))
-			return;
-		if (event instanceof InstanceStartupEvent && event.isLocal())
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		if (event.getApplicationContext() == ctx)
 			init();
-		else if (event instanceof InstanceShutdownEvent && !event.isLocal()) {
-			String instanceId = event.getInstanceId();
-			String host = instanceId.substring(instanceId.lastIndexOf('@') + 1);
-			evict(host);
-		} else if (event instanceof ExportServicesEvent) {
-			if (event.isLocal())
-				return;
-			ExportServicesEvent ev = (ExportServicesEvent) event;
-			String instanceId = event.getInstanceId();
-			String appName = instanceId.substring(0, instanceId.lastIndexOf('@'));
-			appName = appName.substring(0, appName.lastIndexOf('-'));
-			String host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
-			for (String serviceName : ev.getExportServices()) {
-				List<String> hosts = importedServiceCandidates.get(serviceName);
-				if (hosts != null && !hosts.contains(host))
-					hosts.add(host);
-			}
-		}
-	}
-
-	protected boolean handle(InstanceLifecycleEvent event) {
-		return false;
 	}
 
 }

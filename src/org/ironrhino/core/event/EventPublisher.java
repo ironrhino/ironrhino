@@ -2,6 +2,7 @@ package org.ironrhino.core.event;
 
 import org.ironrhino.core.metadata.Scope;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ApplicationContextEvent;
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EventPublisher {
+
+	@Autowired
+	private ApplicationContext ctx;
 
 	@Autowired
 	private ApplicationEventPublisher publisher;
@@ -28,7 +32,7 @@ public class EventPublisher {
 
 	@EventListener
 	public void onApplicationEvent(ApplicationContextEvent event) {
-		if (event.getApplicationContext().getParent() != null)
+		if (event.getApplicationContext() != ctx)
 			return;
 		if (event instanceof ContextRefreshedEvent) {
 			InstanceStartupEvent ise = new InstanceStartupEvent();

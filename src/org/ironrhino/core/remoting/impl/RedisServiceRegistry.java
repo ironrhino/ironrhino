@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.event.EventPublisher;
+import org.ironrhino.core.event.InstanceLifecycleEvent;
+import org.ironrhino.core.event.InstanceShutdownEvent;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
@@ -23,6 +25,7 @@ import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -182,6 +185,26 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	public void destroy() {
 		super.destroy();
 		remotingStringRedisTemplate.delete(NAMESPACE_HOSTS + getLocalHost());
+	}
+
+	@EventListener(condition = "!#event.local")
+	public void onApplicationEvent(InstanceLifecycleEvent event) {
+		if (event instanceof InstanceShutdownEvent) {
+			String instanceId = event.getInstanceId();
+			String host = instanceId.substring(instanceId.lastIndexOf('@') + 1);
+			evict(host);
+		} else if (event instanceof ExportServicesEvent) {
+			ExportServicesEvent ev = (ExportServicesEvent) event;
+			String instanceId = event.getInstanceId();
+			String appName = instanceId.substring(0, instanceId.lastIndexOf('@'));
+			appName = appName.substring(0, appName.lastIndexOf('-'));
+			String host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
+			for (String serviceName : ev.getExportServices()) {
+				List<String> hosts = importedServiceCandidates.get(serviceName);
+				if (hosts != null && !hosts.contains(host))
+					hosts.add(host);
+			}
+		}
 	}
 
 }

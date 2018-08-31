@@ -15,9 +15,6 @@ import javax.annotation.PostConstruct;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException.NoNodeException;
-import org.ironrhino.core.event.InstanceLifecycleEvent;
-import org.ironrhino.core.event.InstanceShutdownEvent;
-import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
@@ -270,12 +267,6 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public void onNodeDataChanged(String path, byte[] data) {
 
-	}
-
-	@Override
-	protected boolean handle(InstanceLifecycleEvent event) {
-		return event instanceof ExportServicesEvent || event instanceof InstanceShutdownEvent;
-		// zookeeper has onNodeChildrenChanged
 	}
 
 	private static String escapeSlash(String host) {
