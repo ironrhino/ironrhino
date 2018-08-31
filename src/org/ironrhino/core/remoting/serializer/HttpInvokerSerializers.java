@@ -38,7 +38,7 @@ public final class HttpInvokerSerializers {
 	}
 
 	public static HttpInvokerSerializer ofContentType(String contentType) {
-		if (StringUtils.isNoneBlank(contentType)) {
+		if (StringUtils.isNotBlank(contentType)) {
 			for (HttpInvokerSerializer serializer : SERIALIZERS)
 				if (contentType.startsWith(serializer.getContentType()))
 					return serializer;
@@ -48,13 +48,13 @@ public final class HttpInvokerSerializers {
 	}
 
 	public static HttpInvokerSerializer ofSerializationType(String serializationType) {
-		if (StringUtils.isNoneBlank(serializationType)) {
+		if (StringUtils.isNotBlank(serializationType)) {
 			for (HttpInvokerSerializer serializer : SERIALIZERS)
 				if (serializer.getSerializationType().equalsIgnoreCase(serializationType))
 					return serializer;
+			log.warn("Use default {} for unknown serializationType: {}", DEFAULT_SERIALIZER.getClass().getName(),
+					serializationType);
 		}
-		log.warn("Use default {} for unknown serializationType: {}", DEFAULT_SERIALIZER.getClass().getName(),
-				serializationType);
 		return DEFAULT_SERIALIZER;
 	}
 
