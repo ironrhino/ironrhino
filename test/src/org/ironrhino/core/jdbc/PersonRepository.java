@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.persistence.EnumType;
 
 import org.ironrhino.common.model.Gender;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 @JdbcRepository
@@ -58,6 +59,9 @@ public interface PersonRepository {
 
 	@Transactional(readOnly = true)
 	List<Person> searchWithLimiting(String namePrefix, Limiting limiting);
+
+	@Transactional(readOnly = true)
+	void searchWithLimiting(String namePrefix, Limiting limiting, RowCallbackHandler rch);
 
 	@Transactional(readOnly = true)
 	@Sql("select count(*) from t_person")

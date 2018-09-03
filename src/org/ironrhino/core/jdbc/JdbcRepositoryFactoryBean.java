@@ -38,6 +38,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -202,6 +203,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		Object[] arguments = methodInvocation.getArguments();
 		NestedPathMapSqlParameterSource sqlParameterSource = new NestedPathMapSqlParameterSource();
 		Map<String, Object> context = new HashMap<>();
+		RowCallbackHandler rch = null;
 		if (arguments.length > 0) {
 			String[] names = ReflectionUtils.getParameterNames(methodInvocation.getMethod());
 			if (names == null)
@@ -213,6 +215,9 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 					if (arg instanceof Limiting) {
 						sql = SqlUtils.appendLimitingClause(databaseProduct, databaseMajorVersion, databaseMinorVersion,
 								sql, names[i], (Limiting) arg);
+					}
+					if (arg instanceof RowCallbackHandler) {
+						rch = (RowCallbackHandler) arg;
 					}
 					if (arg.getClass().isArray()) {
 						Object[] objects = (Object[]) arg;
@@ -262,6 +267,12 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		switch (sqlVerb) {
 		case SELECT:
 			if (returnType instanceof Class) {
+				if (returnType == void.class) {
+					if (rch == null)
+						throw new IllegalStateException("RowCallbackHandler should present");
+					namedParameterJdbcTemplate.query(sql, sqlParameterSource, rch);
+					return null;
+				}
 				Class<?> clz = (Class<?>) returnType;
 				if (BeanUtils.isSimpleValueType(clz)) {
 					return namedParameterJdbcTemplate.queryForObject(sql, sqlParameterSource, clz);

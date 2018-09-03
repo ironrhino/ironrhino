@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.EnumSet;
@@ -13,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ironrhino.common.model.Gender;
 import org.junit.After;
@@ -20,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -241,6 +245,31 @@ public class JdbcRepositoryTest {
 		assertTrue(optional.isPresent());
 		assertEquals(p, optional.get());
 		assertFalse(personRepository.getOptional("notexists").isPresent());
+	}
+
+	@Test
+	public void testRowCallbackHanlder() throws Exception {
+		Person p = new Person();
+		p.setName("test1");
+		p.setDob(LocalDate.now());
+		p.setSince(YearMonth.now());
+		p.setAge(11);
+		p.setGender(Gender.FEMALE);
+		p.setAmount(new BigDecimal("12.00"));
+		personRepository.save(p);
+		p.setName("test2");
+		p.setGender(Gender.MALE);
+		personRepository.save(p);
+		p.setName("test3");
+		personRepository.save(p);
+		AtomicInteger count = new AtomicInteger();
+		personRepository.searchWithLimiting("test", Limiting.of(2), new RowCallbackHandler() {
+			@Override
+			public void processRow(ResultSet rs) throws SQLException {
+				count.incrementAndGet();
+			}
+		});
+		assertEquals(2, count.get());
 	}
 
 }
