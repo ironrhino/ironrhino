@@ -117,7 +117,6 @@ public class SessionCompressorManager {
 							}
 						}
 						map.put(key, value);
-
 					} catch (AccountStatusException e) {
 						throw e;
 					} catch (Exception e) {

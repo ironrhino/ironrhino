@@ -1,6 +1,5 @@
 package org.ironrhino.core.session.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.SessionCompressor;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -25,7 +24,7 @@ public class DefaultSessionCompressor implements SessionCompressor<Object> {
 
 	@Override
 	public Object uncompress(String string) throws Exception {
-		if (StringUtils.isBlank(string))
+		if (string == null)
 			return null;
 		int index = string.indexOf(SEPERATOR);
 		if (index < 0)
@@ -37,7 +36,6 @@ public class DefaultSessionCompressor implements SessionCompressor<Object> {
 		} catch (ClassNotFoundException e) {
 			return string;
 		}
-
 	}
 
 }
