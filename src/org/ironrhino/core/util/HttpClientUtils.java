@@ -25,13 +25,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -60,30 +56,15 @@ public class HttpClientUtils {
 	}
 
 	public static CloseableHttpClient create() {
-		return create(false);
+		return create(10000);
 	}
 
-	public static CloseableHttpClient create(boolean single) {
-		return create(single, 10000);
-	}
-
-	@SuppressWarnings("resource")
-	public static CloseableHttpClient create(boolean single, int connectTimeout) {
-		HttpClientConnectionManager connManager;
-		if (single)
-			connManager = new BasicHttpClientConnectionManager();
-		else {
-			PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(60, TimeUnit.SECONDS);
-			cm.setDefaultMaxPerRoute(1000);
-			cm.setMaxTotal(1000);
-			connManager = cm;
-		}
+	public static CloseableHttpClient create(int connectTimeout) {
 		RequestConfig requestConfig = RequestConfig.custom().setCircularRedirectsAllowed(true)
 				.setConnectTimeout(connectTimeout).setExpectContinueEnabled(true).build();
-		CloseableHttpClient httpclient = HttpClientBuilder.create().setConnectionManager(connManager)
-				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy()).setDefaultRequestConfig(requestConfig)
-				.disableAuthCaching().disableAutomaticRetries().disableConnectionState().disableCookieManagement()
-				.setDefaultHeaders(DEFAULT_HEADERS).build();
+		CloseableHttpClient httpclient = HttpClients.custom().disableAuthCaching().disableAutomaticRetries()
+				.disableConnectionState().disableCookieManagement().setConnectionTimeToLive(60, TimeUnit.SECONDS)
+				.setDefaultRequestConfig(requestConfig).setDefaultHeaders(DEFAULT_HEADERS).build();
 		return httpclient;
 	}
 

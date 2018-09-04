@@ -1,11 +1,8 @@
 package org.ironrhino.core.servlet;
 
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.HttpClientUtils;
 
@@ -50,15 +47,10 @@ public class TestServlet extends HttpServlet {
 
 	private boolean test(String testurl) {
 		log.info("testing: " + testurl);
-		HttpRequestBase httpRequest = new HttpGet(testurl);
 		try {
-			return HttpClientUtils.getDefaultInstance().execute(httpRequest).getStatusLine()
-					.getStatusCode() == HttpServletResponse.SC_OK;
+			return HttpClientUtils.get(testurl) != null;
 		} catch (Exception e) {
-			httpRequest.abort();
 			return false;
-		} finally {
-			httpRequest.releaseConnection();
 		}
 	}
 }

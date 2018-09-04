@@ -205,7 +205,6 @@ public class HttpInvokerServer implements HttpRequestHandler {
 				}
 			}
 			remotingLogger.info("Invoked from {} in {}ms", MDC.get(AccessFilter.MDC_KEY_REQUEST_FROM), time);
-			response.setHeader("Keep-Alive", "timeout=30, max=600");
 			HttpInvokerSerializer serializer = HttpInvokerSerializers.forRequest(request);
 			response.setContentType(serializer.getContentType());
 			serializer.writeRemoteInvocationResult(invocation, result, response.getOutputStream());

@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.NoHttpResponseException;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -46,27 +46,13 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 
 	@Getter
 	@Setter
-	private long timeToLive = 60;
-
-	@Getter
-	@Setter
-	private int maxConnPerRoute = 100;
-
-	@Getter
-	@Setter
-	private int maxConnTotal = 100;
+	private long connectionTimeToLiveInSeconds = 60;
 
 	@PostConstruct
 	public void init() {
-		httpClient = HttpClients.custom().disableAuthCaching().disableConnectionState().disableCookieManagement()
-				.disableRedirectHandling().setMaxConnPerRoute(maxConnPerRoute).setMaxConnTotal(maxConnTotal)
-				.setRetryHandler((ex, executionCount, context) -> {
-					if (executionCount > 3)
-						return false;
-					if (ex instanceof NoHttpResponseException)
-						return true;
-					return false;
-				}).build();
+		httpClient = HttpClients.custom().disableAuthCaching().disableAutomaticRetries().disableConnectionState()
+				.disableCookieManagement().setConnectionTimeToLive(connectionTimeToLiveInSeconds, TimeUnit.SECONDS)
+				.build();
 	}
 
 	@Override
