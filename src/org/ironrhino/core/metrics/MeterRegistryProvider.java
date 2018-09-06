@@ -6,6 +6,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 
 public interface MeterRegistryProvider {
 
-	public Optional<MeterRegistry> get();
+	public Optional<? extends MeterRegistry> get();
 
 }

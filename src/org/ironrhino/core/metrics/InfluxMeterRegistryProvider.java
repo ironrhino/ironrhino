@@ -1,6 +1,9 @@
 package org.ironrhino.core.metrics;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ThreadFactory;
 
 import org.ironrhino.core.spring.configuration.AddressAvailabilityCondition;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
@@ -11,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.lang.Nullable;
 import io.micrometer.influx.InfluxConfig;
 import io.micrometer.influx.InfluxMeterRegistry;
@@ -28,15 +31,34 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 	@Autowired
 	private Environment environment;
 
+	private ThreadFactory threadFactory = new NameableThreadFactory("metrics");
+
+	private InfluxConfig influxConfig;
+
+	private InfluxMeterRegistry influxMeterRegistry;
+
 	@Override
-	public Optional<MeterRegistry> get() {
-		InfluxConfig config = key -> environment.getProperty(key, key.endsWith(".db") ? DEFAULT_DB : (String) null);
+	public Optional<InfluxMeterRegistry> get() {
+		return createMeterRegistry(getConfig(Collections.emptyMap()), false);
+	}
+
+	private InfluxConfig getConfig(Map<String, String> overrides) {
+		return key -> {
+			String suffix = key.substring(key.lastIndexOf('.') + 1);
+			if (overrides != null && overrides.containsKey(suffix))
+				return overrides.get(suffix);
+			return environment.getProperty(key, suffix.equals("db") ? DEFAULT_DB : null);
+		};
+	}
+
+	private Optional<InfluxMeterRegistry> createMeterRegistry(InfluxConfig config, boolean forUpdate) {
 		if (AddressAvailabilityCondition.check(config.uri(), 2000)) {
-			log.info("Add influx metrics registry {} with db '{}'", config.uri(), config.db());
-			MeterRegistry meterRegistry = new InfluxMeterRegistry(config, Clock.SYSTEM,
-					new NameableThreadFactory("metrics"));
+			if (forUpdate)
+				log.info("Add influx metrics registry {} with db '{}'", config.uri(), config.db());
+			this.influxConfig = config;
+			this.influxMeterRegistry = new InfluxMeterRegistry(config, Clock.SYSTEM, threadFactory);
 			// revert https://github.com/micrometer-metrics/micrometer/issues/693
-			meterRegistry.config().namingConvention(new InfluxNamingConvention() {
+			this.influxMeterRegistry.config().namingConvention(new InfluxNamingConvention() {
 
 				@Override
 				public String name(String name, Meter.Type type, @Nullable String baseUnit) {
@@ -48,11 +70,32 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 					return name.replace(",", "\\,").replace(" ", "\\ ").replace("=", "\\=").replace("\"", "\\\"");
 				}
 			});
-			return Optional.of(meterRegistry);
+			return Optional.of(influxMeterRegistry);
 		} else {
 			log.warn("Skip influx metrics registry {} with db '{}'", config.uri(), config.db());
 			return Optional.empty();
 		}
+	}
+
+	public void updateStep(String step) {
+		InfluxMeterRegistry previousMeterRegistry = influxMeterRegistry;
+		InfluxConfig previousConfig = influxConfig;
+		if (previousMeterRegistry == null || previousConfig == null) {
+			log.warn("InfluxMeterRegistry is not registered");
+			return;
+		}
+		String previousStep = previousConfig.step().toString();
+		if (step.equals(previousStep)) {
+			log.warn("Updating step is equals to current step");
+			return;
+		}
+		InfluxConfig config = getConfig(Collections.singletonMap("step", step));
+		createMeterRegistry(config, true).ifPresent(registry -> {
+			Metrics.removeRegistry(previousMeterRegistry);
+			previousMeterRegistry.close();
+			Metrics.addRegistry(registry);
+			log.info("Updated influx metrics registry step from {} to {}", previousStep, step);
+		});
 	}
 
 }
