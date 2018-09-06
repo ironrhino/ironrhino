@@ -10,6 +10,7 @@ import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.security.domain.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.concurrent.ListenableFuture;
 
 @Remoting
 public interface TestService {
@@ -57,6 +58,8 @@ public interface TestService {
 	public Optional<UserDetails> loadOptionalUserByUsername(String username);
 
 	public Future<UserDetails> loadFutureUserByUsername(String username, FutureType futureType);
+
+	public ListenableFuture<UserDetails> loadListenableFutureUserByUsername(String username);
 
 	public Callable<UserDetails> loadCallableUserByUsername(String username);
 

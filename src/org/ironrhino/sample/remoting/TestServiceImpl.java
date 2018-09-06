@@ -20,6 +20,7 @@ import org.ironrhino.security.domain.User;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.SettableListenableFuture;
 
 @Service
@@ -160,6 +161,29 @@ public class TestServiceImpl implements TestService {
 		default:
 			return es.submit(sup::get);
 		}
+	}
+
+	@Override
+	public ListenableFuture<UserDetails> loadListenableFutureUserByUsername(String username) {
+		Supplier<UserDetails> sup = () -> {
+			if (StringUtils.isBlank(username))
+				throw new IllegalArgumentException("username shouldn't be blank");
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			User user = new User();
+			user.setUsername(username);
+			user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
+			return user;
+		};
+		SettableListenableFuture<UserDetails> future = new SettableListenableFuture<>();
+		if (StringUtils.isBlank(username))
+			future.setException(new IllegalArgumentException("username shouldn't be blank"));
+		else
+			future.set(sup.get());
+		return future;
 	}
 
 	@Override

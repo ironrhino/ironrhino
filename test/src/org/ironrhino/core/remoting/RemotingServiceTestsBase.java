@@ -12,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ironrhino.sample.remoting.PersonRepository;
@@ -21,6 +22,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.concurrent.ListenableFuture;
 
 public abstract class RemotingServiceTestsBase {
 
@@ -133,6 +136,22 @@ public abstract class RemotingServiceTestsBase {
 			}
 			assertTrue(error);
 		}
+	}
+
+	@Test
+	public void testListenableFuture() throws Exception {
+		ListenableFuture<UserDetails> future = testService.loadListenableFutureUserByUsername("username");
+		AtomicBoolean b1 = new AtomicBoolean();
+		AtomicBoolean b2 = new AtomicBoolean();
+		future.addCallback(u -> {
+			b1.set("username".equals(u.getUsername()));
+		}, e -> {
+			b2.set(true);
+		});
+		Thread.sleep(1000);
+		assertTrue(b1.get());
+		assertFalse(b2.get());
+		assertEquals("username", future.get().getUsername());
 	}
 
 	@Test

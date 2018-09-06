@@ -16,6 +16,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureTask;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,21 +44,8 @@ public abstract class MethodInterceptorFactoryBean
 		if (method.isDefault())
 			return ReflectionUtils.invokeDefaultMethod(getObject(), method, methodInvocation.getArguments());
 		Class<?> returnType = method.getReturnType();
-		if (returnType == Future.class) {
-			return getExecutorService().submit(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					try {
-						return doInvoke(methodInvocation);
-					} catch (Exception e) {
-						throw e;
-					} catch (Throwable e) {
-						throw new InvocationTargetException(e);
-					}
-				}
-			});
-		} else if (returnType == Callable.class) {
-			return new Callable<Object>() {
+		if (returnType == Callable.class || returnType == ListenableFuture.class || returnType == Future.class) {
+			Callable<Object> callable = new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
 					try {
@@ -68,6 +57,17 @@ public abstract class MethodInterceptorFactoryBean
 					}
 				}
 			};
+			if (returnType == Callable.class) {
+				return callable;
+			}
+			if (returnType == ListenableFuture.class) {
+				ListenableFutureTask<Object> future = new ListenableFutureTask<>(callable);
+				getExecutorService().execute(future);
+				return future;
+			}
+			if (returnType == Future.class) {
+				return getExecutorService().submit(callable);
+			}
 		}
 		return doInvoke(methodInvocation);
 	}
