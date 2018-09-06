@@ -25,6 +25,8 @@ import lombok.Setter;
 public abstract class MethodInterceptorFactoryBean
 		implements MethodInterceptor, FactoryBean<Object>, DisposableBean, ApplicationContextAware {
 
+	public static final int EXECUTOR_POOL_SIZE_DEFAULT = 5;
+
 	public static final String EXECUTOR_POOL_SIZE_SUFFIX = ".executor.pool.size";
 
 	@Setter
@@ -83,8 +85,9 @@ public abstract class MethodInterceptorFactoryBean
 					String poolName = getObjectType().getSimpleName();
 					ApplicationContext ctx = getApplicationContext();
 					if (ctx != null) {
-						int threads = ctx.getEnvironment()
-								.getProperty(getObjectType().getName() + EXECUTOR_POOL_SIZE_SUFFIX, int.class, 5);
+						int threads = ctx.getEnvironment().getProperty(
+								getObjectType().getName() + EXECUTOR_POOL_SIZE_SUFFIX, int.class,
+								EXECUTOR_POOL_SIZE_DEFAULT);
 						executorService = es = Executors.newFixedThreadPool(threads,
 								new NameableThreadFactory(poolName));
 					} else {
