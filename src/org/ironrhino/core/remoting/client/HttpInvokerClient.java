@@ -12,7 +12,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
-import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.stats.ServiceStats;
 import org.ironrhino.core.servlet.AccessFilter;
@@ -35,7 +34,6 @@ import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.springframework.remoting.RemoteInvocationFailureException;
-import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
@@ -46,8 +44,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean
-		implements HttpInvokerClientConfiguration, InitializingBean {
+public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean implements InitializingBean {
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
@@ -61,9 +58,12 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	@Setter
 	private String serviceUrl;
 
-	private volatile SimpleHttpInvokerRequestExecutor httpInvokerRequestExecutor;
+	@Getter
+	@Setter
+	private HttpInvokerRequestExecutor httpInvokerRequestExecutor = new SimpleHttpInvokerRequestExecutor();
 
-	private volatile HttpInvokerSerializer serializer;
+	@Value("${httpInvoker.serialization.type:}")
+	private String serializationType;
 
 	@Getter
 	@Setter
@@ -121,25 +121,12 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		return this.serviceInterface;
 	}
 
-	@Value("${httpInvoker.serialization.type:}")
-	public void setSerializationType(String serializationType) {
-		this.serializer = HttpInvokerSerializers.ofSerializationType(serializationType);
-		SimpleHttpInvokerRequestExecutor executor = new SimpleHttpInvokerRequestExecutor(this.serializer);
-		executor.setConnectTimeout(connectTimeout);
-		executor.setReadTimeout(readTimeout);
-		this.httpInvokerRequestExecutor = executor;
-	}
-
-	@Override
-	public String getCodebaseUrl() {
-		return null;
-	}
-
 	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(serviceInterface, "'serviceInterface' must not be null");
 		Assert.isTrue(serviceInterface.isInterface(), "'serviceInterface' must be an interface");
 		Assert.notNull(httpInvokerRequestExecutor, "'httpInvokerRequestExecutor' must not be null");
+		httpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
 		httpInvokerRequestExecutor.setConnectTimeout(connectTimeout);
 		httpInvokerRequestExecutor.setReadTimeout(readTimeout);
 		if (StringUtils.isBlank(host))
@@ -172,7 +159,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	}
 
 	protected Object doInvoke(MethodInvocation methodInvocation) throws Throwable {
-		RemoteInvocation invocation = serializer.createRemoteInvocation(methodInvocation);
+		RemoteInvocation invocation = httpInvokerRequestExecutor.getSerializer()
+				.createRemoteInvocation(methodInvocation);
 		RemoteInvocationResult result;
 		try {
 			result = executeRequest(invocation, methodInvocation);
@@ -266,7 +254,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			}
 			long time = System.currentTimeMillis();
 			try {
-				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(this, invocation);
+				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(this.getServiceUrl(),
+						invocation);
 				if (serviceStats != null) {
 					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
 							System.currentTimeMillis() - time, false);
@@ -281,12 +270,12 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 				}
 				if (attempts <= 1)
 					throw e;
-				if ((e instanceof SerializationFailedException)
-						&& !serializer.equals(HttpInvokerSerializers.DEFAULT_SERIALIZER)) {
+				if ((e instanceof SerializationFailedException) && !httpInvokerRequestExecutor.getSerializer()
+						.equals(HttpInvokerSerializers.DEFAULT_SERIALIZER)) {
 					log.error("Downgrade service[{}] serialization from {} to {}: {}", getServiceInterface().getName(),
-							serializer.getSerializationType(),
+							httpInvokerRequestExecutor.getSerializer().getSerializationType(),
 							HttpInvokerSerializers.DEFAULT_SERIALIZER.getSerializationType(), e.getMessage());
-					setSerializationType(HttpInvokerSerializers.DEFAULT_SERIALIZER.getSerializationType());
+					httpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.DEFAULT_SERIALIZER);
 					RemoteInvocation newInvocation = HttpInvokerSerializers.DEFAULT_SERIALIZER
 							.createRemoteInvocation(methodInvocation);
 					newInvocation.setAttributes(invocation.getAttributes());

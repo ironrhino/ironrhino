@@ -3,16 +3,16 @@ package org.ironrhino.core.remoting.client;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -24,25 +24,16 @@ import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
-import org.springframework.context.i18n.LocaleContext;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.http.HttpHeaders;
-import org.springframework.remoting.httpinvoker.AbstractHttpInvokerRequestExecutor;
-import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
-import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
 import lombok.Getter;
 import lombok.Setter;
 
-public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvokerRequestExecutor {
+public class HttpComponentsHttpInvokerRequestExecutor extends HttpInvokerRequestExecutor {
 
 	private CloseableHttpClient httpClient;
-
-	@Getter
-	@Setter
-	private HttpInvokerSerializer serializer = HttpInvokerSerializers.DEFAULT_SERIALIZER;
 
 	@Getter
 	@Setter
@@ -55,19 +46,20 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 				.build();
 	}
 
+	@PreDestroy
+	public void destroy() {
+		if (httpClient != null)
+			try {
+				httpClient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+
 	@Override
-	protected RemoteInvocationResult doExecuteRequest(HttpInvokerClientConfiguration config, ByteArrayOutputStream baos)
+	protected RemoteInvocationResult doExecuteRequest(String serviceUrl, ByteArrayOutputStream baos)
 			throws IOException {
-		HttpPost postMethod = new HttpPost(config.getServiceUrl());
-		postMethod.setHeader(HTTP_HEADER_CONTENT_TYPE, getContentType());
-		LocaleContext localeContext = LocaleContextHolder.getLocaleContext();
-		if (localeContext != null) {
-			Locale locale = localeContext.getLocale();
-			if (locale != null)
-				postMethod.setHeader(HTTP_HEADER_ACCEPT_LANGUAGE, locale.toLanguageTag());
-		}
-		if (isAcceptGzipEncoding())
-			postMethod.setHeader(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
+		HttpPost postMethod = new HttpPost(serviceUrl);
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
@@ -75,7 +67,16 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 		if (requestChain != null)
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
+		postMethod.setHeader(HTTP_HEADER_CONTENT_TYPE, getSerializer().getContentType());
+		postMethod.setHeader(HTTP_HEADER_CONTENT_LENGTH, Integer.toString(baos.size()));
+		if (isAcceptGzipEncoding())
+			postMethod.setHeader(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
 		postMethod.setEntity(new ByteArrayEntity(baos.toByteArray()));
+		if (getConnectTimeout() >= 0 || getReadTimeout() >= 0) {
+			RequestConfig config = RequestConfig.custom().setConnectTimeout(getConnectTimeout())
+					.setSocketTimeout(getReadTimeout()).build();
+			postMethod.setConfig(config);
+		}
 		CloseableHttpResponse rsp = httpClient.execute(postMethod);
 		try {
 			StatusLine sl = rsp.getStatusLine();
@@ -89,39 +90,15 @@ public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvoke
 			HttpEntity entity = rsp.getEntity();
 			InputStream responseBody = entity.getContent();
 			Header h = rsp.getFirstHeader(HttpHeaders.CONTENT_TYPE);
-			HttpInvokerSerializer serializer = h != null ? HttpInvokerSerializers.ofContentType(h.getValue())
-					: this.serializer;
-			return serializer.readRemoteInvocationResult(decorateInputStream(responseBody));
+			String contentType = h != null ? h.getValue() : null;
+			HttpInvokerSerializer serializer = StringUtils.isNotBlank(contentType)
+					? HttpInvokerSerializers.ofContentType(contentType)
+					: getSerializer();
+			return serializer.readRemoteInvocationResult(responseBody);
 		} finally {
 			rsp.close();
-			postMethod.releaseConnection();
 		}
 
-	}
-
-	@PreDestroy
-	public void destroy() {
-		try {
-			httpClient.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public String getContentType() {
-		return serializer.getContentType();
-	}
-
-	@Override
-	protected void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException {
-		serializer.writeRemoteInvocation(invocation, decorateOutputStream(os));
-	}
-
-	@Override
-	protected RemoteInvocationResult readRemoteInvocationResult(InputStream is, String codebaseUrl)
-			throws IOException, ClassNotFoundException {
-		return serializer.readRemoteInvocationResult(decorateInputStream(is));
 	}
 
 }
