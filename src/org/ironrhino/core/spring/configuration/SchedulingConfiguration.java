@@ -8,8 +8,10 @@ import org.ironrhino.core.util.NameableThreadFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -21,6 +23,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @EnableScheduling
 @EnableAsync(order = -999, proxyTargetClass = true)
 @Configuration
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfigurer {
 
 	@Value("${taskScheduler.poolSize:5}")

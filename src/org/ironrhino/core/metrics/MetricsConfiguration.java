@@ -12,8 +12,10 @@ import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -25,6 +27,7 @@ import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 @Configuration
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @ClassPresentConditional("io.micrometer.core.instrument.Metrics")
 public class MetricsConfiguration {
 

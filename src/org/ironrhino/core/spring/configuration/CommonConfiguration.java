@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.context.annotation.Role;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -42,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Order(0)
 @Configuration
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @PropertySources({
 		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.properties"),
 		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.yaml", factory = YamlPropertySourceFactory.class),

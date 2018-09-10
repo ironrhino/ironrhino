@@ -11,10 +11,12 @@ import java.util.concurrent.ExecutorService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Role;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
@@ -34,6 +36,7 @@ import lombok.Setter;
 import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @Profile({ DUAL, CLUSTER, CLOUD, "redis" })
 @ClassPresentConditional("org.springframework.data.redis.connection.RedisConnectionFactory")
 @Getter

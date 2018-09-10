@@ -7,9 +7,11 @@ import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Role;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.ClassUtils;
@@ -19,6 +21,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 @Slf4j
 public class DataSourceConfiguration {
