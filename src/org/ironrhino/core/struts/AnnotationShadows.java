@@ -31,7 +31,8 @@ public class AnnotationShadows {
 	@Data
 	@NoArgsConstructor
 	public static class UiConfigImpl implements Serializable {
-
+		private static final boolean dictionaryPresent = org.springframework.util.ClassUtils
+				.isPresent("org.ironrhino.common.model.Dictionary", AnnotationShadows.class.getClassLoader());
 		private static final long serialVersionUID = -5963246979386241924L;
 		private Type genericPropertyType;
 		private Class<?> propertyType;
@@ -110,7 +111,9 @@ public class AnnotationShadows {
 				return;
 			if (StringUtils.isNotBlank(config.id()))
 				this.id = config.id();
-			this.type = config.type();
+			// skip dictionary if not present
+			if (!"dictionary".equals(config.type()) || dictionaryPresent)
+				this.type = config.type();
 			this.inputType = config.inputType();
 			this.listKey = config.listKey();
 			this.listValue = config.listValue();

@@ -96,12 +96,8 @@
 						<#assign hasSelect=true>
 						<#assign cellEdit='click,select,rt_select_template_'+key/>
 					<#elseif config.type=='dictionary'>
-						<#if selectDictionary??>
-							<#assign hasSelect=true>
-							<#assign cellEdit='click,select,rt_select_template_'+key/>
-						<#else>
-							<#assign cellEdit='click'/>
-						</#if>	
+						<#assign hasSelect=true>
+						<#assign cellEdit='click,select,rt_select_template_'+key/>
 					</#if>
 				</#if>
 			<#else>
@@ -177,9 +173,9 @@
 			<#if config.multiple>
 				<#if _celleditable>
 				<#assign temp = []>
-				<#if config.type=='dictionary' && selectDictionary??><#assign templateName><@config.templateName?interpret /></#assign><#assign templateName=templateName?markup_string/></#if>
+				<#if config.type=='dictionary'><#assign templateName><@config.templateName?interpret /></#assign><#assign templateName=templateName?markup_string/></#if>
 				<#list value as v>
-				<#if config.type=='dictionary' && selectDictionary??>
+				<#if config.type=='dictionary'>
 				<#assign temp+=[getDictionaryLabel(templateName,v)]/>
 				<#elseif config.type=='enum'>
 				<#assign temp+=[v.name()]/>
@@ -189,7 +185,7 @@
 				</#list>
 				<#assign dynamicAttributes+={'data-cellvalue':temp?join(',')}/>
 				</#if>
-			<#elseif config.type=='dictionary' && selectDictionary??>
+			<#elseif config.type=='dictionary'>
 				<#if _celleditable>
 				<#assign dynamicAttributes+={'data-cellvalue':value}/>
 				</#if>
@@ -237,7 +233,7 @@
 		<@s.select theme="simple" name=entityName+"."+key list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue=""/>
 		</#if>
 		</template>
-		<#elseif config.type=='dictionary' && selectDictionary??>
+		<#elseif config.type=='dictionary'>
 		<template id="rt_select_template_${key}">
 		<#assign templateName><@config.templateName?interpret /></#assign>
 		<#assign templateName=templateName?markup_string/>

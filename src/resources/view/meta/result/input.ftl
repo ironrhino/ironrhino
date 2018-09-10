@@ -57,7 +57,7 @@
 		<#elseif config.type=='multiselect'>
 			<#if readonly><@s.hidden name=name/></#if>
 			<@s.select disabled=readonly id=id label=label name=name class=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
-		<#elseif config.type=='dictionary'&&selectDictionary??>
+		<#elseif config.type=='dictionary'>
 			<@controlGroup id=id group=group label=label description=description for=id>
 				<#if !config.multiple||config.cssClasses?seq_contains('chosen')>
 					<#if readonly><@s.hidden name=name/></#if>
@@ -190,7 +190,7 @@
 						<#elseif config.type=='multiselect'>
 							<#if readonly><@s.hidden name=name/></#if>
 							<@s.select disabled=readonly id="" theme="simple" name=name class=config.cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" multiple=true dynamicAttributes=dynamicAttributes/>
-						<#elseif config.type=='dictionary'&&selectDictionary??>
+						<#elseif config.type=='dictionary'>
 							<#if !config.multiple||config.cssClasses?seq_contains('chosen')>
 								<#if readonly><@s.hidden name=name/></#if>
 								<@selectDictionary disabled=readonly id="" dictionaryName=templateName name=name required=config.required multiple=config.multiple class=config.cssClass dynamicAttributes=dynamicAttributes/>

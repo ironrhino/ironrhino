@@ -8,13 +8,13 @@
 <#if Parameters.tab?has_content>
 		<#if uiConfigs[Parameters.tab]??>
 		<#assign config=uiConfigs[Parameters.tab]>
-		<#if config.type=='checkbox'||config.type=='enum'||selectDictionary??&&config.type=='dictionary'>
+		<#if config.type=='checkbox'||config.type=='enum'||config.type=='dictionary'>
 		<#assign propertyName=Parameters.tab>
 		</#if>
 		</#if>
 <#else>
 <#list uiConfigs as key,value>
-	<#if (value.type=='enum'||selectDictionary??&&value.type=='dictionary')&&!value.multiple>
+	<#if (value.type=='enum'||value.type=='dictionary')&&!value.multiple>
 		<#assign propertyName=key>
 		<#assign config=value>
 		<#break/>
@@ -34,7 +34,7 @@
 	<#list values as value>
 	<li><a href="#${propertyName+'-'+value.name()}" data-toggle="tab">${value}</a></li>
 	</#list>
-	<#elseif selectDictionary??&&config.type=='dictionary'>
+	<#elseif config.type=='dictionary'>
 	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
 	<#list map as key,value>
 	<li><a href="#${propertyName+'-'+key}" data-toggle="tab">${value}</a></li>
@@ -50,7 +50,7 @@
 	<#list values as value>
 	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=${value.name()}"></div>
 	</#list>
-	<#elseif selectDictionary??&&config.type=='dictionary'>
+	<#elseif config.type=='dictionary'>
 	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
 	<#list map as key,value>
 	<div id="${propertyName+'-'+key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}tab=${propertyName}&${propertyName}=${key?url}"></div>

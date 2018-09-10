@@ -339,7 +339,7 @@ ${formFooter!}
 					</#if>
 					<#if value.propertyType.enum>
 					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(value.propertyType) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.genericPropertyType)?join(',')}">${getText(label)}</option>
-					<#elseif value.type='dictionary' && selectDictionary??>
+					<#elseif value.type='dictionary'>
 					<#local templateName><@value.templateName?interpret /></#local>
 					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="<#if value.multiple>CONTAINS,NOTCONTAINS<#else>EQ,NEQ,ISNOTNULL,ISNULL,ISNOTEMPTY,ISEMPTY,IN,NOTIN</#if>">${getText(label)}</option>
 					<#elseif value.type='select'>
@@ -502,7 +502,7 @@ ${formFooter!}
 				<div class="${config.type}-name input-pseudo"></div>
 				</div>
 			</div>
-		<#elseif config.type=='dictionary' && selectDictionary??>
+		<#elseif config.type=='dictionary'>
 			<@controlGroup id=id group=group label=label description=description for=id>
 				<@selectDictionary disabled=disabled id=id dictionaryName=templateName name=key value=value! class=cssClass dynamicAttributes=dynamicAttributes/>
 			</@controlGroup>
