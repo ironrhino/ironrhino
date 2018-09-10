@@ -492,6 +492,8 @@ ${formFooter!}
 			<@s.select disabled=disabled id=id label=label name=key value=value! class=cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='select'>
 			<@s.select disabled=disabled id=id label=label name=key value=value! class=cssClass list=config.listOptions?eval listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+		<#elseif config.type=='dictionary'>
+			<@s.select disabled=disabled id=id label=label name=key value=value! class=cssClass list=beans['dictionaryControl'].getItemsAsMap(templateName) headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='treeselect' && !disabled>
 			<@s.textfield id=id label=label name=key value=value! class='treeselect-inline '+cssClass data\-url=pickUrl dynamicAttributes=dynamicAttributes/>
 		<#elseif (config.type=='listpick' || config.type=='treeselect') && !disabled>
@@ -502,10 +504,6 @@ ${formFooter!}
 				<div class="${config.type}-name input-pseudo"></div>
 				</div>
 			</div>
-		<#elseif config.type=='dictionary'>
-			<@controlGroup id=id group=group label=label description=description for=id>
-				<@selectDictionary disabled=disabled id=id dictionaryName=templateName name=key value=value! class=cssClass dynamicAttributes=dynamicAttributes/>
-			</@controlGroup>
 		<#elseif config.type=='input'>
 			<#if !disabled && config.queryWithRange><#local cssClass+=' not-ignore-blank'/></#if>
 			<@s.textfield disabled=disabled id=id label=label name=key value=value! type=config.inputType class=cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes>

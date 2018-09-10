@@ -237,7 +237,7 @@
 		<template id="rt_select_template_${key}">
 		<#assign templateName><@config.templateName?interpret /></#assign>
 		<#assign templateName=templateName?markup_string/>
-		<@selectDictionary dictionaryName=templateName id=key name=entityName+"."+key required=config.required/>
+		<@s.select theme="simple" name=entityName+"."+key class=config.cssClass list=beans['dictionaryControl'].getItemsAsMap(templateName) headerKey="" headerValue=""/>
 		</template>
 		</#if>
 	</#if>
