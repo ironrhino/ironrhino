@@ -12,6 +12,7 @@ import java.time.YearMonth;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.ironrhino.core.model.NullObject;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
@@ -42,22 +43,52 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class JsonSerializationUtils {
 
-	@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
-	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
-	@JsonIgnoreProperties(value = { "localizedMessage", "cause", "suppressed" }, ignoreUnknown = true)
-	public static abstract class ThrowableMixin {
-		@JsonCreator
-		public ThrowableMixin(@JsonProperty("message") String message) {
-		}
-	}
+	private static final ObjectMapper sharedObjectMapper = createNewObjectMapper();
 
 	public static ObjectMapper createNewObjectMapper() {
 		return createNewObjectMapper(null);
 	}
 
+	public static String serialize(Object object) throws IOException {
+		if (object == null)
+			return null;
+		if (object instanceof Long)
+			return object + "L";
+		else if (object instanceof Float)
+			return object + "F";
+		else if (object instanceof Enum)
+			return object.getClass().getName() + '.' + ((Enum<?>) object).name();
+		return sharedObjectMapper.writeValueAsString(object);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static Object deserialize(String string) throws IOException {
+		if (string == null)
+			return null;
+		if (Character.isDigit(string.charAt(0))) {
+			if (string.endsWith("L"))
+				return Long.valueOf(string.substring(0, string.length() - 1));
+			else if (string.endsWith("F"))
+				return Float.valueOf(string.substring(0, string.length() - 1));
+		}
+		if (Character.isAlphabetic(string.charAt(0)) && Character.isAlphabetic(string.charAt(string.length() - 1))) {
+			int index = string.lastIndexOf('.');
+			if (index > 0) {
+				String clazz = string.substring(0, index);
+				String name = string.substring(index + 1);
+				try {
+					return Enum.valueOf((Class<Enum>) Class.forName(clazz), name);
+				} catch (ClassNotFoundException e) {
+					return null;
+				}
+			}
+		}
+		return sharedObjectMapper.readValue(string, Object.class);
+	}
+
 	public static ObjectMapper createNewObjectMapper(JsonFactory jsonFactory) {
 		return new ObjectMapper(jsonFactory)
-				.enableDefaultTyping(ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
+				.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY)
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 				.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).addMixIn(Throwable.class, ThrowableMixin.class)
@@ -123,7 +154,22 @@ public class JsonSerializationUtils {
 							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
 						jsonGenerator.writeString(duration.toString());
 					}
+				}).addDeserializer(NullObject.class, new JsonDeserializer<NullObject>() {
+					@Override
+					public NullObject deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+							throws IOException, JsonProcessingException {
+						return NullObject.get();
+					}
 				})).setAnnotationIntrospector(SmartJacksonAnnotationIntrospector.INSTANCE);
+	}
+
+	@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
+	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+	@JsonIgnoreProperties(value = { "localizedMessage", "cause", "suppressed" }, ignoreUnknown = true)
+	public static abstract class ThrowableMixin {
+		@JsonCreator
+		public ThrowableMixin(@JsonProperty("message") String message) {
+		}
 	}
 
 	static class SmartJacksonAnnotationIntrospector extends JacksonAnnotationIntrospector {

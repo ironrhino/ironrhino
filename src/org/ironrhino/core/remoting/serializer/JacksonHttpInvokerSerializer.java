@@ -20,6 +20,7 @@ import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -37,7 +38,8 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	private final ObjectMapper objectMapper;
 
 	public JacksonHttpInvokerSerializer(JsonFactory jsonFactory) {
-		objectMapper = JsonSerializationUtils.createNewObjectMapper(jsonFactory);
+		objectMapper = JsonSerializationUtils.createNewObjectMapper(jsonFactory)
+				.enableDefaultTyping(ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY);
 	}
 
 	@Override
