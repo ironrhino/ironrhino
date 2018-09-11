@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring.data.redis;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.util.JsonSerializationUtils;
@@ -38,6 +39,10 @@ public class JsonRedisSerializer<T> implements RedisSerializer<T> {
 		try {
 			if (object == null)
 				return new byte[0];
+			if (object instanceof Long)
+				return (object + "L").getBytes(StandardCharsets.UTF_8);
+			else if (object instanceof Float)
+				return (object + "F").getBytes(StandardCharsets.UTF_8);
 			byte[] bytes = objectMapper.writeValueAsBytes(object);
 			return bytes;
 		} catch (Exception e) {
@@ -49,8 +54,15 @@ public class JsonRedisSerializer<T> implements RedisSerializer<T> {
 	public T deserialize(byte[] bytes) throws SerializationException {
 		if (bytes == null || bytes.length == 0)
 			return null;
+		String string = new String(bytes, StandardCharsets.UTF_8);
+		if (Character.isDigit(string.charAt(0))) {
+			if (string.endsWith("L"))
+				return (T) Long.valueOf(string.substring(0, string.length() - 1));
+			else if (string.endsWith("F"))
+				return (T) Float.valueOf(string.substring(0, string.length() - 1));
+		}
 		try {
-			return (T) objectMapper.readValue(bytes, Object.class);
+			return (T) objectMapper.readValue(string, Object.class);
 		} catch (Exception e) {
 			throw new SerializationException("Cannot deserialize", e);
 		}

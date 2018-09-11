@@ -6,11 +6,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 public class JsonRedisSerializerTest extends RedisSerializerTestBase {
 
 	@Test
-	public void testPrimitive() {
-		// JsonRedisSerializer doesn't supports this
-	}
-
-	@Test
 	public void testSimpleObject() {
 		// JsonRedisSerializer doesn't supports this
 	}
