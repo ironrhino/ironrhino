@@ -86,6 +86,8 @@ public class AppInfo {
 
 	private static final String NODEPATH;
 
+	private static final String IRONRHINO_VERSION;
+
 	static {
 		String temp = CodecUtils.nextId();
 		_instanceId = temp.substring(temp.length() - 10, temp.length());
@@ -192,6 +194,14 @@ public class AppInfo {
 		String featureProfiles = appProperties.getProperty(KEY_APP_FEATUREPROFILES);
 		if (StringUtils.isNotBlank(featureProfiles))
 			setFeatureProfiles(featureProfiles);
+
+		Package pkg = AppInfo.class.getPackage();
+		if (pkg != null && "ironrhino".equals(pkg.getImplementationVendor())
+				&& "ironrhino-core".equals(pkg.getImplementationTitle())) {
+			IRONRHINO_VERSION = pkg.getImplementationVersion();
+		} else {
+			IRONRHINO_VERSION = null;
+		}
 	}
 
 	public static void setAppName(String name) {
@@ -315,6 +325,10 @@ public class AppInfo {
 
 	public static String getHostAddress() {
 		return HOSTADDRESS;
+	}
+
+	public static String getIronrhinoVersion() {
+		return IRONRHINO_VERSION;
 	}
 
 	public static String getServerInfo() {
