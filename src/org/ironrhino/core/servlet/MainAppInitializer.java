@@ -37,6 +37,7 @@ public class MainAppInitializer implements WebApplicationInitializer {
 		AppInfo.initialize();
 		SERVLET_CONTEXT = servletContext;
 		AppInfo.setContextPath(servletContext.getContextPath());
+
 		String context = servletContext.getRealPath("/");
 		if (context == null)
 			context = "";
@@ -44,6 +45,11 @@ public class MainAppInitializer implements WebApplicationInitializer {
 		String defaultProfiles = System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 		logger = LoggerFactory.getLogger(getClass());
 		printVersion(servletContext);
+		String serverInfo = ServletContainerHelper.getServerInfo(servletContext);
+		if (serverInfo != null) {
+			AppInfo.setServerInfo(serverInfo);
+			logger.info("Server info detected: {}", serverInfo);
+		}
 		if (AppInfo.getHttpPort() == 0) {
 			int port = ServletContainerHelper.detectHttpPort(servletContext, false);
 			if (port > 0) {

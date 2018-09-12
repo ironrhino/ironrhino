@@ -21,6 +21,47 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ServletContainerHelper {
 
+	public static String getServerInfo(ServletContext servletContext) {
+		String serverInfo = servletContext.getServerInfo();
+		if (StringUtils.isBlank(serverInfo))
+			return null;
+		if (serverInfo.startsWith("Apache Tomcat/")) {
+			// Apache Tomcat/9.0.11
+			serverInfo = serverInfo.substring(serverInfo.indexOf(' ') + 1);
+		} else if (serverInfo.startsWith("jetty/")) {
+			// jetty/9.4.z-SNAPSHOT
+			// jetty/9.4.8.v20171121
+			int index = serverInfo.indexOf('-');
+			if (index > 0)
+				serverInfo = serverInfo.substring(0, index);
+			else
+				serverInfo = serverInfo.substring(0, serverInfo.lastIndexOf('.'));
+			serverInfo = StringUtils.capitalize(serverInfo);
+		} else if (serverInfo.startsWith("WildFly ")) {
+			// WildFly Servlet 14.0.1.Final (WildFly Core 6.0.2.Final) - 2.0.13.Final
+			// WildFly Full 14.0.1.Final (WildFly Core 6.0.2.Final) - 2.0.13.Final
+			String[] arr = serverInfo.split("\\s");
+			String version = arr[2];
+			if (version.endsWith(".Final"))
+				version = version.substring(0, version.lastIndexOf('.'));
+			serverInfo = arr[0] + '/' + version;
+		} else if (serverInfo.startsWith("GlassFish ")) {
+			// GlassFish Server Open Source Edition 5.0.1
+			String[] arr = serverInfo.split("\\s");
+			serverInfo = arr[0] + '/' + arr[arr.length - 1];
+		} else if (serverInfo.startsWith("Resin/")) {
+			// Resin/4.0.55
+		} else if (serverInfo.startsWith("WebLogic ")) {
+			// WebLogic Server 12.2.1.2.0 Mon Oct 3 04:35:36 PDT 2016 1827450
+			String[] arr = serverInfo.split("\\s");
+			serverInfo = arr[0] + '/' + arr[2];
+		} else if (serverInfo.startsWith("IBM WebSphere")) {
+			// IBM WebSphere Liberty/18.0.0.2
+			serverInfo = "WebSphere" + serverInfo.substring(serverInfo.lastIndexOf('/'));
+		}
+		return serverInfo;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static int detectHttpPort(ServletContext servletContext, boolean ssl) {
 		String className = servletContext.getClass().getName();

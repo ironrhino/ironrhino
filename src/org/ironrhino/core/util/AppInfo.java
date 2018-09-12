@@ -68,6 +68,8 @@ public class AppInfo {
 
 	private static String version = "1.0.0";
 
+	private static String serverInfo;
+
 	private static int httpPort = 0;
 
 	private static int httpsPort = 0;
@@ -220,6 +222,10 @@ public class AppInfo {
 		AppInfo.version = version;
 	}
 
+	public static void setServerInfo(String serverInfo) {
+		AppInfo.serverInfo = serverInfo;
+	}
+
 	public static void setHttpPort(int httpPort) {
 		AppInfo.httpPort = httpPort;
 	}
@@ -309,6 +315,10 @@ public class AppInfo {
 
 	public static String getHostAddress() {
 		return HOSTADDRESS;
+	}
+
+	public static String getServerInfo() {
+		return serverInfo;
 	}
 
 	public static int getHttpPort() {
