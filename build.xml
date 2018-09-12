@@ -39,13 +39,11 @@
 	<target name="compile">
 		<antcall target="clean" />
 		<antcall target="init" />
-		<replace file="${src.dir}/org/ironrhino/core/Version.java" token="$VERSION$" value="${version}" />
 		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${src.dir}" destdir="${classes.dir}" encoding="utf-8">
 			<compilerarg line="-Xlint:unchecked" />
-			<compilerarg value="-parameters" />
+			<compilerarg value="-parameters"/>
 			<classpath refid="lib.classpath" />
 		</javac>
-		<replace file="${src.dir}/org/ironrhino/core/Version.java" token="${version}" value="$VERSION$" />
 		<copy todir="${classes.dir}">
 			<fileset dir="${src.dir}">
 				<exclude name="**/*.java" />
@@ -57,7 +55,7 @@
 		<mkdir dir="${test.classes.dir}" />
 		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${test.src.dir}" destdir="${test.classes.dir}" encoding="UTF-8">
 			<compilerarg line="-Xlint:unchecked" />
-			<compilerarg value="-parameters" />
+			<compilerarg value="-parameters"/>
 			<classpath>
 				<path refid="lib.classpath" />
 				<pathelement location="${classes.dir}" />
