@@ -64,11 +64,15 @@ public class RedisCacheManager implements CacheManager {
 			Long.class);
 
 	@PostConstruct
-	public void init() throws Exception {
+	public void init() {
 		String defaultSerializerClass = env.getProperty(DEFAULT_SERIALIZER);
 		if (StringUtils.isNotBlank(defaultSerializerClass)) {
-			cacheRedisTemplate.setValueSerializer((RedisSerializer) BeanUtils.instantiateClass(
-					ClassUtils.forName(defaultSerializerClass, RedisCacheManager.class.getClassLoader())));
+			try {
+				cacheRedisTemplate.setValueSerializer((RedisSerializer) BeanUtils.instantiateClass(
+						ClassUtils.forName(defaultSerializerClass, RedisCacheManager.class.getClassLoader())));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			cacheRedisTemplate.setValueSerializer(new FallbackToStringSerializer());
 		}
