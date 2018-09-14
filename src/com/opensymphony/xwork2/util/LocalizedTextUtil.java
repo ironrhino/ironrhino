@@ -31,8 +31,6 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,7 +82,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author tm_jee
  * @version $Date$ $Id$
  */
-@SuppressWarnings({ "rawtypes" , "unchecked" })
 public class LocalizedTextUtil {
 
     private static final List<String> DEFAULT_RESOURCE_BUNDLES = new CopyOnWriteArrayList<String>();
@@ -317,7 +314,7 @@ public class LocalizedTextUtil {
      *
      * @see #findText(Class aClass, String aTextName, Locale locale, String defaultMessage, Object[] args)
      */
-    public static String findText(Class aClass, String aTextName, Locale locale) {
+    public static String findText(Class<?> aClass, String aTextName, Locale locale) {
         return findText(aClass, aTextName, locale, aTextName, new Object[0]);
     }
 
@@ -359,7 +356,7 @@ public class LocalizedTextUtil {
      *                       resource bundle
      * @return the localized text, or null if none can be found and no defaultMessage is provided
      */
-    public static String findText(Class aClass, String aTextName, Locale locale, String defaultMessage, Object[] args) {
+    public static String findText(Class<?> aClass, String aTextName, Locale locale, String defaultMessage, Object[] args) {
         ValueStack valueStack = ActionContext.getContext().getValueStack();
         return findText(aClass, aTextName, locale, defaultMessage, args, valueStack);
 
@@ -407,7 +404,7 @@ public class LocalizedTextUtil {
      *                       one in the ActionContext ThreadLocal
      * @return the localized text, or null if none can be found and no defaultMessage is provided
      */
-    public static String findText(Class aClass, String aTextName, Locale locale, String defaultMessage, Object[] args,
+    public static String findText(Class<?> aClass, String aTextName, Locale locale, String defaultMessage, Object[] args,
                                   ValueStack valueStack) {
         String indexedTextName = null;
         if (aTextName == null) {
@@ -465,7 +462,7 @@ public class LocalizedTextUtil {
                         PropertyDescriptor propertyDescriptor = ReflectionProviderFactory.getInstance().getPropertyDescriptor(actionObj.getClass(), prop);
 
                         if (propertyDescriptor != null) {
-                            Class clazz = propertyDescriptor.getPropertyType();
+                            Class<?> clazz = propertyDescriptor.getPropertyType();
 
                             if (clazz != null) {
                                 if (obj != null)
@@ -667,7 +664,7 @@ public class LocalizedTextUtil {
      * Traverse up class hierarchy looking for message.  Looks at class, then implemented interface,
      * before going up hierarchy.
      */
-    private static String findMessage(Class clazz, String key, String indexedKey, Locale locale, Object[] args, Set<String> checked,
+    private static String findMessage(Class<?> clazz, String key, String indexedKey, Locale locale, Object[] args, Set<String> checked,
                                       ValueStack valueStack) {
         if (checked == null) {
             checked = new TreeSet<String>();
@@ -691,9 +688,9 @@ public class LocalizedTextUtil {
         }
 
         // look in properties of implemented interfaces
-        Class[] interfaces = clazz.getInterfaces();
+        Class<?>[] interfaces = clazz.getInterfaces();
 
-        for (Class anInterface : interfaces) {
+        for (Class<?> anInterface : interfaces) {
             msg = getMessage(anInterface.getName(), locale, key, valueStack, args);
 
             if (msg != null) {
@@ -713,7 +710,7 @@ public class LocalizedTextUtil {
         if (clazz.isInterface()) {
             interfaces = clazz.getInterfaces();
 
-            for (Class anInterface : interfaces) {
+            for (Class<?> anInterface : interfaces) {
                 msg = findMessage(anInterface, key, indexedKey, locale, args, checked, valueStack);
 
                 if (msg != null) {
@@ -744,11 +741,11 @@ public class LocalizedTextUtil {
                 }
                 if (!reloaded) {
                     bundlesMap.clear();
-                    clearMap(ResourceBundle.class, null, "cacheList");
+                    ResourceBundle.clearCache();
                     // now, for the true and utter hack, if we're running in tomcat, clear
                     // it's class loader resource cache as well.
                     clearTomcatCache();
-                    if(context!=null)
+                    if(context != null)
                         context.put(RELOADED, true);
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Resource bundles reloaded");
@@ -760,45 +757,30 @@ public class LocalizedTextUtil {
         }
     }
 
-
     private static void clearTomcatCache() {
-    	ClassLoader loader = Thread.currentThread().getContextClassLoader();
-	    // no need for compilation here.
-	    Class cl = loader.getClass();
-	
-	    try {
-	        if ("org.apache.catalina.loader.WebappClassLoader".equals(cl.getName())) {
-	            clearMap(cl, loader, TOMCAT_RESOURCE_ENTRIES_FIELD);
-	        } else {
-	            LOG.debug("Class loader {} is not tomcat loader.", cl.getName());
-	        }
-	    } catch (NoSuchFieldException nsfe) {
-	        if ("org.apache.catalina.loader.WebappClassLoaderBase".equals(cl.getSuperclass().getName())) {
-	            LOG.debug("Base class {} doesn't contain '{}' field, trying with parent!", cl.getName(), TOMCAT_RESOURCE_ENTRIES_FIELD, nsfe);
-	            try {
-	                clearMap(cl.getSuperclass(), loader, TOMCAT_RESOURCE_ENTRIES_FIELD);
-	            } catch (Exception e) {
-	                LOG.warn("Couldn't clear tomcat cache using {}", cl.getSuperclass().getName(), e);
-	            }
-	        }
-	    } catch (Exception e) {
-	  	    LOG.warn("Couldn't clear tomcat cache", cl.getName(), e);
-	    }
-    }
-
-
-    private static void clearMap(Class cl, Object obj, String name)
-            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-
-        Field field = cl.getDeclaredField(name);
-        field.setAccessible(true);
-
-        Object cache = field.get(obj);
-
-        synchronized (cache) {
-            Class ccl = cache.getClass();
-            Method clearMethod = ccl.getMethod("clear");
-            clearMethod.invoke(cache);
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        Class<?> cl = loader.getClass();
+        try {
+            Field field = null;
+            try {
+                if ("org.apache.catalina.loader.WebappClassLoaderBase".equals(cl.getSuperclass().getName())) {
+                    // Tomcat 8.0 +
+                    field = cl.getSuperclass().getDeclaredField(TOMCAT_RESOURCE_ENTRIES_FIELD);
+                }
+            } catch (NoSuchFieldException nsfe) {
+                if ("org.apache.catalina.loader.WebappClassLoader".equals(cl.getName())) {
+                    field = cl.getDeclaredField(TOMCAT_RESOURCE_ENTRIES_FIELD);
+                }
+            } 
+            if(field != null) {
+                field.setAccessible(true);
+                Map<?,?> cache = (Map<?,?>)field.get(loader);
+                synchronized (cache) {
+                    cache.clear();
+                }
+            }
+        } catch(Throwable ex) {
+            ex.printStackTrace();
         }
     }
 

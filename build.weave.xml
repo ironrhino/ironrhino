@@ -2,7 +2,7 @@
 <project name="ironrhino-weave" default="weave" basedir=".">
 
 	<property name="struts2.version" value="2.4.16" />
-	<property name="ognl.version" value="3.1.14" />
+	<property name="ognl.version" value="3.1.17" />
 	<property name="src.dir" location="${basedir}/src" />
 	<property name="webapp.dir" location="${basedir}/webapp" />
 	<property name="classes.dir" location="${webapp.dir}/WEB-INF/classes" />
