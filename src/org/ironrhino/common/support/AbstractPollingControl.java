@@ -2,7 +2,6 @@ package org.ironrhino.common.support;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -16,13 +15,14 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.common.model.BasePollingEntity;
 import org.ironrhino.common.model.PollingStatus;
-import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -44,9 +44,6 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 
 	@Autowired
 	protected EntityManager<T> entityManager;
-
-	@Autowired
-	private LockService lockService;
 
 	@Autowired
 	protected StringRedisTemplate stringRedisTemplate;
@@ -85,7 +82,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 
 	protected String conditionalUpdateStatusHql;
 
-	protected final AtomicInteger count = new AtomicInteger();
+	protected final AtomicInteger cycles = new AtomicInteger();
 
 	public AbstractPollingControl() {
 		@SuppressWarnings("unchecked")
@@ -111,96 +108,78 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 	public void enqueue() {
 		if (!isRunning() || threadPoolExecutor.isShutdown())
 			return;
-		threadPoolExecutor.execute(() -> {
-			String enqueueLockName = getQueueName() + ".enqueue()";
-			count.incrementAndGet();
-			if (lockService.tryLock(enqueueLockName)) {
-				try {
-					doEnqueue();
-				} finally {
-					lockService.unlock(enqueueLockName);
-				}
-			}
-		});
+		threadPoolExecutor.execute(this::doEnqueue);
 	}
 
 	protected void doEnqueue() {
-		int current = count.get();
+		cycles.incrementAndGet();
+		int current = cycles.get();
 		entityManager.setEntityClass(entityClass);
-		doEnqueueNormal();
+
+		// normal
+		DetachedCriteria dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("status", PollingStatus.INITIALIZED));
+		doEnqueue(dc, Mode.NORMAL);
+
 		if (current % 5 == 1) {
-			doEnqueueRetryable();
+			// normal retryable
+			for (int attempts = 1; attempts < getMaxAttempts(); attempts++) {
+				dc = entityManager.detachedCriteria();
+				dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
+				dc.add(Restrictions.eq("attempts", attempts));
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * attempts);
+				dc.add(Restrictions.lt("modifyDate", cal.getTime()));
+				doEnqueue(dc, Mode.RETRIED);
+			}
+			// abnormal retryable
+			dc = entityManager.detachedCriteria();
+			dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
+			dc.add(Restrictions.ge("attempts", getMaxAttempts()));
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * getMaxAttempts());
+			dc.add(Restrictions.lt("modifyDate", cal.getTime()));
+			doEnqueue(dc, Mode.RETRIED);
 		}
 		if (current % 10 == 1) {
 			// resubmit entities which status are PROCESSING, maybe caused by jvm killed
-			doEnqueueResubmittable();
-		}
-	}
-
-	protected void doEnqueueNormal() {
-		DetachedCriteria dc = entityManager.detachedCriteria();
-		dc.add(Restrictions.eq("status", PollingStatus.INITIALIZED));
-		dc.addOrder(Order.asc("createDate"));
-		entityManager.iterate(batchSize, (entities, session) -> {
-			for (T entity : entities) {
-				entity.setStatus(PollingStatus.PROCESSING);
-				entity.setModifyDate(new Date());
-				session.update(entity);
-			}
-		}, entities -> {
-			// enqueue after commit status change
-			push(Arrays.stream(entities).map(entity -> {
-				logger.info("enqueue {}", entity);
-				return entity.getId();
-			}).collect(Collectors.toList()), false);
-		}, dc);
-	}
-
-	protected void doEnqueueRetryable() {
-		for (int attempts = 1; attempts < getMaxAttempts(); attempts++) {
-			DetachedCriteria dc = entityManager.detachedCriteria();
-			dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
-			dc.add(Restrictions.eq("attempts", attempts));
-			dc.addOrder(Order.asc("createDate"));
+			dc = entityManager.detachedCriteria();
+			dc.add(Restrictions.eq("status", PollingStatus.PROCESSING));
 			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * attempts);
+			cal.add(Calendar.SECOND, -getResubmitIntervalInSeconds());
 			dc.add(Restrictions.lt("modifyDate", cal.getTime()));
-			entityManager.iterate(10, (entities, session) -> {
-				push(Arrays.stream(entities).map(entity -> {
-					logger.info("enqueue {} retried", entity);
-					return entity.getId();
-				}).collect(Collectors.toList()), true);
-			}, dc);
+			doEnqueue(dc, Mode.RESUBMITTED);
 		}
-		// abnormal retryable polling
-		DetachedCriteria dc = entityManager.detachedCriteria();
-		dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
-		dc.add(Restrictions.ge("attempts", getMaxAttempts()));
-		dc.addOrder(Order.asc("createDate"));
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * getMaxAttempts());
-		dc.add(Restrictions.lt("modifyDate", cal.getTime()));
-		entityManager.iterate(10, (entities, session) -> {
-			push(Arrays.stream(entities).map(entity -> {
-				logger.info("enqueue {} retried", entity);
-				return entity.getId();
-			}).collect(Collectors.toList()), true);
-		}, dc);
 	}
 
-	protected void doEnqueueResubmittable() {
-		DetachedCriteria dc = entityManager.detachedCriteria();
-		dc.add(Restrictions.eq("status", PollingStatus.PROCESSING));
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, -getResubmitIntervalInSeconds());
-		dc.add(Restrictions.lt("modifyDate", cal.getTime()));
+	protected void doEnqueue(DetachedCriteria dc, Mode mode) {
 		dc.addOrder(Order.asc("createDate"));
-		entityManager.iterate(batchSize, (entities, session) -> {
-			push(Arrays.stream(entities).map(entity -> {
-				logger.info("enqueue {} resubmitted", entity);
+		dc.setLockMode(LockMode.UPGRADE_SKIPLOCKED);
+		String s = "enqueue {}";
+		if (mode != Mode.NORMAL)
+			s = s + ' ' + mode.name().toLowerCase();
+		String message = s;
+		while (true) {
+			List<T> updatedEntities = entityManager.execute(session -> {
+				session.setJdbcBatchSize(batchSize);
+				Criteria c = dc.getExecutableCriteria(session);
+				c.setMaxResults(batchSize);
+				@SuppressWarnings("unchecked")
+				List<T> entities = c.list();
+				for (T entity : entities) {
+					entity.setStatus(PollingStatus.PROCESSING);
+					entity.setModifyDate(new Date());
+					session.update(entity);
+				}
+				return entities;
+			});
+			if (updatedEntities.isEmpty())
+				break;
+			push(updatedEntities.stream().map(entity -> {
+				logger.info(message, entity);
 				return entity.getId();
-			}).collect(Collectors.toList()), true);
-		}, dc);
+			}).collect(Collectors.toList()), mode != Mode.NORMAL);
+		}
 	}
 
 	@Scheduled(fixedDelayString = "${pollingControl.dequeue.fixedDelay:10000}")
@@ -312,6 +291,10 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 	public void stop(Runnable runnable) {
 		stop();
 		runnable.run();
+	}
+
+	static enum Mode {
+		NORMAL, RETRIED, RESUBMITTED;
 	}
 
 }
