@@ -11,8 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.RestStatus;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -129,9 +132,17 @@ public class RestExceptionHandler {
 			return rs;
 		}
 		log.error(ex.getMessage(), ex);
-		if (oldStatus == HttpServletResponse.SC_OK)
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		return RestStatus.valueOf(RestStatus.CODE_INTERNAL_SERVER_ERROR, ex.getMessage());
+		ResponseStatus rs = AnnotatedElementUtils.findMergedAnnotation(ex.getClass(), ResponseStatus.class);
+		if (rs != null) {
+			if (oldStatus == HttpServletResponse.SC_OK)
+				response.setStatus(rs.value().value());
+			return RestStatus.valueOf(rs.value().name(),
+					StringUtils.isNotBlank(rs.reason()) ? rs.reason() : ex.getMessage());
+		} else {
+			if (oldStatus == HttpServletResponse.SC_OK)
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return RestStatus.valueOf(RestStatus.CODE_INTERNAL_SERVER_ERROR, ex.getMessage());
+		}
 	}
 
 }

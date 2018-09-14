@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -120,8 +121,13 @@ public class ApiDoc implements Serializable {
 				so.setMessage(hs.getReasonPhrase());
 			this.statuses.add(so);
 		}
-		if (!has2xx)
-			this.statuses.add(0, new StatusObject(HttpStatus.OK));
+		if (!has2xx) {
+			ResponseStatus rs = AnnotatedElementUtils.findMergedAnnotation(apiDocMethod, ResponseStatus.class);
+			if (rs != null)
+				this.statuses.add(0, new StatusObject(rs.value()));
+			else
+				this.statuses.add(0, new StatusObject(HttpStatus.OK));
+		}
 
 		Authorize authorize = method.getAnnotation(Authorize.class);
 		if (authorize == null)
