@@ -42,7 +42,7 @@ public class ApiDocInspector {
 
 	public Map<String, List<ApiModuleObject>> getApiModules() {
 		if (apiModules == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
-			ComponentScan cs = AnnotatedElementUtils.findMergedAnnotation(apiConfig.getClass(), ComponentScan.class);
+			ComponentScan cs = AnnotatedElementUtils.getMergedAnnotation(apiConfig.getClass(), ComponentScan.class);
 			String[] basePackages = cs != null ? cs.basePackages() : new String[0];
 			if (basePackages.length == 0)
 				basePackages = new String[] { apiConfig.getClass().getPackage().getName() };

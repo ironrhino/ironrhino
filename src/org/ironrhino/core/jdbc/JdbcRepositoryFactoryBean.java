@@ -35,6 +35,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -184,9 +185,9 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 					"No sql found for method: " + jdbcRepositoryClass.getName() + "." + methodName + "()");
 		SqlVerb sqlVerb = SqlVerb.parseBySql(sql);
 		if (sqlVerb == null) {
-			Transactional transactional = AnnotationUtils.findAnnotation(method, Transactional.class);
+			Transactional transactional = AnnotatedElementUtils.findMergedAnnotation(method, Transactional.class);
 			if (transactional == null)
-				transactional = AnnotationUtils.findAnnotation(jdbcRepositoryClass, Transactional.class);
+				transactional = AnnotatedElementUtils.findMergedAnnotation(jdbcRepositoryClass, Transactional.class);
 			if (transactional != null && transactional.readOnly()) {
 				sqlVerb = SqlVerb.SELECT;
 			}
