@@ -48,8 +48,8 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 			if (entities.isEmpty())
 				break;
 			try {
-				Map<T, Result> results = Metrics.recordTimer("polling." + entityClass.getName(),
-						() -> handle(entities), "batch", "true");
+				Map<T, Result> results = Metrics.recordTimer("polling." + entityClass.getName(), () -> handle(entities),
+						"batch", "true");
 				for (T entity : entities) {
 					Result obj = results.get(entity);
 					if (obj == null) {
@@ -69,13 +69,13 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 						sb.append(" where t.id=?1 and t.status=?2");
 						final String hql = sb.toString();
 						Query query = session.createQuery(hql);
-						query.setParameter(String.valueOf(1), entity.getId());
-						query.setParameter(String.valueOf(2), entity.getStatus());
-						query.setParameter(String.valueOf(3), PollingStatus.SUCCESSFUL);
-						query.setParameter(String.valueOf(4), new Date());
+						query.setParameter(1, entity.getId());
+						query.setParameter(2, entity.getStatus());
+						query.setParameter(3, PollingStatus.SUCCESSFUL);
+						query.setParameter(4, new Date());
 						int index = 5;
 						for (String field : fields.keySet())
-							query.setParameter(String.valueOf(index++), fields.get(field));
+							query.setParameter(index++, fields.get(field));
 						int ret = query.executeUpdate();
 						if (ret == 1) {
 							afterUpdated(session, entity);

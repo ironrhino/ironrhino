@@ -48,13 +48,13 @@ public abstract class BasePollingControl<T extends BasePollingEntity> extends Ab
 				entityManager.execute(session -> {
 					@SuppressWarnings("rawtypes")
 					Query query = session.createQuery(hql);
-					query.setParameter(String.valueOf(1), entity.getId());
-					query.setParameter(String.valueOf(2), entity.getStatus());
-					query.setParameter(String.valueOf(3), PollingStatus.SUCCESSFUL);
-					query.setParameter(String.valueOf(4), new Date());
+					query.setParameter(1, entity.getId());
+					query.setParameter(2, entity.getStatus());
+					query.setParameter(3, PollingStatus.SUCCESSFUL);
+					query.setParameter(4, new Date());
 					int index = 5;
 					for (String field : fields.keySet())
-						query.setParameter(String.valueOf(index++), fields.get(field));
+						query.setParameter(index++, fields.get(field));
 					int result = query.executeUpdate();
 					if (result == 1) {
 						afterUpdated(session, entity);
