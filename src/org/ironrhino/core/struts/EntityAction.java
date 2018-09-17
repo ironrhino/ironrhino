@@ -30,6 +30,7 @@ import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.Subselect;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -204,18 +205,22 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public ReadonlyImpl getReadonly() {
 		if (_readonly == null) {
+			if (getEntityClass().isAnnotationPresent(Immutable.class)) {
+				_readonly = new ReadonlyImpl();
+				_readonly.setValue(true);
+				return _readonly;
+			}
+			if (getEntityClass().isAnnotationPresent(Subselect.class)) {
+				_readonly = new ReadonlyImpl();
+				_readonly.setValue(true);
+				return _readonly;
+			}
 			Richtable rconfig = getClass().getAnnotation(Richtable.class);
 			if (rconfig == null)
 				rconfig = getEntityClass().getAnnotation(Richtable.class);
 			Readonly rc = null;
 			if (rconfig != null)
 				rc = rconfig.readonly();
-			Immutable immutable = getEntityClass().getAnnotation(Immutable.class);
-			if (immutable != null) {
-				_readonly = new ReadonlyImpl();
-				_readonly.setValue(true);
-				return _readonly;
-			}
 			if (isAppendOnly() && rc == null) {
 				_readonly = new ReadonlyImpl();
 				_readonly.setValue(false);
