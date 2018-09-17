@@ -31,9 +31,11 @@ import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.ironrhino.common.model.Gender;
 import org.ironrhino.core.model.ResultPage;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -108,6 +110,31 @@ public class EntityManagerTest {
 		assertFalse(entityManager.exists(person.getId()));
 		assertNull(entityManager.findByNaturalId("test"));
 
+	}
+
+	@Test(expected = ObjectOptimisticLockingFailureException.class)
+	public void testVersion() {
+		entityManager.setEntityClass(Person.class);
+		Person person = new Person();
+		person.setName("test");
+		person.setCode("9527");
+		person.setGender(Gender.MALE);
+		person.setDateOfBirth(new Date());
+		assertEquals(-1, person.getVersion());
+		entityManager.save(person);
+		assertEquals(0, person.getVersion());
+		person.setCreateDate(new Date());
+		entityManager.save(person);
+		assertEquals(1, person.getVersion());
+		entityManager.save(person);
+		assertEquals(2, person.getVersion());
+		entityManager.execute(session -> {
+			Person p = session.get(Person.class, person.getId());
+			assertEquals(2, p.getVersion());
+			p.setVersion(p.getVersion() - 1);
+			session.update(p);
+			return null;
+		});
 	}
 
 	@Test
@@ -226,7 +253,6 @@ public class EntityManagerTest {
 		entityManager.executeUpdate("delete from Person p where p.gender=:gender", args);
 		males = entityManager.find("from Person p where p.gender=:gender", args);
 		assertEquals(0, males.size());
-		clearData();
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
@@ -269,7 +295,6 @@ public class EntityManagerTest {
 		assertEquals("test0", males4.get(0).getName());
 		assertEquals("code0", males4.get(0).getCode());
 		assertEquals(Gender.MALE, males4.get(0).getGender());
-		clearData();
 	}
 
 	@Test
@@ -282,7 +307,6 @@ public class EntityManagerTest {
 			return q.uniqueResult();
 		});
 		assertEquals("test0", person.getName());
-		clearData();
 	}
 
 	@Test
@@ -361,7 +385,6 @@ public class EntityManagerTest {
 		}, dc, true);
 		assertEquals(9, count);
 
-		clearData();
 	}
 
 	private void prepareData() {
@@ -377,7 +400,8 @@ public class EntityManagerTest {
 		}
 	}
 
-	private void clearData() {
+	@After
+	public void clearData() {
 		entityManager.executeUpdate("delete from Person p");
 	}
 

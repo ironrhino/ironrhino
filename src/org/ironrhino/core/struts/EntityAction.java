@@ -985,10 +985,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			try {
 				String versionPropertyName = getVersionPropertyName();
+				boolean forceOverride = false;
 				if (versionPropertyName != null) {
 					Object versionInDb = bwp.getPropertyValue(versionPropertyName);
 					Object versionInUi = bw.getPropertyValue(versionPropertyName);
-					boolean forceOverride = versionInUi == null
+					forceOverride = versionInUi == null
 							|| versionInUi instanceof Number && ((Number) versionInUi).intValue() < 0;
 					if (!forceOverride && !Objects.equals(versionInDb, versionInUi)) {
 						addActionError(getText("validation.version.conflict"));
@@ -1009,8 +1010,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						propertyName = propertyName.substring(0, propertyName.indexOf('.'));
 					if (propertyName.indexOf('[') > 0)
 						propertyName = propertyName.substring(0, propertyName.indexOf('['));
-					if (propertyName.equals(versionPropertyName))
+					if (propertyName.equals(versionPropertyName)) {
+						if (!forceOverride)
+							editedPropertyNames.add(propertyName);
 						continue;
+					}
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
 					if ((propertyName.endsWith("FileName") || propertyName.endsWith("ContentType"))
 							&& bwp.isWritableProperty(propertyName)

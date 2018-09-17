@@ -15,6 +15,7 @@ import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
@@ -45,6 +46,9 @@ public class Person extends BaseEntity {
 	@Column(nullable = false)
 	@CreationTimestamp
 	private Date createDate;
+
+	@Version
+	private int version = -1;
 
 	transient List<String> lifyCycleEvents = new ArrayList<>();
 
