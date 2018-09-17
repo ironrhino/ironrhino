@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.hibernate.proxy.HibernateProxy;
 import org.ironrhino.core.metadata.Param;
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.framework.Advised;
@@ -117,8 +118,8 @@ public class ReflectionUtils {
 	}
 
 	public static Class<?> getActualClass(Class<?> clazz) {
-		if (ProxyObject.class.isAssignableFrom(clazz) || SpringProxy.class.isAssignableFrom(clazz)
-				|| clazz.getName().contains("$$EnhancerBySpringCGLIB$$")) {
+		if (ProxyObject.class.isAssignableFrom(clazz) || HibernateProxy.class.isAssignableFrom(clazz)
+				|| SpringProxy.class.isAssignableFrom(clazz) || clazz.getName().contains("$$EnhancerBySpringCGLIB$$")) {
 			clazz = clazz.getSuperclass();
 			return getActualClass(clazz);
 		} else {
