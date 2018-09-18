@@ -62,7 +62,7 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.registerMbeans:false}")
 	private boolean registerMbeans;
 
-	@Bean(destroyMethod = "close")
+	@Bean
 	@Primary
 	public DataSource dataSource() {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT

@@ -50,7 +50,7 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 		return threadPoolTaskScheduler;
 	}
 
-	@Bean(destroyMethod = "shutdown")
+	@Bean
 	public ExecutorService taskExecutorThreadPool() {
 		return Executors.newFixedThreadPool(taskExecutorPoolSize, new NameableThreadFactory("taskExecutor"));
 	}
