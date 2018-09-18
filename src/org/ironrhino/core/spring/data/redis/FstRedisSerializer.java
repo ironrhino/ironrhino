@@ -1,6 +1,5 @@
 package org.ironrhino.core.spring.data.redis;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.nustaq.serialization.FSTConfiguration;
@@ -28,8 +27,7 @@ public class FstRedisSerializer<T> implements RedisSerializer<T> {
 		try {
 			return (T) conf.asObject(bytes);
 		} catch (Exception e) {
-			if (e instanceof IOException && e.getCause() instanceof NullPointerException
-					&& org.ironrhino.core.util.StringUtils.isUtf8(bytes))
+			if (e.getCause() instanceof NullPointerException && org.ironrhino.core.util.StringUtils.isUtf8(bytes))
 				return (T) new String(bytes, StandardCharsets.UTF_8);
 			throw new SerializationException("Cannot deserialize", e);
 		}

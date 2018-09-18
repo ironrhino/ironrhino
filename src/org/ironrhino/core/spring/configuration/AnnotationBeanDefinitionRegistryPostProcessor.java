@@ -106,12 +106,17 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 					String factoryBeanClassName = fbd.getBeanClassName();
 					if (factoryBeanClassName != null) {
 						Class<?> factoryBeanClass = Class.forName(factoryBeanClassName);
-						Method m = org.springframework.util.ReflectionUtils.findMethod(factoryBeanClass,
-								rbd.getFactoryMethodName());
-						if (m.isAnnotationPresent(Fallback.class))
-							return false;
-						beanClass = m.getReturnType();
-						beanClassName = beanClass.getName();
+						String factoryMethodName = rbd.getFactoryMethodName();
+						if (factoryMethodName != null) {
+							Method m = org.springframework.util.ReflectionUtils.findMethod(factoryBeanClass,
+									factoryMethodName);
+							if (m != null) {
+								if (m.isAnnotationPresent(Fallback.class))
+									return false;
+								beanClass = m.getReturnType();
+								beanClassName = beanClass.getName();
+							}
+						}
 					}
 				}
 			} else {

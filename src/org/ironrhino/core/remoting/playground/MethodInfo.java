@@ -1,15 +1,12 @@
 package org.ironrhino.core.remoting.playground;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import lombok.Data;
 
 @Data
-public class MethodInfo implements Serializable {
-
-	private static final long serialVersionUID = 1311380262742909281L;
+public class MethodInfo {
 
 	private Method method;
 

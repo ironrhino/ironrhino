@@ -30,7 +30,8 @@ public abstract class FallbackSupportMethodInterceptorFactoryBean extends Method
 							try {
 								Class<?> objectType = getObjectType();
 								this.fallback = ctx.getBean(beanName, objectType);
-								log.info("Pick bean {} as fallback of {}", beanName, objectType.getName());
+								log.info("Pick bean {} as fallback of {}", beanName,
+										objectType != null ? objectType.getName() : "Unknown");
 								break;
 							} catch (BeansException e) {
 								continue;
@@ -46,8 +47,6 @@ public abstract class FallbackSupportMethodInterceptorFactoryBean extends Method
 			throw ex;
 		}
 	}
-
-	protected abstract Object doInvoke(MethodInvocation methodInvocation) throws Throwable;
 
 	protected abstract boolean shouldFallBackFor(Throwable ex);
 

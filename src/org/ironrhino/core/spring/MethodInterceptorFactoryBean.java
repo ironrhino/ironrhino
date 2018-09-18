@@ -41,8 +41,10 @@ public abstract class MethodInterceptorFactoryBean
 	@Override
 	public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
-		if (AopUtils.isToStringMethod(methodInvocation.getMethod()))
-			return "Dynamic proxy for [" + getObjectType().getName() + "]";
+		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
+			Class<?> objectType = getObjectType();
+			return "Dynamic proxy for [" + (objectType != null ? objectType.getName() : "Unknown") + "]";
+		}
 		if (method.isDefault())
 			return ReflectionUtils.invokeDefaultMethod(getObject(), method, methodInvocation.getArguments());
 		Class<?> returnType = method.getReturnType();
@@ -82,11 +84,12 @@ public abstract class MethodInterceptorFactoryBean
 			synchronized (this) {
 				es = executorService;
 				if (es == null) {
-					String poolName = getObjectType().getSimpleName();
+					Class<?> objectType = getObjectType();
+					String poolName = objectType != null ? objectType.getSimpleName() : "Unknown";
 					ApplicationContext ctx = getApplicationContext();
 					if (ctx != null) {
 						int threads = ctx.getEnvironment().getProperty(
-								getObjectType().getName() + EXECUTOR_POOL_SIZE_SUFFIX, int.class,
+								objectType != null ? objectType.getName() + EXECUTOR_POOL_SIZE_SUFFIX : "", int.class,
 								EXECUTOR_POOL_SIZE_DEFAULT);
 						executorService = es = Executors.newFixedThreadPool(threads,
 								new NameableThreadFactory(poolName));

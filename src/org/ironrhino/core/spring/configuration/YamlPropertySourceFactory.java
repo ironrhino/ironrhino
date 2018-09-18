@@ -26,6 +26,8 @@ public class YamlPropertySourceFactory implements PropertySourceFactory {
 			throw new IllegalArgumentException("missing snakeyaml"); // for ignoreResourceNotFound
 		}
 		String sourceName = name != null ? name : resource.getResource().getFilename();
+		if (sourceName == null)
+			sourceName = "Unknown";
 		Properties propertiesFromYaml = loadYamlIntoProperties(resource);
 		return new PropertiesPropertySource(sourceName, propertiesFromYaml);
 	}
