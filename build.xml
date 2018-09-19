@@ -41,7 +41,7 @@
 		<antcall target="init" />
 		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${src.dir}" destdir="${classes.dir}" encoding="utf-8">
 			<compilerarg line="-Xlint:unchecked" />
-			<compilerarg value="-parameters"/>
+			<compilerarg value="-parameters" />
 			<classpath refid="lib.classpath" />
 		</javac>
 		<copy todir="${classes.dir}">
@@ -55,7 +55,7 @@
 		<mkdir dir="${test.classes.dir}" />
 		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${test.src.dir}" destdir="${test.classes.dir}" encoding="UTF-8">
 			<compilerarg line="-Xlint:unchecked" />
-			<compilerarg value="-parameters"/>
+			<compilerarg value="-parameters" />
 			<classpath>
 				<path refid="lib.classpath" />
 				<pathelement location="${classes.dir}" />
@@ -67,17 +67,20 @@
 			</fileset>
 		</copy>
 		<mkdir dir="${test.results.dir}" />
-		<junit haltonfailure="no" printsummary="on">
+		<junit haltonfailure="true" haltonerror="true" printsummary="true">
 			<classpath>
 				<path refid="lib.classpath" />
 				<pathelement location="${classes.dir}" />
 				<pathelement location="${test.classes.dir}" />
 			</classpath>
-			<formatter type="brief" usefile="false" />
+			<formatter type="brief" />
 			<formatter type="plain" />
 			<formatter type="xml" />
 			<batchtest todir="${test.results.dir}">
 				<fileset dir="${test.classes.dir}" includes="**/*Test.class" />
+				<!--
+				<fileset dir="${test.classes.dir}" includes="**/*Tests.class" />
+				-->
 			</batchtest>
 		</junit>
 	</target>
