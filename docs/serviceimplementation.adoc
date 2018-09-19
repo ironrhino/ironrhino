@@ -28,16 +28,12 @@ ironrhino通常对内置服务提供多种实现, 并且会在具体的部署规
 |profile | 实现 | 说明
 
 |default
-|org.ironrhino.core.cache.impl.EhCacheManager
-|使用ehcache当缓存, 只能单实例使用
+|org.ironrhino.core.cache.impl.Cache2kCacheManager
+|使用Cache2k当缓存, 只能单实例使用
 
 |dual cloud
 |org.ironrhino.core.cache.impl.RedisCacheManager
 |需要redis服务
-
-|cluster
-|org.ironrhino.core.cache.impl.MemcachedCacheManager
-|需要memcached集群
 |===
 
 * org.ironrhino.core.coordination.LockService
@@ -127,5 +123,5 @@ ironrhino通常对内置服务提供多种实现, 并且会在具体的部署规
 [source,properties]
 .applicationContext.properties
 ----
-org.ironrhino.core.cache.CacheManager=org.ironrhino.core.cache.impl.MemcachedCacheManager
+org.ironrhino.core.cache.CacheManager=org.ironrhino.core.cache.impl.RedisCacheManager
 ----

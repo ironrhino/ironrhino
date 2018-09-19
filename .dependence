@@ -20,6 +20,7 @@
 +spring-data-keyvalue
 +spring-data-redis
 +jedis
+-xmemcached
 -ironrhino-redis-config
 -eaxy
 -struts2-spring-plugin
