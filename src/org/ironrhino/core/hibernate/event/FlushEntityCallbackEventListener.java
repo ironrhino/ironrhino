@@ -1,15 +1,11 @@
 package org.ironrhino.core.hibernate.event;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-
 import javax.persistence.PreUpdate;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.StaleObjectStateException;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.bytecode.enhance.spi.LazyPropertyInitializer;
-import org.hibernate.engine.internal.AbstractEntityEntry;
 import org.hibernate.engine.internal.Versioning;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -25,29 +21,11 @@ public class FlushEntityCallbackEventListener extends DefaultFlushEntityEventLis
 
 	private static final long serialVersionUID = 2455740016988763934L;
 
-	private static final MethodHandle VERSION_SETTER;
-
-	static {
-		try {
-			Field f = AbstractEntityEntry.class.getDeclaredField("version");
-			f.setAccessible(true);
-			VERSION_SETTER = MethodHandles.lookup().unreflectSetter(f);
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	};
-
 	@Override
 	protected boolean invokeInterceptor(SessionImplementor session, Object entity, EntityEntry entry, Object[] values,
 			EntityPersister persister) {
-		// copy version from entity
-		Object version = Versioning.getVersion(values, persister);
-		if (version != null) {
-			try {
-				VERSION_SETTER.invoke(entry, version);
-			} catch (Throwable e) {
-				throw new RuntimeException(e);
-			}
+		if (persister.isVersioned() && !entry.getVersion().equals(Versioning.getVersion(values, persister))) {
+			throw new StaleObjectStateException(entry.getEntityName(), entry.getId());
 		}
 		boolean isDirty = false;
 		if (entry.getStatus() != Status.DELETED) {
