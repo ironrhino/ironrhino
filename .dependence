@@ -10,12 +10,16 @@
 +hibernate-validator
 -spring-aspects
 +spring-retry
++spring-webflux
++reactive-streams
++reactor-core
 -jpa-api
 +persistence-api
 -jta
 +transaction-api
 +HikariCP
 -bonecp
++mongodb-driver<-spring-data-mongodb
 +spring-data-commons
 +spring-data-keyvalue
 +spring-data-redis

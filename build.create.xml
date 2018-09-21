@@ -88,7 +88,7 @@
 					if(features.indexOf('rabbitmq')<0)
 						excludes+='amqp-client-*.jar,spring-rabbit-*.jar,spring-amqp-*.jar,';
 					if(features.indexOf('mongodb')<0)
-						excludes+='mongo-java-driver-*.jar,spring-data-mongodb-*.jar,';
+						excludes+='mongodb-driver-*.jar,spring-data-mongodb-*.jar,';
 					if(features.indexOf('zookeeper')<0)
 						excludes+='zookeeper-*.jar,curator-*.jar,';
 					if(features.indexOf('zxing')<0)

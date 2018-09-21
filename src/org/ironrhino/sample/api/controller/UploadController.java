@@ -12,17 +12,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping("/upload")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class UploadController {
-
-	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView form() {
-		return new ModelAndView("sample/upload");
-	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
 	public String upload(@RequestBody String string) {

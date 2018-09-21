@@ -10,6 +10,7 @@ import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.env.Profiles;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
 
@@ -61,7 +62,7 @@ class ServiceImplementationCondition implements Condition {
 				}
 			}
 			String[] profiles = annotation.profiles();
-			if (profiles.length == 0 || context.getEnvironment().acceptsProfiles(profiles)) {
+			if (profiles.length == 0 || context.getEnvironment().acceptsProfiles(Profiles.of(profiles))) {
 				return true;
 			}
 			return false;
