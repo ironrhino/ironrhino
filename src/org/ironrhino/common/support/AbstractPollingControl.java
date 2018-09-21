@@ -153,6 +153,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 	}
 
 	protected void doEnqueue(DetachedCriteria dc, Mode mode) {
+		dc.addOrder(Order.asc("precedence"));
 		dc.addOrder(Order.asc("createDate"));
 		dc.setLockMode(LockMode.UPGRADE_SKIPLOCKED);
 		String s = "enqueue {}";

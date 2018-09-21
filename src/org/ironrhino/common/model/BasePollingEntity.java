@@ -20,6 +20,9 @@ public abstract class BasePollingEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 3825969412916897020L;
 
+	@UiConfig(width = "80px", displayOrder = 95)
+	private int precedence;
+
 	@UiConfig(width = "80px", readonly = @Readonly(true), displayOrder = 96)
 	private PollingStatus status = PollingStatus.INITIALIZED;
 
