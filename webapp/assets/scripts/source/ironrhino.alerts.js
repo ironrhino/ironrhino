@@ -38,7 +38,7 @@
 			container.find(".popup-title").remove();
 		container.find(".popup-content").addClass(type);
 		popupMessage.html(message);
-		if (message.split('\n').length == 1)
+		if (message && message.split('\n').length == 1)
 			popupMessage.addClass('center');
 
 		container.css({
