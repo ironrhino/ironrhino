@@ -26,6 +26,6 @@ USER ${user}
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-server","-Xms128m","-Xmx1024m","-Xmn80m","-Xss256k","-XX:+DisableExplicitGC","-XX:+UseG1GC","-XX:SurvivorRatio=6","-XX:MaxGCPauseMillis=400","-XX:G1ReservePercent=15","-XX:InitiatingHeapOccupancyPercent=40","-XX:ConcGCThreads=2","-Djava.awt.headless=true","-jar","ROOT.war"]
+ENTRYPOINT ["java","-server","-Xms128m","-Xmx1024m","-Xmn80m","-Xss256k","-XX:+UseG1GC","-XX:MaxGCPauseMillis=200","-XX:ParallelGCThreads=10","-XX:ConcGCThreads=2","-XX:InitiatingHeapOccupancyPercent=70","-Djava.awt.headless=true","-Djava.security.egd=file:/dev/./urandom","-jar","ROOT.war"]
 
 #docker run -d -p 8080:8080 --volume ~/${app}/conf:/home/${user}/${app}/conf --name ${app} ${app}
