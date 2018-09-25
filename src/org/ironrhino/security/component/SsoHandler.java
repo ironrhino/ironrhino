@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
+import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.User;
 import org.slf4j.MDC;
@@ -32,18 +33,25 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.extern.slf4j.Slf4j;
+
 @ApplicationContextPropertiesConditional(key = "portal.baseUrl", value = ANY)
 @Component
+@Slf4j
 public class SsoHandler extends AccessHandler {
+
+	public static final String ROLE_BUILTIN_SSO = "ROLE_BUILTIN_SSO";
 
 	private static final String EXCLUDED_PATTERN = "/setup,/oauth/oauth2/*,/assets/*,/remoting/*";
 
@@ -163,15 +171,30 @@ public class SsoHandler extends AccessHandler {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected UserDetails map(User userFromApi) {
-		UserDetails user = userDetailsService.loadUserByUsername(userFromApi.getUsername());
-		Collection authorities = user.getAuthorities();
-		Set<String> roles = userFromApi.getRoles();
-		List<GrantedAuthority> list = AuthorityUtils.createAuthorityList(roles.toArray(new String[roles.size()]));
-		for (GrantedAuthority ga : list) {
-			if (!authorities.contains(ga))
-				authorities.add(ga);
+		try {
+			UserDetails user = userDetailsService.loadUserByUsername(userFromApi.getUsername());
+			Collection authorities = user.getAuthorities();
+			try {
+				GrantedAuthority sso = new SimpleGrantedAuthority(ROLE_BUILTIN_SSO);
+				if (!authorities.contains(sso))
+					authorities.add(sso);
+				Set<String> roles = userFromApi.getRoles();
+				if (roles != null && !roles.isEmpty()) {
+					List<GrantedAuthority> list = AuthorityUtils
+							.createAuthorityList(roles.toArray(new String[roles.size()]));
+					for (GrantedAuthority ga : list) {
+						if (!authorities.contains(ga))
+							authorities.add(ga);
+					}
+				}
+			} catch (UnsupportedOperationException e) {
+				log.warn("Can not copy roles from portal server because collection is unmodifiable");
+			}
+			return user;
+		} catch (UsernameNotFoundException e) {
+			log.error(e.getMessage());
+			throw new ErrorMessage("access.denied");
 		}
-		return user;
 	}
 
 }

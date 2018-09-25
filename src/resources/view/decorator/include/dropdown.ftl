@@ -27,6 +27,9 @@
 	<#if divider>
 	<li class="divider"></li>
 	</#if>
-	<li><a href="<@url value="${ssoServerBase!}/logout"/>">${getText('logout')}</a></li>
+	<#assign logoutUrl=getUrl('/logout')>
+	<#if ssoServerBase?has_content><#assign logoutUrl=ssoServerBase!+'/logout'></#if>
+	<@authorize ifAnyGranted="ROLE_BUILTIN_SSO"><#assign logoutUrl=properties['portal.baseUrl']+'/logout'></@authorize>
+	<li><a href="${logoutUrl}">${getText('logout')}</a></li>
 	</#if>
 </ul>
