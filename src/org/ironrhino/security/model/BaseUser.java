@@ -61,6 +61,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@CaseInsensitive
 	@NaturalId
 	@Column(nullable = false)
+	@UiConfig(width = "120px")
 	private String username;
 
 	@NotInCopy
@@ -69,19 +70,22 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	private String password;
 
 	@SearchableProperty(boost = 3)
+	@UiConfig(width = "120px")
 	private String name;
 
 	@Email
 	@SearchableProperty(boost = 3)
 	@Column(unique = true)
+	@UiConfig(width = "180px")
 	private String email;
 
 	@MobilePhoneNumber
 	@SearchableProperty
+	@UiConfig(width = "120px")
 	private String phone;
 
 	@JsonIgnore
-	@UiConfig(displayOrder = 99)
+	@UiConfig(width = "80px", displayOrder = 99)
 	private boolean enabled = true;
 
 	@NotInCopy
