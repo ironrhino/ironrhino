@@ -1,5 +1,6 @@
 package org.ironrhino.rest.component;
 
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -30,9 +31,14 @@ public class AuthorizeAspect extends BaseAspect {
 	}
 
 	private void authorize(Authorize authorize) {
-		if (authorize != null
-				&& !AuthzUtils.authorize(authorize.ifAllGranted(), authorize.ifAnyGranted(), authorize.ifNotGranted()))
-			throw RestStatus.UNAUTHORIZED;
+		if (authorize != null) {
+			if (StringUtils.isNotBlank(authorize.access()) && !AuthzUtils.authorize(authorize.access())) {
+				throw RestStatus.UNAUTHORIZED;
+			} else if (!AuthzUtils.authorize(authorize.ifAllGranted(), authorize.ifAnyGranted(),
+					authorize.ifNotGranted())) {
+				throw RestStatus.UNAUTHORIZED;
+			}
+		}
 	}
 
 }

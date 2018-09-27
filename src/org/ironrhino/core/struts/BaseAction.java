@@ -225,8 +225,12 @@ public class BaseAction extends ActionSupport {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		Authorize authorize = findAuthorize();
 		if (authorize != null) {
-			boolean authorized = AuthzUtils.authorize(evalExpression(authorize.ifAllGranted()),
-					evalExpression(authorize.ifAnyGranted()), evalExpression(authorize.ifNotGranted()));
+			boolean authorized;
+			if (StringUtils.isNotBlank(authorize.access()))
+				authorized = AuthzUtils.authorize(authorize.access());
+			else
+				authorized = AuthzUtils.authorize(evalExpression(authorize.ifAllGranted()),
+						evalExpression(authorize.ifAnyGranted()), evalExpression(authorize.ifNotGranted()));
 			if (!authorized && dynamicAuthorizerManager != null
 					&& !authorize.authorizer().equals(DynamicAuthorizer.class)) {
 				String resource = authorize.resource();

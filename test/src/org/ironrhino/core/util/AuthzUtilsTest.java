@@ -4,11 +4,34 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class AuthzUtilsTest {
+
+	@Test
+	public void testAuthorizeAccess() throws Exception {
+		Collection<String> roles = Arrays.asList("ROLE_A", "ROLE_B", "ROLE_C");
+		Authentication auth = new TestingAuthenticationToken("admin", "password",
+				roles.toArray(new String[roles.size()]));
+		SecurityContextHolder.getContext().setAuthentication(auth);
+		assertTrue(AuthzUtils.authorize("permitAll"));
+		assertFalse(AuthzUtils.authorize("denyAll"));
+		assertTrue(AuthzUtils.authorize("hasRole('ROLE_A')"));
+		assertTrue(AuthzUtils.authorize("hasRole('ROLE_A') && hasRole('ROLE_B')"));
+		assertTrue(AuthzUtils.authorize("hasRole('ROLE_A') && hasRole('ROLE_B') && hasRole('ROLE_C')"));
+		assertFalse(AuthzUtils.authorize("hasRole('ROLE_A') && !hasRole('ROLE_B')"));
+
+		assertTrue(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A')"));
+		assertTrue(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && hasRole('ROLE_B')"));
+		assertTrue(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && hasRole('ROLE_B') && hasRole('ROLE_C')"));
+		assertFalse(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && !hasRole('ROLE_B')"));
+	}
 
 	@Test
 	public void testAuthorizeRoles() throws Exception {

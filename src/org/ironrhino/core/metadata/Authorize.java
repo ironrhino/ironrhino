@@ -19,6 +19,8 @@ public @interface Authorize {
 
 	String[] ifNotGranted() default {};
 
+	String access() default "";
+
 	Class<? extends DynamicAuthorizer> authorizer() default DynamicAuthorizer.class;
 
 	String resource() default "";

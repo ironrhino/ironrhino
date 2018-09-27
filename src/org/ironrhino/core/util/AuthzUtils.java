@@ -10,8 +10,13 @@ import org.ironrhino.core.servlet.RequestContext;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -20,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 import lombok.experimental.UtilityClass;
 
@@ -27,6 +33,8 @@ import lombok.experimental.UtilityClass;
 public class AuthzUtils {
 
 	public static final ThreadLocal<UserDetails> DOUBLE_CHCKER_HOLDER = new ThreadLocal<>();
+
+	private static ExpressionParser expressionParser = new SpelExpressionParser();
 
 	public static Object authentication(String property) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -40,6 +48,18 @@ public class AuthzUtils {
 		} catch (BeansException e) {
 			return null;
 		}
+	}
+
+	public static boolean authorize(String access) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null)
+			return false;
+		return expressionParser.parseExpression(access).getValue(new WebSecurityExpressionRoot(auth), Boolean.class);
+	}
+
+	public static boolean authorizeRoles(Collection<String> roles, String access) {
+		Authentication auth = new TestingAuthenticationToken(null, null, roles.toArray(new String[roles.size()]));
+		return expressionParser.parseExpression(access).getValue(new WebSecurityExpressionRoot(auth), Boolean.class);
 	}
 
 	public static boolean authorize(String ifAllGranted, String ifAnyGranted, String ifNotGranted) {
@@ -229,6 +249,22 @@ public class AuthzUtils {
 		if (clazz.isAssignableFrom(ud.getClass()))
 			return (T) ud;
 		return null;
+	}
+
+	// org.springframework.security.web.access.expression.WebSecurityExpressionRoot
+	static class WebSecurityExpressionRoot extends SecurityExpressionRoot {
+		public WebSecurityExpressionRoot(Authentication authentication) {
+			super(authentication);
+			setDefaultRolePrefix("");
+			setTrustResolver(new AuthenticationTrustResolverImpl());
+		}
+
+		public boolean hasIpAddress(String ipAddress) {
+			if (RequestContext.getRequest() == null)
+				return false;
+			return (new IpAddressMatcher(ipAddress).matches(RequestContext.getRequest()));
+		}
+
 	}
 
 }
