@@ -19,7 +19,7 @@
 	<#if user.class.name=='org.ironrhino.security.model.User'>
 	<li><a href="<@url value="${ssoServerBase!}/user/profile"/>" class="popmodal nocache">${getText('profile')}</a></li>
 	<#if !user.getAttribute('oauth_provider')??>
-	<li><a href="<@url value="${ssoServerBase!}/user/password"/>" class="popmodal">${getText('change')}${getText('password')}</a></li>
+	<li><a href="<@url value="${ssoServerBase!}/password"/>" class="popmodal">${getText('change')}${getText('password')}</a></li>
 	</#if>
 	<#assign divider=true/>
 	</#if>

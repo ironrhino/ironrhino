@@ -10,12 +10,8 @@
 		<@s.hidden name="user.id" class="id"/>
 		<@s.hidden name="user.version" class="version"/>
 		<@s.textfield name="user.username" readonly="true"/>
-		<@s.password name="password" class="sha"/>
-		<@s.password name="confirmPassword" class="sha"/>
 	<#else>
 		<@s.textfield name="user.username" class="required checkavailable regex conjunct" data\-replacement="controls-user-roles" data\-regex="${statics['org.ironrhino.security.model.User'].USERNAME_REGEX}" data\-checkurl="${actionBaseUrl}/checkavailable"/>
-		<@s.password name="password" class="required sha"/>
-		<@s.password name="confirmPassword" class="required sha"/>
 	</#if>
 	<@s.textfield name="user.name" class="required"/>
 	<@s.textfield name="user.email" type="email" class="email checkavailable" data\-checkurl="${actionBaseUrl}/checkavailable"/>

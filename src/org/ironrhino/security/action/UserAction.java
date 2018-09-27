@@ -23,12 +23,9 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleFilter;
 import org.ironrhino.core.security.role.UserRoleManager;
-import org.ironrhino.core.session.HttpSessionManager;
-import org.ironrhino.core.spring.security.password.PasswordStrengthChecker;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
-import org.ironrhino.security.event.PasswordChangedEvent;
 import org.ironrhino.security.event.ProfileEditedEvent;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
@@ -38,8 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 import com.opensymphony.xwork2.validator.annotations.EmailValidator;
-import com.opensymphony.xwork2.validator.annotations.ExpressionValidator;
-import com.opensymphony.xwork2.validator.annotations.FieldExpressionValidator;
 import com.opensymphony.xwork2.validator.annotations.RegexFieldValidator;
 import com.opensymphony.xwork2.validator.annotations.RequiredStringValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
@@ -64,31 +59,8 @@ public class UserAction extends EntityAction<User> {
 	private Set<String> hiddenRoles;
 
 	@Getter
-	@Setter
-	private String password;
-
-	@Getter
-	@Setter
-	private String currentPassword;
-
-	@Getter
-	@Setter
-	private String confirmPassword;
-
-	@Value("${login.defaultTargetUrl:/}")
-	private String defaultTargetUrl;
-
-	@Getter
 	@Value("${user.profile.readonly:false}")
 	private boolean userProfileReadonly;
-
-	@Getter
-	@Value("${user.password.readonly:false}")
-	private boolean userPasswordReadonly;
-
-	@Getter
-	@Value("${user.password.currentPasswordNeeded:true}")
-	private boolean userCurrentPasswordNeeded;
 
 	@Autowired
 	private UserManager userManager;
@@ -98,9 +70,6 @@ public class UserAction extends EntityAction<User> {
 
 	@Autowired(required = false)
 	private UserRoleFilter userRoleFilter;
-
-	@Autowired(required = false)
-	private PasswordStrengthChecker passwordStrengthChecker;
 
 	@Autowired
 	protected EventPublisher eventPublisher;
@@ -152,8 +121,7 @@ public class UserAction extends EntityAction<User> {
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "user.username", trim = true, key = "validation.required"),
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "user.name", trim = true, key = "validation.required") }, emails = {
 					@EmailValidator(fieldName = "user.email", key = "validation.invalid") }, regexFields = {
-							@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") }, fieldExpressions = {
-									@FieldExpressionValidator(expression = "password == confirmPassword", fieldName = "confirmPassword", key = "validation.repeat.not.matched") })
+							@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") })
 	public String save() {
 		if (!makeEntityValid())
 			return INPUT;
@@ -193,7 +161,6 @@ public class UserAction extends EntityAction<User> {
 				addFieldError("user.email", getText("validation.already.exists"));
 				return false;
 			}
-			user.setLegiblePassword(password);
 		} else {
 			User temp = user;
 			user = userManager.get(temp.getId());
@@ -203,8 +170,6 @@ public class UserAction extends EntityAction<User> {
 				return false;
 			}
 			BeanUtils.copyProperties(temp, user);
-			if (StringUtils.isNotBlank(password))
-				user.setLegiblePassword(password);
 			int versionInDb = user.getVersion();
 			int versionInUi = temp.getVersion();
 			if (versionInUi > -1 && versionInUi != versionInDb) {
@@ -234,42 +199,13 @@ public class UserAction extends EntityAction<User> {
 		return true;
 	}
 
-	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
-	@InputConfig(resultName = "password")
-	@Validations(requiredStrings = {
-			@RequiredStringValidator(type = ValidatorType.FIELD, trim = true, fieldName = "password", key = "validation.required") }, expressions = {
-					@ExpressionValidator(expression = "password == confirmPassword", key = "validation.repeat.not.matched") })
-	public String password() {
-		if (userPasswordReadonly) {
-			addActionError(getText("access.denied"));
-			return ACCESSDENIED;
-		}
-		User user = AuthzUtils.getUserDetails();
-		if (user != null) {
-			if (passwordStrengthChecker != null)
-				passwordStrengthChecker.check(user, password);
-			if (isUserCurrentPasswordNeeded()) {
-				boolean valid = currentPassword != null && AuthzUtils.isPasswordValid(currentPassword);
-				if (!valid) {
-					addFieldError("currentPassword", getText("currentPassword.error"));
-					return "password";
-				}
-			}
-			boolean passwordExpired = !user.isCredentialsNonExpired();
-			user.setLegiblePassword(password);
-			userManager.save(user);
-			notify("save.success");
-			eventPublisher.publish(
-					new PasswordChangedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),
-					Scope.LOCAL);
-			ServletActionContext.getRequest().setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY,
-					true);
-			if (passwordExpired) {
-				targetUrl = defaultTargetUrl;
-				return REDIRECT;
-			}
-		}
-		return "password";
+	public String resetPassword() {
+		User user = userManager.get(getUid());
+		if (user == null)
+			return NONE;
+		userManager.resetPassword(user);
+		notify("operate.success");
+		return SUCCESS;
 	}
 
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)

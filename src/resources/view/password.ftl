@@ -11,7 +11,7 @@
 ${getText('org.springframework.security.authentication.CredentialsExpiredException')}
 </div>
 </#if>
-<@s.form action="${actionBaseUrl}/password" method="post" class="form-horizontal ajax focus reset">
+<@s.form action="${actionBaseUrl}" method="post" class="form-horizontal ajax focus reset">
 	<#if userCurrentPasswordNeeded!true>
 	<#assign userProfileReadonly=userProfileReadonly!false>
 	<@s.password name="currentPassword" class="required input-pattern sha" readonly=userProfileReadonly/>
