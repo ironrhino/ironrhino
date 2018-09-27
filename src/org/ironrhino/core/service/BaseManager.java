@@ -16,6 +16,10 @@ import org.springframework.orm.hibernate5.HibernateCallback;
 
 public interface BaseManager<T extends Persistable<?>> {
 
+	public default DetachedCriteria detachedCriteria() {
+		return DetachedCriteria.forClass(getEntityClass());
+	}
+
 	public Class<? extends Persistable<?>> getEntityClass();
 
 	public void save(T obj);
@@ -39,8 +43,6 @@ public interface BaseManager<T extends Persistable<?>> {
 	public void delete(T obj);
 
 	public List<T> delete(Serializable... id);
-
-	public DetachedCriteria detachedCriteria();
 
 	public long countByCriteria(DetachedCriteria dc);
 

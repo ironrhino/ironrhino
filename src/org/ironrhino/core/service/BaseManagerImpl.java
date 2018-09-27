@@ -283,11 +283,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	}
 
 	@Override
-	public DetachedCriteria detachedCriteria() {
-		return DetachedCriteria.forClass(getEntityClass());
-	}
-
-	@Override
 	@Transactional(readOnly = true)
 	public long countByCriteria(DetachedCriteria dc) {
 		CriteriaImpl impl;
