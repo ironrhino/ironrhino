@@ -128,7 +128,8 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				if (entity.getParent() != null)
 					entity.setParent(entity.getParent()); // recalculate fullname
 			}
-			session.update(obj);
+			if (!isnew && !session.contains(obj))
+				session.update(obj);
 			if (positionChanged) {
 				for (Object c : entity.getChildren())
 					save((T) c);
@@ -136,7 +137,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		} else {
 			if (isnew)
 				session.save(obj);
-			else
+			else if (!session.contains(obj))
 				session.update(obj);
 		}
 	}
@@ -144,7 +145,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void update(T obj) {
-		sessionFactory.getCurrentSession().update(obj);
+		Session session = sessionFactory.getCurrentSession();
+		if (!session.contains(obj))
+			session.update(obj);
 	}
 
 	@Override
