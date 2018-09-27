@@ -1636,7 +1636,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@JsonConfig(root = "children")
-	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
+	@Authorize(ifNotGranted = UserRole.ROLE_BUILTIN_ANONYMOUS)
 	public String children() {
 		if (!isTreeable())
 			return NOTFOUND;
@@ -1705,7 +1705,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	@JsonConfig(root = "suggestions")
-	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
+	@Authorize(ifNotGranted = UserRole.ROLE_BUILTIN_ANONYMOUS)
 	public String suggestion() {
 		final String propertyName = getUid();
 		if (StringUtils.isBlank(propertyName) || StringUtils.isBlank(keyword))

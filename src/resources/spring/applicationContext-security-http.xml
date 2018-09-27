@@ -18,13 +18,13 @@
 		<security:intercept-url pattern="/api/**" access="permitAll" />
 		<security:intercept-url pattern="/signup*/**" access="permitAll" />
 		<security:intercept-url pattern="/signin*/**" access="permitAll" />
-		<security:intercept-url pattern="/common/upload" access="hasRole('ROLE_BUILTIN_USER')" />
+		<security:intercept-url pattern="/common/upload" access="!hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:intercept-url pattern="/common/**" access="hasRole('ROLE_ADMINISTRATOR')" />
 		<!--
 		<security:intercept-url pattern="/switch/back" access="hasRole('ROLE_PREVIOUS_ADMINISTRATOR')"/> 
 		<security:intercept-url pattern="/switch" access="hasRole('ROLE_ADMINISTRATOR')"/>
 		-->
-		<security:intercept-url pattern="/**" access="hasRole('ROLE_BUILTIN_USER')" />
+		<security:intercept-url pattern="/**" access="!hasRole('ROLE_BUILTIN_ANONYMOUS')" />
 		<security:remember-me services-ref="rememberMeServices" />
 		<security:anonymous granted-authority="ROLE_BUILTIN_ANONYMOUS" username="anonymousUser" key="anonymous" />
 		<security:logout logout-url="/logout" invalidate-session="true" success-handler-ref="logoutSuccessHandler" />
