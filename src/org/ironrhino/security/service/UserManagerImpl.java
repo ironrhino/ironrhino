@@ -3,42 +3,26 @@ package org.ironrhino.security.service;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.criterion.DetachedCriteria;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
-import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.security.role.UserRole;
-import org.ironrhino.core.security.role.UserRoleMapper;
-import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Order(0)
-public class UserManagerImpl extends BaseManagerImpl<User> implements UserManager {
+public class UserManagerImpl extends BaseUserManagerImpl<User> implements UserManager {
 
 	private static final String CACHE_NAMESPACE = "user";
-
-	@Autowired(required = false)
-	private List<UserRoleMapper> userRoleMappers;
-
-	@Value("${user.password.expiresInDays:0}")
-	private int passwordExpiresInDays;
 
 	@Override
 	@Transactional
@@ -70,43 +54,35 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 	}
 
 	@Override
+	@Transactional
+	@EvictCache(namespace = CACHE_NAMESPACE, key = "${[user.username,user.email]}")
+	public void resetPassword(User user) {
+		super.resetPassword(user);
+	}
+
+	@Override
+	@Transactional
+	@EvictCache(namespace = CACHE_NAMESPACE, key = "${[user.username,user.email]}")
+	public void changePassword(User user, String password) {
+		super.changePassword(user, password);
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	@CheckCache(namespace = CACHE_NAMESPACE, key = "${username}", cacheNull = true)
 	public User loadUserByUsername(String username) {
-		if (StringUtils.isBlank(username))
-			return null;
-		// throw new UsernameNotFoundException("username is blank");
+		return super.loadUserByUsername(username);
+	}
+
+	@Override
+	protected User doLoadUserByUsername(String username) {
 		username = username.toLowerCase(Locale.ROOT);
 		User user;
 		if (username.indexOf('@') > 0)
 			user = findOne("email", username);
 		else
 			user = findByNaturalId(username);
-		if (user == null) {
-			// throw new UsernameNotFoundException("No such Username : "+
-			// username);
-			return null; // for @CheckCache
-		}
-		if (passwordExpiresInDays > 0) {
-			user.setPasswordExpiresInDays(passwordExpiresInDays);
-		}
-		populateAuthorities(user);
 		return user;
-	}
-
-	private void populateAuthorities(User user) {
-		List<GrantedAuthority> auths = new ArrayList<>();
-		auths.add(new SimpleGrantedAuthority(UserRole.ROLE_BUILTIN_USER));
-		Set<String> set = user.getRoles();
-		auths.addAll(AuthorityUtils.createAuthorityList(set.toArray(new String[set.size()])));
-		user.setAuthorities(auths);
-		if (userRoleMappers != null)
-			for (UserRoleMapper mapper : userRoleMappers) {
-				String[] roles = mapper.map(user);
-				if (roles != null)
-					for (String role : roles)
-						auths.add(new SimpleGrantedAuthority(role));
-			}
 	}
 
 	@Override
@@ -153,10 +129,8 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 		return candidate + i;
 	}
 
-	@Override
-	public DetachedCriteria detachedCriteria(String role) {
-		DetachedCriteria dc = detachedCriteria();
-		return dc.add(CriterionUtils.matchTag("roles", role));
+	protected Set<String> getBuiltInRoles() {
+		return Collections.singleton(UserRole.ROLE_BUILTIN_USER);
 	}
 
 }
