@@ -1,6 +1,8 @@
 package bootstrap;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.util.Set;
 
@@ -22,12 +24,18 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 public class JettyLauncher {
 
 	public static void start(URL warUrl) throws Exception {
-		int port = 8080;
+		int port = -1;
 		String p = System.getProperty("port.http");
 		if (p == null)
 			p = System.getProperty("jetty.http.port");
 		if (p != null && p.trim().length() > 0)
 			port = Integer.valueOf(p);
+		if (port == -1) {
+			port = 8080;
+			while (!available(port))
+				port++;
+			System.setProperty("port.http", String.valueOf(port));
+		}
 		Server server = new Server(port);
 		server.setSessionIdManager(new DummySessionIdManager());
 		Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
@@ -61,6 +69,25 @@ public class JettyLauncher {
 		server.setStopAtShutdown(true);
 		server.start();
 		server.join();
+	}
+
+	private static boolean available(int port) {
+		ServerSocket ss = null;
+		try {
+			ss = new ServerSocket(port);
+			ss.setReuseAddress(true);
+			return true;
+		} catch (IOException e) {
+		} finally {
+			if (ss != null) {
+				try {
+					ss.close();
+				} catch (IOException e) {
+					/* should not be thrown */
+				}
+			}
+		}
+		return false;
 	}
 
 	static class DummySessionIdManager implements SessionIdManager {
