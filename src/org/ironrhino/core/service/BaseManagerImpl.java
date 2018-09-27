@@ -110,7 +110,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		if (obj instanceof BaseTreeableEntity) {
 			final BaseTreeableEntity entity = (BaseTreeableEntity) obj;
 			boolean positionChanged = false;
-			if (entity.isNew()) {
+			if (isnew) {
 				session.save(entity);
 				session.flush();
 				positionChanged = true;
