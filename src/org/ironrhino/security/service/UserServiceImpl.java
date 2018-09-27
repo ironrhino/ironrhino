@@ -16,14 +16,14 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
 	@Autowired(required = false)
-	private List<ConcreteUserDetailsService> userDetailsServices;
+	private List<ConcreteUserDetailsService<? extends UserDetails>> userDetailsServices;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) {
+	public User loadUserByUsername(String username) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
 		if (userDetailsServices != null)
-			for (ConcreteUserDetailsService uds : userDetailsServices) {
+			for (ConcreteUserDetailsService<?> uds : userDetailsServices) {
 				if (uds.accepts(username))
 					try {
 						User user = BeanUtils.forCopy(User.class).apply(uds.loadUserByUsername(username));

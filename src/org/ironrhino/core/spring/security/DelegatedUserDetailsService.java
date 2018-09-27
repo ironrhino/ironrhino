@@ -22,10 +22,10 @@ import org.springframework.stereotype.Component;
 public class DelegatedUserDetailsService implements UserDetailsService {
 
 	@Autowired(required = false)
-	private List<ConcreteUserDetailsService> userDetailsServices;
+	private List<ConcreteUserDetailsService<? extends UserDetails>> userDetailsServices;
 
 	@Autowired(required = false)
-	private List<RemotingUserDetailsService> remotingUserDetailsServices;
+	private List<RemotingUserDetailsService<? extends UserDetails>> remotingUserDetailsServices;
 
 	@PostConstruct
 	private void init() {
@@ -44,7 +44,7 @@ public class DelegatedUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username, boolean nullInsteadException)
 			throws UsernameNotFoundException {
 		if (userDetailsServices != null) {
-			for (ConcreteUserDetailsService uds : userDetailsServices)
+			for (ConcreteUserDetailsService<?> uds : userDetailsServices)
 				if (uds.accepts(username))
 					try {
 						UserDetails ud = uds.loadUserByUsername(username);
@@ -55,7 +55,7 @@ public class DelegatedUserDetailsService implements UserDetailsService {
 					}
 		}
 		if (remotingUserDetailsServices != null) {
-			for (RemotingUserDetailsService uds : remotingUserDetailsServices)
+			for (RemotingUserDetailsService<?> uds : remotingUserDetailsServices)
 				if (uds instanceof RemotingClientProxy && uds.accepts(username)) {
 					try {
 						UserDetails ud = uds.loadUserByUsername(username);

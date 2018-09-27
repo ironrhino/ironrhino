@@ -25,7 +25,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +72,7 @@ public class UserManagerImpl extends BaseManagerImpl<User> implements UserManage
 	@Override
 	@Transactional(readOnly = true)
 	@CheckCache(namespace = CACHE_NAMESPACE, key = "${username}", cacheNull = true)
-	public UserDetails loadUserByUsername(String username) {
+	public User loadUserByUsername(String username) {
 		if (StringUtils.isBlank(username))
 			return null;
 		// throw new UsernameNotFoundException("username is blank");

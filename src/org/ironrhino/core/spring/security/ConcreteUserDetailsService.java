@@ -2,12 +2,12 @@ package org.ironrhino.core.spring.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
-public interface ConcreteUserDetailsService {
+public interface ConcreteUserDetailsService<T extends UserDetails> {
 
 	public default boolean accepts(String username) {
 		return true;
 	}
 
-	public UserDetails loadUserByUsername(String username);
+	public T loadUserByUsername(String username);
 
 }
