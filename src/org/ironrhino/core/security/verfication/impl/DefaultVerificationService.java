@@ -1,5 +1,6 @@
 package org.ironrhino.core.security.verfication.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +36,7 @@ public class DefaultVerificationService implements VerificationService {
 	private VerificationCodeGenerator verficationCodeGenerator;
 
 	@Autowired(required = false)
-	private List<VerificationCodeNotifier> verificationCodeNotifiers;
+	private List<VerificationCodeNotifier> verificationCodeNotifiers = Collections.emptyList();
 
 	@Value("${verification.code.length:6}")
 	private int length = 6;
