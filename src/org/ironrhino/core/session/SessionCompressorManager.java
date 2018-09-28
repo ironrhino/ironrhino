@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SessionCompressorManager {
 
-	@Value("${password.entryPoint:}")
+	@Value("${password.entryPoint:/password}")
 	private String passwordEntryPoint;
 
 	@Autowired(required = false)

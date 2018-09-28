@@ -2,6 +2,7 @@ package org.ironrhino.security.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +42,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	@Override
 	@Transactional
 	public void save(T user) {
-		if (user.getPassword() == null) {
+		if (user.isNew() && user.getPassword() == null) {
 			resetPassword(user);
 		}
 		super.save(user);
@@ -54,7 +55,8 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 		if (newPassword == null)
 			newPassword = user.getUsername();
 		String password = newPassword;
-		changePassword(user, password);
+		user.setPassword(passwordEncoder.encode(password));
+		user.setPasswordModifyDate(new Date(0)); // magic date for user.isCredentialsNonExpired()
 		if (passwordNotifier != null) {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				public void afterCommit() {
@@ -62,12 +64,14 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 				}
 			});
 		}
+		super.save(user);
 	}
 
 	@Transactional
 	@Override
 	public void changePassword(T user, String password) {
 		user.setPassword(passwordEncoder.encode(password));
+		user.setPasswordModifyDate(new Date());
 		super.save(user);
 	}
 

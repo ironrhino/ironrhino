@@ -190,6 +190,8 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@Override
 	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
+		if (passwordModifyDate != null && passwordModifyDate.getTime() == 0)
+			return false; // reset password
 		return passwordModifyDate == null || passwordExpiresInDays <= 0
 				|| DateUtils.addDays(passwordModifyDate, passwordExpiresInDays).after(new Date());
 	}

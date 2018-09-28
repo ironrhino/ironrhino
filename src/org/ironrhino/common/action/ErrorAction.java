@@ -5,7 +5,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.struts.BaseAction;
@@ -39,7 +38,7 @@ public class ErrorAction extends ActionSupport {
 	@Getter
 	private Throwable exception;
 
-	@Value("${password.entryPoint:}")
+	@Value("${password.entryPoint:/password}")
 	private String passwordEntryPoint;
 
 	public String getUid() {
@@ -66,10 +65,7 @@ public class ErrorAction extends ActionSupport {
 				if (exception instanceof CredentialsExpiredException) {
 					UserDetails ud = AuthzUtils.getUserDetails();
 					if (ud != null) {
-						if (StringUtils.isNotBlank(passwordEntryPoint))
-							targetUrl = passwordEntryPoint;
-						else
-							targetUrl = '/' + StringUtils.uncapitalize(ud.getClass().getSimpleName()) + "/password";
+						targetUrl = passwordEntryPoint;
 						return BaseAction.REDIRECT;
 					}
 				}
