@@ -239,6 +239,7 @@ public class UserAction extends EntityAction<User> {
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	public String inputprofile() {
 		user = AuthzUtils.getUserDetails();
+		user = userManager.get(user.getId());
 		return "profile";
 	}
 
