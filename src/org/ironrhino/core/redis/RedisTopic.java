@@ -12,6 +12,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -81,7 +82,8 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 					subscribe((T) mqRedisTemplate.getValueSerializer().deserialize(message.getBody()));
 				} catch (SerializationException e) {
 					// message from other app
-					if (!(e.getCause() instanceof ClassNotFoundException))
+					if (!(e.getCause() instanceof SerializationFailedException
+							&& e.getCause().getCause() instanceof ClassNotFoundException))
 						throw e;
 				}
 			}, Arrays.asList(globalTopic, applicationTopic));
