@@ -63,6 +63,7 @@
 .input-pseudo.readonly , .input-pseudo.disabled {
 	cursor: not-allowed;
 	background-color: #eee;
+	color: #555;
 }
 
 .input-pseudo > input , .input-pseudo > select {
