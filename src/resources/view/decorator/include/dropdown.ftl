@@ -16,8 +16,8 @@
 	<li class="divider"></li>
 	</@resourcePresentConditional>
 	<#assign divider=false/>
-	<#if user.class.name=='org.ironrhino.security.model.User'>
-	<li><a href="<@url value="${ssoServerBase!}/user/profile"/>" class="popmodal nocache">${getText('profile')}</a></li>
+	<#if user.isNew??>
+	<li><a href="<@url value="${ssoServerBase!}/${user.class.simpleName?uncap_first}/profile"/>" class="popmodal nocache">${getText('profile')}</a></li>
 	<#if !user.getAttribute('oauth_provider')??>
 	<li><a href="<@url value="${ssoServerBase!}/password"/>" class="popmodal">${getText('change')}${getText('password')}</a></li>
 	</#if>
