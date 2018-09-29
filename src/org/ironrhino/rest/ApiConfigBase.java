@@ -28,10 +28,12 @@ import org.ironrhino.rest.doc.ApiDocInspector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -42,6 +44,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.util.ClassUtils;
 import org.springframework.validation.Validator;
@@ -52,6 +55,7 @@ import org.springframework.web.context.ContextLoader;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -74,6 +78,15 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	@Autowired
 	private SpringValidatorAdapter validator;
+
+	@Value("${spring.mvc.taskExecutor.corePoolSize:5}")
+	private int corePoolSize = 5;
+
+	@Value("${spring.mvc.taskExecutor.maxPoolSize:100}")
+	private int maxPoolSize = 100;
+
+	@Value("${spring.mvc.taskExecutor.queueCapacity:50}")
+	private int queueCapacity = 50;
 
 	@PostConstruct
 	private void init() {
@@ -109,6 +122,15 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
 		return objectMapper;
+	}
+
+	@Bean
+	public AsyncTaskExecutor taskExecutor() {
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(corePoolSize);
+		taskExecutor.setMaxPoolSize(maxPoolSize);
+		taskExecutor.setQueueCapacity(queueCapacity);
+		return taskExecutor;
 	}
 
 	@Override
@@ -182,6 +204,12 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Override
 	protected void configureViewResolvers(ViewResolverRegistry registry) {
 		registry.freeMarker();
+	}
+
+	@Override
+	protected void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+		configurer.setDefaultTimeout(30000);
+		configurer.setTaskExecutor(taskExecutor());
 	}
 
 	@Bean
