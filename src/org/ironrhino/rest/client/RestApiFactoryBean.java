@@ -12,6 +12,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,6 +65,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	private final String apiBaseUrl;
 
+	private final Map<String, String> requestHeaders;
+
 	private final Object restApiBean;
 
 	public RestApiFactoryBean(Class<?> restApiClass) {
@@ -81,6 +84,16 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		this.restApiClass = restApiClass;
 		RestApi annotation = restApiClass.getAnnotation(RestApi.class);
 		this.apiBaseUrl = (annotation != null) ? annotation.apiBaseUrl() : "";
+		Map<String, String> map = null;
+		if (annotation != null) {
+			RequestHeader[] rhs = annotation.requestHeaders();
+			if (rhs.length > 0) {
+				map = new HashMap<>(rhs.length * 2);
+				for (RequestHeader h : annotation.requestHeaders())
+					map.put(h.name(), h.value());
+			}
+		}
+		this.requestHeaders = map != null ? map : Collections.emptyMap();
 		if (restTemplate == null) {
 			restTemplate = new org.ironrhino.core.spring.http.client.RestTemplate();
 			Iterator<HttpMessageConverter<?>> it = restTemplate.getMessageConverters().iterator();
@@ -138,6 +151,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 		Map<String, Object> pathVariables = new HashMap<>(8);
 		MultiValueMap<String, String> headers = new HttpHeaders();
+		for (Map.Entry<String, String> entry : requestHeaders.entrySet())
+			headers.set(entry.getKey(), entry.getValue());
 		MultiValueMap<String, Object> requestParams = null;
 		Map<String, String> cookieValues = null;
 		List<Object> requestParamsObjectCandidates = new ArrayList<>(1);

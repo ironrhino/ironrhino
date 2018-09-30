@@ -9,11 +9,12 @@ import org.ironrhino.rest.client.RestClientConfiguration.MyJsonValidator;
 import org.ironrhino.security.domain.User;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@RestApi(restClient = "restClient")
+@RestApi(restClient = "restClient", requestHeaders = { @RequestHeader(name = "Connection", value = "Keep-Alive") })
 @RequestMapping("/user")
 public interface UserClient {
 

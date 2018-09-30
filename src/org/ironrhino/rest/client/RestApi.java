@@ -7,6 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Retention(RUNTIME)
 @Target(TYPE)
@@ -23,5 +24,7 @@ public @interface RestApi {
 	String restClient() default "";
 
 	String apiBaseUrl() default "";
+
+	RequestHeader[] requestHeaders() default {};
 
 }
