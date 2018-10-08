@@ -108,7 +108,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		}
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
-			final BaseTreeableEntity entity = (BaseTreeableEntity) obj;
+			BaseTreeableEntity entity = (BaseTreeableEntity) obj;
 			boolean positionChanged = false;
 			if (isnew) {
 				session.save(entity);
@@ -128,7 +128,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				if (entity.getParent() != null)
 					entity.setParent(entity.getParent()); // recalculate fullname
 			}
-			session.saveOrUpdate(obj);
+			session.update(obj);
 			if (positionChanged) {
 				for (Object c : entity.getChildren())
 					save((T) c);
