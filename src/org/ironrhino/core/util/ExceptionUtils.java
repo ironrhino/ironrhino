@@ -9,6 +9,9 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ExceptionUtils {
+
+	private static final int MAX_DEPTH = 10;
+
 	public static String getStackTraceAsString(Throwable t) {
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -25,13 +28,17 @@ public class ExceptionUtils {
 		}
 	}
 
-	public static String getRootMessage(Throwable t) {
-		int maxDepth = 10;
-		while (t.getCause() != null && maxDepth > 0) {
-			maxDepth--;
+	public static Throwable getRootCause(Throwable t) {
+		int depth = MAX_DEPTH;
+		while (t.getCause() != null && depth > 0) {
+			depth--;
 			t = t.getCause();
 		}
-		return t.getMessage();
+		return t;
+	}
+
+	public static String getRootMessage(Throwable t) {
+		return getRootCause(t).getMessage();
 	}
 
 	public static String getDetailMessage(Throwable t) {
