@@ -54,12 +54,16 @@ public class AuthzUtils {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null)
 			return false;
-		return expressionParser.parseExpression(access).getValue(new WebSecurityExpressionRoot(auth), Boolean.class);
+		Boolean b = expressionParser.parseExpression(access).getValue(new WebSecurityExpressionRoot(auth),
+				Boolean.class);
+		return b != null && b;
 	}
 
 	public static boolean authorizeRoles(Collection<String> roles, String access) {
 		Authentication auth = new TestingAuthenticationToken(null, null, roles.toArray(new String[roles.size()]));
-		return expressionParser.parseExpression(access).getValue(new WebSecurityExpressionRoot(auth), Boolean.class);
+		Boolean b = expressionParser.parseExpression(access).getValue(new WebSecurityExpressionRoot(auth),
+				Boolean.class);
+		return b != null && b;
 	}
 
 	public static boolean authorize(String ifAllGranted, String ifAnyGranted, String ifNotGranted) {
