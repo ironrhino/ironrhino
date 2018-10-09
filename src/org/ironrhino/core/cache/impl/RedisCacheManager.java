@@ -24,12 +24,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
-import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
@@ -115,8 +115,8 @@ public class RedisCacheManager implements CacheManager {
 			return null;
 		try {
 			return findRedisTemplate(namespace).opsForValue().get(generateKey(key, namespace));
-		} catch (SerializationFailedException e) {
-			log.warn(e.getMessage(), e);
+		} catch (SerializationException e) {
+			log.warn(e.getMessage());
 			delete(key, namespace);
 			return null;
 		} catch (Exception e) {
@@ -135,8 +135,8 @@ public class RedisCacheManager implements CacheManager {
 			if (timeToIdle > 0)
 				redisTemplate.expire(actualKey, timeToIdle, timeUnit);
 			return redisTemplate.opsForValue().get(actualKey);
-		} catch (SerializationFailedException e) {
-			log.warn(e.getMessage(), e);
+		} catch (SerializationException e) {
+			log.warn(e.getMessage());
 			delete(key, namespace);
 			return null;
 		} catch (Exception e) {
