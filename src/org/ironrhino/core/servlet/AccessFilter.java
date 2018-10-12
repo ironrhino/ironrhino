@@ -216,7 +216,7 @@ public class AccessFilter implements Filter {
 				throw e;
 			} finally {
 				if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")
-						&& request.getHeader("Last-Event-Id") == null) {
+						&& request.getHeader("Last-Event-ID") == null) {
 					long responseTime = System.currentTimeMillis() - start;
 					MDC.put("responseTime", " responseTime:" + responseTime);
 					accessLog.info("");
