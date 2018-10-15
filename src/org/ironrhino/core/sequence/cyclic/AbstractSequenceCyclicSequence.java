@@ -39,7 +39,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 
 	protected String getCreateTableStatement() {
 		return new StringBuilder("CREATE TABLE ").append(getTableName()).append(" (NAME ").append(getNameColumnType())
-				.append(" PRIMARY KEY, LAST_UPDATED ").append(getTimestampColumnType()).append(")").toString();
+				.append(" NOT NULL PRIMARY KEY, LAST_UPDATED ").append(getTimestampColumnType()).append(")").toString();
 	}
 
 	protected String getInsertStatement() {

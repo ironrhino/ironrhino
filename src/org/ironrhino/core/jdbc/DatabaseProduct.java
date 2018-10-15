@@ -104,7 +104,10 @@ public enum DatabaseProduct {
 
 		@Override
 		public String polishJdbcUrl(String jdbcUrl) {
-			return polishJdbcUrl(jdbcUrl, ":", ";") + ";";
+			String url = polishJdbcUrl(jdbcUrl, ":", ";");
+			if (url.indexOf(':', url.lastIndexOf('/')) > 0 && !url.endsWith(";"))
+				url = url + ";";
+			return url;
 		}
 
 		@Override
