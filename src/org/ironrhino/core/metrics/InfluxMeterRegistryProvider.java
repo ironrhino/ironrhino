@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.lang.Nullable;
@@ -27,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 
 	public static final String DEFAULT_DB = "metrics";
+
+	public static final String DEFAULT_STEP = "PT10S";
 
 	@Autowired
 	private Environment environment;
@@ -47,7 +48,8 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 			String suffix = key.substring(key.lastIndexOf('.') + 1);
 			if (overrides != null && overrides.containsKey(suffix))
 				return overrides.get(suffix);
-			return environment.getProperty(key, suffix.equals("db") ? DEFAULT_DB : null);
+			return environment.getProperty(key,
+					suffix.equals("db") ? DEFAULT_DB : (suffix.equals("step") ? DEFAULT_STEP : null));
 		};
 	}
 
@@ -56,7 +58,7 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 			if (forUpdate)
 				log.info("Add influx metrics registry {} with db '{}'", config.uri(), config.db());
 			this.influxConfig = config;
-			this.influxMeterRegistry = new InfluxMeterRegistry(config, Clock.SYSTEM, threadFactory);
+			this.influxMeterRegistry = InfluxMeterRegistry.builder(config).threadFactory(threadFactory).build();
 			// revert https://github.com/micrometer-metrics/micrometer/issues/693
 			this.influxMeterRegistry.config().namingConvention(new InfluxNamingConvention() {
 
