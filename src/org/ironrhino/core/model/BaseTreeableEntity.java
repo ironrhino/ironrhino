@@ -54,7 +54,6 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	@SearchableProperty
 	protected String name;
 
-	@Column(name = "level")
 	@UiConfig(hidden = true)
 	protected int level;
 
