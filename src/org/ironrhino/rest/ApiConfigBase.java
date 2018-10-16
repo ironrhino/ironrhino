@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySources;
@@ -262,8 +261,11 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	}
 
 	@Bean
-	protected BeanPostProcessor methodValidationPostProcessor() {
-		return new MethodValidationPostProcessor();
+	protected MethodValidationPostProcessor methodValidationPostProcessor() {
+		MethodValidationPostProcessor mvpp = new MethodValidationPostProcessor();
+		mvpp.setProxyTargetClass(true);
+		mvpp.setValidator(this.validator);
+		return mvpp;
 	}
 
 	@Bean
