@@ -7,7 +7,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -174,7 +173,7 @@ public class ApiDoc implements Serializable {
 
 		Class<?> responseBodyClass = method.getReturnType();
 		Type responseBodyGenericType = method.getGenericReturnType();
-		if (Collection.class.isAssignableFrom(responseBodyClass)) {
+		if (Iterable.class.isAssignableFrom(responseBodyClass)) {
 			responseBodyType = "collection";
 		} else if (ResultPage.class.isAssignableFrom(responseBodyClass)) {
 			responseBodyType = "resultPage";
@@ -189,7 +188,7 @@ public class ApiDoc implements Serializable {
 			} else if (type instanceof ParameterizedType) {
 				responseBodyGenericType = pt;
 				pt = (ParameterizedType) type;
-				if (Collection.class.isAssignableFrom((Class<?>) pt.getRawType())) {
+				if (Iterable.class.isAssignableFrom((Class<?>) pt.getRawType())) {
 					responseBodyType = "collection";
 					responseBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
 				}
@@ -204,7 +203,7 @@ public class ApiDoc implements Serializable {
 			} else if (type instanceof ParameterizedType) {
 				responseBodyGenericType = pt;
 				pt = (ParameterizedType) type;
-				if (Collection.class.isAssignableFrom((Class<?>) pt.getRawType())) {
+				if (Iterable.class.isAssignableFrom((Class<?>) pt.getRawType())) {
 					responseBodyType = "collection";
 					responseBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
 				}
@@ -287,7 +286,7 @@ public class ApiDoc implements Serializable {
 						RequestBody ann = (RequestBody) anno;
 						requestBodyRequired = ann.required();
 						Class<?> requestBodyClass = parameterType;
-						if (Collection.class.isAssignableFrom(requestBodyClass)) {
+						if (Iterable.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "collection";
 						} else if (ResultPage.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "resultPage";

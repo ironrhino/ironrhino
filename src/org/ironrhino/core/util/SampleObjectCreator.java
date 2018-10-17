@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -68,7 +67,7 @@ public class SampleObjectCreator {
 				Set<Object> set = new HashSet<>();
 				set.add(createSample(clazz));
 				return set;
-			} else if (Collection.class.isAssignableFrom(raw)) {
+			} else if (Iterable.class.isAssignableFrom(raw)) {
 				List<Object> list = new ArrayList<>();
 				list.add(createSample(clazz));
 				return list;
@@ -144,7 +143,7 @@ public class SampleObjectCreator {
 						if (!references.contains(clazz2))
 							set.add((clazz2 == clazz) ? obj : createObject(clazz2, references));
 						value = set;
-					} else if (Collection.class.isAssignableFrom(raw)) {
+					} else if (Iterable.class.isAssignableFrom(raw)) {
 						List<Object> list = new ArrayList<>();
 						if (!references.contains(clazz2))
 							list.add((clazz2 == clazz) ? obj : createObject(clazz2, references));

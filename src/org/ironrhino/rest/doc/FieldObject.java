@@ -12,7 +12,6 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -87,7 +86,7 @@ public class FieldObject implements Serializable {
 			Type rawtype = pt.getRawType();
 			if (rawtype instanceof Class) {
 				Class<?> cls = (Class<?>) rawtype;
-				if (Collection.class.isAssignableFrom(cls) && pt.getActualTypeArguments().length > 0
+				if (Iterable.class.isAssignableFrom(cls) && pt.getActualTypeArguments().length > 0
 						&& pt.getActualTypeArguments()[0] instanceof Class) {
 					return create(name, (Class<?>) (pt.getActualTypeArguments()[0]), required, true, defaultValue, fd);
 				} else {
@@ -131,7 +130,7 @@ public class FieldObject implements Serializable {
 				type = "float";
 			else if (cls == Boolean.class || cls == Boolean.TYPE)
 				type = "boolean";
-			else if (Collection.class.isAssignableFrom(cls))
+			else if (Iterable.class.isAssignableFrom(cls))
 				type = "array";
 			else if (java.sql.Timestamp.class.isAssignableFrom(cls))
 				type = "datetime";
