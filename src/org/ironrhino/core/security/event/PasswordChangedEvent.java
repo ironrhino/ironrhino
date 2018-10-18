@@ -1,4 +1,4 @@
-package org.ironrhino.security.event;
+package org.ironrhino.core.security.event;
 
 import org.ironrhino.core.event.AbstractAuditEvent;
 

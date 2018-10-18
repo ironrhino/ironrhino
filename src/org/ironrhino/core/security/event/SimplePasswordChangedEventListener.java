@@ -1,4 +1,4 @@
-package org.ironrhino.security.event;
+package org.ironrhino.core.security.event;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
