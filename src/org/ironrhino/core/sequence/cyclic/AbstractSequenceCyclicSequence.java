@@ -39,7 +39,8 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 
 	protected String getCreateTableStatement() {
 		return new StringBuilder("CREATE TABLE ").append(getTableName()).append(" (NAME ").append(getNameColumnType())
-				.append(" NOT NULL PRIMARY KEY, LAST_UPDATED ").append(getTimestampColumnType()).append(")").toString();
+				.append(" NOT NULL PRIMARY KEY, LAST_UPDATED ").append(getTimestampColumnType()).append(" NOT NULL)")
+				.toString();
 	}
 
 	protected String getInsertStatement() {
@@ -223,6 +224,9 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			result.nextId = rs.getInt(1);
 			result.currentTimestamp = rs.getTimestamp(2);
 			result.lastTimestamp = rs.getTimestamp(3);
+			// keep monotonic incrementing
+			if (result.lastTimestamp.after(result.currentTimestamp))
+				result.currentTimestamp = result.lastTimestamp;
 			return result;
 		}
 	}
@@ -233,8 +237,9 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			rs.next();
 			result.currentTimestamp = rs.getTimestamp(1);
 			result.lastTimestamp = rs.getTimestamp(2);
+			// keep monotonic incrementing
 			if (result.lastTimestamp.after(result.currentTimestamp))
-				throw new IllegalStateException("LAST_UPDATED should before CURRENT_TIMESTAMP");
+				result.currentTimestamp = result.lastTimestamp;
 			return result;
 		}
 	}

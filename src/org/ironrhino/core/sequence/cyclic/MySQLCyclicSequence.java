@@ -12,13 +12,15 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
+	private String setVariableSql;
 	private String incrementSql;
 	private String restartSql;
-	private String setVariableSql = "SELECT @TIMESTAMP:=UNIX_TIMESTAMP()";
 	private String selectLastInsertIdSql = "SELECT LAST_INSERT_ID(),@TIMESTAMP";
 
 	@Override
 	public void afterPropertiesSet() {
+		setVariableSql = new StringBuilder("SELECT @TIMESTAMP:=GREATEST(LAST_UPDATED,UNIX_TIMESTAMP()) FROM `")
+				.append(getTableName()).append("` WHERE NAME='").append(getSequenceName()).append("'").toString();
 		incrementSql = new StringBuilder("UPDATE `").append(getTableName())
 				.append("` SET VALUE=LAST_INSERT_ID(VALUE+1),LAST_UPDATED=@TIMESTAMP WHERE NAME='")
 				.append(getSequenceName()).append("' AND DATE_FORMAT(FROM_UNIXTIME(LAST_UPDATED),'")
