@@ -39,7 +39,10 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 		int maxlength = String.valueOf(Long.MAX_VALUE).length() - getCycleType().getPattern().length();
 		Assert.isTrue(getPaddingLength() <= maxlength, "paddingLength should not large than " + maxlength);
 		boundValueOperations = sequenceStringRedisTemplate.boundValueOps(KEY_SEQUENCE + getSequenceName());
-		boundValueOperations.setIfAbsent(getStringValue(now(), getPaddingLength(), 0));
+		Long time = sequenceStringRedisTemplate.execute((RedisConnection connection) -> connection.time());
+		if (time == null)
+			throw new RuntimeException("Unexpected null");
+		boundValueOperations.setIfAbsent(getStringValue(new Date(time), getPaddingLength(), 0));
 	}
 
 	@Override
@@ -72,7 +75,7 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			if (getCycleType().isSameCycle(d, now))
 				return stringValue;
 			else if (d.after(now)) {
-				// overflow
+				// treat it as overflow not clock jumps backward
 				long next = value
 						- Long.valueOf(DateUtils.formatDate8(now)) * ((long) Math.pow(10, getPaddingLength()));
 				return DateUtils.format(now, cycleType.getPattern()) + next;
@@ -91,15 +94,6 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			e.printStackTrace();
 		}
 		return nextStringValue();
-	}
-
-	protected Date now() {
-		Calendar cal = Calendar.getInstance();
-		Long value = sequenceStringRedisTemplate.execute((RedisConnection connection) -> connection.time());
-		if (value == null)
-			throw new RuntimeException("Unexpected null");
-		cal.setTimeInMillis(value);
-		return cal.getTime();
 	}
 
 }
