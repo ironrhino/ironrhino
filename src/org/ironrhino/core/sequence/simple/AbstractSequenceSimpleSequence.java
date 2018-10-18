@@ -44,7 +44,7 @@ public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSim
 			}
 			for (String sequence : new LinkedHashSet<>(
 					Arrays.asList(sequenceName.toUpperCase(), sequenceName, sequenceName.toLowerCase()))) {
-				try (ResultSet rs = dbmd.getTables(catalog, schema, sequence, new String[] { "TABLE" })) {
+				try (ResultSet rs = dbmd.getTables(catalog, schema, sequence, new String[] { "SEQUENCE" })) {
 					if (rs.next()) {
 						sequenceExists = true;
 						break;
