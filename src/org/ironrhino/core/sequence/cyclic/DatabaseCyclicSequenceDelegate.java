@@ -4,11 +4,21 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.Locale;
 
+import javax.sql.DataSource;
+
 import org.ironrhino.core.jdbc.DatabaseProduct;
 
 public class DatabaseCyclicSequenceDelegate extends AbstractDatabaseCyclicSequence {
 
 	private AbstractDatabaseCyclicSequence seq = null;
+
+	public DatabaseCyclicSequenceDelegate() {
+
+	}
+
+	public DatabaseCyclicSequenceDelegate(DataSource dataSource) {
+		setDataSource(dataSource);
+	}
 
 	@Override
 	public void afterPropertiesSet() throws java.lang.Exception {

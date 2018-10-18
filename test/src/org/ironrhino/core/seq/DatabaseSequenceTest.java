@@ -1,5 +1,7 @@
 package org.ironrhino.core.seq;
 
+import javax.sql.DataSource;
+
 import org.ironrhino.core.configuration.DataSourceConfiguration;
 import org.ironrhino.core.seq.DatabaseSequenceTest.DatabaseSequenceConfiguration;
 import org.ironrhino.core.sequence.CyclicSequence.CycleType;
@@ -7,7 +9,6 @@ import org.ironrhino.core.sequence.Sequence;
 import org.ironrhino.core.sequence.cyclic.DatabaseCyclicSequenceDelegate;
 import org.ironrhino.core.sequence.simple.DatabaseSimpleSequenceDelegate;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -22,14 +23,14 @@ public class DatabaseSequenceTest extends SequenceTestBase {
 	@Import(DataSourceConfiguration.class)
 	static class DatabaseSequenceConfiguration {
 
-		@Bean(autowire = Autowire.BY_NAME)
-		public Sequence sample1Sequence() {
-			return new DatabaseSimpleSequenceDelegate();
+		@Bean
+		public Sequence sample1Sequence(DataSource dataSource) {
+			return new DatabaseSimpleSequenceDelegate(dataSource);
 		}
 
-		@Bean(autowire = Autowire.BY_NAME)
-		public Sequence sample2Sequence() {
-			DatabaseCyclicSequenceDelegate cs = new DatabaseCyclicSequenceDelegate();
+		@Bean
+		public Sequence sample2Sequence(DataSource dataSource) {
+			DatabaseCyclicSequenceDelegate cs = new DatabaseCyclicSequenceDelegate(dataSource);
 			cs.setCycleType(CycleType.MINUTE);
 			return cs;
 		}
