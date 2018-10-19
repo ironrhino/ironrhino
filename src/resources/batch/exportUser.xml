@@ -41,7 +41,7 @@
 		</property>
 	</bean>
 	
-	<bean id="jobParemetersValidator" class="org.ironrhino.batch.job.SimpleJobParametersValidator">
+	<bean id="jobParametersValidator" class="org.ironrhino.batch.job.SimpleJobParametersValidator">
 		<property name="requiredKeys">
 			<map>
 				<entry key="workdate" value="DATE"/>
@@ -50,7 +50,7 @@
 	</bean>	
 	
 	<job id="exportUserJob" xmlns="http://www.springframework.org/schema/batch">
-		<validator ref="jobParemetersValidator"/>
+		<validator ref="jobParametersValidator"/>
 		<step id="exportToFile">
 			<tasklet>
 				<chunk reader="userReader" writer="userWriter" commit-interval="${exportUserJob.exportToFile.commit.interval:2}"/>
