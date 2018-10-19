@@ -127,6 +127,8 @@ public class ApplicationContextInspector {
 								map.put(arr[0], arr[1]);
 						}
 					}
+					ctx.getBeanProvider(DefaultPropertiesProvider.class)
+							.forEach(p -> map.putAll(p.getDefaultProperties()));
 					defaultProperties = temp = Collections.unmodifiableMap(map);
 				}
 			}

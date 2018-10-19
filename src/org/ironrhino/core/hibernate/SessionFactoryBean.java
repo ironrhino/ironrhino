@@ -53,6 +53,7 @@ import org.ironrhino.core.hibernate.event.SaveCallbackEventListener;
 import org.ironrhino.core.hibernate.event.SaveOrUpdateCallbackEventListener;
 import org.ironrhino.core.hibernate.type.YearMonthType;
 import org.ironrhino.core.jdbc.DatabaseProduct;
+import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.util.ClassScanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -63,7 +64,8 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean {
+public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean
+		implements DefaultPropertiesProvider {
 
 	@Autowired
 	private Environment environment;
@@ -152,6 +154,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		this.annotatedClasses = annotatedClasses;
 	}
 
+	@Override
 	public Map<String, String> getDefaultProperties() {
 		return defaultProperties;
 	}
