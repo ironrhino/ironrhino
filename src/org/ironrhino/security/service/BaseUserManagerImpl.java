@@ -51,28 +51,38 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	@Transactional
 	@Override
 	public void resetPassword(T user) {
+		T u = get(user.getId());
 		String newPassword = passwordGenerator != null ? passwordGenerator.generate(user) : user.getUsername();
 		if (newPassword == null)
 			newPassword = user.getUsername();
 		String password = newPassword;
-		user.setPassword(passwordEncoder.encode(password));
-		user.setPasswordModifyDate(new Date(0)); // magic date for user.isCredentialsNonExpired()
-		if (passwordNotifier != null) {
-			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-				public void afterCommit() {
-					passwordNotifier.notify(user, password);
-				}
-			});
-		}
-		super.save(user);
+		u.setPassword(passwordEncoder.encode(password));
+		u.setPasswordModifyDate(new Date(0)); // magic date for user.isCredentialsNonExpired()
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			public void afterCommit() {
+				user.setPassword(u.getPassword());
+				user.setPasswordModifyDate(u.getPasswordModifyDate());
+				if (passwordNotifier != null)
+					passwordNotifier.notify(u, password);
+			}
+		});
+		super.save(u);
 	}
 
 	@Transactional
 	@Override
 	public void changePassword(T user, String password) {
-		user.setPassword(passwordEncoder.encode(password));
-		user.setPasswordModifyDate(new Date());
-		super.save(user);
+		T u = get(user.getId());
+		u.setPassword(passwordEncoder.encode(password));
+		u.setPasswordModifyDate(new Date());
+		// copy state to origin object to avoid re-login
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			public void afterCommit() {
+				user.setPassword(u.getPassword());
+				user.setPasswordModifyDate(u.getPasswordModifyDate());
+			}
+		});
+		super.save(u);
 	}
 
 	@Override
