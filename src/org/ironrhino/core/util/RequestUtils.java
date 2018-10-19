@@ -222,6 +222,10 @@ public class RequestUtils {
 		response.addCookie(cookie);
 	}
 
+	public static boolean isSameOrigin(HttpServletRequest request, String url) {
+		return isSameOrigin(request.getRequestURL().toString(), url);
+	}
+
 	public static boolean isSameOrigin(String a, String b) {
 		if (StringUtils.isBlank(a) || StringUtils.isBlank(b))
 			return false;
