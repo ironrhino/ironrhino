@@ -89,6 +89,9 @@ public class RedisConfiguration {
 	@Value("${redis.readTimeout:5000}")
 	private int readTimeout = 5000;
 
+	@Value("${redis.shutdownTimeout:0}")
+	private int shutdownTimeout = 0;
+
 	@Value("${redis.useSsl:false}")
 	private boolean useSsl;
 
@@ -111,7 +114,8 @@ public class RedisConfiguration {
 		if (isUseSsl())
 			builder.useSsl();
 		LettuceClientConfiguration clientConfiguration = builder.clientOptions(clientOptions)
-				.commandTimeout(Duration.ofMillis(getReadTimeout())).build();
+				.commandTimeout(Duration.ofMillis(getReadTimeout()))
+				.shutdownTimeout(Duration.ofMillis(getShutdownTimeout())).build();
 		LettuceConnectionFactory redisConnectionFactory;
 		int database = getDatabase();
 		String password = getPassword();
