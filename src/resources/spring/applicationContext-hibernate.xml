@@ -12,49 +12,6 @@
 				</value>
 			</list>
 		</property>
-		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">
-					${hibernate.dialect:}
-				</prop>
-				<prop key="hibernate.max_fetch_depth">
-					${hibernate.max_fetch_depth:3}
-				</prop>
-				<prop key="hibernate.default_batch_fetch_size">
-					${hibernate.default_batch_fetch_size:10}
-				</prop>
-				<prop key="hibernate.jdbc.fetch_size">
-					${hibernate.jdbc.fetch_size:20}
-				</prop>
-				<prop key="hibernate.jdbc.batch_size">
-					${hibernate.jdbc.batch_size:50}
-				</prop>
-				<prop key="hibernate.order_inserts">
-					${hibernate.order_inserts:true}
-				</prop>
-				<prop key="hibernate.order_updates">
-					${hibernate.order_updates:true}
-				</prop>
-				<prop key="hibernate.jdbc.batch_versioned_data">
-					${hibernate.jdbc.batch_versioned_data:true}
-				</prop>
-				<prop key="hibernate.auto_quote_keyword">
-					${hibernate.auto_quote_keyword:true}
-				</prop>
-				<prop key="hibernate.id.new_generator_mappings">
-					${hibernate.id.new_generator_mappings:}
-				</prop>
-				<prop key="hibernate.cache.use_second_level_cache">
-					${hibernate.cache.use_second_level_cache:false}
-				</prop>
-				<prop key="hibernate.show_sql">
-					${hibernate.show_sql:false}
-				</prop>
-				<prop key="hibernate.hbm2ddl.auto">
-					${hibernate.hbm2ddl.auto:update}
-				</prop>
-			</props>
-		</property>
 	</bean>
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate5.HibernateTransactionManager"
