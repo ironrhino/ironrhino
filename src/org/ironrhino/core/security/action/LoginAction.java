@@ -145,7 +145,7 @@ public class LoginAction extends BaseAction {
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
-		if (StringUtils.isBlank(targetUrl))
+		if (StringUtils.isBlank(targetUrl) || !RequestUtils.isSameOrigin(request, targetUrl))
 			targetUrl = defaultTargetUrl;
 		return REDIRECT;
 	}
@@ -153,6 +153,8 @@ public class LoginAction extends BaseAction {
 	@Override
 	public String input() {
 		HttpServletRequest request = ServletActionContext.getRequest();
+		if (StringUtils.isNotBlank(targetUrl) && !RequestUtils.isSameOrigin(request, targetUrl))
+			targetUrl = defaultTargetUrl;
 		if (username == null)
 			username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 		String referer = request.getHeader("Referer");
