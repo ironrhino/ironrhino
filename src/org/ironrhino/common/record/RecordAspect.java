@@ -76,6 +76,7 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 			return;
 
 		Session session = sessionFactory.getCurrentSession();
+		boolean needFlush = false;
 		for (AbstractEvent event : events) {
 			try {
 				Object entity;
@@ -187,11 +188,13 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 				record.setAction(action.name());
 				record.setRecordDate(new Date());
 				session.save(record);
+				needFlush = true;
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}
-		session.flush();
+		if (needFlush)
+			session.flush();
 	}
 
 	@Override
