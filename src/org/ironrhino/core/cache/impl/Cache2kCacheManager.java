@@ -42,7 +42,7 @@ public class Cache2kCacheManager implements CacheManager {
 		if (key == null || value == null)
 			return;
 		Cache<String, Object> cache = getCache(namespace, true);
-		cache.invoke(key, e -> e.setValue(value).setExpiry(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
+		cache.invoke(key, e -> e.setValue(value).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
 				: (System.currentTimeMillis() + timeUnit.toMillis(timeToLive))));
 	}
 
@@ -112,7 +112,7 @@ public class Cache2kCacheManager implements CacheManager {
 		Cache<String, Object> cache = getCache(namespace, true);
 		for (Map.Entry<String, Object> entry : map.entrySet())
 			cache.invoke(entry.getKey(),
-					e -> e.setValue(entry.getValue()).setExpiry(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
+					e -> e.setValue(entry.getValue()).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
 							: (System.currentTimeMillis() + timeUnit.toMillis(timeToLive))));
 	}
 
@@ -160,10 +160,10 @@ public class Cache2kCacheManager implements CacheManager {
 			if (e.exists()) {
 				e.setValue((Long) e.getValue() + delta);
 				if (timeToLive > 0)
-					e.setExpiry(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+					e.setExpiryTime(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
 			} else {
 				e.setValue(delta);
-				e.setExpiry(System.currentTimeMillis()
+				e.setExpiryTime(System.currentTimeMillis()
 						+ (timeToLive > 0 ? timeUnit.toMillis(timeToLive) : Integer.MAX_VALUE));
 			}
 			return e;
@@ -172,7 +172,8 @@ public class Cache2kCacheManager implements CacheManager {
 	}
 
 	@Override
-	public long decrementAndReturnNonnegative(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
+	public long decrementAndReturnNonnegative(String key, long delta, int timeToLive, TimeUnit timeUnit,
+			String namespace) {
 		if (key == null)
 			throw new IllegalArgumentException("key should not be null");
 		if (delta <= 0)
@@ -186,7 +187,7 @@ public class Cache2kCacheManager implements CacheManager {
 								"namespace:" + namespace + ", key:" + key + " is less than " + delta);
 					e.setValue((Long) e.getValue() - delta);
 					if (timeToLive > 0)
-						e.setExpiry(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+						e.setExpiryTime(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
 				} else {
 					throw new IllegalStateException("namespace:" + namespace + ", key:" + key + " does not exist");
 				}
