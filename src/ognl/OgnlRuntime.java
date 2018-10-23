@@ -1591,6 +1591,7 @@ public class OgnlRuntime {
      * @deprecated Use {@link #callMethod(OgnlContext, Object, String, Object[])} instead.
      * @throws OgnlException For lots of different reasons.
      */
+    @Deprecated
     public static Object callMethod(OgnlContext context, Object target, String methodName, String propertyName, Object[] args)
             throws OgnlException
     {
