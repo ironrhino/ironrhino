@@ -15,9 +15,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.validation.ConstraintViolationException;
+
+import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.sample.remoting.PersonRepository;
 import org.ironrhino.sample.remoting.TestService;
 import org.ironrhino.sample.remoting.TestService.FutureType;
+import org.ironrhino.security.domain.User;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -85,6 +89,21 @@ public abstract class RemotingServiceTestsBase {
 		assertNull(testService.search(null));
 		assertEquals(Collections.EMPTY_LIST, testService.search(""));
 		assertEquals("username", testService.search("username").get(0).getUsername());
+	}
+
+	@Test(expected = ConstraintViolationException.class)
+	public void testBeanValidation() throws Exception {
+		assertEquals(Scope.LOCAL, testService.echo(Scope.LOCAL));
+		testService.echo((Scope) null);
+	}
+
+	@Test(expected = ConstraintViolationException.class)
+	public void testBeanValidationWithValid() throws Exception {
+		User user = new User();
+		user.setEmail("test@test.com");
+		assertEquals(user, testService.echo(user));
+		user.setEmail("iamnotemail");
+		testService.echo(user);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

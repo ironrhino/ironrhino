@@ -2,10 +2,16 @@ package org.ironrhino.core.spring;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import javax.validation.executable.ExecutableValidator;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -14,10 +20,13 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
+import org.springframework.validation.annotation.Validated;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +47,9 @@ public abstract class MethodInterceptorFactoryBean
 	@Setter
 	private ApplicationContext applicationContext;
 
+	@Autowired(required = false)
+	private Validator validator;
+
 	@Override
 	public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
@@ -45,8 +57,21 @@ public abstract class MethodInterceptorFactoryBean
 			Class<?> objectType = getObjectType();
 			return "Dynamic proxy for [" + (objectType != null ? objectType.getName() : "Unknown") + "]";
 		}
+		Object bean = getObject();
+		ExecutableValidator executableValidator = null;
+		Class<?>[] groups = null;
+		if (validator != null) {
+			executableValidator = validator.forExecutables();
+			groups = determineValidationGroups(method);
+		}
+		if (executableValidator != null) {
+			Set<ConstraintViolation<Object>> constraintViolations = executableValidator.validateParameters(bean, method,
+					methodInvocation.getArguments(), groups);
+			if (!constraintViolations.isEmpty())
+				throw new ConstraintViolationException(constraintViolations);
+		}
 		if (method.isDefault())
-			return ReflectionUtils.invokeDefaultMethod(getObject(), method, methodInvocation.getArguments());
+			return ReflectionUtils.invokeDefaultMethod(bean, method, methodInvocation.getArguments());
 		Class<?> returnType = method.getReturnType();
 		if (returnType == Callable.class || returnType == ListenableFuture.class || returnType == Future.class) {
 			Callable<Object> callable = new Callable<Object>() {
@@ -73,10 +98,24 @@ public abstract class MethodInterceptorFactoryBean
 				return getExecutorService().submit(callable);
 			}
 		}
-		return doInvoke(methodInvocation);
+		Object returnValue = doInvoke(methodInvocation);
+		if (executableValidator != null) {
+			Set<ConstraintViolation<Object>> constraintViolations = executableValidator.validateReturnValue(bean,
+					method, returnValue, groups);
+			if (!constraintViolations.isEmpty())
+				throw new ConstraintViolationException(constraintViolations);
+		}
+		return returnValue;
 	}
 
 	protected abstract Object doInvoke(MethodInvocation methodInvocation) throws Throwable;
+
+	protected Class<?>[] determineValidationGroups(Method method) {
+		Validated validatedAnn = AnnotationUtils.findAnnotation(method, Validated.class);
+		if (validatedAnn == null)
+			validatedAnn = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Validated.class);
+		return (validatedAnn != null ? validatedAnn.value() : new Class<?>[0]);
+	}
 
 	private ExecutorService getExecutorService() {
 		ExecutorService es = executorService;

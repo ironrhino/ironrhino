@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.security.domain.User;
@@ -39,9 +42,9 @@ public interface TestService {
 
 	public Date echo(Date value);
 
-	public Scope echo(Scope value);
+	public Scope echo(@NotNull Scope value);
 
-	public User echo(User value);
+	public User echo(@Valid User value);
 
 	public List<String> echoList(List<String> list);
 
