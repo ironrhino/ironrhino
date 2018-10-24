@@ -7,7 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface JdbcRepository {

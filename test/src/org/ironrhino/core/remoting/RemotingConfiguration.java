@@ -5,6 +5,7 @@ import org.ironrhino.sample.remoting.PersonRepository;
 import org.ironrhino.sample.remoting.TestService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Configuration
 public class RemotingConfiguration {
@@ -23,6 +24,11 @@ public class RemotingConfiguration {
 		hic.setServiceInterface(PersonRepository.class);
 		hic.setHost("localhost");
 		return hic;
+	}
+
+	@Bean
+	public LocalValidatorFactoryBean validatorFactory() {
+		return new LocalValidatorFactoryBean();
 	}
 
 }

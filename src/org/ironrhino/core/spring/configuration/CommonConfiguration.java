@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.validation.MessageInterpolator;
-import javax.validation.ValidatorFactory;
+import javax.validation.Validator;
 
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.ironrhino.core.spring.converter.CustomConversionService;
@@ -24,12 +24,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.annotation.Role;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
@@ -38,6 +40,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MessageSourceResourceBundleLocator;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,13 +79,21 @@ public class CommonConfiguration {
 	}
 
 	@Bean
-	public ValidatorFactory validatorFactory() {
+	public LocalValidatorFactoryBean validatorFactory() {
 		LocalValidatorFactoryBean validatorFactoryBean = new LocalValidatorFactoryBean();
 		boolean caching = AppInfo.getStage() != Stage.DEVELOPMENT;
 		MessageInterpolator messageInterpolator = new ResourceBundleMessageInterpolator(
 				new MessageSourceResourceBundleLocator(messageSource(true)), caching);
 		validatorFactoryBean.setMessageInterpolator(messageInterpolator);
 		return validatorFactoryBean;
+	}
+
+	@Bean
+	public static MethodValidationPostProcessor methodValidationPostProcessor(@Lazy Validator validator) {
+		MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();
+		postProcessor.setValidator(validator);
+		postProcessor.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		return postProcessor;
 	}
 
 	@Bean

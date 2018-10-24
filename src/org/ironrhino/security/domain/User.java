@@ -5,14 +5,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.constraints.Email;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class User implements UserDetails {
 
 	private static final long serialVersionUID = -6135434863820342822L;
@@ -23,6 +23,7 @@ public class User implements UserDetails {
 
 	private String name;
 
+	@Email
 	private String email;
 
 	private String phone;
