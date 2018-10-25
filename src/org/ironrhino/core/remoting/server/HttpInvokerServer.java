@@ -17,8 +17,6 @@ import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
 
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.ServiceRegistry;
@@ -102,7 +100,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			} catch (Throwable ex) {
 				if (ex instanceof InvocationTargetException) {
 					ex = new InvocationTargetException(
-							translateAndTrim(((InvocationTargetException) ex).getTargetException()));
+							transform(((InvocationTargetException) ex).getTargetException()));
 				}
 				log.error("Processing of " + MDC.get(MDC_KEY_INTERFACE_NAME) + " remote call resulted in exception",
 						ex instanceof InvocationTargetException ? ex.getCause() : ex);
@@ -131,7 +129,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 					} else {
 						Throwable ex = e;
 						if (ex instanceof CompletionException) {
-							ex = translateAndTrim(e.getCause());
+							ex = transform(e.getCause());
 						}
 						log.error("Processing of " + MDC.get(MDC_KEY_INTERFACE_NAME)
 								+ " remote call resulted in exception", ex);
@@ -154,7 +152,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 								: (((Future<?>) value)).get());
 					} catch (Throwable e) {
 						if (value instanceof Future && e instanceof ExecutionException)
-							e = translateAndTrim(e.getCause());
+							e = transform(e.getCause());
 						log.error("Processing of " + MDC.get(MDC_KEY_INTERFACE_NAME)
 								+ " remote call resulted in exception", e);
 						asyncResult.setException(new InvocationTargetException(e));
@@ -167,13 +165,9 @@ public class HttpInvokerServer implements HttpRequestHandler {
 		return new RemoteInvocationResult(value);
 	}
 
-	protected Throwable translateAndTrim(Throwable throwable) {
-		if (throwable instanceof ConstraintViolationException) {
-			ValidationException ve = new ValidationException(throwable.getMessage());
-			ve.setStackTrace(throwable.getStackTrace());
-			throwable = ve;
-		}
+	protected Throwable transform(Throwable throwable) {
 		ExceptionUtils.trimStackTrace(throwable, MAX_STACK_TRACE_ELEMENTS);
+		throwable = ExceptionUtils.transformForSerialization(throwable);
 		return throwable;
 	}
 

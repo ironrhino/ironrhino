@@ -4,6 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 
 import lombok.experimental.UtilityClass;
 
@@ -53,6 +60,21 @@ public class ExceptionUtils {
 				sb.append(":").append(t.getLocalizedMessage());
 		}
 		return sb.toString();
+	}
+
+	public static Throwable transformForSerialization(Throwable throwable) {
+		if (throwable instanceof ConstraintViolationException) {
+			ConstraintViolationException cve = (ConstraintViolationException) throwable;
+			Set<ConstraintViolation<?>> cvs = new LinkedHashSet<ConstraintViolation<?>>();
+			for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
+				cvs.add(ConstraintViolationImpl.forBeanValidation(cv.getMessageTemplate(), null, null, cv.getMessage(),
+						null, null, null, null, cv.getPropertyPath(), null, null, null));
+			}
+			ConstraintViolationException ex = new ConstraintViolationException(cvs);
+			ex.setStackTrace(cve.getStackTrace());
+			return ex;
+		}
+		return throwable;
 	}
 
 	public static void trimStackTrace(Throwable throwable, int maxStackTraceElements) {
