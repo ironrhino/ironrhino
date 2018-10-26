@@ -91,7 +91,7 @@ EOF
 cd ..
 cd ..
 sed -i '99i export SPRING_PROFILES_DEFAULT=dual' tomcat/bin/catalina.sh
-sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=10 -XX:ConcGCThreads=2 -XX:InitiatingHeapOccupancyPercent=70 -Djava.awt.headless=true -Djava.security.egd=file:/dev/urandom"' tomcat/bin/catalina.sh
+sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=10 -XX:ConcGCThreads=2 -XX:InitiatingHeapOccupancyPercent=70 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=../logs/dumps -Djava.awt.headless=true -Djava.security.egd=file:/dev/urandom"' tomcat/bin/catalina.sh
 mv tomcat tomcat8080
 cp -R tomcat8080 tomcat8081
 sed -i '99i CATALINA_PID="/tmp/tomcat8080_pid"' tomcat8080/bin/catalina.sh
