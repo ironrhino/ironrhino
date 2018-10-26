@@ -449,7 +449,8 @@ public enum DatabaseProduct {
 		String qs = getRecommendedJdbcUrlQueryString();
 		if (qs == null)
 			return jdbcUrl;
-		int i = jdbcUrl.indexOf(delimiter, jdbcUrl.lastIndexOf('/'));
+		int i = delimiter.equals(":") ? jdbcUrl.indexOf(delimiter, jdbcUrl.lastIndexOf('/'))
+				: jdbcUrl.indexOf(delimiter);
 		if (i > 0) {
 			String uri = jdbcUrl.substring(0, i);
 			String params = jdbcUrl.substring(i + 1);
