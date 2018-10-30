@@ -19,7 +19,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,7 +69,7 @@ public class KafkaConsumerConfigBase {
 		factory.setConsumerFactory(consumerFactory);
 		factory.setConcurrency(consumerConcurrency);
 		factory.setBatchListener(true);
-		factory.getContainerProperties().setAckMode(AckMode.MANUAL_IMMEDIATE);
+		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 		return factory;
 	}
 
