@@ -56,6 +56,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -116,6 +117,7 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 
 	private DataSource dataSource;
 
+	@Getter
 	private final Map<String, String> defaultProperties;
 
 	public SessionFactoryBean() {
@@ -148,11 +150,6 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 	@Override
 	public void setAnnotatedClasses(Class<?>... annotatedClasses) {
 		this.annotatedClasses = annotatedClasses;
-	}
-
-	@Override
-	public Map<String, String> getDefaultProperties() {
-		return defaultProperties;
 	}
 
 	protected void fillHibernateProperties() {

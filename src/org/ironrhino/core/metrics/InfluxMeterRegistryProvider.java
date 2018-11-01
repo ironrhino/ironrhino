@@ -1,10 +1,12 @@
 package org.ironrhino.core.metrics;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadFactory;
 
+import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.spring.configuration.AddressAvailabilityCondition;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.NameableThreadFactory;
@@ -18,12 +20,13 @@ import io.micrometer.core.lang.Nullable;
 import io.micrometer.influx.InfluxConfig;
 import io.micrometer.influx.InfluxMeterRegistry;
 import io.micrometer.influx.InfluxNamingConvention;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @ClassPresentConditional("io.micrometer.influx.InfluxMeterRegistry")
 @Slf4j
-public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
+public class InfluxMeterRegistryProvider implements MeterRegistryProvider, DefaultPropertiesProvider {
 
 	public static final String DEFAULT_DB = "metrics";
 
@@ -38,6 +41,18 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 
 	private InfluxMeterRegistry influxMeterRegistry;
 
+	@Getter
+	private final Map<String, String> defaultProperties;
+
+	public InfluxMeterRegistryProvider() {
+		Map<String, String> map = new HashMap<>();
+		String prefix = InfluxConfig.DEFAULT.prefix();
+		map.put(prefix + ".db", DEFAULT_DB);
+		map.put(prefix + ".step", DEFAULT_STEP);
+		map.put(prefix + ".uri", InfluxConfig.DEFAULT.uri());
+		defaultProperties = Collections.unmodifiableMap(map);
+	}
+
 	@Override
 	public Optional<InfluxMeterRegistry> get() {
 		return createMeterRegistry(getConfig(Collections.emptyMap()), false);
@@ -48,8 +63,7 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider {
 			String suffix = key.substring(key.lastIndexOf('.') + 1);
 			if (overrides != null && overrides.containsKey(suffix))
 				return overrides.get(suffix);
-			return environment.getProperty(key,
-					suffix.equals("db") ? DEFAULT_DB : (suffix.equals("step") ? DEFAULT_STEP : null));
+			return environment.getProperty(key, defaultProperties.get(key));
 		};
 	}
 
