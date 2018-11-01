@@ -92,8 +92,8 @@ public class UserController {
 	@Order(3)
 	@Api(value = "获取用户", statuses = { @Status(code = 404, description = "用户名不存在") })
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
-	public DeferredResult<User> get(final @Length(min = 3, max = 20) @PathVariable String username) {
-		final DeferredResult<User> dr = new DeferredResult<>(5000L, RestStatus.REQUEST_TIMEOUT);
+	public DeferredResult<User> get(@Length(min = 3, max = 20) @PathVariable String username) {
+		DeferredResult<User> dr = new DeferredResult<>(5000L, RestStatus.REQUEST_TIMEOUT);
 		executorService.execute(() -> {
 			User u = (User) userManager.loadUserByUsername(username);
 			if (u == null)

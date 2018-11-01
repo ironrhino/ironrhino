@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.Data;
 
@@ -168,6 +169,10 @@ public class FieldObject implements Serializable {
 	}
 
 	public static List<FieldObject> createList(Class<?> domainClass, Fields fields, boolean forRequest) {
+		return createList(domainClass, fields, null, forRequest);
+	}
+
+	public static List<FieldObject> createList(Class<?> domainClass, Fields fields, Class<?> view, boolean forRequest) {
 		if (fields != null && fields.value().length > 0) {
 			List<FieldObject> list = new ArrayList<>(fields.value().length);
 			for (Field f : fields.value()) {
@@ -210,6 +215,28 @@ public class FieldObject implements Serializable {
 				if (!forRequest
 						&& (pd.getReadMethod() == null || pd.getReadMethod().getAnnotation(JsonIgnore.class) != null))
 					continue;
+				if (view != null) {
+					JsonView jsonView = pd.getReadMethod().getAnnotation(JsonView.class);
+					if (jsonView == null) {
+						try {
+							jsonView = pd.getReadMethod().getDeclaringClass().getDeclaredField(name)
+									.getAnnotation(JsonView.class);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					if (jsonView != null) {
+						boolean matched = false;
+						for (Class<?> v : jsonView.value()) {
+							if (v.isAssignableFrom(view)) {
+								matched = true;
+								break;
+							}
+						}
+						if (!matched)
+							continue;
+					}
+				}
 				Field fd = null;
 				boolean required = false;
 				try {

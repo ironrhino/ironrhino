@@ -211,15 +211,13 @@ public class ApiDoc implements Serializable {
 		}
 
 		Fields responseFields = AnnotationUtils.findAnnotation(apiDocMethod, Fields.class);
-		responseBody = FieldObject.createList(responseBodyClass, responseFields, false);
-
+		Class<?> view = null;
 		Object responseSample = ApiDocHelper.generateSample(apiDocClazz, apiDocMethod, responseFields);
 		if (responseSample == null)
 			responseSample = ApiDocHelper.createSample(responseBodyGenericType);
 		if (responseSample instanceof String) {
 			responseBodySample = (String) responseSample;
 		} else if (responseSample != null) {
-			Class<?> view = null;
 			if (responseSample instanceof Flux) {
 				responseSample = Collections.singletonList(((Flux<?>) responseSample).blockFirst());
 			} else if (responseSample instanceof Mono) {
@@ -237,7 +235,7 @@ public class ApiDoc implements Serializable {
 				responseSample = ((MappingJacksonValue) responseSample).getValue();
 			}
 
-			JsonView jsonView = method.getAnnotation(JsonView.class);
+			JsonView jsonView = AnnotationUtils.findAnnotation(method, JsonView.class);
 			if (view == null && jsonView != null)
 				view = jsonView.value()[0];
 			if (view == null)
@@ -245,6 +243,8 @@ public class ApiDoc implements Serializable {
 			else
 				responseBodySample = objectMapper.writerWithView(view).writeValueAsString(responseSample);
 		}
+
+		responseBody = FieldObject.createList(responseBodyClass, responseFields, view, false);
 
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		Type[] genericParameterTypes = method.getGenericParameterTypes();
