@@ -167,6 +167,8 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 			}
 		}
 
+		properties.putAll(getHibernateProperties());
+
 		DatabaseProduct databaseProduct = null;
 		try (Connection conn = dataSource.getConnection()) {
 			DatabaseMetaData dbmd = conn.getMetaData();
