@@ -162,6 +162,7 @@ function upload(files) {
 								+ $('#' + tinymce.EditorManager.activeEditor.id)
 										.data('uploadurl') + '?folder='
 								+ folder,
+						dataType : 'JSON',
 						success : browse
 					}));
 }
