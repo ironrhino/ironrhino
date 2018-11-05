@@ -219,7 +219,7 @@ public class UserAction extends EntityAction<User> {
 			return ACCESSDENIED;
 		}
 		User temp = user;
-		User user = AuthzUtils.getUserDetails();
+		User user = userManager.findByNaturalId(AuthzUtils.getUsername());
 		if (StringUtils.isNotBlank(temp.getEmail()) && !temp.getEmail().equals(user.getEmail())
 				&& userManager.existsOne(true, new Serializable[] { "email", temp.getEmail() })) {
 			addFieldError("user.email", getText("validation.already.exists"));
@@ -238,8 +238,7 @@ public class UserAction extends EntityAction<User> {
 
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	public String inputprofile() {
-		user = AuthzUtils.getUserDetails();
-		user = userManager.get(user.getId());
+		user = userManager.findByNaturalId(AuthzUtils.getUsername());
 		return "profile";
 	}
 
