@@ -14,6 +14,7 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.remoting.DistanceMeasurer;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
@@ -55,6 +56,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Value("${serviceRegistry.lbNodesThreshold:8}")
 	private int lbNodesThreshold = 8;
+
+	@Autowired(required = false)
+	private DistanceMeasurer distanceMeasurer = DistanceMeasurer.DEFAULT;
 
 	@Autowired
 	private ConfigurableApplicationContext ctx;
@@ -233,12 +237,13 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			lookup(serviceName);
 			candidates = importedServiceCandidates.get(serviceName);
 		}
+		candidates = distanceMeasurer.findNearest(getLocalHost(), candidates);
 		boolean loadBalancing = !polling && (candidates != null && candidates.size() <= lbNodesThreshold);
 		if (loadBalancing) {
 			try {
 				int consumers = 0;
 				for (Map.Entry<String, Collection<String>> entry : getExportedHostsForService(serviceName).entrySet()) {
-					if (host == null || entry.getValue().size() < consumers) {
+					if (candidates.contains(entry.getKey()) && (host == null || entry.getValue().size() < consumers)) {
 						host = entry.getKey();
 						consumers = entry.getValue().size();
 					}
