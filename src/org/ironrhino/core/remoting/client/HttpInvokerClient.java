@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
@@ -126,6 +127,9 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		Assert.notNull(serviceInterface, "'serviceInterface' must not be null");
 		Assert.isTrue(serviceInterface.isInterface(), "'serviceInterface' must be an interface");
 		Assert.notNull(httpInvokerRequestExecutor, "'httpInvokerRequestExecutor' must not be null");
+		Remoting anno = serviceInterface.getAnnotation(Remoting.class);
+		if (anno != null && StringUtils.isNotBlank(anno.serializationType()))
+			this.serializationType = anno.serializationType();
 		httpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
 		httpInvokerRequestExecutor.setConnectTimeout(connectTimeout);
 		httpInvokerRequestExecutor.setReadTimeout(readTimeout);

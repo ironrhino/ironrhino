@@ -20,6 +20,8 @@ public @interface Remoting {
 	@AliasFor("value")
 	Class<?>[] serviceInterfaces() default {};
 
+	String serializationType() default "";
+
 	String description() default "";
 
 }
