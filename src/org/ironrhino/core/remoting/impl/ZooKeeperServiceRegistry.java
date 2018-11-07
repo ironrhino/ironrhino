@@ -53,13 +53,6 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public void onReady() {
-		writeDiscoveredServices();
-		writeExportServiceDescriptions();
-		ready = true;
-	}
-
-	@Override
 	protected void lookup(String serviceName) {
 		String path = new StringBuilder(servicesParentPath).append("/").append(serviceName).toString();
 		try {
@@ -68,7 +61,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 				List<String> hosts = new CopyOnWriteArrayList<>();
 				for (String host : children)
 					hosts.add(unescapeSlash(host));
-				importedServiceCandidates.put(serviceName, hosts);
+				getImportedServiceCandidates().put(serviceName, hosts);
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -76,8 +69,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public void register(String serviceName) {
-		String host = getLocalHost();
+	protected void doRegister(String serviceName, String host) {
 		String path = new StringBuilder().append(servicesParentPath).append("/").append(serviceName).append("/")
 				.append(escapeSlash(host)).toString();
 		try {
@@ -88,8 +80,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public void unregister(String serviceName) {
-		String host = getLocalHost();
+	protected void doUnregister(String serviceName, String host) {
 		String path = new StringBuilder().append(servicesParentPath).append("/").append(serviceName).append("/")
 				.append(escapeSlash(host)).toString();
 		try {
@@ -100,13 +91,6 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	protected void onDiscover(String serviceName, String host) {
-		super.onDiscover(serviceName, host);
-		importedServices.put(serviceName, host);
-		if (ready)
-			writeDiscoveredServices();
-	}
-
 	protected void writeDiscoveredServices() {
 		if (importedServices.size() == 0)
 			return;
@@ -121,6 +105,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		}
 	}
 
+	@Override
 	protected void writeExportServiceDescriptions() {
 		if (exportedServiceDescriptions.size() == 0)
 			return;
@@ -217,7 +202,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public Map<String, String> getExportedServices(String appName) {
 		if (AppInfo.getAppName().equals(appName))
-			return exportedServiceDescriptions;
+			return new TreeMap<>(exportedServiceDescriptions);
 		try {
 			String path = new StringBuilder().append(appsParentPath).append("/").append(escapeSlash(appName))
 					.toString();
@@ -240,7 +225,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	public boolean supports(String path) {
 		if (path != null && path.startsWith(servicesParentPath)) {
 			String serviceName = path.substring(servicesParentPath.length() + 1);
-			return importedServiceCandidates.containsKey(serviceName);
+			return getImportedServiceCandidates().containsKey(serviceName);
 		}
 		return false;
 	}
@@ -251,7 +236,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		List<String> hosts = new ArrayList<>(children.size());
 		for (String host : children)
 			hosts.add(unescapeSlash(host));
-		importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<>(hosts));
+		getImportedServiceCandidates().put(serviceName, new CopyOnWriteArrayList<>(hosts));
 	}
 
 	@Override

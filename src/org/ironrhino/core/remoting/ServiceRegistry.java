@@ -14,7 +14,7 @@ public interface ServiceRegistry {
 	// key: service name, value: service object
 	public Map<String, Object> getExportedServices();
 
-	public void register(String serviceName);
+	public void register(String serviceName, Object serviceObject);
 
 	public void unregister(String serviceName);
 

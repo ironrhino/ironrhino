@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -20,23 +21,18 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	protected Map<String, List<String>> services = new ConcurrentHashMap<>();
 
 	@Override
-	public void register(String serviceName) {
+	protected void doRegister(String serviceName, String host) {
 		List<String> hosts = services.putIfAbsent(serviceName, new CopyOnWriteArrayList<>());
 		if (hosts == null)
 			hosts = services.get(serviceName);
-		hosts.add(serviceName);
+		hosts.add(host);
 	}
 
 	@Override
-	public void unregister(String serviceName) {
+	protected void doUnregister(String serviceName, String host) {
 		List<String> hosts = services.get(serviceName);
 		if (hosts != null)
-			hosts.remove(serviceName);
-	}
-
-	@Override
-	protected void onReady() {
-
+			hosts.remove(host);
 	}
 
 	@Override
@@ -45,8 +41,18 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
+	protected void writeDiscoveredServices() {
+
+	}
+
+	@Override
+	protected void writeExportServiceDescriptions() {
+
+	}
+
+	@Override
 	public Map<String, Collection<String>> getExportedHostsForService(String service) {
-		return (exportedServices.containsKey(service))
+		return (getExportedServices().containsKey(service))
 				? Collections.singletonMap(getLocalHost(), Collections.emptyList())
 				: Collections.emptyMap();
 	}
@@ -69,7 +75,7 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public Map<String, String> getExportedServices(String appName) {
 		if (AppInfo.getAppName().equals(appName))
-			return exportedServiceDescriptions;
+			return new TreeMap<>(exportedServiceDescriptions);
 		else
 			return Collections.emptyMap();
 	}

@@ -2,10 +2,8 @@ package org.ironrhino.core.remoting.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,7 +16,6 @@ import org.ironrhino.core.remoting.DistanceMeasurer;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
-import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +30,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 
 import lombok.Getter;
@@ -42,8 +40,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	private static final String CLASS_NAME_SERVER = "org.ironrhino.core.remoting.server.HttpInvokerServer";
 	private static final String CLASS_NAME_CLIENT = "org.ironrhino.core.remoting.client.HttpInvokerClient";
 	private static final boolean IS_SERVER_PRESENT = ClassUtils.isPresent(CLASS_NAME_SERVER,
-			AbstractServiceRegistry.class.getClassLoader());
-	private static final boolean IS_CLIENT_PRESENT = ClassUtils.isPresent(CLASS_NAME_CLIENT,
 			AbstractServiceRegistry.class.getClassLoader());
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -64,12 +60,12 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	private ConfigurableApplicationContext ctx;
 
 	@Getter
-	protected Map<String, List<String>> importedServiceCandidates = new ConcurrentHashMap<>();
+	private Map<String, List<String>> importedServiceCandidates = new ConcurrentHashMap<>();
 
 	@Getter
-	protected Map<String, Object> exportedServices = new HashMap<>();
+	private Map<String, Object> exportedServices = new ConcurrentHashMap<>();
 
-	protected Map<String, String> exportedServiceDescriptions = new TreeMap<>();
+	protected Map<String, String> exportedServiceDescriptions = new ConcurrentHashMap<>();
 
 	protected Map<String, String> importedServices = new ConcurrentHashMap<>();
 
@@ -78,7 +74,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Getter
 	private String localHost;
 
-	public void init() {
+	protected void init() {
 		if (!useHttps)
 			localHost = AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
 					+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_HTTP_PORT);
@@ -112,8 +108,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				if (pv == null)
 					continue;
 				String serviceName = (String) pv.getValue();
-				if (IS_CLIENT_PRESENT)
-					importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<String>());
+				importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<String>());
 			} else {
 				if (clazz != null && FactoryBean.class.isAssignableFrom(clazz) && bd instanceof RootBeanDefinition) {
 					clazz = ((RootBeanDefinition) bd).getTargetType();
@@ -122,21 +117,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 					beanClassName = clazz.getName();
 				}
 				if (IS_SERVER_PRESENT && !skipExport)
-					export(clazz, beanName, beanClassName);
+					tryExport(clazz, beanName, beanClassName);
 			}
 		}
-		if (IS_SERVER_PRESENT) {
-			for (String serviceName : exportedServices.keySet())
-				register(serviceName);
-		} else {
-			logger.warn("No class [" + CLASS_NAME_SERVER + "] found, skipped register services");
-		}
-		if (IS_CLIENT_PRESENT) {
-			for (String serviceName : importedServiceCandidates.keySet())
-				lookup(serviceName);
-		} else {
-			logger.warn("No class [" + CLASS_NAME_CLIENT + "] found, skipped lookup services");
-		}
+		for (String serviceName : importedServiceCandidates.keySet())
+			lookup(serviceName);
 		onReady();
 	}
 
@@ -149,7 +134,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		return i < 0 ? s : host.substring(0, i + 3) + s;
 	}
 
-	private void export(Class<?> clazz, String beanName, String beanClassName) {
+	private void tryExport(Class<?> clazz, String beanName, String beanClassName) {
 		if (!clazz.isInterface()) {
 			Remoting remoting = AnnotatedElementUtils.getMergedAnnotation(clazz, Remoting.class);
 			if (remoting != null) {
@@ -171,50 +156,59 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 							logger.warn("Class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
 									inte.getName());
 						} else {
-							String key = inte.getName() + ".exported";
-							if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
-								logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false",
-										inte.getName(), beanClassName, beanName, normalizeHost(localHost), key);
-							} else {
-								exportedServices.put(inte.getName(), ctx.getBean(beanName));
-								String description = remoting.description();
-								if (StringUtils.isNotBlank(description))
-									description = I18N.getText(description);
-								exportedServiceDescriptions.put(inte.getName(), description);
-								logger.info("Exported service [{}] for bean [{}#{}]@{}", inte.getName(), beanClassName,
-										beanName, normalizeHost(localHost));
-							}
+							doExport(remoting, inte, beanName, beanClassName);
 						}
 					}
 				}
 			}
-			Class<?>[] interfaces = clazz.getInterfaces();
-			if (interfaces != null) {
-				for (Class<?> inte : interfaces) {
-					export(inte, beanName, beanClassName);
-				}
+			for (Class<?> inte : clazz.getInterfaces()) {
+				tryExport(inte, beanName, beanClassName);
 			}
 		} else {
 			Remoting remoting = clazz.getAnnotation(Remoting.class);
 			if (remoting != null) {
-				String key = clazz.getName() + ".exported";
-				if ("false".equals(AppInfo.getApplicationContextProperties().getProperty(key))) {
-					logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false", clazz.getName(),
-							beanClassName, beanName, normalizeHost(localHost), key);
-				} else {
-					exportedServices.put(clazz.getName(), ctx.getBean(beanName));
-					String description = remoting.description();
-					if (StringUtils.isNotBlank(description))
-						description = I18N.getText(description);
-					exportedServiceDescriptions.put(clazz.getName(), description);
-					logger.info("Exported service [{}] for bean [{}#{}]@{}", clazz.getName(), beanClassName, beanName,
-							normalizeHost(localHost));
-				}
+				doExport(remoting, clazz, beanName, beanClassName);
 			}
-			for (Class<?> c : clazz.getInterfaces())
-				export(c, beanName, beanClassName);
+			for (Class<?> inte : clazz.getInterfaces())
+				tryExport(inte, beanName, beanClassName);
 		}
 	}
+
+	private void doExport(Remoting remoting, Class<?> serviceInterface, String beanName, String beanClassName) {
+		String key = serviceInterface.getName() + ".exported";
+		if ("false".equals(ctx.getEnvironment().getProperty(key))) {
+			logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false", serviceInterface.getName(),
+					beanClassName, beanName, normalizeHost(localHost), key);
+		} else {
+			register(serviceInterface.getName(), ctx.getBean(beanName));
+			String description = remoting.description();
+			if (StringUtils.isNotBlank(description))
+				exportedServiceDescriptions.put(serviceInterface.getName(), description);
+			logger.info("Exported service [{}] for bean [{}#{}]@{}", serviceInterface.getName(), beanClassName,
+					beanName, normalizeHost(localHost));
+		}
+	}
+
+	@Override
+	public void register(String serviceName, Object serviceObject) {
+		exportedServices.put(serviceName, serviceObject);
+		String description = exportedServiceDescriptions.get(serviceName);
+		if (StringUtils.isBlank(description))
+			exportedServiceDescriptions.put(serviceName,
+					ctx.getEnvironment().getProperty(serviceName + ".description", ""));
+		doRegister(serviceName, getLocalHost());
+	}
+
+	protected abstract void doRegister(String serviceName, String host);
+
+	@Override
+	public void unregister(String serviceName) {
+		exportedServices.remove(serviceName);
+		exportedServiceDescriptions.remove(serviceName);
+		doUnregister(serviceName, getLocalHost());
+	}
+
+	protected abstract void doUnregister(String serviceName, String host);
 
 	@Override
 	public void evict(String host) {
@@ -231,12 +225,14 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Override
 	public String discover(String serviceName, boolean polling) {
-		String host = null;
 		List<String> candidates = importedServiceCandidates.get(serviceName);
-		if (candidates == null || candidates.size() == 0) {
+		if (CollectionUtils.isEmpty(candidates)) {
 			lookup(serviceName);
 			candidates = importedServiceCandidates.get(serviceName);
 		}
+		if (CollectionUtils.isEmpty(candidates))
+			throw new ServiceNotFoundException(serviceName);
+		String host = null;
 		candidates = distanceMeasurer.findNearest(getLocalHost(), candidates);
 		boolean loadBalancing = !polling && (candidates != null && candidates.size() <= lbNodesThreshold);
 		if (loadBalancing) {
@@ -252,23 +248,30 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				logger.error(e.getMessage(), e);
 			}
 		}
-		if (host == null) {
-			if (candidates != null && candidates.size() > 0)
-				host = candidates.get(ThreadLocalRandom.current().nextInt(candidates.size()));
-		}
-		if (host != null) {
-			onDiscover(serviceName, host);
-			return normalizeHost(host);
-		} else {
-			throw new ServiceNotFoundException(serviceName);
+		if (host == null)
+			host = candidates.get(ThreadLocalRandom.current().nextInt(candidates.size()));
+		onDiscover(serviceName, host, polling);
+		return normalizeHost(host);
+	}
+
+	protected void onDiscover(String serviceName, String host, boolean polling) {
+		importedServices.put(serviceName, host);
+		if (!polling) {
+			logger.info("Discovered " + serviceName + " from " + host);
+			if (ready)
+				writeDiscoveredServices();
 		}
 	}
 
-	protected void onDiscover(String serviceName, String host) {
-		logger.info("Discovered " + serviceName + " from " + host);
+	protected void onReady() {
+		writeDiscoveredServices();
+		writeExportServiceDescriptions();
+		ready = true;
 	}
 
-	protected abstract void onReady();
+	protected abstract void writeDiscoveredServices();
+
+	protected abstract void writeExportServiceDescriptions();
 
 	protected abstract void lookup(String serviceName);
 

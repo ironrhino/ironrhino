@@ -59,39 +59,28 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 			ExportServicesEvent event = new ExportServicesEvent(new ArrayList<>(services));
 			eventPublisher.publish(event, Scope.GLOBAL);
 		}
-		writeDiscoveredServices();
-		writeExportServiceDescriptions();
-		ready = true;
+		super.onReady();
 	}
 
 	@Override
 	protected void lookup(String serviceName) {
 		List<String> list = remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + serviceName, 0, -1);
 		if (list != null && list.size() > 0)
-			importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<>(list));
+			getImportedServiceCandidates().put(serviceName, new CopyOnWriteArrayList<>(list));
 	}
 
 	@Override
-	public void register(String serviceName) {
-		String host = getLocalHost();
+	protected void doRegister(String serviceName, String host) {
 		remotingStringRedisTemplate.opsForList().remove(NAMESPACE_SERVICES + serviceName, 0, host);
 		remotingStringRedisTemplate.opsForList().rightPush(NAMESPACE_SERVICES + serviceName, host);
 	}
 
 	@Override
-	public void unregister(String serviceName) {
-		String host = getLocalHost();
+	protected void doUnregister(String serviceName, String host) {
 		remotingStringRedisTemplate.opsForList().remove(NAMESPACE_SERVICES + serviceName, 0, host);
 	}
 
 	@Override
-	protected void onDiscover(String serviceName, String host) {
-		super.onDiscover(serviceName, host);
-		importedServices.put(serviceName, host);
-		if (ready)
-			writeDiscoveredServices();
-	}
-
 	protected void writeDiscoveredServices() {
 		if (importedServices.size() == 0)
 			return;
@@ -103,6 +92,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 			task.run();
 	}
 
+	@Override
 	protected void writeExportServiceDescriptions() {
 		if (exportedServiceDescriptions.size() == 0)
 			return;
@@ -172,7 +162,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public Map<String, String> getExportedServices(String appName) {
 		if (AppInfo.getAppName().equals(appName))
-			return exportedServiceDescriptions;
+			return new TreeMap<>(exportedServiceDescriptions);
 		Map<Object, Object> map = remotingStringRedisTemplate.opsForHash().entries(NAMESPACE_APPS + appName);
 		Map<String, String> services = new TreeMap<>();
 		for (Map.Entry<Object, Object> entry : map.entrySet())
@@ -200,7 +190,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 			appName = appName.substring(0, appName.lastIndexOf('-'));
 			String host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
 			for (String serviceName : ev.getExportServices()) {
-				List<String> hosts = importedServiceCandidates.get(serviceName);
+				List<String> hosts = getImportedServiceCandidates().get(serviceName);
 				if (hosts != null && !hosts.contains(host))
 					hosts.add(host);
 			}
