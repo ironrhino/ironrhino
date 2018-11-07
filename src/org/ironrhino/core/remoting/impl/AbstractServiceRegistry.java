@@ -283,8 +283,13 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@EventListener
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		if (event.getApplicationContext() == ctx)
-			init();
+		if (IS_SERVER_PRESENT) {
+			if (CLASS_NAME_SERVER.equals(event.getApplicationContext().getId()))
+				init();
+		} else {
+			if (event.getApplicationContext() == ctx)
+				init();
+		}
 	}
 
 }

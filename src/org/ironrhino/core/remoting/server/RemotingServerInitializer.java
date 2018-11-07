@@ -12,8 +12,9 @@ public class RemotingServerInitializer implements WebApplicationInitializer {
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
-		String servletName = "remoting";
+		String servletName = HttpInvokerServer.class.getName();
 		AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
+		ctx.setId(servletName);
 		ctx.register(RemotingServerConfiguration.class);
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet(servletName,
 				new InheritedDispatcherServlet(ctx));
