@@ -136,13 +136,16 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		RequestMapping methodRequestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
 		if (classRequestMapping == null && methodRequestMapping == null)
 			throw new UnsupportedOperationException("@RequestMapping should be present");
-		StringBuilder sb = new StringBuilder(apiBaseUrl);
+		ApplicationContext ctx = getApplicationContext();
+		String baseUrl = apiBaseUrl;
+		if (ctx != null)
+			baseUrl = ctx.getEnvironment().getProperty(restApiClass.getName() + ".apiBaseUrl", baseUrl);
+		StringBuilder sb = new StringBuilder(baseUrl);
 		if (classRequestMapping != null && classRequestMapping.value().length > 0)
 			sb.append(classRequestMapping.value()[0]);
 		if (methodRequestMapping != null && methodRequestMapping.value().length > 0)
 			sb.append(methodRequestMapping.value()[0]);
 		String url = sb.toString().trim();
-		ApplicationContext ctx = getApplicationContext();
 		if (ctx != null)
 			url = ctx.getEnvironment().resolvePlaceholders(url);
 		RequestMethod[] requestMethods = methodRequestMapping != null ? methodRequestMapping.method()
