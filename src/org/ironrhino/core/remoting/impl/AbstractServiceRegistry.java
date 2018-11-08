@@ -47,9 +47,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Value("${serviceRegistry.skipExport:false}")
 	private boolean skipExport;
 
-	@Value("${serviceRegistry.useHttps:false}")
-	private boolean useHttps;
-
 	@Value("${serviceRegistry.lbNodesThreshold:8}")
 	private int lbNodesThreshold = 8;
 
@@ -75,12 +72,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	private String localHost;
 
 	protected void init() {
-		if (!useHttps)
-			localHost = AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
-					+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_HTTP_PORT);
-		else
-			localHost = "https://" + AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
-					+ (AppInfo.getHttpsPort() > 0 ? AppInfo.getHttpsPort() : DEFAULT_HTTPS_PORT);
+		localHost = AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
+				+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_HTTP_PORT);
 		if (ctx instanceof ConfigurableWebApplicationContext) {
 			ServletContext servletContext = ((ConfigurableWebApplicationContext) ctx).getServletContext();
 			String ctxPath = servletContext != null ? servletContext.getContextPath() : "";
@@ -127,11 +120,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	private static String normalizeHost(String host) {
 		int i = host.indexOf('@');
-		if (i < 0)
-			return host;
-		String s = host.substring(i + 1);
-		i = host.indexOf("://");
-		return i < 0 ? s : host.substring(0, i + 3) + s;
+		return i < 0 ? host : host.substring(i + 1);
 	}
 
 	private void tryExport(Class<?> clazz, String beanName, String beanClassName) {
@@ -216,7 +205,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			List<String> hosts = entry.getValue();
 			List<String> tobeRemoved = new ArrayList<>();
 			for (String s : hosts)
-				if (normalizeHost(s).equals(host) || s.indexOf(host) > 0)
+				if (s.equals(host) || normalizeHost(s).equals(host))
 					tobeRemoved.add(s);
 			for (String s : tobeRemoved)
 				hosts.remove(s);

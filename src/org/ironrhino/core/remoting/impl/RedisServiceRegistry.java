@@ -179,16 +179,14 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@EventListener(condition = "!#event.local")
 	public void onApplicationEvent(InstanceLifecycleEvent event) {
+		String instanceId = event.getInstanceId();
+		String appName = instanceId.substring(0, instanceId.lastIndexOf('@'));
+		appName = appName.substring(0, appName.lastIndexOf('-'));
+		String host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
 		if (event instanceof InstanceShutdownEvent) {
-			String instanceId = event.getInstanceId();
-			String host = instanceId.substring(instanceId.lastIndexOf('@') + 1);
 			evict(host);
 		} else if (event instanceof ExportServicesEvent) {
 			ExportServicesEvent ev = (ExportServicesEvent) event;
-			String instanceId = event.getInstanceId();
-			String appName = instanceId.substring(0, instanceId.lastIndexOf('@'));
-			appName = appName.substring(0, appName.lastIndexOf('-'));
-			String host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
 			for (String serviceName : ev.getExportServices()) {
 				List<String> hosts = getImportedServiceCandidates().get(serviceName);
 				if (hosts != null && !hosts.contains(host))
