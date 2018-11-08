@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.http.client.RestTemplate;
+import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
@@ -86,7 +87,7 @@ class RestClientTemplate extends RestTemplate {
 							throw e;
 					}
 				} while (--attempts > 0);
-				throw new IllegalStateException("Should never happens");
+				throw new MaxAttemptsExceededException(maxAttempts);
 			}
 		});
 	}

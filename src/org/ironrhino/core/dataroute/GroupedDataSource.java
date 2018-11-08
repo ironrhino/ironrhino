@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
+import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.RoundRobin;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -153,7 +154,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 				}
 			}
 		} while (--attempts > 0);
-		throw new IllegalStateException("Should never happens");
+		throw new MaxAttemptsExceededException(maxAttempts);
 	}
 
 	@Override

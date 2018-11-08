@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.Date;
 
 import org.ironrhino.core.sequence.MySQLSequenceHelper;
+import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 
@@ -41,8 +42,9 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 	public String nextStringValue() throws DataAccessException {
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
-			int attempts = 3;
-			while (attempts-- > 0) {
+			int maxAttempts = 3;
+			int attempts = maxAttempts;
+			do {
 				stmt.execute(setVariableSql);
 				int rows = stmt.executeUpdate(incrementSql);
 				if (rows == 1)
@@ -56,8 +58,8 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			}
-			throw new IllegalStateException("max attempts reached");
+			} while (--attempts > 0);
+			throw new MaxAttemptsExceededException(maxAttempts);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain last_insert_id()", ex);
 		}

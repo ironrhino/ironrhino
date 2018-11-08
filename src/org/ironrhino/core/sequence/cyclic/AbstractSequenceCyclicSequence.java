@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 
@@ -165,8 +166,9 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
 			CycleType ct = getCycleType();
-			int attempts = 3;
-			while (attempts-- > 0) {
+			int maxAttempts = 3;
+			int attempts = maxAttempts;
+			do {
 				Result result = queryTimestampWithSequence(con, stmt);
 				Date now = result.currentTimestamp;
 				if (sameCycle(result)) {
@@ -194,8 +196,8 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			}
-			throw new IllegalStateException("max attempts reached");
+			} while (--attempts > 0);
+			throw new MaxAttemptsExceededException(maxAttempts);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain next value of sequence", ex);
 		}

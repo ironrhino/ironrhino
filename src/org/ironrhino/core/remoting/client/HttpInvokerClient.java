@@ -23,6 +23,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
+import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -300,7 +301,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 				}
 			}
 		} while (--attempts > 0);
-		throw new IllegalStateException("Should never happens");
+		throw new MaxAttemptsExceededException(maxAttempts);
 	}
 
 	protected RemoteAccessException convertHttpInvokerAccessException(Throwable ex) {
