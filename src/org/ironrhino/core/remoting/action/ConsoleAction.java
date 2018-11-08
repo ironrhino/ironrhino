@@ -36,13 +36,13 @@ public class ConsoleAction extends BaseAction {
 
 	@JsonConfig(root = "hosts")
 	public String hosts() {
-		hosts = serviceRegistry.getExportedHostsForService(getUid());
+		hosts = serviceRegistry.getExportedHostsByService(getUid());
 		return JSON;
 	}
 
 	@JsonConfig(root = "importedServices")
 	public String services() {
-		importedServices = serviceRegistry.getImportedServices(getUid());
+		importedServices = serviceRegistry.getImportedServicesByHost(getUid());
 		return JSON;
 	}
 

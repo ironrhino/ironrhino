@@ -51,19 +51,19 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public Map<String, Collection<String>> getExportedHostsForService(String service) {
+	public Map<String, Collection<String>> getExportedHostsByService(String service) {
 		return (getExportedServices().containsKey(service))
 				? Collections.singletonMap(getLocalHost(), Collections.emptyList())
 				: Collections.emptyMap();
 	}
 
 	@Override
-	public Map<String, String> getImportedHostsForService(String service) {
+	public Map<String, String> getImportedHostsByService(String service) {
 		return Collections.emptyMap();
 	}
 
 	@Override
-	public Map<String, String> getImportedServices(String host) {
+	public Map<String, String> getImportedServicesByHost(String host) {
 		return Collections.emptyMap();
 	}
 
@@ -73,7 +73,7 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public Map<String, String> getExportedServices(String appName) {
+	public Map<String, String> getExportedServicesByAppName(String appName) {
 		if (AppInfo.getAppName().equals(appName))
 			return new TreeMap<>(exportedServiceDescriptions);
 		else

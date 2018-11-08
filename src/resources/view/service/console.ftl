@@ -54,7 +54,7 @@ $(document).on('click','a.host',function(e){
 </div>
 <hr/>
 <#list serviceRegistry.getAllAppNames() as appName>
-<#assign services = serviceRegistry.getExportedServices(appName)>
+<#assign services = serviceRegistry.getExportedServicesByAppName(appName)>
 <#if services?size gt 0>
 <h3 class="center">${appName}</h3>
 <div class="services">

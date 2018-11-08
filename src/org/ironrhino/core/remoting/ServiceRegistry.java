@@ -25,15 +25,15 @@ public interface ServiceRegistry {
 	public Collection<String> getAllAppNames();
 
 	// key: service name, value: service description
-	public Map<String, String> getExportedServices(String appName);
+	public Map<String, String> getExportedServicesByAppName(String appName);
 
 	// key: service name, value: service provider host
-	public Map<String, String> getImportedServices(String host);
+	public Map<String, String> getImportedServicesByHost(String host);
 
 	// key: service provider host, value: service consumer hosts
-	public Map<String, Collection<String>> getExportedHostsForService(String service);
+	public Map<String, Collection<String>> getExportedHostsByService(String service);
 
 	// key: service consumer host, value: service provider host
-	public Map<String, String> getImportedHostsForService(String service);
+	public Map<String, String> getImportedHostsByService(String service);
 
 }

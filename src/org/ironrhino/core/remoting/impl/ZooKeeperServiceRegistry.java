@@ -121,10 +121,10 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public Map<String, Collection<String>> getExportedHostsForService(String service) {
+	public Map<String, Collection<String>> getExportedHostsByService(String service) {
 		try {
 			Map<String, Collection<String>> result = new TreeMap<>();
-			Map<String, String> map = getImportedHostsForService(service);
+			Map<String, String> map = getImportedHostsByService(service);
 			List<String> children = curatorFramework.getChildren().watched()
 					.forPath(new StringBuilder().append(servicesParentPath).append("/").append(service).toString());
 			for (String host : children) {
@@ -146,11 +146,11 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public Map<String, String> getImportedHostsForService(String service) {
+	public Map<String, String> getImportedHostsByService(String service) {
 		try {
 			Map<String, String> result = new TreeMap<>();
 			for (String host : curatorFramework.getChildren().forPath(hostsParentPath)) {
-				Map<String, String> importedServices = getImportedServices(host);
+				Map<String, String> importedServices = getImportedServicesByHost(host);
 				if (importedServices.containsKey(service))
 					result.put(host, importedServices.get(service));
 			}
@@ -164,7 +164,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public Map<String, String> getImportedServices(String host) {
+	public Map<String, String> getImportedServicesByHost(String host) {
 		if (host.equals(getLocalHost()))
 			return importedServices;
 		try {
@@ -200,7 +200,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public Map<String, String> getExportedServices(String appName) {
+	public Map<String, String> getExportedServicesByAppName(String appName) {
 		if (AppInfo.getAppName().equals(appName))
 			return new TreeMap<>(exportedServiceDescriptions);
 		try {

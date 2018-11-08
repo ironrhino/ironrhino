@@ -238,7 +238,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		if (loadBalancing) {
 			try {
 				int consumers = 0;
-				for (Map.Entry<String, Collection<String>> entry : getExportedHostsForService(serviceName).entrySet()) {
+				for (Map.Entry<String, Collection<String>> entry : getExportedHostsByService(serviceName).entrySet()) {
 					if (candidates.contains(entry.getKey()) && (host == null || entry.getValue().size() < consumers)) {
 						host = entry.getKey();
 						consumers = entry.getValue().size();
