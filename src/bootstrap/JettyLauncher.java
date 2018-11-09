@@ -32,10 +32,12 @@ public class JettyLauncher {
 			port = Integer.valueOf(p);
 		if (port == -1) {
 			port = 8080;
-			while (!available(port))
+			while (getTempDirectory(port).exists() || !available(port))
 				port++;
 			System.setProperty("port.http", String.valueOf(port));
 		}
+		File tempDir = getTempDirectory(port);
+		tempDir.mkdirs();
 		Server server = new Server(port);
 		server.setSessionIdManager(new DummySessionIdManager());
 		Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
@@ -57,8 +59,6 @@ public class JettyLauncher {
 			System.out.println("War - " + warUrl.getPath());
 			System.setProperty("executable-war", warUrl.getPath());
 		}
-		File tempDir = new File(new File(System.getProperty("user.home")), ".jetty" + port);
-		tempDir.mkdirs();
 		context.setTempDirectory(tempDir);
 		context.setServer(server);
 		context.addServlet(Default404Servlet.class, "*.class");
@@ -69,6 +69,10 @@ public class JettyLauncher {
 		server.setStopAtShutdown(true);
 		server.start();
 		server.join();
+	}
+
+	private static File getTempDirectory(int port) {
+		return new File(new File(System.getProperty("user.home")), ".jetty" + port);
 	}
 
 	private static boolean available(int port) {
