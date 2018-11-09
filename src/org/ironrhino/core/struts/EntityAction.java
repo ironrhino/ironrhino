@@ -1267,7 +1267,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		response.setHeader("Content-type", "application/json");
 		String filename = String.valueOf(_entity.getId());
-		if (bwi.getPropertyValue("name") != null)
+		if (bwi.isReadableProperty("name"))
 			filename = String.valueOf(bwi.getPropertyValue("name"));
 		filename = URLEncoder.encode(filename, "UTF-8");
 		response.setHeader("Content-disposition", "attachment;filename=" + filename + ".json");
