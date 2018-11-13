@@ -43,7 +43,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 		try (Connection con = getDataSource().getConnection(); Statement stmt = con.createStatement()) {
 			con.setAutoCommit(true);
 			int maxAttempts = 3;
-			int attempts = maxAttempts;
+			int remainingAttempts = maxAttempts;
 			do {
 				stmt.execute(setVariableSql);
 				int rows = stmt.executeUpdate(incrementSql);
@@ -58,7 +58,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			} while (--attempts > 0);
+			} while (--remainingAttempts > 0);
 			throw new MaxAttemptsExceededException(maxAttempts);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain last_insert_id()", ex);

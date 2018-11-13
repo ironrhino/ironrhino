@@ -167,7 +167,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			con.setAutoCommit(true);
 			CycleType ct = getCycleType();
 			int maxAttempts = 3;
-			int attempts = maxAttempts;
+			int remainingAttempts = maxAttempts;
 			do {
 				Result result = queryTimestampWithSequence(con, stmt);
 				Date now = result.currentTimestamp;
@@ -196,7 +196,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			} while (--attempts > 0);
+			} while (--remainingAttempts > 0);
 			throw new MaxAttemptsExceededException(maxAttempts);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain next value of sequence", ex);

@@ -138,15 +138,15 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	@Override
 	protected Object doInvoke(MethodInvocation methodInvocation) throws Exception {
 		Callable<Object> callable = () -> {
-			int attempts = maxAttempts;
+			int remainingAttempts = maxAttempts;
 			do {
 				try {
 					return actualInvoke(methodInvocation);
 				} catch (Exception e) {
-					if (!IO_ERROR_PREDICATE.test(e) || attempts <= 1)
+					if (!IO_ERROR_PREDICATE.test(e) || remainingAttempts <= 1)
 						throw e;
 				}
-			} while (--attempts > 0);
+			} while (--remainingAttempts > 0);
 			throw new MaxAttemptsExceededException(maxAttempts);
 		};
 		return CircuitBreaking.execute(restApiClass.getName(), IO_ERROR_PREDICATE, callable);

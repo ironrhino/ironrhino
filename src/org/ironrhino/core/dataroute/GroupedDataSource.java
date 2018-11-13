@@ -128,7 +128,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 		}
 		if (ds == null)
 			throw new IllegalStateException("No underlying DataSource found");
-		int attempts = maxAttempts;
+		int remainingAttempts = maxAttempts;
 		do {
 			try {
 				Connection conn = username == null ? ds.getConnection() : ds.getConnection(username, password);
@@ -138,7 +138,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 				return conn;
 			} catch (SQLException e) {
 				log.error(e.getMessage(), e);
-				if (attempts <= 1)
+				if (remainingAttempts <= 1)
 					throw e;
 				Integer failureTimes = failureCount.get(ds);
 				if (failureTimes == null)
@@ -153,7 +153,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 					failureCount.put(ds, failureTimes);
 				}
 			}
-		} while (--attempts > 0);
+		} while (--remainingAttempts > 0);
 		throw new MaxAttemptsExceededException(maxAttempts);
 	}
 

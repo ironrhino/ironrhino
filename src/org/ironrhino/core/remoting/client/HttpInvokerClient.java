@@ -250,7 +250,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		String method = null;
 		if (serviceStats != null)
 			method = ReflectionUtils.stringify(methodInvocation.getMethod(), false, true);
-		int attempts = maxAttempts;
+		int remainingAttempts = maxAttempts;
 		do {
 			if (!discovered) {
 				setServiceUrl(discoverServiceUrl());
@@ -274,7 +274,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
 							System.currentTimeMillis() - time, true);
 				}
-				if (attempts <= 1)
+				if (remainingAttempts <= 1)
 					throw e;
 				if ((e instanceof SerializationFailedException) && !httpInvokerRequestExecutor.getSerializer()
 						.equals(HttpInvokerSerializers.DEFAULT_SERIALIZER)) {
@@ -300,7 +300,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 					}
 				}
 			}
-		} while (--attempts > 0);
+		} while (--remainingAttempts > 0);
 		throw new MaxAttemptsExceededException(maxAttempts);
 	}
 
