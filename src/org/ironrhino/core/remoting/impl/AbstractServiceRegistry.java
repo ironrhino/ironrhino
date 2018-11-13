@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
@@ -71,7 +72,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Getter
 	private String localHost;
 
-	protected void init() {
+	@PostConstruct
+	private void afterPropertiesSet() {
 		localHost = AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
 				+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_HTTP_PORT);
 		if (ctx instanceof ConfigurableWebApplicationContext) {
@@ -80,6 +82,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (!ctxPath.isEmpty())
 				localHost += ctxPath;
 		}
+	}
+
+	protected void init() {
 		String[] beanNames = ctx.getBeanDefinitionNames();
 		for (String beanName : beanNames) {
 			BeanDefinition bd = ctx.getBeanFactory().getBeanDefinition(beanName);
