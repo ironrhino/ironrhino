@@ -17,11 +17,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
 import org.ironrhino.core.throttle.CircuitBreaking;
+import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanWrapperImpl;
@@ -50,14 +53,20 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
+import lombok.Getter;
+import lombok.Setter;
 
 public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryBean {
+
+	private static final Predicate<Throwable> IO_ERROR_PREDICATE = ex -> ex instanceof ResourceAccessException
+			&& ex.getCause() instanceof IOException;
 
 	private final Class<?> restApiClass;
 
@@ -68,6 +77,10 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	private final Map<String, String> requestHeaders;
 
 	private final Object restApiBean;
+
+	@Getter
+	@Setter
+	private int maxAttempts = 3;
 
 	public RestApiFactoryBean(Class<?> restApiClass) {
 		this(restApiClass, (RestTemplate) null);
@@ -124,8 +137,19 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	@Override
 	protected Object doInvoke(MethodInvocation methodInvocation) throws Exception {
-		return CircuitBreaking.execute(restApiClass.getName(), ex -> ex.getCause() instanceof IOException,
-				() -> actualInvoke(methodInvocation));
+		Callable<Object> callable = () -> {
+			int attempts = maxAttempts;
+			do {
+				try {
+					return actualInvoke(methodInvocation);
+				} catch (Exception e) {
+					if (!IO_ERROR_PREDICATE.test(e) || attempts <= 1)
+						throw e;
+				}
+			} while (--attempts > 0);
+			throw new MaxAttemptsExceededException(maxAttempts);
+		};
+		return CircuitBreaking.execute(restApiClass.getName(), IO_ERROR_PREDICATE, callable);
 	}
 
 	@SuppressWarnings("unchecked")

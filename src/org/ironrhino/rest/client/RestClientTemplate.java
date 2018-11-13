@@ -3,7 +3,6 @@ package org.ironrhino.rest.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -12,7 +11,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.http.client.RestTemplate;
-import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
@@ -21,14 +19,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.Assert;
 
-import lombok.Getter;
-import lombok.Setter;
-
 class RestClientTemplate extends RestTemplate {
-
-	@Getter
-	@Setter
-	private int maxAttempts = 2;
 
 	public RestClientTemplate(RestClient client) {
 		super();
@@ -64,30 +55,21 @@ class RestClientTemplate extends RestTemplate {
 					request = req;
 				}
 				request.getHeaders().set("Authorization", client.getAuthorizationHeader());
-				int attempts = maxAttempts;
-				do {
-					try {
-						ClientHttpResponse response = execution.execute(request, body);
-						if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-							try (BufferedReader br = new BufferedReader(
-									new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))) {
-								String text = br.lines().collect(Collectors.joining("\n")).toLowerCase(Locale.ROOT);
-								if (text.contains("invalid_token")) {
-									client.getTokenStore().setToken(client.getTokenStoreKey(), null);
-								} else if (text.contains("expired_token")) {
-									client.getTokenStore().setToken(client.getTokenStoreKey(), null);
-								}
-								request.getHeaders().set("Authorization", client.getAuthorizationHeader());
-								return execution.execute(request, body);
-							}
+				ClientHttpResponse response = execution.execute(request, body);
+				if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+					try (BufferedReader br = new BufferedReader(
+							new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))) {
+						String text = br.lines().collect(Collectors.joining("\n")).toLowerCase(Locale.ROOT);
+						if (text.contains("invalid_token")) {
+							client.getTokenStore().setToken(client.getTokenStoreKey(), null);
+						} else if (text.contains("expired_token")) {
+							client.getTokenStore().setToken(client.getTokenStoreKey(), null);
 						}
-						return response;
-					} catch (SocketTimeoutException e) {
-						if (attempts <= 1)
-							throw e;
+						request.getHeaders().set("Authorization", client.getAuthorizationHeader());
+						return execution.execute(request, body);
 					}
-				} while (--attempts > 0);
-				throw new MaxAttemptsExceededException(maxAttempts);
+				}
+				return response;
 			}
 		});
 	}
