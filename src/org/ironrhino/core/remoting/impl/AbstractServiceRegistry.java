@@ -1,12 +1,12 @@
 package org.ironrhino.core.remoting.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
@@ -203,12 +203,10 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	public void evict(String host) {
 		for (Map.Entry<String, List<String>> entry : importedServiceCandidates.entrySet()) {
 			List<String> hosts = entry.getValue();
-			List<String> tobeRemoved = new ArrayList<>();
-			for (String s : hosts)
-				if (s.equals(host) || normalizeHost(s).equals(host))
-					tobeRemoved.add(s);
-			for (String s : tobeRemoved)
-				hosts.remove(s);
+			List<String> tobeRemoved = hosts.stream()
+					.filter(s -> s.equals(host) || normalizeHost(s).equals(host) || s.startsWith(host + "/"))
+					.collect(Collectors.toList());
+			hosts.removeAll(tobeRemoved);
 		}
 	}
 
