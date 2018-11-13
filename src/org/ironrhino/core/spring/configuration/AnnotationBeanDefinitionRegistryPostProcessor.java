@@ -64,7 +64,7 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 					.toArray(new Class<?>[0]);
 		}
 		for (Class<?> annotatedClass : annotatedClasses) {
-			if (!annotatedClass.isInterface())
+			if (!annotatedClass.isInterface() || shouldSkip(annotatedClass))
 				continue;
 			String key = annotatedClass.getName() + ".imported";
 			if ("false".equals(env.getProperty(key))) {
@@ -89,6 +89,10 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 			log.info("Register bean [{}] for @{} [{}]", beanName, annotationClass.getSimpleName(),
 					annotatedClass.getName());
 		}
+	}
+
+	protected boolean shouldSkip(Class<?> annotatedClass) {
+		return false;
 	}
 
 	private boolean existsBean(String beanName, Class<?> annotatedClass, BeanDefinitionRegistry registry) {
