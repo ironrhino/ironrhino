@@ -21,12 +21,16 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
+import javax.annotation.PostConstruct;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
 import org.ironrhino.core.throttle.CircuitBreaking;
 import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.rest.RestStatus;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -45,6 +49,7 @@ import org.springframework.http.converter.json.AbstractJackson2HttpMessageConver
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -54,9 +59,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -68,6 +75,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	private static final Predicate<Throwable> IO_ERROR_PREDICATE = ex -> ex instanceof ResourceAccessException
 			&& ex.getCause() instanceof IOException;
+
+	private Object serviceRegistry;
 
 	private final Class<?> restApiClass;
 
@@ -142,6 +151,18 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	@Override
 	protected boolean shouldFallBackFor(Throwable ex) {
 		return ex instanceof CircuitBreakerOpenException;
+	}
+
+	@PostConstruct
+	private void init() {
+		if (ClassUtils.isPresent("org.ironrhino.core.remoting.ServiceRegistry", getClass().getClassLoader())) {
+			ApplicationContext ctx = getApplicationContext();
+			if (ctx != null)
+				try {
+					serviceRegistry = ctx.getBean(ServiceRegistry.class);
+				} catch (NoSuchBeanDefinitionException e) {
+				}
+		}
 	}
 
 	@Override
@@ -301,6 +322,11 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		String baseUrl = apiBaseUrl;
 		if (ctx != null) {
 			baseUrl = ctx.getEnvironment().getProperty(restApiClass.getName() + ".apiBaseUrl", baseUrl);
+			if (StringUtils.isBlank(baseUrl) && serviceRegistry != null) {
+				baseUrl = ((ServiceRegistry) serviceRegistry).discover(restApiClass.getName(), true);
+				if (baseUrl.indexOf("://") < 0)
+					baseUrl = "http://" + baseUrl;
+			}
 		}
 		StringBuilder sb = new StringBuilder(baseUrl);
 		sb.append(getPathFromRequestMapping(classRequestMapping));
@@ -406,10 +432,20 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			return null;
 		} else {
 			JsonPointer pointer = method.getAnnotation(JsonPointer.class);
-			if (pointer == null) {
-				return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
-			} else {
-				return exchangeWithJsonPointer(type, requestEntity, pointer);
+			try {
+				if (pointer == null) {
+					return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
+				} else {
+					return exchangeWithJsonPointer(type, requestEntity, pointer);
+				}
+			} catch (HttpStatusCodeException e) {
+				try {
+					JsonNode tree = objectMapper.readTree(e.getResponseBodyAsString());
+					if (tree.has("code") && tree.has("status"))
+						throw objectMapper.readValue(objectMapper.treeAsTokens(tree), RestStatus.class);
+				} catch (JsonParseException jpe) {
+				}
+				throw e;
 			}
 		}
 	}

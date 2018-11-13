@@ -284,4 +284,10 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 		return new ApiDocInspector();
 	}
 
+	@Bean
+	@ClassPresentConditional("org.ironrhino.core.remoting.ServiceRegistry")
+	protected ApiRegistrant apiRegistrant() {
+		return new ApiRegistrant(getServletMapping());
+	}
+
 }

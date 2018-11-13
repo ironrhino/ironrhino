@@ -66,6 +66,11 @@ public class RestApiTests {
 		assertEquals(article, articleClient.postForm(article));
 	}
 
+	@Test(expected = RestStatus.class)
+	public void testThrowRestStatus() {
+		articleClient.view(100);
+	}
+
 	@Test
 	public void testJsonPointer() {
 		assertEquals(1, userClient.pagedResult(1, 1).size());
