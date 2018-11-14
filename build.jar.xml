@@ -268,7 +268,7 @@
 			<delete file="${target.dir}/${rest-jar.name}" />
 			<delete file="${target.dir}/${batch-jar.name}" />
 			<delete file="${target.dir}/bootstrap.jar" />
-			<antcall target="compressAssets"/>
+			<antcall target="compressAssets" />
 			<unzip dest="${webapp.dir}/assets/components">
 				<fileset dir="${webapp.dir}/assets/components" includes="*.zip" />
 			</unzip>
@@ -287,9 +287,9 @@
 				</manifest>
 			</jar>
 			<delete dir="${target.dir}/assets" />
-			<antcall target="cleanAssets"/>
+			<antcall target="cleanAssets" />
 			<antcall target="append-revision-for-assets" />
-			<mkdir dir="${classes.dir}/META-INF/descriptors"/>
+			<mkdir dir="${classes.dir}/META-INF/descriptors" />
 			<copy todir="${classes.dir}/META-INF/descriptors">
 				<fileset dir="${webapp.dir}/WEB-INF">
 					<exclude name="web.xml" />
@@ -306,7 +306,7 @@
 					<attribute name="Build-Revision" value="${revision}" />
 				</manifest>
 			</jar>
-			<delete dir="${classes.dir}/META-INF/descriptors"/>
+			<delete dir="${classes.dir}/META-INF/descriptors" />
 			<antcall target="reset-append-revision-for-assets" />
 			<jar jarfile="${target.dir}/${fs-jar.name}" basedir="${classes.dir}" includes="${fs-jar.includes}">
 				<manifest>
@@ -650,14 +650,11 @@
 				</manifest>
 			</jar>
 			<jar jarfile="${target.dir}/temp.jar" basedir="${classes.dir}" includes="bootstrap/**" />
-			<zip destfile="${target.dir}/bootstrap.jar">
-				<zipgroupfileset file="${target.dir}/temp.jar" />
+			<zip destfile="${target.dir}/bootstrap.jar" duplicate="preserve">
 				<zipgroupfileset file="${lib.dir}/jetty-*.jar" />
-				<zipgroupfileset file="${lib.dir}/servlet-api-*.jar" />
-				<zipgroupfileset file="${lib.dir}/annotations-api-*.jar" />
 				<zipgroupfileset file="${lib.dir}/el-api-*.jar" />
-				<zipgroupfileset file="${lib.dir}/websocket-api-*.jar" />
 				<zipgroupfileset file="${lib.dir}/asm-*.jar" />
+				<zipgroupfileset file="${target.dir}/temp.jar" />
 			</zip>
 			<delete file="${target.dir}/temp.jar" />
 		</target>
