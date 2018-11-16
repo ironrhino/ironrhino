@@ -36,7 +36,7 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 	}
 
 	@Override
-	public void onStartup(ServletContext servletContext) throws ServletException {
+	public final void onStartup(ServletContext servletContext) throws ServletException {
 		String servletName = getServletName(apiConfigClass);
 		ServletRegistration.Dynamic dynamic = servletContext.addServlet(servletName, InheritedDispatcherServlet.class);
 		dynamic.setInitParameter(ContextLoader.CONTEXT_CLASS_PARAM,
