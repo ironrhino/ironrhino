@@ -47,11 +47,11 @@ public class RedisLockService implements LockService {
 	public boolean tryLock(String name) {
 		String key = NAMESPACE + name;
 		String holder = holder();
-		Boolean success = coordinationStringRedisTemplate.opsForValue().setIfAbsent(key, holder);
+		Boolean success = coordinationStringRedisTemplate.opsForValue().setIfAbsent(key, holder, this.maxHoldTime,
+				TimeUnit.SECONDS);
 		if (success == null)
 			throw new RuntimeException("Unexpected null");
 		if (success) {
-			coordinationStringRedisTemplate.expire(key, this.maxHoldTime, TimeUnit.SECONDS);
 			return true;
 		} else {
 			if (AppInfo.getContextPath() == null) // not in servlet container
