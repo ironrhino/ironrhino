@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
@@ -18,11 +20,9 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
@@ -31,10 +31,11 @@ import org.springframework.validation.annotation.Validated;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class MethodInterceptorFactoryBean
-		implements MethodInterceptor, FactoryBean<Object>, DisposableBean, ApplicationContextAware {
+public abstract class MethodInterceptorFactoryBean implements MethodInterceptor, FactoryBean<Object> {
 
 	public static final int EXECUTOR_POOL_SIZE_DEFAULT = 5;
+
+	public static final String EXECUTOR_BEAN_NAME_SUFFIX = ".executor.bean.name";
 
 	public static final String EXECUTOR_POOL_SIZE_SUFFIX = ".executor.pool.size";
 
@@ -44,7 +45,7 @@ public abstract class MethodInterceptorFactoryBean
 	private boolean executorServiceCreated;
 
 	@Getter
-	@Setter
+	@Autowired
 	private ApplicationContext applicationContext;
 
 	@Autowired(required = false)
@@ -124,11 +125,12 @@ public abstract class MethodInterceptorFactoryBean
 				es = executorService;
 				if (es == null) {
 					Class<?> objectType = getObjectType();
-					String poolName = objectType != null ? objectType.getSimpleName() : "Unknown";
-					ApplicationContext ctx = getApplicationContext();
-					if (ctx != null) {
-						int threads = ctx.getEnvironment().getProperty(
-								objectType != null ? objectType.getName() + EXECUTOR_POOL_SIZE_SUFFIX : "", int.class,
+					if (objectType == null)
+						throw new RuntimeException("Unexpected null");
+					String poolName = objectType.getSimpleName();
+					if (applicationContext != null) {
+						int threads = applicationContext.getEnvironment().getProperty(
+								objectType.getName() + EXECUTOR_POOL_SIZE_SUFFIX, int.class,
 								EXECUTOR_POOL_SIZE_DEFAULT);
 						executorService = es = Executors.newFixedThreadPool(threads,
 								new NameableThreadFactory(poolName));
@@ -142,8 +144,19 @@ public abstract class MethodInterceptorFactoryBean
 		return es;
 	}
 
-	@Override
-	public void destroy() {
+	@PostConstruct
+	private void init() {
+		Class<?> objectType = getObjectType();
+		if (objectType == null)
+			throw new RuntimeException("Unexpected null");
+		String executorBeanName = applicationContext.getEnvironment()
+				.getProperty(objectType.getName() + EXECUTOR_BEAN_NAME_SUFFIX);
+		if (executorBeanName != null)
+			executorService = applicationContext.getBean(executorBeanName, ExecutorService.class);
+	}
+
+	@PreDestroy
+	private void destroy() {
 		if (executorServiceCreated) {
 			executorService.shutdown();
 			executorServiceCreated = false;
