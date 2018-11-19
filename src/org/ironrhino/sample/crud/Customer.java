@@ -2,7 +2,6 @@ package org.ironrhino.sample.crud;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -117,7 +116,7 @@ public class Customer extends BaseRecordableEntity {
 	@UiConfig(width = "120px", description = "relatedCompanies.description")
 	@ManyToMany
 	@JoinTable(name = "sample_company_customer", joinColumns = @JoinColumn(name = "customer"), inverseJoinColumns = @JoinColumn(name = "company"))
-	private Collection<Company> relatedCompanies;
+	private Set<Company> relatedCompanies;
 
 	@Valid
 	@UiConfig(cssClass = "nullable", description = "addresses.description")

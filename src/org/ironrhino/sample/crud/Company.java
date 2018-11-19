@@ -1,6 +1,6 @@
 package org.ironrhino.sample.crud;
 
-import java.util.Collection;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -85,12 +85,12 @@ public class Company extends BaseEntity {
 	@UiConfig(width = "150px", description = "customers.description", group = "customer")
 	@OneToMany(mappedBy = "company")
 	@OrderBy("name asc")
-	private Collection<Customer> customers;
+	private Set<Customer> customers;
 
 	@UiConfig(width = "150px", description = "relatedCustomers.description", group = "customer")
 	@ManyToMany
 	@JoinTable(name = "sample_company_customer", joinColumns = @JoinColumn(name = "company"), inverseJoinColumns = @JoinColumn(name = "customer"))
-	private Collection<Customer> relatedCustomers;
+	private Set<Customer> relatedCustomers;
 
 	@UiConfig(width = "80px", group = "contactInfo", description = "一对一关系")
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "company")
