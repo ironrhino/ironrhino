@@ -194,10 +194,6 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		if (multiTenantConnectionProvider != null)
 			properties.put(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
 
-		// version 5.2 introduce ALLOW_UPDATE_OUTSIDE_TRANSACTION
-		// used for RecordAspect.afterCommit()
-		properties.put(AvailableSettings.ALLOW_UPDATE_OUTSIDE_TRANSACTION, true);
-
 		properties.put(AvailableSettings.JPA_VALIDATION_FACTORY, validatorFactory);
 
 		setHibernateProperties(properties);

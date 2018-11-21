@@ -12,6 +12,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.event.spi.AbstractEvent;
 import org.hibernate.event.spi.PostDeleteEvent;
 import org.hibernate.event.spi.PostInsertEvent;
@@ -76,7 +77,7 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 			return;
 
 		Session session = sessionFactory.getCurrentSession();
-		boolean needFlush = false;
+		Transaction transaction = null;
 		for (AbstractEvent event : events) {
 			try {
 				Object entity;
@@ -187,14 +188,15 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 				record.setEntityToString(payload != null ? payload : entity.toString());
 				record.setAction(action.name());
 				record.setRecordDate(new Date());
+				if (transaction == null)
+					transaction = session.beginTransaction();
 				session.save(record);
-				needFlush = true;
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}
-		if (needFlush)
-			session.flush();
+		if (transaction != null)
+			transaction.commit();
 	}
 
 	@Override
