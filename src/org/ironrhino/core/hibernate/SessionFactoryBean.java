@@ -50,6 +50,7 @@ import org.ironrhino.core.hibernate.type.YearMonthType;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.util.ClassScanner;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
@@ -168,6 +169,17 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate5.Local
 		}
 
 		properties.putAll(getHibernateProperties());
+
+		if (!properties.containsKey(AvailableSettings.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT)) {
+			Object autoCommit = null;
+			BeanWrapperImpl bw = new BeanWrapperImpl(dataSource);
+			if (bw.isReadableProperty("autoCommit"))
+				autoCommit = bw.getPropertyValue("autoCommit");
+			else if (bw.isReadableProperty("defaultAutoCommit"))
+				autoCommit = bw.getPropertyValue("defaultAutoCommit");
+			if (Boolean.FALSE.equals(autoCommit))
+				properties.put(AvailableSettings.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT, String.valueOf(true));
+		}
 
 		DatabaseProduct databaseProduct = null;
 		try (Connection conn = dataSource.getConnection()) {
