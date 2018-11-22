@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.util.ClassUtils;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -64,9 +65,10 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.registerMbeans:false}")
 	private boolean registerMbeans;
 
-	@Bean
-	@Primary
-	public DataSource dataSource() {
+	@Value("${dataSource.lazyConnect:false}")
+	private boolean lazyConnect;
+
+	protected DataSource createDataSource() {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT
 				&& StringUtils.isBlank(AppInfo.getApplicationContextProperties().getProperty("jdbc.url"))) {
 			boolean available = AddressAvailabilityCondition.check(jdbcUrl, 5000);
@@ -99,16 +101,28 @@ public class DataSourceConfiguration {
 		return ds;
 	}
 
-	@Bean
-	@Primary
-	public JdbcTemplate jdbcTemplate() {
-		return new JdbcTemplate(dataSource());
+	@Bean(autowireCandidate = false)
+	@ApplicationContextPropertiesConditional(key = "dataSource.lazyConnect", value = "true")
+	protected DataSource targetDataSource() {
+		return createDataSource();
 	}
 
 	@Bean
 	@Primary
-	public NamedParameterJdbcTemplate namedParameterJdbcTemplate() {
-		return new NamedParameterJdbcTemplate(dataSource());
+	public DataSource dataSource() {
+		return lazyConnect ? new LazyConnectionDataSourceProxy(targetDataSource()) : createDataSource();
+	}
+
+	@Bean
+	@Primary
+	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+		return new JdbcTemplate(dataSource);
+	}
+
+	@Bean
+	@Primary
+	public NamedParameterJdbcTemplate namedParameterJdbcTemplate(DataSource dataSource) {
+		return new NamedParameterJdbcTemplate(dataSource);
 	}
 
 }
